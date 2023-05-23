@@ -21,7 +21,7 @@ using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 
-namespace Api.DownloadArchivedMessages
+namespace Api.ArchivedMessages
 {
     public partial class ArchivedMessageListener
     {
@@ -32,9 +32,9 @@ namespace Api.DownloadArchivedMessages
             _mediator = mediator;
         }
 
-        [Function("ArchivedMessages")]
+        [Function("GetArchivedMessagesDocument")]
         public async Task<HttpResponseData> GetDocumentAsync(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "{id:Guid}/document")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "v1/archived-messages/{id:Guid}/document")]
         HttpRequestData request,
         Guid id,
         FunctionContext executionContext,

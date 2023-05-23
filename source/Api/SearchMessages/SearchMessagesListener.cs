@@ -18,13 +18,8 @@ using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using Api.Common;
-using Application.OutgoingMessages.Peek;
 using Application.SearchMessages;
-using Domain.OutgoingMessages.Peek;
-using Domain.SeedWork;
 using Infrastructure.Configuration.Serialization;
-using Infrastructure.IncomingMessages;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -43,30 +38,9 @@ public class SearchMessagesListener
         _serializer = serializer;
     }
 
-    [Function("messages")]
-    public async Task<HttpResponseData> RunAsync(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get")]
-        HttpRequestData request,
-        FunctionContext executionContext,
-        CancellationToken hostCancellationToken)
-    {
-        ArgumentNullException.ThrowIfNull(request);
-
-        using var cancellationTokenSource =
-            CancellationTokenSource.CreateLinkedTokenSource(
-                hostCancellationToken,
-                request.FunctionContext.CancellationToken);
-
-        var cancellationToken = cancellationTokenSource.Token;
-
-        var result = await _mediator.Send(new GetMessagesQuery(), cancellationToken).ConfigureAwait(false);
-
-        return await SearchResultResponseAsync(request, result, cancellationToken).ConfigureAwait(false);
-    }
-
-    [Function("ArchivedMessages")]
+    [Function("SearchArchivedMessages")]
     public async Task<HttpResponseData> SearchArchivedMessagesAsync(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "v1/search-archived-messages")]
         HttpRequestData request,
         FunctionContext executionContext,
         CancellationToken hostCancellationToken)
