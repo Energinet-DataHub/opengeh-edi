@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.IO;
+using Application.ArchivedMessages;
 using Application.SearchMessages;
 using Domain.ArchivedMessages;
 using MediatR;
@@ -25,5 +27,7 @@ public static class ArchivedMessageConfiguration
     {
         services.AddTransient<IRequestHandler<GetMessagesQuery, MessageSearchResult>, GetMessageQueryHandler>();
         services.AddScoped<IArchivedMessageRepository, ArchivedMessageRepository>();
+
+        services.AddTransient<IRequestHandler<GetArchivedMessageDocumentQuery, Stream?>, GetArchivedMessageDocumentQueryHandler>();
     }
 }
