@@ -23,16 +23,16 @@ using Microsoft.Azure.Functions.Worker.Http;
 
 namespace Api.ArchivedMessages
 {
-    public partial class ArchivedMessageListener
+    public partial class ArchivedMessageGetDocumentListener
     {
         private readonly IMediator _mediator;
 
-        public ArchivedMessageListener(IMediator mediator)
+        public ArchivedMessageGetDocumentListener(IMediator mediator)
         {
             _mediator = mediator;
         }
 
-        [Function("GetArchivedMessagesDocument")]
+        [Function("ArchivedMessages_GetDocument")]
         public async Task<HttpResponseData> GetDocumentAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "v1/archived-messages/{id:Guid}/document")]
         HttpRequestData request,
