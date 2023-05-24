@@ -25,22 +25,22 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using NodaTime;
 
-namespace Api.SearchMessages;
+namespace Api.ArchivedMessages;
 
-public class SearchMessagesListener
+public class ArchivedMessageSearchListener
 {
     private readonly IMediator _mediator;
     private readonly ISerializer _serializer;
 
-    public SearchMessagesListener(IMediator mediator, ISerializer serializer)
+    public ArchivedMessageSearchListener(IMediator mediator, ISerializer serializer)
     {
         _mediator = mediator;
         _serializer = serializer;
     }
 
-    [Function("SearchArchivedMessages")]
+    [Function("ArchivedMessages_Search")]
     public async Task<HttpResponseData> SearchArchivedMessagesAsync(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "v1/search-archived-messages")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "v1/archived-messages/search")]
         HttpRequestData request,
         FunctionContext executionContext,
         CancellationToken hostCancellationToken)
