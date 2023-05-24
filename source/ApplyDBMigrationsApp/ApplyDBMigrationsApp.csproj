@@ -95,6 +95,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202303151605 Remove unused columns for aggregation result forwarding.sql" />
     <EmbeddedResource Include="Scripts\Model\202303171350 Change sender role and receiver role to role names.sql" />
     <EmbeddedResource Include="Scripts\Model\202304130909 Rename MessageType to DocumentType.sql" />
+    <EmbeddedResource Include="Scripts\Model\202322051044 Add Document to ArchivedMessage.sql" />
     <EmbeddedResource Include="Scripts\Model\202316051024 Add Process Type to ArchivedMassage.sql" />
     <EmbeddedResource Include="Scripts\Model\202317051026 Rename Process Type to BusinessReason.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
@@ -105,6 +106,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Seed\202210041540 Remove failed outgoing messages.sql" />
     <EmbeddedResource Include="Scripts\Seed\202301301357 Insert Reasons.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
+    <None Remove="Scripts\Model\202322051044 Add Document to ArchivedMessage.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202227101336 Add ReadyMessages Table.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101336 Add BundledMessages Table.sql" />

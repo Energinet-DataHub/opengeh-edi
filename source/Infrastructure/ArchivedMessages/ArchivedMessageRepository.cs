@@ -12,22 +12,69 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using Application.Configuration.DataAccess;
 using Domain.ArchivedMessages;
 using Infrastructure.Configuration.DataAccess;
+using Microsoft.Data.SqlClient;
 
 namespace Infrastructure.ArchivedMessages;
 
 public class ArchivedMessageRepository : IArchivedMessageRepository
 {
     private readonly B2BContext _dbContext;
+    private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public ArchivedMessageRepository(B2BContext dbContext)
+    public ArchivedMessageRepository(B2BContext dbContext, IDatabaseConnectionFactory connectionFactory)
     {
         _dbContext = dbContext;
+        _connectionFactory = connectionFactory;
     }
 
     public void Add(ArchivedMessage message)
     {
         _dbContext.ArchivedMessages.Add(message);
+    }
+
+    public async Task<Stream?> GetDocumentAsync(Guid id, CancellationToken cancellationToken)
+    {
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
+        using var command = CreateCommand(
+            $"SELECT Document FROM dbo.[ArchivedMessages] WHERE Id = @Id",
+            new List<KeyValuePair<string, object>>
+            {
+                new("@Id", id.ToString()),
+            },
+            connection);
+
+        using var reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+        await reader.ReadAsync(cancellationToken).ConfigureAwait(false);
+        if (reader.HasRows == false)
+        {
+            return null;
+        }
+
+        return reader.GetStream(0);
+    }
+
+    private static SqlCommand CreateCommand(
+        string sqlStatement, List<KeyValuePair<string, object>> parameters, IDbConnection connection)
+    {
+        var command = connection.CreateCommand();
+
+        command.CommandText = sqlStatement;
+
+        foreach (var parameter in parameters)
+        {
+            var sqlParameter = new SqlParameter(parameter.Key, parameter.Value);
+            command.Parameters.Add(sqlParameter);
+        }
+
+        return (SqlCommand)command;
     }
 }
