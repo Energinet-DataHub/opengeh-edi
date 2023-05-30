@@ -1,0 +1,14 @@
+autoactivation on
+HTTP->PeekRequestListener: Request
+PeekRequestListener->CimFormatParser:Parse
+PeekRequestListener->MessagePeeker:Peek
+MessagePeeker->PeekRequestHandler:Mediator Send
+PeekRequestHandler->BundleMessages:Get
+PeekRequestHandler<--BundleMessages:message
+PeekRequestHandler->EnqueuedMessage:GetBy
+PeekRequestHandler<--EnqueuedMessage:message
+PeekRequestHandler->DocumentFactory:CreateBundleMessage
+PeekRequestHandler->ArchivedMessageRepository:Add
+MessagePeeker<--PeekRequestHandler: PeekResult
+PeekRequestListener<--MessagePeeker: PeekResult
+HTTP<--PeekRequestListener: Response
