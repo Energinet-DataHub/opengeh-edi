@@ -53,12 +53,11 @@ namespace CimMessageAdapter.Messages
             var messageHeader = messageParserResult.IncomingMarketDocument?.Header;
             var marketDocument = messageParserResult.IncomingMarketDocument;
 
-            if (InvalidMessageHeader(messageHeader))
+            if (messageHeader is null)
             {
                 return Result.Failure(messageParserResult.Errors.ToArray());
             }
 
-            ArgumentNullException.ThrowIfNull(messageHeader);
             ArgumentNullException.ThrowIfNull(marketDocument);
 
             await AuthorizeSenderAsync(messageHeader).ConfigureAwait(false);
@@ -91,11 +90,6 @@ namespace CimMessageAdapter.Messages
 
             await _messageQueueDispatcher.CommitAsync(cancellationToken).ConfigureAwait(false);
             return Result.Succeeded();
-        }
-
-        private static bool InvalidMessageHeader(MessageHeader? header)
-        {
-            return header is null;
         }
 
         private Task<bool> CheckTransactionIdAsync(string transactionId, CancellationToken cancellationToken)
@@ -132,14 +126,12 @@ namespace CimMessageAdapter.Messages
 
         private async Task AuthorizeSenderAsync(MessageHeader messageHeader)
         {
-            if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
             var result = await _senderAuthorizer.AuthorizeAsync(messageHeader.SenderId, messageHeader.SenderRole).ConfigureAwait(false);
             _errors.AddRange(result.Errors);
         }
 
         private async Task VerifyReceiverAsync(MessageHeader messageHeader)
         {
-            if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
             var receiverVerification = await ReceiverVerification.VerifyAsync(messageHeader.ReceiverId, messageHeader.ReceiverRole).ConfigureAwait(false);
             _errors.AddRange(receiverVerification.Errors);
         }
