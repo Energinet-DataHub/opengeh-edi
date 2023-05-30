@@ -33,6 +33,7 @@ using IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
 using Result = CimMessageAdapter.Messages.Result;
+using SenderAuthorizer = CimMessageAdapter.Messages.RequestChangeOfSupplier.SenderAuthorizer;
 
 namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
 {

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Application.IncomingMessages.RequestAggregatedMeasureData;
 using Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 using Application.IncomingMessages.RequestChangeOfSupplier;
 using CimMessageAdapter.Messages;
@@ -36,6 +37,7 @@ internal static class IncomingMessageParsingServices
         RegisterB2BResponseServices(services);
         RegisterSchemaProviders(services);
         RegisterRequestChangeOfSupplierMessageHandling(services);
+        RegisterRequestAggregatedMeasureDataHandling(services);
         RegisterRequestChangeOfCustomerCharacteristicsMessageHandling(services);
     }
 
@@ -73,5 +75,12 @@ internal static class IncomingMessageParsingServices
         services
             .AddTransient<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>, XmlMessageParser>();
         services.AddTransient<MessageParser>();
+    }
+
+    private static void RegisterRequestAggregatedMeasureDataHandling(IServiceCollection services)
+    {
+        services
+            .AddTransient<IMessageParser<Series, RequestAggregatedMeasureDataTransaction>, Infrastructure.IncomingMessages.RequestAggregatedMeasureData.XmlMessageParser>();
+        services.AddTransient<CimMessageAdapter.Messages.RequestAggregatedMeasureData.MessageParser>();
     }
 }

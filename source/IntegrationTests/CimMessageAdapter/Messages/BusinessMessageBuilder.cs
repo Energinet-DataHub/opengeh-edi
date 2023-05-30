@@ -33,6 +33,11 @@ namespace IntegrationTests.CimMessageAdapter.Messages
             return new BusinessMessageBuilder(pathToXmlFile, "urn:ediel.org:structure:requestchangeofsupplier:0:1");
         }
 
+        public static BusinessMessageBuilder RequestAggregatedMeasureData(string pathToXmlFile = "CimMessageAdapter//Messages//Xml//RequestAggregatedMeasureData.xml")
+        {
+            return new BusinessMessageBuilder(pathToXmlFile, "urn:ediel.org:measure:requestaggregatedmeasuredata:0:1");
+        }
+
         public static BusinessMessageBuilder RequestChangeCustomerCharacteristics(string pathToXmlFile = "CimMessageAdapter//Messages//Xml//RequestChangeCustomerCharacteristics.xml")
         {
             return new BusinessMessageBuilder(pathToXmlFile, "urn:ediel.org:structure:requestchangecustomercharacteristics:0:1");

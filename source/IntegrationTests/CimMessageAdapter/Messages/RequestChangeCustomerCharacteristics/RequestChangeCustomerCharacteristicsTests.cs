@@ -34,6 +34,7 @@ using Xunit;
 using Xunit.Categories;
 using MessageParser = CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.MessageParser;
 using Result = CimMessageAdapter.Messages.Result;
+using SenderAuthorizer = CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.SenderAuthorizer;
 
 namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 
