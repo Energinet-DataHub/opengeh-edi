@@ -140,7 +140,7 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
         }
 
         return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(
-            new RequestAggregatedMeasureDataIncomingMarketDocument(messageHeader, new List<Serie>()));
+            new RequestAggregatedMeasureDataIncomingMarketDocument(messageHeader, series));
     }
 
     private static async IAsyncEnumerable<Serie> ParseSerieAsync(XmlReader reader, RootElement rootElement)

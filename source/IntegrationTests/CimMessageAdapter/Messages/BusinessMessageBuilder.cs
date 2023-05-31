@@ -85,6 +85,17 @@ namespace IntegrationTests.CimMessageAdapter.Messages
             return this;
         }
 
+        public BusinessMessageBuilder DuplicateSeriesRecords()
+        {
+            // TODO: Consider merging DuplicateMarketActivityRecords and DuplicateSeriesRecords
+            var root = _document.Root;
+            var seriesElement = root!
+                .Element(_xmlNamespace + "Series");
+
+            root.Add(seriesElement);
+            return this;
+        }
+
         public BusinessMessageBuilder WithEnergySupplierId(string energySupplierId)
         {
             SetElementFromMarketActivityRecordValue("marketEvaluationPoint.energySupplier_MarketParticipant.mRID", energySupplierId);
