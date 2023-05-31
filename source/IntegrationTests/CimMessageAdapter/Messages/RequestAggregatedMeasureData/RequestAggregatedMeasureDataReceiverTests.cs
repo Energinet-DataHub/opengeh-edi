@@ -58,7 +58,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         //TODO: triggers MessageReceiver for this request. Which is responsible for validating and forwarding the request to 3th part systems. Consider splitting the responsibilities into 2 (MessageValidator and "MessageDispatcher").
         //TODO: RequestAggregatedMeasureDataReceiver should come from the IOC
-        var result = await ReceiveRequestChangeOfSupplierMessage(messageParserResult).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
 
         Assert.Contains(result.Errors, error => error is UnknownReceiver);
     }
@@ -73,15 +73,38 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .Message();
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
-        var result = await ReceiveRequestChangeOfSupplierMessage(messageParserResult).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
 
         Assert.Contains(result.Errors, error => error is not UnknownReceiver);
     }
 
-    private async Task<Result> ReceiveRequestChangeOfSupplierMessage(MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> message)
+    [Fact]
+    public async Task Receiver_role_must_be_metering_point_administrator()
     {
-        return await CreateMessageReceiver()
-            .ReceiveAsync(message, CancellationToken.None);
+        await using var message = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .WithReceiverRole("DDZ")
+            .Message();
+
+        var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
+
+        Assert.Contains(result.Errors, error => error is not InvalidReceiverRole);
+    }
+
+    [Fact]
+    public async Task Receiver_role_must_be_known()
+    {
+        var invalidReceiverRole = "DDD";
+        await using var message = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .WithReceiverRole(invalidReceiverRole)
+            .Message();
+
+        var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
+
+        Assert.Contains(result.Errors, error => error is InvalidReceiverRole);
     }
 
     private MessageReceiver<global::CimMessageAdapter.Messages.Queues.RequestAggregatedMeasureDataTransaction> CreateMessageReceiver()
