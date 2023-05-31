@@ -1,13 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Actors;
 using Application.Configuration.Authentication;
 using Application.IncomingMessages.RequestAggregatedMeasureData;
 using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestAggregatedMeasureData;
+using Domain.Actors;
 using Domain.Documents;
+using Infrastructure.Configuration.Authentication;
 using IntegrationTests.CimMessageAdapter.Stubs;
 using IntegrationTests.Fixtures;
 using Xunit;
@@ -32,9 +37,16 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         _marketActorAuthenticator = GetService<IMarketActorAuthenticator>();
     }
 
-    public Task InitializeAsync()
+    public async Task InitializeAsync()
     {
-        return Task.CompletedTask;
+        await InvokeCommandAsync(new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.SenderId)).ConfigureAwait(false);
+        var claims = new List<Claim>()
+        {
+            new(ClaimsMap.UserId, new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.SenderId).B2CId),
+            ClaimsMap.RoleFrom(MarketRole.EnergySupplier),
+        };
+
+        await _marketActorAuthenticator.AuthenticateAsync(new ClaimsPrincipal(new ClaimsIdentity(claims)), CancellationToken.None).ConfigureAwait(false);
     }
 
     public Task DisposeAsync()
@@ -75,7 +87,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
 
-        Assert.Contains(result.Errors, error => error is not UnknownReceiver);
+        Assert.DoesNotContain(result.Errors, error => error is UnknownReceiver);
     }
 
     [Fact]
@@ -89,7 +101,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
 
-        Assert.Contains(result.Errors, error => error is not InvalidReceiverRole);
+        Assert.DoesNotContain(result.Errors, error => error is InvalidReceiverRole);
     }
 
     [Fact]
@@ -105,6 +117,20 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
 
         Assert.Contains(result.Errors, error => error is InvalidReceiverRole);
+    }
+
+    [Fact]
+    public async Task Sender_id_must_match_the_organization_of_the_current_authenticated_user()
+    {
+        await using var message = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .WithSenderId(SampleData.SenderId)
+            .Message();
+
+        var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
+
+        Assert.DoesNotContain(result.Errors, error => error is SenderIdDoesNotMatchAuthenticatedUser);
     }
 
     private MessageReceiver<global::CimMessageAdapter.Messages.Queues.RequestAggregatedMeasureDataTransaction> CreateMessageReceiver()
