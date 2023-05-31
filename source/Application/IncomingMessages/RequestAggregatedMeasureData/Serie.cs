@@ -1,4 +1,4 @@
 ﻿namespace Application.IncomingMessages.RequestAggregatedMeasureData;
 
-public record Series(
+public record Serie(
     string Id) : IMarketActivityRecord;

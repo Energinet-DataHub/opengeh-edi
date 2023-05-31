@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.Authentication;
 using Application.IncomingMessages.RequestAggregatedMeasureData;
+using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using Domain.Documents;
@@ -42,11 +43,13 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     }
 
     [Fact]
-    public async Task Receiver_id_must_be_known()
+    public async Task Receiver_id_must_be_unknown()
     {
         var unknownReceiverId = "5790001330550";
+        var knownReceiverRole = "DDZ";
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
+            .WithReceiverRole(knownReceiverRole)
             .WithReceiverId(unknownReceiverId)
             .Message();
 
@@ -57,15 +60,25 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         //TODO: RequestAggregatedMeasureDataReceiver should come from the IOC
         var result = await ReceiveRequestChangeOfSupplierMessage(messageParserResult).ConfigureAwait(false);
 
-        AssertContainsError(result, "B2B-008");
+        Assert.Contains(result.Errors, error => error is UnknownReceiver);
     }
 
-    private static void AssertContainsError(Result result, string errorCode)
+    [Fact]
+    public async Task Receiver_id_must_be_Datahub()
     {
-        Assert.Contains(result.Errors, error => error.Code.Equals(errorCode, StringComparison.OrdinalIgnoreCase));
+        var dataHubReceiverId = "5790001330552";
+        await using var message = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .WithReceiverId(dataHubReceiverId)
+            .Message();
+
+        var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
+        var result = await ReceiveRequestChangeOfSupplierMessage(messageParserResult).ConfigureAwait(false);
+
+        Assert.Contains(result.Errors, error => error is not UnknownReceiver);
     }
 
-    private async Task<Result> ReceiveRequestChangeOfSupplierMessage(MessageParserResult<Series, RequestAggregatedMeasureDataTransaction> message)
+    private async Task<Result> ReceiveRequestChangeOfSupplierMessage(MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> message)
     {
         return await CreateMessageReceiver()
             .ReceiveAsync(message, CancellationToken.None);
@@ -82,7 +95,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         return messageReceiver;
     }
 
-    private Task<MessageParserResult<Series, RequestAggregatedMeasureDataTransaction>> ParseMessageAsync(Stream message)
+    private Task<MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>> ParseMessageAsync(Stream message)
     {
         return _messageParser.ParseAsync(message, DocumentFormat.Xml, CancellationToken.None);
     }

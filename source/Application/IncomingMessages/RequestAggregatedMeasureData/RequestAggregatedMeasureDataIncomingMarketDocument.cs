@@ -17,9 +17,9 @@ using System.Collections.ObjectModel;
 
 namespace Application.IncomingMessages.RequestAggregatedMeasureData;
 
-public class RequestAggregatedMeasureDataIncomingMarketDocument : IIncomingMarketDocument<Series, RequestAggregatedMeasureDataTransaction>
+public class RequestAggregatedMeasureDataIncomingMarketDocument : IIncomingMarketDocument<Serie, RequestAggregatedMeasureDataTransaction>
 {
-    public RequestAggregatedMeasureDataIncomingMarketDocument(MessageHeader header, IReadOnlyCollection<Series> series)
+    public RequestAggregatedMeasureDataIncomingMarketDocument(MessageHeader header, IReadOnlyCollection<Serie> series)
     {
         Header = header;
         MarketActivityRecords = series;
@@ -27,7 +27,7 @@ public class RequestAggregatedMeasureDataIncomingMarketDocument : IIncomingMarke
 
     public MessageHeader Header { get; }
 
-    public IReadOnlyCollection<Series> MarketActivityRecords { get; }
+    public IReadOnlyCollection<Serie> MarketActivityRecords { get; }
 
     public ReadOnlyCollection<RequestAggregatedMeasureDataTransaction> ToTransactions()
     {

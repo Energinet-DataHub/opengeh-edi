@@ -80,7 +80,7 @@ internal static class IncomingMessageParsingServices
     private static void RegisterRequestAggregatedMeasureDataHandling(IServiceCollection services)
     {
         services
-            .AddTransient<IMessageParser<Series, RequestAggregatedMeasureDataTransaction>, Infrastructure.IncomingMessages.RequestAggregatedMeasureData.XmlMessageParser>();
+            .AddTransient<IMessageParser<Serie, RequestAggregatedMeasureDataTransaction>, Infrastructure.IncomingMessages.RequestAggregatedMeasureData.XmlMessageParser>();
         services.AddTransient<CimMessageAdapter.Messages.RequestAggregatedMeasureData.MessageParser>();
     }
 }

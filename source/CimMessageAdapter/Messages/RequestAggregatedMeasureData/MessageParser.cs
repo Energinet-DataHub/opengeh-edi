@@ -25,14 +25,14 @@ namespace CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
 public class MessageParser
 {
-    private readonly IEnumerable<IMessageParser<Series, RequestAggregatedMeasureDataTransaction>> _parsers;
+    private readonly IEnumerable<IMessageParser<Serie, RequestAggregatedMeasureDataTransaction>> _parsers;
 
-    public MessageParser(IEnumerable<IMessageParser<Series, RequestAggregatedMeasureDataTransaction>> parsers)
+    public MessageParser(IEnumerable<IMessageParser<Serie, RequestAggregatedMeasureDataTransaction>> parsers)
     {
         _parsers = parsers;
     }
 
-    public Task<MessageParserResult<Series, RequestAggregatedMeasureDataTransaction>> ParseAsync(
+    public Task<MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>> ParseAsync(
         Stream message, DocumentFormat documentFormat, CancellationToken cancellationToken)
     {
         var parser = _parsers.FirstOrDefault(parser => parser.HandledFormat.Equals(documentFormat));
