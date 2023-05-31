@@ -61,6 +61,12 @@ namespace IntegrationTests.CimMessageAdapter.Messages
             return this;
         }
 
+        public BusinessMessageBuilder WithMessageId(string messageId)
+        {
+            SetRootChildElementValue("mRID", messageId);
+            return this;
+        }
+
         public BusinessMessageBuilder WithSenderId(string senderId)
         {
             SetRootChildElementValue("sender_MarketParticipant.mRID", senderId);

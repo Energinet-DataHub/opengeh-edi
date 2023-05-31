@@ -18,5 +18,9 @@ internal static class SampleData
 {
     internal static string SenderId => "1234567890123";
 
+    internal static string SecondSenderId => "1234567890124";
+
     internal static string StsAssignedUserId => "267DAC56-8CDC-43F8-BE16-91A297F37DE6";
+
+    internal static string SecondStsAssignedUserId => "267DAC56-8CDC-43F8-BE16-91A297F37DE7";
 }

@@ -45,6 +45,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     public async Task InitializeAsync()
     {
         await InvokeCommandAsync(new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.SenderId)).ConfigureAwait(false);
+        await InvokeCommandAsync(new CreateActor(Guid.NewGuid().ToString(), SampleData.SecondStsAssignedUserId, SampleData.SecondSenderId)).ConfigureAwait(false);
         //TODO: Consider removing authentication from validation (message receiver).
         await _marketActorAuthenticator.AuthenticateAsync(new ClaimsPrincipal(new ClaimsIdentity(_claims)), CancellationToken.None).ConfigureAwait(false);
     }
@@ -187,9 +188,59 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         Assert.Contains(result.Errors, error => error is DuplicateTransactionIdDetected);
     }
 
+    [Fact]
+    public async Task Series_must_have_none_unique_transaction_ids_across_senders()
+    {
+        var knownReceiverId = "5790001330552";
+        var knownReceiverRole = "DDZ";
+        await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
+            .ConfigureAwait(false);
+        await using var message = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .WithReceiverRole(knownReceiverRole)
+            .WithReceiverId(knownReceiverId)
+            .WithSenderRole(MarketRole.EnergySupplier.Code)
+            .WithSenderId(SampleData.SenderId)
+            .Message();
+        var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
+        var resultFromFirstMessage = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
+
+        // Request from a second sender.
+        await using var message02 = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .WithReceiverRole(knownReceiverRole)
+            .WithReceiverId(knownReceiverId)
+            .WithMessageId("123564755")
+            .WithSenderRole(MarketRole.EnergySupplier.Code)
+            .WithSenderId(SampleData.SecondSenderId)
+            .Message();
+
+        await CreateSecondIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier }, SampleData.SecondSenderId, SampleData.SecondStsAssignedUserId)
+            .ConfigureAwait(false);
+        var messageParserResult2 = await ParseMessageAsync(message02).ConfigureAwait(false);
+        var resultFromSecondMessage = await CreateMessageReceiver().ReceiveAsync(messageParserResult2, CancellationToken.None).ConfigureAwait(false);
+
+        Assert.DoesNotContain(resultFromFirstMessage.Errors, error => error is DuplicateTransactionIdDetected);
+        Assert.DoesNotContain(resultFromSecondMessage.Errors, error => error is DuplicateTransactionIdDetected);
+    }
+
     private async Task CreateIdentityWithRoles(IEnumerable<MarketRole> roles)
     {
         var claims = new List<Claim>(_claims);
+        claims.AddRange(roles.Select(ClaimsMap.RoleFrom));
+        await _marketActorAuthenticator
+            .AuthenticateAsync(new ClaimsPrincipal(new ClaimsIdentity(claims)), CancellationToken.None)
+            .ConfigureAwait(false);
+    }
+
+    private async Task CreateSecondIdentityWithRoles(IEnumerable<MarketRole> roles, string senderId, string b2cId)
+    {
+        List<Claim> claims = new()
+        {
+            new(
+                ClaimsMap.UserId,
+                new CreateActor(Guid.NewGuid().ToString(), b2cId, senderId).B2CId),
+        };
         claims.AddRange(roles.Select(ClaimsMap.RoleFrom));
         await _marketActorAuthenticator
             .AuthenticateAsync(new ClaimsPrincipal(new ClaimsIdentity(claims)), CancellationToken.None)

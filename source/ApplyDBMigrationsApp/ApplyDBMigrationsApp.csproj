@@ -98,6 +98,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202322051044 Add Document to ArchivedMessage.sql" />
     <EmbeddedResource Include="Scripts\Model\202316051024 Add Process Type to ArchivedMassage.sql" />
     <EmbeddedResource Include="Scripts\Model\202317051026 Rename Process Type to BusinessReason.sql" />
+    <EmbeddedResource Include="Scripts\Model\202331051442 Recreate TransactionIds as TransactionRegistry.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241101 Consolidated BtwoB model.sql" />

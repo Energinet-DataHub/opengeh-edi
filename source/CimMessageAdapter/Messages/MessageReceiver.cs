@@ -80,7 +80,7 @@ namespace CimMessageAdapter.Messages
                     return Result.Failure(new EmptyTransactionId(transaction.MarketActivityRecord.Id));
                 }
 
-                if (await CheckTransactionIdAsync(transaction.MarketActivityRecord.Id, cancellationToken).ConfigureAwait(false) == false)
+                if (await CheckTransactionIdAsync(messageHeader.SenderId, transaction.MarketActivityRecord.Id, cancellationToken).ConfigureAwait(false) == false)
                 {
                     return Result.Failure(new DuplicateTransactionIdDetected(transaction.MarketActivityRecord.Id));
                 }
@@ -92,10 +92,10 @@ namespace CimMessageAdapter.Messages
             return Result.Succeeded();
         }
 
-        private Task<bool> CheckTransactionIdAsync(string transactionId, CancellationToken cancellationToken)
+        private Task<bool> CheckTransactionIdAsync(string senderId, string transactionId, CancellationToken cancellationToken)
         {
             if (transactionId == null) throw new ArgumentNullException(nameof(transactionId));
-            return _transactionIds.TryStoreAsync(transactionId, cancellationToken);
+            return _transactionIds.TryStoreAsync(senderId, transactionId, cancellationToken);
         }
 
         private Task AddToTransactionQueueAsync(IMarketTransaction transaction, CancellationToken cancellationToken)
