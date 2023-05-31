@@ -50,7 +50,12 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .WithReceiverId(unknownReceiverId)
             .Message();
 
-        var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
+        //TODO: MessageParser should return an object representing the request document. consider RequestAggregatedMeasureDataIncomingMarketDocument
+        var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
+
+        //TODO: triggers MessageReceiver for this request. Which is responsible for validating and forwarding the request to 3th part systems. Consider splitting the responsibilities into 2 (MessageValidator and "MessageDispatcher").
+        //TODO: RequestAggregatedMeasureDataReceiver should come from the IOC
+        var result = await ReceiveRequestChangeOfSupplierMessage(messageParserResult).ConfigureAwait(false);
 
         AssertContainsError(result, "B2B-008");
     }
@@ -60,10 +65,10 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         Assert.Contains(result.Errors, error => error.Code.Equals(errorCode, StringComparison.OrdinalIgnoreCase));
     }
 
-    private async Task<Result> ReceiveRequestChangeOfSupplierMessage(Stream message)
+    private async Task<Result> ReceiveRequestChangeOfSupplierMessage(MessageParserResult<Series, RequestAggregatedMeasureDataTransaction> message)
     {
         return await CreateMessageReceiver()
-            .ReceiveAsync(await ParseMessageAsync(message).ConfigureAwait(false), CancellationToken.None);
+            .ReceiveAsync(message, CancellationToken.None);
     }
 
     private MessageReceiver<global::CimMessageAdapter.Messages.Queues.RequestAggregatedMeasureDataTransaction> CreateMessageReceiver()
