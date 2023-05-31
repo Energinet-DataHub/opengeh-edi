@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,6 +28,10 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     private readonly IMarketActorAuthenticator _marketActorAuthenticator;
     private readonly ITransactionIds _transactionIds;
     private readonly IMessageIds _messageIds;
+    private readonly List<Claim> _claims = new()
+    {
+        new(ClaimsMap.UserId, new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.SenderId).B2CId),
+    };
 
     public RequestAggregatedMeasureDataReceiverTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
@@ -40,13 +45,8 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     public async Task InitializeAsync()
     {
         await InvokeCommandAsync(new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.SenderId)).ConfigureAwait(false);
-        var claims = new List<Claim>()
-        {
-            new(ClaimsMap.UserId, new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.SenderId).B2CId),
-            ClaimsMap.RoleFrom(MarketRole.EnergySupplier),
-        };
-
-        await _marketActorAuthenticator.AuthenticateAsync(new ClaimsPrincipal(new ClaimsIdentity(claims)), CancellationToken.None).ConfigureAwait(false);
+        //TODO: Consider removing authentication from validation (message receiver).
+        await _marketActorAuthenticator.AuthenticateAsync(new ClaimsPrincipal(new ClaimsIdentity(_claims)), CancellationToken.None).ConfigureAwait(false);
     }
 
     public Task DisposeAsync()
@@ -122,6 +122,8 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     [Fact]
     public async Task Sender_id_must_match_the_organization_of_the_current_authenticated_user()
     {
+        await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
+            .ConfigureAwait(false);
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
             .WithSenderId(SampleData.SenderId)
@@ -131,6 +133,45 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
 
         Assert.DoesNotContain(result.Errors, error => error is SenderIdDoesNotMatchAuthenticatedUser);
+    }
+
+    [Fact]
+    public async Task Sender_id_does_not_match_the_current_authenticated_user()
+    {
+        await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
+            .ConfigureAwait(false);
+        var invalidSenderId = "5790001330550";
+        await using var message = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .WithSenderId(invalidSenderId)
+            .Message();
+
+        var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
+
+        Assert.Contains(result.Errors, error => error is SenderIdDoesNotMatchAuthenticatedUser);
+    }
+
+    [Fact]
+    public async Task Authenticated_user_must_hold_the_role_type_as_specified_in_message()
+    {
+        await using var message = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .Message();
+
+        var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
+
+        Assert.Contains(result.Errors, error => error is AuthenticatedUserDoesNotHoldRequiredRoleType);
+    }
+
+    private async Task CreateIdentityWithRoles(IEnumerable<MarketRole> roles)
+    {
+        var claims = new List<Claim>(_claims);
+        claims.AddRange(roles.Select(ClaimsMap.RoleFrom));
+        await _marketActorAuthenticator
+            .AuthenticateAsync(new ClaimsPrincipal(new ClaimsIdentity(claims)), CancellationToken.None)
+            .ConfigureAwait(false);
     }
 
     private MessageReceiver<global::CimMessageAdapter.Messages.Queues.RequestAggregatedMeasureDataTransaction> CreateMessageReceiver()
