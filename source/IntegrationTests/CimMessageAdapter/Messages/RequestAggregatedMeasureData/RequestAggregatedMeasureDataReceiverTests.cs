@@ -246,6 +246,92 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         Assert.Contains(result.Errors, error => error is EmptyTransactionId);
     }
 
+    [Fact]
+    public async Task Message_id_must_not_be_empty()
+    {
+        await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
+            .ConfigureAwait(false);
+        await using var message = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .WithMessageId(string.Empty)
+            .Message();
+
+        var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
+
+        Assert.Contains(result.Errors, error => error is EmptyMessageId);
+    }
+
+    [Fact]
+    public async Task Message_ids_must_be_unique()
+    {
+        await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
+            .ConfigureAwait(false);
+        await using var message01 = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .Message();
+        await using var message02 = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .WithSenderId(SampleData.SecondSenderId)
+            .Message();
+
+        var messageParserResult01 = await ParseMessageAsync(message01).ConfigureAwait(false);
+        var result01 = await CreateMessageReceiver().ReceiveAsync(messageParserResult01, CancellationToken.None).ConfigureAwait(false);
+
+        await CreateSecondIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier }, SampleData.SecondSenderId, SampleData.SecondStsAssignedUserId)
+            .ConfigureAwait(false);
+        var messageParserResult02 = await ParseMessageAsync(message02).ConfigureAwait(false);
+        var result02 = await CreateMessageReceiver().ReceiveAsync(messageParserResult02, CancellationToken.None).ConfigureAwait(false);
+
+        Assert.DoesNotContain(result01.Errors, error => error is DuplicateMessageIdDetected);
+        Assert.DoesNotContain(result02.Errors, error => error is DuplicateMessageIdDetected);
+    }
+
+    [Fact]
+    public async Task Message_ids_must_not_be_unique_across_senders()
+    {
+        await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
+            .ConfigureAwait(false);
+        await using var message01 = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .Message();
+        await using var message02 = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+
+            .Message();
+
+        var messageParserResult01 = await ParseMessageAsync(message01).ConfigureAwait(false);
+        var result01 = await CreateMessageReceiver().ReceiveAsync(messageParserResult01, CancellationToken.None).ConfigureAwait(false);
+
+        var messageParserResult02 = await ParseMessageAsync(message01).ConfigureAwait(false);
+        var result02 = await CreateMessageReceiver().ReceiveAsync(messageParserResult02, CancellationToken.None).ConfigureAwait(false);
+
+        Assert.DoesNotContain(result01.Errors, error => error is DuplicateMessageIdDetected);
+        Assert.Contains(result02.Errors, error => error is DuplicateMessageIdDetected);
+    }
+
+    [Fact]
+    public async Task Series_must_have_unique_message_ids()
+    {
+        await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
+            .ConfigureAwait(false);
+        await using var message01 = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .Message();
+        await using var message02 = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .Message();
+
+        var messageParserResult01 = await ParseMessageAsync(message01).ConfigureAwait(false);
+        var result01 = await CreateMessageReceiver().ReceiveAsync(messageParserResult01, CancellationToken.None).ConfigureAwait(false);
+
+        var messageParserResult02 = await ParseMessageAsync(message01).ConfigureAwait(false);
+        var result02 = await CreateMessageReceiver().ReceiveAsync(messageParserResult02, CancellationToken.None).ConfigureAwait(false);
+
+        Assert.DoesNotContain(result01.Errors, error => error is DuplicateMessageIdDetected);
+        Assert.Contains(result02.Errors, error => error is DuplicateMessageIdDetected);
+    }
+
     private async Task CreateIdentityWithRoles(IEnumerable<MarketRole> roles)
     {
         var claims = new List<Claim>(_claims);

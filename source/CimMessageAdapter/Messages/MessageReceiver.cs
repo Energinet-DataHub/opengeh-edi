@@ -67,7 +67,7 @@ namespace CimMessageAdapter.Messages
                 return Result.Failure(_errors.ToArray());
             }
 
-            await CheckMessageIdAsync(messageHeader.MessageId, cancellationToken).ConfigureAwait(false);
+            await CheckMessageIdAsync(messageHeader.SenderId, messageHeader.MessageId, cancellationToken).ConfigureAwait(false);
             if (_errors.Count > 0)
             {
                 return Result.Failure(_errors.ToArray());
@@ -115,10 +115,10 @@ namespace CimMessageAdapter.Messages
             return false;
         }
 
-        private async Task CheckMessageIdAsync(string messageId, CancellationToken cancellationToken)
+        private async Task CheckMessageIdAsync(string senderId, string messageId, CancellationToken cancellationToken)
         {
             if (messageId == null) throw new ArgumentNullException(nameof(messageId));
-            if (await _messageIds.TryStoreAsync(messageId, cancellationToken).ConfigureAwait(false) == false)
+            if (await _messageIds.TryStoreAsync(senderId, messageId, cancellationToken).ConfigureAwait(false) == false)
             {
                 _errors.Add(new DuplicateMessageIdDetected(messageId));
             }

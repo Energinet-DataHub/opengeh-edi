@@ -87,6 +87,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202227101352 Add actor provided id.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101354 Add period start and end.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101355 Add received integration events.sql" />
+    <EmbeddedResource Include="Scripts\Model\202306010815 Recreate MessageIds as MessageRegistry.sql" />
     <EmbeddedResource Include="Scripts\Model\202301301240 Delete unused tables in dbo schema.sql" />
     <EmbeddedResource Include="Scripts\Model\202301301336 Move tables to dbo schema.sql" />
     <EmbeddedResource Include="Scripts\Model\202302011542 Remove period start and end.sql" />
@@ -95,10 +96,10 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202303151605 Remove unused columns for aggregation result forwarding.sql" />
     <EmbeddedResource Include="Scripts\Model\202303171350 Change sender role and receiver role to role names.sql" />
     <EmbeddedResource Include="Scripts\Model\202304130909 Rename MessageType to DocumentType.sql" />
-    <EmbeddedResource Include="Scripts\Model\202322051044 Add Document to ArchivedMessage.sql" />
-    <EmbeddedResource Include="Scripts\Model\202316051024 Add Process Type to ArchivedMassage.sql" />
-    <EmbeddedResource Include="Scripts\Model\202317051026 Rename Process Type to BusinessReason.sql" />
-    <EmbeddedResource Include="Scripts\Model\202331051442 Recreate TransactionIds as TransactionRegistry.sql" />
+    <EmbeddedResource Include="Scripts\Model\202305161024 Add Process Type to ArchivedMassage.sql" />
+    <EmbeddedResource Include="Scripts\Model\202305171026 Rename Process Type to BusinessReason.sql" />
+    <EmbeddedResource Include="Scripts\Model\202305311442 Recreate TransactionIds as TransactionRegistry.sql" />
+    <EmbeddedResource Include="Scripts\Model\202305221044 Add Document to ArchivedMessage.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241101 Consolidated BtwoB model.sql" />
