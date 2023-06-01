@@ -42,6 +42,14 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         _marketActorAuthenticator = GetService<IMarketActorAuthenticator>();
     }
 
+    public static IEnumerable<object[]> AllowedActorRoles =>
+        new List<object[]>
+        {
+            new object[] { MarketRole.EnergySupplier.Code },
+            new object[] { MarketRole.GridOperator.Code },
+            new object[] { MarketRole.BalanceResponsible.Code },
+        };
+
     public async Task InitializeAsync()
     {
         await InvokeCommandAsync(new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.SenderId)).ConfigureAwait(false);
@@ -202,6 +210,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .WithSenderRole(MarketRole.EnergySupplier.Code)
             .WithSenderId(SampleData.SenderId)
             .Message();
+
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var resultFromFirstMessage = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
 
@@ -330,6 +339,21 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         Assert.DoesNotContain(result01.Errors, error => error is DuplicateMessageIdDetected);
         Assert.Contains(result02.Errors, error => error is DuplicateMessageIdDetected);
+    }
+
+    [Theory]
+    [MemberData(nameof(AllowedActorRoles))]
+    public async Task Sender_role_type_must_be_the_role_of(string role)
+    {
+        await using var message = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .WithSenderRole(role)
+            .Message();
+
+        var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
+
+        Assert.DoesNotContain(result.Errors, error => error is SenderRoleTypeIsNotAuthorized);
     }
 
     private async Task CreateIdentityWithRoles(IEnumerable<MarketRole> roles)

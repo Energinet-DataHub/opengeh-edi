@@ -19,7 +19,7 @@ using Application.Configuration.Authentication;
 using CimMessageAdapter.Errors;
 using Domain.Actors;
 
-namespace CimMessageAdapter.Messages
+namespace CimMessageAdapter.Messages.RequestAggregatedMeasureData
 {
     public class SenderAuthorizer : ISenderAuthorizer
     {
@@ -52,7 +52,9 @@ namespace CimMessageAdapter.Messages
 
         private void EnsureSenderRole(string senderRole)
         {
-            if (senderRole.Equals(MarketRole.EnergySupplier.Code, StringComparison.OrdinalIgnoreCase) == false)
+            if (!senderRole.Equals(MarketRole.EnergySupplier.Code, StringComparison.OrdinalIgnoreCase)
+                && !senderRole.Equals(MarketRole.GridOperator.Code, StringComparison.OrdinalIgnoreCase)
+                && !senderRole.Equals(MarketRole.BalanceResponsible.Code, StringComparison.OrdinalIgnoreCase))
             {
                 _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
             }
