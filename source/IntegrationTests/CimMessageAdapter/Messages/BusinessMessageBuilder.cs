@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.IO;
 using System.Xml.Linq;
 
@@ -70,6 +71,23 @@ namespace IntegrationTests.CimMessageAdapter.Messages
         public BusinessMessageBuilder WithSenderId(string senderId)
         {
             SetRootChildElementValue("sender_MarketParticipant.mRID", senderId);
+            return this;
+        }
+
+        public BusinessMessageBuilder WithSeriesTransactionId(string transactionId)
+        {
+            var root = _document.Root;
+            var seriesElement = root!
+                .Element(_xmlNamespace + "Series");
+
+            foreach (var serieElement in seriesElement!.Elements())
+            {
+                if (serieElement.Name.LocalName!.Equals("mRID", StringComparison.Ordinal))
+                {
+                    serieElement!.Value = transactionId;
+                }
+            }
+
             return this;
         }
 
