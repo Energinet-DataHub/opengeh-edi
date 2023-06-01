@@ -131,7 +131,8 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
     {
         var root = await reader.ReadRootElementAsync().ConfigureAwait(false);
         var messageHeader = await MessageHeaderExtractor
-            .ExtractAsync(reader, root, HeaderElementName, SeriesRecordElementName, cancellationToken).ConfigureAwait(false);
+            .ExtractAsync(reader, root, HeaderElementName, SeriesRecordElementName, cancellationToken)
+            .ConfigureAwait(false);
 
         var series = new List<Serie>();
         await foreach (var serie in ParseSerieAsync(reader, root))
@@ -146,13 +147,15 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
     private static async IAsyncEnumerable<Serie> ParseSerieAsync(XmlReader reader, RootElement rootElement)
     {
         var id = string.Empty;
-        var marketEvaluationPointId = string.Empty;
-        var energySupplierId = string.Empty;
-        var balanceResponsibleId = string.Empty;
-        var consumerId = string.Empty;
-        var consumerIdType = string.Empty;
-        var consumerName = string.Empty;
-        var effectiveDate = string.Empty;
+        var settlementSeriesVersion = string.Empty;
+        var marketEvaluationPointType = string.Empty;
+        var marketEvaluationSettlementMethod = string.Empty;
+        var startDateAndOrTimeDateTime = string.Empty;
+        var endDateAndOrTimeDateTime = string.Empty;
+        var meteringGridAreaDomainId = string.Empty;
+        var biddingZoneDomainId = string.Empty;
+        var energySupplierMarketParticipantId = string.Empty;
+        var balanceResponsiblePartyMarketParticipantId = string.Empty;
         var ns = rootElement.DefaultNamespace;
 
         await reader.AdvanceToAsync(SeriesRecordElementName, ns).ConfigureAwait(false);
@@ -162,7 +165,16 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
             if (reader.Is(SeriesRecordElementName, ns, XmlNodeType.EndElement))
             {
                 var record = CreateSerie(
-                    ref id);
+                    ref id,
+                    ref settlementSeriesVersion,
+                    ref marketEvaluationPointType,
+                    ref marketEvaluationSettlementMethod,
+                    ref startDateAndOrTimeDateTime,
+                    ref endDateAndOrTimeDateTime,
+                    ref meteringGridAreaDomainId,
+                    ref biddingZoneDomainId,
+                    ref energySupplierMarketParticipantId,
+                    ref balanceResponsiblePartyMarketParticipantId);
                 yield return record;
             }
 
@@ -173,32 +185,42 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
             {
                 id = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
-
-            // else if (reader.Is("marketEvaluationPoint.mRID", ns))
-            // {
-            //     marketEvaluationPointId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            // }
-            // else if (reader.Is("marketEvaluationPoint.energySupplier_MarketParticipant.mRID", ns))
-            // {
-            //     energySupplierId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            // }
-            // else if (reader.Is("marketEvaluationPoint.balanceResponsibleParty_MarketParticipant.mRID", ns))
-            // {
-            //     balanceResponsibleId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            // }
-            // else if (reader.Is("marketEvaluationPoint.customer_MarketParticipant.mRID", ns))
-            // {
-            //     consumerIdType = reader.GetAttribute("codingScheme") ?? string.Empty;
-            //     consumerId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            // }
-            // else if (reader.Is("marketEvaluationPoint.customer_MarketParticipant.name", ns))
-            // {
-            //     consumerName = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            // }
-            // else if (reader.Is("start_DateAndOrTime.dateTime", ns))
-            // {
-            //     effectiveDate = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            // }
+            else if (reader.Is("settlement_Series.version", ns))
+            {
+                settlementSeriesVersion = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("marketEvaluationPoint.type", ns))
+            {
+                marketEvaluationPointType = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("marketEvaluationPoint.settlementMethod", ns))
+            {
+                marketEvaluationSettlementMethod = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("start_DateAndOrTime.dateTime", ns))
+            {
+                startDateAndOrTimeDateTime = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("end_DateAndOrTime.dateTime", ns))
+            {
+                endDateAndOrTimeDateTime = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("meteringGridArea_Domain.mRID", ns))
+            {
+                meteringGridAreaDomainId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("biddingZone_Domain.mRID", ns))
+            {
+                biddingZoneDomainId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("energySupplier_MarketParticipant.mRID", ns))
+            {
+                energySupplierMarketParticipantId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("balanceResponsibleParty_MarketParticipant.mRID", ns))
+            {
+                balanceResponsiblePartyMarketParticipantId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
             else
             {
                 await reader.ReadAsync().ConfigureAwait(false);
@@ -206,14 +228,40 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
         }
     }
 
-    private static Serie CreateSerie(ref string id)
+    private static Serie CreateSerie(
+        ref string id,
+        ref string settlementSeriesVersion,
+        ref string marketEvaluationPointType,
+        ref string marketEvaluationSettlementMethod,
+        ref string startDateAndOrTimeDateTime,
+        ref string endDateAndOrTimeDateTime,
+        ref string meteringGridAreaDomainId,
+        ref string biddingZoneDomainId,
+        ref string energySupplierMarketParticipantId,
+        ref string balanceResponsiblePartyMarketParticipantId)
     {
-        var serie = new Serie(id)
-        {
-            Id = id,
-        };
+        var serie = new Serie(
+            id,
+            settlementSeriesVersion,
+            marketEvaluationPointType,
+            marketEvaluationSettlementMethod,
+            startDateAndOrTimeDateTime,
+            endDateAndOrTimeDateTime,
+            meteringGridAreaDomainId,
+            biddingZoneDomainId,
+            energySupplierMarketParticipantId,
+            balanceResponsiblePartyMarketParticipantId);
 
         id = string.Empty;
+        settlementSeriesVersion = string.Empty;
+        marketEvaluationPointType = string.Empty;
+        marketEvaluationSettlementMethod = string.Empty;
+        startDateAndOrTimeDateTime = string.Empty;
+        endDateAndOrTimeDateTime = string.Empty;
+        meteringGridAreaDomainId = string.Empty;
+        biddingZoneDomainId = string.Empty;
+        energySupplierMarketParticipantId = string.Empty;
+        balanceResponsiblePartyMarketParticipantId = string.Empty;
 
         return serie;
     }
