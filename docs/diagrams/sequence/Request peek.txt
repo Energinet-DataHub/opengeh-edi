@@ -1,14 +1,22 @@
 autoactivation on
 HTTP->PeekRequestListener: Request
 PeekRequestListener->CimFormatParser:Parse
+PeekRequestListener<--CimFormatParser:DocumentFormat
 PeekRequestListener->MessagePeeker:Peek
 MessagePeeker->PeekRequestHandler:Mediator Send
 PeekRequestHandler->BundleMessages:Get
+BundleMessages->ConnectionFactory:GetConnectionAndOpen
+BundleMessages<--ConnectionFactory:Connection
 PeekRequestHandler<--BundleMessages:message
 PeekRequestHandler->EnqueuedMessage:GetBy
-PeekRequestHandler<--EnqueuedMessage:message
+PeekRequestHandler<--EnqueuedMessage:messageRecords
 PeekRequestHandler->DocumentFactory:CreateBundleMessage
+PeekRequestHandler<--DocumentFactory:Document
+PeekRequestHandler->BundleMessage:CreateFrom
+PeekRequestHandler<--BundleMessage:BundleMessage
 PeekRequestHandler->ArchivedMessageRepository:Add
+ArchivedMessageRepository->B2BContext:Add
+deactivateafter ArchivedMessageRepository
 MessagePeeker<--PeekRequestHandler: PeekResult
 PeekRequestListener<--MessagePeeker: PeekResult
 HTTP<--PeekRequestListener: Response
