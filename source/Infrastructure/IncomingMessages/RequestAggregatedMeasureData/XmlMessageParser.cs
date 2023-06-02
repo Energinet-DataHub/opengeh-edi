@@ -32,6 +32,7 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
 {
     private const string SeriesRecordElementName = "Series";
     private const string HeaderElementName = "RequestAggregatedMeasureData_MarketDocument";
+    private const int MaxMessageSizeInMb = 50;
     private readonly ISchemaProvider _schemaProvider;
     private readonly List<ValidationError> _errors = new();
 
@@ -45,6 +46,13 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
     public async Task<MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>> ParseAsync(Stream message, CancellationToken cancellationToken)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
+
+        var fileSizeInMb = message.Length / (1024 * 1024);
+        if (fileSizeInMb >= MaxMessageSizeInMb)
+        {
+            _errors.Add(new MessageSizeExceeded(fileSizeInMb, MaxMessageSizeInMb));
+            return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(_errors.ToArray());
+        }
 
         string version;
         string businessProcessType;
