@@ -29,6 +29,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     private readonly ITransactionIds _transactionIds;
     private readonly IMessageIds _messageIds;
     private readonly ProcessTypeValidator _processTypeValidator;
+    private readonly MessageTypeValidator _messageTypeValidator;
     private readonly List<Claim> _claims = new()
     {
         new(ClaimsMap.UserId, new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.SenderId).B2CId),
@@ -42,6 +43,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         _messageIds = GetService<IMessageIds>();
         _marketActorAuthenticator = GetService<IMarketActorAuthenticator>();
         _processTypeValidator = GetService<ProcessTypeValidator>();
+        _messageTypeValidator = GetService<MessageTypeValidator>();
     }
 
     public static IEnumerable<object[]> AllowedActorRoles =>
@@ -410,6 +412,30 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         Assert.Contains(result.Errors, error => error is UnknownProcessType);
     }
 
+    [Fact]
+    public async Task Message_type_is_not_allowed()
+    {
+        var knownReceiverId = "5790001330552";
+        var knownReceiverRole = "DDZ";
+        var notAllowedMessageType = "1880";
+        await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
+            .ConfigureAwait(false);
+        await using var message = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .WithMessageType(notAllowedMessageType)
+            .WithReceiverRole(knownReceiverRole)
+            .WithReceiverId(knownReceiverId)
+            .WithSenderRole(MarketRole.EnergySupplier.Code)
+            .WithSenderId(SampleData.SenderId)
+            .Message();
+
+        var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
+
+        Assert.False(result.Success);
+        Assert.Contains(result.Errors, error => error is UnknownMessageType);
+    }
+
     private async Task CreateIdentityWithRoles(IEnumerable<MarketRole> roles)
     {
         var claims = new List<Claim>(_claims);
@@ -441,7 +467,8 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             messageQueueDispatcherSpy,
             _transactionIds,
             new SenderAuthorizer(_marketActorAuthenticator),
-            _processTypeValidator);
+            _processTypeValidator,
+            _messageTypeValidator);
         return messageReceiver;
     }
 

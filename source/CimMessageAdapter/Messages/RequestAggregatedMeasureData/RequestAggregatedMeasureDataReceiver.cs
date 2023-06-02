@@ -9,8 +9,9 @@ public class RequestAggregatedMeasureDataReceiver : MessageReceiver<RequestAggre
         IMessageQueueDispatcher<RequestAggregatedMeasureDataTransaction> messageQueueDispatcher,
         ITransactionIds transactionIds,
         SenderAuthorizer senderAuthorizer,
-        ProcessTypeValidator processTypeValidator)
-        : base(messageIds, messageQueueDispatcher, transactionIds, senderAuthorizer, processTypeValidator)
+        ProcessTypeValidator processTypeValidator,
+        MessageTypeValidator messageTypeValidator)
+        : base(messageIds, messageQueueDispatcher, transactionIds, senderAuthorizer, processTypeValidator, messageTypeValidator)
     {
     }
 }

@@ -56,6 +56,12 @@ namespace IntegrationTests.CimMessageAdapter.Messages
             return this;
         }
 
+        public BusinessMessageBuilder WithMessageType(string messageType)
+        {
+            SetRootChildElementValue("type", messageType);
+            return this;
+        }
+
         public BusinessMessageBuilder WithReceiverRole(string roleType)
         {
             SetRootChildElementValue("receiver_MarketParticipant.marketRole.type", roleType);

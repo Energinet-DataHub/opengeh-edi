@@ -130,6 +130,7 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
     {
         return new MessageHeader(
             element.GetProperty("mRID").ToString(),
+            element.GetProperty("type").GetProperty("value").ToString(),
             element.GetProperty("process.processType").GetProperty("value").ToString(),
             element.GetProperty("sender_MarketParticipant.mRID").GetProperty("value").ToString(),
             element.GetProperty("sender_MarketParticipant.marketRole.type").GetProperty("value").ToString(),

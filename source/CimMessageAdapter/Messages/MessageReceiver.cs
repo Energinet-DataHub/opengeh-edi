@@ -33,9 +33,15 @@ namespace CimMessageAdapter.Messages
         private readonly ITransactionIds _transactionIds;
         private readonly ISenderAuthorizer _senderAuthorizer;
         private readonly IProcessTypeValidator _processTypeValidator;
+        private readonly IMessageTypeValidator _messageTypeValidator;
 
         protected MessageReceiver(
-            IMessageIds messageIds, IMessageQueueDispatcher<TQueue> messageQueueDispatcher, ITransactionIds transactionIds, ISenderAuthorizer senderAuthorizer, IProcessTypeValidator processTypeValidator)
+            IMessageIds messageIds,
+            IMessageQueueDispatcher<TQueue> messageQueueDispatcher,
+            ITransactionIds transactionIds,
+            ISenderAuthorizer senderAuthorizer,
+            IProcessTypeValidator processTypeValidator,
+            IMessageTypeValidator messageTypeValidator)
         {
             _messageIds = messageIds ?? throw new ArgumentNullException(nameof(messageIds));
             _messageQueueDispatcher = messageQueueDispatcher ??
@@ -43,6 +49,7 @@ namespace CimMessageAdapter.Messages
             _transactionIds = transactionIds;
             _senderAuthorizer = senderAuthorizer;
             _processTypeValidator = processTypeValidator;
+            _messageTypeValidator = messageTypeValidator;
         }
 
         public async Task<Result> ReceiveAsync<TMarketActivityRecordType, TMarketTransactionType>(
@@ -71,6 +78,12 @@ namespace CimMessageAdapter.Messages
             }
 
             await CheckMessageIdAsync(messageHeader.SenderId, messageHeader.MessageId, cancellationToken).ConfigureAwait(false);
+            if (_errors.Count > 0)
+            {
+                return Result.Failure(_errors.ToArray());
+            }
+
+            await CheckMessageTypeAsync(messageHeader.MessageType, cancellationToken).ConfigureAwait(false);
             if (_errors.Count > 0)
             {
                 return Result.Failure(_errors.ToArray());
@@ -131,6 +144,12 @@ namespace CimMessageAdapter.Messages
             {
                 _errors.Add(new DuplicateMessageIdDetected(messageId));
             }
+        }
+
+        private async Task CheckMessageTypeAsync(string messageType, CancellationToken cancellationToken)
+        {
+            var result = await _messageTypeValidator.ValidateAsync(messageType, cancellationToken).ConfigureAwait(false);
+            _errors.AddRange(result.Errors);
         }
 
         private async Task CheckProcessTypeAsync(string processType, CancellationToken cancellationToken)

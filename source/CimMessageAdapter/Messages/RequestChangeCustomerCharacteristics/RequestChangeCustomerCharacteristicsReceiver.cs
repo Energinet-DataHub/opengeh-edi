@@ -23,8 +23,9 @@ public class RequestChangeCustomerCharacteristicsReceiver : MessageReceiver<Requ
         IMessageQueueDispatcher<RequestChangeCustomerCharacteristicsTransaction> messageQueueDispatcher,
         ITransactionIds transactionIds,
         SenderAuthorizer senderAuthorizer,
-        DefaultProcessTypeValidator defaultProcessTypeValidator)
-        : base(messageIds, messageQueueDispatcher, transactionIds, senderAuthorizer, defaultProcessTypeValidator)
+        DefaultProcessTypeValidator defaultProcessTypeValidator,
+        DefaultMessageTypeValidator defaultMessageTypeValidator)
+        : base(messageIds, messageQueueDispatcher, transactionIds, senderAuthorizer, defaultProcessTypeValidator, defaultMessageTypeValidator)
     {
     }
 }

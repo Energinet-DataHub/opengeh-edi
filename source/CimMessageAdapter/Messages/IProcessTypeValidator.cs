@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 namespace CimMessageAdapter.Messages;
 
 /// <summary>
-/// Validation for ProcessType
+/// Validation for Process Type
 /// </summary>
 public interface IProcessTypeValidator
 {
     /// <summary>
-    /// Validates ProcessType
+    /// Validates Process Type
     /// </summary>
     /// <param name="processType"></param>
     /// <param name="cancellationToken"></param>

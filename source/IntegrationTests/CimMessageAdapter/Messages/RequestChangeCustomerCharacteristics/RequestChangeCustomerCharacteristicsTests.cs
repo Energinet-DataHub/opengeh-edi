@@ -46,6 +46,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
     private readonly ITransactionIds _transactionIds;
     private readonly IMessageIds _messageIds;
     private readonly DefaultProcessTypeValidator _processTypeValidator;
+    private readonly DefaultMessageTypeValidator _messageTypeValidator;
     private MessageQueueDispatcherStub<global::CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction> _messageQueueDispatcherSpy = new();
     private List<Claim> _claims = new();
 
@@ -57,6 +58,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
         _messageIds = GetService<IMessageIds>();
         _marketActorAuthenticator = GetService<IMarketActorAuthenticator>();
         _processTypeValidator = GetService<DefaultProcessTypeValidator>();
+        _messageTypeValidator = GetService<DefaultMessageTypeValidator>();
     }
 
     public async Task InitializeAsync()
@@ -239,14 +241,15 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
             _messageQueueDispatcherSpy,
             _transactionIds,
             new SenderAuthorizer(_marketActorAuthenticator),
-            _processTypeValidator);
+            _processTypeValidator,
+            _messageTypeValidator);
         return messageReceiver;
     }
 
     private MessageReceiver<global::CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction> CreateMessageReceiver(IMessageIds messageIds)
     {
         _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<global::CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction>();
-        var messageReceiver = new RequestChangeCustomerCharacteristicsReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, new SenderAuthorizer(_marketActorAuthenticator), _processTypeValidator);
+        var messageReceiver = new RequestChangeCustomerCharacteristicsReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, new SenderAuthorizer(_marketActorAuthenticator), _processTypeValidator, _messageTypeValidator);
         return messageReceiver;
     }
 
