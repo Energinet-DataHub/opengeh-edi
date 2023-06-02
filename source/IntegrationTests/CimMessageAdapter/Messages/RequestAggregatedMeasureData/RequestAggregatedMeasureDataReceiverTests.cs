@@ -373,6 +373,20 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     }
 
     [Fact]
+    public async Task Message_does_match_the_expected_schema()
+    {
+        await using var message = BusinessMessageBuilder
+            .RequestAggregatedMeasureData("CimMessageAdapter//Messages//Xml//RequestChangeCustomerCharacteristics.xml")
+            .Message();
+
+        var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
+
+        Assert.False(result.Success);
+        Assert.Contains(result.Errors, error => error is InvalidMessageStructure);
+    }
+
+    [Fact]
     public async Task Process_type_is_not_allowed()
     {
         var knownReceiverId = "5790001330552";
