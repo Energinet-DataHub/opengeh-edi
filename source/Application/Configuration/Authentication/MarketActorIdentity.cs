@@ -32,6 +32,10 @@ namespace Application.Configuration.Authentication
 
         public string Id { get; }
 
+        /// <summary>
+        /// Actor number.
+        /// TODO AJW: Remove nullable.
+        /// </summary>
         public ActorNumber? Number { get; }
 
         public bool HasRole(string role)
