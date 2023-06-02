@@ -47,7 +47,7 @@ namespace Api
             var runtime = RuntimeEnvironment.Default;
             var tokenValidationParameters = await GetTokenValidationParametersAsync(runtime).ConfigureAwait(false);
             var host = ConfigureHost(tokenValidationParameters, runtime);
-
+            // test 
             await host.RunAsync().ConfigureAwait(false);
         }
 
