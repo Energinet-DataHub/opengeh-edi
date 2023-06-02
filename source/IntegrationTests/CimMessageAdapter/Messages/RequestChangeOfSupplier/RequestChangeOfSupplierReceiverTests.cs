@@ -26,7 +26,6 @@ using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using Domain.Actors;
 using Domain.Documents;
-using Domain.OutgoingMessages;
 using Infrastructure.Configuration.Authentication;
 using IntegrationTests.CimMessageAdapter.Stubs;
 using IntegrationTests.Fixtures;
@@ -44,6 +43,7 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
         private readonly IMarketActorAuthenticator _marketActorAuthenticator;
         private readonly ITransactionIds _transactionIds;
         private readonly IMessageIds _messageIds;
+        private readonly DefaultProcessTypeValidator _processTypeValidator;
         private MessageQueueDispatcherStub<global::CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> _messageQueueDispatcherSpy = new();
         private List<Claim> _claims = new();
 
@@ -54,6 +54,7 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
             _transactionIds = GetService<ITransactionIds>();
             _messageIds = GetService<IMessageIds>();
             _marketActorAuthenticator = GetService<IMarketActorAuthenticator>();
+            _processTypeValidator = GetService<DefaultProcessTypeValidator>();
         }
 
         public async Task InitializeAsync()
@@ -214,14 +215,15 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
                 _messageIds,
                 _messageQueueDispatcherSpy,
                 _transactionIds,
-                new SenderAuthorizer(_marketActorAuthenticator));
+                new SenderAuthorizer(_marketActorAuthenticator),
+                _processTypeValidator);
             return messageReceiver;
         }
 
         private MessageReceiver<global::CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> CreateMessageReceiver(IMessageIds messageIds)
         {
             _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<global::CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction>();
-            var messageReceiver = new RequestChangeOfSupplierReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, new SenderAuthorizer(_marketActorAuthenticator));
+            var messageReceiver = new RequestChangeOfSupplierReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, new SenderAuthorizer(_marketActorAuthenticator), _processTypeValidator);
             return messageReceiver;
         }
 

@@ -22,8 +22,9 @@ public class RequestChangeOfSupplierReceiver : MessageReceiver<RequestChangeOfSu
         IMessageIds messageIds,
         IMessageQueueDispatcher<RequestChangeOfSupplierTransaction> messageQueueDispatcher,
         ITransactionIds transactionIds,
-        SenderAuthorizer senderAuthorizer)
-        : base(messageIds, messageQueueDispatcher, transactionIds, senderAuthorizer)
+        SenderAuthorizer senderAuthorizer,
+        DefaultProcessTypeValidator defaultProcessTypeValidator)
+        : base(messageIds, messageQueueDispatcher, transactionIds, senderAuthorizer, defaultProcessTypeValidator)
     {
     }
 }

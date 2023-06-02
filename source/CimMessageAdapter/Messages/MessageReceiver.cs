@@ -32,14 +32,17 @@ namespace CimMessageAdapter.Messages
         private readonly IMessageQueueDispatcher<TQueue> _messageQueueDispatcher;
         private readonly ITransactionIds _transactionIds;
         private readonly ISenderAuthorizer _senderAuthorizer;
+        private readonly IProcessTypeValidator _processTypeValidator;
 
-        protected MessageReceiver(IMessageIds messageIds, IMessageQueueDispatcher<TQueue> messageQueueDispatcher, ITransactionIds transactionIds, ISenderAuthorizer senderAuthorizer)
+        protected MessageReceiver(
+            IMessageIds messageIds, IMessageQueueDispatcher<TQueue> messageQueueDispatcher, ITransactionIds transactionIds, ISenderAuthorizer senderAuthorizer, IProcessTypeValidator processTypeValidator)
         {
             _messageIds = messageIds ?? throw new ArgumentNullException(nameof(messageIds));
             _messageQueueDispatcher = messageQueueDispatcher ??
                                              throw new ArgumentNullException(nameof(messageQueueDispatcher));
             _transactionIds = transactionIds;
             _senderAuthorizer = senderAuthorizer;
+            _processTypeValidator = processTypeValidator;
         }
 
         public async Task<Result> ReceiveAsync<TMarketActivityRecordType, TMarketTransactionType>(
@@ -68,6 +71,12 @@ namespace CimMessageAdapter.Messages
             }
 
             await CheckMessageIdAsync(messageHeader.SenderId, messageHeader.MessageId, cancellationToken).ConfigureAwait(false);
+            if (_errors.Count > 0)
+            {
+                return Result.Failure(_errors.ToArray());
+            }
+
+            await CheckProcessTypeAsync(messageHeader.BusinessReason, cancellationToken).ConfigureAwait(false);
             if (_errors.Count > 0)
             {
                 return Result.Failure(_errors.ToArray());
@@ -122,6 +131,12 @@ namespace CimMessageAdapter.Messages
             {
                 _errors.Add(new DuplicateMessageIdDetected(messageId));
             }
+        }
+
+        private async Task CheckProcessTypeAsync(string processType, CancellationToken cancellationToken)
+        {
+            var result = await _processTypeValidator.ValidateAsync(processType, cancellationToken).ConfigureAwait(false);
+            _errors.AddRange(result.Errors);
         }
 
         private async Task AuthorizeSenderAsync(MessageHeader messageHeader)

@@ -16,6 +16,7 @@ using Application.IncomingMessages.RequestAggregatedMeasureData;
 using Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 using Application.IncomingMessages.RequestChangeOfSupplier;
 using CimMessageAdapter.Messages;
+using CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 using CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using CimMessageAdapter.Response;
@@ -64,6 +65,7 @@ internal static class IncomingMessageParsingServices
                     MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>,
                 IncomingMessages.RequestChangeCustomerCharacteristics.XmlMessageParser>();
         services.AddTransient<CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.MessageParser>();
+        services.AddTransient<DefaultProcessTypeValidator>();
     }
 
     private static void RegisterRequestChangeOfSupplierMessageHandling(IServiceCollection services)
@@ -75,6 +77,7 @@ internal static class IncomingMessageParsingServices
         services
             .AddTransient<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>, XmlMessageParser>();
         services.AddTransient<MessageParser>();
+        services.AddTransient<DefaultProcessTypeValidator>();
     }
 
     private static void RegisterRequestAggregatedMeasureDataHandling(IServiceCollection services)
@@ -82,5 +85,6 @@ internal static class IncomingMessageParsingServices
         services
             .AddTransient<IMessageParser<Serie, RequestAggregatedMeasureDataTransaction>, Infrastructure.IncomingMessages.RequestAggregatedMeasureData.XmlMessageParser>();
         services.AddTransient<CimMessageAdapter.Messages.RequestAggregatedMeasureData.MessageParser>();
+        services.AddTransient<ProcessTypeValidator>();
     }
 }

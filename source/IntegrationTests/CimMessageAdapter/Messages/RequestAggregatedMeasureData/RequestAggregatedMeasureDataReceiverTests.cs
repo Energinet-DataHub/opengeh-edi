@@ -28,6 +28,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     private readonly IMarketActorAuthenticator _marketActorAuthenticator;
     private readonly ITransactionIds _transactionIds;
     private readonly IMessageIds _messageIds;
+    private readonly ProcessTypeValidator _processTypeValidator;
     private readonly List<Claim> _claims = new()
     {
         new(ClaimsMap.UserId, new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.SenderId).B2CId),
@@ -40,6 +41,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         _transactionIds = GetService<ITransactionIds>();
         _messageIds = GetService<IMessageIds>();
         _marketActorAuthenticator = GetService<IMarketActorAuthenticator>();
+        _processTypeValidator = GetService<ProcessTypeValidator>();
     }
 
     public static IEnumerable<object[]> AllowedActorRoles =>
@@ -356,6 +358,44 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         Assert.DoesNotContain(result.Errors, error => error is SenderRoleTypeIsNotAuthorized);
     }
 
+    [Fact]
+    public async Task Return_failure_if_xml_schema_for_business_reason_does_not_exist()
+    {
+        await using var message = BusinessMessageBuilder
+            .RequestAggregatedMeasureData("CimMessageAdapter//Messages//Xml//BadRequestAggregatedMeasureData.xml")
+            .Message();
+
+        var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
+
+        Assert.False(result.Success);
+        Assert.Contains(result.Errors, error => error is UnknownBusinessReasonOrVersion);
+    }
+
+    [Fact]
+    public async Task Process_type_is_not_allowed()
+    {
+        var knownReceiverId = "5790001330552";
+        var knownReceiverRole = "DDZ";
+        var notAllowedProcessType = "1880";
+        await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
+            .ConfigureAwait(false);
+        await using var message = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .WithProcessType(notAllowedProcessType)
+            .WithReceiverRole(knownReceiverRole)
+            .WithReceiverId(knownReceiverId)
+            .WithSenderRole(MarketRole.EnergySupplier.Code)
+            .WithSenderId(SampleData.SenderId)
+            .Message();
+
+        var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
+
+        Assert.False(result.Success);
+        Assert.Contains(result.Errors, error => error is UnknownProcessType);
+    }
+
     private async Task CreateIdentityWithRoles(IEnumerable<MarketRole> roles)
     {
         var claims = new List<Claim>(_claims);
@@ -386,7 +426,8 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             _messageIds,
             messageQueueDispatcherSpy,
             _transactionIds,
-            new SenderAuthorizer(_marketActorAuthenticator));
+            new SenderAuthorizer(_marketActorAuthenticator),
+            _processTypeValidator);
         return messageReceiver;
     }
 

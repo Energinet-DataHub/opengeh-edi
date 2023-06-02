@@ -50,6 +50,12 @@ namespace IntegrationTests.CimMessageAdapter.Messages
             return this;
         }
 
+        public BusinessMessageBuilder WithProcessType(string processType)
+        {
+            SetRootChildElementValue("process.processType", processType);
+            return this;
+        }
+
         public BusinessMessageBuilder WithReceiverRole(string roleType)
         {
             SetRootChildElementValue("receiver_MarketParticipant.marketRole.type", roleType);
