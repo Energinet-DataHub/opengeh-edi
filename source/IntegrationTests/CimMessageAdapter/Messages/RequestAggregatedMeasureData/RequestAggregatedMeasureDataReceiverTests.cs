@@ -22,9 +22,9 @@ using System.Threading.Tasks;
 using Application.Actors;
 using Application.Configuration.Authentication;
 using Application.IncomingMessages.RequestAggregatedMeasureData;
-using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestAggregatedMeasureData;
+using CimMessageAdapter.ValidationErrors;
 using Domain.Actors;
 using Domain.Documents;
 using Infrastructure.Configuration.Authentication;
@@ -99,7 +99,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         //TODO: RequestAggregatedMeasureDataReceiver should come from the IOC
         var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
 
-        Assert.Contains(result.Errors, error => error is UnknownReceiver);
+        Assert.Contains(result.Errors, error => error is InvalidReceiverId);
     }
 
     [Fact]
@@ -114,7 +114,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
 
-        Assert.DoesNotContain(result.Errors, error => error is UnknownReceiver);
+        Assert.DoesNotContain(result.Errors, error => error is InvalidReceiverId);
     }
 
     [Fact]
@@ -159,7 +159,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
 
-        Assert.DoesNotContain(result.Errors, error => error is SenderIdDoesNotMatchAuthenticatedUser);
+        Assert.DoesNotContain(result.Errors, error => error is AuthenticatedUserDoesNotMatchSenderId);
     }
 
     [Fact]
@@ -176,7 +176,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
 
-        Assert.Contains(result.Errors, error => error is SenderIdDoesNotMatchAuthenticatedUser);
+        Assert.Contains(result.Errors, error => error is AuthenticatedUserDoesNotMatchSenderId);
     }
 
     [Fact]
@@ -385,7 +385,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
 
         Assert.False(result.Success);
-        Assert.Contains(result.Errors, error => error is UnknownBusinessReasonOrVersion);
+        Assert.Contains(result.Errors, error => error is InvalidBusinessReasonOrVersion);
     }
 
     [Fact]
@@ -423,7 +423,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
 
         Assert.False(result.Success);
-        Assert.Contains(result.Errors, error => error is UnknownProcessType);
+        Assert.Contains(result.Errors, error => error is NotSupportedProcessType);
     }
 
     [Fact]
@@ -447,7 +447,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
 
         Assert.False(result.Success);
-        Assert.Contains(result.Errors, error => error is UnknownMessageType);
+        Assert.Contains(result.Errors, error => error is NotSupportedMessageType);
     }
 
     [Fact]
@@ -491,9 +491,9 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .ConfigureAwait(false);
     }
 
-    private MessageReceiver<global::CimMessageAdapter.Messages.Queues.RequestAggregatedMeasureDataTransaction> CreateMessageReceiver()
+    private MessageReceiver<global::CimMessageAdapter.Messages.Queues.RequestAggregatedMeasureDataTransactionQueues> CreateMessageReceiver()
     {
-        var messageQueueDispatcherSpy = new MessageQueueDispatcherStub<global::CimMessageAdapter.Messages.Queues.RequestAggregatedMeasureDataTransaction>();
+        var messageQueueDispatcherSpy = new MessageQueueDispatcherStub<global::CimMessageAdapter.Messages.Queues.RequestAggregatedMeasureDataTransactionQueues>();
         var messageReceiver = new RequestAggregatedMeasureDataReceiver(
             _messageIds,
             messageQueueDispatcherSpy,

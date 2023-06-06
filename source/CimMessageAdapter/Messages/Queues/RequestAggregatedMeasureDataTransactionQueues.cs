@@ -12,13 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Errors
-{
-    public class UnknownBusinessReasonOrVersion : ValidationError
-    {
-        public UnknownBusinessReasonOrVersion(string businessReason, string version)
-            : base($"Schema version {version} for business process type {businessReason} does not exist.", "B2B-001")
-        {
-        }
-    }
-}
+namespace CimMessageAdapter.Messages.Queues;
+
+public record RequestAggregatedMeasureDataTransactionQueues(string Name) : Queue;

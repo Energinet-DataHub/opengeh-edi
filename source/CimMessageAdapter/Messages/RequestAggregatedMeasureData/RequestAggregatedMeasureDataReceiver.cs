@@ -16,11 +16,11 @@ using CimMessageAdapter.Messages.Queues;
 
 namespace CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
-public class RequestAggregatedMeasureDataReceiver : MessageReceiver<RequestAggregatedMeasureDataTransaction>
+public class RequestAggregatedMeasureDataReceiver : MessageReceiver<RequestAggregatedMeasureDataTransactionQueues>
 {
     public RequestAggregatedMeasureDataReceiver(
         IMessageIds messageIds,
-        IMessageQueueDispatcher<RequestAggregatedMeasureDataTransaction> messageQueueDispatcher,
+        IMessageQueueDispatcher<RequestAggregatedMeasureDataTransactionQueues> messageQueueDispatcher,
         ITransactionIds transactionIds,
         SenderAuthorizer senderAuthorizer,
         ProcessTypeValidator processTypeValidator,

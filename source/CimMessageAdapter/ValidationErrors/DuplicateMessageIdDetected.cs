@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Errors
+namespace CimMessageAdapter.ValidationErrors
 {
-    public class DuplicateTransactionIdDetected : ValidationError
+    public class DuplicateMessageIdDetected : ValidationError
     {
-        public DuplicateTransactionIdDetected(string transactionId)
-            : base($"Transaction id '{transactionId}' is not unique and will not be processed.", "B2B-005")
+        public DuplicateMessageIdDetected(string messageId)
+            : base($"Message id '{messageId}' is not unique", "00101", "MessageId")
         {
         }
     }

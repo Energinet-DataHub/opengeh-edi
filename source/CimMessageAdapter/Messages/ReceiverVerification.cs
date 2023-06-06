@@ -14,7 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
-using CimMessageAdapter.Errors;
+using CimMessageAdapter.ValidationErrors;
 
 namespace CimMessageAdapter.Messages
 {
@@ -35,7 +35,7 @@ namespace CimMessageAdapter.Messages
 
             if (ReceiverIsKnown(receiverId) == false)
             {
-                return Task.FromResult(Result.Failure(new UnknownReceiver(receiverId)));
+                return Task.FromResult(Result.Failure(new InvalidReceiverId(receiverId)));
             }
 
             return Task.FromResult(Result.Succeeded());

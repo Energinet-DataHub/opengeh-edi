@@ -12,6 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Messages.Queues;
-
-public record RequestAggregatedMeasureDataTransaction(string Name) : Queue;
+namespace CimMessageAdapter.ValidationErrors
+{
+    public class InvalidReceiverId : ValidationError
+    {
+        public InvalidReceiverId(string receiverId)
+            : base($"Receiver id {receiverId} is not a valid receiver", "B2B-008", "ReceiverId")
+        {
+        }
+    }
+}

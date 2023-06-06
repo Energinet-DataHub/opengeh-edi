@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using CimMessageAdapter.Errors;
+using CimMessageAdapter.ValidationErrors;
 
 namespace CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
@@ -27,6 +27,6 @@ public class ProcessTypeValidator : IProcessTypeValidator
     public async Task<Result> ValidateAsync(string processType, CancellationToken cancellationToken)
     {
         return await Task.FromResult(!_whiteList.Contains(processType) ?
-            Result.Failure(new UnknownProcessType(processType)) : Result.Succeeded()).ConfigureAwait(false);
+            Result.Failure(new NotSupportedProcessType(processType)) : Result.Succeeded()).ConfigureAwait(false);
     }
 }

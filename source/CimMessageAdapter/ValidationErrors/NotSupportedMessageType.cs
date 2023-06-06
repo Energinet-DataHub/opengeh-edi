@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Errors
+namespace CimMessageAdapter.ValidationErrors;
+
+public class NotSupportedMessageType : ValidationError
 {
-    public class AuthenticatedUserDoesNotHoldRequiredRoleType : ValidationError
+    public NotSupportedMessageType(string type)
+        : base($"The type {type} is not supported", "00401", "MessageType")
     {
-        public AuthenticatedUserDoesNotHoldRequiredRoleType()
-            : base("The authenticated user does not hold the required role.", "B2B-008")
-        {
-        }
     }
 }

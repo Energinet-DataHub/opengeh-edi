@@ -87,6 +87,9 @@ internal static class IncomingMessageParsingServices
         services
             .AddTransient<IMessageParser<Serie, RequestAggregatedMeasureDataTransaction>, Infrastructure.IncomingMessages.RequestAggregatedMeasureData.XmlMessageParser>();
         services.AddTransient<CimMessageAdapter.Messages.RequestAggregatedMeasureData.MessageParser>();
+        services.AddTransient<RequestAggregatedMeasureDataReceiver>();
+        services.AddTransient<CimMessageAdapter.Messages.RequestAggregatedMeasureData.SenderAuthorizer>();
+        services.AddTransient<RequestAggregatedMeasureDataTransaction>();
         services.AddTransient<ProcessTypeValidator>();
         services.AddTransient<MessageTypeValidator>();
     }

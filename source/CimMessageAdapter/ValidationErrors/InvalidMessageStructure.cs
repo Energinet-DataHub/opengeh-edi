@@ -14,7 +14,7 @@
 
 using System;
 
-namespace CimMessageAdapter.Errors
+namespace CimMessageAdapter.ValidationErrors
 {
     public class InvalidMessageStructure : ValidationError
     {

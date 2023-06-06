@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Errors;
-
-public class EmptyTransactionId : ValidationError
+namespace CimMessageAdapter.ValidationErrors
 {
-    public EmptyTransactionId(string message)
-        : base($"Transaction id may not be empty", "B2B-005")
+    public class InvalidReceiverRole : ValidationError
     {
+        public InvalidReceiverRole()
+            : base("Invalid receiver role", "B2B-008", "ReceiverRole")
+        {
+        }
     }
 }

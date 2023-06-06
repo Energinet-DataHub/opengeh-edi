@@ -11,24 +11,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-namespace CimMessageAdapter.Errors
+
+namespace CimMessageAdapter.ValidationErrors;
+
+public class EmptyMessageId : ValidationError
 {
-    public abstract class ValidationError
+    public EmptyMessageId()
+        : base($"The id of the message cannot be empty", "B2B-003", "MessageId")
     {
-        protected ValidationError(string message, string code)
-        {
-            Message = message;
-            Code = code;
-        }
-
-        protected ValidationError(string message)
-        {
-            Message = message;
-            Code = "UnknownError";
-        }
-
-        public string Message { get; }
-
-        public string Code { get; }
     }
 }

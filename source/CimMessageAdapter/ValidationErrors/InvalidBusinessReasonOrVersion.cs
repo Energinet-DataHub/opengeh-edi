@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Errors
+namespace CimMessageAdapter.ValidationErrors
 {
-    public class SenderIdDoesNotMatchAuthenticatedUser : ValidationError
+    public class InvalidBusinessReasonOrVersion : ValidationError
     {
-        public SenderIdDoesNotMatchAuthenticatedUser()
-            : base("Sender id does not match id of current authenticated user.", "B2B-008")
+        public InvalidBusinessReasonOrVersion(string businessReason, string version)
+            : base($"Schema version {version} for business process type {businessReason} does not exist", "B2B-001")
         {
         }
     }

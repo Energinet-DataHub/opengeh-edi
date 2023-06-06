@@ -91,6 +91,9 @@ namespace Api
                     services.AddSingleton(
                         _ => new RequestChangeCustomerCharacteristicsTransaction("NotImplemented"));
 
+                    services.AddSingleton(
+                        _ => new RequestAggregatedMeasureDataTransactionQueues("NotImplemented"));
+
                     CompositionRoot.Initialize(services)
                         .AddMessageBus(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!)
                         .AddPeekConfiguration(new BundleConfiguration(runtime.MAX_NUMBER_OF_PAYLOADS_IN_BUNDLE))

@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.Configuration.Authentication;
-using CimMessageAdapter.Errors;
+using CimMessageAdapter.ValidationErrors;
 using Domain.Actors;
 
 namespace CimMessageAdapter.Messages.RequestAggregatedMeasureData
@@ -64,7 +64,7 @@ namespace CimMessageAdapter.Messages.RequestAggregatedMeasureData
         {
             if (_marketActorAuthenticator.CurrentIdentity.Number?.Value.Equals(senderId, StringComparison.OrdinalIgnoreCase) == false)
             {
-                _validationErrors.Add(new SenderIdDoesNotMatchAuthenticatedUser());
+                _validationErrors.Add(new AuthenticatedUserDoesNotMatchSenderId());
             }
         }
     }

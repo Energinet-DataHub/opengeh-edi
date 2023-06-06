@@ -21,8 +21,8 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.IncomingMessages.RequestChangeOfSupplier;
-using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
+using CimMessageAdapter.ValidationErrors;
 using DocumentValidation;
 using Json.Schema;
 using DocumentFormat = Domain.Documents.DocumentFormat;
@@ -56,7 +56,7 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
         if (schema is null)
         {
             return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(
-                new UnknownBusinessReasonOrVersion(DocumentName, "0"));
+                new InvalidBusinessReasonOrVersion(DocumentName, "0"));
         }
 
         ResetMessagePosition(message);

@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Errors
+namespace CimMessageAdapter.ValidationErrors
 {
-    public class SenderAuthorizationFailed : ValidationError
+    public class DuplicateTransactionIdDetected : ValidationError
     {
-        public SenderAuthorizationFailed()
-            : base("Sender is not authorization", "B2B-008")
+        public DuplicateTransactionIdDetected(string transactionId)
+            : base($"Transaction id '{transactionId}' is not unique and will not be processed.", "B2B-005", "TransactionId")
         {
         }
     }

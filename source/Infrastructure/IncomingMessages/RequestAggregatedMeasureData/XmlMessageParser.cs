@@ -20,8 +20,8 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using Application.IncomingMessages.RequestAggregatedMeasureData;
-using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
+using CimMessageAdapter.ValidationErrors;
 using DocumentValidation;
 using DocumentValidation.CimXml;
 using DocumentFormat = Domain.Documents.DocumentFormat;
@@ -75,7 +75,7 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
         if (xmlSchema is null)
         {
             return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(
-                new UnknownBusinessReasonOrVersion(businessProcessType, version));
+                new InvalidBusinessReasonOrVersion(businessProcessType, version));
         }
 
         ResetMessagePosition(message);

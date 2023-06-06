@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Errors;
-
-public class UnknownProcessType : ValidationError
+namespace CimMessageAdapter.ValidationErrors
 {
-    public UnknownProcessType(string processType)
-        : base($"Process type {processType} is not known", "xxx-xxx")
+    public class AuthenticatedUserDoesNotMatchSenderId : ValidationError
     {
+        public AuthenticatedUserDoesNotMatchSenderId()
+            : base("Sender id does not match id of current authenticated user", "B2B-008", "SenderId")
+        {
+        }
     }
 }

@@ -18,8 +18,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.IncomingMessages;
-using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages.Queues;
+using CimMessageAdapter.ValidationErrors;
 using MessageHeader = Application.IncomingMessages.MessageHeader;
 
 namespace CimMessageAdapter.Messages
@@ -99,7 +99,7 @@ namespace CimMessageAdapter.Messages
             {
                 if (string.IsNullOrEmpty(transaction.MarketActivityRecord.Id))
                 {
-                    return Result.Failure(new EmptyTransactionId(transaction.MarketActivityRecord.Id));
+                    return Result.Failure(new EmptyTransactionId());
                 }
 
                 if (await CheckTransactionIdAsync(messageHeader.SenderId, transaction.MarketActivityRecord.Id, cancellationToken).ConfigureAwait(false) == false)

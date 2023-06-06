@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Errors
+namespace CimMessageAdapter.ValidationErrors
 {
-    public class DuplicateMessageIdDetected : ValidationError
+    public class SenderRoleTypeIsNotAuthorized : ValidationError
     {
-        public DuplicateMessageIdDetected(string messageId)
-            : base($"Message id '{messageId}' is not unique", "B2B-003")
+        public SenderRoleTypeIsNotAuthorized()
+            : base("Sender role type is not authorized to use this type of message", "B2B-008", "SenderRole")
         {
         }
     }

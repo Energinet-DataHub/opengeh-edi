@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Errors;
+namespace CimMessageAdapter.ValidationErrors;
 
-public class UnknownMessageType : ValidationError
+public class NotSupportedProcessType : ValidationError
 {
-    public UnknownMessageType(string type)
-        : base($"Message type {type} is not known", "xxx-xxx")
+    public NotSupportedProcessType(string processType)
+        : base($"The process type {processType} is not support", "00402", "ProcessType")
     {
     }
 }

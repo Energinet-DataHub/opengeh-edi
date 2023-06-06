@@ -12,13 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Errors
+namespace CimMessageAdapter.ValidationErrors
 {
-    public class UnknownReceiver : ValidationError
+    public abstract class ValidationError
     {
-        public UnknownReceiver(string receiverId)
-            : base($"Receiver id {receiverId} is not known receiver", "B2B-008")
+        protected ValidationError(string message, string code, string? target = null)
         {
+            Message = message;
+            Code = code;
+            Target = target;
         }
+
+        public string Message { get; }
+
+        public string Code { get; }
+
+        public string? Target { get; }
     }
 }
