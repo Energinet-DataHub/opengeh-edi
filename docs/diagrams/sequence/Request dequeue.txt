@@ -1,0 +1,11 @@
+autoactivation on
+HTTP->DequeueRequestListener: Request
+DequeueRequestListener->DequeueRequestHandler:Mediator send
+DequeueRequestHandler->BundleMessageHandler:Dequeue
+BundleMessageHandler->ConnectionFactory:GetConnectionAndOpen
+BundleMessageHandler<--ConnectionFactory:SqlConnection
+BundleMessageHandler->SqlConnection:Commit (delete from BundleMessage and EnqueuedMessage)
+deactivateafter SqlConnection
+DequeueRequestHandler<--BundleMessageHandler:DequeueResult
+DequeueRequestListener<--DequeueRequestHandler:DequeueResult
+HTTP<--DequeueRequestListener: Response

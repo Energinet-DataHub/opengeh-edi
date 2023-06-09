@@ -1,0 +1,15 @@
+autoactivation on
+HTTP->ArchivedMessageSearchListener: Request
+ArchivedMessageSearchListener->Serializer:Deserialize
+ArchivedMessageSearchListener<--Serializer:SearchCriteria
+activate Serializer
+ArchivedMessageSearchListener->GetMessageQueryHandler:Mediator Send
+GetMessageQueryHandler->ConnectionFactory:GetConnectionAndOpen
+GetMessageQueryHandler<--ConnectionFactory:Connection
+GetMessageQueryHandler->Connection:Query
+GetMessageQueryHandler<--Connection:ArchivedMessages
+ArchivedMessageSearchListener<--GetMessageQueryHandler:MessageSearchResult
+ArchivedMessageSearchListener->Serializer:Serialize
+ArchivedMessageSearchListener<--Serializer:body
+deactivateafter Serializer
+HTTP<--ArchivedMessageSearchListener: Response
