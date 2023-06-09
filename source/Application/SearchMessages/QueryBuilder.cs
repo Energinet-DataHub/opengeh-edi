@@ -37,7 +37,7 @@ internal sealed class QueryBuilder
         {
             AddFilter(
                 "Id=@MessageId",
-                new KeyValuePair<string, object>("MessageId", request.MessageId.Value.ToString()));
+                new KeyValuePair<string, object>("MessageId", request.MessageId));
         }
 
         if (request.SenderNumber is not null)

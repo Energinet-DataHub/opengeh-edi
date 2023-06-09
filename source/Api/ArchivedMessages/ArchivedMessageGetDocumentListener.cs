@@ -34,9 +34,9 @@ namespace Api.ArchivedMessages
 
         [Function("ArchivedMessages_GetDocument")]
         public async Task<HttpResponseData> GetDocumentAsync(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "v1/archived-messages/{id:Guid}/document")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "v1/archived-messages/{id}/document")]
         HttpRequestData request,
-        Guid id,
+        string id,
         FunctionContext executionContext,
         CancellationToken hostCancellationToken)
         {
