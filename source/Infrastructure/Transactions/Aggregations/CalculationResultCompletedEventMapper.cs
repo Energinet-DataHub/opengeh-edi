@@ -57,7 +57,7 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
     public bool CanHandle(string eventType)
     {
         ArgumentNullException.ThrowIfNull(eventType);
-        return eventType.Equals("BalanceFixingCalculationResultCompleted", StringComparison.OrdinalIgnoreCase);
+        return eventType.Equals(CalculationResultCompleted.MessageType, StringComparison.OrdinalIgnoreCase);
     }
 
     public string ToJson(byte[] payload)
