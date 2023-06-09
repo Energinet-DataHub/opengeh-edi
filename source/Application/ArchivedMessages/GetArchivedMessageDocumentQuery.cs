@@ -18,4 +18,4 @@ using Application.Configuration.Queries;
 
 namespace Application.ArchivedMessages;
 
-public record GetArchivedMessageDocumentQuery(Guid Id) : IQuery<Stream?>;
+public record GetArchivedMessageDocumentQuery(string Id) : IQuery<Stream?>;

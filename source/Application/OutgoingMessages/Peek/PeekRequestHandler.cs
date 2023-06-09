@@ -73,7 +73,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
         await _bundledMessages.AddAsync(bundledMessage, cancellationToken).ConfigureAwait(false);
 
         _messageArchive.Add(new ArchivedMessage(
-            bundledMessage.Id.Value,
+            bundledMessage.Id.Value.ToString(),
             messageRecords.DocumentType,
             ActorNumber.Create(messageRecords.SenderNumber),
             ActorNumber.Create(messageRecords.ReceiverNumber),
