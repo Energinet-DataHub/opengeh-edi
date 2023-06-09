@@ -97,7 +97,7 @@ public class ArchivedMessageSearchListener
 
 public record SearchArchivedMessages(
     MessageCreationPeriod? CreatedDuringPeriod,
-    Guid? MessageId,
+    string? MessageId,
     string? SenderNumber,
     string? ReceiverNumber,
     IReadOnlyList<string>? DocumentTypes,
