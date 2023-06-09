@@ -31,7 +31,6 @@ namespace IntegrationTests.Application.Transactions.Aggregations;
 public class WhenAnAggregationResultIsAvailableTests : TestBase
 {
     private readonly CalculationResultCompletedEventBuilder _eventBuilder = new();
-    private readonly string _receivedEventType = "BalanceFixingCalculationResultCompleted";
 
     public WhenAnAggregationResultIsAvailableTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
@@ -48,7 +47,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .WithResolution(Resolution.Quarter)
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod);
 
-        await HavingReceivedIntegrationEventAsync(_receivedEventType, _eventBuilder.Build()).ConfigureAwait(false);
+        await HavingReceivedIntegrationEventAsync(CalculationResultCompleted.MessageType, _eventBuilder.Build()).ConfigureAwait(false);
 
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.EnergySupplier, BusinessReason.BalanceFixing);
         outgoingMessage
@@ -73,7 +72,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
             .ResultOf(TimeSeriesType.NonProfiledConsumption);
 
-        await HavingReceivedIntegrationEventAsync(_receivedEventType, _eventBuilder.Build()).ConfigureAwait(false);
+        await HavingReceivedIntegrationEventAsync(CalculationResultCompleted.MessageType, _eventBuilder.Build()).ConfigureAwait(false);
 
         var message = await OutgoingMessageAsync(
             MarketRole.MeteredDataResponsible, BusinessReason.BalanceFixing);
@@ -96,7 +95,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
             .ResultOf(TimeSeriesType.Production);
 
-        await HavingReceivedIntegrationEventAsync(_receivedEventType, _eventBuilder.Build()).ConfigureAwait(false);
+        await HavingReceivedIntegrationEventAsync(CalculationResultCompleted.MessageType, _eventBuilder.Build()).ConfigureAwait(false);
 
         var message = await OutgoingMessageAsync(
             MarketRole.MeteredDataResponsible, BusinessReason.BalanceFixing);
@@ -123,7 +122,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
             .ResultOf(TimeSeriesType.NonProfiledConsumption);
 
-        await HavingReceivedIntegrationEventAsync(_receivedEventType, _eventBuilder.Build()).ConfigureAwait(false);
+        await HavingReceivedIntegrationEventAsync(CalculationResultCompleted.MessageType, _eventBuilder.Build()).ConfigureAwait(false);
 
         var outgoingMessage = await OutgoingMessageAsync(
             MarketRole.BalanceResponsible,
@@ -152,7 +151,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
             .ResultOf(TimeSeriesType.NonProfiledConsumption);
 
-        await HavingReceivedIntegrationEventAsync(_receivedEventType, _eventBuilder.Build()).ConfigureAwait(false);
+        await HavingReceivedIntegrationEventAsync(CalculationResultCompleted.MessageType, _eventBuilder.Build()).ConfigureAwait(false);
 
         var outgoingMessage = await OutgoingMessageAsync(
             MarketRole.BalanceResponsible,
