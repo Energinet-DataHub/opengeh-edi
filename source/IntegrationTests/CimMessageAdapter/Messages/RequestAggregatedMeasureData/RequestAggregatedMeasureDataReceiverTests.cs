@@ -44,6 +44,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     private readonly IMessageIds _messageIds;
     private readonly ProcessTypeValidator _processTypeValidator;
     private readonly MessageTypeValidator _messageTypeValidator;
+    private readonly MessageQueueDispatcherStub<global::CimMessageAdapter.Messages.Queues.RequestAggregatedMeasureDataTransactionQueues> _messageQueueDispatcherSpy = new();
     private readonly List<Claim> _claims = new()
     {
         new(ClaimsMap.UserId, new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.SenderId).B2CId),
@@ -491,6 +492,30 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         Assert.Contains(result.Errors, error => error is InvalidMessageIdSize);
     }
 
+    [Fact]
+    public async Task Valid_activity_records_are_extracted_and_committed_to_queue()
+    {
+        await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
+            .ConfigureAwait(false);
+        var knownReceiverId = "5790001330552";
+        var knownReceiverRole = "DDZ";
+        await using var message = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .WithSenderId(SampleData.SenderId)
+            .WithSenderRole(MarketRole.EnergySupplier.Code)
+            .WithSenderId(SampleData.SenderId)
+            .WithReceiverRole(knownReceiverRole)
+            .WithReceiverId(knownReceiverId)
+            .Message();
+
+        var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
+
+        var transaction = _messageQueueDispatcherSpy.CommittedItems.FirstOrDefault();
+        Assert.True(result.Success);
+        Assert.NotNull(transaction);
+    }
+
     private async Task CreateIdentityWithRoles(IEnumerable<MarketRole> roles)
     {
         var claims = new List<Claim>(_claims);
@@ -516,10 +541,9 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
     private MessageReceiver<global::CimMessageAdapter.Messages.Queues.RequestAggregatedMeasureDataTransactionQueues> CreateMessageReceiver()
     {
-        var messageQueueDispatcherSpy = new MessageQueueDispatcherStub<global::CimMessageAdapter.Messages.Queues.RequestAggregatedMeasureDataTransactionQueues>();
         var messageReceiver = new RequestAggregatedMeasureDataReceiver(
             _messageIds,
-            messageQueueDispatcherSpy,
+            _messageQueueDispatcherSpy,
             _transactionIds,
             new SenderAuthorizer(_marketActorAuthenticator),
             _processTypeValidator,
