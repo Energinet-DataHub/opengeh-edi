@@ -24,6 +24,7 @@ using Application.Configuration.Authentication;
 using Application.IncomingMessages.RequestChangeOfSupplier;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestChangeOfSupplier;
+using CimMessageAdapter.ValidationErrors;
 using Domain.Actors;
 using Domain.Documents;
 using Infrastructure.Configuration.Authentication;
@@ -87,7 +88,7 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
 
             var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
-            AssertContainsError(result, "B2B-008");
+            Assert.Contains(result.Errors, error => error is InvalidReceiverId);
         }
 
         [Fact]
@@ -100,7 +101,7 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
 
             var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
-            AssertContainsError(result, "B2B-008");
+            Assert.Contains(result.Errors, error => error is InvalidReceiverRole);
         }
 
         [Fact]
@@ -113,7 +114,7 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
 
             var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
-            AssertContainsError(result, "B2B-008");
+            Assert.Contains(result.Errors, error => error is AuthenticatedUserDoesNotHoldRequiredRoleType);
         }
 
         [Fact]
@@ -126,7 +127,7 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
 
             var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
-            AssertContainsError(result, "B2B-008");
+            Assert.Contains(result.Errors, error => error is AuthenticatedUserDoesNotHoldRequiredRoleType);
         }
 
         [Fact]
@@ -138,7 +139,7 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
 
             var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
-            AssertContainsError(result, "B2B-008");
+            Assert.Contains(result.Errors, error => error is AuthenticatedUserDoesNotMatchSenderId);
         }
 
         [Fact]
@@ -152,7 +153,7 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
                 .ConfigureAwait(false);
 
             Assert.False(result.Success);
-            AssertContainsError(result, "B2B-001");
+            Assert.Contains(result.Errors, error => error is InvalidBusinessReasonOrVersion);
         }
 
         [Fact]
@@ -190,7 +191,7 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
             var result = await ReceiveRequestChangeOfSupplierMessage(message)
                 .ConfigureAwait(false);
 
-            AssertContainsError(result, "B2B-005");
+            Assert.Contains(result.Errors, error => error is DuplicateTransactionIdDetected);
             Assert.Empty(_messageQueueDispatcherSpy.CommittedItems);
         }
 
