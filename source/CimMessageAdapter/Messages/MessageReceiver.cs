@@ -27,6 +27,7 @@ namespace CimMessageAdapter.Messages
     public abstract class MessageReceiver<TQueue>
         where TQueue : Queue
     {
+        private const int MessageIdLenght = 36;
         private readonly List<ValidationError> _errors = new();
         private readonly IMessageIds _messageIds;
         private readonly IMessageQueueDispatcher<TQueue> _messageQueueDispatcher;
@@ -140,6 +141,11 @@ namespace CimMessageAdapter.Messages
         private async Task CheckMessageIdAsync(string senderId, string messageId, CancellationToken cancellationToken)
         {
             if (messageId == null) throw new ArgumentNullException(nameof(messageId));
+            if (messageId.Length != MessageIdLenght)
+            {
+                _errors.Add(new InvalidMessageIdSize(messageId));
+            }
+
             if (await _messageIds.TryStoreAsync(senderId, messageId, cancellationToken).ConfigureAwait(false) == false)
             {
                 _errors.Add(new DuplicateMessageIdDetected(messageId));

@@ -468,6 +468,29 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         Assert.Contains(result.Errors, error => error is MessageSizeExceeded);
     }
 
+    [Fact]
+    public async Task Message_id_must_be_in_correct_length()
+    {
+        var knownReceiverId = "5790001330552";
+        var knownReceiverRole = "DDZ";
+        await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
+            .ConfigureAwait(false);
+        var toShortMessageId = "36";
+        await using var message = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .WithMessageId(toShortMessageId)
+            .WithSenderRole(MarketRole.EnergySupplier.Code)
+            .WithSenderId(SampleData.SenderId)
+            .WithReceiverRole(knownReceiverRole)
+            .WithReceiverId(knownReceiverId)
+            .Message();
+
+        var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
+
+        Assert.Contains(result.Errors, error => error is InvalidMessageIdSize);
+    }
+
     private async Task CreateIdentityWithRoles(IEnumerable<MarketRole> roles)
     {
         var claims = new List<Claim>(_claims);
