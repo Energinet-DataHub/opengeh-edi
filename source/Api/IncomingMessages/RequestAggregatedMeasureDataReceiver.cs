@@ -13,14 +13,20 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Api.Common;
 using Application.Configuration;
+using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using CimMessageAdapter.Response;
+using Domain.Actors;
+using Domain.ArchivedMessages;
+using Domain.Documents;
+using Domain.OutgoingMessages;
 using Infrastructure.IncomingMessages;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -36,19 +42,25 @@ public class RequestAggregatedMeasureDataReceiver
     private readonly Receiver _messageReceiver;
     private readonly ResponseFactory _responseFactory;
     private readonly ICorrelationContext _correlationContext;
+    private readonly IArchivedMessageRepository _messageArchive;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
     public RequestAggregatedMeasureDataReceiver(
         ILogger<RequestAggregatedMeasureDataReceiver> logger,
         MessageParser messageParser,
         Receiver messageReceiver,
         ResponseFactory responseFactory,
-        ICorrelationContext correlationContext)
+        ICorrelationContext correlationContext,
+        IArchivedMessageRepository messageArchive,
+        ISystemDateTimeProvider systemDateTimeProvider)
     {
         _logger = logger;
         _messageParser = messageParser;
         _messageReceiver = messageReceiver;
         _responseFactory = responseFactory;
         _correlationContext = correlationContext;
+        _messageArchive = messageArchive;
+        _systemDateTimeProvider = systemDateTimeProvider;
     }
 
     //TODO: refactor functions to use nameof for function name
@@ -77,6 +89,23 @@ public class RequestAggregatedMeasureDataReceiver
         }
 
         var messageParserResult = await _messageParser.ParseAsync(request.Body, cimFormat, cancellationToken).ConfigureAwait(false);
+
+        if (messageParserResult.IncomingMarketDocument?.Header is null)
+        {
+            var errorResult = Result.Failure(messageParserResult.Errors.ToArray());
+            return CreateResponse(request, HttpStatusCode.BadRequest, _responseFactory.From(errorResult, cimFormat));
+        }
+
+        var timestamp = _systemDateTimeProvider.Now();
+        _messageArchive.Add(new ArchivedMessage(
+            messageParserResult.IncomingMarketDocument.Header.MessageId,
+            DocumentType.RequestAggregatedMeasureData,
+            ActorNumber.Create(messageParserResult.IncomingMarketDocument.Header.SenderId),
+            ActorNumber.Create(messageParserResult.IncomingMarketDocument.Header.ReceiverId),
+            timestamp,
+            BusinessReason.From(messageParserResult.IncomingMarketDocument.Header.BusinessReason),
+            request.Body));
+
         var result = await _messageReceiver.ReceiveAsync(messageParserResult, cancellationToken)
             .ConfigureAwait(false);
 
