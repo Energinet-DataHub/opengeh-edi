@@ -1,2 +1,10 @@
-﻿ALTER TABLE [dbo].[ArchivedMessages]
-    ADD [ProcessType] NVARCHAR(50) NULL
+﻿IF NOT EXISTS (
+    SELECT *
+    FROM   sys.columns
+    WHERE  object_id = OBJECT_ID(N'[dbo].[ArchivedMessages]')
+      AND name = 'ProcessType'
+)
+    BEGIN
+        ALTER TABLE [dbo].[ArchivedMessages]
+            ADD [ProcessType] NVARCHAR(50) NULL
+    END
