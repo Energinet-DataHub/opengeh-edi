@@ -24,6 +24,7 @@ using Application.Configuration.Authentication;
 using Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
+using CimMessageAdapter.ValidationErrors;
 using Domain.Actors;
 using Domain.Documents;
 using Domain.OutgoingMessages;
@@ -92,7 +93,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
 
         var result = await ReceiveRequestChangeCustomerCharacteristicsMessage(message).ConfigureAwait(false);
 
-        AssertContainsError(result, "B2B-008");
+        Assert.Contains(result.Errors, error => error is InvalidReceiverId);
     }
 
     [Fact]
@@ -105,7 +106,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
 
         var result = await ReceiveRequestChangeCustomerCharacteristicsMessage(message).ConfigureAwait(false);
 
-        AssertContainsError(result, "B2B-008");
+        Assert.Contains(result.Errors, error => error is InvalidReceiverRole);
     }
 
     [Fact]
@@ -118,7 +119,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
 
         var result = await ReceiveRequestChangeCustomerCharacteristicsMessage(message).ConfigureAwait(false);
 
-        AssertContainsError(result, "B2B-008");
+        Assert.Contains(result.Errors, error => error is SenderRoleTypeIsNotAuthorized);
     }
 
     [Fact]
@@ -131,7 +132,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
 
         var result = await ReceiveRequestChangeCustomerCharacteristicsMessage(message).ConfigureAwait(false);
 
-        AssertContainsError(result, "B2B-008");
+        Assert.Contains(result.Errors, error => error is SenderRoleTypeIsNotAuthorized);
     }
 
     [Fact]
@@ -143,7 +144,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
 
         var result = await ReceiveRequestChangeCustomerCharacteristicsMessage(message).ConfigureAwait(false);
 
-        AssertContainsError(result, "B2B-008");
+        Assert.Contains(result.Errors, error => error is AuthenticatedUserDoesNotMatchSenderId);
     }
 
     [Fact]
@@ -157,7 +158,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
             .ConfigureAwait(false);
 
         Assert.False(result.Success);
-        AssertContainsError(result, "B2B-001");
+        Assert.Contains(result.Errors, error => error is InvalidBusinessReasonOrVersion);
     }
 
     [Fact]
@@ -195,13 +196,8 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
         var result = await ReceiveRequestChangeCustomerCharacteristicsMessage(message)
             .ConfigureAwait(false);
 
-        AssertContainsError(result, "B2B-005");
+        Assert.Contains(result.Errors, error => error is DuplicateTransactionIdDetected);
         Assert.Empty(_messageQueueDispatcherSpy.CommittedItems);
-    }
-
-    private static void AssertContainsError(Result result, string errorCode)
-    {
-        Assert.Contains(result.Errors, error => error.Code.Equals(errorCode, StringComparison.OrdinalIgnoreCase));
     }
 
     private static ClaimsPrincipal CreateClaimsPrincipal(IEnumerable<Claim> claims)

@@ -200,11 +200,6 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
             return new ClaimsPrincipal(new ClaimsIdentity(claims));
         }
 
-        private static void AssertContainsError(Result result, string errorCode)
-        {
-            Assert.Contains(result.Errors, error => error.Code.Equals(errorCode, StringComparison.OrdinalIgnoreCase));
-        }
-
         private async Task<Result> ReceiveRequestChangeOfSupplierMessage(Stream message)
         {
             return await CreateMessageReceiver()
