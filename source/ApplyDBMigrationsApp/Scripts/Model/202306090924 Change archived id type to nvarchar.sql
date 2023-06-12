@@ -10,6 +10,3 @@ ALTER TABLE [dbo].[ArchivedMessages]
     ADD CONSTRAINT PK_ArchivedMessages_Id PRIMARY KEY (id);
 
 CREATE INDEX IX_FindMessages ON [dbo].[ArchivedMessages] (Id, DocumentType, ReceiverNumber, SenderNumber, CreatedAt);
-
-ALTER TABLE [dbo].[ArchivedMessages]
-    ADD [Document] [varbinary](max) NULL 
