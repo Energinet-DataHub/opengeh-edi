@@ -27,10 +27,9 @@ using CimMessageAdapter.Messages.Queues;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.Authentication;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
-using Infrastructure.Configuration.Serialization;
 using Infrastructure.Transactions;
-using Infrastructure.Transactions.Aggregations;
 using Infrastructure.Transactions.MoveIn;
+using Infrastructure.WholeSale;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -85,6 +84,9 @@ namespace Api
                     services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration(
                         "NotImplemented"));
 
+                    services.AddSingleton(new WholeSaleServiceBusClientConfiguration(
+                        "NotImplemented"));
+
                     services.AddSingleton(
                         _ => new RequestChangeOfSupplierTransaction(runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!));
 
@@ -92,7 +94,7 @@ namespace Api
                         _ => new RequestChangeCustomerCharacteristicsTransaction("NotImplemented"));
 
                     services.AddSingleton(
-                        _ => new RequestAggregatedMeasureDataTransactionQueues("NotImplemented"));
+                        _ => new RequestAggregatedMeasureDataTransactionQueues(runtime.INCOMING_AGGREGATED_MEASURE_DATA_QUEUE_NAME!));
 
                     CompositionRoot.Initialize(services)
                         .AddMessageBus(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!)
@@ -128,6 +130,7 @@ namespace Api
                             runtime.REQUEST_RESPONSE_LOGGING_CONTAINER_NAME!)
                         .AddMessagePublishing()
                         .AddHttpClientAdapter(sp => new HttpClientAdapter(sp.GetRequiredService<HttpClient>()))
+                        .AddAggregatedMeasureDataServices()
                         .AddMoveInServices(
                             new MoveInSettings(
                                 new MessageDelivery(
