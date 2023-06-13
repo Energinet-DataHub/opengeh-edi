@@ -16,6 +16,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Api.Configuration.Middleware;
 using Api.Configuration.Middleware.Authentication.Bearer;
 using Api.Configuration.Middleware.Authentication.MarketActors;
 using Api.Configuration.Middleware.Correlation;
@@ -27,9 +28,7 @@ using CimMessageAdapter.Messages.Queues;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.Authentication;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
-using Infrastructure.Configuration.Serialization;
 using Infrastructure.Transactions;
-using Infrastructure.Transactions.Aggregations;
 using Infrastructure.Transactions.MoveIn;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
@@ -72,6 +71,7 @@ namespace Api
                 .ConfigureFunctionsWorkerDefaults(worker =>
                 {
                     worker.UseMiddleware<CorrelationIdMiddleware>();
+                    worker.UseMiddleware<UnHandledExceptionMiddleware>();
                     /*worker.UseMiddleware<RequestResponseLoggingMiddleware>();*/
                     ConfigureAuthenticationMiddleware(worker);
                 })
