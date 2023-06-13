@@ -25,20 +25,20 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace Api.IncomingMessages;
 
-public class RequestAggregatedMeasureDataTransactionQueueListener
+public class RequestAggregatedMeasureTransactionQueueListener
 {
     private readonly IMediator _mediator;
     private readonly ISerializer _jsonSerializer;
     private readonly ICorrelationContext _correlationContext;
 
-    public RequestAggregatedMeasureDataTransactionQueueListener(IMediator mediator, ISerializer jsonSerializer, ICorrelationContext correlationContext)
+    public RequestAggregatedMeasureTransactionQueueListener(IMediator mediator, ISerializer jsonSerializer, ICorrelationContext correlationContext)
     {
         _mediator = mediator;
         _jsonSerializer = jsonSerializer;
         _correlationContext = correlationContext;
     }
 
-    [Function(nameof(RequestAggregatedMeasureDataTransactionQueueListener))]
+    [Function(nameof(RequestAggregatedMeasureTransactionQueueListener))]
     public async Task RunAsync(
         [ServiceBusTrigger("%INCOMING_AGGREGATED_MEASURE_DATA_QUEUE_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER")] byte[] data,
         FunctionContext context,

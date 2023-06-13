@@ -36,9 +36,9 @@ using Receiver = CimMessageAdapter.Messages.RequestAggregatedMeasureData.Request
 
 namespace Api.IncomingMessages;
 
-public class RequestAggregatedMeasureDataReceiver
+public class RequestAggregatedMeasureMessageReceiver
 {
-    private readonly ILogger<RequestAggregatedMeasureDataReceiver> _logger;
+    private readonly ILogger<RequestAggregatedMeasureMessageReceiver> _logger;
     private readonly MessageParser _messageParser;
     private readonly Receiver _messageReceiver;
     private readonly ResponseFactory _responseFactory;
@@ -46,8 +46,8 @@ public class RequestAggregatedMeasureDataReceiver
     private readonly IArchivedMessageRepository _messageArchive;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-    public RequestAggregatedMeasureDataReceiver(
-        ILogger<RequestAggregatedMeasureDataReceiver> logger,
+    public RequestAggregatedMeasureMessageReceiver(
+        ILogger<RequestAggregatedMeasureMessageReceiver> logger,
         MessageParser messageParser,
         Receiver messageReceiver,
         ResponseFactory responseFactory,
@@ -65,7 +65,7 @@ public class RequestAggregatedMeasureDataReceiver
     }
 
     //TODO: refactor functions to use nameof for function name
-    [Function(nameof(RequestAggregatedMeasureDataReceiver))]
+    [Function(nameof(RequestAggregatedMeasureMessageReceiver))]
     public async Task<HttpResponseData> RunAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
         HttpRequestData request,
