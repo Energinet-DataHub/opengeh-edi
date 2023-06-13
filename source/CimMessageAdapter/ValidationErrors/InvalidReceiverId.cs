@@ -17,7 +17,7 @@ namespace CimMessageAdapter.ValidationErrors
     public class InvalidReceiverId : ValidationError
     {
         public InvalidReceiverId(string receiverId)
-            : base($"Receiver id {receiverId} is not a valid receiver", "B2B-008", "ReceiverId")
+            : base($"Receiver id {receiverId} is not a valid receiver", "00303", "ReceiverId")
         {
         }
     }

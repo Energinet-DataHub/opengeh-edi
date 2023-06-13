@@ -19,7 +19,7 @@ namespace CimMessageAdapter.ValidationErrors
     public class InvalidMessageStructure : ValidationError
     {
         private InvalidMessageStructure(string message)
-            : base(message, "B2B-005")
+            : base(message, "00302")
         {
         }
 

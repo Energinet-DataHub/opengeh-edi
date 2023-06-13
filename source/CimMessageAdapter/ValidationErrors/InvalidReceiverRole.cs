@@ -17,7 +17,7 @@ namespace CimMessageAdapter.ValidationErrors
     public class InvalidReceiverRole : ValidationError
     {
         public InvalidReceiverRole()
-            : base("Invalid receiver role", "B2B-008", "ReceiverRole")
+            : base("Invalid receiver role", "00304", "ReceiverRole")
         {
         }
     }

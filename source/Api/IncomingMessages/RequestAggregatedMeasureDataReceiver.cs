@@ -23,6 +23,7 @@ using Application.Configuration;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using CimMessageAdapter.Response;
+using CimMessageAdapter.ValidationErrors;
 using Domain.Actors;
 using Domain.ArchivedMessages;
 using Domain.Documents;
@@ -90,10 +91,11 @@ public class RequestAggregatedMeasureDataReceiver
 
         var messageParserResult = await _messageParser.ParseAsync(request.Body, cimFormat, cancellationToken).ConfigureAwait(false);
 
-        if (messageParserResult.IncomingMarketDocument?.Header is null)
+        if (messageParserResult.IncomingMarketDocument?.Header is null || messageParserResult.Errors.Any())
         {
             var errorResult = Result.Failure(messageParserResult.Errors.ToArray());
-            return CreateResponse(request, HttpStatusCode.BadRequest, _responseFactory.From(errorResult, cimFormat));
+            var httpErrorStatusCode = messageParserResult.Errors.Any(x => x is MessageSizeExceeded) ? HttpStatusCode.RequestEntityTooLarge : HttpStatusCode.BadRequest;
+            return CreateResponse(request, httpErrorStatusCode, _responseFactory.From(errorResult, cimFormat));
         }
 
         var timestamp = _systemDateTimeProvider.Now();

@@ -17,7 +17,7 @@ namespace CimMessageAdapter.ValidationErrors
     public class InvalidBusinessReasonOrVersion : ValidationError
     {
         public InvalidBusinessReasonOrVersion(string businessReason, string version)
-            : base($"Schema version {version} for business process type {businessReason} does not exist", "B2B-001")
+            : base($"Schema version {version} for business process type {businessReason} does not exist", "00301")
         {
         }
     }

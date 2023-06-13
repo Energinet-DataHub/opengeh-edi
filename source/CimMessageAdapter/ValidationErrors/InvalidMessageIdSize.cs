@@ -17,7 +17,7 @@ namespace CimMessageAdapter.ValidationErrors;
 public class InvalidMessageIdSize : ValidationError
 {
     public InvalidMessageIdSize(string messageId)
-        : base($"Message id {messageId} is invalid. Must contain 36 characters.", "B2B-008", "MessageId")
+        : base($"Message id {messageId} is invalid. Must contain 36 characters.", "00305", "MessageId")
     {
     }
 }

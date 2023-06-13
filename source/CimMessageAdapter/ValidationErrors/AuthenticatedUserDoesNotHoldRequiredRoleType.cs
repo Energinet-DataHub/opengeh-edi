@@ -17,7 +17,7 @@ namespace CimMessageAdapter.ValidationErrors
     public class AuthenticatedUserDoesNotHoldRequiredRoleType : ValidationError
     {
         public AuthenticatedUserDoesNotHoldRequiredRoleType()
-            : base("The authenticated user does not hold the required role", "B2B-008")
+            : base("The authenticated user does not hold the required role", "00001")
         {
         }
     }

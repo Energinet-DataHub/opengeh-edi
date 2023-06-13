@@ -17,7 +17,7 @@ namespace CimMessageAdapter.ValidationErrors;
 public class EmptyMessageId : ValidationError
 {
     public EmptyMessageId()
-        : base($"The id of the message cannot be empty", "B2B-003", "MessageId")
+        : base($"The id of the message cannot be empty", "00201", "MessageId")
     {
     }
 }

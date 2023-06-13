@@ -17,7 +17,7 @@ namespace CimMessageAdapter.ValidationErrors
     public class SenderRoleTypeIsNotAuthorized : ValidationError
     {
         public SenderRoleTypeIsNotAuthorized()
-            : base("Sender role type is not authorized to use this type of message", "B2B-008", "SenderRole")
+            : base("Sender role type is not authorized to use this type of message", "00003", "SenderRole")
         {
         }
     }

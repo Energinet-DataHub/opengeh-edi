@@ -17,7 +17,7 @@ namespace CimMessageAdapter.ValidationErrors
     public class AuthenticatedUserDoesNotMatchSenderId : ValidationError
     {
         public AuthenticatedUserDoesNotMatchSenderId()
-            : base("Sender id does not match id of current authenticated user", "B2B-008", "SenderId")
+            : base("Sender id does not match id of current authenticated user", "00002", "SenderId")
         {
         }
     }

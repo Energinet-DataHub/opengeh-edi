@@ -17,7 +17,7 @@ namespace CimMessageAdapter.ValidationErrors;
 public class EmptyTransactionId : ValidationError
 {
     public EmptyTransactionId()
-        : base($"Transaction id cannot be empty", "B2B-005", "TransactionId")
+        : base($"Transaction id cannot be empty", "00202", "TransactionId")
     {
     }
 }
