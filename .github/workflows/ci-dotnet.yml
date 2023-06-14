@@ -75,7 +75,7 @@ jobs:
         run: |
           Write-Output "resource_group=$(`
           az keyvault secret show `
-            --vault-name ${{ secrets.azure_keyvault_name }} `
+            --vault-name ${{ vars.azure_keyvault_name }} `
             --name "AZURE-SHARED-RESOURCEGROUP" `
             --query value -o tsv)" >> $Env:GITHUB_OUTPUT
 
@@ -84,7 +84,7 @@ jobs:
         shell: pwsh
         run: Write-Output "namespace_name=$(`
           az keyvault secret show `
-          --vault-name ${{ secrets.azure_keyvault_name }} `
+          --vault-name ${{ vars.azure_keyvault_name }} `
           --name "AZURE-SERVICEBUS-NAMESPACE" `
           --query value -o tsv)" >> $Env:GITHUB_OUTPUT
 
