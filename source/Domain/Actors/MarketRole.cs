@@ -20,8 +20,14 @@ public class MarketRole : EnumerationType
 {
     public static readonly MarketRole MeteringPointAdministrator = new(0, "MeteringPointAdministrator", string.Empty);
     public static readonly MarketRole EnergySupplier = new(1, "EnergySupplier", "DDQ");
+
+    // a Grid Operator has two roles.
+    // GridOperator (DDM) when measuring data
     public static readonly MarketRole GridOperator = new(2, "GridOperator", string.Empty);
     public static readonly MarketRole MeteringDataAdministrator = new(3, "MeteringDataAdministrator", string.Empty);
+
+    // a Grid Operator has two roles.
+    // MeteredDataResponsible (MDR) when requesting calculations?
     public static readonly MarketRole MeteredDataResponsible = new(4, "MeteredDataResponsible", string.Empty);
     public static readonly MarketRole BalanceResponsible = new(5, "BalanceResponsible", string.Empty);
 
