@@ -67,7 +67,7 @@ jobs:
         with:
           client-id: ${{ vars.azure_spn_id_oidc }}
           tenant-id: ${{ secrets.azure_tenant_id }}
-          subscription-id: ${{ secrets.azure_subscription_id }}
+          subscription-id: ${{ vars.azure_subscription_id }}
 
       - name: Get Resource Group
         id: get_resource_group
@@ -93,7 +93,7 @@ jobs:
         run: |
           .\source\AcceptanceTests\deploy\deploy.ps1 `
             -PrNumber ${{ github.event.pull_request.number }} `
-            -Subscription ${{ secrets.azure_subscription_id }} `
+            -Subscription ${{ vars.azure_subscription_id }} `
             -ResourceGroup ${{ steps.get_resource_group.outputs.resource_group }} `
             -SqlServerName " " `
             -NamespaceName ${{ steps.get_servicebus_namespace.outputs.namespace_name }}
@@ -114,14 +114,14 @@ jobs:
         with:
           client-id: ${{ vars.azure_spn_id_oidc }}
           tenant-id: ${{ secrets.azure_tenant_id }}
-          subscription-id: ${{ secrets.azure_subscription_id }}
+          subscription-id: ${{ vars.azure_subscription_id }}
 
       - name: Teardown acceptance test resources
         shell: pwsh
         run: |
           .\source\AcceptanceTests\deploy\teardown.ps1 `
             -PrNumber ${{ github.event.pull_request.number }} `
-            -Subscription ${{ secrets.azure_subscription_id }} `
+            -Subscription ${{ vars.azure_subscription_id }} `
             -ResourceGroup ${{ needs.deploy_acceptance_test_resources.outputs.resource_group }} `
             -SqlServerName " " `
             -NamespaceName ${{ needs.deploy_acceptance_test_resources.outputs.namespace_name }}
