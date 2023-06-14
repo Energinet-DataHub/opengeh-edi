@@ -101,7 +101,7 @@ public class AggregationResultForwardingTests
 
         Assert.Equal(MarketRole.BalanceResponsible, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.BalanceResponsibleNumber, message.ReceiverId.Value);
-        //TODO: Hvad betyder nettab (kun for den balance ansvarlig som har den el-leverandør som har nettabsmålepunktet)
+        //TODO: system korrektion (kun for den balance ansvarlig som har den el-leverandør som har system korrektionsmålepunktet)
     }
 
     [Fact]
