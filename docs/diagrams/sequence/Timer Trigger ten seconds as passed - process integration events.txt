@@ -1,0 +1,17 @@
+autoactivation on
+Function - TenSecondsHasPassed (TimerTrigger)->ProcessIntegrationEventsOnTenSecondsHasPassed: Mediator - Publish (TenSecondsHasHasPassed)
+ProcessIntegrationEventsOnTenSecondsHasPassed->IntegrationEventsProcessor: ProcessMessages
+IntegrationEventsProcessor->DB Connection: Find pending Messages
+IntegrationEventsProcessor<--DB Connection: ReceivedIntegrationEvents
+
+IntegrationEventsProcessor->CalculationResultCompletedEventMapper:CanHandle
+IntegrationEventsProcessor<--CalculationResultCompletedEventMapper: bool
+IntegrationEventsProcessor->CalculationResultCompletedEventMapper: MapFrom
+IntegrationEventsProcessor<--CalculationResultCompletedEventMapper: AggreationResultAvailable (Notification)
+IntegrationEventsProcessor->WhenAnAggregationResultIsAvailable : Mediator - Publish
+WhenAnAggregationResultIsAvailable->CommandSchedulerFacade: Enqueue (ForwardAggregationResult)
+CommandSchedulerFacade->CommandScheduler:Enqueue (InternalCommand)
+CommandScheduler->B2BContext:Add (tabel: QueuedInternalCommands) 
+CommandSchedulerFacade->UnitOfWork:Commit
+UnitOfWork->B2BContext:SaveChanges
+IntegrationEventsProcessor->DB Connection: MarkedAsProcessed

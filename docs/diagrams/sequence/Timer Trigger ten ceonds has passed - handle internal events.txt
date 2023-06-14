@@ -1,0 +1,16 @@
+autoactivation on
+Function - TenSecondsHasPassed (TimerTrigger) ->ProcessIntegrationEventsOnTenSecondsHasPassed:Mediator - Send
+ProcessIntegrationEventsOnTenSecondsHasPassed->InternalCommandProcessor: ProcessPending
+InternalCommandProcessor->ProcessPendingInternalCommandAccessor:GetPending
+ProcessPendingInternalCommandAccessor->B2BContext: GetQueuedInternalCommands (not processed)
+ProcessPendingInternalCommandAccessor<--B2BContext: QueuedInternalCommands
+ProcessPendingInternalCommandAccessor->InternalCommandMapper:GetByName
+ProcessPendingInternalCommandAccessor->Serializer:Deserialize
+ProcessPendingInternalCommandAccessor<--Serializer: InternalCommand
+ProcessPendingInternalCommandAccessor->CommandExecutor:Execute (InternalCommand)
+CommandExecutor->ServiceScopeFactory:GetRequiredService (Mediator)
+CommandExecutor->Mediator: Send
+Mediator->ForwardAggregationResultHandler: Handle
+ForwardAggregationResultHandler->AggregationResultForwardingRepository:Add
+ForwardAggregationResultHandler->IOutgoingMessageStore:Add
+ProcessPendingInternalCommandAccessor->Connection: MarkAsProcessed
