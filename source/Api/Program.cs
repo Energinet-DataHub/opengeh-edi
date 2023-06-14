@@ -70,8 +70,8 @@ namespace Api
             return new HostBuilder()
                 .ConfigureFunctionsWorkerDefaults(worker =>
                 {
-                    worker.UseMiddleware<CorrelationIdMiddleware>();
                     worker.UseMiddleware<UnHandledExceptionMiddleware>();
+                    worker.UseMiddleware<CorrelationIdMiddleware>();
                     /*worker.UseMiddleware<RequestResponseLoggingMiddleware>();*/
                     ConfigureAuthenticationMiddleware(worker);
                 })
