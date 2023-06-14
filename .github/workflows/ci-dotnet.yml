@@ -65,7 +65,7 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.azure_spn_id_oidc }}
+          client-id: ${{ vars.azure_spn_id_oidc }}
           tenant-id: ${{ secrets.azure_tenant_id }}
           subscription-id: ${{ secrets.azure_subscription_id }}
 
@@ -112,7 +112,7 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.azure_spn_id_oidc }}
+          client-id: ${{ vars.azure_spn_id_oidc }}
           tenant-id: ${{ secrets.azure_tenant_id }}
           subscription-id: ${{ secrets.azure_subscription_id }}
 
