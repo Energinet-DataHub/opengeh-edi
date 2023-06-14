@@ -89,6 +89,68 @@ public class AggregationResultForwardingTests
         Assert.Equal(SettlementType.NonProfiled.Name, message.Series.SettlementType);
     }
 
+    [Fact]
+    public void Create_message_for_balance_responsible_when_result_is_total_production()
+    {
+        var result = _aggregationResult
+            .ForProduction()
+            .WithGrouping(ActorNumber.Create("1234567890123"), ActorNumber.Create("1234567890124"))
+            .Build();
+
+        var message = CreateMessage(result);
+
+        Assert.Equal(MarketRole.BalanceResponsible, message.ReceiverRole);
+        Assert.Equal(result.ActorGrouping?.BalanceResponsibleNumber, message.ReceiverId.Value);
+        //TODO: system korrektion (kun for den balance ansvarlig som har den el-leverandør som har system korrektionsmålepunktet)
+    }
+
+    [Fact]
+    public void Create_message_for_balance_responsible_when_result_is_flex()
+    {
+        var result = _aggregationResult
+            .ForConsumption(SettlementType.Flex)
+            .WithGrouping(ActorNumber.Create("1234567890123"), ActorNumber.Create("1234567890124"))
+            .Build();
+
+        var message = CreateMessage(result);
+
+        Assert.Equal(MarketRole.BalanceResponsible, message.ReceiverRole);
+        Assert.Equal(result.ActorGrouping?.BalanceResponsibleNumber, message.ReceiverId.Value);
+        Assert.Equal(SettlementType.Flex.Name, message.Series.SettlementType);
+        //TODO: Hvad betyder nettab (kun for den balance ansvarlig som har den el-leverandør som har nettabsmålepunktet)
+    }
+
+    [Fact]
+    public void Create_message_for_energy_supplier_when_result_is_flex()
+    {
+        var result = _aggregationResult
+            .ForConsumption(SettlementType.Flex)
+            .WithGrouping(ActorNumber.Create("1234567890123"), null)
+            .Build();
+
+        var message = CreateMessage(result);
+
+        Assert.Equal(MarketRole.EnergySupplier, message.ReceiverRole);
+        Assert.Equal(result.ActorGrouping?.EnergySupplierNumber, message.ReceiverId.Value);
+        Assert.Equal(SettlementType.Flex.Name, message.Series.SettlementType);
+        //TODO: Hvad betyder nettab (kun for de el-leverandøre som den elleverandør har)
+    }
+
+    [Fact]
+    public void Create_message_for_energy_supplier_when_result_is_total_production()
+    {
+        var result = _aggregationResult
+            .ForProduction()
+            .WithGrouping(ActorNumber.Create("1234567890123"), null)
+            .Build();
+
+        var message = CreateMessage(result);
+
+        Assert.Equal(MarketRole.EnergySupplier, message.ReceiverRole);
+        Assert.Equal(result.ActorGrouping?.EnergySupplierNumber, message.ReceiverId.Value);
+        //TODO: Hvad betyder system korrektion (kun for de el-leverandøre som den balance ansarlige har)
+    }
+
     private static AggregationResultMessage CreateMessage(Aggregation result)
     {
         var transaction = CreateTransaction();

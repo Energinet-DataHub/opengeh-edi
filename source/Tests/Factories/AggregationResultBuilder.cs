@@ -40,7 +40,7 @@ public class AggregationResultBuilder
             new Period(
                 SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)),
                 SystemClock.Instance.GetCurrentInstant()),
-            SettlementType.NonProfiled.Name,
+            _settlementType?.Name,
             BusinessReason.BalanceFixing.Name,
             _actorGrouping,
             new GridAreaDetails(_gridArea.Code, _gridOperator.Value));
@@ -56,7 +56,6 @@ public class AggregationResultBuilder
     public AggregationResultBuilder ForProduction()
     {
         _meteringPointType = MeteringPointType.Production;
-        _settlementType = null;
         return this;
     }
 
