@@ -15,3 +15,5 @@ CommandScheduler->B2BContext:Add (tabel: QueuedInternalCommands)
 CommandSchedulerFacade->UnitOfWork:Commit
 UnitOfWork->B2BContext:SaveChanges
 IntegrationEventsProcessor->DB Connection: MarkedAsProcessed
+
+
