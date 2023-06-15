@@ -18,10 +18,10 @@ namespace Domain.Transactions.Aggregations;
 
 public class SettlementType : EnumerationType
 {
-    // customer with more than ~100.000 kwH
+    // Customer with more than ~100.000 kwH per year
     public static readonly SettlementType NonProfiled = new(0, nameof(NonProfiled), "E02");
 
-    // customer with less than ~100.000 kwH
+    // Customer with less than ~100.000 kwH per year
     public static readonly SettlementType Flex = new(1, nameof(Flex), "XXX");
 
     private SettlementType(int id, string name, string code)
