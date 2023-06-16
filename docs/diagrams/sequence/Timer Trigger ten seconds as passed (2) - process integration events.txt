@@ -1,33 +1,14 @@
 autoactivation on
-participantgroup #lightyellow **Api**
-participant Timer Trigger (TenSecondsHasPassed)
-
-end
-participantgroup #lightblue **Application**
-participant WhenAnAggregationResultIsAvailable
-participant CommandSchedulerFacade
-end
-participantgroup #lightgreen **Infrastructure**
-participant ProcessIntegrationEventsOnTenSecondsHasPassed
-participant IntegrationEventsProcessor
-participant DB Connection
-participant CalculationResultCompletedEventMapper
-participant CommandScheduler
-participant B2BContext
-participant UnitOfWork
-participant IntegrationEventsProcessor
-end
-Timer Trigger (TenSecondsHasPassed)->Mediator:Publish(Event: TenSecondsHasHasPassed)
-Mediator->ProcessIntegrationEventsOnTenSecondsHasPassed:Handle
+Function - TenSecondsHasPassed (TimerTrigger)->ProcessIntegrationEventsOnTenSecondsHasPassed: Mediator - Publish (TenSecondsHasHasPassed)
 ProcessIntegrationEventsOnTenSecondsHasPassed->IntegrationEventsProcessor: ProcessMessages
 IntegrationEventsProcessor->DB Connection: Find pending Messages
 IntegrationEventsProcessor<--DB Connection: ReceivedIntegrationEvents
+
 IntegrationEventsProcessor->CalculationResultCompletedEventMapper:CanHandle
 IntegrationEventsProcessor<--CalculationResultCompletedEventMapper: bool
 IntegrationEventsProcessor->CalculationResultCompletedEventMapper: MapFrom
 IntegrationEventsProcessor<--CalculationResultCompletedEventMapper: AggreationResultAvailable (Notification)
-IntegrationEventsProcessor->Mediator:Publish (Events)
-Mediator->WhenAnAggregationResultIsAvailable:Handle
+IntegrationEventsProcessor->WhenAnAggregationResultIsAvailable : Mediator - Publish
 WhenAnAggregationResultIsAvailable->CommandSchedulerFacade: Enqueue (ForwardAggregationResult)
 CommandSchedulerFacade->CommandScheduler:Enqueue (InternalCommand)
 CommandScheduler->B2BContext:Add (tabel: QueuedInternalCommands) 
