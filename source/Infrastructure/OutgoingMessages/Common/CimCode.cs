@@ -48,6 +48,9 @@ public static class CimCode
         if (meteringPointType == MeteringPointType.Production)
             return "E18";
 
+        if (meteringPointType == MeteringPointType.Exchange)
+            return "E20";
+
         throw NoCodeFoundFor(meteringPointType.Name);
     }
 
