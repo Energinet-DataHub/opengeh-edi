@@ -23,7 +23,7 @@ namespace CimMessageAdapter.Messages;
 public interface IMessageTypeValidator
 {
     /// <summary>
-    /// Validates  Message Type
+    /// Validates Message Type
     /// </summary>
     /// <param name="messageType"></param>
     /// <param name="cancellationToken"></param>
