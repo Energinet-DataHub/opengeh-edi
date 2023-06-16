@@ -17,6 +17,7 @@ using Application.Configuration;
 
 namespace Api.Configuration.Middleware.Correlation
 {
+    //TODO: Invistigate why this is needed
     public sealed class CorrelationContext : ICorrelationContext
     {
         private string? _id;

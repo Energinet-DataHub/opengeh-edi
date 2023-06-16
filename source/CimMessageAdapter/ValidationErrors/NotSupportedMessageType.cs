@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Errors
+namespace CimMessageAdapter.ValidationErrors;
+
+public class NotSupportedMessageType : ValidationError
 {
-    public class DuplicateTransactionIdDetected : ValidationError
+    public NotSupportedMessageType(string type)
+        : base($"The type {type} is not supported", "00401", "MessageType")
     {
-        public DuplicateTransactionIdDetected(string transactionId)
-            : base($"Transaction id '{transactionId}' is not unique and will not be processed.", "B2B-005")
-        {
-        }
     }
 }

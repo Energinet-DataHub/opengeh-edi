@@ -20,8 +20,8 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
-using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
+using CimMessageAdapter.ValidationErrors;
 using DocumentValidation;
 using DocumentValidation.CimXml;
 using DocumentFormat = Domain.Documents.DocumentFormat;
@@ -70,7 +70,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         {
             return new
                 MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>(
-                    new UnknownBusinessReasonOrVersion(businessProcessType, version));
+                    new InvalidBusinessReasonOrVersion(businessProcessType, version));
         }
 
         ResetMessagePosition(message);

@@ -64,8 +64,8 @@ namespace IntegrationTests.Fixtures
                 $"DELETE FROM [dbo].[MoveInTransactions] " +
                 $"DELETE FROM [dbo].[AggregatedTimeSeriesTransactions] " +
                 $"DELETE FROM [dbo].[UpdateCustomerMasterDataTransactions] " +
-                $"DELETE FROM [dbo].[MessageIds] " +
-                $"DELETE FROM [dbo].[TransactionIds]" +
+                $"DELETE FROM [dbo].[MessageRegistry] " +
+                $"DELETE FROM [dbo].[TransactionRegistry]" +
                 $"DELETE FROM [dbo].[OutgoingMessages] " +
                 $"DELETE FROM [dbo].[ReasonTranslations] " +
                 $"DELETE FROM [dbo].[QueuedInternalCommands] " +
