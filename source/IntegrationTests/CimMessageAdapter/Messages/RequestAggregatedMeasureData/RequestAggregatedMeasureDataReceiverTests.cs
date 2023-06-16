@@ -238,7 +238,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .RequestAggregatedMeasureData()
             .WithReceiverRole(knownReceiverRole)
             .WithReceiverId(knownReceiverId)
-            .WithMessageId("123564755")
+            .WithMessageId("123564789123564789123564789123564789")
             .WithSenderRole(MarketRole.EnergySupplier.Code)
             .WithSenderId(SampleData.SecondSenderId)
             .Message();
