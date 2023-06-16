@@ -118,6 +118,13 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202304131240 Create ArchivedMessage table.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <None Remove="Scripts\Model\202305311442 Recreate TransactionIds as TransactionRegistry.sql" />
+    <EmbeddedResource Include="Scripts\Model\202305311442 Recreate TransactionIds as TransactionRegistry.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Scripts\Model\202306010815 Recreate MessageIds as MessageRegistry.sql" />
+    <EmbeddedResource Include="Scripts\Model\202306010815 Recreate MessageIds as MessageRegistry.sql" />
   </ItemGroup>
 
 </Project>

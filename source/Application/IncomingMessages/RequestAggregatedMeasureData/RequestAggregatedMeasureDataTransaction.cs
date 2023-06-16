@@ -12,13 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Errors
+using Application.Configuration.Commands.Commands;
+using MediatR;
+
+namespace Application.IncomingMessages.RequestAggregatedMeasureData;
+
+public class RequestAggregatedMeasureDataTransaction : ICommand<Unit>, IMarketTransaction<Serie>
 {
-    public class UnknownReceiver : ValidationError
+    public RequestAggregatedMeasureDataTransaction(MessageHeader messageHeader, Serie marketActivityRecord)
     {
-        public UnknownReceiver(string receiverId)
-            : base($"Receiver id {receiverId} is not known receiver", "B2B-008")
-        {
-        }
+        MessageHeader = messageHeader;
+        MarketActivityRecord = marketActivityRecord;
     }
+
+    public MessageHeader MessageHeader { get; }
+
+    public Serie MarketActivityRecord { get; }
 }

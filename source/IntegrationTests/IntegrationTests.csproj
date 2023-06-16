@@ -66,6 +66,9 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\BadRequestAggregatedMeasureData.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
       <EmbeddedResource Include="CimMessageAdapter\Messages\xml\BadRequestChangeCustomerCharacteristics.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
@@ -76,6 +79,10 @@ limitations under the License.
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <EmbeddedResource Include="CimMessageAdapter\Messages\xml\RequestChangeOfSupplier.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="CimMessageAdapter\Messages\xml\RequestAggregatedMeasureData.xml" />
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\RequestAggregatedMeasureData.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
     </ItemGroup>

@@ -27,9 +27,10 @@ namespace IntegrationTests.Application.IncomingMessages
         private readonly string _createdAt = SystemClock.Instance.GetCurrentInstant().ToString();
         private readonly string _receiverRole = "DDQ";
         private readonly string _senderRole = "DDZ";
+        private readonly string _messageType = NotSet;
         private Instant _effectiveDate = SystemClock.Instance.GetCurrentInstant();
         private string? _messageId;
-        private string _businessReason = NotSet;
+        private string _processType = NotSet;
         private string _senderId = NotSet;
         private ActorNumber _receiverId = DataHubDetails.IdentificationNumber;
         private string? _consumerName = NotSet;
@@ -58,7 +59,7 @@ namespace IntegrationTests.Application.IncomingMessages
 
         internal IncomingMessageBuilder WithBusinessReason(BusinessReason businessReason)
         {
-            _businessReason = businessReason.Name;
+            _processType = businessReason.Name;
             return this;
         }
 
@@ -123,7 +124,8 @@ namespace IntegrationTests.Application.IncomingMessages
         {
             return new MessageHeader(
                 _messageId ?? Guid.NewGuid().ToString(),
-                _businessReason,
+                _messageType,
+                _processType,
                 _senderId,
                 _senderRole,
                 _receiverId.Value,

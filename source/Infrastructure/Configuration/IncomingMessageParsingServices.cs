@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Application.IncomingMessages.RequestAggregatedMeasureData;
 using Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 using Application.IncomingMessages.RequestChangeOfSupplier;
 using CimMessageAdapter.Messages;
+using CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 using CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using CimMessageAdapter.Response;
@@ -36,6 +38,7 @@ internal static class IncomingMessageParsingServices
         RegisterB2BResponseServices(services);
         RegisterSchemaProviders(services);
         RegisterRequestChangeOfSupplierMessageHandling(services);
+        RegisterRequestAggregatedMeasureDataHandling(services);
         RegisterRequestChangeOfCustomerCharacteristicsMessageHandling(services);
     }
 
@@ -62,6 +65,8 @@ internal static class IncomingMessageParsingServices
                     MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>,
                 IncomingMessages.RequestChangeCustomerCharacteristics.XmlMessageParser>();
         services.AddTransient<CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.MessageParser>();
+        services.AddScoped<DefaultProcessTypeValidator>();
+        services.AddScoped<DefaultMessageTypeValidator>();
     }
 
     private static void RegisterRequestChangeOfSupplierMessageHandling(IServiceCollection services)
@@ -73,5 +78,19 @@ internal static class IncomingMessageParsingServices
         services
             .AddTransient<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>, XmlMessageParser>();
         services.AddTransient<MessageParser>();
+        services.AddScoped<DefaultProcessTypeValidator>();
+        services.AddScoped<DefaultMessageTypeValidator>();
+    }
+
+    private static void RegisterRequestAggregatedMeasureDataHandling(IServiceCollection services)
+    {
+        services
+            .AddTransient<IMessageParser<Serie, RequestAggregatedMeasureDataTransaction>, Infrastructure.IncomingMessages.RequestAggregatedMeasureData.XmlMessageParser>();
+        services.AddTransient<CimMessageAdapter.Messages.RequestAggregatedMeasureData.MessageParser>();
+        services.AddTransient<RequestAggregatedMeasureDataReceiver>();
+        services.AddTransient<CimMessageAdapter.Messages.RequestAggregatedMeasureData.SenderAuthorizer>();
+        services.AddTransient<RequestAggregatedMeasureDataTransaction>();
+        services.AddScoped<ProcessTypeValidator>();
+        services.AddScoped<MessageTypeValidator>();
     }
 }

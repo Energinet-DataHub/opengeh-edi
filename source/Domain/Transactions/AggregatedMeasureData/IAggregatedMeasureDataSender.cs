@@ -12,13 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Errors
+namespace Domain.Transactions.AggregatedMeasureData;
+
+/// <summary>
+/// Responsible for send AggregatedMeasureDataTransactionRequest to a Receiver
+/// </summary>
+public interface IAggregatedMeasureDataSender
 {
-    public class SenderAuthorizationFailed : ValidationError
-    {
-        public SenderAuthorizationFailed()
-            : base("Sender is not authorization", "B2B-008")
-        {
-        }
-    }
+    /// <summary>
+    /// Sending request to Receiver
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
+    Task SendAsync(AggregatedMeasureDataTransactionRequest request, CancellationToken cancellationToken);
 }
