@@ -19,11 +19,11 @@ using Infrastructure.WholeSale;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData;
 
-public class AggregatedMeasureDataSender : IAggregatedMeasureDataSender
+public class RequestedAggregatedMeasureDataSender : IAggregatedMeasureDataSender
 {
     private readonly WholeSaleInbox<AggregatedMeasureDataTransactionRequest> _wholeSaleInbox;
 
-    public AggregatedMeasureDataSender(WholeSaleInbox<AggregatedMeasureDataTransactionRequest> wholeSaleInbox)
+    public RequestedAggregatedMeasureDataSender(WholeSaleInbox<AggregatedMeasureDataTransactionRequest> wholeSaleInbox)
     {
         _wholeSaleInbox = wholeSaleInbox;
     }

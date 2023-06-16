@@ -21,12 +21,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData;
 
-internal static class AggregatedMeasureDataConfiguration
+internal static class RequestedAggregatedMeasureDataConfiguration
 {
     public static void Configure(IServiceCollection services)
     {
         services.AddTransient<IRequestHandler<RequestAggregatedMeasureDataTransaction, Unit>, AggregatedMeasureDataRequestHandler>();
-        services.AddTransient<IAggregatedMeasureDataSender, AggregatedMeasureDataSender>();
+        services.AddTransient<IAggregatedMeasureDataSender, RequestedAggregatedMeasureDataSender>();
         services.AddTransient<WholeSaleInbox<AggregatedMeasureDataTransactionRequest>>();
     }
 }
