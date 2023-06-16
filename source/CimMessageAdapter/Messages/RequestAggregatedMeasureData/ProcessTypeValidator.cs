@@ -26,7 +26,7 @@ public class ProcessTypeValidator : IProcessTypeValidator
 
     public async Task<Result> ValidateAsync(string processType, CancellationToken cancellationToken)
     {
-        return await Task.FromResult(!_whiteList.Contains(processType) ?
-            Result.Failure(new NotSupportedProcessType(processType)) : Result.Succeeded()).ConfigureAwait(false);
+        return await Task.FromResult(_whiteList.Contains(processType) ?
+             Result.Succeeded() : Result.Failure(new NotSupportedProcessType(processType))).ConfigureAwait(false);
     }
 }

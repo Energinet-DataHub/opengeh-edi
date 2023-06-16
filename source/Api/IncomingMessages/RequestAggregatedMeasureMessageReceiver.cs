@@ -91,7 +91,8 @@ public class RequestAggregatedMeasureMessageReceiver
 
         var messageParserResult = await _messageParser.ParseAsync(request.Body, cimFormat, cancellationToken).ConfigureAwait(false);
 
-        if (messageParserResult.IncomingMarketDocument?.Header is null || messageParserResult.Errors.Any())
+        var messageHeader = messageParserResult.IncomingMarketDocument?.Header;
+        if (messageHeader is null || messageParserResult.Errors.Any())
         {
             var errorResult = Result.Failure(messageParserResult.Errors.ToArray());
             var httpErrorStatusCode = messageParserResult.Errors.Any(x => x is MessageSizeExceeded) ? HttpStatusCode.RequestEntityTooLarge : HttpStatusCode.BadRequest;
@@ -100,12 +101,12 @@ public class RequestAggregatedMeasureMessageReceiver
 
         var timestamp = _systemDateTimeProvider.Now();
         _messageArchive.Add(new ArchivedMessage(
-            messageParserResult.IncomingMarketDocument.Header.MessageId,
+            messageHeader.MessageId,
             DocumentType.RequestAggregatedMeasureData,
-            ActorNumber.Create(messageParserResult.IncomingMarketDocument.Header.SenderId),
-            ActorNumber.Create(messageParserResult.IncomingMarketDocument.Header.ReceiverId),
+            ActorNumber.Create(messageHeader.SenderId),
+            ActorNumber.Create(messageHeader.ReceiverId),
             timestamp,
-            BusinessReason.From(messageParserResult.IncomingMarketDocument.Header.BusinessReason),
+            BusinessReason.From(messageHeader.BusinessReason),
             request.Body));
 
         var result = await _messageReceiver.ReceiveAsync(messageParserResult, cancellationToken)

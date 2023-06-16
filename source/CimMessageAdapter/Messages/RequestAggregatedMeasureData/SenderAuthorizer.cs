@@ -44,7 +44,7 @@ namespace CimMessageAdapter.Messages.RequestAggregatedMeasureData
 
         private void EnsureCurrentUserHasRequiredRole(string senderRole)
         {
-            if (_marketActorAuthenticator.CurrentIdentity.HasRole(senderRole) == false)
+            if (!_marketActorAuthenticator.CurrentIdentity.HasRole(senderRole))
             {
                 _validationErrors.Add(new AuthenticatedUserDoesNotHoldRequiredRoleType());
             }
@@ -53,7 +53,7 @@ namespace CimMessageAdapter.Messages.RequestAggregatedMeasureData
         private void EnsureSenderRole(string senderRole)
         {
             if (!senderRole.Equals(MarketRole.EnergySupplier.Code, StringComparison.OrdinalIgnoreCase)
-                && !senderRole.Equals(MarketRole.GridOperator.Code, StringComparison.OrdinalIgnoreCase)
+                && !senderRole.Equals(MarketRole.MeteredDataResponsible.Code, StringComparison.OrdinalIgnoreCase)
                 && !senderRole.Equals(MarketRole.BalanceResponsible.Code, StringComparison.OrdinalIgnoreCase))
             {
                 _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());

@@ -34,7 +34,7 @@ public class AggregatedMeasureDataRequestHandler : IRequestHandler<RequestAggreg
     public async Task<Unit> Handle(RequestAggregatedMeasureDataTransaction request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
-        var requestMessage = request.Message;
+        var requestMessage = request.MessageHeader;
         var requestMarketActivityRecord = request.MarketActivityRecord;
 
         var requestData = new AggregatedMeasureDataTransactionRequest(
@@ -59,7 +59,7 @@ public class AggregatedMeasureDataRequestHandler : IRequestHandler<RequestAggreg
                 requestMarketActivityRecord.EnergySupplierMarketParticipantId,
                 requestMarketActivityRecord.BalanceResponsiblePartyMarketParticipantId));
 
-        await _aggregatedMeasureDataSender.InvokeAsync(requestData, cancellationToken).ConfigureAwait(false);
+        await _aggregatedMeasureDataSender.SendAsync(requestData, cancellationToken).ConfigureAwait(false);
         return Unit.Value;
     }
 }

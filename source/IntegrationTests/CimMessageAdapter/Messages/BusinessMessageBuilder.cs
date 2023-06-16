@@ -14,6 +14,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Xml.Linq;
 
 namespace IntegrationTests.CimMessageAdapter.Messages
@@ -89,17 +90,12 @@ namespace IntegrationTests.CimMessageAdapter.Messages
         public BusinessMessageBuilder WithSeriesTransactionId(string transactionId)
         {
             var root = _document.Root;
-            var seriesElement = root!
-                .Element(_xmlNamespace + "Series");
+            var serieElement = root!
+                .Element(_xmlNamespace + "Series")!
+                .Elements()
+                .First(serieElement => serieElement.Name.LocalName!.Equals("mRID", StringComparison.Ordinal));
 
-            foreach (var serieElement in seriesElement!.Elements())
-            {
-                if (serieElement.Name.LocalName!.Equals("mRID", StringComparison.Ordinal))
-                {
-                    serieElement!.Value = transactionId;
-                }
-            }
-
+            serieElement!.Value = transactionId;
             return this;
         }
 

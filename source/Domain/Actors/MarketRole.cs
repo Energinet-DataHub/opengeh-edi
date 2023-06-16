@@ -22,7 +22,7 @@ public class MarketRole : EnumerationType
     public static readonly MarketRole EnergySupplier = new(1, "EnergySupplier", "DDQ");
     public static readonly MarketRole GridOperator = new(2, "GridOperator", "DDM");
     public static readonly MarketRole MeteringDataAdministrator = new(3, "MeteringDataAdministrator", string.Empty);
-    public static readonly MarketRole MeteredDataResponsible = new(4, "MeteredDataResponsible", string.Empty);
+    public static readonly MarketRole MeteredDataResponsible = new(4, "MeteredDataResponsible", "MDR");
     public static readonly MarketRole BalanceResponsible = new(5, "BalanceResponsible", "DDK");
 
     private MarketRole(int id, string name, string code)

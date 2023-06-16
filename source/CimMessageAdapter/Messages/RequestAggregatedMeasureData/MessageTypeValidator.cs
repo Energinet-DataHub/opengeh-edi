@@ -26,7 +26,7 @@ public class MessageTypeValidator : IMessageTypeValidator
 
     public async Task<Result> ValidateAsync(string messageType, CancellationToken cancellationToken)
     {
-        return await Task.FromResult(!_whiteList.Contains(messageType) ?
-            Result.Failure(new NotSupportedMessageType(messageType)) : Result.Succeeded()).ConfigureAwait(false);
+        return await Task.FromResult(_whiteList.Contains(messageType) ?
+             Result.Succeeded() : Result.Failure(new NotSupportedMessageType(messageType))).ConfigureAwait(false);
     }
 }

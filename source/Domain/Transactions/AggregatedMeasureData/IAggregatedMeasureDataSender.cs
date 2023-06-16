@@ -25,5 +25,5 @@ public interface IAggregatedMeasureDataSender
     /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-    Task InvokeAsync(AggregatedMeasureDataTransactionRequest request, CancellationToken cancellationToken);
+    Task SendAsync(AggregatedMeasureDataTransactionRequest request, CancellationToken cancellationToken);
 }

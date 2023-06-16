@@ -19,13 +19,13 @@ namespace Application.IncomingMessages.RequestAggregatedMeasureData;
 
 public class RequestAggregatedMeasureDataTransaction : ICommand<Unit>, IMarketTransaction<Serie>
 {
-    public RequestAggregatedMeasureDataTransaction(MessageHeader message, Serie marketActivityRecord)
+    public RequestAggregatedMeasureDataTransaction(MessageHeader messageHeader, Serie marketActivityRecord)
     {
-        Message = message;
+        MessageHeader = messageHeader;
         MarketActivityRecord = marketActivityRecord;
     }
 
-    public MessageHeader Message { get; }
+    public MessageHeader MessageHeader { get; }
 
     public Serie MarketActivityRecord { get; }
 }

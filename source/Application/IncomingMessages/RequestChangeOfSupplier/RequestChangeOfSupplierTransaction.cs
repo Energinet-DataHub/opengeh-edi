@@ -22,13 +22,13 @@ namespace Application.IncomingMessages.RequestChangeOfSupplier
     public class RequestChangeOfSupplierTransaction : ICommand<Unit>, IMarketTransaction<MarketActivityRecord>
     {
         [JsonConstructor]
-        public RequestChangeOfSupplierTransaction(MessageHeader message, MarketActivityRecord marketActivityRecord)
+        public RequestChangeOfSupplierTransaction(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
         {
-            Message = message;
+            MessageHeader = messageHeader;
             MarketActivityRecord = marketActivityRecord;
         }
 
-        public MessageHeader Message { get; }
+        public MessageHeader MessageHeader { get; }
 
         public MarketActivityRecord MarketActivityRecord { get; }
 

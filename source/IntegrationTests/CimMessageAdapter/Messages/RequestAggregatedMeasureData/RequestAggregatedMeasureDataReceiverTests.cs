@@ -65,7 +65,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         new List<object[]>
         {
             new object[] { MarketRole.EnergySupplier.Code },
-            new object[] { MarketRole.GridOperator.Code },
+            new object[] { MarketRole.MeteredDataResponsible.Code },
             new object[] { MarketRole.BalanceResponsible.Code },
         };
 
@@ -216,7 +216,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     }
 
     [Fact]
-    public async Task Series_must_have_none_unique_transaction_ids_across_senders()
+    public async Task Series_must_have_unique_transaction_ids_across_senders()
     {
         var knownReceiverId = "5790001330552";
         var knownReceiverRole = "DDZ";

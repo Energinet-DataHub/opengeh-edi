@@ -28,7 +28,7 @@ public class AggregatedMeasureDataSender : IAggregatedMeasureDataSender
         _wholeSaleInbox = wholeSaleInbox;
     }
 
-    public async Task InvokeAsync(AggregatedMeasureDataTransactionRequest request, CancellationToken cancellationToken)
+    public async Task SendAsync(AggregatedMeasureDataTransactionRequest request, CancellationToken cancellationToken)
     {
         await _wholeSaleInbox.SendAsync(request, cancellationToken).ConfigureAwait(false);
     }

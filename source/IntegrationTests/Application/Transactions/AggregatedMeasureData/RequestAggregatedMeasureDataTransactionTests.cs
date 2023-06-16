@@ -54,7 +54,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
         Assert.NotNull(dispatchedMessage);
         var byteAsString = Encoding.UTF8.GetString(dispatchedMessage?.Body);
         var dispatchedAggregatedMeasureDataTransactionRequest = _jsonSerializer.Deserialize<AggregatedMeasureDataTransactionRequest>(byteAsString);
-        Assert.Equal(incomingMessage.Message.MessageId, dispatchedAggregatedMeasureDataTransactionRequest.Message.MessageId);
+        Assert.Equal(incomingMessage.MessageHeader.MessageId, dispatchedAggregatedMeasureDataTransactionRequest.Message.MessageId);
     }
 
     private static RequestAggregatedMeasureDataMessageBuilder MessageBuilder()
