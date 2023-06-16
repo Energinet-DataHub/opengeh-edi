@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Errors
+namespace IntegrationTests.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
+
+internal static class SampleData
 {
-    public class DuplicateMessageIdDetected : ValidationError
-    {
-        public DuplicateMessageIdDetected(string messageId)
-            : base($"Message id '{messageId}' is not unique", "B2B-003")
-        {
-        }
-    }
+    internal static string SenderId => "1234567890123";
+
+    internal static string SecondSenderId => "1234567890124";
+
+    internal static string StsAssignedUserId => "267DAC56-8CDC-43F8-BE16-91A297F37DE6";
+
+    internal static string SecondStsAssignedUserId => "267DAC56-8CDC-43F8-BE16-91A297F37DE7";
 }

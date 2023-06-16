@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using CimMessageAdapter.Errors;
+using CimMessageAdapter.ValidationErrors;
 
 namespace CimMessageAdapter.Messages
 {

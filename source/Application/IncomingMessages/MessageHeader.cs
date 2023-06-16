@@ -16,9 +16,10 @@ namespace Application.IncomingMessages
 {
     public class MessageHeader
     {
-        public MessageHeader(string messageId, string businessReason, string senderId, string senderRole, string receiverId, string receiverRole, string createdAt)
+        public MessageHeader(string messageId, string messageType, string businessReason, string senderId, string senderRole, string receiverId, string receiverRole, string createdAt)
         {
             MessageId = messageId;
+            MessageType = messageType;
             BusinessReason = businessReason;
             SenderId = senderId;
             SenderRole = senderRole;
@@ -28,6 +29,8 @@ namespace Application.IncomingMessages
         }
 
         public string MessageId { get; }
+
+        public string MessageType { get; }
 
         public string BusinessReason { get; }
 

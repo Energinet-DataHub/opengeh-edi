@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Errors
+namespace CimMessageAdapter.ValidationErrors
 {
-    public class SenderIdDoesNotMatchAuthenticatedUser : ValidationError
+    public class SenderRoleTypeIsNotAuthorized : ValidationError
     {
-        public SenderIdDoesNotMatchAuthenticatedUser()
-            : base("Sender id does not match id of current authenticated user.", "B2B-008")
+        public SenderRoleTypeIsNotAuthorized()
+            : base("Sender role type is not authorized to use this type of message", "00003", "SenderRole")
         {
         }
     }

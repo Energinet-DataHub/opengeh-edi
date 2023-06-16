@@ -29,6 +29,7 @@ internal static class MessageHeaderExtractor
         CancellationToken cancellationToken)
     {
         var messageId = string.Empty;
+        var messageType = string.Empty;
         var processType = string.Empty;
         var senderId = string.Empty;
         var senderRole = string.Empty;
@@ -43,6 +44,8 @@ internal static class MessageHeaderExtractor
         {
             if (reader.Is("mRID", ns))
                 messageId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            else if (reader.Is("type", ns))
+                messageType = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             else if (reader.Is("process.processType", ns))
                 processType = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             else if (reader.Is("sender_MarketParticipant.mRID", ns))
@@ -60,6 +63,6 @@ internal static class MessageHeaderExtractor
             if (reader.Is(marketActivityRecordElementName, ns)) break;
         }
 
-        return new MessageHeader(messageId, processType, senderId, senderRole, receiverId, receiverRole, createdAt);
+        return new MessageHeader(messageId, messageType, processType, senderId, senderRole, receiverId, receiverRole, createdAt);
     }
 }
