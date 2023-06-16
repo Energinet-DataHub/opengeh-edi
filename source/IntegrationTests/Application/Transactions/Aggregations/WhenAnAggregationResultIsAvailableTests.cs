@@ -23,7 +23,6 @@ using Energinet.DataHub.Wholesale.Contracts.Events;
 using IntegrationTests.Assertions;
 using IntegrationTests.Factories;
 using IntegrationTests.Fixtures;
-using Json.More;
 using Xunit;
 using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
 
@@ -171,9 +170,11 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     }
 
     [Theory]
-    [InlineData(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing, nameof(BusinessReason.BalanceFixing))]
-    [InlineData(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Aggregation, nameof(BusinessReason.PreliminaryAggregation))]
-    public async Task Exchange_is_sent_to_the_grid_operator(ProcessType processType, string businessReason)
+    [InlineData(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing, nameof(BusinessReason.BalanceFixing), TimeSeriesType.NetExchangePerGa)]
+    [InlineData(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing, nameof(BusinessReason.BalanceFixing), TimeSeriesType.NetExchangePerNeighboringGa)]
+    [InlineData(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.NetExchangePerGa)]
+    [InlineData(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.NetExchangePerNeighboringGa)]
+    public async Task Exchange_is_sent_to_the_grid_operator(ProcessType processType, string businessReason, TimeSeriesType timeSeriesType)
     {
         _eventBuilder
             .WithProcessType(processType)
@@ -181,7 +182,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .WithMeasurementUnit(QuantityUnit.Kwh)
             .AggregatedBy(SampleData.GridAreaCode, null, null)
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
-            .ResultOf(TimeSeriesType.NetExchangePerGa);
+            .ResultOf(timeSeriesType);
 
         await HavingReceivedIntegrationEventAsync(CalculationResultCompleted.MessageType, _eventBuilder.Build()).ConfigureAwait(false);
 
