@@ -16,6 +16,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Api.Configuration.Middleware;
 using Api.Configuration.Middleware.Authentication.Bearer;
 using Api.Configuration.Middleware.Authentication.MarketActors;
 using Api.Configuration.Middleware.Correlation;
@@ -70,6 +71,7 @@ namespace Api
             return new HostBuilder()
                 .ConfigureFunctionsWorkerDefaults(worker =>
                 {
+                    worker.UseMiddleware<UnHandledExceptionMiddleware>();
                     worker.UseMiddleware<CorrelationIdMiddleware>();
                     /*worker.UseMiddleware<RequestResponseLoggingMiddleware>();*/
                     ConfigureAuthenticationMiddleware(worker);
