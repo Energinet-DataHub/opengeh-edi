@@ -32,6 +32,7 @@ using Infrastructure.Configuration.IntegrationEvents;
 using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Infrastructure.Transactions.MoveIn;
+using Infrastructure.WholeSale;
 using IntegrationTests.Fixtures;
 using IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 using IntegrationTests.Infrastructure.Configuration.InternalCommands;
@@ -136,6 +137,7 @@ namespace IntegrationTests
             _services = new ServiceCollection();
 
             _services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration("Fake"));
+            _services.AddSingleton(new WholeSaleServiceBusClientConfiguration("Fake"));
             _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
             _services.AddSingleton(
                 _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
@@ -164,6 +166,7 @@ namespace IntegrationTests
                 .AddMessagePublishing()
                 .AddRequestHandler<TestCommandHandler>()
                 .AddHttpClientAdapter(_ => _httpClientSpy)
+                .AddAggregatedMeasureDataServices()
                 .AddMoveInServices(
                     new MoveInSettings(
                         new MessageDelivery(new GridOperator() { GracePeriodInDaysAfterEffectiveDateIfNotUpdated = 1, }),

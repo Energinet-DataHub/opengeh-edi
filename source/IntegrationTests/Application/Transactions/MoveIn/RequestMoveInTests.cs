@@ -54,8 +54,8 @@ namespace IntegrationTests.Application.Transactions.MoveIn
 
             var assertTransaction = await AssertTransaction.TransactionAsync(SampleData.ActorProvidedId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
             assertTransaction.HasState(MoveInTransaction.State.Started)
-                .HasStartedByMessageId(incomingMessage.Message.MessageId)
-                .HasNewEnergySupplierId(incomingMessage.Message.SenderId)
+                .HasStartedByMessageId(incomingMessage.MessageHeader.MessageId)
+                .HasNewEnergySupplierId(incomingMessage.MessageHeader.SenderId)
                 .HasConsumerId(incomingMessage.MarketActivityRecord.ConsumerId!)
                 .HasConsumerName(incomingMessage.MarketActivityRecord.ConsumerName!)
                 .HasConsumerIdType(incomingMessage.MarketActivityRecord.ConsumerIdType!)
@@ -120,7 +120,7 @@ namespace IntegrationTests.Application.Transactions.MoveIn
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
 
             var rejectMessage = await RejectMessage().ConfigureAwait(false);
-            rejectMessage.HasReceiverId(incomingMessage.Message.SenderId);
+            rejectMessage.HasReceiverId(incomingMessage.MessageHeader.SenderId);
         }
 
         [Fact]

@@ -27,6 +27,7 @@ public class DocumentType : EnumerationType
     public static readonly DocumentType ConfirmRequestChangeAccountingPointCharacteristics = new(5, nameof(ConfirmRequestChangeAccountingPointCharacteristics), MessageCategory.MasterData);
     public static readonly DocumentType RejectRequestChangeAccountingPointCharacteristics = new(6, nameof(RejectRequestChangeAccountingPointCharacteristics), MessageCategory.MasterData);
     public static readonly DocumentType NotifyAggregatedMeasureData = new(7, nameof(NotifyAggregatedMeasureData), MessageCategory.Aggregations);
+    public static readonly DocumentType RequestAggregatedMeasureData = new(8, nameof(RequestAggregatedMeasureData), MessageCategory.None);
 
     private DocumentType(int id, string name, MessageCategory category)
         : base(id, name)

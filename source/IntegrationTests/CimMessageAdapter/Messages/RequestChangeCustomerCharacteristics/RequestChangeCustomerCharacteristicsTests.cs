@@ -24,6 +24,7 @@ using Application.Configuration.Authentication;
 using Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
+using CimMessageAdapter.ValidationErrors;
 using Domain.Actors;
 using Domain.Documents;
 using Domain.OutgoingMessages;
@@ -34,6 +35,7 @@ using Xunit;
 using Xunit.Categories;
 using MessageParser = CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.MessageParser;
 using Result = CimMessageAdapter.Messages.Result;
+using SenderAuthorizer = CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.SenderAuthorizer;
 
 namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 
@@ -44,6 +46,8 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
     private readonly IMarketActorAuthenticator _marketActorAuthenticator;
     private readonly ITransactionIds _transactionIds;
     private readonly IMessageIds _messageIds;
+    private readonly DefaultProcessTypeValidator _processTypeValidator;
+    private readonly DefaultMessageTypeValidator _messageTypeValidator;
     private MessageQueueDispatcherStub<global::CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction> _messageQueueDispatcherSpy = new();
     private List<Claim> _claims = new();
 
@@ -54,6 +58,8 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
         _transactionIds = GetService<ITransactionIds>();
         _messageIds = GetService<IMessageIds>();
         _marketActorAuthenticator = GetService<IMarketActorAuthenticator>();
+        _processTypeValidator = GetService<DefaultProcessTypeValidator>();
+        _messageTypeValidator = GetService<DefaultMessageTypeValidator>();
     }
 
     public async Task InitializeAsync()
@@ -87,7 +93,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
 
         var result = await ReceiveRequestChangeCustomerCharacteristicsMessage(message).ConfigureAwait(false);
 
-        AssertContainsError(result, "B2B-008");
+        Assert.Contains(result.Errors, error => error is InvalidReceiverId);
     }
 
     [Fact]
@@ -100,7 +106,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
 
         var result = await ReceiveRequestChangeCustomerCharacteristicsMessage(message).ConfigureAwait(false);
 
-        AssertContainsError(result, "B2B-008");
+        Assert.Contains(result.Errors, error => error is InvalidReceiverRole);
     }
 
     [Fact]
@@ -113,7 +119,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
 
         var result = await ReceiveRequestChangeCustomerCharacteristicsMessage(message).ConfigureAwait(false);
 
-        AssertContainsError(result, "B2B-008");
+        Assert.Contains(result.Errors, error => error is SenderRoleTypeIsNotAuthorized);
     }
 
     [Fact]
@@ -126,7 +132,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
 
         var result = await ReceiveRequestChangeCustomerCharacteristicsMessage(message).ConfigureAwait(false);
 
-        AssertContainsError(result, "B2B-008");
+        Assert.Contains(result.Errors, error => error is SenderRoleTypeIsNotAuthorized);
     }
 
     [Fact]
@@ -138,7 +144,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
 
         var result = await ReceiveRequestChangeCustomerCharacteristicsMessage(message).ConfigureAwait(false);
 
-        AssertContainsError(result, "B2B-008");
+        Assert.Contains(result.Errors, error => error is AuthenticatedUserDoesNotMatchSenderId);
     }
 
     [Fact]
@@ -152,7 +158,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
             .ConfigureAwait(false);
 
         Assert.False(result.Success);
-        AssertContainsError(result, "B2B-001");
+        Assert.Contains(result.Errors, error => error is InvalidBusinessReasonOrVersion);
     }
 
     [Fact]
@@ -190,13 +196,8 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
         var result = await ReceiveRequestChangeCustomerCharacteristicsMessage(message)
             .ConfigureAwait(false);
 
-        AssertContainsError(result, "B2B-005");
+        Assert.Contains(result.Errors, error => error is DuplicateTransactionIdDetected);
         Assert.Empty(_messageQueueDispatcherSpy.CommittedItems);
-    }
-
-    private static void AssertContainsError(Result result, string errorCode)
-    {
-        Assert.Contains(result.Errors, error => error.Code.Equals(errorCode, StringComparison.OrdinalIgnoreCase));
     }
 
     private static ClaimsPrincipal CreateClaimsPrincipal(IEnumerable<Claim> claims)
@@ -235,14 +236,16 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
             _messageIds,
             _messageQueueDispatcherSpy,
             _transactionIds,
-            new SenderAuthorizer(_marketActorAuthenticator));
+            new SenderAuthorizer(_marketActorAuthenticator),
+            _processTypeValidator,
+            _messageTypeValidator);
         return messageReceiver;
     }
 
     private MessageReceiver<global::CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction> CreateMessageReceiver(IMessageIds messageIds)
     {
         _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<global::CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction>();
-        var messageReceiver = new RequestChangeCustomerCharacteristicsReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, new SenderAuthorizer(_marketActorAuthenticator));
+        var messageReceiver = new RequestChangeCustomerCharacteristicsReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, new SenderAuthorizer(_marketActorAuthenticator), _processTypeValidator, _messageTypeValidator);
         return messageReceiver;
     }
 

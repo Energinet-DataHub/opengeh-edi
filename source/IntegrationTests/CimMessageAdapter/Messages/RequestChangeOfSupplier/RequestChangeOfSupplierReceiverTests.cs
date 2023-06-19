@@ -24,15 +24,16 @@ using Application.Configuration.Authentication;
 using Application.IncomingMessages.RequestChangeOfSupplier;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestChangeOfSupplier;
+using CimMessageAdapter.ValidationErrors;
 using Domain.Actors;
 using Domain.Documents;
-using Domain.OutgoingMessages;
 using Infrastructure.Configuration.Authentication;
 using IntegrationTests.CimMessageAdapter.Stubs;
 using IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
 using Result = CimMessageAdapter.Messages.Result;
+using SenderAuthorizer = CimMessageAdapter.Messages.RequestChangeOfSupplier.SenderAuthorizer;
 
 namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
 {
@@ -43,6 +44,8 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
         private readonly IMarketActorAuthenticator _marketActorAuthenticator;
         private readonly ITransactionIds _transactionIds;
         private readonly IMessageIds _messageIds;
+        private readonly DefaultProcessTypeValidator _processTypeValidator;
+        private readonly DefaultMessageTypeValidator _messageTypeValidator;
         private MessageQueueDispatcherStub<global::CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> _messageQueueDispatcherSpy = new();
         private List<Claim> _claims = new();
 
@@ -53,6 +56,8 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
             _transactionIds = GetService<ITransactionIds>();
             _messageIds = GetService<IMessageIds>();
             _marketActorAuthenticator = GetService<IMarketActorAuthenticator>();
+            _processTypeValidator = GetService<DefaultProcessTypeValidator>();
+            _messageTypeValidator = GetService<DefaultMessageTypeValidator>();
         }
 
         public async Task InitializeAsync()
@@ -83,7 +88,7 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
 
             var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
-            AssertContainsError(result, "B2B-008");
+            Assert.Contains(result.Errors, error => error is InvalidReceiverId);
         }
 
         [Fact]
@@ -96,7 +101,7 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
 
             var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
-            AssertContainsError(result, "B2B-008");
+            Assert.Contains(result.Errors, error => error is InvalidReceiverRole);
         }
 
         [Fact]
@@ -109,7 +114,7 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
 
             var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
-            AssertContainsError(result, "B2B-008");
+            Assert.Contains(result.Errors, error => error is AuthenticatedUserDoesNotHoldRequiredRoleType);
         }
 
         [Fact]
@@ -122,7 +127,7 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
 
             var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
-            AssertContainsError(result, "B2B-008");
+            Assert.Contains(result.Errors, error => error is AuthenticatedUserDoesNotHoldRequiredRoleType);
         }
 
         [Fact]
@@ -134,7 +139,7 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
 
             var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
-            AssertContainsError(result, "B2B-008");
+            Assert.Contains(result.Errors, error => error is AuthenticatedUserDoesNotMatchSenderId);
         }
 
         [Fact]
@@ -148,7 +153,7 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
                 .ConfigureAwait(false);
 
             Assert.False(result.Success);
-            AssertContainsError(result, "B2B-001");
+            Assert.Contains(result.Errors, error => error is InvalidBusinessReasonOrVersion);
         }
 
         [Fact]
@@ -186,18 +191,13 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
             var result = await ReceiveRequestChangeOfSupplierMessage(message)
                 .ConfigureAwait(false);
 
-            AssertContainsError(result, "B2B-005");
+            Assert.Contains(result.Errors, error => error is DuplicateTransactionIdDetected);
             Assert.Empty(_messageQueueDispatcherSpy.CommittedItems);
         }
 
         private static ClaimsPrincipal CreateClaimsPrincipal(IEnumerable<Claim> claims)
         {
             return new ClaimsPrincipal(new ClaimsIdentity(claims));
-        }
-
-        private static void AssertContainsError(Result result, string errorCode)
-        {
-            Assert.Contains(result.Errors, error => error.Code.Equals(errorCode, StringComparison.OrdinalIgnoreCase));
         }
 
         private async Task<Result> ReceiveRequestChangeOfSupplierMessage(Stream message)
@@ -213,14 +213,16 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
                 _messageIds,
                 _messageQueueDispatcherSpy,
                 _transactionIds,
-                new SenderAuthorizer(_marketActorAuthenticator));
+                new SenderAuthorizer(_marketActorAuthenticator),
+                _processTypeValidator,
+                _messageTypeValidator);
             return messageReceiver;
         }
 
         private MessageReceiver<global::CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> CreateMessageReceiver(IMessageIds messageIds)
         {
             _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<global::CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction>();
-            var messageReceiver = new RequestChangeOfSupplierReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, new SenderAuthorizer(_marketActorAuthenticator));
+            var messageReceiver = new RequestChangeOfSupplierReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, new SenderAuthorizer(_marketActorAuthenticator), _processTypeValidator, _messageTypeValidator);
             return messageReceiver;
         }
 
