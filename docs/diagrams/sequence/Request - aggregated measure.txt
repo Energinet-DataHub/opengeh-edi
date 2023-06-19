@@ -1,4 +1,27 @@
-HTTP->RequestAggregatedMeasureDataReceiver: Request
+autoactivation on
+participantgroup #lightyellow **Api**
+participant HTTP Trigger
+participant RequestAggregatedMeasureDataReceiver
+end
+participantgroup #lightgreen **Infrastructure**
+participant CimFormatParser
+participant MessageIdRegistry
+participant TransactionIdRegistry
+participant XmlMessageParser
+participant MessageQueueDispatcher
+participant ServiceBusSenderAdapter
+end
+participantgroup #lightgreen **CimMessageAdapter**
+participant MessageParser
+participant RequestAggregatedMeasureDataReceiver
+participant SenderAuthorize
+participant MessageReceiver
+participant ReceiverVerification
+end
+participantgroup #lightgreen **DocumentValidation**
+participant CimXmlSchemaProvider
+end
+HTTP Trigger->RequestAggregatedMeasureDataReceiver: Request
 RequestAggregatedMeasureDataReceiver->CimFormatParser:Parse
 RequestAggregatedMeasureDataReceiver<--CimFormatParser:DocumentFormat
 RequestAggregatedMeasureDataReceiver->MessageParser:Parse
@@ -19,4 +42,4 @@ MessageReceiver<--TransactionIdRegistry:bool
 MessageReceiver->MessageQueueDispatcher:Add
 MessageReceiver->MessageQueueDispatcher:Commit
 RequestAggregatedMeasureDataReceiver<--MessageReceiver:Result
-HTTP<--RequestAggregatedMeasureDataReceiver: Response
+HTTP Trigger<--RequestAggregatedMeasureDataReceiver: Response
