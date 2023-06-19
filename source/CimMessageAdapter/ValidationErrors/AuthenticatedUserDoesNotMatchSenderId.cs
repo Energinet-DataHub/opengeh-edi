@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Errors
+namespace CimMessageAdapter.ValidationErrors
 {
-    public class InvalidReceiverRole : ValidationError
+    public class AuthenticatedUserDoesNotMatchSenderId : ValidationError
     {
-        public InvalidReceiverRole()
-            : base("Invalid receiver role", "B2B-008")
+        public AuthenticatedUserDoesNotMatchSenderId()
+            : base("Sender id does not match id of current authenticated user", "00002", "SenderId")
         {
         }
     }

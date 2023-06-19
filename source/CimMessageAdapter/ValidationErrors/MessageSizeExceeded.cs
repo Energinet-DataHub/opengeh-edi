@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Errors;
+namespace CimMessageAdapter.ValidationErrors;
 
-public class EmptyMessageId : ValidationError
+public class MessageSizeExceeded : ValidationError
 {
-    public EmptyMessageId()
-        : base($"Message id cannot be empty", "B2B-003")
+    public MessageSizeExceeded(long actualSize, long sizeLimitation)
+        : base($"Message size {actualSize}mb exceeds {sizeLimitation}mb", "00004")
     {
     }
 }

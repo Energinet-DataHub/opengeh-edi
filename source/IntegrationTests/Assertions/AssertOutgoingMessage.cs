@@ -103,6 +103,12 @@ namespace IntegrationTests.Assertions
             return this;
         }
 
+        public AssertOutgoingMessage HasBusinessReason(string businessReason)
+        {
+            Assert.Equal(businessReason, _message.BusinessReason);
+            return this;
+        }
+
         public AssertMarketActivityRecord WithMarketActivityRecord()
         {
             return new AssertMarketActivityRecord(_message.MessageRecord);

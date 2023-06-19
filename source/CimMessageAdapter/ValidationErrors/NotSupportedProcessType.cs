@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Errors
+namespace CimMessageAdapter.ValidationErrors;
+
+public class NotSupportedProcessType : ValidationError
 {
-    public class UnknownBusinessReasonOrVersion : ValidationError
+    public NotSupportedProcessType(string processType)
+        : base($"The process type {processType} is not support", "00402", "ProcessType")
     {
-        public UnknownBusinessReasonOrVersion(string businessReason, string version)
-            : base($"Schema version {version} for business process type {businessReason} does not exist.", "B2B-001")
-        {
-        }
     }
 }

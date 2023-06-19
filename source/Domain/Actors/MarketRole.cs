@@ -23,13 +23,13 @@ public class MarketRole : EnumerationType
 
     // A grid operator has two roles.
     // GridOperator (DDM) when creating a new metering point
-    public static readonly MarketRole GridOperator = new(2, "GridOperator", string.Empty);
+    public static readonly MarketRole GridOperator = new(2, "GridOperator", "DDM");
     public static readonly MarketRole MeteringDataAdministrator = new(3, "MeteringDataAdministrator", string.Empty);
 
     // A grid operator has two roles.
     // MeteredDataResponsible (MDR) when requesting data from DataHub
-    public static readonly MarketRole MeteredDataResponsible = new(4, "MeteredDataResponsible", string.Empty);
-    public static readonly MarketRole BalanceResponsible = new(5, "BalanceResponsible", string.Empty);
+    public static readonly MarketRole MeteredDataResponsible = new(4, "MeteredDataResponsible", "MDR");
+    public static readonly MarketRole BalanceResponsible = new(5, "BalanceResponsible", "DDK");
 
     private MarketRole(int id, string name, string code)
         : base(id, name)

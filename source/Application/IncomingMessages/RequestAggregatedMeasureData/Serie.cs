@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Errors
-{
-    public class SenderRoleTypeIsNotAuthorized : ValidationError
-    {
-        public SenderRoleTypeIsNotAuthorized()
-            : base("Sender role type is not authorized to use this type of message.", "B2B-008")
-        {
-        }
-    }
-}
+namespace Application.IncomingMessages.RequestAggregatedMeasureData;
+
+public record Serie(
+    string Id,
+    string SettlementSeriesVersion,
+    string MarketEvaluationPointType,
+    string MarketEvaluationSettlementMethod,
+    string StartDateAndOrTimeDateTime,
+    string EndDateAndOrTimeDateTime,
+    string MeteringGridAreaDomainId,
+    string BiddingZoneDomainId,
+    string EnergySupplierMarketParticipantId,
+    string BalanceResponsiblePartyMarketParticipantId) : IMarketActivityRecord;
