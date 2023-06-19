@@ -57,7 +57,7 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
     public bool CanHandle(string eventType)
     {
         ArgumentNullException.ThrowIfNull(eventType);
-        return eventType.Equals("BalanceFixingCalculationResultCompleted", StringComparison.OrdinalIgnoreCase);
+        return eventType.Equals(CalculationResultCompleted.MessageType, StringComparison.OrdinalIgnoreCase);
     }
 
     public string ToJson(byte[] payload)
@@ -122,6 +122,8 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
             TimeSeriesType.Production => MeteringPointType.Production.Name,
             TimeSeriesType.FlexConsumption => MeteringPointType.Consumption.Name,
             TimeSeriesType.NonProfiledConsumption => MeteringPointType.Consumption.Name,
+            TimeSeriesType.NetExchangePerGa => MeteringPointType.Exchange.Name,
+            TimeSeriesType.NetExchangePerNeighboringGa => MeteringPointType.Exchange.Name,
             TimeSeriesType.Unspecified => throw new InvalidOperationException("Unknown metering point type"),
             _ => throw new InvalidOperationException("Could not determine metering point type"),
         };

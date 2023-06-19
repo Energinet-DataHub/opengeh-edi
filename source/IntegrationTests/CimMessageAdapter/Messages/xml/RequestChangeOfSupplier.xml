@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <cim:RequestChangeOfSupplier_MarketDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cim="urn:ediel.org:structure:requestchangeofsupplier:0:1" xsi:schemaLocation="urn:ediel.org:structure:requestchangeofsupplier:0:1 urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd">
-	<cim:mRID>78954612</cim:mRID>
+	<cim:mRID>123564789123564789123564789123564789</cim:mRID>
 	<cim:type>392</cim:type>
 	<cim:process.processType>E65</cim:process.processType>
 	<cim:businessSector.type>23</cim:businessSector.type>

@@ -61,12 +61,12 @@ namespace Application.Transactions.MoveIn
                 request.MarketActivityRecord.MarketEvaluationPointId,
                 InstantPattern.General.Parse(request.MarketActivityRecord.EffectiveDate).GetValueOrThrow(),
                 marketEvaluationPoint?.EnergySupplierNumber?.Value,
-                request.Message.MessageId,
+                request.MessageHeader.MessageId,
                 request.MarketActivityRecord.EnergySupplierId ?? string.Empty,
                 request.MarketActivityRecord.ConsumerId,
                 request.MarketActivityRecord.ConsumerName,
                 request.MarketActivityRecord.ConsumerIdType,
-                ActorNumber.Create(request.Message.SenderId));
+                ActorNumber.Create(request.MessageHeader.SenderId));
 
             if (string.IsNullOrEmpty(request.MarketActivityRecord.EnergySupplierId))
             {
@@ -76,7 +76,7 @@ namespace Application.Transactions.MoveIn
 
             if (!IsEnergySupplierIdAndSenderIdAMatch(
                     request.MarketActivityRecord.EnergySupplierId,
-                    request.Message.SenderId))
+                    request.MessageHeader.SenderId))
             {
                return await RejectInvalidRequestMessageAsync(transaction, "EnergySupplierDoesNotMatchSender", cancellationToken).ConfigureAwait(false);
             }

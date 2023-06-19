@@ -14,7 +14,7 @@
 
 using System.Collections.Generic;
 using Application.IncomingMessages;
-using CimMessageAdapter.Errors;
+using CimMessageAdapter.ValidationErrors;
 
 namespace CimMessageAdapter.Messages
 {
