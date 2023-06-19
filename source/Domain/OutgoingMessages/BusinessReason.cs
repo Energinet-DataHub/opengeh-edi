@@ -21,6 +21,7 @@ public sealed class BusinessReason : EnumerationType
     public static readonly BusinessReason MoveIn = new(0, nameof(MoveIn));
     public static readonly BusinessReason BalanceFixing = new(1, nameof(BalanceFixing));
     public static readonly BusinessReason PreliminaryAggregation = new(2, nameof(PreliminaryAggregation));
+    public static readonly BusinessReason D05 = new(3, nameof(D05));
 
     private BusinessReason(int id, string name)
      : base(id, name)
