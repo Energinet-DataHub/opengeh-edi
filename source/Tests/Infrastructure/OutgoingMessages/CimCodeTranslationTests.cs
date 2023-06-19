@@ -34,6 +34,7 @@ public class CimCodeTests
     [Theory]
     [InlineData(nameof(MeteringPointType.Production), "E18")]
     [InlineData(nameof(MeteringPointType.Consumption), "E17")]
+    [InlineData(nameof(MeteringPointType.Exchange), "E20")]
     public void Translate_metering_point_type(string meteringPointType, string expectedCode)
     {
         Assert.Equal(expectedCode, CimCode.Of(MeteringPointType.From(meteringPointType)));
