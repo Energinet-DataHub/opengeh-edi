@@ -74,7 +74,6 @@ public class MessageParserTests
         Assert.True(result.Success == false);
     }
 
-
     #region xml messages
     private static Stream CreateXmlMessage()
     {
