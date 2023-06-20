@@ -116,7 +116,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     }
 
     [Fact]
-    public async Task Receiver_role_must_be_metering_point_administrator()
+    public async Task Receiver_role_must_be_calculation_responsible()
     {
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
