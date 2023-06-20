@@ -86,18 +86,15 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     public async Task Receiver_id_must_be_unknown()
     {
         var unknownReceiverId = "5790001330550";
-        var knownReceiverRole = "DDZ";
+        var knownReceiverRole = "DGL";
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
             .WithReceiverRole(knownReceiverRole)
             .WithReceiverId(unknownReceiverId)
             .Message();
 
-        //TODO: MessageParser should return an object representing the request document. consider RequestAggregatedMeasureDataIncomingMarketDocument
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
 
-        //TODO: triggers MessageReceiver for this request. Which is responsible for validating and forwarding the request to 3th part systems. Consider splitting the responsibilities into 2 (MessageValidator and "MessageDispatcher").
-        //TODO: RequestAggregatedMeasureDataReceiver should come from the IOC
         var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
 
         Assert.Contains(result.Errors, error => error is InvalidReceiverId);
@@ -123,7 +120,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     {
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
-            .WithReceiverRole("DDZ")
+            .WithReceiverRole("DGL")
             .Message();
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
@@ -498,7 +495,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
             .ConfigureAwait(false);
         var knownReceiverId = "5790001330552";
-        var knownReceiverRole = "DDZ";
+        var knownReceiverRole = "DGL";
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
             .WithSenderId(SampleData.SenderId)

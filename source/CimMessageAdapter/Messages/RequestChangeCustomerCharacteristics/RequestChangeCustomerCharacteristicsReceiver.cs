@@ -25,7 +25,7 @@ public class RequestChangeCustomerCharacteristicsReceiver : MessageReceiver<Requ
         SenderAuthorizer senderAuthorizer,
         DefaultProcessTypeValidator defaultProcessTypeValidator,
         DefaultMessageTypeValidator defaultMessageTypeValidator)
-        : base(messageIds, messageQueueDispatcher, transactionIds, senderAuthorizer, defaultProcessTypeValidator, defaultMessageTypeValidator)
+        : base(messageIds, messageQueueDispatcher, transactionIds, senderAuthorizer, defaultProcessTypeValidator, defaultMessageTypeValidator, new MasterDataReceiverResponsibleVerification())
     {
     }
 }

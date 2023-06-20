@@ -18,12 +18,15 @@ using CimMessageAdapter.ValidationErrors;
 
 namespace CimMessageAdapter.Messages
 {
-    public static class ReceiverVerification
+    /// <summary>
+    /// Responsible for verifying that the Receiver is a Master Data Responsible Receiver
+    /// </summary>
+    public class MasterDataReceiverResponsibleVerification : IReceiverValidator
     {
-        private const string MeteringPointAdministratorRole = "DDZ";
+        private const string MasterDataResponsibleRole = "DDZ";
         private const string GlnOfDataHub = "5790001330552";
 
-        public static Task<Result> VerifyAsync(string receiverId, string role)
+        public Task<Result> VerifyAsync(string receiverId, string role)
         {
             if (receiverId == null) throw new ArgumentNullException(nameof(receiverId));
             if (role == null) throw new ArgumentNullException(nameof(role));
@@ -43,7 +46,7 @@ namespace CimMessageAdapter.Messages
 
         private static bool IsMeteringPointAdministrator(string role)
         {
-            return role.Equals(MeteringPointAdministratorRole, StringComparison.OrdinalIgnoreCase);
+            return role.Equals(MasterDataResponsibleRole, StringComparison.OrdinalIgnoreCase);
         }
 
         private static bool ReceiverIsKnown(string receiverId)
