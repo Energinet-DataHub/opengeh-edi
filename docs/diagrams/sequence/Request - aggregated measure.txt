@@ -44,6 +44,7 @@ MessageReceiver->MessageQueueDispatcher:Add
 MessageReceiver->MessageQueueDispatcher:Commit (publish)
 MessageQueueDispatcher->ServiceBusSenderFactory:GetSender
 MessageQueueDispatcher<--ServiceBusSenderFactory:Sender (Adapter)
-MessageQueueDispatcher->ServiceBusSenderAdapter:Send
+MessageQueueDispatcher->ServiceBusSenderAdapter:Send (transaction)
+MessageQueueDispatcher->TransactionScope:Commit (one per transaction)
 RequestAggregatedMeasureDataReceiver<--MessageReceiver:Result
 HTTP Trigger<--RequestAggregatedMeasureDataReceiver: Response
