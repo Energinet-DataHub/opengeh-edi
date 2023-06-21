@@ -5,6 +5,7 @@
       AND name = 'ProcessType'
 )
     BEGIN
+        /* is nullable to ensure backward compatability */
         ALTER TABLE [dbo].[ArchivedMessages]
             ADD [ProcessType] NVARCHAR(50) NULL
     END

@@ -211,7 +211,7 @@ public class SearchMessagesTests : TestBase
             ActorNumber.Create(senderNumber ?? "1234512345123"),
             ActorNumber.Create(receiverNumber ?? "1234512345128"),
             createdAt.GetValueOrDefault(_systemDateTimeProvider.Now()),
-            BusinessReason.From(businessReason ?? BusinessReason.BalanceFixing.Name),
+            businessReason ?? BusinessReason.BalanceFixing.Name,
             new MemoryStream());
     }
 
