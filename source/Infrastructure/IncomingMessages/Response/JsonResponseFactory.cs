@@ -48,6 +48,8 @@ public class JsonResponseFactory : IResponseFactory
         writer.WriteStringValue(result.Errors.Count == 1 ? result.Errors.First().Code : "BadRequest");
         writer.WritePropertyName("Message");
         writer.WriteStringValue(result.Errors.Count == 1 ? result.Errors.First().Message : "Multiple errors in message");
+        writer.WritePropertyName("Target");
+        writer.WriteStringValue(result.Errors.Count == 1 ? result.Errors.First().Target : string.Empty);
 
         if (result.Errors.Count > 1)
         {
@@ -62,6 +64,8 @@ public class JsonResponseFactory : IResponseFactory
                 writer.WriteStringValue(validationError.Code);
                 writer.WritePropertyName("Message");
                 writer.WriteStringValue(validationError.Message);
+                writer.WritePropertyName("Target");
+                writer.WriteStringValue(validationError.Target);
                 writer.WriteEndObject();
             }
 

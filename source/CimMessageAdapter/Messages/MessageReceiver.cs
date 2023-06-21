@@ -18,8 +18,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.IncomingMessages;
-using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages.Queues;
+using CimMessageAdapter.ValidationErrors;
 using MessageHeader = Application.IncomingMessages.MessageHeader;
 
 namespace CimMessageAdapter.Messages
@@ -27,19 +27,30 @@ namespace CimMessageAdapter.Messages
     public abstract class MessageReceiver<TQueue>
         where TQueue : Queue
     {
+        private const int MessageIdLength = 36;
         private readonly List<ValidationError> _errors = new();
         private readonly IMessageIds _messageIds;
         private readonly IMessageQueueDispatcher<TQueue> _messageQueueDispatcher;
         private readonly ITransactionIds _transactionIds;
         private readonly ISenderAuthorizer _senderAuthorizer;
+        private readonly IProcessTypeValidator _processTypeValidator;
+        private readonly IMessageTypeValidator _messageTypeValidator;
 
-        protected MessageReceiver(IMessageIds messageIds, IMessageQueueDispatcher<TQueue> messageQueueDispatcher, ITransactionIds transactionIds, ISenderAuthorizer senderAuthorizer)
+        protected MessageReceiver(
+            IMessageIds messageIds,
+            IMessageQueueDispatcher<TQueue> messageQueueDispatcher,
+            ITransactionIds transactionIds,
+            ISenderAuthorizer senderAuthorizer,
+            IProcessTypeValidator processTypeValidator,
+            IMessageTypeValidator messageTypeValidator)
         {
             _messageIds = messageIds ?? throw new ArgumentNullException(nameof(messageIds));
             _messageQueueDispatcher = messageQueueDispatcher ??
                                              throw new ArgumentNullException(nameof(messageQueueDispatcher));
             _transactionIds = transactionIds;
             _senderAuthorizer = senderAuthorizer;
+            _processTypeValidator = processTypeValidator;
+            _messageTypeValidator = messageTypeValidator;
         }
 
         public async Task<Result> ReceiveAsync<TMarketActivityRecordType, TMarketTransactionType>(
@@ -60,42 +71,51 @@ namespace CimMessageAdapter.Messages
 
             ArgumentNullException.ThrowIfNull(marketDocument);
 
-            await AuthorizeSenderAsync(messageHeader).ConfigureAwait(false);
-            await VerifyReceiverAsync(messageHeader).ConfigureAwait(false);
-            if (MessageIdIsEmpty(messageHeader.MessageId))
-            {
-                return Result.Failure(_errors.ToArray());
-            }
+            MessageIdIsEmpty(messageHeader.MessageId);
 
-            await CheckMessageIdAsync(messageHeader.MessageId, cancellationToken).ConfigureAwait(false);
-            if (_errors.Count > 0)
-            {
-                return Result.Failure(_errors.ToArray());
-            }
+            var authorizeSenderTask = AuthorizeSenderAsync(messageHeader);
+            var verifyReceiverTask = VerifyReceiverAsync(messageHeader);
+            var checkMessageIdTask = CheckMessageIdAsync(messageHeader.SenderId, messageHeader.MessageId, cancellationToken);
+            var checkMessageTypeTask = CheckMessageTypeAsync(messageHeader.MessageType, cancellationToken);
+            var checkProcessTypeTask = CheckProcessTypeAsync(messageHeader.BusinessReason, cancellationToken);
+
+            await Task.WhenAll(
+                authorizeSenderTask,
+                verifyReceiverTask,
+                checkMessageIdTask,
+                checkMessageTypeTask,
+                checkProcessTypeTask).ConfigureAwait(false);
 
             foreach (var transaction in marketDocument.ToTransactions())
             {
                 if (string.IsNullOrEmpty(transaction.MarketActivityRecord.Id))
                 {
-                    return Result.Failure(new EmptyTransactionId(transaction.MarketActivityRecord.Id));
+                    _errors.Add(new EmptyTransactionId());
                 }
 
-                if (await CheckTransactionIdAsync(transaction.MarketActivityRecord.Id, cancellationToken).ConfigureAwait(false) == false)
+                if (!await TryStoreTransactionIdAsync(messageHeader.SenderId, transaction.MarketActivityRecord.Id, cancellationToken).ConfigureAwait(false))
                 {
-                    return Result.Failure(new DuplicateTransactionIdDetected(transaction.MarketActivityRecord.Id));
+                    _errors.Add(new DuplicateTransactionIdDetected(transaction.MarketActivityRecord.Id));
                 }
 
                 await AddToTransactionQueueAsync(transaction, cancellationToken).ConfigureAwait(false);
+            }
+
+            if (_errors.Count > 0)
+            {
+                return Result.Failure(_errors.ToArray());
             }
 
             await _messageQueueDispatcher.CommitAsync(cancellationToken).ConfigureAwait(false);
             return Result.Succeeded();
         }
 
-        private Task<bool> CheckTransactionIdAsync(string transactionId, CancellationToken cancellationToken)
+        private async Task<bool> TryStoreTransactionIdAsync(string senderId, string transactionId, CancellationToken cancellationToken)
         {
             if (transactionId == null) throw new ArgumentNullException(nameof(transactionId));
-            return _transactionIds.TryStoreAsync(transactionId, cancellationToken);
+
+            return await _transactionIds
+                .TryStoreAsync(senderId, transactionId, cancellationToken).ConfigureAwait(false);
         }
 
         private Task AddToTransactionQueueAsync(IMarketTransaction transaction, CancellationToken cancellationToken)
@@ -115,13 +135,30 @@ namespace CimMessageAdapter.Messages
             return false;
         }
 
-        private async Task CheckMessageIdAsync(string messageId, CancellationToken cancellationToken)
+        private async Task CheckMessageIdAsync(string senderId, string messageId, CancellationToken cancellationToken)
         {
             if (messageId == null) throw new ArgumentNullException(nameof(messageId));
-            if (await _messageIds.TryStoreAsync(messageId, cancellationToken).ConfigureAwait(false) == false)
+            if (messageId.Length != MessageIdLength)
+            {
+                _errors.Add(new InvalidMessageIdSize(messageId));
+            }
+
+            if (!await _messageIds.TryStoreAsync(senderId, messageId, cancellationToken).ConfigureAwait(false))
             {
                 _errors.Add(new DuplicateMessageIdDetected(messageId));
             }
+        }
+
+        private async Task CheckMessageTypeAsync(string messageType, CancellationToken cancellationToken)
+        {
+            var result = await _messageTypeValidator.ValidateAsync(messageType, cancellationToken).ConfigureAwait(false);
+            _errors.AddRange(result.Errors);
+        }
+
+        private async Task CheckProcessTypeAsync(string processType, CancellationToken cancellationToken)
+        {
+            var result = await _processTypeValidator.ValidateAsync(processType, cancellationToken).ConfigureAwait(false);
+            _errors.AddRange(result.Errors);
         }
 
         private async Task AuthorizeSenderAsync(MessageHeader messageHeader)

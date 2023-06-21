@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Errors;
-
-public class EmptyTransactionId : ValidationError
+namespace CimMessageAdapter.ValidationErrors
 {
-    public EmptyTransactionId(string message)
-        : base($"Transaction id may not be empty", "B2B-005")
+    public class DuplicateTransactionIdDetected : ValidationError
     {
+        public DuplicateTransactionIdDetected(string transactionId)
+            : base($"Transaction id '{transactionId}' is not unique and will not be processed.", "00102", "TransactionId")
+        {
+        }
     }
 }
