@@ -23,7 +23,7 @@ namespace CimMessageAdapter.Messages
     /// </summary>
     public class MasterDataReceiverResponsibleVerification : IReceiverValidator
     {
-        private const string MasterDataResponsibleRole = "DDZ";
+        private const string MasterDataResponsibleRoleForDataHub = "DDZ";
         private const string GlnOfDataHub = "5790001330552";
 
         public Task<Result> VerifyAsync(string receiverId, string role)
