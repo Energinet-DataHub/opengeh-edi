@@ -19,7 +19,7 @@ using CimMessageAdapter.ValidationErrors;
 namespace CimMessageAdapter.Messages
 {
     /// <summary>
-    /// Responsible for verifying that the Receiver is a Master Data Responsible Receiver
+    /// Responsible for verifying that the Receiver is a Master Data Responsible Receiver and Datahub
     /// </summary>
     public class MasterDataReceiverResponsibleVerification : IReceiverValidator
     {
@@ -31,12 +31,12 @@ namespace CimMessageAdapter.Messages
             if (receiverId == null) throw new ArgumentNullException(nameof(receiverId));
             if (role == null) throw new ArgumentNullException(nameof(role));
 
-            if (IsMeteringPointAdministrator(role) == false)
+            if (IsMasterDataResponsible(role) == false)
             {
                 return Task.FromResult(Result.Failure(new InvalidReceiverRole()));
             }
 
-            if (ReceiverIsKnown(receiverId) == false)
+            if (ReceiverIsDataHub(receiverId) == false)
             {
                 return Task.FromResult(Result.Failure(new InvalidReceiverId(receiverId)));
             }
@@ -44,12 +44,12 @@ namespace CimMessageAdapter.Messages
             return Task.FromResult(Result.Succeeded());
         }
 
-        private static bool IsMeteringPointAdministrator(string role)
+        private static bool IsMasterDataResponsible(string role)
         {
             return role.Equals(MasterDataResponsibleRole, StringComparison.OrdinalIgnoreCase);
         }
 
-        private static bool ReceiverIsKnown(string receiverId)
+        private static bool ReceiverIsDataHub(string receiverId)
         {
             return receiverId.Equals(GlnOfDataHub, StringComparison.OrdinalIgnoreCase);
         }

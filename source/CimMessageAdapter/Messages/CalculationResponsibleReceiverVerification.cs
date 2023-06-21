@@ -19,7 +19,7 @@ using CimMessageAdapter.ValidationErrors;
 namespace CimMessageAdapter.Messages;
 
 /// <summary>
-/// Responsible for verifying that the Receiver is a Calculation Responsible Receiver
+/// Responsible for verifying that the Receiver is a Calculation Responsible Receiver and Datahub
 /// </summary>
 public class CalculationResponsibleReceiverVerification : IReceiverValidator
 {
@@ -31,12 +31,12 @@ public class CalculationResponsibleReceiverVerification : IReceiverValidator
         if (receiverId == null) throw new ArgumentNullException(nameof(receiverId));
         if (role == null) throw new ArgumentNullException(nameof(role));
 
-        if (IsMeteringPointAdministrator(role) == false)
+        if (IsCalculationResponsible(role) == false)
         {
             return Task.FromResult(Result.Failure(new InvalidReceiverRole()));
         }
 
-        if (ReceiverIsKnown(receiverId) == false)
+        if (ReceiverIsDataHub(receiverId) == false)
         {
             return Task.FromResult(Result.Failure(new InvalidReceiverId(receiverId)));
         }
@@ -44,12 +44,12 @@ public class CalculationResponsibleReceiverVerification : IReceiverValidator
         return Task.FromResult(Result.Succeeded());
     }
 
-    private static bool IsMeteringPointAdministrator(string role)
+    private static bool IsCalculationResponsible(string role)
     {
         return role.Equals(CalculationResponsibleRole, StringComparison.OrdinalIgnoreCase);
     }
 
-    private static bool ReceiverIsKnown(string receiverId)
+    private static bool ReceiverIsDataHub(string receiverId)
     {
         return receiverId.Equals(GlnOfDataHub, StringComparison.OrdinalIgnoreCase);
     }

@@ -44,6 +44,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     private readonly IMessageIds _messageIds;
     private readonly ProcessTypeValidator _processTypeValidator;
     private readonly MessageTypeValidator _messageTypeValidator;
+    private readonly CalculationResponsibleReceiverVerification _calculationResponsibleReceiverVerification;
     private readonly MessageQueueDispatcherStub<global::CimMessageAdapter.Messages.Queues.RequestAggregatedMeasureDataTransactionQueues> _messageQueueDispatcherSpy = new();
     private readonly List<Claim> _claims = new()
     {
@@ -59,6 +60,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         _marketActorAuthenticator = GetService<IMarketActorAuthenticator>();
         _processTypeValidator = GetService<ProcessTypeValidator>();
         _messageTypeValidator = GetService<MessageTypeValidator>();
+        _calculationResponsibleReceiverVerification = GetService<CalculationResponsibleReceiverVerification>();
     }
 
     public static IEnumerable<object[]> AllowedActorRoles =>
@@ -544,7 +546,8 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             _transactionIds,
             new SenderAuthorizer(_marketActorAuthenticator),
             _processTypeValidator,
-            _messageTypeValidator);
+            _messageTypeValidator,
+            _calculationResponsibleReceiverVerification);
         return messageReceiver;
     }
 
