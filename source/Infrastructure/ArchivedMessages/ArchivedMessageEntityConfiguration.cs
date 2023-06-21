@@ -47,10 +47,7 @@ public class ArchivedMessageEntityConfiguration : IEntityTypeConfiguration<Archi
             toDbValue => toDbValue.Value,
             fromDbValue => ActorNumber.Create(fromDbValue));
         builder.Property(x => x.CreatedAt);
-        builder.Property(x => x.BusinessReason)
-            .HasConversion(
-                toDbValue => toDbValue == null ? null : toDbValue.Name,
-                fromDbValue => !string.IsNullOrWhiteSpace(fromDbValue) ? BusinessReason.From(fromDbValue) : null);
+        builder.Property(x => x.BusinessReason);
         builder.Property(x => x.Document)
             .HasColumnName("Document")
             .HasConversion(
