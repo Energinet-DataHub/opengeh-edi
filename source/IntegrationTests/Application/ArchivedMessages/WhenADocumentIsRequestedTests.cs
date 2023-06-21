@@ -67,7 +67,7 @@ public class WhenADocumentIsRequestedTests : TestBase
             ActorNumber.Create("1234512345123"),
             ActorNumber.Create("1234512345128"),
             _systemDateTimeProvider.Now(),
-            BusinessReason.From(BusinessReason.BalanceFixing.Name),
+            BusinessReason.BalanceFixing.Name,
             new MemoryStream());
     }
 
