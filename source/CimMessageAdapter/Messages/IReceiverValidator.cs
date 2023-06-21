@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 namespace CimMessageAdapter.Messages;
 
 /// <summary>
-/// Responsible for verifying that the message contains the excepted receiver
+/// Responsible for verifying that the message contains the expected receiver
 /// </summary>
 public interface IReceiverValidator
 {
