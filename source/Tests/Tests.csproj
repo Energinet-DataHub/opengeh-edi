@@ -92,6 +92,10 @@ limitations under the License.
       <EmbeddedResource Include="CimMessageAdapter\Messages\xml\RequestChangeCustomerCharacteristics.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+      <None Remove="CimMessageAdapter\Messages\json\AggregatedMeasure\Request Aggregated Measure Data.json" />
+      <EmbeddedResource Include="CimMessageAdapter\Messages\json\AggregatedMeasure\Request Aggregated Measure Data.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>

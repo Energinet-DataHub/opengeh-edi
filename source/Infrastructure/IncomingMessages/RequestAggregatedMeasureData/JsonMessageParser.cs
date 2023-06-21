@@ -155,7 +155,8 @@ public class JsonMessageParser : IMessageParser<Serie, RequestAggregatedMeasureD
     private static Serie SeriesFrom(JsonElement element)
     {
         return new Serie(
-            element.GetProperty("mRID").ToString(),
+            element.GetProperty("mRID")
+                .ToString(),
             element.GetProperty("settlement_Series.version").GetProperty("value")
                 .ToString(),
             element.GetProperty("marketEvaluationPoint.type").GetProperty("value")
@@ -168,7 +169,7 @@ public class JsonMessageParser : IMessageParser<Serie, RequestAggregatedMeasureD
                 .ToString(),
             element.GetProperty("meteringGridArea_Domain.mRID").GetProperty("value")
                 .ToString(),
-            element.GetProperty("biddingZone_Domain.mRID").GetProperty("Value")
+            element.GetProperty("biddingZone_Domain.mRID").GetProperty("value")
                 .ToString(),
             element.GetProperty("energySupplier_MarketParticipant.mRID").GetProperty("value")
                 .ToString(),
