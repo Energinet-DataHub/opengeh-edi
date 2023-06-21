@@ -106,7 +106,7 @@ public class RequestAggregatedMeasureMessageReceiver
             ActorNumber.Create(messageHeader.SenderId),
             ActorNumber.Create(messageHeader.ReceiverId),
             timestamp,
-            BusinessReason.From(messageHeader.BusinessReason),
+            messageHeader.BusinessReason,
             request.Body));
 
         var result = await _messageReceiver.ReceiveAsync(messageParserResult, cancellationToken)
