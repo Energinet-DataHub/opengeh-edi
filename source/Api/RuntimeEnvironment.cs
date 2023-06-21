@@ -53,7 +53,7 @@ namespace Api
             {
                 var variable = GetEnvironmentVariable(nameof(MAX_NUMBER_OF_PAYLOADS_IN_BUNDLE));
                 return string.IsNullOrWhiteSpace(variable) || int.TryParse(variable, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out var value) == false
-                    ? 2000
+                    ? 500
                     : value;
             }
         }
