@@ -14,22 +14,28 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Application.IncomingMessages.RequestAggregatedMeasureData;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestAggregatedMeasureData;
-using Domain.Documents;
+using DocumentValidation;
 using Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Xunit;
+using DocumentFormat = Domain.Documents.DocumentFormat;
 
 namespace Tests.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
 public class MessageParserTests
 {
     private static readonly string PathToMessages =
-        $"cimMessageAdapter{Path.DirectorySeparatorChar}Messages{Path.DirectorySeparatorChar}";
+        $"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}";
+
+    private static readonly string SubPath =
+        $"{Path.DirectorySeparatorChar}aggregatedmeasure{Path.DirectorySeparatorChar}";
 
     private readonly MessageParser _messageParser;
 
@@ -39,14 +45,17 @@ public class MessageParserTests
             new IMessageParser<Serie, RequestAggregatedMeasureDataTransaction>[]
             {
                 new XmlMessageParser(),
-                // TODO: add json parser: new JsonMessageParser(),
+                new JsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
             });
     }
 
     public static IEnumerable<object[]> CreateMessages()
     {
-        return new List<object[]> { new object[] { DocumentFormat.Xml, CreateXmlMessage() } };
-        // TODO: add json parser: new object[] { DocumentFormat.Json, CreateMessages(),
+        return new List<object[]>
+        {
+            new object[] { DocumentFormat.Xml, CreateXmlMessage() },
+            new object[] { DocumentFormat.Json, CreateJsonMessages() },
+        };
     }
 
     public static IEnumerable<object[]> CreateBadMessages()
@@ -62,6 +71,28 @@ public class MessageParserTests
         var result = await _messageParser.ParseAsync(message, format, CancellationToken.None).ConfigureAwait(false);
 
         Assert.True(result.Success);
+        var messageHeader = result?.IncomingMarketDocument?.Header;
+        Assert.True(messageHeader != null);
+        Assert.Equal("123564789123564789123564789123564789", messageHeader.MessageId);
+        Assert.Equal("D05", messageHeader.BusinessReason);
+        Assert.Equal("5799999933318", messageHeader.SenderId);
+        Assert.Equal("DDK", messageHeader.SenderRole);
+        Assert.Equal("5790001330552", messageHeader.ReceiverId);
+        Assert.Equal("DGL", messageHeader.ReceiverRole);
+        Assert.Equal("2022-12-17T09:30:47Z", messageHeader.CreatedAt);
+
+        var serie = result?.IncomingMarketDocument?.MarketActivityRecords.First();
+        Assert.True(serie != null);
+        Assert.Equal("123353185", serie.Id);
+        Assert.Equal("5799999933318", serie.BalanceResponsiblePartyMarketParticipantId);
+        Assert.Equal("10YDK-1--------M", serie.BiddingZoneDomainId);
+        Assert.Equal("5790001330552", serie.EnergySupplierMarketParticipantId);
+        Assert.Equal("E17", serie.MarketEvaluationPointType);
+        Assert.Equal("244", serie.MeteringGridAreaDomainId);
+        Assert.Equal("D01", serie.MarketEvaluationSettlementMethod);
+        Assert.Equal("D01", serie.SettlementSeriesVersion);
+        Assert.Equal("2022-07-22T22:00:00Z", serie.EndDateAndOrTimeDateTime);
+        Assert.Equal("2022-06-17T22:00:00Z", serie.StartDateAndOrTimeDateTime);
     }
 
     [Theory]
@@ -78,7 +109,7 @@ public class MessageParserTests
     private static Stream CreateXmlMessage()
     {
         var xmlDocument = XDocument.Load(
-            $"{PathToMessages}xml{Path.DirectorySeparatorChar}AggregatedMeasure{Path.DirectorySeparatorChar}RequestAggregatedMeasureData.xml");
+            $"{PathToMessages}xml{SubPath}RequestAggregatedMeasureData.xml");
         var stream = new MemoryStream();
         xmlDocument.Save(stream);
 
@@ -88,10 +119,30 @@ public class MessageParserTests
     private static Stream CreateBadXmlMessage()
     {
         var xmlDocument = XDocument.Load(
-            $"{PathToMessages}xml{Path.DirectorySeparatorChar}AggregatedMeasure{Path.DirectorySeparatorChar}BadRequestAggregatedMeasureData.xml");
+            $"{PathToMessages}xml{SubPath}BadRequestAggregatedMeasureData.xml");
         var stream = new MemoryStream();
         xmlDocument.Save(stream);
 
+        return stream;
+    }
+
+    #endregion
+
+    #region json messages
+
+    private static Stream CreateJsonMessages()
+    {
+        return ReadTextFile($"{PathToMessages}json{SubPath}Request Aggregated Measure Data.json");
+    }
+
+    private static MemoryStream ReadTextFile(string path)
+    {
+        var jsonDoc = File.ReadAllText(path);
+        var stream = new MemoryStream();
+        using var writer = new StreamWriter(stream: stream, encoding: Encoding.UTF8, bufferSize: 4096, leaveOpen: true);
+        writer.Write(jsonDoc);
+        writer.Flush();
+        stream.Position = 0;
         return stream;
     }
 
