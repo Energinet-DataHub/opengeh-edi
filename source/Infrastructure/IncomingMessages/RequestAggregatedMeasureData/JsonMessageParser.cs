@@ -109,10 +109,8 @@ public class JsonMessageParser : IMessageParser<Serie, RequestAggregatedMeasureD
             message.Position = 0;
     }
 
-    // This is added by Rasmus
     private static MessageHeader MessageHeaderFrom(JsonElement element)
     {
-        // tjek at disse værdier passser.
         // flyt til en hjælper klasse
         return new MessageHeader(
             element.GetProperty("mRID").ToString(),
