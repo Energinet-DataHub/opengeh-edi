@@ -208,7 +208,7 @@ namespace Infrastructure.Configuration
 
         public CompositionRoot AddAggregatedMeasureDataServices()
         {
-            AggregatedMeasureDataConfiguration.Configure(_services);
+            RequestedAggregatedMeasureDataConfiguration.Configure(_services);
             return this;
         }
 

@@ -67,6 +67,7 @@ internal static class IncomingMessageParsingServices
         services.AddTransient<CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.MessageParser>();
         services.AddScoped<DefaultProcessTypeValidator>();
         services.AddScoped<DefaultMessageTypeValidator>();
+        services.AddScoped<MasterDataReceiverResponsibleVerification>();
     }
 
     private static void RegisterRequestChangeOfSupplierMessageHandling(IServiceCollection services)
@@ -80,6 +81,7 @@ internal static class IncomingMessageParsingServices
         services.AddTransient<MessageParser>();
         services.AddScoped<DefaultProcessTypeValidator>();
         services.AddScoped<DefaultMessageTypeValidator>();
+        services.AddScoped<MasterDataReceiverResponsibleVerification>();
     }
 
     private static void RegisterRequestAggregatedMeasureDataHandling(IServiceCollection services)
@@ -92,5 +94,6 @@ internal static class IncomingMessageParsingServices
         services.AddTransient<RequestAggregatedMeasureDataTransaction>();
         services.AddScoped<ProcessTypeValidator>();
         services.AddScoped<MessageTypeValidator>();
+        services.AddScoped<CalculationResponsibleReceiverVerification>();
     }
 }
