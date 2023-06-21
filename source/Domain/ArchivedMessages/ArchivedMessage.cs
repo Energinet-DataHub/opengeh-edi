@@ -25,5 +25,5 @@ public record ArchivedMessage(
     ActorNumber SenderNumber,
     ActorNumber ReceiverNumber,
     Instant CreatedAt,
-    BusinessReason? BusinessReason,
+    string? BusinessReason,
     Stream Document);
