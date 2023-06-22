@@ -60,8 +60,11 @@ public class MessageParserTests
 
     public static IEnumerable<object[]> CreateBadMessages()
     {
-        return new List<object[]> { new object[] { DocumentFormat.Xml, CreateBadXmlMessage() } };
-        // TODO: add json parser: new object[] { DocumentFormat.Json, CreateMessages(),
+        return new List<object[]>
+        {
+                new object[] { DocumentFormat.Xml, CreateBadXmlMessage() },
+                new object[] { DocumentFormat.Json, CreateBadJsonMessages() },
+        };
     }
 
     [Theory]
@@ -71,7 +74,7 @@ public class MessageParserTests
         var result = await _messageParser.ParseAsync(message, format, CancellationToken.None).ConfigureAwait(false);
 
         Assert.True(result.Success);
-        var messageHeader = result?.IncomingMarketDocument?.Header;
+        var messageHeader = result!.IncomingMarketDocument!.Header;
         Assert.True(messageHeader != null);
         Assert.Equal("123564789123564789123564789123564789", messageHeader.MessageId);
         Assert.Equal("D05", messageHeader.BusinessReason);
@@ -81,7 +84,7 @@ public class MessageParserTests
         Assert.Equal("DGL", messageHeader.ReceiverRole);
         Assert.Equal("2022-12-17T09:30:47Z", messageHeader.CreatedAt);
 
-        var serie = result?.IncomingMarketDocument?.MarketActivityRecords.First();
+        var serie = result!.IncomingMarketDocument!.MarketActivityRecords.First();
         Assert.True(serie != null);
         Assert.Equal("123353185", serie.Id);
         Assert.Equal("5799999933318", serie.BalanceResponsiblePartyMarketParticipantId);
@@ -119,7 +122,7 @@ public class MessageParserTests
     private static Stream CreateBadXmlMessage()
     {
         var xmlDocument = XDocument.Load(
-            $"{PathToMessages}xml{SubPath}BadRequestAggregatedMeasureData.xml");
+            $"{PathToMessages}xml{SubPath}BadVersionRequestAggregatedMeasureData.xml");
         var stream = new MemoryStream();
         xmlDocument.Save(stream);
 
@@ -133,6 +136,11 @@ public class MessageParserTests
     private static Stream CreateJsonMessages()
     {
         return ReadTextFile($"{PathToMessages}json{SubPath}Request Aggregated Measure Data.json");
+    }
+
+    private static Stream CreateBadJsonMessages()
+    {
+        return ReadTextFile($"{PathToMessages}json{SubPath}Bad Skema Request Aggregated Measure Data.json");
     }
 
     private static MemoryStream ReadTextFile(string path)
