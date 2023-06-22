@@ -63,7 +63,8 @@ public class MessageParserTests
         return new List<object[]>
         {
                 new object[] { DocumentFormat.Xml, CreateBadXmlMessage() },
-                new object[] { DocumentFormat.Json, CreateBadJsonMessages() },
+                new object[] { DocumentFormat.Json, CreateBadSkemaJsonMessages() },
+                new object[] { DocumentFormat.Json, CreateFailedSkemaValidationJsonMessages() },
         };
     }
 
@@ -138,9 +139,14 @@ public class MessageParserTests
         return ReadTextFile($"{PathToMessages}json{SubPath}Request Aggregated Measure Data.json");
     }
 
-    private static Stream CreateBadJsonMessages()
+    private static Stream CreateBadSkemaJsonMessages()
     {
         return ReadTextFile($"{PathToMessages}json{SubPath}Bad Skema Request Aggregated Measure Data.json");
+    }
+
+    private static Stream CreateFailedSkemaValidationJsonMessages()
+    {
+        return ReadTextFile($"{PathToMessages}json{SubPath}Fail schema validation Aggregated Measure Data.json");
     }
 
     private static MemoryStream ReadTextFile(string path)

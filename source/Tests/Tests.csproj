@@ -63,6 +63,9 @@ limitations under the License.
       <EmbeddedResource Include="CimMessageAdapter\Messages\json\AggregatedMeasure\Bad Skema Request Aggregated Measure Data.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\json\AggregatedMeasure\Fail schema validation Aggregated Measure Data.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
       <EmbeddedResource Include="CimMessageAdapter\Messages\json\Invalid Request Change of Supplier.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
