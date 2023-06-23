@@ -77,9 +77,9 @@ public class JsonMessageParser : IMessageParser<Serie, RequestAggregatedMeasureD
 
         try
         {
-            return ParseJsonData(
-                await JsonDocument.ParseAsync(message, cancellationToken: cancellationToken)
-                .ConfigureAwait(false));
+            using var document = await JsonDocument.ParseAsync(message, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+            return ParseJsonData(document);
         }
         catch (JsonException exception)
         {
@@ -88,6 +88,10 @@ public class JsonMessageParser : IMessageParser<Serie, RequestAggregatedMeasureD
         catch (ArgumentException argumentException)
         {
             return InvalidJsonFailure(argumentException);
+        }
+        catch (IOException e)
+        {
+            return InvalidJsonFailure(e);
         }
     }
 
