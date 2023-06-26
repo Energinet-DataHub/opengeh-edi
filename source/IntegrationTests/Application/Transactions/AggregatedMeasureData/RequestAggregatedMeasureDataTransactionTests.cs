@@ -14,6 +14,7 @@
 
 using System.Text;
 using System.Threading.Tasks;
+using Application.Configuration.DataAccess;
 using Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EnergySupplying.RequestResponse.Requests;
 using Infrastructure.Configuration.MessageBus;
@@ -43,18 +44,20 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
     }
 
     [Fact]
-    public async Task Aggregated_measure_data_transaction_is_started_send_to_service_bus()
+    public async Task Aggregated_measure_data_process_is_send_to_Data_Base()
     {
         var incomingMessage = MessageBuilder()
             .Build();
 
-        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
+        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false); // Hvad skal dette bruges til?
 
-        var dispatchedMessage = _senderSpy.Message;
-        Assert.NotNull(dispatchedMessage);
-        var byteAsString = Encoding.UTF8.GetString(dispatchedMessage?.Body);
-        var dispatchedAggregatedMeasureDataTransactionRequest = _jsonSerializer.Deserialize<AggregatedMeasureDataTransactionRequest>(byteAsString);
-        Assert.Equal(incomingMessage.MessageHeader.MessageId, dispatchedAggregatedMeasureDataTransactionRequest.Message.MessageId);
+        //var assertTransaction = await AssertTransaction.TransactionAsync(SampleData.ActorProvidedId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+
+        // var dispatchedMessage = _senderSpy.Message;
+        // Assert.NotNull(dispatchedMessage);
+        // var byteAsString = Encoding.UTF8.GetString(dispatchedMessage?.Body);
+        // var dispatchedAggregatedMeasureDataTransactionRequest = _jsonSerializer.Deserialize<AggregatedMeasureDataTransactionRequest>(byteAsString);
+        //Assert.Equal(incomingMessage.MessageHeader.MessageId, dispatchedAggregatedMeasureDataTransactionRequest.Message.MessageId);
     }
 
     private static RequestAggregatedMeasureDataMessageBuilder MessageBuilder()

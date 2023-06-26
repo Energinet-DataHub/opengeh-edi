@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Data;
 using Domain.SeedWork;
 
 namespace Domain.Transactions.AggregatedMeasureData
@@ -29,6 +30,9 @@ namespace Domain.Transactions.AggregatedMeasureData
         private readonly string _energySupplierMarketParticipantId;
         private readonly string _balanceResponsiblePartyMarketParticipantId;
         private readonly string _requestedByActorId;
+#pragma warning disable CS0414
+        private readonly State _state;
+#pragma warning restore CS0414
 
         public AggregatedMeasureDataProcess(string id, string settlementSeriesVersion, string marketEvaluationPointType, string marketEvaluationSettlementMethod, string startDateAndOrTimeDateTime, string endDateAndOrTimeDateTime, string meteringGridAreaDomainId, string biddingZoneDomainId, string energySupplierMarketParticipantId, string balanceResponsiblePartyMarketParticipantId, string requestedByActorId)
         {
@@ -43,6 +47,15 @@ namespace Domain.Transactions.AggregatedMeasureData
             _energySupplierMarketParticipantId = energySupplierMarketParticipantId;
             _balanceResponsiblePartyMarketParticipantId = balanceResponsiblePartyMarketParticipantId;
             _requestedByActorId = requestedByActorId;
+            _state = State.Started;
+        }
+
+        public enum State
+        {
+            Started,
+            Accepted,
+            Rejected,
+            Completed,
         }
     }
 }
