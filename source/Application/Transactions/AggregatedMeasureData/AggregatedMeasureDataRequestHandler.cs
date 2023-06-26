@@ -24,30 +24,20 @@ namespace Application.Transactions.AggregatedMeasureData;
 
 public class AggregatedMeasureDataRequestHandler : IRequestHandler<RequestAggregatedMeasureDataTransaction, Unit>
 {
-    private readonly IAggregatedMeasureDataSender _aggregatedMeasureDataSender;
+    private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
 
-    public AggregatedMeasureDataRequestHandler(IAggregatedMeasureDataSender aggregatedMeasureDataSender)
+    public AggregatedMeasureDataRequestHandler(IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
-        _aggregatedMeasureDataSender = aggregatedMeasureDataSender;
+        _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
     }
 
-    public async Task<Unit> Handle(RequestAggregatedMeasureDataTransaction request, CancellationToken cancellationToken)
+    public Task<Unit> Handle(RequestAggregatedMeasureDataTransaction request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
-        var requestMessage = request.MessageHeader;
+        var requestMessageHeader = request.MessageHeader;
         var requestMarketActivityRecord = request.MarketActivityRecord;
 
-        var requestData = new AggregatedMeasureDataTransactionRequest(
-            new MessageHeader(
-                messageId: requestMessage.MessageId,
-                messageType: requestMessage.MessageType,
-                businessReason: requestMessage.BusinessReason,
-                senderId: requestMessage.SenderId,
-                senderRole: requestMessage.SenderRole,
-                receiverId: requestMessage.ReceiverId,
-                receiverRole: requestMessage.ReceiverRole,
-                createdAt: requestMessage.CreatedAt),
-            new Serie(
+        var process = new AggregatedMeasureDataProcess(
                 requestMarketActivityRecord.Id,
                 requestMarketActivityRecord.SettlementSeriesVersion,
                 requestMarketActivityRecord.MarketEvaluationPointType,
@@ -57,9 +47,10 @@ public class AggregatedMeasureDataRequestHandler : IRequestHandler<RequestAggreg
                 requestMarketActivityRecord.MeteringGridAreaDomainId,
                 requestMarketActivityRecord.BiddingZoneDomainId,
                 requestMarketActivityRecord.EnergySupplierMarketParticipantId,
-                requestMarketActivityRecord.BalanceResponsiblePartyMarketParticipantId));
+                requestMarketActivityRecord.BalanceResponsiblePartyMarketParticipantId,
+                requestMessageHeader.SenderId);
 
-        await _aggregatedMeasureDataSender.SendAsync(requestData, cancellationToken).ConfigureAwait(false);
-        return Unit.Value;
+        _aggregatedMeasureDataProcessRepository.Add(process);
+        return Task.FromResult(Unit.Value);
     }
 }
