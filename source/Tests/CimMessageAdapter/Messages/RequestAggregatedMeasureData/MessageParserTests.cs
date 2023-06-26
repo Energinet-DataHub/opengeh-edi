@@ -15,13 +15,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Application.IncomingMessages.RequestAggregatedMeasureData;
-using Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using CimMessageAdapter.ValidationErrors;
@@ -54,12 +52,14 @@ public class MessageParserTests
             });
     }
 
-    public static IEnumerable<object[]> CreateMessages()
+    public static IEnumerable<object[]> CreateMessagesWithSingleAndMultipleTransactions()
     {
         return new List<object[]>
         {
             new object[] { DocumentFormat.Xml, CreateBaseXmlMessage("RequestAggregatedMeasureData.xml") },
-            new object[] { DocumentFormat.Json, CreateBaseJsonMessages("Request Aggregated Measure Data.json") },
+            new object[] { DocumentFormat.Xml, CreateBaseXmlMessage("TwoSeriesRequestAggregatedMeasureData.xml") },
+            new object[] { DocumentFormat.Json, CreateBaseJsonMessages("RequestAggregatedMeasureData.json") },
+            new object[] { DocumentFormat.Json, CreateBaseJsonMessages("RequestAggregatedMeasureData.json", 1) },
         };
     }
 
@@ -69,14 +69,13 @@ public class MessageParserTests
         {
                 new object[] { DocumentFormat.Xml, CreateBaseXmlMessage("BadVersionRequestAggregatedMeasureData.xml"), nameof(InvalidBusinessReasonOrVersion) },
                 new object[] { DocumentFormat.Xml, CreateBaseXmlMessage("RequestAggregatedMeasureData.xml", 51), nameof(MessageSizeExceeded) },
-                new object[] { DocumentFormat.Json, CreateBaseJsonMessages("Bad Scheme Request Aggregated Measure Data.json"), nameof(InvalidMessageStructure) },
-                new object[] { DocumentFormat.Json, CreateBaseJsonMessages("Failed Scheme Validation Aggregated Measure Data.json"), nameof(InvalidMessageStructure) },
-                new object[] { DocumentFormat.Json, CreateBaseJsonMessages("Request Aggregated Measure Data.json", 51), nameof(MessageSizeExceeded) },
+                new object[] { DocumentFormat.Json, CreateBaseJsonMessages("FailSchemeValidationAggregatedMeasureData.json"), nameof(InvalidMessageStructure) },
+                new object[] { DocumentFormat.Json, CreateBaseJsonMessages("RequestAggregatedMeasureData.json", 51), nameof(MessageSizeExceeded) },
         };
     }
 
     [Theory]
-    [MemberData(nameof(CreateMessages))]
+    [MemberData(nameof(CreateMessagesWithSingleAndMultipleTransactions))]
     public async Task Successfully_parsed(DocumentFormat format, Stream message)
     {
         var result = await _messageParser.ParseAsync(message, format, CancellationToken.None).ConfigureAwait(false);
@@ -92,23 +91,25 @@ public class MessageParserTests
         Assert.Equal("DGL", messageHeader.ReceiverRole);
         Assert.Equal("2022-12-17T09:30:47Z", messageHeader.CreatedAt);
 
-        var serie = result!.IncomingMarketDocument!.MarketActivityRecords.First();
-        Assert.True(serie != null);
-        Assert.Equal("123353185", serie.Id);
-        Assert.Equal("5799999933318", serie.BalanceResponsiblePartyMarketParticipantId);
-        Assert.Equal("10YDK-1--------M", serie.BiddingZoneDomainId);
-        Assert.Equal("5790001330552", serie.EnergySupplierMarketParticipantId);
-        Assert.Equal("E17", serie.MarketEvaluationPointType);
-        Assert.Equal("244", serie.MeteringGridAreaDomainId);
-        Assert.Equal("D01", serie.MarketEvaluationSettlementMethod);
-        Assert.Equal("D01", serie.SettlementSeriesVersion);
-        Assert.Equal("2022-07-22T22:00:00Z", serie.EndDateAndOrTimeDateTime);
-        Assert.Equal("2022-06-17T22:00:00Z", serie.StartDateAndOrTimeDateTime);
+        foreach (var serie in result!.IncomingMarketDocument!.MarketActivityRecords)
+        {
+            Assert.True(serie != null);
+            Assert.Equal("123353185", serie.Id);
+            Assert.Equal("5799999933318", serie.BalanceResponsiblePartyMarketParticipantId);
+            Assert.Equal("10YDK-1--------M", serie.BiddingZoneDomainId);
+            Assert.Equal("5790001330552", serie.EnergySupplierMarketParticipantId);
+            Assert.Equal("E17", serie.MarketEvaluationPointType);
+            Assert.Equal("244", serie.MeteringGridAreaDomainId);
+            Assert.Equal("D01", serie.MarketEvaluationSettlementMethod);
+            Assert.Equal("D01", serie.SettlementSeriesVersion);
+            Assert.Equal("2022-07-22T22:00:00Z", serie.EndDateAndOrTimeDateTime);
+            Assert.Equal("2022-06-17T22:00:00Z", serie.StartDateAndOrTimeDateTime);
+        }
     }
 
     [Theory]
     [MemberData(nameof(CreateBadMessages))]
-    public async Task Can_not_parse(DocumentFormat format, Stream message, string expectedError)
+    public async Task Messages_with_errors(DocumentFormat format, Stream message, string expectedError)
     {
         var result = await _messageParser.ParseAsync(message, format, CancellationToken.None).ConfigureAwait(false);
 
@@ -150,20 +151,21 @@ public class MessageParserTests
         message.Position = 0;
         return message;
     }
+
     #endregion
 
     #region json messages
-    private static Stream CreateBaseJsonMessages(string fileName, int newFileSizeInMb = 0)
+    private static Stream CreateBaseJsonMessages(string fileName, int addSeriesUntilMbSize = 0)
     {
-        return ReadTextFile($"{PathToMessages}json{SubPath}{fileName}", newFileSizeInMb);
+        return ReadTextFile($"{PathToMessages}json{SubPath}{fileName}", addSeriesUntilMbSize);
     }
 
-    private static MemoryStream ReadTextFile(string path, int newFileSizeInMb = 0)
+    private static MemoryStream ReadTextFile(string path, int addSeriesUntilMbSize = 0)
     {
         var jsonDoc = File.ReadAllText(path);
-        if (newFileSizeInMb > 0)
+        if (addSeriesUntilMbSize > 0)
         {
-            jsonDoc = ChangeJsonFileSizeTo(jsonDoc, newFileSizeInMb);
+            jsonDoc = ChangeJsonFileSizeTo(jsonDoc, addSeriesUntilMbSize);
         }
 
         var stream = new MemoryStream();
@@ -175,9 +177,9 @@ public class MessageParserTests
         return stream;
     }
 
-    private static string ChangeJsonFileSizeTo(string jsonDoc, int newFileSizeInMb)
+    private static string ChangeJsonFileSizeTo(string jsonDoc, int addSeriesUntilMbSize)
     {
-        var newFileSizeInBytes = newFileSizeInMb * 1024 * 1024;
+        var newFileSizeInBytes = addSeriesUntilMbSize * 1024 * 1024;
         int indexOfSeries = jsonDoc.IndexOf("Series", StringComparison.Ordinal);
         if (indexOfSeries < 0)
         {
@@ -185,15 +187,14 @@ public class MessageParserTests
         }
 
         int seriesStartAtIndex = indexOfSeries + "Series".Length + 4;
+        var jsonDocSb = new StringBuilder(jsonDoc);
 
-        var sb = new StringBuilder(jsonDoc);
-
-        while (sb.Length < newFileSizeInBytes)
+        while (jsonDocSb.Length < newFileSizeInBytes)
         {
-            sb.Insert(seriesStartAtIndex, SeriesDummy, 10);
+            jsonDocSb.Insert(seriesStartAtIndex, SeriesDummy, 10);
         }
 
-        return sb.ToString();
+        return jsonDocSb.ToString();
     }
 
     #endregion

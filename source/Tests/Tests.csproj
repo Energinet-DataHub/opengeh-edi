@@ -60,10 +60,13 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="CimMessageAdapter\Messages\json\AggregatedMeasure\Bad Scheme Request Aggregated Measure Data.json">
+      <EmbeddedResource Include="CimMessageAdapter\Messages\json\AggregatedMeasure\No Scheme Request Aggregated Measure Data.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="CimMessageAdapter\Messages\json\AggregatedMeasure\Failed Scheme Validation Aggregated Measure Data.json">
+      <EmbeddedResource Include="CimMessageAdapter\Messages\json\AggregatedMeasure\FailSchemeValidationAggregatedMeasureData.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\json\AggregatedMeasure\RequestAggregatedMeasureData.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <EmbeddedResource Include="CimMessageAdapter\Messages\json\ChangeOfSupplier\Invalid Request Change of Supplier.json">
@@ -77,6 +80,9 @@ limitations under the License.
       </EmbeddedResource>
       <EmbeddedResource Include="CimMessageAdapter\Messages\xml\AggregatedMeasure\RequestAggregatedMeasureData.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\AggregatedMeasure\TwoSeriesRequestAggregatedMeasureData.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <EmbeddedResource Include="CimMessageAdapter\Messages\xml\ChangeAccountingPoint\RequestChangeAccountingPointCharacteristics.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -99,9 +105,6 @@ limitations under the License.
       <None Remove="CimMessageAdapter\Messages\xml\RequestChangeAccountingPointCharacteristics.xml" />
       <None Remove="CimMessageAdapter\Messages\xml\RequestChangeCustomerCharacteristics.xml" />
       <None Remove="CimMessageAdapter\Messages\json\AggregatedMeasure\Request Aggregated Measure Data.json" />
-      <EmbeddedResource Include="CimMessageAdapter\Messages\json\AggregatedMeasure\Request Aggregated Measure Data.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
