@@ -24,8 +24,9 @@ public class RequestChangeOfSupplierReceiver : MessageReceiver<RequestChangeOfSu
         ITransactionIds transactionIds,
         SenderAuthorizer senderAuthorizer,
         DefaultProcessTypeValidator defaultProcessTypeValidator,
-        DefaultMessageTypeValidator defaultMessageTypeValidator)
-        : base(messageIds, messageQueueDispatcher, transactionIds, senderAuthorizer, defaultProcessTypeValidator, defaultMessageTypeValidator)
+        DefaultMessageTypeValidator defaultMessageTypeValidator,
+        MasterDataReceiverResponsibleVerification masterDataReceiverResponsibleVerification)
+        : base(messageIds, messageQueueDispatcher, transactionIds, senderAuthorizer, defaultProcessTypeValidator, defaultMessageTypeValidator, masterDataReceiverResponsibleVerification)
     {
     }
 }

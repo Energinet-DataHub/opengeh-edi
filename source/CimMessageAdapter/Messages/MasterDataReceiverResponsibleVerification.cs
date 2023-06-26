@@ -18,22 +18,25 @@ using CimMessageAdapter.ValidationErrors;
 
 namespace CimMessageAdapter.Messages
 {
-    public static class ReceiverVerification
+    /// <summary>
+    /// Responsible for verifying that the Receiver is a Master Data Responsible Receiver and Datahub
+    /// </summary>
+    public class MasterDataReceiverResponsibleVerification : IReceiverValidator
     {
-        private const string MeteringPointAdministratorRole = "DDZ";
+        private const string MasterDataResponsibleRole = "DDZ";
         private const string GlnOfDataHub = "5790001330552";
 
-        public static Task<Result> VerifyAsync(string receiverId, string role)
+        public Task<Result> VerifyAsync(string receiverId, string role)
         {
             if (receiverId == null) throw new ArgumentNullException(nameof(receiverId));
             if (role == null) throw new ArgumentNullException(nameof(role));
 
-            if (IsMeteringPointAdministrator(role) == false)
+            if (IsMasterDataResponsible(role) == false)
             {
                 return Task.FromResult(Result.Failure(new InvalidReceiverRole()));
             }
 
-            if (ReceiverIsKnown(receiverId) == false)
+            if (ReceiverIsDataHub(receiverId) == false)
             {
                 return Task.FromResult(Result.Failure(new InvalidReceiverId(receiverId)));
             }
@@ -41,12 +44,12 @@ namespace CimMessageAdapter.Messages
             return Task.FromResult(Result.Succeeded());
         }
 
-        private static bool IsMeteringPointAdministrator(string role)
+        private static bool IsMasterDataResponsible(string role)
         {
-            return role.Equals(MeteringPointAdministratorRole, StringComparison.OrdinalIgnoreCase);
+            return role.Equals(MasterDataResponsibleRole, StringComparison.OrdinalIgnoreCase);
         }
 
-        private static bool ReceiverIsKnown(string receiverId)
+        private static bool ReceiverIsDataHub(string receiverId)
         {
             return receiverId.Equals(GlnOfDataHub, StringComparison.OrdinalIgnoreCase);
         }
