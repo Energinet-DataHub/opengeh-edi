@@ -27,7 +27,6 @@ using CimMessageAdapter.ValidationErrors;
 using Domain.Actors;
 using Domain.ArchivedMessages;
 using Domain.Documents;
-using Domain.OutgoingMessages;
 using Infrastructure.IncomingMessages;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
