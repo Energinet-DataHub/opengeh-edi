@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Text.Json;
 using System.Threading;
@@ -25,7 +24,6 @@ using CimMessageAdapter.Messages;
 using CimMessageAdapter.ValidationErrors;
 using DocumentValidation;
 using Infrastructure.IncomingMessages.BaseParsers;
-using Json.Schema;
 using DocumentFormat = Domain.Documents.DocumentFormat;
 
 namespace Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
