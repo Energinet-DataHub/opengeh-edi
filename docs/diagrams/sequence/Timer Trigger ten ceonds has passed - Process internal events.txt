@@ -1,0 +1,34 @@
+autoactivation on
+participantgroup #lightyellow **Api**
+participant Func - TenSecondsHasPassed
+end
+participantgroup #lightgreen **Infrastructure**
+participant ProcessInternalCommandsOnTimeHasPassed
+participant InternalCommandProcessor
+participant InternalCommandAccessor
+participant B2BContext
+participant InternalCommandMapper
+participant Serializer
+participant CommandExecutor
+participant AggregationResultForwardingRepository
+participant OutgoingMessageStore
+participant Connection
+end
+participantgroup #lightblue **Application**
+participant ForwardAggregationResultHandler
+end
+Func - TenSecondsHasPassed ->ProcessInternalCommandsOnTimeHasPassed:Mediator - Send
+ProcessInternalCommandsOnTimeHasPassed->InternalCommandProcessor: ProcessPending
+InternalCommandProcessor->InternalCommandAccessor:GetPending
+InternalCommandAccessor->B2BContext: GetQueuedInternalCommands (not processed)
+InternalCommandAccessor<--B2BContext: QueuedInternalCommands
+InternalCommandProcessor->InternalCommandMapper:GetByName
+InternalCommandProcessor->Serializer:Deserialize
+InternalCommandProcessor<--Serializer: InternalCommand
+InternalCommandProcessor->CommandExecutor:Execute (InternalCommand)
+CommandExecutor->ForwardAggregationResultHandler: Mediator - Send 
+ForwardAggregationResultHandler->AggregationResultForwardingRepository:Add
+AggregationResultForwardingRepository->B2BContext:Add
+ForwardAggregationResultHandler->OutgoingMessageStore:Add
+OutgoingMessageStore->B2BContext:Add
+InternalCommandProcessor->Connection:MarkedAsProcessed
