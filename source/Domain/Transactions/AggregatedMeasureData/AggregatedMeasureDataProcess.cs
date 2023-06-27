@@ -12,50 +12,74 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Data;
+using Domain.Actors;
 using Domain.SeedWork;
+using NodaTime;
 
 namespace Domain.Transactions.AggregatedMeasureData
 {
     public class AggregatedMeasureDataProcess : Entity
     {
-        private readonly string _id;
-        private readonly string _settlementSeriesVersion;
-        private readonly string _marketEvaluationPointType;
-        private readonly string _marketEvaluationSettlementMethod;
-        private readonly string _startDateAndOrTimeDateTime;
-        private readonly string _endDateAndOrTimeDateTime;
-        private readonly string _meteringGridAreaDomainId;
-        private readonly string _biddingZoneDomainId;
-        private readonly string _energySupplierMarketParticipantId;
-        private readonly string _balanceResponsiblePartyMarketParticipantId;
-        private readonly string _requestedByActorId;
 #pragma warning disable CS0414
         private readonly State _state;
 #pragma warning restore CS0414
 
-        public AggregatedMeasureDataProcess(string id, string settlementSeriesVersion, string marketEvaluationPointType, string marketEvaluationSettlementMethod, string startDateAndOrTimeDateTime, string endDateAndOrTimeDateTime, string meteringGridAreaDomainId, string biddingZoneDomainId, string energySupplierMarketParticipantId, string balanceResponsiblePartyMarketParticipantId, string requestedByActorId)
+        private readonly ActorNumber _requestedByActorId;
+
+        public AggregatedMeasureDataProcess(
+            ProcessId processId,
+            string settlementSeriesVersion,
+            string marketEvaluationPointType,
+            string marketEvaluationSettlementMethod,
+            Instant startDateAndOrTimeDateTime,
+            Instant endDateAndOrTimeDateTime,
+            string meteringGridAreaDomainId,
+            string biddingZoneDomainId,
+            string energySupplierMarketParticipantId,
+            string balanceResponsiblePartyMarketParticipantId,
+            ActorNumber requestedByActorId)
         {
-            _id = id;
-            _settlementSeriesVersion = settlementSeriesVersion;
-            _marketEvaluationPointType = marketEvaluationPointType;
-            _marketEvaluationSettlementMethod = marketEvaluationSettlementMethod;
-            _startDateAndOrTimeDateTime = startDateAndOrTimeDateTime;
-            _endDateAndOrTimeDateTime = endDateAndOrTimeDateTime;
-            _meteringGridAreaDomainId = meteringGridAreaDomainId;
-            _biddingZoneDomainId = biddingZoneDomainId;
-            _energySupplierMarketParticipantId = energySupplierMarketParticipantId;
-            _balanceResponsiblePartyMarketParticipantId = balanceResponsiblePartyMarketParticipantId;
+            ProcessId = processId;
+            SettlementSeriesVersion = settlementSeriesVersion;
+            MarketEvaluationPointType = marketEvaluationPointType;
+            MarketEvaluationSettlementMethod = marketEvaluationSettlementMethod;
+            StartDateAndOrTimeDateTime = startDateAndOrTimeDateTime;
+            EndDateAndOrTimeDateTime = endDateAndOrTimeDateTime;
+            MeteringGridAreaDomainId = meteringGridAreaDomainId;
+            BiddingZoneDomainId = biddingZoneDomainId;
+            EnergySupplierMarketParticipantId = energySupplierMarketParticipantId;
+            BalanceResponsiblePartyMarketParticipantId = balanceResponsiblePartyMarketParticipantId;
             _requestedByActorId = requestedByActorId;
-            _state = State.Started;
+            _state = State.Initialized;
         }
 
         public enum State
         {
-            Started,
-            Accepted,
+            Initialized,
+            BeingProcessed,
             Rejected,
+            Accepted,
             Completed,
         }
+
+        public ProcessId ProcessId { get; }
+
+        public string SettlementSeriesVersion { get; }
+
+        public string MarketEvaluationPointType { get; }
+
+        public string MarketEvaluationSettlementMethod { get; }
+
+        public Instant StartDateAndOrTimeDateTime { get; }
+
+        public Instant EndDateAndOrTimeDateTime { get; }
+
+        public string MeteringGridAreaDomainId { get; }
+
+        public string BiddingZoneDomainId { get; }
+
+        public string EnergySupplierMarketParticipantId { get; }
+
+        public string BalanceResponsiblePartyMarketParticipantId { get; }
     }
 }

@@ -27,7 +27,6 @@ using Azure.Messaging.ServiceBus;
 using CimMessageAdapter.Messages;
 using Domain.Documents;
 using Domain.MasterData.MarketEvaluationPoints;
-using Domain.Transactions.MoveIn;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Infrastructure.Actors;
 using Infrastructure.ArchivedMessages;
@@ -81,7 +80,6 @@ namespace Infrastructure.Configuration
             services.AddScoped<ITransactionIds, TransactionIdRegistry>();
             services.AddScoped<IMessageIds, MessageIdRegistry>();
             services.AddScoped(typeof(IMessageQueueDispatcher<>), typeof(MessageQueueDispatcher<>));
-            services.AddScoped<IMoveInTransactionRepository, MoveInTransactionRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             services.AddScoped<IFeatureFlagProvider, FeatureFlagProviderProvider>();
