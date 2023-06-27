@@ -56,6 +56,7 @@ The domain C4 model and rendered diagrams are located in the folder hierarchy [d
 Maintenance of the C4 model should be performed using VS Code and a local version of Structurizr Lite running in Docker. See [DataHub base model](https://github.com/Energinet-DataHub/opengeh-arch-diagrams#datahub-base-model) for a description of how to do this.
 
 ## Flow diagrams
+
 Incoming requests
 ![image](https://github.com/Energinet-DataHub/opengeh-edi/assets/122119488/7f163627-763c-4d16-8b9c-34027d5c0815)
 
