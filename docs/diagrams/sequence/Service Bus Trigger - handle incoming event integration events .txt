@@ -1,0 +1,6 @@
+autoactivation on
+IntegrationEventListener->EventReceiver: Reciever
+EventReceiver->B2BContext:Find
+EventReceiver<--B2BContext: bool
+EventReceiver->B2BContext: Add
+EventReceiver->B2BContext: SaveChanges

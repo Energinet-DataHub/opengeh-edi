@@ -21,6 +21,9 @@ public class MessageCategory : EnumerationType
     public static readonly MessageCategory MasterData = new(0, nameof(MasterData));
     public static readonly MessageCategory Aggregations = new(1, nameof(Aggregations));
 
+    // Message category can not be peeked
+    public static readonly MessageCategory None = new(2, nameof(None));
+
     private MessageCategory(int id, string name)
         : base(id, name)
     {

@@ -29,7 +29,7 @@ limitations under the License.
     <PackageReference Include="DbUp.Reboot.SqlServer" Version="1.5.0" />
     <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
-    <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.5.22">
+    <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.6.40">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -95,9 +95,10 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202303151605 Remove unused columns for aggregation result forwarding.sql" />
     <EmbeddedResource Include="Scripts\Model\202303171350 Change sender role and receiver role to role names.sql" />
     <EmbeddedResource Include="Scripts\Model\202304130909 Rename MessageType to DocumentType.sql" />
-    <EmbeddedResource Include="Scripts\Model\202322051044 Add Document to ArchivedMessage.sql" />
-    <EmbeddedResource Include="Scripts\Model\202316051024 Add Process Type to ArchivedMassage.sql" />
-    <EmbeddedResource Include="Scripts\Model\202317051026 Rename Process Type to BusinessReason.sql" />
+    <EmbeddedResource Include="Scripts\Model\202305221044 Add Document to ArchivedMessage.sql" />
+    <EmbeddedResource Include="Scripts\Model\202306090924 Change archived id type to nvarchar.sql" />
+    <EmbeddedResource Include="Scripts\Model\202305161024 Add Process Type to ArchivedMassage.sql" />
+    <EmbeddedResource Include="Scripts\Model\202305171026 Rename Process Type to BusinessReason.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241101 Consolidated BtwoB model.sql" />
@@ -117,6 +118,13 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202304131240 Create ArchivedMessage table.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <None Remove="Scripts\Model\202305311442 Recreate TransactionIds as TransactionRegistry.sql" />
+    <EmbeddedResource Include="Scripts\Model\202305311442 Recreate TransactionIds as TransactionRegistry.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Scripts\Model\202306010815 Recreate MessageIds as MessageRegistry.sql" />
+    <EmbeddedResource Include="Scripts\Model\202306010815 Recreate MessageIds as MessageRegistry.sql" />
   </ItemGroup>
 
 </Project>

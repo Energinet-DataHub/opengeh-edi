@@ -77,7 +77,7 @@ public class SearchMessagesTests : TestBase
     public async Task Filter_messages_by_message_id_and_created_date()
     {
         //Arrange
-        var messageId = Guid.NewGuid();
+        var messageId = Guid.NewGuid().ToString();
         await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z"), messageId));
         await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z")));
 
@@ -96,7 +96,7 @@ public class SearchMessagesTests : TestBase
     public async Task Filter_messages_by_message_id()
     {
         //Arrange
-        var messageId = Guid.NewGuid();
+        var messageId = Guid.NewGuid().ToString();
         await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z"), messageId));
 
         //Act
@@ -199,19 +199,19 @@ public class SearchMessagesTests : TestBase
 
     private ArchivedMessage CreateArchivedMessage(
         Instant? createdAt = null,
-        Guid? messageId = null,
+        string? messageId = null,
         string? senderNumber = null,
         string? receiverNumber = null,
         string? documentType = null,
         string? businessReason = null)
     {
         return new ArchivedMessage(
-            messageId.GetValueOrDefault(Guid.NewGuid()),
+            string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
             EnumerationType.FromName<DocumentType>(documentType ?? DocumentType.AccountingPointCharacteristics.Name),
             ActorNumber.Create(senderNumber ?? "1234512345123"),
             ActorNumber.Create(receiverNumber ?? "1234512345128"),
             createdAt.GetValueOrDefault(_systemDateTimeProvider.Now()),
-            BusinessReason.From(businessReason ?? BusinessReason.BalanceFixing.Name),
+            businessReason ?? BusinessReason.BalanceFixing.Name,
             new MemoryStream());
     }
 

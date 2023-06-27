@@ -23,9 +23,11 @@ using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.OutgoingMessages.Dequeue;
 using Application.OutgoingMessages.Peek;
+using Dapper;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.Peek;
+using Domain.SeedWork;
 using Infrastructure.Configuration.DataAccess;
 using Microsoft.Data.SqlClient;
 
@@ -91,49 +93,31 @@ public class BundledMessages : IBundledMessages
 
         using var connection =
             await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
-        using var command = CreateCommand(
-            $"SELECT Id, ReceiverNumber, MessageCategory, MessageIdsIncluded, GeneratedDocument FROM dbo.BundledMessages WHERE ReceiverNumber = @ReceiverNumber AND MessageCategory = @MessageCategory",
-            new List<KeyValuePair<string, object>>
-            {
-                new("@ReceiverNumber", receiverNumber.Value), new("@MessageCategory", category.Name),
-            },
-            connection);
 
-        using var reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
-        await reader.ReadAsync(cancellationToken).ConfigureAwait(false);
-        if (reader.HasRows == false)
+        var sqlStatement =
+            $"SELECT Id, ReceiverNumber, MessageCategory, MessageIdsIncluded, GeneratedDocument FROM dbo.BundledMessages WHERE ReceiverNumber = @ReceiverNumber AND MessageCategory = @MessageCategory";
+        var result = await connection.QueryFirstOrDefaultAsync<BundledMessageDto>(
+            sqlStatement,
+            new
+            {
+                ReceiverNumber = receiverNumber.Value,
+                MessageCategory = category.Name,
+            }).ConfigureAwait(false);
+
+        if (result is null)
         {
             return null;
         }
 
-        var id = BundledMessageId.From(reader.GetGuid(0));
-        var messageIdsIncluded = reader
-            .GetString(3)
-            .Split(",")
-            .Select(messageId => Guid.Parse(messageId))
-            .AsEnumerable();
-        var document = reader.GetStream(4);
-        return BundledMessage.Create(id, receiverNumber, category, messageIdsIncluded, document);
-    }
-
-    private static void ResetBundleStream(Stream document)
-    {
-        document.Position = 0;
-    }
-
-    private static SqlCommand CreateCommand(
-        string sqlStatement, List<KeyValuePair<string, object>> parameters, IDbConnection connection)
-    {
-        var command = connection.CreateCommand();
-
-        command.CommandText = sqlStatement;
-
-        foreach (var parameter in parameters)
-        {
-            var sqlParameter = new SqlParameter(parameter.Key, parameter.Value);
-            command.Parameters.Add(sqlParameter);
-        }
-
-        return (SqlCommand)command;
+        return BundledMessage.Create(
+                BundledMessageId.From(result.Id),
+                ActorNumber.Create(result.ReceiverNumber),
+                EnumerationType.FromName<MessageCategory>(result.MessageCategory),
+                result.MessageIdsIncluded.Split(",").Select(messageId => Guid.Parse(messageId)).AsEnumerable(),
+                new MemoryStream(result.GeneratedDocument));
     }
 }
+
+#pragma warning disable CA1819
+public record BundledMessageDto(Guid Id, string ReceiverNumber, string MessageCategory, string MessageIdsIncluded, byte[] GeneratedDocument);
+#pragma warning restore CA1819

@@ -30,6 +30,8 @@ namespace Api
 
         public virtual string? INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME => GetEnvironmentVariable(nameof(INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME));
 
+        public virtual string? INCOMING_AGGREGATED_MEASURE_DATA_QUEUE_NAME => GetEnvironmentVariable(nameof(INCOMING_AGGREGATED_MEASURE_DATA_QUEUE_NAME));
+
         public virtual string? REQUEST_RESPONSE_LOGGING_CONNECTION_STRING =>
             GetEnvironmentVariable(nameof(REQUEST_RESPONSE_LOGGING_CONNECTION_STRING));
 
@@ -51,7 +53,7 @@ namespace Api
             {
                 var variable = GetEnvironmentVariable(nameof(MAX_NUMBER_OF_PAYLOADS_IN_BUNDLE));
                 return string.IsNullOrWhiteSpace(variable) || int.TryParse(variable, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out var value) == false
-                    ? 100000
+                    ? 500
                     : value;
             }
         }

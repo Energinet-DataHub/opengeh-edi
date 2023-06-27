@@ -22,17 +22,11 @@ using Application.OutgoingMessages;
 using Application.OutgoingMessages.Common;
 using Application.OutgoingMessages.Common.Reasons;
 using Application.OutgoingMessages.Peek;
-using Application.SearchMessages;
-using Application.Transactions.Aggregations;
 using Application.Transactions.MoveIn;
 using Azure.Messaging.ServiceBus;
 using CimMessageAdapter.Messages;
-using Dapper;
-using Dapper.NodaTime;
-using Domain.ArchivedMessages;
 using Domain.Documents;
 using Domain.MasterData.MarketEvaluationPoints;
-using Domain.OutgoingMessages;
 using Domain.Transactions.MoveIn;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Infrastructure.Actors;
@@ -62,6 +56,7 @@ using Infrastructure.OutgoingMessages.Peek;
 using Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Infrastructure.Transactions;
+using Infrastructure.Transactions.AggregatedMeasureData;
 using Infrastructure.Transactions.Aggregations;
 using Infrastructure.Transactions.MoveIn;
 using Infrastructure.Transactions.UpdateCustomer;
@@ -208,6 +203,12 @@ namespace Infrastructure.Configuration
             Func<IServiceProvider, IMeteringPointMasterDataClient>? addMeteringPointMasterDataClient = null)
         {
             MoveInConfiguration.Configure(_services, settings, addMoveInRequestService, addCustomerMasterDataClient, addMeteringPointMasterDataClient);
+            return this;
+        }
+
+        public CompositionRoot AddAggregatedMeasureDataServices()
+        {
+            RequestedAggregatedMeasureDataConfiguration.Configure(_services);
             return this;
         }
 

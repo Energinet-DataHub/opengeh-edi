@@ -8,7 +8,7 @@
 
     <ItemGroup>
       <PackageReference Include="JsonSchema.Net" Version="4.1.1" />
-      <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.5.22">
+      <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.6.40">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
@@ -77,6 +77,10 @@
       <None Remove="Schemas\Json\Notify-Aggregated-Measure-Data-assembly-model.schema.json" />
       <EmbeddedResource Include="Schemas\Json\Notify-Aggregated-Measure-Data-assembly-model.schema.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="CimXml\Schemas\urn-ediel-org-measure-requestaggregatedmeasuredata-0-1.xsd" />
+      <EmbeddedResource Include="CimXml\Schemas\urn-ediel-org-measure-requestaggregatedmeasuredata-0-1.xsd">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
     </ItemGroup>
 

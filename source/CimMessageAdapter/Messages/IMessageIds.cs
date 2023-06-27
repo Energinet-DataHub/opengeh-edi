@@ -25,8 +25,9 @@ namespace CimMessageAdapter.Messages
         /// <summary>
         /// Store message id
         /// </summary>
+        /// <param name="senderId"></param>
         /// <param name="messageId"></param>
         /// <param name="cancellationToken"></param>
-        Task<bool> TryStoreAsync(string messageId, CancellationToken cancellationToken);
+        Task<bool> TryStoreAsync(string senderId, string messageId, CancellationToken cancellationToken);
     }
 }

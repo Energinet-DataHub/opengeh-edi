@@ -44,7 +44,7 @@ public class WhenADocumentIsRequestedTests : TestBase
     [Fact]
     public async Task Get_document_by_id()
     {
-        var id = Guid.NewGuid();
+        var id = Guid.NewGuid().ToString();
         await ArchiveMessage(CreateArchivedMessage());
         await ArchiveMessage(CreateArchivedMessage(id));
         await ArchiveMessage(CreateArchivedMessage());
@@ -59,15 +59,15 @@ public class WhenADocumentIsRequestedTests : TestBase
         return NodaTime.Text.InstantPattern.General.Parse(date).Value;
     }
 
-    private ArchivedMessage CreateArchivedMessage(Guid? messageId = null)
+    private ArchivedMessage CreateArchivedMessage(string? messageId = null)
     {
         return new ArchivedMessage(
-            messageId.GetValueOrDefault(Guid.NewGuid()),
+            string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
             EnumerationType.FromName<DocumentType>(DocumentType.AccountingPointCharacteristics.Name),
             ActorNumber.Create("1234512345123"),
             ActorNumber.Create("1234512345128"),
             _systemDateTimeProvider.Now(),
-            BusinessReason.From(BusinessReason.BalanceFixing.Name),
+            BusinessReason.BalanceFixing.Name,
             new MemoryStream());
     }
 

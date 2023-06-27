@@ -22,13 +22,13 @@ namespace Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
 public class RequestChangeAccountingPointCharacteristicsTransaction : ICommand<Unit>, IMarketTransaction<MarketActivityRecord>
 {
     [JsonConstructor]
-    public RequestChangeAccountingPointCharacteristicsTransaction(MessageHeader message, MarketActivityRecord marketActivityRecord)
+    public RequestChangeAccountingPointCharacteristicsTransaction(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
     {
-        Message = message;
+        MessageHeader = messageHeader;
         MarketActivityRecord = marketActivityRecord;
     }
 
-    public MessageHeader Message { get; }
+    public MessageHeader MessageHeader { get; }
 
     public MarketActivityRecord MarketActivityRecord { get; }
 

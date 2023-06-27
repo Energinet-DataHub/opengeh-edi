@@ -31,5 +31,5 @@ public interface IArchivedMessageRepository
     /// <param name="id"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>Stream</returns>
-    Task<Stream?> GetDocumentAsync(Guid id, CancellationToken cancellationToken);
+    Task<Stream?> GetDocumentAsync(string id, CancellationToken cancellationToken);
 }

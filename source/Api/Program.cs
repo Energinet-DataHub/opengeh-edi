@@ -16,6 +16,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Api.Configuration.Middleware;
 using Api.Configuration.Middleware.Authentication.Bearer;
 using Api.Configuration.Middleware.Authentication.MarketActors;
 using Api.Configuration.Middleware.Correlation;
@@ -27,10 +28,9 @@ using CimMessageAdapter.Messages.Queues;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.Authentication;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
-using Infrastructure.Configuration.Serialization;
 using Infrastructure.Transactions;
-using Infrastructure.Transactions.Aggregations;
 using Infrastructure.Transactions.MoveIn;
+using Infrastructure.WholeSale;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -71,6 +71,7 @@ namespace Api
             return new HostBuilder()
                 .ConfigureFunctionsWorkerDefaults(worker =>
                 {
+                    worker.UseMiddleware<UnHandledExceptionMiddleware>();
                     worker.UseMiddleware<CorrelationIdMiddleware>();
                     /*worker.UseMiddleware<RequestResponseLoggingMiddleware>();*/
                     ConfigureAuthenticationMiddleware(worker);
@@ -85,11 +86,17 @@ namespace Api
                     services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration(
                         "NotImplemented"));
 
+                    services.AddSingleton(new WholeSaleServiceBusClientConfiguration(
+                        "NotImplemented"));
+
                     services.AddSingleton(
                         _ => new RequestChangeOfSupplierTransaction(runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!));
 
                     services.AddSingleton(
                         _ => new RequestChangeCustomerCharacteristicsTransaction("NotImplemented"));
+
+                    services.AddSingleton(
+                        _ => new RequestAggregatedMeasureDataTransactionQueues(runtime.INCOMING_AGGREGATED_MEASURE_DATA_QUEUE_NAME!));
 
                     CompositionRoot.Initialize(services)
                         .AddMessageBus(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!)
@@ -125,6 +132,7 @@ namespace Api
                             runtime.REQUEST_RESPONSE_LOGGING_CONTAINER_NAME!)
                         .AddMessagePublishing()
                         .AddHttpClientAdapter(sp => new HttpClientAdapter(sp.GetRequiredService<HttpClient>()))
+                        .AddAggregatedMeasureDataServices()
                         .AddMoveInServices(
                             new MoveInSettings(
                                 new MessageDelivery(
@@ -141,7 +149,8 @@ namespace Api
                     services.AddLiveHealthCheck();
                     services.AddExternalDomainServiceBusQueuesHealthCheck(
                         runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
-                        runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!);
+                        runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!,
+                        runtime.INCOMING_AGGREGATED_MEASURE_DATA_QUEUE_NAME!);
                     services.AddSqlServerHealthCheck(runtime.DB_CONNECTION_STRING!);
                 })
                 .Build();

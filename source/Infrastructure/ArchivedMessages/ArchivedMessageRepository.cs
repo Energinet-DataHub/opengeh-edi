@@ -41,14 +41,14 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
         _dbContext.ArchivedMessages.Add(message);
     }
 
-    public async Task<Stream?> GetDocumentAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<Stream?> GetDocumentAsync(string id, CancellationToken cancellationToken)
     {
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         using var command = CreateCommand(
             $"SELECT Document FROM dbo.[ArchivedMessages] WHERE Id = @Id",
             new List<KeyValuePair<string, object>>
             {
-                new("@Id", id.ToString()),
+                new("@Id", id),
             },
             connection);
 
