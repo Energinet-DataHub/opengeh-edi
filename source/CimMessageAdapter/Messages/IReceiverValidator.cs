@@ -12,18 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Actors;
-using Domain.Documents;
-using Domain.OutgoingMessages;
-using NodaTime;
+using System.Threading.Tasks;
 
-namespace Domain.ArchivedMessages;
+namespace CimMessageAdapter.Messages;
 
-public record ArchivedMessage(
-    string Id,
-    DocumentType DocumentType,
-    ActorNumber SenderNumber,
-    ActorNumber ReceiverNumber,
-    Instant CreatedAt,
-    string? BusinessReason,
-    Stream Document);
+/// <summary>
+/// Responsible for verifying that the message contains the expected receiver
+/// </summary>
+public interface IReceiverValidator
+{
+    /// <summary>
+    /// Verify the receiver Id and role
+    /// </summary>
+    /// <param name="receiverId"></param>
+    /// <param name="role"></param>
+    /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
+    Task<Result> VerifyAsync(string receiverId, string role);
+}

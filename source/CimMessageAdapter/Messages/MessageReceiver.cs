@@ -35,6 +35,7 @@ namespace CimMessageAdapter.Messages
         private readonly ISenderAuthorizer _senderAuthorizer;
         private readonly IProcessTypeValidator _processTypeValidator;
         private readonly IMessageTypeValidator _messageTypeValidator;
+        private readonly IReceiverValidator _receiverValidator;
 
         protected MessageReceiver(
             IMessageIds messageIds,
@@ -42,7 +43,8 @@ namespace CimMessageAdapter.Messages
             ITransactionIds transactionIds,
             ISenderAuthorizer senderAuthorizer,
             IProcessTypeValidator processTypeValidator,
-            IMessageTypeValidator messageTypeValidator)
+            IMessageTypeValidator messageTypeValidator,
+            IReceiverValidator receiverValidator)
         {
             _messageIds = messageIds ?? throw new ArgumentNullException(nameof(messageIds));
             _messageQueueDispatcher = messageQueueDispatcher ??
@@ -51,6 +53,7 @@ namespace CimMessageAdapter.Messages
             _senderAuthorizer = senderAuthorizer;
             _processTypeValidator = processTypeValidator;
             _messageTypeValidator = messageTypeValidator;
+            _receiverValidator = receiverValidator;
         }
 
         public async Task<Result> ReceiveAsync<TMarketActivityRecordType, TMarketTransactionType>(
@@ -169,7 +172,7 @@ namespace CimMessageAdapter.Messages
 
         private async Task VerifyReceiverAsync(MessageHeader messageHeader)
         {
-            var receiverVerification = await ReceiverVerification.VerifyAsync(messageHeader.ReceiverId, messageHeader.ReceiverRole).ConfigureAwait(false);
+            var receiverVerification = await _receiverValidator.VerifyAsync(messageHeader.ReceiverId, messageHeader.ReceiverRole).ConfigureAwait(false);
             _errors.AddRange(receiverVerification.Errors);
         }
     }
