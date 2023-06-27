@@ -76,8 +76,10 @@ public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureD
         try
         {
             JsonElement seriesJson;
+            using var document = await JsonDocument.ParseAsync(message, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
             MessageHeader header = GetDocumentHeaderAndTransactions(
-                await JsonDocument.ParseAsync(message, cancellationToken: cancellationToken).ConfigureAwait(false),
+                document,
                 HeaderElementName,
                 SeriesElementName,
                 out seriesJson);
@@ -91,6 +93,10 @@ public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureD
         catch (ArgumentException argumentException)
         {
             return InvalidJsonFailure(argumentException);
+        }
+        catch (IOException e)
+        {
+            return InvalidJsonFailure(e);
         }
     }
 
