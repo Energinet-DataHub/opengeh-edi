@@ -30,7 +30,8 @@ using DocumentFormat = Domain.Documents.DocumentFormat;
 
 namespace Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
-public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureDataTransaction>, IMessageParser<Serie, RequestAggregatedMeasureDataTransaction>
+public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureDataTransaction>,
+    IMessageParser<Serie, RequestAggregatedMeasureDataTransaction>
 {
     private const string SeriesElementName = "Series";
     private const string HeaderElementName = "RequestAggregatedMeasureData_MarketDocument";
@@ -56,7 +57,6 @@ public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureD
         }
 
         var schema = await GetSchemaAsync(DocumentName, cancellationToken).ConfigureAwait(false);
-
         if (schema is null)
         {
             return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(
@@ -75,17 +75,13 @@ public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureD
 
         try
         {
-            JsonElement seriesJson;
             using var document = await JsonDocument.ParseAsync(message, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
-            MessageHeader header = GetDocumentHeaderAndTransactions(
-                document,
-                HeaderElementName,
-                SeriesElementName,
-                out seriesJson);
+            JsonElement header = document.RootElement.GetProperty(HeaderElementName);
+            JsonElement seriesJson = header.GetProperty(SeriesElementName);
 
-            return ParseJsonData(header, seriesJson);
+            return ParseJsonData(MessageHeaderFrom(header), seriesJson);
         }
         catch (JsonException exception)
         {

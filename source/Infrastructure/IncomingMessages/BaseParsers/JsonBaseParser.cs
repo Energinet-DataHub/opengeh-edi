@@ -83,19 +83,6 @@ where TICommand : IMarketTransaction<TTransactionType>
         return _errors.ToList();
     }
 
-    public MessageHeader GetDocumentHeaderAndTransactions(JsonDocument document, string headerElementName, string transactionsElementName, out JsonElement transactions)
-    {
-        if (document == null)
-        {
-            throw new ArgumentNullException(nameof(document));
-        }
-
-        var messageHeader = document.RootElement.GetProperty(headerElementName);
-        transactions = messageHeader.GetProperty(transactionsElementName);
-
-        return MessageHeaderFrom(messageHeader);
-    }
-
     public async Task ValidateMessageAsync(JsonSchema schema, Stream message)
     {
         var jsonDocument = await JsonDocument.ParseAsync(message).ConfigureAwait(false);
@@ -108,14 +95,14 @@ where TICommand : IMarketTransaction<TTransactionType>
         ResetMessagePosition(message);
     }
 
+    public string GetJsonDateStringWithoutQuotes(JsonElement element)
+    {
+        return element.ToString().Trim('"');
+    }
+
     private static bool IsValid(JsonDocument document, JsonSchema schema)
     {
         return schema.Evaluate(document, new EvaluationOptions() { OutputFormat = OutputFormat.Flag, }).IsValid;
-    }
-
-    private static string GetJsonDateStringWithoutQuotes(JsonElement element)
-    {
-        return element.ToString().Trim('"');
     }
 
     private void ExtractValidationErrors(JsonDocument jsonDocument, JsonSchema schema)
