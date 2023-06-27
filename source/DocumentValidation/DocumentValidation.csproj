@@ -82,6 +82,10 @@
       <EmbeddedResource Include="CimXml\Schemas\urn-ediel-org-measure-requestaggregatedmeasuredata-0-1.xsd">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
+      <None Remove="Schemas\Json\Request-aggregated-measure-data-assembly-model.schema.json" />
+      <EmbeddedResource Include="Schemas\Json\Request-aggregated-measure-data-assembly-model.schema.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
