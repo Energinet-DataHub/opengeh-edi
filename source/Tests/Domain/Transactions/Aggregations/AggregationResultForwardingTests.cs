@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Domain.Actors;
-using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions;
 using Domain.Transactions.Aggregations;
@@ -87,6 +86,64 @@ public class AggregationResultForwardingTests
         Assert.Equal(MarketRole.BalanceResponsible, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.BalanceResponsibleNumber, message.ReceiverId.Value);
         Assert.Equal(SettlementType.NonProfiled.Name, message.Series.SettlementType);
+    }
+
+    [Fact]
+    public void Create_message_for_balance_responsible_when_result_is_total_production()
+    {
+        var result = _aggregationResult
+            .ForProduction()
+            .WithGrouping(ActorNumber.Create("1234567890123"), ActorNumber.Create("1234567890124"))
+            .Build();
+
+        var message = CreateMessage(result);
+
+        Assert.Equal(MarketRole.BalanceResponsible, message.ReceiverRole);
+        Assert.Equal(result.ActorGrouping?.BalanceResponsibleNumber, message.ReceiverId.Value);
+    }
+
+    [Fact]
+    public void Create_message_for_balance_responsible_when_result_is_flex()
+    {
+        var result = _aggregationResult
+            .ForConsumption(SettlementType.Flex)
+            .WithGrouping(ActorNumber.Create("1234567890123"), ActorNumber.Create("1234567890124"))
+            .Build();
+
+        var message = CreateMessage(result);
+
+        Assert.Equal(MarketRole.BalanceResponsible, message.ReceiverRole);
+        Assert.Equal(result.ActorGrouping?.BalanceResponsibleNumber, message.ReceiverId.Value);
+        Assert.Equal(SettlementType.Flex.Name, message.Series.SettlementType);
+    }
+
+    [Fact]
+    public void Create_message_for_energy_supplier_when_result_is_flex()
+    {
+        var result = _aggregationResult
+            .ForConsumption(SettlementType.Flex)
+            .WithGrouping(ActorNumber.Create("1234567890123"), null)
+            .Build();
+
+        var message = CreateMessage(result);
+
+        Assert.Equal(MarketRole.EnergySupplier, message.ReceiverRole);
+        Assert.Equal(result.ActorGrouping?.EnergySupplierNumber, message.ReceiverId.Value);
+        Assert.Equal(SettlementType.Flex.Name, message.Series.SettlementType);
+    }
+
+    [Fact]
+    public void Create_message_for_energy_supplier_when_result_is_total_production()
+    {
+        var result = _aggregationResult
+            .ForProduction()
+            .WithGrouping(ActorNumber.Create("1234567890123"), null)
+            .Build();
+
+        var message = CreateMessage(result);
+
+        Assert.Equal(MarketRole.EnergySupplier, message.ReceiverRole);
+        Assert.Equal(result.ActorGrouping?.EnergySupplierNumber, message.ReceiverId.Value);
     }
 
     private static AggregationResultMessage CreateMessage(Aggregation result)
