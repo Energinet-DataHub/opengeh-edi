@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -59,6 +60,9 @@ namespace Api.IncomingMessages
             _logger.LogInformation($"Received {nameof(RequestChangeOfSupplierMessageReceiver)} request");
 
             if (request == null) throw new ArgumentNullException(nameof(request));
+
+            // TODO: remove this! added to trigger an exception to validate our logging.
+            if (request.Query.AllKeys.Contains("exception")) throw new ArgumentNullException(nameof(request));
 
             using var cancellationTokenSource =
                 CancellationTokenSource.CreateLinkedTokenSource(
