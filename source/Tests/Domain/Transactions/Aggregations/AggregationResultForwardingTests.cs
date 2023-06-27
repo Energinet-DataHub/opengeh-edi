@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Domain.Actors;
-using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions;
 using Domain.Transactions.Aggregations;

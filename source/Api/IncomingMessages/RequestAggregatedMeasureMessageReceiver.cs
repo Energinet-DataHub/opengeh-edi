@@ -27,7 +27,6 @@ using CimMessageAdapter.ValidationErrors;
 using Domain.Actors;
 using Domain.ArchivedMessages;
 using Domain.Documents;
-using Domain.OutgoingMessages;
 using Infrastructure.IncomingMessages;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -106,7 +105,7 @@ public class RequestAggregatedMeasureMessageReceiver
             ActorNumber.Create(messageHeader.SenderId),
             ActorNumber.Create(messageHeader.ReceiverId),
             timestamp,
-            BusinessReason.From(messageHeader.BusinessReason),
+            messageHeader.BusinessReason,
             request.Body));
 
         var result = await _messageReceiver.ReceiveAsync(messageParserResult, cancellationToken)
