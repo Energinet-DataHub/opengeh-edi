@@ -119,7 +119,6 @@ public class MessageParserTests
         Assert.Contains(result.Errors, error => error.GetType().Name == expectedError);
     }
 
-    #region xml messages
     private static Stream CreateBaseXmlMessage(string fileName, int newFileSizeInMb = 0)
     {
         var xmlDocument = XDocument.Load(
@@ -152,9 +151,6 @@ public class MessageParserTests
         return message;
     }
 
-    #endregion
-
-    #region json messages
     private static Stream CreateBaseJsonMessages(string fileName, int addSeriesUntilMbSize = 0)
     {
         return ReadTextFile($"{PathToMessages}json{SubPath}{fileName}", addSeriesUntilMbSize);
@@ -196,6 +192,4 @@ public class MessageParserTests
 
         return jsonDocSb.ToString();
     }
-
-    #endregion
 }
