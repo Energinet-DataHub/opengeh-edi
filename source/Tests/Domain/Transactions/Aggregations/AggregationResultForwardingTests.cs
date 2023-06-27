@@ -152,7 +152,6 @@ public class AggregationResultForwardingTests
 
         Assert.Equal(MarketRole.BalanceResponsible, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.BalanceResponsibleNumber, message.ReceiverId.Value);
-        //TODO: system korrektion (kun for den balance ansvarlig som har den el-leverandør som har system korrektionsmålepunktet)
     }
 
     [Fact]
@@ -168,7 +167,6 @@ public class AggregationResultForwardingTests
         Assert.Equal(MarketRole.BalanceResponsible, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.BalanceResponsibleNumber, message.ReceiverId.Value);
         Assert.Equal(SettlementType.Flex.Name, message.Series.SettlementType);
-        //TODO: Hvad betyder nettab (kun for den balance ansvarlig som har den el-leverandør som har nettabsmålepunktet)
     }
 
     [Fact]
@@ -184,7 +182,6 @@ public class AggregationResultForwardingTests
         Assert.Equal(MarketRole.EnergySupplier, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.EnergySupplierNumber, message.ReceiverId.Value);
         Assert.Equal(SettlementType.Flex.Name, message.Series.SettlementType);
-        //TODO: Hvad betyder nettab (kun for de el-leverandøre som den elleverandør har)
     }
 
     [Fact]
@@ -199,7 +196,6 @@ public class AggregationResultForwardingTests
 
         Assert.Equal(MarketRole.EnergySupplier, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.EnergySupplierNumber, message.ReceiverId.Value);
-        //TODO: Hvad betyder system korrektion (kun for de el-leverandøre som den balance ansarlige har)
     }
 
     private static AggregationResultMessage CreateMessage(Aggregation result)
