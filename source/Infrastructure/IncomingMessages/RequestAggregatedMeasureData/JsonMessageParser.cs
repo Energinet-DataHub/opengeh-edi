@@ -32,7 +32,7 @@ namespace Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
 public class JsonMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDataTransaction>
 {
-    private const string SeriesRecordElementName = "Series";
+    private const string SeriesElementName = "Series";
     private const string HeaderElementName = "RequestAggregatedMeasureData_MarketDocument";
     private const string DocumentName = "RequestAggregatedMeasureData";
     private const int MaxMessageSizeInMb = 50;
@@ -103,7 +103,6 @@ public class JsonMessageParser : IMessageParser<Serie, RequestAggregatedMeasureD
 
     private static MessageHeader MessageHeaderFrom(JsonElement element)
     {
-        // flyt til en hjælper klasse
         return new MessageHeader(
             element.GetProperty("mRID").ToString(),
             element.GetProperty("type").GetProperty("value").ToString(),
@@ -126,7 +125,7 @@ public class JsonMessageParser : IMessageParser<Serie, RequestAggregatedMeasureD
         var series = new List<Serie>();
         var messageHeader = MessageHeaderFrom(document.RootElement.GetProperty(HeaderElementName));
         var incomingSeries = document.RootElement.GetProperty(HeaderElementName)
-            .GetProperty(SeriesRecordElementName);
+            .GetProperty(SeriesElementName);
 
         foreach (var jsonElement in incomingSeries.EnumerateArray())
         {
