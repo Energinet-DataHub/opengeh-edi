@@ -59,7 +59,7 @@ public class AggregationResultBuilder
         return this;
     }
 
-    public AggregationResultBuilder ForConsumption(SettlementType settlementType)
+    public AggregationResultBuilder ForConsumption(SettlementType? settlementType)
     {
         _meteringPointType = MeteringPointType.Consumption;
         _settlementType = settlementType;
