@@ -1,0 +1,50 @@
+autoactivation on
+participantgroup #lightyellow **Api**
+participant HTTP Trigger
+participant PeekRequestListener
+end
+participantgroup #lightblue **Application**
+participant PeekRequestHandler
+participant DocumentFactory
+participant MessagePeeker
+end
+participantgroup #FFCCCB **Domain**
+participant EnqueuedMessage
+end
+participantgroup #lightgreen **Infrastructure**
+participant ConnectionFactory
+participant BundleMessages
+participant ArchivedMessageRepository
+participant CimFormatParser
+participant BundleMessage
+participant B2BContext
+participant UnitOfWork
+end
+participantgroup #lightgreen **CimMessageAdapter**
+end
+participantgroup #lightgreen **DocumentValidation**
+participant CimXmlSchemaProvider
+end
+HTTP Trigger->PeekRequestListener: Request
+PeekRequestListener->CimFormatParser:Parse
+PeekRequestListener<--CimFormatParser:DocumentFormat
+PeekRequestListener->MessagePeeker:Peek
+MessagePeeker->Mediator:Send
+Mediator->PeekRequestHandler:Handle
+PeekRequestHandler->BundleMessages:Get
+BundleMessages->ConnectionFactory:GetConnectionAndOpen
+BundleMessages<--ConnectionFactory:Connection
+PeekRequestHandler<--BundleMessages:message
+PeekRequestHandler->EnqueuedMessage:GetBy
+PeekRequestHandler<--EnqueuedMessage:messageRecords
+PeekRequestHandler->DocumentFactory:CreateBundleMessage
+PeekRequestHandler<--DocumentFactory:Document
+PeekRequestHandler->BundleMessage:CreateFrom
+PeekRequestHandler<--BundleMessage:BundleMessage
+PeekRequestHandler->ArchivedMessageRepository:Add
+ArchivedMessageRepository->B2BContext:Add
+deactivateafter ArchivedMessageRepository
+Mediator->UnitOfWork:Commit
+MessagePeeker<--PeekRequestHandler: PeekResult
+PeekRequestListener<--MessagePeeker: PeekResult
+HTTP Trigger<--PeekRequestListener: Response
