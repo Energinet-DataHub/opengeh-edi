@@ -77,8 +77,3 @@ Handling integration events
 
 Handling internal commands
 ![image](https://github.com/Energinet-DataHub/opengeh-edi/assets/122119488/d552c1fc-05e8-4fca-9876-ed2de62414d1)
-
-
-
-
-
