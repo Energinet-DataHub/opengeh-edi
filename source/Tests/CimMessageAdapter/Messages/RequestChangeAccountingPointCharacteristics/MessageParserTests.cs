@@ -115,7 +115,7 @@ public class MessageParserTests
 
     private static Stream CreateXmlMessage()
     {
-        var xmlDoc = XDocument.Load($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}RequestChangeAccountingPointCharacteristics.xml");
+        var xmlDoc = XDocument.Load($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}ChangeAccountingPoint{Path.DirectorySeparatorChar}RequestChangeAccountingPointCharacteristics.xml");
         var stream = new MemoryStream();
         xmlDoc.Save(stream);
 
@@ -124,7 +124,7 @@ public class MessageParserTests
 
     private static Stream CreateXmlMessageWithMultipleRecords()
     {
-        var xmlDoc = XDocument.Load($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}RequestChangeAccountingPointCharacteristicsMultipleMarketActivityRecords.xml");
+        var xmlDoc = XDocument.Load($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}ChangeAccountingPoint{Path.DirectorySeparatorChar}RequestChangeAccountingPointCharacteristicsMultipleMarketActivityRecords.xml");
         var stream = new MemoryStream();
         xmlDoc.Save(stream);
 

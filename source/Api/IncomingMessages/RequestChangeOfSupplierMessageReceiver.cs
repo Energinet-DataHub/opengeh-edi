@@ -61,6 +61,9 @@ namespace Api.IncomingMessages
 
             if (request == null) throw new ArgumentNullException(nameof(request));
 
+            // TODO: remove this! added to trigger an exception to validate our logging.
+            if (request.Query.AllKeys.Contains("exception")) throw new ArgumentNullException(nameof(request));
+
             using var cancellationTokenSource =
                 CancellationTokenSource.CreateLinkedTokenSource(
                     hostCancellationToken,
