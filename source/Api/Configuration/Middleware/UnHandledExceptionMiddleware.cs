@@ -55,7 +55,7 @@ public class UnHandledExceptionMiddleware : IFunctionsWorkerMiddleware
             catch (Exception ex)
     #pragma warning restore CA1031
             {
-                _logger.LogError("Error processing invocation: {Ex}", ex.Message);
+                _logger.LogError(ex, "Error processing invocation: {Ex}", ex.Message);
 
                 var httpReqData = await context.GetHttpRequestDataAsync().ConfigureAwait(false);
 

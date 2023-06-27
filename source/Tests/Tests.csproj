@@ -60,9 +60,6 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="CimMessageAdapter\Messages\json\AggregatedMeasure\No Scheme Request Aggregated Measure Data.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
       <EmbeddedResource Include="CimMessageAdapter\Messages\json\AggregatedMeasure\FailSchemeValidationAggregatedMeasureData.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
