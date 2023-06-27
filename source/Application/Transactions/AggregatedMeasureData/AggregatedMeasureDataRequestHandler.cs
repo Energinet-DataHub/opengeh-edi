@@ -16,50 +16,43 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.IncomingMessages.RequestAggregatedMeasureData;
+using Domain.Actors;
+using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
 using MediatR;
-using Serie = Domain.Transactions.AggregatedMeasureData.Serie;
+using NodaTime.Text;
 
 namespace Application.Transactions.AggregatedMeasureData;
 
 public class AggregatedMeasureDataRequestHandler : IRequestHandler<RequestAggregatedMeasureDataTransaction, Unit>
 {
-    private readonly IAggregatedMeasureDataSender _aggregatedMeasureDataSender;
+    private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
 
-    public AggregatedMeasureDataRequestHandler(IAggregatedMeasureDataSender aggregatedMeasureDataSender)
+    public AggregatedMeasureDataRequestHandler(IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
-        _aggregatedMeasureDataSender = aggregatedMeasureDataSender;
+        _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
     }
 
-    public async Task<Unit> Handle(RequestAggregatedMeasureDataTransaction request, CancellationToken cancellationToken)
+    public Task<Unit> Handle(RequestAggregatedMeasureDataTransaction request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
-        var requestMessage = request.MessageHeader;
+        var requestMessageHeader = request.MessageHeader;
         var requestMarketActivityRecord = request.MarketActivityRecord;
 
-        var requestData = new AggregatedMeasureDataTransactionRequest(
-            new MessageHeader(
-                messageId: requestMessage.MessageId,
-                messageType: requestMessage.MessageType,
-                businessReason: requestMessage.BusinessReason,
-                senderId: requestMessage.SenderId,
-                senderRole: requestMessage.SenderRole,
-                receiverId: requestMessage.ReceiverId,
-                receiverRole: requestMessage.ReceiverRole,
-                createdAt: requestMessage.CreatedAt),
-            new Serie(
-                requestMarketActivityRecord.Id,
-                requestMarketActivityRecord.SettlementSeriesVersion,
-                requestMarketActivityRecord.MarketEvaluationPointType,
-                requestMarketActivityRecord.MarketEvaluationSettlementMethod,
-                requestMarketActivityRecord.StartDateAndOrTimeDateTime,
-                requestMarketActivityRecord.EndDateAndOrTimeDateTime,
-                requestMarketActivityRecord.MeteringGridAreaDomainId,
-                requestMarketActivityRecord.BiddingZoneDomainId,
-                requestMarketActivityRecord.EnergySupplierMarketParticipantId,
-                requestMarketActivityRecord.BalanceResponsiblePartyMarketParticipantId));
+        var process = new AggregatedMeasureDataProcess(
+            ProcessId.New(),
+            requestMarketActivityRecord.SettlementSeriesVersion,
+            requestMarketActivityRecord.MarketEvaluationPointType,
+            requestMarketActivityRecord.MarketEvaluationSettlementMethod,
+            InstantPattern.General.Parse(requestMarketActivityRecord.StartDateAndOrTimeDateTime).GetValueOrThrow(),
+            InstantPattern.General.Parse(requestMarketActivityRecord.EndDateAndOrTimeDateTime).GetValueOrThrow(),
+            requestMarketActivityRecord.BiddingZoneDomainId,
+            requestMarketActivityRecord.MeteringGridAreaDomainId,
+            requestMarketActivityRecord.EnergySupplierMarketParticipantId,
+            requestMarketActivityRecord.BalanceResponsiblePartyMarketParticipantId,
+            ActorNumber.Create(requestMessageHeader.SenderId));
 
-        await _aggregatedMeasureDataSender.SendAsync(requestData, cancellationToken).ConfigureAwait(false);
-        return Unit.Value;
+        _aggregatedMeasureDataProcessRepository.Add(process);
+        return Task.FromResult(Unit.Value);
     }
 }
