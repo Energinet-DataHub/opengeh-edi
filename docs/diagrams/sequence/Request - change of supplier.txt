@@ -1,0 +1,45 @@
+autoactivation on
+participantgroup #lightyellow **Api**
+participant HTTP Trigger
+participant RequestChangeOfSupplierMessageReceiver
+end
+participantgroup #lightgreen **Infrastructure**
+participant CimFormatParser
+participant MessageIdRegistry
+participant TransactionIdRegistry
+participant XmlMessageParser
+participant MessageQueueDispatcher
+participant ServiceBusSenderAdapter
+end
+participantgroup #lightgreen **CimMessageAdapter**
+participant MessageParser
+participant MessageReceiver
+participant SenderAuthorizer
+participant ReceiverVerification
+end
+participantgroup #lightgreen **DocumentValidation**
+participant CimXmlSchemaProvider
+end
+HTTP Trigger->RequestChangeOfSupplierMessageReceiver: Request
+RequestChangeOfSupplierMessageReceiver->CimFormatParser:Parse
+RequestChangeOfSupplierMessageReceiver<--CimFormatParser:DocumentFormat
+RequestChangeOfSupplierMessageReceiver->MessageParser:Parse
+MessageParser->XmlMessageParser:Parse
+XmlMessageParser->CimXmlSchemaProvider:GetSchema
+XmlMessageParser<--CimXmlSchemaProvider:Schema
+MessageParser<--XmlMessageParser:MessageParserResult
+RequestChangeOfSupplierMessageReceiver<--MessageParser: MessageParseResult
+RequestChangeOfSupplierMessageReceiver->MessageReceiver:Receive
+MessageReceiver->SenderAuthorizer:Authorize
+MessageReceiver<--SenderAuthorizer:Result
+MessageReceiver->ReceiverVerification:Verifiy
+MessageReceiver<--ReceiverVerification:Result
+MessageReceiver->MessageIdRegistry:TryStore
+MessageReceiver<--MessageIdRegistry:bool
+MessageReceiver->TransactionIdRegistry:TryStore
+MessageReceiver<--TransactionIdRegistry:bool
+MessageReceiver->MessageQueueDispatcher:Add transactions
+MessageReceiver->MessageQueueDispatcher:Commit
+MessageQueueDispatcher->ServiceBusSenderAdapter:Send Service Bus Messages\nNew transaction scope per message
+RequestChangeOfSupplierMessageReceiver<--MessageReceiver:Result
+HTTP Trigger<--RequestChangeOfSupplierMessageReceiver: Response
