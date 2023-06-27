@@ -78,6 +78,7 @@ public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureD
             JsonElement seriesJson;
             using var document = await JsonDocument.ParseAsync(message, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
+
             MessageHeader header = GetDocumentHeaderAndTransactions(
                 document,
                 HeaderElementName,
