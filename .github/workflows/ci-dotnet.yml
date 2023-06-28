@@ -31,7 +31,7 @@ jobs:
     with:
       tests_dll_file_path: \source\IntegrationTests\bin\Release\net7.0\IntegrationTests.dll
       download_attempt_limit: 12
-      dotnet_version: 7.0.200      
+      dotnet_version: 7.0.200
 
   # Run all tests in 'ArchitectureTests.dll'
   architecture_tests:
