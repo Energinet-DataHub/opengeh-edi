@@ -20,6 +20,7 @@ using Application.Transactions.MoveIn.MasterDataDelivery;
 using Application.Transactions.MoveIn.Notifications;
 using Application.Transactions.MoveIn.UpdateCustomer;
 using Application.Transactions.UpdateCustomer;
+using Domain.Transactions.MoveIn;
 using Domain.Transactions.MoveIn.Events;
 using Infrastructure.Transactions.MoveIn.UpdateCustomer;
 using MediatR;
@@ -64,6 +65,7 @@ internal static class MoveInConfiguration
         }
 
         services.AddScoped<MoveInNotifications>();
+        services.AddScoped<IMoveInTransactionRepository, MoveInTransactionRepository>();
         services.AddTransient<IRequestHandler<RequestChangeOfSupplierTransaction, Unit>, MoveInRequestHandler>();
         services.AddTransient<IRequestHandler<FetchCustomerMasterData, Unit>, FetchCustomerMasterDataHandler>();
         services.AddTransient<IRequestHandler<FetchMeteringPointMasterData, Unit>, FetchMeteringPointMasterDataHandler>();

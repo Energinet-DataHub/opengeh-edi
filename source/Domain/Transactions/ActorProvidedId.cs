@@ -16,6 +16,9 @@ using Domain.SeedWork;
 
 namespace Domain.Transactions;
 
+/// <summary>
+/// Represent the provide id for the transaction. E.g. Serie id or MarketActivityRecord id.
+/// </summary>
 public class ActorProvidedId : ValueObject
 {
     private ActorProvidedId(string id)
