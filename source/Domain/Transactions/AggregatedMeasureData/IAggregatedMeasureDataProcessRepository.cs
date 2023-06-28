@@ -18,7 +18,7 @@ using NodaTime;
 namespace Domain.Transactions.AggregatedMeasureData
 {
     /// <summary>
-    /// Storage for transactions
+    /// Storage for Process
     /// </summary>
     public interface IAggregatedMeasureDataProcessRepository
     {
