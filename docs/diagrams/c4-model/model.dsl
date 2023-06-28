@@ -6,7 +6,7 @@ ediDomain = group "EDI" {
         technology "SQL Server"
         tags "Data Storage, Microsoft Azure - SQL Database"
     }
-    ediApiApp = container "EDI" {
+    edi = container "EDI" {
         description "Backend server providing API for EDI operations"
         technology "Azure function, C#"
         tags "Microsoft Azure - Function Apps"
