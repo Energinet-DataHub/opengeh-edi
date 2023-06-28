@@ -20,66 +20,61 @@ namespace Domain.Transactions.AggregatedMeasureData
 {
     public class AggregatedMeasureDataProcess : Entity
     {
-#pragma warning disable CS0414
-        private readonly State _state;
-#pragma warning restore CS0414
-
         private readonly ActorNumber _requestedByActorId;
 
         public AggregatedMeasureDataProcess(
             ProcessId processId,
-            string settlementSeriesVersion,
-            string marketEvaluationPointType,
-            string marketEvaluationSettlementMethod,
+            BusinessTransactionId businessTransactionId,
+            ActorNumber requestedByActorId,
+            string? settlementVersion,
+            string? marketEvaluationPointType,
+            string? marketEvaluationSettlementMethod,
             Instant startDateAndOrTimeDateTime,
-            Instant endDateAndOrTimeDateTime,
-            string meteringGridAreaDomainId,
-            string biddingZoneDomainId,
-            string energySupplierMarketParticipantId,
-            string balanceResponsiblePartyMarketParticipantId,
-            ActorNumber requestedByActorId)
+            Instant? endDateAndOrTimeDateTime,
+            string? meteringGridAreaDomainId,
+            string? energySupplierMarketParticipantId,
+            string? balanceResponsiblePartyMarketParticipantId)
         {
             ProcessId = processId;
-            SettlementSeriesVersion = settlementSeriesVersion;
+            BusinessTransactionId = businessTransactionId;
+            SettlementVersion = settlementVersion;
             MarketEvaluationPointType = marketEvaluationPointType;
             MarketEvaluationSettlementMethod = marketEvaluationSettlementMethod;
             StartDateAndOrTimeDateTime = startDateAndOrTimeDateTime;
             EndDateAndOrTimeDateTime = endDateAndOrTimeDateTime;
             MeteringGridAreaDomainId = meteringGridAreaDomainId;
-            BiddingZoneDomainId = biddingZoneDomainId;
             EnergySupplierMarketParticipantId = energySupplierMarketParticipantId;
             BalanceResponsiblePartyMarketParticipantId = balanceResponsiblePartyMarketParticipantId;
             _requestedByActorId = requestedByActorId;
-            _state = State.Initialized;
-        }
-
-        public enum State
-        {
-            Initialized,
-            BeingProcessed,
-            Rejected,
-            Accepted,
-            Completed,
         }
 
         public ProcessId ProcessId { get; }
 
-        public string SettlementSeriesVersion { get; }
+        public BusinessTransactionId BusinessTransactionId { get; }
 
-        public string MarketEvaluationPointType { get; }
+        /// <summary>
+        /// Represent the version for a specific calculation.
+        /// </summary>
+        public string? SettlementVersion { get; }
 
-        public string MarketEvaluationSettlementMethod { get; }
+        /// <summary>
+        /// Represent consumption types or production.
+        /// </summary>
+        public string? MarketEvaluationPointType { get; }
+
+        /// <summary>
+        /// Represent the type of Settlement. E.g. Flex or NonProfile or null
+        /// </summary>
+        public string? MarketEvaluationSettlementMethod { get; }
 
         public Instant StartDateAndOrTimeDateTime { get; }
 
-        public Instant EndDateAndOrTimeDateTime { get; }
+        public Instant? EndDateAndOrTimeDateTime { get; }
 
-        public string MeteringGridAreaDomainId { get; }
+        public string? MeteringGridAreaDomainId { get; }
 
-        public string BiddingZoneDomainId { get; }
+        public string? EnergySupplierMarketParticipantId { get; }
 
-        public string EnergySupplierMarketParticipantId { get; }
-
-        public string BalanceResponsiblePartyMarketParticipantId { get; }
+        public string? BalanceResponsiblePartyMarketParticipantId { get; }
     }
 }

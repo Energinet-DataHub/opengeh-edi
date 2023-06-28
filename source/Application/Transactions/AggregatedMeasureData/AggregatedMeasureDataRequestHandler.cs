@@ -41,16 +41,16 @@ public class AggregatedMeasureDataRequestHandler : IRequestHandler<RequestAggreg
 
         var process = new AggregatedMeasureDataProcess(
             ProcessId.New(),
+            BusinessTransactionId.Create(requestMarketActivityRecord.Id),
+            ActorNumber.Create(requestMessageHeader.SenderId),
             requestMarketActivityRecord.SettlementSeriesVersion,
             requestMarketActivityRecord.MarketEvaluationPointType,
             requestMarketActivityRecord.MarketEvaluationSettlementMethod,
             InstantPattern.General.Parse(requestMarketActivityRecord.StartDateAndOrTimeDateTime).GetValueOrThrow(),
             InstantPattern.General.Parse(requestMarketActivityRecord.EndDateAndOrTimeDateTime).GetValueOrThrow(),
-            requestMarketActivityRecord.BiddingZoneDomainId,
             requestMarketActivityRecord.MeteringGridAreaDomainId,
             requestMarketActivityRecord.EnergySupplierMarketParticipantId,
-            requestMarketActivityRecord.BalanceResponsiblePartyMarketParticipantId,
-            ActorNumber.Create(requestMessageHeader.SenderId));
+            requestMarketActivityRecord.BalanceResponsiblePartyMarketParticipantId);
 
         _aggregatedMeasureDataProcessRepository.Add(process);
         return Task.FromResult(Unit.Value);
