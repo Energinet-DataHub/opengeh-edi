@@ -16,6 +16,9 @@ using Domain.SeedWork;
 
 namespace Domain.Transactions;
 
+/// <summary>
+/// Is the Id for the Process within the EDI domain
+/// </summary>
 public class ProcessId : ValueObject
 {
     private ProcessId(Guid id)

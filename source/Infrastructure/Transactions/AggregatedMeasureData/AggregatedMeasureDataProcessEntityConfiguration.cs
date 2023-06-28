@@ -31,25 +31,24 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
             .HasConversion(
                 toDbValue => toDbValue.Id,
                 fromDbValue => ProcessId.Create(fromDbValue));
-        builder.Property(x => x.SettlementSeriesVersion);
-        builder.Property(x => x.MarketEvaluationPointType);
-        builder.Property(x => x.MarketEvaluationSettlementMethod);
-        builder.Property(x => x.StartDateAndOrTimeDateTime);
-        builder.Property(x => x.EndDateAndOrTimeDateTime);
+        builder.Property(x => x.BusinessTransactionId)
+            .HasConversion(
+                toDbValue => toDbValue.Id,
+                fromDbValue => BusinessTransactionId.Create(fromDbValue));
+        builder.Property(x => x.SettlementVersion);
+        builder.Property(x => x.MeteringPointType);
+        builder.Property(x => x.SettlementMethod);
+        builder.Property(x => x.StartOfPeriod);
+        builder.Property(x => x.EndOfPeriod);
         builder.Property(x => x.MeteringGridAreaDomainId);
-        builder.Property(x => x.BiddingZoneDomainId);
-        builder.Property(x => x.EnergySupplierMarketParticipantId);
-        builder.Property(x => x.BalanceResponsiblePartyMarketParticipantId);
+        builder.Property(x => x.EnergySupplierId);
+        builder.Property(x => x.BalanceResponsibleId);
 
         builder.Property<ActorNumber>("_requestedByActorId")
             .HasColumnName("RequestedByActorId")
             .HasConversion(
                 toDbValue => toDbValue.Value,
                 fromDbValue => ActorNumber.Create(fromDbValue));
-
-        builder.Property<AggregatedMeasureDataProcess.State>("_state")
-            .HasConversion(toDbValue => toDbValue.ToString(), fromDbValue => Enum.Parse<AggregatedMeasureDataProcess.State>(fromDbValue, true))
-            .HasColumnName("State");
 
         builder.Ignore(x => x.DomainEvents);
     }

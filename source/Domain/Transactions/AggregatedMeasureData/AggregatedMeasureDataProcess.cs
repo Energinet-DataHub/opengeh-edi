@@ -20,66 +20,61 @@ namespace Domain.Transactions.AggregatedMeasureData
 {
     public class AggregatedMeasureDataProcess : Entity
     {
-#pragma warning disable CS0414
-        private readonly State _state;
-#pragma warning restore CS0414
-
         private readonly ActorNumber _requestedByActorId;
 
         public AggregatedMeasureDataProcess(
             ProcessId processId,
-            string settlementSeriesVersion,
-            string marketEvaluationPointType,
-            string marketEvaluationSettlementMethod,
-            Instant startDateAndOrTimeDateTime,
-            Instant endDateAndOrTimeDateTime,
-            string meteringGridAreaDomainId,
-            string biddingZoneDomainId,
-            string energySupplierMarketParticipantId,
-            string balanceResponsiblePartyMarketParticipantId,
-            ActorNumber requestedByActorId)
+            BusinessTransactionId businessTransactionId,
+            ActorNumber requestedByActorId,
+            string? settlementVersion,
+            string? meteringPointType,
+            string? settlementMethod,
+            Instant startOfPeriod,
+            Instant? endOfPeriod,
+            string? meteringGridAreaDomainId,
+            string? energySupplierId,
+            string? balanceResponsibleId)
         {
             ProcessId = processId;
-            SettlementSeriesVersion = settlementSeriesVersion;
-            MarketEvaluationPointType = marketEvaluationPointType;
-            MarketEvaluationSettlementMethod = marketEvaluationSettlementMethod;
-            StartDateAndOrTimeDateTime = startDateAndOrTimeDateTime;
-            EndDateAndOrTimeDateTime = endDateAndOrTimeDateTime;
+            BusinessTransactionId = businessTransactionId;
+            SettlementVersion = settlementVersion;
+            MeteringPointType = meteringPointType;
+            SettlementMethod = settlementMethod;
+            StartOfPeriod = startOfPeriod;
+            EndOfPeriod = endOfPeriod;
             MeteringGridAreaDomainId = meteringGridAreaDomainId;
-            BiddingZoneDomainId = biddingZoneDomainId;
-            EnergySupplierMarketParticipantId = energySupplierMarketParticipantId;
-            BalanceResponsiblePartyMarketParticipantId = balanceResponsiblePartyMarketParticipantId;
+            EnergySupplierId = energySupplierId;
+            BalanceResponsibleId = balanceResponsibleId;
             _requestedByActorId = requestedByActorId;
-            _state = State.Initialized;
-        }
-
-        public enum State
-        {
-            Initialized,
-            BeingProcessed,
-            Rejected,
-            Accepted,
-            Completed,
         }
 
         public ProcessId ProcessId { get; }
 
-        public string SettlementSeriesVersion { get; }
+        public BusinessTransactionId BusinessTransactionId { get; }
 
-        public string MarketEvaluationPointType { get; }
+        /// <summary>
+        /// Represent the version for a specific calculation.
+        /// </summary>
+        public string? SettlementVersion { get; }
 
-        public string MarketEvaluationSettlementMethod { get; }
+        /// <summary>
+        /// Represent consumption types or production.
+        /// </summary>
+        public string? MeteringPointType { get; }
 
-        public Instant StartDateAndOrTimeDateTime { get; }
+        /// <summary>
+        /// Represent the type of Settlement. E.g. Flex or NonProfile or null
+        /// </summary>
+        public string? SettlementMethod { get; }
 
-        public Instant EndDateAndOrTimeDateTime { get; }
+        public Instant StartOfPeriod { get; }
 
-        public string MeteringGridAreaDomainId { get; }
+        public Instant? EndOfPeriod { get; }
 
-        public string BiddingZoneDomainId { get; }
+        public string? MeteringGridAreaDomainId { get; }
 
-        public string EnergySupplierMarketParticipantId { get; }
+        public string? EnergySupplierId { get; }
 
-        public string BalanceResponsiblePartyMarketParticipantId { get; }
+        public string? BalanceResponsibleId { get; }
     }
 }
