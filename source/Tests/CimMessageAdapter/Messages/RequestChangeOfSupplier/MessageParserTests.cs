@@ -109,7 +109,7 @@ public class MessageParserTests
 
     private static Stream CreateXmlMessage()
     {
-        var xmlDoc = XDocument.Load($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}RequestChangeOfSupplier.xml");
+        var xmlDoc = XDocument.Load($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}ChangeOfSupplier{Path.DirectorySeparatorChar}RequestChangeOfSupplier.xml");
         var stream = new MemoryStream();
         xmlDoc.Save(stream);
 
@@ -119,12 +119,12 @@ public class MessageParserTests
     private static MemoryStream CreateJsonMessage()
     {
         return ReadTextFile(
-            $"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}json{Path.DirectorySeparatorChar}Request Change of Supplier.json");
+            $"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}json{Path.DirectorySeparatorChar}ChangeOfSupplier{Path.DirectorySeparatorChar}Request Change of Supplier.json");
     }
 
     private static MemoryStream CreateInvalidJsonMessage()
     {
-        return ReadTextFile($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}json{Path.DirectorySeparatorChar}Invalid Request Change of Supplier.json");
+        return ReadTextFile($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}json{Path.DirectorySeparatorChar}ChangeOfSupplier{Path.DirectorySeparatorChar}Invalid Request Change of Supplier.json");
     }
 
     private static Stream CreateInvalidXmlMessage()

@@ -23,6 +23,7 @@ using Domain.OutgoingMessages.GenericNotification;
 using Domain.OutgoingMessages.Peek;
 using Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.Transactions.AggregatedMeasureData;
 using Domain.Transactions.Aggregations;
 using Domain.Transactions.MoveIn;
 using Infrastructure.ArchivedMessages;
@@ -33,6 +34,7 @@ using Infrastructure.MasterData.MarketEvaluationPoints;
 using Infrastructure.OutgoingMessages;
 using Infrastructure.OutgoingMessages.Peek;
 using Infrastructure.Transactions;
+using Infrastructure.Transactions.AggregatedMeasureData;
 using Infrastructure.Transactions.Aggregations;
 using Infrastructure.Transactions.UpdateCustomer;
 using Microsoft.EntityFrameworkCore;
@@ -57,6 +59,8 @@ namespace Infrastructure.Configuration.DataAccess
 
         public DbSet<MoveInTransaction> Transactions { get; private set; }
 
+        public DbSet<AggregatedMeasureDataProcess> AggregatedMeasureDataProcesses { get; private set; }
+
         public DbSet<AggregationResultForwarding> AggregatedTimeSeriesTransactions { get; private set; }
 
         public DbSet<OutgoingMessage> OutgoingMessages { get; private set; }
@@ -78,6 +82,7 @@ namespace Infrastructure.Configuration.DataAccess
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
 
             modelBuilder.ApplyConfiguration(new MoveInTransactionEntityConfiguration(_serializer));
+            modelBuilder.ApplyConfiguration(new AggregatedMeasureDataProcessEntityConfiguration());
             modelBuilder.ApplyConfiguration(new AggregationResultForwardingEntityConfiguration(_serializer));
             modelBuilder.ApplyConfiguration(new EntityConfiguration());
             modelBuilder.ApplyConfiguration(new OutgoingMessageEntityConfiguration());
