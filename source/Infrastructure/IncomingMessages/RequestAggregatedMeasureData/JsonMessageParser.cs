@@ -63,9 +63,8 @@ public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureD
 
         ResetMessagePosition(message);
 
-        await ValidateMessageAsync(schema, message).ConfigureAwait(false);
+        var errors = await ValidateMessageAsync(schema, message).ConfigureAwait(false);
 
-        var errors = GetErrors();
         if (errors.Count > 0)
         {
             return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(errors.ToArray());

@@ -14,19 +14,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.IncomingMessages.RequestAggregatedMeasureData;
 using Application.IncomingMessages.RequestChangeOfSupplier;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.ValidationErrors;
 using DocumentValidation;
 using Infrastructure.IncomingMessages.BaseParsers;
-using Json.Schema;
 using DocumentFormat = Domain.Documents.DocumentFormat;
 using MessageHeader = Application.IncomingMessages.MessageHeader;
 
@@ -60,9 +56,8 @@ public class JsonMessageParser : JsonParserBase<MarketActivityRecord, RequestCha
 
         ResetMessagePosition(message);
 
-        await ValidateMessageAsync(schema, message).ConfigureAwait(false);
+        var errors = await ValidateMessageAsync(schema, message).ConfigureAwait(false);
 
-        var errors = GetErrors();
         if (errors.Count > 0)
         {
             return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(errors.ToArray());

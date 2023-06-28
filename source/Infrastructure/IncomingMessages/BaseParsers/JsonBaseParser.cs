@@ -76,14 +76,7 @@ where TICommand : IMarketTransaction<TTransactionType>
             InvalidMessageStructure.From(exception));
     }
 
-#pragma warning disable CA1002
-    protected List<ValidationError> GetErrors()
-#pragma warning restore CA1002
-    {
-        return _errors.ToList();
-    }
-
-    protected async Task ValidateMessageAsync(JsonSchema schema, Stream message)
+    protected async Task<List<ValidationError>> ValidateMessageAsync(JsonSchema schema, Stream message)
     {
         var jsonDocument = await JsonDocument.ParseAsync(message).ConfigureAwait(false);
 
@@ -93,6 +86,8 @@ where TICommand : IMarketTransaction<TTransactionType>
         }
 
         ResetMessagePosition(message);
+
+        return _errors;
     }
 
     protected string GetJsonDateStringWithoutQuotes(JsonElement element)
