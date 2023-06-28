@@ -99,9 +99,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202306090924 Change archived id type to nvarchar.sql" />
     <EmbeddedResource Include="Scripts\Model\202305161024 Add Process Type to ArchivedMassage.sql" />
     <EmbeddedResource Include="Scripts\Model\202305171026 Rename Process Type to BusinessReason.sql" />
-    <EmbeddedResource Include="Scripts\Model\202306271334 Create AggregatedMeasureDataProcesses Table.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Scripts\Model\202306271334 Create AggregatedMeasureDataProcesses Table.sql"/>
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241101 Consolidated BtwoB model.sql" />
@@ -118,9 +116,7 @@ limitations under the License.
     <None Remove="Scripts\Model\202227101352 Change Id from string to uniqueidentifier.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101353 Change Id from string to uniqueidentifier.sql" />
     <None Remove="Scripts\Model\202304131240 Create ArchivedMessage table.sql" />
-    <EmbeddedResource Include="Scripts\Model\202304131240 Create ArchivedMessage table.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Scripts\Model\202304131240 Create ArchivedMessage table.sql"/>
     <None Remove="Scripts\Model\202305311442 Recreate TransactionIds as TransactionRegistry.sql" />
     <EmbeddedResource Include="Scripts\Model\202305311442 Recreate TransactionIds as TransactionRegistry.sql" />
   </ItemGroup>
