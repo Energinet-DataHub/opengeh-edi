@@ -6,7 +6,7 @@ ediDomain = group "EDI" {
         technology "SQL Server"
         tags "Data Storage, Microsoft Azure - SQL Database"
     }
-    ediApiApp = container "EDI Web API" {
+    ediApiApp = container "EDI" {
         description "Backend server providing API for EDI operations"
         technology "Azure function, C#"
         tags "Microsoft Azure - Function Apps"
@@ -17,7 +17,7 @@ ediDomain = group "EDI" {
             tags "Microsoft Azure - Function Apps"
 
             # Domain relationships
-            this -> ediDb "Store messages and business transactions" "EF Core, Dapper"
+            this -> ediDb "Stores messages and business transactions" "EF Core, Dapper"
         }
         ediDequeueComponent = component "Dequeue component" {
             description "Handles dequeue requests from actors"
@@ -48,7 +48,7 @@ ediDomain = group "EDI" {
         }
 
         # Base model relationships
-        actorB2BSystem -> this "Request/Query" {
+        actorB2BSystem -> this "Requests" {
             tags "Simple View"
         }
     }
@@ -58,10 +58,10 @@ ediDomain = group "EDI" {
         tags "Intermediate Technology" "Microsoft Azure - API Management Services"
 
         # Base model relationships
-        actorB2BSystem -> this "Request/Query eg. Peek and Dequeue"
+        actorB2BSystem -> this "Requests eg. Peek and Dequeue"
 
         # Domain relationships
-        this -> ediPeekComponent "Request/Query"
+        this -> ediPeekComponent "Requests"
         this -> ediDequeueComponent "Dequeue messages"
 
         # Domain-to-domain relationships
