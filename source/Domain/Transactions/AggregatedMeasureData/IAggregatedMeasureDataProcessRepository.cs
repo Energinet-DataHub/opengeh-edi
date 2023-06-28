@@ -18,12 +18,12 @@ using NodaTime;
 namespace Domain.Transactions.AggregatedMeasureData
 {
     /// <summary>
-    /// Storage for transactions
+    /// Storage for Process
     /// </summary>
     public interface IAggregatedMeasureDataProcessRepository
     {
         /// <summary>
-        /// Adds a transaction to store
+        /// Adds a new process to store
         /// </summary>
         /// <param name="process"></param>
         void Add(AggregatedMeasureDataProcess process);
