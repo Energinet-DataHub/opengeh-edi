@@ -12,27 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+using Domain.Transactions.MoveIn;
+using NodaTime;
 
-namespace Domain.Transactions;
-
-//TODO: This is going to be removed. We should use ProcessId instead for this.
-public class TransactionId : ValueObject
+namespace Domain.Transactions.AggregatedMeasureData
 {
-    private TransactionId(Guid id)
+    /// <summary>
+    /// Storage for Process
+    /// </summary>
+    public interface IAggregatedMeasureDataProcessRepository
     {
-        Id = id;
-    }
-
-    public Guid Id { get; }
-
-    public static TransactionId Create(Guid transactionId)
-    {
-        return new TransactionId(transactionId);
-    }
-
-    public static TransactionId New()
-    {
-        return new TransactionId(Guid.NewGuid());
+        /// <summary>
+        /// Adds a new process to store
+        /// </summary>
+        /// <param name="process"></param>
+        void Add(AggregatedMeasureDataProcess process);
     }
 }
