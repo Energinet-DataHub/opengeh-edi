@@ -16,23 +16,20 @@ using Domain.SeedWork;
 
 namespace Domain.Transactions;
 
-//TODO: This is going to be removed. We should use ProcessId instead for this.
-public class TransactionId : ValueObject
+/// <summary>
+/// Represent the Serie id and MarketActiveRecord provided by the actor when sending the request.
+/// </summary>
+public class BusinessTransactionId : ValueObject
 {
-    private TransactionId(Guid id)
+    private BusinessTransactionId(string id)
     {
         Id = id;
     }
 
-    public Guid Id { get; }
+    public string Id { get; }
 
-    public static TransactionId Create(Guid transactionId)
+    public static BusinessTransactionId Create(string transactionId)
     {
-        return new TransactionId(transactionId);
-    }
-
-    public static TransactionId New()
-    {
-        return new TransactionId(Guid.NewGuid());
+        return new BusinessTransactionId(transactionId);
     }
 }
