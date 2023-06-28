@@ -23,7 +23,7 @@ namespace Domain.Transactions.AggregatedMeasureData
     public interface IAggregatedMeasureDataProcessRepository
     {
         /// <summary>
-        /// Adds a transaction to store
+        /// Adds a new process to store
         /// </summary>
         /// <param name="process"></param>
         void Add(AggregatedMeasureDataProcess process);
