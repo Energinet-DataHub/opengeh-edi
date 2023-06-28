@@ -40,7 +40,7 @@ where TICommand : IMarketTransaction<TTransactionType>
         _schemaProvider = schemaProvider;
     }
 
-    public Task<JsonSchema?> GetSchemaAsync(string documentName, CancellationToken cancellationToken)
+    protected Task<JsonSchema?> GetSchemaAsync(string documentName, CancellationToken cancellationToken)
     {
         if (documentName == null)
         {
@@ -50,7 +50,7 @@ where TICommand : IMarketTransaction<TTransactionType>
         return _schemaProvider.GetSchemaAsync<JsonSchema>(documentName.ToUpper(CultureInfo.InvariantCulture), "0", cancellationToken);
     }
 
-    public MessageHeader MessageHeaderFrom(JsonElement element)
+    protected MessageHeader MessageHeaderFrom(JsonElement element)
     {
         return new MessageHeader(
             element.GetProperty("mRID").ToString(),
@@ -63,13 +63,13 @@ where TICommand : IMarketTransaction<TTransactionType>
             GetJsonDateStringWithoutQuotes(element.GetProperty("createdDateTime")));
     }
 
-    public void ResetMessagePosition(Stream message)
+    protected void ResetMessagePosition(Stream message)
     {
         if (message is { CanRead: true } && message.Position > 0)
             message.Position = 0;
     }
 
-    public MessageParserResult<TTransactionType, TICommand> InvalidJsonFailure(
+    protected MessageParserResult<TTransactionType, TICommand> InvalidJsonFailure(
         Exception exception)
     {
         return new MessageParserResult<TTransactionType, TICommand>(
@@ -77,13 +77,13 @@ where TICommand : IMarketTransaction<TTransactionType>
     }
 
 #pragma warning disable CA1002
-    public List<ValidationError> GetErrors()
+    protected List<ValidationError> GetErrors()
 #pragma warning restore CA1002
     {
         return _errors.ToList();
     }
 
-    public async Task ValidateMessageAsync(JsonSchema schema, Stream message)
+    protected async Task ValidateMessageAsync(JsonSchema schema, Stream message)
     {
         var jsonDocument = await JsonDocument.ParseAsync(message).ConfigureAwait(false);
 
@@ -95,7 +95,7 @@ where TICommand : IMarketTransaction<TTransactionType>
         ResetMessagePosition(message);
     }
 
-    public string GetJsonDateStringWithoutQuotes(JsonElement element)
+    protected string GetJsonDateStringWithoutQuotes(JsonElement element)
     {
         return element.ToString().Trim('"');
     }
@@ -124,11 +124,8 @@ where TICommand : IMarketTransaction<TTransactionType>
         }
     }
 
-    private void AddValidationError(string? errorMessage)
+    private void AddValidationError(string errorMessage)
     {
-        if (errorMessage != null)
-        {
-            _errors.Add(InvalidMessageStructure.From(errorMessage));
-        }
+        _errors.Add(InvalidMessageStructure.From(errorMessage));
     }
 }
