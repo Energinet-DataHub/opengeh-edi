@@ -12,24 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
-using System.Threading.Tasks;
 using Domain.Transactions.AggregatedMeasureData;
-using Infrastructure.WholeSale;
+using Infrastructure.Configuration.DataAccess;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData;
 
-public class RequestedAggregatedMeasureDataSender : IAggregatedMeasureDataSender
+public class AggregatedMeasureDataProcessRepository : IAggregatedMeasureDataProcessRepository
 {
-    private readonly WholeSaleInbox<AggregatedMeasureDataTransactionRequest> _wholeSaleInbox;
+    private readonly B2BContext _b2BContext;
 
-    public RequestedAggregatedMeasureDataSender(WholeSaleInbox<AggregatedMeasureDataTransactionRequest> wholeSaleInbox)
+    public AggregatedMeasureDataProcessRepository(B2BContext b2BContext)
     {
-        _wholeSaleInbox = wholeSaleInbox;
+        _b2BContext = b2BContext;
     }
 
-    public async Task SendAsync(AggregatedMeasureDataTransactionRequest request, CancellationToken cancellationToken)
+    public void Add(AggregatedMeasureDataProcess process)
     {
-        await _wholeSaleInbox.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        _b2BContext.AggregatedMeasureDataProcesses.Add(process);
     }
 }

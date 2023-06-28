@@ -16,23 +16,25 @@ using Domain.SeedWork;
 
 namespace Domain.Transactions;
 
-//TODO: This is going to be removed. We should use ProcessId instead for this.
-public class TransactionId : ValueObject
+/// <summary>
+/// Is the Id for the Process within the EDI domain
+/// </summary>
+public class ProcessId : ValueObject
 {
-    private TransactionId(Guid id)
+    private ProcessId(Guid id)
     {
         Id = id;
     }
 
     public Guid Id { get; }
 
-    public static TransactionId Create(Guid transactionId)
+    public static ProcessId Create(Guid transactionId)
     {
-        return new TransactionId(transactionId);
+        return new ProcessId(transactionId);
     }
 
-    public static TransactionId New()
+    public static ProcessId New()
     {
-        return new TransactionId(Guid.NewGuid());
+        return new ProcessId(Guid.NewGuid());
     }
 }

@@ -12,15 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EnergySupplying.RequestResponse.Requests;
-using Infrastructure.Configuration.MessageBus;
-using Infrastructure.Configuration.Serialization;
+using Application.Configuration.DataAccess;
+using Dapper;
 using IntegrationTests.Application.IncomingMessages;
 using IntegrationTests.Fixtures;
-using IntegrationTests.TestDoubles;
 using Xunit;
 using Xunit.Categories;
 
@@ -29,32 +26,23 @@ namespace IntegrationTests.Application.Transactions.AggregatedMeasureData;
 [IntegrationTest]
 public class RequestAggregatedMeasureDataTransactionTests : TestBase
 {
-    private readonly ServiceBusSenderSpy _senderSpy;
-    private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
-    private readonly ISerializer _jsonSerializer;
+    private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
 
     public RequestAggregatedMeasureDataTransactionTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _jsonSerializer = GetService<ISerializer>();
-        _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IServiceBusSenderFactory>();
-        _senderSpy = new ServiceBusSenderSpy("Fake");
-        _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
+        _databaseConnectionFactory = GetService<IDatabaseConnectionFactory>();
     }
 
     [Fact]
-    public async Task Aggregated_measure_data_transaction_is_started_send_to_service_bus()
+    public async Task Aggregated_measure_data_process_is_created()
     {
         var incomingMessage = MessageBuilder()
             .Build();
 
         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-
-        var dispatchedMessage = _senderSpy.Message;
-        Assert.NotNull(dispatchedMessage);
-        var byteAsString = Encoding.UTF8.GetString(dispatchedMessage?.Body);
-        var dispatchedAggregatedMeasureDataTransactionRequest = _jsonSerializer.Deserialize<AggregatedMeasureDataTransactionRequest>(byteAsString);
-        Assert.Equal(incomingMessage.MessageHeader.MessageId, dispatchedAggregatedMeasureDataTransactionRequest.Message.MessageId);
+        var process = await GetProcess(incomingMessage.MessageHeader.SenderId);
+        Assert.NotNull(process);
     }
 
     private static RequestAggregatedMeasureDataMessageBuilder MessageBuilder()
@@ -62,9 +50,14 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
         return new RequestAggregatedMeasureDataMessageBuilder();
     }
 
-    private async Task DisposeAsync()
+    private async Task<object?> GetProcess(string senderId)
     {
-        await _senderSpy.DisposeAsync().ConfigureAwait(false);
-        await _serviceBusClientSenderFactory.DisposeAsync().ConfigureAwait(false);
+        using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+        return connection.QuerySingle(
+            $"SELECT * FROM dbo.AggregatedMeasureDataProcesses WHERE RequestedByActorId = @SenderId",
+            new
+            {
+                @SenderId = senderId,
+            });
     }
 }
