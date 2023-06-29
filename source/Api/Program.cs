@@ -69,12 +69,17 @@ namespace Api
             RuntimeEnvironment runtime)
         {
             return new HostBuilder()
-                .ConfigureFunctionsWorkerDefaults(worker =>
+                .ConfigureFunctionsWorkerDefaults(
+                    worker =>
                 {
                     worker.UseMiddleware<UnHandledExceptionMiddleware>();
                     worker.UseMiddleware<CorrelationIdMiddleware>();
                     /*worker.UseMiddleware<RequestResponseLoggingMiddleware>();*/
                     ConfigureAuthenticationMiddleware(worker);
+                },
+                    options =>
+                {
+                    options.EnableUserCodeException = true;
                 })
                 .ConfigureServices(services =>
                 {
