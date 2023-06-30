@@ -31,7 +31,7 @@ public class AggregatedMeasureDataProcessTests
 
         var startedEvent = process.DomainEvents.FirstOrDefault(e => e is AggregatedMeasureProcessWasStarted) as AggregatedMeasureProcessWasStarted;
         Assert.NotNull(startedEvent);
-        Assert.Equal(SampleData.ProcessId, startedEvent?.TransactionId);
+        Assert.Equal(SampleData.ProcessId, startedEvent?.ProcessId.Id);
     }
 
     private static AggregatedMeasureDataProcess CreateProcess()
