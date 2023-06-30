@@ -19,18 +19,18 @@ import "google/protobuf/duration.proto";
 
 option csharp_namespace = "Energinet.DataHub.Edi.Responses.AggregatedMeasureData";
 
-message AggregatedMeasureDataAcceptedAcceptedResponse {
-  string process_id = 1;
+message AggregatedMeasureDataAcceptedResponse {
+  string edi_reference_id = 1; //meta data
+  repeated Serie series = 2;
+}
+
+message Serie {
   // A consecutive number which is increased by new calculations with the same reason code.
   optional int32 version = 2;
-  // The correction settlement variant that is exchanged.
-  optional string settlement_series_version = 3; 
-  optional string metering_grid_area_domain_id = 6; //TODO: Is this the same as the requested grid area?
-  optional string energySupplier_id  = 9;
-  optional string balance_responsible_id = 10;
-  optional string product = 11;
-  string quantity_measure_unit_name = 12;
-  Period series_period = 13;
+  optional string grid_area_code = 4; //grid_area_code
+  optional string product = 7;
+  string quantity_measure_unit_name = 8;
+  Period series_period = 9;
 }
 
 message Period {
