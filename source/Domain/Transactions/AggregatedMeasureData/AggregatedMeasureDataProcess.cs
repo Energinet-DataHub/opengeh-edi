@@ -14,6 +14,7 @@
 
 using Domain.Actors;
 using Domain.SeedWork;
+using Domain.Transactions.AggregatedMeasureData.Events;
 using NodaTime;
 
 namespace Domain.Transactions.AggregatedMeasureData
@@ -46,6 +47,7 @@ namespace Domain.Transactions.AggregatedMeasureData
             EnergySupplierId = energySupplierId;
             BalanceResponsibleId = balanceResponsibleId;
             _requestedByActorId = requestedByActorId;
+            AddDomainEvent(new AggregatedMeasureProcessWasStarted(ProcessId.Id));
         }
 
         public ProcessId ProcessId { get; }
