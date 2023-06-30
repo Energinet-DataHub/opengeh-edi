@@ -33,9 +33,6 @@ public class NotifyWholesaleWhenAggregatedMeasureProcessWasStarted : INotificati
     public async Task Handle(AggregatedMeasureProcessWasStarted notification, CancellationToken cancellationToken)
     {
         if (notification == null) throw new ArgumentNullException(nameof(notification));
-
-        var newCommand = new NotifyWholesale(notification.ProcessId);
-
-        await _commandScheduler.EnqueueAsync(newCommand).ConfigureAwait(false);
+        await _commandScheduler.EnqueueAsync(new NotifyWholesale(notification.ProcessId)).ConfigureAwait(false);
     }
 }
