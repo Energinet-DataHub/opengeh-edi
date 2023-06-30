@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+using System.Text.Json.Serialization;
+using Application.Configuration.Commands.Commands;
+using Domain.Transactions;
 
-namespace Domain.Transactions.AggregatedMeasureData.Events;
+namespace Application.Transactions.AggregatedMeasureData.Notifications;
 
-public class AggregatedMeasureProcessWasStarted : DomainEvent
+public class NotifyWholesale : InternalCommand
 {
-    public AggregatedMeasureProcessWasStarted(ProcessId processId)
+    [JsonConstructor]
+    public NotifyWholesale(ProcessId processId)
     {
         ProcessId = processId;
     }

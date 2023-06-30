@@ -47,7 +47,7 @@ namespace Domain.Transactions.AggregatedMeasureData
             EnergySupplierId = energySupplierId;
             BalanceResponsibleId = balanceResponsibleId;
             _requestedByActorId = requestedByActorId;
-            AddDomainEvent(new AggregatedMeasureProcessWasStarted(ProcessId.Id));
+            AddDomainEvent(new AggregatedMeasureProcessWasStarted(ProcessId));
         }
 
         public ProcessId ProcessId { get; }
