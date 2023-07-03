@@ -20,14 +20,14 @@ import "google/protobuf/duration.proto";
 option csharp_namespace = "Energinet.DataHub.Edi.Responses.AggregatedMeasureData";
 
 message AggregatedMeasureDataAcceptedResponse {
-  string edi_reference_id = 1; //meta data
+  string edi_reference_id = 1; //meta data? LRN: I would prefer that it is part of the contract, the response without it would be unhand-able.
   repeated Serie series = 2;
 }
 
 message Serie {
-  // A consecutive number which is increased by new calculations with the same reason code.
+  // A consecutive number which is increased by new calculations with the same reason code. LRN: Should we know the reason code for the series?
   optional int32 version = 2;
-  optional string grid_area_code = 4; //grid_area_code
+  optional string grid_area_code = 4;
   optional string product = 7;
   string quantity_measure_unit_name = 8;
   Period series_period = 9;

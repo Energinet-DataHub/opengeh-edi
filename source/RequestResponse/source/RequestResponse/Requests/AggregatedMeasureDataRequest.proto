@@ -22,16 +22,15 @@ message AggregatedMeasureDataRequest {
   optional string settlement_version = 1; 
   optional string metering_point_type = 2;
   google.protobuf.Timestamp start_of_period = 3;
-  // if end date is not present the period should end on the same day as end of start day
-  optional google.protobuf.Timestamp end_of_period = 4;
+  optional google.protobuf.Timestamp end_of_period = 4; // if end date is not present the period should end on the same day as end of start day 
   optional string grid_area_code = 5;
   optional string energy_supplier_id = 6;
   optional string balance_responsible_id = 7;
   
   // TODO: wholesale needs this to validate that the grid responsible has the specified grid-area
-  optional string grid_responsible_id = 9; //set sender_id if sender_role is grid and grid area is present!
+  optional string grid_responsible_id = 9; //set sender_id if sender_role is grid and grid area is present! LRN: why not set this always?
 
   // TODO: point2point - meta data 
-  string external_reference_id = 10; 
-  string domain_sender = 11;
+  string edi_reference_id = 10; //TODO: LRN without this the future response would be unhand-able.
+  string domain_sender = 11; // TODO: Why is this required? 
 }
