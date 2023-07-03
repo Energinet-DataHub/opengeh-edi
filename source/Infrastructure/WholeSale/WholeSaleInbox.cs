@@ -19,7 +19,6 @@ using System.Threading.Tasks;
 using Application.Configuration;
 using Application.WholeSale;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.Core.JsonSerialization;
 using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Configuration.Serialization;
 

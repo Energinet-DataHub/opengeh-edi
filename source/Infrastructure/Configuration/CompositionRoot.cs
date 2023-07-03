@@ -27,6 +27,7 @@ using Azure.Messaging.ServiceBus;
 using CimMessageAdapter.Messages;
 using Domain.Documents;
 using Domain.MasterData.MarketEvaluationPoints;
+using Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Infrastructure.Actors;
 using Infrastructure.ArchivedMessages;
@@ -59,6 +60,7 @@ using Infrastructure.Transactions.AggregatedMeasureData;
 using Infrastructure.Transactions.Aggregations;
 using Infrastructure.Transactions.MoveIn;
 using Infrastructure.Transactions.UpdateCustomer;
+using Infrastructure.WholeSale;
 using MediatR;
 using MediatR.Registration;
 using Microsoft.EntityFrameworkCore;
@@ -91,6 +93,7 @@ namespace Infrastructure.Configuration
             AddMasterDataServices();
             AddActorServices();
             AddProcessing();
+            AddWholeSaleInBox();
             ReadModelHandlingConfiguration.AddReadModelHandling(services);
             UpdateCustomerMasterDataConfiguration.Configure(services);
             DequeueConfiguration.Configure(services);
@@ -301,6 +304,11 @@ namespace Infrastructure.Configuration
             _services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>));
             _services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RaiseDomainEventsBehaviour<,>));
             _services.AddTransient(typeof(IPipelineBehavior<,>), typeof(EnqueueOutgoingMessagesBehaviour<,>));
+        }
+
+        private void AddWholeSaleInBox()
+        {
+            WholeSaleInboxConfiguration.Configure<AggregatedMeasureDataProcess>(_services);
         }
     }
 }

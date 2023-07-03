@@ -12,15 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.WholeSale;
-using Microsoft.Extensions.DependencyInjection;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace Infrastructure.WholeSale;
+namespace Application.WholeSale;
 
-public static class WholeSaleInboxConfiguration
+/// <summary>
+/// Interface for wholeSale inbox
+/// </summary>
+public interface IWholeSaleInBox<T>
 {
-    public static void Configure<T>(IServiceCollection services)
-    {
-       services.AddTransient<IWholeSaleInBox<T>, WholeSaleInbox<T>>();
-    }
+    /// <summary>
+    /// Send <paramref name="request"/> to wholeSale
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    Task SendAsync(T request, CancellationToken cancellationToken);
 }
