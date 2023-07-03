@@ -17,6 +17,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration;
+using Application.WholeSale;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.JsonSerialization;
 using Infrastructure.Configuration.MessageBus;
@@ -24,7 +25,7 @@ using Infrastructure.Configuration.Serialization;
 
 namespace Infrastructure.WholeSale;
 
-public class WholeSaleInbox<T>
+public class WholeSaleInbox<T> : IWholeSaleInBox<T>
 {
     private const string CorrelationId = "CorrelationID";
     private readonly ISerializer _jsonSerializer;

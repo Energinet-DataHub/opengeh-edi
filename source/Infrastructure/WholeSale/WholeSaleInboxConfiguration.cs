@@ -12,19 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json.Serialization;
-using Application.Configuration.Commands.Commands;
-using Domain.Transactions;
+using Infrastructure.ArchivedMessages;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Application.Transactions.AggregatedMeasureData.Notifications;
+namespace Infrastructure.WholeSale;
 
-public class NotifyWholesale : InternalCommand
+public static class WholeSaleInboxConfiguration
 {
-    [JsonConstructor]
-    public NotifyWholesale(ProcessId processId)
+    public static void Configure(IServiceCollection services)
     {
-        ProcessId = processId;
+       // services.AddScoped<IWholeSaleInbox, ArchivedMessageRepository>();
     }
-
-    public ProcessId ProcessId { get; }
 }

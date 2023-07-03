@@ -16,24 +16,30 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Transactions.AggregatedMeasureData.Notifications;
+using Application.WholeSale;
 using Domain.Transactions.AggregatedMeasureData;
 using MediatR;
 
 namespace Application.Transactions.AggregatedMeasureData;
 
-public class NotifyWholesaleHandler : IRequestHandler<NotifyWholesale, Unit>
+public class NotifyWholesaleHandler : IRequestHandler<NotifyWholesaleOfAggregatedMeasureDataRequest, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
+    private readonly IWholeSaleInBox<AggregatedMeasureDataProcess> _wholeSaleInBox;
 
     public NotifyWholesaleHandler(
-        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
+        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository,
+        IWholeSaleInBox<AggregatedMeasureDataProcess> wholeSaleInBox)
     {
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
+        _wholeSaleInBox = wholeSaleInBox;
     }
 
-    public Task<Unit> Handle(NotifyWholesale request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(
+        NotifyWholesaleOfAggregatedMeasureDataRequest request,
+        CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(request); // This should not happen, remove
+        ArgumentNullException.ThrowIfNull(request);
 
         var process = _aggregatedMeasureDataProcessRepository.GetById(request.ProcessId);
         if (process == null)
@@ -42,8 +48,14 @@ public class NotifyWholesaleHandler : IRequestHandler<NotifyWholesale, Unit>
         }
 
         // send message
+        await _wholeSaleInBox.SendAsync(CreateWholeSaleMessage(), cancellationToken).ConfigureAwait(false);
         process.SendToWholesale();
+        return Unit.Value;
+    }
 
-        return Unit.Task;
+    private static AggregatedMeasureDataProcess CreateWholeSaleMessage()
+    {
+        throw new NotImplementedException();
+        //return new AggregatedMeasureDataProcess();
     }
 }
