@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
+using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
 using Infrastructure.Configuration.DataAccess;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData;
 
@@ -29,5 +32,13 @@ public class AggregatedMeasureDataProcessRepository : IAggregatedMeasureDataProc
     public void Add(AggregatedMeasureDataProcess process)
     {
         _b2BContext.AggregatedMeasureDataProcesses.Add(process);
+    }
+
+    public AggregatedMeasureDataProcess? GetById(ProcessId processId)
+    {
+        return _b2BContext
+            .AggregatedMeasureDataProcesses
+            .Include("_messages")
+            .FirstOrDefault(process => process.ProcessId == processId);
     }
 }

@@ -22,6 +22,7 @@ namespace Domain.Transactions.AggregatedMeasureData
     public class AggregatedMeasureDataProcess : Entity
     {
         private readonly ActorNumber _requestedByActorId;
+        private State _state;
 
         public AggregatedMeasureDataProcess(
             ProcessId processId,
@@ -46,8 +47,17 @@ namespace Domain.Transactions.AggregatedMeasureData
             MeteringGridAreaDomainId = meteringGridAreaDomainId;
             EnergySupplierId = energySupplierId;
             BalanceResponsibleId = balanceResponsibleId;
+            _state = State.Initialized;
             _requestedByActorId = requestedByActorId;
             AddDomainEvent(new AggregatedMeasureProcessWasStarted(ProcessId));
+        }
+
+        public enum State
+        {
+            Initialized,
+            Sent,
+            Accepted,
+            Rejected,
         }
 
         public ProcessId ProcessId { get; }
@@ -78,5 +88,15 @@ namespace Domain.Transactions.AggregatedMeasureData
         public string? EnergySupplierId { get; }
 
         public string? BalanceResponsibleId { get; }
+
+        public void SendToWholesale()
+        {
+            if (_state != State.Initialized)
+            {
+                throw new AggregatedMeasureDataException("Process has already been dealt with");
+            }
+
+            _state = State.Sent;
+        }
     }
 }
