@@ -27,7 +27,6 @@ using Azure.Messaging.ServiceBus;
 using CimMessageAdapter.Messages;
 using Domain.Documents;
 using Domain.MasterData.MarketEvaluationPoints;
-using Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Infrastructure.Actors;
 using Infrastructure.ArchivedMessages;
@@ -308,7 +307,7 @@ namespace Infrastructure.Configuration
 
         private void AddWholeSaleInBox()
         {
-            WholeSaleInboxConfiguration.Configure<AggregatedMeasureDataProcess>(_services);
+            WholeSaleInboxConfiguration.Configure(_services);
         }
     }
 }

@@ -13,14 +13,15 @@
 // limitations under the License.
 
 using Application.WholeSale;
+using Domain.Transactions.AggregatedMeasureData;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.WholeSale;
 
 public static class WholeSaleInboxConfiguration
 {
-    public static void Configure<T>(IServiceCollection services)
+    public static void Configure(IServiceCollection services)
     {
-       services.AddTransient<IWholeSaleInBox<T>, WholeSaleInbox<T>>();
+       services.AddTransient<IWholeSaleInBox<AggregatedMeasureDataProcess>, WholeSaleInbox<AggregatedMeasureDataProcess>>();
     }
 }
