@@ -19,14 +19,16 @@ import "google/protobuf/timestamp.proto";
 option csharp_namespace = "Energinet.DataHub.Edi.Requests.AggregatedMeasureData";
 
 message AggregatedTimeSeriesRequest {
-  // The requested version of the settlement
   optional string settlement_version = 1; 
   optional string metering_point_type = 2;
+  optional string grid_area_code = 4;
+  optional string energy_supplier_id = 5;
+  optional string balance_responsible_id = 6;
+  optional string grid_responsible_id = 8; //set sender_id if sender_role is grid and grid area is present! LRN: why not set this always?
+  Period period = 3;
+}
+
+message Period {
   google.protobuf.Timestamp start_of_period = 3;
-  optional google.protobuf.Timestamp end_of_period = 4; // if end date is not present the period should end on the same day as end of start day 
-  optional string grid_area_code = 5;
-  optional string energy_supplier_id = 6;
-  optional string balance_responsible_id = 7;
-  // TODO: wholesale needs this to validate that the grid responsible has the specified grid-area
-  optional string grid_responsible_id = 9; //set sender_id if sender_role is grid and grid area is present! LRN: why not set this always?
+  google.protobuf.Timestamp end_of_period = 4;
 }

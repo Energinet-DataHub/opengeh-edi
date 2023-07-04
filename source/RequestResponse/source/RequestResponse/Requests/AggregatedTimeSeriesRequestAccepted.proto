@@ -24,7 +24,6 @@ message AggregatedTimeSeriesRequestAccepted {
 }
 
 message Serie {
-  // A consecutive number which is increased by new calculations with the same reason code. LRN: Should we know the reason code for the series?
   int32 version = 2;
   string grid_area = 4;
   Product product = 7;
@@ -60,6 +59,8 @@ enum QuantityUnit{
 
 enum Product{
   PRODUCT_UNSPECIFIED = 0;
+  PRODUCT_ENERGY = 1;
+  PRODUCT_TARIF = 2;
 }
 
 /*
