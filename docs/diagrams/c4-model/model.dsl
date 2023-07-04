@@ -2,12 +2,12 @@
 
 ediDomain = group "EDI" {
     ediDb = container "EDI Database" {
-        description "Stores information related to business transactions and outgoing messages"
-        technology "SQL Database Schema"
+        description "Stores information related to EDI operations"
+        technology "SQL Server"
         tags "Data Storage, Microsoft Azure - SQL Database"
     }
-    ediApiApp = container "EDI Web API" {
-        description "<add description>"
+    edi = container "EDI" {
+        description "Backend server providing API for EDI operations"
         technology "Azure function, C#"
         tags "Microsoft Azure - Function Apps"
 
@@ -17,7 +17,7 @@ ediDomain = group "EDI" {
             tags "Microsoft Azure - Function Apps"
 
             # Domain relationships
-            this -> ediDb "Reads / generates messages" "EF Core"
+            this -> ediDb "Stores messages and business transactions" "EF Core, Dapper"
         }
         ediDequeueComponent = component "Dequeue component" {
             description "Handles dequeue requests from actors"
@@ -41,14 +41,14 @@ ediDomain = group "EDI" {
             tags "Microsoft Azure - Function Apps"
 
             # Base model relationships
-            this -> dh3.sharedServiceBus "Handles events indicating time series data is available"
+            this -> dh3.sharedServiceBus "Subscribes to integration events"
 
             # Domain relationships
             this -> ediTimeSeriesRequester "Triggers requester to fetch time series data"
         }
 
         # Base model relationships
-        actorB2BSystem -> this "Peek/Dequeue messages" {
+        actorB2BSystem -> this "Requests" {
             tags "Simple View"
         }
     }
@@ -58,10 +58,10 @@ ediDomain = group "EDI" {
         tags "Intermediate Technology" "Microsoft Azure - API Management Services"
 
         # Base model relationships
-        actorB2BSystem -> this "Peek/Dequeue messages"
+        actorB2BSystem -> this "Requests eg. Peek and Dequeue"
 
         # Domain relationships
-        this -> ediPeekComponent "Peek messages"
+        this -> ediPeekComponent "Requests"
         this -> ediDequeueComponent "Dequeue messages"
 
         # Domain-to-domain relationships
