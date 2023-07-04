@@ -19,35 +19,49 @@ import "google/protobuf/duration.proto";
 
 option csharp_namespace = "Energinet.DataHub.Edi.Responses.AggregatedMeasureData";
 
-message AggregatedMeasureDataAcceptedResponse {
-  string edi_reference_id = 1; //meta data? LRN: I would prefer that it is part of the contract, the response without it would be unhand-able.
+message AggregatedTimeSeriesRequestAccepted {
   repeated Serie series = 2;
 }
 
 message Serie {
   // A consecutive number which is increased by new calculations with the same reason code. LRN: Should we know the reason code for the series?
-  optional int32 version = 2;
-  optional string grid_area_code = 4;
-  optional string product = 7;
-  string quantity_measure_unit_name = 8;
-  Period series_period = 9;
-}
-
-message Period {
-  google.protobuf.Duration resolution = 1;
-  DateTimeInterval timeInterval = 2;
+  int32 version = 2;
+  string grid_area = 4;
+  Product product = 7;
+  QuantityUnit quantity_unit = 8;
+  Period period = 9;
   repeated Point Point = 3;
 }
 
 message Point {
   int32 position = 1;
-  optional DecimalValue quantity = 2;
-  optional string quality = 3;
+  DecimalValue quantity = 2;
+  QuantityQuality quantity_quality = 3;
 }
 
-message DateTimeInterval {
-  google.protobuf.Timestamp start = 1;
-  google.protobuf.Timestamp end = 2;
+message Period {
+  google.protobuf.Timestamp start_of_period = 3;
+  google.protobuf.Timestamp end_of_period = 4;
+}
+
+enum QuantityQuality{
+  QUANTITY_QUALITY_UNSPECIFIED = 0;
+  QUANTITY_QUALITY_MISSING = 1;
+  QUANTITY_QUALITY_ESTIMATED = 2;
+  QUANTITY_QUALITY_MEASURED = 3;
+  QUANTITY_QUALITY_INCOMPLETE = 4;
+  QUANTITY_QUALITY_CALCULATED = 5;
+}
+
+enum QuantityUnit{
+  QUANTITY_UNIT_UNSPECIFIED = 0;
+  QUANTITY_UNIT_KWH = 1;
+}
+
+enum Product{
+  PRODUCT_UNSPECIFIED = 0;
+  PRODUCT_ENERGY = 1;
+  PRODUCT_TARIFF = 2;
 }
 
 /*

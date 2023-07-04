@@ -14,18 +14,19 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Transactions.AggregatedMeasureData;
 
 namespace Application.WholeSale;
 
 /// <summary>
 /// Interface for wholeSale inbox
 /// </summary>
-public interface IWholeSaleInBox<T>
+public interface IWholeSaleInBox
 {
     /// <summary>
     /// Send <paramref name="request"/> to wholeSale
     /// </summary>
     /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
-    Task SendAsync(T request, CancellationToken cancellationToken);
+    Task SendAsync(AggregatedMeasureDataProcess request, CancellationToken cancellationToken);
 }

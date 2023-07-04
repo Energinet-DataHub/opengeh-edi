@@ -91,7 +91,6 @@ namespace Domain.Transactions.AggregatedMeasureData
 
         public void WholesaleIsNotifiedOfRequest()
         {
-            //TODO: LRN, this was a != State.Initialized. that would only guard against dev mistakes (calling this method in the wrong place) but not against if the Wholesale already had been notified.
             if (_state == State.Sent)
             {
                 throw new AggregatedMeasureDataException("Wholesale has already been notified");

@@ -18,18 +18,21 @@ using System.Threading.Tasks;
 using Application.Transactions.AggregatedMeasureData.Notifications;
 using Application.WholeSale;
 using Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.Edi.Responses.AggregatedMeasureData;
 using MediatR;
 
-namespace Application.Transactions.AggregatedMeasureData;
+namespace Infrastructure.Transactions.AggregatedMeasureData;
 
-public class RequestAggregatedMeasuredDataFromWholesale : IRequestHandler<NotifyWholesaleOfAggregatedMeasureDataRequest, Unit>
+public class
+    RequestAggregatedMeasuredDataFromWholesale : IRequestHandler<NotifyWholesaleOfAggregatedMeasureDataRequest, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
-    private readonly IWholeSaleInBox<AggregatedMeasureDataProcess> _wholeSaleInBox;
+    // TODO: Remove the dependency to RequestResponse when we get a response from wholesale
+    private readonly IWholeSaleInBox _wholeSaleInBox;
 
     public RequestAggregatedMeasuredDataFromWholesale(
         IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository,
-        IWholeSaleInBox<AggregatedMeasureDataProcess> wholeSaleInBox)
+        IWholeSaleInBox wholeSaleInBox)
     {
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
         _wholeSaleInBox = wholeSaleInBox;
@@ -40,18 +43,14 @@ public class RequestAggregatedMeasuredDataFromWholesale : IRequestHandler<Notify
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        var process = _aggregatedMeasureDataProcessRepository.GetById(request.ProcessId) ?? throw new ArgumentNullException(nameof(request));
+        var process = _aggregatedMeasureDataProcessRepository.GetById(request.ProcessId) ??
+                      throw new ArgumentNullException(nameof(request));
 
         // send message
-        await _wholeSaleInBox.SendAsync(CreateWholeSaleMessage(), cancellationToken).ConfigureAwait(false);
+        await _wholeSaleInBox.SendAsync(
+            process,
+            cancellationToken).ConfigureAwait(false);
         process.WholesaleIsNotifiedOfRequest();
         return Unit.Value;
-    }
-
-    // LRN: consider move this to a factory, it could return a AggregatedMeasureDataAcceptedResponse or something like that.
-    private static AggregatedMeasureDataProcess CreateWholeSaleMessage()
-    {
-        throw new NotImplementedException();
-        //return new AggregatedMeasureDataProcess();
     }
 }

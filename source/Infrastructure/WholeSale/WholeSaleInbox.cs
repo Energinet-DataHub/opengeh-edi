@@ -19,43 +19,38 @@ using System.Threading.Tasks;
 using Application.Configuration;
 using Application.WholeSale;
 using Azure.Messaging.ServiceBus;
+using Domain.Transactions;
+using Domain.Transactions.AggregatedMeasureData;
 using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Configuration.Serialization;
+using Infrastructure.Transactions.AggregatedMeasureData;
 
 namespace Infrastructure.WholeSale;
 
-public class WholeSaleInbox<T> : IWholeSaleInBox<T>
+public class WholeSaleInbox : IWholeSaleInBox
 {
-    private const string CorrelationId = "CorrelationID";
-    private readonly ISerializer _jsonSerializer;
-    private readonly ICorrelationContext _correlationContext;
     private readonly IServiceBusSenderAdapter _senderCreator;
 
     public WholeSaleInbox(
-        ISerializer jsonSerializer,
-        ICorrelationContext correlationContext,
         IServiceBusSenderFactory serviceBusSenderFactory,
         WholeSaleServiceBusClientConfiguration wholeSaleServiceBusClientConfiguration)
     {
         if (serviceBusSenderFactory == null) throw new ArgumentNullException(nameof(serviceBusSenderFactory));
         if (wholeSaleServiceBusClientConfiguration == null) throw new ArgumentNullException(nameof(wholeSaleServiceBusClientConfiguration));
 
-        _jsonSerializer = jsonSerializer;
-        _correlationContext = correlationContext;
         _senderCreator = serviceBusSenderFactory.GetSender(wholeSaleServiceBusClientConfiguration.QueueName);
     }
 
-    public async Task SendAsync(T request, CancellationToken cancellationToken)
+    public async Task SendAsync(
+        AggregatedMeasureDataProcess request,
+        CancellationToken cancellationToken)
     {
-        await _senderCreator.SendAsync(CreateMessage(request), cancellationToken).ConfigureAwait(false);
-    }
-
-    private ServiceBusMessage CreateMessage(T request)
-    {
-        var json = _jsonSerializer.Serialize(request);
-        var data = Encoding.UTF8.GetBytes(json);
-        var message = new ServiceBusMessage(data);
-        message.ApplicationProperties.Add(CorrelationId, _correlationContext.Id);
-        return message;
+        // We transform the request from our side to a response from wholesale,
+        // That is, we mimic the response from whole defined in the protobuf contract
+        // AggregatedMeasuredDataAcceptedResponse.proto and send it to our own inbox.
+        // Such that we can continue implementing peek of aggregated measured data.
+        await _senderCreator.SendAsync(
+            AggregatedMeasureDataProcessFactory.CreateServiceBusMessage(request),
+            cancellationToken).ConfigureAwait(false);
     }
 }
