@@ -56,7 +56,7 @@ namespace Domain.Transactions.AggregatedMeasureData
         {
             Initialized,
             Sent,
-            Accepted,
+            Accepted, // TODO: LRN this would indicate that the process is completed, is only property to  describe state enough?
             Rejected,
         }
 
@@ -89,11 +89,12 @@ namespace Domain.Transactions.AggregatedMeasureData
 
         public string? BalanceResponsibleId { get; }
 
-        public void SendToWholesale()
+        public void WholesaleIsNotifiedOfRequest()
         {
-            if (_state != State.Initialized)
+            //TODO: LRN, this was a != State.Initialized. that would only guard against dev mistakes (calling this method in the wrong place) but not against if the Wholesale already had been notified.
+            if (_state == State.Sent)
             {
-                throw new AggregatedMeasureDataException("Process has already been dealt with");
+                throw new AggregatedMeasureDataException("Wholesale has already been notified");
             }
 
             _state = State.Sent;

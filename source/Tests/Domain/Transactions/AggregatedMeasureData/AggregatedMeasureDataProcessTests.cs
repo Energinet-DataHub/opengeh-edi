@@ -38,7 +38,7 @@ public class AggregatedMeasureDataProcessTests
     public void Process_is_set_to_sent()
     {
         var process = CreateProcess();
-        process.SendToWholesale();
+        process.WholesaleIsNotifiedOfRequest();
         // currently our state is private, hence we can not test on anything here.
         // As of right now!
     }
@@ -47,9 +47,9 @@ public class AggregatedMeasureDataProcessTests
     public void Process_can_not_be_send_twice()
     {
         var process = CreateProcess();
-        process.SendToWholesale();
+        process.WholesaleIsNotifiedOfRequest();
 
-        Assert.Throws<AggregatedMeasureDataException>(() => process.SendToWholesale());
+        Assert.Throws<AggregatedMeasureDataException>(() => process.WholesaleIsNotifiedOfRequest());
     }
 
     private static AggregatedMeasureDataProcess CreateProcess()

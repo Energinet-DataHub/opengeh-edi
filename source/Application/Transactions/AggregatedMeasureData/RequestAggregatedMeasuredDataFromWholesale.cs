@@ -22,12 +22,12 @@ using MediatR;
 
 namespace Application.Transactions.AggregatedMeasureData;
 
-public class NotifyWholesaleHandler : IRequestHandler<NotifyWholesaleOfAggregatedMeasureDataRequest, Unit>
+public class RequestAggregatedMeasuredDataFromWholesale : IRequestHandler<NotifyWholesaleOfAggregatedMeasureDataRequest, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
     private readonly IWholeSaleInBox<AggregatedMeasureDataProcess> _wholeSaleInBox;
 
-    public NotifyWholesaleHandler(
+    public RequestAggregatedMeasuredDataFromWholesale(
         IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository,
         IWholeSaleInBox<AggregatedMeasureDataProcess> wholeSaleInBox)
     {
@@ -40,19 +40,15 @@ public class NotifyWholesaleHandler : IRequestHandler<NotifyWholesaleOfAggregate
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-
-        var process = _aggregatedMeasureDataProcessRepository.GetById(request.ProcessId);
-        if (process == null)
-        {
-            throw new ArgumentNullException(nameof(request));
-        }
+        var process = _aggregatedMeasureDataProcessRepository.GetById(request.ProcessId) ?? throw new ArgumentNullException(nameof(request));
 
         // send message
         await _wholeSaleInBox.SendAsync(CreateWholeSaleMessage(), cancellationToken).ConfigureAwait(false);
-        process.SendToWholesale();
+        process.WholesaleIsNotifiedOfRequest();
         return Unit.Value;
     }
 
+    // LRN: consider move this to a factory, it could return a AggregatedMeasureDataAcceptedResponse or something like that.
     private static AggregatedMeasureDataProcess CreateWholeSaleMessage()
     {
         throw new NotImplementedException();
