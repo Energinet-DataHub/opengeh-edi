@@ -68,7 +68,7 @@ public static class CimCode
             return "DGL";
         if (marketRole == MarketRole.MeteringPointAdministrator)
             return "DDZ";
-        if (marketRole == MarketRole.BalanceResponsible)
+        if (marketRole == MarketRole.BalanceResponsibleParty)
             return "DDK";
 
         throw NoCodeFoundFor(marketRole.Name);

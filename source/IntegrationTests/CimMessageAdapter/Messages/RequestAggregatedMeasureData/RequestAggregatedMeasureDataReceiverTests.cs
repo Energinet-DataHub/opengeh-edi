@@ -68,7 +68,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         {
             new object[] { MarketRole.EnergySupplier.Code },
             new object[] { MarketRole.MeteredDataResponsible.Code },
-            new object[] { MarketRole.BalanceResponsible.Code },
+            new object[] { MarketRole.BalanceResponsibleParty.Code },
         };
 
     public async Task InitializeAsync()

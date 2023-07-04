@@ -33,7 +33,7 @@ internal static class SampleData
 
     public static string ReceiverId => "1234567890987";
 
-    public static MarketRole ReceiverRole => MarketRole.BalanceResponsible;
+    public static MarketRole ReceiverRole => MarketRole.BalanceResponsibleParty;
 
     public static string Timestamp => "2022-12-20T23:00:00Z";
 
