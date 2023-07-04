@@ -70,6 +70,9 @@ namespace Infrastructure.OutgoingMessages
                     fromDbValue => EnumerationType.FromName<MarketRole>(fromDbValue));
             builder.Property(x => x.MessageRecord);
 
+            builder.Ignore(x => x.AssignedBundleId);
+            builder.Ignore(x => x.Receiver);
+
             builder
                 .HasDiscriminator<string>("Discriminator")
                 .HasValue<OutgoingMessage>(nameof(OutgoingMessage))

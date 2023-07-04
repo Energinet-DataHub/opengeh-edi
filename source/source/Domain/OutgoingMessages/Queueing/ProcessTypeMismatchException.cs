@@ -11,27 +11,21 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+namespace Domain.OutgoingMessages.Queueing;
 
-using Domain.Actors;
-using Domain.OutgoingMessages.Peek;
-using Domain.SeedWork;
-
-namespace Domain.OutgoingMessages;
-
-public class BundleId : ValueObject
+public class ProcessTypeMismatchException : Exception
 {
-    private BundleId(MessageCategory messageCategory, ActorNumber receiverNumber)
+    public ProcessTypeMismatchException(string message)
+        : base(message)
     {
-        MessageCategory = messageCategory;
-        ReceiverNumber = receiverNumber;
     }
 
-    public MessageCategory MessageCategory { get; }
-
-    public ActorNumber ReceiverNumber { get; }
-
-    public static BundleId Create(MessageCategory messageCategory, ActorNumber actorNumber)
+    public ProcessTypeMismatchException(string message, Exception innerException)
+        : base(message, innerException)
     {
-        return new BundleId(messageCategory, actorNumber);
+    }
+
+    public ProcessTypeMismatchException()
+    {
     }
 }
