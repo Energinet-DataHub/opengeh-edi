@@ -94,7 +94,7 @@ public class RequestAggregatedMeasureMessageReceiver
         if (messageHeader is null || messageParserResult.Errors.Any())
         {
             var errorResult = Result.Failure(messageParserResult.Errors.ToArray());
-            var httpErrorStatusCode = messageParserResult.Errors.Any(x => x is MessageSizeExceeded) ? HttpStatusCode.RequestEntityTooLarge : HttpStatusCode.BadRequest;
+            var httpErrorStatusCode = HttpStatusCode.BadRequest;
             return CreateResponse(request, httpErrorStatusCode, _responseFactory.From(errorResult, cimFormat));
         }
 
