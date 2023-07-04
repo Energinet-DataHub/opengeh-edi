@@ -14,9 +14,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,23 +23,22 @@ using Application.IncomingMessages.RequestAggregatedMeasureData;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.ValidationErrors;
 using DocumentValidation;
-using Json.Schema;
+using Infrastructure.IncomingMessages.BaseParsers;
 using DocumentFormat = Domain.Documents.DocumentFormat;
 
 namespace Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
-public class JsonMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDataTransaction>
+public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureDataTransaction>,
+    IMessageParser<Serie, RequestAggregatedMeasureDataTransaction>
 {
     private const string SeriesElementName = "Series";
     private const string HeaderElementName = "RequestAggregatedMeasureData_MarketDocument";
     private const string DocumentName = "RequestAggregatedMeasureData";
     private const int MaxMessageSizeInMb = 50;
-    private readonly ISchemaProvider _schemaProvider;
-    private readonly List<ValidationError> _errors = new();
 
     public JsonMessageParser(JsonSchemaProvider schemaProvider)
+        : base(schemaProvider)
     {
-        _schemaProvider = schemaProvider;
     }
 
     public DocumentFormat HandledFormat => DocumentFormat.Json;
@@ -53,13 +50,11 @@ public class JsonMessageParser : IMessageParser<Serie, RequestAggregatedMeasureD
         var fileSizeInMb = message.Length / (1024 * 1024);
         if (fileSizeInMb >= MaxMessageSizeInMb)
         {
-            _errors.Add(new MessageSizeExceeded(fileSizeInMb, MaxMessageSizeInMb));
-            return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(_errors.ToArray());
+            return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(
+                new MessageSizeExceeded(fileSizeInMb, MaxMessageSizeInMb));
         }
 
-        var schema = await _schemaProvider
-            .GetSchemaAsync<JsonSchema>(DocumentName.ToUpper(CultureInfo.InvariantCulture), "0", cancellationToken)
-            .ConfigureAwait(false);
+        var schema = await GetSchemaAsync(DocumentName, cancellationToken).ConfigureAwait(false);
         if (schema is null)
         {
             return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(
@@ -68,18 +63,22 @@ public class JsonMessageParser : IMessageParser<Serie, RequestAggregatedMeasureD
 
         ResetMessagePosition(message);
 
-        await ValidateMessageAsync(schema, message).ConfigureAwait(false);
+        var errors = await ValidateMessageAsync(schema, message).ConfigureAwait(false);
 
-        if (_errors.Count > 0)
+        if (errors.Count > 0)
         {
-            return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(_errors.ToArray());
+            return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(errors.ToArray());
         }
 
         try
         {
             using var document = await JsonDocument.ParseAsync(message, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
-            return ParseJsonData(document);
+
+            JsonElement header = document.RootElement.GetProperty(HeaderElementName);
+            JsonElement seriesJson = header.GetProperty(SeriesElementName);
+
+            return ParseJsonData(MessageHeaderFrom(header), seriesJson);
         }
         catch (JsonException exception)
         {
@@ -93,54 +92,6 @@ public class JsonMessageParser : IMessageParser<Serie, RequestAggregatedMeasureD
         {
             return InvalidJsonFailure(e);
         }
-    }
-
-    private static void ResetMessagePosition(Stream message)
-    {
-        if (message.CanRead && message.Position > 0)
-            message.Position = 0;
-    }
-
-    private static MessageHeader MessageHeaderFrom(JsonElement element)
-    {
-        return new MessageHeader(
-            element.GetProperty("mRID").ToString(),
-            element.GetProperty("type").GetProperty("value").ToString(),
-            element.GetProperty("process.processType").GetProperty("value").ToString(),
-            element.GetProperty("sender_MarketParticipant.mRID").GetProperty("value").ToString(),
-            element.GetProperty("sender_MarketParticipant.marketRole.type").GetProperty("value").ToString(),
-            element.GetProperty("receiver_MarketParticipant.mRID").GetProperty("value").ToString(),
-            element.GetProperty("receiver_MarketParticipant.marketRole.type").GetProperty("value").ToString(),
-            GetJsonDateStringWithoutQuotes(element.GetProperty("createdDateTime")));
-    }
-
-    private static string GetJsonDateStringWithoutQuotes(JsonElement element)
-    {
-        return element.ToString().Trim('"');
-    }
-
-    private static MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> ParseJsonData(
-        JsonDocument document)
-    {
-        var series = new List<Serie>();
-        var messageHeader = MessageHeaderFrom(document.RootElement.GetProperty(HeaderElementName));
-        var incomingSeries = document.RootElement.GetProperty(HeaderElementName)
-            .GetProperty(SeriesElementName);
-
-        foreach (var jsonElement in incomingSeries.EnumerateArray())
-        {
-            series.Add(SeriesFrom(jsonElement));
-        }
-
-        return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(
-            new RequestAggregatedMeasureDataIncomingMarketDocument(messageHeader, series));
-    }
-
-    private static MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> InvalidJsonFailure(
-        Exception exception)
-    {
-        return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(
-            InvalidMessageStructure.From(exception));
     }
 
     private static Serie SeriesFrom(JsonElement element)
@@ -168,47 +119,18 @@ public class JsonMessageParser : IMessageParser<Serie, RequestAggregatedMeasureD
                 .ToString());
     }
 
-    private static bool IsValid(JsonDocument document, JsonSchema schema)
+    private static MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> ParseJsonData(
+        MessageHeader header,
+        JsonElement seriesJson)
     {
-        return schema.Evaluate(document, new EvaluationOptions() { OutputFormat = OutputFormat.Flag, }).IsValid;
-    }
+        var series = new List<Serie>();
 
-    private async Task ValidateMessageAsync(JsonSchema schema, Stream message)
-    {
-        var jsonDocument = await JsonDocument.ParseAsync(message).ConfigureAwait(false);
-
-        if (IsValid(jsonDocument, schema) == false)
+        foreach (var jsonElement in seriesJson.EnumerateArray())
         {
-            ExtractValidationErrors(jsonDocument, schema);
+            series.Add(SeriesFrom(jsonElement));
         }
 
-        ResetMessagePosition(message);
-    }
-
-    private void ExtractValidationErrors(JsonDocument jsonDocument, JsonSchema schema)
-    {
-        var result = schema.Evaluate(jsonDocument, new EvaluationOptions() { OutputFormat = OutputFormat.List, });
-        result
-            .Details
-            .Where(detail => detail.HasErrors)
-            .ToList().ForEach(AddValidationErrors);
-    }
-
-    private void AddValidationErrors(EvaluationResults validationResult)
-    {
-        var propertyName = validationResult.InstanceLocation.ToString();
-        var errorsValues = validationResult.Errors ?? new Dictionary<string, string>();
-        foreach (var error in errorsValues)
-        {
-            AddValidationError($"{propertyName}: {error}");
-        }
-    }
-
-    private void AddValidationError(string? errorMessage)
-    {
-        if (errorMessage != null)
-        {
-            _errors.Add(InvalidMessageStructure.From(errorMessage));
-        }
+        return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(
+            new RequestAggregatedMeasureDataIncomingMarketDocument(header, series));
     }
 }
