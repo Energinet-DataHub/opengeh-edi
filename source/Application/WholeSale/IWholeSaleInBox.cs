@@ -12,12 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.ValidationErrors;
+using System.Threading;
+using System.Threading.Tasks;
+using Domain.Transactions.AggregatedMeasureData;
 
-public class MessageSizeExceeded : ValidationError
+namespace Application.WholeSale;
+
+/// <summary>
+/// Interface for wholeSale inbox
+/// </summary>
+public interface IWholeSaleInBox
 {
-    public MessageSizeExceeded(long actualSize, long sizeLimitation)
-        : base($"Message size {actualSize}mb exceeds {sizeLimitation}mb", "00004")
-    {
-    }
+    /// <summary>
+    /// Send <paramref name="request"/> to wholeSale
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    Task SendAsync(AggregatedMeasureDataProcess request, CancellationToken cancellationToken);
 }

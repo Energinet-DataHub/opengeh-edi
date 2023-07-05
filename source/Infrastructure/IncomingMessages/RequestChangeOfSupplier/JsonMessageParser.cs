@@ -14,9 +14,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,23 +22,22 @@ using Application.IncomingMessages.RequestChangeOfSupplier;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.ValidationErrors;
 using DocumentValidation;
-using Json.Schema;
+using Infrastructure.IncomingMessages.BaseParsers;
 using DocumentFormat = Domain.Documents.DocumentFormat;
 using MessageHeader = Application.IncomingMessages.MessageHeader;
 
 namespace Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 
-public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>
+public class JsonMessageParser : JsonParserBase<MarketActivityRecord, RequestChangeOfSupplierTransaction>,
+    IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";
     private const string DocumentName = "RequestChangeOfSupplier";
-    private readonly ISchemaProvider _schemaProvider;
-    private readonly List<ValidationError> _errors = new();
 
     public JsonMessageParser(JsonSchemaProvider schemaProvider)
+        : base(schemaProvider)
     {
-        _schemaProvider = schemaProvider;
     }
 
     public DocumentFormat HandledFormat => DocumentFormat.Json;
@@ -50,9 +47,7 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
 
-        var schema = await _schemaProvider
-            .GetSchemaAsync<JsonSchema>(DocumentName.ToUpper(CultureInfo.InvariantCulture), "0", cancellationToken)
-            .ConfigureAwait(false);
+        var schema = await GetSchemaAsync(DocumentName, cancellationToken).ConfigureAwait(false);
         if (schema is null)
         {
             return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(
@@ -61,85 +56,53 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
 
         ResetMessagePosition(message);
 
-        await ValidateMessageAsync(schema, message).ConfigureAwait(false);
+        var errors = await ValidateMessageAsync(schema, message).ConfigureAwait(false);
 
-        if (_errors.Count > 0)
+        if (errors.Count > 0)
         {
-            return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(_errors.ToArray());
+            return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(errors.ToArray());
         }
 
         try
         {
-            using (var document = await JsonDocument.ParseAsync(message, cancellationToken: cancellationToken)
-                       .ConfigureAwait(false))
-            {
-                try
-                {
-                    return ParseJsonData(document);
-                }
-                catch (JsonException exception)
-                {
-                    return InvalidJsonFailure(exception);
-                }
-                catch (ArgumentException argumentException)
-                {
-                    return InvalidJsonFailure(argumentException);
-                }
-            }
+            using var document = await JsonDocument.ParseAsync(message, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            JsonElement header = document.RootElement.GetProperty(HeaderElementName);
+            JsonElement seriesJson = header.GetProperty(MarketActivityRecordElementName);
+
+            return ParseJsonData(MessageHeaderFrom(header), seriesJson);
+        }
+        catch (JsonException exception)
+        {
+            return InvalidJsonFailure(exception);
+        }
+        catch (ArgumentException argumentException)
+        {
+            return InvalidJsonFailure(argumentException);
         }
         catch (IOException e)
         {
             return InvalidJsonFailure(e);
         }
-        finally
-        {
-        }
     }
 
-    private static MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction> ParseJsonData(
-        JsonDocument document)
+    private MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction> ParseJsonData(
+        MessageHeader header,
+        JsonElement marketActivityRecordJson)
     {
         var marketActivityRecords = new List<MarketActivityRecord>();
-        var messageHeader = MessageHeaderFrom(document.RootElement.GetProperty(HeaderElementName));
-        var marketActivityRecord = document.RootElement.GetProperty(HeaderElementName)
-            .GetProperty(MarketActivityRecordElementName);
-        var records = marketActivityRecord.EnumerateArray();
-        foreach (var jsonElement in records)
+
+        foreach (var jsonElement in marketActivityRecordJson.EnumerateArray())
         {
             marketActivityRecords.Add(MarketActivityRecordFrom(jsonElement));
         }
 
         return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(
-            new RequestChangeOfSupplierIncomingMarketDocument(messageHeader, marketActivityRecords));
+            new RequestChangeOfSupplierIncomingMarketDocument(header, marketActivityRecords));
     }
 
-    private static void ResetMessagePosition(Stream message)
-    {
-        if (message.CanRead && message.Position > 0)
-            message.Position = 0;
-    }
-
-    private static MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction> InvalidJsonFailure(
-        Exception exception)
-    {
-        return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(
-            InvalidMessageStructure.From(exception));
-    }
-
-    private static MessageHeader MessageHeaderFrom(JsonElement element)
-    {
-        return new MessageHeader(
-            element.GetProperty("mRID").ToString(),
-            element.GetProperty("type").GetProperty("value").ToString(),
-            element.GetProperty("process.processType").GetProperty("value").ToString(),
-            element.GetProperty("sender_MarketParticipant.mRID").GetProperty("value").ToString(),
-            element.GetProperty("sender_MarketParticipant.marketRole.type").GetProperty("value").ToString(),
-            element.GetProperty("receiver_MarketParticipant.mRID").GetProperty("value").ToString(),
-            element.GetProperty("receiver_MarketParticipant.marketRole.type").GetProperty("value").ToString(),
-            GetJsonDateStringWithoutQuotes(element.GetProperty("createdDateTime")));
-    }
-
-    private static MarketActivityRecord MarketActivityRecordFrom(JsonElement element)
+    private MarketActivityRecord MarketActivityRecordFrom(JsonElement element)
     {
         return new MarketActivityRecord()
         {
@@ -160,54 +123,5 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
             ConsumerName = element.GetProperty("marketEvaluationPoint.customer_MarketParticipant.name").ToString(),
             EffectiveDate = GetJsonDateStringWithoutQuotes(element.GetProperty("start_DateAndOrTime.dateTime")),
         };
-    }
-
-    private static string GetJsonDateStringWithoutQuotes(JsonElement element)
-    {
-        return element.ToString().Trim('"');
-    }
-
-    private static bool IsValid(JsonDocument document, JsonSchema schema)
-    {
-        return schema.Evaluate(document, new EvaluationOptions() { OutputFormat = OutputFormat.Flag, }).IsValid;
-    }
-
-    private async Task ValidateMessageAsync(JsonSchema schema, Stream message)
-    {
-        var jsonDocument = await JsonDocument.ParseAsync(message).ConfigureAwait(false);
-
-        if (IsValid(jsonDocument, schema) == false)
-        {
-            ExtractValidationErrors(jsonDocument, schema);
-        }
-
-        ResetMessagePosition(message);
-    }
-
-    private void ExtractValidationErrors(JsonDocument jsonDocument, JsonSchema schema)
-    {
-        var result = schema.Evaluate(jsonDocument, new EvaluationOptions() { OutputFormat = OutputFormat.List, });
-        result
-            .Details
-            .Where(detail => detail.HasErrors)
-            .ToList().ForEach(AddValidationErrors);
-    }
-
-    private void AddValidationErrors(EvaluationResults validationResult)
-    {
-        var propertyName = validationResult.InstanceLocation.ToString();
-        var errorsValues = validationResult.Errors ?? new Dictionary<string, string>();
-        foreach (var error in errorsValues)
-        {
-            AddValidationError($"{propertyName}: {error}");
-        }
-    }
-
-    private void AddValidationError(string? errorMessage)
-    {
-        if (errorMessage != null)
-        {
-            _errors.Add(InvalidMessageStructure.From(errorMessage));
-        }
     }
 }
