@@ -117,36 +117,15 @@ public class MessageParserTests
         Assert.Contains(result.Errors, error => error.GetType().Name == expectedError);
     }
 
-    private static Stream CreateBaseXmlMessage(string fileName, int newFileSizeInMb = 0)
+    private static Stream CreateBaseXmlMessage(string fileName)
     {
         var xmlDocument = XDocument.Load(
             $"{PathToMessages}xml{SubPath}{fileName}");
-        if (newFileSizeInMb > 0)
-        {
-            return ChangeXmlFileSizeTo(xmlDocument, newFileSizeInMb);
-        }
 
         var stream = new MemoryStream();
         xmlDocument.Save(stream);
 
         return stream;
-    }
-
-    private static Stream ChangeXmlFileSizeTo(XDocument document, int newFileSizeInMb)
-    {
-        var newFileSizeInBytes = newFileSizeInMb * 1024 * 1024;
-        var message = new MemoryStream();
-        document.Save(message, SaveOptions.DisableFormatting);
-        message.Position = 0;
-        if (message.Length > newFileSizeInBytes) return message;
-
-        var remainSize = newFileSizeInBytes - message.Length;
-
-        byte[] data = new byte[remainSize];
-        message.Write(data);
-
-        message.Position = 0;
-        return message;
     }
 
     private static Stream CreateBaseJsonMessages(string fileName, int addSeriesUntilMbSize = 0)
