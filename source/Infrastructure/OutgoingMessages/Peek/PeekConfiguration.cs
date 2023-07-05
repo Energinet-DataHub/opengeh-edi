@@ -25,6 +25,7 @@ internal static class PeekConfiguration
 {
     internal static void Configure(IServiceCollection services, IBundleConfiguration bundleConfiguration, Func<IServiceProvider, IBundledMessages>? bundleStoreBuilder)
     {
+        services.AddScoped<MessageEnqueuer>();
         services.AddTransient<MessagePeeker>();
         services.AddTransient<IRequestHandler<PeekRequest, PeekResult>, PeekRequestHandler>();
         services.AddScoped<IEnqueuedMessages, EnqueuedMessages>();

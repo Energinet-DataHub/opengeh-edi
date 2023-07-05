@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
@@ -21,8 +20,8 @@ using Dapper;
 using Domain.Actors;
 using Domain.Documents;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.Queueing;
 using Domain.Transactions;
+using Infrastructure.OutgoingMessages;
 using IntegrationTests.Fixtures;
 using Xunit;
 
@@ -47,7 +46,7 @@ public class WhenEnqueueingTests : TestBase
             ActorNumber.Create("1123456789102"),
             MarketRole.MeteringDataAdministrator,
             "MessageRecord");
-        var messageEnqueuer = new MessageEnqueuer(GetService<IOutgoingMessageStore>());
+        var messageEnqueuer = GetService<MessageEnqueuer>();
 
         messageEnqueuer.Enqueue(message);
         var unitOfWork = GetService<IUnitOfWork>();
@@ -68,30 +67,5 @@ public class WhenEnqueueingTests : TestBase
         Assert.Equal(result.BusinessReason, message.BusinessReason);
         Assert.NotNull(result.MessageRecord);
         Assert.NotNull(result.AssignedBundleId);
-    }
-}
-
-#pragma warning disable
-public class MessageEnqueuer
-{
-    private readonly IOutgoingMessageStore _outgoingMessageStore;
-
-    public MessageEnqueuer(IOutgoingMessageStore outgoingMessageStore)
-    {
-        _outgoingMessageStore = outgoingMessageStore;
-    }
-
-    /// <summary>
-    /// Enqueues the outgoingmessage in a bundle.
-    /// When a message is enqued, it is assigned a bundle id. and is peek'able
-    /// </summary>
-    /// <param name="message"></param>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
-    public void Enqueue(OutgoingMessage message)
-    {
-        var actorMessageQueue = ActorMessageQueue.CreateFor(message.Receiver, BusinessReason.From(message.BusinessReason));
-        actorMessageQueue.Enqueue(message);
-        _outgoingMessageStore.Add(message);
     }
 }
