@@ -17,7 +17,7 @@ syntax = "proto3";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 
-option csharp_namespace = "Energinet.DataHub.Edi.Responses.AggregatedMeasureData";
+option csharp_namespace = "Energinet.DataHub.Edi.Requests.TimeSeries.Aggregated";
 
 message AggregatedTimeSeriesRequestAccepted {
   repeated Serie series = 2;
@@ -29,12 +29,21 @@ message Serie {
   Product product = 7;
   QuantityUnit quantity_unit = 8;
   Period period = 9;
-  repeated Point Point = 3;
+  repeated TimeSeriesPoint time_series_points = 3;
 }
 
-message Point {
-  int32 position = 1;
-  DecimalValue quantity = 2;
+message TimeSeriesPoint {
+
+  // The start of the time interval where the energy was produces/consumed.
+  google.protobuf.Timestamp time = 1;
+
+  /*
+   * 3 digit scale decimal value of the energy quantity.
+   * Value is only set when quality is not set to missing.
+   */
+  optional DecimalValue quantity = 2;
+
+  // The aggregated quality currently represents a value suitable for creation of RSM-014 CIM XML messages.
   QuantityQuality quantity_quality = 3;
 }
 
@@ -43,6 +52,10 @@ message Period {
   google.protobuf.Timestamp end_of_period = 4;
 }
 
+/*
+ * Unspecified is unused but according to best practice.
+ * Read more at https://protobuf.dev/programming-guides/style/#enums.
+ */
 enum QuantityQuality{
   QUANTITY_QUALITY_UNSPECIFIED = 0;
   QUANTITY_QUALITY_MISSING = 1;
@@ -52,11 +65,19 @@ enum QuantityQuality{
   QUANTITY_QUALITY_CALCULATED = 5;
 }
 
+/*
+ * Unspecified is unused but according to best practice.
+ * Read more at https://protobuf.dev/programming-guides/style/#enums.
+ */
 enum QuantityUnit{
   QUANTITY_UNIT_UNSPECIFIED = 0;
   QUANTITY_UNIT_KWH = 1;
 }
 
+/*
+ * Unspecified is unused but according to best practice.
+ * Read more at https://protobuf.dev/programming-guides/style/#enums.
+ */
 enum Product{
   PRODUCT_UNSPECIFIED = 0;
   PRODUCT_ENERGY = 1;
