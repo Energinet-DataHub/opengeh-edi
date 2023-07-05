@@ -33,7 +33,7 @@ using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Receiver = CimMessageAdapter.Messages.RequestAggregatedMeasureData.RequestAggregatedMeasureDataReceiver;
 
-namespace Api.IncomingMessages;
+namespace Api.IncomingMessages.AggregatedMeasure;
 
 public class RequestAggregatedMeasureMessageReceiver
 {

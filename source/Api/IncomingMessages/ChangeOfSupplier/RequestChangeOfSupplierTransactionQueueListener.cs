@@ -23,7 +23,7 @@ using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace Api.IncomingMessages
+namespace Api.IncomingMessages.ChangeOfSupplier
 {
     public class RequestChangeOfSupplierTransactionQueueListener
     {

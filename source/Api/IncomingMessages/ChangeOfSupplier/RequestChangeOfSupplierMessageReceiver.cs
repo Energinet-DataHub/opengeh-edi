@@ -26,7 +26,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 
-namespace Api.IncomingMessages
+namespace Api.IncomingMessages.ChangeOfSupplier
 {
     public class RequestChangeOfSupplierMessageReceiver
     {

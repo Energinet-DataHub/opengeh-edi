@@ -22,25 +22,28 @@ using Application.IncomingMessages.RequestAggregatedMeasureData;
 using Infrastructure.Configuration.Serialization;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Logging;
 
-namespace Api.IncomingMessages;
+namespace Api.IncomingMessages.EdiInbox;
 
-public class RequestAggregatedMeasureTransactionQueueListener
+public class RequestEdiInboxMessageQueueListener
 {
+    private readonly ILogger<RequestEdiInboxMessageQueueListener> _logger;
     private readonly IMediator _mediator;
     private readonly ISerializer _jsonSerializer;
     private readonly ICorrelationContext _correlationContext;
 
-    public RequestAggregatedMeasureTransactionQueueListener(IMediator mediator, ISerializer jsonSerializer, ICorrelationContext correlationContext)
+    public RequestEdiInboxMessageQueueListener(IMediator mediator, ISerializer jsonSerializer, ICorrelationContext correlationContext, ILogger<RequestEdiInboxMessageQueueListener> logger)
     {
+        _logger = logger;
         _mediator = mediator;
         _jsonSerializer = jsonSerializer;
         _correlationContext = correlationContext;
     }
 
-    [Function(nameof(RequestAggregatedMeasureTransactionQueueListener))]
+    [Function(nameof(RequestEdiInboxMessageQueueListener))]
     public async Task RunAsync(
-        [ServiceBusTrigger("%INCOMING_AGGREGATED_MEASURE_DATA_QUEUE_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER")] byte[] data,
+        [ServiceBusTrigger("%EDI_INBOX_MESSAGE_QUEUE_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER")] byte[] data,
         FunctionContext context,
         CancellationToken hostCancellationToken)
     {
@@ -54,11 +57,11 @@ public class RequestAggregatedMeasureTransactionQueueListener
 
         var cancellationToken = cancellationTokenSource.Token;
         SetCorrelationIdFromServiceBusMessage(context);
-
         var byteAsString = Encoding.UTF8.GetString(data);
 
+        //Deserialize byteAsString into the correct Class -> ProtoBuf contract -> C# Class?
         await _mediator.Send(
-                _jsonSerializer.Deserialize<RequestAggregatedMeasureDataTransaction>(byteAsString), cancellationToken)
+                _jsonSerializer.Deserialize<AggregatedMeasureDataAccepted>(byteAsString), cancellationToken)
             .ConfigureAwait(false);
     }
 
@@ -73,5 +76,7 @@ public class RequestAggregatedMeasureTransactionQueueListener
 
         var metadata = _jsonSerializer.Deserialize<ServiceBusMessageMetadata>(serviceBusMessageMetadata.ToString() ?? throw new InvalidOperationException());
         _correlationContext.SetId(metadata.CorrelationID ?? throw new InvalidOperationException("Service bus metadata property CorrelationID is missing"));
+
+        _logger.LogInformation("Dequeued service bus message with correlation id: " + _correlationContext.Id ?? string.Empty);
     }
 }
