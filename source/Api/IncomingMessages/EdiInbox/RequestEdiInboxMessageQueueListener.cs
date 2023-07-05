@@ -19,6 +19,9 @@ using System.Threading.Tasks;
 using Api.Configuration;
 using Application.Configuration;
 using Application.IncomingMessages.RequestAggregatedMeasureData;
+using Domain.Transactions;
+using Energinet.DataHub.Edi.Responses.AggregatedMeasureData;
+using Energinet.DataHub.Wholesale.Contracts.Events;
 using Infrastructure.Configuration.Serialization;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
@@ -57,12 +60,11 @@ public class RequestEdiInboxMessageQueueListener
 
         var cancellationToken = cancellationTokenSource.Token;
         SetCorrelationIdFromServiceBusMessage(context);
-        var byteAsString = Encoding.UTF8.GetString(data);
 
-        //Deserialize byteAsString into the correct Class -> ProtoBuf contract -> C# Class?
-        await _mediator.Send(
-                _jsonSerializer.Deserialize<AggregatedMeasureDataAccepted>(byteAsString), cancellationToken)
-            .ConfigureAwait(false);
+        context.BindingContext.BindingData.TryGetValue("RequestId", out var processId);
+        ArgumentNullException.ThrowIfNull(processId);
+        var command = new AggregatedMeasureDataAccepted(data, Guid.Parse((string)processId));
+        await _mediator.Send(command, cancellationToken).ConfigureAwait(false);
     }
 
     private void SetCorrelationIdFromServiceBusMessage(FunctionContext context)

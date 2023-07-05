@@ -98,5 +98,25 @@ namespace Domain.Transactions.AggregatedMeasureData
 
             _state = State.Sent;
         }
+
+        public void WholesaleHasReplied()
+        {
+            if (_state == State.Accepted)
+            {
+                return;
+            }
+
+            if (_state != State.Sent)
+            {
+                throw new AggregatedMeasureDataException("Wholesale has not been notified yet");
+            }
+
+            _state = State.Accepted;
+        }
+
+        public bool IsAlreadyReceivedFromWholesale()
+        {
+            return _state == State.Accepted || _state == State.Rejected;
+        }
     }
 }

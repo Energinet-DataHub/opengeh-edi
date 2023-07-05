@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.Commands;
 using Application.IncomingMessages.RequestAggregatedMeasureData;
 using Application.Transactions.AggregatedMeasureData.Notifications;
+using Domain.Transactions;
+using Domain.Transactions.AggregatedMeasureData;
 using MediatR;
 
 namespace Application.Transactions.AggregatedMeasureData;
@@ -24,15 +27,27 @@ namespace Application.Transactions.AggregatedMeasureData;
 public class AggregatedMeasureDataAcceptedHandler : IRequestHandler<AggregatedMeasureDataAccepted, Unit>
 {
     private readonly ICommandScheduler _commandScheduler;
+    private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
 
-    public AggregatedMeasureDataAcceptedHandler(ICommandScheduler commandScheduler)
+    public AggregatedMeasureDataAcceptedHandler(ICommandScheduler commandScheduler, IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
         _commandScheduler = commandScheduler;
+        _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
     }
 
     public async Task<Unit> Handle(AggregatedMeasureDataAccepted request, CancellationToken cancellationToken)
     {
-        await _commandScheduler.EnqueueAsync(new AggregatedMeasureDataAcceptedCommand()).ConfigureAwait(false);
+        ArgumentNullException.ThrowIfNull(request);
+        var process = _aggregatedMeasureDataProcessRepository.GetById(ProcessId.Create(request.ProcessId));
+        ArgumentNullException.ThrowIfNull(process);
+        if (process.IsAlreadyReceivedFromWholesale())
+        {
+            return Unit.Value;
+        }
+
+        var internalCommand = new AggregatedMeasureDataAcceptedInternalCommand(request);
+        await _commandScheduler.EnqueueAsync(internalCommand).ConfigureAwait(false);
+        process.WholesaleHasReplied();
         return Unit.Value;
     }
 }

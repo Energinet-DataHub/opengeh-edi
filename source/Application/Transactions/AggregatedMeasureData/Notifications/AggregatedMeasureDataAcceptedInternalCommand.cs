@@ -14,14 +14,18 @@
 
 using System.Text.Json.Serialization;
 using Application.Configuration.Commands.Commands;
+using Application.IncomingMessages.RequestAggregatedMeasureData;
 using Domain.Transactions;
 
 namespace Application.Transactions.AggregatedMeasureData.Notifications;
 
-public class AggregatedMeasureDataAcceptedCommand : InternalCommand
+public class AggregatedMeasureDataAcceptedInternalCommand : InternalCommand
 {
+    private readonly AggregatedMeasureDataAccepted _aggregatedMeasureDataAccepted;
+
     [JsonConstructor]
-    public AggregatedMeasureDataAcceptedCommand()
+    public AggregatedMeasureDataAcceptedInternalCommand(AggregatedMeasureDataAccepted aggregatedMeasureDataAccepted)
     {
+        _aggregatedMeasureDataAccepted = aggregatedMeasureDataAccepted;
     }
 }

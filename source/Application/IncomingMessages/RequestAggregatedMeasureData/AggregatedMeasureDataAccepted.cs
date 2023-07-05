@@ -20,8 +20,15 @@ namespace Application.IncomingMessages.RequestAggregatedMeasureData;
 
 public class AggregatedMeasureDataAccepted : ICommand<Unit>
 {
-    public AggregatedMeasureDataAccepted()
+    public AggregatedMeasureDataAccepted(byte[] data, Guid processId)
     {
-        throw new NotImplementedException();
+        Data = data;
+        ProcessId = processId;
     }
+
+#pragma warning disable CA1819
+    public byte[] Data { get; }
+#pragma warning restore CA1819
+
+    public Guid ProcessId { get; }
 }
