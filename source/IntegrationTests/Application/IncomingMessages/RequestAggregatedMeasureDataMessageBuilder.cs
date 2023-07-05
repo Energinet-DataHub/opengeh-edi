@@ -25,7 +25,8 @@ public class RequestAggregatedMeasureDataMessageBuilder
 {
     private const string NotSet = "NotSet";
     private readonly string _serieId = "123353185";
-    private readonly string _settlementSeriesVersion = "D01";
+    // TODO AJW: It this a int or?
+    private readonly string _settlementSeriesVersion = "2";
     private readonly string _marketEvaluationPointType = "E17";
     private readonly string _marketEvaluationSettlementMethod = "D01";
     private readonly string _startDateAndOrTimeDateTime = "2022-06-17T22:00:00Z";

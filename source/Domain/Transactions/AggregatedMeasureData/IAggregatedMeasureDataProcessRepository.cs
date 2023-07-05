@@ -27,5 +27,11 @@ namespace Domain.Transactions.AggregatedMeasureData
         /// </summary>
         /// <param name="process"></param>
         void Add(AggregatedMeasureDataProcess process);
+
+        /// <summary>
+        /// Gets the process with ID = <paramref name="processId"/>
+        /// </summary>
+        /// <param name="processId"></param>
+        AggregatedMeasureDataProcess? GetById(ProcessId processId);
     }
 }
