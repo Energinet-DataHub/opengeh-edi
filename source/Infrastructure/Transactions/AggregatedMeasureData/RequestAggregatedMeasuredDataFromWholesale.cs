@@ -43,10 +43,10 @@ public class
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
+
         var process = _aggregatedMeasureDataProcessRepository.GetById(request.ProcessId) ??
                       throw new ArgumentNullException(nameof(request));
 
-        // send message
         await _wholeSaleInBox.SendAsync(
             process,
             cancellationToken).ConfigureAwait(false);

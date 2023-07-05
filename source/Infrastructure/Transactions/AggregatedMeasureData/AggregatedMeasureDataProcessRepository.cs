@@ -38,7 +38,6 @@ public class AggregatedMeasureDataProcessRepository : IAggregatedMeasureDataProc
     {
         return _b2BContext
             .AggregatedMeasureDataProcesses
-            .Include("_messages")
             .FirstOrDefault(process => process.ProcessId == processId);
     }
 }

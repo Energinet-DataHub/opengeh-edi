@@ -29,8 +29,9 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
         builder.HasKey(x => x.ProcessId);
         builder.Property(x => x.ProcessId)
             .HasConversion(
-                toDbValue => toDbValue.Id,
-                fromDbValue => ProcessId.Create(fromDbValue));
+                toDbValue => toDbValue.Id.ToString(),
+                // TODO AJW: Due to the SQL column type we need to parse the string to a Guid.
+                fromDbValue => ProcessId.Create(Guid.Parse(fromDbValue)));
         builder.Property(x => x.BusinessTransactionId)
             .HasConversion(
                 toDbValue => toDbValue.Id,

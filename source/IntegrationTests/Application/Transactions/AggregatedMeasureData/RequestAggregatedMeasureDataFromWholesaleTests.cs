@@ -45,19 +45,22 @@ public class RequestAggregatedMeasureDataFromWholesaleTests : TestBase
         _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
     }
 
-    // TODO AJH START HERE 04-07-2023
     [Fact]
     public async Task Aggregated_measure_data_process_is_created()
     {
-        var incomingMessage = MessageBuilder()
-            .Build();
-
+        // Arrange
+        // TODO Consider making a process builder
+        var incomingMessage = MessageBuilder().Build();
         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
         var processId = await GetProcessId(incomingMessage.MessageHeader.SenderId).ConfigureAwait(false);
+
+        // Act
         var command = new NotifyWholesaleOfAggregatedMeasureDataRequest(processId);
         await InvokeCommandAsync(command).ConfigureAwait(false);
-        var m = _senderSpy.Message;
-        Assert.NotNull(processId);
+
+        // Assert
+        var expected = _senderSpy.Message;
+        Assert.Equal(processId.Id.ToString(), expected?.MessageId);
     }
 
     private static RequestAggregatedMeasureDataMessageBuilder MessageBuilder()
@@ -67,13 +70,11 @@ public class RequestAggregatedMeasureDataFromWholesaleTests : TestBase
 
     private async Task<ProcessId> GetProcessId(string senderId)
     {
-        using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+        using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(CancellationToken.None)
+            .ConfigureAwait(false);
         var dictionary = (IDictionary<string, object>)await connection.QuerySingleAsync(
-            $"SELECT * FROM dbo.AggregatedMeasureDataProcesses WHERE RequestedByActorId = @SenderId",
-            new
-            {
-                @SenderId = senderId,
-            }).ConfigureAwait(false);
+            "SELECT * FROM dbo.AggregatedMeasureDataProcesses WHERE RequestedByActorId = @SenderId",
+            new { SenderId = senderId }).ConfigureAwait(false);
 
         return ProcessId.Create(Guid.Parse(dictionary["ProcessId"].ToString() ?? string.Empty));
     }
