@@ -125,11 +125,11 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         await HavingReceivedIntegrationEventAsync(CalculationResultCompleted.MessageName, _eventBuilder.Build()).ConfigureAwait(false);
 
         var outgoingMessage = await OutgoingMessageAsync(
-            MarketRole.BalanceResponsible,
+            MarketRole.BalanceResponsibleParty,
             BusinessReason.BalanceFixing);
         outgoingMessage
             .HasReceiverId(SampleData.BalanceResponsibleNumber.Value)
-            .HasReceiverRole(MarketRole.BalanceResponsible.Name)
+            .HasReceiverRole(MarketRole.BalanceResponsibleParty.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasMessageRecordValue<TimeSeries>(
@@ -154,11 +154,11 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         await HavingReceivedIntegrationEventAsync(CalculationResultCompleted.MessageName, _eventBuilder.Build()).ConfigureAwait(false);
 
         var outgoingMessage = await OutgoingMessageAsync(
-            MarketRole.BalanceResponsible,
+            MarketRole.BalanceResponsibleParty,
             BusinessReason.BalanceFixing);
         outgoingMessage
             .HasReceiverId(SampleData.BalanceResponsibleNumber.Value)
-            .HasReceiverRole(MarketRole.BalanceResponsible.Name)
+            .HasReceiverRole(MarketRole.BalanceResponsibleParty.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasMessageRecordValue<TimeSeries>(
