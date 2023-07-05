@@ -20,20 +20,20 @@ namespace Domain.OutgoingMessages.Queueing;
 public class ActorMessageQueue
 {
     private readonly Receiver _receiver;
-    private readonly BusinessReason _processType;
+    private readonly BusinessReason _businessReason;
     private readonly List<Bundle> _bundles = new();
 
-    private ActorMessageQueue(Receiver receiver, BusinessReason processType)
+    private ActorMessageQueue(Receiver receiver, BusinessReason businessReason)
     {
         _receiver = receiver;
-        _processType = processType;
+        _businessReason = businessReason;
     }
 
     private Bundle? NextBundleToPeek => _bundles.FirstOrDefault(bundle => bundle.IsDequeued == false);
 
-    public static ActorMessageQueue CreateFor(Receiver receiver, BusinessReason processType)
+    public static ActorMessageQueue CreateFor(Receiver receiver, BusinessReason businessReason)
     {
-        return new ActorMessageQueue(receiver, processType);
+        return new ActorMessageQueue(receiver, businessReason);
     }
 
     public void Enqueue(OutgoingMessage outgoingMessage, int maxNumberOfMessagesInABundle = 1)
@@ -46,7 +46,7 @@ public class ActorMessageQueue
 
     public PeekResult Peek()
     {
-        return new PeekResult(NextBundleToPeek?.Id, NextBundleToPeek?.MessageTypeInBundle);
+        return new PeekResult(NextBundleToPeek?.Id, NextBundleToPeek?.DocumentTypeInBundle);
     }
 
     public void Dequeue()
@@ -61,20 +61,20 @@ public class ActorMessageQueue
             throw new ReceiverMismatchException();
         }
 
-        if (outgoingMessage.BusinessReason.Equals(_processType.Name, StringComparison.OrdinalIgnoreCase) == false)
+        if (outgoingMessage.BusinessReason.Equals(_businessReason.Name, StringComparison.OrdinalIgnoreCase) == false)
         {
             throw new ProcessTypeMismatchException();
         }
     }
 
-    private Bundle? CurrentBundleOf(DocumentType messageType)
+    private Bundle? CurrentBundleOf(DocumentType documentType)
     {
-        return _bundles.FirstOrDefault(bundle => bundle.IsClosed == false && bundle.MessageTypeInBundle == messageType);
+        return _bundles.FirstOrDefault(bundle => bundle.IsClosed == false && bundle.DocumentTypeInBundle == documentType);
     }
 
-    private Bundle CreateBundleOf(DocumentType messageType, int maxNumberOfMessagesInABundle)
+    private Bundle CreateBundleOf(DocumentType documentType, int maxNumberOfMessagesInABundle)
     {
-        var bundle = new Bundle(BundleId.New(), messageType, maxNumberOfMessagesInABundle);
+        var bundle = new Bundle(BundleId.New(), documentType, maxNumberOfMessagesInABundle);
         _bundles.Add(bundle);
         return bundle;
     }

@@ -21,14 +21,14 @@ internal sealed class Bundle
     private readonly int _maxNumberOfMessagesInABundle;
     private int _messageCount;
 
-    internal Bundle(BundleId id, DocumentType messageTypeInBundle, int maxNumberOfMessagesInABundle)
+    internal Bundle(BundleId id, DocumentType documentTypeInBundle, int maxNumberOfMessagesInABundle)
     {
         _maxNumberOfMessagesInABundle = maxNumberOfMessagesInABundle;
         Id = id;
-        MessageTypeInBundle = messageTypeInBundle;
+        DocumentTypeInBundle = documentTypeInBundle;
     }
 
-    internal DocumentType MessageTypeInBundle { get; }
+    internal DocumentType DocumentTypeInBundle { get; }
 
     internal BundleId Id { get; }
 
