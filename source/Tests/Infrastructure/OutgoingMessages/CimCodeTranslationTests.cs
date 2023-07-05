@@ -44,7 +44,7 @@ public class CimCodeTests
     [InlineData(nameof(MarketRole.MeteredDataResponsible), "MDR")]
     [InlineData(nameof(MarketRole.MeteringDataAdministrator), "DGL")]
     [InlineData(nameof(MarketRole.GridOperator), "DDM")]
-    [InlineData(nameof(MarketRole.BalanceResponsible), "DDK")]
+    [InlineData(nameof(MarketRole.BalanceResponsibleParty), "DDK")]
     [InlineData(nameof(MarketRole.EnergySupplier), "DDQ")]
     [InlineData(nameof(MarketRole.MeteringPointAdministrator), "DDZ")]
     public void Translate_market_role(string marketRole, string expectedCode)

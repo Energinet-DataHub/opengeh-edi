@@ -54,7 +54,7 @@ namespace CimMessageAdapter.Messages.RequestAggregatedMeasureData
         {
             if (!senderRole.Equals(MarketRole.EnergySupplier.Code, StringComparison.OrdinalIgnoreCase)
                 && !senderRole.Equals(MarketRole.MeteredDataResponsible.Code, StringComparison.OrdinalIgnoreCase)
-                && !senderRole.Equals(MarketRole.BalanceResponsible.Code, StringComparison.OrdinalIgnoreCase))
+                && !senderRole.Equals(MarketRole.BalanceResponsibleParty.Code, StringComparison.OrdinalIgnoreCase))
             {
                 _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
             }

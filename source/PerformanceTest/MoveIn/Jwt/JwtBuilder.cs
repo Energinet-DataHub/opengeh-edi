@@ -37,7 +37,7 @@ internal sealed class JwtBuilder
     {
         return new List<Claim>
         {
-            new("roles", "electricalsupplier"),
+            new("roles", "energysupplier"),
             new("test-actornumber", actorNumber),
             new("azp", Guid.NewGuid().ToString()),
         };
