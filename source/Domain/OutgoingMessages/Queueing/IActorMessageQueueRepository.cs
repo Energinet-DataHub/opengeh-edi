@@ -13,29 +13,17 @@
 // limitations under the License.
 
 using Domain.Actors;
-using Domain.SeedWork;
+using Domain.OutgoingMessages.Peek;
 
 namespace Domain.OutgoingMessages.Queueing;
 
-public class Receiver : ValueObject
+/// <summary>
+/// The repository for the actor message queue.
+/// </summary>
+public interface IActorMessageQueueRepository
 {
-    private Receiver(ActorNumber actorNumber, MarketRole actorRole)
-    {
-        Number = actorNumber;
-        ActorRole = actorRole;
-    }
-
-    #pragma warning disable
-    private Receiver()
-    {
-    }
-
-    public ActorNumber Number { get; }
-
-    public MarketRole ActorRole { get; }
-
-    public static Receiver Create(ActorNumber actorNumber, MarketRole actorRole)
-    {
-        return new Receiver(actorNumber, actorRole);
-    }
+    /// <summary>
+    /// Get the next message in the queue for the given actor number and message category.
+    /// </summary>
+    Task<ActorMessageQueue> ActorMessageQueueForAsync(ActorNumber actorNumber, MessageCategory messageCategory);
 }

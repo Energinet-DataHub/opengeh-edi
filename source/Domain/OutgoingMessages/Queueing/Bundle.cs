@@ -16,7 +16,7 @@ using Domain.Documents;
 
 namespace Domain.OutgoingMessages.Queueing;
 
-internal sealed class Bundle
+public sealed class Bundle
 {
     private readonly int _maxNumberOfMessagesInABundle;
     private int _messageCount;
@@ -26,6 +26,11 @@ internal sealed class Bundle
         _maxNumberOfMessagesInABundle = maxNumberOfMessagesInABundle;
         Id = id;
         DocumentTypeInBundle = documentTypeInBundle;
+    }
+
+    #pragma warning disable
+    private Bundle()
+    {
     }
 
     internal DocumentType DocumentTypeInBundle { get; }

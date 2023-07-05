@@ -13,20 +13,28 @@
 // limitations under the License.
 
 using Domain.Documents;
+using Domain.SeedWork;
 
 namespace Domain.OutgoingMessages.Queueing;
 
 #pragma warning disable CA1711 // This is actually a message queue
-public class ActorMessageQueue
+public class ActorMessageQueue : Entity
 {
     private readonly Receiver _receiver;
     private readonly BusinessReason _businessReason;
     private readonly List<Bundle> _bundles = new();
+    private readonly Guid _id;
 
     private ActorMessageQueue(Receiver receiver, BusinessReason businessReason)
     {
         _receiver = receiver;
         _businessReason = businessReason;
+        _id = Guid.NewGuid();
+    }
+
+    #pragma warning disable
+    private ActorMessageQueue()
+    {
     }
 
     private Bundle? NextBundleToPeek => _bundles.FirstOrDefault(bundle => bundle.IsDequeued == false);

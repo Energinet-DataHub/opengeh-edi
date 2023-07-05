@@ -13,21 +13,29 @@
 // limitations under the License.
 
 using System;
-using Application.Configuration.Queries;
 using Application.OutgoingMessages;
 using Application.OutgoingMessages.Peek;
+using Application.OutgoingMessages.Queueing;
+using Domain.OutgoingMessages.Queueing;
+using Infrastructure.OutgoingMessages.Queueing;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using PeekResult = Application.OutgoingMessages.Peek.PeekResult;
 
 namespace Infrastructure.OutgoingMessages.Peek;
 
 internal static class PeekConfiguration
 {
-    internal static void Configure(IServiceCollection services, IBundleConfiguration bundleConfiguration, Func<IServiceProvider, IBundledMessages>? bundleStoreBuilder)
+    internal static void Configure(
+        IServiceCollection services,
+        IBundleConfiguration bundleConfiguration,
+        Func<IServiceProvider, IBundledMessages>? bundleStoreBuilder)
     {
         services.AddScoped<MessageEnqueuer>();
+        services.AddScoped<IActorMessageQueueRepository, ActorMessageQueueRepository>();
         services.AddTransient<MessagePeeker>();
         services.AddTransient<IRequestHandler<PeekRequest, PeekResult>, PeekRequestHandler>();
+        services.AddTransient<IRequestHandler<PeekCommand, Domain.OutgoingMessages.Queueing.PeekResult>, PeekHandler>();
         services.AddScoped<IEnqueuedMessages, EnqueuedMessages>();
         services.AddScoped(_ => bundleConfiguration);
 
