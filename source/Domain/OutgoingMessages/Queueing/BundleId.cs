@@ -26,4 +26,9 @@ public record BundleId
     {
         return new BundleId(Guid.NewGuid());
     }
+
+    public static BundleId Create(Guid id)
+    {
+        return new BundleId(id);
+    }
 }

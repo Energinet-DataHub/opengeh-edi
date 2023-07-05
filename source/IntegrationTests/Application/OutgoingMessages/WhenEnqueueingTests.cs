@@ -21,6 +21,7 @@ using Dapper;
 using Domain.Actors;
 using Domain.Documents;
 using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.Queueing;
 using Domain.Transactions;
 using IntegrationTests.Fixtures;
 using Xunit;
@@ -66,7 +67,7 @@ public class WhenEnqueueingTests : TestBase
         Assert.Equal(result.SenderRole, message.SenderRole.Name);
         Assert.Equal(result.BusinessReason, message.BusinessReason);
         Assert.NotNull(result.MessageRecord);
-        // Assert.NotNull(result.AssignedBundleId);
+        Assert.NotNull(result.AssignedBundleId);
     }
 }
 
@@ -89,6 +90,8 @@ public class MessageEnqueuer
     /// <exception cref="NotImplementedException"></exception>
     public void Enqueue(OutgoingMessage message)
     {
+        var actorMessageQueue = ActorMessageQueue.CreateFor(message.Receiver, BusinessReason.From(message.BusinessReason));
+        actorMessageQueue.Enqueue(message);
         _outgoingMessageStore.Add(message);
     }
 }
