@@ -57,6 +57,7 @@ limitations under the License.
       <ProjectReference Include="..\EnergySupplying.Contracts\EnergySupplying.Contracts.csproj" />
       <ProjectReference Include="..\CimMessageAdapter\CimMessageAdapter.csproj" />
       <ProjectReference Include="..\Application\Application.csproj" />
+      <ProjectReference Include="..\RequestResponse\source\RequestResponse\RequestResponse.csproj" />
     </ItemGroup>
 
 </Project>

@@ -34,6 +34,24 @@ public class AggregatedMeasureDataProcessTests
         Assert.Equal(SampleData.ProcessId, startedEvent?.ProcessId.Id);
     }
 
+    [Fact]
+    public void Process_is_set_to_sent()
+    {
+        var process = CreateProcess();
+        process.WholesaleIsNotifiedOfRequest();
+        // currently our state is private, hence we can not test on anything here.
+        // As of right now!
+    }
+
+    [Fact]
+    public void Process_can_not_be_send_twice()
+    {
+        var process = CreateProcess();
+        process.WholesaleIsNotifiedOfRequest();
+
+        Assert.Throws<AggregatedMeasureDataException>(() => process.WholesaleIsNotifiedOfRequest());
+    }
+
     private static AggregatedMeasureDataProcess CreateProcess()
     {
         return new AggregatedMeasureDataProcess(
