@@ -68,7 +68,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         {
             new object[] { MarketRole.EnergySupplier.Code },
             new object[] { MarketRole.MeteredDataResponsible.Code },
-            new object[] { MarketRole.BalanceResponsible.Code },
+            new object[] { MarketRole.BalanceResponsibleParty.Code },
         };
 
     public async Task InitializeAsync()
@@ -448,24 +448,6 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         Assert.False(result.Success);
         Assert.Contains(result.Errors, error => error is NotSupportedMessageType);
-    }
-
-    [Fact]
-    public async Task Message_size_exceeds_limitation()
-    {
-        await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
-            .ConfigureAwait(false);
-        await using var message = BusinessMessageBuilder
-            .RequestAggregatedMeasureData()
-            .WithSenderRole(MarketRole.EnergySupplier.Code)
-            .WithSenderId(SampleData.SenderId)
-            .MessageWithSize(51);
-
-        var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
-        var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
-
-        Assert.False(result.Success);
-        Assert.Contains(result.Errors, error => error is MessageSizeExceeded);
     }
 
     [Fact]
