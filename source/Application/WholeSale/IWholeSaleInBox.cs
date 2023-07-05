@@ -12,19 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json.Serialization;
-using Application.Configuration.Commands.Commands;
-using Domain.Transactions;
+using System.Threading;
+using System.Threading.Tasks;
+using Domain.Transactions.AggregatedMeasureData;
 
-namespace Application.Transactions.AggregatedMeasureData.Notifications;
+namespace Application.WholeSale;
 
-public class NotifyWholesale : InternalCommand
+/// <summary>
+/// Interface for wholeSale inbox
+/// </summary>
+public interface IWholeSaleInBox
 {
-    [JsonConstructor]
-    public NotifyWholesale(ProcessId processId)
-    {
-        ProcessId = processId;
-    }
-
-    public ProcessId ProcessId { get; }
+    /// <summary>
+    /// Send <paramref name="request"/> to wholeSale
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    Task SendAsync(AggregatedMeasureDataProcess request, CancellationToken cancellationToken);
 }
