@@ -19,18 +19,13 @@ When a actor wished to peek a message from DataHub. EDI is responsible for gener
 
 ## Supported formats
 
-Currently we support the CIM XML format. The EDI domain will also support the following incoming and outgoing formats: CIM JSON and Ebix.
+Currently we support the CIM XML and CIM JSON formats. The EDI domain will also support the following incoming and outgoing formats: Ebix.
 
 ## Domain Roadmap
 
 In this sprint we are working on
 
-- Be able to search for outgoing messages in frontend
-
-In the next sprint we are working on
-
-- Support new proces type
-- New outgoing message. Net exchange pr. grid
+- Be able to create response for request aggregated measure data
 
 ## Getting Started
 
