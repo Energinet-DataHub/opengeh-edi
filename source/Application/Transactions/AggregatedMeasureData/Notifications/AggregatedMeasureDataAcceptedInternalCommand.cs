@@ -21,11 +21,11 @@ namespace Application.Transactions.AggregatedMeasureData.Notifications;
 
 public class AggregatedMeasureDataAcceptedInternalCommand : InternalCommand
 {
-    private readonly AggregatedMeasureDataAccepted _aggregatedMeasureDataAccepted;
-
     [JsonConstructor]
     public AggregatedMeasureDataAcceptedInternalCommand(AggregatedMeasureDataAccepted aggregatedMeasureDataAccepted)
     {
-        _aggregatedMeasureDataAccepted = aggregatedMeasureDataAccepted;
+        AggregatedMeasureDataAccepted = aggregatedMeasureDataAccepted;
     }
+
+    public AggregatedMeasureDataAccepted AggregatedMeasureDataAccepted { get; }
 }
