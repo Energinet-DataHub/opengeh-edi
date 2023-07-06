@@ -15,6 +15,7 @@
 using Domain.Actors;
 using Domain.Documents;
 using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.Peek;
 using Domain.OutgoingMessages.Queueing;
 using Domain.Transactions;
 using Xunit;
@@ -26,27 +27,17 @@ public class ActorMessageQueueTests
     [Fact]
     public void Receiver_of_the_message_must_match_message_queue()
     {
-        var actorMessageQueue = ActorMessageQueue.CreateFor(Receiver.Create(ActorNumber.Create("1234567890123"), MarketRole.EnergySupplier), BusinessReason.BalanceFixing);
+        var actorMessageQueue = ActorMessageQueue.CreateFor(Receiver.Create(ActorNumber.Create("1234567890123"), MarketRole.EnergySupplier));
         var outgoingMessage = CreateOutgoingMessage(Receiver.Create(ActorNumber.Create("1234567890124"), MarketRole.EnergySupplier), BusinessReason.BalanceFixing);
 
         Assert.Throws<ReceiverMismatchException>(() => actorMessageQueue.Enqueue(outgoingMessage));
     }
 
     [Fact]
-    public void Process_type_of_message_must_match_process_type_of_queue()
-    {
-        var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), MarketRole.EnergySupplier);
-        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver, BusinessReason.BalanceFixing);
-        var outgoingMessage = CreateOutgoingMessage(receiver, BusinessReason.MoveIn);
-
-        Assert.Throws<ProcessTypeMismatchException>(() => actorMessageQueue.Enqueue(outgoingMessage));
-    }
-
-    [Fact]
     public void Outgoing_message_is_assigned_to_a_bundle_when_enqueued()
     {
         var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), MarketRole.EnergySupplier);
-        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver, BusinessReason.BalanceFixing);
+        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
         var outgoingMessage = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
 
         actorMessageQueue.Enqueue(outgoingMessage);
@@ -57,7 +48,7 @@ public class ActorMessageQueueTests
     [Fact]
     public void When_no_message_has_been_enqueued_peek_returns_no_bundle_id()
     {
-        var actorMessageQueue = ActorMessageQueue.CreateFor(Receiver.Create(ActorNumber.Create("1234567890123"), MarketRole.EnergySupplier), BusinessReason.BalanceFixing);
+        var actorMessageQueue = ActorMessageQueue.CreateFor(Receiver.Create(ActorNumber.Create("1234567890123"), MarketRole.EnergySupplier));
 
         var result = actorMessageQueue.Peek();
 
@@ -68,7 +59,7 @@ public class ActorMessageQueueTests
     public void Return_bundle_id_when_messages_are_enqueued()
     {
         var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), MarketRole.EnergySupplier);
-        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver, BusinessReason.BalanceFixing);
+        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
         var outgoingMessage = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
         actorMessageQueue.Enqueue(outgoingMessage);
 
@@ -81,12 +72,12 @@ public class ActorMessageQueueTests
     public void Peek_returns_empty_bundle_if_bundle_has_been_dequeued()
     {
         var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), MarketRole.EnergySupplier);
-        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver, BusinessReason.BalanceFixing);
+        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
         var outgoingMessage = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
         actorMessageQueue.Enqueue(outgoingMessage);
 
-        actorMessageQueue.Peek();
-        actorMessageQueue.Dequeue();
+        var result = actorMessageQueue.Peek();
+        actorMessageQueue.Dequeue(result.BundleId!);
 
         Assert.Null(actorMessageQueue.Peek().BundleId);
     }
@@ -95,12 +86,12 @@ public class ActorMessageQueueTests
     public void If_current_bundle_is_full_the_message_is_assigned_to_a_new_bundle()
     {
         var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), MarketRole.EnergySupplier);
-        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver, BusinessReason.BalanceFixing);
+        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
         actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing), maxNumberOfMessagesInABundle: 1);
         actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing), maxNumberOfMessagesInABundle: 1);
 
         var firstBundle = actorMessageQueue.Peek();
-        actorMessageQueue.Dequeue();
+        actorMessageQueue.Dequeue(firstBundle.BundleId!);
         var secondBundle = actorMessageQueue.Peek();
 
         Assert.NotNull(firstBundle.BundleId);
@@ -109,20 +100,20 @@ public class ActorMessageQueueTests
     }
 
     [Fact]
-    public void Messages_are_bundled_by_message_type()
+    public void Messages_are_bundled_by_message_type_and_process_type()
     {
         var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), MarketRole.EnergySupplier);
-        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver, BusinessReason.MoveIn);
+        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
         actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.MoveIn, DocumentType.RejectRequestChangeOfSupplier), maxNumberOfMessagesInABundle: 2);
-        actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.MoveIn, DocumentType.ConfirmRequestChangeOfSupplier), maxNumberOfMessagesInABundle: 2);
+        actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing, DocumentType.NotifyAggregatedMeasureData), maxNumberOfMessagesInABundle: 2);
 
-        var firstPeekResult = actorMessageQueue.Peek();
-        actorMessageQueue.Dequeue();
-        var secondPeekResult = actorMessageQueue.Peek();
-        actorMessageQueue.Dequeue();
+        var firstPeekResult = actorMessageQueue.Peek(MessageCategory.Aggregations);
+        actorMessageQueue.Dequeue(firstPeekResult.BundleId!);
+        var secondPeekResult = actorMessageQueue.Peek(MessageCategory.MasterData);
+        actorMessageQueue.Dequeue(secondPeekResult.BundleId!);
 
-        Assert.Equal(DocumentType.RejectRequestChangeOfSupplier, firstPeekResult.MessageType);
-        Assert.Equal(DocumentType.ConfirmRequestChangeOfSupplier, secondPeekResult.MessageType);
+        Assert.Equal(DocumentType.NotifyAggregatedMeasureData, firstPeekResult.MessageType);
+        Assert.Equal(DocumentType.RejectRequestChangeOfSupplier, secondPeekResult.MessageType);
         Assert.NotEqual(firstPeekResult.BundleId, secondPeekResult.BundleId);
     }
 
@@ -130,7 +121,7 @@ public class ActorMessageQueueTests
     public void Peek_returns_the_oldest_bundle()
     {
         var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), MarketRole.EnergySupplier);
-        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver, BusinessReason.BalanceFixing);
+        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
         var messageAssignedToFirstBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
         var messageAssignedToSecondBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
         actorMessageQueue.Enqueue(messageAssignedToFirstBundle, 1);

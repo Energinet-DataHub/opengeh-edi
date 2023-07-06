@@ -32,7 +32,7 @@ public class MessageEnqueuer
     {
         ArgumentNullException.ThrowIfNull(message);
 
-        var actorMessageQueue = ActorMessageQueue.CreateFor(message.Receiver, BusinessReason.From(message.BusinessReason));
+        var actorMessageQueue = ActorMessageQueue.CreateFor(message.Receiver);
         actorMessageQueue.Enqueue(message);
 
         _outgoingMessageStore.Add(message);

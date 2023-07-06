@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Domain.Documents;
+using Domain.OutgoingMessages.Peek;
 using Domain.SeedWork;
 
 namespace Domain.OutgoingMessages.Queueing;
@@ -20,15 +21,13 @@ namespace Domain.OutgoingMessages.Queueing;
 #pragma warning disable CA1711 // This is actually a message queue
 public class ActorMessageQueue : Entity
 {
-    private readonly Receiver _receiver;
-    private readonly BusinessReason _businessReason;
-    private readonly List<Bundle> _bundles = new();
     private readonly Guid _id;
+    private readonly Receiver _receiver;
+    private readonly List<Bundle> _bundles = new();
 
-    private ActorMessageQueue(Receiver receiver, BusinessReason businessReason)
+    private ActorMessageQueue(Receiver receiver)
     {
         _receiver = receiver;
-        _businessReason = businessReason;
         _id = Guid.NewGuid();
     }
 
@@ -37,29 +36,34 @@ public class ActorMessageQueue : Entity
     {
     }
 
-    private Bundle? NextBundleToPeek => _bundles.FirstOrDefault(bundle => bundle.IsDequeued == false);
-
-    public static ActorMessageQueue CreateFor(Receiver receiver, BusinessReason businessReason)
+    public static ActorMessageQueue CreateFor(Receiver receiver)
     {
-        return new ActorMessageQueue(receiver, businessReason);
+        return new ActorMessageQueue(receiver);
     }
 
     public void Enqueue(OutgoingMessage outgoingMessage, int maxNumberOfMessagesInABundle = 1)
     {
         ArgumentNullException.ThrowIfNull(outgoingMessage);
         EnsureApplicable(outgoingMessage);
-        var currentBundle = CurrentBundleOf(outgoingMessage.DocumentType) ?? CreateBundleOf(outgoingMessage.DocumentType, maxNumberOfMessagesInABundle);
+        var currentBundle = CurrentBundleOf(BusinessReason.From(outgoingMessage.BusinessReason), outgoingMessage.DocumentType) ??
+                            CreateBundleOf(BusinessReason.From(outgoingMessage.BusinessReason), outgoingMessage.DocumentType, maxNumberOfMessagesInABundle);
         currentBundle.Add(outgoingMessage);
     }
 
     public PeekResult Peek()
     {
-        return new PeekResult(NextBundleToPeek?.Id, NextBundleToPeek?.DocumentTypeInBundle);
+        return new PeekResult(NextBundleToPeek()?.Id, NextBundleToPeek()?.MessageTypeInBundle);
     }
 
-    public void Dequeue()
+    public PeekResult Peek(MessageCategory category)
     {
-        NextBundleToPeek?.Dequeue();
+        return new PeekResult(NextBundleToPeek(category)?.Id, NextBundleToPeek(category)?.MessageTypeInBundle);
+    }
+
+    public void Dequeue(BundleId bundleId)
+    {
+        var bundle = _bundles.SingleOrDefault(bundle => bundle.Id == bundleId && bundle.IsDequeued == false);
+        bundle?.Dequeue();
     }
 
     private void EnsureApplicable(OutgoingMessage outgoingMessage)
@@ -68,22 +72,27 @@ public class ActorMessageQueue : Entity
         {
             throw new ReceiverMismatchException();
         }
-
-        if (outgoingMessage.BusinessReason.Equals(_businessReason.Name, StringComparison.OrdinalIgnoreCase) == false)
-        {
-            throw new ProcessTypeMismatchException();
-        }
     }
 
-    private Bundle? CurrentBundleOf(DocumentType documentType)
+    private Bundle? CurrentBundleOf(BusinessReason businessReason, DocumentType messageType)
     {
-        return _bundles.FirstOrDefault(bundle => bundle.IsClosed == false && bundle.DocumentTypeInBundle == documentType);
+        return _bundles.FirstOrDefault(bundle =>
+            bundle.IsClosed == false
+            && bundle.MessageTypeInBundle == messageType
+            && bundle.BusinessReason == businessReason);
     }
 
-    private Bundle CreateBundleOf(DocumentType documentType, int maxNumberOfMessagesInABundle)
+    private Bundle CreateBundleOf(BusinessReason businessReason, DocumentType messageType, int maxNumberOfMessagesInABundle)
     {
-        var bundle = new Bundle(BundleId.New(), documentType, maxNumberOfMessagesInABundle);
+        var bundle = new Bundle(BundleId.New(), businessReason, messageType, maxNumberOfMessagesInABundle);
         _bundles.Add(bundle);
         return bundle;
+    }
+
+    private Bundle? NextBundleToPeek(MessageCategory? category = null)
+    {
+        return category is not null ?
+            _bundles.FirstOrDefault(bundle => bundle.IsDequeued == false && bundle.MessageTypeInBundle.Category.Equals(category)) :
+            _bundles.FirstOrDefault(bundle => bundle.IsDequeued == false);
     }
 }

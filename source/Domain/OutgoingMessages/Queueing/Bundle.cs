@@ -21,21 +21,24 @@ public sealed class Bundle
     private readonly int _maxNumberOfMessagesInABundle;
     private int _messageCount;
 
-    internal Bundle(BundleId id, DocumentType documentTypeInBundle, int maxNumberOfMessagesInABundle)
-    {
-        _maxNumberOfMessagesInABundle = maxNumberOfMessagesInABundle;
-        Id = id;
-        DocumentTypeInBundle = documentTypeInBundle;
-    }
-
-    #pragma warning disable
+#pragma warning disable
     private Bundle()
     {
     }
 
-    internal DocumentType DocumentTypeInBundle { get; }
+    internal Bundle(BundleId id, BusinessReason businessReason, DocumentType messageTypeInBundle, int maxNumberOfMessagesInABundle)
+    {
+        _maxNumberOfMessagesInABundle = maxNumberOfMessagesInABundle;
+        Id = id;
+        BusinessReason = businessReason;
+        MessageTypeInBundle = messageTypeInBundle;
+    }
+
+    internal DocumentType MessageTypeInBundle { get; }
 
     internal BundleId Id { get; }
+
+    internal BusinessReason BusinessReason { get; }
 
     internal bool IsClosed { get; private set; }
 
