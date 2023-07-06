@@ -30,8 +30,7 @@ public class ActorMessageQueueEntityConfiguration : IEntityTypeConfiguration<Act
         ArgumentNullException.ThrowIfNull(builder);
         builder.ToTable("ActorMessageQueues", "dbo");
         builder.HasKey("_id");
-        builder.Property<BusinessReason>("_businessReason").HasColumnName("BusinessReason")
-            .HasConversion(toDbValue => toDbValue.Name, fromDbValue => BusinessReason.From(fromDbValue));
+        builder.Property<Guid>("_id").HasColumnName("Id");
         builder.OwnsOne<Receiver>("_receiver", entityBuilder =>
         {
             entityBuilder.Property(receiver => receiver.Number).HasColumnName("ActorNumber")
@@ -54,6 +53,7 @@ public class ActorMessageQueueEntityConfiguration : IEntityTypeConfiguration<Act
                 .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<BusinessReason>(fromDbValue));
             navigationBuilder.Property<int>("_messageCount").HasColumnName("MessageCount");
             navigationBuilder.Property<int>("_maxNumberOfMessagesInABundle").HasColumnName("MaxMessageCount");
+            navigationBuilder.WithOwner().HasForeignKey("ActorMessageQueueId");
         });
 
         builder.Ignore(entity => entity.DomainEvents);

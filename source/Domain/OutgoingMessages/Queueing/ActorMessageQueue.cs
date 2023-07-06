@@ -52,12 +52,12 @@ public class ActorMessageQueue : Entity
 
     public PeekResult Peek()
     {
-        return new PeekResult(NextBundleToPeek()?.Id, NextBundleToPeek()?.MessageTypeInBundle);
+        return new PeekResult(NextBundleToPeek()?.Id, NextBundleToPeek()?.DocumentTypeInBundle);
     }
 
     public PeekResult Peek(MessageCategory category)
     {
-        return new PeekResult(NextBundleToPeek(category)?.Id, NextBundleToPeek(category)?.MessageTypeInBundle);
+        return new PeekResult(NextBundleToPeek(category)?.Id, NextBundleToPeek(category)?.DocumentTypeInBundle);
     }
 
     public void Dequeue(BundleId bundleId)
@@ -78,7 +78,7 @@ public class ActorMessageQueue : Entity
     {
         return _bundles.FirstOrDefault(bundle =>
             bundle.IsClosed == false
-            && bundle.MessageTypeInBundle == messageType
+            && bundle.DocumentTypeInBundle == messageType
             && bundle.BusinessReason == businessReason);
     }
 
@@ -92,7 +92,7 @@ public class ActorMessageQueue : Entity
     private Bundle? NextBundleToPeek(MessageCategory? category = null)
     {
         return category is not null ?
-            _bundles.FirstOrDefault(bundle => bundle.IsDequeued == false && bundle.MessageTypeInBundle.Category.Equals(category)) :
+            _bundles.FirstOrDefault(bundle => bundle.IsDequeued == false && bundle.DocumentTypeInBundle.Category.Equals(category)) :
             _bundles.FirstOrDefault(bundle => bundle.IsDequeued == false);
     }
 }

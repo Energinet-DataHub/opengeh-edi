@@ -15,7 +15,6 @@
 using System;
 using System.Threading.Tasks;
 using Domain.Actors;
-using Domain.OutgoingMessages.Peek;
 using Domain.OutgoingMessages.Queueing;
 using Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -31,14 +30,20 @@ public class ActorMessageQueueRepository : IActorMessageQueueRepository
         _b2BContext = b2BContext;
     }
 
-    public async Task<ActorMessageQueue> ActorMessageQueueForAsync(ActorNumber actorNumber, MessageCategory messageCategory)
+    public async Task<ActorMessageQueue?> ActorMessageQueueForAsync(ActorNumber actorNumber, MarketRole actorRole)
     {
         ArgumentNullException.ThrowIfNull(actorNumber);
-        var sql = $"SELECT * FROM [dbo].[ActorMessageQueues] m join [dbo].[Bundles] b on m.Id = b.ActorMessageQueueId " +
-                  $"WHERE m.ActorNumber = {actorNumber.Value} AND b.IsDequeued = 0 AND b.DocumentTypeInBundle in ('NotifyAggregatedMeasureData')";
+        ArgumentNullException.ThrowIfNull(actorRole);
+
+        var sql = $"SELECT m.*, b.IsDequeued FROM [dbo].[ActorMessageQueues] m join [dbo].[Bundles] b on m.Id = b.ActorMessageQueueId " +
+                  $"WHERE b.IsDequeued = 0 AND m.ActorNumber = '{actorNumber.Value}' AND m.ActorRole = '{actorRole.Name}'";
         var actorMessageQueue = await _b2BContext.ActorMessageQueues.FromSqlRaw(sql, actorNumber.Value).FirstOrDefaultAsync().ConfigureAwait(false);
-        ArgumentNullException.ThrowIfNull(actorMessageQueue);
 
         return actorMessageQueue;
+    }
+
+    public async Task AddAsync(ActorMessageQueue actorMessageQueue)
+    {
+        await _b2BContext.AddAsync(actorMessageQueue).ConfigureAwait(false);
     }
 }

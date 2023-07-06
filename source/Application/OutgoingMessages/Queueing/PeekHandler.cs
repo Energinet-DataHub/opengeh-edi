@@ -37,15 +37,17 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
         ArgumentNullException.ThrowIfNull(request);
 
         var actorMessageQueue = await
-            _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.MessageCategory).ConfigureAwait(false);
+            _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.ActorRole).ConfigureAwait(false);
 
-        return actorMessageQueue.Peek();
+        return actorMessageQueue != null ? actorMessageQueue.Peek() : new PeekResult();
     }
 }
 
-public record PeekCommand(ActorNumber ActorNumber, MessageCategory MessageCategory) : ICommand<PeekResult>
+public record PeekCommand(ActorNumber ActorNumber, MessageCategory MessageCategory, MarketRole ActorRole) : ICommand<PeekResult>
 {
     public ActorNumber ActorNumber { get; set; } = ActorNumber;
 
     public MessageCategory MessageCategory { get; set; } = MessageCategory;
+
+    public MarketRole ActorRole { get; set; } = ActorRole;
 }

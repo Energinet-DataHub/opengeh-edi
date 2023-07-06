@@ -62,7 +62,7 @@ public class WhenEnqueueingTests : TestBase
     {
         var message = CreateOutgoingMessage();
         await EnqueueMessage(message);
-        var command = new PeekCommand(message.ReceiverId, message.DocumentType.Category);
+        var command = new PeekCommand(message.ReceiverId, message.DocumentType.Category, message.ReceiverRole);
 
         var result = await InvokeCommandAsync(command);
 
@@ -87,7 +87,7 @@ public class WhenEnqueueingTests : TestBase
     {
         var messageEnqueuer = GetService<MessageEnqueuer>();
 
-        messageEnqueuer.Enqueue(message);
+        await messageEnqueuer.EnqueueAsync(message);
         var unitOfWork = GetService<IUnitOfWork>();
         await unitOfWork.CommitAsync();
     }

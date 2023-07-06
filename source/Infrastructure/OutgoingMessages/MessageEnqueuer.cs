@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Threading.Tasks;
 using Application.OutgoingMessages;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.Queueing;
@@ -22,18 +23,27 @@ namespace Infrastructure.OutgoingMessages;
 public class MessageEnqueuer
 {
     private readonly IOutgoingMessageStore _outgoingMessageStore;
+    private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
 
-    public MessageEnqueuer(IOutgoingMessageStore outgoingMessageStore)
+    public MessageEnqueuer(IOutgoingMessageStore outgoingMessageStore, IActorMessageQueueRepository actorMessageQueueRepository)
     {
         _outgoingMessageStore = outgoingMessageStore;
+        _actorMessageQueueRepository = actorMessageQueueRepository;
     }
 
-    public void Enqueue(OutgoingMessage message)
+    public async Task EnqueueAsync(OutgoingMessage message)
     {
         ArgumentNullException.ThrowIfNull(message);
 
-        var actorMessageQueue = ActorMessageQueue.CreateFor(message.Receiver);
-        actorMessageQueue.Enqueue(message);
+        var messageQueue = await _actorMessageQueueRepository.ActorMessageQueueForAsync(message.Receiver.Number, message.Receiver.ActorRole).ConfigureAwait(false);
+
+        if (messageQueue == null)
+        {
+            messageQueue = ActorMessageQueue.CreateFor(message.Receiver);
+            await _actorMessageQueueRepository.AddAsync(messageQueue).ConfigureAwait(false);
+        }
+
+        messageQueue.Enqueue(message);
 
         _outgoingMessageStore.Add(message);
     }

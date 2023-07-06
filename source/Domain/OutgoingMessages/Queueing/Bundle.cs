@@ -26,15 +26,15 @@ public sealed class Bundle
     {
     }
 
-    internal Bundle(BundleId id, BusinessReason businessReason, DocumentType messageTypeInBundle, int maxNumberOfMessagesInABundle)
+    internal Bundle(BundleId id, BusinessReason businessReason, DocumentType documentTypeInBundle, int maxNumberOfMessagesInABundle)
     {
         _maxNumberOfMessagesInABundle = maxNumberOfMessagesInABundle;
         Id = id;
         BusinessReason = businessReason;
-        MessageTypeInBundle = messageTypeInBundle;
+        DocumentTypeInBundle = documentTypeInBundle;
     }
 
-    internal DocumentType MessageTypeInBundle { get; }
+    internal DocumentType DocumentTypeInBundle { get; }
 
     internal BundleId Id { get; }
 

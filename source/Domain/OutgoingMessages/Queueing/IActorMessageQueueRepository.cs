@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Domain.Actors;
-using Domain.OutgoingMessages.Peek;
 
 namespace Domain.OutgoingMessages.Queueing;
 
@@ -25,5 +24,10 @@ public interface IActorMessageQueueRepository
     /// <summary>
     /// Get the next message in the queue for the given actor number and message category.
     /// </summary>
-    Task<ActorMessageQueue> ActorMessageQueueForAsync(ActorNumber actorNumber, MessageCategory messageCategory);
+    Task<ActorMessageQueue?> ActorMessageQueueForAsync(ActorNumber actorNumber, MarketRole actorRole);
+
+    /// <summary>
+    /// Add a new message to the queue.
+    /// </summary>
+    Task AddAsync(ActorMessageQueue actorMessageQueue);
 }
