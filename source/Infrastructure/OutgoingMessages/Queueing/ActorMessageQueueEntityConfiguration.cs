@@ -50,6 +50,10 @@ public class ActorMessageQueueEntityConfiguration : IEntityTypeConfiguration<Act
             navigationBuilder.Property<bool>("IsDequeued").HasColumnName("IsDequeued");
             navigationBuilder.Property<DocumentType>("DocumentTypeInBundle").HasColumnName("DocumentTypeInBundle")
                 .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<DocumentType>(fromDbValue));
+            navigationBuilder.Property<BusinessReason>("BusinessReason").HasColumnName("BusinessReason")
+                .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<BusinessReason>(fromDbValue));
+            navigationBuilder.Property<int>("_messageCount").HasColumnName("MessageCount");
+            navigationBuilder.Property<int>("_maxNumberOfMessagesInABundle").HasColumnName("MaxMessageCount");
         });
 
         builder.Ignore(entity => entity.DomainEvents);
