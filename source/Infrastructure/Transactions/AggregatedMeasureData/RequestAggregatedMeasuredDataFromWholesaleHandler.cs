@@ -23,13 +23,13 @@ using MediatR;
 namespace Infrastructure.Transactions.AggregatedMeasureData;
 
 public class
-    RequestAggregatedMeasuredDataFromWholesale : IRequestHandler<NotifyWholesaleOfAggregatedMeasureDataRequest, Unit>
+    RequestAggregatedMeasuredDataFromWholesaleHandler : IRequestHandler<NotifyWholesaleOfAggregatedMeasureDataRequest, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
     // TODO: Remove the dependency to RequestResponse when we get a response from wholesale
     private readonly IWholeSaleInBox _wholeSaleInBox;
 
-    public RequestAggregatedMeasuredDataFromWholesale(
+    public RequestAggregatedMeasuredDataFromWholesaleHandler(
         IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository,
         IWholeSaleInBox wholeSaleInBox)
     {

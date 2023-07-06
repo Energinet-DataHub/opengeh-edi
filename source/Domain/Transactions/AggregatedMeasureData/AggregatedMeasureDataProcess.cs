@@ -99,7 +99,7 @@ namespace Domain.Transactions.AggregatedMeasureData
             _state = State.Sent;
         }
 
-        public void WholesaleHasReplied()
+        public void ReplyFromWholesaleAccepted()
         {
             if (_state == State.Accepted)
             {
@@ -114,7 +114,7 @@ namespace Domain.Transactions.AggregatedMeasureData
             _state = State.Accepted;
         }
 
-        public bool IsAlreadyReceivedFromWholesale()
+        public bool IsProcessReadyForWholesaleReply()
         {
             return _state == State.Accepted || _state == State.Rejected;
         }

@@ -40,14 +40,14 @@ public class AggregatedMeasureDataAcceptedHandler : IRequestHandler<AggregatedMe
         ArgumentNullException.ThrowIfNull(request);
         var process = _aggregatedMeasureDataProcessRepository.GetById(ProcessId.Create(request.ProcessId));
         ArgumentNullException.ThrowIfNull(process);
-        if (process.IsAlreadyReceivedFromWholesale())
+        if (process.IsProcessReadyForWholesaleReply())
         {
             return Unit.Value;
         }
 
         var internalCommand = new AggregatedMeasureDataAcceptedInternalCommand(request);
         await _commandScheduler.EnqueueAsync(internalCommand).ConfigureAwait(false);
-        process.WholesaleHasReplied();
+        process.ReplyFromWholesaleAccepted();
         return Unit.Value;
     }
 }
