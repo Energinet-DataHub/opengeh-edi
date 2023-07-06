@@ -26,8 +26,8 @@ namespace Application.Transactions.AggregatedMeasureData;
 
 public class AggregatedMeasureDataAcceptedHandler : IRequestHandler<AggregatedMeasureDataAccepted, Unit>
 {
-    private readonly ICommandScheduler _commandScheduler;
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
+    private readonly ICommandScheduler _commandScheduler;
 
     public AggregatedMeasureDataAcceptedHandler(ICommandScheduler commandScheduler, IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
@@ -40,11 +40,13 @@ public class AggregatedMeasureDataAcceptedHandler : IRequestHandler<AggregatedMe
         ArgumentNullException.ThrowIfNull(request);
         var process = _aggregatedMeasureDataProcessRepository.GetById(ProcessId.Create(request.ProcessId));
         ArgumentNullException.ThrowIfNull(process);
-        if (process.IsProcessReadyForWholesaleReply())
+
+        if (process.HasWholesaleAlreadyReplied())
         {
             return Unit.Value;
         }
 
+        process.CheckThatProcessReadyForWholesaleReply();
         var internalCommand = new AggregatedMeasureDataAcceptedInternalCommand(request);
         await _commandScheduler.EnqueueAsync(internalCommand).ConfigureAwait(false);
         process.ReplyFromWholesaleAccepted();

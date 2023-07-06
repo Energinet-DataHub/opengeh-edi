@@ -114,9 +114,17 @@ namespace Domain.Transactions.AggregatedMeasureData
             _state = State.Accepted;
         }
 
-        public bool IsProcessReadyForWholesaleReply()
+        public bool HasWholesaleAlreadyReplied()
         {
             return _state == State.Accepted || _state == State.Rejected;
+        }
+
+        public void CheckThatProcessReadyForWholesaleReply()
+        {
+            if (_state == State.Initialized)
+            {
+                throw new AggregatedMeasureDataException("Wholesale has not been notified yet");
+            }
         }
     }
 }

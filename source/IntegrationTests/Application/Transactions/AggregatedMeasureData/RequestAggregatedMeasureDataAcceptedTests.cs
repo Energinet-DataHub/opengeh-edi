@@ -13,18 +13,21 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.IncomingMessages.RequestAggregatedMeasureData;
-using Application.Transactions.AggregatedMeasureData.Notifications;
 using Dapper;
+using Domain.Actors;
 using Domain.Transactions;
+using Domain.Transactions.AggregatedMeasureData;
 using Infrastructure.Configuration.MessageBus;
+using Infrastructure.Transactions.AggregatedMeasureData;
 using IntegrationTests.Application.IncomingMessages;
 using IntegrationTests.Fixtures;
 using IntegrationTests.TestDoubles;
+using NodaTime;
+using NodaTime.Text;
 using Xunit;
 using Xunit.Categories;
 
@@ -47,21 +50,38 @@ public class RequestAggregatedMeasureDataAcceptedTests : TestBase
     }
 
     [Fact]
-    public async Task Aggregated_measure_data_process_is_created()
+    public async Task Must_Throw_Exception_When_Process_Does_Not_Exist()
     {
         // Arrange
-        // TODO Consider making a process builder
-        var incomingMessage = MessageBuilder().Build();
-        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-        var processId = await GetProcessId(incomingMessage.MessageHeader.SenderId).ConfigureAwait(false);
+        var process = AggregatedMeasureDataProcessBuilder.Build(ProcessId.Create(Guid.NewGuid()));
+        var serviceBusMessage = AggregatedMeasureDataProcessFactory.CreateServiceBusMessage(process);
+        await _senderSpy.SendAsync(serviceBusMessage, CancellationToken.None).ConfigureAwait(false);
+        var message = _senderSpy.Message;
 
         // Act
-        var command = new AggregatedMeasureDataAccepted(processId);
-        await InvokeCommandAsync(command).ConfigureAwait(false);
+        var command = new AggregatedMeasureDataAccepted(message!.Body.ToArray(), Guid.Parse(message.MessageId));
 
         // Assert
-        var expected = _senderSpy.Message;
-        Assert.Equal(processId.Id.ToString(), expected?.MessageId);
+        await Assert.ThrowsAsync<ArgumentNullException>(() => InvokeCommandAsync(command)).ConfigureAwait(false);
+    }
+
+    // TODO AJW: When state is added to the process, this test should be updated to reflect that
+    [Fact]
+    public async Task Must_Throw_Exception_When_Process_State_Is_Initialized()
+    {
+        // Arrange
+        var transactionCommand = MessageBuilder().Build();
+        await InvokeCommandAsync(transactionCommand).ConfigureAwait(false);
+        var process = await GetProcess(transactionCommand.MessageHeader.SenderId).ConfigureAwait(false);
+        var serviceBusMessage = AggregatedMeasureDataProcessFactory.CreateServiceBusMessage(process!);
+        await _senderSpy.SendAsync(serviceBusMessage, CancellationToken.None).ConfigureAwait(false);
+        var message = _senderSpy.Message;
+
+        // Act
+        var command = new AggregatedMeasureDataAccepted(message!.Body.ToArray(), Guid.Parse(message.MessageId));
+
+        // Assert
+        await Assert.ThrowsAsync<AggregatedMeasureDataException>(() => InvokeCommandAsync(command)).ConfigureAwait(false);
     }
 
     private static RequestAggregatedMeasureDataMessageBuilder MessageBuilder()
@@ -69,15 +89,40 @@ public class RequestAggregatedMeasureDataAcceptedTests : TestBase
         return new RequestAggregatedMeasureDataMessageBuilder();
     }
 
-    private async Task<ProcessId> GetProcessId(string senderId)
+    private async Task<AggregatedMeasureDataProcess?> GetProcess(string senderId)
     {
-        using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(CancellationToken.None)
+        using var connection = await _databaseConnectionFactory
+            .GetConnectionAndOpenAsync(CancellationToken.None)
             .ConfigureAwait(false);
-        var dictionary = (IDictionary<string, object>)await connection.QuerySingleAsync(
-            "SELECT * FROM dbo.AggregatedMeasureDataProcesses WHERE RequestedByActorId = @SenderId",
-            new { SenderId = senderId }).ConfigureAwait(false);
+        var query = "SELECT * FROM dbo.AggregatedMeasureDataProcesses WHERE RequestedByActorId = @SenderId";
+        var reader = await connection.ExecuteReaderAsync(query, new { SenderId = senderId }).ConfigureAwait(false);
+        reader.Read();
+        var processId = ProcessId.Create(Guid.Parse(reader["ProcessId"].ToString() ?? string.Empty));
+        var businessTransactionId = BusinessTransactionId.Create(reader["BusinessTransactionId"].ToString()!);
+        var requestedByActorId = ActorNumber.Create(reader["requestedByActorId"].ToString()!);
+        var settlementVersion = reader["SettlementVersion"].ToString() ?? string.Empty;
+        var meteringPointType = reader["MeteringPointType"].ToString() ?? string.Empty;
+        var settlementMethod = reader["SettlementMethod"].ToString() ?? string.Empty;
+        var startOfPeriod = LocalDateTimePattern.CreateWithInvariantCulture("dd-MM-yyyy HH:mm:ss").Parse(reader["StartOfPeriod"].ToString()!).Value.InZoneStrictly(DateTimeZoneProviders.Tzdb.GetSystemDefault()).ToInstant();
+        var endOfPeriod = LocalDateTimePattern.CreateWithInvariantCulture("dd-MM-yyyy HH:mm:ss").Parse(reader["EndOfPeriod"].ToString()!).Value.InZoneStrictly(DateTimeZoneProviders.Tzdb.GetSystemDefault()).ToInstant();
+        var meteringGridAreaDomainId = reader["MeteringGridAreaDomainId"].ToString() ?? string.Empty;
+        var energySupplierId = reader["EnergySupplierId"].ToString() ?? string.Empty;
+        var balanceResponsibleId = reader["BalanceResponsibleId"].ToString() ?? string.Empty;
 
-        return ProcessId.Create(Guid.Parse(dictionary["ProcessId"].ToString() ?? string.Empty));
+        var process = new AggregatedMeasureDataProcess(
+            processId,
+            businessTransactionId,
+            requestedByActorId,
+            settlementVersion,
+            meteringPointType,
+            settlementMethod,
+            startOfPeriod,
+            endOfPeriod,
+            meteringGridAreaDomainId,
+            energySupplierId,
+            balanceResponsibleId);
+
+        return process;
     }
 
     private async Task DisposeAsync()
