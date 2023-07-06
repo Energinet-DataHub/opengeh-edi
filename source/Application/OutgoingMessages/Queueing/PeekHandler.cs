@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration;
@@ -30,20 +29,20 @@ namespace Application.OutgoingMessages.Queueing;
 public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
 {
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
-    private readonly IDocumentRepository _documentRepository;
+    private readonly IMarketDocumentRepository _marketDocumentRepository;
     private readonly DocumentFactory _documentFactory;
     private readonly IOutgoingMessageStore _outgoingMessageStore;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
     public PeekHandler(
         IActorMessageQueueRepository actorMessageQueueRepository,
-        IDocumentRepository documentRepository,
+        IMarketDocumentRepository marketDocumentRepository,
         DocumentFactory documentFactory,
         IOutgoingMessageStore outgoingMessageStore,
         ISystemDateTimeProvider systemDateTimeProvider)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
-        _documentRepository = documentRepository;
+        _marketDocumentRepository = marketDocumentRepository;
         _documentFactory = documentFactory;
         _outgoingMessageStore = outgoingMessageStore;
         _systemDateTimeProvider = systemDateTimeProvider;
@@ -64,33 +63,17 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
         if (peekResult.BundleId == null)
             return new PeekResult(null);
 
-        var document = await _documentRepository.GetAsync(peekResult.BundleId).ConfigureAwait(false);
+        var document = await _marketDocumentRepository.GetAsync(peekResult.BundleId).ConfigureAwait(false);
 
         if (document == null)
         {
             var outgoingMessages = await _outgoingMessageStore.GetByAssignedBundleIdAsync(peekResult.BundleId).ConfigureAwait(false);
             var result = await _documentFactory.CreateFromAsync(outgoingMessages, request.DocumentFormat, _systemDateTimeProvider.Now()).ConfigureAwait(false);
-            _documentRepository.AddAsync(new MarketDocument(result, peekResult.BundleId));
+            await _marketDocumentRepository.AddAsync(new MarketDocument(result, peekResult.BundleId)).ConfigureAwait(false);
         }
 
         return new PeekResult(document!.Payload, document.BundleId.Id);
     }
 }
 
-public interface IDocumentRepository // domain - infra
-{
-    /// <summary>
-    /// Get document by bundle id
-    /// </summary>
-    Task<MarketDocument?> GetAsync(BundleId bundleId);
-
-    /// <summary>
-    /// Add document to repository
-    /// </summary>
-    Task AddAsync(MarketDocument marketDocument);
-}
-
-public record MarketDocument(Stream Payload, BundleId BundleId); // domain
-
-public record PeekCommand(ActorNumber ActorNumber, MessageCategory MessageCategory, MarketRole ActorRole, DocumentFormat DocumentFormat) : ICommand<PeekResult>
-
+public record PeekCommand(ActorNumber ActorNumber, MessageCategory MessageCategory, MarketRole ActorRole, DocumentFormat DocumentFormat) : ICommand<PeekResult>;

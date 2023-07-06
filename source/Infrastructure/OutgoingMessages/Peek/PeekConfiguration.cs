@@ -35,7 +35,7 @@ internal static class PeekConfiguration
         services.AddScoped<IActorMessageQueueRepository, ActorMessageQueueRepository>();
         services.AddTransient<MessagePeeker>();
         services.AddTransient<IRequestHandler<PeekRequest, PeekResult>, PeekRequestHandler>();
-        services.AddTransient<IRequestHandler<PeekCommand, Domain.OutgoingMessages.Queueing.PeekResult>, PeekHandler>();
+        services.AddTransient<IRequestHandler<PeekCommand, PeekResult>, PeekHandler>();
         services.AddScoped<IEnqueuedMessages, EnqueuedMessages>();
         services.AddScoped(_ => bundleConfiguration);
 

@@ -62,11 +62,11 @@ public class WhenEnqueueingTests : TestBase
     {
         var message = CreateOutgoingMessage();
         await EnqueueMessage(message);
-        var command = new PeekCommand(message.ReceiverId, message.DocumentType.Category, message.ReceiverRole);
+        var command = new PeekCommand(message.ReceiverId, message.DocumentType.Category, message.ReceiverRole, DocumentFormat.Json);
 
         var result = await InvokeCommandAsync(command);
 
-        Assert.NotNull(result.BundleId);
+        Assert.NotNull(result.MessageId);
     }
 
     private static OutgoingMessage CreateOutgoingMessage()
