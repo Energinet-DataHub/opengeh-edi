@@ -67,9 +67,7 @@ public static class AggregatedMeasureDataProcessFactory
 
         return new Serie()
         {
-#pragma warning disable CA1305
-            Version = int.Parse(aggregatedMeasureDataProcess.SettlementVersion ?? "0"),
-#pragma warning restore CA1305
+            Version = 2,
             GridArea = aggregatedMeasureDataProcess.MeteringGridAreaDomainId,
             Product = Product.Tariff,
             QuantityUnit = QuantityUnit.Kwh,
