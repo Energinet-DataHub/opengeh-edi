@@ -15,6 +15,7 @@
 using System.Threading.Tasks;
 using Domain.OutgoingMessages.Queueing;
 using Infrastructure.Configuration.DataAccess;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.OutgoingMessages.Queueing;
 
@@ -27,13 +28,13 @@ public class MarketDocumentRepository : IMarketDocumentRepository
         _b2BContext = b2BContext;
     }
 
-    public Task<MarketDocument?> GetAsync(BundleId bundleId)
+    public async Task<MarketDocument?> GetAsync(BundleId bundleId)
     {
-        throw new System.NotImplementedException();
+        return await _b2BContext.MarketDocuments.FirstOrDefaultAsync(x => x.BundleId == bundleId).ConfigureAwait(false);
     }
 
-    public Task AddAsync(MarketDocument marketDocument)
+    public async Task AddAsync(MarketDocument marketDocument)
     {
-        throw new System.NotImplementedException();
+        await _b2BContext.AddAsync(marketDocument).ConfigureAwait(false);
     }
 }

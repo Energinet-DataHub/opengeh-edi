@@ -29,6 +29,6 @@ public class MarketDocumentEntityConfiguration : IEntityTypeConfiguration<Market
         builder.Property<Guid>("_id").HasColumnName("Id");
         builder.Property<BundleId>("BundleId").HasColumnName("Id")
             .HasConversion(toDbValue => toDbValue.Id, fromDbValue => BundleId.Create(fromDbValue));
-        builder.Property("_payload").HasColumnName("Payload");
+        builder.Property(entity => entity.Payload); // Should be a byte[]?
     }
 }

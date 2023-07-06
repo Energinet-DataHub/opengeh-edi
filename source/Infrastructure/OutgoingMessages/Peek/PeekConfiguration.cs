@@ -31,6 +31,7 @@ internal static class PeekConfiguration
         IBundleConfiguration bundleConfiguration,
         Func<IServiceProvider, IBundledMessages>? bundleStoreBuilder)
     {
+        services.AddScoped<IMarketDocumentRepository, MarketDocumentRepository>();
         services.AddScoped<MessageEnqueuer>();
         services.AddScoped<IActorMessageQueueRepository, ActorMessageQueueRepository>();
         services.AddTransient<MessagePeeker>();

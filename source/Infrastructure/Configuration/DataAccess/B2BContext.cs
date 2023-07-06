@@ -81,6 +81,8 @@ namespace Infrastructure.Configuration.DataAccess
 
         public DbSet<ActorMessageQueue> ActorMessageQueues { get; private set; }
 
+        public DbSet<MarketDocument> MarketDocuments { get; private set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
@@ -97,6 +99,7 @@ namespace Infrastructure.Configuration.DataAccess
             modelBuilder.ApplyConfiguration(new BundledMessageConfiguration());
             modelBuilder.ApplyConfiguration(new ArchivedMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ActorMessageQueueEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new MarketDocumentEntityConfiguration());
 
             modelBuilder.Entity<GenericNotificationMessage>()
                 .Ignore(entity => entity.MarketActivityRecord);
