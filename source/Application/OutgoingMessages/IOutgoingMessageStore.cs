@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.Queueing;
 
 namespace Application.OutgoingMessages
 {
@@ -26,5 +29,10 @@ namespace Application.OutgoingMessages
         /// </summary>
         /// <param name="message"></param>
         void Add(OutgoingMessage message);
+
+        /// <summary>
+        /// Get all messages assigned to a bundle by id.
+        /// </summary>
+        Task<IReadOnlyCollection<OutgoingMessage>> GetByAssignedBundleIdAsync(BundleId bundleId);
     }
 }

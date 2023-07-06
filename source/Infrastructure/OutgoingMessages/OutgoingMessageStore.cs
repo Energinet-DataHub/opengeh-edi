@@ -12,9 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Application.OutgoingMessages;
 using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.Queueing;
 using Infrastructure.Configuration.DataAccess;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.OutgoingMessages
 {
@@ -30,6 +35,12 @@ namespace Infrastructure.OutgoingMessages
         public void Add(OutgoingMessage message)
         {
             _context.OutgoingMessages.Add(message);
+        }
+
+        public async Task<IReadOnlyCollection<OutgoingMessage>> GetByAssignedBundleIdAsync(BundleId bundleId)
+        {
+            return (await _context.OutgoingMessages.Where(x => x.AssignedBundleId == bundleId)
+                .ToListAsync().ConfigureAwait(false)).AsReadOnly();
         }
     }
 }

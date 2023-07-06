@@ -13,23 +13,40 @@
 // limitations under the License.
 
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Configuration;
 using Application.Configuration.Commands.Commands;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.OutgoingMessages.Peek;
 using Domain.OutgoingMessages.Queueing;
 using MediatR;
+using PeekResult = Application.OutgoingMessages.Peek.PeekResult;
 
 namespace Application.OutgoingMessages.Queueing;
 
 public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
 {
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
+    private readonly IDocumentRepository _documentRepository;
+    private readonly DocumentFactory _documentFactory;
+    private readonly IOutgoingMessageStore _outgoingMessageStore;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-    public PeekHandler(IActorMessageQueueRepository actorMessageQueueRepository)
+    public PeekHandler(
+        IActorMessageQueueRepository actorMessageQueueRepository,
+        IDocumentRepository documentRepository,
+        DocumentFactory documentFactory,
+        IOutgoingMessageStore outgoingMessageStore,
+        ISystemDateTimeProvider systemDateTimeProvider)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
+        _documentRepository = documentRepository;
+        _documentFactory = documentFactory;
+        _outgoingMessageStore = outgoingMessageStore;
+        _systemDateTimeProvider = systemDateTimeProvider;
     }
 
     public async Task<PeekResult> Handle(PeekCommand request, CancellationToken cancellationToken)
@@ -39,15 +56,41 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
         var actorMessageQueue = await
             _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.ActorRole).ConfigureAwait(false);
 
-        return actorMessageQueue != null ? actorMessageQueue.Peek() : new PeekResult();
+        if (actorMessageQueue is null)
+            return new PeekResult(null);
+
+        var peekResult = actorMessageQueue.Peek(request.MessageCategory);
+
+        if (peekResult.BundleId == null)
+            return new PeekResult(null);
+
+        var document = await _documentRepository.GetAsync(peekResult.BundleId).ConfigureAwait(false);
+
+        if (document == null)
+        {
+            var outgoingMessages = await _outgoingMessageStore.GetByAssignedBundleIdAsync(peekResult.BundleId).ConfigureAwait(false);
+            var result = await _documentFactory.CreateFromAsync(outgoingMessages, request.DocumentFormat, _systemDateTimeProvider.Now()).ConfigureAwait(false);
+            _documentRepository.AddAsync(new MarketDocument(result, peekResult.BundleId));
+        }
+
+        return new PeekResult(document!.Payload, document.BundleId.Id);
     }
 }
 
-public record PeekCommand(ActorNumber ActorNumber, MessageCategory MessageCategory, MarketRole ActorRole) : ICommand<PeekResult>
+public interface IDocumentRepository // domain - infra
 {
-    public ActorNumber ActorNumber { get; set; } = ActorNumber;
+    /// <summary>
+    /// Get document by bundle id
+    /// </summary>
+    Task<MarketDocument?> GetAsync(BundleId bundleId);
 
-    public MessageCategory MessageCategory { get; set; } = MessageCategory;
-
-    public MarketRole ActorRole { get; set; } = ActorRole;
+    /// <summary>
+    /// Add document to repository
+    /// </summary>
+    Task AddAsync(MarketDocument marketDocument);
 }
+
+public record MarketDocument(Stream Payload, BundleId BundleId); // domain
+
+public record PeekCommand(ActorNumber ActorNumber, MessageCategory MessageCategory, MarketRole ActorRole, DocumentFormat DocumentFormat) : ICommand<PeekResult>
+

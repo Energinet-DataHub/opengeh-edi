@@ -18,14 +18,14 @@ namespace Domain.OutgoingMessages.Queueing;
 
 public record PeekResult()
 {
-    public PeekResult(BundleId? bundleId, DocumentType? messageType)
+    public PeekResult(BundleId? bundleId, DocumentType? documentType)
         : this()
     {
         BundleId = bundleId;
-        MessageType = messageType;
+        DocumentType = documentType;
     }
 
     public BundleId? BundleId { get; }
 
-    public DocumentType? MessageType { get; }
+    public DocumentType? DocumentType { get; }
 }

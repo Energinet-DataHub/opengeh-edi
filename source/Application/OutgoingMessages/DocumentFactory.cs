@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,6 +31,35 @@ public class DocumentFactory
     public DocumentFactory(IEnumerable<IDocumentWriter> documentWriters)
     {
         _documentWriters = documentWriters.ToList();
+    }
+
+    public Task<Stream> CreateFromAsync(IReadOnlyCollection<OutgoingMessage> outgoingMessages, DocumentFormat documentFormat, Instant timestamp)
+    {
+        ArgumentNullException.ThrowIfNull(documentFormat);
+        ArgumentNullException.ThrowIfNull(outgoingMessages);
+        var documentType = outgoingMessages.First().DocumentType;
+        var bundledMessageId = outgoingMessages.First().AssignedBundleId;
+        var senderId = outgoingMessages.First().SenderId.Value;
+        var senderRole = outgoingMessages.First().SenderRole.Name;
+        var receiverId = outgoingMessages.First().Receiver.Number.Value;
+        var receiverRole = outgoingMessages.First().Receiver.ActorRole.Name;
+        var businessReason = outgoingMessages.First().BusinessReason;
+
+        var documentWriter =
+            _documentWriters.FirstOrDefault(writer =>
+            {
+                return writer.HandlesType(documentType) &&
+                       writer.HandlesFormat(documentFormat);
+            });
+
+        if (documentWriter is null)
+        {
+            throw new OutgoingMessageException($"Could not handle document type {documentType}");
+        }
+
+        return documentWriter.WriteAsync(
+            new MessageHeader(businessReason, senderId, senderRole, receiverId, receiverRole, bundledMessageId!.Id.ToString(), timestamp),
+            outgoingMessages.Select(message => message.MessageRecord).ToList());
     }
 
     public Task<Stream> CreateFromAsync(BundledMessageId bundledMessageId, MessageRecords messageRecords, DocumentFormat documentFormat, Instant timestamp)
