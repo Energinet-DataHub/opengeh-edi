@@ -28,7 +28,7 @@ public static class AggregatedMeasureDataProcessFactory
     // TODO: consider moving this to another class
     public static ServiceBusMessage CreateServiceBusMessage(InboxEvent @event)
     {
-        ArgumentNullException.ThrowIfNull(event);
+        ArgumentNullException.ThrowIfNull(@event);
         var message = new ServiceBusMessage
         {
             Body = new BinaryData(@event.Message.ToByteArray()),

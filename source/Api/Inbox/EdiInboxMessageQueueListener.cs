@@ -13,21 +13,19 @@
 // limitations under the License.
 
 using System;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Api.Configuration;
 using Application.Configuration;
 using Application.IncomingMessages.RequestAggregatedMeasureData;
-using Domain.Transactions;
 using Energinet.DataHub.Edi.Responses.AggregatedMeasureData;
-using Energinet.DataHub.Wholesale.Contracts.Events;
+using Infrastructure.Configuration.InboxEvents;
 using Infrastructure.Configuration.Serialization;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace Api.IncomingMessages.EdiInbox;
+namespace Api.EdiInbox;
 
 public class EdiInboxMessageQueueListener
 {
@@ -35,24 +33,32 @@ public class EdiInboxMessageQueueListener
     private readonly IMediator _mediator;
     private readonly ISerializer _jsonSerializer;
     private readonly ICorrelationContext _correlationContext;
+    private readonly InboxEventReceiver _inboxEventReceiver;
 
-    public EdiInboxMessageQueueListener(IMediator mediator, ISerializer jsonSerializer, ICorrelationContext correlationContext, ILogger<EdiInboxMessageQueueListener> logger)
+    public EdiInboxMessageQueueListener(
+        IMediator mediator,
+        ISerializer jsonSerializer,
+        ICorrelationContext correlationContext,
+        ILogger<EdiInboxMessageQueueListener> logger,
+        InboxEventReceiver inboxEventReceiver)
     {
         _logger = logger;
         _mediator = mediator;
         _jsonSerializer = jsonSerializer;
         _correlationContext = correlationContext;
+        _inboxEventReceiver = inboxEventReceiver;
     }
 
     [Function(nameof(EdiInboxMessageQueueListener))]
     public async Task RunAsync(
-        [ServiceBusTrigger("%EDI_INBOX_MESSAGE_QUEUE_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER")] byte[] data,
+        [ServiceBusTrigger("%EDI_INBOX_MESSAGE_QUEUE_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER")] byte[] message,
         FunctionContext context,
         CancellationToken hostCancellationToken)
     {
-        if (data == null) throw new ArgumentNullException(nameof(data));
+        if (message == null) throw new ArgumentNullException(nameof(message));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
+        //TODO: delete this? who can cancel this?
         using var cancellationTokenSource =
             CancellationTokenSource.CreateLinkedTokenSource(
                 hostCancellationToken,
@@ -61,15 +67,16 @@ public class EdiInboxMessageQueueListener
         var cancellationToken = cancellationTokenSource.Token;
         SetCorrelationIdFromServiceBusMessage(context);
 
-        context.BindingContext.BindingData.TryGetValue("RequestId", out var processId);
-        ArgumentNullException.ThrowIfNull(processId);
+        context.BindingContext.BindingData.TryGetValue("RequestId", out var eventId);
+        ArgumentNullException.ThrowIfNull(eventId);
 
-        // TODO: move this to a function which makes use of the busfield: "Subject" and add the class to it.
-        // Since we currently only accept one kind of inbox message....
-        var aggregatedTimeSeries = AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(data);
-
-        var command = new AggregatedMeasureDataAccepted(aggregatedTimeSeries, Guid.Parse((string)processId));
-        await _mediator.Send(command, cancellationToken).ConfigureAwait(false);
+        //Matching ADR-008 name convention
+        context.BindingContext.BindingData.TryGetValue("Subject", out var eventName);
+        ArgumentNullException.ThrowIfNull(eventName);
+        await _inboxEventReceiver.ReceiveAsync(
+            (string)eventId,
+            (string)eventName,
+            message).ConfigureAwait(false);
     }
 
     private void SetCorrelationIdFromServiceBusMessage(FunctionContext context)

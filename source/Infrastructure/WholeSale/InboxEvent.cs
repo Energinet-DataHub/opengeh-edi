@@ -1,4 +1,4 @@
-// Copyright 2020 Energinet DataHub A/S
+﻿// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -23,4 +23,3 @@ public record InboxEvent
     string InboxEventName,
     int InboxEventMinorVersion, // TODO: version of the event, may help us with breaking changes.
     IMessage Message);
-

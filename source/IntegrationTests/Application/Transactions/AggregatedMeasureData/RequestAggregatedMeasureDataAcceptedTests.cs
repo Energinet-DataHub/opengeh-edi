@@ -24,6 +24,7 @@ using Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.Edi.Responses.AggregatedMeasureData;
 using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Transactions.AggregatedMeasureData;
+using Infrastructure.WholeSale;
 using IntegrationTests.Application.IncomingMessages;
 using IntegrationTests.Fixtures;
 using IntegrationTests.TestDoubles;
@@ -55,7 +56,9 @@ public class RequestAggregatedMeasureDataAcceptedTests : TestBase
     {
         // Arrange
         var process = AggregatedMeasureDataProcessBuilder.Build(ProcessId.Create(Guid.NewGuid()));
-        var serviceBusMessage = AggregatedMeasureDataProcessFactory.CreateServiceBusMessage(process);
+        var wholesaleResponse = AggregatedMeasureDataProcessFactory.CreateResponseFromWholeSaleTemp(process);
+        var inboxEvent = new InboxEvent(process.ProcessId.Id, nameof(wholesaleResponse), 2, wholesaleResponse);
+        var serviceBusMessage = AggregatedMeasureDataProcessFactory.CreateServiceBusMessage(inboxEvent);
         await _senderSpy.SendAsync(serviceBusMessage, CancellationToken.None).ConfigureAwait(false);
         var message = _senderSpy.Message;
         var aggregatedTimeSeries = AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(message!.Body);
@@ -75,7 +78,9 @@ public class RequestAggregatedMeasureDataAcceptedTests : TestBase
         var transactionCommand = MessageBuilder().Build();
         await InvokeCommandAsync(transactionCommand).ConfigureAwait(false);
         var process = await GetProcess(transactionCommand.MessageHeader.SenderId).ConfigureAwait(false);
-        var serviceBusMessage = AggregatedMeasureDataProcessFactory.CreateServiceBusMessage(process!);
+        var wholesaleResponse = AggregatedMeasureDataProcessFactory.CreateResponseFromWholeSaleTemp(process!);
+        var inboxEvent = new InboxEvent(process!.ProcessId.Id, nameof(wholesaleResponse), 2, wholesaleResponse);
+        var serviceBusMessage = AggregatedMeasureDataProcessFactory.CreateServiceBusMessage(inboxEvent);
         await _senderSpy.SendAsync(serviceBusMessage, CancellationToken.None).ConfigureAwait(false);
         var message = _senderSpy.Message;
         var aggregatedTimeSeries = AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(message!.Body);

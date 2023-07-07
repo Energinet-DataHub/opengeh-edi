@@ -45,6 +45,7 @@ public class WholeSaleInbox : IWholeSaleInBox
         AggregatedMeasureDataProcess request,
         CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(request);
         // We transform the request from our side to a response from wholesale,
         // That is, we mimic the response from whole defined in the protobuf contract
         // AggregatedMeasuredDataAcceptedResponse.proto and send it to our own inbox.
