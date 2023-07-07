@@ -69,7 +69,8 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
         {
             var outgoingMessages = await _outgoingMessageStore.GetByAssignedBundleIdAsync(peekResult.BundleId).ConfigureAwait(false);
             var result = await _documentFactory.CreateFromAsync(outgoingMessages, request.DocumentFormat, _systemDateTimeProvider.Now()).ConfigureAwait(false);
-            await _marketDocumentRepository.AddAsync(new MarketDocument(result, peekResult.BundleId)).ConfigureAwait(false);
+            document = new MarketDocument(result, peekResult.BundleId);
+            await _marketDocumentRepository.AddAsync(document).ConfigureAwait(false);
         }
 
         return new PeekResult(document!.Payload, document.BundleId.Id);
