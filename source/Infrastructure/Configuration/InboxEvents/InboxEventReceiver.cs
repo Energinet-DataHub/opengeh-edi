@@ -12,14 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.Commands.Commands;
-using Application.IncomingMessages.RequestAggregatedMeasureData;
-using Energinet.DataHub.Edi.Responses.AggregatedMeasureData;
 using MediatR;
 
 namespace Infrastructure.Configuration.InboxEvents;
@@ -29,9 +26,9 @@ public class InboxEventReceiver
     private readonly IReadOnlyList<IInboxEventMapper> _mappers;
     private readonly IMediator _mediator;
 
-    public InboxEventReceiver(IReadOnlyList<IInboxEventMapper> mappers, IMediator mediator)
+    public InboxEventReceiver(IEnumerable<IInboxEventMapper> mappers, IMediator mediator)
     {
-        _mappers = mappers;
+        _mappers = mappers.ToList();
         _mediator = mediator;
     }
 
@@ -58,20 +55,13 @@ public class InboxEventReceiver
 
     private async Task RegisterAsync(string eventId, string eventName, byte[] eventPayload)
     {
-        // TODO: make this dynamic
-        var command = Parse(eventId, eventName, eventPayload);
+        var command = CreateCommandFromEvent(eventId, eventName, eventPayload);
         await _mediator.Send(command, CancellationToken.None).ConfigureAwait(false);
     }
 
-    private ICommand<Unit> Parse(string eventId, string eventName, byte[] eventPayload)
+    private ICommand<Unit> CreateCommandFromEvent(string eventId, string eventName, byte[] eventPayload)
     {
         var mapper = _mappers.First(mapper => mapper.CanHandle(eventName));
-
-
-
-        var aggregatedTimeSeries = AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(eventPayload);
-        var command = new AggregatedMeasureDataAccepted(aggregatedTimeSeries, Guid.Parse(eventId));
-
-        return command;
+        return mapper.CreateCommand(eventId, eventPayload);
     }
 }

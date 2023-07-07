@@ -17,29 +17,27 @@ using System.Threading;
 using System.Threading.Tasks;
 using Api.Configuration;
 using Application.Configuration;
-using Application.IncomingMessages.RequestAggregatedMeasureData;
-using Energinet.DataHub.Edi.Responses.AggregatedMeasureData;
 using Infrastructure.Configuration.InboxEvents;
 using Infrastructure.Configuration.Serialization;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace Api.EdiInbox;
+namespace Api.Inbox;
 
-public class EdiInboxMessageQueueListener
+public class InboxMessageQueueListener
 {
-    private readonly ILogger<EdiInboxMessageQueueListener> _logger;
+    private readonly ILogger<InboxMessageQueueListener> _logger;
     private readonly IMediator _mediator;
     private readonly ISerializer _jsonSerializer;
     private readonly ICorrelationContext _correlationContext;
     private readonly InboxEventReceiver _inboxEventReceiver;
 
-    public EdiInboxMessageQueueListener(
+    public InboxMessageQueueListener(
         IMediator mediator,
         ISerializer jsonSerializer,
         ICorrelationContext correlationContext,
-        ILogger<EdiInboxMessageQueueListener> logger,
+        ILogger<InboxMessageQueueListener> logger,
         InboxEventReceiver inboxEventReceiver)
     {
         _logger = logger;
@@ -49,7 +47,7 @@ public class EdiInboxMessageQueueListener
         _inboxEventReceiver = inboxEventReceiver;
     }
 
-    [Function(nameof(EdiInboxMessageQueueListener))]
+    [Function(nameof(InboxMessageQueueListener))]
     public async Task RunAsync(
         [ServiceBusTrigger("%EDI_INBOX_MESSAGE_QUEUE_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER")] byte[] message,
         FunctionContext context,

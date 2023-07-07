@@ -24,20 +24,20 @@ namespace Infrastructure.Transactions.AggregatedMeasureData;
 
 public class AggregatedMeasureDataRequestAcceptedEventMapper : IInboxEventMapper
 {
-    public ICommand<Unit> MapFromAsync(byte[] payload, string eventId)
-    {
-        var aggregatedTimeSeries = AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(payload);
-        return new AggregatedMeasureDataAccepted(aggregatedTimeSeries, Guid.Parse(eventId));
-    }
-
     public bool CanHandle(string eventType)
     {
         ArgumentNullException.ThrowIfNull(eventType);
         return eventType.Equals(nameof(AggregatedTimeSeriesRequestAccepted), StringComparison.OrdinalIgnoreCase);
     }
 
-    public string ToJson(byte[] payload, string eventId)
+    public ICommand<Unit> CreateCommand(string eventId, byte[] eventPayload)
     {
-        throw new System.NotImplementedException();
+        var aggregatedTimeSeries = AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(eventPayload);
+        return new AggregatedMeasureDataAccepted(aggregatedTimeSeries, Guid.Parse(eventId));
+    }
+
+    public Task<INotification> MapFromAsync(string payload)
+    {
+        throw new NotImplementedException();
     }
 }

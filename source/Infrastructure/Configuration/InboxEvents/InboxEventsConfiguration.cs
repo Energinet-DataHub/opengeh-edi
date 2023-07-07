@@ -12,26 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.Configuration.Commands.Commands;
-using MediatR;
+using Infrastructure.Transactions.AggregatedMeasureData;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Configuration.InboxEvents;
 
-/// <summary>
-///     Interface to handle inbox messages.
-/// </summary>
-public interface IInboxEventMapper
+public static class InboxEventsConfiguration
 {
-    /// <summary>
-    ///     Determines whether the specified event type can be handled by the mapper
-    /// </summary>
-    /// <param name="eventType"></param>
-    bool CanHandle(string eventType);
-
-    /// <summary>
-    ///     Creates a command from the event payload.
-    /// </summary>
-    /// <param name="eventId"></param>
-    /// <param name="eventPayload"></param>
-    ICommand<Unit> CreateCommand(string eventId, byte[] eventPayload);
+    public static void Configure(IServiceCollection services)
+    {
+        services.AddTransient<InboxEventReceiver>();
+        services.AddTransient<IInboxEventMapper, AggregatedMeasureDataRequestAcceptedEventMapper>();
+    }
 }

@@ -33,5 +33,8 @@ internal static class RequestedAggregatedMeasureDataConfiguration
         services.AddTransient<INotificationHandler<AggregatedMeasureProcessWasStarted>, NotifyWholesaleWhenAggregatedMeasureProcessWasStartedHandler>();
         services.AddScoped<WholeSaleInbox>();
         services.AddScoped<IAggregatedMeasureDataProcessRepository, AggregatedMeasureDataProcessRepository>();
+        services
+            .AddTransient<IRequestHandler<AggregatedMeasureDataAcceptedInternalCommand, Unit>,
+                AggregatedMeasureDataAcceptedInternalCommandHandler>();
     }
 }

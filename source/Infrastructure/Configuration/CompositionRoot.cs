@@ -33,6 +33,7 @@ using Infrastructure.ArchivedMessages;
 using Infrastructure.Configuration.Authentication;
 using Infrastructure.Configuration.DataAccess;
 using Infrastructure.Configuration.FeatureFlag;
+using Infrastructure.Configuration.InboxEvents;
 using Infrastructure.Configuration.IntegrationEvents;
 using Infrastructure.Configuration.InternalCommands;
 using Infrastructure.Configuration.MessageBus;
@@ -97,6 +98,7 @@ namespace Infrastructure.Configuration
             UpdateCustomerMasterDataConfiguration.Configure(services);
             DequeueConfiguration.Configure(services);
             IntegrationEventsConfiguration.Configure(services);
+            InboxEventsConfiguration.Configure(services);
             ArchivedMessageConfiguration.Configure(services);
             QueryHandlingConfiguration.Configure(services);
         }
