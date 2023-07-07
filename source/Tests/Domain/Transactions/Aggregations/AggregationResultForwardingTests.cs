@@ -134,7 +134,7 @@ public class AggregationResultForwardingTests
 
         var message = CreateMessage(result);
 
-        Assert.Equal(MarketRole.BalanceResponsible, message.ReceiverRole);
+        Assert.Equal(MarketRole.BalanceResponsibleParty, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.BalanceResponsibleNumber, message.ReceiverId.Value);
         Assert.Equal(SettlementType.NonProfiled.Name, message.Series.SettlementType);
     }
@@ -149,7 +149,7 @@ public class AggregationResultForwardingTests
 
         var message = CreateMessage(result);
 
-        Assert.Equal(MarketRole.BalanceResponsible, message.ReceiverRole);
+        Assert.Equal(MarketRole.BalanceResponsibleParty, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.BalanceResponsibleNumber, message.ReceiverId.Value);
     }
 
@@ -163,7 +163,7 @@ public class AggregationResultForwardingTests
 
         var message = CreateMessage(result);
 
-        Assert.Equal(MarketRole.BalanceResponsible, message.ReceiverRole);
+        Assert.Equal(MarketRole.BalanceResponsibleParty, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.BalanceResponsibleNumber, message.ReceiverId.Value);
         Assert.Equal(SettlementType.Flex.Name, message.Series.SettlementType);
     }

@@ -12,12 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.ValidationErrors;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+using Application.Configuration.Commands.Commands;
+using Domain.Transactions;
+using MediatR;
 
-public class MessageSizeExceeded : ValidationError
+namespace Application.Transactions.AggregatedMeasureData.Notifications;
+
+public class NotifyWholesaleOfAggregatedMeasureDataRequest : InternalCommand
 {
-    public MessageSizeExceeded(long actualSize, long sizeLimitation)
-        : base($"Message size {actualSize}mb exceeds {sizeLimitation}mb", "00004")
+    [JsonConstructor]
+    public NotifyWholesaleOfAggregatedMeasureDataRequest(ProcessId processId)
     {
+        ProcessId = processId;
     }
+
+    public ProcessId ProcessId { get; }
 }

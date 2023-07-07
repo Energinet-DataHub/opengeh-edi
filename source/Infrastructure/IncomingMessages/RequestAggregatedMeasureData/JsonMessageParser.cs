@@ -34,7 +34,6 @@ public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureD
     private const string SeriesElementName = "Series";
     private const string HeaderElementName = "RequestAggregatedMeasureData_MarketDocument";
     private const string DocumentName = "RequestAggregatedMeasureData";
-    private const int MaxMessageSizeInMb = 50;
 
     public JsonMessageParser(JsonSchemaProvider schemaProvider)
         : base(schemaProvider)
@@ -46,13 +45,6 @@ public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureD
     public async Task<MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>> ParseAsync(Stream message, CancellationToken cancellationToken)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
-
-        var fileSizeInMb = message.Length / (1024 * 1024);
-        if (fileSizeInMb >= MaxMessageSizeInMb)
-        {
-            return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(
-                new MessageSizeExceeded(fileSizeInMb, MaxMessageSizeInMb));
-        }
 
         var schema = await GetSchemaAsync(DocumentName, cancellationToken).ConfigureAwait(false);
         if (schema is null)
