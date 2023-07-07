@@ -76,7 +76,7 @@ public class WhenEnqueueingTests : TestBase
 
     private static OutgoingMessage CreateOutgoingMessage()
     {
-        var p = new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z");
+        var p = new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z"); //TODO tilføj point
         var points = Array.Empty<Point>();
         var message = AggregationResultMessage.Create(
             ActorNumber.Create("1234567891912"),
