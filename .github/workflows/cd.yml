@@ -40,7 +40,7 @@ jobs:
   dotnet_promote_prerelease:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/promote-prerelease.yml@v11
+    uses: Energinet-DataHub/.github/.github/workflows/promote-prerelease.yml@v12
     with:
       release_name_prefix: dotnet
 
@@ -53,7 +53,7 @@ jobs:
     needs: dotnet_promote_prerelease
     steps:
       - name: Find associated pull request
-        uses: Energinet-DataHub/.github/.github/actions/find-related-pr-number@v11
+        uses: Energinet-DataHub/.github/.github/actions/find-related-pr-number@v12
         id: find_pull_request
 
       - name: Repository Dispatch
@@ -73,7 +73,7 @@ jobs:
     if: |
       always() &&
       contains(needs.*.result, 'failure')
-    uses: Energinet-DataHub/.github/.github/workflows/notify-team.yml@v11
+    uses: Energinet-DataHub/.github/.github/workflows/notify-team.yml@v12
     with:
       team_name: Phoenix
       subject: "Deployment dispatch failed: EDI"
