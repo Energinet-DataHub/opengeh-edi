@@ -67,7 +67,7 @@ public class WhenEnqueueingTests : TestBase
     {
         var message = CreateOutgoingMessage();
         await EnqueueMessage(message);
-        var command = new PeekCommand(message.ReceiverId, message.DocumentType.Category, message.ReceiverRole, DocumentFormat.Json);
+        var command = new PeekCommand(message.ReceiverId, message.DocumentType.Category, message.ReceiverRole, DocumentFormat.Xml);
 
         var result = await InvokeCommandAsync(command);
 
@@ -76,7 +76,8 @@ public class WhenEnqueueingTests : TestBase
 
     private static OutgoingMessage CreateOutgoingMessage()
     {
-        var points = new[] { new Point(1, 1.0m, "measured", "sample") };
+        var p = new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z");
+        var points = Array.Empty<Point>();
         var message = AggregationResultMessage.Create(
             ActorNumber.Create("1234567891912"),
             MarketRole.MeteringDataAdministrator,
