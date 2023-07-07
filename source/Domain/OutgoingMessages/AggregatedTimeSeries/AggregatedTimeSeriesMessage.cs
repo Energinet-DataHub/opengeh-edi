@@ -1,21 +1,32 @@
-﻿using Domain.Actors;
-using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Domain.SeedWork;
+﻿// Copyright 2020 Energinet DataHub A/S
+//
+// Licensed under the Apache License, Version 2.0 (the "License2");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using Domain.Actors;
+using Domain.Documents;
 using Domain.Transactions;
 using Energinet.DataHub.Edi.Responses.AggregatedMeasureData;
-using Point = Domain.Transactions.Aggregations.Point;
 
 namespace Domain.OutgoingMessages.AggregatedTimeSeries;
 
 public class AggregatedTimeSeriesMessage : OutgoingMessage
 {
-    public AggregatedTimeSeriesMessage()
-        : base()
+    public AggregatedTimeSeriesMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+        : base(documentType, receiverId, transactionId, businessReason, receiverRole, senderId, senderRole, messageRecord)
     {
-
     }
 
-    public object Create(
+    /*public object Create(
         ActorNumber receiverNumber,
         MarketRole receiverRole,
         ProcessId processId,
@@ -24,6 +35,9 @@ public class AggregatedTimeSeriesMessage : OutgoingMessage
         ArgumentNullException.ThrowIfNull(processId);
         ArgumentNullException.ThrowIfNull(result);
         ArgumentNullException.ThrowIfNull(receiverNumber);
+
+        // delete
+        return new AggregatedTimeSeries("1", "2", "3");
 
         var series = result.Series
             .Select(serie => new AggregatedTimeSeries(serie.Version,s))
@@ -35,14 +49,7 @@ public class AggregatedTimeSeriesMessage : OutgoingMessage
             EnumerationType.FromName<BusinessReason>(result.BusinessReason).Name,
             receiverRole,
             series);
-    }
-
-    public record AggregatedTimeSeries(
-        string MessageId,
-        string Version,
-        string SettlementVersion);
-
-
+    }*/
     /*
      "mRID": "string",
             "version": "string ?",
@@ -79,6 +86,11 @@ public class AggregatedTimeSeriesMessage : OutgoingMessage
 
      *
      * */
-    */
-
 }
+
+/*
+public record AggregatedTimeSeries(
+    string MessageId,
+    string Version,
+    string SettlementVersion);
+*/

@@ -14,21 +14,20 @@
 
 using System;
 using Application.Configuration.Commands.Commands;
+using Energinet.DataHub.Edi.Responses.AggregatedMeasureData;
 using MediatR;
 
 namespace Application.IncomingMessages.RequestAggregatedMeasureData;
 
 public class AggregatedMeasureDataAccepted : ICommand<Unit>
 {
-    public AggregatedMeasureDataAccepted(byte[] data, Guid processId)
+    public AggregatedMeasureDataAccepted(AggregatedTimeSeriesRequestAccepted timeSeries, Guid processId)
     {
-        Data = data;
+        TimeSeries = timeSeries;
         ProcessId = processId;
     }
 
-#pragma warning disable CA1819
-    public byte[] Data { get; }
-#pragma warning restore CA1819
+    public AggregatedTimeSeriesRequestAccepted TimeSeries { get; }
 
     public Guid ProcessId { get; }
 }

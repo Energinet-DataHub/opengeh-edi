@@ -29,14 +29,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Api.IncomingMessages.EdiInbox;
 
-public class RequestEdiInboxMessageQueueListener
+public class EdiInboxMessageQueueListener
 {
-    private readonly ILogger<RequestEdiInboxMessageQueueListener> _logger;
+    private readonly ILogger<EdiInboxMessageQueueListener> _logger;
     private readonly IMediator _mediator;
     private readonly ISerializer _jsonSerializer;
     private readonly ICorrelationContext _correlationContext;
 
-    public RequestEdiInboxMessageQueueListener(IMediator mediator, ISerializer jsonSerializer, ICorrelationContext correlationContext, ILogger<RequestEdiInboxMessageQueueListener> logger)
+    public EdiInboxMessageQueueListener(IMediator mediator, ISerializer jsonSerializer, ICorrelationContext correlationContext, ILogger<EdiInboxMessageQueueListener> logger)
     {
         _logger = logger;
         _mediator = mediator;
@@ -44,7 +44,7 @@ public class RequestEdiInboxMessageQueueListener
         _correlationContext = correlationContext;
     }
 
-    [Function(nameof(RequestEdiInboxMessageQueueListener))]
+    [Function(nameof(EdiInboxMessageQueueListener))]
     public async Task RunAsync(
         [ServiceBusTrigger("%EDI_INBOX_MESSAGE_QUEUE_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER")] byte[] data,
         FunctionContext context,
@@ -63,7 +63,12 @@ public class RequestEdiInboxMessageQueueListener
 
         context.BindingContext.BindingData.TryGetValue("RequestId", out var processId);
         ArgumentNullException.ThrowIfNull(processId);
-        var command = new AggregatedMeasureDataAccepted(data, Guid.Parse((string)processId));
+
+        // TODO: move this to a function which makes use of the busfield: "Subject" and add the class to it.
+        // Since we currently only accept one kind of inbox message....
+        var aggregatedTimeSeries = AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(data);
+
+        var command = new AggregatedMeasureDataAccepted(aggregatedTimeSeries, Guid.Parse((string)processId));
         await _mediator.Send(command, cancellationToken).ConfigureAwait(false);
     }
 

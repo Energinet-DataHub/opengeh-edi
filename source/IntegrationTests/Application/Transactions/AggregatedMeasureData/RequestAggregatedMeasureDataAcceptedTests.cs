@@ -21,6 +21,7 @@ using Dapper;
 using Domain.Actors;
 using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.Edi.Responses.AggregatedMeasureData;
 using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Transactions.AggregatedMeasureData;
 using IntegrationTests.Application.IncomingMessages;
@@ -57,9 +58,10 @@ public class RequestAggregatedMeasureDataAcceptedTests : TestBase
         var serviceBusMessage = AggregatedMeasureDataProcessFactory.CreateServiceBusMessage(process);
         await _senderSpy.SendAsync(serviceBusMessage, CancellationToken.None).ConfigureAwait(false);
         var message = _senderSpy.Message;
+        var aggregatedTimeSeries = AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(message!.Body);
 
         // Act
-        var command = new AggregatedMeasureDataAccepted(message!.Body.ToArray(), Guid.Parse(message.MessageId));
+        var command = new AggregatedMeasureDataAccepted(aggregatedTimeSeries, Guid.Parse(message.MessageId));
 
         // Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() => InvokeCommandAsync(command)).ConfigureAwait(false);
@@ -76,9 +78,10 @@ public class RequestAggregatedMeasureDataAcceptedTests : TestBase
         var serviceBusMessage = AggregatedMeasureDataProcessFactory.CreateServiceBusMessage(process!);
         await _senderSpy.SendAsync(serviceBusMessage, CancellationToken.None).ConfigureAwait(false);
         var message = _senderSpy.Message;
+        var aggregatedTimeSeries = AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(message!.Body);
 
         // Act
-        var command = new AggregatedMeasureDataAccepted(message!.Body.ToArray(), Guid.Parse(message.MessageId));
+        var command = new AggregatedMeasureDataAccepted(aggregatedTimeSeries, Guid.Parse(message.MessageId));
 
         // Assert
         await Assert.ThrowsAsync<AggregatedMeasureDataException>(() => InvokeCommandAsync(command)).ConfigureAwait(false);

@@ -29,9 +29,8 @@ public class AggregatedMeasureDataForwarding : Entity
     public ProcessId Id { get; }
 
     // TODO: Remove reference to RequestResponse solution!
-    public AggregatedTimeSeriesMessage CreateMessage(AggregatedTimeSeriesRequestAccepted request)
+    public static AggregatedTimeSeriesMessage CreateMessage(AggregatedTimeSeriesRequestAccepted request)
     {
-
         throw new InvalidOperationException("Could not determine the receiver of the aggregation result");
     }
 }
