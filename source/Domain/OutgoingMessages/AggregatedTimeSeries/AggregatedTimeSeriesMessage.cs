@@ -26,6 +26,35 @@ public class AggregatedTimeSeriesMessage : OutgoingMessage
     {
     }
 
+    public AggregatedTimeSeriesMessage()
+    {
+
+    }
+    //https://energinet.dk/media/0nsklumj/20220422-edi-transaktioner-for-danske-elmarkede-cim-ver-1_4.pdf#page=81&zoom=100,72,114
+    //Page 67
+    //Same of the strings underneath has types. Which may be described in the link above, not sure
+    //This is work in progress!!!! AJW
+    public string Mrid;
+    public string? Version;
+    public string? SettlementSeriesVersion;
+    public string? OriginalTransactionReferenc;
+    public string? MarketEvaluationType;
+    public string? MarketEvalationSettlementMethod;
+    public string? MktpsType;
+    public string? RegistrationTime;
+    public string? BiddingDomain;
+    public string? MetingsGridArea;
+    public string? EnergiSupplier;
+    public string? BallanceResponsible;
+    public string? Product; // this is a enum in the protobuf contract
+    public string  QuntityMeasureUnit // type in protobuf
+    public Period Period;
+
+
+    private record Period(string resolution, TimeInterval timeinterval);
+
+    private record TimeInterval(string start, string end)
+
     /*public object Create(
         ActorNumber receiverNumber,
         MarketRole receiverRole,
