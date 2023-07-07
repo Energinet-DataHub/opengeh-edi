@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.IO;
 using Domain.OutgoingMessages.Queueing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -27,8 +28,12 @@ public class MarketDocumentEntityConfiguration : IEntityTypeConfiguration<Market
         builder.ToTable("MarketDocuments", "dbo");
         builder.HasKey("_id");
         builder.Property<Guid>("_id").HasColumnName("Id");
-        builder.Property<BundleId>("BundleId").HasColumnName("Id")
+        builder.Property<BundleId>("BundleId").HasColumnName("BundleId")
             .HasConversion(toDbValue => toDbValue.Id, fromDbValue => BundleId.Create(fromDbValue));
-        builder.Property(entity => entity.Payload); // Should be a byte[]?
+        builder.Property(entity => entity.Payload)
+            .HasColumnName("Payload")
+            .HasConversion(
+                toDbValue => ((MemoryStream)toDbValue).ToArray(),
+                fromDbValue => new MemoryStream(fromDbValue));
     }
 }

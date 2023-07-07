@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
@@ -20,10 +21,14 @@ using Dapper;
 using Domain.Actors;
 using Domain.Documents;
 using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions;
+using Domain.Transactions.Aggregations;
 using Infrastructure.OutgoingMessages;
 using IntegrationTests.Fixtures;
+using NodaTime.Extensions;
 using Xunit;
+using Point = Domain.Transactions.Aggregations.Point;
 
 namespace IntegrationTests.Application.OutgoingMessages;
 
@@ -71,15 +76,21 @@ public class WhenEnqueueingTests : TestBase
 
     private static OutgoingMessage CreateOutgoingMessage()
     {
-        var message = new OutgoingMessage(
-            DocumentType.NotifyAggregatedMeasureData,
-            ActorNumber.Create("1123456789101"),
-            TransactionId.New(),
-            BusinessReason.BalanceFixing.Name,
-            MarketRole.MeteredDataResponsible,
-            ActorNumber.Create("1123456789102"),
+        var points = new[] { new Point(1, 1.0m, "measured", "sample") };
+        var message = AggregationResultMessage.Create(
+            ActorNumber.Create("1234567891912"),
             MarketRole.MeteringDataAdministrator,
-            "MessageRecord");
+            TransactionId.Create(Guid.NewGuid()),
+            new Aggregation(
+                points,
+                MeteringPointType.Consumption.Name,
+                MeasurementUnit.Kwh.Name,
+                Resolution.Hourly.Name,
+                new Period(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant()),
+                SettlementType.NonProfiled.Name,
+                BusinessReason.BalanceFixing.Name,
+                new ActorGrouping("1234567891911", null),
+                new GridAreaDetails("805", "1234567891045")));
         return message;
     }
 
