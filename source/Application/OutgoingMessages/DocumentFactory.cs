@@ -37,13 +37,14 @@ public class DocumentFactory
     {
         ArgumentNullException.ThrowIfNull(documentFormat);
         ArgumentNullException.ThrowIfNull(outgoingMessages);
-        var documentType = outgoingMessages.First().DocumentType;
-        var bundledMessageId = outgoingMessages.First().AssignedBundleId;
-        var senderId = outgoingMessages.First().SenderId.Value;
-        var senderRole = outgoingMessages.First().SenderRole.Name;
-        var receiverId = outgoingMessages.First().Receiver.Number.Value;
-        var receiverRole = outgoingMessages.First().Receiver.ActorRole.Name;
-        var businessReason = outgoingMessages.First().BusinessReason;
+        var outgoingMessage = outgoingMessages.First();
+        var documentType = outgoingMessage.DocumentType;
+        var bundledMessageId = outgoingMessage.AssignedBundleId;
+        var senderId = outgoingMessage.SenderId.Value;
+        var senderRole = outgoingMessage.SenderRole.Name;
+        var receiverId = outgoingMessage.Receiver.Number.Value;
+        var receiverRole = outgoingMessage.Receiver.ActorRole.Name;
+        var businessReason = outgoingMessage.BusinessReason;
 
         var documentWriter =
             _documentWriters.FirstOrDefault(writer =>

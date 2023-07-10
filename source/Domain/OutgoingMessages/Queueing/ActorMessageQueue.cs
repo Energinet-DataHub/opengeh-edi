@@ -18,7 +18,7 @@ using Domain.SeedWork;
 
 namespace Domain.OutgoingMessages.Queueing;
 
-#pragma warning disable CA1711 // This is actually a message queue
+#pragma warning disable CA1711 // Identifiers should not have incorrect suffix
 public class ActorMessageQueue : Entity
 {
     private readonly Guid _id;
