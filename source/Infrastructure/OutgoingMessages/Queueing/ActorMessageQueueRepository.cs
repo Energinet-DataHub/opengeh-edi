@@ -37,7 +37,18 @@ public class ActorMessageQueueRepository : IActorMessageQueueRepository
 
         var sql = $"SELECT m.*, b.IsDequeued FROM [dbo].[ActorMessageQueues] m join [dbo].[Bundles] b on m.Id = b.ActorMessageQueueId " +
                   $"WHERE b.IsDequeued = 0 AND m.ActorNumber = '{actorNumber.Value}' AND m.ActorRole = '{actorRole.Name}'";
-        var actorMessageQueue = await _b2BContext.ActorMessageQueues.FromSqlRaw(sql, actorNumber.Value).FirstOrDefaultAsync().ConfigureAwait(false);
+        var actorMessageQueue = await _b2BContext.ActorMessageQueues.FromSqlRaw(sql).FirstOrDefaultAsync().ConfigureAwait(false);
+
+        return actorMessageQueue;
+    }
+
+    public async Task<ActorMessageQueue?> ActorMessageQueueForAsync(BundleId bundleId)
+    {
+        ArgumentNullException.ThrowIfNull(bundleId);
+
+        var sql = $"SELECT m.*, b.IsDequeued FROM [dbo].[ActorMessageQueues] m join [dbo].[Bundles] b on m.Id = b.ActorMessageQueueId " +
+                  $"WHERE b.IsDequeued = 0 AND m.Id = '{bundleId.Id}'";
+        var actorMessageQueue = await _b2BContext.ActorMessageQueues.FromSqlRaw(sql).FirstOrDefaultAsync().ConfigureAwait(false);
 
         return actorMessageQueue;
     }

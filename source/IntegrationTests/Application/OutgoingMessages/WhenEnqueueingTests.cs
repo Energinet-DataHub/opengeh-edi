@@ -16,6 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
+using Application.OutgoingMessages.Dequeue;
 using Application.OutgoingMessages.Queueing;
 using Dapper;
 using Domain.Actors;
@@ -72,6 +73,20 @@ public class WhenEnqueueingTests : TestBase
         var result = await InvokeCommandAsync(command);
 
         Assert.NotNull(result.MessageId);
+    }
+
+    [Fact]
+    public async Task Can_dequeue_bundle()
+    {
+        var message = CreateOutgoingMessage();
+        await EnqueueMessage(message);
+        var peekCommand = new PeekCommand(message.ReceiverId, message.DocumentType.Category, message.ReceiverRole, DocumentFormat.Xml);
+        var peekResult = await InvokeCommandAsync(peekCommand);
+        var dequeueCommand = new DequeueCommand(peekResult.MessageId!.Value);
+
+        var result = await InvokeCommandAsync(dequeueCommand);
+
+        Assert.False(result.Success);
     }
 
     private static OutgoingMessage CreateOutgoingMessage()

@@ -22,9 +22,14 @@ namespace Domain.OutgoingMessages.Queueing;
 public interface IActorMessageQueueRepository
 {
     /// <summary>
-    /// Get the next message in the queue for the given actor number and message category.
+    /// Get the the queue for the given actor number and message category.
     /// </summary>
     Task<ActorMessageQueue?> ActorMessageQueueForAsync(ActorNumber actorNumber, MarketRole actorRole);
+
+    /// <summary>
+    /// Get the queue for the given bundle id.
+    /// </summary>
+    Task<ActorMessageQueue?> ActorMessageQueueForAsync(BundleId bundleId);
 
     /// <summary>
     /// Add a new message to the queue.

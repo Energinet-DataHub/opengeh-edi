@@ -23,5 +23,6 @@ internal static class DequeueConfiguration
     internal static void Configure(IServiceCollection services)
     {
         services.AddTransient<IRequestHandler<DequeueRequest, DequeueResult>, DequeueRequestHandler>();
+        services.AddTransient<IRequestHandler<DequeueCommand, DequeCommandResult>, DequeueHandler>();
     }
 }
