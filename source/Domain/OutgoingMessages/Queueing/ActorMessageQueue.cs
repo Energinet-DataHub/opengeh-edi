@@ -106,7 +106,7 @@ public class ActorMessageQueue : Entity
             _bundles.FirstOrDefault(bundle => bundle.IsDequeued == false && bundle.DocumentTypeInBundle.Category.Equals(category)) :
             _bundles.FirstOrDefault(bundle => bundle.IsDequeued == false);
 
-        nextBundleToPeek.CloseBundle();
+        nextBundleToPeek?.CloseBundle();
 
         return nextBundleToPeek;
     }
