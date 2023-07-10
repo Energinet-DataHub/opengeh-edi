@@ -12,17 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.OutgoingMessages.Dequeue;
-using MediatR;
-using Microsoft.Extensions.DependencyInjection;
+using Domain.Documents;
 
-namespace Infrastructure.OutgoingMessages.Dequeue;
+namespace Domain.OutgoingMessages.Queueing;
 
-internal static class DequeueConfiguration
+public record PeekResult()
 {
-    internal static void Configure(IServiceCollection services)
+    public PeekResult(BundleId? bundleId, DocumentType? documentType)
+        : this()
     {
-        services.AddTransient<IRequestHandler<DequeueRequest, DequeueResult>, DequeueRequestHandler>();
-        services.AddTransient<IRequestHandler<DequeueCommand, DequeCommandResult>, DequeueHandler>();
+        BundleId = bundleId;
+        DocumentType = documentType;
     }
+
+    public BundleId? BundleId { get; }
+
+    public DocumentType? DocumentType { get; }
 }

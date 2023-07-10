@@ -12,17 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.OutgoingMessages.Dequeue;
-using MediatR;
-using Microsoft.Extensions.DependencyInjection;
+using Domain.Actors;
+using Domain.SeedWork;
 
-namespace Infrastructure.OutgoingMessages.Dequeue;
+namespace Domain.OutgoingMessages.Queueing;
 
-internal static class DequeueConfiguration
+public class Receiver : ValueObject
 {
-    internal static void Configure(IServiceCollection services)
+    private Receiver(ActorNumber actorNumber, MarketRole actorRole)
     {
-        services.AddTransient<IRequestHandler<DequeueRequest, DequeueResult>, DequeueRequestHandler>();
-        services.AddTransient<IRequestHandler<DequeueCommand, DequeCommandResult>, DequeueHandler>();
+        Number = actorNumber;
+        ActorRole = actorRole;
+    }
+
+    #pragma warning disable
+    private Receiver()
+    {
+    }
+
+    public ActorNumber Number { get; }
+
+    public MarketRole ActorRole { get; }
+
+    public static Receiver Create(ActorNumber actorNumber, MarketRole actorRole)
+    {
+        return new Receiver(actorNumber, actorRole);
     }
 }

@@ -11,18 +11,24 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+namespace Domain.OutgoingMessages.Queueing;
 
-using Application.OutgoingMessages.Dequeue;
-using MediatR;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace Infrastructure.OutgoingMessages.Dequeue;
-
-internal static class DequeueConfiguration
+public record BundleId
 {
-    internal static void Configure(IServiceCollection services)
+    private BundleId(Guid id)
     {
-        services.AddTransient<IRequestHandler<DequeueRequest, DequeueResult>, DequeueRequestHandler>();
-        services.AddTransient<IRequestHandler<DequeueCommand, DequeCommandResult>, DequeueHandler>();
+        Id = id;
+    }
+
+    public Guid Id { get; }
+
+    public static BundleId New()
+    {
+        return new BundleId(Guid.NewGuid());
+    }
+
+    public static BundleId Create(Guid id)
+    {
+        return new BundleId(id);
     }
 }
