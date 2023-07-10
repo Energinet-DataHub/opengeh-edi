@@ -91,8 +91,12 @@ public class ActorMessageQueue : Entity
 
     private Bundle? NextBundleToPeek(MessageCategory? category = null)
     {
-        return category is not null ?
+        var nextBundleToPeek = category is not null ?
             _bundles.FirstOrDefault(bundle => bundle.IsDequeued == false && bundle.DocumentTypeInBundle.Category.Equals(category)) :
             _bundles.FirstOrDefault(bundle => bundle.IsDequeued == false);
+
+        nextBundleToPeek.CloseBundle();
+
+        return nextBundleToPeek;
     }
 }

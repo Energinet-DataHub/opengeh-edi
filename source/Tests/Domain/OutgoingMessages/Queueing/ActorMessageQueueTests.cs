@@ -132,6 +132,21 @@ public class ActorMessageQueueTests
         Assert.Equal(messageAssignedToFirstBundle.AssignedBundleId, result.BundleId);
     }
 
+    [Fact]
+    public void Peek_closes_the_bundle_that_is_peeked()
+    {
+        var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), MarketRole.EnergySupplier);
+        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
+        var messageAssignedToFirstBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
+        var messageAssignedToSecondBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
+        actorMessageQueue.Enqueue(messageAssignedToFirstBundle, 1);
+
+        actorMessageQueue.Peek();
+        actorMessageQueue.Enqueue(messageAssignedToSecondBundle, 1);
+
+        Assert.NotEqual(messageAssignedToFirstBundle.AssignedBundleId, messageAssignedToSecondBundle.AssignedBundleId);
+    }
+
     private static OutgoingMessage CreateOutgoingMessage(
         Receiver? receiver = null,
         BusinessReason? processType = null,

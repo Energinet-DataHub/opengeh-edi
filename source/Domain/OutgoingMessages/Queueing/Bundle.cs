@@ -61,4 +61,9 @@ public sealed class Bundle
     {
         IsClosed = _maxNumberOfMessagesInABundle == _messageCount;
     }
+
+    public void CloseBundle()
+    {
+        IsClosed = true;
+    }
 }
