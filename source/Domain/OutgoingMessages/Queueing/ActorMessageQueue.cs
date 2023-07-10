@@ -41,13 +41,24 @@ public class ActorMessageQueue : Entity
         return new ActorMessageQueue(receiver);
     }
 
-    public void Enqueue(OutgoingMessage outgoingMessage, int maxNumberOfMessagesInABundle = 1)
+    public void Enqueue(OutgoingMessage outgoingMessage, int? maxNumberOfMessagesInABundle = null)
     {
         ArgumentNullException.ThrowIfNull(outgoingMessage);
         EnsureApplicable(outgoingMessage);
+
         var currentBundle = CurrentBundleOf(BusinessReason.From(outgoingMessage.BusinessReason), outgoingMessage.DocumentType) ??
-                            CreateBundleOf(BusinessReason.From(outgoingMessage.BusinessReason), outgoingMessage.DocumentType, maxNumberOfMessagesInABundle);
+                            CreateBundleOf(BusinessReason.From(outgoingMessage.BusinessReason), outgoingMessage.DocumentType,
+                                SetMaxNumberOfMessagesInABundle(maxNumberOfMessagesInABundle, outgoingMessage.DocumentType));
+
         currentBundle.Add(outgoingMessage);
+    }
+
+    private int SetMaxNumberOfMessagesInABundle(int? maxNumberOfMessagesInABundle, DocumentType documentType)
+    {
+        if (maxNumberOfMessagesInABundle != null)
+            return maxNumberOfMessagesInABundle.Value;
+
+        return documentType.Category == MessageCategory.Aggregations ? 2000 : 10000;
     }
 
     public PeekResult Peek()
