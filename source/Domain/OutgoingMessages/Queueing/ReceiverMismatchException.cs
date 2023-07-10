@@ -11,18 +11,21 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+namespace Domain.OutgoingMessages.Queueing;
 
-using Application.OutgoingMessages.Dequeue;
-using MediatR;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace Infrastructure.OutgoingMessages.Dequeue;
-
-internal static class DequeueConfiguration
+public class ReceiverMismatchException : Exception
 {
-    internal static void Configure(IServiceCollection services)
+    public ReceiverMismatchException(string message)
+        : base(message)
     {
-        services.AddTransient<IRequestHandler<DequeueRequest, DequeueResult>, DequeueRequestHandler>();
-        services.AddTransient<IRequestHandler<DequeueCommand, DequeCommandResult>, DequeueHandler>();
+    }
+
+    public ReceiverMismatchException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+
+    public ReceiverMismatchException()
+    {
     }
 }
