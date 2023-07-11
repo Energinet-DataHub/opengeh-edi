@@ -21,14 +21,14 @@ namespace Application.Configuration.Authentication
 {
     public abstract class MarketActorIdentity
     {
-        private readonly IEnumerable<MarketRole> _roles;
-
         protected MarketActorIdentity(string id, ActorNumber? number, IEnumerable<MarketRole> roles)
         {
             Id = id;
             Number = number;
-            _roles = roles;
+            Roles = roles;
         }
+
+        public IEnumerable<MarketRole> Roles { get; private set; }
 
         public string Id { get; }
 
@@ -40,8 +40,8 @@ namespace Application.Configuration.Authentication
 
         public bool HasRole(string role)
         {
-            return _roles.Any(marketRole => marketRole.Name.Equals(role, StringComparison.OrdinalIgnoreCase) ||
-                                            marketRole.Code.Equals(role, StringComparison.OrdinalIgnoreCase));
+            return Roles.Any(marketRole => marketRole.Name.Equals(role, StringComparison.OrdinalIgnoreCase) ||
+                                           marketRole.Code.Equals(role, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
