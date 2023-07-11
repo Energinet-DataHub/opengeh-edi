@@ -41,12 +41,13 @@ public class AggregatedMeasureDataAcceptedInternalCommandHandler : IRequestHandl
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(request.AggregatedMeasureDataAccepted);
 
-        // Lav Entitet
-        var transaction = new AggregatedMeasureDataForwarding(ProcessId.New());
-        var process = _aggregatedMeasureDataProcessRepository.GetById(ProcessId.Create(request.AggregatedMeasureDataAccepted.ProcessId));
+        var process = _aggregatedMeasureDataProcessRepository
+            .GetById(ProcessId.Create(request.AggregatedMeasureDataAccepted.ProcessId));
+
         ArgumentNullException.ThrowIfNull(process);
-        //_transactions.Add(transaction);
-        _outgoingMessageStore.Add(AggregatedMeasureDataForwarding.CreateMessage(request.AggregatedMeasureDataAccepted.TimeSeries, process));
+
+        var outgoingMessage = process.CreateMessage(request.AggregatedMeasureDataAccepted.TimeSeries);
+        _outgoingMessageStore.Add(outgoingMessage);
         return Unit.Task;
     }
 }

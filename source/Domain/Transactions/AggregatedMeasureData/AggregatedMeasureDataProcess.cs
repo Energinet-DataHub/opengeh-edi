@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Domain.Actors;
+using Domain.OutgoingMessages;
 using Domain.SeedWork;
 using Domain.Transactions.AggregatedMeasureData.Events;
 using NodaTime;
@@ -125,6 +126,15 @@ namespace Domain.Transactions.AggregatedMeasureData
             {
                 throw new AggregatedMeasureDataException("Wholesale has not been notified yet");
             }
+        }
+
+        public AggregatedMeasureDataAcceptedMessage CreateMessage(string timeseries)
+        {
+            return AggregatedMeasureDataAcceptedMessage.Create(
+                ProcessId,
+                ActorProvidedId.Create(_requestedByActorId.Value),
+                BusinessReason.PreliminaryAggregation,
+                timeseries);
         }
     }
 }

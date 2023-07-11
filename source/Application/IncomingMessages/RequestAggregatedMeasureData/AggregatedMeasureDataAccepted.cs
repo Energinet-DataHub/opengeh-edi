@@ -14,20 +14,20 @@
 
 using System;
 using Application.Configuration.Commands.Commands;
-using Energinet.DataHub.Edi.Responses.AggregatedMeasureData;
+using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using MediatR;
 
 namespace Application.IncomingMessages.RequestAggregatedMeasureData;
 
 public class AggregatedMeasureDataAccepted : ICommand<Unit>
 {
-    public AggregatedMeasureDataAccepted(AggregatedTimeSeriesRequestAccepted timeSeries, Guid processId)
+    public AggregatedMeasureDataAccepted(string timeSeries, Guid processId)
     {
         TimeSeries = timeSeries;
         ProcessId = processId;
     }
 
-    public AggregatedTimeSeriesRequestAccepted TimeSeries { get; }
+    public string TimeSeries { get; }
 
     public Guid ProcessId { get; }
 }

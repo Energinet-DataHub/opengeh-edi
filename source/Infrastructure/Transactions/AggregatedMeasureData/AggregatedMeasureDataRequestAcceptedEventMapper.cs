@@ -32,8 +32,8 @@ public class AggregatedMeasureDataRequestAcceptedEventMapper : IInboxEventMapper
 
     public ICommand<Unit> CreateCommand(string eventId, byte[] eventPayload)
     {
-        var aggregatedTimeSeries = AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(eventPayload);
-        return new AggregatedMeasureDataAccepted(aggregatedTimeSeries, Guid.Parse(eventId));
+        var payload = AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(eventPayload);
+        return new AggregatedMeasureDataAccepted(payload.ToString(), Guid.Parse(eventId));
     }
 
     public Task<INotification> MapFromAsync(string payload)
