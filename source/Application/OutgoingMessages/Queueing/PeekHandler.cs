@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration;
 using Application.Configuration.Commands.Commands;
+using Application.Configuration.DataAccess;
 using Domain.Actors;
 using Domain.Documents;
 using Domain.OutgoingMessages.Peek;
@@ -33,19 +34,22 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
     private readonly DocumentFactory _documentFactory;
     private readonly IOutgoingMessageStore _outgoingMessageStore;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IUnitOfWork _unitOfWork;
 
     public PeekHandler(
         IActorMessageQueueRepository actorMessageQueueRepository,
         IMarketDocumentRepository marketDocumentRepository,
         DocumentFactory documentFactory,
         IOutgoingMessageStore outgoingMessageStore,
-        ISystemDateTimeProvider systemDateTimeProvider)
+        ISystemDateTimeProvider systemDateTimeProvider,
+        IUnitOfWork unitOfWork)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _marketDocumentRepository = marketDocumentRepository;
         _documentFactory = documentFactory;
         _outgoingMessageStore = outgoingMessageStore;
         _systemDateTimeProvider = systemDateTimeProvider;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<PeekResult> Handle(PeekCommand request, CancellationToken cancellationToken)
@@ -59,6 +63,9 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
             return new PeekResult(null);
 
         var peekResult = actorMessageQueue.Peek(request.MessageCategory);
+        // Right after we Peek, we close the bundle. This is to ensure that the bundle wont be added more messages, after we have peeked.
+        // And before we potentially create a document from the bundle and are able to return it.
+        await _unitOfWork.CommitAsync().ConfigureAwait(false);
 
         if (peekResult.BundleId == null)
             return new PeekResult(null);
