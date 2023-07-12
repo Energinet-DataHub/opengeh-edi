@@ -16,6 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.Commands.Commands;
+using Domain.Actors;
 using Domain.OutgoingMessages.Queueing;
 using MediatR;
 
@@ -40,7 +41,7 @@ public class DequeueHandler : IRequestHandler<DequeueCommand, DequeCommandResult
         }
 
         var bundleId = BundleId.Create(messageId);
-        var actorQueue = await _actorMessageQueueRepository.ActorMessageQueueForAsync(bundleId).ConfigureAwait(false);
+        var actorQueue = await _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.MarketRole).ConfigureAwait(false);
 
         if (actorQueue == null)
         {
@@ -53,6 +54,6 @@ public class DequeueHandler : IRequestHandler<DequeueCommand, DequeCommandResult
     }
 }
 
-public record DequeueCommand(string MessageId) : ICommand<DequeCommandResult>;
+public record DequeueCommand(string MessageId, MarketRole MarketRole, ActorNumber ActorNumber) : ICommand<DequeCommandResult>;
 
 public record DequeCommandResult(bool Success);

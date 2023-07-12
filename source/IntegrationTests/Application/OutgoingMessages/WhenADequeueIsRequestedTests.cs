@@ -1,85 +1,85 @@
-﻿// // Copyright 2020 Energinet DataHub A/S
-// //
-// // Licensed under the Apache License, Version 2.0 (the "License2");
-// // you may not use this file except in compliance with the License.
-// // You may obtain a copy of the License at
-// //
-// //     http://www.apache.org/licenses/LICENSE-2.0
-// //
-// // Unless required by applicable law or agreed to in writing, software
-// // distributed under the License is distributed on an "AS IS" BASIS,
-// // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// // See the License for the specific language governing permissions and
-// // limitations under the License.
+﻿// Copyright 2020 Energinet DataHub A/S
 //
-// using System;
-// using System.Threading;
-// using System.Threading.Tasks;
-// using Application.Configuration.DataAccess;
-// using Application.OutgoingMessages.Dequeue;
-// using Application.OutgoingMessages.Peek;
-// using Application.OutgoingMessages.Queueing;
-// using Dapper;
-// using Domain.Actors;
-// using Domain.Documents;
-// using Domain.OutgoingMessages;
-// using Domain.OutgoingMessages.Peek;
-// using Domain.OutgoingMessages.Queueing;
-// using IntegrationTests.Application.IncomingMessages;
-// using IntegrationTests.Fixtures;
-// using Xunit;
+// Licensed under the Apache License, Version 2.0 (the "License2");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// namespace IntegrationTests.Application.OutgoingMessages;
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-// public class WhenADequeueIsRequestedTests : TestBase
-// {
-//     public WhenADequeueIsRequestedTests(DatabaseFixture databaseFixture)
-//         : base(databaseFixture)
-//     {
-//     }
-//
-//     [Fact]
-//     public async Task Dequeue_is_unsuccessful_when_bundle_does_not_exist()
-//     {
-//         var dequeueResult = await InvokeCommandAsync(new DequeueRequest(Guid.NewGuid().ToString())).ConfigureAwait(false);
-//
-//         Assert.False(dequeueResult.Success);
-//     }
-//
-//     [Fact]
-//     public async Task Dequeue_is_Successful()
-//     {
-//         await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
-//         var peekResult = await InvokeCommandAsync(new PeekCommand(
-//             ActorNumber.Create(SampleData.NewEnergySupplierNumber),
-//             MessageCategory.MasterData,
-//             MarketRole.EnergySupplier,
-//             DocumentFormat.Xml)).ConfigureAwait(false);
-//
-//         var dequeueResult = await InvokeCommandAsync(new DequeueCommand(peekResult.MessageId.GetValueOrDefault().ToString())).ConfigureAwait(false);
-//
-//         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
-//         var found = await connection
-//             .QuerySingleOrDefaultAsync<bool>("SELECT IsDequeued FROM [dbo].Bundles")
-//             .ConfigureAwait(false);
-//
-//         Assert.True(dequeueResult.Success);
-//         Assert.True(found);
-//     }
-//
-//     private async Task GivenAMoveInTransactionHasBeenAccepted()
-//     {
-//         var incomingMessage = new IncomingMessageBuilder()
-//             .WithMarketEvaluationPointId(SampleData.MeteringPointNumber)
-//             .WithBusinessReason(BusinessReason.MoveIn)
-//             .WithReceiver(SampleData.ReceiverId)
-//             .WithSenderId(SampleData.SenderId)
-//             .WithConsumerName(SampleData.ConsumerName)
-//             .WithEnergySupplierId(SampleData.NewEnergySupplierNumber)
-//             .WithMessageId(SampleData.OriginalMessageId)
-//             .WithTransactionId(SampleData.TransactionId)
-//             .Build();
-//
-//         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-//     }
-// }
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Application.Configuration.DataAccess;
+using Application.OutgoingMessages.Dequeue;
+using Application.OutgoingMessages.Peek;
+using Application.OutgoingMessages.Queueing;
+using Dapper;
+using Domain.Actors;
+using Domain.Documents;
+using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.Peek;
+using Domain.OutgoingMessages.Queueing;
+using IntegrationTests.Application.IncomingMessages;
+using IntegrationTests.Fixtures;
+using Xunit;
+
+namespace IntegrationTests.Application.OutgoingMessages;
+
+public class WhenADequeueIsRequestedTests : TestBase
+{
+    public WhenADequeueIsRequestedTests(DatabaseFixture databaseFixture)
+        : base(databaseFixture)
+    {
+    }
+
+    [Fact]
+    public async Task Dequeue_is_unsuccessful_when_bundle_does_not_exist()
+    {
+        var dequeueResult = await InvokeCommandAsync(new DequeueRequest(Guid.NewGuid().ToString())).ConfigureAwait(false);
+
+        Assert.False(dequeueResult.Success);
+    }
+
+    [Fact]
+    public async Task Dequeue_is_Successful()
+    {
+        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+        var peekResult = await InvokeCommandAsync(new PeekCommand(
+            ActorNumber.Create(SampleData.NewEnergySupplierNumber),
+            MessageCategory.MasterData,
+            MarketRole.EnergySupplier,
+            DocumentFormat.Xml)).ConfigureAwait(false);
+
+        var dequeueResult = await InvokeCommandAsync(new DequeueCommand(peekResult.MessageId.GetValueOrDefault().ToString(), MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId))).ConfigureAwait(false);
+
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+        var found = await connection
+            .QuerySingleOrDefaultAsync<bool>("SELECT IsDequeued FROM [dbo].Bundles")
+            .ConfigureAwait(false);
+
+        Assert.True(dequeueResult.Success);
+        Assert.True(found);
+    }
+
+    private async Task GivenAMoveInTransactionHasBeenAccepted()
+    {
+        var incomingMessage = new IncomingMessageBuilder()
+            .WithMarketEvaluationPointId(SampleData.MeteringPointNumber)
+            .WithBusinessReason(BusinessReason.MoveIn)
+            .WithReceiver(SampleData.ReceiverId)
+            .WithSenderId(SampleData.SenderId)
+            .WithConsumerName(SampleData.ConsumerName)
+            .WithEnergySupplierId(SampleData.NewEnergySupplierNumber)
+            .WithMessageId(SampleData.OriginalMessageId)
+            .WithTransactionId(SampleData.TransactionId)
+            .Build();
+
+        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
+    }
+}

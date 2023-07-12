@@ -82,7 +82,7 @@ public class WhenEnqueueingTests : TestBase
         await EnqueueMessage(message);
         var peekCommand = new PeekCommand(message.ReceiverId, message.DocumentType.Category, message.ReceiverRole, DocumentFormat.Xml);
         var peekResult = await InvokeCommandAsync(peekCommand);
-        var dequeueCommand = new DequeueCommand(peekResult.MessageId!.Value.ToString());
+        var dequeueCommand = new DequeueCommand(peekResult.MessageId!.Value.ToString(), message.ReceiverRole, message.ReceiverId);
 
         var result = await InvokeCommandAsync(dequeueCommand);
 
