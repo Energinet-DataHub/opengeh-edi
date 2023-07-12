@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Application.Configuration.Authentication;
 using Application.OutgoingMessages.Dequeue;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
@@ -24,10 +26,12 @@ namespace Api.OutgoingMessages;
 public class DequeueRequestListener
 {
     private readonly IMediator _mediator;
+    private readonly IMarketActorAuthenticator _authenticator;
 
-    public DequeueRequestListener(IMediator mediator)
+    public DequeueRequestListener(IMediator mediator, IMarketActorAuthenticator authenticator)
     {
         _mediator = mediator;
+        _authenticator = authenticator;
     }
 
     [Function("DequeueRequestListener")]
@@ -37,7 +41,7 @@ public class DequeueRequestListener
         FunctionContext executionContext,
         string messageId)
     {
-        var result = await _mediator.Send(new DequeueRequest(messageId)).ConfigureAwait(false);
+        var result = await _mediator.Send(new DequeueCommand(messageId, _authenticator.CurrentIdentity.Roles.First(), _authenticator.CurrentIdentity.Number!)).ConfigureAwait(false);
         return result.Success
             ? request.CreateResponse(HttpStatusCode.OK)
             : request.CreateResponse(HttpStatusCode.BadRequest);
