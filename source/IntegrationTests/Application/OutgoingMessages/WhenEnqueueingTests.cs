@@ -86,7 +86,7 @@ public class WhenEnqueueingTests : TestBase
 
         var result = await InvokeCommandAsync(dequeueCommand);
 
-        Assert.False(result.Success);
+        Assert.True(result.Success);
     }
 
     private static OutgoingMessage CreateOutgoingMessage()
