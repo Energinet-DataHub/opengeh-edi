@@ -27,11 +27,6 @@ public interface IActorMessageQueueRepository
     Task<ActorMessageQueue?> ActorMessageQueueForAsync(ActorNumber actorNumber, MarketRole actorRole);
 
     /// <summary>
-    /// Get the actor queue for the given bundle id.
-    /// </summary>
-    Task<ActorMessageQueue?> ActorMessageQueueForAsync(BundleId bundleId);
-
-    /// <summary>
     /// Add a new actor queue.
     /// </summary>
     Task AddAsync(ActorMessageQueue actorMessageQueue);
