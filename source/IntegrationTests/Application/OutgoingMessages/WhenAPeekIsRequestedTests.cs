@@ -84,7 +84,6 @@ public class WhenAPeekIsRequestedTests : TestBase
         Assert.NotNull(firstPeekResult.MessageId);
         Assert.NotNull(secondPeekResult.MessageId);
         Assert.Equal(firstPeekResult.Bundle!, secondPeekResult.Bundle!);
-        // AssertXmlMessage.IsTheSameDocument(firstPeekResult.Bundle!, secondPeekResult.Bundle!); TODO: LRN
     }
 
     [Fact]
