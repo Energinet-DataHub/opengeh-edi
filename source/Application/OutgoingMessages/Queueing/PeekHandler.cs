@@ -107,8 +107,9 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
         // And before we are able to update the bundle to closed in the database.
         var actorMessageQueue = await
             _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.ActorRole).ConfigureAwait(false);
-        actorMessageQueue?.Peek(request.MessageCategory);
-        await _unitOfWork.CommitAsync().ConfigureAwait(false);
+        var peekResult = actorMessageQueue?.Peek(request.MessageCategory);
+        if (peekResult != null)
+            await _unitOfWork.CommitAsync().ConfigureAwait(false);
     }
 }
 
