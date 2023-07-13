@@ -60,7 +60,7 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
     public async Task<PeekResult> Handle(PeekCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        EnsureBundleIsClosedBeforePeekingAsync(request);
+        await EnsureBundleIsClosedBeforePeekingAsync(request).ConfigureAwait(false);
 
         var actorMessageQueue = await
             _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.ActorRole).ConfigureAwait(false);
