@@ -13,12 +13,14 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration;
 using Application.Configuration.Commands.Commands;
 using Application.Configuration.DataAccess;
 using Domain.Actors;
+using Domain.ArchivedMessages;
 using Domain.Documents;
 using Domain.OutgoingMessages.Peek;
 using Domain.OutgoingMessages.Queueing;
@@ -35,6 +37,7 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
     private readonly IOutgoingMessageStore _outgoingMessageStore;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IArchivedMessageRepository _archivedMessageRepository;
 
     public PeekHandler(
         IActorMessageQueueRepository actorMessageQueueRepository,
@@ -42,7 +45,8 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
         DocumentFactory documentFactory,
         IOutgoingMessageStore outgoingMessageStore,
         ISystemDateTimeProvider systemDateTimeProvider,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IArchivedMessageRepository archivedMessageRepository)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _marketDocumentRepository = marketDocumentRepository;
@@ -50,6 +54,7 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
         _outgoingMessageStore = outgoingMessageStore;
         _systemDateTimeProvider = systemDateTimeProvider;
         _unitOfWork = unitOfWork;
+        _archivedMessageRepository = archivedMessageRepository;
     }
 
     public async Task<PeekResult> Handle(PeekCommand request, CancellationToken cancellationToken)
@@ -75,9 +80,25 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
         if (document == null)
         {
             var outgoingMessages = await _outgoingMessageStore.GetByAssignedBundleIdAsync(peekResult.BundleId).ConfigureAwait(false);
-            var result = await _documentFactory.CreateFromAsync(outgoingMessages, request.DocumentFormat, _systemDateTimeProvider.Now()).ConfigureAwait(false);
+            var timestamp = _systemDateTimeProvider.Now();
+            var result = await _documentFactory.CreateFromAsync(outgoingMessages, request.DocumentFormat, timestamp).ConfigureAwait(false);
             document = new MarketDocument(result, peekResult.BundleId);
             await _marketDocumentRepository.AddAsync(document).ConfigureAwait(false);
+
+            var outgoingMessage = outgoingMessages.First();
+            var documentType = outgoingMessage.DocumentType;
+            var senderId = outgoingMessage.SenderId.Value;
+            var receiverId = outgoingMessage.Receiver.Number.Value;
+            var businessReason = outgoingMessage.BusinessReason;
+
+            _archivedMessageRepository.Add(new ArchivedMessage(
+                peekResult.BundleId.Id.ToString(),
+                documentType,
+                ActorNumber.Create(senderId),
+                ActorNumber.Create(receiverId),
+                timestamp,
+                businessReason,
+                result));
         }
 
         return new PeekResult(document!.Payload, document.BundleId.Id);

@@ -35,7 +35,12 @@ public class DequeueHandler : IRequestHandler<DequeueCommand, DequeCommandResult
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var bundleId = BundleId.Create(request.MessageId);
+        if (Guid.TryParse(request.MessageId, out var messageId) == false)
+        {
+            return new DequeCommandResult(false);
+        }
+
+        var bundleId = BundleId.Create(messageId);
         var actorQueue = await _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.MarketRole).ConfigureAwait(false);
 
         if (actorQueue == null)
@@ -49,6 +54,6 @@ public class DequeueHandler : IRequestHandler<DequeueCommand, DequeCommandResult
     }
 }
 
-public record DequeueCommand(Guid MessageId, MarketRole MarketRole, ActorNumber ActorNumber) : ICommand<DequeCommandResult>;
+public record DequeueCommand(string MessageId, MarketRole MarketRole, ActorNumber ActorNumber) : ICommand<DequeCommandResult>;
 
 public record DequeCommandResult(bool Success);
