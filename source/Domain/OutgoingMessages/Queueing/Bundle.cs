@@ -42,7 +42,7 @@ public sealed class Bundle
 
     internal bool IsClosed { get; private set; }
 
-    internal bool IsDequeued { get; private set; }
+    public bool IsDequeued { get; private set; }
 
     internal void Add(OutgoingMessage outgoingMessage)
     {

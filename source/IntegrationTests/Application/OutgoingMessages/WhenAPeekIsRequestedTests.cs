@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Application.Configuration.DataAccess;
 using Application.OutgoingMessages.Peek;
+using Application.OutgoingMessages.Queueing;
 using Dapper;
 using Domain.Actors;
 using Domain.Documents;
@@ -29,6 +30,7 @@ using IntegrationTests.Assertions;
 using IntegrationTests.Factories;
 using IntegrationTests.Fixtures;
 using IntegrationTests.TestDoubles;
+using MediatR;
 using Xunit;
 
 namespace IntegrationTests.Application.OutgoingMessages;
@@ -53,7 +55,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         var result = await PeekMessage(MessageCategory.Aggregations).ConfigureAwait(false);
 
         Assert.Null(result.Bundle);
-        Assert.False(await BundleIsRegistered().ConfigureAwait(false));
+        Assert.True(await BundleIsRegistered().ConfigureAwait(false));
     }
 
     [Fact]
@@ -72,21 +74,6 @@ public class WhenAPeekIsRequestedTests : TestBase
     }
 
     [Fact]
-    public async Task Bundled_message_contains_maximum_number_of_payloads()
-    {
-        SetMaximumNumberOfPayloadsInBundle(1);
-        await GivenTwoMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
-        await InsertFakeMessagesAsync(SampleData.NewEnergySupplierNumber, MarketRole.EnergySupplier, MessageCategory.MasterData, BusinessReason.MoveIn, DocumentType.ConfirmRequestChangeOfSupplier).ConfigureAwait(false);
-
-        var result = await PeekMessage(MessageCategory.MasterData).ConfigureAwait(false);
-
-        AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
-            .IsDocumentType(DocumentType.ConfirmRequestChangeOfSupplier)
-            .IsBusinessReason(BusinessReason.MoveIn)
-            .HasMarketActivityRecordCount(1);
-    }
-
-    [Fact]
     public async Task Ensure_same_bundle_is_returned_if_not_dequeued()
     {
         await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
@@ -96,19 +83,7 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         Assert.NotNull(firstPeekResult.MessageId);
         Assert.NotNull(secondPeekResult.MessageId);
-        AssertXmlMessage.IsTheSameDocument(firstPeekResult.Bundle!, secondPeekResult.Bundle!);
-    }
-
-    [Fact]
-    public async Task Return_empty_bundle_if_bundle_is_already_registered()
-    {
-        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
-        await PeekMessage(MessageCategory.MasterData).ConfigureAwait(false);
-
-        _bundledMessagesStub.ReturnsEmptyMessage();
-        var peekResult = await PeekMessage(MessageCategory.MasterData).ConfigureAwait(false);
-
-        Assert.Null(peekResult.Bundle);
+        Assert.Equal(firstPeekResult.Bundle!, secondPeekResult.Bundle!);
     }
 
     [Fact]
@@ -179,23 +154,18 @@ public class WhenAPeekIsRequestedTests : TestBase
         await InvokeCommandAsync(message).ConfigureAwait(false);
     }
 
-    private void SetMaximumNumberOfPayloadsInBundle(int maxNumberOfPayloadsInBundle)
-    {
-        var bundleConfiguration = (BundleConfigurationStub)GetService<IBundleConfiguration>();
-        bundleConfiguration.MaxNumberOfPayloadsInBundle = maxNumberOfPayloadsInBundle;
-    }
-
     private async Task<bool> BundleIsRegistered()
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var numberOfBundles = await connection
-            .ExecuteScalarAsync<int>("SELECT COUNT(*) FROM dbo.BundledMessages").ConfigureAwait(false);
+            .ExecuteScalarAsync<int>("SELECT COUNT(*) FROM dbo.Bundles").ConfigureAwait(false);
         return numberOfBundles == 1;
     }
 
     private Task<PeekResult> PeekMessage(MessageCategory category)
     {
-        return _messagePeeker.PeekAsync(ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, DocumentFormat.Xml);
+        var mediatr = GetService<IMediator>();
+        return mediatr.Send(new PeekCommand(ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, MarketRole.EnergySupplier, DocumentFormat.Xml));
     }
 
     private async Task AssertMessageIsArchived(Guid? messageId)

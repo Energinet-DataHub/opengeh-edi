@@ -13,14 +13,17 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Api.Common;
 using Application.Configuration.Authentication;
 using Application.OutgoingMessages.Peek;
+using Application.OutgoingMessages.Queueing;
 using Domain.OutgoingMessages.Peek;
 using Domain.SeedWork;
 using Infrastructure.IncomingMessages;
+using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
@@ -32,13 +35,18 @@ public class PeekRequestListener
     private readonly MessagePeeker _messagePeeker;
     private readonly IMarketActorAuthenticator _authenticator;
     private readonly ILogger<PeekRequestListener> _logger;
+    private readonly IMediator _mediator;
 
     public PeekRequestListener(
-        MessagePeeker messagePeeker, IMarketActorAuthenticator authenticator, ILogger<PeekRequestListener> logger)
+        MessagePeeker messagePeeker,
+        IMarketActorAuthenticator authenticator,
+        ILogger<PeekRequestListener> logger,
+        IMediator mediator)
     {
         _messagePeeker = messagePeeker;
         _authenticator = authenticator;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _mediator = mediator;
     }
 
     [Function("PeekRequestListener")]
@@ -62,28 +70,28 @@ public class PeekRequestListener
             return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
         }
 
-        var result = await _messagePeeker.PeekAsync(
+        var peekResult = await _mediator.Send(new PeekCommand(
                 _authenticator.CurrentIdentity.Number!,
                 EnumerationType.FromName<MessageCategory>(messageCategory),
-                desiredDocumentFormat)
-            .ConfigureAwait(false);
+                _authenticator.CurrentIdentity.Roles.First(),
+                desiredDocumentFormat)).ConfigureAwait(false);
 
         var response = HttpResponseData.CreateResponse(request);
-        if (result.Bundle is null)
+        if (peekResult.Bundle is null)
         {
             response.StatusCode = HttpStatusCode.NoContent;
             return response;
         }
 
-        if (result.MessageId == null)
+        if (peekResult.MessageId == null)
         {
             response.StatusCode = HttpStatusCode.InternalServerError;
             return response;
         }
 
-        response.Body = result.Bundle;
+        response.Body = peekResult.Bundle;
         response.Headers.Add("content-type", contentType);
-        response.Headers.Add("MessageId", result.MessageId.ToString());
+        response.Headers.Add("MessageId", peekResult.MessageId.ToString());
         response.StatusCode = HttpStatusCode.OK;
         return response;
     }
