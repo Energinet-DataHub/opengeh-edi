@@ -21,6 +21,7 @@ using Domain.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics
 using Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Domain.OutgoingMessages.GenericNotification;
 using Domain.OutgoingMessages.Peek;
+using Domain.OutgoingMessages.Queueing;
 using Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Domain.Transactions.AggregatedMeasureData;
@@ -33,6 +34,7 @@ using Infrastructure.Configuration.Serialization;
 using Infrastructure.MasterData.MarketEvaluationPoints;
 using Infrastructure.OutgoingMessages;
 using Infrastructure.OutgoingMessages.Peek;
+using Infrastructure.OutgoingMessages.Queueing;
 using Infrastructure.Transactions;
 using Infrastructure.Transactions.AggregatedMeasureData;
 using Infrastructure.Transactions.Aggregations;
@@ -77,6 +79,10 @@ namespace Infrastructure.Configuration.DataAccess
 
         public DbSet<ReceivedIntegrationEvent> ReceivedIntegrationEvents { get; private set; }
 
+        public DbSet<ActorMessageQueue> ActorMessageQueues { get; private set; }
+
+        public DbSet<MarketDocument> MarketDocuments { get; private set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
@@ -92,6 +98,8 @@ namespace Infrastructure.Configuration.DataAccess
             modelBuilder.ApplyConfiguration(new MarketEvaluationPointEntityConfiguration());
             modelBuilder.ApplyConfiguration(new BundledMessageConfiguration());
             modelBuilder.ApplyConfiguration(new ArchivedMessageEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new ActorMessageQueueEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new MarketDocumentEntityConfiguration());
 
             modelBuilder.Entity<GenericNotificationMessage>()
                 .Ignore(entity => entity.MarketActivityRecord);

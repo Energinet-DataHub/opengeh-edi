@@ -22,6 +22,7 @@ using Domain.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics
 using Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Domain.OutgoingMessages.GenericNotification;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Domain.OutgoingMessages.Queueing;
 using Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Domain.SeedWork;
@@ -69,6 +70,11 @@ namespace Infrastructure.OutgoingMessages
                     toDbValue => toDbValue.ToString(),
                     fromDbValue => EnumerationType.FromName<MarketRole>(fromDbValue));
             builder.Property(x => x.MessageRecord);
+            builder.Property(x => x.AssignedBundleId).HasConversion(
+                toDbValue => toDbValue == null ? Guid.Empty : toDbValue.Id,
+                fromDbValue => fromDbValue == Guid.Empty ? null : BundleId.Create(fromDbValue));
+
+            builder.Ignore(x => x.Receiver);
 
             builder
                 .HasDiscriminator<string>("Discriminator")

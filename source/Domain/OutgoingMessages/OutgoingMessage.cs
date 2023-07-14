@@ -14,6 +14,7 @@
 
 using Domain.Actors;
 using Domain.Documents;
+using Domain.OutgoingMessages.Queueing;
 using Domain.Transactions;
 
 namespace Domain.OutgoingMessages
@@ -52,5 +53,37 @@ namespace Domain.OutgoingMessages
         public MarketRole SenderRole { get; }
 
         public string MessageRecord { get; }
+
+        public Receiver Receiver => Receiver.Create(ReceiverId, ReceiverRole);
+
+        public BundleId? AssignedBundleId { get; private set; }
+
+        public static OutgoingMessage Create(
+            Receiver receiver,
+            BusinessReason businessReason,
+            DocumentType documentType,
+            TransactionId transactionId,
+            ActorNumber senderId,
+            MarketRole senderRole,
+            string messageRecord)
+        {
+            ArgumentNullException.ThrowIfNull(receiver);
+            ArgumentNullException.ThrowIfNull(businessReason);
+
+            return new OutgoingMessage(
+                documentType,
+                receiver.Number,
+                transactionId,
+                businessReason.Name,
+                receiver.ActorRole,
+                senderId,
+                senderRole,
+                messageRecord);
+        }
+
+        public void AssignToBundle(BundleId bundleId)
+        {
+            AssignedBundleId = bundleId;
+        }
     }
 }

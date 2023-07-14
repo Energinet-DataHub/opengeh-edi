@@ -12,26 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Actors;
-using Domain.OutgoingMessages.Peek;
-using Domain.SeedWork;
+namespace Domain.OutgoingMessages.Queueing;
 
-namespace Domain.OutgoingMessages;
-
-public class BundleId : ValueObject
+public class MarketDocument
 {
-    private BundleId(MessageCategory messageCategory, ActorNumber receiverNumber)
+    private readonly Guid _id;
+
+    public MarketDocument(Stream payload, BundleId bundleId)
     {
-        MessageCategory = messageCategory;
-        ReceiverNumber = receiverNumber;
+        _id = Guid.NewGuid();
+        Payload = payload;
+        BundleId = bundleId;
     }
 
-    public MessageCategory MessageCategory { get; }
+    public Stream Payload { get; }
 
-    public ActorNumber ReceiverNumber { get; }
+    public BundleId BundleId { get; }
 
-    public static BundleId Create(MessageCategory messageCategory, ActorNumber actorNumber)
+    #pragma warning disable
+    private MarketDocument()
     {
-        return new BundleId(messageCategory, actorNumber);
     }
 }
