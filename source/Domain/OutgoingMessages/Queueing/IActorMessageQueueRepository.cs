@@ -12,27 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.Queueing;
+using Domain.Actors;
 
-namespace Application.OutgoingMessages
+namespace Domain.OutgoingMessages.Queueing;
+
+/// <summary>
+/// The repository for the actor message queue.
+/// </summary>
+public interface IActorMessageQueueRepository
 {
     /// <summary>
-    /// Store for outgoing actor messages
+    /// Get the the actor queue for the given actor number and message category.
     /// </summary>
-    public interface IOutgoingMessageStore
-    {
-        /// <summary>
-        /// Add message to queue
-        /// </summary>
-        /// <param name="message"></param>
-        void Add(OutgoingMessage message);
+    Task<ActorMessageQueue?> ActorMessageQueueForAsync(ActorNumber actorNumber, MarketRole actorRole);
 
-        /// <summary>
-        /// Get all messages assigned to a bundle by id.
-        /// </summary>
-        Task<IReadOnlyCollection<OutgoingMessage>> GetByAssignedBundleIdAsync(BundleId bundleId);
-    }
+    /// <summary>
+    /// Add a new actor queue.
+    /// </summary>
+    Task AddAsync(ActorMessageQueue actorMessageQueue);
 }

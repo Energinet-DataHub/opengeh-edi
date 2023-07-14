@@ -48,7 +48,7 @@ public class MoveInNotifications
             DocumentType.GenericNotification,
             ActorNumber.Create(transaction.CurrentEnergySupplierId!),
             transaction.TransactionId,
-            BusinessReasonCode.CustomerMoveInOrMoveOut.Code,
+            BusinessReason.MoveIn.Name,
             MarketRole.EnergySupplier,
             DataHubDetails.IdentificationNumber,
             MarketRole.MeteringPointAdministrator,

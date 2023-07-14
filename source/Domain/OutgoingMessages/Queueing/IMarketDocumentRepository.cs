@@ -12,27 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.Queueing;
+namespace Domain.OutgoingMessages.Queueing;
 
-namespace Application.OutgoingMessages
+/// <summary>
+///  Repository for market documents
+/// </summary>
+public interface IMarketDocumentRepository
 {
     /// <summary>
-    /// Store for outgoing actor messages
+    /// Get document by bundle id
     /// </summary>
-    public interface IOutgoingMessageStore
-    {
-        /// <summary>
-        /// Add message to queue
-        /// </summary>
-        /// <param name="message"></param>
-        void Add(OutgoingMessage message);
+    Task<MarketDocument?> GetAsync(BundleId bundleId);
 
-        /// <summary>
-        /// Get all messages assigned to a bundle by id.
-        /// </summary>
-        Task<IReadOnlyCollection<OutgoingMessage>> GetByAssignedBundleIdAsync(BundleId bundleId);
-    }
+    /// <summary>
+    /// Add document to repository
+    /// </summary>
+    Task AddAsync(MarketDocument marketDocument);
 }
