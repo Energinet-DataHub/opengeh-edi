@@ -20,17 +20,16 @@ import "google/protobuf/duration.proto";
 option csharp_namespace = "Energinet.DataHub.Edi.Responses.AggregatedMeasureData";
 
 message AggregatedTimeSeriesRequestAccepted {
-  repeated Serie series = 2;
+  repeated Serie series = 1;
 }
 
 message Serie {
-  // A consecutive number which is increased by new calculations with the same reason code. LRN: Should we know the reason code for the series?
-  int32 version = 2;
-  string grid_area = 4;
-  Product product = 7;
-  QuantityUnit quantity_unit = 8;
-  Period period = 9;
-  repeated Point Point = 3;
+  string settlement_version = 1;
+  string grid_area = 2;
+  Product product = 3;
+  QuantityUnit quantity_unit = 4;
+  Period period = 5;
+  repeated Point Point = 6;
 }
 
 message Point {
@@ -40,8 +39,8 @@ message Point {
 }
 
 message Period {
-  google.protobuf.Timestamp start_of_period = 3;
-  google.protobuf.Timestamp end_of_period = 4;
+  google.protobuf.Timestamp start_of_period = 1;
+  google.protobuf.Timestamp end_of_period = 2;
 }
 
 enum QuantityQuality{

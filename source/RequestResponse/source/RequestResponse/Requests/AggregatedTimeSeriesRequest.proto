@@ -29,9 +29,10 @@ message AggregatedTimeSeriesRequest {
     AggregationPerEnergySupplierPerBalanceResponsiblePartyPerGridArea aggregation_per_energysupplier_per_balanceresponsibleparty_per_gridarea = 7;
   }
 }
+
 message Period {
-  google.protobuf.Timestamp start_of_period = 3;
-  google.protobuf.Timestamp end_of_period = 4;
+  google.protobuf.Timestamp start_of_period = 1;
+  google.protobuf.Timestamp end_of_period = 2;
 }
 
 message AggregationPerGridArea {
@@ -58,7 +59,9 @@ message AggregationPerEnergySupplierPerGridArea {
    */
   string grid_area_code = 1;
 
-  string EnergySupplierGlnOrEic = 2;
+  string BalanceResponsiblePartyGlnOrEic = 2;
+
+  string EnergySupplierGlnOrEic = 3;
 }
 
 message AggregationPerBalanceResponsiblePartyPerGridArea {
@@ -72,6 +75,8 @@ message AggregationPerBalanceResponsiblePartyPerGridArea {
   string grid_area_code = 1;
 
   string BalanceResponsiblePartyGlnOrEic = 2;
+
+  string EnergySupplierGlnOrEic = 3;
 }
 
 message AggregationPerEnergySupplierPerBalanceResponsiblePartyPerGridArea {
@@ -88,7 +93,7 @@ message AggregationPerEnergySupplierPerBalanceResponsiblePartyPerGridArea {
 
   string EnergySupplierGlnOrEic = 3;
 }
-
+  
 enum TimeSeriesType {
   /*
    * Unspecified is unused but according to best practice.
