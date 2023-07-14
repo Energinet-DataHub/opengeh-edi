@@ -20,16 +20,21 @@ import "google/protobuf/duration.proto";
 option csharp_namespace = "Energinet.DataHub.Edi.Requests.TimeSeries.Aggregated";
 
 message AggregatedTimeSeriesRequestAccepted {
-  repeated Serie series = 2;
+  repeated Serie series = 1;
 }
 
 message Serie {
-  int32 version = 2;
-  string grid_area = 4;
-  Product product = 7;
-  QuantityUnit quantity_unit = 8;
-  Period period = 9;
-  repeated TimeSeriesPoint time_series_points = 3;
+  string settlement_version = 1;
+  string grid_area = 2;
+  Product product = 3;
+  QuantityUnit quantity_unit = 4;
+  Period period = 5;
+  repeated TimeSeriesPoint time_series_points = 6;
+}
+
+message Period {
+  google.protobuf.Timestamp start_of_period = 1;
+  google.protobuf.Timestamp end_of_period = 2;
 }
 
 message TimeSeriesPoint {
@@ -45,11 +50,6 @@ message TimeSeriesPoint {
 
   // The aggregated quality currently represents a value suitable for creation of RSM-014 CIM XML messages.
   QuantityQuality quantity_quality = 3;
-}
-
-message Period {
-  google.protobuf.Timestamp start_of_period = 3;
-  google.protobuf.Timestamp end_of_period = 4;
 }
 
 /*
