@@ -18,7 +18,6 @@ using System.Threading.Tasks;
 using Application.Transactions.AggregatedMeasureData.Notifications;
 using Application.WholeSale;
 using Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.Edi.Responses.AggregatedMeasureData;
 using MediatR;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData;
