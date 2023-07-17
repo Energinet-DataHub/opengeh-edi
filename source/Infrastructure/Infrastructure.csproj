@@ -1,4 +1,4 @@
-﻿<!--
+<!--
 Copyright 2020 Energinet DataHub A/S
 
 Licensed under the Apache License, Version 2.0 (the "License2");
@@ -24,7 +24,7 @@ limitations under the License.
     <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="6.0.2" />
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.15.0" />
     <PackageReference Include="Dapper-NodaTime" Version="0.1.0" />
-    <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="7.4.4" />
+    <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="7.4.7" />
     <PackageReference Include="Energinet.DataHub.Core.Logging" Version="2.2.7" />
     <PackageReference Include="Energinet.DataHub.EnergySupplying.IntegrationEvents" Version="1.0.2" />
     <PackageReference Include="Energinet.DataHub.EnergySupplying.RequestResponse" Version="1.2.0" />
