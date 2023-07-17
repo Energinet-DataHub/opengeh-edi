@@ -15,9 +15,9 @@
 using System;
 using Azure.Messaging.ServiceBus;
 using Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.Edi.Responses.AggregatedMeasureData;
+using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.WellKnownTypes;
-using Serie = Energinet.DataHub.Edi.Responses.AggregatedMeasureData.Serie;
+using Serie = Energinet.DataHub.Edi.Responses.Serie;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData;
 
@@ -52,9 +52,8 @@ public static class AggregatedMeasureDataProcessFactory
     private static Serie CreateSerie(AggregatedMeasureDataProcess aggregatedMeasureDataProcess)
     {
         var quantity = new DecimalValue() { Units = 12345, Nanos = 123450000, };
-        var point = new Point()
+        var point = new TimeSeriesPoint()
         {
-            Position = 1,
             Quantity = quantity,
             QuantityQuality = QuantityQuality.Incomplete,
         };
@@ -68,13 +67,13 @@ public static class AggregatedMeasureDataProcessFactory
         return new Serie()
         {
 #pragma warning disable CA1305
-            Version = int.Parse(aggregatedMeasureDataProcess.SettlementVersion ?? "0"),
+            SettlementVersion = aggregatedMeasureDataProcess.SettlementVersion ?? "0",
 #pragma warning restore CA1305
             GridArea = aggregatedMeasureDataProcess.MeteringGridAreaDomainId,
-            Product = Product.Tariff,
+            Product = Product.Tarif,
             QuantityUnit = QuantityUnit.Kwh,
             Period = period,
-            Point = { point },
+            TimeSeriesPoints = { point },
         };
     }
 }
