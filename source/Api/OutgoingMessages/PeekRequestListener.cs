@@ -19,7 +19,6 @@ using System.Threading.Tasks;
 using Api.Common;
 using Application.Configuration.Authentication;
 using Application.OutgoingMessages.Peek;
-using Application.OutgoingMessages.Queueing;
 using Domain.OutgoingMessages.Peek;
 using Domain.SeedWork;
 using Infrastructure.IncomingMessages;
@@ -32,18 +31,15 @@ namespace Api.OutgoingMessages;
 
 public class PeekRequestListener
 {
-    private readonly MessagePeeker _messagePeeker;
     private readonly IMarketActorAuthenticator _authenticator;
     private readonly ILogger<PeekRequestListener> _logger;
     private readonly IMediator _mediator;
 
     public PeekRequestListener(
-        MessagePeeker messagePeeker,
         IMarketActorAuthenticator authenticator,
         ILogger<PeekRequestListener> logger,
         IMediator mediator)
     {
-        _messagePeeker = messagePeeker;
         _authenticator = authenticator;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _mediator = mediator;
@@ -77,13 +73,13 @@ public class PeekRequestListener
                 desiredDocumentFormat)).ConfigureAwait(false);
 
         var response = HttpResponseData.CreateResponse(request);
-        if (peekResult.Bundle is null)
+        if (peekResult.MessageId is null)
         {
             response.StatusCode = HttpStatusCode.NoContent;
             return response;
         }
 
-        if (peekResult.MessageId == null)
+        if (peekResult.Bundle == null)
         {
             response.StatusCode = HttpStatusCode.InternalServerError;
             return response;

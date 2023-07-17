@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Application.OutgoingMessages;
 using Application.OutgoingMessages.Peek;
-using Application.OutgoingMessages.Queueing;
 using Domain.OutgoingMessages.Queueing;
 using Infrastructure.OutgoingMessages.Queueing;
 using MediatR;
@@ -26,27 +23,11 @@ namespace Infrastructure.OutgoingMessages.Peek;
 
 internal static class PeekConfiguration
 {
-    internal static void Configure(
-        IServiceCollection services,
-        IBundleConfiguration bundleConfiguration,
-        Func<IServiceProvider, IBundledMessages>? bundleStoreBuilder)
+    internal static void Configure(IServiceCollection services)
     {
-        services.AddScoped<IMarketDocumentRepository, MarketDocumentRepository>();
         services.AddScoped<MessageEnqueuer>();
         services.AddScoped<IActorMessageQueueRepository, ActorMessageQueueRepository>();
-        services.AddTransient<MessagePeeker>();
-        services.AddTransient<IRequestHandler<PeekRequest, PeekResult>, PeekRequestHandler>();
+        services.AddScoped<IMarketDocumentRepository, MarketDocumentRepository>();
         services.AddTransient<IRequestHandler<PeekCommand, PeekResult>, PeekHandler>();
-        services.AddScoped<IEnqueuedMessages, EnqueuedMessages>();
-        services.AddScoped(_ => bundleConfiguration);
-
-        if (bundleStoreBuilder is null)
-        {
-            services.AddScoped<IBundledMessages, BundledMessages>();
-        }
-        else
-        {
-            services.AddScoped(bundleStoreBuilder);
-        }
     }
 }

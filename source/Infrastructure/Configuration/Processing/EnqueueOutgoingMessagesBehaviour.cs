@@ -21,6 +21,7 @@ using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.Peek;
 using Infrastructure.Configuration.DataAccess;
 using Infrastructure.OutgoingMessages;
+using Infrastructure.OutgoingMessages.Queueing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 

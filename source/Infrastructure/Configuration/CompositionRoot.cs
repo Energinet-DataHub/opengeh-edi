@@ -82,7 +82,7 @@ namespace Infrastructure.Configuration
             services.AddScoped<IMessageIds, MessageIdRegistry>();
             services.AddScoped(typeof(IMessageQueueDispatcher<>), typeof(MessageQueueDispatcher<>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
+            services.AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>();
             services.AddScoped<IFeatureFlagProvider, FeatureFlagProviderProvider>();
 
             AddMediatR();
@@ -113,9 +113,9 @@ namespace Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddPeekConfiguration(IBundleConfiguration bundleConfiguration, Func<IServiceProvider, IBundledMessages>? bundleStoreBuilder = null)
+        public CompositionRoot AddPeekConfiguration()
         {
-            PeekConfiguration.Configure(_services, bundleConfiguration, bundleStoreBuilder);
+            PeekConfiguration.Configure(_services);
             return this;
         }
 
@@ -191,7 +191,7 @@ namespace Infrastructure.Configuration
         public CompositionRoot AddMessagePublishing()
         {
             _services.AddSingleton<IActorLookup, ActorLookup>();
-            _services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
+            _services.AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>();
             _services.AddScoped<OutgoingMessageEnqueuer>();
             return this;
         }

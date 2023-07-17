@@ -18,16 +18,16 @@ using Application.OutgoingMessages;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.Queueing;
 
-namespace Infrastructure.OutgoingMessages;
+namespace Infrastructure.OutgoingMessages.Queueing;
 
 public class MessageEnqueuer
 {
-    private readonly IOutgoingMessageStore _outgoingMessageStore;
+    private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
 
-    public MessageEnqueuer(IOutgoingMessageStore outgoingMessageStore, IActorMessageQueueRepository actorMessageQueueRepository)
+    public MessageEnqueuer(IOutgoingMessageRepository outgoingMessageRepository, IActorMessageQueueRepository actorMessageQueueRepository)
     {
-        _outgoingMessageStore = outgoingMessageStore;
+        _outgoingMessageRepository = outgoingMessageRepository;
         _actorMessageQueueRepository = actorMessageQueueRepository;
     }
 
@@ -45,6 +45,6 @@ public class MessageEnqueuer
 
         messageQueue.Enqueue(message);
 
-        _outgoingMessageStore.Add(message);
+        _outgoingMessageRepository.Add(message);
     }
 }

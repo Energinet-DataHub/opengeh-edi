@@ -71,9 +71,7 @@ namespace IntegrationTests.Fixtures
                 $"DELETE FROM [dbo].[QueuedInternalCommands] " +
                 $"DELETE FROM [dbo].[MarketEvaluationPoints]" +
                 $"DELETE FROM [dbo].[Actor]" +
-                $"DELETE FROM [dbo].[BundledMessages]" +
                 $"DELETE FROM [dbo].[ReceivedIntegrationEvents]" +
-                $"DELETE FROM [dbo].[EnqueuedMessages]" +
                 $"DELETE FROM [dbo].[AggregatedMeasureDataProcesses]" +
                 $"DELETE FROM [dbo].[ArchivedMessages]" +
                 $"DELETE FROM [dbo].[MarketDocuments]" +

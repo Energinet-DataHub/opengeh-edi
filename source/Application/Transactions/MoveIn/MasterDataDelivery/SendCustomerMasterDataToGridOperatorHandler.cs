@@ -33,7 +33,7 @@ public class SendCustomerMasterDataToGridOperatorHandler : IRequestHandler<SendC
 
     public SendCustomerMasterDataToGridOperatorHandler(
         IMoveInTransactionRepository transactionRepository,
-        IOutgoingMessageStore outgoingMessageStore,
+        IOutgoingMessageRepository outgoingMessageRepository,
         IMarketEvaluationPointRepository marketEvaluationPointRepository,
         IActorLookup actorLookup)
     {
