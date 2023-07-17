@@ -19,7 +19,6 @@ using System.Threading.Tasks;
 using Api.Common;
 using Application.Configuration.Authentication;
 using Application.OutgoingMessages.Peek;
-using Application.OutgoingMessages.Queueing;
 using Domain.OutgoingMessages.Peek;
 using Domain.SeedWork;
 using Infrastructure.IncomingMessages;
