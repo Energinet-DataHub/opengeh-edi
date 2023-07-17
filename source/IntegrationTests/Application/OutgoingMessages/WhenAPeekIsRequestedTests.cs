@@ -37,14 +37,9 @@ namespace IntegrationTests.Application.OutgoingMessages;
 
 public class WhenAPeekIsRequestedTests : TestBase
 {
-    private readonly BundledMessagesStub _bundledMessagesStub;
-    private readonly MessagePeeker _messagePeeker;
-
     public WhenAPeekIsRequestedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _bundledMessagesStub = (BundledMessagesStub)GetService<IBundledMessages>();
-        _messagePeeker = GetService<MessagePeeker>();
     }
 
     [Fact]

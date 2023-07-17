@@ -41,7 +41,7 @@ public class WhenADequeueIsRequestedTests : TestBase
     [Fact]
     public async Task Dequeue_is_unsuccessful_when_bundle_does_not_exist()
     {
-        var dequeueResult = await InvokeCommandAsync(new DequeueRequest(Guid.NewGuid().ToString())).ConfigureAwait(false);
+        var dequeueResult = await InvokeCommandAsync(new DequeueCommand(Guid.NewGuid().ToString(), MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId))).ConfigureAwait(false);
 
         Assert.False(dequeueResult.Success);
     }

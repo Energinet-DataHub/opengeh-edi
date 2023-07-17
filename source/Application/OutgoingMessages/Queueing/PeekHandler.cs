@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,7 +26,6 @@ using Domain.Documents;
 using Domain.OutgoingMessages.Peek;
 using Domain.OutgoingMessages.Queueing;
 using MediatR;
-using PeekResult = Application.OutgoingMessages.Peek.PeekResult;
 
 namespace Application.OutgoingMessages.Queueing;
 
@@ -114,3 +114,5 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
 }
 
 public record PeekCommand(ActorNumber ActorNumber, MessageCategory MessageCategory, MarketRole ActorRole, DocumentFormat DocumentFormat) : ICommand<PeekResult>;
+
+public record PeekResult(Stream? Bundle, Guid? MessageId = default);

@@ -62,36 +62,4 @@ public class DocumentFactory
             new MessageHeader(businessReason, senderId, senderRole, receiverId, receiverRole, bundledMessageId!.Id.ToString(), timestamp),
             outgoingMessages.Select(message => message.MessageRecord).ToList());
     }
-
-    public Task<Stream> CreateFromAsync(BundledMessageId bundledMessageId, MessageRecords messageRecords, DocumentFormat documentFormat, Instant timestamp)
-    {
-        ArgumentNullException.ThrowIfNull(bundledMessageId);
-        ArgumentNullException.ThrowIfNull(messageRecords);
-
-        var documentWriter =
-            _documentWriters.FirstOrDefault(writer =>
-                writer.HandlesType(messageRecords.DocumentType) &&
-                writer.HandlesFormat(documentFormat));
-
-        if (documentWriter is null)
-        {
-            throw new OutgoingMessageException($"Could not handle document type {messageRecords.DocumentType.Name}");
-        }
-
-        return documentWriter.WriteAsync(
-            CreateHeader(bundledMessageId, messageRecords, timestamp),
-            messageRecords.Records);
-    }
-
-    private static MessageHeader CreateHeader(BundledMessageId bundledMessageId, MessageRecords messageRecords, Instant timeStamp)
-    {
-        return new MessageHeader(
-            messageRecords.BusinessReason,
-            messageRecords.SenderNumber,
-            messageRecords.SenderRole,
-            messageRecords.ReceiverNumber,
-            messageRecords.ReceiverRole,
-            bundledMessageId.Value.ToString(),
-            timeStamp);
-    }
 }

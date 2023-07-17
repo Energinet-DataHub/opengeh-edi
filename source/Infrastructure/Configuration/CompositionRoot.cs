@@ -113,9 +113,9 @@ namespace Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddPeekConfiguration(IBundleConfiguration bundleConfiguration, Func<IServiceProvider, IBundledMessages>? bundleStoreBuilder = null)
+        public CompositionRoot AddPeekConfiguration()
         {
-            PeekConfiguration.Configure(_services, bundleConfiguration, bundleStoreBuilder);
+            PeekConfiguration.Configure(_services);
             return this;
         }
 

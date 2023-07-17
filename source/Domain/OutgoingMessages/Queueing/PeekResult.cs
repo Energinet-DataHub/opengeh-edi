@@ -16,10 +16,9 @@ using Domain.Documents;
 
 namespace Domain.OutgoingMessages.Queueing;
 
-public record PeekResult()
+public class PeekResult
 {
     public PeekResult(BundleId? bundleId, DocumentType? documentType)
-        : this()
     {
         BundleId = bundleId;
         DocumentType = documentType;

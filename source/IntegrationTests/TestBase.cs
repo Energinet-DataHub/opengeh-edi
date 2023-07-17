@@ -147,11 +147,7 @@ namespace IntegrationTests
             CompositionRoot.Initialize(_services)
                 .AddAuthentication()
                 .AddAggregationsConfiguration()
-                .AddPeekConfiguration(
-                    new BundleConfigurationStub(),
-                    sp => new BundledMessagesStub(
-                        sp.GetRequiredService<IDatabaseConnectionFactory>(),
-                        sp.GetRequiredService<B2BContext>()))
+                .AddPeekConfiguration()
                 .AddRemoteBusinessService<DummyRequest, DummyReply>(
                     sp => new RemoteBusinessServiceRequestSenderSpy<DummyRequest>("Dummy"), "Dummy")
                 .AddDatabaseConnectionFactory(DatabaseFixture.ConnectionString)
