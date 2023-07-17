@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,16 +26,15 @@ using Domain.Documents;
 using Domain.OutgoingMessages.Peek;
 using Domain.OutgoingMessages.Queueing;
 using MediatR;
-using PeekResult = Application.OutgoingMessages.Peek.PeekResult;
 
-namespace Application.OutgoingMessages.Queueing;
+namespace Application.OutgoingMessages.Peek;
 
 public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
 {
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
     private readonly IMarketDocumentRepository _marketDocumentRepository;
     private readonly DocumentFactory _documentFactory;
-    private readonly IOutgoingMessageStore _outgoingMessageStore;
+    private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IArchivedMessageRepository _archivedMessageRepository;
@@ -43,7 +43,7 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
         IActorMessageQueueRepository actorMessageQueueRepository,
         IMarketDocumentRepository marketDocumentRepository,
         DocumentFactory documentFactory,
-        IOutgoingMessageStore outgoingMessageStore,
+        IOutgoingMessageRepository outgoingMessageRepository,
         ISystemDateTimeProvider systemDateTimeProvider,
         IUnitOfWork unitOfWork,
         IArchivedMessageRepository archivedMessageRepository)
@@ -51,7 +51,7 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _marketDocumentRepository = marketDocumentRepository;
         _documentFactory = documentFactory;
-        _outgoingMessageStore = outgoingMessageStore;
+        _outgoingMessageRepository = outgoingMessageRepository;
         _systemDateTimeProvider = systemDateTimeProvider;
         _unitOfWork = unitOfWork;
         _archivedMessageRepository = archivedMessageRepository;
@@ -77,7 +77,7 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
         {
             var timestamp = _systemDateTimeProvider.Now();
 
-            var outgoingMessages = await _outgoingMessageStore.GetByAssignedBundleIdAsync(peekResult.BundleId).ConfigureAwait(false);
+            var outgoingMessages = await _outgoingMessageRepository.GetByAssignedBundleIdAsync(peekResult.BundleId).ConfigureAwait(false);
             var result = await _documentFactory.CreateFromAsync(outgoingMessages, request.DocumentFormat, timestamp).ConfigureAwait(false);
 
             document = new MarketDocument(result, peekResult.BundleId);
@@ -114,3 +114,5 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
 }
 
 public record PeekCommand(ActorNumber ActorNumber, MessageCategory MessageCategory, MarketRole ActorRole, DocumentFormat DocumentFormat) : ICommand<PeekResult>;
+
+public record PeekResult(Stream? Bundle, Guid? MessageId = default);

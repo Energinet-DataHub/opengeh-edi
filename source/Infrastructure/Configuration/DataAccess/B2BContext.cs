@@ -33,7 +33,6 @@ using Infrastructure.Configuration.InternalCommands;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.MasterData.MarketEvaluationPoints;
 using Infrastructure.OutgoingMessages;
-using Infrastructure.OutgoingMessages.Peek;
 using Infrastructure.OutgoingMessages.Queueing;
 using Infrastructure.Transactions;
 using Infrastructure.Transactions.AggregatedMeasureData;
@@ -73,8 +72,6 @@ namespace Infrastructure.Configuration.DataAccess
 
         public DbSet<EnqueuedMessage> EnqueuedMessages { get; private set; }
 
-        public DbSet<BundledMessage> BundledMessages { get; private set; }
-
         public DbSet<ArchivedMessage> ArchivedMessages { get; private set; }
 
         public DbSet<ReceivedIntegrationEvent> ReceivedIntegrationEvents { get; private set; }
@@ -92,11 +89,9 @@ namespace Infrastructure.Configuration.DataAccess
             modelBuilder.ApplyConfiguration(new AggregationResultForwardingEntityConfiguration(_serializer));
             modelBuilder.ApplyConfiguration(new EntityConfiguration());
             modelBuilder.ApplyConfiguration(new OutgoingMessageEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new EnqueuedMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QueuedInternalCommandEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ReceivedIntegrationEventEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MarketEvaluationPointEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new BundledMessageConfiguration());
             modelBuilder.ApplyConfiguration(new ArchivedMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ActorMessageQueueEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MarketDocumentEntityConfiguration());

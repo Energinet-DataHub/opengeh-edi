@@ -38,16 +38,16 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
 {
     private readonly IMoveInTransactionRepository _transactionRepository;
     private readonly IMessageRecordParser _messageRecordParser;
-    private readonly IOutgoingMessageStore _outgoingMessageStore;
+    private readonly IOutgoingMessageRepository _outgoingMessageRepository;
 
     public ForwardMeteringPointMasterDataHandler(
         IMoveInTransactionRepository transactionRepository,
         IMessageRecordParser messageRecordParser,
-        IOutgoingMessageStore outgoingMessageStore)
+        IOutgoingMessageRepository outgoingMessageRepository)
     {
         _transactionRepository = transactionRepository;
         _messageRecordParser = messageRecordParser;
-        _outgoingMessageStore = outgoingMessageStore;
+        _outgoingMessageRepository = outgoingMessageRepository;
     }
 
     public async Task<Unit> Handle(ForwardMeteringPointMasterData request, CancellationToken cancellationToken)
@@ -59,7 +59,7 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
             throw new MoveInException($"Could not find move in transaction '{request.TransactionId}'");
         }
 
-        _outgoingMessageStore.Add(AccountingPointCharacteristicsMessageFrom(request.MasterDataContent, transaction));
+        _outgoingMessageRepository.Add(AccountingPointCharacteristicsMessageFrom(request.MasterDataContent, transaction));
 
         transaction.MarkMeteringPointMasterDataAsSent();
         return await Task.FromResult(Unit.Value).ConfigureAwait(false);
