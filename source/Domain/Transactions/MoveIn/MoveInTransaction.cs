@@ -14,9 +14,9 @@
 
 using Domain.Actors;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
-using Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
-using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
+using Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeOfSupplier;
+using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 using Domain.SeedWork;
 using Domain.Transactions.MoveIn.Events;
 using NodaTime;

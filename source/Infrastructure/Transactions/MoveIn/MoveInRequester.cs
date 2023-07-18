@@ -13,12 +13,12 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Application.Transactions;
 using Application.Transactions.MoveIn;
-using EnergySupplying.Contracts.BusinessRequests.MoveIn;
 using Infrastructure.Configuration.Serialization;
 using Microsoft.Extensions.Logging;
 
@@ -45,9 +45,9 @@ public sealed class MoveInRequester : IMoveInRequester
         return await ParseResultFromAsync(response).ConfigureAwait(false);
     }
 
-    private static RequestV2 CreateRequestFrom(MoveInRequest request)
+    private static MoveInRequestV2 CreateRequestFrom(MoveInRequest request)
     {
-        return new RequestV2(
+        return new MoveInRequestV2(
             request.AccountingPointNumber,
             request.EnergySupplierNumber,
             request.EffectiveDate,
@@ -56,9 +56,9 @@ public sealed class MoveInRequester : IMoveInRequester
                 request.CustomerNumber));
     }
 
-    private async Task<HttpResponseMessage> TryCallAsync(RequestV2 request)
+    private async Task<HttpResponseMessage> TryCallAsync(MoveInRequestV2 moveInRequest)
     {
-        using var content = new StringContent(_serializer.Serialize(request));
+        using var content = new StringContent(_serializer.Serialize(moveInRequest));
         var response = await _httpClientAdapter.PostAsync(_configuration.BusinessService.RequestEndPoint, content).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
         return response;
@@ -71,7 +71,7 @@ public sealed class MoveInRequester : IMoveInRequester
             var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             _logger.LogInformation($"Response body from business processing: {responseBody}");
 
-            var result = _serializer.Deserialize<Response>(responseBody);
+            var result = _serializer.Deserialize<MoveInResponse>(responseBody);
             var validationErrors = result.ValidationErrors.ToList();
             if (validationErrors.Count > 0)
             {
@@ -87,3 +87,12 @@ public sealed class MoveInRequester : IMoveInRequester
         }
     }
 }
+
+public record MoveInResponse(IEnumerable<string> ValidationErrors, string ProcessId = "");
+public record MoveInRequestV2(
+    string? AccountingPointNumber,
+    string? EnergySupplierNumber,
+    string? EffectiveDate,
+    Customer? Customer);
+
+public record Customer(string? Name, string? Number);

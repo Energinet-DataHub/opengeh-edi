@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Domain.Documents;
+using Domain.OutgoingMessages.Exceptions;
 using Domain.OutgoingMessages.Peek;
 using Domain.SeedWork;
 

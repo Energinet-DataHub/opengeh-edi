@@ -23,7 +23,7 @@ using Application.Configuration;
 using Application.OutgoingMessages.Common;
 using DocumentValidation;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.Common;

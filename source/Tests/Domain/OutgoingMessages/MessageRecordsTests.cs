@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.Exceptions;
 using Domain.OutgoingMessages.Peek;
 using Xunit;
 

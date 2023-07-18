@@ -22,7 +22,7 @@ using System.Xml.Schema;
 using DocumentValidation.Xml;
 using Domain.Actors;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 using Domain.SeedWork;
 using Infrastructure.OutgoingMessages.Common;
 using Xunit;

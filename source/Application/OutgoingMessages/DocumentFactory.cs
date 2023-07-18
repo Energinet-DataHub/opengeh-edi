@@ -20,6 +20,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Domain.Documents;
 using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.Exceptions;
 using NodaTime;
 
 namespace Application.OutgoingMessages;
