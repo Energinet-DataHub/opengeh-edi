@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.OutgoingMessages.Dequeue;
-using Application.OutgoingMessages.Queueing;
+using Application.OutgoingMessages.Peek;
 using Dapper;
 using Domain.Actors;
 using Domain.Documents;
@@ -26,6 +26,7 @@ using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using Infrastructure.OutgoingMessages;
+using Infrastructure.OutgoingMessages.Queueing;
 using IntegrationTests.Fixtures;
 using NodaTime.Extensions;
 using Xunit;
@@ -82,11 +83,11 @@ public class WhenEnqueueingTests : TestBase
         await EnqueueMessage(message);
         var peekCommand = new PeekCommand(message.ReceiverId, message.DocumentType.Category, message.ReceiverRole, DocumentFormat.Xml);
         var peekResult = await InvokeCommandAsync(peekCommand);
-        var dequeueCommand = new DequeueCommand(peekResult.MessageId!.Value);
+        var dequeueCommand = new DequeueCommand(peekResult.MessageId!.Value.ToString(), message.ReceiverRole, message.ReceiverId);
 
         var result = await InvokeCommandAsync(dequeueCommand);
 
-        Assert.False(result.Success);
+        Assert.True(result.Success);
     }
 
     private static OutgoingMessage CreateOutgoingMessage()

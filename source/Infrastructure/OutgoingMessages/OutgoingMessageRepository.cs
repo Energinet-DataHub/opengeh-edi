@@ -23,11 +23,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.OutgoingMessages
 {
-    public class OutgoingMessageStore : IOutgoingMessageStore
+    public class OutgoingMessageRepository : IOutgoingMessageRepository
     {
         private readonly B2BContext _context;
 
-        public OutgoingMessageStore(B2BContext context)
+        public OutgoingMessageRepository(B2BContext context)
         {
             _context = context;
         }

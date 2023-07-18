@@ -36,10 +36,10 @@ public class RemoveDequeuedBundlesWhenADayHasPassed : INotificationHandler<ADayH
         const string deleteStmt = @"
             DELETE FROM [dbo].[MarketDocuments]
             WHERE [BundleId] IN (SELECT [Id]
-            FROM [B2BTransactions].[dbo].[Bundles]
+            FROM [dbo].[Bundles]
             WHERE [IsDequeued] = 1)
 
-            DELETE FROM [B2BTransactions].[dbo].[Bundles]
+            DELETE FROM [dbo].[Bundles]
             WHERE [IsDequeued] = 1";
 
         using var connection =

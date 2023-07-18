@@ -19,7 +19,6 @@ using Dapper;
 using Domain.Actors;
 using Domain.Documents;
 using Domain.OutgoingMessages;
-using Infrastructure.OutgoingMessages.Common;
 using IntegrationTests.Application.IncomingMessages;
 using IntegrationTests.Fixtures;
 using Xunit;
@@ -39,7 +38,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase
         await GivenRequestHasBeenAccepted().ConfigureAwait(false);
 
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
-        var sql = $"SELECT * FROM [dbo].[EnqueuedMessages]";
+        var sql = $"SELECT * FROM [dbo].[OutgoingMessages]";
         var result = await
             connection
             .QuerySingleOrDefaultAsync(sql)

@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using Application.WholeSale;
-using Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.Edi.Responses.AggregatedMeasureData;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.WholeSale;

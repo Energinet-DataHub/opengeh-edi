@@ -12,15 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Application.OutgoingMessages.Peek;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.Queueing;
 
-/// <summary>
-/// Contains configuration settings for message peek
-/// </summary>
-public interface IBundleConfiguration
+namespace Application.OutgoingMessages
 {
     /// <summary>
-    /// Maximum number of payloads/records in a message bundle
+    /// Store for outgoing actor messages
     /// </summary>
-    int MaxNumberOfPayloadsInBundle { get; }
+    public interface IOutgoingMessageRepository
+    {
+        /// <summary>
+        /// Add message to queue
+        /// </summary>
+        /// <param name="message"></param>
+        void Add(OutgoingMessage message);
+
+        /// <summary>
+        /// Get all messages assigned to a bundle by id.
+        /// </summary>
+        Task<IReadOnlyCollection<OutgoingMessage>> GetByAssignedBundleIdAsync(BundleId bundleId);
+    }
 }
