@@ -43,4 +43,13 @@ limitations under the License.
       <ProjectReference Include="..\RequestResponse\source\RequestResponse\RequestResponse.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="OutgoingMessages\MoveIn" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\RequestResponse\source\RequestResponse\RequestResponse.csproj" />
+      <Folder Include="OutgoingMessages\MoveIn" />
+    </ItemGroup>
+
 </Project>

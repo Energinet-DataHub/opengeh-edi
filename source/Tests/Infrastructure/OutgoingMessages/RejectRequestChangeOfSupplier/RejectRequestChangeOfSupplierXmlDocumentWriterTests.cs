@@ -24,7 +24,7 @@ using Application.OutgoingMessages.Common;
 using DocumentValidation;
 using DocumentValidation.CimXml;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;

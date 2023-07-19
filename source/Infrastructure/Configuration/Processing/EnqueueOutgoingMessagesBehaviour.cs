@@ -21,6 +21,7 @@ using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.Peek;
 using Infrastructure.Configuration.DataAccess;
 using Infrastructure.OutgoingMessages;
+using Infrastructure.OutgoingMessages.Queueing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,12 +31,12 @@ public class EnqueueOutgoingMessagesBehaviour<TRequest, TResponse> : IPipelineBe
     where TRequest : ICommand<TResponse>
 {
     private readonly B2BContext _b2BContext;
-    private readonly OutgoingMessageEnqueuer _outgoingMessageEnqueuer;
+    private readonly MessageEnqueuer _messageEnqueuer;
 
-    public EnqueueOutgoingMessagesBehaviour(B2BContext b2BContext, OutgoingMessageEnqueuer outgoingMessageEnqueuer)
+    public EnqueueOutgoingMessagesBehaviour(B2BContext b2BContext, MessageEnqueuer messageEnqueuer)
     {
         _b2BContext = b2BContext;
-        _outgoingMessageEnqueuer = outgoingMessageEnqueuer;
+        _messageEnqueuer = messageEnqueuer;
     }
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
@@ -51,17 +52,7 @@ public class EnqueueOutgoingMessagesBehaviour<TRequest, TResponse> : IPipelineBe
 
         foreach (var message in outgoingMessages)
         {
-            await _outgoingMessageEnqueuer.EnqueueAsync(
-                new EnqueuedMessage(
-                    message.Id,
-                    message.ReceiverId.Value,
-                    message.ReceiverRole.Name,
-                    message.SenderId.Value,
-                    message.SenderRole.Name,
-                    message.DocumentType.Name,
-                    message.DocumentType.Category.Name,
-                    message.BusinessReason,
-                    message.MessageRecord)).ConfigureAwait(false);
+            await _messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
         }
 
         return result;

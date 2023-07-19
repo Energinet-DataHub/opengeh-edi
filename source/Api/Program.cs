@@ -22,7 +22,6 @@ using Api.Configuration.Middleware.Authentication.MarketActors;
 using Api.Configuration.Middleware.Correlation;
 using Application.Actors;
 using Application.Configuration.DataAccess;
-using Application.OutgoingMessages.Peek;
 using Application.Transactions.MoveIn;
 using CimMessageAdapter.Messages.Queues;
 using Infrastructure.Configuration;
@@ -103,7 +102,7 @@ namespace Api
 
                     CompositionRoot.Initialize(services)
                         .AddMessageBus(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!)
-                        .AddPeekConfiguration(new BundleConfiguration(runtime.MAX_NUMBER_OF_PAYLOADS_IN_BUNDLE))
+                        .AddPeekConfiguration()
                         .AddAggregationsConfiguration()
                         .AddRemoteBusinessService<DummyRequest, DummyReply>("Dummy", "Dummy")
                         .AddBearerAuthentication(tokenValidationParameters)

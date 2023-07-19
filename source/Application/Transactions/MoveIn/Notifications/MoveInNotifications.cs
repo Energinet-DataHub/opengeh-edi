@@ -18,19 +18,19 @@ using Application.OutgoingMessages.Common;
 using Domain.Actors;
 using Domain.Documents;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.GenericNotification;
+using Domain.OutgoingMessages.MoveIn.GenericNotification;
 using Domain.Transactions.MoveIn;
 
 namespace Application.Transactions.MoveIn.Notifications;
 
 public class MoveInNotifications
 {
-    private readonly IOutgoingMessageStore _outgoingMessageStore;
+    private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly IMessageRecordParser _messageRecordParser;
 
-    public MoveInNotifications(IOutgoingMessageStore outgoingMessageStore, IMessageRecordParser messageRecordParser)
+    public MoveInNotifications(IOutgoingMessageRepository outgoingMessageRepository, IMessageRecordParser messageRecordParser)
     {
-        _outgoingMessageStore = outgoingMessageStore;
+        _outgoingMessageRepository = outgoingMessageRepository;
         _messageRecordParser = messageRecordParser;
     }
 
@@ -48,13 +48,13 @@ public class MoveInNotifications
             DocumentType.GenericNotification,
             ActorNumber.Create(transaction.CurrentEnergySupplierId!),
             transaction.TransactionId,
-            BusinessReasonCode.CustomerMoveInOrMoveOut.Code,
+            BusinessReason.MoveIn.Name,
             MarketRole.EnergySupplier,
             DataHubDetails.IdentificationNumber,
             MarketRole.MeteringPointAdministrator,
             _messageRecordParser.From(marketActivityRecord));
 
-        _outgoingMessageStore.Add(message);
+        _outgoingMessageRepository.Add(message);
     }
 
     public void NotifyGridOperator(MoveInTransaction transaction, string gridOperatorNumber)
@@ -76,6 +76,6 @@ public class MoveInNotifications
             MarketRole.MeteringPointAdministrator,
             _messageRecordParser.From(marketActivityRecord));
 
-        _outgoingMessageStore.Add(message);
+        _outgoingMessageRepository.Add(message);
     }
 }

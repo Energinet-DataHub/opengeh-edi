@@ -69,7 +69,7 @@ public class NotifyCurrentEnergySupplierHandlerTests
 
         var assertTransaction = await AssertTransactionAsync().ConfigureAwait(false);
         assertTransaction.HasEndOfSupplyNotificationState(MoveInTransaction.NotificationState.WasNotified);
-        var assertOutgoingMessage = await AssertMessageAsync(DocumentType.GenericNotification, BusinessReasonCode.CustomerMoveInOrMoveOut.Code).ConfigureAwait(false);
+        var assertOutgoingMessage = await AssertMessageAsync(DocumentType.GenericNotification, BusinessReason.MoveIn.Name).ConfigureAwait(false);
         assertOutgoingMessage.HasReceiverId(SampleData.CurrentEnergySupplierNumber)
             .HasReceiverRole(MarketRole.EnergySupplier.ToString())
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)

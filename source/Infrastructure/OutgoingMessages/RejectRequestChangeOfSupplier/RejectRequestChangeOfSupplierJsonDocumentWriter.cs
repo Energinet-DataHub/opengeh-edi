@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 using Application.OutgoingMessages.Common;
 using Domain.Documents;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 using Infrastructure.OutgoingMessages.Common.Json;
 
 namespace Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;

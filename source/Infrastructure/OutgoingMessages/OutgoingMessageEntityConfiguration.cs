@@ -16,14 +16,15 @@ using System;
 using Domain.Actors;
 using Domain.Documents;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.AccountingPointCharacteristics;
-using Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
-using Domain.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
-using Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
-using Domain.OutgoingMessages.GenericNotification;
+using Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics;
+using Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
+using Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeAccountingPointCharacteristics;
+using Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeOfSupplier;
+using Domain.OutgoingMessages.MoveIn.GenericNotification;
+using Domain.OutgoingMessages.MoveIn.RejectRequestChangeAccountingPointCharacteristics;
+using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
-using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.OutgoingMessages.Queueing;
 using Domain.SeedWork;
 using Domain.Transactions;
 using Microsoft.EntityFrameworkCore;
@@ -69,6 +70,11 @@ namespace Infrastructure.OutgoingMessages
                     toDbValue => toDbValue.ToString(),
                     fromDbValue => EnumerationType.FromName<MarketRole>(fromDbValue));
             builder.Property(x => x.MessageRecord);
+            builder.Property(x => x.AssignedBundleId).HasConversion(
+                toDbValue => toDbValue == null ? Guid.Empty : toDbValue.Id,
+                fromDbValue => fromDbValue == Guid.Empty ? null : BundleId.Create(fromDbValue));
+
+            builder.Ignore(x => x.Receiver);
 
             builder
                 .HasDiscriminator<string>("Discriminator")
