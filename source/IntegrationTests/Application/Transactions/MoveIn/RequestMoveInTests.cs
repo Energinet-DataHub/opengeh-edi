@@ -22,7 +22,7 @@ using Dapper;
 using Domain.Actors;
 using Domain.Documents;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+using Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeOfSupplier;
 using Domain.Transactions.MoveIn;
 using Infrastructure.Configuration.InternalCommands;
 using Infrastructure.Transactions;
@@ -211,10 +211,10 @@ namespace IntegrationTests.Application.Transactions.MoveIn
                     GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
             assertMessage.HasReceiverRole(MarketRole.EnergySupplier.Name);
             assertMessage
-                .HasMessageRecordValue<Domain.OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord>(
+                .HasMessageRecordValue<Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier.MarketActivityRecord>(
                     record => record.MarketEvaluationPointId, SampleData.MeteringPointNumber);
             assertMessage
-                .HasMessageRecordValue<Domain.OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord>(
+                .HasMessageRecordValue<Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier.MarketActivityRecord>(
                     record => record.OriginalTransactionId, SampleData.ActorProvidedId.Id);
 
             return assertMessage;

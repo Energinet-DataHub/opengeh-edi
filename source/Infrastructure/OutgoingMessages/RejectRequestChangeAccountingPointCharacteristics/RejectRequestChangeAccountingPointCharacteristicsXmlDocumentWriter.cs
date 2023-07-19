@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Application.OutgoingMessages.Common;
 using Application.OutgoingMessages.Common.Xml;
-using Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
+using Domain.OutgoingMessages.MoveIn.RejectRequestChangeAccountingPointCharacteristics;
 using Infrastructure.OutgoingMessages.Common.Xml;
 
 namespace Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;

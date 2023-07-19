@@ -18,8 +18,8 @@ using System.Threading.Tasks;
 using System.Xml;
 using Application.OutgoingMessages.Common;
 using Application.OutgoingMessages.Common.Xml;
-using Domain.OutgoingMessages.AccountingPointCharacteristics;
-using Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
+using Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics;
+using Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 using Infrastructure.OutgoingMessages.Common.Xml;
 
 namespace Infrastructure.OutgoingMessages.AccountingPointCharacteristics;

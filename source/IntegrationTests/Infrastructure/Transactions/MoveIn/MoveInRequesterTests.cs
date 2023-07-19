@@ -17,8 +17,8 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Application.Transactions.MoveIn;
-using EnergySupplying.Contracts.BusinessRequests.MoveIn;
 using Infrastructure.Transactions;
+using Infrastructure.Transactions.MoveIn;
 using IntegrationTests.Fixtures;
 using IntegrationTests.TestDoubles;
 using NodaTime;
@@ -47,7 +47,7 @@ public class MoveInRequesterTests : TestBase
 
         _httpClientSpy
             .AssertJsonContent(
-                new RequestV2(
+                new MoveInRequestV2(
                     request.AccountingPointNumber,
                     request.EnergySupplierNumber,
                     request.EffectiveDate,

@@ -29,7 +29,7 @@ using Infrastructure.OutgoingMessages.Common;
 using Tests.Factories;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
-using MarketActivityRecord = Domain.OutgoingMessages.AccountingPointCharacteristics.MarketActivityRecord;
+using MarketActivityRecord = Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics.MarketActivityRecord;
 
 namespace Tests.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 

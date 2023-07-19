@@ -24,14 +24,14 @@ using Application.OutgoingMessages.Common;
 using DocumentValidation;
 using DocumentValidation.CimXml;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Tests.Factories;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
-using MarketActivityRecord = Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics.MarketActivityRecord;
+using MarketActivityRecord = Domain.OutgoingMessages.MoveIn.RejectRequestChangeAccountingPointCharacteristics.MarketActivityRecord;
 
 namespace Tests.Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 

@@ -14,8 +14,8 @@
 
 using System;
 using Domain.MasterData;
-using Domain.OutgoingMessages.AccountingPointCharacteristics;
-using Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
+using Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics;
+using Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 using Infrastructure.Configuration;
 
 namespace Tests.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;

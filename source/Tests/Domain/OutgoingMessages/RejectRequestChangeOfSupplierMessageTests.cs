@@ -15,7 +15,8 @@
 using System.Collections.Generic;
 using Domain.Actors;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.OutgoingMessages.Exceptions;
+using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 using Domain.Transactions;
 using Xunit;
 
