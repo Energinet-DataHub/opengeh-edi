@@ -27,17 +27,16 @@ using CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 using CimMessageAdapter.ValidationErrors;
 using Domain.Actors;
 using Domain.Documents;
-using Domain.OutgoingMessages;
 using Infrastructure.Configuration.Authentication;
-using IntegrationTests.CimMessageAdapter.Stubs;
 using IntegrationTests.Fixtures;
+using IntegrationTests.Infrastructure.CimMessageAdapter.Stubs;
 using Xunit;
 using Xunit.Categories;
 using MessageParser = CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.MessageParser;
 using Result = CimMessageAdapter.Messages.Result;
 using SenderAuthorizer = CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.SenderAuthorizer;
 
-namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
+namespace IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 
 [IntegrationTest]
 public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetime
@@ -66,6 +65,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
 
     public async Task InitializeAsync()
     {
+#pragma warning disable CA2007
         var createActorCommand =
             new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.ActorNumber);
         await InvokeCommandAsync(createActorCommand).ConfigureAwait(false);

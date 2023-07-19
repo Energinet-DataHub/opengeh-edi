@@ -28,14 +28,14 @@ using CimMessageAdapter.ValidationErrors;
 using Domain.Actors;
 using Domain.Documents;
 using Infrastructure.Configuration.Authentication;
-using IntegrationTests.CimMessageAdapter.Stubs;
 using IntegrationTests.Fixtures;
+using IntegrationTests.Infrastructure.CimMessageAdapter.Stubs;
 using Xunit;
 using Xunit.Categories;
 using Result = CimMessageAdapter.Messages.Result;
 using SenderAuthorizer = CimMessageAdapter.Messages.RequestChangeOfSupplier.SenderAuthorizer;
 
-namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
+namespace IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestChangeOfSupplier
 {
     [IntegrationTest]
     public class RequestChangeOfSupplierReceiverTests : TestBase, IAsyncLifetime
@@ -71,13 +71,16 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
                 ClaimsMap.RoleFrom(MarketRole.EnergySupplier),
             };
 
+#pragma warning disable CA2007
             await _marketActorAuthenticator.AuthenticateAsync(CreateIdentity(), CancellationToken.None);
+#pragma warning restore CA2007
         }
 
         public Task DisposeAsync()
         {
             return Task.CompletedTask;
         }
+#pragma warning disable CA2007
 
         [Fact]
         public async Task Receiver_id_must_be_known()

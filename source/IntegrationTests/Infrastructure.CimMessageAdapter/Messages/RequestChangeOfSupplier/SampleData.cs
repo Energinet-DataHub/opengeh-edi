@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier;
+namespace IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 
 internal static class SampleData
 {

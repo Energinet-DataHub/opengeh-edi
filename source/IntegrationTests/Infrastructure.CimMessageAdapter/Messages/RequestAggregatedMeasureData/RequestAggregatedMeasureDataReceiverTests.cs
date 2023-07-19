@@ -28,12 +28,12 @@ using CimMessageAdapter.ValidationErrors;
 using Domain.Actors;
 using Domain.Documents;
 using Infrastructure.Configuration.Authentication;
-using IntegrationTests.CimMessageAdapter.Stubs;
 using IntegrationTests.Fixtures;
+using IntegrationTests.Infrastructure.CimMessageAdapter.Stubs;
 using Xunit;
 using Xunit.Categories;
 
-namespace IntegrationTests.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
+namespace IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
 [IntegrationTest]
 public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetime
@@ -73,6 +73,8 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
     public async Task InitializeAsync()
     {
+#pragma warning disable CA2007
+
         await InvokeCommandAsync(new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.SenderId)).ConfigureAwait(false);
         await InvokeCommandAsync(new CreateActor(Guid.NewGuid().ToString(), SampleData.SecondStsAssignedUserId, SampleData.SecondSenderId)).ConfigureAwait(false);
         //TODO: Consider removing authentication from validation (message receiver).

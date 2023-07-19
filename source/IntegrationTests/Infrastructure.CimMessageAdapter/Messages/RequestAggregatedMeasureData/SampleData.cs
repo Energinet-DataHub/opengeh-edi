@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace IntegrationTests.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
+namespace IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
 internal static class SampleData
 {

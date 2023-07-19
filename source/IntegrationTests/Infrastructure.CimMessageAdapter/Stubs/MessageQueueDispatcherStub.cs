@@ -20,7 +20,7 @@ using Application.IncomingMessages;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.Queues;
 
-namespace IntegrationTests.CimMessageAdapter.Stubs
+namespace IntegrationTests.Infrastructure.CimMessageAdapter.Stubs
 {
     public class MessageQueueDispatcherStub<TQueue> : IMessageQueueDispatcher<TQueue>
     where TQueue : Queue
