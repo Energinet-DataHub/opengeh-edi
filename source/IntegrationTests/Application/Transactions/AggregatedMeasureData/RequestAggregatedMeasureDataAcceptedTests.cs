@@ -21,7 +21,7 @@ using Dapper;
 using Domain.Actors;
 using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.Edi.Responses.AggregatedMeasureData;
+using Energinet.DataHub.Edi.Responses;
 using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Transactions.AggregatedMeasureData;
 using Infrastructure.WholeSale;

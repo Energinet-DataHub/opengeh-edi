@@ -1,4 +1,4 @@
-// Copyright 2020 Energinet DataHub A/S
+﻿// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@ using System.Text.Json;
 using Domain.Actors;
 using Domain.Documents;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 
 namespace Domain.Transactions.AggregatedMeasureData;

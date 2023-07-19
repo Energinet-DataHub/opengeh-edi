@@ -128,13 +128,13 @@ namespace Domain.Transactions.AggregatedMeasureData
             }
         }
 
-        public AggregatedMeasureDataAcceptedMessage CreateMessage(string timeseries)
-        {
-            return AggregatedMeasureDataAcceptedMessage.Create(
-                ProcessId,
-                ActorProvidedId.Create(_requestedByActorId.Value),
-                BusinessReason.PreliminaryAggregation,
-                timeseries);
-        }
+        // public AggregatedMeasureDataAcceptedMessage CreateMessage(string timeseries)
+        // {
+        //     return AggregatedMeasureDataAcceptedMessage.Create(
+        //         ProcessId,
+        //         ActorProvidedId.Create(_requestedByActorId.Value),
+        //         BusinessReason.PreliminaryAggregation,
+        //         timeseries);
+        // }
     }
 }

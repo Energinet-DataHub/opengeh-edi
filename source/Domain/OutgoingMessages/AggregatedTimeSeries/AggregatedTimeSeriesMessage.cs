@@ -15,7 +15,6 @@
 using Domain.Actors;
 using Domain.Documents;
 using Domain.Transactions;
-using Energinet.DataHub.Edi.Responses.AggregatedMeasureData;
 
 namespace Domain.OutgoingMessages.AggregatedTimeSeries;
 

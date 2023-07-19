@@ -25,11 +25,11 @@ namespace Infrastructure.Transactions.AggregatedMeasureData;
 
 public class AggregatedMeasureDataAcceptedInternalCommandHandler : IRequestHandler<AggregatedMeasureDataAcceptedInternalCommand, Unit>
 {
-    private readonly IOutgoingMessageStore _outgoingMessageStore;
+    private readonly IOutgoingMessageRepository _outgoingMessageStore;
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
 
     public AggregatedMeasureDataAcceptedInternalCommandHandler(
-        IOutgoingMessageStore outgoingMessageStore,
+        IOutgoingMessageRepository outgoingMessageStore,
         IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
         _outgoingMessageStore = outgoingMessageStore;
@@ -46,8 +46,8 @@ public class AggregatedMeasureDataAcceptedInternalCommandHandler : IRequestHandl
 
         ArgumentNullException.ThrowIfNull(process);
 
-        var outgoingMessage = process.CreateMessage(request.AggregatedMeasureDataAccepted.TimeSeries);
-        _outgoingMessageStore.Add(outgoingMessage);
+        // var outgoingMessage = process.CreateMessage(request.AggregatedMeasureDataAccepted.TimeSeries);
+        // _outgoingMessageStore.Add(outgoingMessage);
         return Unit.Task;
     }
 }

@@ -16,7 +16,7 @@ using System;
 using System.Threading.Tasks;
 using Application.Configuration.Commands.Commands;
 using Application.IncomingMessages.RequestAggregatedMeasureData;
-using Energinet.DataHub.Edi.Responses.AggregatedMeasureData;
+using Energinet.DataHub.Edi.Responses;
 using Infrastructure.Configuration.InboxEvents;
 using MediatR;
 

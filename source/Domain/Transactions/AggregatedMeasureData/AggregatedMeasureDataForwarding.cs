@@ -14,7 +14,7 @@
 
 using Domain.OutgoingMessages.AggregatedTimeSeries;
 using Domain.SeedWork;
-using Energinet.DataHub.Edi.Responses.AggregatedMeasureData;
+using Energinet.DataHub.Edi.Responses;
 
 namespace Domain.Transactions.AggregatedMeasureData;
 
