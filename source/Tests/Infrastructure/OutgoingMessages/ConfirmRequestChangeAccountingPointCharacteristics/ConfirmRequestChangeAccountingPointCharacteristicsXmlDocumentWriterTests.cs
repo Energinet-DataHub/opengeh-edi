@@ -30,7 +30,7 @@ using Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPointCharact
 using Tests.Factories;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
-using MarketActivityRecord = Domain.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics.MarketActivityRecord;
+using MarketActivityRecord = Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeAccountingPointCharacteristics.MarketActivityRecord;
 
 namespace Tests.Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
 

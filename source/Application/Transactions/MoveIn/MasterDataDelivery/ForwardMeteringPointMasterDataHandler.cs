@@ -23,14 +23,14 @@ using Domain.Actors;
 using Domain.Documents;
 using Domain.MasterData.Dictionaries;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.AccountingPointCharacteristics;
-using Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
+using Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics;
+using Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 using Domain.Transactions;
 using Domain.Transactions.MoveIn;
 using MediatR;
 using NodaTime.Extensions;
-using Address = Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails.Address;
-using Series = Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails.Series;
+using Address = Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics.MarketEvaluationPointDetails.Address;
+using Series = Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics.MarketEvaluationPointDetails.Series;
 
 namespace Application.Transactions.MoveIn.MasterDataDelivery;
 

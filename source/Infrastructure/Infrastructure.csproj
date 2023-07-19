@@ -53,9 +53,8 @@ limitations under the License.
   </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\DocumentValidation\DocumentValidation.csproj" />
-      <ProjectReference Include="..\EnergySupplying.Contracts\EnergySupplying.Contracts.csproj" />
-      <ProjectReference Include="..\CimMessageAdapter\CimMessageAdapter.csproj" />
+      <ProjectReference Include="..\Infrastructure.DocumentValidation\Infrastructure.DocumentValidation.csproj" />
+      <ProjectReference Include="..\Infrastructure.CimMessageAdapter\Infrastructure.CimMessageAdapter.csproj" />
       <ProjectReference Include="..\Application\Application.csproj" />
       <ProjectReference Include="..\RequestResponse\source\RequestResponse\RequestResponse.csproj" />
     </ItemGroup>

@@ -25,7 +25,7 @@ using Application.OutgoingMessages.Common;
 using DocumentValidation;
 using DocumentValidation.CimXml;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.GenericNotification;
+using Domain.OutgoingMessages.MoveIn.GenericNotification;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.Common;

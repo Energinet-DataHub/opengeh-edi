@@ -14,7 +14,7 @@
 
 using System;
 using System.Collections.Generic;
-using Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+using Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
 using NodaTime;
 
 namespace Application.MasterData;
