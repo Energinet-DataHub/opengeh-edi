@@ -27,6 +27,7 @@ using CimMessageAdapter.ValidationErrors;
 using Domain.Actors;
 using Domain.ArchivedMessages;
 using Domain.Documents;
+using Infrastructure.Configuration.DataAccess;
 using Infrastructure.IncomingMessages;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -44,6 +45,7 @@ public class RequestAggregatedMeasureMessageReceiver
     private readonly ICorrelationContext _correlationContext;
     private readonly IArchivedMessageRepository _messageArchive;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly B2BContext _context;
 
     public RequestAggregatedMeasureMessageReceiver(
         ILogger<RequestAggregatedMeasureMessageReceiver> logger,
@@ -52,8 +54,9 @@ public class RequestAggregatedMeasureMessageReceiver
         ResponseFactory responseFactory,
         ICorrelationContext correlationContext,
         IArchivedMessageRepository messageArchive,
-        ISystemDateTimeProvider systemDateTimeProvider)
-    {
+        ISystemDateTimeProvider systemDateTimeProvider,
+        B2BContext context)
+        {
         _logger = logger;
         _messageParser = messageParser;
         _messageReceiver = messageReceiver;
@@ -61,6 +64,7 @@ public class RequestAggregatedMeasureMessageReceiver
         _correlationContext = correlationContext;
         _messageArchive = messageArchive;
         _systemDateTimeProvider = systemDateTimeProvider;
+        _context = context;
     }
 
     //TODO: refactor functions to use nameof for function name
@@ -108,6 +112,10 @@ public class RequestAggregatedMeasureMessageReceiver
             messageHeader.BusinessReason,
             request.Body));
 
+        // We need to manually save the changes.
+        // We keep this seperated from the commit in "ReceiveAsync", since we want to store the
+        // request no matter what.
+        await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         var result = await _messageReceiver.ReceiveAsync(messageParserResult, cancellationToken)
             .ConfigureAwait(false);
 
