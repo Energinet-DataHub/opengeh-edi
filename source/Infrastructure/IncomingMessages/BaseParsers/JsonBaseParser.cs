@@ -104,28 +104,43 @@ where TICommand : IMarketTransaction<TTransactionType>
     {
         var result = schema.Evaluate(jsonDocument, new EvaluationOptions() { OutputFormat = OutputFormat.List, });
 
-        // As of right now, an error in an attribute of our schema will result in errors
-        // in all attributes. The "true" failed attributes will have 2 errors.
+        var errors = result
+            .Details
+            .Where(detail => detail.HasErrors).ToList();
+
+        // As of right now, if an attribute is given a type, which does not specified the schema.
+        // Then we will get errors in all other attributes, by the json validator.
+        // When we get a type error, then the detail describing the "true" error will contain 2 errors.
+        // Namely:
         // One describing the error and one saying: "Expected value to match one of the values specified by the enum"
         // The "false" errors will not have a description of what went wrong, but it will contain
         // the error: "Expected value to match one of the values specified by the enum"
-        var errors = result
-            .Details
-            .Where(detail => detail.HasErrors && detail.Errors?.Count > 1);
-        var uniqueErrors = new List<EvaluationResults>();
-        foreach (var error in errors)
-        {
-            // We get more than one error for wrongly structured attributes, due to some "oneOf"
-            // checks done by JsonSchema. Hence we may remove these duplicated errors by checking
-            // the attribute, which resulted in an error.
-            // e.g InstanceLocation may be: /RequestAggregatedMeasureData_MarketDocument/businessSector.type/value
-            if (uniqueErrors.All(er => er.InstanceLocation != error.InstanceLocation))
-            {
-                uniqueErrors.Add(error);
-            }
-        }
+        var attributeTypeErrors = errors?.Where(detail => detail.Errors?.Count > 1).ToList() ?? new List<EvaluationResults>();
 
-        uniqueErrors.ForEach(AddValidationErrors);
+        // If we have errors in the attribute types, then we will only report these errors.
+        // Hence if a value of another attribute has a length which does not satisfy the schema.
+        // Then the customer will have these reported when the types of the attributes matches the schema.
+        if (attributeTypeErrors.Any())
+        {
+            var uniqueErrors = new List<EvaluationResults>();
+            foreach (var error in attributeTypeErrors)
+            {
+                // We get more than one error for mismatching attributes types, due to some "oneOf"
+                // checks done by JsonSchema. Hence we may remove these duplicated errors comparing
+                // the attribute location (name).
+                // e.g. InstanceLocation may be: /RequestAggregatedMeasureData_MarketDocument/businessSector.type/value
+                if (uniqueErrors.All(er => er.InstanceLocation != error.InstanceLocation))
+                {
+                    uniqueErrors.Add(error);
+                }
+            }
+
+            uniqueErrors.ForEach(AddValidationErrors);
+        }
+        else
+        {
+            errors?.ForEach(AddValidationErrors);
+        }
     }
 
     private void AddValidationErrors(EvaluationResults validationResult)
