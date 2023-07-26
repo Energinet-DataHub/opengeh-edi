@@ -103,10 +103,29 @@ where TICommand : IMarketTransaction<TTransactionType>
     private void ExtractValidationErrors(JsonDocument jsonDocument, JsonSchema schema)
     {
         var result = schema.Evaluate(jsonDocument, new EvaluationOptions() { OutputFormat = OutputFormat.List, });
-        result
+
+        // As of right now, an error in an attribute of our schema will result in errors
+        // in all attributes. The "true" failed attributes will have 2 errors.
+        // One describing the error and one saying: "Expected value to match one of the values specified by the enum"
+        // The "false" errors will not have a description of what went wrong, but it will contain
+        // the error: "Expected value to match one of the values specified by the enum"
+        var errors = result
             .Details
-            .Where(detail => detail.HasErrors)
-            .ToList().ForEach(AddValidationErrors);
+            .Where(detail => detail.HasErrors && detail.Errors?.Count > 1);
+        var uniqueErrors = new List<EvaluationResults>();
+        foreach (var error in errors)
+        {
+            // We get more than one error for wrongly structured attributes, due to some "oneOf"
+            // checks done by JsonSchema. Hence we may remove these duplicated errors by checking
+            // the attribute, which resulted in an error.
+            // e.g InstanceLocation may be: /RequestAggregatedMeasureData_MarketDocument/businessSector.type/value
+            if (uniqueErrors.All(er => er.InstanceLocation != error.InstanceLocation))
+            {
+                uniqueErrors.Add(error);
+            }
+        }
+
+        uniqueErrors.ForEach(AddValidationErrors);
     }
 
     private void AddValidationErrors(EvaluationResults validationResult)
