@@ -139,16 +139,14 @@ public class RequestAggregatedMeasureDataAcceptedTests : TestBase
         var meteringPointType = reader["MeteringPointType"].ToString() ?? string.Empty;
         var settlementMethod = reader["SettlementMethod"].ToString() ?? string.Empty;
         var startOfPeriod = Instant.FromDateTimeUtc(
-            DateTime.ParseExact(
+            DateTime.Parse(
                 reader["StartOfPeriod"].ToString()!,
-                "dd-MM-yyyy HH:mm:ss",
-                new CultureInfo("da-DK"))
+                CultureInfo.CurrentCulture)
                 .ToUniversalTime());
         var endOfPeriod = Instant.FromDateTimeUtc(
-            DateTime.ParseExact(
+            DateTime.Parse(
                     reader["endOfPeriod"].ToString()!,
-                    "dd-MM-yyyy HH:mm:ss",
-                    new CultureInfo("da-DK"))
+                    CultureInfo.CurrentCulture)
                 .ToUniversalTime());
         /*var startOfPeriod = Instant.FromDateTimeUtc(
             LocalDateTimePattern.CreateWithInvariantCulture("dd-MM-yyyy HH:mm:ss")
