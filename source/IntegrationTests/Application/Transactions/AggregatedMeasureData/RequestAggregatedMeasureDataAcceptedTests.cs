@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -137,8 +138,25 @@ public class RequestAggregatedMeasureDataAcceptedTests : TestBase
         var settlementVersion = reader["SettlementVersion"].ToString() ?? string.Empty;
         var meteringPointType = reader["MeteringPointType"].ToString() ?? string.Empty;
         var settlementMethod = reader["SettlementMethod"].ToString() ?? string.Empty;
-        var startOfPeriod = LocalDateTimePattern.CreateWithInvariantCulture("dd-MM-yyyy HH:mm:ss").Parse(reader["StartOfPeriod"].ToString()!).Value.InZoneStrictly(DateTimeZoneProviders.Tzdb.GetSystemDefault()).ToInstant();
-        var endOfPeriod = LocalDateTimePattern.CreateWithInvariantCulture("dd-MM-yyyy HH:mm:ss").Parse(reader["EndOfPeriod"].ToString()!).Value.InZoneStrictly(DateTimeZoneProviders.Tzdb.GetSystemDefault()).ToInstant();
+        var startOfPeriod = Instant.FromDateTimeUtc(
+            DateTime.ParseExact(
+                reader["StartOfPeriod"].ToString()!,
+                "dd-MM-yyyy HH:mm:ss",
+                new CultureInfo("da-DK"))
+                .ToUniversalTime());
+        var endOfPeriod = Instant.FromDateTimeUtc(
+            DateTime.ParseExact(
+                    reader["endOfPeriod"].ToString()!,
+                    "dd-MM-yyyy HH:mm:ss",
+                    new CultureInfo("da-DK"))
+                .ToUniversalTime());
+        /*var startOfPeriod = Instant.FromDateTimeUtc(
+            LocalDateTimePattern.CreateWithInvariantCulture("dd-MM-yyyy HH:mm:ss")
+            .Parse(reader["StartOfPeriod"].ToString()!)
+            .Value); //.InZoneStrictly(DateTimeZoneProviders.Tzdb.GetSystemDefault()).ToInstant();*/
+        /*var endOfPeriod = LocalDateTimePattern.CreateWithInvariantCulture("dd-MM-yyyy HH:mm:ss")
+            .Parse(reader["EndOfPeriod"].ToString()!).Value.InZoneStrictly(DateTimeZoneProviders.Tzdb.GetSystemDefault()).ToInstant();
+        */
         var meteringGridAreaDomainId = reader["MeteringGridAreaDomainId"].ToString() ?? string.Empty;
         var energySupplierId = reader["EnergySupplierId"].ToString() ?? string.Empty;
         var balanceResponsibleId = reader["BalanceResponsibleId"].ToString() ?? string.Empty;
