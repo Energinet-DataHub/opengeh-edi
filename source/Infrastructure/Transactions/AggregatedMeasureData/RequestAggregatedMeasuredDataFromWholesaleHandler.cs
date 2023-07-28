@@ -23,13 +23,13 @@ using MediatR;
 namespace Infrastructure.Transactions.AggregatedMeasureData;
 
 public class
-    RequestAggregatedMeasuredDataFromWholesale : IRequestHandler<NotifyWholesaleOfAggregatedMeasureDataRequest, Unit>
+    RequestAggregatedMeasuredDataFromWholesaleHandler : IRequestHandler<NotifyWholesaleOfAggregatedMeasureDataRequest, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
     // TODO: Remove the dependency to RequestResponse when we get a response from wholesale
     private readonly IWholeSaleInBox _wholeSaleInBox;
 
-    public RequestAggregatedMeasuredDataFromWholesale(
+    public RequestAggregatedMeasuredDataFromWholesaleHandler(
         IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository,
         IWholeSaleInBox wholeSaleInBox)
     {
@@ -46,6 +46,9 @@ public class
         var process = _aggregatedMeasureDataProcessRepository.GetById(request.ProcessId) ??
                       throw new ArgumentNullException(nameof(request));
 
+        // TODO: does this work? will it update the correct process?
+        // TODO: What happens if there is not process with the same ID in the database?
+        _aggregatedMeasureDataProcessRepository.Update(process);
         await _wholeSaleInBox.SendAsync(
             process,
             cancellationToken).ConfigureAwait(false);

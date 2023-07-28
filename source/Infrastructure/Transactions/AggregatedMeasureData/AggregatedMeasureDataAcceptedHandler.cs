@@ -1,0 +1,75 @@
+﻿// Copyright 2020 Energinet DataHub A/S
+//
+// Licensed under the Apache License, Version 2.0 (the "License2");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Application.OutgoingMessages;
+using Application.Transactions.AggregatedMeasureData.Notifications;
+using Domain.Transactions;
+using Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.Edi.Responses;
+using MediatR;
+
+namespace Infrastructure.Transactions.AggregatedMeasureData;
+
+public class AggregatedMeasureDataAcceptedInternalCommandHandler : IRequestHandler<AggregatedMeasureDataAcceptedInternalCommand, Unit>
+{
+    private readonly IOutgoingMessageRepository _outgoingMessageStore;
+    private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
+
+    public AggregatedMeasureDataAcceptedInternalCommandHandler(
+        IOutgoingMessageRepository outgoingMessageStore,
+        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
+    {
+        _outgoingMessageStore = outgoingMessageStore;
+        _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
+    }
+
+    // DET ER HER !!!
+    public Task<Unit> Handle(AggregatedMeasureDataAcceptedInternalCommand request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(request.AggregatedMeasureDataAccepted);
+
+        var process = _aggregatedMeasureDataProcessRepository
+            .GetById(ProcessId.Create(request.AggregatedMeasureDataAccepted.ProcessId));
+
+        ArgumentNullException.ThrowIfNull(process);
+        ArgumentNullException.ThrowIfNull(request.AggregatedMeasureDataAccepted.TimeSeries);
+
+        var wholesaleSeries =
+            AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(
+                new BinaryData(
+                    Encoding.BigEndianUnicode.GetBytes(request.AggregatedMeasureDataAccepted.TimeSeries)));
+
+        if (process.HasMessageBeenGenerated())
+        {
+            return Unit.Task;
+        }
+
+        process.SetMessageGenerated();
+
+        // If we map this to an Aggregation.cs we can create and AggregationResultMessage which will build to
+        // a RSM-014 when we peek these from outgoing messages!
+        var outgoingMessages = process.CreateMessage(wholesaleSeries);
+
+        // TODO: does this work? will it update the correct process?
+        // TODO: What happens if there is not process with the same ID in the database?
+        _aggregatedMeasureDataProcessRepository.Update(process);
+        outgoingMessages.ForEach(message => _outgoingMessageStore.Add(message));
+        return Unit.Task;
+    }
+}

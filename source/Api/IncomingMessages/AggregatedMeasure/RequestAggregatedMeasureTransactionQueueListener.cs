@@ -23,7 +23,7 @@ using Infrastructure.Configuration.Serialization;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 
-namespace Api.IncomingMessages;
+namespace Api.IncomingMessages.AggregatedMeasure;
 
 public class RequestAggregatedMeasureTransactionQueueListener
 {

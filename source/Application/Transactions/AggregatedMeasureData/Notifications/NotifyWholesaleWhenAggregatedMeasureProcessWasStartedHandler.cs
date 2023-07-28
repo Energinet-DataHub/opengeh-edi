@@ -21,11 +21,11 @@ using MediatR;
 
 namespace Application.Transactions.AggregatedMeasureData.Notifications;
 
-public class NotifyWholesaleWhenAggregatedMeasureProcessWasStarted : INotificationHandler<AggregatedMeasureProcessWasStarted>
+public class NotifyWholesaleWhenAggregatedMeasureProcessWasStartedHandler : INotificationHandler<AggregatedMeasureProcessWasStarted>
 {
     private readonly ICommandScheduler _commandScheduler;
 
-    public NotifyWholesaleWhenAggregatedMeasureProcessWasStarted(ICommandScheduler commandScheduler)
+    public NotifyWholesaleWhenAggregatedMeasureProcessWasStartedHandler(ICommandScheduler commandScheduler)
     {
         _commandScheduler = commandScheduler;
     }

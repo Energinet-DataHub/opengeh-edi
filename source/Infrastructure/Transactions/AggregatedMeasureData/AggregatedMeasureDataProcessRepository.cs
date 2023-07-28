@@ -40,4 +40,9 @@ public class AggregatedMeasureDataProcessRepository : IAggregatedMeasureDataProc
             .AggregatedMeasureDataProcesses
             .FirstOrDefault(process => process.ProcessId == processId);
     }
+
+    public void Update(AggregatedMeasureDataProcess process)
+    {
+        _b2BContext.AggregatedMeasureDataProcesses.Update(process);
+    }
 }

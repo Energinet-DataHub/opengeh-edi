@@ -28,9 +28,13 @@ internal static class RequestedAggregatedMeasureDataConfiguration
     public static void Configure(IServiceCollection services)
     {
         services.AddTransient<IRequestHandler<RequestAggregatedMeasureDataTransaction, Unit>, AggregatedMeasureDataRequestHandler>();
-        services.AddTransient<IRequestHandler<NotifyWholesaleOfAggregatedMeasureDataRequest, Unit>, RequestAggregatedMeasuredDataFromWholesale>();
-        services.AddTransient<INotificationHandler<AggregatedMeasureProcessWasStarted>, NotifyWholesaleWhenAggregatedMeasureProcessWasStarted>();
+        services.AddTransient<IRequestHandler<AggregatedMeasureDataAccepted, Unit>, AggregatedMeasureDataAcceptedHandler>();
+        services.AddTransient<IRequestHandler<NotifyWholesaleOfAggregatedMeasureDataRequest, Unit>, RequestAggregatedMeasuredDataFromWholesaleHandler>();
+        services.AddTransient<INotificationHandler<AggregatedMeasureProcessWasStarted>, NotifyWholesaleWhenAggregatedMeasureProcessWasStartedHandler>();
         services.AddScoped<WholeSaleInbox>();
         services.AddScoped<IAggregatedMeasureDataProcessRepository, AggregatedMeasureDataProcessRepository>();
+        services
+            .AddTransient<IRequestHandler<AggregatedMeasureDataAcceptedInternalCommand, Unit>,
+                AggregatedMeasureDataAcceptedInternalCommandHandler>();
     }
 }

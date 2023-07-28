@@ -16,7 +16,9 @@ using System;
 using Azure.Messaging.ServiceBus;
 using Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.Edi.Responses;
+using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
+using Infrastructure.WholeSale;
 using Serie = Energinet.DataHub.Edi.Responses.Serie;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData;
@@ -24,21 +26,22 @@ namespace Infrastructure.Transactions.AggregatedMeasureData;
 public static class AggregatedMeasureDataProcessFactory
 {
     // TODO: consider moving this to another class
-    public static ServiceBusMessage CreateServiceBusMessage(AggregatedMeasureDataProcess process)
+    public static ServiceBusMessage CreateServiceBusMessage(InboxEvent @event)
     {
-        var bodyFromWholesaleMock = CreateResponseFromWholeSaleTemp(process);
-        var message = new ServiceBusMessage()
+        ArgumentNullException.ThrowIfNull(@event);
+        var message = new ServiceBusMessage
         {
-            Body = new BinaryData(bodyFromWholesaleMock),
-            Subject = nameof(process),
-            MessageId = process.ProcessId.Id.ToString(),
+            Body = new BinaryData(@event.Message.ToByteArray()),
+            Subject = @event.InboxEventName,
+            MessageId = @event.InboxEventIdentification.ToString(),
         };
-        message.ApplicationProperties.Add("RequestId", process.ProcessId.Id.ToString());
+
+        message.ApplicationProperties.Add("RequestId", @event.InboxEventIdentification.ToString());
 
         return message;
     }
 
-    private static AggregatedTimeSeriesRequestAccepted CreateResponseFromWholeSaleTemp(
+    public static AggregatedTimeSeriesRequestAccepted CreateResponseFromWholeSaleTemp(
         AggregatedMeasureDataProcess aggregatedMeasureDataProcess)
     {
         ArgumentNullException.ThrowIfNull(aggregatedMeasureDataProcess);
@@ -66,9 +69,7 @@ public static class AggregatedMeasureDataProcessFactory
 
         return new Serie()
         {
-#pragma warning disable CA1305
-            SettlementVersion = aggregatedMeasureDataProcess.SettlementVersion ?? "0",
-#pragma warning restore CA1305
+            SettlementVersion = "2",
             GridArea = aggregatedMeasureDataProcess.MeteringGridAreaDomainId,
             Product = Product.Tarif,
             QuantityUnit = QuantityUnit.Kwh,
