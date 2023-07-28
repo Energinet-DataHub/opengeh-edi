@@ -55,10 +55,20 @@ public class AggregatedMeasureDataAcceptedInternalCommandHandler : IRequestHandl
                 new BinaryData(
                     Encoding.BigEndianUnicode.GetBytes(request.AggregatedMeasureDataAccepted.TimeSeries)));
 
+        if (process.HasMessageBeenGenerated())
+        {
+            return Unit.Task;
+        }
+
+        process.SetMessageGenerated();
+
         // If we map this to an Aggregation.cs we can create and AggregationResultMessage which will build to
         // a RSM-014 when we peek these from outgoing messages!
         var outgoingMessages = process.CreateMessage(wholesaleSeries);
 
+        // TODO: does this work? will it update the correct process?
+        // TODO: What happens if there is not process with the same ID in the database?
+        _aggregatedMeasureDataProcessRepository.Update(process);
         outgoingMessages.ForEach(message => _outgoingMessageStore.Add(message));
         return Unit.Task;
     }

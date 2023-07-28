@@ -18,11 +18,9 @@ using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.SeedWork;
 using Domain.Transactions.AggregatedMeasureData.Events;
 using Domain.Transactions.Aggregations;
-using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.Collections;
 using NodaTime;
-using NodaTime.Text;
 using Period = Domain.Transactions.Aggregations.Period;
 using Point = Domain.Transactions.Aggregations.Point;
 using wholesaleSerie = Energinet.DataHub.Edi.Responses.Serie;
@@ -68,6 +66,7 @@ namespace Domain.Transactions.AggregatedMeasureData
             Sent,
             Accepted, // TODO: LRN this would indicate that the process is completed, is only property to  describe state enough?
             Rejected,
+            OutGoingMessageGenerated,
         }
 
         public ProcessId ProcessId { get; }
@@ -135,6 +134,22 @@ namespace Domain.Transactions.AggregatedMeasureData
             {
                 throw new AggregatedMeasureDataException("Wholesale has not been notified yet");
             }
+        }
+
+        public void SetMessageGenerated()
+        {
+            if (_state == State.Accepted || _state == State.OutGoingMessageGenerated)
+            {
+                _state = State.OutGoingMessageGenerated;
+                return;
+            }
+
+            throw new AggregatedMeasureDataException("This process is missing a reply from wholesale");
+        }
+
+        public bool HasMessageBeenGenerated()
+        {
+            return _state == State.OutGoingMessageGenerated;
         }
 
         // TODO: this should live inside infrastructure instead of domain
@@ -209,7 +224,6 @@ namespace Domain.Transactions.AggregatedMeasureData
         {
             var startTime = serie.Period.StartOfPeriod;
             var endTime = serie.Period.EndOfPeriod;
-            var hej = Instant.FromDateTimeUtc(endTime.ToDateTime());
             return new Period(
                 Instant.FromDateTimeUtc(startTime.ToDateTime()),
                 Instant.FromDateTimeUtc(endTime.ToDateTime()));
@@ -235,8 +249,7 @@ namespace Domain.Transactions.AggregatedMeasureData
 
         private List<Aggregation> AggregationFromTimeSeries(List<wholesaleSerie> timeSeries)
         {
-            var temp = MapPeriod(timeSeries.First());
-
+            // This should lice in infrastructure
             var aggregations = timeSeries.Select(serie => new Aggregation(
                 MapPoints(serie.TimeSeriesPoints),
                 MapMeteringPointType(serie),

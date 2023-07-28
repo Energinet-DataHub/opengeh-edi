@@ -46,6 +46,9 @@ public class
         var process = _aggregatedMeasureDataProcessRepository.GetById(request.ProcessId) ??
                       throw new ArgumentNullException(nameof(request));
 
+        // TODO: does this work? will it update the correct process?
+        // TODO: What happens if there is not process with the same ID in the database?
+        _aggregatedMeasureDataProcessRepository.Update(process);
         await _wholeSaleInBox.SendAsync(
             process,
             cancellationToken).ConfigureAwait(false);
