@@ -34,6 +34,7 @@ where TICommand : IMarketTransaction<TTransactionType>
 {
     private readonly ISchemaProvider _schemaProvider;
     private readonly List<ValidationError> _errors = new();
+    private readonly string _unUsefulError = "[enum, Expected value to match one of the values specified by the enum]";
 
     protected JsonParserBase(ISchemaProvider schemaProvider)
     {
@@ -103,10 +104,12 @@ where TICommand : IMarketTransaction<TTransactionType>
     private void ExtractValidationErrors(JsonDocument jsonDocument, JsonSchema schema)
     {
         var result = schema.Evaluate(jsonDocument, new EvaluationOptions() { OutputFormat = OutputFormat.List, });
-        result
+
+        var errors = result
             .Details
-            .Where(detail => detail.HasErrors)
-            .ToList().ForEach(AddValidationErrors);
+            .Where(detail => detail.HasErrors).ToList();
+
+        errors?.ForEach(AddValidationErrors);
     }
 
     private void AddValidationErrors(EvaluationResults validationResult)
@@ -115,7 +118,11 @@ where TICommand : IMarketTransaction<TTransactionType>
         var errorsValues = validationResult.Errors ?? new Dictionary<string, string>();
         foreach (var error in errorsValues)
         {
-            AddValidationError($"{propertyName}: {error}");
+            var errorMessage = $"{propertyName}: {error}";
+            if ($"{error}" != _unUsefulError && _errors.All(er => er.Message != errorMessage))
+            {
+                AddValidationError(errorMessage);
+            }
         }
     }
 

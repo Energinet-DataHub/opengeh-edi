@@ -2,10 +2,7 @@
 	"RequestAggregatedMeasureData_MarketDocument": {
 		"mRID": "123564789123564789123564789123564789",
 		"businessSector.type": {
-			"value": [
-        "23",
-        "23" 
-      ]
+			"value": ["23"]
 		},
 		"createdDateTime": "2022-12-17T09:30:47Z",
 		"process.processType": {
