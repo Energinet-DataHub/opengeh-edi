@@ -13,12 +13,14 @@
 // limitations under the License.
 
 using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.OutgoingMessages;
 using Application.Transactions.AggregatedMeasureData.Notifications;
 using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.Edi.Responses;
 using MediatR;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData;
@@ -36,6 +38,7 @@ public class AggregatedMeasureDataAcceptedInternalCommandHandler : IRequestHandl
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
     }
 
+    // DET ER HER !!!
     public Task<Unit> Handle(AggregatedMeasureDataAcceptedInternalCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -45,9 +48,18 @@ public class AggregatedMeasureDataAcceptedInternalCommandHandler : IRequestHandl
             .GetById(ProcessId.Create(request.AggregatedMeasureDataAccepted.ProcessId));
 
         ArgumentNullException.ThrowIfNull(process);
+        ArgumentNullException.ThrowIfNull(request.AggregatedMeasureDataAccepted.TimeSeries);
 
-        // var outgoingMessage = process.CreateMessage(request.AggregatedMeasureDataAccepted.TimeSeries);
-        // _outgoingMessageStore.Add(outgoingMessage);
+        var wholesaleSeries =
+            AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(
+                new BinaryData(
+                    Encoding.BigEndianUnicode.GetBytes(request.AggregatedMeasureDataAccepted.TimeSeries)));
+
+        // If we map this to an Aggregation.cs we can create and AggregationResultMessage which will build to
+        // a RSM-014 when we peek these from outgoing messages!
+        var outgoingMessages = process.CreateMessage(wholesaleSeries);
+
+        outgoingMessages.ForEach(message => _outgoingMessageStore.Add(message));
         return Unit.Task;
     }
 }

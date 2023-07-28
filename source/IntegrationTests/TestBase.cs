@@ -20,14 +20,12 @@ using System.Threading.Tasks;
 using Api.Configuration.Middleware.Correlation;
 using Application.Configuration;
 using Application.Configuration.Commands.Commands;
-using Application.Configuration.DataAccess;
 using Application.Configuration.Queries;
 using Application.Configuration.TimeEvents;
 using Application.Transactions.MoveIn;
 using Azure.Messaging.ServiceBus;
 using Google.Protobuf;
 using Infrastructure.Configuration;
-using Infrastructure.Configuration.DataAccess;
 using Infrastructure.Configuration.IntegrationEvents;
 using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
@@ -168,6 +166,8 @@ namespace IntegrationTests
                         new MessageDelivery(new GridOperator() { GracePeriodInDaysAfterEffectiveDateIfNotUpdated = 1, }),
                         new BusinessService(new Uri("http://someuri"))))
                 .AddMessageParserServices();
+            _services.AddTransient<IRequestHandler<IntegrationTests.Infrastructure.Configuration.Inbox.TestCommand, Unit>,
+                    IntegrationTests.Infrastructure.Configuration.Inbox.TestCommandHandler>();
             _serviceProvider = _services.BuildServiceProvider();
         }
     }

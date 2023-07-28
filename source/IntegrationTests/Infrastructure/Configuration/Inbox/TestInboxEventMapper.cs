@@ -14,19 +14,21 @@
 
 using System;
 using Application.Configuration.Commands.Commands;
+using Infrastructure.Configuration.InboxEvents;
 using MediatR;
 
-namespace Application.IncomingMessages.RequestAggregatedMeasureData;
+namespace IntegrationTests.Infrastructure.Configuration.Inbox;
 
-public class AggregatedMeasureDataAccepted : ICommand<Unit>
+public class TestInboxEventMapper : IInboxEventMapper
 {
-    public AggregatedMeasureDataAccepted(string timeSeries, Guid processId)
+    public bool CanHandle(string eventType)
     {
-        TimeSeries = timeSeries;
-        ProcessId = processId;
+        ArgumentNullException.ThrowIfNull(eventType);
+        return eventType.Equals(nameof(TestInboxEvent), StringComparison.OrdinalIgnoreCase);
     }
 
-    public string TimeSeries { get; }
-
-    public Guid ProcessId { get; }
+    public ICommand<Unit> CreateCommand(string eventId, byte[] eventPayload)
+    {
+        return new TestCommand(eventId);
+    }
 }

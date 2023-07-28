@@ -14,9 +14,18 @@
 
 using Domain.Actors;
 using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.SeedWork;
 using Domain.Transactions.AggregatedMeasureData.Events;
+using Domain.Transactions.Aggregations;
+using Energinet.DataHub.Edi.Requests;
+using Energinet.DataHub.Edi.Responses;
+using Google.Protobuf.Collections;
 using NodaTime;
+using NodaTime.Text;
+using Period = Domain.Transactions.Aggregations.Period;
+using Point = Domain.Transactions.Aggregations.Point;
+using wholesaleSerie = Energinet.DataHub.Edi.Responses.Serie;
 
 namespace Domain.Transactions.AggregatedMeasureData
 {
@@ -128,13 +137,148 @@ namespace Domain.Transactions.AggregatedMeasureData
             }
         }
 
-        // public AggregatedMeasureDataAcceptedMessage CreateMessage(string timeseries)
-        // {
-        //     return AggregatedMeasureDataAcceptedMessage.Create(
-        //         ProcessId,
-        //         ActorProvidedId.Create(_requestedByActorId.Value),
-        //         BusinessReason.PreliminaryAggregation,
-        //         timeseries);
-        // }
+        // TODO: this should live inside infrastructure instead of domain
+#pragma warning disable CA1002
+        public List<AggregationResultMessage> CreateMessage(AggregatedTimeSeriesRequestAccepted timeseries)
+#pragma warning restore CA1002
+        {
+            ArgumentNullException.ThrowIfNull(timeseries);
+            var aggregations = AggregationFromTimeSeries(timeseries.Series.ToList());
+
+            // TransactionId and processId is the same.
+            var processId = TransactionId.Create(ProcessId.Id);
+
+            var messages = aggregations.Select(aggregation =>
+                AggregationResultMessage.Create(
+                    _requestedByActorId,
+                    MarketRole.GridOperator, //TODO: Change this
+                    processId!,
+                    aggregation)).ToList();
+            return messages;
+        }
+
+        private static decimal DecimalFromDecimalValue(DecimalValue value)
+        {
+            const int nanoFactor = 1_000_000_000;
+            return value.Units + (value.Nanos / nanoFactor);
+        }
+
+        private static string MapQuality(QuantityQuality quality)
+        {
+            return quality switch
+            {
+                QuantityQuality.Incomplete => Quality.Incomplete.Name,
+                QuantityQuality.Measured => Quality.Measured.Name,
+                QuantityQuality.Missing => Quality.Missing.Name,
+                QuantityQuality.Estimated => Quality.Estimated.Name,
+                QuantityQuality.Unspecified => throw new InvalidOperationException("Quality is not specified"),
+                _ => throw new InvalidOperationException("Unknown quality type"),
+            };
+        }
+
+        private static IReadOnlyList<Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
+        {
+            var points = new List<Point>();
+
+            var pointPosition = 1;
+            foreach (var point in timeSeriesPoints)
+            {
+                points.Add(new Point(pointPosition, DecimalFromDecimalValue(point.Quantity), MapQuality(point.QuantityQuality), point.Time?.ToString() ?? string.Empty));
+                pointPosition++;
+            }
+
+            return points.AsReadOnly();
+        }
+
+        private static string MapUnitType(wholesaleSerie serie)
+        {
+            return serie.QuantityUnit switch
+            {
+                QuantityUnit.Kwh => MeasurementUnit.Kwh.Name,
+                QuantityUnit.Unspecified => throw new InvalidOperationException("Could not map unit type"),
+                _ => throw new InvalidOperationException("Unknown unit type"),
+            };
+        }
+
+        private static string MapResolution(wholesaleSerie serie)
+        {
+            return Domain.Transactions.Aggregations.Resolution.QuarterHourly.Name;
+        }
+
+        private static Period MapPeriod(wholesaleSerie serie)
+        {
+            var startTime = serie.Period.StartOfPeriod;
+            var endTime = serie.Period.EndOfPeriod;
+            var hej = Instant.FromDateTimeUtc(endTime.ToDateTime());
+            return new Period(
+                Instant.FromDateTimeUtc(startTime.ToDateTime()),
+                Instant.FromDateTimeUtc(endTime.ToDateTime()));
+        }
+
+        private static string? MapSettlementMethod(wholesaleSerie serie)
+        {
+            return SettlementType.Flex.Name;
+            /*
+            return serie.SettlementVersion switch // Fix this
+            {
+                nameof(TimeSeriesType.Production) => null,
+                nameof(TimeSeriesType.FlexConsumption) => SettlementType.Flex.Name,
+                nameof(TimeSeriesType.NonProfiledConsumption) => SettlementType.NonProfiled.Name,
+                _ => null,
+            };*/
+        }
+
+        private static string MapProcessType(wholesaleSerie serie)
+        {
+            return BusinessReason.PreliminaryAggregation.Name;
+        }
+
+        private List<Aggregation> AggregationFromTimeSeries(List<wholesaleSerie> timeSeries)
+        {
+            var temp = MapPeriod(timeSeries.First());
+
+            var aggregations = timeSeries.Select(serie => new Aggregation(
+                MapPoints(serie.TimeSeriesPoints),
+                MapMeteringPointType(serie),
+                MapUnitType(serie),
+                MapResolution(serie), // as of right now, this does not exist
+                MapPeriod(serie),
+                MapSettlementMethod(serie),
+                MapProcessType(serie),
+                MapActorGrouping(serie),
+                MapGridAreaDetails(serie)));
+
+            return aggregations.ToList();
+        }
+
+#pragma warning disable CA1822 // remove this when we have proper data
+        private string MapMeteringPointType(wholesaleSerie serie)
+#pragma warning restore CA1822
+        {
+            return Domain.OutgoingMessages.MeteringPointType.Production.Name;
+            /*
+            return MeteringPointType switch
+            {
+                nameof(TimeSeriesType.Production) => Domain.OutgoingMessages.MeteringPointType.Production.Name,
+                nameof(TimeSeriesType.FlexConsumption) => Domain.OutgoingMessages.MeteringPointType.Consumption.Name,
+                nameof(TimeSeriesType.NonProfiledConsumption) => Domain.OutgoingMessages.MeteringPointType.Consumption.Name,
+                nameof(TimeSeriesType.NetExchangePerGa) => Domain.OutgoingMessages.MeteringPointType.Exchange.Name,
+                nameof(TimeSeriesType.NetExchangePerNeighboringGa) => Domain.OutgoingMessages.MeteringPointType.Exchange.Name,
+                nameof(TimeSeriesType.TotalConsumption) => Domain.OutgoingMessages.MeteringPointType.Consumption.Name,
+                nameof(TimeSeriesType.Unspecified) => throw new InvalidOperationException("Unknown metering point type"),
+                _ => throw new InvalidOperationException("Could not determine metering point type"),
+            };*/
+        }
+
+        private ActorGrouping MapActorGrouping(wholesaleSerie serie)
+        {
+            return new ActorGrouping(EnergySupplierId, BalanceResponsibleId);
+        }
+
+        private GridAreaDetails MapGridAreaDetails(wholesaleSerie serie)
+        {
+            // correct this
+            return new GridAreaDetails(MeteringGridAreaDomainId ?? string.Empty, "5790002606892");
+        }
     }
 }

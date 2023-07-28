@@ -13,20 +13,19 @@
 // limitations under the License.
 
 using System;
-using Application.Configuration.Commands.Commands;
+using System.Threading;
+using System.Threading.Tasks;
 using MediatR;
 
-namespace Application.IncomingMessages.RequestAggregatedMeasureData;
+namespace IntegrationTests.Infrastructure.Configuration.Inbox;
 
-public class AggregatedMeasureDataAccepted : ICommand<Unit>
+public class TestCommandHandler : IRequestHandler<TestCommand, Unit>
 {
-    public AggregatedMeasureDataAccepted(string timeSeries, Guid processId)
+    public Task<Unit> Handle(TestCommand request, CancellationToken cancellationToken)
     {
-        TimeSeries = timeSeries;
-        ProcessId = processId;
+        ArgumentNullException.ThrowIfNull(request);
+        throw new TestSuccessException("We successfully reached the handler. Which is supposed" +
+                                      "to save an internal command. By doing this, we add test data to " +
+                                      "our solution, hence we throw an exception instead.");
     }
-
-    public string TimeSeries { get; }
-
-    public Guid ProcessId { get; }
 }

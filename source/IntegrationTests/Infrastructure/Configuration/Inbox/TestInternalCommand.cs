@@ -12,21 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Application.Configuration.Commands.Commands;
-using MediatR;
 
-namespace Application.IncomingMessages.RequestAggregatedMeasureData;
+namespace IntegrationTests.Infrastructure.Configuration.Inbox;
 
-public class AggregatedMeasureDataAccepted : ICommand<Unit>
+public class TestInternalCommand : InternalCommand
 {
-    public AggregatedMeasureDataAccepted(string timeSeries, Guid processId)
+    public TestInternalCommand(string property)
     {
-        TimeSeries = timeSeries;
-        ProcessId = processId;
+        Property = property;
     }
 
-    public string TimeSeries { get; }
-
-    public Guid ProcessId { get; }
+    public string Property { get; }
 }

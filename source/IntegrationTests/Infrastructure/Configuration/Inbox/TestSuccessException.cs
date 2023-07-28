@@ -13,20 +13,22 @@
 // limitations under the License.
 
 using System;
-using Application.Configuration.Commands.Commands;
-using MediatR;
 
-namespace Application.IncomingMessages.RequestAggregatedMeasureData;
+namespace IntegrationTests.Infrastructure.Configuration.Inbox;
 
-public class AggregatedMeasureDataAccepted : ICommand<Unit>
+public class TestSuccessException : Exception
 {
-    public AggregatedMeasureDataAccepted(string timeSeries, Guid processId)
+    public TestSuccessException(string message)
+        : base(message)
     {
-        TimeSeries = timeSeries;
-        ProcessId = processId;
     }
 
-    public string TimeSeries { get; }
+    public TestSuccessException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
 
-    public Guid ProcessId { get; }
+    public TestSuccessException()
+    {
+    }
 }

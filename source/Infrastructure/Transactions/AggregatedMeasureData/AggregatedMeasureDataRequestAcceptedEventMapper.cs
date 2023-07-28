@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using System.Threading.Tasks;
+using System.Text;
 using Application.Configuration.Commands.Commands;
 using Application.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.Edi.Responses;
@@ -32,12 +32,12 @@ public class AggregatedMeasureDataRequestAcceptedEventMapper : IInboxEventMapper
 
     public ICommand<Unit> CreateCommand(string eventId, byte[] eventPayload)
     {
-        var payload = AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(eventPayload);
-        return new AggregatedMeasureDataAccepted(payload.ToString(), Guid.Parse(eventId));
-    }
+        //var payload = AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(eventPayload);
+        ArgumentNullException.ThrowIfNull(eventPayload);
+        // Why do we want to cast to string here?
+        var payloadAsString = Encoding.BigEndianUnicode.GetString(eventPayload);
 
-    public Task<INotification> MapFromAsync(string payload)
-    {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(payloadAsString);
+        return new AggregatedMeasureDataAccepted(payloadAsString, Guid.Parse(eventId));
     }
 }

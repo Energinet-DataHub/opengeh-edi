@@ -28,20 +28,17 @@ namespace Api.Inbox;
 public class InboxMessageQueueListener
 {
     private readonly ILogger<InboxMessageQueueListener> _logger;
-    private readonly IMediator _mediator;
     private readonly ISerializer _jsonSerializer;
     private readonly ICorrelationContext _correlationContext;
     private readonly InboxEventReceiver _inboxEventReceiver;
 
     public InboxMessageQueueListener(
-        IMediator mediator,
         ISerializer jsonSerializer,
         ICorrelationContext correlationContext,
         ILogger<InboxMessageQueueListener> logger,
         InboxEventReceiver inboxEventReceiver)
     {
         _logger = logger;
-        _mediator = mediator;
         _jsonSerializer = jsonSerializer;
         _correlationContext = correlationContext;
         _inboxEventReceiver = inboxEventReceiver;
@@ -56,13 +53,6 @@ public class InboxMessageQueueListener
         if (message == null) throw new ArgumentNullException(nameof(message));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        //TODO: delete this? who can cancel this?
-        using var cancellationTokenSource =
-            CancellationTokenSource.CreateLinkedTokenSource(
-                hostCancellationToken,
-                context.CancellationToken);
-
-        var cancellationToken = cancellationTokenSource.Token;
         SetCorrelationIdFromServiceBusMessage(context);
 
         context.BindingContext.BindingData.TryGetValue("RequestId", out var eventId);

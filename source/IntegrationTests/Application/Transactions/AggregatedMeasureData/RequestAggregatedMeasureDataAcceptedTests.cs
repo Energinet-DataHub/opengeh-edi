@@ -13,15 +13,20 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.IncomingMessages.RequestAggregatedMeasureData;
+using Application.Transactions.AggregatedMeasureData.Notifications;
 using Dapper;
 using Domain.Actors;
+using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.Edi.Responses;
+using Google.Protobuf;
 using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Transactions.AggregatedMeasureData;
 using Infrastructure.WholeSale;
@@ -64,7 +69,8 @@ public class RequestAggregatedMeasureDataAcceptedTests : TestBase
         var aggregatedTimeSeries = AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(message!.Body);
 
         // Act
-        var command = new AggregatedMeasureDataAccepted(aggregatedTimeSeries, Guid.Parse(message.MessageId));
+        //var command = new AggregatedMeasureDataAccepted(aggregatedTimeSeries, Guid.Parse(message.MessageId));
+        var command = new AggregatedMeasureDataAccepted(message.Body!.ToString(), Guid.Parse(message.MessageId));
 
         // Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() => InvokeCommandAsync(command)).ConfigureAwait(false);
@@ -83,13 +89,33 @@ public class RequestAggregatedMeasureDataAcceptedTests : TestBase
         var serviceBusMessage = AggregatedMeasureDataProcessFactory.CreateServiceBusMessage(inboxEvent);
         await _senderSpy.SendAsync(serviceBusMessage, CancellationToken.None).ConfigureAwait(false);
         var message = _senderSpy.Message;
-        var aggregatedTimeSeries = AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(message!.Body);
 
         // Act
-        var command = new AggregatedMeasureDataAccepted(aggregatedTimeSeries, Guid.Parse(message.MessageId));
+        //var command = new AggregatedMeasureDataAccepted(aggregatedTimeSeries, Guid.Parse(message.MessageId));
+        var command = new AggregatedMeasureDataAccepted(message!.Body!.ToString(), Guid.Parse(message.MessageId));
 
         // Assert
-        await Assert.ThrowsAsync<AggregatedMeasureDataException>(() => InvokeCommandAsync(command)).ConfigureAwait(false);
+        await Assert.ThrowsAsync<AggregatedMeasureDataException>(() => InvokeCommandAsync(command))
+            .ConfigureAwait(false);
+    }
+
+    [Fact]
+    public async Task Internal_command_is_saved_as_outgoing_message()
+    {
+        var transactionCommand = MessageBuilder().Build();
+        await InvokeCommandAsync(transactionCommand).ConfigureAwait(false);
+        var process = await GetProcess(transactionCommand.MessageHeader.SenderId).ConfigureAwait(false);
+        var wholesaleResponse = AggregatedMeasureDataProcessFactory.CreateResponseFromWholeSaleTemp(process!);
+        var responseAsByteArray = new BinaryData(wholesaleResponse.ToByteArray());
+        var wholesaleResponseAsString = Encoding.BigEndianUnicode.GetString(responseAsByteArray);
+        var aggregatedMeasure = new AggregatedMeasureDataAccepted(wholesaleResponseAsString, process!.ProcessId.Id);
+
+        var internalCommand = new AggregatedMeasureDataAcceptedInternalCommand(aggregatedMeasure);
+        await InvokeCommandAsync(internalCommand).ConfigureAwait(false);
+
+        var outgoingMessage = GetOutgoingMessage("1234567891234567");
+
+        Assert.NotNull(outgoingMessage);
     }
 
     private static RequestAggregatedMeasureDataMessageBuilder MessageBuilder()
@@ -131,6 +157,19 @@ public class RequestAggregatedMeasureDataAcceptedTests : TestBase
             balanceResponsibleId);
 
         return process;
+    }
+
+    private async Task<AggregationResultMessage?> GetOutgoingMessage(string receiverId)
+    {
+        using var connection = await _databaseConnectionFactory
+            .GetConnectionAndOpenAsync(CancellationToken.None)
+            .ConfigureAwait(false);
+        var query = "SELECT * FROM dbo.OutgoingMessages WHERE ReceiverId = @ReceiverId";
+        var result = await connection
+            .QueryAsync(query, new { ReceiverId = receiverId }).ConfigureAwait(false);
+
+        ArgumentNullException.ThrowIfNull(result);
+        return result?.ToList().FirstOrDefault();
     }
 
     private async Task DisposeAsync()

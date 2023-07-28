@@ -12,25 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.OutgoingMessages.AggregatedTimeSeries;
-using Domain.SeedWork;
-using Energinet.DataHub.Edi.Responses;
+using Application.Configuration.Commands.Commands;
+using MediatR;
 
-namespace Domain.Transactions.AggregatedMeasureData;
+namespace IntegrationTests.Infrastructure.Configuration.Inbox;
 
-public class AggregatedMeasureDataForwarding : Entity
+#pragma warning disable
+public class TestCommand : ICommand<Unit>
 {
-    public AggregatedMeasureDataForwarding(
-        ProcessId processId)
+    public TestCommand(string aProperty)
     {
-        Id = processId;
+        AProperty = aProperty;
     }
 
-    public ProcessId Id { get; }
-
-    // TODO: Remove reference to RequestResponse solution!
-    public static AggregatedTimeSeriesMessage CreateMessage(AggregatedTimeSeriesRequestAccepted request, AggregatedMeasureDataProcess procesId)
-    {
-        throw new NotImplementedException();
-    }
+    public string AProperty { get; }
 }
