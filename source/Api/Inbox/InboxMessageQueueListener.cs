@@ -61,6 +61,9 @@ public class InboxMessageQueueListener
         //Matching ADR-008 name convention
         context.BindingContext.BindingData.TryGetValue("Subject", out var eventName);
         ArgumentNullException.ThrowIfNull(eventName);
+        //This will result in a outgoing message. We may want to save this as an integration event or
+        //create a new DB for these messages. Since we cannot make proper integration events for these messages
+        //Since we have to add metadata for our test handlers. Which lives inside the production code..
         await _inboxEventReceiver.ReceiveAsync(
             (string)eventId,
             (string)eventName,
