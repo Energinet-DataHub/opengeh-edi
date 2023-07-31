@@ -23,7 +23,7 @@ using Application.OutgoingMessages.Common;
 using DocumentValidation;
 using Domain.Actors;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+using Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
 using Domain.SeedWork;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;

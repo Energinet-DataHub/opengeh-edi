@@ -59,6 +59,7 @@ using Infrastructure.Transactions.AggregatedMeasureData;
 using Infrastructure.Transactions.Aggregations;
 using Infrastructure.Transactions.MoveIn;
 using Infrastructure.Transactions.UpdateCustomer;
+using Infrastructure.WholeSale;
 using MediatR;
 using MediatR.Registration;
 using Microsoft.EntityFrameworkCore;
@@ -81,7 +82,7 @@ namespace Infrastructure.Configuration
             services.AddScoped<IMessageIds, MessageIdRegistry>();
             services.AddScoped(typeof(IMessageQueueDispatcher<>), typeof(MessageQueueDispatcher<>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
+            services.AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>();
             services.AddScoped<IFeatureFlagProvider, FeatureFlagProviderProvider>();
 
             AddMediatR();
@@ -91,6 +92,7 @@ namespace Infrastructure.Configuration
             AddMasterDataServices();
             AddActorServices();
             AddProcessing();
+            AddWholeSaleInBox();
             ReadModelHandlingConfiguration.AddReadModelHandling(services);
             UpdateCustomerMasterDataConfiguration.Configure(services);
             DequeueConfiguration.Configure(services);
@@ -111,9 +113,9 @@ namespace Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddPeekConfiguration(IBundleConfiguration bundleConfiguration, Func<IServiceProvider, IBundledMessages>? bundleStoreBuilder = null)
+        public CompositionRoot AddPeekConfiguration()
         {
-            PeekConfiguration.Configure(_services, bundleConfiguration, bundleStoreBuilder);
+            PeekConfiguration.Configure(_services);
             return this;
         }
 
@@ -189,7 +191,7 @@ namespace Infrastructure.Configuration
         public CompositionRoot AddMessagePublishing()
         {
             _services.AddSingleton<IActorLookup, ActorLookup>();
-            _services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
+            _services.AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>();
             _services.AddScoped<OutgoingMessageEnqueuer>();
             return this;
         }
@@ -301,6 +303,11 @@ namespace Infrastructure.Configuration
             _services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>));
             _services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RaiseDomainEventsBehaviour<,>));
             _services.AddTransient(typeof(IPipelineBehavior<,>), typeof(EnqueueOutgoingMessagesBehaviour<,>));
+        }
+
+        private void AddWholeSaleInBox()
+        {
+            WholeSaleInboxConfiguration.Configure(_services);
         }
     }
 }

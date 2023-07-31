@@ -15,7 +15,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Domain.Actors;
-using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 using Domain.Transactions;
 using Domain.Transactions.MoveIn;
 using Domain.Transactions.MoveIn.Events;

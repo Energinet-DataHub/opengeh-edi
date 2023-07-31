@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CimMessageAdapter", "CimMessageAdapter\CimMessageAdapter.csproj", "{27395443-B503-4A4A-B9F1-01C3F9C75222}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure.CimMessageAdapter", "Infrastructure.CimMessageAdapter\Infrastructure.CimMessageAdapter.csproj", "{27395443-B503-4A4A-B9F1-01C3F9C75222}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api", "Api\Api.csproj", "{B14EBA74-CCAF-4677-8AE5-A0F6302ED54C}"
 EndProject
@@ -17,8 +17,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArchitectureTests", "Archit
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{87BCDB76-76A4-46A3-9F67-571847541C90}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EnergySupplying.Contracts", "EnergySupplying.Contracts\EnergySupplying.Contracts.csproj", "{4AA95CA9-C2EB-4F47-88D5-8E320F62142C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Domain\Domain.csproj", "{093FBBA9-B7CF-411E-93DA-2B743FA153AB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestResponse", "RequestResponse\source\RequestResponse\RequestResponse.csproj", "{6A9A18B6-9445-45A0-813D-B7143DB9BC74}"
@@ -27,7 +25,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerformanceTest", "Performa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplyDBMigrationsApp", "ApplyDBMigrationsApp\ApplyDBMigrationsApp.csproj", "{600E0CAA-23B7-493D-90D0-6DDA72104673}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocumentValidation", "DocumentValidation\DocumentValidation.csproj", "{5AB5E68B-40C5-4FDF-8EA7-99FFD3DCBC13}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.DocumentValidation", "Infrastructure.DocumentValidation\Infrastructure.DocumentValidation.csproj", "{5AB5E68B-40C5-4FDF-8EA7-99FFD3DCBC13}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{49203B33-3DA4-4FC2-B64F-4F351CF545C8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,10 +63,6 @@ Global
 		{87BCDB76-76A4-46A3-9F67-571847541C90}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87BCDB76-76A4-46A3-9F67-571847541C90}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87BCDB76-76A4-46A3-9F67-571847541C90}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4AA95CA9-C2EB-4F47-88D5-8E320F62142C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4AA95CA9-C2EB-4F47-88D5-8E320F62142C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4AA95CA9-C2EB-4F47-88D5-8E320F62142C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4AA95CA9-C2EB-4F47-88D5-8E320F62142C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{093FBBA9-B7CF-411E-93DA-2B743FA153AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{093FBBA9-B7CF-411E-93DA-2B743FA153AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{093FBBA9-B7CF-411E-93DA-2B743FA153AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -92,6 +88,9 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{76FA7684-27E1-4022-9FB3-F72811E45C60} = {49203B33-3DA4-4FC2-B64F-4F351CF545C8}
+		{87BCDB76-76A4-46A3-9F67-571847541C90} = {49203B33-3DA4-4FC2-B64F-4F351CF545C8}
+		{D0C39286-C7BE-4714-8CA1-5654B68A9529} = {49203B33-3DA4-4FC2-B64F-4F351CF545C8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D7925810-FA85-4F9E-A124-72F36BAEB9F0}

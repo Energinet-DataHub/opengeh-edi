@@ -24,7 +24,7 @@ namespace Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 public class AggregationResultMessage : OutgoingMessage
 {
     private AggregationResultMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
-        : base(documentType, receiverId, transactionId, businessReason, receiverRole, senderId, senderRole, JsonSerializer.Serialize(messageRecord))
+        : base(documentType, receiverId, transactionId, businessReason, receiverRole, senderId, senderRole, messageRecord)
     {
         Series = new Serializer().Deserialize<TimeSeries>(messageRecord)!;
     }

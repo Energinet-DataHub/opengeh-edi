@@ -21,7 +21,7 @@ using Application.IncomingMessages.RequestChangeOfSupplier;
 using Application.OutgoingMessages.Common.Reasons;
 using Domain.Actors;
 using Domain.MasterData.MarketEvaluationPoints;
-using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 using Domain.Transactions;
 using Domain.Transactions.MoveIn;
 using MediatR;

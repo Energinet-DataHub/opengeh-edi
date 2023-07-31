@@ -15,6 +15,7 @@
 using Application.Actors;
 using Application.Configuration.Commands;
 using Application.Configuration.TimeEvents;
+using Application.Transactions.AggregatedMeasureData.Notifications;
 using Application.Transactions.Aggregations;
 using Application.Transactions.MoveIn;
 using Application.Transactions.MoveIn.MasterDataDelivery;
@@ -52,6 +53,7 @@ internal static class InternalCommandProcessing
         mapper.Add("SetConsumerHasMovedIn", typeof(SetConsumerHasMovedIn));
         mapper.Add("UpdateCustomerMasterData", typeof(UpdateCustomerMasterData));
         mapper.Add("Aggregations.ForwardAggregationResult", typeof(ForwardAggregationResult));
+        mapper.Add("NotifyWholesaleOfAggregatedMeasureDataRequest", typeof(NotifyWholesaleOfAggregatedMeasureDataRequest));
 
         return mapper;
     }
