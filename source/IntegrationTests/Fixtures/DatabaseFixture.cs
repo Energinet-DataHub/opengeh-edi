@@ -76,7 +76,8 @@ namespace IntegrationTests.Fixtures
                 $"DELETE FROM [dbo].[ArchivedMessages]" +
                 $"DELETE FROM [dbo].[MarketDocuments]" +
                 $"DELETE FROM [dbo].[Bundles]" +
-                $"DELETE FROM [dbo].[ActorMessageQueues]";
+                $"DELETE FROM [dbo].[ActorMessageQueues]" +
+                $"DELETE FROM [dbo].[ReceivedInboxEvents]";
 
             _context.Database.ExecuteSqlRaw(cleanupStatement);
         }

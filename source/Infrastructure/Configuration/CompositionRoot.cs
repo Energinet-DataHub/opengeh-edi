@@ -39,6 +39,7 @@ using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Infrastructure.Configuration.Processing;
 using Infrastructure.Configuration.Serialization;
+using Infrastructure.InboxEvents;
 using Infrastructure.IncomingMessages;
 using Infrastructure.MasterData.MarketEvaluationPoints;
 using Infrastructure.OutgoingMessages;
@@ -97,6 +98,7 @@ namespace Infrastructure.Configuration
             UpdateCustomerMasterDataConfiguration.Configure(services);
             DequeueConfiguration.Configure(services);
             IntegrationEventsConfiguration.Configure(services);
+            InboxEventsConfiguration.Configure(services);
             ArchivedMessageConfiguration.Configure(services);
             QueryHandlingConfiguration.Configure(services);
         }
