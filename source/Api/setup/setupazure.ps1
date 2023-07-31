@@ -11,6 +11,10 @@ az account set --name $subscription
 
 CreateQueue -queueName $username"-sbq-incoming_change_of_supplier_message_queue" -serviceBusNamespaceName $serviceBusNamespaceName
 
+CreateQueue -queueName $username"-sbq-incoming_aggregated_measure_data_queue" -serviceBusNamespaceName $serviceBusNamespaceName
+
+CreateQueue -queueName $username"-sbq-incoming_inbox_messages_queue" -serviceBusNamespaceName $serviceBusNamespaceName
+
 CreateTopic -topicName $username"-sbt-integration_events_topic" -serviceBusNamespaceName $serviceBusNamespaceName
 
 CreateTopicSubscription -topicName $username"-sbt-integration_events_topic" -topicSubscriptionName $username"-sbts-integration_events_subscription" -serviceBusNamespaceName $serviceBusNamespaceName
