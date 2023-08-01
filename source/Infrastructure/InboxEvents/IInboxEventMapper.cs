@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using MediatR;
 
@@ -26,8 +27,9 @@ public interface IInboxEventMapper
     /// Map payload to a notification
     /// </summary>
     /// <param name="payload"></param>
+    /// <param name="referenceId"></param>
     /// <returns><see cref="INotification"/></returns>
-    Task<INotification> MapFromAsync(string payload);
+    Task<INotification> MapFromAsync(string payload, Guid referenceId);
 
     /// <summary>
     /// Determines whether the specified event type can be handled by the mapper

@@ -30,7 +30,7 @@ public static class AggregatedMeasureDataProcessFactory
         var message = new ServiceBusMessage()
         {
             Body = new BinaryData(bodyFromWholesaleMock),
-            Subject = nameof(process),
+            Subject = nameof(AggregatedTimeSeriesRequestAccepted),
             MessageId = process.ProcessId.Id.ToString(),
         };
         message.ApplicationProperties.Add("ReferenceId", process.ProcessId.Id.ToString());
