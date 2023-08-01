@@ -34,6 +34,7 @@ message Serie {
 message Period {
   google.protobuf.Timestamp start_of_period = 1;
   google.protobuf.Timestamp end_of_period = 2;
+  Resolution resolution = 3;
 }
 
 message TimeSeriesPoint {
@@ -96,4 +97,15 @@ message DecimalValue {
   // Nano units of the amount (10^-9)
   // Must be same sign as units
   sfixed32 nanos = 2;
+}
+
+/* 
+ * Representation of the resolution.
+ * Unspecified is unused but according to best practice.
+ * Read more at https://protobuf.dev/programming-guides/style/#enums.
+ */
+enum Resolution{
+  RESOLUTION_UNSPECIFIED = 0;
+  RESOLUTION_PT1H = 1;
+  RESOLUTION_PT15M = 2;
 }
