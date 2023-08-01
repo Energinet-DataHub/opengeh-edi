@@ -127,6 +127,8 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202305311442 Recreate TransactionIds as TransactionRegistry.sql" />
     <None Remove="Scripts\Model\202307311506 Create ReceivedInboxEvents table.sql" />
     <EmbeddedResource Include="Scripts\Model\202307311506 Create ReceivedInboxEvents table.sql" />
+    <None Remove="Scripts\Model\202308011325 Add referenceId to ReceivedInboxEvents.sql" />
+    <EmbeddedResource Include="Scripts\Model\202308011325 Add referenceId to ReceivedInboxEvents.sql" />
   </ItemGroup>
 
   <ItemGroup>

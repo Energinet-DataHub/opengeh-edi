@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Configuration;
 using Infrastructure.Configuration.DataAccess;
-using Infrastructure.Configuration.IntegrationEvents;
 
 namespace Infrastructure.InboxEvents;
 
@@ -37,13 +37,13 @@ public class InboxEventReceiver
         _mappers = mappers;
     }
 
-    public async Task ReceiveAsync(string eventId, string eventType, byte[] eventPayload)
+    public async Task ReceiveAsync(string eventId, string eventType, Guid referenceId, byte[] eventPayload)
     {
         if (!EventIsKnown(eventType)) return;
 
         if (await EventIsAlreadyRegisteredAsync(eventId).ConfigureAwait(false) == false)
         {
-            await RegisterAsync(eventId, eventType, eventPayload).ConfigureAwait(false);
+            await RegisterAsync(eventId, eventType, referenceId, eventPayload).ConfigureAwait(false);
         }
     }
 
@@ -58,9 +58,9 @@ public class InboxEventReceiver
         return _mappers.Any(handler => handler.CanHandle(eventType));
     }
 
-    private async Task RegisterAsync(string eventId, string eventType, byte[] eventPayload)
+    private async Task RegisterAsync(string eventId, string eventType, Guid referenceId, byte[] eventPayload)
     {
-        _context.ReceivedInboxEvents.Add(new ReceivedInboxEvent(eventId, eventType, ToJson(eventType, eventPayload), _dateTimeProvider.Now()));
+        _context.ReceivedInboxEvents.Add(new ReceivedInboxEvent(eventId, eventType, referenceId, ToJson(eventType, eventPayload), _dateTimeProvider.Now()));
         await _context.SaveChangesAsync().ConfigureAwait(false);
     }
 

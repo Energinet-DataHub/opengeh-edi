@@ -62,6 +62,7 @@ public static class AggregatedMeasureDataProcessFactory
         {
             StartOfPeriod = new Timestamp() { Seconds = aggregatedMeasureDataProcess.StartOfPeriod.ToUnixTimeSeconds(), },
             EndOfPeriod = new Timestamp() { Seconds = aggregatedMeasureDataProcess.EndOfPeriod?.ToUnixTimeSeconds() ?? 1, },
+            Resolution = Resolution.Pt15M,
         };
 
         return new Serie()

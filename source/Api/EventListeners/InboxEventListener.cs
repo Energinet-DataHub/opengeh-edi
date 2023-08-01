@@ -65,6 +65,7 @@ public class InboxEventListener
         await _inboxEventReceiver.ReceiveAsync(
             (string)eventId,
             (string)eventName,
+            referenceId,
             message).ConfigureAwait(false);
     }
 

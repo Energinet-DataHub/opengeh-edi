@@ -12,17 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using NodaTime;
 
 namespace Infrastructure.InboxEvents;
 
 public class ReceivedInboxEvent
 {
-    public ReceivedInboxEvent(string id, string eventType, string eventPayload, Instant occurredOn)
+    public ReceivedInboxEvent(string id, string eventType, Guid referenceId, string eventPayload, Instant occurredOn)
     {
         Id = id;
         OccurredOn = occurredOn;
         EventType = eventType;
+        ReferenceId = referenceId;
         EventPayload = eventPayload;
     }
 
@@ -36,6 +38,8 @@ public class ReceivedInboxEvent
     public Instant OccurredOn { get; }
 
     public string EventType { get; }
+
+    public Guid ReferenceId { get; }
 
     public string EventPayload { get; }
 }

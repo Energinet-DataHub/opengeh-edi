@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
@@ -32,6 +33,7 @@ public class WhenAnInboxEventIsReceivedTests : TestBase
     private readonly TestInboxEvent _event;
     private readonly byte[] _eventPayload;
     private readonly string _eventId = "1";
+    private readonly Guid _referenceId = Guid.NewGuid();
     private InboxEventReceiver _receiver;
 
     public WhenAnInboxEventIsReceivedTests(DatabaseFixture databaseFixture)
@@ -51,29 +53,36 @@ public class WhenAnInboxEventIsReceivedTests : TestBase
     [Fact]
     public async Task Event_is_registered_if_it_is_a_known_event()
     {
+        // Act
         await EventIsReceived(_eventId);
 
+        // Assert
         await EventIsRegisteredWithInbox(_eventId);
     }
 
     [Fact]
     public async Task Event_is_not_registered_if_it_is_unknown()
     {
+        // Arrange
         var noIntegrationEventMappers = new List<IInboxEventMapper>();
         _receiver = new InboxEventReceiver(GetService<B2BContext>(), GetService<ISystemDateTimeProvider>(), noIntegrationEventMappers);
 
+        // Act
         await EventIsReceived(_eventId);
 
-        await EventIsRegisteredWithInbox(_eventId, false);
+        // Assert
+        await EventIsRegisteredWithInbox(_eventId, 0);
     }
 
     [Fact]
     public async Task Event_registration_is_omitted_if_already_registered()
     {
+        // Act
         await EventIsReceived(_eventId).ConfigureAwait(false);
 
         await EventIsReceived(_eventId).ConfigureAwait(false);
 
+        // Assert
         await EventIsRegisteredWithInbox(_eventId);
     }
 
@@ -84,13 +93,13 @@ public class WhenAnInboxEventIsReceivedTests : TestBase
 
     private Task EventIsReceived(string eventId)
     {
-        return _receiver.ReceiveAsync(eventId, _eventType, _eventPayload);
+        return _receiver.ReceiveAsync(eventId, _eventType, _referenceId, _eventPayload);
     }
 
-    private async Task EventIsRegisteredWithInbox(string eventId, bool isExpectedToBeRegistered = true)
+    private async Task EventIsRegisteredWithInbox(string eventId, int expectedNumberOfRegisteredEvents = 1)
     {
         var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
-        var isRegistered = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM dbo.ReceivedInboxEvents WHERE Id = @EventId", new { EventId = eventId, });
-        Assert.Equal(isExpectedToBeRegistered, isRegistered);
+        var numberOfRegisteredEvents = connection.ExecuteScalar<int>($"SELECT COUNT(*) FROM dbo.ReceivedInboxEvents WHERE Id = @EventId", new { EventId = eventId, });
+        Assert.Equal(expectedNumberOfRegisteredEvents, numberOfRegisteredEvents);
     }
 }
