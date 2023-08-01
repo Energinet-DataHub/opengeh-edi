@@ -11,31 +11,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+namespace IntegrationTests.Infrastructure.InboxEvents;
 
-using NodaTime;
-
-namespace Infrastructure.Configuration.IntegrationEvents;
-
-public class ReceivedIntegrationEvent
+#pragma warning disable
+public class TestInboxEvent
 {
-    public ReceivedIntegrationEvent(string id, string eventType, string eventPayload, Instant occurredOn)
-    {
-        Id = id;
-        OccurredOn = occurredOn;
-        EventType = eventType;
-        EventPayload = eventPayload;
-    }
-
-    #pragma warning disable CS8618 // Needed by ORM
-    private ReceivedIntegrationEvent()
-    {
-    }
-
-    public string Id { get; }
-
-    public Instant OccurredOn { get; }
-
-    public string EventType { get; }
-
-    public string EventPayload { get; }
+    public string Property1 { get; set; } = "Test";
 }
