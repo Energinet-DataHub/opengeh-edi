@@ -31,6 +31,7 @@ using Infrastructure.ArchivedMessages;
 using Infrastructure.Configuration.IntegrationEvents;
 using Infrastructure.Configuration.InternalCommands;
 using Infrastructure.Configuration.Serialization;
+using Infrastructure.InboxEvents;
 using Infrastructure.MasterData.MarketEvaluationPoints;
 using Infrastructure.OutgoingMessages;
 using Infrastructure.OutgoingMessages.Queueing;
@@ -80,6 +81,8 @@ namespace Infrastructure.Configuration.DataAccess
 
         public DbSet<MarketDocument> MarketDocuments { get; private set; }
 
+        public DbSet<ReceivedInboxEvent> ReceivedInboxEvents { get; private set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
@@ -95,6 +98,7 @@ namespace Infrastructure.Configuration.DataAccess
             modelBuilder.ApplyConfiguration(new ArchivedMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ActorMessageQueueEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MarketDocumentEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new ReceivedInboxEventEntityConfiguration());
 
             modelBuilder.Entity<GenericNotificationMessage>()
                 .Ignore(entity => entity.MarketActivityRecord);

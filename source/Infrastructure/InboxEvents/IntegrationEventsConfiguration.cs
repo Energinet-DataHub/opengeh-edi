@@ -12,30 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.Configuration.IntegrationEvents;
+namespace Infrastructure.InboxEvents;
 
-public class ReceivedIntegrationEvent
+public static class InboxEventsConfiguration
 {
-    public ReceivedIntegrationEvent(string id, string eventType, string eventPayload, Instant occurredOn)
+    public static void Configure(IServiceCollection services)
     {
-        Id = id;
-        OccurredOn = occurredOn;
-        EventType = eventType;
-        EventPayload = eventPayload;
+        services.AddTransient<InboxEventReceiver>();
     }
-
-    #pragma warning disable CS8618 // Needed by ORM
-    private ReceivedIntegrationEvent()
-    {
-    }
-
-    public string Id { get; }
-
-    public Instant OccurredOn { get; }
-
-    public string EventType { get; }
-
-    public string EventPayload { get; }
 }

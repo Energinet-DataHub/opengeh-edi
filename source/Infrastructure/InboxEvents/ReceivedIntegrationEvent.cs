@@ -14,11 +14,11 @@
 
 using NodaTime;
 
-namespace Infrastructure.Configuration.IntegrationEvents;
+namespace Infrastructure.InboxEvents;
 
-public class ReceivedIntegrationEvent
+public class ReceivedInboxEvent
 {
-    public ReceivedIntegrationEvent(string id, string eventType, string eventPayload, Instant occurredOn)
+    public ReceivedInboxEvent(string id, string eventType, string eventPayload, Instant occurredOn)
     {
         Id = id;
         OccurredOn = occurredOn;
@@ -27,7 +27,7 @@ public class ReceivedIntegrationEvent
     }
 
     #pragma warning disable CS8618 // Needed by ORM
-    private ReceivedIntegrationEvent()
+    private ReceivedInboxEvent()
     {
     }
 
