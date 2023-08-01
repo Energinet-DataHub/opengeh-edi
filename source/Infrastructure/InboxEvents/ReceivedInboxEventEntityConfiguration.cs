@@ -30,5 +30,6 @@ public class ReceivedInboxEventEntityConfiguration : IEntityTypeConfiguration<Re
         builder.Property(entity => entity.OccurredOn);
         builder.Property(entity => entity.EventType);
         builder.Property(entity => entity.EventPayload);
+        builder.Property(entity => entity.ReferenceId);
     }
 }

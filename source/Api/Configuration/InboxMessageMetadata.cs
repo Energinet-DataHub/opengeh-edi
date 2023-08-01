@@ -13,33 +13,17 @@
 // limitations under the License.
 
 using System;
-using NodaTime;
+using System.Text.Json.Serialization;
 
-namespace Infrastructure.InboxEvents;
+namespace Api.Configuration;
 
-public class ReceivedInboxEvent
+public class InboxMessageMetadata
 {
-    public ReceivedInboxEvent(string id, string eventType, Guid referenceId, string eventPayload, Instant occurredOn)
+    [JsonConstructor]
+    public InboxMessageMetadata(Guid referenceId)
     {
-        Id = id;
-        OccurredOn = occurredOn;
-        EventType = eventType;
         ReferenceId = referenceId;
-        EventPayload = eventPayload;
     }
-
-    #pragma warning disable CS8618 // Needed by ORM
-    private ReceivedInboxEvent()
-    {
-    }
-
-    public string Id { get; }
-
-    public Instant OccurredOn { get; }
-
-    public string EventType { get; }
 
     public Guid ReferenceId { get; }
-
-    public string EventPayload { get; }
 }

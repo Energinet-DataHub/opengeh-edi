@@ -33,7 +33,7 @@ public static class AggregatedMeasureDataProcessFactory
             Subject = nameof(process),
             MessageId = process.ProcessId.Id.ToString(),
         };
-        message.ApplicationProperties.Add("RequestId", process.ProcessId.Id.ToString());
+        message.ApplicationProperties.Add("ReferenceId", process.ProcessId.Id.ToString());
 
         return message;
     }
@@ -62,6 +62,7 @@ public static class AggregatedMeasureDataProcessFactory
         {
             StartOfPeriod = new Timestamp() { Seconds = aggregatedMeasureDataProcess.StartOfPeriod.ToUnixTimeSeconds(), },
             EndOfPeriod = new Timestamp() { Seconds = aggregatedMeasureDataProcess.EndOfPeriod?.ToUnixTimeSeconds() ?? 1, },
+            Resolution = Resolution.Pt15M,
         };
 
         return new Serie()

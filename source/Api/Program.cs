@@ -97,6 +97,9 @@ namespace Api
                     services.AddSingleton(
                         _ => new RequestAggregatedMeasureDataTransactionQueues(runtime.INCOMING_AGGREGATED_MEASURE_DATA_QUEUE_NAME!));
 
+                    services.AddSingleton(
+                        _ => new InboxEventQueues(runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!));
+
                     CompositionRoot.Initialize(services)
                         .AddMessageBus(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!)
                         .AddPeekConfiguration()
@@ -149,7 +152,8 @@ namespace Api
                     services.AddExternalDomainServiceBusQueuesHealthCheck(
                         runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
                         runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!,
-                        runtime.INCOMING_AGGREGATED_MEASURE_DATA_QUEUE_NAME!);
+                        runtime.INCOMING_AGGREGATED_MEASURE_DATA_QUEUE_NAME!,
+                        runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!);
                     services.AddSqlServerHealthCheck(runtime.DB_CONNECTION_STRING!);
                 })
                 .Build();
