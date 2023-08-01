@@ -37,6 +37,5 @@ public class ReceivedInboxEvent
 
     public string EventType { get; }
 
-    #pragma warning disable CA1819
     public string EventPayload { get; }
 }

@@ -32,7 +32,7 @@ public class WhenAnInboxEventIsReceivedTests : TestBase
     private readonly TestInboxEvent _event;
     private readonly byte[] _eventPayload;
     private readonly string _eventId = "1";
-    private InboxEventReceiver _receiver; // TODO: Change
+    private InboxEventReceiver _receiver;
 
     public WhenAnInboxEventIsReceivedTests(DatabaseFixture databaseFixture)
      : base(databaseFixture)
