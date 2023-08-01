@@ -33,7 +33,7 @@ public static class AggregatedMeasureDataProcessFactory
             Subject = nameof(process),
             MessageId = process.ProcessId.Id.ToString(),
         };
-        message.ApplicationProperties.Add("RequestId", process.ProcessId.Id.ToString());
+        message.ApplicationProperties.Add("ReferenceId", process.ProcessId.Id.ToString());
 
         return message;
     }
