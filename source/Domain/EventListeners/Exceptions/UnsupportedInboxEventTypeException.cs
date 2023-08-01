@@ -12,18 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.Configuration.TimeEvents;
-using MediatR;
-using Microsoft.Extensions.DependencyInjection;
+namespace Domain.EventListeners.Exceptions;
 
-namespace Infrastructure.InboxEvents;
-
-public static class InboxEventsConfiguration
+public class UnsupportedInboxEventTypeException : Exception
 {
-    public static void Configure(IServiceCollection services)
+    public UnsupportedInboxEventTypeException(string message)
+        : base(message)
     {
-        services.AddTransient<INotificationHandler<TenSecondsHasHasPassed>,
-            ProcessInboxEventsOnTenSecondsHasPassed>();
-        services.AddTransient<InboxEventReceiver>();
+    }
+
+    public UnsupportedInboxEventTypeException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+
+    private UnsupportedInboxEventTypeException()
+    {
     }
 }

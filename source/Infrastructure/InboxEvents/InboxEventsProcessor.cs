@@ -20,7 +20,9 @@ using System.Threading.Tasks;
 using Application.Configuration;
 using Application.Configuration.DataAccess;
 using Dapper;
+using Domain.EventListeners.Exceptions;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.InboxEvents;
 
@@ -29,40 +31,48 @@ public class InboxEventsProcessor
     private readonly IDatabaseConnectionFactory _connectionFactory;
     private readonly IMediator _mediator;
     private readonly ISystemDateTimeProvider _dateTimeProvider;
+    private readonly ILogger<InboxEventsProcessor> _logger;
     private readonly List<IInboxEventMapper> _mappers;
 
-    public InboxEventsProcessor(IDatabaseConnectionFactory connectionFactory, IMediator mediator, ISystemDateTimeProvider dateTimeProvider, IEnumerable<IInboxEventMapper> mappers)
+    public InboxEventsProcessor(
+        IDatabaseConnectionFactory connectionFactory,
+        IMediator mediator,
+        ISystemDateTimeProvider dateTimeProvider,
+        IEnumerable<IInboxEventMapper> mappers,
+        ILogger<InboxEventsProcessor> logger)
     {
         _connectionFactory = connectionFactory;
         _mediator = mediator;
         _dateTimeProvider = dateTimeProvider;
         _mappers = mappers.ToList();
+        _logger = logger;
     }
 
-    public async Task ProcessMessagesAsync(CancellationToken cancellationToken)
+    public async Task ProcessEventsAsync(CancellationToken cancellationToken)
     {
-        var messages = await FindPendingMessagesAsync(cancellationToken).ConfigureAwait(false);
+        var indboxEvents = await FindPendingMessagesAsync(cancellationToken).ConfigureAwait(false);
 
-        foreach (var message in messages)
+        foreach (var inboxEvent in indboxEvents)
         {
             try
             {
                 await _mediator.Publish(
-                    await MapperFor(message.EventType)
-                        .MapFromAsync(message.EventPayload, message.ReferenceId).ConfigureAwait(false),
+                    await MapperFor(inboxEvent.EventType)
+                        .MapFromAsync(inboxEvent.EventPayload, inboxEvent.ReferenceId).ConfigureAwait(false),
                     cancellationToken)
                     .ConfigureAwait(false);
-                await MarkAsProcessedAsync(message, cancellationToken).ConfigureAwait(false);
+                await MarkAsProcessedAsync(inboxEvent, cancellationToken).ConfigureAwait(false);
             }
-            #pragma warning disable CA1031 // We dont' the type of exception here
+            #pragma warning disable CA1031 // Multiple exceptions can be causing a process failed.
             catch (Exception e)
             {
-                await MarkAsFailedAsync(message, e, cancellationToken).ConfigureAwait(false);
+                await MarkAsFailedAsync(inboxEvent, e, cancellationToken).ConfigureAwait(false);
+                _logger.LogError(e, "Failed to process inbox event. EventType {@Event}", inboxEvent);
             }
         }
     }
 
-    private async Task MarkAsProcessedAsync(ReceivedInboxEvent message, CancellationToken cancellationToken)
+    private async Task MarkAsProcessedAsync(ReceivedInboxEvent @event, CancellationToken cancellationToken)
     {
         var updateStatement = $"UPDATE dbo.ReceivedInboxEvents " +
                               "SET ProcessedDate = @Now " +
@@ -70,12 +80,12 @@ public class InboxEventsProcessor
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         await connection.ExecuteAsync(updateStatement, new
         {
-            Id = message.Id,
+            Id = @event.Id,
             Now = _dateTimeProvider.Now().ToDateTimeUtc(),
         }).ConfigureAwait(false);
     }
 
-    private async Task MarkAsFailedAsync(ReceivedInboxEvent message, Exception exception, CancellationToken cancellationToken)
+    private async Task MarkAsFailedAsync(ReceivedInboxEvent @event, Exception exception, CancellationToken cancellationToken)
     {
         var updateStatement = $"UPDATE dbo.ReceivedInboxEvents " +
                               "SET ProcessedDate = @Now, " +
@@ -84,7 +94,7 @@ public class InboxEventsProcessor
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         await connection.ExecuteAsync(updateStatement, new
         {
-            Id = message.Id,
+            Id = @event.Id,
             Now = _dateTimeProvider.Now().ToDateTimeUtc(),
             ErrorMessage = exception.ToString(),
         }).ConfigureAwait(false);
@@ -107,6 +117,8 @@ public class InboxEventsProcessor
 
     private IInboxEventMapper MapperFor(string eventType)
     {
-        return _mappers.First(mapper => mapper.CanHandle(eventType));
+        var mapper = _mappers.FirstOrDefault(mapper => mapper.CanHandle(eventType))
+                     ?? throw new UnsupportedInboxEventTypeException($"No InboxEventMapper for {eventType} eventType was found.");
+        return mapper;
     }
 }

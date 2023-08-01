@@ -24,7 +24,7 @@ namespace IntegrationTests.Infrastructure.InboxEvents;
 public class TestInboxEventMapper : IInboxEventMapper
 {
     #pragma warning disable // Method cannot be static since inherited from the interface
-    public Task<INotification> MapFromAsync(string payload)
+    public Task<INotification> MapFromAsync(string payload, Guid referenceId)
     {
         var integrationEvent = JsonSerializer.Deserialize<TestInboxEvent>(payload);
         return Task.FromResult((INotification)new TestNotification(integrationEvent!.Property1));

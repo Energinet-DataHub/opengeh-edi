@@ -12,24 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
-using System.Threading.Tasks;
 using Application.Configuration.TimeEvents;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.InboxEvents;
 
-public class ProcessInboxEventsOnTenSecondsHasPassed : INotificationHandler<TenSecondsHasHasPassed>
+public static class InboxEventsConfiguration
 {
-    private readonly InboxEventsProcessor _processor;
-
-    public ProcessInboxEventsOnTenSecondsHasPassed(InboxEventsProcessor processor)
+    public static void Configure(IServiceCollection services)
     {
-        _processor = processor;
-    }
-
-    public Task Handle(TenSecondsHasHasPassed notification, CancellationToken cancellationToken)
-    {
-        return _processor.ProcessEventsAsync(cancellationToken);
+        services.AddTransient<INotificationHandler<TenSecondsHasHasPassed>,
+            ProcessInboxEventsOnTenSecondsHasPassed>();
+        services.AddTransient<InboxEventReceiver>();
+        services.AddTransient<InboxEventsProcessor>();
     }
 }

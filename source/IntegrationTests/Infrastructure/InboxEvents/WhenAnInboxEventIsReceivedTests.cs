@@ -23,6 +23,8 @@ using Dapper;
 using Infrastructure.Configuration.DataAccess;
 using Infrastructure.InboxEvents;
 using IntegrationTests.Fixtures;
+using MediatR;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace IntegrationTests.Infrastructure.InboxEvents;
@@ -83,7 +85,7 @@ public class WhenAnInboxEventIsReceivedTests : TestBase
         await EventIsReceived(_eventId).ConfigureAwait(false);
 
         // Assert
-        await EventIsRegisteredWithInbox(_eventId);
+        await EventIsRegisteredWithInbox(_eventId, 1);
     }
 
     private static byte[] CreateEventPayload(TestInboxEvent @event)
