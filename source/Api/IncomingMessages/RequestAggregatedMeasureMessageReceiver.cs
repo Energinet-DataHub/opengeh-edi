@@ -18,12 +18,13 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Api.IncomingMessages.RequestHandlers.Commands;
+using Api.Common;
 using Application.Configuration;
+using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using CimMessageAdapter.Response;
-using Domain.ArchivedMessages;
-using Infrastructure.Configuration.DataAccess;
+using Infrastructure.IncomingMessages;
+using Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -36,37 +37,24 @@ public class RequestAggregatedMeasureMessageReceiver
 {
     private readonly ILogger<RequestAggregatedMeasureMessageReceiver> _logger;
     private readonly MessageParser _messageParser;
-    private readonly Receiver _messageReceiver;
     private readonly ResponseFactory _responseFactory;
     private readonly ICorrelationContext _correlationContext;
-    private readonly IArchivedMessageRepository _messageArchive;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-    private readonly B2BContext _context;
     private readonly IMediator _mediator;
 
     public RequestAggregatedMeasureMessageReceiver(
         ILogger<RequestAggregatedMeasureMessageReceiver> logger,
         MessageParser messageParser,
-        Receiver messageReceiver,
         ResponseFactory responseFactory,
         ICorrelationContext correlationContext,
-        IArchivedMessageRepository messageArchive,
-        ISystemDateTimeProvider systemDateTimeProvider,
-        B2BContext context,
         IMediator mediator)
         {
         _logger = logger;
         _messageParser = messageParser;
-        _messageReceiver = messageReceiver;
         _responseFactory = responseFactory;
         _correlationContext = correlationContext;
-        _messageArchive = messageArchive;
-        _systemDateTimeProvider = systemDateTimeProvider;
-        _context = context;
         _mediator = mediator;
         }
 
-    //TODO: refactor functions to use nameof for function name
     [Function(nameof(RequestAggregatedMeasureMessageReceiver))]
     public async Task<HttpResponseData> RunAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
@@ -80,12 +68,6 @@ public class RequestAggregatedMeasureMessageReceiver
                 hostCancellationToken,
                 request.FunctionContext.CancellationToken);
 
-        var cancellationToken = cancellationTokenSource.Token;
-
-        var response = await _mediator.Send(new ValidateAggregatedMeasureDataRequest(request), cancellationToken).ConfigureAwait(false);
-
-        return response;
-        /*
         var cancellationToken = cancellationTokenSource.Token;
 
         var contentType = request.Headers.GetContentType();
@@ -107,26 +89,12 @@ public class RequestAggregatedMeasureMessageReceiver
             return CreateResponse(request, httpErrorStatusCode, _responseFactory.From(errorResult, cimFormat));
         }
 
-        var timestamp = _systemDateTimeProvider.Now();
-        _messageArchive.Add(new ArchivedMessage(
-            messageHeader.MessageId,
-            DocumentType.RequestAggregatedMeasureData,
-            ActorNumber.Create(messageHeader.SenderId),
-            ActorNumber.Create(messageHeader.ReceiverId),
-            timestamp,
-            messageHeader.BusinessReason,
-            request.Body));
-
-        // We need to manually save the changes.
-        // We keep this seperated from the commit in "ReceiveAsync", since we want to store the
-        // request no matter what.
-        await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        var result = await _messageReceiver.ReceiveAsync(messageParserResult, cancellationToken)
+        var result = await _mediator
+            .Send(new ValidateAggregatedMeasureDataRequest(messageParserResult, request.Body), cancellationToken)
             .ConfigureAwait(false);
 
         var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
         return CreateResponse(request, httpStatusCode, _responseFactory.From(result, cimFormat));
-        */
     }
 
     private HttpResponseData CreateResponse(

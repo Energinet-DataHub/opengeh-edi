@@ -15,7 +15,6 @@
 using System;
 using System.Linq;
 using Domain.Documents;
-using Domain.OutgoingMessages;
 using Domain.SeedWork;
 
 namespace Infrastructure.IncomingMessages;

@@ -12,17 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.IO;
 using Application.Configuration.Commands.Commands;
-using Microsoft.Azure.Functions.Worker.Http;
+using Application.IncomingMessages.RequestAggregatedMeasureData;
+using CimMessageAdapter.Messages;
 
-namespace Api.IncomingMessages.RequestHandlers.Commands;
+namespace Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
-public class ValidateAggregatedMeasureDataRequest : ICommand<HttpResponseData>
+public class ValidateAggregatedMeasureDataRequest : ICommand<Result>
 {
-    public ValidateAggregatedMeasureDataRequest(HttpRequestData request)
+    public ValidateAggregatedMeasureDataRequest(
+        MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> request,
+        Stream originalMessage)
     {
         Request = request;
+        OriginalMessage = originalMessage;
     }
 
-    public HttpRequestData Request { get; }
+    public MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> Request { get; }
+
+    public Stream OriginalMessage { get; }
 }
