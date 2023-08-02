@@ -35,10 +35,7 @@ public class ValidateAggregatedMeasureDataRequestHandler
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
     public ValidateAggregatedMeasureDataRequestHandler(
-        MessageParser messageParser,
         Receiver messageReceiver,
-        ResponseFactory responseFactory,
-        ICorrelationContext correlationContext,
         IArchivedMessageRepository messageArchive,
         ISystemDateTimeProvider systemDateTimeProvider)
     {
