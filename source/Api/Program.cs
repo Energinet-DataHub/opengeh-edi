@@ -97,9 +97,6 @@ namespace Api
                     services.AddSingleton(
                         _ => new RequestAggregatedMeasureDataTransactionQueues(runtime.INCOMING_AGGREGATED_MEASURE_DATA_QUEUE_NAME!));
 
-                    services.AddSingleton(
-                        _ => new InboxEventQueues(runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!));
-
                     CompositionRoot.Initialize(services)
                         .AddMessageBus(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!)
                         .AddPeekConfiguration()

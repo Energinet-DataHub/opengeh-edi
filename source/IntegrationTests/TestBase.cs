@@ -59,10 +59,13 @@ namespace IntegrationTests
             _httpClientSpy = new HttpClientSpy();
             _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
             NotificationHandlerSpy = new TestNotificationHandlerSpy();
+            InboxEventNotificationHandler = new IntegrationTests.Infrastructure.InboxEvents.TestNotificationHandlerSpy();
             BuildServices();
         }
 
         protected TestNotificationHandlerSpy NotificationHandlerSpy { get; }
+
+        protected IntegrationTests.Infrastructure.InboxEvents.TestNotificationHandlerSpy InboxEventNotificationHandler { get; }
 
         public void Dispose()
         {
@@ -143,6 +146,8 @@ namespace IntegrationTests
                 _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
 
             _services.AddTransient<INotificationHandler<TestNotification>>(_ => NotificationHandlerSpy);
+            _services.AddTransient<INotificationHandler<IntegrationTests.Infrastructure.InboxEvents.TestNotification>>(
+                _ => InboxEventNotificationHandler);
 
             CompositionRoot.Initialize(_services)
                 .AddAuthentication()

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using MediatR;
 
@@ -29,7 +30,7 @@ public interface IInboxEventMapper
     /// <param name="payload"></param>
     /// <param name="referenceId"></param>
     /// <returns><see cref="INotification"/></returns>
-    Task<INotification> MapFromAsync(string payload, Guid referenceId);
+    Task<IReadOnlyList<INotification>> MapFromAsync(string payload, Guid referenceId);
 
     /// <summary>
     /// Determines whether the specified event type can be handled by the mapper

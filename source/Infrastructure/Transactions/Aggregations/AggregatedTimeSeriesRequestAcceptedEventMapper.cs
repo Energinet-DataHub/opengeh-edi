@@ -14,45 +14,60 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Application.Transactions.Aggregations;
+using Domain.OutgoingMessages;
+using Domain.Transactions;
+using Domain.Transactions.AggregatedMeasureData;
 using Domain.Transactions.Aggregations;
 using Energinet.DataHub.Edi.Responses;
+using Google.Protobuf.Collections;
 using Infrastructure.InboxEvents;
 using MediatR;
+using Serie = Energinet.DataHub.Edi.Responses.Serie;
 
 namespace Infrastructure.Transactions.Aggregations;
 
 public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
 {
+    private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
     private readonly IGridAreaLookup _gridAreaLookup;
 
-    public AggregatedTimeSeriesRequestAcceptedEventMapper(IGridAreaLookup gridAreaLookup)
+    public AggregatedTimeSeriesRequestAcceptedEventMapper(
+        IGridAreaLookup gridAreaLookup,
+        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
+        _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
         _gridAreaLookup = gridAreaLookup;
     }
 
-    public Task<INotification> MapFromAsync(string payload, Guid referenceId)
+    public async Task<IReadOnlyList<INotification>> MapFromAsync(string payload, Guid referenceId)
     {
         var inboxEvent =
             AggregatedTimeSeriesRequestAccepted.Parser.ParseJson(payload);
-        var aggregations = new List<Aggregation>();
 
+        var process = _aggregatedMeasureDataProcessRepository.GetById(ProcessId.Create(referenceId));
+        ArgumentNullException.ThrowIfNull(process);
+
+        var aggregations = new List<Aggregation>();
+/*
         foreach (var serie in inboxEvent.Series)
         {
-            // aggregations.Add(new Aggregation(
-            //     MapPoints(serie.TimeSeriesPoints),
+            aggregations.Add(new Aggregation(
+                MapPoints(serie.TimeSeriesPoints),
             //     MapMeteringgPointType(serie.ti),
             //     MapUnitType(serie),
             //     MapResolution(serie),
-            //     MapPeriod(serie),
-            //     MapSettlementMethod(serie),
-            //     MapProcessType(serie),
-            //     MapActorGrouping(serie),
-            //     await MapGridAreaDetailsAsync(serie).ConfigureAwait(false)));
+            //    MapPeriod(serie),
+                MapSettlementMethod(process),
+                MapProcessType(serie),
+                MapActorGrouping(process),
+                await MapGridAreaDetailsAsync(serie).ConfigureAwait(false)));
         }
-
-        return Task.FromResult<INotification>(new AggregationResultAvailable(null!));
+        */
+        var hej = await MapGridAreaDetailsAsync(inboxEvent.Series.First()).ConfigureAwait(false);
+        return new List<INotification>();
     }
 
     public bool CanHandle(string eventType)
@@ -67,20 +82,20 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         return inboxEvent.ToString();
     }
 
-    // private static IReadOnlyList<Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
-    // {
-    //     var points = new List<Point>();
-    //
-    //     var pointPosition = 1;
-    //     foreach (var point in timeSeriesPoints)
-    //     {
-    //         points.Add(new Point(pointPosition, Parse(point.Quantity), MapQuality(point.QuantityQuality), point.Time.ToString()));
-    //         pointPosition++;
-    //     }
-    //
-    //     return points.AsReadOnly();
-    // }
-    //
+    private static IReadOnlyList<Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
+    {
+        var points = new List<Point>();
+
+        var pointPosition = 1;
+        foreach (var point in timeSeriesPoints)
+        {
+            points.Add(new Point(pointPosition, Parse(point.Quantity), MapQuality(point.QuantityQuality), point.Time.ToString()));
+            pointPosition++;
+        }
+
+        return points.AsReadOnly();
+    }
+
     // private static string MapMeteringPointType(CalculationResultCompleted integrationEvent)
     // {
     //     return integrationEvent.TimeSeriesType switch
@@ -95,46 +110,41 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
     //         _ => throw new InvalidOperationException("Could not determine metering point type"),
     //     };
     // }
-    //
-    // private static ActorGrouping MapActorGrouping(Serie serie)
-    // {
-    //     return serie.AggregationLevelCase switch
-    //     {
-    //         CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerGridarea => new ActorGrouping(null, null),
-    //         CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerBalanceresponsiblepartyPerGridarea => new ActorGrouping(null, serie.AggregationPerBalanceresponsiblepartyPerGridarea.BalanceResponsiblePartyGlnOrEic),
-    //         CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerEnergysupplierPerGridarea => new ActorGrouping(serie.AggregationPerEnergysupplierPerGridarea.EnergySupplierGlnOrEic, null),
-    //         CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea => new ActorGrouping(serie.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.EnergySupplierGlnOrEic, serie.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.BalanceResponsiblePartyGlnOrEic),
-    //         CalculationResultCompleted.AggregationLevelOneofCase.None => throw new InvalidOperationException("Aggregation level is not specified"),
-    //         _ => throw new InvalidOperationException("Aggregation level is unknown"),
-    //     };
-    // }
-    //
-    // private static string? MapSettlementMethod(Serie serie)
-    // {
-    //     return serie.TimeSeriesType switch
-    //     {
-    //         TimeSeriesType.Production => null,
-    //         TimeSeriesType.FlexConsumption => SettlementType.Flex.Name,
-    //         TimeSeriesType.NonProfiledConsumption => SettlementType.NonProfiled.Name,
-    //         _ => null,
-    //     };
-    // }
-    //
+    private static ActorGrouping MapActorGrouping(AggregatedMeasureDataProcess process)
+    {
+        return new ActorGrouping(process.EnergySupplierId, process.BalanceResponsibleId);
+    }
+
+    private static string? MapSettlementMethod(AggregatedMeasureDataProcess process)
+    {
+        var settlementTypeName = null as string;
+        try
+        {
+            settlementTypeName = SettlementType.From(process.SettlementMethod ?? string.Empty).Name;
+        }
+        catch (InvalidCastException)
+        {
+            //TODO: Do we support production? Which do not have a settlement type.
+        }
+
+        return settlementTypeName;
+    }
+
     // private static Period MapPeriod(Serie serie)
     // {
     //     return new Period(serie.PeriodStartUtc.ToInstant(), serie.PeriodEndUtc.ToInstant());
     // }
-    //
-    // private static string MapResolution(Serie integrationEvent)
+//
+    // private static string MapResolution(Serie serie)
     // {
-    //     return integrationEvent.Resolution switch
+    //     return serie.TimeSeriesPoints.First().R switch
     //     {
     //         Resolution.Quarter => Domain.Transactions.Aggregations.Resolution.QuarterHourly.Name,
     //         Resolution.Unspecified => throw new InvalidOperationException("Could not map resolution type"),
     //         _ => throw new InvalidOperationException("Unknown resolution type"),
     //     };
     // }
-    //
+
     // private static string MapUnitType(Serie serie)
     // {
     //     return serie.QuantityUnit switch
@@ -159,56 +169,47 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
     //         _ => throw new InvalidOperationException("Could not determine metering point type"),
     //     };
     // }
-    //
-    // private static string MapProcessType(Serie serie)
-    // {
-    //     return serie.ProcessType switch
-    //     {
-    //         Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Aggregation => BusinessReason.PreliminaryAggregation.Name,
-    //         Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing => BusinessReason.BalanceFixing.Name,
-    //         Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Unspecified => throw new InvalidOperationException("Process type is not specified from Wholesales"),
-    //         _ => throw new InvalidOperationException("Unknown process type from Wholesales"),
-    //     };
-    // }
-    //
-    // private static string MapQuality(QuantityQuality quality)
-    // {
-    //     return quality switch
-    //     {
-    //         QuantityQuality.Incomplete => Quality.Incomplete.Name,
-    //         QuantityQuality.Measured => Quality.Measured.Name,
-    //         QuantityQuality.Missing => Quality.Missing.Name,
-    //         QuantityQuality.Estimated => Quality.Estimated.Name,
-    //         QuantityQuality.Unspecified => throw new InvalidOperationException("Quality is not specified"),
-    //         _ => throw new InvalidOperationException("Unknown quality type"),
-    //     };
-    // }
-    //
-    // private static decimal? Parse(DecimalValue? input)
-    // {
-    //     if (input is null)
-    //     {
-    //         return null;
-    //     }
-    //
-    //     const decimal nanoFactor = 1_000_000_000;
-    //     return input.Units + (input.Nanos / nanoFactor);
-    // }
-    //
-    // private async Task<GridAreaDetails> MapGridAreaDetailsAsync(Serie serie)
-    // {
-    //     var gridAreaCode = serie.AggregationLevelCase switch
-    //     {
-    //         CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerGridarea => serie.AggregationPerGridarea.GridAreaCode,
-    //         CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerBalanceresponsiblepartyPerGridarea => serie.AggregationPerBalanceresponsiblepartyPerGridarea.GridAreaCode,
-    //         CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerEnergysupplierPerGridarea => serie.AggregationPerEnergysupplierPerGridarea.GridAreaCode,
-    //         CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea => serie.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.GridAreaCode,
-    //         CalculationResultCompleted.AggregationLevelOneofCase.None => throw new InvalidOperationException("Aggregation level was not specified"),
-    //         _ => throw new InvalidOperationException("Unknown aggregation level"),
-    //     };
-    //
-    //     var gridOperatorNumber = await _gridAreaLookup.GetGridOperatorForAsync(gridAreaCode).ConfigureAwait(false);
-    //
-    //     return new GridAreaDetails(gridAreaCode, gridOperatorNumber.Value);
-    // }
+    private static string MapProcessType(Serie serie)
+    {
+        return BusinessReason.PreliminaryAggregation.Name;
+        // TODO: Is it possible to request BalanceFixing?
+        /*return serie.ProcessType switch
+        {
+            Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Aggregation => BusinessReason.PreliminaryAggregation.Name,
+            Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing => BusinessReason.BalanceFixing.Name,
+            Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Unspecified => throw new InvalidOperationException("Process type is not specified from Wholesales"),
+            _ => throw new InvalidOperationException("Unknown process type from Wholesales"),
+        };*/
+    }
+
+    private static string MapQuality(QuantityQuality quality)
+    {
+        return quality switch
+        {
+            QuantityQuality.Incomplete => Quality.Incomplete.Name,
+            QuantityQuality.Measured => Quality.Measured.Name,
+            QuantityQuality.Missing => Quality.Missing.Name,
+            QuantityQuality.Estimated => Quality.Estimated.Name,
+            QuantityQuality.Unspecified => throw new InvalidOperationException("Quality is not specified"),
+            _ => throw new InvalidOperationException("Unknown quality type"),
+        };
+    }
+
+    private static decimal? Parse(DecimalValue? input)
+    {
+        if (input is null)
+        {
+            return null;
+        }
+
+        const decimal nanoFactor = 1_000_000_000;
+        return input.Units + (input.Nanos / nanoFactor);
+    }
+
+    private async Task<GridAreaDetails> MapGridAreaDetailsAsync(Serie serie)
+    {
+        var gridOperatorNumber = await _gridAreaLookup.GetGridOperatorForAsync(serie.GridArea).ConfigureAwait(false);
+
+        return new GridAreaDetails(serie.GridArea, gridOperatorNumber.Value);
+    }
 }

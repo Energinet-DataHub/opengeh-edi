@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,7 +23,6 @@ using Dapper;
 using Infrastructure.Configuration.DataAccess;
 using Infrastructure.InboxEvents;
 using IntegrationTests.Fixtures;
-using IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Xunit;
@@ -57,6 +57,17 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
         await ProcessInboxMessages().ConfigureAwait(false);
 
         await EventIsMarkedAsProcessed(_eventId).ConfigureAwait(false);
+    }
+
+    [Fact]
+    public async Task Notifications_for_events_is_published()
+    {
+        InboxEventNotificationHandler.AddNotification("Event1");
+        InboxEventNotificationHandler.AddNotification("Event2");
+
+        await ProcessInboxMessages().ConfigureAwait(false);
+
+        InboxEventNotificationHandler.AssertExpectedNotifications();
     }
 
     [Fact]
@@ -107,6 +118,10 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
 
     private string ToJson()
     {
-        return _testInboxEventMapper.ToJson(JsonSerializer.SerializeToUtf8Bytes(new TestIntegrationEvent()));
+        return _testInboxEventMapper.ToJson(JsonSerializer.SerializeToUtf8Bytes(new List<TestInboxEvent>
+        {
+            new TestInboxEvent("Event1"),
+            new TestInboxEvent("Event2"),
+        }));
     }
 }

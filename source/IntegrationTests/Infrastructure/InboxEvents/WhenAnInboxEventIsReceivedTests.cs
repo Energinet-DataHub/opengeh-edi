@@ -48,7 +48,7 @@ public class WhenAnInboxEventIsReceivedTests : TestBase
         {
             new TestInboxEventMapper(),
         });
-        _event = new TestInboxEvent();
+        _event = new TestInboxEvent("event1");
         _eventPayload = CreateEventPayload(_event);
     }
 
@@ -90,7 +90,10 @@ public class WhenAnInboxEventIsReceivedTests : TestBase
 
     private static byte[] CreateEventPayload(TestInboxEvent @event)
     {
-        return JsonSerializer.SerializeToUtf8Bytes(@event);
+        return JsonSerializer.SerializeToUtf8Bytes(new List<TestInboxEvent>
+        {
+            @event,
+        });
     }
 
     private Task EventIsReceived(string eventId)

@@ -50,17 +50,22 @@ public class InboxEventsProcessor
 
     public async Task ProcessEventsAsync(CancellationToken cancellationToken)
     {
-        var indboxEvents = await FindPendingMessagesAsync(cancellationToken).ConfigureAwait(false);
+        var inboxEvents = await FindPendingMessagesAsync(cancellationToken).ConfigureAwait(false);
 
-        foreach (var inboxEvent in indboxEvents)
+        foreach (var inboxEvent in inboxEvents)
         {
             try
             {
-                await _mediator.Publish(
-                    await MapperFor(inboxEvent.EventType)
-                        .MapFromAsync(inboxEvent.EventPayload, inboxEvent.ReferenceId).ConfigureAwait(false),
-                    cancellationToken)
-                    .ConfigureAwait(false);
+                var notifications = await MapperFor(inboxEvent.EventType)
+                    .MapFromAsync(inboxEvent.EventPayload, inboxEvent.ReferenceId).ConfigureAwait(false);
+                foreach (var notification in notifications)
+                {
+                    await _mediator.Publish(
+                            notification,
+                            cancellationToken)
+                        .ConfigureAwait(false);
+                }
+
                 await MarkAsProcessedAsync(inboxEvent, cancellationToken).ConfigureAwait(false);
             }
             #pragma warning disable CA1031 // Multiple exceptions can be causing a process failed.

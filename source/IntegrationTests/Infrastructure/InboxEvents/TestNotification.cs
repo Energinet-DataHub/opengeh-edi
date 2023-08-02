@@ -12,6 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Messages.Queues;
+using MediatR;
 
-public record InboxEventQueues(string Name) : Queue;
+namespace IntegrationTests.Infrastructure.InboxEvents;
+
+#pragma warning disable
+public class TestNotification : INotification
+{
+    public TestNotification(string aProperty)
+    {
+        AProperty = aProperty;
+    }
+
+    public string AProperty { get; }
+}

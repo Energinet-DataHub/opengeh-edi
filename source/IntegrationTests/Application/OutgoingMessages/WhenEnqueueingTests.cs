@@ -107,7 +107,8 @@ public class WhenEnqueueingTests : TestBase
                 SettlementType.NonProfiled.Name,
                 BusinessReason.BalanceFixing.Name,
                 new ActorGrouping("1234567891911", null),
-                new GridAreaDetails("805", "1234567891045")));
+                new GridAreaDetails("805", "1234567891045"),
+                null));
         return message;
     }
 
