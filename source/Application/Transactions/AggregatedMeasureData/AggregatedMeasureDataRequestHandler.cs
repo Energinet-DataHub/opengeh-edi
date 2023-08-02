@@ -43,6 +43,7 @@ public class AggregatedMeasureDataRequestHandler : IRequestHandler<RequestAggreg
             ProcessId.New(),
             BusinessTransactionId.Create(requestMarketActivityRecord.Id),
             ActorNumber.Create(requestMessageHeader.SenderId),
+            requestMessageHeader.BusinessReason,
             requestMarketActivityRecord.SettlementSeriesVersion,
             requestMarketActivityRecord.MarketEvaluationPointType,
             requestMarketActivityRecord.MarketEvaluationSettlementMethod,

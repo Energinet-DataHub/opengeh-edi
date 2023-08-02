@@ -168,7 +168,8 @@ public class TimeSeriesBuilder
             _energySupplierNumber,
             _balanceResponsibleNumber,
             _period,
-            _points);
+            _points,
+            null);
     }
 
     private static Instant ParseTimeStamp(string timestamp)

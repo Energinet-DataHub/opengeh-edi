@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Application.Transactions.Aggregations;
 using Domain.OutgoingMessages;
@@ -25,6 +24,9 @@ using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.Collections;
 using Infrastructure.InboxEvents;
 using MediatR;
+using NodaTime.Serialization.Protobuf;
+using Period = Energinet.DataHub.Edi.Responses.Period;
+using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
 using Serie = Energinet.DataHub.Edi.Responses.Serie;
 
 namespace Infrastructure.Transactions.Aggregations;
@@ -50,24 +52,25 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         var process = _aggregatedMeasureDataProcessRepository.GetById(ProcessId.Create(referenceId));
         ArgumentNullException.ThrowIfNull(process);
 
-        var aggregations = new List<Aggregation>();
-/*
+        var aggregations = new List<AggregationResultAvailable>();
+
         foreach (var serie in inboxEvent.Series)
         {
-            aggregations.Add(new Aggregation(
+            aggregations.Add(new AggregationResultAvailable(
+                new Aggregation(
                 MapPoints(serie.TimeSeriesPoints),
-            //     MapMeteringgPointType(serie.ti),
-            //     MapUnitType(serie),
-            //     MapResolution(serie),
-            //    MapPeriod(serie),
+                MapMeteringPointType(process),
+                MapUnitType(serie),
+                MapResolution(serie.Period.Resolution),
+                MapPeriod(serie.Period),
                 MapSettlementMethod(process),
-                MapProcessType(serie),
+                MapBusinessReason(process),
                 MapActorGrouping(process),
-                await MapGridAreaDetailsAsync(serie).ConfigureAwait(false)));
+                await MapGridAreaDetailsAsync(serie).ConfigureAwait(false),
+                MapOriginalTransactionIdReference(process))));
         }
-        */
-        var hej = await MapGridAreaDetailsAsync(inboxEvent.Series.First()).ConfigureAwait(false);
-        return new List<INotification>();
+
+        return aggregations;
     }
 
     public bool CanHandle(string eventType)
@@ -80,6 +83,16 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
     {
         var inboxEvent = AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(payload);
         return inboxEvent.ToString();
+    }
+
+    private static string? MapOriginalTransactionIdReference(AggregatedMeasureDataProcess process)
+    {
+        return process.BusinessTransactionId.Id;
+    }
+
+    private static string MapMeteringPointType(AggregatedMeasureDataProcess process)
+    {
+        return process.MeteringPointType ?? "HVad skal den sættes til, hvis vi ikke for en ind i requestet?";
     }
 
     private static IReadOnlyList<Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
@@ -96,20 +109,6 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         return points.AsReadOnly();
     }
 
-    // private static string MapMeteringPointType(CalculationResultCompleted integrationEvent)
-    // {
-    //     return integrationEvent.TimeSeriesType switch
-    //     {
-    //         TimeSeriesType.Production => MeteringPointType.Production.Name,
-    //         TimeSeriesType.FlexConsumption => MeteringPointType.Consumption.Name,
-    //         TimeSeriesType.NonProfiledConsumption => MeteringPointType.Consumption.Name,
-    //         TimeSeriesType.NetExchangePerGa => MeteringPointType.Exchange.Name,
-    //         TimeSeriesType.NetExchangePerNeighboringGa => MeteringPointType.Exchange.Name,
-    //         TimeSeriesType.TotalConsumption => MeteringPointType.Consumption.Name,
-    //         TimeSeriesType.Unspecified => throw new InvalidOperationException("Unknown metering point type"),
-    //         _ => throw new InvalidOperationException("Could not determine metering point type"),
-    //     };
-    // }
     private static ActorGrouping MapActorGrouping(AggregatedMeasureDataProcess process)
     {
         return new ActorGrouping(process.EnergySupplierId, process.BalanceResponsibleId);
@@ -124,37 +123,38 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         }
         catch (InvalidCastException)
         {
-            //TODO: Do we support production? Which do not have a settlement type.
+            // Settlement type for Production is set to null.
         }
 
         return settlementTypeName;
     }
 
-    // private static Period MapPeriod(Serie serie)
-    // {
-    //     return new Period(serie.PeriodStartUtc.ToInstant(), serie.PeriodEndUtc.ToInstant());
-    // }
-//
-    // private static string MapResolution(Serie serie)
-    // {
-    //     return serie.TimeSeriesPoints.First().R switch
-    //     {
-    //         Resolution.Quarter => Domain.Transactions.Aggregations.Resolution.QuarterHourly.Name,
-    //         Resolution.Unspecified => throw new InvalidOperationException("Could not map resolution type"),
-    //         _ => throw new InvalidOperationException("Unknown resolution type"),
-    //     };
-    // }
+    private static Domain.Transactions.Aggregations.Period MapPeriod(Period period)
+    {
+        return new Domain.Transactions.Aggregations.Period(period.StartOfPeriod.ToInstant(), period.EndOfPeriod.ToInstant());
+    }
 
-    // private static string MapUnitType(Serie serie)
-    // {
-    //     return serie.QuantityUnit switch
-    //     {
-    //         QuantityUnit.Kwh => MeasurementUnit.Kwh.Name,
-    //         QuantityUnit.Unspecified => throw new InvalidOperationException("Could not map unit type"),
-    //         _ => throw new InvalidOperationException("Unknown unit type"),
-    //     };
-    // }
-    //
+    private static string MapResolution(Resolution resolution)
+    {
+        return resolution switch
+        {
+            Resolution.Pt15M => Domain.Transactions.Aggregations.Resolution.QuarterHourly.Name,
+            Resolution.Pt1H => Domain.Transactions.Aggregations.Resolution.Hourly.Name,
+            Resolution.Unspecified => throw new InvalidOperationException("Could not map resolution type"),
+            _ => throw new InvalidOperationException("Unknown resolution type"),
+        };
+    }
+
+    private static string MapUnitType(Serie serie)
+    {
+        return serie.QuantityUnit switch
+        {
+            QuantityUnit.Kwh => MeasurementUnit.Kwh.Name,
+            QuantityUnit.Unspecified => throw new InvalidOperationException("Could not map unit type"),
+            _ => throw new InvalidOperationException("Unknown unit type"),
+        };
+    }
+
     // private static string MapMeteringPointType(Serie serie)
     // {
     //     return serie.TimeSeriesType switch
@@ -169,17 +169,9 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
     //         _ => throw new InvalidOperationException("Could not determine metering point type"),
     //     };
     // }
-    private static string MapProcessType(Serie serie)
+    private static string MapBusinessReason(AggregatedMeasureDataProcess process)
     {
-        return BusinessReason.PreliminaryAggregation.Name;
-        // TODO: Is it possible to request BalanceFixing?
-        /*return serie.ProcessType switch
-        {
-            Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Aggregation => BusinessReason.PreliminaryAggregation.Name,
-            Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing => BusinessReason.BalanceFixing.Name,
-            Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Unspecified => throw new InvalidOperationException("Process type is not specified from Wholesales"),
-            _ => throw new InvalidOperationException("Unknown process type from Wholesales"),
-        };*/
+        return process.BusinessReason;
     }
 
     private static string MapQuality(QuantityQuality quality)

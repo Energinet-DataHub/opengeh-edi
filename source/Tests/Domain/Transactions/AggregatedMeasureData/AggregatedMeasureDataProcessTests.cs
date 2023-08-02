@@ -58,6 +58,7 @@ public class AggregatedMeasureDataProcessTests
             ProcessId.Create(SampleData.ProcessId),
             BusinessTransactionId.Create(SampleData.BusinessTransactionId),
             ActorNumber.Create(SampleData.RequestedByActorId),
+            SampleData.BusinessReason,
             SampleData.SettlementVersion,
             SampleData.MeteringPointType,
             SampleData.SettlementMethod,

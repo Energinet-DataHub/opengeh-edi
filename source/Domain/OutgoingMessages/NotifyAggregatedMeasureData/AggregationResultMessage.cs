@@ -57,7 +57,8 @@ public class AggregationResultMessage : OutgoingMessage
             result.ActorGrouping.EnergySupplierNumber,
             result.ActorGrouping.BalanceResponsibleNumber,
             result.Period,
-            result.Points.Select(p => new Point(p.Position, p.Quantity, p.Quality, p.SampleTime)).ToList());
+            result.Points.Select(p => new Point(p.Position, p.Quantity, p.Quality, p.SampleTime)).ToList(),
+            result.OriginalTransactionIdReference);
 
         return new AggregationResultMessage(
             receiverNumber,
@@ -78,6 +79,7 @@ public record TimeSeries(
     string? EnergySupplierNumber,
     string? BalanceResponsibleNumber,
     Period Period,
-    IReadOnlyList<Point> Point);
+    IReadOnlyList<Point> Point,
+    string? OriginalTransactionIdReference);
 
 public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
