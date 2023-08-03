@@ -35,13 +35,10 @@ public static class CimCode
         if (businessReason == BusinessReason.PreliminaryAggregation)
             return "D03";
 
-        if (businessReason == BusinessReason.ToBeKnownD05)
+        if (businessReason == BusinessReason.WholesaleFixing)
             return "D05";
 
-        if (businessReason == BusinessReason.ToBeKnownD09)
-            return "D09";
-
-        if (businessReason == BusinessReason.ToBeKnownD32)
+        if (businessReason == BusinessReason.Correction)
             return "D32";
 
         throw NoCodeFoundFor(businessReason.Name);
@@ -61,13 +58,10 @@ public static class CimCode
             return BusinessReason.PreliminaryAggregation;
 
         if (businessReasonCode == "D05")
-            return BusinessReason.ToBeKnownD05;
-
-        if (businessReasonCode == "D09")
-            return BusinessReason.ToBeKnownD09;
+            return BusinessReason.WholesaleFixing;
 
         if (businessReasonCode == "D32")
-            return BusinessReason.ToBeKnownD32;
+            return BusinessReason.Correction;
 
         throw NoBusinessReasonFoundFor(businessReasonCode);
     }
