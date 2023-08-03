@@ -111,7 +111,8 @@ public class InboxEventsProcessor
         var sql = "SELECT " +
                   $"Id AS {nameof(ReceivedInboxEvent.Id)}, " +
                   $"EventType AS {nameof(ReceivedInboxEvent.EventType)}, " +
-                  $"EventPayload AS {nameof(ReceivedInboxEvent.EventPayload)} " +
+                  $"EventPayload AS {nameof(ReceivedInboxEvent.EventPayload)}, " +
+                  $"ReferenceId as {nameof(ReceivedInboxEvent.ReferenceId)} " +
                   "FROM dbo.ReceivedInboxEvents " +
                   "WHERE ProcessedDate IS NULL " +
                   "ORDER BY OccurredOn";

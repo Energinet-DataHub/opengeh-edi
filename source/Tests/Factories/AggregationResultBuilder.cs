@@ -44,6 +44,7 @@ public class AggregationResultBuilder
             BusinessReason.BalanceFixing.Name,
             _actorGrouping,
             new GridAreaDetails(_gridArea.Code, _gridOperator.Value),
+            null,
             null);
     }
 

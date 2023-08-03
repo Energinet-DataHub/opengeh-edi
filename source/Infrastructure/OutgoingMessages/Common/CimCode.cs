@@ -35,7 +35,41 @@ public static class CimCode
         if (businessReason == BusinessReason.PreliminaryAggregation)
             return "D03";
 
+        if (businessReason == BusinessReason.ToBeKnownD05)
+            return "D05";
+
+        if (businessReason == BusinessReason.ToBeKnownD09)
+            return "D09";
+
+        if (businessReason == BusinessReason.ToBeKnownD32)
+            return "D32";
+
         throw NoCodeFoundFor(businessReason.Name);
+    }
+
+    public static BusinessReason To(string businessReasonCode)
+    {
+        ArgumentNullException.ThrowIfNull(businessReasonCode);
+
+        if (businessReasonCode == "D04")
+            return BusinessReason.BalanceFixing;
+
+        if (businessReasonCode == "E65")
+            return BusinessReason.MoveIn;
+
+        if (businessReasonCode == "D03")
+            return BusinessReason.PreliminaryAggregation;
+
+        if (businessReasonCode == "D05")
+            return BusinessReason.ToBeKnownD05;
+
+        if (businessReasonCode == "D09")
+            return BusinessReason.ToBeKnownD09;
+
+        if (businessReasonCode == "D32")
+            return BusinessReason.ToBeKnownD32;
+
+        throw NoBusinessReasonFoundFor(businessReasonCode);
     }
 
     public static string Of(MeteringPointType meteringPointType)
@@ -140,5 +174,10 @@ public static class CimCode
     private static Exception NoCodeFoundFor(string domainType)
     {
         return new InvalidOperationException($"No code has been defined for {domainType}");
+    }
+
+    private static Exception NoBusinessReasonFoundFor(string businessReasonCode)
+    {
+        return new InvalidOperationException($"No business reason has been defined for {businessReasonCode}");
     }
 }

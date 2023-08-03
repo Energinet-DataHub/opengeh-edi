@@ -108,6 +108,7 @@ public class WhenEnqueueingTests : TestBase
                 BusinessReason.BalanceFixing.Name,
                 new ActorGrouping("1234567891911", null),
                 new GridAreaDetails("805", "1234567891045"),
+                null,
                 null));
         return message;
     }

@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.Transactions.Aggregations;
+using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
@@ -23,6 +24,7 @@ using Domain.Transactions.Aggregations;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.Collections;
 using Infrastructure.InboxEvents;
+using Infrastructure.OutgoingMessages.Common;
 using MediatR;
 using NodaTime.Serialization.Protobuf;
 using Period = Energinet.DataHub.Edi.Responses.Period;
@@ -59,7 +61,7 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
             aggregations.Add(new AggregationResultAvailable(
                 new Aggregation(
                 MapPoints(serie.TimeSeriesPoints),
-                MapMeteringPointType(process),
+                MapMeteringPointType(serie),
                 MapUnitType(serie),
                 MapResolution(serie.Period.Resolution),
                 MapPeriod(serie.Period),
@@ -67,7 +69,8 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
                 MapBusinessReason(process),
                 MapActorGrouping(process),
                 await MapGridAreaDetailsAsync(serie).ConfigureAwait(false),
-                MapOriginalTransactionIdReference(process))));
+                MapOriginalTransactionIdReference(process),
+                MapReceiver(process))));
         }
 
         return aggregations;
@@ -76,13 +79,19 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
     public bool CanHandle(string eventType)
     {
         ArgumentNullException.ThrowIfNull(eventType);
-        return eventType.Equals(nameof(AggregatedTimeSeriesRequestAcceptedEventMapper), StringComparison.OrdinalIgnoreCase);
+        return eventType.Equals(nameof(AggregatedTimeSeriesRequestAccepted), StringComparison.OrdinalIgnoreCase);
     }
 
     public string ToJson(byte[] payload)
     {
-        var inboxEvent = AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(payload);
+        var inboxEvent = AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(
+            payload);
         return inboxEvent.ToString();
+    }
+
+    private static string MapReceiver(AggregatedMeasureDataProcess process)
+    {
+        return process.RequestedByActorId.Value;
     }
 
     private static string? MapOriginalTransactionIdReference(AggregatedMeasureDataProcess process)
@@ -90,9 +99,19 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         return process.BusinessTransactionId.Id;
     }
 
-    private static string MapMeteringPointType(AggregatedMeasureDataProcess process)
+    private static string MapMeteringPointType(Serie serie)
     {
-        return process.MeteringPointType ?? "HVad skal den sættes til, hvis vi ikke for en ind i requestet?";
+        return serie.TimeSeriesType switch
+        {
+            TimeSeriesType.Production => MeteringPointType.Production.Name,
+            TimeSeriesType.FlexConsumption => MeteringPointType.Consumption.Name,
+            TimeSeriesType.NonProfiledConsumption => MeteringPointType.Consumption.Name,
+            TimeSeriesType.NetExchangePerGa => MeteringPointType.Exchange.Name,
+            TimeSeriesType.NetExchangePerNeighboringGa => MeteringPointType.Exchange.Name,
+            TimeSeriesType.TotalConsumption => MeteringPointType.Consumption.Name,
+            TimeSeriesType.Unspecified => throw new InvalidOperationException("Unknown metering point type"),
+            _ => throw new InvalidOperationException("Could not determine metering point type"),
+        };
     }
 
     private static IReadOnlyList<Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
@@ -155,23 +174,9 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         };
     }
 
-    // private static string MapMeteringPointType(Serie serie)
-    // {
-    //     return serie.TimeSeriesType switch
-    //     {
-    //         TimeSeriesType.Production => MeteringPointType.Production.Name,
-    //         TimeSeriesType.FlexConsumption => MeteringPointType.Consumption.Name,
-    //         TimeSeriesType.NonProfiledConsumption => MeteringPointType.Consumption.Name,
-    //         TimeSeriesType.NetExchangePerGa => MeteringPointType.Exchange.Name,
-    //         TimeSeriesType.NetExchangePerNeighboringGa => MeteringPointType.Exchange.Name,
-    //         TimeSeriesType.TotalConsumption => MeteringPointType.Consumption.Name,
-    //         TimeSeriesType.Unspecified => throw new InvalidOperationException("Unknown metering point type"),
-    //         _ => throw new InvalidOperationException("Could not determine metering point type"),
-    //     };
-    // }
     private static string MapBusinessReason(AggregatedMeasureDataProcess process)
     {
-        return process.BusinessReason;
+        return CimCode.To(process.BusinessReason).Name;
     }
 
     private static string MapQuality(QuantityQuality quality)

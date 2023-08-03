@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Transactions.AggregatedMeasureData.Notifications;
 using Application.WholeSale;
+using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
 using MediatR;
 
@@ -26,7 +27,6 @@ public class
     RequestAggregatedMeasuredDataFromWholesale : IRequestHandler<NotifyWholesaleOfAggregatedMeasureDataRequest, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
-    // TODO: Remove the dependency to RequestResponse when we get a response from wholesale
     private readonly IWholeSaleInBox _wholeSaleInBox;
 
     public RequestAggregatedMeasuredDataFromWholesale(
@@ -43,7 +43,7 @@ public class
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var process = _aggregatedMeasureDataProcessRepository.GetById(request.ProcessId) ??
+        var process = _aggregatedMeasureDataProcessRepository.GetById(ProcessId.Create(request.ProcessId)) ??
                       throw new ArgumentNullException(nameof(request));
 
         await _wholeSaleInBox.SendAsync(

@@ -44,12 +44,11 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
         builder.Property(x => x.EnergySupplierId);
         builder.Property(x => x.BalanceResponsibleId);
         builder.Property(x => x.BusinessReason);
-
-        builder.Property<ActorNumber>("_requestedByActorId")
-            .HasColumnName("RequestedByActorId")
+        builder.Property(x => x.RequestedByActorId)
             .HasConversion(
                 toDbValue => toDbValue.Value,
                 fromDbValue => ActorNumber.Create(fromDbValue));
+
         /* TODO: add this when we are ready for state in DB
         builder.Property<AggregatedMeasureDataProcess.State>("_state")
             .HasConversion(

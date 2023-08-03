@@ -39,7 +39,7 @@ public class AggregatedMeasureDataRequestHandler : IRequestHandler<RequestAggreg
         var requestMessageHeader = request.MessageHeader;
         var requestMarketActivityRecord = request.MarketActivityRecord;
 
-        var process = new AggregatedMeasureDataProcess(
+        var process = AggregatedMeasureDataProcess.Create(
             ProcessId.New(),
             BusinessTransactionId.Create(requestMarketActivityRecord.Id),
             ActorNumber.Create(requestMessageHeader.SenderId),

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Application.Configuration.TimeEvents;
+using Infrastructure.Transactions.Aggregations;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -26,5 +27,6 @@ public static class InboxEventsConfiguration
             ProcessInboxEventsOnTenSecondsHasPassed>();
         services.AddTransient<InboxEventReceiver>();
         services.AddTransient<InboxEventsProcessor>();
+        services.AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestAcceptedEventMapper>();
     }
 }
