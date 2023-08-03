@@ -29,7 +29,7 @@ using Infrastructure.Configuration.Authentication;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Infrastructure.Transactions;
 using Infrastructure.Transactions.MoveIn;
-using Infrastructure.WholeSale;
+using Infrastructure.Wholesale;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -85,7 +85,7 @@ namespace Api
                     services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration(
                         "NotImplemented"));
 
-                    services.AddSingleton(new WholeSaleServiceBusClientConfiguration(
+                    services.AddSingleton(new WholesaleServiceBusClientConfiguration(
                         runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!));
 
                     services.AddSingleton(

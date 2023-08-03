@@ -12,21 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
-using System.Threading.Tasks;
-using Domain.Transactions.AggregatedMeasureData;
+using Application.Wholesale;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Application.WholeSale;
+namespace Infrastructure.Wholesale;
 
-/// <summary>
-/// Interface for wholeSale inbox
-/// </summary>
-public interface IWholeSaleInBox
+public static class WholesaleInboxConfiguration
 {
-    /// <summary>
-    /// Send <paramref name="request"/> to wholeSale
-    /// </summary>
-    /// <param name="request"></param>
-    /// <param name="cancellationToken"></param>
-    Task SendAsync(AggregatedMeasureDataProcess request, CancellationToken cancellationToken);
+    public static void Configure(IServiceCollection services)
+    {
+       services.AddTransient<IWholesaleInbox, WholesaleInbox>();
+    }
 }

@@ -16,7 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Transactions.AggregatedMeasureData.Notifications;
-using Application.WholeSale;
+using Application.Wholesale;
 using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
 using MediatR;
@@ -27,14 +27,14 @@ public class
     RequestAggregatedMeasuredDataFromWholesale : IRequestHandler<NotifyWholesaleOfAggregatedMeasureDataRequest, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
-    private readonly IWholeSaleInBox _wholeSaleInBox;
+    private readonly IWholesaleInbox _wholesaleInbox;
 
     public RequestAggregatedMeasuredDataFromWholesale(
         IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository,
-        IWholeSaleInBox wholeSaleInBox)
+        IWholesaleInbox wholesaleInbox)
     {
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
-        _wholeSaleInBox = wholeSaleInBox;
+        _wholesaleInbox = wholesaleInbox;
     }
 
     public async Task<Unit> Handle(
@@ -46,7 +46,7 @@ public class
         var process = _aggregatedMeasureDataProcessRepository.GetById(ProcessId.Create(request.ProcessId)) ??
                       throw new ArgumentNullException(nameof(request));
 
-        await _wholeSaleInBox.SendAsync(
+        await _wholesaleInbox.SendAsync(
             process,
             cancellationToken).ConfigureAwait(false);
         process.WholesaleIsNotifiedOfRequest();

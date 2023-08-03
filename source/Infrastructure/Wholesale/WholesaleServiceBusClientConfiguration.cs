@@ -14,11 +14,11 @@
 
 using Infrastructure.Configuration.MessageBus;
 
-namespace Infrastructure.WholeSale;
+namespace Infrastructure.Wholesale;
 
-public class WholeSaleServiceBusClientConfiguration : IServiceBusClientConfiguration
+public class WholesaleServiceBusClientConfiguration : IServiceBusClientConfiguration
 {
-    public WholeSaleServiceBusClientConfiguration(string queueName)
+    public WholesaleServiceBusClientConfiguration(string queueName)
     {
         QueueName = queueName;
     }

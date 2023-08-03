@@ -20,19 +20,17 @@ using System.Threading.Tasks;
 using Api.Configuration.Middleware.Correlation;
 using Application.Configuration;
 using Application.Configuration.Commands.Commands;
-using Application.Configuration.DataAccess;
 using Application.Configuration.Queries;
 using Application.Configuration.TimeEvents;
 using Application.Transactions.MoveIn;
 using Azure.Messaging.ServiceBus;
 using Google.Protobuf;
 using Infrastructure.Configuration;
-using Infrastructure.Configuration.DataAccess;
 using Infrastructure.Configuration.IntegrationEvents;
 using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Infrastructure.Transactions.MoveIn;
-using Infrastructure.WholeSale;
+using Infrastructure.Wholesale;
 using IntegrationTests.Fixtures;
 using IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 using IntegrationTests.Infrastructure.Configuration.InternalCommands;
@@ -140,7 +138,7 @@ namespace IntegrationTests
             _services = new ServiceCollection();
 
             _services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration("Fake"));
-            _services.AddSingleton(new WholeSaleServiceBusClientConfiguration("Fake"));
+            _services.AddSingleton(new WholesaleServiceBusClientConfiguration("Fake"));
             _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
             _services.AddSingleton(
                 _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
