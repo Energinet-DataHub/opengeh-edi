@@ -74,7 +74,6 @@ public class AggregationResultForwarding : Entity
 
     private AggregationResultMessage MessageForKnownReceiver(Aggregation result, string receiver, string receiverRole)
     {
-        //TODO: specify the actor role for the receiver. (should be stored on the process)
         return AggregationResultMessage.Create(ActorNumber.Create(receiver), EnumerationType.FromName<MarketRole>(receiverRole), Id, result);
     }
 

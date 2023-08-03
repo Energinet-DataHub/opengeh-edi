@@ -32,8 +32,8 @@ public sealed class BusinessReason : EnumerationType
 
     public static BusinessReason From(string valueToParse)
     {
-        var processType = GetAll<BusinessReason>().FirstOrDefault(processType =>
+        var businessReason = GetAll<BusinessReason>().FirstOrDefault(processType =>
             processType.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{valueToParse} is not a valid process type");
-        return processType;
+        return businessReason;
     }
 }
