@@ -24,8 +24,9 @@ public record Aggregation(
     string BusinessReason,
     ActorGrouping ActorGrouping,
     GridAreaDetails GridAreaDetails,
-    string? OriginalTransactionIdReference,
-    string? Receiver);
+    string? OriginalTransactionIdReference = null,
+    string? Receiver = null,
+    string? ReceiverRole = null);
 
 public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
 

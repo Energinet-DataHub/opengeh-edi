@@ -43,9 +43,7 @@ public class AggregationResultBuilder
             _settlementType?.Name,
             BusinessReason.BalanceFixing.Name,
             _actorGrouping,
-            new GridAreaDetails(_gridArea.Code, _gridOperator.Value),
-            null,
-            null);
+            new GridAreaDetails(_gridArea.Code, _gridOperator.Value));
     }
 
     public AggregationResultBuilder WithGridAreaDetails(GridArea gridArea, ActorNumber gridOperator)

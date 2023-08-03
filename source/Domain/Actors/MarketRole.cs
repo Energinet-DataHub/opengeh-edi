@@ -39,6 +39,12 @@ public class MarketRole : EnumerationType
 
     public string Code { get; }
 
+    public static MarketRole FromCode(string code)
+    {
+        var matchingItem = GetAll<MarketRole>().FirstOrDefault(item => item.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
+        return matchingItem ?? throw new InvalidOperationException($"'{code}' is not a valid code in {typeof(MarketRole)}");
+    }
+
     public override string ToString()
     {
         return Name;

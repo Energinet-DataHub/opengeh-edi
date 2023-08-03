@@ -70,7 +70,8 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
                 MapActorGrouping(process),
                 await MapGridAreaDetailsAsync(serie).ConfigureAwait(false),
                 MapOriginalTransactionIdReference(process),
-                MapReceiver(process))));
+                MapReceiver(process),
+                MapReceiverRole(process))));
         }
 
         return aggregations;
@@ -92,6 +93,11 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
     private static string MapReceiver(AggregatedMeasureDataProcess process)
     {
         return process.RequestedByActorId.Value;
+    }
+
+    private static string MapReceiverRole(AggregatedMeasureDataProcess process)
+    {
+        return MarketRole.FromCode(process.RequestedByActorRoleCode).Name;
     }
 
     private static string? MapOriginalTransactionIdReference(AggregatedMeasureDataProcess process)

@@ -109,6 +109,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202308021404 Change process id type to unique identifier.sql" />
     <EmbeddedResource Include="Scripts\Model\202308011412 Add ProcessedDate and errorMessage to ReceivedInboxEvents.sql" />
     <EmbeddedResource Include="Scripts\Model\202308021348 Add businessReason to AggregatedMeasureDataProcesses.sql" />
+    <EmbeddedResource Include="Scripts\Model\202308031502 Add RequestedByActorRole to AggregatedMeasureDataProcesses.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241101 Consolidated BtwoB model.sql" />

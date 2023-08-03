@@ -27,6 +27,7 @@
                 ProcessId processId,
                 BusinessTransactionId businessTransactionId,
                 ActorNumber requestedByActorId,
+                string requestedByActorRoleCode,
                 string businessReason,
                 string? settlementVersion,
                 string? meteringPointType,
@@ -49,6 +50,7 @@
                 EnergySupplierId = energySupplierId;
                 BalanceResponsibleId = balanceResponsibleId;
                 RequestedByActorId = requestedByActorId;
+                RequestedByActorRoleCode = requestedByActorRoleCode;
             }
 
             public enum State
@@ -92,10 +94,13 @@
 
             public ActorNumber RequestedByActorId { get; set; }
 
+            public string RequestedByActorRoleCode { get; }
+
             public static AggregatedMeasureDataProcess Create(
                 ProcessId processId,
                 BusinessTransactionId businessTransactionId,
                 ActorNumber requestedByActorId,
+                string requestedByActorRole,
                 string businessReason,
                 string? settlementVersion,
                 string? meteringPointType,
@@ -110,6 +115,7 @@
                     processId,
                     businessTransactionId,
                     requestedByActorId,
+                    requestedByActorRole,
                     businessReason,
                     settlementVersion,
                     meteringPointType,

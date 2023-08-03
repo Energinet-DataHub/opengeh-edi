@@ -48,6 +48,7 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
             .HasConversion(
                 toDbValue => toDbValue.Value,
                 fromDbValue => ActorNumber.Create(fromDbValue));
+        builder.Property(x => x.RequestedByActorRoleCode);
 
         /* TODO: add this when we are ready for state in DB
         builder.Property<AggregatedMeasureDataProcess.State>("_state")

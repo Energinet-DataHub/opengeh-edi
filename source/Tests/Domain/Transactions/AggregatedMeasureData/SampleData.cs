@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Domain.Actors;
 using NodaTime;
 
 namespace Tests.Domain.Transactions.AggregatedMeasureData;
@@ -42,4 +43,6 @@ public static class SampleData
     internal static string RequestedByActorId => "1234567890123";
 
     internal static string BusinessReason => "D03";
+
+    internal static string RequestedByActorRole => MarketRole.MeteredDataResponsible.ToString();
 }
