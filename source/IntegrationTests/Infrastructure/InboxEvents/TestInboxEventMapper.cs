@@ -13,10 +13,11 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.InboxEvents;
-using IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 using MediatR;
 
 namespace IntegrationTests.Infrastructure.InboxEvents;
@@ -24,10 +25,16 @@ namespace IntegrationTests.Infrastructure.InboxEvents;
 public class TestInboxEventMapper : IInboxEventMapper
 {
     #pragma warning disable // Method cannot be static since inherited from the interface
-    public Task<INotification> MapFromAsync(string payload)
+    public Task<IReadOnlyList<INotification>> MapFromAsync(string payload, Guid referenceId, CancellationToken cancellationToken)
     {
-        var integrationEvent = JsonSerializer.Deserialize<TestInboxEvent>(payload);
-        return Task.FromResult((INotification)new TestNotification(integrationEvent!.Property1));
+        var inboxEvents = JsonSerializer.Deserialize<List<TestInboxEvent>>(payload);
+        var notifications = new List<TestNotification>();
+        foreach (var @event in inboxEvents)
+        {
+            notifications.Add( new TestNotification(@event.EventProperty));
+        }
+
+        return Task.FromResult(notifications as IReadOnlyList<INotification>);
     }
 
     public bool CanHandle(string eventType)
@@ -38,7 +45,7 @@ public class TestInboxEventMapper : IInboxEventMapper
 
     public string ToJson(byte[] payload)
     {
-        var integrationEvent = JsonSerializer.Deserialize<TestInboxEvent>(payload);
+        var integrationEvent = JsonSerializer.Deserialize<List<TestInboxEvent>>(payload);
         return JsonSerializer.Serialize(integrationEvent);
     }
 }

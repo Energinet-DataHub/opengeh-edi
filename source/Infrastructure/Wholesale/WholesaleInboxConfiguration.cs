@@ -12,14 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Application.Wholesale;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.InboxEvents;
+namespace Infrastructure.Wholesale;
 
-public static class InboxEventsConfiguration
+public static class WholesaleInboxConfiguration
 {
     public static void Configure(IServiceCollection services)
     {
-        services.AddTransient<InboxEventReceiver>();
+       services.AddTransient<IWholesaleInbox, WholesaleInbox>();
     }
 }

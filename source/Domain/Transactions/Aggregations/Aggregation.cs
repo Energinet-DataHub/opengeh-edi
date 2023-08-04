@@ -23,7 +23,10 @@ public record Aggregation(
     string? SettlementType,
     string BusinessReason,
     ActorGrouping ActorGrouping,
-    GridAreaDetails GridAreaDetails);
+    GridAreaDetails GridAreaDetails,
+    string? OriginalTransactionIdReference = null,
+    string? Receiver = null,
+    string? ReceiverRole = null);
 
 public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
 

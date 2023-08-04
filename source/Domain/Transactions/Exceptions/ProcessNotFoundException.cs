@@ -12,6 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Messages.Queues;
+namespace Domain.Transactions.Exceptions;
 
-public record InboxEventQueues(string Name) : Queue;
+public class ProcessNotFoundException : Exception
+{
+    private ProcessNotFoundException()
+    {
+    }
+
+    private ProcessNotFoundException(string message)
+        : base(message)
+    {
+    }
+
+    private ProcessNotFoundException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+
+    public static Exception ProcessForProcessIdNotFound(Guid requestProcessId)
+    {
+        return new ProcessNotFoundException($"Process for process id {requestProcessId} not found");
+    }
+}

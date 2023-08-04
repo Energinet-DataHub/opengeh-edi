@@ -21,13 +21,14 @@ namespace Domain.Transactions.AggregatedMeasureData
 {
     public class AggregatedMeasureDataProcess : Entity
     {
-        private readonly ActorNumber _requestedByActorId;
-        private State _state;
+        private State _state = State.Initialized;
 
-        public AggregatedMeasureDataProcess(
+        protected AggregatedMeasureDataProcess(
             ProcessId processId,
             BusinessTransactionId businessTransactionId,
             ActorNumber requestedByActorId,
+            string requestedByActorRoleCode,
+            string businessReason,
             string? settlementVersion,
             string? meteringPointType,
             string? settlementMethod,
@@ -39,6 +40,7 @@ namespace Domain.Transactions.AggregatedMeasureData
         {
             ProcessId = processId;
             BusinessTransactionId = businessTransactionId;
+            BusinessReason = businessReason;
             SettlementVersion = settlementVersion;
             MeteringPointType = meteringPointType;
             SettlementMethod = settlementMethod;
@@ -47,9 +49,8 @@ namespace Domain.Transactions.AggregatedMeasureData
             MeteringGridAreaDomainId = meteringGridAreaDomainId;
             EnergySupplierId = energySupplierId;
             BalanceResponsibleId = balanceResponsibleId;
-            _state = State.Initialized;
-            _requestedByActorId = requestedByActorId;
-            AddDomainEvent(new AggregatedMeasureProcessWasStarted(ProcessId));
+            RequestedByActorId = requestedByActorId;
+            RequestedByActorRoleCode = requestedByActorRoleCode;
         }
 
         public enum State
@@ -63,6 +64,8 @@ namespace Domain.Transactions.AggregatedMeasureData
         public ProcessId ProcessId { get; }
 
         public BusinessTransactionId BusinessTransactionId { get; }
+
+        public string BusinessReason { get; }
 
         /// <summary>
         /// Represent the version for a specific calculation.
@@ -88,6 +91,43 @@ namespace Domain.Transactions.AggregatedMeasureData
         public string? EnergySupplierId { get; }
 
         public string? BalanceResponsibleId { get; }
+
+        public ActorNumber RequestedByActorId { get; set; }
+
+        public string RequestedByActorRoleCode { get; }
+
+        public static AggregatedMeasureDataProcess Create(
+            ProcessId processId,
+            BusinessTransactionId businessTransactionId,
+            ActorNumber requestedByActorId,
+            string requestedByActorRole,
+            string businessReason,
+            string? settlementVersion,
+            string? meteringPointType,
+            string? settlementMethod,
+            Instant startOfPeriod,
+            Instant? endOfPeriod,
+            string? meteringGridAreaDomainId,
+            string? energySupplierId,
+            string? balanceResponsibleId)
+        {
+            var process = new AggregatedMeasureDataProcess(
+                processId,
+                businessTransactionId,
+                requestedByActorId,
+                requestedByActorRole,
+                businessReason,
+                settlementVersion,
+                meteringPointType,
+                settlementMethod,
+                startOfPeriod,
+                endOfPeriod,
+                meteringGridAreaDomainId,
+                energySupplierId,
+                balanceResponsibleId);
+            process.AddDomainEvent(new AggregatedMeasureProcessWasStarted(processId));
+            return process;
+        }
 
         public void WholesaleIsNotifiedOfRequest()
         {

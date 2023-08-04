@@ -54,10 +54,12 @@ public class AggregatedMeasureDataProcessTests
 
     private static AggregatedMeasureDataProcess CreateProcess()
     {
-        return new AggregatedMeasureDataProcess(
+        return AggregatedMeasureDataProcess.Create(
             ProcessId.Create(SampleData.ProcessId),
             BusinessTransactionId.Create(SampleData.BusinessTransactionId),
             ActorNumber.Create(SampleData.RequestedByActorId),
+            SampleData.RequestedByActorRole,
+            SampleData.BusinessReason,
             SampleData.SettlementVersion,
             SampleData.MeteringPointType,
             SampleData.SettlementMethod,

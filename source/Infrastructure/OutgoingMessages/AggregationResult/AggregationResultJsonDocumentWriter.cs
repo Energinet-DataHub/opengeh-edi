@@ -107,6 +107,11 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
                     new KeyValuePair<string, string>("value", CimCode.Of(SettlementType.From(series.SettlementType))));
             }
 
+            if (series.OriginalTransactionIdReference is not null)
+            {
+                writer.WriteProperty("originalTransactionIDReference_Series.mRID", series.OriginalTransactionIdReference);
+            }
+
             writer.WriteObject("marketEvaluationPoint.type", new KeyValuePair<string, string>("value", CimCode.Of(MeteringPointType.From(series.MeteringPointType))));
             writer.WriteProperty("product", GeneralValues.ProductCode);
             writer.WriteObject("quantity_Measure_Unit.name", new KeyValuePair<string, string>("value", CimCode.Of(MeasurementUnit.From(series.MeasureUnitType))));

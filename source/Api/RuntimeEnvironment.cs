@@ -49,17 +49,6 @@ namespace Api
         public virtual bool ALLOW_TEST_TOKENS =>
             bool.Parse(GetEnvironmentVariable(nameof(ALLOW_TEST_TOKENS)) ?? "false");
 
-        public int MAX_NUMBER_OF_PAYLOADS_IN_BUNDLE
-        {
-            get
-            {
-                var variable = GetEnvironmentVariable(nameof(MAX_NUMBER_OF_PAYLOADS_IN_BUNDLE));
-                return string.IsNullOrWhiteSpace(variable) || int.TryParse(variable, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out var value) == false
-                    ? 500
-                    : value;
-            }
-        }
-
         public virtual Uri AGGREGATION_RESULTS_API_URI =>
             new(GetEnvironmentVariable(nameof(AGGREGATION_RESULTS_API_URI))!);
 

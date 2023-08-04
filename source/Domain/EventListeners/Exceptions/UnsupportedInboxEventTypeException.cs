@@ -12,21 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
-using System.Threading.Tasks;
-using Domain.Transactions.AggregatedMeasureData;
+namespace Domain.EventListeners.Exceptions;
 
-namespace Application.WholeSale;
-
-/// <summary>
-/// Interface for wholeSale inbox
-/// </summary>
-public interface IWholeSaleInBox
+public class UnsupportedInboxEventTypeException : Exception
 {
-    /// <summary>
-    /// Send <paramref name="request"/> to wholeSale
-    /// </summary>
-    /// <param name="request"></param>
-    /// <param name="cancellationToken"></param>
-    Task SendAsync(AggregatedMeasureDataProcess request, CancellationToken cancellationToken);
+    public UnsupportedInboxEventTypeException(string message)
+        : base(message)
+    {
+    }
+
+    public UnsupportedInboxEventTypeException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+
+    private UnsupportedInboxEventTypeException()
+    {
+    }
 }
