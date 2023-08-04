@@ -23,28 +23,24 @@ using MediatR;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData.Handlers;
 
-public class RequestAggregatedMeasuredDataFromWholesale
-    : IRequestHandler<NotifyWholesaleOfAggregatedMeasureDataRequest, Unit>
+public class AcceptedAggregatedTimeSeriesFromWholesale : IRequestHandler<AcceptedAggregatedTimeSeries, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
 
-    public RequestAggregatedMeasuredDataFromWholesale(
-        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
+    public AcceptedAggregatedTimeSeriesFromWholesale(IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
     }
 
-    public async Task<Unit> Handle(
-        NotifyWholesaleOfAggregatedMeasureDataRequest request,
-        CancellationToken cancellationToken)
+    public async Task<Unit> Handle(AcceptedAggregatedTimeSeries request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         var process = await _aggregatedMeasureDataProcessRepository
-            .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false)
-            ?? throw ProcessNotFoundException.ProcessForProcessIdNotFound(request.ProcessId);
+                          .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false)
+                      ?? throw ProcessNotFoundException.ProcessForProcessIdNotFound(request.ProcessId);
 
-        process.SendToWholesale();
+        process.WasAccepted(request.NotificationAggregatedTimeSerie);
 
         return Unit.Value;
     }

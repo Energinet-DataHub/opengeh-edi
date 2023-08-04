@@ -13,25 +13,21 @@
 // limitations under the License.
 
 using System;
-using System.Text.Json.Serialization;
-using Application.Configuration.Commands.Commands;
-using Domain.Transactions.Aggregations;
+using System.Collections.Generic;
+using Domain.Transactions.AggregatedMeasureData;
+using MediatR;
 
-namespace Application.Transactions.Aggregations;
+namespace Application.Transactions.AggregatedMeasureData;
 
-public class ForwardAggregationResult : InternalCommand
+public class AggregatedTimeSeriesRequestWasAccepted : INotification
 {
-    [JsonConstructor]
-    public ForwardAggregationResult(Guid id, Aggregation result)
-    : base(id)
+    public AggregatedTimeSeriesRequestWasAccepted(Guid processId, IReadOnlyList<AggregatedTimeSerie> aggregatedTimeSerie)
     {
-        Result = result;
+        ProcessId = processId;
+        AggregatedTimeSerie = aggregatedTimeSerie;
     }
 
-    public ForwardAggregationResult(Aggregation result)
-    {
-        Result = result;
-    }
+    public Guid ProcessId { get; }
 
-    public Aggregation Result { get; }
+    public IReadOnlyList<AggregatedTimeSerie> AggregatedTimeSerie { get; }
 }

@@ -1,4 +1,4 @@
-﻿﻿// Copyright 2020 Energinet DataHub A/S
+﻿// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -16,30 +16,22 @@
  using System.Threading;
  using System.Threading.Tasks;
  using Api.Configuration;
- using Application.Configuration;
  using Infrastructure.Configuration.Serialization;
  using Infrastructure.InboxEvents;
  using Microsoft.Azure.Functions.Worker;
- using Microsoft.Extensions.Logging;
 
  namespace Api.EventListeners;
 
 public class InboxEventListener
 {
-    private readonly ILogger<InboxEventListener> _logger;
     private readonly ISerializer _jsonSerializer;
-    private readonly ICorrelationContext _correlationContext;
     private readonly InboxEventReceiver _inboxEventReceiver;
 
     public InboxEventListener(
         ISerializer jsonSerializer,
-        ICorrelationContext correlationContext,
-        ILogger<InboxEventListener> logger,
         InboxEventReceiver inboxEventReceiver)
     {
-        _logger = logger;
         _jsonSerializer = jsonSerializer;
-        _correlationContext = correlationContext;
         _inboxEventReceiver = inboxEventReceiver;
     }
 

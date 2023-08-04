@@ -119,5 +119,18 @@ namespace Domain.Transactions.AggregatedMeasureData
                 _state = State.Sent;
             }
         }
+
+        public void WasAccepted(IReadOnlyList<AggregatedTimeSerie> aggregatedTimeSerie)
+        {
+            if (_state == State.Sent)
+            {
+                _state = State.Accepted;
+                //TODO: How to store aggregatedTimeSerie
+                //TODO: create handle for AggregatedMeasureProcessWasAccepted domain event => creates new internal command
+                //TODO: new handler for internal command which is responsible for publishing a new AggregationResultAvailable.
+                //AggregatedTimeSeriesResponse = aggregatedTimeSerie;
+                AddDomainEvent(new AggregatedMeasureProcessWasAccepted(ProcessId));
+            }
+        }
     }
 }
