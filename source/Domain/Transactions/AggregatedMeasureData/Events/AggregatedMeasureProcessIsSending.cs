@@ -16,9 +16,9 @@ using Domain.SeedWork;
 
 namespace Domain.Transactions.AggregatedMeasureData.Events;
 
-public class AggregatedMeasureProcessWasStarted : DomainEvent
+public class AggregatedMeasureProcessIsSending : DomainEvent
 {
-    public AggregatedMeasureProcessWasStarted(ProcessId processId)
+    public AggregatedMeasureProcessIsSending(ProcessId processId)
     {
         ProcessId = processId;
     }

@@ -23,7 +23,7 @@ namespace Domain.Transactions.AggregatedMeasureData
     {
         private State _state = State.Initialized;
 
-        protected AggregatedMeasureDataProcess(
+        public AggregatedMeasureDataProcess(
             ProcessId processId,
             BusinessTransactionId businessTransactionId,
             ActorNumber requestedByActorId,
@@ -51,11 +51,18 @@ namespace Domain.Transactions.AggregatedMeasureData
             BalanceResponsibleId = balanceResponsibleId;
             RequestedByActorId = requestedByActorId;
             RequestedByActorRoleCode = requestedByActorRoleCode;
+
+            //Ensures that ORM doesn't create domain event when loading this entity.
+            if (_state == State.Initialized)
+            {
+                AddDomainEvent(new AggregatedMeasureProcessIsStarted(processId));
+            }
         }
 
         public enum State
         {
             Initialized,
+            Sending,
             Sent,
             Accepted, // TODO: LRN this would indicate that the process is completed, is only property to  describe state enough?
             Rejected,
@@ -96,47 +103,21 @@ namespace Domain.Transactions.AggregatedMeasureData
 
         public string RequestedByActorRoleCode { get; }
 
-        public static AggregatedMeasureDataProcess Create(
-            ProcessId processId,
-            BusinessTransactionId businessTransactionId,
-            ActorNumber requestedByActorId,
-            string requestedByActorRole,
-            string businessReason,
-            string? settlementVersion,
-            string? meteringPointType,
-            string? settlementMethod,
-            Instant startOfPeriod,
-            Instant? endOfPeriod,
-            string? meteringGridAreaDomainId,
-            string? energySupplierId,
-            string? balanceResponsibleId)
+        public void SendToWholesale()
         {
-            var process = new AggregatedMeasureDataProcess(
-                processId,
-                businessTransactionId,
-                requestedByActorId,
-                requestedByActorRole,
-                businessReason,
-                settlementVersion,
-                meteringPointType,
-                settlementMethod,
-                startOfPeriod,
-                endOfPeriod,
-                meteringGridAreaDomainId,
-                energySupplierId,
-                balanceResponsibleId);
-            process.AddDomainEvent(new AggregatedMeasureProcessWasStarted(processId));
-            return process;
+            if (_state == State.Initialized)
+            {
+                _state = State.Sending;
+                AddDomainEvent(new AggregatedMeasureProcessIsSending(ProcessId));
+            }
         }
 
-        public void WholesaleIsNotifiedOfRequest()
+        public void WasSentToWholesale()
         {
-            if (_state == State.Sent)
+            if (_state == State.Sending)
             {
-                throw new AggregatedMeasureDataException("Wholesale has already been notified");
+                _state = State.Sent;
             }
-
-            _state = State.Sent;
         }
     }
 }

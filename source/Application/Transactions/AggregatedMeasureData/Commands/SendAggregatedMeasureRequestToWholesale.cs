@@ -16,12 +16,12 @@ using System;
 using System.Text.Json.Serialization;
 using Application.Configuration.Commands.Commands;
 
-namespace Application.Transactions.AggregatedMeasureData.Notifications;
+namespace Application.Transactions.AggregatedMeasureData.Commands;
 
-public class NotifyWholesaleOfAggregatedMeasureDataRequest : InternalCommand
+public class SendAggregatedMeasureRequestToWholesale : InternalCommand
 {
     [JsonConstructor]
-    public NotifyWholesaleOfAggregatedMeasureDataRequest(Guid processId)
+    public SendAggregatedMeasureRequestToWholesale(Guid processId)
     {
         ProcessId = processId;
     }

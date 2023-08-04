@@ -12,18 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
-using Application.Transactions.AggregatedMeasureData.Notifications;
-using Dapper;
-using Domain.Transactions;
-using Infrastructure.Configuration.MessageBus;
+using Domain.Transactions.AggregatedMeasureData;
+using Domain.Transactions.AggregatedMeasureData.Events;
+using Infrastructure.Configuration.DataAccess;
 using IntegrationTests.Application.IncomingMessages;
 using IntegrationTests.Fixtures;
-using IntegrationTests.TestDoubles;
 using Xunit;
 using Xunit.Categories;
 
@@ -32,35 +29,71 @@ namespace IntegrationTests.Application.Transactions.AggregatedMeasureData;
 [IntegrationTest]
 public class RequestAggregatedMeasureDataFromWholesaleTests : TestBase
 {
-    private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
-    private readonly ServiceBusSenderSpy _senderSpy;
-    private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
+    private readonly B2BContext _b2BContext;
 
     public RequestAggregatedMeasureDataFromWholesaleTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _databaseConnectionFactory = GetService<IDatabaseConnectionFactory>();
-        _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IServiceBusSenderFactory>();
-        _senderSpy = new ServiceBusSenderSpy("Fake");
-        _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
+        _b2BContext = GetService<B2BContext>();
     }
 
     [Fact]
     public async Task Aggregated_measure_data_process_is_created()
     {
         // Arrange
-        // TODO Consider making a process builder
         var incomingMessage = MessageBuilder().Build();
         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-        var processId = await GetProcessId(incomingMessage.MessageHeader.SenderId).ConfigureAwait(false);
+        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
 
         // Act
-        var command = new NotifyWholesaleOfAggregatedMeasureDataRequest(processId.Id);
-        await InvokeCommandAsync(command).ConfigureAwait(false);
+        process!.SendToWholesale();
 
         // Assert
-        var expected = _senderSpy.Message;
-        Assert.Equal(processId.Id.ToString(), expected?.MessageId);
+        Assert.Equal(process.BusinessTransactionId.Id, incomingMessage.MarketActivityRecord.Id);
+        AssertProcessState(process, AggregatedMeasureDataProcess.State.Sending);
+    }
+
+    [Fact]
+    public async Task Aggregated_measure_data_process_was_send_to_wholesale()
+    {
+        // Arrange
+        var incomingMessage = MessageBuilder().Build();
+        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
+        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
+
+        // Act
+        process!.SendToWholesale();
+        process!.WasSentToWholesale();
+
+        // Assert
+        Assert.Equal(process.BusinessTransactionId.Id, incomingMessage.MarketActivityRecord.Id);
+        AssertProcessState(process, AggregatedMeasureDataProcess.State.Sent);
+    }
+
+    [Fact]
+    public async Task Aggregated_measure_data_process_cannot_be_send_to_wholesale_twice()
+    {
+        // Arrange
+        var incomingMessage = MessageBuilder().Build();
+        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
+        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
+
+        // Act
+        process!.SendToWholesale();
+        process!.SendToWholesale();
+
+        // Assert
+        var aggregatedMeasureProcessIsSendingDomainEvents =
+            process.DomainEvents.Where(x => x is AggregatedMeasureProcessIsSending);
+        Assert.Equal(incomingMessage.MarketActivityRecord.Id, process.BusinessTransactionId.Id);
+        Assert.Single(aggregatedMeasureProcessIsSendingDomainEvents);
+        AssertProcessState(process, AggregatedMeasureDataProcess.State.Sending);
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        _b2BContext.Dispose();
     }
 
     private static RequestAggregatedMeasureDataMessageBuilder MessageBuilder()
@@ -68,20 +101,16 @@ public class RequestAggregatedMeasureDataFromWholesaleTests : TestBase
         return new RequestAggregatedMeasureDataMessageBuilder();
     }
 
-    private async Task<ProcessId> GetProcessId(string senderId)
+    private static void AssertProcessState(AggregatedMeasureDataProcess process, AggregatedMeasureDataProcess.State state)
     {
-        using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(CancellationToken.None)
-            .ConfigureAwait(false);
-        var dictionary = (IDictionary<string, object>)await connection.QuerySingleAsync(
-            "SELECT * FROM dbo.AggregatedMeasureDataProcesses WHERE RequestedByActorId = @SenderId",
-            new { SenderId = senderId }).ConfigureAwait(false);
-
-        return ProcessId.Create(Guid.Parse(dictionary["ProcessId"].ToString() ?? string.Empty));
+        var processState = typeof(AggregatedMeasureDataProcess).GetField("_state", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(process);
+        Assert.Equal(state, processState);
     }
 
-    private async Task DisposeAsync()
+    private AggregatedMeasureDataProcess? GetProcess(string senderId)
     {
-        await _senderSpy.DisposeAsync().ConfigureAwait(false);
-        await _serviceBusClientSenderFactory.DisposeAsync().ConfigureAwait(false);
+        return _b2BContext.AggregatedMeasureDataProcesses
+            .ToList()
+            .FirstOrDefault(x => x.RequestedByActorId.Value == senderId);
     }
 }

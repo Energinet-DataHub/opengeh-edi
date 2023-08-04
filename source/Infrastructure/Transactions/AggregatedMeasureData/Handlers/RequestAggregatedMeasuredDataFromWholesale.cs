@@ -15,27 +15,23 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Transactions.AggregatedMeasureData.Notifications;
-using Application.Wholesale;
+using Application.Transactions.AggregatedMeasureData.Commands;
 using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
 using Domain.Transactions.Exceptions;
 using MediatR;
 
-namespace Infrastructure.Transactions.AggregatedMeasureData;
+namespace Infrastructure.Transactions.AggregatedMeasureData.Handlers;
 
-public class
-    RequestAggregatedMeasuredDataFromWholesale : IRequestHandler<NotifyWholesaleOfAggregatedMeasureDataRequest, Unit>
+public class RequestAggregatedMeasuredDataFromWholesale
+    : IRequestHandler<NotifyWholesaleOfAggregatedMeasureDataRequest, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
-    private readonly IWholesaleInbox _wholesaleInbox;
 
     public RequestAggregatedMeasuredDataFromWholesale(
-        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository,
-        IWholesaleInbox wholesaleInbox)
+        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
-        _wholesaleInbox = wholesaleInbox;
     }
 
     public async Task<Unit> Handle(
@@ -48,10 +44,10 @@ public class
             .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false)
             ?? throw ProcessNotFoundException.ProcessForProcessIdNotFound(request.ProcessId);
 
-        await _wholesaleInbox.SendAsync(
-            process,
-            cancellationToken).ConfigureAwait(false);
-        process.WholesaleIsNotifiedOfRequest();
+        process.SendToWholesale();
+        // await _wholesaleInbox.SendAsync(
+        //     process,
+        //     cancellationToken).ConfigureAwait(false);
         return Unit.Value;
     }
 }

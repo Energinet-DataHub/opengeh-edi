@@ -50,13 +50,12 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
                 fromDbValue => ActorNumber.Create(fromDbValue));
         builder.Property(x => x.RequestedByActorRoleCode);
 
-        /* TODO: add this when we are ready for state in DB
         builder.Property<AggregatedMeasureDataProcess.State>("_state")
             .HasConversion(
                 toDbValue => toDbValue.ToString(),
                 fromDbValue => Enum.Parse<AggregatedMeasureDataProcess.State>(fromDbValue, true))
             .HasColumnName("State");
-        */
+
         builder.Ignore(x => x.DomainEvents);
     }
 }

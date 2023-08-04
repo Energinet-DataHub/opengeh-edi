@@ -16,23 +16,24 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.Commands;
+using Application.Transactions.AggregatedMeasureData.Commands;
 using Domain.Transactions.AggregatedMeasureData.Events;
 using MediatR;
 
 namespace Application.Transactions.AggregatedMeasureData.Notifications;
 
-public class NotifyWholesaleWhenAggregatedMeasureProcessWasStarted : INotificationHandler<AggregatedMeasureProcessWasStarted>
+public class SendAggregatedMeasureRequestToWholesaleWhenProcessIsSending : INotificationHandler<AggregatedMeasureProcessIsSending>
 {
     private readonly ICommandScheduler _commandScheduler;
 
-    public NotifyWholesaleWhenAggregatedMeasureProcessWasStarted(ICommandScheduler commandScheduler)
+    public SendAggregatedMeasureRequestToWholesaleWhenProcessIsSending(ICommandScheduler commandScheduler)
     {
         _commandScheduler = commandScheduler;
     }
 
-    public async Task Handle(AggregatedMeasureProcessWasStarted notification, CancellationToken cancellationToken)
+    public async Task Handle(AggregatedMeasureProcessIsSending notification, CancellationToken cancellationToken)
     {
         if (notification == null) throw new ArgumentNullException(nameof(notification));
-        await _commandScheduler.EnqueueAsync(new NotifyWholesaleOfAggregatedMeasureDataRequest(notification.ProcessId.Id)).ConfigureAwait(false);
+        await _commandScheduler.EnqueueAsync(new SendAggregatedMeasureRequestToWholesale(notification.ProcessId.Id)).ConfigureAwait(false);
     }
 }

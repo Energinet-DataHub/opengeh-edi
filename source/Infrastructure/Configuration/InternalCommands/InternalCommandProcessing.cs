@@ -15,6 +15,7 @@
 using Application.Actors;
 using Application.Configuration.Commands;
 using Application.Configuration.TimeEvents;
+using Application.Transactions.AggregatedMeasureData.Commands;
 using Application.Transactions.AggregatedMeasureData.Notifications;
 using Application.Transactions.Aggregations;
 using Application.Transactions.MoveIn;
@@ -54,6 +55,7 @@ internal static class InternalCommandProcessing
         mapper.Add("UpdateCustomerMasterData", typeof(UpdateCustomerMasterData));
         mapper.Add("Aggregations.ForwardAggregationResult", typeof(ForwardAggregationResult));
         mapper.Add("NotifyWholesaleOfAggregatedMeasureDataRequest", typeof(NotifyWholesaleOfAggregatedMeasureDataRequest));
+        mapper.Add("SendAggregatedMeasureRequestToWholesale", typeof(SendAggregatedMeasureRequestToWholesale));
 
         return mapper;
     }
