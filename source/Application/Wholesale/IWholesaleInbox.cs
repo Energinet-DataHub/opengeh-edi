@@ -12,16 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Infrastructure.Configuration.MessageBus;
+using System.Threading;
+using System.Threading.Tasks;
+using Domain.Transactions.AggregatedMeasureData;
 
-namespace Infrastructure.WholeSale;
+namespace Application.Wholesale;
 
-public class WholeSaleServiceBusClientConfiguration : IServiceBusClientConfiguration
+/// <summary>
+/// Interface for wholesale inbox
+/// </summary>
+public interface IWholesaleInbox
 {
-    public WholeSaleServiceBusClientConfiguration(string queueName)
-    {
-        QueueName = queueName;
-    }
-
-    public string QueueName { get; }
+    /// <summary>
+    /// Send <paramref name="request"/> to wholesale
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    Task SendAsync(AggregatedMeasureDataProcess request, CancellationToken cancellationToken);
 }

@@ -17,7 +17,7 @@ using Application.Transactions.AggregatedMeasureData;
 using Application.Transactions.AggregatedMeasureData.Notifications;
 using Domain.Transactions.AggregatedMeasureData;
 using Domain.Transactions.AggregatedMeasureData.Events;
-using Infrastructure.WholeSale;
+using Infrastructure.Wholesale;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -30,7 +30,7 @@ internal static class RequestedAggregatedMeasureDataConfiguration
         services.AddTransient<IRequestHandler<RequestAggregatedMeasureDataTransaction, Unit>, AggregatedMeasureDataRequestHandler>();
         services.AddTransient<IRequestHandler<NotifyWholesaleOfAggregatedMeasureDataRequest, Unit>, RequestAggregatedMeasuredDataFromWholesale>();
         services.AddTransient<INotificationHandler<AggregatedMeasureProcessWasStarted>, NotifyWholesaleWhenAggregatedMeasureProcessWasStarted>();
-        services.AddScoped<WholeSaleInbox>();
+        services.AddScoped<WholesaleInbox>();
         services.AddScoped<IAggregatedMeasureDataProcessRepository, AggregatedMeasureDataProcessRepository>();
     }
 }

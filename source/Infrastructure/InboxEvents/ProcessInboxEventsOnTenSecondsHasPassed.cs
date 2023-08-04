@@ -11,14 +11,25 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-namespace IntegrationTests.Infrastructure.InboxEvents;
 
-#pragma warning disable
-public class TestInboxEvent
+using System.Threading;
+using System.Threading.Tasks;
+using Application.Configuration.TimeEvents;
+using MediatR;
+
+namespace Infrastructure.InboxEvents;
+
+public class ProcessInboxEventsOnTenSecondsHasPassed : INotificationHandler<TenSecondsHasHasPassed>
 {
-    public TestInboxEvent(string eventProperty)
+    private readonly InboxEventsProcessor _processor;
+
+    public ProcessInboxEventsOnTenSecondsHasPassed(InboxEventsProcessor processor)
     {
-        EventProperty = eventProperty;
+        _processor = processor;
     }
-    public string EventProperty { get; set; }
+
+    public Task Handle(TenSecondsHasHasPassed notification, CancellationToken cancellationToken)
+    {
+        return _processor.ProcessEventsAsync(cancellationToken);
+    }
 }

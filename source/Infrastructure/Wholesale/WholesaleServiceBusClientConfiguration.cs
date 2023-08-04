@@ -11,14 +11,17 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-namespace IntegrationTests.Infrastructure.InboxEvents;
 
-#pragma warning disable
-public class TestInboxEvent
+using Infrastructure.Configuration.MessageBus;
+
+namespace Infrastructure.Wholesale;
+
+public class WholesaleServiceBusClientConfiguration : IServiceBusClientConfiguration
 {
-    public TestInboxEvent(string eventProperty)
+    public WholesaleServiceBusClientConfiguration(string queueName)
     {
-        EventProperty = eventProperty;
+        QueueName = queueName;
     }
-    public string EventProperty { get; set; }
+
+    public string QueueName { get; }
 }

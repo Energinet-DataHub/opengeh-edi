@@ -12,15 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.WholeSale;
-using Microsoft.Extensions.DependencyInjection;
+using MediatR;
 
-namespace Infrastructure.WholeSale;
+namespace IntegrationTests.Infrastructure.InboxEvents;
 
-public static class WholeSaleInboxConfiguration
+#pragma warning disable
+public class TestNotification : INotification
 {
-    public static void Configure(IServiceCollection services)
+    public TestNotification(string aProperty)
     {
-       services.AddTransient<IWholeSaleInBox, WholeSaleInbox>();
+        AProperty = aProperty;
     }
+
+    public string AProperty { get; }
 }
