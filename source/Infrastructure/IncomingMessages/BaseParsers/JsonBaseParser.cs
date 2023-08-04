@@ -87,7 +87,7 @@ where TICommand : IMarketTransaction<TTransactionType>
 
         ResetMessagePosition(message);
 
-        return _errors;
+        return _errors.DistinctBy(x => x.Message).ToList();
     }
 
     protected string GetJsonDateStringWithoutQuotes(JsonElement element)
@@ -102,18 +102,24 @@ where TICommand : IMarketTransaction<TTransactionType>
 
     private void ExtractValidationErrors(JsonDocument jsonDocument, JsonSchema schema)
     {
-        var result = schema.Evaluate(jsonDocument, new EvaluationOptions() { OutputFormat = OutputFormat.List, });
-        result
-            .Details
-            .Where(detail => detail.HasErrors)
-            .ToList().ForEach(AddValidationErrors);
+        var result = schema.Evaluate(jsonDocument, new EvaluationOptions() { OutputFormat = OutputFormat.Hierarchical, });
+        FindErrorsForInvalidEvaluation(result);
     }
 
-    private void AddValidationErrors(EvaluationResults validationResult)
+    private void FindErrorsForInvalidEvaluation(EvaluationResults result)
     {
-        var propertyName = validationResult.InstanceLocation.ToString();
-        var errorsValues = validationResult.Errors ?? new Dictionary<string, string>();
-        foreach (var error in errorsValues)
+        if (!result.IsValid)
+        {
+            foreach (var detail in result.Details)
+            {
+                FindErrorsForInvalidEvaluation(detail);
+            }
+        }
+
+        if (!result.HasErrors || result.Errors == null) return;
+
+        var propertyName = result.InstanceLocation.ToString();
+        foreach (var error in result.Errors)
         {
             AddValidationError($"{propertyName}: {error}");
         }
