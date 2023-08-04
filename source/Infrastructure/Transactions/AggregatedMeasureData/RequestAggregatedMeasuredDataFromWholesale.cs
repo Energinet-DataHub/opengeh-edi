@@ -19,6 +19,7 @@ using Application.Transactions.AggregatedMeasureData.Notifications;
 using Application.Wholesale;
 using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
+using Domain.Transactions.Exceptions;
 using MediatR;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData;
@@ -43,8 +44,9 @@ public class
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var process = _aggregatedMeasureDataProcessRepository.GetById(ProcessId.Create(request.ProcessId)) ??
-                      throw new ArgumentNullException(nameof(request));
+        var process = await _aggregatedMeasureDataProcessRepository
+            .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false)
+            ?? throw ProcessNotFoundException.ProcessForProcessIdNotFound(request.ProcessId);
 
         await _wholesaleInbox.SendAsync(
             process,

@@ -51,9 +51,7 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
                 MapSettlementMethod(integrationEvent),
                 MapProcessType(integrationEvent),
                 MapActorGrouping(integrationEvent),
-                await MapGridAreaDetailsAsync(integrationEvent).ConfigureAwait(false),
-                null,
-                null));
+                await MapGridAreaDetailsAsync(integrationEvent).ConfigureAwait(false)));
     }
 
     public bool CanHandle(string eventType)

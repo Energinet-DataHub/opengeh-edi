@@ -80,6 +80,6 @@ public record TimeSeries(
     string? BalanceResponsibleNumber,
     Period Period,
     IReadOnlyList<Point> Point,
-    string? OriginalTransactionIdReference);
+    string? OriginalTransactionIdReference = null);
 
 public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);

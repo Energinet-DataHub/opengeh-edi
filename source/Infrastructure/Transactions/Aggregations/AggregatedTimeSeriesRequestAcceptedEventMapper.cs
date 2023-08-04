@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Transactions.Aggregations;
 using Domain.Actors;
@@ -21,6 +22,7 @@ using Domain.OutgoingMessages;
 using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
 using Domain.Transactions.Aggregations;
+using Domain.Transactions.Exceptions;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.Collections;
 using Infrastructure.InboxEvents;
@@ -46,13 +48,14 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         _gridAreaLookup = gridAreaLookup;
     }
 
-    public async Task<IReadOnlyList<INotification>> MapFromAsync(string payload, Guid referenceId)
+    public async Task<IReadOnlyList<INotification>> MapFromAsync(string payload, Guid referenceId, CancellationToken cancellationToken)
     {
         var inboxEvent =
             AggregatedTimeSeriesRequestAccepted.Parser.ParseJson(payload);
 
-        var process = _aggregatedMeasureDataProcessRepository.GetById(ProcessId.Create(referenceId));
-        ArgumentNullException.ThrowIfNull(process);
+        var process = await _aggregatedMeasureDataProcessRepository
+                          .GetByIdAsync(ProcessId.Create(referenceId), cancellationToken).ConfigureAwait(false)
+                      ?? throw ProcessNotFoundException.ProcessForProcessIdNotFound(referenceId);
 
         var aggregations = new List<AggregationResultAvailable>();
 

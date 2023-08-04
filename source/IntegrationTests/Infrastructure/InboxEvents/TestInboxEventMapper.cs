@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.InboxEvents;
 using MediatR;
@@ -24,7 +25,7 @@ namespace IntegrationTests.Infrastructure.InboxEvents;
 public class TestInboxEventMapper : IInboxEventMapper
 {
     #pragma warning disable // Method cannot be static since inherited from the interface
-    public Task<IReadOnlyList<INotification>> MapFromAsync(string payload, Guid referenceId)
+    public Task<IReadOnlyList<INotification>> MapFromAsync(string payload, Guid referenceId, CancellationToken cancellationToken)
     {
         var inboxEvents = JsonSerializer.Deserialize<List<TestInboxEvent>>(payload);
         var notifications = new List<TestNotification>();

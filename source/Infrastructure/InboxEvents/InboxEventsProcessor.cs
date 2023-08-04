@@ -57,7 +57,7 @@ public class InboxEventsProcessor
             try
             {
                 var notifications = await MapperFor(inboxEvent.EventType)
-                    .MapFromAsync(inboxEvent.EventPayload, inboxEvent.ReferenceId).ConfigureAwait(false);
+                    .MapFromAsync(inboxEvent.EventPayload, inboxEvent.ReferenceId, cancellationToken).ConfigureAwait(false);
                 foreach (var notification in notifications)
                 {
                     await _mediator.Publish(
