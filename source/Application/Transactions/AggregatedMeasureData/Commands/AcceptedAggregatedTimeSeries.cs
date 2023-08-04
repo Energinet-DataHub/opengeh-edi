@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Application.Configuration.Commands.Commands;
 using Domain.Transactions.AggregatedMeasureData;
 
@@ -21,6 +22,7 @@ namespace Application.Transactions.AggregatedMeasureData.Commands;
 
 public class AcceptedAggregatedTimeSeries : InternalCommand
 {
+    [JsonConstructor]
     public AcceptedAggregatedTimeSeries(Guid processId, IReadOnlyList<AggregatedTimeSerie> notificationAggregatedTimeSerie)
     {
         ProcessId = processId;

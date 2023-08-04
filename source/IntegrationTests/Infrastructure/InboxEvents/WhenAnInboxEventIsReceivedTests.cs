@@ -90,10 +90,7 @@ public class WhenAnInboxEventIsReceivedTests : TestBase
 
     private static byte[] CreateEventPayload(TestInboxEvent @event)
     {
-        return JsonSerializer.SerializeToUtf8Bytes(new List<TestInboxEvent>
-        {
-            @event,
-        });
+        return JsonSerializer.SerializeToUtf8Bytes(@event);
     }
 
     private Task EventIsReceived(string eventId)

@@ -16,7 +16,7 @@ namespace IntegrationTests.Infrastructure.InboxEvents;
 #pragma warning disable
 public class TestInboxEvent
 {
-    public TestInboxEvent(string eventProperty)
+    public TestInboxEvent(string? eventProperty = "test")
     {
         EventProperty = eventProperty;
     }

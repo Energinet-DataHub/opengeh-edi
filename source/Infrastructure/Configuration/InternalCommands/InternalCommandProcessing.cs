@@ -56,6 +56,7 @@ internal static class InternalCommandProcessing
         mapper.Add("Aggregations.ForwardAggregationResult", typeof(ForwardAggregationResult));
         mapper.Add("NotifyWholesaleOfAggregatedMeasureDataRequest", typeof(NotifyWholesaleOfAggregatedMeasureDataRequest));
         mapper.Add("SendAggregatedMeasureRequestToWholesale", typeof(SendAggregatedMeasureRequestToWholesale));
+        mapper.Add("AcceptedAggregatedTimeSeries", typeof(AcceptedAggregatedTimeSeries));
 
         return mapper;
     }
