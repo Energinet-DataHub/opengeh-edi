@@ -103,6 +103,8 @@ namespace Domain.Transactions.AggregatedMeasureData
 
         public string RequestedByActorRoleCode { get; }
 
+        public string? ResponseData { get; set; }
+
         public void SendToWholesale()
         {
             if (_state == State.Initialized)
@@ -120,15 +122,12 @@ namespace Domain.Transactions.AggregatedMeasureData
             }
         }
 
-        public void WasAccepted(IReadOnlyList<AggregatedTimeSerie> aggregatedTimeSerie)
+        public void WasAccepted(string responseData)
         {
             if (_state == State.Sent)
             {
                 _state = State.Accepted;
-                //TODO: How to store aggregatedTimeSerie
-                //TODO: create handle for AggregatedMeasureProcessWasAccepted domain event => creates new internal command
-                //TODO: new handler for internal command which is responsible for publishing a new AggregationResultAvailable.
-                //AggregatedTimeSeriesResponse = aggregatedTimeSerie;
+                ResponseData = responseData;
                 AddDomainEvent(new AggregatedMeasureProcessWasAccepted(ProcessId));
             }
         }

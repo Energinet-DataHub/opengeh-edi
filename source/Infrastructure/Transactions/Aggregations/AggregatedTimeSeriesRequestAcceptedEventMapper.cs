@@ -80,20 +80,6 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         return inboxEvent.ToString();
     }
 
-    // private static string MapReceiver(AggregatedMeasureDataProcess process)
-    // {
-    //     return process.RequestedByActorId.Value;
-    // }
-    //
-    // private static string MapReceiverRole(AggregatedMeasureDataProcess process)
-    // {
-    //     return MarketRole.FromCode(process.RequestedByActorRoleCode).Name;
-    // }
-    //
-    // private static string? MapOriginalTransactionIdReference(AggregatedMeasureDataProcess process)
-    // {
-    //     return process.BusinessTransactionId.Id;
-    // }
     private static string MapMeteringPointType(Serie serie)
     {
         return serie.TimeSeriesType switch
@@ -123,25 +109,6 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         return points.AsReadOnly();
     }
 
-    // private static ActorGrouping MapActorGrouping(AggregatedMeasureDataProcess process)
-    // {
-    //     return new ActorGrouping(process.EnergySupplierId, process.BalanceResponsibleId);
-    // }
-    //
-    // private static string? MapSettlementMethod(AggregatedMeasureDataProcess process)
-    // {
-    //     var settlementTypeName = null as string;
-    //     try
-    //     {
-    //         settlementTypeName = SettlementType.From(process.SettlementMethod ?? string.Empty).Name;
-    //     }
-    //     catch (InvalidCastException)
-    //     {
-    //         // Settlement type for Production is set to null.
-    //     }
-    //
-    //     return settlementTypeName;
-    // }
     private static Domain.Transactions.Aggregations.Period MapPeriod(Period period)
     {
         return new Domain.Transactions.Aggregations.Period(period.StartOfPeriod.ToInstant(), period.EndOfPeriod.ToInstant());
@@ -168,10 +135,6 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         };
     }
 
-    // private static string MapBusinessReason(AggregatedMeasureDataProcess process)
-    // {
-    //     return CimCode.To(process.BusinessReason).Name;
-    // }
     private static string MapQuality(QuantityQuality quality)
     {
         return quality switch

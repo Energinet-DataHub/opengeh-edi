@@ -19,6 +19,7 @@ using Application.Transactions.AggregatedMeasureData.Commands;
 using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
 using Domain.Transactions.Exceptions;
+using Infrastructure.Configuration.Serialization;
 using MediatR;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData.Handlers;
@@ -26,10 +27,14 @@ namespace Infrastructure.Transactions.AggregatedMeasureData.Handlers;
 public class AcceptedAggregatedTimeSeriesFromWholesale : IRequestHandler<AcceptedAggregatedTimeSeries, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
+    private readonly ISerializer _serializer;
 
-    public AcceptedAggregatedTimeSeriesFromWholesale(IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
+    public AcceptedAggregatedTimeSeriesFromWholesale(
+        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository,
+        ISerializer serializer)
     {
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
+        _serializer = serializer;
     }
 
     public async Task<Unit> Handle(AcceptedAggregatedTimeSeries request, CancellationToken cancellationToken)
@@ -40,7 +45,7 @@ public class AcceptedAggregatedTimeSeriesFromWholesale : IRequestHandler<Accepte
                           .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false)
                       ?? throw ProcessNotFoundException.ProcessForProcessIdNotFound(request.ProcessId);
 
-        process.WasAccepted(request.NotificationAggregatedTimeSerie);
+        process.WasAccepted(_serializer.Serialize(request.NotificationAggregatedTimeSerie));
 
         return Unit.Value;
     }

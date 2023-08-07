@@ -18,14 +18,14 @@ namespace Domain.Transactions.AggregatedMeasureData;
 
 public class AggregatedTimeSerie
 {
-    public AggregatedTimeSerie(IReadOnlyList<Point> points, string meteringPointType, string unitType, string resolution, Period period, GridAreaDetails gridAreaDetailsAsync)
+    public AggregatedTimeSerie(IReadOnlyList<Point> points, string meteringPointType, string unitType, string resolution, Period period, GridAreaDetails gridAreaDetails)
     {
         Points = points;
         MeteringPointType = meteringPointType;
         UnitType = unitType;
         Resolution = resolution;
         Period = period;
-        GridAreaDetailsAsync = gridAreaDetailsAsync;
+        GridAreaDetails = gridAreaDetails;
     }
 
     public IReadOnlyList<Point> Points { get; }
@@ -38,5 +38,5 @@ public class AggregatedTimeSerie
 
     public Period Period { get; }
 
-    public GridAreaDetails GridAreaDetailsAsync { get; }
+    public GridAreaDetails GridAreaDetails { get; }
 }
