@@ -51,12 +51,22 @@ namespace Domain.Transactions.AggregatedMeasureData
             BalanceResponsibleId = balanceResponsibleId;
             RequestedByActorId = requestedByActorId;
             RequestedByActorRoleCode = requestedByActorRoleCode;
+            AddDomainEvent(new AggregatedMeasureProcessIsStarted(processId));
+        }
 
-            //Ensures that ORM doesn't create domain event when loading this entity.
-            if (_state == State.Initialized)
-            {
-                AddDomainEvent(new AggregatedMeasureProcessIsStarted(processId));
-            }
+        /// <summary>
+        /// DO NOT DELETE THIS OR CREATE A CONSTRUCTOR WITH LESS PARAMETERS.
+        /// Entity Framework needs this, since it uses the constructor with the least parameters.
+        /// Thereafter assign the rest of the parameters via reflection.
+        /// To avoid throwing domainEvents when EF loads entity from database
+        /// </summary>
+        /// <param name="state"></param>
+        /// <remarks> Dont use this! </remarks>
+#pragma warning disable CS8618
+        private AggregatedMeasureDataProcess(State state)
+#pragma warning restore CS8618
+        {
+            _state = state;
         }
 
         public enum State
@@ -64,7 +74,7 @@ namespace Domain.Transactions.AggregatedMeasureData
             Initialized,
             Sending,
             Sent,
-            Accepted, // TODO: LRN this would indicate that the process is completed, is only property to  describe state enough?
+            Accepted,
             Rejected,
         }
 

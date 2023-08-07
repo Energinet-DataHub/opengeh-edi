@@ -27,11 +27,11 @@ using Xunit.Categories;
 namespace IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
 [IntegrationTest]
-public class RequestAggregatedMeasureDataFromWholesaleTests : TestBase
+public class AggregatedMeasureDataRequestFromWholesaleTests : TestBase
 {
     private readonly B2BContext _b2BContext;
 
-    public RequestAggregatedMeasureDataFromWholesaleTests(DatabaseFixture databaseFixture)
+    public AggregatedMeasureDataRequestFromWholesaleTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _b2BContext = GetService<B2BContext>();
