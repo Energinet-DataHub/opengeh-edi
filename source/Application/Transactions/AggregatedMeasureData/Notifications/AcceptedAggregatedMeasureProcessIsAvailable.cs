@@ -34,8 +34,6 @@ public class AcceptedAggregatedMeasureProcessIsAvailable : INotificationHandler<
     public async Task Handle(AggregatedMeasureProcessWasAccepted notification, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(notification);
-
-        if (notification == null) throw new ArgumentNullException(nameof(notification));
         await _commandScheduler.EnqueueAsync(new CreateAggregatedMeasureAggregationResults(notification.ProcessId.Id)).ConfigureAwait(false);
     }
 }

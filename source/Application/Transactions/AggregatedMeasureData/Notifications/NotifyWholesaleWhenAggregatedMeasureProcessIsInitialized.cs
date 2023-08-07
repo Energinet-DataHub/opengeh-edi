@@ -22,16 +22,16 @@ using MediatR;
 
 namespace Application.Transactions.AggregatedMeasureData.Notifications;
 
-public class NotifyWholesaleWhenAggregatedMeasureProcessIsStarted : INotificationHandler<AggregatedMeasureProcessIsStarted>
+public class NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized : INotificationHandler<AggregatedMeasureProcessIsInitialized>
 {
     private readonly ICommandScheduler _commandScheduler;
 
-    public NotifyWholesaleWhenAggregatedMeasureProcessIsStarted(ICommandScheduler commandScheduler)
+    public NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized(ICommandScheduler commandScheduler)
     {
         _commandScheduler = commandScheduler;
     }
 
-    public async Task Handle(AggregatedMeasureProcessIsStarted notification, CancellationToken cancellationToken)
+    public async Task Handle(AggregatedMeasureProcessIsInitialized notification, CancellationToken cancellationToken)
     {
         if (notification == null) throw new ArgumentNullException(nameof(notification));
         await _commandScheduler.EnqueueAsync(new NotifyWholesaleOfAggregatedMeasureDataRequest(notification.ProcessId.Id)).ConfigureAwait(false);

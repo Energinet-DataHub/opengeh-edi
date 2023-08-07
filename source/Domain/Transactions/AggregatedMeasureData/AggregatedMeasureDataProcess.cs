@@ -51,7 +51,7 @@ namespace Domain.Transactions.AggregatedMeasureData
             BalanceResponsibleId = balanceResponsibleId;
             RequestedByActorId = requestedByActorId;
             RequestedByActorRoleCode = requestedByActorRoleCode;
-            AddDomainEvent(new AggregatedMeasureProcessIsStarted(processId));
+            AddDomainEvent(new AggregatedMeasureProcessIsInitialized(processId));
         }
 
         /// <summary>

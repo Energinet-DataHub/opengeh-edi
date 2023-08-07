@@ -14,9 +14,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.Commands;
 using Application.Transactions.AggregatedMeasureData.Commands;
 using Application.Transactions.Aggregations;
 using Domain.Actors;
@@ -27,6 +27,9 @@ using Domain.Transactions.Exceptions;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.Common;
 using MediatR;
+using GridAreaDetails = Domain.Transactions.Aggregations.GridAreaDetails;
+using Period = Domain.Transactions.Aggregations.Period;
+using Point = Domain.Transactions.Aggregations.Point;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData.Handlers;
 
@@ -60,15 +63,15 @@ public class CreateAggregatedMeasureAggregationResultsHandler : IRequestHandler<
         {
             var notification = new AggregationResultAvailable(
                 new Aggregation(
-                    timeSerie.Points,
+                    MapPoints(timeSerie.Points),
                     timeSerie.MeteringPointType,
                     timeSerie.UnitType,
                     timeSerie.Resolution,
-                    timeSerie.Period,
+                    MapPeriod(timeSerie.Period),
                     MapSettlementMethod(process),
                     MapBusinessReason(process),
                     MapActorGrouping(process),
-                    timeSerie.GridAreaDetails,
+                    MapGridAreaDetails(timeSerie.GridAreaDetails),
                     process.BusinessTransactionId.Id,
                     process.RequestedByActorId.Value,
                     MapReceiverRole(process)));
@@ -80,6 +83,21 @@ public class CreateAggregatedMeasureAggregationResultsHandler : IRequestHandler<
         }
 
         return Unit.Value;
+    }
+
+    private static GridAreaDetails MapGridAreaDetails(Domain.Transactions.AggregatedMeasureData.GridAreaDetails timeSerieGridAreaDetails)
+    {
+        return new GridAreaDetails(timeSerieGridAreaDetails.GridAreaCode, timeSerieGridAreaDetails.OperatorNumber);
+    }
+
+    private static Period MapPeriod(Domain.Transactions.AggregatedMeasureData.Period timeSeriePeriod)
+    {
+        return new Period(timeSeriePeriod.Start, timeSeriePeriod.End);
+    }
+
+    private static List<Point> MapPoints(IReadOnlyList<Domain.Transactions.AggregatedMeasureData.Point> points)
+    {
+        return points.Select(point => new Point(point.Position, point.Quantity, point.Quality, point.SampleTime)).ToList();
     }
 
     private static string MapReceiverRole(AggregatedMeasureDataProcess process)

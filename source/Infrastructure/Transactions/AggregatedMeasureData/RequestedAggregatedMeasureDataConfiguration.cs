@@ -34,7 +34,7 @@ internal static class RequestedAggregatedMeasureDataConfiguration
         services.AddTransient<IRequestHandler<CreateAggregatedMeasureAggregationResults, Unit>, CreateAggregatedMeasureAggregationResultsHandler>();
         services.AddTransient<IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>, SendAggregatedMeasuredDataToWholesale>();
         services.AddTransient<IRequestHandler<AcceptedAggregatedTimeSeries, Unit>, AcceptedAggregatedTimeSeriesFromWholesale>();
-        services.AddTransient<INotificationHandler<AggregatedMeasureProcessIsStarted>, NotifyWholesaleWhenAggregatedMeasureProcessIsStarted>();
+        services.AddTransient<INotificationHandler<AggregatedMeasureProcessIsInitialized>, NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized>();
         services.AddTransient<INotificationHandler<AggregatedMeasureProcessWasAccepted>, AcceptedAggregatedMeasureProcessIsAvailable>();
         services.AddTransient<INotificationHandler<AggregatedMeasureProcessIsSending>, SendAggregatedMeasureRequestToWholesaleWhenProcessIsSending>();
         services.AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>, WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable>();

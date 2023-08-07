@@ -18,6 +18,7 @@ using Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
+using Period = Energinet.DataHub.Edi.Responses.Period;
 using Serie = Energinet.DataHub.Edi.Responses.Serie;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData;

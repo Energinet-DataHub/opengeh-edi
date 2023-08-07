@@ -19,7 +19,6 @@ using System.Threading.Tasks;
 using Application.Transactions.AggregatedMeasureData;
 using Application.Transactions.Aggregations;
 using Domain.OutgoingMessages;
-using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
 using Domain.Transactions.Aggregations;
 using Energinet.DataHub.Edi.Responses;
@@ -27,7 +26,9 @@ using Google.Protobuf.Collections;
 using Infrastructure.InboxEvents;
 using MediatR;
 using NodaTime.Serialization.Protobuf;
+using GridAreaDetails = Domain.Transactions.AggregatedMeasureData.GridAreaDetails;
 using Period = Energinet.DataHub.Edi.Responses.Period;
+using Point = Domain.Transactions.AggregatedMeasureData.Point;
 using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
 using Serie = Energinet.DataHub.Edi.Responses.Serie;
 
@@ -109,9 +110,9 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         return points.AsReadOnly();
     }
 
-    private static Domain.Transactions.Aggregations.Period MapPeriod(Period period)
+    private static Domain.Transactions.AggregatedMeasureData.Period MapPeriod(Period period)
     {
-        return new Domain.Transactions.Aggregations.Period(period.StartOfPeriod.ToInstant(), period.EndOfPeriod.ToInstant());
+        return new Domain.Transactions.AggregatedMeasureData.Period(period.StartOfPeriod.ToInstant(), period.EndOfPeriod.ToInstant());
     }
 
     private static string MapResolution(Resolution resolution)
