@@ -14,7 +14,6 @@
 
 using Domain.Actors;
 using Domain.Documents;
-using Domain.OutgoingMessages;
 using NodaTime;
 
 namespace Domain.ArchivedMessages;
