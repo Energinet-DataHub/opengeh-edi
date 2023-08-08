@@ -14,8 +14,10 @@
 
 using Application.IncomingMessages.RequestAggregatedMeasureData;
 using Application.Transactions.AggregatedMeasureData;
+using CimMessageAdapter.Messages;
 using Domain.Transactions.AggregatedMeasureData;
 using Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+using Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
 using Infrastructure.Transactions.AggregatedMeasureData.Notifications;
@@ -36,6 +38,7 @@ internal static class RequestedAggregatedMeasureDataConfiguration
         services.AddTransient<IRequestHandler<AcceptedAggregatedTimeSeries, Unit>, AcceptProcessWhenAcceptedAggregatedTimeSeriesAvailable>();
         services.AddTransient<INotificationHandler<AggregatedMeasureProcessIsInitialized>, NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized>();
         services.AddTransient<INotificationHandler<AggregatedMeasureProcessWasAccepted>, AcceptedAggregatedMeasureProcessIsAvailable>();
+        services.AddTransient<IRequestHandler<ReceiveAggregatedMeasureDataRequest, Result>, ValidateAggregatedMeasureDataRequestHandler>();
         services.AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>, WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable>();
         services.AddScoped<WholesaleInbox>();
         services.AddScoped<IAggregatedMeasureDataProcessRepository, AggregatedMeasureDataProcessRepository>();
