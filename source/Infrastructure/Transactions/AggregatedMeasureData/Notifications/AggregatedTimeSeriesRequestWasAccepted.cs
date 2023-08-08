@@ -12,18 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Domain.Transactions.AggregatedMeasureData;
+using System;
+using System.Collections.Generic;
+using Domain.Transactions.AggregatedMeasureData;
+using MediatR;
 
-/// <summary>
-/// Responsible for send AggregatedMeasureDataTransactionRequest to a Receiver
-/// </summary>
-public interface IAggregatedMeasureDataSender
+namespace Infrastructure.Transactions.AggregatedMeasureData.Notifications;
+
+public class AggregatedTimeSeriesRequestWasAccepted : INotification
 {
-    /// <summary>
-    /// Sending request to Receiver
-    /// </summary>
-    /// <param name="request"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-    Task SendAsync(AggregatedMeasureDataTransactionRequest request, CancellationToken cancellationToken);
+    public AggregatedTimeSeriesRequestWasAccepted(Guid processId, IReadOnlyList<AggregatedTimeSerie> aggregatedTimeSerie)
+    {
+        ProcessId = processId;
+        AggregatedTimeSerie = aggregatedTimeSerie;
+    }
+
+    public Guid ProcessId { get; }
+
+    public IReadOnlyList<AggregatedTimeSerie> AggregatedTimeSerie { get; }
 }

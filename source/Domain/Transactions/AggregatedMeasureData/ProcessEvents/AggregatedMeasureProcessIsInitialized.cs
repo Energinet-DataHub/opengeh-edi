@@ -14,7 +14,7 @@
 
 using Domain.SeedWork;
 
-namespace Domain.Transactions.AggregatedMeasureData.Events;
+namespace Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 
 public class AggregatedMeasureProcessIsInitialized : DomainEvent
 {

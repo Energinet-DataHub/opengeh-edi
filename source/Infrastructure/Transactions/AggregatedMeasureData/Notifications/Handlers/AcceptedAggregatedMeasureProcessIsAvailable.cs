@@ -16,11 +16,11 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.Commands;
-using Application.Transactions.AggregatedMeasureData.Commands;
-using Domain.Transactions.AggregatedMeasureData.Events;
+using Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+using Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using MediatR;
 
-namespace Application.Transactions.AggregatedMeasureData.Notifications;
+namespace Infrastructure.Transactions.AggregatedMeasureData.Notifications.Handlers;
 
 public class AcceptedAggregatedMeasureProcessIsAvailable : INotificationHandler<AggregatedMeasureProcessWasAccepted>
 {

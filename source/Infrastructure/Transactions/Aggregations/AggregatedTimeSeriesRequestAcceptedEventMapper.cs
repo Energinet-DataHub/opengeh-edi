@@ -24,6 +24,7 @@ using Domain.Transactions.Aggregations;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.Collections;
 using Infrastructure.InboxEvents;
+using Infrastructure.Transactions.AggregatedMeasureData.Notifications;
 using MediatR;
 using NodaTime.Serialization.Protobuf;
 using GridAreaDetails = Domain.Transactions.AggregatedMeasureData.GridAreaDetails;

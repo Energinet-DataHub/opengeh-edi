@@ -12,21 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Domain.Transactions.AggregatedMeasureData;
+using System;
+using System.Text.Json.Serialization;
+using Application.Configuration.Commands.Commands;
 
-public class AggregatedMeasureDataException : Exception
+namespace Infrastructure.Transactions.AggregatedMeasureData.Commands;
+
+public class SendAggregatedMeasureRequestToWholesale : InternalCommand
 {
-    public AggregatedMeasureDataException(string message)
-        : base(message)
+    [JsonConstructor]
+    public SendAggregatedMeasureRequestToWholesale(Guid processId)
     {
+        ProcessId = processId;
     }
 
-    public AggregatedMeasureDataException()
-    {
-    }
-
-    public AggregatedMeasureDataException(string message, Exception innerException)
-        : base(message, innerException)
-    {
-    }
+    public Guid ProcessId { get; }
 }

@@ -16,7 +16,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Domain.Transactions.AggregatedMeasureData;
-using Domain.Transactions.AggregatedMeasureData.Events;
+using Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Infrastructure.Configuration.DataAccess;
 using IntegrationTests.Application.IncomingMessages;
 using IntegrationTests.Fixtures;
@@ -43,7 +43,6 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         var incomingMessage = MessageBuilder().Build();
         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
         var process = GetProcess(incomingMessage.MessageHeader.SenderId);
-        process!.SendToWholesale();
         process!.WasSentToWholesale();
 
         // Act
@@ -53,6 +52,27 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         var domainEvents =
             process.DomainEvents.Where(x => x is AggregatedMeasureProcessWasAccepted);
 
+        Assert.Single(domainEvents);
+        AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);
+    }
+
+    [Fact]
+    public async Task Aggregated_measure_data_process_cannot_be_send_to_wholesale_twice()
+    {
+        // Arrange
+        var incomingMessage = MessageBuilder().Build();
+        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
+        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
+        process!.WasSentToWholesale();
+
+        // Act
+        process.WasAccepted(string.Empty);
+        process.WasAccepted(string.Empty);
+
+        // Assert
+        var domainEvents =
+            process.DomainEvents.Where(x => x is AggregatedMeasureProcessWasAccepted);
+        Assert.Equal(incomingMessage.MarketActivityRecord.Id, process.BusinessTransactionId.Id);
         Assert.Single(domainEvents);
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);
     }

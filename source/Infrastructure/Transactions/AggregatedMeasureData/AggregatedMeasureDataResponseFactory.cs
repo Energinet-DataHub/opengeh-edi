@@ -23,7 +23,7 @@ using Serie = Energinet.DataHub.Edi.Responses.Serie;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData;
 
-public static class AggregatedMeasureDataProcessFactory
+public static class AggregatedMeasureDataResponseFactory
 {
     // TODO: consider moving this to another class
     public static ServiceBusMessage CreateServiceBusMessage(AggregatedMeasureDataProcess process)

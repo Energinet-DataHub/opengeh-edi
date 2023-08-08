@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Transactions.AggregatedMeasureData.Commands;
 using Application.Transactions.Aggregations;
 using Domain.Actors;
 using Domain.Transactions;
@@ -31,15 +30,15 @@ using GridAreaDetails = Domain.Transactions.Aggregations.GridAreaDetails;
 using Period = Domain.Transactions.Aggregations.Period;
 using Point = Domain.Transactions.Aggregations.Point;
 
-namespace Infrastructure.Transactions.AggregatedMeasureData.Handlers;
+namespace Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
 
-public class CreateAggregatedMeasureAggregationResultsHandler : IRequestHandler<CreateAggregatedMeasureAggregationResults, Unit>
+public class MakeAggregatedMeasureAsAggregationResults : IRequestHandler<CreateAggregatedMeasureAggregationResults, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
     private readonly ISerializer _serializer;
     private readonly IMediator _mediator;
 
-    public CreateAggregatedMeasureAggregationResultsHandler(
+    public MakeAggregatedMeasureAsAggregationResults(
         IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository,
         ISerializer serializer,
         IMediator mediator)

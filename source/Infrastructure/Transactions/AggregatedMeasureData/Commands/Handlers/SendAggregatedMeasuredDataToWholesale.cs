@@ -15,14 +15,13 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Transactions.AggregatedMeasureData.Commands;
 using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
 using Domain.Transactions.Exceptions;
 using Infrastructure.Wholesale;
 using MediatR;
 
-namespace Infrastructure.Transactions.AggregatedMeasureData.Handlers;
+namespace Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
 
 public class SendAggregatedMeasuredDataToWholesale
     : IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>

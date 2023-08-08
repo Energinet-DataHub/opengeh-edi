@@ -14,11 +14,12 @@
 
 using Application.IncomingMessages.RequestAggregatedMeasureData;
 using Application.Transactions.AggregatedMeasureData;
-using Application.Transactions.AggregatedMeasureData.Commands;
-using Application.Transactions.AggregatedMeasureData.Notifications;
 using Domain.Transactions.AggregatedMeasureData;
-using Domain.Transactions.AggregatedMeasureData.Events;
-using Infrastructure.Transactions.AggregatedMeasureData.Handlers;
+using Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+using Infrastructure.Transactions.AggregatedMeasureData.Commands;
+using Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
+using Infrastructure.Transactions.AggregatedMeasureData.Notifications;
+using Infrastructure.Transactions.AggregatedMeasureData.Notifications.Handlers;
 using Infrastructure.Wholesale;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,13 +31,11 @@ internal static class RequestedAggregatedMeasureDataConfiguration
     public static void Configure(IServiceCollection services)
     {
         services.AddTransient<IRequestHandler<RequestAggregatedMeasureDataTransaction, Unit>, AggregatedMeasureDataRequestHandler>();
-        services.AddTransient<IRequestHandler<NotifyWholesaleOfAggregatedMeasureDataRequest, Unit>, RequestAggregatedMeasuredDataFromWholesale>();
-        services.AddTransient<IRequestHandler<CreateAggregatedMeasureAggregationResults, Unit>, CreateAggregatedMeasureAggregationResultsHandler>();
+        services.AddTransient<IRequestHandler<CreateAggregatedMeasureAggregationResults, Unit>, MakeAggregatedMeasureAsAggregationResults>();
         services.AddTransient<IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>, SendAggregatedMeasuredDataToWholesale>();
-        services.AddTransient<IRequestHandler<AcceptedAggregatedTimeSeries, Unit>, AcceptedAggregatedTimeSeriesFromWholesale>();
+        services.AddTransient<IRequestHandler<AcceptedAggregatedTimeSeries, Unit>, AcceptProcessWhenAcceptedAggregatedTimeSeriesAvailable>();
         services.AddTransient<INotificationHandler<AggregatedMeasureProcessIsInitialized>, NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized>();
         services.AddTransient<INotificationHandler<AggregatedMeasureProcessWasAccepted>, AcceptedAggregatedMeasureProcessIsAvailable>();
-        services.AddTransient<INotificationHandler<AggregatedMeasureProcessIsSending>, SendAggregatedMeasureRequestToWholesaleWhenProcessIsSending>();
         services.AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>, WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable>();
         services.AddScoped<WholesaleInbox>();
         services.AddScoped<IAggregatedMeasureDataProcessRepository, AggregatedMeasureDataProcessRepository>();

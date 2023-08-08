@@ -14,7 +14,7 @@
 
 using Domain.Actors;
 using Domain.SeedWork;
-using Domain.Transactions.AggregatedMeasureData.Events;
+using Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using NodaTime;
 
 namespace Domain.Transactions.AggregatedMeasureData
@@ -72,7 +72,6 @@ namespace Domain.Transactions.AggregatedMeasureData
         public enum State
         {
             Initialized,
-            Sending,
             Sent,
             Accepted,
             Rejected,
@@ -115,18 +114,9 @@ namespace Domain.Transactions.AggregatedMeasureData
 
         public string? ResponseData { get; set; }
 
-        public void SendToWholesale()
-        {
-            if (_state == State.Initialized)
-            {
-                _state = State.Sending;
-                AddDomainEvent(new AggregatedMeasureProcessIsSending(ProcessId));
-            }
-        }
-
         public void WasSentToWholesale()
         {
-            if (_state == State.Sending)
+            if (_state == State.Initialized)
             {
                 _state = State.Sent;
             }

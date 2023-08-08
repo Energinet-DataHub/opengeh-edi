@@ -17,7 +17,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Domain.Transactions.AggregatedMeasureData;
-using Domain.Transactions.AggregatedMeasureData.Events;
 using Infrastructure.Configuration.DataAccess;
 using IntegrationTests.Application.IncomingMessages;
 using IntegrationTests.Fixtures;
@@ -42,15 +41,14 @@ public class AggregatedMeasureDataRequestFromWholesaleTests : TestBase
     {
         // Arrange
         var incomingMessage = MessageBuilder().Build();
-        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
 
         // Act
-        process!.SendToWholesale();
+        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
 
         // Assert
-        Assert.Equal(process.BusinessTransactionId.Id, incomingMessage.MarketActivityRecord.Id);
-        AssertProcessState(process, AggregatedMeasureDataProcess.State.Sending);
+        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
+        Assert.Equal(process!.BusinessTransactionId.Id, incomingMessage.MarketActivityRecord.Id);
+        AssertProcessState(process, AggregatedMeasureDataProcess.State.Initialized);
     }
 
     [Fact]
@@ -62,32 +60,11 @@ public class AggregatedMeasureDataRequestFromWholesaleTests : TestBase
         var process = GetProcess(incomingMessage.MessageHeader.SenderId);
 
         // Act
-        process!.SendToWholesale();
         process!.WasSentToWholesale();
 
         // Assert
         Assert.Equal(process.BusinessTransactionId.Id, incomingMessage.MarketActivityRecord.Id);
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Sent);
-    }
-
-    [Fact]
-    public async Task Aggregated_measure_data_process_cannot_be_send_to_wholesale_twice()
-    {
-        // Arrange
-        var incomingMessage = MessageBuilder().Build();
-        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
-
-        // Act
-        process!.SendToWholesale();
-        process!.SendToWholesale();
-
-        // Assert
-        var aggregatedMeasureProcessIsSendingDomainEvents =
-            process.DomainEvents.Where(x => x is AggregatedMeasureProcessIsSending);
-        Assert.Equal(incomingMessage.MarketActivityRecord.Id, process.BusinessTransactionId.Id);
-        Assert.Single(aggregatedMeasureProcessIsSendingDomainEvents);
-        AssertProcessState(process, AggregatedMeasureDataProcess.State.Sending);
     }
 
     protected override void Dispose(bool disposing)

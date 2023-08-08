@@ -45,7 +45,7 @@ public class WholesaleInbox : IWholesaleInbox
         // AggregatedMeasuredDataAcceptedResponse.proto and send it to our own inbox.
         // Such that we can continue implementing peek of aggregated measured data.
         await _senderCreator.SendAsync(
-            AggregatedMeasureDataProcessFactory.CreateServiceBusMessage(request),
+            AggregatedMeasureDataResponseFactory.CreateServiceBusMessage(request),
             cancellationToken).ConfigureAwait(false);
     }
 }

@@ -15,36 +15,36 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Transactions.AggregatedMeasureData.Commands;
 using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
 using Domain.Transactions.Exceptions;
+using Infrastructure.Configuration.Serialization;
 using MediatR;
 
-namespace Infrastructure.Transactions.AggregatedMeasureData.Handlers;
+namespace Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
 
-public class RequestAggregatedMeasuredDataFromWholesale
-    : IRequestHandler<NotifyWholesaleOfAggregatedMeasureDataRequest, Unit>
+public class AcceptProcessWhenAcceptedAggregatedTimeSeriesAvailable : IRequestHandler<AcceptedAggregatedTimeSeries, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
+    private readonly ISerializer _serializer;
 
-    public RequestAggregatedMeasuredDataFromWholesale(
-        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
+    public AcceptProcessWhenAcceptedAggregatedTimeSeriesAvailable(
+        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository,
+        ISerializer serializer)
     {
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
+        _serializer = serializer;
     }
 
-    public async Task<Unit> Handle(
-        NotifyWholesaleOfAggregatedMeasureDataRequest request,
-        CancellationToken cancellationToken)
+    public async Task<Unit> Handle(AcceptedAggregatedTimeSeries request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         var process = await _aggregatedMeasureDataProcessRepository
-            .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false)
-            ?? throw ProcessNotFoundException.ProcessForProcessIdNotFound(request.ProcessId);
+                          .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false)
+                      ?? throw ProcessNotFoundException.ProcessForProcessIdNotFound(request.ProcessId);
 
-        process.SendToWholesale();
+        process.WasAccepted(_serializer.Serialize(request.NotificationAggregatedTimeSeries));
 
         return Unit.Value;
     }

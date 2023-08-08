@@ -12,16 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+using System;
+using System.Text.Json.Serialization;
+using Application.Configuration.Commands.Commands;
 
-namespace Domain.Transactions.AggregatedMeasureData.Events;
+namespace Infrastructure.Transactions.AggregatedMeasureData.Commands;
 
-public class AggregatedMeasureProcessIsSending : DomainEvent
+public class CreateAggregatedMeasureAggregationResults : InternalCommand
 {
-    public AggregatedMeasureProcessIsSending(ProcessId processId)
+    [JsonConstructor]
+    public CreateAggregatedMeasureAggregationResults(Guid processId)
     {
         ProcessId = processId;
     }
 
-    public ProcessId ProcessId { get; }
+    public Guid ProcessId { get; }
 }
