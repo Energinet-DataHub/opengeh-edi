@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Infrastructure.Configuration.MessageBus;
+using Application.Wholesale;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.WholeSale;
+namespace Infrastructure.Wholesale;
 
-public class WholeSaleServiceBusClientConfiguration : IServiceBusClientConfiguration
+public static class WholesaleInboxConfiguration
 {
-    public WholeSaleServiceBusClientConfiguration(string queueName)
+    public static void Configure(IServiceCollection services)
     {
-        QueueName = queueName;
+       services.AddTransient<IWholesaleInbox, WholesaleInbox>();
     }
-
-    public string QueueName { get; }
 }

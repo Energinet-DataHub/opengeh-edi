@@ -12,21 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using Application.Configuration.Commands.Commands;
-using Domain.Transactions;
-using MediatR;
 
 namespace Application.Transactions.AggregatedMeasureData.Notifications;
 
 public class NotifyWholesaleOfAggregatedMeasureDataRequest : InternalCommand
 {
     [JsonConstructor]
-    public NotifyWholesaleOfAggregatedMeasureDataRequest(ProcessId processId)
+    public NotifyWholesaleOfAggregatedMeasureDataRequest(Guid processId)
     {
         ProcessId = processId;
     }
 
-    public ProcessId ProcessId { get; }
+    public Guid ProcessId { get; }
 }

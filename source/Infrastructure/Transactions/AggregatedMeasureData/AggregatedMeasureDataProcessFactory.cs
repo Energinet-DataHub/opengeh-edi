@@ -16,6 +16,7 @@ using System;
 using Azure.Messaging.ServiceBus;
 using Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.Edi.Responses;
+using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Serie = Energinet.DataHub.Edi.Responses.Serie;
 
@@ -29,11 +30,11 @@ public static class AggregatedMeasureDataProcessFactory
         var bodyFromWholesaleMock = CreateResponseFromWholeSaleTemp(process);
         var message = new ServiceBusMessage()
         {
-            Body = new BinaryData(bodyFromWholesaleMock),
-            Subject = nameof(process),
+            Body = new BinaryData(bodyFromWholesaleMock.ToByteArray()),
+            Subject = nameof(AggregatedTimeSeriesRequestAccepted),
             MessageId = process.ProcessId.Id.ToString(),
         };
-        message.ApplicationProperties.Add("RequestId", process.ProcessId.Id.ToString());
+        message.ApplicationProperties.Add("ReferenceId", process.ProcessId.Id.ToString());
 
         return message;
     }
@@ -56,12 +57,14 @@ public static class AggregatedMeasureDataProcessFactory
         {
             Quantity = quantity,
             QuantityQuality = QuantityQuality.Incomplete,
+            Time = new Timestamp() { Seconds = 1, },
         };
 
         var period = new Period()
         {
             StartOfPeriod = new Timestamp() { Seconds = aggregatedMeasureDataProcess.StartOfPeriod.ToUnixTimeSeconds(), },
             EndOfPeriod = new Timestamp() { Seconds = aggregatedMeasureDataProcess.EndOfPeriod?.ToUnixTimeSeconds() ?? 1, },
+            Resolution = Resolution.Pt15M,
         };
 
         return new Serie()
@@ -74,6 +77,7 @@ public static class AggregatedMeasureDataProcessFactory
             QuantityUnit = QuantityUnit.Kwh,
             Period = period,
             TimeSeriesPoints = { point },
+            TimeSeriesType = TimeSeriesType.Production,
         };
     }
 }

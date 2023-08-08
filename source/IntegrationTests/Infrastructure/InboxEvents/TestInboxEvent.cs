@@ -11,22 +11,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+namespace IntegrationTests.Infrastructure.InboxEvents;
 
-using System.Threading;
-using System.Threading.Tasks;
-using Domain.Transactions.AggregatedMeasureData;
-
-namespace Application.WholeSale;
-
-/// <summary>
-/// Interface for wholeSale inbox
-/// </summary>
-public interface IWholeSaleInBox
+#pragma warning disable
+public class TestInboxEvent
 {
-    /// <summary>
-    /// Send <paramref name="request"/> to wholeSale
-    /// </summary>
-    /// <param name="request"></param>
-    /// <param name="cancellationToken"></param>
-    Task SendAsync(AggregatedMeasureDataProcess request, CancellationToken cancellationToken);
+    public TestInboxEvent(string eventProperty)
+    {
+        EventProperty = eventProperty;
+    }
+    public string EventProperty { get; set; }
 }

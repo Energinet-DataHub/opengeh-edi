@@ -13,27 +13,22 @@
 // limitations under the License.
 
 using System;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration;
-using Application.WholeSale;
-using Azure.Messaging.ServiceBus;
-using Domain.Transactions;
+using Application.Wholesale;
 using Domain.Transactions.AggregatedMeasureData;
 using Infrastructure.Configuration.MessageBus;
-using Infrastructure.Configuration.Serialization;
 using Infrastructure.Transactions.AggregatedMeasureData;
 
-namespace Infrastructure.WholeSale;
+namespace Infrastructure.Wholesale;
 
-public class WholeSaleInbox : IWholeSaleInBox
+public class WholesaleInbox : IWholesaleInbox
 {
     private readonly IServiceBusSenderAdapter _senderCreator;
 
-    public WholeSaleInbox(
+    public WholesaleInbox(
         IServiceBusSenderFactory serviceBusSenderFactory,
-        WholeSaleServiceBusClientConfiguration wholeSaleServiceBusClientConfiguration)
+        WholesaleServiceBusClientConfiguration wholeSaleServiceBusClientConfiguration)
     {
         if (serviceBusSenderFactory == null) throw new ArgumentNullException(nameof(serviceBusSenderFactory));
         if (wholeSaleServiceBusClientConfiguration == null) throw new ArgumentNullException(nameof(wholeSaleServiceBusClientConfiguration));

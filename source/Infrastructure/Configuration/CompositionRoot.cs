@@ -21,7 +21,6 @@ using Application.Configuration.DataAccess;
 using Application.OutgoingMessages;
 using Application.OutgoingMessages.Common;
 using Application.OutgoingMessages.Common.Reasons;
-using Application.OutgoingMessages.Peek;
 using Application.Transactions.MoveIn;
 using Azure.Messaging.ServiceBus;
 using CimMessageAdapter.Messages;
@@ -39,6 +38,7 @@ using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Infrastructure.Configuration.Processing;
 using Infrastructure.Configuration.Serialization;
+using Infrastructure.InboxEvents;
 using Infrastructure.IncomingMessages;
 using Infrastructure.MasterData.MarketEvaluationPoints;
 using Infrastructure.OutgoingMessages;
@@ -59,7 +59,7 @@ using Infrastructure.Transactions.AggregatedMeasureData;
 using Infrastructure.Transactions.Aggregations;
 using Infrastructure.Transactions.MoveIn;
 using Infrastructure.Transactions.UpdateCustomer;
-using Infrastructure.WholeSale;
+using Infrastructure.Wholesale;
 using MediatR;
 using MediatR.Registration;
 using Microsoft.EntityFrameworkCore;
@@ -97,6 +97,7 @@ namespace Infrastructure.Configuration
             UpdateCustomerMasterDataConfiguration.Configure(services);
             DequeueConfiguration.Configure(services);
             IntegrationEventsConfiguration.Configure(services);
+            InboxEventsConfiguration.Configure(services);
             ArchivedMessageConfiguration.Configure(services);
             QueryHandlingConfiguration.Configure(services);
         }
@@ -307,7 +308,7 @@ namespace Infrastructure.Configuration
 
         private void AddWholeSaleInBox()
         {
-            WholeSaleInboxConfiguration.Configure(_services);
+            WholesaleInboxConfiguration.Configure(_services);
         }
     }
 }

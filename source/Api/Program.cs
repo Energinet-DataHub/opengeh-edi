@@ -29,7 +29,7 @@ using Infrastructure.Configuration.Authentication;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Infrastructure.Transactions;
 using Infrastructure.Transactions.MoveIn;
-using Infrastructure.WholeSale;
+using Infrastructure.Wholesale;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -85,8 +85,8 @@ namespace Api
                     services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration(
                         "NotImplemented"));
 
-                    services.AddSingleton(new WholeSaleServiceBusClientConfiguration(
-                        "NotImplemented"));
+                    services.AddSingleton(new WholesaleServiceBusClientConfiguration(
+                        runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!));
 
                     services.AddSingleton(
                         _ => new RequestChangeOfSupplierTransaction(runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!));
@@ -149,7 +149,8 @@ namespace Api
                     services.AddExternalDomainServiceBusQueuesHealthCheck(
                         runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
                         runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!,
-                        runtime.INCOMING_AGGREGATED_MEASURE_DATA_QUEUE_NAME!);
+                        runtime.INCOMING_AGGREGATED_MEASURE_DATA_QUEUE_NAME!,
+                        runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!);
                     services.AddSqlServerHealthCheck(runtime.DB_CONNECTION_STRING!);
                 })
                 .Build();

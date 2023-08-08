@@ -21,6 +21,8 @@ public sealed class BusinessReason : EnumerationType
     public static readonly BusinessReason MoveIn = new(0, nameof(MoveIn));
     public static readonly BusinessReason BalanceFixing = new(1, nameof(BalanceFixing));
     public static readonly BusinessReason PreliminaryAggregation = new(2, nameof(PreliminaryAggregation));
+    public static readonly BusinessReason WholesaleFixing = new(3, nameof(WholesaleFixing));    //Engrosafiksering
+    public static readonly BusinessReason Correction = new(5, nameof(Correction));
 
     private BusinessReason(int id, string name)
      : base(id, name)
@@ -29,8 +31,8 @@ public sealed class BusinessReason : EnumerationType
 
     public static BusinessReason From(string valueToParse)
     {
-        var processType = GetAll<BusinessReason>().FirstOrDefault(processType =>
+        var businessReason = GetAll<BusinessReason>().FirstOrDefault(processType =>
             processType.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{valueToParse} is not a valid process type");
-        return processType;
+        return businessReason;
     }
 }

@@ -55,7 +55,7 @@ public class RequestAggregatedMeasureDataFromWholesaleTests : TestBase
         var processId = await GetProcessId(incomingMessage.MessageHeader.SenderId).ConfigureAwait(false);
 
         // Act
-        var command = new NotifyWholesaleOfAggregatedMeasureDataRequest(processId);
+        var command = new NotifyWholesaleOfAggregatedMeasureDataRequest(processId.Id);
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
         // Assert

@@ -32,6 +32,8 @@ namespace Api
 
         public virtual string? INCOMING_AGGREGATED_MEASURE_DATA_QUEUE_NAME => GetEnvironmentVariable(nameof(INCOMING_AGGREGATED_MEASURE_DATA_QUEUE_NAME));
 
+        public virtual string? EDI_INBOX_MESSAGE_QUEUE_NAME => GetEnvironmentVariable(nameof(EDI_INBOX_MESSAGE_QUEUE_NAME));
+
         public virtual string? REQUEST_RESPONSE_LOGGING_CONNECTION_STRING =>
             GetEnvironmentVariable(nameof(REQUEST_RESPONSE_LOGGING_CONNECTION_STRING));
 
@@ -46,17 +48,6 @@ namespace Api
 
         public virtual bool ALLOW_TEST_TOKENS =>
             bool.Parse(GetEnvironmentVariable(nameof(ALLOW_TEST_TOKENS)) ?? "false");
-
-        public int MAX_NUMBER_OF_PAYLOADS_IN_BUNDLE
-        {
-            get
-            {
-                var variable = GetEnvironmentVariable(nameof(MAX_NUMBER_OF_PAYLOADS_IN_BUNDLE));
-                return string.IsNullOrWhiteSpace(variable) || int.TryParse(variable, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out var value) == false
-                    ? 500
-                    : value;
-            }
-        }
 
         public virtual Uri AGGREGATION_RESULTS_API_URI =>
             new(GetEnvironmentVariable(nameof(AGGREGATION_RESULTS_API_URI))!);
