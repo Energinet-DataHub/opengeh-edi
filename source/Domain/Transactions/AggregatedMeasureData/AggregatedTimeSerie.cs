@@ -12,26 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text.Json.Serialization;
-using Application.Configuration.Commands.Commands;
-using Domain.Transactions.Aggregations;
+namespace Domain.Transactions.AggregatedMeasureData;
 
-namespace Application.Transactions.Aggregations;
+public record AggregatedTimeSerie(
+    IReadOnlyList<Point> Points,
+    string MeteringPointType,
+    string UnitType,
+    string Resolution,
+    Period Period,
+    GridAreaDetails GridAreaDetails);
 
-public class ForwardAggregationResult : InternalCommand
-{
-    [JsonConstructor]
-    public ForwardAggregationResult(Guid id, Aggregation result)
-    : base(id)
-    {
-        Result = result;
-    }
+public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
 
-    public ForwardAggregationResult(Aggregation result)
-    {
-        Result = result;
-    }
-
-    public Aggregation Result { get; }
-}
+public record GridAreaDetails(string GridAreaCode, string OperatorNumber);

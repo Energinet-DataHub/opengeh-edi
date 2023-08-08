@@ -15,12 +15,12 @@
 using Application.Actors;
 using Application.Configuration.Commands;
 using Application.Configuration.TimeEvents;
-using Application.Transactions.AggregatedMeasureData.Notifications;
 using Application.Transactions.Aggregations;
 using Application.Transactions.MoveIn;
 using Application.Transactions.MoveIn.MasterDataDelivery;
 using Application.Transactions.MoveIn.Notifications;
 using Application.Transactions.UpdateCustomer;
+using Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -53,7 +53,9 @@ internal static class InternalCommandProcessing
         mapper.Add("SetConsumerHasMovedIn", typeof(SetConsumerHasMovedIn));
         mapper.Add("UpdateCustomerMasterData", typeof(UpdateCustomerMasterData));
         mapper.Add("Aggregations.ForwardAggregationResult", typeof(ForwardAggregationResult));
-        mapper.Add("NotifyWholesaleOfAggregatedMeasureDataRequest", typeof(NotifyWholesaleOfAggregatedMeasureDataRequest));
+        mapper.Add("SendAggregatedMeasureRequestToWholesale", typeof(SendAggregatedMeasureRequestToWholesale));
+        mapper.Add("AcceptedAggregatedTimeSeries", typeof(AcceptedAggregatedTimeSeries));
+        mapper.Add("CreateAggregatedMeasureAggregationResults", typeof(CreateAggregatedMeasureAggregationResults));
 
         return mapper;
     }

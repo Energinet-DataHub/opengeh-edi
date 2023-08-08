@@ -12,18 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Domain.Transactions.AggregatedMeasureData;
+using System;
+using System.Text.Json.Serialization;
+using Application.Configuration.Commands.Commands;
 
-/// <summary>
-/// Responsible for send AggregatedMeasureDataTransactionRequest to a Receiver
-/// </summary>
-public interface IAggregatedMeasureDataSender
+namespace Infrastructure.Transactions.AggregatedMeasureData.Commands;
+
+public class CreateAggregatedMeasureAggregationResults : InternalCommand
 {
-    /// <summary>
-    /// Sending request to Receiver
-    /// </summary>
-    /// <param name="request"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-    Task SendAsync(AggregatedMeasureDataTransactionRequest request, CancellationToken cancellationToken);
+    [JsonConstructor]
+    public CreateAggregatedMeasureAggregationResults(Guid processId)
+    {
+        ProcessId = processId;
+    }
+
+    public Guid ProcessId { get; }
 }

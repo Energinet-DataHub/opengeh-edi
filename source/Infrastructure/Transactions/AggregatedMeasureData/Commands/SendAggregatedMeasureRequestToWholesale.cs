@@ -12,17 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Domain.Transactions.AggregatedMeasureData;
+using System;
+using System.Text.Json.Serialization;
+using Application.Configuration.Commands.Commands;
 
-public class AggregatedMeasureDataTransactionRequest
+namespace Infrastructure.Transactions.AggregatedMeasureData.Commands;
+
+public class SendAggregatedMeasureRequestToWholesale : InternalCommand
 {
-    public AggregatedMeasureDataTransactionRequest(MessageHeader message, Serie marketActivityRecord)
+    [JsonConstructor]
+    public SendAggregatedMeasureRequestToWholesale(Guid processId)
     {
-        Message = message;
-        MarketActivityRecord = marketActivityRecord;
+        ProcessId = processId;
     }
 
-    public MessageHeader Message { get; }
-
-    public Serie MarketActivityRecord { get; }
+    public Guid ProcessId { get; }
 }

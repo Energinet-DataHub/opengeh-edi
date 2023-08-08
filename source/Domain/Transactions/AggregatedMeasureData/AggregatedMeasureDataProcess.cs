@@ -14,7 +14,7 @@
 
 using Domain.Actors;
 using Domain.SeedWork;
-using Domain.Transactions.AggregatedMeasureData.Events;
+using Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using NodaTime;
 
 namespace Domain.Transactions.AggregatedMeasureData
@@ -23,7 +23,7 @@ namespace Domain.Transactions.AggregatedMeasureData
     {
         private State _state = State.Initialized;
 
-        protected AggregatedMeasureDataProcess(
+        public AggregatedMeasureDataProcess(
             ProcessId processId,
             BusinessTransactionId businessTransactionId,
             ActorNumber requestedByActorId,
@@ -51,13 +51,29 @@ namespace Domain.Transactions.AggregatedMeasureData
             BalanceResponsibleId = balanceResponsibleId;
             RequestedByActorId = requestedByActorId;
             RequestedByActorRoleCode = requestedByActorRoleCode;
+            AddDomainEvent(new AggregatedMeasureProcessIsInitialized(processId));
+        }
+
+        /// <summary>
+        /// DO NOT DELETE THIS OR CREATE A CONSTRUCTOR WITH LESS PARAMETERS.
+        /// Entity Framework needs this, since it uses the constructor with the least parameters.
+        /// Thereafter assign the rest of the parameters via reflection.
+        /// To avoid throwing domainEvents when EF loads entity from database
+        /// </summary>
+        /// <param name="state"></param>
+        /// <remarks> Dont use this! </remarks>
+#pragma warning disable CS8618
+        private AggregatedMeasureDataProcess(State state)
+#pragma warning restore CS8618
+        {
+            _state = state;
         }
 
         public enum State
         {
             Initialized,
             Sent,
-            Accepted, // TODO: LRN this would indicate that the process is completed, is only property to  describe state enough?
+            Accepted,
             Rejected,
         }
 
@@ -96,47 +112,24 @@ namespace Domain.Transactions.AggregatedMeasureData
 
         public string RequestedByActorRoleCode { get; }
 
-        public static AggregatedMeasureDataProcess Create(
-            ProcessId processId,
-            BusinessTransactionId businessTransactionId,
-            ActorNumber requestedByActorId,
-            string requestedByActorRole,
-            string businessReason,
-            string? settlementVersion,
-            string? meteringPointType,
-            string? settlementMethod,
-            Instant startOfPeriod,
-            Instant? endOfPeriod,
-            string? meteringGridAreaDomainId,
-            string? energySupplierId,
-            string? balanceResponsibleId)
+        public string? ResponseData { get; set; }
+
+        public void WasSentToWholesale()
         {
-            var process = new AggregatedMeasureDataProcess(
-                processId,
-                businessTransactionId,
-                requestedByActorId,
-                requestedByActorRole,
-                businessReason,
-                settlementVersion,
-                meteringPointType,
-                settlementMethod,
-                startOfPeriod,
-                endOfPeriod,
-                meteringGridAreaDomainId,
-                energySupplierId,
-                balanceResponsibleId);
-            process.AddDomainEvent(new AggregatedMeasureProcessWasStarted(processId));
-            return process;
+            if (_state == State.Initialized)
+            {
+                _state = State.Sent;
+            }
         }
 
-        public void WholesaleIsNotifiedOfRequest()
+        public void WasAccepted(string responseData)
         {
             if (_state == State.Sent)
             {
-                throw new AggregatedMeasureDataException("Wholesale has already been notified");
+                _state = State.Accepted;
+                ResponseData = responseData;
+                AddDomainEvent(new AggregatedMeasureProcessWasAccepted(ProcessId));
             }
-
-            _state = State.Sent;
         }
     }
 }

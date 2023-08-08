@@ -13,18 +13,23 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Application.Configuration.Commands.Commands;
+using Domain.Transactions.AggregatedMeasureData;
 
-namespace Application.Transactions.AggregatedMeasureData.Notifications;
+namespace Infrastructure.Transactions.AggregatedMeasureData.Commands;
 
-public class NotifyWholesaleOfAggregatedMeasureDataRequest : InternalCommand
+public class AcceptedAggregatedTimeSeries : InternalCommand
 {
     [JsonConstructor]
-    public NotifyWholesaleOfAggregatedMeasureDataRequest(Guid processId)
+    public AcceptedAggregatedTimeSeries(Guid processId, IReadOnlyList<AggregatedTimeSerie> notificationAggregatedTimeSeries)
     {
         ProcessId = processId;
+        NotificationAggregatedTimeSeries = notificationAggregatedTimeSeries;
     }
 
     public Guid ProcessId { get; }
+
+    public IReadOnlyList<AggregatedTimeSerie> NotificationAggregatedTimeSeries { get; }
 }

@@ -12,16 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+using System;
+using System.Collections.Generic;
+using Domain.Transactions.AggregatedMeasureData;
+using MediatR;
 
-namespace Domain.Transactions.AggregatedMeasureData.Events;
+namespace Infrastructure.Transactions.AggregatedMeasureData.Notifications;
 
-public class AggregatedMeasureProcessWasStarted : DomainEvent
+public class AggregatedTimeSeriesRequestWasAccepted : INotification
 {
-    public AggregatedMeasureProcessWasStarted(ProcessId processId)
+    public AggregatedTimeSeriesRequestWasAccepted(Guid processId, IReadOnlyList<AggregatedTimeSerie> aggregatedTimeSerie)
     {
         ProcessId = processId;
+        AggregatedTimeSerie = aggregatedTimeSerie;
     }
 
-    public ProcessId ProcessId { get; }
+    public Guid ProcessId { get; }
+
+    public IReadOnlyList<AggregatedTimeSerie> AggregatedTimeSerie { get; }
 }
