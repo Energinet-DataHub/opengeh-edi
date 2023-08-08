@@ -28,7 +28,7 @@ using Receiver = CimMessageAdapter.Messages.RequestAggregatedMeasureData.Request
 namespace Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
 public class ValidateAggregatedMeasureDataRequestHandler
-    : IRequestHandler<ValidateAggregatedMeasureDataRequest, Result>
+    : IRequestHandler<ReceiveAggregatedMeasureDataRequest, Result>
 {
     private readonly RequestAggregatedMeasureDataReceiver _messageReceiver;
     private readonly IArchivedMessageRepository _messageArchive;
@@ -44,11 +44,11 @@ public class ValidateAggregatedMeasureDataRequestHandler
         _systemDateTimeProvider = systemDateTimeProvider;
     }
 
-    public async Task<Result> Handle(ValidateAggregatedMeasureDataRequest request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(ReceiveAggregatedMeasureDataRequest request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var messageHeader = request.Request.IncomingMarketDocument?.Header;
+        var messageHeader = request.MessageResult.IncomingMarketDocument?.Header;
         ArgumentNullException.ThrowIfNull(messageHeader);
 
         var timestamp = _systemDateTimeProvider.Now();
@@ -62,7 +62,7 @@ public class ValidateAggregatedMeasureDataRequestHandler
             messageHeader.BusinessReason,
             request.OriginalMessage));
 
-        var result = await _messageReceiver.ReceiveAsync(request.Request, cancellationToken)
+        var result = await _messageReceiver.ReceiveAsync(request.MessageResult, cancellationToken)
             .ConfigureAwait(false);
 
         return result;

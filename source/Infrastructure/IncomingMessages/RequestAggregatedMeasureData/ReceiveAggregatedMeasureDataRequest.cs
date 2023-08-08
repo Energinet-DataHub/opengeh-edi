@@ -19,17 +19,17 @@ using CimMessageAdapter.Messages;
 
 namespace Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
-public class ValidateAggregatedMeasureDataRequest : ICommand<Result>
+public class ReceiveAggregatedMeasureDataRequest : ICommand<Result>
 {
-    public ValidateAggregatedMeasureDataRequest(
-        MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> request,
+    public ReceiveAggregatedMeasureDataRequest(
+        MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> messageResult,
         Stream originalMessage)
     {
-        Request = request;
+        MessageResult = messageResult;
         OriginalMessage = originalMessage;
     }
 
-    public MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> Request { get; }
+    public MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> MessageResult { get; }
 
     public Stream OriginalMessage { get; }
 }

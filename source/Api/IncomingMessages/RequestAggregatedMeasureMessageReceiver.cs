@@ -90,7 +90,7 @@ public class RequestAggregatedMeasureMessageReceiver
         }
 
         var result = await _mediator
-            .Send(new ValidateAggregatedMeasureDataRequest(messageParserResult, request.Body), cancellationToken)
+            .Send(new ReceiveAggregatedMeasureDataRequest(messageParserResult, request.Body), cancellationToken)
             .ConfigureAwait(false);
 
         var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
