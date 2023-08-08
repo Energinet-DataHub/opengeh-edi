@@ -23,11 +23,9 @@ using Application.Configuration;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using CimMessageAdapter.Response;
-using CimMessageAdapter.ValidationErrors;
-using Domain.Actors;
-using Domain.ArchivedMessages;
-using Domain.Documents;
 using Infrastructure.IncomingMessages;
+using Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
+using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
@@ -39,31 +37,24 @@ public class RequestAggregatedMeasureMessageReceiver
 {
     private readonly ILogger<RequestAggregatedMeasureMessageReceiver> _logger;
     private readonly MessageParser _messageParser;
-    private readonly Receiver _messageReceiver;
     private readonly ResponseFactory _responseFactory;
     private readonly ICorrelationContext _correlationContext;
-    private readonly IArchivedMessageRepository _messageArchive;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IMediator _mediator;
 
     public RequestAggregatedMeasureMessageReceiver(
         ILogger<RequestAggregatedMeasureMessageReceiver> logger,
         MessageParser messageParser,
-        Receiver messageReceiver,
         ResponseFactory responseFactory,
         ICorrelationContext correlationContext,
-        IArchivedMessageRepository messageArchive,
-        ISystemDateTimeProvider systemDateTimeProvider)
-    {
+        IMediator mediator)
+        {
         _logger = logger;
         _messageParser = messageParser;
-        _messageReceiver = messageReceiver;
         _responseFactory = responseFactory;
         _correlationContext = correlationContext;
-        _messageArchive = messageArchive;
-        _systemDateTimeProvider = systemDateTimeProvider;
-    }
+        _mediator = mediator;
+        }
 
-    //TODO: refactor functions to use nameof for function name
     [Function(nameof(RequestAggregatedMeasureMessageReceiver))]
     public async Task<HttpResponseData> RunAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
@@ -98,17 +89,8 @@ public class RequestAggregatedMeasureMessageReceiver
             return CreateResponse(request, httpErrorStatusCode, _responseFactory.From(errorResult, cimFormat));
         }
 
-        var timestamp = _systemDateTimeProvider.Now();
-        _messageArchive.Add(new ArchivedMessage(
-            messageHeader.MessageId,
-            DocumentType.RequestAggregatedMeasureData,
-            ActorNumber.Create(messageHeader.SenderId),
-            ActorNumber.Create(messageHeader.ReceiverId),
-            timestamp,
-            messageHeader.BusinessReason,
-            request.Body));
-
-        var result = await _messageReceiver.ReceiveAsync(messageParserResult, cancellationToken)
+        var result = await _mediator
+            .Send(new ReceiveAggregatedMeasureDataRequest(messageParserResult, request.Body), cancellationToken)
             .ConfigureAwait(false);
 
         var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
