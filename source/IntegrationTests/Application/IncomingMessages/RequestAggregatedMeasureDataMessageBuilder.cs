@@ -36,7 +36,7 @@ public class RequestAggregatedMeasureDataMessageBuilder
     private readonly string _energySupplierMarketParticipantId = "5790001330552";
     private readonly string _balanceResponsiblePartyMarketParticipantId = "5799999933318";
     private readonly string _messageType = NotSet;
-    private readonly string _processType = NotSet;
+    private readonly string _processType = "D03";
     private readonly string _senderId = "1234567891234567";
     private readonly ActorNumber _receiverId = DataHubDetails.IdentificationNumber;
     private readonly string _receiverRole = "DDQ";

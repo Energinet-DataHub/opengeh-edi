@@ -12,15 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.WholeSale;
-using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Text.Json.Serialization;
 
-namespace Infrastructure.WholeSale;
+namespace Api.Configuration;
 
-public static class WholeSaleInboxConfiguration
+public class InboxMessageMetadata
 {
-    public static void Configure(IServiceCollection services)
+    [JsonConstructor]
+    public InboxMessageMetadata(Guid referenceId)
     {
-       services.AddTransient<IWholeSaleInBox, WholeSaleInbox>();
+        ReferenceId = referenceId;
     }
+
+    public Guid ReferenceId { get; }
 }

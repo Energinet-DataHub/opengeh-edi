@@ -29,9 +29,8 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
         builder.HasKey(x => x.ProcessId);
         builder.Property(x => x.ProcessId)
             .HasConversion(
-                toDbValue => toDbValue.Id.ToString(),
-                // TODO AJW: Due to the SQL column type we need to parse the string to a Guid.
-                fromDbValue => ProcessId.Create(Guid.Parse(fromDbValue)));
+                toDbValue => toDbValue.Id,
+                fromDbValue => ProcessId.Create(fromDbValue));
         builder.Property(x => x.BusinessTransactionId)
             .HasConversion(
                 toDbValue => toDbValue.Id,
@@ -44,12 +43,13 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
         builder.Property(x => x.MeteringGridAreaDomainId);
         builder.Property(x => x.EnergySupplierId);
         builder.Property(x => x.BalanceResponsibleId);
-
-        builder.Property<ActorNumber>("_requestedByActorId")
-            .HasColumnName("RequestedByActorId")
+        builder.Property(x => x.BusinessReason);
+        builder.Property(x => x.RequestedByActorId)
             .HasConversion(
                 toDbValue => toDbValue.Value,
                 fromDbValue => ActorNumber.Create(fromDbValue));
+        builder.Property(x => x.RequestedByActorRoleCode);
+
         /* TODO: add this when we are ready for state in DB
         builder.Property<AggregatedMeasureDataProcess.State>("_state")
             .HasConversion(

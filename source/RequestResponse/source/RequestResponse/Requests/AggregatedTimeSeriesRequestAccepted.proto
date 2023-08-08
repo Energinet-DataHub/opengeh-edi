@@ -29,11 +29,13 @@ message Serie {
   QuantityUnit quantity_unit = 4;
   Period period = 5;
   repeated TimeSeriesPoint time_series_points = 6;
+  TimeSeriesType time_series_type = 7;
 }
 
 message Period {
   google.protobuf.Timestamp start_of_period = 1;
   google.protobuf.Timestamp end_of_period = 2;
+  Resolution resolution = 3;
 }
 
 message TimeSeriesPoint {
@@ -96,4 +98,35 @@ message DecimalValue {
   // Nano units of the amount (10^-9)
   // Must be same sign as units
   sfixed32 nanos = 2;
+}
+
+/* 
+ * Representation of the resolution.
+ * Unspecified is unused but according to best practice.
+ * Read more at https://protobuf.dev/programming-guides/style/#enums.
+ */
+enum Resolution{
+  RESOLUTION_UNSPECIFIED = 0;
+  RESOLUTION_PT1H = 1;
+  RESOLUTION_PT15M = 2;
+}
+
+/*
+ * Representation of market evaluation point type,
+ */
+enum TimeSeriesType {
+  /*
+   * Unspecified is unused but according to best practice.
+   * Read more at https://protobuf.dev/programming-guides/style/#enums.
+   */
+  TIME_SERIES_TYPE_UNSPECIFIED = 0;
+  TIME_SERIES_TYPE_PRODUCTION = 1;
+  TIME_SERIES_TYPE_NON_PROFILED_CONSUMPTION = 2;
+  TIME_SERIES_TYPE_FLEX_CONSUMPTION = 3;
+  TIME_SERIES_TYPE_NET_EXCHANGE_PER_GA = 4;
+  TIME_SERIES_TYPE_NET_EXCHANGE_PER_NEIGHBORING_GA = 5;
+  TIME_SERIES_TYPE_GRID_LOSS = 6;
+  TIME_SERIES_TYPE_NEGATIVE_GRID_LOSS = 7;
+  TIME_SERIES_TYPE_POSITIVE_GRID_LOSS = 8;
+  TIME_SERIES_TYPE_TOTAL_CONSUMPTION = 9;
 }
