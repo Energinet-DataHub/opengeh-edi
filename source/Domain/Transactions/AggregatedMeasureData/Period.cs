@@ -12,21 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Globalization;
+using NodaTime;
+
 namespace Domain.Transactions.AggregatedMeasureData;
 
-public class AggregatedMeasureDataException : Exception
-{
-    public AggregatedMeasureDataException(string message)
-        : base(message)
-    {
-    }
-
-    public AggregatedMeasureDataException()
-    {
-    }
-
-    public AggregatedMeasureDataException(string message, Exception innerException)
-        : base(message, innerException)
-    {
-    }
-}
+public record Period(Instant Start, Instant End);

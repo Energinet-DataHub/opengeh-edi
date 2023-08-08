@@ -16,20 +16,20 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Transactions.AggregatedMeasureData;
 using Application.Transactions.Aggregations;
-using Domain.Actors;
 using Domain.OutgoingMessages;
-using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
 using Domain.Transactions.Aggregations;
-using Domain.Transactions.Exceptions;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.Collections;
 using Infrastructure.InboxEvents;
-using Infrastructure.OutgoingMessages.Common;
+using Infrastructure.Transactions.AggregatedMeasureData.Notifications;
 using MediatR;
 using NodaTime.Serialization.Protobuf;
+using GridAreaDetails = Domain.Transactions.AggregatedMeasureData.GridAreaDetails;
 using Period = Energinet.DataHub.Edi.Responses.Period;
+using Point = Domain.Transactions.AggregatedMeasureData.Point;
 using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
 using Serie = Energinet.DataHub.Edi.Responses.Serie;
 
@@ -37,47 +37,36 @@ namespace Infrastructure.Transactions.Aggregations;
 
 public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
 {
-    private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
     private readonly IGridAreaLookup _gridAreaLookup;
 
     public AggregatedTimeSeriesRequestAcceptedEventMapper(
-        IGridAreaLookup gridAreaLookup,
-        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
+        IGridAreaLookup gridAreaLookup)
     {
-        _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
         _gridAreaLookup = gridAreaLookup;
     }
 
-    public async Task<IReadOnlyList<INotification>> MapFromAsync(string payload, Guid referenceId, CancellationToken cancellationToken)
+    public async Task<INotification> MapFromAsync(string payload, Guid referenceId, CancellationToken cancellationToken)
     {
         var inboxEvent =
             AggregatedTimeSeriesRequestAccepted.Parser.ParseJson(payload);
 
-        var process = await _aggregatedMeasureDataProcessRepository
-                          .GetByIdAsync(ProcessId.Create(referenceId), cancellationToken).ConfigureAwait(false)
-                      ?? throw ProcessNotFoundException.ProcessForProcessIdNotFound(referenceId);
-
-        var aggregations = new List<AggregationResultAvailable>();
+        var aggregatedTimeSeries = new List<AggregatedTimeSerie>();
 
         foreach (var serie in inboxEvent.Series)
         {
-            aggregations.Add(new AggregationResultAvailable(
-                new Aggregation(
-                MapPoints(serie.TimeSeriesPoints),
-                MapMeteringPointType(serie),
-                MapUnitType(serie),
-                MapResolution(serie.Period.Resolution),
-                MapPeriod(serie.Period),
-                MapSettlementMethod(process),
-                MapBusinessReason(process),
-                MapActorGrouping(process),
-                await MapGridAreaDetailsAsync(serie).ConfigureAwait(false),
-                MapOriginalTransactionIdReference(process),
-                MapReceiver(process),
-                MapReceiverRole(process))));
+            aggregatedTimeSeries.Add(
+                new AggregatedTimeSerie(
+                    MapPoints(serie.TimeSeriesPoints),
+                    MapMeteringPointType(serie),
+                    MapUnitType(serie),
+                    MapResolution(serie.Period.Resolution),
+                    MapPeriod(serie.Period),
+                    await MapGridAreaDetailsAsync(serie).ConfigureAwait(false)));
         }
 
-        return aggregations;
+        return new AggregatedTimeSeriesRequestWasAccepted(
+            referenceId,
+            aggregatedTimeSeries);
     }
 
     public bool CanHandle(string eventType)
@@ -91,21 +80,6 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         var inboxEvent = AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(
             payload);
         return inboxEvent.ToString();
-    }
-
-    private static string MapReceiver(AggregatedMeasureDataProcess process)
-    {
-        return process.RequestedByActorId.Value;
-    }
-
-    private static string MapReceiverRole(AggregatedMeasureDataProcess process)
-    {
-        return MarketRole.FromCode(process.RequestedByActorRoleCode).Name;
-    }
-
-    private static string? MapOriginalTransactionIdReference(AggregatedMeasureDataProcess process)
-    {
-        return process.BusinessTransactionId.Id;
     }
 
     private static string MapMeteringPointType(Serie serie)
@@ -137,29 +111,9 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         return points.AsReadOnly();
     }
 
-    private static ActorGrouping MapActorGrouping(AggregatedMeasureDataProcess process)
+    private static Domain.Transactions.AggregatedMeasureData.Period MapPeriod(Period period)
     {
-        return new ActorGrouping(process.EnergySupplierId, process.BalanceResponsibleId);
-    }
-
-    private static string? MapSettlementMethod(AggregatedMeasureDataProcess process)
-    {
-        var settlementTypeName = null as string;
-        try
-        {
-            settlementTypeName = SettlementType.From(process.SettlementMethod ?? string.Empty).Name;
-        }
-        catch (InvalidCastException)
-        {
-            // Settlement type for Production is set to null.
-        }
-
-        return settlementTypeName;
-    }
-
-    private static Domain.Transactions.Aggregations.Period MapPeriod(Period period)
-    {
-        return new Domain.Transactions.Aggregations.Period(period.StartOfPeriod.ToInstant(), period.EndOfPeriod.ToInstant());
+        return new Domain.Transactions.AggregatedMeasureData.Period(period.StartOfPeriod.ToInstant(), period.EndOfPeriod.ToInstant());
     }
 
     private static string MapResolution(Resolution resolution)
@@ -181,11 +135,6 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
             QuantityUnit.Unspecified => throw new InvalidOperationException("Could not map unit type"),
             _ => throw new InvalidOperationException("Unknown unit type"),
         };
-    }
-
-    private static string MapBusinessReason(AggregatedMeasureDataProcess process)
-    {
-        return CimCode.To(process.BusinessReason).Name;
     }
 
     private static string MapQuality(QuantityQuality quality)

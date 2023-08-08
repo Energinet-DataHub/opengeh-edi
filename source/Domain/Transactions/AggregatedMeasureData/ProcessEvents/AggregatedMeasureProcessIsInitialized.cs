@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Domain.Transactions.AggregatedMeasureData;
+using Domain.SeedWork;
 
-public record Serie(
-    string Id,
-    string SettlementSeriesVersion,
-    string MarketEvaluationPointType,
-    string MarketEvaluationSettlementMethod,
-    string StartDateAndOrTimeDateTime,
-    string EndDateAndOrTimeDateTime,
-    string MeteringGridAreaDomainId,
-    string BiddingZoneDomainId,
-    string EnergySupplierMarketParticipantId,
-    string BalanceResponsiblePartyMarketParticipantId);
+namespace Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+
+public class AggregatedMeasureProcessIsInitialized : DomainEvent
+{
+    public AggregatedMeasureProcessIsInitialized(ProcessId processId)
+    {
+        ProcessId = processId;
+    }
+
+    public ProcessId ProcessId { get; }
+}

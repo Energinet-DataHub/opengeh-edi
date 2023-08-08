@@ -12,26 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text.Json.Serialization;
-using Application.Configuration.Commands.Commands;
-using Domain.Transactions.Aggregations;
+using Domain.SeedWork;
 
-namespace Application.Transactions.Aggregations;
+namespace Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 
-public class ForwardAggregationResult : InternalCommand
+public class AggregatedMeasureProcessWasAccepted : DomainEvent
 {
-    [JsonConstructor]
-    public ForwardAggregationResult(Guid id, Aggregation result)
-    : base(id)
+    public AggregatedMeasureProcessWasAccepted(ProcessId processId)
     {
-        Result = result;
+        ProcessId = processId;
     }
 
-    public ForwardAggregationResult(Aggregation result)
-    {
-        Result = result;
-    }
-
-    public Aggregation Result { get; }
+    public ProcessId ProcessId { get; }
 }
