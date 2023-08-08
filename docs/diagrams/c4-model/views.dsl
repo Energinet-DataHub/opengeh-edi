@@ -41,7 +41,7 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
             exclude "relationship.tag==OAuth"
             exclude "element.tag==Intermediate Technology"
             exclude ediDb
-            exclude commonB2C
+            exclude sharedB2C
         }
 
         container dh3 "EDIDetailed" {

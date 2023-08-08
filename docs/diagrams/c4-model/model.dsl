@@ -65,7 +65,7 @@ ediDomain = group "EDI" {
         this -> ediDequeueComponent "Dequeue messages"
 
         # Domain-to-domain relationships
-        this -> commonB2C "Validate OAuth token" "https" {
+        this -> dh3.sharedB2C "Validate OAuth token" "https" {
             tags "OAuth"
         }
     }
