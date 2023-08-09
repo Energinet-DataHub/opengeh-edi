@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
@@ -76,7 +77,14 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         {
             try
             {
-                return await ParseXmlDataAsync(reader, cancellationToken).ConfigureAwait(false);
+                var parsedXmlData = await ParseXmlDataAsync(reader, cancellationToken).ConfigureAwait(false);
+
+                if (_errors.Any())
+                {
+                    return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(_errors.ToArray());
+                }
+
+                return parsedXmlData;
             }
             catch (XmlException exception)
             {
