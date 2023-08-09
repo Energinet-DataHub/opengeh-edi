@@ -17,7 +17,7 @@ namespace CimMessageAdapter.ValidationErrors;
 public class NotSupportedMessageType : ValidationError
 {
     public NotSupportedMessageType(string type)
-        : base($"The type {type} is not supported", "00401", "MessageType")
+        : base($"The type {type} is not supported", "00401", "Type")
     {
     }
 }

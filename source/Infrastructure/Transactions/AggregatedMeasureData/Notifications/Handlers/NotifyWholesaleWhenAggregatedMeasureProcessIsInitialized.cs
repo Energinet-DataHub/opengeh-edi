@@ -20,7 +20,7 @@ using Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using MediatR;
 
-namespace Infrastructure.Transactions.AggregatedMeasureData.Notifications;
+namespace Infrastructure.Transactions.AggregatedMeasureData.Notifications.Handlers;
 
 public class NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized : INotificationHandler<AggregatedMeasureProcessIsInitialized>
 {

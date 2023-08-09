@@ -143,9 +143,10 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .Message();
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
-        var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
 
-        Assert.Contains(result.Errors, error => error is InvalidReceiverRole);
+        Assert.False(messageParserResult.Success);
+        Assert.Contains(messageParserResult.Errors, error => error is InvalidMessageStructure);
+        Assert.Contains(messageParserResult.Errors, error => error.Message.Contains(new InvalidReceiverRole().Target!, StringComparison.InvariantCultureIgnoreCase));
     }
 
     [Fact]
@@ -422,10 +423,10 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .Message();
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
-        var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
 
-        Assert.False(result.Success);
-        Assert.Contains(result.Errors, error => error is NotSupportedProcessType);
+        Assert.False(messageParserResult.Success);
+        Assert.Contains(messageParserResult.Errors, error => error is InvalidMessageStructure);
+        Assert.Contains(messageParserResult.Errors, error => error.Message.Contains(new NotSupportedProcessType(string.Empty).Target!, StringComparison.InvariantCultureIgnoreCase));
     }
 
     [Fact]
@@ -446,10 +447,10 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .Message();
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
-        var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
 
-        Assert.False(result.Success);
-        Assert.Contains(result.Errors, error => error is NotSupportedMessageType);
+        Assert.False(messageParserResult.Success);
+        Assert.Contains(messageParserResult.Errors, error => error is InvalidMessageStructure);
+        Assert.Contains(messageParserResult.Errors, error => error.Message.Contains(new NotSupportedMessageType(string.Empty).Target!, StringComparison.InvariantCultureIgnoreCase));
     }
 
     [Fact]
