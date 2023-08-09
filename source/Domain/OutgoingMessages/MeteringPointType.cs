@@ -29,7 +29,7 @@ public class MeteringPointType : EnumerationType
 
     public static MeteringPointType From(string valueToParse)
     {
-        var meteringPointType = GetAll<MeteringPointType>().FirstOrDefault(type => type.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{valueToParse} is not a valid product type");
+        var meteringPointType = GetAll<MeteringPointType>().FirstOrDefault(type => type.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{valueToParse} is not a valid metering point type");
 
         return meteringPointType;
     }
