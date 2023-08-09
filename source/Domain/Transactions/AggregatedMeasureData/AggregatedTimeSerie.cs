@@ -20,7 +20,9 @@ public record AggregatedTimeSerie(
     string UnitType,
     string Resolution,
     Period Period,
-    GridAreaDetails GridAreaDetails);
+    GridAreaDetails GridAreaDetails,
+    string? Product,
+    string? SettlementVersion);
 
 public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
 

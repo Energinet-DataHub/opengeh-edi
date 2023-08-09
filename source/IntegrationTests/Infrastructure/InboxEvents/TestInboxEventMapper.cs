@@ -26,9 +26,9 @@ public class TestInboxEventMapper : IInboxEventMapper
     #pragma warning disable // Method cannot be static since inherited from the interface
     public Task<INotification> MapFromAsync(string payload, Guid referenceId, CancellationToken cancellationToken)
     {
-        var inboxEvents = JsonSerializer.Deserialize<TestNotification>(payload);
+        var inboxEvents = JsonSerializer.Deserialize<TestInboxEvent>(payload);
 
-        return Task.FromResult((INotification)inboxEvents);
+        return Task.FromResult(new TestNotification(inboxEvents.EventProperty) as INotification);
     }
 
     public bool CanHandle(string eventType)
@@ -39,7 +39,7 @@ public class TestInboxEventMapper : IInboxEventMapper
 
     public string ToJson(byte[] payload)
     {
-        var integrationEvent = JsonSerializer.Deserialize<TestNotification>(payload);
+        var integrationEvent = JsonSerializer.Deserialize<TestInboxEvent>(payload);
         return JsonSerializer.Serialize(integrationEvent);
     }
 }
