@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
@@ -72,7 +73,6 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
 
         ResetMessagePosition(message);
         using var reader = XmlReader.Create(message, CreateXmlReaderSettings(xmlSchema));
-
         if (_errors.Count > 0)
         {
             return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(_errors.ToArray());
@@ -80,7 +80,14 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
 
         try
         {
-            return await ParseXmlDataAsync(reader, cancellationToken).ConfigureAwait(false);
+            var parsedXmlData = await ParseXmlDataAsync(reader, cancellationToken).ConfigureAwait(false);
+
+            if (_errors.Any())
+            {
+               return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(_errors.ToArray());
+            }
+
+            return parsedXmlData;
         }
         catch (XmlException exception)
         {
