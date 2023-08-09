@@ -73,7 +73,9 @@ public class MakeAggregatedMeasureAsAggregationResults : IRequestHandler<CreateA
                     MapGridAreaDetails(timeSerie.GridAreaDetails),
                     process.BusinessTransactionId.Id,
                     process.RequestedByActorId.Value,
-                    MapReceiverRole(process)));
+                    MapReceiverRole(process),
+                    timeSerie.Product,
+                    timeSerie.SettlementVersion));
 
             await _mediator.Publish(
                     notification,

@@ -16,21 +16,20 @@ using Domain.SeedWork;
 
 namespace Domain.OutgoingMessages;
 
-public class MeteringPointType : EnumerationType
+public class ProductType : EnumerationType
 {
-    public static readonly MeteringPointType Consumption = new(0, nameof(Consumption));
-    public static readonly MeteringPointType Production = new(1, nameof(Production));
-    public static readonly MeteringPointType Exchange = new(2, nameof(Exchange));
+    public static readonly ProductType Energy = new(0, nameof(Energy));
+    public static readonly ProductType Tarif = new(1, nameof(Tarif));
 
-    private MeteringPointType(int id, string name)
+    private ProductType(int id, string name)
         : base(id, name)
     {
     }
 
-    public static MeteringPointType From(string valueToParse)
+    public static ProductType From(string valueToParse)
     {
-        var meteringPointType = GetAll<MeteringPointType>().FirstOrDefault(type => type.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{valueToParse} is not a valid product type");
+        var productType = GetAll<ProductType>().FirstOrDefault(type => type.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{valueToParse} is not a valid product type");
 
-        return meteringPointType;
+        return productType;
     }
 }

@@ -22,6 +22,7 @@ using Domain.OutgoingMessages;
 using Domain.Transactions.AggregatedMeasureData;
 using Domain.Transactions.Aggregations;
 using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.MeteringPoints.IntegrationEvents.ChangeMasterData;
 using Google.Protobuf.Collections;
 using Infrastructure.InboxEvents;
 using Infrastructure.Transactions.AggregatedMeasureData.Notifications;
@@ -61,7 +62,9 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
                     MapUnitType(serie),
                     MapResolution(serie.Period.Resolution),
                     MapPeriod(serie.Period),
-                    await MapGridAreaDetailsAsync(serie).ConfigureAwait(false)));
+                    await MapGridAreaDetailsAsync(serie).ConfigureAwait(false),
+                    MapProduct(serie),
+                    MapSettlementVersion(serie)));
         }
 
         return new AggregatedTimeSeriesRequestWasAccepted(
@@ -80,6 +83,22 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         var inboxEvent = AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(
             payload);
         return inboxEvent.ToString();
+    }
+
+    private static string? MapSettlementVersion(Serie serie)
+    {
+        return serie.SettlementVersion;
+    }
+
+    private static string? MapProduct(Serie serie)
+    {
+        return serie.Product switch
+        {
+            Product.Energy => ProductType.Energy.Name,
+            Product.Tarif => ProductType.Tarif.Name,
+            Product.Unspecified => null,
+            _ => throw new InvalidOperationException("Could not determine product type"),
+        };
     }
 
     private static string MapMeteringPointType(Serie serie)
