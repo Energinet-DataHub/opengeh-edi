@@ -450,6 +450,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         Assert.False(messageParserResult.Success);
         Assert.Contains(messageParserResult.Errors, error => error is InvalidMessageStructure);
+        Assert.Contains(messageParserResult.Errors, error => error.Message.Contains(new NotSupportedMessageType(string.Empty).Target!, StringComparison.InvariantCultureIgnoreCase));
     }
 
     [Fact]
