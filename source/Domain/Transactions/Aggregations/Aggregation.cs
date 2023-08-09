@@ -26,7 +26,9 @@ public record Aggregation(
     GridAreaDetails GridAreaDetails,
     string? OriginalTransactionIdReference = null,
     string? Receiver = null,
-    string? ReceiverRole = null);
+    string? ReceiverRole = null,
+    string? Product = null,
+    string? SettlementVersion = null);
 
 public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
 

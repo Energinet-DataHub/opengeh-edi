@@ -24,25 +24,25 @@ namespace IntegrationTests.Infrastructure.InboxEvents;
 public class TestNotificationHandlerSpy : INotificationHandler<TestNotification>
 {
     private static readonly List<TestNotification> _testNotifications = new();
-    private readonly List<string> _notifications = new();
+    private static readonly List<string> _notifications = new();
 
-    public Task Handle(TestNotification notification, CancellationToken cancellationToken)
-    {
-        _testNotifications.Add(notification);
-        return Task.CompletedTask;
-    }
-
-    public void AddNotification(string notification)
+    public static void AddNotification(string notification)
     {
         _notifications.Add(notification);
     }
 
-    public void AssertExpectedNotifications()
+    public static void AssertExpectedNotifications()
     {
         Assert.NotNull(_testNotifications);
         Assert.Contains(
             _notifications,
             notificationString => _testNotifications.Any(
                 testNotification => testNotification.AProperty == notificationString));
+    }
+
+    public Task Handle(TestNotification notification, CancellationToken cancellationToken)
+    {
+        _testNotifications.Add(notification);
+        return Task.CompletedTask;
     }
 }

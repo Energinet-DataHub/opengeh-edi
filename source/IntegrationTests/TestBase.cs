@@ -22,6 +22,7 @@ using Application.Configuration;
 using Application.Configuration.Commands.Commands;
 using Application.Configuration.Queries;
 using Application.Configuration.TimeEvents;
+using Application.Transactions.Aggregations;
 using Application.Transactions.MoveIn;
 using Azure.Messaging.ServiceBus;
 using Google.Protobuf;
@@ -29,15 +30,20 @@ using Infrastructure.Configuration;
 using Infrastructure.Configuration.IntegrationEvents;
 using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
+using Infrastructure.InboxEvents;
+using Infrastructure.Transactions.AggregatedMeasureData.Notifications;
+using Infrastructure.Transactions.Aggregations;
 using Infrastructure.Transactions.MoveIn;
 using Infrastructure.Wholesale;
 using IntegrationTests.Fixtures;
-using IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 using IntegrationTests.Infrastructure.Configuration.InternalCommands;
+using IntegrationTests.Infrastructure.InboxEvents;
 using IntegrationTests.TestDoubles;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+using TestNotification = IntegrationTests.Infrastructure.Configuration.IntegrationEvents.TestNotification;
+using TestNotificationHandlerSpy = IntegrationTests.Infrastructure.Configuration.IntegrationEvents.TestNotificationHandlerSpy;
 
 namespace IntegrationTests
 {
@@ -57,11 +63,14 @@ namespace IntegrationTests
             _httpClientSpy = new HttpClientSpy();
             _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
             NotificationHandlerSpy = new TestNotificationHandlerSpy();
+            TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
             InboxEventNotificationHandler = new IntegrationTests.Infrastructure.InboxEvents.TestNotificationHandlerSpy();
             BuildServices();
         }
 
         protected TestNotificationHandlerSpy NotificationHandlerSpy { get; }
+
+        protected TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
 
         protected IntegrationTests.Infrastructure.InboxEvents.TestNotificationHandlerSpy InboxEventNotificationHandler { get; }
 
@@ -143,7 +152,11 @@ namespace IntegrationTests
             _services.AddSingleton(
                 _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
 
+            _services.AddTransient<InboxEventsProcessor>();
+            _services.AddTransient<AggregatedTimeSeriesRequestAcceptedEventMapper>();
+            _services.AddTransient<IGridAreaLookup, GridAreaLookup>();
             _services.AddTransient<INotificationHandler<TestNotification>>(_ => NotificationHandlerSpy);
+            _services.AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>>(_ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy);
             _services.AddTransient<INotificationHandler<IntegrationTests.Infrastructure.InboxEvents.TestNotification>>(
                 _ => InboxEventNotificationHandler);
 

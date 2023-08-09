@@ -62,11 +62,11 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
     [Fact]
     public async Task Notification_for_events_is_published()
     {
-        InboxEventNotificationHandler.AddNotification("Event1");
+        TestNotificationHandlerSpy.AddNotification("Event1");
 
         await ProcessInboxMessages().ConfigureAwait(false);
 
-        InboxEventNotificationHandler.AssertExpectedNotifications();
+        TestNotificationHandlerSpy.AssertExpectedNotifications();
     }
 
     [Fact]
@@ -117,6 +117,6 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
 
     private string ToJson()
     {
-        return _testInboxEventMapper.ToJson(JsonSerializer.SerializeToUtf8Bytes(new TestNotification("Event1")));
+        return _testInboxEventMapper.ToJson(JsonSerializer.SerializeToUtf8Bytes(new TestInboxEvent("Event1")));
     }
 }
