@@ -30,7 +30,8 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
             !include https://raw.githubusercontent.com/Energinet-DataHub/opengeh-wholesale/main/docs/diagrams/c4-model/model.dsl
 
             # Include Frontend model
-            !include https://raw.githubusercontent.com/Energinet-DataHub/greenforce-frontend/main/docs/diagrams/c4-model/model.dsl
+            !include https://raw.githubusercontent.com/Energinet-DataHub/greenforce-frontend/krmoos/removed-deprecated-containers/docs/diagrams/c4-model/model.dsl
+            #!include https://raw.githubusercontent.com/Energinet-DataHub/greenforce-frontend/main/docs/diagrams/c4-model/model.dsl
         }
     }
 
@@ -41,7 +42,7 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
             exclude "relationship.tag==OAuth"
             exclude "element.tag==Intermediate Technology"
             exclude ediDb
-            exclude commonB2C
+            exclude dh3.sharedB2C
         }
 
         container dh3 "EDIDetailed" {
