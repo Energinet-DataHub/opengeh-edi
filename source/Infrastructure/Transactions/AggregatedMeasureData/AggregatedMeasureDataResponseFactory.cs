@@ -14,10 +14,12 @@
 
 using System;
 using Azure.Messaging.ServiceBus;
+using Domain.OutgoingMessages;
 using Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
+using Infrastructure.OutgoingMessages.Common;
 using Period = Energinet.DataHub.Edi.Responses.Period;
 using Serie = Energinet.DataHub.Edi.Responses.Serie;
 
@@ -25,22 +27,42 @@ namespace Infrastructure.Transactions.AggregatedMeasureData;
 
 public static class AggregatedMeasureDataResponseFactory
 {
-    // TODO: consider moving this to another class
     public static ServiceBusMessage CreateServiceBusMessage(AggregatedMeasureDataProcess process)
     {
-        var bodyFromWholesaleMock = CreateResponseFromWholeSaleTemp(process);
+        if (process == null) throw new ArgumentNullException(nameof(process));
+
+        var bodyFromWholesaleMock = process.BusinessReason == CimCode.Of(BusinessReason.BalanceFixing)
+            ? CreateRejectedResponseFromWholesale()
+            : CreateAcceptedResponseFromWholesale(process);
+
         var message = new ServiceBusMessage()
         {
             Body = new BinaryData(bodyFromWholesaleMock.ToByteArray()),
-            Subject = nameof(AggregatedTimeSeriesRequestAccepted),
+            Subject = bodyFromWholesaleMock.GetType().Name,
             MessageId = process.ProcessId.Id.ToString(),
         };
-        message.ApplicationProperties.Add("ReferenceId", process.ProcessId.Id.ToString());
 
+        message.ApplicationProperties.Add("ReferenceId", process.ProcessId.Id.ToString());
         return message;
     }
 
-    private static AggregatedTimeSeriesRequestAccepted CreateResponseFromWholeSaleTemp(
+    private static IMessage CreateRejectedResponseFromWholesale()
+    {
+        var wholesaleResponse = new AggregatedTimeSeriesRequestRejected();
+        wholesaleResponse.RejectReasons.Add(CreateRejectReason());
+        return wholesaleResponse;
+    }
+
+    private static RejectReason CreateRejectReason()
+    {
+        return new RejectReason()
+        {
+            ErrorMessage = "something went wrong",
+            ErrorCode = ErrorCodes.InvalidBalanceResponsibleForPeriod,
+        };
+    }
+
+    private static IMessage CreateAcceptedResponseFromWholesale(
         AggregatedMeasureDataProcess aggregatedMeasureDataProcess)
     {
         ArgumentNullException.ThrowIfNull(aggregatedMeasureDataProcess);
