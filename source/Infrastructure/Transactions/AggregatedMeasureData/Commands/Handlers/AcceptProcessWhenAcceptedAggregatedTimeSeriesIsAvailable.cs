@@ -41,8 +41,7 @@ public class AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable : IRequest
         ArgumentNullException.ThrowIfNull(request);
 
         var process = await _aggregatedMeasureDataProcessRepository
-                          .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false)
-                      ?? throw ProcessNotFoundException.ProcessForProcessIdNotFound(request.ProcessId);
+            .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
         process.WasAccepted(_serializer.Serialize(request.NotificationAggregatedTimeSeries));
 

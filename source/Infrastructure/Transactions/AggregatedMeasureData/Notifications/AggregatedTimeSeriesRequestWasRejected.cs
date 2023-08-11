@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using Domain.Transactions.AggregatedMeasureData;
 using Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using MediatR;
 

@@ -12,20 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+namespace Domain.Transactions.AggregatedMeasureData;
 
-namespace Domain.OutgoingMessages.Queueing;
-
-public class MessageCategory : EnumerationType
-{
-    public static readonly MessageCategory MasterData = new(0, nameof(MasterData));
-    public static readonly MessageCategory Aggregations = new(1, nameof(Aggregations));
-
-    // Message category can not be peeked
-    public static readonly MessageCategory None = new(2, nameof(None));
-
-    private MessageCategory(int id, string name)
-        : base(id, name)
-    {
-    }
-}
+public record RejectReason(string ErrorCode, string ErrorMessage);

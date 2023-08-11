@@ -23,7 +23,7 @@ using Google.Protobuf.Collections;
 using Infrastructure.InboxEvents;
 using Infrastructure.Transactions.AggregatedMeasureData.Notifications;
 using MediatR;
-using RejectReason = Domain.Transactions.AggregatedMeasureData.ProcessEvents.RejectReason;
+using RejectReason = Domain.Transactions.AggregatedMeasureData.RejectReason;
 
 namespace Infrastructure.Transactions.Aggregations;
 

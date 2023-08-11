@@ -12,6 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+using System;
+using System.Text.Json.Serialization;
+using Application.Configuration.Commands.Commands;
 
-public record RejectReason(string ErrorCode, string ErrorMessage);
+namespace Infrastructure.Transactions.AggregatedMeasureData.Commands;
+
+public class ForwardRejectedAggregationResult : InternalCommand
+{
+    [JsonConstructor]
+    public ForwardRejectedAggregationResult(Guid processId)
+    {
+        ProcessId = processId;
+    }
+
+    public Guid ProcessId { get; }
+}

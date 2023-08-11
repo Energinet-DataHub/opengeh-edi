@@ -53,8 +53,7 @@ public class MakeAggregatedMeasureAsAggregationResults : IRequestHandler<CreateA
         ArgumentNullException.ThrowIfNull(request);
 
         var process = await _aggregatedMeasureDataProcessRepository
-                          .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false)
-                      ?? throw ProcessNotFoundException.ProcessForProcessIdNotFound(request.ProcessId);
+            .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
         var responseData = _serializer.Deserialize<IList<AggregatedTimeSerie>>(process.ResponseData ?? string.Empty);
 

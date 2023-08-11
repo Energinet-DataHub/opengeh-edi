@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Application.Configuration.Commands.Commands;
-using Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+using Domain.Transactions.AggregatedMeasureData;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData.Commands;
 

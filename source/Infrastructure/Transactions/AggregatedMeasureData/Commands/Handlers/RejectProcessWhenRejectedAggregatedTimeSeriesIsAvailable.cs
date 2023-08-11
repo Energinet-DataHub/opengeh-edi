@@ -17,7 +17,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
-using Domain.Transactions.Exceptions;
 using Infrastructure.Configuration.Serialization;
 using MediatR;
 
@@ -41,8 +40,7 @@ public class RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable : IRequest
         ArgumentNullException.ThrowIfNull(request);
 
         var process = await _aggregatedMeasureDataProcessRepository
-                          .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false)
-                      ?? throw ProcessNotFoundException.ProcessForProcessIdNotFound(request.ProcessId);
+            .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
         process.WasRejected(_serializer.Serialize(request.RejectReasons));
         return Unit.Value;

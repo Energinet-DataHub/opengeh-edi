@@ -57,6 +57,7 @@ internal static class InternalCommandProcessing
         mapper.Add("AcceptedAggregatedTimeSeries", typeof(AcceptedAggregatedTimeSeries));
         mapper.Add("CreateAggregatedMeasureAggregationResults", typeof(CreateAggregatedMeasureAggregationResults));
         mapper.Add("RejectedAggregatedTimeSeries", typeof(RejectedAggregatedTimeSeries));
+        mapper.Add("ForwardRejectedAggregationResult", typeof(ForwardRejectedAggregationResult));
 
         return mapper;
     }
