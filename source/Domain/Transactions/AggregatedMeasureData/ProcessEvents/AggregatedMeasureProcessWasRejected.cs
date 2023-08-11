@@ -18,7 +18,6 @@ namespace Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 
 public class AggregatedMeasureProcessWasRejected : DomainEvent
 {
-    // TODO: Missing handler RFG, MADU
     public AggregatedMeasureProcessWasRejected(ProcessId processId)
     {
         ProcessId = processId;
