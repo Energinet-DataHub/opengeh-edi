@@ -18,8 +18,13 @@ syntax = "proto3";
 option csharp_namespace = "Energinet.DataHub.Edi.Responses";
 
 message AggregatedTimeSeriesRequestRejected {
+  repeated RejectReason reject_reasons = 1;
+}
+
+// Contains all errors for the request
+message RejectReason {
   ErrorCodes error_code = 1;
-  string error_message = 2;
+  optional string error_message = 2;
 }
 
 enum ErrorCodes {
