@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
+using Domain.Transactions.Exceptions;
 using Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
@@ -35,11 +37,13 @@ public class AggregatedMeasureDataProcessRepository : IAggregatedMeasureDataProc
         _b2BContext.AggregatedMeasureDataProcesses.Add(process);
     }
 
-    public async Task<AggregatedMeasureDataProcess?> GetByIdAsync(ProcessId processId, CancellationToken cancellationToken)
+    public async Task<AggregatedMeasureDataProcess> GetByIdAsync(ProcessId processId, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(processId);
         return await _b2BContext
-            .AggregatedMeasureDataProcesses
-            .FirstOrDefaultAsync(process => process.ProcessId == processId, cancellationToken)
-            .ConfigureAwait(false);
+               .AggregatedMeasureDataProcesses
+               .FirstOrDefaultAsync(process => process.ProcessId == processId, cancellationToken)
+               .ConfigureAwait(false)
+            ?? throw ProcessNotFoundException.ProcessForProcessIdNotFound(processId.Id);
     }
 }

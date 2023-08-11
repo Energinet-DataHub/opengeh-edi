@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Domain.OutgoingMessages.Peek;
+using Domain.OutgoingMessages.Queueing;
 using Domain.SeedWork;
 
 namespace Domain.Documents;
@@ -28,6 +29,7 @@ public class DocumentType : EnumerationType
     public static readonly DocumentType RejectRequestChangeAccountingPointCharacteristics = new(6, nameof(RejectRequestChangeAccountingPointCharacteristics), MessageCategory.MasterData);
     public static readonly DocumentType NotifyAggregatedMeasureData = new(7, nameof(NotifyAggregatedMeasureData), MessageCategory.Aggregations);
     public static readonly DocumentType RequestAggregatedMeasureData = new(8, nameof(RequestAggregatedMeasureData), MessageCategory.None);
+    public static readonly DocumentType RejectAggregatedMeasureData = new(9, nameof(RejectAggregatedMeasureData), MessageCategory.Aggregations);
 
     private DocumentType(int id, string name, MessageCategory category)
         : base(id, name)
