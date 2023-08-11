@@ -34,7 +34,6 @@ public class RejectedAggregatedMeasureProcessIsAvailable : INotificationHandler<
     public async Task Handle(AggregatedMeasureProcessWasRejected notification, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(notification);
-
         await _commandScheduler.EnqueueAsync(new ForwardRejectedAggregationResult(notification.ProcessId.Id)).ConfigureAwait(false);
     }
 }

@@ -42,9 +42,9 @@ public class AggregatedMeasureDataProcessRepository : IAggregatedMeasureDataProc
     {
         ArgumentNullException.ThrowIfNull(processId);
         return await _b2BContext
-                   .AggregatedMeasureDataProcesses
-                   .FirstOrDefaultAsync(process => process.ProcessId == processId, cancellationToken)
-                   .ConfigureAwait(false)
-               ?? throw ProcessNotFoundException.ProcessForProcessIdNotFound(processId.Id);
+               .AggregatedMeasureDataProcesses
+               .FirstOrDefaultAsync(process => process.ProcessId == processId, cancellationToken)
+               .ConfigureAwait(false)
+            ?? throw ProcessNotFoundException.ProcessForProcessIdNotFound(processId.Id);
     }
 }
