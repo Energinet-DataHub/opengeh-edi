@@ -12,20 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+using System;
+using System.Text.Json.Serialization;
+using Application.Configuration.Commands.Commands;
 
-namespace Domain.OutgoingMessages.Queueing;
+namespace Infrastructure.Transactions.AggregatedMeasureData.Commands;
 
-public class MessageCategory : EnumerationType
+public class ForwardRejectedAggregationResult : InternalCommand
 {
-    public static readonly MessageCategory MasterData = new(0, nameof(MasterData));
-    public static readonly MessageCategory Aggregations = new(1, nameof(Aggregations));
-
-    // Message category can not be peeked
-    public static readonly MessageCategory None = new(2, nameof(None));
-
-    private MessageCategory(int id, string name)
-        : base(id, name)
+    [JsonConstructor]
+    public ForwardRejectedAggregationResult(Guid processId)
     {
+        ProcessId = processId;
     }
+
+    public Guid ProcessId { get; }
 }

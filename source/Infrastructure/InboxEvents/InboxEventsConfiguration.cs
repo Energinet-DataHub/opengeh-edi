@@ -28,5 +28,6 @@ public static class InboxEventsConfiguration
         services.AddTransient<InboxEventReceiver>();
         services.AddTransient<InboxEventsProcessor>();
         services.AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestAcceptedEventMapper>();
+        services.AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestRejectedMapper>();
     }
 }

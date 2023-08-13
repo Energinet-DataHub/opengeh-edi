@@ -28,9 +28,9 @@ using IntegrationTests.Application.IncomingMessages;
 using IntegrationTests.Assertions;
 using IntegrationTests.Factories;
 using IntegrationTests.Fixtures;
-using IntegrationTests.TestDoubles;
 using MediatR;
 using Xunit;
+using MessageCategory = Domain.OutgoingMessages.Queueing.MessageCategory;
 
 namespace IntegrationTests.Application.OutgoingMessages;
 

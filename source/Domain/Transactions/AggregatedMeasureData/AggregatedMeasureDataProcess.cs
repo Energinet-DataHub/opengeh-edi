@@ -131,5 +131,15 @@ namespace Domain.Transactions.AggregatedMeasureData
                 AddDomainEvent(new AggregatedMeasureProcessWasAccepted(ProcessId));
             }
         }
+
+        public void WasRejected(string responseData)
+        {
+            if (_state == State.Sent)
+            {
+                _state = State.Rejected;
+                ResponseData = responseData;
+                AddDomainEvent(new AggregatedMeasureProcessWasRejected(ProcessId));
+            }
+        }
     }
 }

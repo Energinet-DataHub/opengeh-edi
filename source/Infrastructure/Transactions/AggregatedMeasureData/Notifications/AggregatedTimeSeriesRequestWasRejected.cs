@@ -12,20 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+using System;
+using System.Collections.Generic;
+using Domain.Transactions.AggregatedMeasureData;
+using Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+using MediatR;
 
-namespace Domain.OutgoingMessages.Queueing;
+namespace Infrastructure.Transactions.AggregatedMeasureData.Notifications;
 
-public class MessageCategory : EnumerationType
-{
-    public static readonly MessageCategory MasterData = new(0, nameof(MasterData));
-    public static readonly MessageCategory Aggregations = new(1, nameof(Aggregations));
-
-    // Message category can not be peeked
-    public static readonly MessageCategory None = new(2, nameof(None));
-
-    private MessageCategory(int id, string name)
-        : base(id, name)
-    {
-    }
-}
+public record AggregatedTimeSeriesRequestWasRejected(
+    Guid ReferenceId,
+    IReadOnlyList<RejectReason> RejectReasons)
+    : INotification;

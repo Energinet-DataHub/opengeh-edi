@@ -23,7 +23,6 @@ using Application.Configuration.DataAccess;
 using Domain.Actors;
 using Domain.ArchivedMessages;
 using Domain.Documents;
-using Domain.OutgoingMessages.Peek;
 using Domain.OutgoingMessages.Queueing;
 using MediatR;
 
