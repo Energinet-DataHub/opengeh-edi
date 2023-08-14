@@ -52,6 +52,7 @@ using Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Infrastructure.OutgoingMessages.Dequeue;
 using Infrastructure.OutgoingMessages.GenericNotification;
 using Infrastructure.OutgoingMessages.Peek;
+using Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 using Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Infrastructure.Transactions;
@@ -276,6 +277,7 @@ namespace Infrastructure.Configuration
             _services.AddScoped<IDocumentWriter, RejectRequestChangeOfSupplierJsonDocumentWriter>();
             _services.AddScoped<IDocumentWriter, AggregationResultXmlDocumentWriter>();
             _services.AddScoped<IDocumentWriter, AggregationResultJsonDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataXmlDocumentWriter>();
 
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
             _services.AddScoped<IMessageRecordParser, MessageRecordParser>();
