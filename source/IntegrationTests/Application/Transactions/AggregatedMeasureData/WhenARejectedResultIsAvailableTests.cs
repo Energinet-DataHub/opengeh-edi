@@ -33,11 +33,11 @@ using RejectReason = Energinet.DataHub.Edi.Responses.RejectReason;
 namespace IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
 [IntegrationTest]
-public class WhenAnRejectedResultIsAvailableTests : TestBase
+public class WhenARejectedResultIsAvailableTests : TestBase
 {
     private readonly B2BContext _b2BContext;
 
-    public WhenAnRejectedResultIsAvailableTests(DatabaseFixture databaseFixture)
+    public WhenARejectedResultIsAvailableTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _b2BContext = GetService<B2BContext>();
