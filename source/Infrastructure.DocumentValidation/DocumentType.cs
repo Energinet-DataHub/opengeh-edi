@@ -18,4 +18,5 @@ public enum DocumentType
 {
     AggregationResult,
     CustomerMasterData,
+    RejectRequestAggregatedMeasureData, // RSM-16 Reject Document
 }

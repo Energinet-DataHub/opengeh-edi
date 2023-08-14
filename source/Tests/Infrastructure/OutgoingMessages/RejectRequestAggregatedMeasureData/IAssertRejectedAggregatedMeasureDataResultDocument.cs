@@ -15,7 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Domain.OutgoingMessages;
-using Period = Domain.Transactions.Aggregations.Period;
+using NodaTime;
 
 namespace Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 
@@ -46,7 +46,24 @@ public interface IAssertRejectedAggregatedMeasureDataResultDocument
     /// Asserts time stamp
     /// </summary>
     /// <param name="expectedTimestamp"></param>
-    IAssertRejectedAggregatedMeasureDataResultDocument HasTimestamp(string expectedTimestamp);
+    IAssertRejectedAggregatedMeasureDataResultDocument HasTimestamp(Instant expectedTimestamp);
+
+    /// <summary>
+    /// Asserts reason code
+    /// </summary>
+    /// <param name="reasonCode"></param>
+    IAssertRejectedAggregatedMeasureDataResultDocument HasReasonCode(string reasonCode);
+
+    /// <summary>
+    /// Asserts document validity
+    /// </summary>
+    Task<IAssertRejectedAggregatedMeasureDataResultDocument> DocumentIsValidAsync();
+
+    /// <summary>
+    /// Asserts the business reason
+    /// </summary>
+    /// <param name="businessReason"></param>
+    IAssertRejectedAggregatedMeasureDataResultDocument HasBusinessReason(BusinessReason businessReason);
 
     /// <summary>
     /// Asserts transaction id
@@ -55,77 +72,20 @@ public interface IAssertRejectedAggregatedMeasureDataResultDocument
     IAssertRejectedAggregatedMeasureDataResultDocument HasTransactionId(Guid expectedTransactionId);
 
     /// <summary>
-    /// Asserts grid area code
+    /// Asserts serie reason code
     /// </summary>
-    /// <param name="expectedGridAreaCode"></param>
-    IAssertRejectedAggregatedMeasureDataResultDocument HasGridAreaCode(string expectedGridAreaCode);
+    /// <param name="expectedSerieReasonCode"></param>
+    IAssertRejectedAggregatedMeasureDataResultDocument HasSerieReasonCode(string expectedSerieReasonCode);
 
     /// <summary>
-    /// Asserts balance supplier number
+    /// Asserts serie reason message
     /// </summary>
-    /// <param name="expectedBalanceResponsibleNumber"></param>
-    IAssertRejectedAggregatedMeasureDataResultDocument HasBalanceResponsibleNumber(string expectedBalanceResponsibleNumber);
+    /// <param name="expectedSerieReasonMessage"></param>
+    IAssertRejectedAggregatedMeasureDataResultDocument HasSerieReasonMessage(string expectedSerieReasonMessage);
 
     /// <summary>
-    /// Asserts energy supplier number
+    /// Asserts original transaction id
     /// </summary>
-    /// <param name="expectedEnergySupplierNumber"></param>
-    IAssertRejectedAggregatedMeasureDataResultDocument HasEnergySupplierNumber(string expectedEnergySupplierNumber);
-
-    /// <summary>
-    /// Asserts product code
-    /// </summary>
-    /// <param name="expectedProductCode"></param>
-    IAssertRejectedAggregatedMeasureDataResultDocument HasProductCode(string expectedProductCode);
-
-    /// <summary>
-    /// Asserts period
-    /// </summary>
-    /// <param name="expectedPeriod"></param>
-    IAssertRejectedAggregatedMeasureDataResultDocument HasPeriod(Period expectedPeriod);
-
-    /// <summary>
-    /// Asserts a point
-    /// </summary>
-    /// <param name="position"></param>
-    /// <param name="quantity"></param>
-    IAssertRejectedAggregatedMeasureDataResultDocument HasPoint(int position, int quantity);
-
-    /// <summary>
-    /// Asserts document validity
-    /// </summary>
-    Task<IAssertRejectedAggregatedMeasureDataResultDocument> DocumentIsValidAsync();
-
-    /// <summary>
-    /// Asserts the settlement method is not present
-    /// </summary>
-    IAssertRejectedAggregatedMeasureDataResultDocument SettlementMethodIsNotPresent();
-
-    /// <summary>
-    /// Asserts the energy supplier number is not present
-    /// </summary>
-    IAssertRejectedAggregatedMeasureDataResultDocument EnergySupplierNumberIsNotPresent();
-
-    /// <summary>
-    /// Asserts the balance responsible number is not present
-    /// </summary>
-    IAssertRejectedAggregatedMeasureDataResultDocument BalanceResponsibleNumberIsNotPresent();
-
-    /// <summary>
-    /// Asserts the quantity is not present
-    /// </summary>
-    /// <param name="position"></param>
-    IAssertRejectedAggregatedMeasureDataResultDocument QuantityIsNotPresentForPosition(int position);
-
-    /// <summary>
-    /// Asserts the quality is not present
-    /// </summary>
-    /// <param name="position"></param>
-    IAssertRejectedAggregatedMeasureDataResultDocument QualityIsNotPresentForPosition(int position);
-
-    /// <summary>
-    /// Asserts the process type.
-    /// </summary>
-    /// <param name="businessReason"></param>
-    IAssertRejectedAggregatedMeasureDataResultDocument HasBusinessReason(BusinessReason businessReason);
+    /// <param name="expectedOriginalTransactionId"></param>
+    IAssertRejectedAggregatedMeasureDataResultDocument HasOriginalTransactionId(string expectedOriginalTransactionId);
 }

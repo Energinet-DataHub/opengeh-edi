@@ -18,7 +18,6 @@ using System.Threading.Tasks;
 using System.Xml;
 using Application.OutgoingMessages.Common;
 using Application.OutgoingMessages.Common.Xml;
-using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 using Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
 using Infrastructure.OutgoingMessages.Common.Xml;
 
@@ -44,27 +43,25 @@ public class RejectRequestAggregatedMeasureDataXmlDocumentWriter : DocumentWrite
         if (marketActivityPayloads == null) throw new ArgumentNullException(nameof(marketActivityPayloads));
         if (writer == null) throw new ArgumentNullException(nameof(writer));
 
-        foreach (var marketActivityRecord in ParseFrom<RejectedTimeSerie>(marketActivityPayloads))
+        foreach (var rejectedTimeSerie in ParseFrom<RejectedTimeSerie>(marketActivityPayloads))
         {
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Series", null).ConfigureAwait(false);
-            // await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, marketActivityRecord.Id.ToString())
-            //     .ConfigureAwait(false);
-            // await writer.WriteElementStringAsync(
-            //     DocumentDetails.Prefix,
-            //     "originalTransactionIDReference_MktActivityRecord.mRID",
-            //     null,
-            //     marketActivityRecord.OriginalTransactionId).ConfigureAwait(false);
-            // await writer.WriteStartElementAsync(DocumentDetails.Prefix, "marketEvaluationPoint.mRID", null).ConfigureAwait(false);
-            // await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
-            // writer.WriteValue(marketActivityRecord.MarketEvaluationPointId);
-            // await writer.WriteEndElementAsync().ConfigureAwait(false);
-            // foreach (var reason in marketActivityRecord.Reasons)
-            // {
-            //     await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Reason", null).ConfigureAwait(false);
-            //     await writer.WriteElementStringAsync(DocumentDetails.Prefix, "code", null, reason.Code).ConfigureAwait(false);
-            //     await writer.WriteElementStringAsync(DocumentDetails.Prefix, "text", null, reason.Text).ConfigureAwait(false);
-            //     await writer.WriteEndElementAsync().ConfigureAwait(false);
-            // }
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, rejectedTimeSerie.TransactionId.ToString())
+                 .ConfigureAwait(false);
+            await writer.WriteElementStringAsync(
+                DocumentDetails.Prefix,
+                "originalTransactionIDReference_Series.mRID",
+                null,
+                rejectedTimeSerie.OriginalTransactionIdReference).ConfigureAwait(false);
+
+            foreach (var reason in rejectedTimeSerie.RejectReasons)
+            {
+                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Reason", null).ConfigureAwait(false);
+                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "code", null, reason.ErrorCode).ConfigureAwait(false);
+                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "text", null, reason.ErrorMessage).ConfigureAwait(false);
+                await writer.WriteEndElementAsync().ConfigureAwait(false);
+            }
+
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
     }

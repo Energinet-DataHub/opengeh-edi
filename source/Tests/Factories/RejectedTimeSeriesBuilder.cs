@@ -16,39 +16,30 @@ using System;
 using System.Collections.Generic;
 using Domain.Actors;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
-using Domain.Transactions.Aggregations;
 using NodaTime;
-using NodaTime.Text;
-using Period = Domain.Transactions.Aggregations.Period;
-using Point = Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
+using Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 
 namespace Tests.Factories;
 
 public class RejectedTimeSeriesBuilder
 {
-    private readonly RejectReason _rejectReason = new RejectReason("342", "This is an error");
-    private readonly string _originalTransactionIdReference = Guid.NewGuid().ToString();
-    private readonly string _receiverNumber = "1234567890123";
-    private readonly MarketRole _receiverRole = MarketRole.MeteredDataResponsible;
-    private readonly string _senderNumber = "1234567890321";
-    private readonly MarketRole _senderRole = MarketRole.MeteringDataAdministrator;
-    private readonly string _messageId = Guid.NewGuid().ToString();
-    private readonly BusinessReason _businessReason = BusinessReason.BalanceFixing;
-    private readonly Instant _timeStamp = SystemClock.Instance.GetCurrentInstant();
-    private readonly Guid _transactionId = Guid.NewGuid();
+    private readonly string _receiverNumber = SampleData.ReceiverId;
+    private readonly MarketRole _receiverRole = SampleData.ReceiverRole;
+    private readonly string _senderNumber = SampleData.SenderId;
+    private readonly MarketRole _senderRole = SampleData.SenderRole;
+    private readonly string _messageId = SampleData.MessageId;
+    private readonly BusinessReason _businessReason = SampleData.BusinessReason;
+    private readonly Instant _creationDate = SampleData.CreationDate;
+    private readonly Guid _transactionId = SampleData.TransactionId;
+    private readonly string _originalTransactionIdReference = SampleData.OriginalTransactionId;
+    private readonly IReadOnlyList<RejectReason> _rejectReasons = new List<RejectReason> { new(SampleData.SerieReasonCode, SampleData.SerieReasonMessage) };
 
     public static RejectedTimeSeriesBuilder RejectAggregatedMeasureDataResult()
     {
         return new RejectedTimeSeriesBuilder();
     }
 
-    // public TimeSeriesBuilder WithTransactionId(Guid transactionId)
-    // {
-    //     _transactionId = transactionId;
-    //     return this;
-    // }
     public MessageHeader BuildHeader()
     {
         return new MessageHeader(
@@ -58,19 +49,14 @@ public class RejectedTimeSeriesBuilder
             _receiverNumber,
             _receiverRole.Name,
             _messageId,
-            _timeStamp);
+            _creationDate);
     }
 
     public RejectedTimeSerie BuildRejectedTimeSerie()
     {
         return new RejectedTimeSerie(
             _transactionId,
-            _rejectReason,
+            _rejectReasons,
             _originalTransactionIdReference);
-    }
-
-    private static Instant ParseTimeStamp(string timestamp)
-    {
-        return InstantPattern.General.Parse(timestamp).Value;
     }
 }

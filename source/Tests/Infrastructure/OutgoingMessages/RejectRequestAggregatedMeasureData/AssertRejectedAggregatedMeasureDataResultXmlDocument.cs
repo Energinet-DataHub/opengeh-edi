@@ -13,13 +13,11 @@
 // limitations under the License.
 
 using System;
-using System.Globalization;
 using System.Threading.Tasks;
 using DocumentValidation;
 using Domain.OutgoingMessages;
-using Domain.Transactions.Aggregations;
 using Infrastructure.OutgoingMessages.Common;
-using Tests.Infrastructure.OutgoingMessages.AggregationResult;
+using NodaTime;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 
 namespace Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
@@ -36,7 +34,7 @@ public class AssertRejectedAggregatedMeasureDataResultXmlDocument : IAssertRejec
 
     public async Task<IAssertRejectedAggregatedMeasureDataResultDocument> DocumentIsValidAsync()
     {
-        await _documentAsserter.HasValidStructureAsync(DocumentType.AggregationResult).ConfigureAwait(false);
+        await _documentAsserter.HasValidStructureAsync(DocumentType.RejectRequestAggregatedMeasureData).ConfigureAwait(false);
         return this;
     }
 
@@ -70,9 +68,9 @@ public class AssertRejectedAggregatedMeasureDataResultXmlDocument : IAssertRejec
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasTimestamp(string expectedTimestamp)
+    public IAssertRejectedAggregatedMeasureDataResultDocument HasTimestamp(Instant expectedTimestamp)
     {
-        _documentAsserter.HasValue("createdDateTime", expectedTimestamp);
+        _documentAsserter.HasValue("createdDateTime", expectedTimestamp.ToString());
         return this;
     }
 
@@ -82,21 +80,21 @@ public class AssertRejectedAggregatedMeasureDataResultXmlDocument : IAssertRejec
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasOriginalTransactionId(Guid expectedOriginalTransactionId)
+    public IAssertRejectedAggregatedMeasureDataResultDocument HasOriginalTransactionId(string expectedOriginalTransactionId)
     {
-        _documentAsserter.HasValue($"Series[1]/originalTransactionIDReference_Series.mRID", expectedOriginalTransactionId.ToString());
+        _documentAsserter.HasValue($"Series[1]/originalTransactionIDReference_Series.mRID", expectedOriginalTransactionId);
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasSeriesReasonCode(string expectedSeriesReasonCode)
+    public IAssertRejectedAggregatedMeasureDataResultDocument HasSerieReasonCode(string expectedSerieReasonCode)
     {
-        _documentAsserter.HasValue($"Series[1]/Reason[1]/code", expectedSeriesReasonCode);
+        _documentAsserter.HasValue($"Series[1]/Reason[1]/code", expectedSerieReasonCode);
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasSeriesReasonMessage(string expectedSeriesReasonMessage)
+    public IAssertRejectedAggregatedMeasureDataResultDocument HasSerieReasonMessage(string expectedSerieReasonMessage)
     {
-        _documentAsserter.HasValue($"Series[1]/Reason[1]/text", expectedSeriesReasonMessage);
+        _documentAsserter.HasValue($"Series[1]/Reason[1]/text", expectedSerieReasonMessage);
         return this;
     }
 }

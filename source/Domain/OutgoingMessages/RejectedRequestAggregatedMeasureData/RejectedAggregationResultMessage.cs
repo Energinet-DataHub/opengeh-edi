@@ -20,7 +20,7 @@ namespace Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
 
 public class RejectedAggregationResultMessage : OutgoingMessage
 {
-    public RejectedAggregationResultMessage(ActorNumber receiverId, TransactionId transactionId, string businessReason, MarketRole receiverRole, IReadOnlyList<RejectedTimeSerie> series)
+    public RejectedAggregationResultMessage(ActorNumber receiverId, TransactionId transactionId, string businessReason, MarketRole receiverRole, RejectedTimeSerie series)
         : base(DocumentType.RejectAggregatedMeasureData, receiverId, transactionId, businessReason, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringDataAdministrator, new Serializer().Serialize(series))
     {
         Series = series;
@@ -29,15 +29,15 @@ public class RejectedAggregationResultMessage : OutgoingMessage
     private RejectedAggregationResultMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
         : base(documentType, receiverId, transactionId, businessReason, receiverRole, senderId, senderRole, messageRecord)
     {
-        Series = new Serializer().Deserialize<List<RejectedTimeSerie>>(messageRecord)!;
+        Series = new Serializer().Deserialize<RejectedTimeSerie>(messageRecord)!;
     }
 
-    public IReadOnlyList<RejectedTimeSerie> Series { get; }
+    public RejectedTimeSerie Series { get; }
 }
 
 public record RejectedTimeSerie(
     Guid TransactionId,
-    RejectReason RejectReason,
+    IReadOnlyList<RejectReason> RejectReasons,
     string OriginalTransactionIdReference);
 
 public record RejectReason(string ErrorCode, string ErrorMessage);

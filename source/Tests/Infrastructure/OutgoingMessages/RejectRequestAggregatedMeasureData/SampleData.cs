@@ -14,6 +14,7 @@
 
 using System;
 using Domain.Actors;
+using Domain.OutgoingMessages;
 using NodaTime;
 using NodaTime.Text;
 
@@ -21,10 +22,6 @@ namespace Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureDa
 
 internal static class SampleData
 {
-    public static string EnergySupplierNumber => "5790001330552";
-
-    public static string BalanceResponsibleNumber => "6790001330551";
-
     public static string MessageId => "12345678";
 
     public static string SenderId => "1234567890123";
@@ -35,13 +32,17 @@ internal static class SampleData
 
     public static MarketRole ReceiverRole => MarketRole.BalanceResponsibleParty;
 
-    public static string Timestamp => "2022-12-20T23:00:00Z";
-
-    public static string GridAreaCode => "234";
+    public static Instant CreationDate => InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value;
 
     public static Guid TransactionId => Guid.Parse("4E85A732-85FD-4D92-8FF3-72C052802716");
 
-    public static Instant StartOfPeriod => InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value;
+    public static string ReasonCode => "A02";
 
-    public static Instant EndOfPeriod => InstantPattern.General.Parse("2022-02-13T23:00:00Z").Value;
+    public static BusinessReason BusinessReason => BusinessReason.BalanceFixing;
+
+    public static string SerieReasonCode => "E18";
+
+    public static string SerieReasonMessage => "Det virker ikke!";
+
+    public static string OriginalTransactionId => "4E85A732-85FD-4D92-8FF3-72C052802717";
 }

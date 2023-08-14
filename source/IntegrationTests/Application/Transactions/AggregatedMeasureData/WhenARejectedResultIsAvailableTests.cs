@@ -52,9 +52,13 @@ public class WhenARejectedResultIsAvailableTests : TestBase
         {
             ErrorCode = ErrorCodes.NoDataForPeriod,
         };
+        var rejectReason2 = new RejectReason()
+        {
+            ErrorCode = ErrorCodes.InvalidPeriod,
+        };
         var rejectEvent = new AggregatedTimeSeriesRequestRejected()
         {
-            RejectReasons = { rejectReason },
+            RejectReasons = { rejectReason, rejectReason2 },
         };
 
         // Act
@@ -68,7 +72,8 @@ public class WhenARejectedResultIsAvailableTests : TestBase
             .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasAnyMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReason.ErrorCode, rejectReason.ErrorCode.ToString());
+            .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons[0].ErrorCode, rejectReason.ErrorCode.ToString())
+            .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons[1].ErrorCode, rejectReason2.ErrorCode.ToString());
     }
 
     protected override void Dispose(bool disposing)
