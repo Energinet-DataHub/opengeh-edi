@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
@@ -118,6 +120,13 @@ namespace IntegrationTests.Assertions
         {
             var sut = _serializer.Deserialize<TMessageRecord>(_message.MessageRecord);
             Assert.Equal(expectedValue, propertySelector(sut));
+            return this;
+        }
+
+        public AssertOutgoingMessage HasAnyMessageRecordValue<TMessageRecord>(Func<TMessageRecord, object> propertySelector, object expectedValue)
+        {
+            IReadOnlyList<TMessageRecord> sut = _serializer.Deserialize<IReadOnlyList<TMessageRecord>>(_message.MessageRecord);
+            Assert.Equal(expectedValue, sut.Select(propertySelector).First());
             return this;
         }
 
