@@ -125,7 +125,7 @@ namespace IntegrationTests.Assertions
 
         public AssertOutgoingMessage HasAnyMessageRecordValue<TMessageRecord>(Func<TMessageRecord, object> propertySelector, object expectedValue)
         {
-            var sut = _serializer.Deserialize<IReadOnlyList<TMessageRecord>>(_message.MessageRecord);
+            IReadOnlyList<TMessageRecord> sut = _serializer.Deserialize<IReadOnlyList<TMessageRecord>>(_message.MessageRecord);
             Assert.Equal(expectedValue, sut.Select(propertySelector).First());
             return this;
         }

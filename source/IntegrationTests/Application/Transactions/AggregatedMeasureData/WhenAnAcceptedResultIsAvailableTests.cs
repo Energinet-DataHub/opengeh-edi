@@ -92,18 +92,6 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion!, timeSerie.SettlementVersion);
     }
 
-    private async Task AddInboxEvent(
-        AggregatedMeasureDataProcess process,
-        AggregatedTimeSeriesRequestAccepted acceptedEvent)
-    {
-        await GetService<InboxEventReceiver>()
-            .ReceiveAsync(
-                Guid.NewGuid().ToString(),
-                nameof(AggregatedTimeSeriesRequestAccepted),
-                process.ProcessId.Id,
-                acceptedEvent.ToByteArray()).ConfigureAwait(false);
-    }
-
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
@@ -147,6 +135,18 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             TimeSeriesPoints = { point },
             TimeSeriesType = TimeSeriesType.Production,
         };
+    }
+
+    private async Task AddInboxEvent(
+        AggregatedMeasureDataProcess process,
+        AggregatedTimeSeriesRequestAccepted acceptedEvent)
+    {
+        await GetService<InboxEventReceiver>()
+            .ReceiveAsync(
+                Guid.NewGuid().ToString(),
+                nameof(AggregatedTimeSeriesRequestAccepted),
+                process.ProcessId.Id,
+                acceptedEvent.ToByteArray()).ConfigureAwait(false);
     }
 
     private async Task<AssertOutgoingMessage> OutgoingMessageAsync(
