@@ -23,8 +23,10 @@ using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.Edi.Responses;
+using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Infrastructure.Configuration.DataAccess;
+using Infrastructure.InboxEvents;
 using Infrastructure.OutgoingMessages.Common;
 using IntegrationTests.Assertions;
 using IntegrationTests.Fixtures;
@@ -68,30 +70,29 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     }
 
     // TODO: Raise condition, getting two unique eventIds pointing at the same reference?
-    // [Fact]
-    // public async Task Receive_2_Aggregated_measure_data_responses_is_accepted()
-    // {
-    //     // Arrange
-    //     var process = BuildProcess();
-    //     var acceptedEvent = GetAcceptedEvent(process);
-    //
-    //     // Act
-    //     var task01 = HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id);
-    //     var task02 = HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id);
-    //
-    //     await Task.WhenAll(task01, task02);
-    //
-    //     // Assert
-    //     var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
-    //     var timeSerie = acceptedEvent.Series.First();
-    //     outgoingMessage
-    //         .HasBusinessReason(CimCode.To(process.BusinessReason).Name)
-    //         .HasReceiverId(process.RequestedByActorId.Value)
-    //         .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
-    //         .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
-    //         .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-    //         .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion!, timeSerie.SettlementVersion);
-    // }
+    [Fact]
+    public async Task Receive_2_Aggregated_measure_data_responses_is_accepted()
+    {
+        // Arrange
+        var process = BuildProcess();
+        var acceptedEvent = GetAcceptedEvent(process);
+
+        // Act
+        await GetService<InboxEventReceiver>().ReceiveAsync(Guid.NewGuid().ToString(), nameof(AggregatedTimeSeriesRequestAccepted), process.ProcessId.Id, acceptedEvent.ToByteArray()).ConfigureAwait(false);
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id);
+
+        // Assert
+        var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
+        var timeSerie = acceptedEvent.Series.First();
+        outgoingMessage
+            .HasBusinessReason(CimCode.To(process.BusinessReason).Name)
+            .HasReceiverId(process.RequestedByActorId.Value)
+            .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
+            .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
+            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
+            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion!, timeSerie.SettlementVersion);
+    }
+
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
