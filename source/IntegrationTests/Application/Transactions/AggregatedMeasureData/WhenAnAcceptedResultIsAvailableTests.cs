@@ -69,16 +69,16 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion!, timeSerie.SettlementVersion);
     }
 
-    // TODO: Raise condition, getting two unique eventIds pointing at the same reference?
     [Fact]
-    public async Task Receive_2_Aggregated_measure_data_responses_is_accepted()
+    public async Task Received_2_accepted_events_for_same_aggregated_measure_data_process()
     {
         // Arrange
         var process = BuildProcess();
         var acceptedEvent = GetAcceptedEvent(process);
 
         // Act
-        await GetService<InboxEventReceiver>().ReceiveAsync(Guid.NewGuid().ToString(), nameof(AggregatedTimeSeriesRequestAccepted), process.ProcessId.Id, acceptedEvent.ToByteArray()).ConfigureAwait(false);
+        await GetService<InboxEventReceiver>()
+            .ReceiveAsync(Guid.NewGuid().ToString(), nameof(AggregatedTimeSeriesRequestAccepted), process.ProcessId.Id, acceptedEvent.ToByteArray()).ConfigureAwait(false);
         await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id);
 
         // Assert
