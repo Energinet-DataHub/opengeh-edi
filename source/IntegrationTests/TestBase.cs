@@ -123,7 +123,13 @@ namespace IntegrationTests
 
         protected async Task HavingReceivedInboxEventAsync(string eventType, IMessage eventPayload, Guid processId)
         {
-            await GetService<InboxEventReceiver>().ReceiveAsync(Guid.NewGuid().ToString(), eventType, processId, eventPayload.ToByteArray()).ConfigureAwait(false);
+            await GetService<InboxEventReceiver>().
+                ReceiveAsync(
+                    Guid.NewGuid().ToString(),
+                    eventType,
+                    processId,
+                    eventPayload.ToByteArray())
+                .ConfigureAwait(false);
             await ProcessReceivedInboxEventsAsync().ConfigureAwait(false);
             await ProcessInternalCommandsAsync().ConfigureAwait(false);
         }

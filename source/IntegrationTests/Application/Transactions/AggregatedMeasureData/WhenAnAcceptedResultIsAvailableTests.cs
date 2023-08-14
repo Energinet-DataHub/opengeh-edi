@@ -77,8 +77,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         var acceptedEvent = GetAcceptedEvent(process);
 
         // Act
-        await GetService<InboxEventReceiver>()
-            .ReceiveAsync(Guid.NewGuid().ToString(), nameof(AggregatedTimeSeriesRequestAccepted), process.ProcessId.Id, acceptedEvent.ToByteArray()).ConfigureAwait(false);
+        await AddInboxEvent(process, acceptedEvent);
         await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id);
 
         // Assert
@@ -91,6 +90,18 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion!, timeSerie.SettlementVersion);
+    }
+
+    private async Task AddInboxEvent(
+        AggregatedMeasureDataProcess process,
+        AggregatedTimeSeriesRequestAccepted acceptedEvent)
+    {
+        await GetService<InboxEventReceiver>()
+            .ReceiveAsync(
+                Guid.NewGuid().ToString(),
+                nameof(AggregatedTimeSeriesRequestAccepted),
+                process.ProcessId.Id,
+                acceptedEvent.ToByteArray()).ConfigureAwait(false);
     }
 
     protected override void Dispose(bool disposing)
