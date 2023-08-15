@@ -103,8 +103,6 @@ public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureD
                 .ToString(),
             element.GetProperty("meteringGridArea_Domain.mRID").GetProperty("value")
                 .ToString(),
-            element.GetProperty("biddingZone_Domain.mRID").GetProperty("value")
-                .ToString(),
             element.GetProperty("energySupplier_MarketParticipant.mRID").GetProperty("value")
                 .ToString(),
             element.GetProperty("balanceResponsibleParty_MarketParticipant.mRID").GetProperty("value")

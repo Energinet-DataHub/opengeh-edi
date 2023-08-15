@@ -22,6 +22,5 @@ public record Serie(
     string StartDateAndOrTimeDateTime,
     string EndDateAndOrTimeDateTime,
     string MeteringGridAreaDomainId,
-    string BiddingZoneDomainId,
     string EnergySupplierMarketParticipantId,
     string BalanceResponsiblePartyMarketParticipantId) : IMarketActivityRecord;
