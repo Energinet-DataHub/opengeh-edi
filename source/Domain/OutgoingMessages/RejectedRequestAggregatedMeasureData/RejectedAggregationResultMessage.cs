@@ -21,7 +21,7 @@ namespace Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
 public class RejectedAggregationResultMessage : OutgoingMessage
 {
     public RejectedAggregationResultMessage(ActorNumber receiverId, TransactionId transactionId, string businessReason, MarketRole receiverRole, RejectedTimeSerie series)
-        : base(DocumentType.RejectAggregatedMeasureData, receiverId, transactionId, businessReason, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringDataAdministrator, new Serializer().Serialize(series))
+        : base(DocumentType.RejectRequestAggregatedMeasureData, receiverId, transactionId, businessReason, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringDataAdministrator, new Serializer().Serialize(series))
     {
         Series = series;
     }
