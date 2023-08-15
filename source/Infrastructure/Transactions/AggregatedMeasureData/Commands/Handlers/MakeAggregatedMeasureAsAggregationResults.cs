@@ -106,7 +106,6 @@ public class MakeAggregatedMeasureAsAggregationResults : IRequestHandler<CreateA
 
     private static ActorGrouping MapActorGrouping(AggregatedMeasureDataProcess process)
     {
-        //return new ActorGrouping(process.EnergySupplierId, process.BalanceResponsibleId);
         if (process.RequestedByActorRoleCode == MarketRole.BalanceResponsibleParty.Code)
         {
             return new ActorGrouping(null, process.BalanceResponsibleId);
