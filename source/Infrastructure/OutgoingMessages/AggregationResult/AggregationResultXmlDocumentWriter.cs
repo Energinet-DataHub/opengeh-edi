@@ -59,7 +59,6 @@ public class AggregationResultXmlDocumentWriter : DocumentWriter
                 "marketEvaluationPoint.settlementMethod", timeSeries.SettlementType is null ? null : CimCode.Of(SettlementType.From(timeSeries.SettlementType)), writer).ConfigureAwait(false);
             await WriteElementIfHasValueAsync("settlement_Series.version", timeSeries.SettlementVersion, writer).ConfigureAwait(false);
             await WriteElementIfHasValueAsync("originalTransactionIDReference_Series.mRID", timeSeries.OriginalTransactionIdReference, writer).ConfigureAwait(false);
-            await WriteElementIfHasValueAsync("product", timeSeries.Product, writer).ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "meteringGridArea_Domain.mRID", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "codingScheme", null, "NDK").ConfigureAwait(false);
