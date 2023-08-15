@@ -52,7 +52,7 @@ public abstract class DocumentWriter : IDocumentWriter
         return stream;
     }
 
-    public bool HandlesType(DocumentType documentType)
+    public virtual bool HandlesType(DocumentType documentType)
     {
         if (documentType == null) throw new ArgumentNullException(nameof(documentType));
         return documentType.Name.Equals(_documentDetails.Type.Split("_")[0], StringComparison.OrdinalIgnoreCase);
