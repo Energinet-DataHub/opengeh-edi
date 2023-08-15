@@ -44,7 +44,6 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
         var exceptedTimeSerie = aggregatedTimeSeriesRequestAccepted.Series.First();
         Assert.Equal(exceptedTimeSerie.GridArea, actualTimeSerie.GridAreaDetails.GridAreaCode);
         Assert.Equal(exceptedTimeSerie.SettlementVersion, actualTimeSerie.SettlementVersion);
-        Assert.Equal(MapProduct(exceptedTimeSerie), actualTimeSerie.Product);
         Assert.Equal(exceptedTimeSerie.Period.StartOfPeriod.ToInstant(), actualTimeSerie.Period.Start);
         Assert.Equal(exceptedTimeSerie.Period.EndOfPeriod.ToInstant(), actualTimeSerie.Period.End);
         Assert.Equal(MapUnitType(exceptedTimeSerie), actualTimeSerie.UnitType);
@@ -63,17 +62,6 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
     {
         _actualNotifications.Add(notification);
         return Task.CompletedTask;
-    }
-
-    private static string? MapProduct(Serie serie)
-    {
-        return serie.Product switch
-        {
-            Product.Energy => ProductType.Energy.Name,
-            Product.Tarif => ProductType.Tarif.Name,
-            Product.Unspecified => null,
-            _ => throw new InvalidOperationException("Could not determine product type"),
-        };
     }
 
     private static string MapQuality(QuantityQuality quality)

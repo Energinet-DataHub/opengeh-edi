@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json;
 using Domain.Actors;
 using Domain.Documents;
 using Domain.SeedWork;
@@ -59,7 +58,6 @@ public class AggregationResultMessage : OutgoingMessage
             result.Period,
             result.Points.Select(p => new Point(p.Position, p.Quantity, p.Quality, p.SampleTime)).ToList(),
             result.OriginalTransactionIdReference,
-            result.Product,
             result.SettlementVersion);
 
         return new AggregationResultMessage(
@@ -83,7 +81,6 @@ public record TimeSeries(
     Period Period,
     IReadOnlyList<Point> Point,
     string? OriginalTransactionIdReference = null,
-    string? Product = null,
     string? SettlementVersion = null);
 
 public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);

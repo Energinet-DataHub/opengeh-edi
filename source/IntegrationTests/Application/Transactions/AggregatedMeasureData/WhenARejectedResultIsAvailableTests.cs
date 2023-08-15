@@ -98,8 +98,8 @@ public class WhenARejectedResultIsAvailableTests : TestBase
         var process = new AggregatedMeasureDataProcess(
           ProcessId.New(),
           BusinessTransactionId.Create(Guid.NewGuid().ToString()),
-          SampleData.Receiver,
-          SampleData.ReceiverRole.Code,
+          SampleData.ReceiverNumber,
+          SampleData.BalanceResponsibleParty.Code,
           CimCode.Of(BusinessReason.BalanceFixing),
           null,
           null,
