@@ -86,7 +86,6 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
         {
             SettlementVersion = "0",
             GridArea = "244",
-            Product = Product.Tarif,
             QuantityUnit = QuantityUnit.Kwh,
             Period = period,
             TimeSeriesPoints = { point },

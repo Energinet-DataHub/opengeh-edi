@@ -96,7 +96,6 @@ public static class AggregatedMeasureDataResponseFactory
             SettlementVersion = aggregatedMeasureDataProcess.SettlementVersion ?? "0",
 #pragma warning restore CA1305
             GridArea = aggregatedMeasureDataProcess.MeteringGridAreaDomainId,
-            Product = Product.Tarif,
             QuantityUnit = QuantityUnit.Kwh,
             Period = period,
             TimeSeriesPoints = { point },
