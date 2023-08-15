@@ -34,9 +34,16 @@ public class RemoveInternalCommandsWhenADayHasPassed : INotificationHandler<ADay
     public async Task Handle(ADayHasPassed notification, CancellationToken cancellationToken)
     {
         const string deleteStmt = @"
-            DELETE FROM [dbo].[QueuedInternalCommands]
-            WHERE [ProcessedDate] IS NOT NULL
-             AND [ErrorMessage] IS NULL";
+            WHILE (SELECT Count(*) FROM [dbo].[QueuedInternalCommands] WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL) > 0
+                BEGIN
+                    WITH CTE AS
+                             (
+                                 SELECT TOP 1000 *
+                                 FROM [dbo].[QueuedInternalCommands]
+                             )
+                    DELETE FROM CTE WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL;
+                    SELECT 'Cleared 1000 expired rows' AS 'INFO LOG';
+                END";
 
         using var connection =
             (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
