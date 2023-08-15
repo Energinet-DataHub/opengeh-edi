@@ -73,7 +73,6 @@ public class MakeAggregatedMeasureAsAggregationResults : IRequestHandler<CreateA
                     process.BusinessTransactionId.Id,
                     process.RequestedByActorId.Value,
                     MapReceiverRole(process),
-                    timeSerie.Product,
                     timeSerie.SettlementVersion));
 
             await _mediator.Publish(
@@ -107,7 +106,18 @@ public class MakeAggregatedMeasureAsAggregationResults : IRequestHandler<CreateA
 
     private static ActorGrouping MapActorGrouping(AggregatedMeasureDataProcess process)
     {
-        return new ActorGrouping(process.EnergySupplierId, process.BalanceResponsibleId);
+        //return new ActorGrouping(process.EnergySupplierId, process.BalanceResponsibleId);
+        if (process.RequestedByActorRoleCode == MarketRole.BalanceResponsibleParty.Code)
+        {
+            return new ActorGrouping(null, process.BalanceResponsibleId);
+        }
+
+        if (process.RequestedByActorRoleCode == MarketRole.EnergySupplier.Code)
+        {
+            return new ActorGrouping(process.EnergySupplierId, null);
+        }
+
+        return new ActorGrouping(null, null);
     }
 
     private static string? MapSettlementMethod(AggregatedMeasureDataProcess process)

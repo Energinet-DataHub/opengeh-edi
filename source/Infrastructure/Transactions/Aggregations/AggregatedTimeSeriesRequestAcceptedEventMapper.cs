@@ -61,7 +61,6 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
                     MapResolution(serie.Period.Resolution),
                     MapPeriod(serie.Period),
                     await MapGridAreaDetailsAsync(serie).ConfigureAwait(false),
-                    MapProduct(serie),
                     MapSettlementVersion(serie)));
         }
 
@@ -86,17 +85,6 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
     private static string? MapSettlementVersion(Serie serie)
     {
         return serie.SettlementVersion;
-    }
-
-    private static string? MapProduct(Serie serie)
-    {
-        return serie.Product switch
-        {
-            Product.Energy => ProductType.Energy.Name,
-            Product.Tarif => ProductType.Tarif.Name,
-            Product.Unspecified => null,
-            _ => throw new InvalidOperationException("Could not determine product type"),
-        };
     }
 
     private static string MapMeteringPointType(Serie serie)

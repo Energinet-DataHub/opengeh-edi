@@ -66,7 +66,9 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion!, timeSerie.SettlementVersion);
+            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion, timeSerie.SettlementVersion)
+            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
+            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId);
     }
 
     [Fact]
@@ -129,7 +131,6 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             SettlementVersion = aggregatedMeasureDataProcess.SettlementVersion ?? "0",
 #pragma warning restore CA1305
             GridArea = aggregatedMeasureDataProcess.MeteringGridAreaDomainId,
-            Product = Product.Tarif,
             QuantityUnit = QuantityUnit.Kwh,
             Period = period,
             TimeSeriesPoints = { point },
@@ -160,13 +161,15 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
     }
 
-    private AggregatedMeasureDataProcess BuildProcess()
+    private AggregatedMeasureDataProcess BuildProcess(MarketRole? receiverRole = null)
     {
+        receiverRole ??= SampleData.BalanceResponsibleParty;
+
         var process = new AggregatedMeasureDataProcess(
           ProcessId.New(),
           BusinessTransactionId.Create(Guid.NewGuid().ToString()),
-          SampleData.Receiver,
-          SampleData.ReceiverRole.Code,
+          SampleData.ReceiverNumber,
+          receiverRole.Code,
           CimCode.Of(BusinessReason.BalanceFixing),
           null,
           null,
@@ -174,8 +177,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
           SampleData.StartOfPeriod,
           SampleData.EndOfPeriod,
           SampleData.GridAreaCode,
-          null,
-          null);
+          receiverRole == MarketRole.EnergySupplier ? SampleData.ReceiverNumber.Value : null,
+          receiverRole == MarketRole.BalanceResponsibleParty ? SampleData.ReceiverNumber.Value : null);
 
         process.WasSentToWholesale();
         _b2BContext.AggregatedMeasureDataProcesses.Add(process);

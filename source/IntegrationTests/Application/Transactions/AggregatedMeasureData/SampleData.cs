@@ -26,7 +26,7 @@ internal sealed class SampleData
 
     internal static Instant EndOfPeriod => EffectiveDateFactory.OffsetDaysFromToday(1);
 
-    internal static ActorNumber Receiver => ActorNumber.Create("8200000007743");
+    internal static ActorNumber ReceiverNumber => ActorNumber.Create("8200000007743");
 
-    internal static MarketRole ReceiverRole => MarketRole.BalanceResponsibleParty;
+    internal static MarketRole BalanceResponsibleParty => MarketRole.BalanceResponsibleParty;
 }
