@@ -65,17 +65,20 @@ public class ForwardRejectedAggregationResultHandler : IRequestHandler<ForwardRe
         IReadOnlyList<RejectReason> rejectedReasons)
     {
         var transactionId = TransactionId.Create(process.ProcessId.Id);
-        var rejectedTimeSeries = rejectedReasons.Select(reason =>
-            new RejectedTimeSerie(
+        var rejectedTimeSerie = new RejectedTimeSerie(
                 transactionId.Id,
-                new Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData.RejectReason(reason.ErrorCode, reason.ErrorMessage),
-                process.BusinessTransactionId.Id));
+                rejectedReasons.Select(reason =>
+                        new Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData.RejectReason(
+                            reason.ErrorCode,
+                            reason.ErrorMessage))
+                    .ToList(),
+                process.BusinessTransactionId.Id);
 
         return new RejectedAggregationResultMessage(
             process.RequestedByActorId,
             transactionId,
             CimCode.To(process.BusinessReason).Name,
             MarketRole.FromCode(process.RequestedByActorRoleCode),
-            rejectedTimeSeries.ToList());
+            rejectedTimeSerie);
     }
 }

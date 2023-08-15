@@ -85,6 +85,7 @@ public class CimXmlSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
         {
             DocumentType.AggregationResult => "notifyaggregatedmeasuredata",
             DocumentType.CustomerMasterData => "CharacteristicsOfACustomerAtAnAp",
+            DocumentType.RejectRequestAggregatedMeasureData => "RejectRequestAggregatedMeasureData",
             _ => throw new InvalidOperationException("Unknown document type"),
         };
     }
