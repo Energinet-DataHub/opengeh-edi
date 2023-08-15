@@ -37,6 +37,7 @@ internal static class InternalCommandProcessing
         services.AddTransient<InternalCommandAccessor>();
         services.AddTransient<InternalCommandProcessor>();
         services.AddTransient<INotificationHandler<TenSecondsHasHasPassed>, ProcessInternalCommandsOnTimeHasPassed>();
+        services.AddTransient<INotificationHandler<ADayHasPassed>, RemoveInternalCommandsWhenADayHasPassed>();
     }
 
     private static InternalCommandMapper CreateInternalCommandMap()
