@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Application.OutgoingMessages.Common;
 using Application.OutgoingMessages.Common.Xml;
+using Domain.Documents;
 using Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
 using Infrastructure.OutgoingMessages.Common.Xml;
 
@@ -36,6 +37,13 @@ public class RejectRequestAggregatedMeasureDataXmlDocumentWriter : DocumentWrite
             parser,
             "A02")
     {
+    }
+
+    // TODO: This document type is obsolete and should not be used. Can be deleted after 2023-08-20
+    public override bool HandlesType(DocumentType documentType)
+    {
+        return DocumentType.RejectAggregatedMeasureData == documentType
+               || DocumentType.RejectRequestAggregatedMeasureData == documentType;
     }
 
     protected override async Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer)
