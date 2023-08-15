@@ -32,10 +32,6 @@
 					"codingScheme": "A10",
 					"value": "5799999933318"
 				},
-				"biddingZone_Domain.mRID": {
-					"codingScheme": "A01",
-					"value": "10YDK-1--------M"
-				},
 				"end_DateAndOrTime.dateTime": "2022-07-22T22:00:00Z",
 				"energySupplier_MarketParticipant.mRID": {
 					"codingScheme": "A10",

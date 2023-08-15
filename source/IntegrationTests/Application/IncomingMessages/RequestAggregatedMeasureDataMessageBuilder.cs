@@ -32,7 +32,6 @@ public class RequestAggregatedMeasureDataMessageBuilder
     private readonly string _startDateAndOrTimeDateTime = "2022-06-17T22:00:00Z";
     private readonly string _endDateAndOrTimeDateTime = "2022-07-22T22:00:00Z";
     private readonly string _meteringGridAreaDomainId = "244";
-    private readonly string _biddingZoneDomainId = "10YDK-1--------M";
     private readonly string _energySupplierMarketParticipantId = "5790001330552";
     private readonly string _balanceResponsiblePartyMarketParticipantId = "5799999933318";
     private readonly string _messageType = NotSet;
@@ -60,7 +59,6 @@ public class RequestAggregatedMeasureDataMessageBuilder
             _startDateAndOrTimeDateTime,
             _endDateAndOrTimeDateTime,
             _meteringGridAreaDomainId,
-            _biddingZoneDomainId,
             _energySupplierMarketParticipantId,
             _balanceResponsiblePartyMarketParticipantId);
 
