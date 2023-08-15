@@ -87,7 +87,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
         BusinessReason businessReason)
     {
         return await AssertOutgoingMessage.OutgoingMessageAsync(
-            DocumentType.RejectAggregatedMeasureData.Name,
+            DocumentType.RejectRequestAggregatedMeasureData.Name,
             businessReason.Name,
             roleOfReceiver,
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);

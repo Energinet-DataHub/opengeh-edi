@@ -57,7 +57,7 @@ public class ValidateAggregatedMeasureDataRequestHandler
             string.IsNullOrWhiteSpace(messageHeader.MessageId)
                 ? "Unknown message id"
                 : messageHeader.MessageId,
-            DocumentType.RequestAggregatedMeasureData,
+            IncomingDocumentType.RequestAggregatedMeasureData,
             TryGetActorNumber(messageHeader.SenderId),
             TryGetActorNumber(messageHeader.ReceiverId),
             timestamp,
