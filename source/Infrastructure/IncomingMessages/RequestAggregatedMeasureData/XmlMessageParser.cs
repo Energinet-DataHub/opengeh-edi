@@ -174,7 +174,6 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
         var startDateAndOrTimeDateTime = string.Empty;
         var endDateAndOrTimeDateTime = string.Empty;
         var meteringGridAreaDomainId = string.Empty;
-        var biddingZoneDomainId = string.Empty;
         var energySupplierMarketParticipantId = string.Empty;
         var balanceResponsiblePartyMarketParticipantId = string.Empty;
         var ns = rootElement.DefaultNamespace;
@@ -193,7 +192,6 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
                     ref startDateAndOrTimeDateTime,
                     ref endDateAndOrTimeDateTime,
                     ref meteringGridAreaDomainId,
-                    ref biddingZoneDomainId,
                     ref energySupplierMarketParticipantId,
                     ref balanceResponsiblePartyMarketParticipantId);
                 yield return record;
@@ -230,10 +228,6 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
             {
                 meteringGridAreaDomainId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
-            else if (reader.Is("biddingZone_Domain.mRID", ns))
-            {
-                biddingZoneDomainId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
             else if (reader.Is("energySupplier_MarketParticipant.mRID", ns))
             {
                 energySupplierMarketParticipantId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
@@ -257,7 +251,6 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
         ref string startDateAndOrTimeDateTime,
         ref string endDateAndOrTimeDateTime,
         ref string meteringGridAreaDomainId,
-        ref string biddingZoneDomainId,
         ref string energySupplierMarketParticipantId,
         ref string balanceResponsiblePartyMarketParticipantId)
     {
@@ -269,7 +262,6 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
             startDateAndOrTimeDateTime,
             endDateAndOrTimeDateTime,
             meteringGridAreaDomainId,
-            biddingZoneDomainId,
             energySupplierMarketParticipantId,
             balanceResponsiblePartyMarketParticipantId);
 
@@ -280,7 +272,6 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
         startDateAndOrTimeDateTime = string.Empty;
         endDateAndOrTimeDateTime = string.Empty;
         meteringGridAreaDomainId = string.Empty;
-        biddingZoneDomainId = string.Empty;
         energySupplierMarketParticipantId = string.Empty;
         balanceResponsiblePartyMarketParticipantId = string.Empty;
 

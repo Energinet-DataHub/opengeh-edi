@@ -94,7 +94,6 @@ public class MessageParserTests
             Assert.True(serie != null);
             Assert.Equal("123353185", serie.Id);
             Assert.Equal("5799999933318", serie.BalanceResponsiblePartyMarketParticipantId);
-            Assert.Equal("10YDK-1--------M", serie.BiddingZoneDomainId);
             Assert.Equal("5790001330552", serie.EnergySupplierMarketParticipantId);
             Assert.Equal("E17", serie.MarketEvaluationPointType);
             Assert.Equal("244", serie.MeteringGridAreaDomainId);
