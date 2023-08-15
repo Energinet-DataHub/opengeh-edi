@@ -20,13 +20,13 @@ using Application.Configuration.TimeEvents;
 using MediatR;
 using Microsoft.Data.SqlClient;
 
-namespace Infrastructure.Configuration.InternalCommands;
+namespace Infrastructure.Configuration.IntegrationEvents;
 
-public class RemoveInternalCommandsWhenADayHasPassed : INotificationHandler<ADayHasPassed>
+public class RemoveIntegrationEventsWhenADaysHasPassed : INotificationHandler<ADayHasPassed>
 {
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
 
-    public RemoveInternalCommandsWhenADayHasPassed(IDatabaseConnectionFactory databaseConnectionFactory)
+    public RemoveIntegrationEventsWhenADaysHasPassed(IDatabaseConnectionFactory databaseConnectionFactory)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
     }
@@ -34,7 +34,7 @@ public class RemoveInternalCommandsWhenADayHasPassed : INotificationHandler<ADay
     public async Task Handle(ADayHasPassed notification, CancellationToken cancellationToken)
     {
         const string deleteStmt = @"
-            DELETE FROM [dbo].[QueuedInternalCommands]
+            DELETE FROM [dbo].[ReceivedIntegrationEvents]
             WHERE [ProcessedDate] IS NOT NULL
              AND [ErrorMessage] IS NULL";
 

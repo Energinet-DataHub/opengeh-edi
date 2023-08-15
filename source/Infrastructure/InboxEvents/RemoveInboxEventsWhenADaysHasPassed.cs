@@ -35,8 +35,8 @@ public class RemoveInboxEventsWhenADaysHasPassed : INotificationHandler<ADayHasP
     {
         const string deleteStmt = @"
             DELETE FROM [dbo].[ReceivedInboxEvents]
-            WHERE [ProcessedDate] != null
-            AND [ErrorMessage] = null";
+            WHERE [ProcessedDate] IS NOT NULL
+                AND [ErrorMessage] IS NULL";
 
         using var connection =
             (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);

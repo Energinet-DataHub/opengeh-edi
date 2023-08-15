@@ -23,10 +23,8 @@ public static class InboxEventsConfiguration
 {
     public static void Configure(IServiceCollection services)
     {
-        services.AddTransient<INotificationHandler<TenSecondsHasHasPassed>,
-            ProcessInboxEventsOnTenSecondsHasPassed>();
-        services.AddTransient<INotificationHandler<ADayHasPassed>,
-            RemoveInboxEventsWhenADaysHasPassed>();
+        services.AddTransient<INotificationHandler<TenSecondsHasHasPassed>, ProcessInboxEventsOnTenSecondsHasPassed>();
+        services.AddTransient<INotificationHandler<ADayHasPassed>, RemoveInboxEventsWhenADaysHasPassed>();
         services.AddTransient<InboxEventReceiver>();
         services.AddTransient<InboxEventsProcessor>();
         services.AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestAcceptedEventMapper>();
