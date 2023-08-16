@@ -55,7 +55,7 @@ public class MakeAggregatedMeasureAsAggregationResults : IRequestHandler<CreateA
         var process = await _aggregatedMeasureDataProcessRepository
             .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
-        var responseData = _serializer.Deserialize<IList<AggregatedTimeSerie>>(process.ResponseData ?? string.Empty);
+        var responseData = _serializer.Deserialize<IList<AggregatedTimeSerie>>(process.ResponseData ?? string.Empty); //If type or its props is changed, serializer.Deserialize could throw an exception
 
         foreach (var timeSerie in responseData)
         {
