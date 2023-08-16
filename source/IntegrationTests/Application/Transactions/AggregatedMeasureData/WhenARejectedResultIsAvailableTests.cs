@@ -103,7 +103,6 @@ public class WhenARejectedResultIsAvailableTests : TestBase
           CimCode.Of(BusinessReason.BalanceFixing),
           null,
           null,
-          null,
           SampleData.StartOfPeriod,
           SampleData.EndOfPeriod,
           SampleData.GridAreaCode,

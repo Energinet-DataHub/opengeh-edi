@@ -45,7 +45,6 @@ public class AggregatedMeasureDataRequestHandler : IRequestHandler<RequestAggreg
             ActorNumber.Create(requestMessageHeader.SenderId),
             requestMessageHeader.SenderRole,
             requestMessageHeader.BusinessReason,
-            requestMarketActivityRecord.SettlementSeriesVersion,
             requestMarketActivityRecord.MarketEvaluationPointType,
             requestMarketActivityRecord.MarketEvaluationSettlementMethod,
             InstantPattern.General.Parse(requestMarketActivityRecord.StartDateAndOrTimeDateTime).GetValueOrThrow(),
