@@ -19,14 +19,13 @@ import "google/protobuf/timestamp.proto";
 option csharp_namespace = "Energinet.DataHub.Edi.Requests";
 
 message AggregatedTimeSeriesRequest { 
-  optional string settlement_version = 1;
-  optional TimeSeriesType time_series_type = 2;
-  Period period = 3;
+  optional TimeSeriesType time_series_type = 1;
+  Period period = 2;
   oneof aggregation_level {
-    AggregationPerGridArea aggregation_per_gridarea = 4;
-    AggregationPerEnergySupplierPerGridArea aggregation_per_energysupplier_per_gridarea = 5;
-    AggregationPerBalanceResponsiblePartyPerGridArea aggregation_per_balanceresponsibleparty_per_gridarea = 6;
-    AggregationPerEnergySupplierPerBalanceResponsiblePartyPerGridArea aggregation_per_energysupplier_per_balanceresponsibleparty_per_gridarea = 7;
+    AggregationPerGridArea aggregation_per_gridarea = 3;
+    AggregationPerEnergySupplierPerGridArea aggregation_per_energysupplier_per_gridarea = 4;
+    AggregationPerBalanceResponsiblePartyPerGridArea aggregation_per_balanceresponsibleparty_per_gridarea = 5;
+    AggregationPerEnergySupplierPerBalanceResponsiblePartyPerGridArea aggregation_per_energysupplier_per_balanceresponsibleparty_per_gridarea = 6;
   }
 }
 
