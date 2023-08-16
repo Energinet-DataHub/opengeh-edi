@@ -61,6 +61,11 @@ namespace ArchitectureTests
                 typeof(INotificationHandler<>),
                 new[] { ApplicationAssemblies.Application, ApplicationAssemblies.Infrastructure });
 
+        public static IEnumerable<object[]> GetDocumentWritersRequirements()
+            => ResolveTypesThatImplementType(
+                typeof(IDocumentWriter),
+                new[] { ApplicationAssemblies.Application, ApplicationAssemblies.Infrastructure });
+
         public static IEnumerable<object[]> GetFunctionRequirements()
         {
             var allTypes = ReflectionHelper.FindAllTypes();
@@ -109,6 +114,14 @@ namespace ArchitectureTests
             Assert.True(scope.ServiceProvider.CanSatisfyRequirement(requirement));
         }
 
+        [Theory(DisplayName = nameof(All_document_writer_are_registered))]
+        [MemberData(nameof(GetDocumentWritersRequirements))]
+        public void All_document_writer_are_registered(Requirement requirement)
+        {
+            using var scope = _host.Services.CreateScope();
+            Assert.True(scope.ServiceProvider.CanSatisfyType(requirement));
+        }
+
         [Theory(DisplayName = nameof(All_dependencies_can_be_resolved_for_middleware))]
         [MemberData(nameof(GetMiddlewareRequirements))]
         public void All_dependencies_can_be_resolved_for_middleware(Requirement requirement)
@@ -133,6 +146,15 @@ namespace ArchitectureTests
 
             return allImplementations(targetType, allTypes(assemblies))
                 .Select(type => new object[] { new Requirement(type.Name, getGenericTypeDefinition(type, targetType)) });
+        }
+
+        private static IEnumerable<object[]> ResolveTypesThatImplementType(Type targetType, Assembly[] assemblies)
+        {
+            var allTypes = ReflectionHelper.FindAllTypesInAssemblies();
+            var allImplementations = ReflectionHelper.FindAllTypesThatImplementType();
+
+            return allImplementations(targetType, allTypes(assemblies))
+                .Select(type => new object[] { new Requirement(type.Name, new List<Type> { targetType }, type) });
         }
 
         private sealed class TestEnvironment : RuntimeEnvironment
