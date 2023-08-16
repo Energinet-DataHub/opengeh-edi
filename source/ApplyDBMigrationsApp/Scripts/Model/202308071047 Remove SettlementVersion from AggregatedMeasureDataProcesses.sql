@@ -1,2 +1,2 @@
-﻿git chALTER TABLE [dbo].[AggregatedMeasureDataProcesses] DROP COLUMN [SettlementVersion]
-GO
+﻿ALTER TABLE [dbo].[AggregatedMeasureDataProcesses] DROP COLUMN [SettlementVersion]
+GO-b "a"
