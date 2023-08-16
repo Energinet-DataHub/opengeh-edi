@@ -278,6 +278,7 @@ namespace Infrastructure.Configuration
             _services.AddScoped<IDocumentWriter, AggregationResultXmlDocumentWriter>();
             _services.AddScoped<IDocumentWriter, AggregationResultJsonDocumentWriter>();
             _services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataXmlDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataJsonDocumentWriter>();
 
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
             _services.AddScoped<IMessageRecordParser, MessageRecordParser>();

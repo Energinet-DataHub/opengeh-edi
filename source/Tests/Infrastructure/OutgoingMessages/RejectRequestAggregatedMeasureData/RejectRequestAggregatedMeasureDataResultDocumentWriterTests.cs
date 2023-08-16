@@ -43,7 +43,7 @@ public class RejectRequestAggregatedMeasureDataResultDocumentWriterTests : IClas
 
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
-    //[InlineData(nameof(DocumentFormat.Json))]
+    [InlineData(nameof(DocumentFormat.Json))]
     public async Task Can_create_document(string documentFormat)
     {
         var document = await CreateDocument(
@@ -77,7 +77,7 @@ public class RejectRequestAggregatedMeasureDataResultDocumentWriterTests : IClas
         }
         else
         {
-            return new AggregationResultJsonDocumentWriter(_parser).WriteAsync(
+            return new RejectRequestAggregatedMeasureDataJsonDocumentWriter(_parser).WriteAsync(
                 documentHeader,
                 new[] { records, });
         }
@@ -85,16 +85,14 @@ public class RejectRequestAggregatedMeasureDataResultDocumentWriterTests : IClas
 
     private IAssertRejectedAggregatedMeasureDataResultDocument AssertDocument(Stream document, DocumentFormat documentFormat)
     {
-        var assertXmlDocument = AssertXmlDocument.Document(document, "cim", _documentValidation.Validator);
-        return new AssertRejectedAggregatedMeasureDataResultXmlDocument(assertXmlDocument);
-        // if (documentFormat == DocumentFormat.Xml)
-        // {
-        //     var assertXmlDocument = AssertXmlDocument.Document(document, "cim", _documentValidation.Validator);
-        //     return new AssertRejectedAggregatedMeasureDataResultXmlDocument(assertXmlDocument);
-        // }
-        // else
-        // {
-        //     return new AssertAggregationResultJsonDocument(document);
-        // }
+        if (documentFormat == DocumentFormat.Xml)
+        {
+            var assertXmlDocument = AssertXmlDocument.Document(document, "cim", _documentValidation.Validator);
+            return new AssertRejectedAggregatedMeasureDataResultXmlDocument(assertXmlDocument);
+        }
+        else
+        {
+            return new RejectRequestAggregatedMeasureDataResultJsonDocument(document);
+        }
     }
 }
