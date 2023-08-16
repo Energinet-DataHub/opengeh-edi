@@ -41,10 +41,10 @@ internal static class IServiceProviderHelpers
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(requirement);
-        var dep = requirement.DependentOn.SelectMany(dependency =>
-            services.GetServices(dependency));
 
-        return dep.Any(service => service!.GetType() == requirement.ActualType);
+        return requirement.DependentOn
+            .SelectMany(services.GetServices)
+            .Any(service => service!.GetType() == requirement.ActualType);
     }
 
     public static bool RequirementIsPartOfCollection<T>(this IServiceProvider serviceProvider, Requirement requirement)

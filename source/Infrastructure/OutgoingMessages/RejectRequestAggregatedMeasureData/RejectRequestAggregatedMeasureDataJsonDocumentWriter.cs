@@ -74,7 +74,6 @@ public class RejectRequestAggregatedMeasureDataJsonDocumentWriter : IDocumentWri
             writer.WriteStartObject();
 
             writer.WriteProperty("mRID", series.TransactionId.ToString());
-
             writer.WriteProperty("originalTransactionIDReference_Series.mRID", series.OriginalTransactionIdReference);
 
             writer.WritePropertyName("Reason");
