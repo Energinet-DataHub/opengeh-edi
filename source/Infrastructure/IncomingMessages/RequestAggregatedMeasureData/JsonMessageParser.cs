@@ -92,7 +92,6 @@ public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureD
     {
         return new Serie(
             element.GetProperty("mRID").ToString(),
-            GetPropertyWithValue(element, "settlement_Series.version"),
             GetPropertyWithValue(element, "marketEvaluationPoint.type"),
             GetPropertyWithValue(element, "marketEvaluationPoint.settlementMethod"),
             element.GetProperty("start_DateAndOrTime.dateTime").ToString(),

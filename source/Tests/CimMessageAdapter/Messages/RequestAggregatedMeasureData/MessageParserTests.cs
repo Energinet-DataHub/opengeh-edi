@@ -98,7 +98,6 @@ public class MessageParserTests
             Assert.Equal("E17", serie.MarketEvaluationPointType);
             Assert.Equal("244", serie.MeteringGridAreaDomainId);
             Assert.Equal("D01", serie.MarketEvaluationSettlementMethod);
-            Assert.Equal("D01", serie.SettlementSeriesVersion);
             Assert.Equal("2022-07-22T22:00:00Z", serie.EndDateAndOrTimeDateTime);
             Assert.Equal("2022-06-17T22:00:00Z", serie.StartDateAndOrTimeDateTime);
         }

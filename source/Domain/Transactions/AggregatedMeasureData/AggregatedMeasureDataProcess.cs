@@ -29,7 +29,6 @@ namespace Domain.Transactions.AggregatedMeasureData
             ActorNumber requestedByActorId,
             string requestedByActorRoleCode,
             string businessReason,
-            string? settlementVersion,
             string? meteringPointType,
             string? settlementMethod,
             Instant startOfPeriod,
@@ -41,7 +40,6 @@ namespace Domain.Transactions.AggregatedMeasureData
             ProcessId = processId;
             BusinessTransactionId = businessTransactionId;
             BusinessReason = businessReason;
-            SettlementVersion = settlementVersion;
             MeteringPointType = meteringPointType;
             SettlementMethod = settlementMethod;
             StartOfPeriod = startOfPeriod;
@@ -82,11 +80,6 @@ namespace Domain.Transactions.AggregatedMeasureData
         public BusinessTransactionId BusinessTransactionId { get; }
 
         public string BusinessReason { get; }
-
-        /// <summary>
-        /// Represent the version for a specific calculation.
-        /// </summary>
-        public string? SettlementVersion { get; }
 
         /// <summary>
         /// Represent consumption types or production.
