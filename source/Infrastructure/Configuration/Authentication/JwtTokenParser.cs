@@ -67,6 +67,10 @@ namespace Infrastructure.Configuration.Authentication
                 var principal = tokenHandler.ValidateToken(token, _validationParameters, out _);
                 return Result.Succeeded(principal);
             }
+            catch (ArgumentException e)
+            {
+                return Result.Failed(new TokenValidationFailed(e.Message), token);
+            }
             catch (SecurityTokenException e)
             {
                 return Result.Failed(new TokenValidationFailed(e.Message), token);
