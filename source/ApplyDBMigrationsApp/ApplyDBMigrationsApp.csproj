@@ -112,6 +112,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202308031502 Add RequestedByActorRole to AggregatedMeasureDataProcesses.sql" />
     <EmbeddedResource Include="Scripts\Model\202308041146 Add State to AggregatedMeasureDataProcesses.sql" />
     <EmbeddedResource Include="Scripts\Model\202308071047 Add ResponseData to AggregatedMeasureDataProcesses.sql" />
+    <EmbeddedResource Include="Scripts\Model\202308071047 Remove SettlementVersion from AggregatedMeasureDataProcesses.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241101 Consolidated BtwoB model.sql" />

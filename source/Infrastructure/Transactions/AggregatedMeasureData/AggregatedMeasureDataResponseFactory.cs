@@ -92,9 +92,6 @@ public static class AggregatedMeasureDataResponseFactory
 
         return new Serie()
         {
-#pragma warning disable CA1305
-            SettlementVersion = aggregatedMeasureDataProcess.SettlementVersion ?? "0",
-#pragma warning restore CA1305
             GridArea = aggregatedMeasureDataProcess.MeteringGridAreaDomainId,
             QuantityUnit = QuantityUnit.Kwh,
             Period = period,
