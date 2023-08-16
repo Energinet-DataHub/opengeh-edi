@@ -33,28 +33,50 @@ public class RemoveInternalCommandsWhenADayHasPassed : INotificationHandler<ADay
 
     public async Task Handle(ADayHasPassed notification, CancellationToken cancellationToken)
     {
-        const string deleteStmt = @"
-            DELETE FROM [dbo].[QueuedInternalCommands]
-            WHERE [ProcessedDate] IS NOT NULL
-             AND [ErrorMessage] IS NULL";
+        while (await AnyProcessedQueuedInternalCommandsAsync(cancellationToken).ConfigureAwait(false))
+        {
+            const string deleteStmt = @"
+                WITH CTE AS
+                 (
+                     SELECT TOP 10000 *
+                     FROM [dbo].[QueuedInternalCommands]
+                      WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL
+                 )
+                DELETE FROM CTE;";
+
+            using var connection =
+                (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
+            using var transaction = connection.BeginTransaction();
+            using var command = connection.CreateCommand();
+            command.Transaction = transaction;
+            command.CommandText = deleteStmt;
+
+            try
+            {
+                await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+                await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+            }
+            catch (DbException)
+            {
+                // Add exception logging
+                await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
+                throw; // re-throw exception
+            }
+        }
+    }
+
+    private async Task<bool> AnyProcessedQueuedInternalCommandsAsync(CancellationToken cancellationToken)
+    {
+        const string selectStmt = @"
+               SELECT Count(*) FROM [dbo].[QueuedInternalCommands] WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL";
 
         using var connection =
             (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
-        using var transaction = connection.BeginTransaction();
         using var command = connection.CreateCommand();
-        command.Transaction = transaction;
-        command.CommandText = deleteStmt;
+        command.CommandText = selectStmt;
 
-        try
-        {
-            await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
-            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-        }
-        catch (DbException)
-        {
-            // Add exception logging
-            await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-            throw; // re-throw exception
-        }
+        var amountOfProcessedCommands = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+
+        return amountOfProcessedCommands > 0;
     }
 }
