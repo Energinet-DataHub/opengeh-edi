@@ -17,16 +17,14 @@ using Azure.Messaging.ServiceBus;
 namespace Communication.Internal;
 
 /// <summary>
-/// Factory for ServiceBusQueueMessages
+/// Factory for ServiceBusQueueMessages.
 /// </summary>
 public interface IServiceBusQueueMessageFactory
 {
     /// <summary>
     /// Create Service Bus Message
     /// </summary>
-    /// <param name="event"></param>
+    /// <param name="pointToPointEvent"></param>
     /// <returns>A Service Bus Message</returns>
-#pragma warning disable CA1716
-    ServiceBusMessage Create(PointToPointEvent @event);
-#pragma warning restore CA1716
+    ServiceBusMessage Create(PointToPointEvent pointToPointEvent);
 }

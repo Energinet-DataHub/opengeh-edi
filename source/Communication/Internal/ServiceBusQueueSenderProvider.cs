@@ -19,13 +19,13 @@ namespace Communication.Internal;
 public class ServiceBusQueueSenderProvider : IServiceBusQueueSenderProvider
 {
     private readonly string _serviceBusPointToPointEventWriteConnectionString;
-    private readonly string _topicName;
+    private readonly string _queueName;
     private ServiceBusSender? _serviceBusSender;
 
-    public ServiceBusQueueSenderProvider(string serviceBusPointToPointEventWriteConnectionString, string topicName)
+    public ServiceBusQueueSenderProvider(string serviceBusPointToPointEventWriteConnectionString, string queueName)
     {
         _serviceBusPointToPointEventWriteConnectionString = serviceBusPointToPointEventWriteConnectionString;
-        _topicName = topicName;
+        _queueName = queueName;
     }
 
     public ServiceBusSender Instance
@@ -34,8 +34,10 @@ public class ServiceBusQueueSenderProvider : IServiceBusQueueSenderProvider
         {
             if (_serviceBusSender == null)
             {
+#pragma warning disable CA2000
                 var serviceBusClient = new ServiceBusClient(_serviceBusPointToPointEventWriteConnectionString);
-                _serviceBusSender = serviceBusClient.CreateSender(_topicName);
+#pragma warning restore CA2000
+                _serviceBusSender = serviceBusClient.CreateSender(_queueName);
             }
 
             return _serviceBusSender;

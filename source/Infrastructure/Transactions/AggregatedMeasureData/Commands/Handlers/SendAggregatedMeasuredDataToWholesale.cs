@@ -46,6 +46,9 @@ public class SendAggregatedMeasuredDataToWholesale
         var process = await _aggregatedMeasureDataProcessRepository
             .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
+        // var event = Factory.CreatePoint2Point(process);
+        // await wholesalesender.send(queuename, event, cancellationtoken);
+
         await _wholesaleInbox.SendAsync(
             process,
             cancellationToken).ConfigureAwait(false);

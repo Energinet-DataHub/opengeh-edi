@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Communication.Internal;
+using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Communication;

@@ -19,7 +19,7 @@ using Microsoft.Extensions.Logging;
 namespace Communication.Internal;
 
 /// <summary>
-/// The sender runs as a background service
+/// The sender runs as a background service.
 /// </summary>
 public class OutboxSender : IOutboxSender
 {
@@ -46,7 +46,7 @@ public class OutboxSender : IOutboxSender
         var eventCount = 0;
         var messageBatch = await _serviceBusQueueSenderProvider.Instance.CreateMessageBatchAsync(cancellationToken).ConfigureAwait(false);
 
-        await foreach (var @event in _pointToPointEventProvider.GetAsync().ConfigureAwait(false))
+        await foreach (var @event in _pointToPointEventProvider.GetAsync(cancellationToken).ConfigureAwait(false))
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -76,7 +76,7 @@ public class OutboxSender : IOutboxSender
         }
 
         if (eventCount > 0)
-            _logger.LogDebug("Sent {EventCount} integration events in {Time} ms", eventCount, stopwatch.Elapsed.TotalMilliseconds);
+            _logger.LogDebug("Sent {EventCount} point to point events in {Time} ms", eventCount, stopwatch.Elapsed.TotalMilliseconds);
     }
 
     private async Task SendBatchAsync(ServiceBusMessageBatch batch)

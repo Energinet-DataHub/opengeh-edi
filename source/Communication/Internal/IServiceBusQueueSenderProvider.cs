@@ -17,12 +17,12 @@ using Azure.Messaging.ServiceBus;
 namespace Communication.Internal;
 
 /// <summary>
-/// Interface for a Service Bus Queue Sender Provider
+///     Interface for a Service Bus Queue Sender Provider
 /// </summary>
 public interface IServiceBusQueueSenderProvider
 {
     /// <summary>
-    /// Creates Service bus Sender Instance
+    ///     Creates Service bus Sender Instance
     /// </summary>
     ServiceBusSender Instance { get; }
 }

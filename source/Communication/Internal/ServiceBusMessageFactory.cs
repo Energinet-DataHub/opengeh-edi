@@ -19,19 +19,19 @@ namespace Communication.Internal;
 
 public class ServiceBusQueueMessageFactory : IServiceBusQueueMessageFactory
 {
-    public ServiceBusMessage Create(PointToPointEvent @event)
+    public ServiceBusMessage Create(PointToPointEvent pointToPointEvent)
     {
+        ArgumentNullException.ThrowIfNull(pointToPointEvent);
+
         var serviceBusMessage = new ServiceBusMessage
         {
-#pragma warning disable CA1062
-            Body = new BinaryData(@event.Message.ToByteArray()),
-#pragma warning restore CA1062
-            Subject = @event.EventName,
-            MessageId = @event.EventIdentification.ToString(),
+            Body = new BinaryData(pointToPointEvent.Message.ToByteArray()),
+            Subject = pointToPointEvent.EventName,
+            MessageId = pointToPointEvent.EventIdentification.ToString(),
         };
 
-        serviceBusMessage.ApplicationProperties.Add("EventMinorVersion", @event.EventMinorVersion);
-
+        serviceBusMessage.ApplicationProperties.Add("EventMinorVersion", pointToPointEvent.EventMinorVersion);
+        // TODO AJW serviceBusMessage.ApplicationProperties.Add("ReferenceId", process.ProcessId.Id.ToString());
         return serviceBusMessage;
     }
 }
