@@ -38,7 +38,8 @@ public class RemoveMonthOldReceivedIntegrationEventIdsWhenADaysHasPassed : INoti
     {
         if (notification == null) throw new ArgumentNullException(nameof(notification));
 
-        while (await AnyReceivedIntegrationEventsAsync(notification, cancellationToken).ConfigureAwait(false))
+        var montheAgo = notification.Now.Plus(-Duration.FromDays(30));
+        while (await AnyReceivedIntegrationEventsAsync(montheAgo, cancellationToken).ConfigureAwait(false))
         {
             const string deleteStmt = @"
                 WITH CTE AS
@@ -56,7 +57,7 @@ public class RemoveMonthOldReceivedIntegrationEventIdsWhenADaysHasPassed : INoti
             using var command = connection.CreateCommand();
             command.Parameters.AddWithValue(
                 "@LastMonthInstant",
-                notification.Now.Plus(-Duration.FromDays(30)).ToDateTimeUtc());
+                montheAgo.ToDateTimeUtc());
             command.Transaction = transaction;
             command.CommandText = deleteStmt;
 
@@ -74,7 +75,7 @@ public class RemoveMonthOldReceivedIntegrationEventIdsWhenADaysHasPassed : INoti
         }
     }
 
-    private async Task<bool> AnyReceivedIntegrationEventsAsync(ADayHasPassed today, CancellationToken cancellationToken)
+    private async Task<bool> AnyReceivedIntegrationEventsAsync(Instant monthAgo, CancellationToken cancellationToken)
     {
         const string selectStmt = @"
                SELECT Count(*) FROM [dbo].[ReceivedIntegrationEventIds] WHERE [OccurredOn] < @LastMonthInstant";
@@ -85,7 +86,7 @@ public class RemoveMonthOldReceivedIntegrationEventIdsWhenADaysHasPassed : INoti
         using var command = connection.CreateCommand();
         command.Parameters.AddWithValue(
             "@LastMonthInstant",
-            today.Now.Plus(-Duration.FromDays(30)).ToDateTimeUtc());
+            monthAgo.ToDateTimeUtc());
         command.CommandText = selectStmt;
 
         var amountOfOldEvents = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);

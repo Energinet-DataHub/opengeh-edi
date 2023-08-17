@@ -33,28 +33,52 @@ public class RemoveInboxEventsWhenADaysHasPassed : INotificationHandler<ADayHasP
 
     public async Task Handle(ADayHasPassed notification, CancellationToken cancellationToken)
     {
-        const string deleteStmt = @"
-            DELETE FROM [dbo].[ReceivedInboxEvents]
-            WHERE [ProcessedDate] IS NOT NULL
-                AND [ErrorMessage] IS NULL";
+        while (await AnyReceivedInboxEventsAsync(cancellationToken).ConfigureAwait(false))
+        {
+            const string deleteStmt = @"
+                WITH CTE AS
+                 (
+                     SELECT TOP 10000 *
+                     FROM [dbo].[ReceivedInboxEvents]
+                     WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL
+                 )
+                DELETE FROM CTE;";
+
+            using var connection =
+                (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken)
+                    .ConfigureAwait(false);
+            using var transaction = connection.BeginTransaction();
+            using var command = connection.CreateCommand();
+            command.Transaction = transaction;
+            command.CommandText = deleteStmt;
+
+            try
+            {
+                await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+                await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+            }
+            catch (DbException)
+            {
+                // Add exception logging
+                await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
+                throw; // re-throw exception
+            }
+        }
+    }
+
+    private async Task<bool> AnyReceivedInboxEventsAsync(CancellationToken cancellationToken)
+    {
+        const string selectStmt = @"
+               SELECT Count(*) FROM [dbo].[ReceivedInboxEvents]
+                     WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL";
 
         using var connection =
             (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
-        using var transaction = connection.BeginTransaction();
         using var command = connection.CreateCommand();
-        command.Transaction = transaction;
-        command.CommandText = deleteStmt;
+        command.CommandText = selectStmt;
 
-        try
-        {
-            await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
-            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-        }
-        catch (DbException)
-        {
-            // Add exception logging
-            await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-            throw; // re-throw exception
-        }
+        var amountOfProcessedEvents = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+
+        return amountOfProcessedEvents > 0;
     }
 }
