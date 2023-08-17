@@ -47,7 +47,7 @@ public class IntegrationEventReceiver
 
     private async Task<bool> EventIsAlreadyRegisteredAsync(string eventId)
     {
-        var inboxMessage = await _context.ReceivedIntegrationEvents.FindAsync(eventId).ConfigureAwait(false);
+        var inboxMessage = await _context.ReceivedIntegrationEventIds.FindAsync(eventId).ConfigureAwait(false);
         return inboxMessage is not null;
     }
 
@@ -58,7 +58,12 @@ public class IntegrationEventReceiver
 
     private async Task RegisterAsync(string eventId, string eventType, byte[] eventPayload)
     {
-        _context.ReceivedIntegrationEvents.Add(new ReceivedIntegrationEvent(eventId, eventType, ToJson(eventType, eventPayload), _dateTimeProvider.Now()));
+        _context.ReceivedIntegrationEventIds.Add(new ReceivedIntegrationEventId(eventId, _dateTimeProvider.Now()));
+        _context.ReceivedIntegrationEvents.Add(new ReceivedIntegrationEvent(
+            eventId,
+            eventType,
+            ToJson(eventType, eventPayload),
+            _dateTimeProvider.Now()));
         await _context.SaveChangesAsync().ConfigureAwait(false);
     }
 

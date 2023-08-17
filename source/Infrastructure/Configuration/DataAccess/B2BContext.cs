@@ -77,11 +77,15 @@ namespace Infrastructure.Configuration.DataAccess
 
         public DbSet<ReceivedIntegrationEvent> ReceivedIntegrationEvents { get; private set; }
 
+        public DbSet<ReceivedIntegrationEventId> ReceivedIntegrationEventIds { get; set; }
+
         public DbSet<ActorMessageQueue> ActorMessageQueues { get; private set; }
 
         public DbSet<MarketDocument> MarketDocuments { get; private set; }
 
         public DbSet<ReceivedInboxEvent> ReceivedInboxEvents { get; private set; }
+
+        public DbSet<ReceivedInboxEventId> ReceivedInboxEventIds { get; private set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -99,6 +103,8 @@ namespace Infrastructure.Configuration.DataAccess
             modelBuilder.ApplyConfiguration(new ActorMessageQueueEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MarketDocumentEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ReceivedInboxEventEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new ReceivedInboxEventIdEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new ReceivedIntegrationEventIdEntityConfiguration());
 
             modelBuilder.Entity<GenericNotificationMessage>()
                 .Ignore(entity => entity.MarketActivityRecord);

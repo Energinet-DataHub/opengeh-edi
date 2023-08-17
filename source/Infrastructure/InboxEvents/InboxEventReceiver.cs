@@ -49,8 +49,8 @@ public class InboxEventReceiver
 
     private async Task<bool> EventIsAlreadyRegisteredAsync(string eventId)
     {
-        var inboxMessage = await _context.ReceivedInboxEvents.FindAsync(eventId).ConfigureAwait(false);
-        return inboxMessage is not null;
+        var inboxEventId = await _context.ReceivedInboxEventIds.FindAsync(eventId).ConfigureAwait(false);
+        return inboxEventId is not null;
     }
 
     private bool EventIsKnown(string eventType)
@@ -60,7 +60,13 @@ public class InboxEventReceiver
 
     private async Task RegisterAsync(string eventId, string eventType, Guid referenceId, byte[] eventPayload)
     {
-        _context.ReceivedInboxEvents.Add(new ReceivedInboxEvent(eventId, eventType, referenceId, ToJson(eventType, eventPayload), _dateTimeProvider.Now()));
+        _context.ReceivedInboxEventIds.Add(new ReceivedInboxEventId(eventId, _dateTimeProvider.Now()));
+        _context.ReceivedInboxEvents.Add(new ReceivedInboxEvent(
+            eventId,
+            eventType,
+            referenceId,
+            ToJson(eventType, eventPayload),
+            _dateTimeProvider.Now()));
         await _context.SaveChangesAsync().ConfigureAwait(false);
     }
 
