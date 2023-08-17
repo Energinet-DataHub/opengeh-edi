@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,42 +20,53 @@ using Application.Configuration.DataAccess;
 using Application.Configuration.TimeEvents;
 using MediatR;
 using Microsoft.Data.SqlClient;
+using NodaTime;
 
-namespace Infrastructure.Configuration.IntegrationEvents;
+namespace Infrastructure.InboxEvents;
 
-public class RemoveIntegrationEventsWhenADaysHasPassed : INotificationHandler<ADayHasPassed>
+public class RemoveMonthOldReceivedInboxEventIdsWhenADayHasPassed : INotificationHandler<ADayHasPassed>
 {
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
 
-    public RemoveIntegrationEventsWhenADaysHasPassed(IDatabaseConnectionFactory databaseConnectionFactory)
+    public RemoveMonthOldReceivedInboxEventIdsWhenADayHasPassed(
+        IDatabaseConnectionFactory databaseConnectionFactory)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
     }
 
     public async Task Handle(ADayHasPassed notification, CancellationToken cancellationToken)
     {
-        while (await AnyReceivedIntegrationEventsAsync(cancellationToken).ConfigureAwait(false))
+        if (notification == null) throw new ArgumentNullException(nameof(notification));
+
+        var monthAgo = notification.Now.Plus(-Duration.FromDays(30));
+        var amountOfOldEvents = 1;
+        while (amountOfOldEvents > 0)
         {
             const string deleteStmt = @"
                 WITH CTE AS
                  (
                      SELECT TOP 10000 *
-                     FROM [dbo].[ReceivedIntegrationEvents]
-                     WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL
+                     FROM [dbo].[ReceivedInboxEventIds]
+                     WHERE [OccurredOn] < @LastMonthInstant
                  )
-                DELETE FROM CTE;";
+                DELETE FROM CTE;
+
+                SELECT Count(*) FROM [dbo].[ReceivedInboxEventIds] WHERE [OccurredOn] < @LastMonthInstant";
 
             using var connection =
                 (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken)
                     .ConfigureAwait(false);
             using var transaction = connection.BeginTransaction();
             using var command = connection.CreateCommand();
+            command.Parameters.AddWithValue(
+                "@LastMonthInstant",
+                monthAgo.ToDateTimeUtc());
             command.Transaction = transaction;
             command.CommandText = deleteStmt;
 
             try
             {
-                await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+                amountOfOldEvents = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
                 await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             }
             catch (DbException)
@@ -64,20 +76,5 @@ public class RemoveIntegrationEventsWhenADaysHasPassed : INotificationHandler<AD
                 throw; // re-throw exception
             }
         }
-    }
-
-    private async Task<bool> AnyReceivedIntegrationEventsAsync(CancellationToken cancellationToken)
-    {
-        const string selectStmt = @"
-               SELECT Count(*) FROM [dbo].[ReceivedIntegrationEvents] WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL";
-
-        using var connection =
-            (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
-        using var command = connection.CreateCommand();
-        command.CommandText = selectStmt;
-
-        var amountOfProcessedEvents = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
-
-        return amountOfProcessedEvents > 0;
     }
 }

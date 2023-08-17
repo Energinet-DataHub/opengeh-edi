@@ -27,24 +27,24 @@ using Xunit;
 
 namespace IntegrationTests.Infrastructure.Retention;
 
-public class RemoveMonthOldReceivedInboxEventIdsWhenADaysHasPassedTests : TestBase
+public class RemoveMonthOldReceivedInboxEventIdsWhenADayHasPassedTests : TestBase
 {
     private readonly B2BContext _b2BContext;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-    private readonly RemoveMonthOldReceivedInboxEventIdsWhenADaysHasPassed _sut;
+    private readonly RemoveMonthOldReceivedInboxEventIdsWhenADayHasPassed _sut;
 
-    public RemoveMonthOldReceivedInboxEventIdsWhenADaysHasPassedTests(
+    public RemoveMonthOldReceivedInboxEventIdsWhenADayHasPassedTests(
         DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _b2BContext = GetService<B2BContext>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
-        _sut = new RemoveMonthOldReceivedInboxEventIdsWhenADaysHasPassed(
+        _sut = new RemoveMonthOldReceivedInboxEventIdsWhenADayHasPassed(
             GetService<IDatabaseConnectionFactory>());
     }
 
     [Fact]
-    public async Task Clean_up_received_integration_event_ids_older_then_a_month()
+    public async Task Clean_up_received_inbox_event_ids_older_then_a_month()
     {
         // arrange
         var monthAgo = _systemDateTimeProvider.Now().Plus(-Duration.FromDays(31));

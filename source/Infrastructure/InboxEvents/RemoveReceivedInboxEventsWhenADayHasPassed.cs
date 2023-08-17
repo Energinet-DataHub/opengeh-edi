@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,50 +19,46 @@ using Application.Configuration.DataAccess;
 using Application.Configuration.TimeEvents;
 using MediatR;
 using Microsoft.Data.SqlClient;
-using NodaTime;
 
-namespace Infrastructure.Configuration.IntegrationEvents;
+namespace Infrastructure.InboxEvents;
 
-public class RemoveMonthOldReceivedIntegrationEventIdsWhenADaysHasPassed : INotificationHandler<ADayHasPassed>
+public class RemoveReceivedInboxEventsWhenADayHasPassed : INotificationHandler<ADayHasPassed>
 {
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
 
-    public RemoveMonthOldReceivedIntegrationEventIdsWhenADaysHasPassed(
-        IDatabaseConnectionFactory databaseConnectionFactory)
+    public RemoveReceivedInboxEventsWhenADayHasPassed(IDatabaseConnectionFactory databaseConnectionFactory)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
     }
 
     public async Task Handle(ADayHasPassed notification, CancellationToken cancellationToken)
     {
-        if (notification == null) throw new ArgumentNullException(nameof(notification));
-
-        var montheAgo = notification.Now.Plus(-Duration.FromDays(30));
-        while (await AnyReceivedIntegrationEventsAsync(montheAgo, cancellationToken).ConfigureAwait(false))
+        var amountOfOldEvents = 1;
+        while (amountOfOldEvents > 0)
         {
             const string deleteStmt = @"
                 WITH CTE AS
                  (
                      SELECT TOP 10000 *
-                     FROM [dbo].[ReceivedIntegrationEventIds]
-                     WHERE [OccurredOn] < @LastMonthInstant
+                     FROM [dbo].[ReceivedInboxEvents]
+                     WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL
                  )
-                DELETE FROM CTE;";
+                DELETE FROM CTE;
+
+                SELECT Count(*) FROM [dbo].[ReceivedInboxEvents]
+                    WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL";
 
             using var connection =
                 (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken)
                     .ConfigureAwait(false);
             using var transaction = connection.BeginTransaction();
             using var command = connection.CreateCommand();
-            command.Parameters.AddWithValue(
-                "@LastMonthInstant",
-                montheAgo.ToDateTimeUtc());
             command.Transaction = transaction;
             command.CommandText = deleteStmt;
 
             try
             {
-                await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+                amountOfOldEvents = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
                 await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             }
             catch (DbException)
@@ -73,24 +68,5 @@ public class RemoveMonthOldReceivedIntegrationEventIdsWhenADaysHasPassed : INoti
                 throw; // re-throw exception
             }
         }
-    }
-
-    private async Task<bool> AnyReceivedIntegrationEventsAsync(Instant monthAgo, CancellationToken cancellationToken)
-    {
-        const string selectStmt = @"
-               SELECT Count(*) FROM [dbo].[ReceivedIntegrationEventIds] WHERE [OccurredOn] < @LastMonthInstant";
-
-        using var connection =
-            (SqlConnection)await _databaseConnectionFactory
-                .GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
-        using var command = connection.CreateCommand();
-        command.Parameters.AddWithValue(
-            "@LastMonthInstant",
-            monthAgo.ToDateTimeUtc());
-        command.CommandText = selectStmt;
-
-        var amountOfOldEvents = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
-
-        return amountOfOldEvents > 0;
     }
 }

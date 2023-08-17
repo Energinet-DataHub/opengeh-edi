@@ -33,7 +33,8 @@ public class RemoveInternalCommandsWhenADayHasPassed : INotificationHandler<ADay
 
     public async Task Handle(ADayHasPassed notification, CancellationToken cancellationToken)
     {
-        while (await AnyProcessedQueuedInternalCommandsAsync(cancellationToken).ConfigureAwait(false))
+        var amountOfOldCommands = 1;
+        while (amountOfOldCommands > 0)
         {
             const string deleteStmt = @"
                 WITH CTE AS
@@ -42,7 +43,10 @@ public class RemoveInternalCommandsWhenADayHasPassed : INotificationHandler<ADay
                      FROM [dbo].[QueuedInternalCommands]
                       WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL
                  )
-                DELETE FROM CTE;";
+                DELETE FROM CTE;
+
+                SELECT Count(*) FROM [dbo].[QueuedInternalCommands]
+                    WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL";
 
             using var connection =
                 (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
@@ -53,7 +57,7 @@ public class RemoveInternalCommandsWhenADayHasPassed : INotificationHandler<ADay
 
             try
             {
-                await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+                amountOfOldCommands = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
                 await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             }
             catch (DbException)
@@ -63,20 +67,5 @@ public class RemoveInternalCommandsWhenADayHasPassed : INotificationHandler<ADay
                 throw; // re-throw exception
             }
         }
-    }
-
-    private async Task<bool> AnyProcessedQueuedInternalCommandsAsync(CancellationToken cancellationToken)
-    {
-        const string selectStmt = @"
-               SELECT Count(*) FROM [dbo].[QueuedInternalCommands] WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL";
-
-        using var connection =
-            (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
-        using var command = connection.CreateCommand();
-        command.CommandText = selectStmt;
-
-        var amountOfProcessedCommands = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
-
-        return amountOfProcessedCommands > 0;
     }
 }

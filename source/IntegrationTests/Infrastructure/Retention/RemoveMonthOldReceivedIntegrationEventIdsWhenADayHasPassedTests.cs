@@ -27,19 +27,19 @@ using Xunit;
 
 namespace IntegrationTests.Infrastructure.Retention;
 
-public class RemoveMonthOldReceivedIntegrationEventIdsWhenADaysHasPassedTests : TestBase
+public class RemoveMonthOldReceivedIntegrationEventIdsWhenADayHasPassedTests : TestBase
 {
     private readonly B2BContext _b2BContext;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-    private readonly RemoveMonthOldReceivedIntegrationEventIdsWhenADaysHasPassed _sut;
+    private readonly RemoveMonthOldReceivedIntegrationEventIdsWhenADayHasPassed _sut;
 
-    public RemoveMonthOldReceivedIntegrationEventIdsWhenADaysHasPassedTests(
+    public RemoveMonthOldReceivedIntegrationEventIdsWhenADayHasPassedTests(
         DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _b2BContext = GetService<B2BContext>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
-        _sut = new RemoveMonthOldReceivedIntegrationEventIdsWhenADaysHasPassed(
+        _sut = new RemoveMonthOldReceivedIntegrationEventIdsWhenADayHasPassed(
             GetService<IDatabaseConnectionFactory>());
     }
 

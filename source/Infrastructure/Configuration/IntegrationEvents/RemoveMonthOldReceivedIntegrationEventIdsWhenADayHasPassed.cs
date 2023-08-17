@@ -22,13 +22,13 @@ using MediatR;
 using Microsoft.Data.SqlClient;
 using NodaTime;
 
-namespace Infrastructure.InboxEvents;
+namespace Infrastructure.Configuration.IntegrationEvents;
 
-public class RemoveMonthOldReceivedInboxEventIdsWhenADaysHasPassed : INotificationHandler<ADayHasPassed>
+public class RemoveMonthOldReceivedIntegrationEventIdsWhenADayHasPassed : INotificationHandler<ADayHasPassed>
 {
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
 
-    public RemoveMonthOldReceivedInboxEventIdsWhenADaysHasPassed(
+    public RemoveMonthOldReceivedIntegrationEventIdsWhenADayHasPassed(
         IDatabaseConnectionFactory databaseConnectionFactory)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
@@ -38,17 +38,20 @@ public class RemoveMonthOldReceivedInboxEventIdsWhenADaysHasPassed : INotificati
     {
         if (notification == null) throw new ArgumentNullException(nameof(notification));
 
-        var montheAgo = notification.Now.Plus(-Duration.FromDays(30));
-        while (await AnyReceivedInboxEventsAsync(montheAgo, cancellationToken).ConfigureAwait(false))
+        var monthAgo = notification.Now.Plus(-Duration.FromDays(30));
+        var amountOfOldEvents = 1;
+        while (amountOfOldEvents > 0)
         {
             const string deleteStmt = @"
                 WITH CTE AS
                  (
                      SELECT TOP 10000 *
-                     FROM [dbo].[ReceivedInboxEventIds]
+                     FROM [dbo].[ReceivedIntegrationEventIds]
                      WHERE [OccurredOn] < @LastMonthInstant
                  )
-                DELETE FROM CTE;";
+                DELETE FROM CTE;
+
+                SELECT Count(*) FROM [dbo].[ReceivedIntegrationEventIds] WHERE [OccurredOn] < @LastMonthInstant";
 
             using var connection =
                 (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken)
@@ -57,13 +60,13 @@ public class RemoveMonthOldReceivedInboxEventIdsWhenADaysHasPassed : INotificati
             using var command = connection.CreateCommand();
             command.Parameters.AddWithValue(
                 "@LastMonthInstant",
-                montheAgo.ToDateTimeUtc());
+                monthAgo.ToDateTimeUtc());
             command.Transaction = transaction;
             command.CommandText = deleteStmt;
 
             try
             {
-                await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+                amountOfOldEvents = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
                 await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             }
             catch (DbException)
@@ -73,24 +76,5 @@ public class RemoveMonthOldReceivedInboxEventIdsWhenADaysHasPassed : INotificati
                 throw; // re-throw exception
             }
         }
-    }
-
-    private async Task<bool> AnyReceivedInboxEventsAsync(Instant montheAgo, CancellationToken cancellationToken)
-    {
-        const string selectStmt = @"
-               SELECT Count(*) FROM [dbo].[ReceivedInboxEventIds] WHERE [OccurredOn] < @LastMonthInstant";
-
-        using var connection =
-            (SqlConnection)await _databaseConnectionFactory
-                .GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
-        using var command = connection.CreateCommand();
-        command.Parameters.AddWithValue(
-            "@LastMonthInstant",
-            montheAgo.ToDateTimeUtc());
-        command.CommandText = selectStmt;
-
-        var amountOfOldEvents = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
-
-        return amountOfOldEvents > 0;
     }
 }

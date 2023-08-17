@@ -20,29 +20,33 @@ using Application.Configuration.TimeEvents;
 using MediatR;
 using Microsoft.Data.SqlClient;
 
-namespace Infrastructure.InboxEvents;
+namespace Infrastructure.Configuration.IntegrationEvents;
 
-public class RemoveInboxEventsWhenADaysHasPassed : INotificationHandler<ADayHasPassed>
+public class RemoveReceivedIntegrationEventsWhenADayHasPassed : INotificationHandler<ADayHasPassed>
 {
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
 
-    public RemoveInboxEventsWhenADaysHasPassed(IDatabaseConnectionFactory databaseConnectionFactory)
+    public RemoveReceivedIntegrationEventsWhenADayHasPassed(IDatabaseConnectionFactory databaseConnectionFactory)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
     }
 
     public async Task Handle(ADayHasPassed notification, CancellationToken cancellationToken)
     {
-        while (await AnyReceivedInboxEventsAsync(cancellationToken).ConfigureAwait(false))
+        var amountOfOldEvents = 1;
+        while (amountOfOldEvents > 0)
         {
             const string deleteStmt = @"
                 WITH CTE AS
                  (
                      SELECT TOP 10000 *
-                     FROM [dbo].[ReceivedInboxEvents]
+                     FROM [dbo].[ReceivedIntegrationEvents]
                      WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL
                  )
-                DELETE FROM CTE;";
+                DELETE FROM CTE;
+
+                SELECT Count(*) FROM [dbo].[ReceivedIntegrationEvents]
+                    WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL";
 
             using var connection =
                 (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken)
@@ -54,7 +58,7 @@ public class RemoveInboxEventsWhenADaysHasPassed : INotificationHandler<ADayHasP
 
             try
             {
-                await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+                amountOfOldEvents = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
                 await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             }
             catch (DbException)
@@ -64,21 +68,5 @@ public class RemoveInboxEventsWhenADaysHasPassed : INotificationHandler<ADayHasP
                 throw; // re-throw exception
             }
         }
-    }
-
-    private async Task<bool> AnyReceivedInboxEventsAsync(CancellationToken cancellationToken)
-    {
-        const string selectStmt = @"
-               SELECT Count(*) FROM [dbo].[ReceivedInboxEvents]
-                     WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL";
-
-        using var connection =
-            (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
-        using var command = connection.CreateCommand();
-        command.CommandText = selectStmt;
-
-        var amountOfProcessedEvents = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
-
-        return amountOfProcessedEvents > 0;
     }
 }
