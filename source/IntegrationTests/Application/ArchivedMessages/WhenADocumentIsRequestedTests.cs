@@ -24,10 +24,9 @@ using Domain.Documents;
 using Domain.OutgoingMessages;
 using Domain.SeedWork;
 using IntegrationTests.Fixtures;
-using NodaTime;
 using Xunit;
 
-namespace IntegrationTests.Application.SearchMessages;
+namespace IntegrationTests.Application.ArchivedMessages;
 
 public class WhenADocumentIsRequestedTests : TestBase
 {
@@ -54,9 +53,13 @@ public class WhenADocumentIsRequestedTests : TestBase
         Assert.NotNull(result);
     }
 
-    private static Instant CreatedAt(string date)
+    [Fact]
+    public async Task Id_has_to_be_unique()
     {
-        return NodaTime.Text.InstantPattern.General.Parse(date).Value;
+        var id = Guid.NewGuid().ToString();
+        await ArchiveMessage(CreateArchivedMessage(id));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => ArchiveMessage(CreateArchivedMessage(id))).ConfigureAwait(false);
     }
 
     private ArchivedMessage CreateArchivedMessage(string? messageId = null)
