@@ -32,8 +32,8 @@ public class WhenRequestIsReceivedTests : TestBase
     {
         var command = new UpdateCustomerMasterData(SampleData.MarketEvaluationPointNumber, SampleData.EffectiveDate, SampleData.TransactionId);
 
-        await InvokeCommandAsync(command).ConfigureAwait(false)
-;
+        await InvokeCommandAsync(command).ConfigureAwait(false);
+
         await AssertTransaction.TransactionAsync(SampleData.TransactionId.ToString(), GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
     }
 }
