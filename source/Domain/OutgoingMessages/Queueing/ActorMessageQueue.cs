@@ -73,7 +73,7 @@ public class ActorMessageQueue : Entity
 
     public void Dequeue(BundleId bundleId)
     {
-        var bundle = _bundles.SingleOrDefault(bundle => bundle.Id == bundleId && bundle.IsDequeued == false);
+        var bundle = _bundles.FirstOrDefault(bundle => bundle.Id == bundleId && bundle.IsDequeued == false);
         bundle?.Dequeue();
     }
 
