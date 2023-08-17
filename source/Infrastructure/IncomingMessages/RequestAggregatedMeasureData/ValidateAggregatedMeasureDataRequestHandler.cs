@@ -54,9 +54,8 @@ public class ValidateAggregatedMeasureDataRequestHandler
         var timestamp = _systemDateTimeProvider.Now();
 
         _messageArchive.Add(new ArchivedMessage(
-            string.IsNullOrWhiteSpace(messageHeader.MessageId)
-                ? "Unknown message id"
-                : messageHeader.MessageId,
+            Guid.NewGuid().ToString(),
+            messageHeader.MessageId,
             IncomingDocumentType.RequestAggregatedMeasureData,
             TryGetActorNumber(messageHeader.SenderId),
             TryGetActorNumber(messageHeader.ReceiverId),

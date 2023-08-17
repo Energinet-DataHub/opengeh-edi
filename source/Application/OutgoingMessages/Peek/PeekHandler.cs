@@ -89,6 +89,7 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
             var businessReason = outgoingMessage.BusinessReason;
             _archivedMessageRepository.Add(new ArchivedMessage(
                 peekResult.BundleId.Id.ToString(),
+                peekResult.BundleId.Id.ToString(),
                 documentType,
                 ActorNumber.Create(senderId),
                 ActorNumber.Create(receiverId),

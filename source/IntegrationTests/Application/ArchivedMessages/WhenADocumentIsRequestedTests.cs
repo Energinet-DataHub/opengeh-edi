@@ -24,10 +24,9 @@ using Domain.Documents;
 using Domain.OutgoingMessages;
 using Domain.SeedWork;
 using IntegrationTests.Fixtures;
-using NodaTime;
 using Xunit;
 
-namespace IntegrationTests.Application.SearchMessages;
+namespace IntegrationTests.Application.ArchivedMessages;
 
 public class WhenADocumentIsRequestedTests : TestBase
 {
@@ -54,14 +53,27 @@ public class WhenADocumentIsRequestedTests : TestBase
         Assert.NotNull(result);
     }
 
-    private static Instant CreatedAt(string date)
+    [Fact]
+    public async Task Can_add_archived_messages_with_existing_message_id()
     {
-        return NodaTime.Text.InstantPattern.General.Parse(date).Value;
+        await ArchiveMessage(CreateArchivedMessage(null, "MessageId"));
+
+        try
+        {
+            await ArchiveMessage(CreateArchivedMessage(null, "MessageId"));
+        }
+#pragma warning disable CA1031  // We want to catch all exceptions
+        catch
+#pragma warning restore CA1031
+        {
+            Assert.Fail("We should be able to have multiple messages with the same message id");
+        }
     }
 
-    private ArchivedMessage CreateArchivedMessage(string? messageId = null)
+    private ArchivedMessage CreateArchivedMessage(string? id = null, string? messageId = null)
     {
         return new ArchivedMessage(
+            string.IsNullOrWhiteSpace(id) ? Guid.NewGuid().ToString() : id,
             string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
             EnumerationType.FromName<DocumentType>(DocumentType.AccountingPointCharacteristics.Name),
             ActorNumber.Create("1234512345123"),

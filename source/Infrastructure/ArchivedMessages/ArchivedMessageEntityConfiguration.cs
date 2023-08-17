@@ -53,5 +53,6 @@ public class ArchivedMessageEntityConfiguration : IEntityTypeConfiguration<Archi
             .HasConversion(
                 toDbValue => ((MemoryStream)toDbValue).ToArray(),
                 fromDbValue => new MemoryStream(fromDbValue));
+        builder.Property(x => x.MessageId);
     }
 }
