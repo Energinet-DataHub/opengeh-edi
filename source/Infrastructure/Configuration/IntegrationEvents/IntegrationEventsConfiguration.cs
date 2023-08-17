@@ -26,6 +26,8 @@ public static class IntegrationEventsConfiguration
         services.AddTransient<INotificationHandler<TenSecondsHasHasPassed>,
             ProcessIntegrationEventsOnTenSecondsHasPassed>();
         services.AddTransient<INotificationHandler<ADayHasPassed>, RemoveIntegrationEventsWhenADaysHasPassed>();
+        services.AddTransient<INotificationHandler<ADayHasPassed>,
+            RemoveMonthOldReceivedIntegrationEventIdsWhenADaysHasPassed>();
         services.AddTransient<IntegrationEventReceiver>();
         services.AddTransient<IntegrationEventsProcessor>();
         services.AddTransient<IIntegrationEventMapper, CalculationResultCompletedEventMapper>();
