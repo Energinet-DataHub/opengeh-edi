@@ -114,6 +114,8 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202308071047 Add ResponseData to AggregatedMeasureDataProcesses.sql" />
     <EmbeddedResource Include="Scripts\Model\202308071047 Remove SettlementVersion from AggregatedMeasureDataProcesses.sql" />
     <EmbeddedResource Include="Scripts\Model\202308171013 Add messageId to ArchivedMessages.sql" />
+    <EmbeddedResource Include="Scripts\Model\202308171048 Add ProcessDate index on ReceivedIntegrationEvents.sql" />
+    <EmbeddedResource Include="Scripts\Model\202308171049 Add ProcessDate index on ReceivedInboxEvents.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241101 Consolidated BtwoB model.sql" />
