@@ -4,4 +4,4 @@
     OccurredOn datetime2(7) NOT NULL,
     CONSTRAINT PK_ReceivedInboxEventIds PRIMARY KEY NONCLUSTERED (Id)
 )
-GO
+GO 
