@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Actors;
 using Application.Configuration.DataAccess;
@@ -30,10 +31,11 @@ public class ActorRegistry : IActorRegistry
         _databaseConnectionFactory = databaseConnectionFactory;
     }
 
-    public async Task<bool> TryStoreAsync(CreateActor createActor)
+    public async Task<bool> TryStoreAsync(CreateActor createActor, CancellationToken cancellationToken)
     {
         if (createActor == null) throw new ArgumentNullException(nameof(createActor));
-        using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken)
+            .ConfigureAwait(false);
         var sqlStatement = @$"INSERT INTO [dbo].[Actor] ([Id], [B2CId], [IdentificationNumber]) VALUES ('{createActor.ActorId}', '{createActor.B2CId}', '{createActor.IdentificationNumber}')";
         try
         {

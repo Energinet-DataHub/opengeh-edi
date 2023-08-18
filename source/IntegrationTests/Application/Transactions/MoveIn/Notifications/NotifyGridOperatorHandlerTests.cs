@@ -72,7 +72,7 @@ public class NotifyGridOperatorHandlerTests
         var outgoingMessageTransaction = await AssertOutgoingMessage.OutgoingMessageAsync(
             SampleData.TransactionId,
             DocumentType.GenericNotification.Name,
-            ProcessType.MoveIn.Name,
+            BusinessReason.MoveIn.Name,
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
         outgoingMessageTransaction.HasSenderId(DataHubDetails.IdentificationNumber.Value)
             .HasSenderRole(MarketRole.MeteringPointAdministrator.ToString())

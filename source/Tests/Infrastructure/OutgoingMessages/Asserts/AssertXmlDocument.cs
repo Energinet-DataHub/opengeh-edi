@@ -17,13 +17,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
-using System.Xml.Schema;
 using System.Xml.XPath;
 using DocumentValidation;
-using DocumentValidation.Xml;
 using Xunit;
 
 namespace Tests.Infrastructure.OutgoingMessages.Asserts;
@@ -35,16 +34,15 @@ public class AssertXmlDocument
     private readonly string _prefix;
     private readonly DocumentValidator? _documentValidator;
     private readonly XDocument _document;
-    private readonly XmlReader _reader;
     private readonly XmlNamespaceManager _xmlNamespaceManager;
 
     private AssertXmlDocument(Stream stream, string prefix)
     {
         _stream = stream;
         _prefix = prefix;
-        _reader = XmlReader.Create(stream);
-        _document = XDocument.Load(_reader);
-        _xmlNamespaceManager = new XmlNamespaceManager(_reader.NameTable);
+        using var reader = XmlReader.Create(stream);
+        _document = XDocument.Load(reader);
+        _xmlNamespaceManager = new XmlNamespaceManager(reader.NameTable);
         _xmlNamespaceManager.AddNamespace(prefix, _document.Root!.Name.NamespaceName);
     }
 
@@ -99,7 +97,7 @@ public class AssertXmlDocument
 
     public async Task<AssertXmlDocument> HasValidStructureAsync(DocumentType type, string version = "0.1")
     {
-        var validationResult = await _documentValidator!.ValidateAsync(_stream, DocumentFormat.CimXml, type, version).ConfigureAwait(false);
+        var validationResult = await _documentValidator!.ValidateAsync(_stream, DocumentFormat.CimXml, type, CancellationToken.None, version).ConfigureAwait(false);
         Assert.True(validationResult.IsValid);
         return this;
     }

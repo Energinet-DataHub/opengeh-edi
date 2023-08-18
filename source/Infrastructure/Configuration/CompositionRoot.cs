@@ -21,19 +21,11 @@ using Application.Configuration.DataAccess;
 using Application.OutgoingMessages;
 using Application.OutgoingMessages.Common;
 using Application.OutgoingMessages.Common.Reasons;
-using Application.OutgoingMessages.Peek;
-using Application.SearchMessages;
-using Application.Transactions.Aggregations;
 using Application.Transactions.MoveIn;
 using Azure.Messaging.ServiceBus;
 using CimMessageAdapter.Messages;
-using Dapper;
-using Dapper.NodaTime;
-using Domain.ArchivedMessages;
 using Domain.Documents;
 using Domain.MasterData.MarketEvaluationPoints;
-using Domain.OutgoingMessages;
-using Domain.Transactions.MoveIn;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Infrastructure.Actors;
 using Infrastructure.ArchivedMessages;
@@ -46,6 +38,7 @@ using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Infrastructure.Configuration.Processing;
 using Infrastructure.Configuration.Serialization;
+using Infrastructure.InboxEvents;
 using Infrastructure.IncomingMessages;
 using Infrastructure.MasterData.MarketEvaluationPoints;
 using Infrastructure.OutgoingMessages;
@@ -59,12 +52,15 @@ using Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Infrastructure.OutgoingMessages.Dequeue;
 using Infrastructure.OutgoingMessages.GenericNotification;
 using Infrastructure.OutgoingMessages.Peek;
+using Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 using Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Infrastructure.Transactions;
+using Infrastructure.Transactions.AggregatedMeasureData;
 using Infrastructure.Transactions.Aggregations;
 using Infrastructure.Transactions.MoveIn;
 using Infrastructure.Transactions.UpdateCustomer;
+using Infrastructure.Wholesale;
 using MediatR;
 using MediatR.Registration;
 using Microsoft.EntityFrameworkCore;
@@ -86,9 +82,8 @@ namespace Infrastructure.Configuration
             services.AddScoped<ITransactionIds, TransactionIdRegistry>();
             services.AddScoped<IMessageIds, MessageIdRegistry>();
             services.AddScoped(typeof(IMessageQueueDispatcher<>), typeof(MessageQueueDispatcher<>));
-            services.AddScoped<IMoveInTransactionRepository, MoveInTransactionRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
+            services.AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>();
             services.AddScoped<IFeatureFlagProvider, FeatureFlagProviderProvider>();
 
             AddMediatR();
@@ -98,10 +93,12 @@ namespace Infrastructure.Configuration
             AddMasterDataServices();
             AddActorServices();
             AddProcessing();
+            AddWholeSaleInBox();
             ReadModelHandlingConfiguration.AddReadModelHandling(services);
             UpdateCustomerMasterDataConfiguration.Configure(services);
             DequeueConfiguration.Configure(services);
             IntegrationEventsConfiguration.Configure(services);
+            InboxEventsConfiguration.Configure(services);
             ArchivedMessageConfiguration.Configure(services);
             QueryHandlingConfiguration.Configure(services);
         }
@@ -118,9 +115,9 @@ namespace Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddPeekConfiguration(IBundleConfiguration bundleConfiguration, Func<IServiceProvider, IBundledMessages>? bundleStoreBuilder = null)
+        public CompositionRoot AddPeekConfiguration()
         {
-            PeekConfiguration.Configure(_services, bundleConfiguration, bundleStoreBuilder);
+            PeekConfiguration.Configure(_services);
             return this;
         }
 
@@ -196,7 +193,7 @@ namespace Infrastructure.Configuration
         public CompositionRoot AddMessagePublishing()
         {
             _services.AddSingleton<IActorLookup, ActorLookup>();
-            _services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
+            _services.AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>();
             _services.AddScoped<OutgoingMessageEnqueuer>();
             return this;
         }
@@ -208,6 +205,12 @@ namespace Infrastructure.Configuration
             Func<IServiceProvider, IMeteringPointMasterDataClient>? addMeteringPointMasterDataClient = null)
         {
             MoveInConfiguration.Configure(_services, settings, addMoveInRequestService, addCustomerMasterDataClient, addMeteringPointMasterDataClient);
+            return this;
+        }
+
+        public CompositionRoot AddAggregatedMeasureDataServices()
+        {
+            RequestedAggregatedMeasureDataConfiguration.Configure(_services);
             return this;
         }
 
@@ -274,6 +277,8 @@ namespace Infrastructure.Configuration
             _services.AddScoped<IDocumentWriter, RejectRequestChangeOfSupplierJsonDocumentWriter>();
             _services.AddScoped<IDocumentWriter, AggregationResultXmlDocumentWriter>();
             _services.AddScoped<IDocumentWriter, AggregationResultJsonDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataXmlDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataJsonDocumentWriter>();
 
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
             _services.AddScoped<IMessageRecordParser, MessageRecordParser>();
@@ -302,6 +307,11 @@ namespace Infrastructure.Configuration
             _services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>));
             _services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RaiseDomainEventsBehaviour<,>));
             _services.AddTransient(typeof(IPipelineBehavior<,>), typeof(EnqueueOutgoingMessagesBehaviour<,>));
+        }
+
+        private void AddWholeSaleInBox()
+        {
+            WholesaleInboxConfiguration.Configure(_services);
         }
     }
 }

@@ -14,6 +14,7 @@
 
 using System;
 using System.Data;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Dapper;
@@ -34,7 +35,7 @@ public class AssertTransaction
     public static async Task<AssertTransaction> TransactionAsync(string transactionId, IDatabaseConnectionFactory connectionFactory)
     {
         if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
-        using var connection = await connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         return new AssertTransaction(GetTransaction(transactionId, connection));
     }
 

@@ -14,9 +14,9 @@
 
 using Domain.Actors;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
-using Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
-using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
+using Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeOfSupplier;
+using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 using Domain.SeedWork;
 using Domain.Transactions.MoveIn.Events;
 using NodaTime;
@@ -131,7 +131,7 @@ namespace Domain.Transactions.MoveIn
             if (_businessProcessState == BusinessProcessState.Accepted)
                 return;
 
-            _messages.Add(ConfirmRequestChangeOfSupplierMessage.Create(TransactionId, ActorProvidedId, ProcessType.MoveIn, MarketEvaluationPointId, _requestedBy));
+            _messages.Add(ConfirmRequestChangeOfSupplierMessage.Create(TransactionId, ActorProvidedId, BusinessReason.MoveIn, MarketEvaluationPointId, _requestedBy));
 
             _businessProcessState = BusinessProcessState.Accepted;
             ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
@@ -146,7 +146,7 @@ namespace Domain.Transactions.MoveIn
             _messages.Add(RejectRequestChangeOfSupplierMessage.Create(
                 TransactionId,
                 ActorProvidedId,
-                ProcessType.MoveIn,
+                BusinessReason.MoveIn,
                 MarketEvaluationPointId,
                 _requestedBy,
                 reasons));
@@ -233,7 +233,7 @@ namespace Domain.Transactions.MoveIn
             _messages.Add(CharacteristicsOfACustomerAtAnApMessage.Create(
                 TransactionId,
                 ActorProvidedId,
-                ProcessType.MoveIn,
+                BusinessReason.MoveIn,
                 receiverNumber,
                 receiverRole,
                 EffectiveDate,

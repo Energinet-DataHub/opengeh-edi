@@ -79,6 +79,6 @@ public class AggregationResultForwarding : Entity
 
     private AggregationResultMessage MessageForTheBalanceResponsible(Aggregation result)
     {
-        return AggregationResultMessage.Create(ActorNumber.Create(result.ActorGrouping!.BalanceResponsibleNumber!), MarketRole.BalanceResponsible, Id, result);
+        return AggregationResultMessage.Create(ActorNumber.Create(result.ActorGrouping!.BalanceResponsibleNumber!), MarketRole.BalanceResponsibleParty, Id, result);
     }
 }

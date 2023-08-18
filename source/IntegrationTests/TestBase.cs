@@ -14,15 +14,16 @@
 
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Api.Configuration.Middleware.Correlation;
 using Application.Configuration;
 using Application.Configuration.Commands.Commands;
-using Application.Configuration.DataAccess;
 using Application.Configuration.Queries;
 using Application.Configuration.TimeEvents;
+using Application.Transactions.Aggregations;
 using Application.Transactions.MoveIn;
 using Azure.Messaging.ServiceBus;
 using Google.Protobuf;
@@ -31,14 +32,20 @@ using Infrastructure.Configuration.DataAccess;
 using Infrastructure.Configuration.IntegrationEvents;
 using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
+using Infrastructure.InboxEvents;
+using Infrastructure.Transactions.AggregatedMeasureData.Notifications;
+using Infrastructure.Transactions.Aggregations;
 using Infrastructure.Transactions.MoveIn;
+using Infrastructure.Wholesale;
 using IntegrationTests.Fixtures;
-using IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 using IntegrationTests.Infrastructure.Configuration.InternalCommands;
+using IntegrationTests.Infrastructure.InboxEvents;
 using IntegrationTests.TestDoubles;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+using TestNotification = IntegrationTests.Infrastructure.Configuration.IntegrationEvents.TestNotification;
+using TestNotificationHandlerSpy = IntegrationTests.Infrastructure.Configuration.IntegrationEvents.TestNotificationHandlerSpy;
 
 namespace IntegrationTests
 {
@@ -47,6 +54,7 @@ namespace IntegrationTests
     {
         private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
         private readonly HttpClientSpy _httpClientSpy;
+        private readonly B2BContext _b2BContext;
         private ServiceCollection? _services;
         private IServiceProvider _serviceProvider = default!;
         private bool _disposed;
@@ -58,10 +66,17 @@ namespace IntegrationTests
             _httpClientSpy = new HttpClientSpy();
             _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
             NotificationHandlerSpy = new TestNotificationHandlerSpy();
+            TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
+            InboxEventNotificationHandler = new IntegrationTests.Infrastructure.InboxEvents.TestNotificationHandlerSpy();
             BuildServices();
+            _b2BContext = GetService<B2BContext>();
         }
 
         protected TestNotificationHandlerSpy NotificationHandlerSpy { get; }
+
+        protected TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
+
+        protected IntegrationTests.Infrastructure.InboxEvents.TestNotificationHandlerSpy InboxEventNotificationHandler { get; }
 
         public void Dispose()
         {
@@ -82,6 +97,7 @@ namespace IntegrationTests
                 return;
             }
 
+            _b2BContext.Dispose();
             _serviceBusSenderFactoryStub.Dispose();
             ((ServiceProvider)_serviceProvider!).Dispose();
             _disposed = true;
@@ -105,6 +121,19 @@ namespace IntegrationTests
             await HavingProcessedInternalTasksAsync().ConfigureAwait(false);
         }
 
+        protected async Task HavingReceivedInboxEventAsync(string eventType, IMessage eventPayload, Guid processId)
+        {
+            await GetService<InboxEventReceiver>().
+                ReceiveAsync(
+                    Guid.NewGuid().ToString(),
+                    eventType,
+                    processId,
+                    eventPayload.ToByteArray())
+                .ConfigureAwait(false);
+            await ProcessReceivedInboxEventsAsync().ConfigureAwait(false);
+            await ProcessInternalCommandsAsync().ConfigureAwait(false);
+        }
+
         protected Task HavingProcessedInternalTasksAsync()
         {
             return ProcessBackgroundTasksAsync();
@@ -117,6 +146,21 @@ namespace IntegrationTests
                 .Append("SharedAccessKeyName=send;")
                 .Append(CultureInfo.InvariantCulture, $"SharedAccessKey={Guid.NewGuid():N}")
                 .ToString();
+        }
+
+        private async Task ProcessInternalCommandsAsync()
+        {
+            await ProcessBackgroundTasksAsync();
+
+            if (_b2BContext.QueuedInternalCommands.Any(command => command.ProcessedDate == null))
+            {
+                await ProcessInternalCommandsAsync();
+            }
+        }
+
+        private Task ProcessReceivedInboxEventsAsync()
+        {
+            return ProcessBackgroundTasksAsync();
         }
 
         private Task ProcessReceivedIntegrationEventsAsync()
@@ -136,20 +180,23 @@ namespace IntegrationTests
             _services = new ServiceCollection();
 
             _services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration("Fake"));
+            _services.AddSingleton(new WholesaleServiceBusClientConfiguration("Fake"));
             _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
             _services.AddSingleton(
                 _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
 
+            _services.AddTransient<InboxEventsProcessor>();
+            _services.AddTransient<AggregatedTimeSeriesRequestAcceptedEventMapper>();
+            _services.AddTransient<IGridAreaLookup, GridAreaLookup>();
             _services.AddTransient<INotificationHandler<TestNotification>>(_ => NotificationHandlerSpy);
+            _services.AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>>(_ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy);
+            _services.AddTransient<INotificationHandler<IntegrationTests.Infrastructure.InboxEvents.TestNotification>>(
+                _ => InboxEventNotificationHandler);
 
             CompositionRoot.Initialize(_services)
                 .AddAuthentication()
                 .AddAggregationsConfiguration()
-                .AddPeekConfiguration(
-                    new BundleConfigurationStub(),
-                    sp => new BundledMessagesStub(
-                        sp.GetRequiredService<IDatabaseConnectionFactory>(),
-                        sp.GetRequiredService<B2BContext>()))
+                .AddPeekConfiguration()
                 .AddRemoteBusinessService<DummyRequest, DummyReply>(
                     sp => new RemoteBusinessServiceRequestSenderSpy<DummyRequest>("Dummy"), "Dummy")
                 .AddDatabaseConnectionFactory(DatabaseFixture.ConnectionString)
@@ -164,6 +211,7 @@ namespace IntegrationTests
                 .AddMessagePublishing()
                 .AddRequestHandler<TestCommandHandler>()
                 .AddHttpClientAdapter(_ => _httpClientSpy)
+                .AddAggregatedMeasureDataServices()
                 .AddMoveInServices(
                     new MoveInSettings(
                         new MessageDelivery(new GridOperator() { GracePeriodInDaysAfterEffectiveDateIfNotUpdated = 1, }),

@@ -13,19 +13,9 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Text.Json.Serialization;
-using System.Threading;
-using System.Threading.Tasks;
 using Application.Configuration.Commands.Commands;
-using Application.OutgoingMessages;
-using Domain.Actors;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Domain.SeedWork;
-using Domain.Transactions;
 using Domain.Transactions.Aggregations;
-using MediatR;
 
 namespace Application.Transactions.Aggregations;
 

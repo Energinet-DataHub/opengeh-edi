@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using DocumentValidation;
 using Domain.OutgoingMessages;
@@ -128,7 +129,7 @@ internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationRe
 
     public async Task<IAssertAggregationResultDocument> DocumentIsValidAsync()
     {
-        var schema = await _schemas.GetSchemaAsync<JsonSchema>("NOTIFYAGGREGATEDMEASUREDATA", "0").ConfigureAwait(false);
+        var schema = await _schemas.GetSchemaAsync<JsonSchema>("NOTIFYAGGREGATEDMEASUREDATA", "0", CancellationToken.None).ConfigureAwait(false);
         var validationOptions = new EvaluationOptions()
         {
             OutputFormat = OutputFormat.List,
@@ -178,9 +179,9 @@ internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationRe
         return this;
     }
 
-    public IAssertAggregationResultDocument HasProcessType(ProcessType processType)
+    public IAssertAggregationResultDocument HasBusinessReason(BusinessReason businessReason)
     {
-        Assert.Equal(CimCode.Of(processType), _root.GetProperty("process.processType").GetProperty("value").ToString());
+        Assert.Equal(CimCode.Of(businessReason), _root.GetProperty("process.processType").GetProperty("value").ToString());
         return this;
     }
 

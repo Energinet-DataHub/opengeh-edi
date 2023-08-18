@@ -14,18 +14,19 @@
 
 using Domain.Actors;
 using Domain.Documents;
+using Domain.OutgoingMessages.Queueing;
 using Domain.Transactions;
 
 namespace Domain.OutgoingMessages
 {
     public class OutgoingMessage
     {
-        public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+        public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
         {
             DocumentType = documentType;
             ReceiverId = receiverId;
             TransactionId = transactionId;
-            ProcessType = processType;
+            BusinessReason = businessReason;
             ReceiverRole = receiverRole;
             SenderId = senderId;
             SenderRole = senderRole;
@@ -43,7 +44,7 @@ namespace Domain.OutgoingMessages
 
         public TransactionId TransactionId { get; }
 
-        public string ProcessType { get; }
+        public string BusinessReason { get; }
 
         public MarketRole ReceiverRole { get; }
 
@@ -52,5 +53,37 @@ namespace Domain.OutgoingMessages
         public MarketRole SenderRole { get; }
 
         public string MessageRecord { get; }
+
+        public Receiver Receiver => Receiver.Create(ReceiverId, ReceiverRole);
+
+        public BundleId? AssignedBundleId { get; private set; }
+
+        public static OutgoingMessage Create(
+            Receiver receiver,
+            BusinessReason businessReason,
+            DocumentType documentType,
+            TransactionId transactionId,
+            ActorNumber senderId,
+            MarketRole senderRole,
+            string messageRecord)
+        {
+            ArgumentNullException.ThrowIfNull(receiver);
+            ArgumentNullException.ThrowIfNull(businessReason);
+
+            return new OutgoingMessage(
+                documentType,
+                receiver.Number,
+                transactionId,
+                businessReason.Name,
+                receiver.ActorRole,
+                senderId,
+                senderRole,
+                messageRecord);
+        }
+
+        public void AssignToBundle(BundleId bundleId)
+        {
+            AssignedBundleId = bundleId;
+        }
     }
 }

@@ -27,6 +27,7 @@ namespace IntegrationTests.Application.IncomingMessages
         private readonly string _createdAt = SystemClock.Instance.GetCurrentInstant().ToString();
         private readonly string _receiverRole = "DDQ";
         private readonly string _senderRole = "DDZ";
+        private readonly string _messageType = NotSet;
         private Instant _effectiveDate = SystemClock.Instance.GetCurrentInstant();
         private string? _messageId;
         private string _processType = NotSet;
@@ -56,9 +57,9 @@ namespace IntegrationTests.Application.IncomingMessages
             return this;
         }
 
-        internal IncomingMessageBuilder WithProcessType(ProcessType processType)
+        internal IncomingMessageBuilder WithBusinessReason(BusinessReason businessReason)
         {
-            _processType = processType.Name;
+            _processType = businessReason.Name;
             return this;
         }
 
@@ -123,6 +124,7 @@ namespace IntegrationTests.Application.IncomingMessages
         {
             return new MessageHeader(
                 _messageId ?? Guid.NewGuid().ToString(),
+                _messageType,
                 _processType,
                 _senderId,
                 _senderRole,

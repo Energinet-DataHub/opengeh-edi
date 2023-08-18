@@ -43,6 +43,7 @@ namespace Infrastructure.IncomingMessages.Response
             writer.WriteStartElement("Error");
             writer.WriteElementString("Code", result.Errors.Count == 1 ? result.Errors.First().Code : "BadRequest");
             writer.WriteElementString("Message", result.Errors.Count == 1 ? result.Errors.First().Message : "Multiple errors in message");
+            writer.WriteElementString("Target", result.Errors.Count == 1 ? result.Errors.First().Target : string.Empty);
             if (result.Errors.Count > 1)
             {
                 writer.WriteStartElement("Details");
@@ -51,6 +52,7 @@ namespace Infrastructure.IncomingMessages.Response
                     writer.WriteStartElement("Error");
                     writer.WriteElementString("Code", validationError.Code);
                     writer.WriteElementString("Message", validationError.Message);
+                    writer.WriteElementString("Target", validationError.Target);
                     writer.WriteEndElement();
                 }
 

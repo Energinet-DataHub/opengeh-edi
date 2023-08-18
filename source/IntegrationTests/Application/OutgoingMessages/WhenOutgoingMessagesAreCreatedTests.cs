@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Dapper;
 using Domain.Actors;
 using Domain.Documents;
 using Domain.OutgoingMessages;
-using Infrastructure.OutgoingMessages.Common;
 using IntegrationTests.Application.IncomingMessages;
 using IntegrationTests.Fixtures;
 using Xunit;
@@ -37,8 +37,8 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase
     {
         await GivenRequestHasBeenAccepted().ConfigureAwait(false);
 
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
-        var sql = $"SELECT * FROM [dbo].[EnqueuedMessages]";
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+        var sql = $"SELECT * FROM [dbo].[OutgoingMessages]";
         var result = await
             connection
             .QuerySingleOrDefaultAsync(sql)
@@ -50,7 +50,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase
         Assert.Equal(result.ReceiverRole, MarketRole.EnergySupplier.Name);
         Assert.Equal(result.SenderId, DataHubDetails.IdentificationNumber.Value);
         Assert.Equal(result.SenderRole, MarketRole.MeteringPointAdministrator.Name);
-        Assert.Equal(ProcessType.MoveIn.Name, result.ProcessType);
+        Assert.Equal(BusinessReason.MoveIn.Name, result.BusinessReason);
         Assert.NotNull(result.MessageRecord);
     }
 
@@ -65,7 +65,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase
     private async Task GivenRequestHasBeenAccepted()
     {
         var incomingMessage = MessageBuilder()
-            .WithProcessType(ProcessType.MoveIn)
+            .WithBusinessReason(BusinessReason.MoveIn)
             .WithReceiver(SampleData.ReceiverId)
             .WithSenderId(SampleData.SenderId)
             .WithConsumerName(SampleData.ConsumerName)

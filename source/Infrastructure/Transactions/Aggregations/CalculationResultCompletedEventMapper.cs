@@ -24,7 +24,6 @@ using Infrastructure.Configuration.IntegrationEvents;
 using MediatR;
 using NodaTime.Serialization.Protobuf;
 using Point = Domain.Transactions.Aggregations.Point;
-using ProcessType = Domain.OutgoingMessages.ProcessType;
 using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
 
 namespace Infrastructure.Transactions.Aggregations;
@@ -58,7 +57,7 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
     public bool CanHandle(string eventType)
     {
         ArgumentNullException.ThrowIfNull(eventType);
-        return eventType.Equals("BalanceFixingCalculationResultCompleted", StringComparison.OrdinalIgnoreCase);
+        return eventType.Equals(CalculationResultCompleted.MessageName, StringComparison.OrdinalIgnoreCase);
     }
 
     public string ToJson(byte[] payload)
@@ -123,6 +122,9 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
             TimeSeriesType.Production => MeteringPointType.Production.Name,
             TimeSeriesType.FlexConsumption => MeteringPointType.Consumption.Name,
             TimeSeriesType.NonProfiledConsumption => MeteringPointType.Consumption.Name,
+            TimeSeriesType.NetExchangePerGa => MeteringPointType.Exchange.Name,
+            TimeSeriesType.NetExchangePerNeighboringGa => MeteringPointType.Exchange.Name,
+            TimeSeriesType.TotalConsumption => MeteringPointType.Consumption.Name,
             TimeSeriesType.Unspecified => throw new InvalidOperationException("Unknown metering point type"),
             _ => throw new InvalidOperationException("Could not determine metering point type"),
         };
@@ -146,10 +148,10 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
     {
         return integrationEvent.ProcessType switch
         {
-            Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Aggregation => ProcessType.PreliminaryAggregation.Name,
-            Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing => ProcessType.BalanceFixing.Name,
-            Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Unspecified => throw new InvalidOperationException("Process type is not specified"),
-            _ => throw new InvalidOperationException("Unknown process type"),
+            Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Aggregation => BusinessReason.PreliminaryAggregation.Name,
+            Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing => BusinessReason.BalanceFixing.Name,
+            Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Unspecified => throw new InvalidOperationException("Process type is not specified from Wholesales"),
+            _ => throw new InvalidOperationException("Unknown process type from Wholesales"),
         };
     }
 

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using CimMessageAdapter.Messages;
@@ -29,14 +30,15 @@ namespace Infrastructure.IncomingMessages
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
         }
 
-        public async Task<bool> TryStoreAsync(string transactionId)
+        public async Task<bool> TryStoreAsync(string senderId, string transactionId, CancellationToken cancellationToken)
         {
-            using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+            using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
 
+            transactionId = $"{senderId}_{transactionId}";
             var result = await connection.ExecuteAsync(
-                    $"IF NOT EXISTS (SELECT * FROM dbo.TransactionIds WHERE TransactionId = @TransactionId)" +
-                    $"INSERT INTO dbo.TransactionIds(TransactionId) VALUES(@TransactionId)",
-                    new { TransactionId = transactionId })
+                    $"IF NOT EXISTS (SELECT * FROM dbo.TransactionRegistry WHERE TransactionId = @TransactionId AND SenderId = @SenderId)" +
+                    $"INSERT INTO dbo.TransactionRegistry(TransactionId, SenderId) VALUES(@TransactionId, @SenderId)",
+                    new { TransactionId = transactionId, SenderId = senderId })
                 .ConfigureAwait(false);
 
             return result == 1;

@@ -1,0 +1,119 @@
+﻿// Copyright 2020 Energinet DataHub A/S
+//
+// Licensed under the Apache License, Version 2.0 (the "License2");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Application.Configuration;
+using Application.Configuration.DataAccess;
+using Dapper;
+using Energinet.DataHub.Edi.Responses;
+using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
+using Infrastructure.Configuration.DataAccess;
+using Infrastructure.InboxEvents;
+using Infrastructure.Transactions.Aggregations;
+using IntegrationTests.Fixtures;
+using Xunit;
+using Period = Energinet.DataHub.Edi.Responses.Period;
+
+namespace IntegrationTests.Infrastructure.InboxEvents;
+
+public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestBase
+{
+    private readonly string _eventType = nameof(AggregatedTimeSeriesRequestAccepted);
+    private readonly Guid _referenceId = Guid.NewGuid();
+    private readonly string _eventId = "1";
+    private readonly InboxEventsProcessor _processor;
+    private readonly AggregatedTimeSeriesRequestAcceptedEventMapper _aggregatedTimeSeriesRequestAcceptedEventMapper;
+    private readonly AggregatedTimeSeriesRequestAccepted _aggregatedTimeSeriesRequestAcceptedResponse;
+
+    public WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests(DatabaseFixture databaseFixture)
+        : base(databaseFixture)
+    {
+        _processor = GetService<InboxEventsProcessor>();
+        _aggregatedTimeSeriesRequestAcceptedEventMapper = GetService<AggregatedTimeSeriesRequestAcceptedEventMapper>();
+        _aggregatedTimeSeriesRequestAcceptedResponse = CreateResponseFromWholeSaleTemp();
+        RegisterInboxEvent();
+    }
+
+    [Fact]
+    public async Task Event_is_marked_as_processed_when_a_handler_has_handled_it_successfully()
+    {
+        await _processor.ProcessEventsAsync(CancellationToken.None);
+
+        TestAggregatedTimeSeriesRequestAcceptedHandlerSpy.AssertExpectedNotifications(_aggregatedTimeSeriesRequestAcceptedResponse);
+        await EventIsMarkedAsProcessedAsync(_eventId).ConfigureAwait(false);
+    }
+
+    private static AggregatedTimeSeriesRequestAccepted CreateResponseFromWholeSaleTemp()
+    {
+        var wholesaleResponse = new AggregatedTimeSeriesRequestAccepted();
+        wholesaleResponse.Series.Add(CreateSerie());
+
+        return wholesaleResponse;
+    }
+
+    private static Serie CreateSerie()
+    {
+        var quantity = new DecimalValue() { Units = 12345, Nanos = 123450000, };
+        var point = new TimeSeriesPoint()
+        {
+            Quantity = quantity,
+            QuantityQuality = QuantityQuality.Incomplete,
+            Time = new Timestamp() { Seconds = 1, },
+        };
+
+        var period = new Period()
+        {
+            StartOfPeriod = new Timestamp() { Seconds = 1, },
+            EndOfPeriod = new Timestamp() { Seconds = 2, },
+            Resolution = Resolution.Pt15M,
+        };
+
+        return new Serie()
+        {
+            SettlementVersion = "0",
+            GridArea = "244",
+            QuantityUnit = QuantityUnit.Kwh,
+            Period = period,
+            TimeSeriesPoints = { point },
+            TimeSeriesType = TimeSeriesType.Production,
+        };
+    }
+
+    private void RegisterInboxEvent()
+    {
+        var context = GetService<B2BContext>();
+        context.ReceivedInboxEvents.Add(new ReceivedInboxEvent(
+            _eventId,
+            _eventType,
+            _referenceId,
+            ToJson(),
+            GetService<ISystemDateTimeProvider>().Now()));
+        context.SaveChanges();
+    }
+
+    private async Task EventIsMarkedAsProcessedAsync(string eventId)
+    {
+        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+        var isProcessed = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM dbo.ReceivedInboxEvents WHERE Id = @EventId AND ProcessedDate IS NOT NULL", new { EventId = eventId, });
+        Assert.True(isProcessed);
+    }
+
+    private string ToJson()
+    {
+        return _aggregatedTimeSeriesRequestAcceptedEventMapper.ToJson(_aggregatedTimeSeriesRequestAcceptedResponse.ToByteArray());
+    }
+}

@@ -22,7 +22,7 @@ public interface IMarketTransaction
     /// <summary>
     /// Message metadata
     /// </summary>
-    MessageHeader Message { get; }
+    MessageHeader MessageHeader { get; }
 }
 
 /// <summary>

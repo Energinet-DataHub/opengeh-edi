@@ -17,8 +17,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using EnergySupplying.Contracts.BusinessRequests.MoveIn;
 using Infrastructure.Transactions;
+using Infrastructure.Transactions.MoveIn;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -66,7 +66,7 @@ public class HttpClientSpy : IHttpClientAdapter
 
     private HttpResponseMessage CreateResponseFromProcessing()
     {
-        var businessProcessResponse = new Response(_validationErrors, _businessProcessId);
+        var businessProcessResponse = new MoveInResponse(_validationErrors, _businessProcessId);
         var content = new StringContent(JsonConvert.SerializeObject(businessProcessResponse));
         var response = new HttpResponseMessage(_responseCode);
         response.Content = content;

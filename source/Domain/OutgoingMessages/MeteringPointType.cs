@@ -20,6 +20,7 @@ public class MeteringPointType : EnumerationType
 {
     public static readonly MeteringPointType Consumption = new(0, nameof(Consumption));
     public static readonly MeteringPointType Production = new(1, nameof(Production));
+    public static readonly MeteringPointType Exchange = new(2, nameof(Exchange));
 
     private MeteringPointType(int id, string name)
         : base(id, name)

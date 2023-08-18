@@ -127,6 +127,6 @@ public interface IAssertAggregationResultDocument
     /// <summary>
     /// Asserts the process type.
     /// </summary>
-    /// <param name="processType"></param>
-    IAssertAggregationResultDocument HasProcessType(ProcessType processType);
+    /// <param name="businessReason"></param>
+    IAssertAggregationResultDocument HasBusinessReason(BusinessReason businessReason);
 }

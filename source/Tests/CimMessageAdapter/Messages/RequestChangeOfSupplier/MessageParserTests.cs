@@ -17,14 +17,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Application.IncomingMessages.RequestChangeOfSupplier;
-using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestChangeOfSupplier;
+using CimMessageAdapter.ValidationErrors;
 using DocumentValidation;
-using Domain.OutgoingMessages;
 using Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 using Xunit;
 using DocumentFormat = Domain.Documents.DocumentFormat;
@@ -67,12 +67,12 @@ public class MessageParserTests
     [MemberData(nameof(CreateMessages))]
     public async Task Can_parse(DocumentFormat format, Stream message)
     {
-        var result = await _messageParser.ParseAsync(message, format).ConfigureAwait(false);
+        var result = await _messageParser.ParseAsync(message, format, CancellationToken.None).ConfigureAwait(false);
 
         Assert.True(result.Success);
         var header = result.IncomingMarketDocument?.Header;
         Assert.Equal("78954612", header?.MessageId);
-        Assert.Equal("E65", header?.ProcessType);
+        Assert.Equal("E65", header?.BusinessReason);
         Assert.Equal("5799999933318", header?.SenderId);
         Assert.Equal("DDQ", header?.SenderRole);
         Assert.Equal("5790001330552", header?.ReceiverId);
@@ -93,7 +93,7 @@ public class MessageParserTests
     [MemberData(nameof(CreateMessagesWithInvalidStructure))]
     public async Task Return_error_when_structure_is_invalid(DocumentFormat format, Stream message)
     {
-        var result = await _messageParser.ParseAsync(message, format).ConfigureAwait(false);
+        var result = await _messageParser.ParseAsync(message, format, CancellationToken.None).ConfigureAwait(false);
 
         Assert.False(result.Success);
         Assert.Contains(result.Errors, error => error is InvalidMessageStructure);
@@ -104,12 +104,12 @@ public class MessageParserTests
     {
         var parser = new MessageParser(new List<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>>());
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => parser.ParseAsync(CreateXmlMessage(), DocumentFormat.Xml)).ConfigureAwait(false);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => parser.ParseAsync(CreateXmlMessage(), DocumentFormat.Xml, CancellationToken.None)).ConfigureAwait(false);
     }
 
     private static Stream CreateXmlMessage()
     {
-        var xmlDoc = XDocument.Load($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}RequestChangeOfSupplier.xml");
+        var xmlDoc = XDocument.Load($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}ChangeOfSupplier{Path.DirectorySeparatorChar}RequestChangeOfSupplier.xml");
         var stream = new MemoryStream();
         xmlDoc.Save(stream);
 
@@ -119,12 +119,12 @@ public class MessageParserTests
     private static MemoryStream CreateJsonMessage()
     {
         return ReadTextFile(
-            $"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}json{Path.DirectorySeparatorChar}Request Change of Supplier.json");
+            $"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}json{Path.DirectorySeparatorChar}ChangeOfSupplier{Path.DirectorySeparatorChar}Request Change of Supplier.json");
     }
 
     private static MemoryStream CreateInvalidJsonMessage()
     {
-        return ReadTextFile($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}json{Path.DirectorySeparatorChar}Invalid Request Change of Supplier.json");
+        return ReadTextFile($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}json{Path.DirectorySeparatorChar}ChangeOfSupplier{Path.DirectorySeparatorChar}Invalid Request Change of Supplier.json");
     }
 
     private static Stream CreateInvalidXmlMessage()

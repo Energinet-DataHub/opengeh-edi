@@ -21,7 +21,7 @@ using Application.IncomingMessages.RequestChangeOfSupplier;
 using Application.OutgoingMessages.Common.Reasons;
 using Domain.Actors;
 using Domain.MasterData.MarketEvaluationPoints;
-using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 using Domain.Transactions;
 using Domain.Transactions.MoveIn;
 using MediatR;
@@ -61,30 +61,30 @@ namespace Application.Transactions.MoveIn
                 request.MarketActivityRecord.MarketEvaluationPointId,
                 InstantPattern.General.Parse(request.MarketActivityRecord.EffectiveDate).GetValueOrThrow(),
                 marketEvaluationPoint?.EnergySupplierNumber?.Value,
-                request.Message.MessageId,
+                request.MessageHeader.MessageId,
                 request.MarketActivityRecord.EnergySupplierId ?? string.Empty,
                 request.MarketActivityRecord.ConsumerId,
                 request.MarketActivityRecord.ConsumerName,
                 request.MarketActivityRecord.ConsumerIdType,
-                ActorNumber.Create(request.Message.SenderId));
+                ActorNumber.Create(request.MessageHeader.SenderId));
 
             if (string.IsNullOrEmpty(request.MarketActivityRecord.EnergySupplierId))
             {
-                return await RejectInvalidRequestMessageAsync(transaction, request, "EnergySupplierIdIsEmpty")
+                return await RejectInvalidRequestMessageAsync(transaction, "EnergySupplierIdIsEmpty", cancellationToken)
                     .ConfigureAwait(false);
             }
 
             if (!IsEnergySupplierIdAndSenderIdAMatch(
                     request.MarketActivityRecord.EnergySupplierId,
-                    request.Message.SenderId))
+                    request.MessageHeader.SenderId))
             {
-               return await RejectInvalidRequestMessageAsync(transaction, request, "EnergySupplierDoesNotMatchSender").ConfigureAwait(false);
+               return await RejectInvalidRequestMessageAsync(transaction, "EnergySupplierDoesNotMatchSender", cancellationToken).ConfigureAwait(false);
             }
 
             var businessProcessResult = await InvokeBusinessProcessAsync(transaction).ConfigureAwait(false);
             if (businessProcessResult.Success == false)
             {
-                var reasons = await CreateReasonsFromAsync(businessProcessResult.ValidationErrors).ConfigureAwait(false);
+                var reasons = await CreateReasonsFromAsync(businessProcessResult.ValidationErrors, cancellationToken).ConfigureAwait(false);
                 transaction.Reject(reasons);
             }
             else
@@ -102,9 +102,9 @@ namespace Application.Transactions.MoveIn
             return energySupplierId == senderId;
         }
 
-        private async Task<Unit> RejectInvalidRequestMessageAsync(MoveInTransaction transaction, RequestChangeOfSupplierTransaction request, string error)
+        private async Task<Unit> RejectInvalidRequestMessageAsync(MoveInTransaction transaction, string error, CancellationToken cancellationToken)
         {
-            var reasons = await CreateReasonsFromAsync(new Collection<string>() { error }).ConfigureAwait(false);
+            var reasons = await CreateReasonsFromAsync(new Collection<string>() { error }, cancellationToken).ConfigureAwait(false);
             transaction.Reject(reasons);
 
             _moveInTransactionRepository.Add(transaction);
@@ -122,9 +122,9 @@ namespace Application.Transactions.MoveIn
             return _moveInRequester.InvokeAsync(businessProcess);
         }
 
-        private Task<ReadOnlyCollection<Reason>> CreateReasonsFromAsync(IReadOnlyCollection<string> validationErrors)
+        private Task<ReadOnlyCollection<Reason>> CreateReasonsFromAsync(IReadOnlyCollection<string> validationErrors, CancellationToken cancellationToken)
         {
-            return _validationErrorTranslator.TranslateAsync(validationErrors);
+            return _validationErrorTranslator.TranslateAsync(validationErrors, cancellationToken);
         }
     }
 }

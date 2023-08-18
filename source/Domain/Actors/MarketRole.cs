@@ -20,10 +20,16 @@ public class MarketRole : EnumerationType
 {
     public static readonly MarketRole MeteringPointAdministrator = new(0, "MeteringPointAdministrator", string.Empty);
     public static readonly MarketRole EnergySupplier = new(1, "EnergySupplier", "DDQ");
-    public static readonly MarketRole GridOperator = new(2, "GridOperator", string.Empty);
+
+    // A grid operator has two roles.
+    // GridOperator (DDM) when creating a new metering point
+    public static readonly MarketRole GridOperator = new(2, "GridOperator", "DDM");
     public static readonly MarketRole MeteringDataAdministrator = new(3, "MeteringDataAdministrator", string.Empty);
-    public static readonly MarketRole MeteredDataResponsible = new(4, "MeteredDataResponsible", string.Empty);
-    public static readonly MarketRole BalanceResponsible = new(5, "BalanceResponsible", string.Empty);
+
+    // A grid operator has two roles.
+    // MeteredDataResponsible (MDR) when requesting data from DataHub
+    public static readonly MarketRole MeteredDataResponsible = new(4, "MeteredDataResponsible", "MDR");
+    public static readonly MarketRole BalanceResponsibleParty = new(5, "BalanceResponsibleParty", "DDK");
 
     private MarketRole(int id, string name, string code)
         : base(id, name)
@@ -32,6 +38,12 @@ public class MarketRole : EnumerationType
     }
 
     public string Code { get; }
+
+    public static MarketRole FromCode(string code)
+    {
+        var matchingItem = GetAll<MarketRole>().FirstOrDefault(item => item.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
+        return matchingItem ?? throw new InvalidOperationException($"'{code}' is not a valid code in {typeof(MarketRole)}");
+    }
 
     public override string ToString()
     {

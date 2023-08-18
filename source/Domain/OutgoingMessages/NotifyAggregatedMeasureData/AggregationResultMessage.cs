@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json;
 using Domain.Actors;
 using Domain.Documents;
 using Domain.SeedWork;
@@ -23,14 +22,14 @@ namespace Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 
 public class AggregationResultMessage : OutgoingMessage
 {
-    private AggregationResultMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
-        : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, JsonSerializer.Serialize(messageRecord))
+    private AggregationResultMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+        : base(documentType, receiverId, transactionId, businessReason, receiverRole, senderId, senderRole, messageRecord)
     {
         Series = new Serializer().Deserialize<TimeSeries>(messageRecord)!;
     }
 
-    private AggregationResultMessage(ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, TimeSeries series)
-        : base(DocumentType.NotifyAggregatedMeasureData, receiverId, transactionId, processType, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringDataAdministrator, new Serializer().Serialize(series))
+    private AggregationResultMessage(ActorNumber receiverId, TransactionId transactionId, string businessReason, MarketRole receiverRole, TimeSeries series)
+        : base(DocumentType.NotifyAggregatedMeasureData, receiverId, transactionId, businessReason, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringDataAdministrator, new Serializer().Serialize(series))
     {
         Series = series;
     }
@@ -57,12 +56,14 @@ public class AggregationResultMessage : OutgoingMessage
             result.ActorGrouping.EnergySupplierNumber,
             result.ActorGrouping.BalanceResponsibleNumber,
             result.Period,
-            result.Points.Select(p => new Point(p.Position, p.Quantity, p.Quality, p.SampleTime)).ToList());
+            result.Points.Select(p => new Point(p.Position, p.Quantity, p.Quality, p.SampleTime)).ToList(),
+            result.OriginalTransactionIdReference,
+            result.SettlementVersion);
 
         return new AggregationResultMessage(
             receiverNumber,
             transactionId,
-            EnumerationType.FromName<ProcessType>(result.ProcessType).Name,
+            EnumerationType.FromName<BusinessReason>(result.BusinessReason).Name,
             receiverRole,
             series);
     }
@@ -78,6 +79,8 @@ public record TimeSeries(
     string? EnergySupplierNumber,
     string? BalanceResponsibleNumber,
     Period Period,
-    IReadOnlyList<Point> Point);
+    IReadOnlyList<Point> Point,
+    string? OriginalTransactionIdReference = null,
+    string? SettlementVersion = null);
 
 public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);

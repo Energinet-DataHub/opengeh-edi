@@ -15,7 +15,8 @@
 using System.Collections.Generic;
 using Domain.Actors;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.OutgoingMessages.Exceptions;
+using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 using Domain.Transactions;
 using Xunit;
 
@@ -50,7 +51,7 @@ public class RejectRequestChangeOfSupplierMessageTests
         return RejectRequestChangeOfSupplierMessage.Create(
             TransactionId.New(),
             ActorProvidedId.Create("123456789"),
-            ProcessType.MoveIn,
+            BusinessReason.MoveIn,
             string.Empty,
             ActorNumber.Create("1234567890123"),
             listOfReasons);

@@ -22,18 +22,18 @@ limitations under the License.
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
-        <PackageReference Include="xunit" Version="2.4.2" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
+        <PackageReference Include="xunit" Version="2.5.0" />
         <PackageReference Include="xunit.categories" Version="2.0.6" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="coverlet.collector" Version="3.2.0">
+        <PackageReference Include="coverlet.collector" Version="6.0.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.5.22">
+        <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.6.40">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -60,32 +60,48 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="CimMessageAdapter\Messages\json\Invalid Request Change of Supplier.json">
+      <EmbeddedResource Include="CimMessageAdapter\Messages\json\AggregatedMeasure\FailSchemeValidationAggregatedMeasureData.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\json\AggregatedMeasure\RequestAggregatedMeasureData.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\json\ChangeOfSupplier\Invalid Request Change of Supplier.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\json\ChangeOfSupplier\Request Change of Supplier.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\AggregatedMeasure\BadVersionRequestAggregatedMeasureData.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="CimMessageAdapter\Messages\json\Request Change of Supplier.json">
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\AggregatedMeasure\RequestAggregatedMeasureData.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\BadRequestChangeOfSupplier.xml">
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\AggregatedMeasure\TwoSeriesRequestAggregatedMeasureData.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\ChangeAccountingPoint\RequestChangeAccountingPointCharacteristics.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\Confirm request Change of Supplier.xml">
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\ChangeAccountingPoint\RequestChangeAccountingPointCharacteristicsMultipleMarketActivityRecords.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\RequestChangeAccountingPointCharacteristicsMultipleMarketActivityRecords.xml">
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\ChangeCustomerCharacteristics\RequestChangeCustomerCharacteristics.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\ChangeOfSupplier\BadRequestChangeOfSupplier.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\RequestChangeOfSupplier.xml">
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\ChangeOfSupplier\Confirm request Change of Supplier.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\ChangeOfSupplier\RequestChangeOfSupplier.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
       <None Remove="CimMessageAdapter\Messages\xml\RequestChangeAccountingPointCharacteristics.xml" />
-      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\RequestChangeAccountingPointCharacteristics.xml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </EmbeddedResource>
       <None Remove="CimMessageAdapter\Messages\xml\RequestChangeCustomerCharacteristics.xml" />
-      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\RequestChangeCustomerCharacteristics.xml">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
+      <None Remove="CimMessageAdapter\Messages\json\AggregatedMeasure\Request Aggregated Measure Data.json" />
     </ItemGroup>
 
     <ItemGroup>

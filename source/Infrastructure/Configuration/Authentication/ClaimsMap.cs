@@ -23,10 +23,10 @@ public static class ClaimsMap
 {
     private static readonly Dictionary<string, MarketRole> _rolesMap = new()
     {
-        { "electricalsupplier", MarketRole.EnergySupplier },
+        { "energysupplier", MarketRole.EnergySupplier },
         { "gridoperator", MarketRole.GridOperator },
         { "metereddataresponsible", MarketRole.MeteredDataResponsible },
-        { "balanceresponsible", MarketRole.BalanceResponsible },
+        { "balanceresponsibleparty", MarketRole.BalanceResponsibleParty },
     };
 
     public static string UserId => "azp";

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.OutgoingMessages.Dequeue;
@@ -22,6 +23,7 @@ using Domain.Actors;
 using Domain.Documents;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.Peek;
+using Domain.OutgoingMessages.Queueing;
 using IntegrationTests.Application.IncomingMessages;
 using IntegrationTests.Fixtures;
 using Xunit;
@@ -38,7 +40,7 @@ public class WhenADequeueIsRequestedTests : TestBase
     [Fact]
     public async Task Dequeue_is_unsuccessful_when_bundle_does_not_exist()
     {
-        var dequeueResult = await InvokeCommandAsync(new DequeueRequest(Guid.NewGuid().ToString())).ConfigureAwait(false);
+        var dequeueResult = await InvokeCommandAsync(new DequeueCommand(Guid.NewGuid().ToString(), MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId))).ConfigureAwait(false);
 
         Assert.False(dequeueResult.Success);
     }
@@ -47,31 +49,28 @@ public class WhenADequeueIsRequestedTests : TestBase
     public async Task Dequeue_is_Successful()
     {
         await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
-        var peekResult = await InvokeCommandAsync(new PeekRequest(
+        var peekResult = await InvokeCommandAsync(new PeekCommand(
             ActorNumber.Create(SampleData.NewEnergySupplierNumber),
             MessageCategory.MasterData,
+            MarketRole.EnergySupplier,
             DocumentFormat.Xml)).ConfigureAwait(false);
 
-        var dequeueResult = await InvokeCommandAsync(new DequeueRequest(peekResult.MessageId.GetValueOrDefault().ToString())).ConfigureAwait(false);
+        var dequeueResult = await InvokeCommandAsync(new DequeueCommand(peekResult.MessageId.GetValueOrDefault().ToString(), MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId))).ConfigureAwait(false);
 
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var found = await connection
-            .QuerySingleOrDefaultAsync("SELECT * FROM [dbo].BundledMessages")
+            .QuerySingleOrDefaultAsync<bool>("SELECT IsDequeued FROM [dbo].Bundles")
             .ConfigureAwait(false);
-        var sqlCountStatement = $"SELECT COUNT(*) FROM [dbo].EnqueuedMessages WHERE ReceiverId = {SampleData.NewEnergySupplierNumber}";
-        var messagesInQueue = await connection
-            .ExecuteScalarAsync<int>(sqlCountStatement);
 
         Assert.True(dequeueResult.Success);
-        Assert.Null(found);
-        Assert.Equal(0, messagesInQueue);
+        Assert.True(found);
     }
 
     private async Task GivenAMoveInTransactionHasBeenAccepted()
     {
         var incomingMessage = new IncomingMessageBuilder()
             .WithMarketEvaluationPointId(SampleData.MeteringPointNumber)
-            .WithProcessType(ProcessType.MoveIn)
+            .WithBusinessReason(BusinessReason.MoveIn)
             .WithReceiver(SampleData.ReceiverId)
             .WithSenderId(SampleData.SenderId)
             .WithConsumerName(SampleData.ConsumerName)

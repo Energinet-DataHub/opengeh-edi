@@ -22,21 +22,20 @@ limitations under the License.
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="2.2.5" />
-        <PackageReference Include="Microsoft.Azure.Functions.Worker.Core" Version="1.11.0" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
+        <PackageReference Include="Microsoft.Azure.Functions.Worker.Core" Version="1.14.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
         <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
-        <PackageReference Include="xunit" Version="2.4.2" />
+        <PackageReference Include="xunit" Version="2.5.0" />
         <PackageReference Include="xunit.categories" Version="2.0.6" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="coverlet.collector" Version="3.2.0">
+        <PackageReference Include="coverlet.collector" Version="6.0.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.5.22">
+        <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.6.40">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -67,16 +66,23 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\BadRequestChangeCustomerCharacteristics.xml">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\BadRequestChangeOfSupplier.xml">
+      <EmbeddedResource Include="Infrastructure.CimMessageAdapter\Messages\xml\BadRequestAggregatedMeasureData.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\RequestChangeCustomerCharacteristics.xml">
+      <EmbeddedResource Include="Infrastructure.CimMessageAdapter\Messages\xml\BadRequestChangeCustomerCharacteristics.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\RequestChangeOfSupplier.xml">
+      <EmbeddedResource Include="Infrastructure.CimMessageAdapter\Messages\xml\BadRequestChangeOfSupplier.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Infrastructure.CimMessageAdapter\Messages\xml\RequestChangeCustomerCharacteristics.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Infrastructure.CimMessageAdapter\Messages\xml\RequestChangeOfSupplier.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="CimMessageAdapter\Messages\xml\RequestAggregatedMeasureData.xml" />
+      <EmbeddedResource Include="Infrastructure.CimMessageAdapter\Messages\xml\RequestAggregatedMeasureData.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
     </ItemGroup>

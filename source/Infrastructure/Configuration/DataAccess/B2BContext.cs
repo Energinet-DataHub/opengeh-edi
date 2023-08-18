@@ -15,24 +15,28 @@
 using System;
 using Domain.ArchivedMessages;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.AccountingPointCharacteristics;
-using Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
-using Domain.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
-using Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
-using Domain.OutgoingMessages.GenericNotification;
+using Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics;
+using Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
+using Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeAccountingPointCharacteristics;
+using Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeOfSupplier;
+using Domain.OutgoingMessages.MoveIn.GenericNotification;
+using Domain.OutgoingMessages.MoveIn.RejectRequestChangeAccountingPointCharacteristics;
+using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 using Domain.OutgoingMessages.Peek;
-using Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
-using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.OutgoingMessages.Queueing;
+using Domain.Transactions.AggregatedMeasureData;
 using Domain.Transactions.Aggregations;
 using Domain.Transactions.MoveIn;
 using Infrastructure.ArchivedMessages;
 using Infrastructure.Configuration.IntegrationEvents;
 using Infrastructure.Configuration.InternalCommands;
 using Infrastructure.Configuration.Serialization;
+using Infrastructure.InboxEvents;
 using Infrastructure.MasterData.MarketEvaluationPoints;
 using Infrastructure.OutgoingMessages;
-using Infrastructure.OutgoingMessages.Peek;
+using Infrastructure.OutgoingMessages.Queueing;
 using Infrastructure.Transactions;
+using Infrastructure.Transactions.AggregatedMeasureData;
 using Infrastructure.Transactions.Aggregations;
 using Infrastructure.Transactions.UpdateCustomer;
 using Microsoft.EntityFrameworkCore;
@@ -57,6 +61,8 @@ namespace Infrastructure.Configuration.DataAccess
 
         public DbSet<MoveInTransaction> Transactions { get; private set; }
 
+        public DbSet<AggregatedMeasureDataProcess> AggregatedMeasureDataProcesses { get; private set; }
+
         public DbSet<AggregationResultForwarding> AggregatedTimeSeriesTransactions { get; private set; }
 
         public DbSet<OutgoingMessage> OutgoingMessages { get; private set; }
@@ -67,26 +73,32 @@ namespace Infrastructure.Configuration.DataAccess
 
         public DbSet<EnqueuedMessage> EnqueuedMessages { get; private set; }
 
-        public DbSet<BundledMessage> BundledMessages { get; private set; }
-
         public DbSet<ArchivedMessage> ArchivedMessages { get; private set; }
 
         public DbSet<ReceivedIntegrationEvent> ReceivedIntegrationEvents { get; private set; }
+
+        public DbSet<ActorMessageQueue> ActorMessageQueues { get; private set; }
+
+        public DbSet<MarketDocument> MarketDocuments { get; private set; }
+
+        public DbSet<ReceivedInboxEvent> ReceivedInboxEvents { get; private set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
 
             modelBuilder.ApplyConfiguration(new MoveInTransactionEntityConfiguration(_serializer));
+            modelBuilder.ApplyConfiguration(new AggregatedMeasureDataProcessEntityConfiguration());
             modelBuilder.ApplyConfiguration(new AggregationResultForwardingEntityConfiguration(_serializer));
             modelBuilder.ApplyConfiguration(new EntityConfiguration());
             modelBuilder.ApplyConfiguration(new OutgoingMessageEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new EnqueuedMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QueuedInternalCommandEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ReceivedIntegrationEventEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MarketEvaluationPointEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new BundledMessageConfiguration());
             modelBuilder.ApplyConfiguration(new ArchivedMessageEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new ActorMessageQueueEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new MarketDocumentEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new ReceivedInboxEventEntityConfiguration());
 
             modelBuilder.Entity<GenericNotificationMessage>()
                 .Ignore(entity => entity.MarketActivityRecord);

@@ -50,7 +50,7 @@ namespace ArchitectureTests
         public static Func<Type, IEnumerable<Type>, IEnumerable<Type>> FindAllTypesThatImplementType()
         {
             return (targetType, types) =>
-                types.Where(targetType.IsAssignableFrom);
+                types.Where(targetType.IsAssignableFrom).Where(type => type.IsAbstract == false);
         }
 
         public static Func<Type, IEnumerable<Type>, IEnumerable<Type>> FindAllTypesThatImplementGenericInterface()

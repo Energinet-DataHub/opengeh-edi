@@ -20,6 +20,7 @@ using Application.Transactions.MoveIn;
 using Application.Transactions.MoveIn.MasterDataDelivery;
 using Application.Transactions.MoveIn.Notifications;
 using Application.Transactions.UpdateCustomer;
+using Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -36,6 +37,7 @@ internal static class InternalCommandProcessing
         services.AddTransient<InternalCommandAccessor>();
         services.AddTransient<InternalCommandProcessor>();
         services.AddTransient<INotificationHandler<TenSecondsHasHasPassed>, ProcessInternalCommandsOnTimeHasPassed>();
+        services.AddTransient<INotificationHandler<ADayHasPassed>, RemoveInternalCommandsWhenADayHasPassed>();
     }
 
     private static InternalCommandMapper CreateInternalCommandMap()
@@ -52,6 +54,11 @@ internal static class InternalCommandProcessing
         mapper.Add("SetConsumerHasMovedIn", typeof(SetConsumerHasMovedIn));
         mapper.Add("UpdateCustomerMasterData", typeof(UpdateCustomerMasterData));
         mapper.Add("Aggregations.ForwardAggregationResult", typeof(ForwardAggregationResult));
+        mapper.Add("SendAggregatedMeasureRequestToWholesale", typeof(SendAggregatedMeasureRequestToWholesale));
+        mapper.Add("AcceptedAggregatedTimeSeries", typeof(AcceptedAggregatedTimeSeries));
+        mapper.Add("CreateAggregatedMeasureAggregationResults", typeof(CreateAggregatedMeasureAggregationResults));
+        mapper.Add("RejectedAggregatedTimeSeries", typeof(RejectedAggregatedTimeSeries));
+        mapper.Add("ForwardRejectedAggregationResult", typeof(ForwardRejectedAggregationResult));
 
         return mapper;
     }

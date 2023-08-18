@@ -15,6 +15,7 @@
 using System;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Api.Common;
 using Application.Configuration;
@@ -42,39 +43,49 @@ namespace Api.IncomingMessages
             ResponseFactory responseFactory,
             MessageParser messageParser)
         {
-            _logger = logger;
-            _correlationContext = correlationContext;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _correlationContext = correlationContext ?? throw new ArgumentNullException(nameof(correlationContext));
             _messageReceiver = messageReceiver ?? throw new ArgumentNullException(nameof(messageReceiver));
-            _responseFactory = responseFactory;
-            _messageParser = messageParser;
+            _responseFactory = responseFactory ?? throw new ArgumentNullException(nameof(responseFactory));
+            _messageParser = messageParser ?? throw new ArgumentNullException(nameof(messageParser));
         }
 
         [Function("RequestChangeOfSupplier")]
         public async Task<HttpResponseData> RunAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
-            HttpRequestData request)
+            HttpRequestData request,
+            CancellationToken hostCancellationToken)
         {
             _logger.LogInformation($"Received {nameof(RequestChangeOfSupplierMessageReceiver)} request");
 
             if (request == null) throw new ArgumentNullException(nameof(request));
 
+            using var cancellationTokenSource =
+                CancellationTokenSource.CreateLinkedTokenSource(
+                    hostCancellationToken,
+                    request.FunctionContext.CancellationToken);
+
+            var cancellationToken = cancellationTokenSource.Token;
+
             var contentType = request.Headers.GetContentType();
             var cimFormat = CimFormatParser.ParseFromContentTypeHeaderValue(contentType);
             if (cimFormat is null)
             {
-                _logger.LogInformation($"Could not parse desired CIM format from Content-Type header value: {contentType}");
+                _logger.LogInformation(
+                    $"Could not parse desired CIM format from Content-Type header value: {contentType}");
                 return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var messageParserResult = await _messageParser.ParseAsync(request.Body, cimFormat).ConfigureAwait(false);
-            var result = await _messageReceiver.ReceiveAsync(messageParserResult)
+            var messageParserResult = await _messageParser.ParseAsync(request.Body, cimFormat, cancellationToken).ConfigureAwait(false);
+            var result = await _messageReceiver.ReceiveAsync(messageParserResult, cancellationToken)
                 .ConfigureAwait(false);
 
             var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
             return CreateResponse(request, httpStatusCode, _responseFactory.From(result, cimFormat));
         }
 
-        private HttpResponseData CreateResponse(HttpRequestData request, HttpStatusCode statusCode, ResponseMessage responseMessage)
+        private HttpResponseData CreateResponse(
+            HttpRequestData request, HttpStatusCode statusCode, ResponseMessage responseMessage)
         {
             var response = request.CreateResponse(statusCode);
             response.WriteString(responseMessage.MessageBody, Encoding.UTF8);

@@ -18,4 +18,11 @@ using NodaTime;
 
 namespace Domain.ArchivedMessages;
 
-public record ArchivedMessage(Guid Id, DocumentType DocumentType, ActorNumber SenderNumber, ActorNumber ReceiverNumber, Instant CreatedAt);
+public record ArchivedMessage(
+    string Id,
+    DocumentType DocumentType,
+    ActorNumber SenderNumber,
+    ActorNumber ReceiverNumber,
+    Instant CreatedAt,
+    string? BusinessReason,
+    Stream Document);

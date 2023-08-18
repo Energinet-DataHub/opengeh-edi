@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.Transactions.MoveIn;
@@ -21,7 +22,7 @@ using Dapper;
 using Domain.Actors;
 using Domain.Documents;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+using Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeOfSupplier;
 using Domain.Transactions.MoveIn;
 using Infrastructure.Configuration.InternalCommands;
 using Infrastructure.Transactions;
@@ -53,8 +54,8 @@ namespace IntegrationTests.Application.Transactions.MoveIn
 
             var assertTransaction = await AssertTransaction.TransactionAsync(SampleData.ActorProvidedId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
             assertTransaction.HasState(MoveInTransaction.State.Started)
-                .HasStartedByMessageId(incomingMessage.Message.MessageId)
-                .HasNewEnergySupplierId(incomingMessage.Message.SenderId)
+                .HasStartedByMessageId(incomingMessage.MessageHeader.MessageId)
+                .HasNewEnergySupplierId(incomingMessage.MessageHeader.SenderId)
                 .HasConsumerId(incomingMessage.MarketActivityRecord.ConsumerId!)
                 .HasConsumerName(incomingMessage.MarketActivityRecord.ConsumerName!)
                 .HasConsumerIdType(incomingMessage.MarketActivityRecord.ConsumerIdType!)
@@ -95,7 +96,7 @@ namespace IntegrationTests.Application.Transactions.MoveIn
             httpClientMock.RespondWithValidationErrors(new List<string> { "InvalidConsumer" });
 
             var incomingMessage = MessageBuilder()
-                .WithProcessType(ProcessType.MoveIn)
+                .WithBusinessReason(BusinessReason.MoveIn)
                 .WithReceiver(SampleData.ReceiverId)
                 .WithSenderId(SampleData.SenderId)
                 .WithConsumerName(null)
@@ -110,7 +111,7 @@ namespace IntegrationTests.Application.Transactions.MoveIn
         public async Task A_reject_message_is_created_when_the_sender_id_does_not_match_energy_supplier_id()
         {
             var incomingMessage = MessageBuilder()
-                .WithProcessType(ProcessType.MoveIn)
+                .WithBusinessReason(BusinessReason.MoveIn)
                 .WithReceiver(SampleData.ReceiverId)
                 .WithSenderId("1234567890123")
                 .WithConsumerName(null)
@@ -119,14 +120,14 @@ namespace IntegrationTests.Application.Transactions.MoveIn
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
 
             var rejectMessage = await RejectMessage().ConfigureAwait(false);
-            rejectMessage.HasReceiverId(incomingMessage.Message.SenderId);
+            rejectMessage.HasReceiverId(incomingMessage.MessageHeader.SenderId);
         }
 
         [Fact]
         public async Task A_reject_message_is_created_when_the_energy_supplier_id_is_empty()
         {
             var incomingMessage = MessageBuilder()
-                .WithProcessType(ProcessType.MoveIn)
+                .WithBusinessReason(BusinessReason.MoveIn)
                 .WithReceiver(SampleData.ReceiverId)
                 .WithSenderId(SampleData.SenderId)
                 .WithEnergySupplierId(null)
@@ -150,7 +151,7 @@ namespace IntegrationTests.Application.Transactions.MoveIn
         private async Task GivenRequestHasBeenAccepted()
         {
             var incomingMessage = MessageBuilder()
-                .WithProcessType(ProcessType.MoveIn)
+                .WithBusinessReason(BusinessReason.MoveIn)
                 .WithReceiver(SampleData.ReceiverId)
                 .WithSenderId(SampleData.SenderId)
                 .WithConsumerName(SampleData.ConsumerName)
@@ -179,7 +180,7 @@ namespace IntegrationTests.Application.Transactions.MoveIn
             var assertMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
                     currentTransactionId,
                     DocumentType.ConfirmRequestChangeOfSupplier.Name,
-                    ProcessType.MoveIn.Name,
+                    BusinessReason.MoveIn.Name,
                     MarketRole.EnergySupplier,
                     GetService<IDatabaseConnectionFactory>())
                 .ConfigureAwait(false);
@@ -205,15 +206,15 @@ namespace IntegrationTests.Application.Transactions.MoveIn
             var assertMessage = await AssertOutgoingMessage
                 .OutgoingMessageAsync(
                     DocumentType.RejectRequestChangeOfSupplier.Name,
-                    ProcessType.MoveIn.Name,
+                    BusinessReason.MoveIn.Name,
                     MarketRole.EnergySupplier,
                     GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
             assertMessage.HasReceiverRole(MarketRole.EnergySupplier.Name);
             assertMessage
-                .HasMessageRecordValue<Domain.OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord>(
+                .HasMessageRecordValue<Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier.MarketActivityRecord>(
                     record => record.MarketEvaluationPointId, SampleData.MeteringPointNumber);
             assertMessage
-                .HasMessageRecordValue<Domain.OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord>(
+                .HasMessageRecordValue<Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier.MarketActivityRecord>(
                     record => record.OriginalTransactionId, SampleData.ActorProvidedId.Id);
 
             return assertMessage;
@@ -221,7 +222,7 @@ namespace IntegrationTests.Application.Transactions.MoveIn
 
         private async Task<Guid> GetTransactionIdAsync()
         {
-            using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
+            using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
             return await connection
                 .QueryFirstAsync<Guid>(
                     "SELECT TOP(1) TransactionId FROM dbo.MoveInTransactions WHERE ActorProvidedId = @ActorProvidedId",

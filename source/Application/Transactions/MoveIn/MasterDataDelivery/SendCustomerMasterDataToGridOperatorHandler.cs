@@ -33,7 +33,7 @@ public class SendCustomerMasterDataToGridOperatorHandler : IRequestHandler<SendC
 
     public SendCustomerMasterDataToGridOperatorHandler(
         IMoveInTransactionRepository transactionRepository,
-        IOutgoingMessageStore outgoingMessageStore,
+        IOutgoingMessageRepository outgoingMessageRepository,
         IMarketEvaluationPointRepository marketEvaluationPointRepository,
         IActorLookup actorLookup)
     {
@@ -53,7 +53,7 @@ public class SendCustomerMasterDataToGridOperatorHandler : IRequestHandler<SendC
         }
 
         var gridOperatorNumber =
-            await GetGridOperatorNumberAsync(transaction.MarketEvaluationPointId)
+            await GetGridOperatorNumberAsync(transaction.MarketEvaluationPointId, cancellationToken)
                 .ConfigureAwait(false);
 
         transaction.SendCustomerMasterDataToGridOperator(gridOperatorNumber);
@@ -61,11 +61,14 @@ public class SendCustomerMasterDataToGridOperatorHandler : IRequestHandler<SendC
         return Unit.Value;
     }
 
-    private async Task<ActorNumber> GetGridOperatorNumberAsync(string marketEvaluationPointNumber)
+    private async Task<ActorNumber> GetGridOperatorNumberAsync(
+        string marketEvaluationPointNumber,
+        CancellationToken cancellationToken)
     {
         var marketEvaluationPoint = await _marketEvaluationPointRepository
             .GetByNumberAsync(marketEvaluationPointNumber).ConfigureAwait(false);
-        return ActorNumber.Create(await _actorLookup.GetActorNumberByIdAsync(marketEvaluationPoint!.GridOperatorId.GetValueOrDefault())
+        return ActorNumber.Create(await _actorLookup
+            .GetActorNumberByIdAsync(marketEvaluationPoint!.GridOperatorId.GetValueOrDefault(), cancellationToken)
             .ConfigureAwait(false));
     }
 }

@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
@@ -23,9 +24,8 @@ using Application.Configuration;
 using Application.OutgoingMessages.Common;
 using DocumentValidation;
 using DocumentValidation.CimXml;
-using Domain.Actors;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.GenericNotification;
+using Domain.OutgoingMessages.MoveIn.GenericNotification;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.Common;
@@ -93,7 +93,7 @@ namespace Tests.Infrastructure.OutgoingMessages.GenericNotification
         private async Task AssertConformsToSchema(Stream message)
         {
             _schemaProvider = new CimXmlSchemaProvider();
-            var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("genericnotification", "0.1")
+            var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("genericnotification", "0.1", CancellationToken.None)
                 .ConfigureAwait(false);
             await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);
         }

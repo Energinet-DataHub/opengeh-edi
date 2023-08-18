@@ -17,7 +17,7 @@ using NodaTime;
 namespace Domain.OutgoingMessages
 {
     public record MessageHeader(
-        string ProcessType,
+        string BusinessReason,
         string SenderId,
         string SenderRole,
         string ReceiverId,

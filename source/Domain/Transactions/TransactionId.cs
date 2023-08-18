@@ -16,6 +16,7 @@ using Domain.SeedWork;
 
 namespace Domain.Transactions;
 
+//TODO: This is going to be removed. We should use ProcessId instead for this.
 public class TransactionId : ValueObject
 {
     private TransactionId(Guid id)

@@ -15,11 +15,12 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.OutgoingMessages.Common.Reasons;
 using Dapper;
-using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 
 namespace Infrastructure.OutgoingMessages.Common.Reasons;
 
@@ -32,11 +33,11 @@ internal sealed class ValidationErrorTranslator : IValidationErrorTranslator
         _connectionFactory = connectionFactory;
     }
 
-    public async Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<string> validationErrors)
+    public async Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<string> validationErrors, CancellationToken cancellationToken)
     {
         var reasons = new List<Reason>();
         var errorCodes = validationErrors.ToList();
-        var reasonTranslations = await GetTranslationsAsync(errorCodes).ConfigureAwait(false);
+        var reasonTranslations = await GetTranslationsAsync(errorCodes, cancellationToken).ConfigureAwait(false);
 
         reasons.AddRange(GetUnregisteredReasons(errorCodes, reasonTranslations));
         reasons.AddRange(reasonTranslations.Select(translation => new Reason(translation.Text, translation.Code)));
@@ -49,11 +50,11 @@ internal sealed class ValidationErrorTranslator : IValidationErrorTranslator
         return unregisteredCodes.Select(errorCode => new Reason($"No code and text found for {errorCode}", "999")).ToList();
     }
 
-    private async Task<List<ReasonTranslation>> GetTranslationsAsync(IEnumerable<string> errorCodes)
+    private async Task<List<ReasonTranslation>> GetTranslationsAsync(IEnumerable<string> errorCodes, CancellationToken cancellationToken)
     {
         const string sql = "SELECT [Text], [Code], [ErrorCode] FROM [dbo].[ReasonTranslations] WHERE ErrorCode IN @ErrorCodes AND LanguageCode = 'dk'";
 
-        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         var result = await connection
             .QueryAsync<ReasonTranslation>(sql, new { ErrorCodes = errorCodes })
             .ConfigureAwait(false);

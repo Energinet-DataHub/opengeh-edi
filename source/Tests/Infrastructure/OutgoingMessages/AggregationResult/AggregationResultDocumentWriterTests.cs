@@ -153,18 +153,18 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     }
 
     [Theory]
-    [InlineData(nameof(DocumentFormat.Xml), nameof(ProcessType.PreliminaryAggregation))]
-    [InlineData(nameof(DocumentFormat.Json), nameof(ProcessType.PreliminaryAggregation))]
-    [InlineData(nameof(DocumentFormat.Xml), nameof(ProcessType.BalanceFixing))]
-    [InlineData(nameof(DocumentFormat.Json), nameof(ProcessType.BalanceFixing))]
-    public async Task Process_type_is_translated(string documentFormat, string processType)
+    [InlineData(nameof(DocumentFormat.Xml), nameof(BusinessReason.PreliminaryAggregation))]
+    [InlineData(nameof(DocumentFormat.Json), nameof(BusinessReason.PreliminaryAggregation))]
+    [InlineData(nameof(DocumentFormat.Xml), nameof(BusinessReason.BalanceFixing))]
+    [InlineData(nameof(DocumentFormat.Json), nameof(BusinessReason.BalanceFixing))]
+    public async Task Business_reason_is_translated(string documentFormat, string processType)
     {
-        _timeSeries.WithProcessType(ProcessType.From(processType));
+        _timeSeries.WithBusinessReason(BusinessReason.From(processType));
 
         var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
 
         AssertDocument(document, DocumentFormat.From(documentFormat))
-            .HasProcessType(ProcessType.From(processType));
+            .HasBusinessReason(BusinessReason.From(processType));
     }
 
     private Task<Stream> CreateDocument(TimeSeriesBuilder resultBuilder, DocumentFormat documentFormat)

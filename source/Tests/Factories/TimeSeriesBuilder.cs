@@ -30,7 +30,7 @@ public class TimeSeriesBuilder
     private readonly List<Point> _points = new();
     private string _messageId = Guid.NewGuid().ToString();
     private Instant _timeStamp = SystemClock.Instance.GetCurrentInstant();
-    private ProcessType _processType = ProcessType.BalanceFixing;
+    private BusinessReason _businessReason = BusinessReason.BalanceFixing;
     private string _receiverNumber = "1234567890123";
     private MarketRole _receiverRole = MarketRole.MeteredDataResponsible;
     private string _senderNumber = "1234567890321";
@@ -57,10 +57,10 @@ public class TimeSeriesBuilder
         return this;
     }
 
-    public TimeSeriesBuilder WithProcessType(ProcessType? processType)
+    public TimeSeriesBuilder WithBusinessReason(BusinessReason? businessReason)
     {
-        ArgumentNullException.ThrowIfNull(processType);
-        _processType = processType;
+        ArgumentNullException.ThrowIfNull(businessReason);
+        _businessReason = businessReason;
         return this;
     }
 
@@ -147,7 +147,7 @@ public class TimeSeriesBuilder
     public MessageHeader BuildHeader()
     {
         return new MessageHeader(
-            _processType.Name,
+            _businessReason.Name,
             _senderNumber,
             _senderRole.Name,
             _receiverNumber,

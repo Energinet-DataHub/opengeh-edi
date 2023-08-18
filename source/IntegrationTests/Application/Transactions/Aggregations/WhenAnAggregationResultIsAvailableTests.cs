@@ -24,7 +24,6 @@ using IntegrationTests.Assertions;
 using IntegrationTests.Factories;
 using IntegrationTests.Fixtures;
 using Xunit;
-using ProcessType = Domain.OutgoingMessages.ProcessType;
 using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
 
 namespace IntegrationTests.Application.Transactions.Aggregations;
@@ -32,7 +31,6 @@ namespace IntegrationTests.Application.Transactions.Aggregations;
 public class WhenAnAggregationResultIsAvailableTests : TestBase
 {
     private readonly CalculationResultCompletedEventBuilder _eventBuilder = new();
-    private readonly string _receivedEventType = "BalanceFixingCalculationResultCompleted";
 
     public WhenAnAggregationResultIsAvailableTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
@@ -49,9 +47,9 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .WithResolution(Resolution.Quarter)
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod);
 
-        await HavingReceivedIntegrationEventAsync(_receivedEventType, _eventBuilder.Build()).ConfigureAwait(false);
+        await HavingReceivedIntegrationEventAsync(CalculationResultCompleted.MessageName, _eventBuilder.Build()).ConfigureAwait(false);
 
-        var outgoingMessage = await OutgoingMessageAsync(MarketRole.EnergySupplier, ProcessType.BalanceFixing);
+        var outgoingMessage = await OutgoingMessageAsync(MarketRole.EnergySupplier, BusinessReason.BalanceFixing);
         outgoingMessage
             .HasReceiverId(SampleData.EnergySupplierNumber.Value)
             .HasReceiverRole(MarketRole.EnergySupplier.Name)
@@ -74,10 +72,10 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
             .ResultOf(TimeSeriesType.NonProfiledConsumption);
 
-        await HavingReceivedIntegrationEventAsync(_receivedEventType, _eventBuilder.Build()).ConfigureAwait(false);
+        await HavingReceivedIntegrationEventAsync(CalculationResultCompleted.MessageName, _eventBuilder.Build()).ConfigureAwait(false);
 
         var message = await OutgoingMessageAsync(
-            MarketRole.MeteredDataResponsible, ProcessType.BalanceFixing);
+            MarketRole.MeteredDataResponsible, BusinessReason.BalanceFixing);
         message.HasReceiverId(SampleData.GridOperatorNumber)
             .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
@@ -97,10 +95,10 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
             .ResultOf(TimeSeriesType.Production);
 
-        await HavingReceivedIntegrationEventAsync(_receivedEventType, _eventBuilder.Build()).ConfigureAwait(false);
+        await HavingReceivedIntegrationEventAsync(CalculationResultCompleted.MessageName, _eventBuilder.Build()).ConfigureAwait(false);
 
         var message = await OutgoingMessageAsync(
-            MarketRole.MeteredDataResponsible, ProcessType.BalanceFixing);
+            MarketRole.MeteredDataResponsible, BusinessReason.BalanceFixing);
         message.HasReceiverId(SampleData.GridOperatorNumber)
             .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
@@ -124,14 +122,14 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
             .ResultOf(TimeSeriesType.NonProfiledConsumption);
 
-        await HavingReceivedIntegrationEventAsync(_receivedEventType, _eventBuilder.Build()).ConfigureAwait(false);
+        await HavingReceivedIntegrationEventAsync(CalculationResultCompleted.MessageName, _eventBuilder.Build()).ConfigureAwait(false);
 
         var outgoingMessage = await OutgoingMessageAsync(
-            MarketRole.BalanceResponsible,
-            ProcessType.BalanceFixing);
+            MarketRole.BalanceResponsibleParty,
+            BusinessReason.BalanceFixing);
         outgoingMessage
             .HasReceiverId(SampleData.BalanceResponsibleNumber.Value)
-            .HasReceiverRole(MarketRole.BalanceResponsible.Name)
+            .HasReceiverRole(MarketRole.BalanceResponsibleParty.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasMessageRecordValue<TimeSeries>(
@@ -153,14 +151,14 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
             .ResultOf(TimeSeriesType.NonProfiledConsumption);
 
-        await HavingReceivedIntegrationEventAsync(_receivedEventType, _eventBuilder.Build()).ConfigureAwait(false);
+        await HavingReceivedIntegrationEventAsync(CalculationResultCompleted.MessageName, _eventBuilder.Build()).ConfigureAwait(false);
 
         var outgoingMessage = await OutgoingMessageAsync(
-            MarketRole.BalanceResponsible,
-            ProcessType.BalanceFixing);
+            MarketRole.BalanceResponsibleParty,
+            BusinessReason.BalanceFixing);
         outgoingMessage
             .HasReceiverId(SampleData.BalanceResponsibleNumber.Value)
-            .HasReceiverRole(MarketRole.BalanceResponsible.Name)
+            .HasReceiverRole(MarketRole.BalanceResponsibleParty.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasMessageRecordValue<TimeSeries>(
@@ -171,7 +169,57 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
                 null!);
     }
 
-    private async Task<AssertOutgoingMessage> OutgoingMessageAsync(MarketRole roleOfReceiver, ProcessType completedAggregationType)
+    [Theory]
+    [InlineData(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing, nameof(BusinessReason.BalanceFixing), TimeSeriesType.NetExchangePerGa)]
+    [InlineData(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing, nameof(BusinessReason.BalanceFixing), TimeSeriesType.NetExchangePerNeighboringGa)]
+    [InlineData(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.NetExchangePerGa)]
+    [InlineData(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.NetExchangePerNeighboringGa)]
+    public async Task Exchange_is_sent_to_the_grid_operator(ProcessType processType, string businessReason, TimeSeriesType timeSeriesType)
+    {
+        _eventBuilder
+            .WithProcessType(processType)
+            .WithResolution(Resolution.Quarter)
+            .WithMeasurementUnit(QuantityUnit.Kwh)
+            .AggregatedBy(SampleData.GridAreaCode, null, null)
+            .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
+            .ResultOf(timeSeriesType);
+
+        await HavingReceivedIntegrationEventAsync(CalculationResultCompleted.MessageName, _eventBuilder.Build()).ConfigureAwait(false);
+
+        var message = await OutgoingMessageAsync(MarketRole.MeteredDataResponsible, BusinessReason.From(businessReason));
+        message.HasReceiverId(SampleData.GridOperatorNumber)
+            .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
+            .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
+            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
+            .HasBusinessReason(businessReason)
+            .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, MeteringPointType.Exchange.Name);
+    }
+
+    [Theory]
+    [InlineData(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing, nameof(BusinessReason.BalanceFixing), TimeSeriesType.TotalConsumption)]
+    [InlineData(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.TotalConsumption)]
+    public async Task Total_consumption_is_sent_to_the_grid_operator(ProcessType processType, string businessReason, TimeSeriesType timeSeriesType)
+    {
+        _eventBuilder
+            .WithProcessType(processType)
+            .WithResolution(Resolution.Quarter)
+            .WithMeasurementUnit(QuantityUnit.Kwh)
+            .AggregatedBy(SampleData.GridAreaCode, null, null)
+            .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
+            .ResultOf(timeSeriesType);
+
+        await HavingReceivedIntegrationEventAsync(CalculationResultCompleted.MessageName, _eventBuilder.Build()).ConfigureAwait(false);
+
+        var message = await OutgoingMessageAsync(MarketRole.MeteredDataResponsible, BusinessReason.From(businessReason));
+        message.HasReceiverId(SampleData.GridOperatorNumber)
+            .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
+            .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
+            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
+            .HasBusinessReason(businessReason)
+            .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, MeteringPointType.Consumption.Name);
+    }
+
+    private async Task<AssertOutgoingMessage> OutgoingMessageAsync(MarketRole roleOfReceiver, BusinessReason completedAggregationType)
     {
         return await AssertOutgoingMessage.OutgoingMessageAsync(
             DocumentType.NotifyAggregatedMeasureData.Name,

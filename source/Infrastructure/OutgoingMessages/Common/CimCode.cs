@@ -22,20 +22,48 @@ namespace Infrastructure.OutgoingMessages.Common;
 
 public static class CimCode
 {
-    public static string Of(ProcessType processType)
+    public static string Of(BusinessReason businessReason)
     {
-        ArgumentNullException.ThrowIfNull(processType);
+        ArgumentNullException.ThrowIfNull(businessReason);
 
-        if (processType == ProcessType.BalanceFixing)
+        if (businessReason == BusinessReason.BalanceFixing)
             return "D04";
 
-        if (processType == ProcessType.MoveIn)
+        if (businessReason == BusinessReason.MoveIn)
             return "E65";
 
-        if (processType == ProcessType.PreliminaryAggregation)
+        if (businessReason == BusinessReason.PreliminaryAggregation)
             return "D03";
 
-        throw NoCodeFoundFor(processType.Name);
+        if (businessReason == BusinessReason.WholesaleFixing)
+            return "D05";
+
+        if (businessReason == BusinessReason.Correction)
+            return "D32";
+
+        throw NoCodeFoundFor(businessReason.Name);
+    }
+
+    public static BusinessReason To(string businessReasonCode)
+    {
+        ArgumentNullException.ThrowIfNull(businessReasonCode);
+
+        if (businessReasonCode == "D04")
+            return BusinessReason.BalanceFixing;
+
+        if (businessReasonCode == "E65")
+            return BusinessReason.MoveIn;
+
+        if (businessReasonCode == "D03")
+            return BusinessReason.PreliminaryAggregation;
+
+        if (businessReasonCode == "D05")
+            return BusinessReason.WholesaleFixing;
+
+        if (businessReasonCode == "D32")
+            return BusinessReason.Correction;
+
+        throw NoBusinessReasonFoundFor(businessReasonCode);
     }
 
     public static string Of(MeteringPointType meteringPointType)
@@ -47,6 +75,9 @@ public static class CimCode
 
         if (meteringPointType == MeteringPointType.Production)
             return "E18";
+
+        if (meteringPointType == MeteringPointType.Exchange)
+            return "E20";
 
         throw NoCodeFoundFor(meteringPointType.Name);
     }
@@ -65,7 +96,7 @@ public static class CimCode
             return "DGL";
         if (marketRole == MarketRole.MeteringPointAdministrator)
             return "DDZ";
-        if (marketRole == MarketRole.BalanceResponsible)
+        if (marketRole == MarketRole.BalanceResponsibleParty)
             return "DDK";
 
         throw NoCodeFoundFor(marketRole.Name);
@@ -137,5 +168,10 @@ public static class CimCode
     private static Exception NoCodeFoundFor(string domainType)
     {
         return new InvalidOperationException($"No code has been defined for {domainType}");
+    }
+
+    private static Exception NoBusinessReasonFoundFor(string businessReasonCode)
+    {
+        return new InvalidOperationException($"No business reason has been defined for {businessReasonCode}");
     }
 }

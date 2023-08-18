@@ -21,9 +21,13 @@ public record Aggregation(
     string Resolution,
     Period Period,
     string? SettlementType,
-    string ProcessType,
+    string BusinessReason,
     ActorGrouping ActorGrouping,
-    GridAreaDetails GridAreaDetails);
+    GridAreaDetails GridAreaDetails,
+    string? OriginalTransactionIdReference = null,
+    string? Receiver = null,
+    string? ReceiverRole = null,
+    string? SettlementVersion = null);
 
 public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
 

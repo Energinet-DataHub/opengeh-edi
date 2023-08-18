@@ -14,8 +14,9 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading;
 using System.Threading.Tasks;
-using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 
 namespace Application.OutgoingMessages.Common.Reasons;
 
@@ -28,6 +29,7 @@ public interface IValidationErrorTranslator
     /// Translate from validation errors
     /// </summary>
     /// <param name="validationErrors"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns><see cref="Reason"/></returns>
-    Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<string> validationErrors);
+    Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<string> validationErrors, CancellationToken cancellationToken);
 }

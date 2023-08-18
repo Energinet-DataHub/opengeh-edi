@@ -64,17 +64,20 @@ namespace IntegrationTests.Fixtures
                 $"DELETE FROM [dbo].[MoveInTransactions] " +
                 $"DELETE FROM [dbo].[AggregatedTimeSeriesTransactions] " +
                 $"DELETE FROM [dbo].[UpdateCustomerMasterDataTransactions] " +
-                $"DELETE FROM [dbo].[MessageIds] " +
-                $"DELETE FROM [dbo].[TransactionIds]" +
+                $"DELETE FROM [dbo].[MessageRegistry] " +
+                $"DELETE FROM [dbo].[TransactionRegistry]" +
                 $"DELETE FROM [dbo].[OutgoingMessages] " +
                 $"DELETE FROM [dbo].[ReasonTranslations] " +
                 $"DELETE FROM [dbo].[QueuedInternalCommands] " +
                 $"DELETE FROM [dbo].[MarketEvaluationPoints]" +
                 $"DELETE FROM [dbo].[Actor]" +
-                $"DELETE FROM [dbo].[BundledMessages]" +
                 $"DELETE FROM [dbo].[ReceivedIntegrationEvents]" +
-                $"DELETE FROM [dbo].[EnqueuedMessages]" +
-                $"DELETE FROM [dbo].[ArchivedMessages]";
+                $"DELETE FROM [dbo].[AggregatedMeasureDataProcesses]" +
+                $"DELETE FROM [dbo].[ArchivedMessages]" +
+                $"DELETE FROM [dbo].[MarketDocuments]" +
+                $"DELETE FROM [dbo].[Bundles]" +
+                $"DELETE FROM [dbo].[ActorMessageQueues]" +
+                $"DELETE FROM [dbo].[ReceivedInboxEvents]";
 
             _context.Database.ExecuteSqlRaw(cleanupStatement);
         }

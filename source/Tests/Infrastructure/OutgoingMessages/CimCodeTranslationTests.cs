@@ -24,16 +24,17 @@ namespace Tests.Infrastructure.OutgoingMessages;
 public class CimCodeTests
 {
     [Theory]
-    [InlineData(nameof(ProcessType.BalanceFixing), "D04")]
-    [InlineData(nameof(ProcessType.MoveIn), "E65")]
-    public void Translate_process_type(string processType, string expectedCode)
+    [InlineData(nameof(BusinessReason.BalanceFixing), "D04")]
+    [InlineData(nameof(BusinessReason.MoveIn), "E65")]
+    public void Translate_business_reason(string businessReason, string expectedCode)
     {
-        Assert.Equal(expectedCode, CimCode.Of(ProcessType.From(processType)));
+        Assert.Equal(expectedCode, CimCode.Of(BusinessReason.From(businessReason)));
     }
 
     [Theory]
     [InlineData(nameof(MeteringPointType.Production), "E18")]
     [InlineData(nameof(MeteringPointType.Consumption), "E17")]
+    [InlineData(nameof(MeteringPointType.Exchange), "E20")]
     public void Translate_metering_point_type(string meteringPointType, string expectedCode)
     {
         Assert.Equal(expectedCode, CimCode.Of(MeteringPointType.From(meteringPointType)));
@@ -43,7 +44,7 @@ public class CimCodeTests
     [InlineData(nameof(MarketRole.MeteredDataResponsible), "MDR")]
     [InlineData(nameof(MarketRole.MeteringDataAdministrator), "DGL")]
     [InlineData(nameof(MarketRole.GridOperator), "DDM")]
-    [InlineData(nameof(MarketRole.BalanceResponsible), "DDK")]
+    [InlineData(nameof(MarketRole.BalanceResponsibleParty), "DDK")]
     [InlineData(nameof(MarketRole.EnergySupplier), "DDQ")]
     [InlineData(nameof(MarketRole.MeteringPointAdministrator), "DDZ")]
     public void Translate_market_role(string marketRole, string expectedCode)

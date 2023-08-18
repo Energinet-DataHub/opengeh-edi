@@ -16,14 +16,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
-using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestChangeAccountingPointCharacteristics;
+using CimMessageAdapter.ValidationErrors;
 using Domain.Documents;
-using Domain.OutgoingMessages;
 using Infrastructure.IncomingMessages.RequestChangeAccountingPointCharacteristics;
 using Xunit;
 using MarketActivityRecord = Application.IncomingMessages.RequestChangeAccountPointCharacteristics.MarketActivityRecord;
@@ -72,7 +72,7 @@ public class MessageParserTests
     [MemberData(nameof(CreateMessages))]
     public async Task Can_parse(DocumentFormat format, Stream message)
     {
-        var result = await _messageParser.ParseAsync(message, format).ConfigureAwait(false);
+        var result = await _messageParser.ParseAsync(message, format, CancellationToken.None).ConfigureAwait(false);
 
         Assert.True(result.Success);
         AssertHeader(result.IncomingMarketDocument?.Header);
@@ -83,7 +83,7 @@ public class MessageParserTests
     [MemberData(nameof(CreateMessagesWithMultipleRecords))]
     public async Task Can_parse_multiple_records(DocumentFormat format, Stream message)
     {
-        var result = await _messageParser.ParseAsync(message, format).ConfigureAwait(false);
+        var result = await _messageParser.ParseAsync(message, format, CancellationToken.None).ConfigureAwait(false);
 
         var record1 = result.IncomingMarketDocument?.MarketActivityRecords.ToList()[0];
         var record2 = result.IncomingMarketDocument?.MarketActivityRecords.ToList()[1];
@@ -99,7 +99,7 @@ public class MessageParserTests
     [MemberData(nameof(CreateMessagesWithInvalidStructure))]
     public async Task Return_error_when_structure_is_invalid(DocumentFormat format, Stream message)
     {
-        var result = await _messageParser.ParseAsync(message, format).ConfigureAwait(false);
+        var result = await _messageParser.ParseAsync(message, format, CancellationToken.None).ConfigureAwait(false);
 
         Assert.False(result.Success);
         Assert.Contains(result.Errors, error => error is InvalidMessageStructure);
@@ -110,12 +110,12 @@ public class MessageParserTests
     {
         var parser = new MessageParser(new List<IMessageParser<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>>());
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => parser.ParseAsync(CreateXmlMessage(), DocumentFormat.Xml)).ConfigureAwait(false);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => parser.ParseAsync(CreateXmlMessage(), DocumentFormat.Xml, CancellationToken.None)).ConfigureAwait(false);
     }
 
     private static Stream CreateXmlMessage()
     {
-        var xmlDoc = XDocument.Load($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}RequestChangeAccountingPointCharacteristics.xml");
+        var xmlDoc = XDocument.Load($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}ChangeAccountingPoint{Path.DirectorySeparatorChar}RequestChangeAccountingPointCharacteristics.xml");
         var stream = new MemoryStream();
         xmlDoc.Save(stream);
 
@@ -124,7 +124,7 @@ public class MessageParserTests
 
     private static Stream CreateXmlMessageWithMultipleRecords()
     {
-        var xmlDoc = XDocument.Load($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}RequestChangeAccountingPointCharacteristicsMultipleMarketActivityRecords.xml");
+        var xmlDoc = XDocument.Load($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}ChangeAccountingPoint{Path.DirectorySeparatorChar}RequestChangeAccountingPointCharacteristicsMultipleMarketActivityRecords.xml");
         var stream = new MemoryStream();
         xmlDoc.Save(stream);
 
@@ -198,7 +198,7 @@ public class MessageParserTests
     private static void AssertHeader(MessageHeader? header)
     {
         Assert.Equal("253698245", header?.MessageId);
-        Assert.Equal("E02", header?.ProcessType);
+        Assert.Equal("E02", header?.BusinessReason);
         Assert.Equal("5799999933318", header?.SenderId);
         Assert.Equal("DDM", header?.SenderRole);
         Assert.Equal("5790001330552", header?.ReceiverId);

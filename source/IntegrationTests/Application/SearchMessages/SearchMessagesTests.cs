@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Configuration;
@@ -21,6 +23,8 @@ using Application.SearchMessages;
 using Domain.Actors;
 using Domain.ArchivedMessages;
 using Domain.Documents;
+using Domain.OutgoingMessages;
+using Domain.SeedWork;
 using IntegrationTests.Fixtures;
 using NodaTime;
 using Xunit;
@@ -29,13 +33,13 @@ namespace IntegrationTests.Application.SearchMessages;
 
 public class SearchMessagesTests : TestBase
 {
-    private readonly IArchivedMessageRepository _repository;
+    private readonly IArchivedMessageRepository _archivedMessageRepository;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
     public SearchMessagesTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _repository = GetService<IArchivedMessageRepository>();
+        _archivedMessageRepository = GetService<IArchivedMessageRepository>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
     }
 
@@ -73,7 +77,7 @@ public class SearchMessagesTests : TestBase
     public async Task Filter_messages_by_message_id_and_created_date()
     {
         //Arrange
-        var messageId = Guid.NewGuid();
+        var messageId = Guid.NewGuid().ToString();
         await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z"), messageId));
         await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z")));
 
@@ -92,7 +96,7 @@ public class SearchMessagesTests : TestBase
     public async Task Filter_messages_by_message_id()
     {
         //Arrange
-        var messageId = Guid.NewGuid();
+        var messageId = Guid.NewGuid().ToString();
         await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z"), messageId));
 
         //Act
@@ -120,24 +124,100 @@ public class SearchMessagesTests : TestBase
         Assert.Equal(senderNumber, result.Messages[0].SenderNumber);
     }
 
+    [Fact]
+    public async Task Filter_messages_by_receiver()
+    {
+        // Arrange
+        var receiverNumber = "1234512345129";
+        await ArchiveMessage(CreateArchivedMessage(receiverNumber: receiverNumber));
+        await ArchiveMessage(CreateArchivedMessage());
+
+        // Act
+        var result = await QueryAsync(new GetMessagesQuery(ReceiverNumber: receiverNumber)).ConfigureAwait(false);
+
+        // Assert
+        Assert.Single(result.Messages);
+        Assert.Equal(receiverNumber, result.Messages[0].ReceiverNumber);
+    }
+
+    [Fact]
+    public async Task Filter_messages_by_document_types()
+    {
+        // Arrange
+        var confirmRequestChangeOfSupplier = DocumentType.ConfirmRequestChangeOfSupplier.Name;
+        var rejectRequestChangeOfSupplier = DocumentType.RejectRequestChangeOfSupplier.Name;
+        await ArchiveMessage(CreateArchivedMessage(documentType: confirmRequestChangeOfSupplier));
+        await ArchiveMessage(CreateArchivedMessage(documentType: rejectRequestChangeOfSupplier));
+        await ArchiveMessage(CreateArchivedMessage());
+
+        // Act
+        var result = await QueryAsync(new GetMessagesQuery(DocumentTypes: new List<string>()
+        {
+            confirmRequestChangeOfSupplier,
+            rejectRequestChangeOfSupplier,
+        })).ConfigureAwait(false);
+
+        // Assert
+        Assert.Contains(
+            result.Messages,
+            message => message.DocumentType.Equals(confirmRequestChangeOfSupplier, StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(
+            result.Messages,
+            message => message.DocumentType.Equals(rejectRequestChangeOfSupplier, StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public async Task Filter_messages_by_business_reasons()
+    {
+        // Arrange
+        var moveIn = BusinessReason.MoveIn;
+        var balanceFixing = BusinessReason.BalanceFixing;
+        await ArchiveMessage(CreateArchivedMessage(businessReason: moveIn.Name));
+        await ArchiveMessage(CreateArchivedMessage(businessReason: balanceFixing.Name));
+        await ArchiveMessage(CreateArchivedMessage());
+
+        // Act
+        var result = await QueryAsync(new GetMessagesQuery(BusinessReasons: new List<string>()
+        {
+            moveIn.Name,
+            balanceFixing.Name,
+        })).ConfigureAwait(false);
+
+        // Assert
+        Assert.Contains(
+            result.Messages,
+            message => message.BusinessReason!.Equals(moveIn.Name, StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(
+            result.Messages,
+            message => message.BusinessReason!.Equals(balanceFixing.Name, StringComparison.OrdinalIgnoreCase));
+    }
+
     private static Instant CreatedAt(string date)
     {
         return NodaTime.Text.InstantPattern.General.Parse(date).Value;
     }
 
-    private ArchivedMessage CreateArchivedMessage(Instant? createdAt = null, Guid? messageId = null, string? senderNumber = null)
+    private ArchivedMessage CreateArchivedMessage(
+        Instant? createdAt = null,
+        string? messageId = null,
+        string? senderNumber = null,
+        string? receiverNumber = null,
+        string? documentType = null,
+        string? businessReason = null)
     {
         return new ArchivedMessage(
-            messageId.GetValueOrDefault(Guid.NewGuid()),
-            DocumentType.AccountingPointCharacteristics,
+            string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
+            EnumerationType.FromName<DocumentType>(documentType ?? DocumentType.AccountingPointCharacteristics.Name),
             ActorNumber.Create(senderNumber ?? "1234512345123"),
-            ActorNumber.Create("1234512345124"),
-            createdAt.GetValueOrDefault(_systemDateTimeProvider.Now()));
+            ActorNumber.Create(receiverNumber ?? "1234512345128"),
+            createdAt.GetValueOrDefault(_systemDateTimeProvider.Now()),
+            businessReason ?? BusinessReason.BalanceFixing.Name,
+            new MemoryStream());
     }
 
     private async Task ArchiveMessage(ArchivedMessage archivedMessage)
     {
-        _repository.Add(archivedMessage);
+        _archivedMessageRepository.Add(archivedMessage);
         await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
     }
 }
