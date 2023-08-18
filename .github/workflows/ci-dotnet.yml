@@ -66,7 +66,7 @@ jobs:
         uses: azure/login@v1
         with:
           client-id: ${{ vars.integration_test_azure_spn_id_oidc }}
-          tenant-id: ${{ vars.azure_tenant_id }}
+          tenant-id: ${{ vars.integration_test_azure_tenant_id }}
           subscription-id: ${{ vars.integration_test_azure_subscription_id }}
 
       - name: Get Resource Group
@@ -113,7 +113,7 @@ jobs:
         uses: azure/login@v1
         with:
           client-id: ${{ vars.integration_test_azure_spn_id_oidc }}
-          tenant-id: ${{ vars.azure_tenant_id }}
+          tenant-id: ${{ vars.integration_test_azure_tenant_id }}
           subscription-id: ${{ vars.integration_test_azure_subscription_id }}
 
       - name: Teardown acceptance test resources
