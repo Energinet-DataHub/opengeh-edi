@@ -45,7 +45,7 @@ public class RemoveInternalCommandsWhenADayHasPassedTests : TestBase
     public async Task Clean_up_internal_commands_succeed()
     {
         // arrange
-        var amountOfProcessedInternalCommands = 2500;
+        var amountOfProcessedInternalCommands = 25000;
         var amountOfNotProcessedInternalCommands = 25;
         await GenerateInternalCommands(amountOfProcessedInternalCommands, amountOfNotProcessedInternalCommands);
 
