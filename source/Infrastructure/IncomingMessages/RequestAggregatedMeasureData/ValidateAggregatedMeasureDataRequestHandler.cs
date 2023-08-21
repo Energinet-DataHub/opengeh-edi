@@ -54,10 +54,11 @@ public class ValidateAggregatedMeasureDataRequestHandler
         var timestamp = _systemDateTimeProvider.Now();
 
         _messageArchive.Add(new ArchivedMessage(
+            Guid.NewGuid().ToString(),
             messageHeader.MessageId,
-            DocumentType.RequestAggregatedMeasureData,
-            ActorNumber.Create(messageHeader.SenderId),
-            ActorNumber.Create(messageHeader.ReceiverId),
+            IncomingDocumentType.RequestAggregatedMeasureData,
+            TryGetActorNumber(messageHeader.SenderId),
+            TryGetActorNumber(messageHeader.ReceiverId),
             timestamp,
             messageHeader.BusinessReason,
             request.OriginalMessage));
@@ -66,5 +67,19 @@ public class ValidateAggregatedMeasureDataRequestHandler
             .ConfigureAwait(false);
 
         return result;
+    }
+
+    private static ActorNumber? TryGetActorNumber(string messageHeaderSenderId)
+    {
+        try
+        {
+            return ActorNumber.Create(messageHeaderSenderId);
+        }
+#pragma warning disable CA1031
+        catch
+#pragma warning restore CA1031
+        {
+            return null;
+        }
     }
 }

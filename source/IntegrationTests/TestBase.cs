@@ -14,6 +14,7 @@
 
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,6 +28,7 @@ using Application.Transactions.MoveIn;
 using Azure.Messaging.ServiceBus;
 using Google.Protobuf;
 using Infrastructure.Configuration;
+using Infrastructure.Configuration.DataAccess;
 using Infrastructure.Configuration.IntegrationEvents;
 using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
@@ -52,6 +54,7 @@ namespace IntegrationTests
     {
         private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
         private readonly HttpClientSpy _httpClientSpy;
+        private readonly B2BContext _b2BContext;
         private ServiceCollection? _services;
         private IServiceProvider _serviceProvider = default!;
         private bool _disposed;
@@ -66,6 +69,7 @@ namespace IntegrationTests
             TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
             InboxEventNotificationHandler = new IntegrationTests.Infrastructure.InboxEvents.TestNotificationHandlerSpy();
             BuildServices();
+            _b2BContext = GetService<B2BContext>();
         }
 
         protected TestNotificationHandlerSpy NotificationHandlerSpy { get; }
@@ -93,6 +97,7 @@ namespace IntegrationTests
                 return;
             }
 
+            _b2BContext.Dispose();
             _serviceBusSenderFactoryStub.Dispose();
             ((ServiceProvider)_serviceProvider!).Dispose();
             _disposed = true;
@@ -116,6 +121,19 @@ namespace IntegrationTests
             await HavingProcessedInternalTasksAsync().ConfigureAwait(false);
         }
 
+        protected async Task HavingReceivedInboxEventAsync(string eventType, IMessage eventPayload, Guid processId)
+        {
+            await GetService<InboxEventReceiver>().
+                ReceiveAsync(
+                    Guid.NewGuid().ToString(),
+                    eventType,
+                    processId,
+                    eventPayload.ToByteArray())
+                .ConfigureAwait(false);
+            await ProcessReceivedInboxEventsAsync().ConfigureAwait(false);
+            await ProcessInternalCommandsAsync().ConfigureAwait(false);
+        }
+
         protected Task HavingProcessedInternalTasksAsync()
         {
             return ProcessBackgroundTasksAsync();
@@ -128,6 +146,21 @@ namespace IntegrationTests
                 .Append("SharedAccessKeyName=send;")
                 .Append(CultureInfo.InvariantCulture, $"SharedAccessKey={Guid.NewGuid():N}")
                 .ToString();
+        }
+
+        private async Task ProcessInternalCommandsAsync()
+        {
+            await ProcessBackgroundTasksAsync();
+
+            if (_b2BContext.QueuedInternalCommands.Any(command => command.ProcessedDate == null))
+            {
+                await ProcessInternalCommandsAsync();
+            }
+        }
+
+        private Task ProcessReceivedInboxEventsAsync()
+        {
+            return ProcessBackgroundTasksAsync();
         }
 
         private Task ProcessReceivedIntegrationEventsAsync()

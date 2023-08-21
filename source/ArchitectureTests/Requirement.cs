@@ -37,6 +37,16 @@ internal static class IServiceProviderHelpers
         return requirement.DependentOn.All(dependency => services.GetService(dependency) != null);
     }
 
+    public static bool CanSatisfyType(this IServiceProvider services, Requirement requirement)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(requirement);
+
+        return requirement.DependentOn
+            .SelectMany(services.GetServices)
+            .Any(service => service!.GetType() == requirement.ActualType);
+    }
+
     public static bool RequirementIsPartOfCollection<T>(this IServiceProvider serviceProvider, Requirement requirement)
         where T : class
     {

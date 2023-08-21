@@ -37,6 +37,7 @@ internal static class InternalCommandProcessing
         services.AddTransient<InternalCommandAccessor>();
         services.AddTransient<InternalCommandProcessor>();
         services.AddTransient<INotificationHandler<TenSecondsHasHasPassed>, ProcessInternalCommandsOnTimeHasPassed>();
+        services.AddTransient<INotificationHandler<ADayHasPassed>, RemoveInternalCommandsWhenADayHasPassed>();
     }
 
     private static InternalCommandMapper CreateInternalCommandMap()
@@ -56,6 +57,8 @@ internal static class InternalCommandProcessing
         mapper.Add("SendAggregatedMeasureRequestToWholesale", typeof(SendAggregatedMeasureRequestToWholesale));
         mapper.Add("AcceptedAggregatedTimeSeries", typeof(AcceptedAggregatedTimeSeries));
         mapper.Add("CreateAggregatedMeasureAggregationResults", typeof(CreateAggregatedMeasureAggregationResults));
+        mapper.Add("RejectedAggregatedTimeSeries", typeof(RejectedAggregatedTimeSeries));
+        mapper.Add("ForwardRejectedAggregationResult", typeof(ForwardRejectedAggregationResult));
 
         return mapper;
     }

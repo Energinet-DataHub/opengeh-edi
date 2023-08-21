@@ -4,28 +4,18 @@
 
 ## Intro
 
-The EDI domain is responsible for handling incoming and outgoing message to and from DataHub.
-EDI domain receives incoming requests from actor and performs B2B validations on the request.
+The EDI domain is responsible for handling incoming and outgoing message too and from DataHub.
+EDI domain receives incoming requests from an actor and performs B2B validations on the request.
 The request is then forwarded to relevant domain.
-When a actor wished to peek a message from DataHub. EDI is responsible for generating the message, and ensuring that the correct actor receives the message
+When a actor wishes to peek a message from DataHub. EDI is responsible for generating the message, and ensuring that the correct actor receives the message
 
 ## Architecture
 
 ![image](./docs/diagrams/c4-model/views/EDIDetailed.png)
 
-## Business diagram of EDI
-
-![image](https://user-images.githubusercontent.com/72008816/215047284-652c90d7-7e50-408f-b3ce-93f58ea62929.png)
-
 ## Supported formats
 
 Currently we support the CIM XML and CIM JSON formats. The EDI domain will also support the following incoming and outgoing formats: Ebix.
-
-## Domain Roadmap
-
-In this sprint we are working on
-
-- Be able to create response for request aggregated measure data
 
 ## Getting Started
 

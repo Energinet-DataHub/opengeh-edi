@@ -32,11 +32,6 @@ public class AggregationResultForwarding : Entity
     {
         ArgumentNullException.ThrowIfNull(result);
 
-        if (result.Receiver is not null && result.ReceiverRole is not null)
-        {
-            return MessageForKnownReceiver(result, result.Receiver, result.ReceiverRole);
-        }
-
         if (IsTotalResultPerGridArea(result))
         {
             return MessageForTheGridOperator(result);
@@ -70,11 +65,6 @@ public class AggregationResultForwarding : Entity
     private static bool ResultIsForTheBalanceResponsible(Aggregation result)
     {
         return result.ActorGrouping!.BalanceResponsibleNumber is not null;
-    }
-
-    private AggregationResultMessage MessageForKnownReceiver(Aggregation result, string receiver, string receiverRole)
-    {
-        return AggregationResultMessage.Create(ActorNumber.Create(receiver), EnumerationType.FromName<MarketRole>(receiverRole), Id, result);
     }
 
     private AggregationResultMessage MessageForTheGridOperator(Aggregation result)

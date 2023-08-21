@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using NodaTime;
+
 namespace Domain.Transactions.AggregatedMeasureData;
 
+[Serializable]
 public record AggregatedTimeSerie(
     IReadOnlyList<Point> Points,
     string MeteringPointType,
@@ -21,9 +24,13 @@ public record AggregatedTimeSerie(
     string Resolution,
     Period Period,
     GridAreaDetails GridAreaDetails,
-    string? Product,
     string? SettlementVersion);
 
+[Serializable]
 public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
 
+[Serializable]
 public record GridAreaDetails(string GridAreaCode, string OperatorNumber);
+
+[Serializable]
+public record Period(Instant Start, Instant End);

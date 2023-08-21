@@ -23,12 +23,12 @@ using MediatR;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
 
-public class AcceptProcessWhenAcceptedAggregatedTimeSeriesAvailable : IRequestHandler<AcceptedAggregatedTimeSeries, Unit>
+public class AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable : IRequestHandler<AcceptedAggregatedTimeSeries, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
     private readonly ISerializer _serializer;
 
-    public AcceptProcessWhenAcceptedAggregatedTimeSeriesAvailable(
+    public AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable(
         IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository,
         ISerializer serializer)
     {
@@ -41,8 +41,7 @@ public class AcceptProcessWhenAcceptedAggregatedTimeSeriesAvailable : IRequestHa
         ArgumentNullException.ThrowIfNull(request);
 
         var process = await _aggregatedMeasureDataProcessRepository
-                          .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false)
-                      ?? throw ProcessNotFoundException.ProcessForProcessIdNotFound(request.ProcessId);
+            .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
         process.WasAccepted(_serializer.Serialize(request.NotificationAggregatedTimeSeries));
 

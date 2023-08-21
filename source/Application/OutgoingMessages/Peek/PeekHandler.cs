@@ -23,7 +23,6 @@ using Application.Configuration.DataAccess;
 using Domain.Actors;
 using Domain.ArchivedMessages;
 using Domain.Documents;
-using Domain.OutgoingMessages.Peek;
 using Domain.OutgoingMessages.Queueing;
 using MediatR;
 
@@ -89,6 +88,7 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
             var receiverId = outgoingMessage.Receiver.Number.Value;
             var businessReason = outgoingMessage.BusinessReason;
             _archivedMessageRepository.Add(new ArchivedMessage(
+                peekResult.BundleId.Id.ToString(),
                 peekResult.BundleId.Id.ToString(),
                 documentType,
                 ActorNumber.Create(senderId),

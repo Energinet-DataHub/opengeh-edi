@@ -21,6 +21,7 @@ using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Infrastructure.OutgoingMessages.Common;
 using Period = Energinet.DataHub.Edi.Responses.Period;
+using RejectReason = Energinet.DataHub.Edi.Responses.RejectReason;
 using Serie = Energinet.DataHub.Edi.Responses.Serie;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData;
@@ -57,8 +58,7 @@ public static class AggregatedMeasureDataResponseFactory
     {
         return new RejectReason()
         {
-            ErrorMessage = "something went wrong",
-            ErrorCode = ErrorCodes.InvalidBalanceResponsibleForPeriod,
+            ErrorCode = ErrorCodes.InvalidBalanceResponsibleForPeriod, ErrorMessage = "something went wrong",
         };
     }
 
@@ -92,11 +92,7 @@ public static class AggregatedMeasureDataResponseFactory
 
         return new Serie()
         {
-#pragma warning disable CA1305
-            SettlementVersion = aggregatedMeasureDataProcess.SettlementVersion ?? "0",
-#pragma warning restore CA1305
             GridArea = aggregatedMeasureDataProcess.MeteringGridAreaDomainId,
-            Product = Product.Tarif,
             QuantityUnit = QuantityUnit.Kwh,
             Period = period,
             TimeSeriesPoints = { point },

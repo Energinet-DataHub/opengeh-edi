@@ -95,6 +95,7 @@ public class ArchivedMessageSearchListener
     }
 }
 
+[Serializable]
 public record SearchArchivedMessages(
     MessageCreationPeriod? CreatedDuringPeriod,
     string? MessageId,
@@ -103,4 +104,5 @@ public record SearchArchivedMessages(
     IReadOnlyList<string>? DocumentTypes,
     IReadOnlyList<string>? BusinessReasons);
 
+[Serializable]
 public record MessageCreationPeriod(Instant Start, Instant End);

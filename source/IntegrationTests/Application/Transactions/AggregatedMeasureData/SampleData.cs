@@ -12,9 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Globalization;
+using Domain.Actors;
+using IntegrationTests.Factories;
 using NodaTime;
 
-namespace Domain.Transactions.AggregatedMeasureData;
+namespace IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
-public record Period(Instant Start, Instant End);
+internal sealed class SampleData
+{
+    internal static string GridAreaCode => "805";
+
+    internal static Instant StartOfPeriod => EffectiveDateFactory.InstantAsOfToday();
+
+    internal static Instant EndOfPeriod => EffectiveDateFactory.OffsetDaysFromToday(1);
+
+    internal static ActorNumber ReceiverNumber => ActorNumber.Create("8200000007743");
+
+    internal static MarketRole BalanceResponsibleParty => MarketRole.BalanceResponsibleParty;
+}

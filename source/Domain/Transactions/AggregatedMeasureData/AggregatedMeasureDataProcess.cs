@@ -29,7 +29,6 @@ namespace Domain.Transactions.AggregatedMeasureData
             ActorNumber requestedByActorId,
             string requestedByActorRoleCode,
             string businessReason,
-            string? settlementVersion,
             string? meteringPointType,
             string? settlementMethod,
             Instant startOfPeriod,
@@ -41,7 +40,6 @@ namespace Domain.Transactions.AggregatedMeasureData
             ProcessId = processId;
             BusinessTransactionId = businessTransactionId;
             BusinessReason = businessReason;
-            SettlementVersion = settlementVersion;
             MeteringPointType = meteringPointType;
             SettlementMethod = settlementMethod;
             StartOfPeriod = startOfPeriod;
@@ -84,11 +82,6 @@ namespace Domain.Transactions.AggregatedMeasureData
         public string BusinessReason { get; }
 
         /// <summary>
-        /// Represent the version for a specific calculation.
-        /// </summary>
-        public string? SettlementVersion { get; }
-
-        /// <summary>
         /// Represent consumption types or production.
         /// </summary>
         public string? MeteringPointType { get; }
@@ -129,6 +122,16 @@ namespace Domain.Transactions.AggregatedMeasureData
                 _state = State.Accepted;
                 ResponseData = responseData;
                 AddDomainEvent(new AggregatedMeasureProcessWasAccepted(ProcessId));
+            }
+        }
+
+        public void WasRejected(string responseData)
+        {
+            if (_state == State.Sent)
+            {
+                _state = State.Rejected;
+                ResponseData = responseData;
+                AddDomainEvent(new AggregatedMeasureProcessWasRejected(ProcessId));
             }
         }
     }

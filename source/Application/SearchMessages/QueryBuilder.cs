@@ -36,7 +36,7 @@ internal sealed class QueryBuilder
         if (request.MessageId is not null)
         {
             AddFilter(
-                "Id=@MessageId",
+                "MessageId=@MessageId",
                 new KeyValuePair<string, object>("MessageId", request.MessageId));
         }
 
@@ -73,7 +73,7 @@ internal sealed class QueryBuilder
 
     private string BuildStatement()
     {
-        var selectStatement = "SELECT Id AS MessageId, DocumentType, SenderNumber, ReceiverNumber, CreatedAt, BusinessReason FROM dbo.ArchivedMessages";
+        var selectStatement = "SELECT Id, MessageId, DocumentType, SenderNumber, ReceiverNumber, CreatedAt, BusinessReason FROM dbo.ArchivedMessages";
 
         if (_statement.Count > 0)
         {

@@ -25,14 +25,11 @@ public class RequestAggregatedMeasureDataMessageBuilder
 {
     private const string NotSet = "NotSet";
     private readonly string _serieId = "123353185";
-    // TODO AJW: It this a int or?
-    private readonly string _settlementSeriesVersion = "2";
     private readonly string _marketEvaluationPointType = "E17";
     private readonly string _marketEvaluationSettlementMethod = "D01";
     private readonly string _startDateAndOrTimeDateTime = "2022-06-17T22:00:00Z";
     private readonly string _endDateAndOrTimeDateTime = "2022-07-22T22:00:00Z";
     private readonly string _meteringGridAreaDomainId = "244";
-    private readonly string _biddingZoneDomainId = "10YDK-1--------M";
     private readonly string _energySupplierMarketParticipantId = "5790001330552";
     private readonly string _balanceResponsiblePartyMarketParticipantId = "5799999933318";
     private readonly string _messageType = NotSet;
@@ -54,13 +51,11 @@ public class RequestAggregatedMeasureDataMessageBuilder
     private Serie CreateSerieCreateRecord() =>
         new(
             _serieId,
-            _settlementSeriesVersion,
             _marketEvaluationPointType,
             _marketEvaluationSettlementMethod,
             _startDateAndOrTimeDateTime,
             _endDateAndOrTimeDateTime,
             _meteringGridAreaDomainId,
-            _biddingZoneDomainId,
             _energySupplierMarketParticipantId,
             _balanceResponsiblePartyMarketParticipantId);
 

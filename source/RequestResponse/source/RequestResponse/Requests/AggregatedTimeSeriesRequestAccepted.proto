@@ -25,11 +25,10 @@ message AggregatedTimeSeriesRequestAccepted {
 message Serie {
   string settlement_version = 1;
   string grid_area = 2;
-  Product product = 3;
-  QuantityUnit quantity_unit = 4;
-  Period period = 5;
-  repeated TimeSeriesPoint time_series_points = 6;
-  TimeSeriesType time_series_type = 7;
+  QuantityUnit quantity_unit = 3;
+  Period period = 4;
+  repeated TimeSeriesPoint time_series_points = 5;
+  TimeSeriesType time_series_type = 6;
 }
 
 message Period {
@@ -73,16 +72,6 @@ enum QuantityQuality{
 enum QuantityUnit{
   QUANTITY_UNIT_UNSPECIFIED = 0;
   QUANTITY_UNIT_KWH = 1;
-}
-
-/*
- * Unspecified is unused but according to best practice.
- * Read more at https://protobuf.dev/programming-guides/style/#enums.
- */
-enum Product{
-  PRODUCT_UNSPECIFIED = 0;
-  PRODUCT_ENERGY = 1;
-  PRODUCT_TARIF = 2;
 }
 
 /*

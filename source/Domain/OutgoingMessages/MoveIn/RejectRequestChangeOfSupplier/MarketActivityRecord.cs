@@ -14,6 +14,7 @@
 
 namespace Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier
 {
+    [Serializable]
     public class MarketActivityRecord
     {
         public MarketActivityRecord(string id, string originalTransactionId, string marketEvaluationPointId, IEnumerable<Reason> reasons)

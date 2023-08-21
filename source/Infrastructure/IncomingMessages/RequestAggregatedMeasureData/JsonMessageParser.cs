@@ -42,7 +42,9 @@ public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureD
 
     public DocumentFormat HandledFormat => DocumentFormat.Json;
 
-    public async Task<MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>> ParseAsync(Stream message, CancellationToken cancellationToken)
+    public async Task<MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>> ParseAsync(
+        Stream message,
+        CancellationToken cancellationToken)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
 
@@ -89,26 +91,19 @@ public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureD
     private static Serie SeriesFrom(JsonElement element)
     {
         return new Serie(
-            element.GetProperty("mRID")
-                .ToString(),
-            element.GetProperty("settlement_Series.version").GetProperty("value")
-                .ToString(),
-            element.GetProperty("marketEvaluationPoint.type").GetProperty("value")
-                .ToString(),
-            element.GetProperty("marketEvaluationPoint.settlementMethod").GetProperty("value")
-                .ToString(),
-            element.GetProperty("start_DateAndOrTime.dateTime")
-                .ToString(),
-            element.GetProperty("end_DateAndOrTime.dateTime")
-                .ToString(),
-            element.GetProperty("meteringGridArea_Domain.mRID").GetProperty("value")
-                .ToString(),
-            element.GetProperty("biddingZone_Domain.mRID").GetProperty("value")
-                .ToString(),
-            element.GetProperty("energySupplier_MarketParticipant.mRID").GetProperty("value")
-                .ToString(),
-            element.GetProperty("balanceResponsibleParty_MarketParticipant.mRID").GetProperty("value")
-                .ToString());
+            element.GetProperty("mRID").ToString(),
+            GetPropertyWithValue(element, "marketEvaluationPoint.type"),
+            GetPropertyWithValue(element, "marketEvaluationPoint.settlementMethod"),
+            element.GetProperty("start_DateAndOrTime.dateTime").ToString(),
+            element.TryGetProperty("end_DateAndOrTime.dateTime", out var endDateProperty) ? endDateProperty.ToString() : null,
+            GetPropertyWithValue(element, "meteringGridArea_Domain.mRID"),
+            GetPropertyWithValue(element, "energySupplier_MarketParticipant.mRID"),
+            GetPropertyWithValue(element, "balanceResponsibleParty_MarketParticipant.mRID"));
+    }
+
+    private static string? GetPropertyWithValue(JsonElement element, string propertyName)
+    {
+        return element.TryGetProperty(propertyName, out var property) ? property.GetProperty("value").ToString() : null;
     }
 
     private static MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> ParseJsonData(

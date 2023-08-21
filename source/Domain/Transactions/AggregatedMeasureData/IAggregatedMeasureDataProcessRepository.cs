@@ -33,6 +33,6 @@ namespace Domain.Transactions.AggregatedMeasureData
         /// </summary>
         /// <param name="processId"></param>
         /// <param name="cancellationToken"></param>
-        Task<AggregatedMeasureDataProcess?> GetByIdAsync(ProcessId processId, CancellationToken cancellationToken);
+        Task<AggregatedMeasureDataProcess> GetByIdAsync(ProcessId processId, CancellationToken cancellationToken);
     }
 }

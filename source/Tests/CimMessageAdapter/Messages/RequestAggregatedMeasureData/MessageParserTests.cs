@@ -94,12 +94,10 @@ public class MessageParserTests
             Assert.True(serie != null);
             Assert.Equal("123353185", serie.Id);
             Assert.Equal("5799999933318", serie.BalanceResponsiblePartyMarketParticipantId);
-            Assert.Equal("10YDK-1--------M", serie.BiddingZoneDomainId);
             Assert.Equal("5790001330552", serie.EnergySupplierMarketParticipantId);
             Assert.Equal("E17", serie.MarketEvaluationPointType);
             Assert.Equal("244", serie.MeteringGridAreaDomainId);
             Assert.Equal("D01", serie.MarketEvaluationSettlementMethod);
-            Assert.Equal("D01", serie.SettlementSeriesVersion);
             Assert.Equal("2022-07-22T22:00:00Z", serie.EndDateAndOrTimeDateTime);
             Assert.Equal("2022-06-17T22:00:00Z", serie.StartDateAndOrTimeDateTime);
         }

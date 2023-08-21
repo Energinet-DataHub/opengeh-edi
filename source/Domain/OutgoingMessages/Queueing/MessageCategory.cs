@@ -14,7 +14,7 @@
 
 using Domain.SeedWork;
 
-namespace Domain.OutgoingMessages.Peek;
+namespace Domain.OutgoingMessages.Queueing;
 
 public class MessageCategory : EnumerationType
 {

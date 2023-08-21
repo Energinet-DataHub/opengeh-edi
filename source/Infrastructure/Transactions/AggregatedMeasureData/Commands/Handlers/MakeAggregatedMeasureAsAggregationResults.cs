@@ -53,10 +53,9 @@ public class MakeAggregatedMeasureAsAggregationResults : IRequestHandler<CreateA
         ArgumentNullException.ThrowIfNull(request);
 
         var process = await _aggregatedMeasureDataProcessRepository
-                          .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false)
-                      ?? throw ProcessNotFoundException.ProcessForProcessIdNotFound(request.ProcessId);
+            .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
-        var responseData = _serializer.Deserialize<IList<AggregatedTimeSerie>>(process.ResponseData ?? string.Empty);
+        var responseData = _serializer.Deserialize<IList<AggregatedTimeSerie>>(process.ResponseData ?? string.Empty); //If type or its props is changed, serializer.Deserialize could throw an exception
 
         foreach (var timeSerie in responseData)
         {
@@ -74,7 +73,6 @@ public class MakeAggregatedMeasureAsAggregationResults : IRequestHandler<CreateA
                     process.BusinessTransactionId.Id,
                     process.RequestedByActorId.Value,
                     MapReceiverRole(process),
-                    timeSerie.Product,
                     timeSerie.SettlementVersion));
 
             await _mediator.Publish(
@@ -108,7 +106,17 @@ public class MakeAggregatedMeasureAsAggregationResults : IRequestHandler<CreateA
 
     private static ActorGrouping MapActorGrouping(AggregatedMeasureDataProcess process)
     {
-        return new ActorGrouping(process.EnergySupplierId, process.BalanceResponsibleId);
+        if (process.RequestedByActorRoleCode == MarketRole.BalanceResponsibleParty.Code)
+        {
+            return new ActorGrouping(null, process.BalanceResponsibleId);
+        }
+
+        if (process.RequestedByActorRoleCode == MarketRole.EnergySupplier.Code)
+        {
+            return new ActorGrouping(process.EnergySupplierId, null);
+        }
+
+        return new ActorGrouping(null, null);
     }
 
     private static string? MapSettlementMethod(AggregatedMeasureDataProcess process)

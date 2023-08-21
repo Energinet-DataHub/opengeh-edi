@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -56,7 +55,7 @@ public class DocumentFactory
 
         if (documentWriter is null)
         {
-            throw new OutgoingMessageException($"Could not handle document type {documentType}");
+            throw new OutgoingMessageException($"Could not handle document type {documentType} and format {documentFormat}");
         }
 
         return documentWriter.WriteAsync(

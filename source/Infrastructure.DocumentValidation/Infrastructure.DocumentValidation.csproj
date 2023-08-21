@@ -27,8 +27,11 @@
       <EmbeddedResource Include="CimXml\Schemas\urn-ediel-org-measure-notifyaggregatedmeasuredata-0-1.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+      <EmbeddedResource Include="CimXml\Schemas\urn-ediel-org-measure-rejectrequestaggregatedmeasuredata-0-1.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
       <EmbeddedResource Include="CimXml\Schemas\urn-ediel-org-structure-accountingpointcharacteristics-0-1.xsd">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <EmbeddedResource Include="CimXml\Schemas\urn-ediel-org-structure-characteristicsofacustomeratanap-0-1.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -87,6 +90,9 @@
       <EmbeddedResource Include="Schemas\Json\Request-aggregated-measure-data-assembly-model.schema.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+      <None Update="Schemas\Json\Reject-request-aggregated-measure-data-assembly-model.schema.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
