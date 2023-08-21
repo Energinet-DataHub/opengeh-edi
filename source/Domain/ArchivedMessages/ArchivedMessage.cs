@@ -20,9 +20,10 @@ namespace Domain.ArchivedMessages;
 
 public record ArchivedMessage(
     string Id,
+    string? MessageId,
     DocumentType DocumentType,
-    ActorNumber SenderNumber,
-    ActorNumber ReceiverNumber,
+    ActorNumber? SenderNumber,
+    ActorNumber? ReceiverNumber,
     Instant CreatedAt,
     string? BusinessReason,
     Stream Document);
