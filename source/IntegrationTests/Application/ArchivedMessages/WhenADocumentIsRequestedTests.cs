@@ -79,6 +79,19 @@ public class WhenADocumentIsRequestedTests : TestBase
         }
     }
 
+    [Fact]
+    public async Task Shorten_messageId_when_it_has_more_than_36_characters()
+    {
+        var id = Guid.NewGuid().ToString();
+        var over36Chars = id + "-1234123";
+        await ArchiveMessage(CreateArchivedMessage(id, over36Chars));
+
+        var result = await QueryAsync(new GetMessagesQuery()).ConfigureAwait(false);
+
+        Assert.NotNull(result);
+        Assert.Equal(id, result.Messages[0].MessageId);
+    }
+
     private ArchivedMessage CreateArchivedMessage(string? id = null, string? messageId = null)
     {
         return new ArchivedMessage(
