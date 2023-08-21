@@ -57,7 +57,7 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
     }
 
     [Fact]
-    public async Task Aggregated_measure_data_process_cannot_be_send_to_wholesale_twice()
+    public async Task Aggregated_measure_data_process_accepted_will_only_be_processed_once()
     {
         // Arrange
         var incomingMessage = MessageBuilder().Build();
@@ -75,6 +75,27 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         Assert.Equal(incomingMessage.MarketActivityRecord.Id, process.BusinessTransactionId.Id);
         Assert.Single(domainEvents);
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);
+    }
+
+    [Fact]
+    public async Task Aggregated_measure_data_process_rejected_will_only_be_processed_once()
+    {
+        // Arrange
+        var incomingMessage = MessageBuilder().Build();
+        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
+        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
+        process!.WasSentToWholesale();
+
+        // Act
+        process.WasRejected(string.Empty);
+        process.WasRejected(string.Empty);
+
+        // Assert
+        var domainEvents =
+            process.DomainEvents.Where(x => x is AggregatedMeasureProcessWasRejected);
+        Assert.Equal(incomingMessage.MarketActivityRecord.Id, process.BusinessTransactionId.Id);
+        Assert.Single(domainEvents);
+        AssertProcessState(process, AggregatedMeasureDataProcess.State.Rejected);
     }
 
     [Fact]

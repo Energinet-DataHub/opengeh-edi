@@ -19,7 +19,6 @@ using Application.Actors;
 using Application.Configuration.DataAccess;
 using Dapper;
 using IntegrationTests.Fixtures;
-using JetBrains.Annotations;
 using MediatR;
 using Xunit;
 
@@ -30,7 +29,7 @@ public class CreateActorsTests : TestBase
     private readonly IMediator _mediator;
     private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public CreateActorsTests([NotNull] DatabaseFixture databaseFixture)
+    public CreateActorsTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _mediator = GetService<IMediator>();
