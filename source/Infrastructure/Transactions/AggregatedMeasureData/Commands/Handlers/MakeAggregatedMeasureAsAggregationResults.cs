@@ -81,6 +81,8 @@ public class MakeAggregatedMeasureAsAggregationResults : IRequestHandler<CreateA
                 .ConfigureAwait(false);
         }
 
+        process.IsCompleted();
+
         return Unit.Value;
     }
 

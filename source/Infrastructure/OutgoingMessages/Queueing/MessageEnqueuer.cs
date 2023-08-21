@@ -35,7 +35,9 @@ public class MessageEnqueuer
     {
         ArgumentNullException.ThrowIfNull(message);
 
-        var messageQueue = await _actorMessageQueueRepository.ActorMessageQueueForAsync(message.Receiver.Number, message.Receiver.ActorRole).ConfigureAwait(false);
+        var messageQueue = await _actorMessageQueueRepository.ActorMessageQueueForAsync(
+            message.Receiver.Number,
+            message.Receiver.ActorRole).ConfigureAwait(false);
 
         if (messageQueue == null)
         {

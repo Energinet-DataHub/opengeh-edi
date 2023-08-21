@@ -98,6 +98,23 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Rejected);
     }
 
+    [Fact]
+    public async Task Aggregated_measure_data_process_is_completed()
+    {
+        // Arrange
+        var incomingMessage = MessageBuilder().Build();
+        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
+        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
+        process!.WasSentToWholesale();
+        process.WasAccepted(string.Empty);
+
+        // Act
+        process.IsCompleted();
+
+        // Assert
+        AssertProcessState(process, AggregatedMeasureDataProcess.State.Completed);
+    }
+
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);

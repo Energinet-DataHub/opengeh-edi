@@ -57,6 +57,9 @@ public class ForwardRejectedAggregationResultHandler : IRequestHandler<ForwardRe
         _outgoingMessageRepository.Add(CreateRejectedAggregationResultMessage(
             process,
             rejectedReasons));
+
+        process.IsCompleted();
+
         return Unit.Value;
     }
 
