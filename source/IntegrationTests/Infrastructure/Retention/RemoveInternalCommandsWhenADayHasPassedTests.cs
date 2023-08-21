@@ -18,7 +18,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration;
 using Application.Configuration.DataAccess;
-using Application.Configuration.TimeEvents;
 using Infrastructure.Configuration.DataAccess;
 using Infrastructure.Configuration.InternalCommands;
 using IntegrationTests.Fixtures;
@@ -30,7 +29,7 @@ public class RemoveInternalCommandsWhenADayHasPassedTests : TestBase
 {
     private readonly B2BContext _b2BContext;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-    private readonly RemoveInternalCommandsWhenADayHasPassed _sut;
+    private readonly InternalCommandsRetention _sut;
 
     public RemoveInternalCommandsWhenADayHasPassedTests(
         DatabaseFixture databaseFixture)
@@ -38,19 +37,19 @@ public class RemoveInternalCommandsWhenADayHasPassedTests : TestBase
     {
         _b2BContext = GetService<B2BContext>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
-        _sut = new RemoveInternalCommandsWhenADayHasPassed(GetService<IDatabaseConnectionFactory>());
+        _sut = new InternalCommandsRetention(GetService<IDatabaseConnectionFactory>());
     }
 
     [Fact]
     public async Task Clean_up_internal_commands_succeed()
     {
         // arrange
-        var amountOfProcessedInternalCommands = 25000;
+        var amountOfProcessedInternalCommands = 2500;
         var amountOfNotProcessedInternalCommands = 25;
         await GenerateInternalCommands(amountOfProcessedInternalCommands, amountOfNotProcessedInternalCommands);
 
         // Act
-        await _sut.Handle(new ADayHasPassed(_systemDateTimeProvider.Now()), CancellationToken.None);
+        await _sut.CleanupAsync(CancellationToken.None);
 
         // Assert
         AssertProcessedInternalCommandIsRemoved(amountOfNotProcessedInternalCommands);

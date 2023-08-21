@@ -16,22 +16,21 @@ using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
-using Application.Configuration.TimeEvents;
-using MediatR;
+using Infrastructure.DataRetention;
 using Microsoft.Data.SqlClient;
 
 namespace Infrastructure.Configuration.Queueing;
 
-public class RemoveDequeuedBundlesWhenADayHasPassed : INotificationHandler<ADayHasPassed>
+public class DequeuedBundlesRetention : IDataRetention
 {
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
 
-    public RemoveDequeuedBundlesWhenADayHasPassed(IDatabaseConnectionFactory databaseConnectionFactory)
+    public DequeuedBundlesRetention(IDatabaseConnectionFactory databaseConnectionFactory)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
     }
 
-    public async Task Handle(ADayHasPassed notification, CancellationToken cancellationToken)
+    public async Task CleanupAsync(CancellationToken cancellationToken)
     {
         const string deleteStmt = @"
             DELETE FROM [dbo].[MarketDocuments]

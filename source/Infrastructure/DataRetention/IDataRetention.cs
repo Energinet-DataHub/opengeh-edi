@@ -12,19 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.OutgoingMessages.Dequeue;
-using Infrastructure.Configuration.Queueing;
-using Infrastructure.DataRetention;
-using MediatR;
-using Microsoft.Extensions.DependencyInjection;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace Infrastructure.OutgoingMessages.Dequeue;
+namespace Infrastructure.DataRetention;
 
-internal static class DequeueConfiguration
+/// <summary>
+/// Represent the contract for data retention for a single data source.
+/// A data source can be a database table.
+/// </summary>
+public interface IDataRetention
 {
-    internal static void Configure(IServiceCollection services)
-    {
-        services.AddTransient<IRequestHandler<DequeueCommand, DequeCommandResult>, DequeueHandler>();
-        services.AddTransient<IDataRetention, DequeuedBundlesRetention>();
-    }
+    /// <summary>
+    /// Responsible for cleaning the no longer needed data.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
+    Task CleanupAsync(CancellationToken cancellationToken);
 }

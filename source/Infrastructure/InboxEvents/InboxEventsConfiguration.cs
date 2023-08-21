@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Application.Configuration.TimeEvents;
+using Infrastructure.DataRetention;
 using Infrastructure.Transactions.Aggregations;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,7 +25,7 @@ public static class InboxEventsConfiguration
     public static void Configure(IServiceCollection services)
     {
         services.AddTransient<INotificationHandler<TenSecondsHasHasPassed>, ProcessInboxEventsOnTenSecondsHasPassed>();
-        services.AddTransient<INotificationHandler<ADayHasPassed>, RemoveMonthOldReceivedInboxEventsWhenADayHasPassed>();
+        services.AddTransient<IDataRetention, ReceivedInboxEventsRetention>();
         services.AddTransient<InboxEventReceiver>();
         services.AddTransient<InboxEventsProcessor>();
         services.AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestAcceptedEventMapper>();

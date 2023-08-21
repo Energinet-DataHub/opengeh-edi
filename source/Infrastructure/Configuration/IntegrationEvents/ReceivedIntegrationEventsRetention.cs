@@ -12,32 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Configuration;
 using Application.Configuration.DataAccess;
-using Application.Configuration.TimeEvents;
-using MediatR;
+using Infrastructure.DataRetention;
 using Microsoft.Data.SqlClient;
 using NodaTime;
 
-namespace Infrastructure.InboxEvents;
+namespace Infrastructure.Configuration.IntegrationEvents;
 
-public class RemoveMonthOldReceivedInboxEventsWhenADayHasPassed : INotificationHandler<ADayHasPassed>
+public class ReceivedIntegrationEventsRetention : IDataRetention
 {
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-    public RemoveMonthOldReceivedInboxEventsWhenADayHasPassed(IDatabaseConnectionFactory databaseConnectionFactory)
+    public ReceivedIntegrationEventsRetention(
+        IDatabaseConnectionFactory databaseConnectionFactory,
+        ISystemDateTimeProvider systemDateTimeProvider)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
+        _systemDateTimeProvider = systemDateTimeProvider;
     }
 
-    public async Task Handle(ADayHasPassed notification, CancellationToken cancellationToken)
+    public async Task CleanupAsync(CancellationToken cancellationToken)
     {
-        if (notification == null) throw new ArgumentNullException(nameof(notification));
-
-        var monthAgo = notification.Now.Plus(-Duration.FromDays(30));
+        var monthAgo = _systemDateTimeProvider.Now().Plus(-Duration.FromDays(30));
         var amountOfOldEvents = 1;
         while (amountOfOldEvents > 0)
         {
@@ -45,13 +46,13 @@ public class RemoveMonthOldReceivedInboxEventsWhenADayHasPassed : INotificationH
                 WITH CTE AS
                  (
                      SELECT TOP 10000 *
-                     FROM [dbo].[ReceivedInboxEvents]
-                     WHERE [ErrorMessage] IS NULL AND [ProcessedDate] IS NOT NULL AND [ProcessedDate] < @LastMonthInstant
+                     FROM [dbo].[ReceivedIntegrationEvents]
+                     WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL AND [ProcessedDate] < @LastMonthInstant
                  )
                 DELETE FROM CTE;
 
-                SELECT Count(*) FROM [dbo].[ReceivedInboxEvents]
-                    WHERE [ErrorMessage] IS NULL AND [ProcessedDate] IS NOT NULL AND [ProcessedDate] < @LastMonthInstant";
+                SELECT Count(*) FROM [dbo].[ReceivedIntegrationEvents]
+                    WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL AND [ProcessedDate] < @LastMonthInstant";
 
             using var connection =
                 (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken)
