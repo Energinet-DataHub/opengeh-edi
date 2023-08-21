@@ -25,7 +25,6 @@ using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions;
 using Domain.Transactions.Aggregations;
-using Infrastructure.OutgoingMessages;
 using Infrastructure.OutgoingMessages.Queueing;
 using IntegrationTests.Fixtures;
 using NodaTime.Extensions;

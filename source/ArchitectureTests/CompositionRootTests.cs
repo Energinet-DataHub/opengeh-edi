@@ -114,9 +114,9 @@ namespace ArchitectureTests
             Assert.True(scope.ServiceProvider.CanSatisfyRequirement(requirement));
         }
 
-        [Theory(DisplayName = nameof(All_document_writer_are_registered))]
+        [Theory(DisplayName = nameof(All_document_writers_are_registered))]
         [MemberData(nameof(GetDocumentWritersRequirements))]
-        public void All_document_writer_are_registered(Requirement requirement)
+        public void All_document_writers_are_registered(Requirement requirement)
         {
             using var scope = _host.Services.CreateScope();
             Assert.True(scope.ServiceProvider.CanSatisfyType(requirement));

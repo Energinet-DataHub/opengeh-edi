@@ -55,6 +55,15 @@ public class WhenADocumentIsRequestedTests : TestBase
     }
 
     [Fact]
+    public async Task Id_has_to_be_unique()
+    {
+        var id = Guid.NewGuid().ToString();
+        await ArchiveMessage(CreateArchivedMessage(id));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => ArchiveMessage(CreateArchivedMessage(id))).ConfigureAwait(false);
+    }
+
+    [Fact]
     public async Task Can_add_archived_messages_with_existing_message_id()
     {
         var id1 = Guid.NewGuid().ToString();
