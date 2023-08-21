@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Application.ArchivedMessages;
 using Application.Configuration;
 using Application.Configuration.DataAccess;
+using Application.SearchMessages;
 using Domain.Actors;
 using Domain.ArchivedMessages;
 using Domain.Documents;
@@ -62,9 +63,49 @@ public class WhenADocumentIsRequestedTests : TestBase
         await Assert.ThrowsAsync<InvalidOperationException>(() => ArchiveMessage(CreateArchivedMessage(id))).ConfigureAwait(false);
     }
 
-    private ArchivedMessage CreateArchivedMessage(string? messageId = null)
+    [Fact]
+    public async Task Can_add_archived_messages_with_existing_message_id()
+    {
+        var id1 = Guid.NewGuid().ToString();
+        var id2 = Guid.NewGuid().ToString();
+        var messageId = "MessageId";
+        await ArchiveMessage(CreateArchivedMessage(id1, messageId));
+
+        try
+        {
+            await ArchiveMessage(CreateArchivedMessage(id2, messageId));
+        }
+#pragma warning disable CA1031  // We want to catch all exceptions
+        catch
+#pragma warning restore CA1031
+        {
+            Assert.Fail("We should be able to save multiple messages with the same message id");
+        }
+
+        var result = await QueryAsync(new GetMessagesQuery()).ConfigureAwait(false);
+
+        Assert.Equal(2, result.Messages.Count);
+        Assert.Equal(messageId, result.Messages[0].MessageId);
+        Assert.Equal(messageId, result.Messages[1].MessageId);
+    }
+
+    [Fact]
+    public async Task Shorten_messageId_when_it_has_more_than_36_characters()
+    {
+        var id = Guid.NewGuid().ToString();
+        var over36Chars = id + "-1234123";
+        await ArchiveMessage(CreateArchivedMessage(id, over36Chars));
+
+        var result = await QueryAsync(new GetMessagesQuery()).ConfigureAwait(false);
+
+        Assert.NotNull(result);
+        Assert.Equal(id, result.Messages[0].MessageId);
+    }
+
+    private ArchivedMessage CreateArchivedMessage(string? id = null, string? messageId = null)
     {
         return new ArchivedMessage(
+            string.IsNullOrWhiteSpace(id) ? Guid.NewGuid().ToString() : id,
             string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
             EnumerationType.FromName<DocumentType>(DocumentType.AccountingPointCharacteristics.Name),
             ActorNumber.Create("1234512345123"),
