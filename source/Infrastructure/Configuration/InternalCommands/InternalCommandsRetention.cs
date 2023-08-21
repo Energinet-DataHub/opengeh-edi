@@ -12,32 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
-using Application.Configuration.TimeEvents;
-using MediatR;
+using Infrastructure.DataRetention;
 using Microsoft.Data.SqlClient;
-using NodaTime;
 
-namespace Infrastructure.InboxEvents;
+namespace Infrastructure.Configuration.InternalCommands;
 
-public class RemoveMonthOldReceivedInboxEventsWhenADayHasPassed : INotificationHandler<ADayHasPassed>
+public class InternalCommandsRetention : IDataRetention
 {
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
 
-    public RemoveMonthOldReceivedInboxEventsWhenADayHasPassed(IDatabaseConnectionFactory databaseConnectionFactory)
+    public InternalCommandsRetention(IDatabaseConnectionFactory databaseConnectionFactory)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
     }
 
-    public async Task Handle(ADayHasPassed notification, CancellationToken cancellationToken)
+    public async Task CleanupAsync(CancellationToken cancellationToken)
     {
-        if (notification == null) throw new ArgumentNullException(nameof(notification));
-
-        var monthAgo = notification.Now.Plus(-Duration.FromDays(30));
         var amountOfOldEvents = 1;
         while (amountOfOldEvents > 0)
         {
@@ -45,22 +39,18 @@ public class RemoveMonthOldReceivedInboxEventsWhenADayHasPassed : INotificationH
                 WITH CTE AS
                  (
                      SELECT TOP 10000 *
-                     FROM [dbo].[ReceivedInboxEvents]
-                     WHERE [ErrorMessage] IS NULL AND [ProcessedDate] IS NOT NULL AND [ProcessedDate] < @LastMonthInstant
+                     FROM [dbo].[QueuedInternalCommands]
+                      WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL
                  )
                 DELETE FROM CTE;
 
-                SELECT Count(*) FROM [dbo].[ReceivedInboxEvents]
-                    WHERE [ErrorMessage] IS NULL AND [ProcessedDate] IS NOT NULL AND [ProcessedDate] < @LastMonthInstant";
+                SELECT Count(*) FROM [dbo].[QueuedInternalCommands]
+                    WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL";
 
             using var connection =
-                (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken)
-                    .ConfigureAwait(false);
+                (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
             using var transaction = connection.BeginTransaction();
             using var command = connection.CreateCommand();
-            command.Parameters.AddWithValue(
-                "@LastMonthInstant",
-                monthAgo.ToDateTimeUtc());
             command.Transaction = transaction;
             command.CommandText = deleteStmt;
 

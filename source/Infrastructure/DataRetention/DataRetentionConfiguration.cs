@@ -13,22 +13,16 @@
 // limitations under the License.
 
 using Application.Configuration.TimeEvents;
-using Infrastructure.DataRetention;
-using Infrastructure.Transactions.Aggregations;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.Configuration.IntegrationEvents;
+namespace Infrastructure.DataRetention;
 
-public static class IntegrationEventsConfiguration
+public static class DataRetentionConfiguration
 {
     public static void Configure(IServiceCollection services)
     {
-        services.AddTransient<INotificationHandler<TenSecondsHasHasPassed>,
-            ProcessIntegrationEventsOnTenSecondsHasPassed>();
-        services.AddTransient<IDataRetention, ReceivedIntegrationEventsDataRetention>();
-        services.AddTransient<IntegrationEventReceiver>();
-        services.AddTransient<IntegrationEventsProcessor>();
-        services.AddTransient<IIntegrationEventMapper, CalculationResultCompletedEventMapper>();
+        services.AddTransient<INotificationHandler<ADayHasPassed>,
+            ExecuteDataRetentionsWhenADayHasPassed>();
     }
 }

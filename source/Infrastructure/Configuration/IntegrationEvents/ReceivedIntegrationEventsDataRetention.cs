@@ -15,45 +15,59 @@
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Configuration;
 using Application.Configuration.DataAccess;
-using Application.Configuration.TimeEvents;
-using MediatR;
+using Infrastructure.DataRetention;
 using Microsoft.Data.SqlClient;
+using NodaTime;
 
-namespace Infrastructure.Configuration.InternalCommands;
+namespace Infrastructure.Configuration.IntegrationEvents;
 
-public class RemoveInternalCommandsWhenADayHasPassed : INotificationHandler<ADayHasPassed>
+public class ReceivedIntegrationEventsDataRetention : IDataRetention
 {
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-    public RemoveInternalCommandsWhenADayHasPassed(IDatabaseConnectionFactory databaseConnectionFactory)
+    public ReceivedIntegrationEventsDataRetention(
+        IDatabaseConnectionFactory databaseConnectionFactory,
+        ISystemDateTimeProvider systemDateTimeProvider)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
+        _systemDateTimeProvider = systemDateTimeProvider;
     }
 
-    public async Task Handle(ADayHasPassed notification, CancellationToken cancellationToken)
+    public async Task CleanupAsync(CancellationToken cancellationToken)
     {
-        while (await AnyProcessedQueuedInternalCommandsAsync(cancellationToken).ConfigureAwait(false))
+        var monthAgo = _systemDateTimeProvider.Now().Plus(-Duration.FromDays(30));
+        var amountOfOldEvents = 1;
+        while (amountOfOldEvents > 0)
         {
             const string deleteStmt = @"
                 WITH CTE AS
                  (
                      SELECT TOP 10000 *
-                     FROM [dbo].[QueuedInternalCommands]
-                      WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL
+                     FROM [dbo].[ReceivedIntegrationEvents]
+                     WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL AND [ProcessedDate] < @LastMonthInstant
                  )
-                DELETE FROM CTE;";
+                DELETE FROM CTE;
+
+                SELECT Count(*) FROM [dbo].[ReceivedIntegrationEvents]
+                    WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL AND [ProcessedDate] < @LastMonthInstant";
 
             using var connection =
-                (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
+                (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken)
+                    .ConfigureAwait(false);
             using var transaction = connection.BeginTransaction();
             using var command = connection.CreateCommand();
+            command.Parameters.AddWithValue(
+                "@LastMonthInstant",
+                monthAgo.ToDateTimeUtc());
             command.Transaction = transaction;
             command.CommandText = deleteStmt;
 
             try
             {
-                await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+                amountOfOldEvents = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
                 await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             }
             catch (DbException)
@@ -63,20 +77,5 @@ public class RemoveInternalCommandsWhenADayHasPassed : INotificationHandler<ADay
                 throw; // re-throw exception
             }
         }
-    }
-
-    private async Task<bool> AnyProcessedQueuedInternalCommandsAsync(CancellationToken cancellationToken)
-    {
-        const string selectStmt = @"
-               SELECT Count(*) FROM [dbo].[QueuedInternalCommands] WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL";
-
-        using var connection =
-            (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
-        using var command = connection.CreateCommand();
-        command.CommandText = selectStmt;
-
-        var amountOfProcessedCommands = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
-
-        return amountOfProcessedCommands > 0;
     }
 }
