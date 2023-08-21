@@ -57,8 +57,8 @@ public class ValidateAggregatedMeasureDataRequestHandler
             Guid.NewGuid().ToString(),
             messageHeader.MessageId,
             IncomingDocumentType.RequestAggregatedMeasureData,
-            messageHeader.SenderId,
-            messageHeader.ReceiverId,
+            string.IsNullOrEmpty(messageHeader.SenderId) ? null : ActorNumber.Create(messageHeader.SenderId),
+            string.IsNullOrEmpty(messageHeader.ReceiverId) ? null : ActorNumber.Create(messageHeader.ReceiverId),
             timestamp,
             messageHeader.BusinessReason,
             request.OriginalMessage));
