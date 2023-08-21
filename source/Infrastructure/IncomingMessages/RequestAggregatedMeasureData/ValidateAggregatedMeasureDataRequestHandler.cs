@@ -55,7 +55,7 @@ public class ValidateAggregatedMeasureDataRequestHandler
 
         _messageArchive.Add(new ArchivedMessage(
             Guid.NewGuid().ToString(),
-            messageHeader.MessageId?.Substring(0, 36),
+            messageHeader.MessageId,
             IncomingDocumentType.RequestAggregatedMeasureData,
             TryGetActorNumber(messageHeader.SenderId),
             TryGetActorNumber(messageHeader.ReceiverId),
