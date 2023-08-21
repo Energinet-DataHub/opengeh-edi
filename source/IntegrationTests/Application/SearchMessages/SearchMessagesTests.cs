@@ -54,8 +54,8 @@ public class SearchMessagesTests : TestBase
         var messageInfo = result.Messages.FirstOrDefault(message => message.Id == archivedMessage.Id);
         Assert.NotNull(messageInfo);
         Assert.Equal(archivedMessage.DocumentType.Name, messageInfo.DocumentType);
-        Assert.Equal(archivedMessage.SenderNumber.Value, messageInfo.SenderNumber);
-        Assert.Equal(archivedMessage.ReceiverNumber.Value, messageInfo.ReceiverNumber);
+        Assert.Equal(archivedMessage.SenderNumber?.Value, messageInfo.SenderNumber);
+        Assert.Equal(archivedMessage.ReceiverNumber?.Value, messageInfo.ReceiverNumber);
         Assert.Equal(archivedMessage.CreatedAt, messageInfo.CreatedAt);
         Assert.Equal(archivedMessage.MessageId, messageInfo.MessageId);
     }
