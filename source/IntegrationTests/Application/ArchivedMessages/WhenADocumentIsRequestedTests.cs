@@ -65,11 +65,6 @@ public class WhenADocumentIsRequestedTests : TestBase
         try
         {
             await ArchiveMessage(CreateArchivedMessage(id2, messageId));
-            var result = await QueryAsync(new GetMessagesQuery()).ConfigureAwait(false);
-
-            Assert.Equal(2, result.Messages.Count);
-            Assert.Equal(messageId, result.Messages[0].MessageId);
-            Assert.Equal(messageId, result.Messages[1].MessageId);
         }
 #pragma warning disable CA1031  // We want to catch all exceptions
         catch
@@ -77,6 +72,12 @@ public class WhenADocumentIsRequestedTests : TestBase
         {
             Assert.Fail("We should be able to save multiple messages with the same message id");
         }
+
+        var result = await QueryAsync(new GetMessagesQuery()).ConfigureAwait(false);
+
+        Assert.Equal(2, result.Messages.Count);
+        Assert.Equal(messageId, result.Messages[0].MessageId);
+        Assert.Equal(messageId, result.Messages[1].MessageId);
     }
 
     [Fact]
