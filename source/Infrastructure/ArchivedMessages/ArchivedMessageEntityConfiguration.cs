@@ -55,7 +55,11 @@ public class ArchivedMessageEntityConfiguration : IEntityTypeConfiguration<Archi
                 fromDbValue => new MemoryStream(fromDbValue));
         builder.Property(x => x.MessageId)
             .HasConversion(
-                toDbValue => string.IsNullOrEmpty(toDbValue) ? null : toDbValue.Substring(0, 36),
+                toDbValue => string.IsNullOrEmpty(toDbValue)
+                    ? null
+                    : toDbValue.Length > 36
+                        ? toDbValue.Substring(0, 36)
+                        : toDbValue,
                 fromDbValue => fromDbValue);
     }
 }
