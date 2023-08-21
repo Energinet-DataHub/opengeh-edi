@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Application.ArchivedMessages;
 using Application.Configuration;
 using Application.Configuration.DataAccess;
+using Application.SearchMessages;
 using Domain.Actors;
 using Domain.ArchivedMessages;
 using Domain.Documents;
@@ -56,17 +57,25 @@ public class WhenADocumentIsRequestedTests : TestBase
     [Fact]
     public async Task Can_add_archived_messages_with_existing_message_id()
     {
-        await ArchiveMessage(CreateArchivedMessage(null, "MessageId"));
+        var id1 = Guid.NewGuid().ToString();
+        var id2 = Guid.NewGuid().ToString();
+        var messageId = "MessageId";
+        await ArchiveMessage(CreateArchivedMessage(id1, messageId));
 
         try
         {
-            await ArchiveMessage(CreateArchivedMessage(null, "MessageId"));
+            await ArchiveMessage(CreateArchivedMessage(id2, messageId));
+            var result = await QueryAsync(new GetMessagesQuery()).ConfigureAwait(false);
+
+            Assert.Equal(2, result.Messages.Count);
+            Assert.Equal(messageId, result.Messages[0].MessageId);
+            Assert.Equal(messageId, result.Messages[1].MessageId);
         }
 #pragma warning disable CA1031  // We want to catch all exceptions
         catch
 #pragma warning restore CA1031
         {
-            Assert.Fail("We should be able to have multiple messages with the same message id");
+            Assert.Fail("We should be able to save multiple messages with the same message id");
         }
     }
 
