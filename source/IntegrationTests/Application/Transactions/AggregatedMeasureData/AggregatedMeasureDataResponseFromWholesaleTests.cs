@@ -57,7 +57,7 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
     }
 
     [Fact]
-    public async Task Aggregated_measure_data_process_accepted_will_only_be_processed_ones()
+    public async Task Aggregated_measure_data_process_accepted_will_only_be_processed_once()
     {
         // Arrange
         var incomingMessage = MessageBuilder().Build();
