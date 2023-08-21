@@ -20,6 +20,7 @@ using Application.Transactions.MoveIn;
 using Application.Transactions.MoveIn.MasterDataDelivery;
 using Application.Transactions.MoveIn.Notifications;
 using Application.Transactions.UpdateCustomer;
+using Infrastructure.DataRetention;
 using Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,7 +38,7 @@ internal static class InternalCommandProcessing
         services.AddTransient<InternalCommandAccessor>();
         services.AddTransient<InternalCommandProcessor>();
         services.AddTransient<INotificationHandler<TenSecondsHasHasPassed>, ProcessInternalCommandsOnTimeHasPassed>();
-        services.AddTransient<INotificationHandler<ADayHasPassed>, RemoveInternalCommandsWhenADayHasPassed>();
+        services.AddTransient<IDataRetention, InternalCommandsRetention>();
     }
 
     private static InternalCommandMapper CreateInternalCommandMap()
