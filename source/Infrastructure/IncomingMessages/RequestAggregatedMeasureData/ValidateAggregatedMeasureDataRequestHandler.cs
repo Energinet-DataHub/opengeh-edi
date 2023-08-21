@@ -54,9 +54,8 @@ public class ValidateAggregatedMeasureDataRequestHandler
         var timestamp = _systemDateTimeProvider.Now();
 
         _messageArchive.Add(new ArchivedMessage(
-            string.IsNullOrWhiteSpace(messageHeader.MessageId)
-                ? "Unknown message id"
-                : messageHeader.MessageId,
+            Guid.NewGuid().ToString(),
+            messageHeader.MessageId,
             IncomingDocumentType.RequestAggregatedMeasureData,
             TryGetActorNumber(messageHeader.SenderId),
             TryGetActorNumber(messageHeader.ReceiverId),
@@ -70,7 +69,7 @@ public class ValidateAggregatedMeasureDataRequestHandler
         return result;
     }
 
-    private static ActorNumber TryGetActorNumber(string messageHeaderSenderId)
+    private static ActorNumber? TryGetActorNumber(string messageHeaderSenderId)
     {
         try
         {
@@ -80,7 +79,7 @@ public class ValidateAggregatedMeasureDataRequestHandler
         catch
 #pragma warning restore CA1031
         {
-            return ActorNumber.Create("0000000000000"); // 13 0's
+            return null;
         }
     }
 }
