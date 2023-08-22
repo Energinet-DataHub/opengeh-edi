@@ -1,4 +1,4 @@
-// Copyright 2020 Energinet DataHub A/S
+﻿// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -22,14 +22,14 @@ using Infrastructure.Configuration.IntegrationEvents;
 namespace Api;
 
 #pragma warning disable CA1711
-public sealed class IntegrationEventHandler : IIntegrationEventHandler
+public class IntegrationEventHandler : IIntegrationEventHandler
 #pragma warning restore CA1711
 {
-    private readonly IntegrationEventReceiver _eventReceiver;
+    private readonly IntegrationEventReceiver _integrationEventReceiver;
 
-    public IntegrationEventHandler(IntegrationEventReceiver eventReceiver)
+    public IntegrationEventHandler(IntegrationEventReceiver integrationEventReceiver)
     {
-        _eventReceiver = eventReceiver;
+        _integrationEventReceiver = integrationEventReceiver;
     }
 
     public bool ShouldHandle(string eventName)
@@ -40,6 +40,6 @@ public sealed class IntegrationEventHandler : IIntegrationEventHandler
     public async Task HandleAsync(IntegrationEvent integrationEvent)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
-        await _eventReceiver.ReceiveAsync(integrationEvent.EventIdentification.ToString(), integrationEvent.EventName, integrationEvent.Message.ToByteArray()).ConfigureAwait(false);
+        await _integrationEventReceiver.ReceiveAsync(integrationEvent.EventIdentification.ToString(), integrationEvent.EventName, integrationEvent.Message.ToByteArray()).ConfigureAwait(false);
     }
 }

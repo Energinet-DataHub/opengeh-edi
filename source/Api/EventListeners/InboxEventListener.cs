@@ -16,6 +16,9 @@
  using System.Threading;
  using System.Threading.Tasks;
  using Api.Configuration;
+ using Energinet.DataHub.Core.Messaging.Communication;
+ using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
+ using Infrastructure.Configuration.IntegrationEvents;
  using Infrastructure.Configuration.Serialization;
  using Infrastructure.InboxEvents;
  using Microsoft.Azure.Functions.Worker;
@@ -26,13 +29,19 @@ public class InboxEventListener
 {
     private readonly ISerializer _jsonSerializer;
     private readonly InboxEventReceiver _inboxEventReceiver;
+    private readonly IntegrationEventReceiver _eventReceiver;
+    private readonly ISubscriber _subscriber;
 
     public InboxEventListener(
         ISerializer jsonSerializer,
-        InboxEventReceiver inboxEventReceiver)
+        InboxEventReceiver inboxEventReceiver,
+        IntegrationEventReceiver eventReceiver,
+        ISubscriber subscriber)
     {
         _jsonSerializer = jsonSerializer;
         _inboxEventReceiver = inboxEventReceiver;
+        _eventReceiver = eventReceiver;
+        _subscriber = subscriber;
     }
 
     [Function(nameof(InboxEventListener))]
@@ -43,6 +52,10 @@ public class InboxEventListener
         FunctionContext context,
         CancellationToken hostCancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(context);
+
+        await _subscriber.HandleAsync(IntegrationEventServiceBusMessage.Create(message, context.BindingContext.BindingData!)).ConfigureAwait(false);
+
         if (message == null) throw new ArgumentNullException(nameof(message));
         if (context == null) throw new ArgumentNullException(nameof(context));
 

@@ -27,6 +27,7 @@ using Application.Transactions.MoveIn;
 using CimMessageAdapter.Messages.Queues;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
+using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.Reflection;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.Authentication;
@@ -162,7 +163,8 @@ namespace Api
                         TopicName = runtime.INTEGRATION_EVENTS_TOPIC_NAME!,
                         ServiceBusConnectionString = runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER!,
                     });*/
-                    services.AddSubscriber<IntegrationEventHandler>(new List<MessageDescriptor>());
+                    var list = new List<MessageDescriptor>();
+                    services.AddSubscriber<IntegrationEventHandler>(list);
                 })
                 .Build();
         }

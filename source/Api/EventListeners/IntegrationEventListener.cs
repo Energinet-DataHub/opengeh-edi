@@ -52,6 +52,7 @@ public class IntegrationEventListener
         // TODO Consider
         // _subscriber.ValidateAndLog(context)
         await _subscriber.HandleAsync(IntegrationEventServiceBusMessage.Create(eventData, context.BindingContext.BindingData!)).ConfigureAwait(false);
-        // TODO return _eventReceiver.ReceiveAsync(eventDetails.EventId, eventDetails.EventType, eventData);
+
+        //return _eventReceiver.ReceiveAsync(eventDetails.EventId, eventDetails.EventType, eventData);
     }
 }
