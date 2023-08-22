@@ -14,8 +14,12 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Application.Configuration;
 using Application.Configuration.DataAccess;
+using Application.Configuration.TimeEvents;
+using Dapper;
 using Domain.Actors;
 using Domain.Documents;
 using Domain.OutgoingMessages;
@@ -30,6 +34,8 @@ using Infrastructure.InboxEvents;
 using Infrastructure.OutgoingMessages.Common;
 using IntegrationTests.Assertions;
 using IntegrationTests.Fixtures;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Categories;
 using Period = Energinet.DataHub.Edi.Responses.Period;

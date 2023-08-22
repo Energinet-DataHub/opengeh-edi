@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Application.Configuration.DataAccess;
 using Application.OutgoingMessages;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.Queueing;
@@ -24,23 +25,32 @@ public class MessageEnqueuer
 {
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public MessageEnqueuer(IOutgoingMessageRepository outgoingMessageRepository, IActorMessageQueueRepository actorMessageQueueRepository)
+    public MessageEnqueuer(
+        IOutgoingMessageRepository outgoingMessageRepository,
+        IActorMessageQueueRepository actorMessageQueueRepository,
+        IUnitOfWork unitOfWork)
     {
         _outgoingMessageRepository = outgoingMessageRepository;
         _actorMessageQueueRepository = actorMessageQueueRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task EnqueueAsync(OutgoingMessage message)
     {
         ArgumentNullException.ThrowIfNull(message);
 
-        var messageQueue = await _actorMessageQueueRepository.ActorMessageQueueForAsync(message.Receiver.Number, message.Receiver.ActorRole).ConfigureAwait(false);
+        var messageQueue = await _actorMessageQueueRepository.ActorMessageQueueForAsync(
+            message.Receiver.Number,
+            message.Receiver.ActorRole).ConfigureAwait(false);
 
         if (messageQueue == null)
         {
             messageQueue = ActorMessageQueue.CreateFor(message.Receiver);
             await _actorMessageQueueRepository.AddAsync(messageQueue).ConfigureAwait(false);
+            // Here be dragons
+            await _unitOfWork.CommitAsync().ConfigureAwait(false);
         }
 
         messageQueue.Enqueue(message);

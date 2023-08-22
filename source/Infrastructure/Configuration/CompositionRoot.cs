@@ -85,6 +85,7 @@ namespace Infrastructure.Configuration
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>();
             services.AddScoped<IFeatureFlagProvider, FeatureFlagProviderProvider>();
+            services.AddMemoryCache();
 
             AddMediatR();
             services.AddLogging();
@@ -242,14 +243,6 @@ namespace Infrastructure.Configuration
         {
             _services.AddSingleton(adapterBuilder);
             AddRemoteBusinessService<TRequest, TReply>(responseQueueName);
-            return this;
-        }
-
-        public CompositionRoot AddRequestHandler<TRequestHandler>()
-            where TRequestHandler : class
-        {
-            _services.AddTransient<TRequestHandler>();
-
             return this;
         }
 

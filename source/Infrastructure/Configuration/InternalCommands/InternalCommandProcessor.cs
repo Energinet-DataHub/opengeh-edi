@@ -15,6 +15,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Configuration;
 using Application.Configuration.Commands.Commands;
 using Application.Configuration.DataAccess;
 using Dapper;
@@ -32,6 +33,7 @@ namespace Infrastructure.Configuration.InternalCommands
         private readonly CommandExecutor _commandExecutor;
         private readonly ILogger<InternalCommandProcessor> _logger;
         private readonly IDatabaseConnectionFactory _connectionFactory;
+        private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
         public InternalCommandProcessor(
             InternalCommandMapper mapper,
@@ -39,7 +41,8 @@ namespace Infrastructure.Configuration.InternalCommands
             ISerializer serializer,
             CommandExecutor commandExecutor,
             ILogger<InternalCommandProcessor> logger,
-            IDatabaseConnectionFactory connectionFactory)
+            IDatabaseConnectionFactory connectionFactory,
+            ISystemDateTimeProvider systemDateTimeProvider)
         {
             _mapper = mapper;
             _internalCommandAccessor = internalCommandAccessor ?? throw new ArgumentNullException(nameof(internalCommandAccessor));
@@ -47,8 +50,10 @@ namespace Infrastructure.Configuration.InternalCommands
             _commandExecutor = commandExecutor ?? throw new ArgumentNullException(nameof(commandExecutor));
             _logger = logger;
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+            _systemDateTimeProvider = systemDateTimeProvider;
         }
 
+        // What happens if this takes more the 10 sec and a second processor is being executed by the time trigger.
         public async Task ProcessPendingAsync(CancellationToken cancellationToken)
         {
             var pendingCommands = await _internalCommandAccessor.GetPendingAsync().ConfigureAwait(false);
@@ -95,7 +100,7 @@ namespace Infrastructure.Configuration.InternalCommands
                 "WHERE [Id] = @Id",
                 new
                 {
-                    NowDate = DateTime.UtcNow,
+                    NowDate = _systemDateTimeProvider.Now().ToDateTimeUtc(),
                     Error = exception,
                     queuedCommand.Id,
                 }).ConfigureAwait(false);
@@ -110,7 +115,7 @@ namespace Infrastructure.Configuration.InternalCommands
                 "WHERE [Id] = @Id",
                 new
                 {
-                    NowDate = DateTime.UtcNow,
+                    NowDate = _systemDateTimeProvider.Now().ToDateTimeUtc(),
                     queuedCommand.Id,
                 }).ConfigureAwait(false);
         }

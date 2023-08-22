@@ -28,6 +28,7 @@ using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using Infrastructure.OutgoingMessages.Queueing;
 using IntegrationTests.Fixtures;
+using Microsoft.Extensions.DependencyInjection;
 using NodaTime.Extensions;
 using Xunit;
 using Point = Domain.Transactions.Aggregations.Point;
@@ -65,27 +66,6 @@ public class WhenEnqueueingTests : TestBase
         Assert.Equal(result.BusinessReason, message.BusinessReason);
         Assert.NotNull(result.MessageRecord);
         Assert.NotNull(result.AssignedBundleId);
-    }
-
-    [Fact]
-    public async Task Ensure_outgoing_messages_is_enqueued_in_the_same_actor_queue()
-    {
-        var message = CreateOutgoingMessage();
-        await _messageEnqueuer.EnqueueAsync(message);
-        await _messageEnqueuer.EnqueueAsync(message);
-
-        var unitOfWork = GetService<IUnitOfWork>();
-        await unitOfWork.CommitAsync();
-
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
-        var sql = "SELECT * FROM [dbo].[ActorMessageQueues]";
-        var result = (await
-            connection
-                .QueryAsync(sql)
-                .ConfigureAwait(false)).ToList();
-
-        Assert.NotNull(result);
-        Assert.Single(result);
     }
 
     [Fact]

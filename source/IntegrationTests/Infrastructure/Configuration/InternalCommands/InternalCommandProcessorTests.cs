@@ -22,6 +22,7 @@ using Application.Configuration.DataAccess;
 using Dapper;
 using Infrastructure.Configuration.InternalCommands;
 using IntegrationTests.Fixtures;
+using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit;
 using Xunit.Categories;
@@ -47,6 +48,7 @@ public class InternalCommandProcessorTests : TestBase
         _connectionFactory = GetService<IDatabaseConnectionFactory>();
         var mapper = GetService<InternalCommandMapper>();
         mapper.Add(nameof(TestCommand), typeof(TestCommand));
+        mapper.Add(nameof(TestCreateOutgoingMessageCommand), typeof(TestCreateOutgoingMessageCommand));
     }
 
     private IDbConnection Connection => _connectionFactory.GetConnectionAndOpen();
@@ -60,7 +62,7 @@ public class InternalCommandProcessorTests : TestBase
 
         await ProcessPendingCommands().ConfigureAwait(false);
 
-        AssertIsProcessed(command);
+        AssertIsProcessedSuccessful(command);
     }
 
     [Fact]
@@ -71,21 +73,72 @@ public class InternalCommandProcessorTests : TestBase
 
         await ProcessPendingCommands().ConfigureAwait(false);
 
-        AssertIsProcessed(commandThatThrows);
-        AssertHasException(commandThatThrows);
+        AssertHasErrorMessage(commandThatThrows);
     }
 
-    private void AssertIsProcessed(InternalCommand command)
+    [Fact]
+    public async Task When_parallels_internal_command_processor_handles_same_commands()
+    {
+        // Arrange
+        var serviceScopeFactory = GetService<IServiceScopeFactory>();
+        using var newScope = serviceScopeFactory.CreateScope();
+        var internalCommandProcessor = newScope.ServiceProvider.GetRequiredService<InternalCommandProcessor>();
+        var commandThatThrows = new TestCreateOutgoingMessageCommand(1);
+
+        await Schedule(commandThatThrows).ConfigureAwait(false);
+
+        var task1 = ProcessPendingCommands();
+
+         // NEW SCOPE for second task.
+        var task2 = internalCommandProcessor.ProcessPendingAsync(CancellationToken.None);
+
+        await Task.WhenAll(task1, task2).ConfigureAwait(false);
+        AssertSingleActorMessageQueue();
+        AssertOutgoingMessage(1);
+    }
+
+    // Can be solved by looking at ChangeTracker for a new ActorMessageQueue before return null and creating a new one.
+    [Fact]
+    public async Task Ensure_a_single_actor_queue_is_created_for_multiple_outgoing_message()
+    {
+        // Arrange
+        var commandThatThrows = new TestCreateOutgoingMessageCommand(2);
+
+        await Schedule(commandThatThrows).ConfigureAwait(false);
+
+        await ProcessPendingCommands().ConfigureAwait(false);
+
+        AssertSingleActorMessageQueue();
+        AssertOutgoingMessage(2);
+    }
+
+    private void AssertSingleActorMessageQueue()
     {
         var checkStatement =
-            $"SELECT COUNT(1) FROM [dbo].[QueuedInternalCommands] WHERE Id = '{command.Id}' AND ProcessedDate IS NOT NULL";
+            $"SELECT COUNT(*) FROM [dbo].[ActorMessageQueues]";
+
+        Assert.Equal(1, Connection.ExecuteScalar<int>(checkStatement));
+    }
+
+    private void AssertOutgoingMessage(int exceptedCount)
+    {
+        var checkStatement =
+            $"SELECT COUNT(*) FROM [dbo].[OutgoingMessages]";
+
+        Assert.Equal(exceptedCount, Connection.ExecuteScalar<int>(checkStatement));
+    }
+
+    private void AssertIsProcessedSuccessful(InternalCommand command)
+    {
+        var checkStatement =
+            $"SELECT COUNT(1) FROM [dbo].[QueuedInternalCommands] WHERE Id = '{command.Id}' AND ProcessedDate IS NOT NULL AND [ErrorMessage] IS NULL";
         AssertSqlStatement(checkStatement);
     }
 
-    private void AssertHasException(InternalCommand command)
+    private void AssertHasErrorMessage(InternalCommand command)
     {
         var checkStatement =
-            $"SELECT COUNT(1) FROM [dbo].[QueuedInternalCommands] WHERE Id = '{command.Id}' AND [ErrorMessage] IS NOT NULL";
+            $"SELECT COUNT(1) FROM [dbo].[QueuedInternalCommands] WHERE Id = '{command.Id}' AND [ErrorMessage] IS NOT NULL AND ProcessedDate IS NOT NULL";
         AssertSqlStatement(checkStatement);
     }
 
