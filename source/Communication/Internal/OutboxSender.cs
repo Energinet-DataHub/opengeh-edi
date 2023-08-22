@@ -24,7 +24,7 @@ namespace Communication.Internal;
 public class OutboxSender : IOutboxSender
 {
     private readonly IPointToPointEventProvider _pointToPointEventProvider;
-    private readonly IServiceBusQueueSenderProvider _serviceBusQueueSenderProvider;
+    private readonly ServiceBusQueueSenderProviderAlternative _serviceBusQueueSenderProvider;
     private readonly IServiceBusQueueMessageFactory _serviceBusQueueMessageFactory;
     private readonly ILogger _logger;
 
@@ -40,11 +40,11 @@ public class OutboxSender : IOutboxSender
         _logger = logger;
     }
 
-    public async Task SendAsync(CancellationToken cancellationToken)
+    public async Task SendAsync(string queueName, CancellationToken cancellationToken)
     {
         var stopwatch = Stopwatch.StartNew();
         var eventCount = 0;
-        var messageBatch = await _serviceBusQueueSenderProvider.Instance.CreateMessageBatchAsync(cancellationToken).ConfigureAwait(false);
+        var messageBatch = await _serviceBusQueueSenderProvider.GetQueueSender(queueName).CreateMessageBatchAsync(cancellationToken).ConfigureAwait(false);
 
         await foreach (var @event in _pointToPointEventProvider.GetAsync(cancellationToken).ConfigureAwait(false))
         {

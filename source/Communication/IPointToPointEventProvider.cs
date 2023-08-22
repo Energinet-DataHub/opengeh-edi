@@ -26,6 +26,6 @@ public interface IPointToPointEventProvider
     /// <summary>
     /// Get Point To Point event
     /// </summary>
-    /// <returns>A PointToPoint event</returns>
+    /// <returns>PointToPoint events</returns>
     IAsyncEnumerable<PointToPointEvent> GetAsync(CancellationToken cancellationToken);
 }

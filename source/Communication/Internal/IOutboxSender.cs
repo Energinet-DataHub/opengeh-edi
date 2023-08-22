@@ -24,5 +24,5 @@ public interface IOutboxSender
     /// </summary>
     /// <param name="cancellationToken"></param>
     /// <returns>Task</returns>
-    Task SendAsync(CancellationToken cancellationToken);
+    Task SendAsync(string queueName, CancellationToken cancellationToken);
 }
