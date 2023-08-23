@@ -87,14 +87,13 @@ namespace Infrastructure.Configuration.InternalCommands
                 }
 
                 innerStopWatch.Stop();
-                if (innerStopWatch.ElapsedMilliseconds < 500m)
-                {
-                    _logger?.Log(LogLevel.Debug, "{Command} executed in {ElapsedMilliseconds} ms", queuedCommand.Type, innerStopWatch.ElapsedMilliseconds);
-                }
-                else
-                {
-                    _logger?.Log(LogLevel.Warning, "{Command} executed in {ElapsedMilliseconds} ms", queuedCommand.Type, innerStopWatch.ElapsedMilliseconds);
-                }
+                _logger?.Log(
+                    innerStopWatch.ElapsedMilliseconds < 500m
+                        ? LogLevel.Debug
+                        : LogLevel.Warning,
+                    "{Command} executed in {ElapsedMilliseconds} ms",
+                    queuedCommand.Type,
+                    innerStopWatch.ElapsedMilliseconds);
 
                 innerStopWatch.Reset();
             }
@@ -116,7 +115,6 @@ namespace Infrastructure.Configuration.InternalCommands
             await connection.ExecuteScalarAsync(
                 "UPDATE [dbo].[QueuedInternalCommands] " +
                 "SET ProcessedDate = @NowDate, " +
-                "InMemory = 0, " +
                 "ErrorMessage = @Error " +
                 "WHERE [Id] = @Id",
                 new
@@ -132,8 +130,7 @@ namespace Infrastructure.Configuration.InternalCommands
             using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
             await connection.ExecuteScalarAsync(
                 "UPDATE [dbo].[QueuedInternalCommands] " +
-                "SET ProcessedDate = @NowDate, " +
-                "InMemory = 0 " +
+                "SET ProcessedDate = @NowDate " +
                 "WHERE [Id] = @Id",
                 new
                 {
