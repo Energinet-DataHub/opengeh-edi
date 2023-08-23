@@ -1,4 +1,4 @@
-﻿// Copyright 2020 Energinet DataHub A/S
+﻿﻿// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -16,32 +16,31 @@
  using System.Threading;
  using System.Threading.Tasks;
  using Api.Configuration;
- using Energinet.DataHub.Core.Messaging.Communication;
- using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
- using Infrastructure.Configuration.IntegrationEvents;
+ using Application.Configuration;
  using Infrastructure.Configuration.Serialization;
  using Infrastructure.InboxEvents;
  using Microsoft.Azure.Functions.Worker;
+ using Microsoft.Extensions.Logging;
 
  namespace Api.EventListeners;
 
 public class InboxEventListener
 {
+    private readonly ILogger<InboxEventListener> _logger;
     private readonly ISerializer _jsonSerializer;
+    private readonly ICorrelationContext _correlationContext;
     private readonly InboxEventReceiver _inboxEventReceiver;
-    private readonly IntegrationEventReceiver _eventReceiver;
-    private readonly ISubscriber _subscriber;
 
     public InboxEventListener(
         ISerializer jsonSerializer,
-        InboxEventReceiver inboxEventReceiver,
-        IntegrationEventReceiver eventReceiver,
-        ISubscriber subscriber)
+        ICorrelationContext correlationContext,
+        ILogger<InboxEventListener> logger,
+        InboxEventReceiver inboxEventReceiver)
     {
+        _logger = logger;
         _jsonSerializer = jsonSerializer;
+        _correlationContext = correlationContext;
         _inboxEventReceiver = inboxEventReceiver;
-        _eventReceiver = eventReceiver;
-        _subscriber = subscriber;
     }
 
     [Function(nameof(InboxEventListener))]
@@ -52,10 +51,6 @@ public class InboxEventListener
         FunctionContext context,
         CancellationToken hostCancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(context);
-
-        await _subscriber.HandleAsync(IntegrationEventServiceBusMessage.Create(message, context.BindingContext.BindingData!)).ConfigureAwait(false);
-
         if (message == null) throw new ArgumentNullException(nameof(message));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
