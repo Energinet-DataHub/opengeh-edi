@@ -16,27 +16,30 @@ using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
-using Application.Configuration.TimeEvents;
-using MediatR;
+using Infrastructure.DataRetention;
 using Microsoft.Data.SqlClient;
 
-namespace Infrastructure.Configuration.IntegrationEvents;
+namespace Infrastructure.Configuration.Queueing;
 
-public class RemoveIntegrationEventsWhenADaysHasPassed : INotificationHandler<ADayHasPassed>
+public class DequeuedBundlesRetention : IDataRetention
 {
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
 
-    public RemoveIntegrationEventsWhenADaysHasPassed(IDatabaseConnectionFactory databaseConnectionFactory)
+    public DequeuedBundlesRetention(IDatabaseConnectionFactory databaseConnectionFactory)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
     }
 
-    public async Task Handle(ADayHasPassed notification, CancellationToken cancellationToken)
+    public async Task CleanupAsync(CancellationToken cancellationToken)
     {
         const string deleteStmt = @"
-            DELETE FROM [dbo].[ReceivedIntegrationEvents]
-            WHERE [ProcessedDate] IS NOT NULL
-             AND [ErrorMessage] IS NULL";
+            DELETE FROM [dbo].[MarketDocuments]
+            WHERE [BundleId] IN (SELECT [Id]
+            FROM [dbo].[Bundles]
+            WHERE [IsDequeued] = 1)
+
+            DELETE FROM [dbo].[Bundles]
+            WHERE [IsDequeued] = 1";
 
         using var connection =
             (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);

@@ -38,6 +38,7 @@ using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Infrastructure.Configuration.Processing;
 using Infrastructure.Configuration.Serialization;
+using Infrastructure.DataRetention;
 using Infrastructure.InboxEvents;
 using Infrastructure.IncomingMessages;
 using Infrastructure.MasterData.MarketEvaluationPoints;
@@ -101,6 +102,7 @@ namespace Infrastructure.Configuration
             InboxEventsConfiguration.Configure(services);
             ArchivedMessageConfiguration.Configure(services);
             QueryHandlingConfiguration.Configure(services);
+            DataRetentionConfiguration.Configure(services);
         }
 
         public static CompositionRoot Initialize(IServiceCollection services)

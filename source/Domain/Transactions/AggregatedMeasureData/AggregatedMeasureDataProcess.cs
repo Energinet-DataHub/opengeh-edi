@@ -73,6 +73,7 @@ namespace Domain.Transactions.AggregatedMeasureData
             Sent,
             Accepted,
             Rejected,
+            Completed,
         }
 
         public ProcessId ProcessId { get; }
@@ -132,6 +133,14 @@ namespace Domain.Transactions.AggregatedMeasureData
                 _state = State.Rejected;
                 ResponseData = responseData;
                 AddDomainEvent(new AggregatedMeasureProcessWasRejected(ProcessId));
+            }
+        }
+
+        public void IsCompleted()
+        {
+            if (_state is State.Rejected or State.Accepted)
+            {
+                _state = State.Completed;
             }
         }
     }

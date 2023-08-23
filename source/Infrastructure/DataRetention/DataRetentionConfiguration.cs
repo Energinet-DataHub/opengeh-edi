@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Actors;
-using Domain.Documents;
-using NodaTime;
+using Application.Configuration.TimeEvents;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Domain.ArchivedMessages;
+namespace Infrastructure.DataRetention;
 
-public record ArchivedMessage(
-    string Id,
-    string? MessageId,
-    DocumentType DocumentType,
-    ActorNumber? SenderNumber,
-    ActorNumber? ReceiverNumber,
-    Instant CreatedAt,
-    string? BusinessReason,
-    Stream Document);
+public static class DataRetentionConfiguration
+{
+    public static void Configure(IServiceCollection services)
+    {
+        services.AddTransient<INotificationHandler<ADayHasPassed>,
+            ExecuteDataRetentionsWhenADayHasPassed>();
+    }
+}

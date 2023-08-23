@@ -12,18 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Actors;
-using Domain.Documents;
-using NodaTime;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace Domain.ArchivedMessages;
+namespace Infrastructure.DataRetention;
 
-public record ArchivedMessage(
-    string Id,
-    string? MessageId,
-    DocumentType DocumentType,
-    ActorNumber? SenderNumber,
-    ActorNumber? ReceiverNumber,
-    Instant CreatedAt,
-    string? BusinessReason,
-    Stream Document);
+/// <summary>
+/// Represent the contract for data retention for a single data source.
+/// A data source can be a database table.
+/// </summary>
+public interface IDataRetention
+{
+    /// <summary>
+    /// Responsible for cleaning the no longer needed data.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
+    Task CleanupAsync(CancellationToken cancellationToken);
+}
