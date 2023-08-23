@@ -26,8 +26,7 @@ using Application.Configuration.DataAccess;
 using Application.Transactions.MoveIn;
 using CimMessageAdapter.Messages.Queues;
 using Energinet.DataHub.Core.Messaging.Communication;
-using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
-using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.Reflection;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.Authentication;
@@ -123,7 +122,7 @@ namespace Api
                         .AddDatabaseConnectionFactory(databaseConnectionString!)
                         .AddSystemClock(new SystemDateTimeProvider())
                         .AddDatabaseContext(databaseConnectionString!)
-                        .AddCorrelationContext(sp =>
+                        .AddCorrelationContext(_ =>
                         {
                             var correlationContext = new CorrelationContext();
                             if (!runtime.IsRunningLocally()) return correlationContext;
@@ -157,14 +156,12 @@ namespace Api
                         runtime.INCOMING_AGGREGATED_MEASURE_DATA_QUEUE_NAME!,
                         runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!);
                     services.AddSqlServerHealthCheck(runtime.DB_CONNECTION_STRING!);
-                    /*TODO services.AddSubscriberWorker(_ => new SubscriberWorkerSettings
+
+                    var integrationEventDescriptors = new List<MessageDescriptor>
                     {
-                        SubscriptionName = runtime.BALANCE_FIXING_RESULT_AVAILABLE_EVENT_SUBSCRIPTION_NAME!,
-                        TopicName = runtime.INTEGRATION_EVENTS_TOPIC_NAME!,
-                        ServiceBusConnectionString = runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER!,
-                    });*/
-                    var list = new List<MessageDescriptor>();
-                    services.AddSubscriber<IntegrationEventHandler>(list);
+                        CalculationResultCompleted.Descriptor,
+                    };
+                    services.AddSubscriber<IntegrationEventHandler>(integrationEventDescriptors);
                 })
                 .Build();
         }
