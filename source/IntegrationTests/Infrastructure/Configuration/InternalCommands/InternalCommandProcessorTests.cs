@@ -83,9 +83,9 @@ public class InternalCommandProcessorTests : TestBase
         var serviceScopeFactory = GetService<IServiceScopeFactory>();
         using var newScope = serviceScopeFactory.CreateScope();
         var internalCommandProcessor = newScope.ServiceProvider.GetRequiredService<InternalCommandProcessor>();
-        var commandThatThrows = new TestCreateOutgoingMessageCommand(1);
+        var command = new TestCreateOutgoingMessageCommand(1);
 
-        await Schedule(commandThatThrows).ConfigureAwait(false);
+        await Schedule(command).ConfigureAwait(false);
 
         var task1 = ProcessPendingCommands();
 
