@@ -77,7 +77,7 @@ public class InternalCommandProcessorTests : TestBase
     }
 
     [Fact]
-    public async Task When_parallels_internal_command_processor_handles_same_commands()
+    public async Task When_parallel_internal_command_processor_handles_same_command()
     {
         // Arrange
         var serviceScopeFactory = GetService<IServiceScopeFactory>();
@@ -95,21 +95,22 @@ public class InternalCommandProcessorTests : TestBase
         await Task.WhenAll(task1, task2).ConfigureAwait(false);
         AssertSingleActorMessageQueue();
         AssertOutgoingMessage(1);
+        AssertIsProcessedSuccessful(command);
     }
 
-    // Can be solved by looking at ChangeTracker for a new ActorMessageQueue before return null and creating a new one.
     [Fact]
     public async Task Ensure_a_single_actor_queue_is_created_for_multiple_outgoing_message()
     {
         // Arrange
-        var commandThatThrows = new TestCreateOutgoingMessageCommand(2);
+        var command = new TestCreateOutgoingMessageCommand(2);
 
-        await Schedule(commandThatThrows).ConfigureAwait(false);
+        await Schedule(command).ConfigureAwait(false);
 
         await ProcessPendingCommands().ConfigureAwait(false);
 
         AssertSingleActorMessageQueue();
         AssertOutgoingMessage(2);
+        AssertIsProcessedSuccessful(command);
     }
 
     private void AssertSingleActorMessageQueue()

@@ -13,10 +13,10 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
+using Application.OutgoingMessages;
 using Application.OutgoingMessages.Dequeue;
 using Application.OutgoingMessages.Peek;
 using Dapper;
@@ -28,7 +28,6 @@ using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using Infrastructure.OutgoingMessages.Queueing;
 using IntegrationTests.Fixtures;
-using Microsoft.Extensions.DependencyInjection;
 using NodaTime.Extensions;
 using Xunit;
 using Point = Domain.Transactions.Aggregations.Point;
@@ -38,11 +37,13 @@ namespace IntegrationTests.Application.OutgoingMessages;
 public class WhenEnqueueingTests : TestBase
 {
     private readonly MessageEnqueuer _messageEnqueuer;
+    private readonly IOutgoingMessageRepository _outgoingMessageRepository;
 
     public WhenEnqueueingTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _messageEnqueuer = GetService<MessageEnqueuer>();
+        _outgoingMessageRepository = GetService<IOutgoingMessageRepository>();
     }
 
     [Fact]
@@ -118,6 +119,7 @@ public class WhenEnqueueingTests : TestBase
     private async Task EnqueueMessage(OutgoingMessage message)
     {
         await _messageEnqueuer.EnqueueAsync(message);
+        _outgoingMessageRepository.Add(message);
         var unitOfWork = GetService<IUnitOfWork>();
         await unitOfWork.CommitAsync();
     }

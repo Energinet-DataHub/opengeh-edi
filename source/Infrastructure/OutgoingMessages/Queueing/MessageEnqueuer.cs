@@ -14,8 +14,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Application.Configuration.DataAccess;
-using Application.OutgoingMessages;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.Queueing;
 
@@ -23,18 +21,11 @@ namespace Infrastructure.OutgoingMessages.Queueing;
 
 public class MessageEnqueuer
 {
-    private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
-    private readonly IUnitOfWork _unitOfWork;
 
-    public MessageEnqueuer(
-        IOutgoingMessageRepository outgoingMessageRepository,
-        IActorMessageQueueRepository actorMessageQueueRepository,
-        IUnitOfWork unitOfWork)
+    public MessageEnqueuer(IActorMessageQueueRepository actorMessageQueueRepository)
     {
-        _outgoingMessageRepository = outgoingMessageRepository;
         _actorMessageQueueRepository = actorMessageQueueRepository;
-        _unitOfWork = unitOfWork;
     }
 
     public async Task EnqueueAsync(OutgoingMessage message)
@@ -49,12 +40,8 @@ public class MessageEnqueuer
         {
             messageQueue = ActorMessageQueue.CreateFor(message.Receiver);
             await _actorMessageQueueRepository.AddAsync(messageQueue).ConfigureAwait(false);
-            // Here be dragons
-            await _unitOfWork.CommitAsync().ConfigureAwait(false);
         }
 
         messageQueue.Enqueue(message);
-
-        _outgoingMessageRepository.Add(message);
     }
 }

@@ -15,14 +15,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration;
 using Application.Configuration.Commands.Commands;
 using Application.Configuration.DataAccess;
 using Dapper;
-using Infrastructure.Configuration.DataAccess;
 using MediatR;
 using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Configuration.Processing;
 
@@ -30,20 +28,17 @@ public class UnitOfWorkBehaviour<TRequest, TResponse> : IPipelineBehavior<TReque
     where TRequest : ICommand<TResponse>
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly B2BContext _context;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
+    private readonly ILogger<UnitOfWorkBehaviour<TRequest, TResponse>> _logger;
 
     public UnitOfWorkBehaviour(
         IUnitOfWork unitOfWork,
-        B2BContext context,
-        ISystemDateTimeProvider systemDateTimeProvider,
-        IDatabaseConnectionFactory databaseConnectionFactory)
+        IDatabaseConnectionFactory databaseConnectionFactory,
+        ILogger<UnitOfWorkBehaviour<TRequest, TResponse>> logger)
     {
         _unitOfWork = unitOfWork;
-        _context = context;
-        _systemDateTimeProvider = systemDateTimeProvider;
         _databaseConnectionFactory = databaseConnectionFactory;
+        _logger = logger;
     }
 
     public async Task<TResponse> Handle(
@@ -54,10 +49,19 @@ public class UnitOfWorkBehaviour<TRequest, TResponse> : IPipelineBehavior<TReque
         if (next == null) throw new ArgumentNullException(nameof(next));
 
         var result = await next().ConfigureAwait(false);
-        //await MarkAsProcessedIfInternalCommandAsync(request, cancellationToken).ConfigureAwait(false);
+
         if (!await InternalCommandAlreadyMarkedAsProcessedAsync(request, cancellationToken).ConfigureAwait(false))
         {
             await _unitOfWork.CommitAsync().ConfigureAwait(false);
+        }
+        else
+        {
+            var commandId = (request as InternalCommand)?.Id;
+            _logger.Log(
+                LogLevel.Information,
+                "Command (id: {CommandId}, type: {CommandType}) was processed. All changes will be discarded",
+                commandId,
+                request.GetType());
         }
 
         return result;
@@ -67,17 +71,14 @@ public class UnitOfWorkBehaviour<TRequest, TResponse> : IPipelineBehavior<TReque
         TRequest request,
         CancellationToken cancellationToken)
     {
-        if (request is InternalCommand internalCommand)
-        {
-            var checkStatement =
-                $"SELECT COUNT(1) FROM [dbo].[QueuedInternalCommands] WHERE Id = '{internalCommand.Id}' AND ProcessedDate IS NOT NULL";
-            using var connection =
-                (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken)
-                    .ConfigureAwait(false);
-            var result = await connection.ExecuteScalarAsync<bool>(checkStatement).ConfigureAwait(false);
-            return result;
-        }
+        if (request is not InternalCommand internalCommand) return false;
 
-        return false;
+        var checkStatement =
+            $"SELECT COUNT(1) FROM [dbo].[QueuedInternalCommands] WHERE Id = '{internalCommand.Id}' AND ProcessedDate IS NOT NULL";
+        using var connection =
+            (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+        return await connection.ExecuteScalarAsync<bool>(checkStatement).ConfigureAwait(false);
     }
 }

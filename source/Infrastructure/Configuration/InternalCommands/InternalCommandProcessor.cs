@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration;
@@ -48,15 +49,18 @@ namespace Infrastructure.Configuration.InternalCommands
             _internalCommandAccessor = internalCommandAccessor ?? throw new ArgumentNullException(nameof(internalCommandAccessor));
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
             _commandExecutor = commandExecutor ?? throw new ArgumentNullException(nameof(commandExecutor));
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
             _systemDateTimeProvider = systemDateTimeProvider;
         }
 
-        // What happens if this takes more the 10 sec and a second processor is being executed by the time trigger.
         public async Task ProcessPendingAsync(CancellationToken cancellationToken)
         {
-            var pendingCommands = await _internalCommandAccessor.GetPendingAsync().ConfigureAwait(false);
+            var stopwatch = new Stopwatch();
+            var innerStopWatch = new Stopwatch();
+            stopwatch.Start();
+            var pendingCommands = await _internalCommandAccessor
+                .GetPendingAsync().ConfigureAwait(false);
 
             var executionPolicy = Policy
                 .Handle<Exception>()
@@ -67,6 +71,7 @@ namespace Infrastructure.Configuration.InternalCommands
 
             foreach (var queuedCommand in pendingCommands)
             {
+                innerStopWatch.Start();
                 var result = await executionPolicy.ExecuteAndCaptureAsync(() =>
                     ExecuteCommandAsync(queuedCommand)).ConfigureAwait(false);
 
@@ -80,7 +85,22 @@ namespace Infrastructure.Configuration.InternalCommands
                 {
                     await MarkAsProcessedAsync(queuedCommand, cancellationToken).ConfigureAwait(false);
                 }
+
+                innerStopWatch.Stop();
+                if (innerStopWatch.ElapsedMilliseconds < 500m)
+                {
+                    _logger?.Log(LogLevel.Debug, "{Command} executed in {ElapsedMilliseconds} ms", queuedCommand.Type, innerStopWatch.ElapsedMilliseconds);
+                }
+                else
+                {
+                    _logger?.Log(LogLevel.Warning, "{Command} executed in {ElapsedMilliseconds} ms", queuedCommand.Type, innerStopWatch.ElapsedMilliseconds);
+                }
+
+                innerStopWatch.Reset();
             }
+
+            stopwatch.Stop();
+            _logger?.Log(LogLevel.Information, "Internal Command Processor executed in {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
         }
 
         private Task ExecuteCommandAsync(QueuedInternalCommand queuedInternalCommand)
@@ -96,6 +116,7 @@ namespace Infrastructure.Configuration.InternalCommands
             await connection.ExecuteScalarAsync(
                 "UPDATE [dbo].[QueuedInternalCommands] " +
                 "SET ProcessedDate = @NowDate, " +
+                "InMemory = 0, " +
                 "ErrorMessage = @Error " +
                 "WHERE [Id] = @Id",
                 new
@@ -111,7 +132,8 @@ namespace Infrastructure.Configuration.InternalCommands
             using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
             await connection.ExecuteScalarAsync(
                 "UPDATE [dbo].[QueuedInternalCommands] " +
-                "SET ProcessedDate = @NowDate " +
+                "SET ProcessedDate = @NowDate, " +
+                "InMemory = 0 " +
                 "WHERE [Id] = @Id",
                 new
                 {
