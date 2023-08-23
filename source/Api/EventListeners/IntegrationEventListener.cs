@@ -14,6 +14,8 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Infrastructure.Configuration.IntegrationEvents;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -24,15 +26,17 @@ public class IntegrationEventListener
 {
     private readonly ILogger<IntegrationEventListener> _logger;
     private readonly IntegrationEventReceiver _eventReceiver;
+    private readonly ISubscriber _subscriber;
 
-    public IntegrationEventListener(ILogger<IntegrationEventListener> logger, IntegrationEventReceiver eventReceiver)
+    public IntegrationEventListener(ILogger<IntegrationEventListener> logger, IntegrationEventReceiver eventReceiver, ISubscriber subscriber)
     {
         _logger = logger;
         _eventReceiver = eventReceiver;
+        _subscriber = subscriber;
     }
 
     [Function(nameof(IntegrationEventListener))]
-    public Task RunAsync(
+    public async Task RunAsync(
         [ServiceBusTrigger(
             "%INTEGRATION_EVENTS_TOPIC_NAME%",
             "%BALANCE_FIXING_RESULT_AVAILABLE_EVENT_SUBSCRIPTION_NAME%",
@@ -45,6 +49,6 @@ public class IntegrationEventListener
         var eventDetails = context.ExtractEventDetails();
         _logger.LogInformation($"Integration event details: {eventDetails}");
 
-        return _eventReceiver.ReceiveAsync(eventDetails.EventId, eventDetails.EventType, eventData);
+        await _subscriber.HandleAsync(IntegrationEventServiceBusMessage.Create(eventData, context.BindingContext.BindingData!)).ConfigureAwait(false);
     }
 }
