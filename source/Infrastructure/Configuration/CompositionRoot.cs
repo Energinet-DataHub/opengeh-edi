@@ -85,7 +85,6 @@ namespace Infrastructure.Configuration
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>();
             services.AddScoped<IFeatureFlagProvider, FeatureFlagProviderProvider>();
-            services.AddMemoryCache();
 
             AddMediatR();
             services.AddLogging();
