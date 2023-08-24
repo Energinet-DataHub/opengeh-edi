@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using AcceptanceTest.Drivers;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Microsoft.Extensions.Configuration;
 
 namespace AcceptanceTest;
@@ -21,9 +22,16 @@ public class TestRunner : IAsyncDisposable
 {
     protected TestRunner()
     {
-    //  var configuration = ReadConfigurationSettings();
-        EventPublisher = new IntegrationEventPublisher(
-            @event publisher configuration
+    var root = new ConfigurationBuilder()
+        .AddJsonFile("integrationtest.local.settings.json", false, false)
+        .Build();
+
+    var secretsConfiguration = BuildSecretsConfiguration(root);
+    var connectionString = secretsConfiguration.GetValue<string>("sb-domain-relay-listen-connection-string")!;
+    var topicName = secretsConfiguration.GetValue<string>("sbt-sharedres-integrationevent-received-name")!;
+
+    EventPublisher = new IntegrationEventPublisher(
+        connectionString, topicName);
     }
 
     internal IntegrationEventPublisher EventPublisher { get; }
@@ -34,11 +42,13 @@ public class TestRunner : IAsyncDisposable
         GC.SuppressFinalize(this);
     }
 
-    // private static IConfigurationRoot ReadConfigurationSettings()
-    // {
-    //     return new ConfigurationBuilder()
-    //         .SetBasePath(Directory.GetCurrentDirectory())
-    //         .AddJsonFile("appsettings.json", false, false)
-    //         .Build();
-    // }
+    private static IConfigurationRoot BuildSecretsConfiguration(IConfigurationRoot root)
+    {
+        var sharedKeyVaultName = root.GetValue<string>("SHARED_KEYVAULT_NAME");
+        var sharedKeyVaultUrl = $"https://{sharedKeyVaultName}.vault.azure.net/";
+
+        return new ConfigurationBuilder()
+            .AddAuthenticatedAzureKeyVault(sharedKeyVaultUrl)
+            .Build();
+    }
 }
