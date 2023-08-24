@@ -26,7 +26,7 @@ public sealed class WhenAggregationResultIsPublishedTests : TestRunner
     public WhenAggregationResultIsPublishedTests()
     {
         _aggregations = new AggregationResultDsl(
-            new EdiDriver(),
+            new EdiDriver(AzpToken),
             new WholeSaleDriver(EventPublisher));
     }
 

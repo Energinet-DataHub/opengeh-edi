@@ -23,10 +23,12 @@ namespace AcceptanceTest.Drivers;
 
 internal sealed class EdiDriver : IDisposable
 {
+    private readonly string _azpToken;
     private readonly HttpClient _httpClient;
 
-    public EdiDriver()
+    public EdiDriver(string azpToken)
     {
+        _azpToken = azpToken;
         _httpClient = new HttpClient();
         _httpClient.BaseAddress = new Uri("https://func-api-edi-u-001.azurewebsites.net/");
     }
@@ -38,7 +40,7 @@ internal sealed class EdiDriver : IDisposable
 
     public async Task<Stream> PeekMessageAsync(string actorNumber, string[] marketRoles)
     {
-        var token = TokenBuilder.BuildToken(actorNumber, marketRoles);
+        var token = TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
         var stopWatch = Stopwatch.StartNew();
         while (stopWatch.ElapsedMilliseconds < 60000)
         {

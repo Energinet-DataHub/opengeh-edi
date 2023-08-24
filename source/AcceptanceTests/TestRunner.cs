@@ -22,19 +22,21 @@ public class TestRunner : IAsyncDisposable
 {
     protected TestRunner()
     {
-    var root = new ConfigurationBuilder()
-        .AddJsonFile("integrationtest.local.settings.json", false, false)
-        .Build();
+        var root = new ConfigurationBuilder()
+            .AddJsonFile("integrationtest.local.settings.json", false, false)
+            .Build();
+        var secretsConfiguration = BuildSecretsConfiguration(root);
 
-    var secretsConfiguration = BuildSecretsConfiguration(root);
-    var connectionString = secretsConfiguration.GetValue<string>("sb-domain-relay-listen-connection-string")!;
-    var topicName = secretsConfiguration.GetValue<string>("sbt-sharedres-integrationevent-received-name")!;
+        var connectionString = secretsConfiguration.GetValue<string>("sb-domain-relay-manage-connection-string")!;
+        var topicName = secretsConfiguration.GetValue<string>("sbt-sharedres-integrationevent-received-name")!;
 
-    EventPublisher = new IntegrationEventPublisher(
-        connectionString, topicName);
+        EventPublisher = new IntegrationEventPublisher(connectionString, topicName);
+        AzpToken = secretsConfiguration.GetValue<string>("AZP_TOKEN")!;
     }
 
     internal IntegrationEventPublisher EventPublisher { get; }
+
+    internal string AzpToken { get; }
 
     public async ValueTask DisposeAsync()
     {
@@ -49,6 +51,7 @@ public class TestRunner : IAsyncDisposable
 
         return new ConfigurationBuilder()
             .AddAuthenticatedAzureKeyVault(sharedKeyVaultUrl)
+            .AddJsonFile("integrationtest.local.settings.json", false, false)
             .Build();
     }
 }
