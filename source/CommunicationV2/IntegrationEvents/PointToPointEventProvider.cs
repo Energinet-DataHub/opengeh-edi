@@ -1,4 +1,5 @@
-﻿using CommunicationV2.IntegrationEvents.Publisher;
+﻿using CommunicationV2.IntegrationEvents.Internal.Publisher;
+using CommunicationV2.IntegrationEvents.Publisher;
 using Infrastructure.Transactions.AggregatedMeasureData;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,20 +7,25 @@ namespace CommunicationV2.IntegrationEvents;
 
 public class PointToPointEventProvider : IPointToPointEventProvider
 {
-    private readonly DbContext _dbContext;
     private readonly AggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
 
-    public PointToPointEventProvider(DbContext dbContext, AggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
+    public PointToPointEventProvider(AggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
-        _dbContext = dbContext;
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
     }
-    public IAsyncEnumerable<PointToPointEvent> GetAsync()
-    {
-        // await _aggregatedMeasureDataProcessRepository
-        //     .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
-        //
-             await _aggregatedMeasureDataProcessRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
 
+    public async IAsyncEnumerable<PointToPointEvent> GetAsync()
+    {
+        var aggregatedMeasureDataProcesses = await _aggregatedMeasureDataProcessRepository
+        .GetAllAsync().ConfigureAwait(false);
+
+
+        foreach (var process in aggregatedMeasureDataProcesses)
+        {
+           yield return new PointToPointEvent()
+           {
+               EventIdentification = process.ProcessId,
+           }
+        }
     }
 }

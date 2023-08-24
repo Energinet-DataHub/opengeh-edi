@@ -15,7 +15,7 @@
 // using System.Collections.ObjectModel;
 // using System.Text.Json;
 //
-// namespace Energinet.DataHub.Core.Messaging.Communication;
+// namespace CommunicationV2.IntegrationEvents;
 //
 // public sealed class IntegrationEventServiceBusMessage
 // {

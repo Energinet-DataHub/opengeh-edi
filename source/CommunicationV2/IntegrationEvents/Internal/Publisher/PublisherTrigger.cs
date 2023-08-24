@@ -17,6 +17,7 @@ using Energinet.DataHub.Core.App.WebApp.Hosting;
 using Energinet.DataHub.Core.Messaging.Communication.Publisher;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using IPublisher = CommunicationV2.IntegrationEvents.Publisher.IPublisher;
 
 namespace CommunicationV2.IntegrationEvents.Internal.Publisher;
 

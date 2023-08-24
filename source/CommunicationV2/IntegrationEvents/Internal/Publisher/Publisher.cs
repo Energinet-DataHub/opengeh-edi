@@ -16,6 +16,7 @@ using System.Diagnostics;
 using CommunicationV2.IntegrationEvents.Publisher;
 using Energinet.DataHub.Core.Messaging.Communication.Publisher;
 using Microsoft.Extensions.Logging;
+using IPublisher = CommunicationV2.IntegrationEvents.Publisher.IPublisher;
 
 namespace CommunicationV2.IntegrationEvents.Internal.Publisher;
 

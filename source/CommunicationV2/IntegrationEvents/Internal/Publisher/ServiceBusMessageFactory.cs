@@ -41,9 +41,24 @@ internal sealed class ServiceBusMessageFactory : IServiceBusMessageFactory
             Subject = @event.EventName,
             MessageId = @event.EventIdentification.ToString(),
         };
-
-        serviceBusMessage.ApplicationProperties.Add("ReferenceId", @event.ReferenceId);
-
+        //message.ApplicationProperties.Add("ReferenceId", process.ProcessId.Id.ToString());
+        //serviceBusMessage.ApplicationProperties.Add("EventMinorVersion", @event.EventMinorVersion);
         return serviceBusMessage;
+
+        // if (process == null) throw new ArgumentNullException(nameof(process));
+        //
+        // var bodyFromWholesaleMock = process.BusinessReason == CimCode.Of(BusinessReason.BalanceFixing)
+        //     ? CreateRejectedResponseFromWholesale()
+        //     : CreateAcceptedResponseFromWholesale(process);
+        //
+        // var message = new ServiceBusMessage()
+        // {
+        //     Body = new BinaryData(bodyFromWholesaleMock.ToByteArray()),
+        //     Subject = bodyFromWholesaleMock.GetType().Name,
+        //     MessageId = process.ProcessId.Id.ToString(),
+        // };
+        //
+        // message.ApplicationProperties.Add("ReferenceId", process.ProcessId.Id.ToString());
+        // return message;
     }
 }

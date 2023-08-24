@@ -46,6 +46,7 @@ public class SendAggregatedMeasuredDataToWholesale
         var process = await _aggregatedMeasureDataProcessRepository
             .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
+        //Afsendelse fra wholesale (reject eller accept besked)
         await _wholesaleInbox.SendAsync(
             process,
             cancellationToken).ConfigureAwait(false);

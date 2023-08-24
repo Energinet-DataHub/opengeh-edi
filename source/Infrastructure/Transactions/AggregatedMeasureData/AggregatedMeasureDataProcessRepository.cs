@@ -48,11 +48,11 @@ public class AggregatedMeasureDataProcessRepository : IAggregatedMeasureDataProc
             ?? throw ProcessNotFoundException.ProcessForProcessIdNotFound(processId.Id);
     }
 
-    public async Task<List<AggregatedMeasureDataProcess>> GetAllAsync(ProcessId processId, CancellationToken cancellationToken)
+    public async Task<List<AggregatedMeasureDataProcess>> GetAllAsync()
     {
-        ArgumentNullException.ThrowIfNull(processId);
+        //CancellationToken?
         return await _b2BContext
                    .AggregatedMeasureDataProcesses
-                   .ToListAsync(cancellationToken).ConfigureAwait(false);
+                   .ToListAsync().ConfigureAwait(false);
     }
 }
