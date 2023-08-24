@@ -27,7 +27,7 @@ internal sealed class EdiDriver : IDisposable
     public EdiDriver()
     {
         _httpClient = new HttpClient();
-        _httpClient.BaseAddress = new Uri("http://localhost:7071/api/");
+        _httpClient.BaseAddress = new Uri("https://func-api-edi-u-001.azurewebsites.net/");
     }
 
     public void Dispose()
@@ -63,7 +63,7 @@ internal sealed class EdiDriver : IDisposable
 
     private async Task<HttpResponseMessage> PeekAsync(string token)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Get, "peek/aggregations");
+        using var request = new HttpRequestMessage(HttpMethod.Get, "api/peek/aggregations");
         request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
         request.Content = new StringContent(string.Empty, Encoding.UTF8, "application/xml");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/xml");

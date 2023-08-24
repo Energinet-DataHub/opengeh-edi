@@ -38,7 +38,7 @@ internal sealed class TokenBuilder
         var claims = new List<Claim>()
         {
             new("test-actornumber", uniqueActorNumber),
-            new("azp", Guid.NewGuid().ToString()),
+            new("azp", azp token secret,
         };
         claims.AddRange(roles.Select(role => new Claim("roles", role)));
         return claims;

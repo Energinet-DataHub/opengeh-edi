@@ -21,11 +21,9 @@ public class TestRunner : IAsyncDisposable
 {
     protected TestRunner()
     {
-        var configuration = ReadConfigurationSettings();
-
+    //  var configuration = ReadConfigurationSettings();
         EventPublisher = new IntegrationEventPublisher(
-            configuration.GetSection("IntegrationEvents:ServiceBusConnectionString").Value!,
-            configuration.GetSection("IntegrationEvents:TopicName").Value!);
+            @event publisher configuration
     }
 
     internal IntegrationEventPublisher EventPublisher { get; }
@@ -36,11 +34,11 @@ public class TestRunner : IAsyncDisposable
         GC.SuppressFinalize(this);
     }
 
-    private static IConfigurationRoot ReadConfigurationSettings()
-    {
-        return new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", false, false)
-            .Build();
-    }
+    // private static IConfigurationRoot ReadConfigurationSettings()
+    // {
+    //     return new ConfigurationBuilder()
+    //         .SetBasePath(Directory.GetCurrentDirectory())
+    //         .AddJsonFile("appsettings.json", false, false)
+    //         .Build();
+    // }
 }

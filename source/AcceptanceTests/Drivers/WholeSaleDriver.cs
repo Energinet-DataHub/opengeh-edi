@@ -30,7 +30,7 @@ internal sealed class WholeSaleDriver
     internal Task PublishAggregationResultAsync(string gridAreaCode)
     {
         return _integrationEventPublisher.PublishAsync(
-            "BalanceFixingCalculationResultCompleted",
+            "CalculationResultCompleted",
             CreateAggregationResultAvailableEventFor(gridAreaCode).ToByteArray());
     }
 
@@ -49,6 +49,7 @@ internal sealed class WholeSaleDriver
             },
             PeriodEndUtc = DateTime.UtcNow.ToTimestamp(),
             PeriodStartUtc = DateTime.UtcNow.ToTimestamp(),
+            TimeSeriesPoints = { new TimeSeriesPoint { Time = new Timestamp { Seconds = 100000 }, Quantity = new DecimalValue { Units = 123, Nanos = 1200000 }, QuantityQuality = QuantityQuality.Measured } },
         };
         return processCompletedEvent;
     }

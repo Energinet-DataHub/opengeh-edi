@@ -41,11 +41,12 @@ internal sealed class IntegrationEventPublisher : IAsyncDisposable
 
     private static ServiceBusMessage CreateIntegrationEventMessage(string eventName, byte[] eventPayload)
     {
+        var messageId = Guid.NewGuid().ToString();
         return new ServiceBusMessage()
         {
             Body = new BinaryData(eventPayload),
             ContentType = "application/octet-stream",
-            MessageId = Guid.NewGuid().ToString(),
+            MessageId = messageId,
             Subject = eventName,
         };
     }

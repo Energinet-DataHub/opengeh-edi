@@ -34,6 +34,6 @@ public sealed class WhenAggregationResultIsPublishedTests : TestRunner
     public async Task Actor_can_fetch_aggregation_result()
     {
         await _aggregations.PublishResultFor(gridAreaCode: "543").ConfigureAwait(false);
-        await _aggregations.ConfirmResultIsAvailableFor(actorNumber: "5790000610976", actorRole: "gridoperator").ConfigureAwait(false);
+        await _aggregations.ConfirmResultIsAvailableFor(actorNumber: "5790000610976", actorRole: "energysupplier").ConfigureAwait(false);
     }
 }
