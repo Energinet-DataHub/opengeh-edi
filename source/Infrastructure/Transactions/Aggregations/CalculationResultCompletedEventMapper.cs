@@ -51,13 +51,17 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
                 MapSettlementMethod(integrationEvent),
                 MapProcessType(integrationEvent),
                 MapActorGrouping(integrationEvent),
-                await MapGridAreaDetailsAsync(integrationEvent).ConfigureAwait(false)));
+                await MapGridAreaDetailsAsync(integrationEvent).ConfigureAwait(false),
+                null,
+                null,
+                null,
+                MapSettlementVersion(integrationEvent)));
     }
 
     public bool CanHandle(string eventType)
     {
         ArgumentNullException.ThrowIfNull(eventType);
-        return eventType.Equals(CalculationResultCompleted.MessageName, StringComparison.OrdinalIgnoreCase);
+        return eventType.Equals(CalculationResultCompleted.EventName, StringComparison.OrdinalIgnoreCase);
     }
 
     public string ToJson(byte[] payload)
@@ -148,9 +152,13 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
     {
         return integrationEvent.ProcessType switch
         {
-            Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Aggregation => BusinessReason.PreliminaryAggregation.Name,
-            Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing => BusinessReason.BalanceFixing.Name,
-            Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Unspecified => throw new InvalidOperationException("Process type is not specified from Wholesales"),
+            ProcessType.Aggregation => BusinessReason.PreliminaryAggregation.Name,
+            ProcessType.BalanceFixing => BusinessReason.BalanceFixing.Name,
+            ProcessType.WholesaleFixing => BusinessReason.WholesaleFixing.Name,
+            ProcessType.FirstCorrectionSettlement => BusinessReason.Correction.Name, // TODO: Check if this is correct
+            ProcessType.SecondCorrectionSettlement => BusinessReason.Correction.Name, // TODO: Check if this is correct
+            ProcessType.ThirdCorrectionSettlement => BusinessReason.Correction.Name, // TODO: Check if this is correct
+            ProcessType.Unspecified => throw new InvalidOperationException("Process type is not specified from Wholesales"),
             _ => throw new InvalidOperationException("Unknown process type from Wholesales"),
         };
     }
@@ -163,8 +171,20 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
             QuantityQuality.Measured => Quality.Measured.Name,
             QuantityQuality.Missing => Quality.Missing.Name,
             QuantityQuality.Estimated => Quality.Estimated.Name,
+            QuantityQuality.Calculated => Quality.Calculated.Name,
             QuantityQuality.Unspecified => throw new InvalidOperationException("Quality is not specified"),
             _ => throw new InvalidOperationException("Unknown quality type"),
+        };
+    }
+
+    private static string? MapSettlementVersion(CalculationResultCompleted integrationEvent)
+    {
+        return integrationEvent.ProcessType switch
+        {
+            ProcessType.FirstCorrectionSettlement => SettlementVersion.FirstCorrection.Name,
+            ProcessType.SecondCorrectionSettlement => SettlementVersion.SecondCorrection.Name,
+            ProcessType.ThirdCorrectionSettlement => SettlementVersion.ThirdCorrection.Name,
+            _ => null,
         };
     }
 
