@@ -50,11 +50,7 @@ public class UnitOfWorkBehaviour<TRequest, TResponse> : IPipelineBehavior<TReque
 
         var result = await next().ConfigureAwait(false);
 
-        if (!await InternalCommandAlreadyMarkedAsProcessedAsync(request, cancellationToken).ConfigureAwait(false))
-        {
-            await _unitOfWork.CommitAsync().ConfigureAwait(false);
-        }
-        else
+        if (await InternalCommandAlreadyMarkedAsProcessedAsync(request, cancellationToken).ConfigureAwait(false))
         {
             var commandId = (request as InternalCommand)?.Id;
             _logger.Log(
@@ -62,6 +58,10 @@ public class UnitOfWorkBehaviour<TRequest, TResponse> : IPipelineBehavior<TReque
                 "Command (id: {CommandId}, type: {CommandType}) was processed. All changes will be discarded",
                 commandId,
                 request.GetType());
+        }
+        else
+        {
+            await _unitOfWork.CommitAsync().ConfigureAwait(false);
         }
 
         return result;

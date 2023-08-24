@@ -51,7 +51,7 @@ public class WhenEnqueueingTests : TestBase
     {
         var message = CreateOutgoingMessage();
         await EnqueueMessage(message);
-
+        // TODO: (LRN) Ensure we have a ActorQueue with a bundle with the expected OutgoingMessage.
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var sql = "SELECT * FROM [dbo].[OutgoingMessages]";
         var result = await
@@ -118,8 +118,8 @@ public class WhenEnqueueingTests : TestBase
 
     private async Task EnqueueMessage(OutgoingMessage message)
     {
-        await _messageEnqueuer.EnqueueAsync(message);
         _outgoingMessageRepository.Add(message);
+        await _messageEnqueuer.EnqueueAsync(message);
         var unitOfWork = GetService<IUnitOfWork>();
         await unitOfWork.CommitAsync();
     }

@@ -77,7 +77,7 @@ public class InternalCommandProcessorTests : TestBase
     }
 
     [Fact]
-    public async Task When_parallel_internal_command_processor_handles_same_command()
+    public async Task Processing_same_command_twice_should_result_in_one_outgoing_message()
     {
         // Arrange
         var serviceScopeFactory = GetService<IServiceScopeFactory>();
