@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
+using AcceptanceTest.Exceptions;
 using AcceptanceTest.Factories;
 
 namespace AcceptanceTest.Drivers;
@@ -50,6 +51,11 @@ internal sealed class EdiDriver : IDisposable
                 return document;
             }
 
+            if (peekResponse.StatusCode != HttpStatusCode.NoContent)
+            {
+                throw new UnexpectedPeekResponseException($"Unexpected Peek response: {peekResponse.StatusCode}");
+            }
+
             await Task.Delay(500).ConfigureAwait(false);
         }
 
@@ -74,7 +80,7 @@ internal sealed class EdiDriver : IDisposable
 
     private async Task DequeueAsync(string token, string messageId)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Delete, $"dequeue/{messageId}");
+        using var request = new HttpRequestMessage(HttpMethod.Delete, $"api/dequeue/{messageId}");
         request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
         var dequeueResponse = await _httpClient.SendAsync(request).ConfigureAwait(false);
         dequeueResponse.EnsureSuccessStatusCode();
