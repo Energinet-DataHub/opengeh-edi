@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using CommunicationV2.IntegrationEvents.Internal.Publisher;
+using CommunicationV2.IntegrationEvents.Publisher;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
-using Energinet.DataHub.Core.Messaging.Communication.Internal.Publisher;
-using Energinet.DataHub.Core.Messaging.Communication.Internal.Subscriber;
-using Energinet.DataHub.Core.Messaging.Communication.Publisher;
-using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Google.Protobuf.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.Core.Messaging.Communication;
+namespace CommunicationV2.IntegrationEvents;
 
 public static class Registration
 {
@@ -32,11 +30,13 @@ public static class Registration
     /// <param name="services">The <see cref="IServiceCollection"/> to add the service to.</param>
     /// <returns>A reference to this instance after the operation has completed.</returns>
     public static IServiceCollection AddPublisher<TIntegrationEventProvider>(this IServiceCollection services)
-        where TIntegrationEventProvider : class, IIntegrationEventProvider
+        where TIntegrationEventProvider : class, IPointToPointEventProvider
     {
         services.AddSingleton<IServiceBusSenderProvider, ServiceBusSenderProvider>();
-        services.AddScoped<IIntegrationEventProvider, TIntegrationEventProvider>();
-        services.AddScoped<IPublisher, Internal.Publisher.Publisher>();
+        //services.AddScoped<IIntegrationEventProvider, TIntegrationEventProvider>();
+        services.AddScoped<IPointToPointEventProvider, TPointToPointEventProvider>();
+
+        services.AddScoped<IPublisher, CommunicationV2.IntegrationEvents.Internal.Publisher.Publisher>();
         services.AddScoped<IServiceBusMessageFactory, ServiceBusMessageFactory>();
         return services;
     }

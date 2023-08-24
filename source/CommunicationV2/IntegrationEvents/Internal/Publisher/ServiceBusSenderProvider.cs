@@ -16,7 +16,7 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Messaging.Communication.Publisher;
 using Microsoft.Extensions.Options;
 
-namespace Energinet.DataHub.Core.Messaging.Communication.Internal.Publisher;
+namespace CommunicationV2.IntegrationEvents.Internal.Publisher;
 
 internal sealed class ServiceBusSenderProvider : IServiceBusSenderProvider
 {

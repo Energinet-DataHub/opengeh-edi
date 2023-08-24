@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Transactions;
@@ -45,5 +46,13 @@ public class AggregatedMeasureDataProcessRepository : IAggregatedMeasureDataProc
                .FirstOrDefaultAsync(process => process.ProcessId == processId, cancellationToken)
                .ConfigureAwait(false)
             ?? throw ProcessNotFoundException.ProcessForProcessIdNotFound(processId.Id);
+    }
+
+    public async Task<List<AggregatedMeasureDataProcess>> GetAllAsync(ProcessId processId, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(processId);
+        return await _b2BContext
+                   .AggregatedMeasureDataProcesses
+                   .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 }

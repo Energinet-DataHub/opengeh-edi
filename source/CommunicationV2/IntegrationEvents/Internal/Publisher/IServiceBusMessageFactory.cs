@@ -13,14 +13,25 @@
 // limitations under the License.
 
 using Azure.Messaging.ServiceBus;
-using CommunicationV2.IntegrationEvents;
 
-namespace Energinet.DataHub.Core.Messaging.Communication.Internal.Publisher;
+namespace CommunicationV2.IntegrationEvents.Internal.Publisher;
 
 /// <summary>
 /// Creates a <see cref="ServiceBusMessage"/> instance from an <see cref="IntegrationEvent"/>
 /// </summary>
 internal interface IServiceBusMessageFactory
 {
-    ServiceBusMessage Create(IntegrationEvent @event);
+    /// <summary>
+    /// Creates ServiceBusMessage from Integration Event
+    /// </summary>
+    /// <param name="event"></param>
+    /// <returns>ServiceBusMessage</returns>
+    ServiceBusMessage CreateServiceBusMessageFromIntegrationEvent(IntegrationEvent @event);
+
+    /// <summary>
+    /// Creates ServiceBusMessage from PointToPoint Event
+    /// </summary>
+    /// <param name="event"></param>
+    /// <returns>ServiceBusMessage</returns>
+    ServiceBusMessage CreateServiceBusMessageFromPointToPointEvent(PointToPointEvent @event);
 }

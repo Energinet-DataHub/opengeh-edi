@@ -13,14 +13,13 @@
 // limitations under the License.
 
 using Azure.Messaging.ServiceBus;
-using CommunicationV2.IntegrationEvents;
 using Google.Protobuf;
 
-namespace Energinet.DataHub.Core.Messaging.Communication.Internal.Publisher;
+namespace CommunicationV2.IntegrationEvents.Internal.Publisher;
 
 internal sealed class ServiceBusMessageFactory : IServiceBusMessageFactory
 {
-    public ServiceBusMessage Create(IntegrationEvent @event)
+    public ServiceBusMessage CreateServiceBusMessageFromIntegrationEvent(IntegrationEvent @event)
     {
         var serviceBusMessage = new ServiceBusMessage
         {
@@ -30,6 +29,20 @@ internal sealed class ServiceBusMessageFactory : IServiceBusMessageFactory
         };
 
         serviceBusMessage.ApplicationProperties.Add("EventMinorVersion", @event.EventMinorVersion);
+
+        return serviceBusMessage;
+    }
+
+    public ServiceBusMessage CreateServiceBusMessageFromPointToPointEvent(PointToPointEvent @event)
+    {
+        var serviceBusMessage = new ServiceBusMessage
+        {
+            Body = new BinaryData(@event.Message.ToByteArray()),
+            Subject = @event.EventName,
+            MessageId = @event.EventIdentification.ToString(),
+        };
+
+        serviceBusMessage.ApplicationProperties.Add("ReferenceId", @event.ReferenceId);
 
         return serviceBusMessage;
     }

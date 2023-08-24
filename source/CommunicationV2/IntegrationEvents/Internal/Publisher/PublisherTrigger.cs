@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using CommunicationV2.IntegrationEvents.Publisher;
 using Energinet.DataHub.Core.App.WebApp.Hosting;
 using Energinet.DataHub.Core.Messaging.Communication.Publisher;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Energinet.DataHub.Core.Messaging.Communication.Internal.Publisher;
+namespace CommunicationV2.IntegrationEvents.Internal.Publisher;
 
 /// <summary>
 /// The sender runs as a background service

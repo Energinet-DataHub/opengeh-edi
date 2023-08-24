@@ -7,13 +7,20 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="IntegrationEvents\" />
       <Folder Include="PointToPointEvents\" />
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.15.0" />
+      <PackageReference Include="Energinet.DataHub.Core.App.WebApp" Version="7.5.1" />
       <PackageReference Include="Google.Protobuf" Version="3.23.4" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.9" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
       <PackageReference Include="System.Memory.Data" Version="1.0.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

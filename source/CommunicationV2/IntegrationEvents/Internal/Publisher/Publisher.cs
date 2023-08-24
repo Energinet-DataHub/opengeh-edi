@@ -13,29 +13,29 @@
 // limitations under the License.
 
 using System.Diagnostics;
-using Azure.Messaging.ServiceBus;
+using CommunicationV2.IntegrationEvents.Publisher;
 using Energinet.DataHub.Core.Messaging.Communication.Publisher;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.Core.Messaging.Communication.Internal.Publisher;
+namespace CommunicationV2.IntegrationEvents.Internal.Publisher;
 
 /// <summary>
 /// The sender runs as a background service
 /// </summary>
 internal sealed class Publisher : IPublisher
 {
-    private readonly IIntegrationEventProvider _integrationEventProvider;
+    private readonly IPointToPointEventProvider _pointToPointEventProvider;
     private readonly IServiceBusSenderProvider _senderProvider;
     private readonly IServiceBusMessageFactory _serviceBusMessageFactory;
     private readonly ILogger _logger;
 
     public Publisher(
-        IIntegrationEventProvider integrationEventProvider,
+        IPointToPointEventProvider pointToPointEventProvider,
         IServiceBusSenderProvider senderProvider,
         IServiceBusMessageFactory serviceBusMessageFactory,
         ILogger<Publisher> logger)
     {
-        _integrationEventProvider = integrationEventProvider;
+        _pointToPointEventProvider = pointToPointEventProvider;
         _senderProvider = senderProvider;
         _serviceBusMessageFactory = serviceBusMessageFactory;
         _logger = logger;
@@ -43,50 +43,56 @@ internal sealed class Publisher : IPublisher
 
     public async Task PublishAsync(CancellationToken cancellationToken)
     {
-        var stopwatch = Stopwatch.StartNew();
-        var eventCount = 0;
-        var messageBatch = await _senderProvider.Instance.CreateMessageBatchAsync(cancellationToken).ConfigureAwait(false);
-
-        await foreach (var @event in _integrationEventProvider.GetAsync().WithCancellation(cancellationToken).ConfigureAwait(false))
+        await foreach (var @event in _pointToPointEventProvider.GetAsync().WithCancellation(cancellationToken)
+                           .ConfigureAwait(false))
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            eventCount++;
-            var serviceBusMessage = _serviceBusMessageFactory.Create(@event);
-            if (!messageBatch.TryAddMessage(serviceBusMessage))
-            {
-                await SendBatchAsync(messageBatch).ConfigureAwait(false);
-                messageBatch = await _senderProvider.Instance.CreateMessageBatchAsync(cancellationToken).ConfigureAwait(false);
-
-                if (!messageBatch.TryAddMessage(serviceBusMessage))
-                {
-                    await SendMessageThatExceedsBatchLimitAsync(serviceBusMessage).ConfigureAwait(false);
-                }
-            }
+            var serviceBusMessage = _serviceBusMessageFactory.CreateServiceBusMessageFromPointToPointEvent(@event);
         }
 
-        try
-        {
-            await _senderProvider.Instance.SendMessagesAsync(messageBatch, cancellationToken).ConfigureAwait(false);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Failed to publish messages");
-        }
-
-        if (eventCount > 0)
-        {
-            _logger.LogDebug("Sent {EventCount} integration events in {Time} ms", eventCount, stopwatch.Elapsed.TotalMilliseconds);
-        }
+        // var stopwatch = Stopwatch.StartNew();
+        // var eventCount = 0;
+        // var messageBatch = await _senderProvider.Instance.CreateMessageBatchAsync(cancellationToken).ConfigureAwait(false);
+        //
+        // await foreach (var @event in _pointToPointEventProvider.GetAsync().WithCancellation(cancellationToken).ConfigureAwait(false))
+        // {
+        //     cancellationToken.ThrowIfCancellationRequested();
+        //
+        //     eventCount++;
+        //     var serviceBusMessage = _serviceBusMessageFactory.Create(@event);
+        //     if (!messageBatch.TryAddMessage(serviceBusMessage))
+        //     {
+        //         await SendBatchAsync(messageBatch).ConfigureAwait(false);
+        //         messageBatch = await _senderProvider.Instance.CreateMessageBatchAsync(cancellationToken).ConfigureAwait(false);
+        //
+        //         if (!messageBatch.TryAddMessage(serviceBusMessage))
+        //         {
+        //             await SendMessageThatExceedsBatchLimitAsync(serviceBusMessage).ConfigureAwait(false);
+        //         }
+        //     }
+        // }
+        //
+        // try
+        // {
+        //     await _senderProvider.Instance.SendMessagesAsync(messageBatch, cancellationToken).ConfigureAwait(false);
+        // }
+        // catch (Exception e)
+        // {
+        //     _logger.LogError(e, "Failed to publish messages");
+        // }
+        //
+        // if (eventCount > 0)
+        // {
+        //     _logger.LogDebug("Sent {EventCount} integration events in {Time} ms", eventCount, stopwatch.Elapsed.TotalMilliseconds);
+        // }
     }
 
-    private async Task SendBatchAsync(ServiceBusMessageBatch batch)
-    {
-        await _senderProvider.Instance.SendMessagesAsync(batch).ConfigureAwait(false);
-    }
-
-    private async Task SendMessageThatExceedsBatchLimitAsync(ServiceBusMessage serviceBusMessage)
-    {
-        await _senderProvider.Instance.SendMessageAsync(serviceBusMessage).ConfigureAwait(false);
-    }
+    // private async Task SendBatchAsync(ServiceBusMessageBatch batch)
+    // {
+    //     await _senderProvider.Instance.SendMessagesAsync(batch).ConfigureAwait(false);
+    // }
+    //
+    // private async Task SendMessageThatExceedsBatchLimitAsync(ServiceBusMessage serviceBusMessage)
+    // {
+    //     await _senderProvider.Instance.SendMessageAsync(serviceBusMessage).ConfigureAwait(false);
+    // }
 }

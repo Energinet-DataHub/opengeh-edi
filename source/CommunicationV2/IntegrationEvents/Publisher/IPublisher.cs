@@ -12,9 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.Core.Messaging.Communication.Publisher;
+namespace CommunicationV2.IntegrationEvents.Publisher;
 
+/// <summary>
+/// Publisher for Ptp Communication
+/// </summary>
 public interface IPublisher
 {
+    /// <summary>
+    /// Publish Method for Ptp communication
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Ptp Task</returns>
     Task PublishAsync(CancellationToken cancellationToken);
 }

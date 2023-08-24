@@ -12,17 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Azure.Messaging.ServiceBus;
+using Google.Protobuf;
 
-namespace CommunicationV2.IntegrationEvents.Internal.Publisher;
+namespace CommunicationV2.IntegrationEvents;
 
 /// <summary>
-/// ServiceBus Provider
+/// ADR-008:  https://energinet.atlassian.net/wiki/spaces/D3/pages/328957986/ADR+008+-+Integration+events+with+protocol+buffers
 /// </summary>
-internal interface IServiceBusSenderProvider
-{
-    /// <summary>
-    /// The instance of the ServiceBusSender
-    /// </summary>
-    ServiceBusSender Instance { get; }
-}
+public record PointToPointEvent(Guid EventIdentification, string EventName, int ReferenceId, IMessage Message);

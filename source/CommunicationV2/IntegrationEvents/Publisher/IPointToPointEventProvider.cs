@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Azure.Messaging.ServiceBus;
-
-namespace CommunicationV2.IntegrationEvents.Internal.Publisher;
+namespace CommunicationV2.IntegrationEvents.Publisher;
 
 /// <summary>
-/// ServiceBus Provider
+/// In order to use the publishing functionality of this library and to publish point to point events an implementation of this interface is required.
+/// The implementation is responsible for creating or fetching point to point events (likely from a database)
+/// and subsequently commit state changes.
 /// </summary>
-internal interface IServiceBusSenderProvider
+public interface IPointToPointEventProvider
 {
     /// <summary>
-    /// The instance of the ServiceBusSender
+    /// Returns Point to Point Event
     /// </summary>
-    ServiceBusSender Instance { get; }
+    /// <returns>Point To Point Event</returns>
+    IAsyncEnumerable<PointToPointEvent> GetAsync();
 }
