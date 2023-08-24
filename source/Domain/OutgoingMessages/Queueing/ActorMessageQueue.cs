@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Domain.Documents;
-using Domain.OutgoingMessages.Peek;
 using Domain.SeedWork;
 
 namespace Domain.OutgoingMessages.Queueing;
@@ -22,14 +21,15 @@ namespace Domain.OutgoingMessages.Queueing;
 public class ActorMessageQueue : Entity
 {
     private readonly Guid _id;
-    private readonly Receiver _receiver;
     private readonly List<Bundle> _bundles = new();
 
     private ActorMessageQueue(Receiver receiver)
     {
-        _receiver = receiver;
+        Receiver = receiver;
         _id = Guid.NewGuid();
     }
+
+    public Receiver Receiver { get; set; }
 
     #pragma warning disable
     private ActorMessageQueue()
@@ -79,7 +79,7 @@ public class ActorMessageQueue : Entity
 
     private void EnsureApplicable(OutgoingMessage outgoingMessage)
     {
-        if (outgoingMessage.Receiver.Equals(_receiver) == false)
+        if (outgoingMessage.Receiver.Equals(Receiver) == false)
         {
             throw new ReceiverMismatchException();
         }

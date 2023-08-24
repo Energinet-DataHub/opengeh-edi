@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Domain.Actors;
 using Domain.OutgoingMessages.Queueing;
@@ -35,9 +36,14 @@ public class ActorMessageQueueRepository : IActorMessageQueueRepository
         ArgumentNullException.ThrowIfNull(actorNumber);
         ArgumentNullException.ThrowIfNull(actorRole);
 
-        var sql = $"SELECT m.*, b.IsDequeued FROM [dbo].[ActorMessageQueues] m join [dbo].[Bundles] b on m.Id = b.ActorMessageQueueId " +
-                  $"WHERE b.IsDequeued = 0 AND m.ActorNumber = '{actorNumber.Value}' AND m.ActorRole = '{actorRole.Name}'";
-        var actorMessageQueue = await _b2BContext.ActorMessageQueues.FromSqlRaw(sql).FirstOrDefaultAsync().ConfigureAwait(false);
+        var actorMessageQueue = await _b2BContext.ActorMessageQueues.FirstOrDefaultAsync(queue =>
+            queue.Receiver.Number.Equals(actorNumber) && queue.Receiver.ActorRole.Equals(actorRole)).ConfigureAwait(false);
+
+        if (actorMessageQueue is null)
+        {
+            actorMessageQueue = _b2BContext.ActorMessageQueues.Local.FirstOrDefault(queue =>
+                queue.Receiver.Number.Equals(actorNumber) && queue.Receiver.ActorRole.Equals(actorRole));
+        }
 
         return actorMessageQueue;
     }
