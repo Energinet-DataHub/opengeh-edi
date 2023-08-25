@@ -35,6 +35,5 @@ public sealed class WhenAggregationResultIsPublishedTests : TestRunner
     {
         await _aggregations.PublishResultFor(gridAreaCode: "543").ConfigureAwait(false);
         await _aggregations.ConfirmResultIsAvailableFor(actorNumber: "5790000610976", actorRole: "metereddataresponsible").ConfigureAwait(false);
-        Assert.Equal(2, 1);
     }
 }
