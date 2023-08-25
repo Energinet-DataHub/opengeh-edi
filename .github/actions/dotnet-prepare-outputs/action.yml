@@ -61,3 +61,13 @@ runs:
           --no-restore \
           --configuration Release \
           --output '${{ inputs.output_path }}\functions\performancetest'
+
+    - name: Publish AcceptanceTest
+      shell: bash
+      run: |
+        dotnet publish \
+          'source/AcceptanceTests/AcceptanceTests.csproj' \
+          --no-build \
+          --no-restore \
+          --configuration Release \
+          --output '${{ inputs.output_path }}\AcceptanceTests'
