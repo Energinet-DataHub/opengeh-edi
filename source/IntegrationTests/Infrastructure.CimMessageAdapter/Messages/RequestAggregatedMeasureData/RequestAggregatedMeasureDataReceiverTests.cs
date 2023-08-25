@@ -28,6 +28,7 @@ using CimMessageAdapter.ValidationErrors;
 using Domain.Actors;
 using Domain.Documents;
 using Infrastructure.Configuration.Authentication;
+using Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using IntegrationTests.Fixtures;
 using IntegrationTests.Infrastructure.CimMessageAdapter.Stubs;
 using Xunit;
@@ -498,6 +499,24 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var transaction = _messageQueueDispatcherSpy.CommittedItems.FirstOrDefault();
         Assert.True(result.Success);
         Assert.NotNull(transaction);
+    }
+
+    [Fact]
+    public async Task Transaction_ids_NEWNAME()
+    {
+        await using var message = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .Message();
+
+        var messageParserResult1 = await ParseMessageAsync(message).ConfigureAwait(false);
+
+        var request1 = new ReceiveAggregatedMeasureDataRequest(messageParserResult1, message);
+        var request2 = new ReceiveAggregatedMeasureDataRequest(messageParserResult1, message);
+
+        var result1 = InvokeCommandAsync(request1);
+        var result2 = InvokeCommandAsync(request2);
+
+        await Task.WhenAll(result1, result2);
     }
 
     private async Task CreateIdentityWithRoles(IEnumerable<MarketRole> roles)

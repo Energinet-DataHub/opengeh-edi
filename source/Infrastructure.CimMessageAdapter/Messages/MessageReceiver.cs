@@ -28,6 +28,7 @@ namespace CimMessageAdapter.Messages
         where TQueue : Queue
     {
         private const int MessageIdLength = 36;
+        private const int TransactionIdLength = 36;
         private readonly List<ValidationError> _errors = new();
         private readonly IMessageIds _messageIds;
         private readonly IMessageQueueDispatcher<TQueue> _messageQueueDispatcher;
@@ -78,6 +79,7 @@ namespace CimMessageAdapter.Messages
 
             var authorizeSenderTask = AuthorizeSenderAsync(messageHeader);
             var verifyReceiverTask = VerifyReceiverAsync(messageHeader);
+            // dont save here, move this belove
             var checkMessageIdTask = CheckMessageIdAsync(messageHeader.SenderId, messageHeader.MessageId, cancellationToken);
             var checkMessageTypeTask = CheckMessageTypeAsync(messageHeader.MessageType, cancellationToken);
             var checkProcessTypeTask = CheckProcessTypeAsync(messageHeader.BusinessReason, cancellationToken);
@@ -89,16 +91,35 @@ namespace CimMessageAdapter.Messages
                 checkMessageTypeTask,
                 checkProcessTypeTask).ConfigureAwait(false);
 
-            foreach (var transaction in marketDocument.ToTransactions())
+            var transactions = marketDocument.ToTransactions();
+            var transactionIds = new List<string>();
+            foreach (var transaction in transactions)
             {
-                if (string.IsNullOrEmpty(transaction.MarketActivityRecord.Id))
+                var transactionId = transaction.MarketActivityRecord.Id;
+                if (string.IsNullOrEmpty(transactionId))
                 {
                     _errors.Add(new EmptyTransactionId());
+                    continue;
                 }
 
-                if (!await TryStoreTransactionIdAsync(messageHeader.SenderId, transaction.MarketActivityRecord.Id, cancellationToken).ConfigureAwait(false))
+                if (transactionId.Length != TransactionIdLength)
                 {
-                    _errors.Add(new DuplicateTransactionIdDetected(transaction.MarketActivityRecord.Id));
+                    _errors.Add(new InvalidTransactionIdSize(transactionId));
+                    continue;
+                }
+
+                if (transactionIds.Contains(transactionId))
+                {
+                    _errors.Add(new DuplicateTransactionIdDetected(transactionId));
+                }
+                else
+                {
+                    transactionIds.Add(transaction.MarketActivityRecord.Id);
+                }
+
+                if (await TransactionIdIsDuplicatedAsync(messageHeader.SenderId, transactionId, cancellationToken).ConfigureAwait(false))
+                {
+                    _errors.Add(new DuplicateTransactionIdDetected(transactionId));
                 }
 
                 await AddToTransactionQueueAsync(transaction, cancellationToken).ConfigureAwait(false);
@@ -109,8 +130,37 @@ namespace CimMessageAdapter.Messages
                 return Result.Failure(_errors.ToArray());
             }
 
+            // We add the transaction id for later comparisons.
+            foreach (var transactionId in transactionIds)
+            {
+                // This should only happen, if the actor has two request running on different threads
+                // with non unique transaction id across these threads.
+                var success = await TryStoreTransactionIdAsync(
+                        messageHeader.SenderId,
+                        transactionId,
+                        cancellationToken)
+                    .ConfigureAwait(false);
+                if (!success)
+                {
+                    _errors.Add(new DuplicateTransactionIdDetected(transactionId));
+                }
+            }
+
+            if (_errors.Count > 0)
+            {
+                return Result.Failure(_errors.ToArray());
+            }
+
             await _messageQueueDispatcher.CommitAsync(cancellationToken).ConfigureAwait(false);
             return Result.Succeeded();
+        }
+
+        private async Task<bool> TransactionIdIsDuplicatedAsync(string senderId, string transactionId, CancellationToken cancellationToken)
+        {
+            if (transactionId == null) throw new ArgumentNullException(nameof(transactionId));
+
+            return !await _transactionIds
+                .TransactionIdOfSenderIsUniqueAsync(senderId, transactionId, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<bool> TryStoreTransactionIdAsync(string senderId, string transactionId, CancellationToken cancellationToken)
@@ -145,8 +195,7 @@ namespace CimMessageAdapter.Messages
             {
                 _errors.Add(new InvalidMessageIdSize(messageId));
             }
-
-            if (!await _messageIds.TryStoreAsync(senderId, messageId, cancellationToken).ConfigureAwait(false))
+            else if (!await _messageIds.TryStoreAsync(senderId, messageId, cancellationToken).ConfigureAwait(false))
             {
                 _errors.Add(new DuplicateMessageIdDetected(messageId));
             }
