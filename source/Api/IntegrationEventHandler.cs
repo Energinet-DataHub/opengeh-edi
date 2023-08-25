@@ -32,11 +32,6 @@ public class IntegrationEventHandler : IIntegrationEventHandler
         _integrationEventReceiver = integrationEventReceiver;
     }
 
-    public bool ShouldHandle(string eventName)
-    {
-        return true;
-    }
-
     public async Task HandleAsync(IntegrationEvent integrationEvent)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
