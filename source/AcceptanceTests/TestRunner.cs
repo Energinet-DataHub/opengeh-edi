@@ -23,7 +23,8 @@ public class TestRunner : IAsyncDisposable
     protected TestRunner()
     {
         var root = new ConfigurationBuilder()
-            .AddJsonFile("integrationtest.local.settings.json", false, false)
+            .AddJsonFile("integrationtest.local.settings.json", true)
+            .AddEnvironmentVariables()
             .Build();
         var secretsConfiguration = BuildSecretsConfiguration(root);
 
@@ -31,7 +32,7 @@ public class TestRunner : IAsyncDisposable
         var topicName = secretsConfiguration.GetValue<string>("sbt-sharedres-integrationevent-received-name")!;
 
         EventPublisher = new IntegrationEventPublisher(connectionString, topicName);
-        AzpToken = secretsConfiguration.GetValue<string>("AZP_TOKEN")!;
+        AzpToken = root.GetValue<string>("AZP_TOKEN")!;
     }
 
     internal IntegrationEventPublisher EventPublisher { get; }
@@ -51,7 +52,6 @@ public class TestRunner : IAsyncDisposable
 
         return new ConfigurationBuilder()
             .AddAuthenticatedAzureKeyVault(sharedKeyVaultUrl)
-            .AddJsonFile("integrationtest.local.settings.json", false, false)
             .Build();
     }
 }
