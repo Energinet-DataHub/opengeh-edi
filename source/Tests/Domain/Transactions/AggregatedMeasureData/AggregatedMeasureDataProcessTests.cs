@@ -13,24 +13,25 @@
 // limitations under the License.
 
 using System;
-using System.Text.Json.Serialization;
-using Application.Configuration.Commands.Commands;
+using System.Collections.Generic;
+using Domain.Transactions.AggregatedMeasureData;
+using Xunit;
 
-namespace IntegrationTests.Infrastructure.Configuration.InternalCommands;
+namespace Tests.Domain.Transactions.AggregatedMeasureData;
 
-public class TestCommand : InternalCommand
+public class AggregatedMeasureDataProcessTests
 {
-    [JsonConstructor]
-    public TestCommand(Guid id, bool throwException)
-        : base(id)
+    [Fact]
+    public void Ensure_we_do_not_break_states()
     {
-        ThrowException = throwException;
-    }
+        var expectedStates = new List<string>()
+        {
+            "Initialized", "Sent", "Accepted", "Rejected", "Completed",
+        };
 
-    public TestCommand(bool throwException = false)
-    {
-        ThrowException = throwException;
-    }
+        var actualStates = Enum.GetNames(typeof(AggregatedMeasureDataProcess.State));
 
-    public bool ThrowException { get; }
+        Assert.Equal(expectedStates.Count, actualStates.Length);
+        Assert.Contains(actualStates, state => expectedStates.Contains(state));
+    }
 }

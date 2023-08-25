@@ -12,25 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text.Json.Serialization;
-using Application.Configuration.Commands.Commands;
+using Domain.Actors;
+using Domain.Documents;
+using Domain.OutgoingMessages;
+using Domain.Transactions;
 
 namespace IntegrationTests.Infrastructure.Configuration.InternalCommands;
 
-public class TestCommand : InternalCommand
+public class TestOutgoingMessage : OutgoingMessage
 {
-    [JsonConstructor]
-    public TestCommand(Guid id, bool throwException)
-        : base(id)
+    public TestOutgoingMessage()
+        : base(DocumentType.RejectAggregatedMeasureData, ActorNumber.Create("1234567891234"), TransactionId.New(), Domain.OutgoingMessages.BusinessReason.BalanceFixing.Name, MarketRole.EnergySupplier, ActorNumber.Create("1234567891234"), MarketRole.MeteringDataAdministrator, "data")
     {
-        ThrowException = throwException;
     }
-
-    public TestCommand(bool throwException = false)
-    {
-        ThrowException = throwException;
-    }
-
-    public bool ThrowException { get; }
 }

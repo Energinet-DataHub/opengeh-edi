@@ -18,19 +18,19 @@ using Application.Configuration.Commands.Commands;
 
 namespace IntegrationTests.Infrastructure.Configuration.InternalCommands;
 
-public class TestCommand : InternalCommand
+public class TestCreateOutgoingMessageCommand : InternalCommand
 {
     [JsonConstructor]
-    public TestCommand(Guid id, bool throwException)
+    public TestCreateOutgoingMessageCommand(Guid id, int numberOfOutgoingMessages)
         : base(id)
     {
-        ThrowException = throwException;
+        NumberOfOutgoingMessages = numberOfOutgoingMessages;
     }
 
-    public TestCommand(bool throwException = false)
+    public TestCreateOutgoingMessageCommand(int numberOfOutgoingMessages)
     {
-        ThrowException = throwException;
+        NumberOfOutgoingMessages = numberOfOutgoingMessages;
     }
 
-    public bool ThrowException { get; }
+    public int NumberOfOutgoingMessages { get; }
 }

@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.Configuration.TimeEvents;
 using Application.OutgoingMessages.Dequeue;
 using Infrastructure.Configuration.Queueing;
+using Infrastructure.DataRetention;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -25,6 +25,6 @@ internal static class DequeueConfiguration
     internal static void Configure(IServiceCollection services)
     {
         services.AddTransient<IRequestHandler<DequeueCommand, DequeCommandResult>, DequeueHandler>();
-        services.AddTransient<INotificationHandler<ADayHasPassed>, RemoveDequeuedBundlesWhenADayHasPassed>();
+        services.AddTransient<IDataRetention, DequeuedBundlesRetention>();
     }
 }

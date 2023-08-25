@@ -22,7 +22,6 @@ using Dapper;
 using Domain.Actors;
 using Domain.Documents;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.Peek;
 using Domain.OutgoingMessages.Queueing;
 using IntegrationTests.Application.IncomingMessages;
 using IntegrationTests.Fixtures;

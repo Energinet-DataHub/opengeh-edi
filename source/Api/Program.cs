@@ -13,6 +13,7 @@
 // limitations under the License.using System;
 
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -24,6 +25,9 @@ using Application.Actors;
 using Application.Configuration.DataAccess;
 using Application.Transactions.MoveIn;
 using CimMessageAdapter.Messages.Queues;
+using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.Wholesale.Contracts.Events;
+using Google.Protobuf.Reflection;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.Authentication;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
@@ -118,7 +122,7 @@ namespace Api
                         .AddDatabaseConnectionFactory(databaseConnectionString!)
                         .AddSystemClock(new SystemDateTimeProvider())
                         .AddDatabaseContext(databaseConnectionString!)
-                        .AddCorrelationContext(sp =>
+                        .AddCorrelationContext(_ =>
                         {
                             var correlationContext = new CorrelationContext();
                             if (!runtime.IsRunningLocally()) return correlationContext;
@@ -152,6 +156,12 @@ namespace Api
                         runtime.INCOMING_AGGREGATED_MEASURE_DATA_QUEUE_NAME!,
                         runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!);
                     services.AddSqlServerHealthCheck(runtime.DB_CONNECTION_STRING!);
+
+                    var integrationEventDescriptors = new List<MessageDescriptor>
+                    {
+                        CalculationResultCompleted.Descriptor,
+                    };
+                    services.AddSubscriber<IntegrationEventHandler>(integrationEventDescriptors);
                 })
                 .Build();
         }

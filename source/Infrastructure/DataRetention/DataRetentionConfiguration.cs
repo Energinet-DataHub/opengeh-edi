@@ -12,25 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text.Json.Serialization;
-using Application.Configuration.Commands.Commands;
+using Application.Configuration.TimeEvents;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace IntegrationTests.Infrastructure.Configuration.InternalCommands;
+namespace Infrastructure.DataRetention;
 
-public class TestCommand : InternalCommand
+public static class DataRetentionConfiguration
 {
-    [JsonConstructor]
-    public TestCommand(Guid id, bool throwException)
-        : base(id)
+    public static void Configure(IServiceCollection services)
     {
-        ThrowException = throwException;
+        services.AddTransient<INotificationHandler<ADayHasPassed>,
+            ExecuteDataRetentionsWhenADayHasPassed>();
     }
-
-    public TestCommand(bool throwException = false)
-    {
-        ThrowException = throwException;
-    }
-
-    public bool ThrowException { get; }
 }

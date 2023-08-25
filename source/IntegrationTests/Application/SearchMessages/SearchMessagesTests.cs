@@ -51,12 +51,13 @@ public class SearchMessagesTests : TestBase
 
         var result = await QueryAsync(new GetMessagesQuery()).ConfigureAwait(false);
 
-        var messageInfo = result.Messages.FirstOrDefault(message => message.MessageId == archivedMessage.Id);
+        var messageInfo = result.Messages.FirstOrDefault(message => message.Id == archivedMessage.Id);
         Assert.NotNull(messageInfo);
         Assert.Equal(archivedMessage.DocumentType.Name, messageInfo.DocumentType);
-        Assert.Equal(archivedMessage.SenderNumber.Value, messageInfo.SenderNumber);
-        Assert.Equal(archivedMessage.ReceiverNumber.Value, messageInfo.ReceiverNumber);
+        Assert.Equal(archivedMessage.SenderNumber?.Value, messageInfo.SenderNumber);
+        Assert.Equal(archivedMessage.ReceiverNumber?.Value, messageInfo.ReceiverNumber);
         Assert.Equal(archivedMessage.CreatedAt, messageInfo.CreatedAt);
+        Assert.Equal(archivedMessage.MessageId, messageInfo.MessageId);
     }
 
     [Fact]
@@ -78,7 +79,7 @@ public class SearchMessagesTests : TestBase
     {
         //Arrange
         var messageId = Guid.NewGuid().ToString();
-        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z"), messageId));
+        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z"), messageId: messageId));
         await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z")));
 
         //Act
@@ -89,6 +90,7 @@ public class SearchMessagesTests : TestBase
             messageId)).ConfigureAwait(false);
 
         //Assert
+        Assert.Single(result.Messages);
         Assert.Equal(messageId, result.Messages[0].MessageId);
     }
 
@@ -97,7 +99,8 @@ public class SearchMessagesTests : TestBase
     {
         //Arrange
         var messageId = Guid.NewGuid().ToString();
-        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z"), messageId));
+        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z"), messageId: messageId));
+        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z")));
 
         //Act
         var result = await QueryAsync(new GetMessagesQuery(
@@ -199,14 +202,16 @@ public class SearchMessagesTests : TestBase
 
     private ArchivedMessage CreateArchivedMessage(
         Instant? createdAt = null,
-        string? messageId = null,
+        string? id = null,
         string? senderNumber = null,
         string? receiverNumber = null,
         string? documentType = null,
-        string? businessReason = null)
+        string? businessReason = null,
+        string? messageId = null)
     {
         return new ArchivedMessage(
-            string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
+            string.IsNullOrWhiteSpace(id) ? Guid.NewGuid().ToString() : id,
+            messageId,
             EnumerationType.FromName<DocumentType>(documentType ?? DocumentType.AccountingPointCharacteristics.Name),
             ActorNumber.Create(senderNumber ?? "1234512345123"),
             ActorNumber.Create(receiverNumber ?? "1234512345128"),

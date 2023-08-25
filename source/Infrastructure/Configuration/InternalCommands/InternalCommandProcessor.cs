@@ -13,8 +13,10 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Configuration;
 using Application.Configuration.Commands.Commands;
 using Application.Configuration.DataAccess;
 using Dapper;
@@ -32,6 +34,7 @@ namespace Infrastructure.Configuration.InternalCommands
         private readonly CommandExecutor _commandExecutor;
         private readonly ILogger<InternalCommandProcessor> _logger;
         private readonly IDatabaseConnectionFactory _connectionFactory;
+        private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
         public InternalCommandProcessor(
             InternalCommandMapper mapper,
@@ -39,19 +42,25 @@ namespace Infrastructure.Configuration.InternalCommands
             ISerializer serializer,
             CommandExecutor commandExecutor,
             ILogger<InternalCommandProcessor> logger,
-            IDatabaseConnectionFactory connectionFactory)
+            IDatabaseConnectionFactory connectionFactory,
+            ISystemDateTimeProvider systemDateTimeProvider)
         {
             _mapper = mapper;
             _internalCommandAccessor = internalCommandAccessor ?? throw new ArgumentNullException(nameof(internalCommandAccessor));
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
             _commandExecutor = commandExecutor ?? throw new ArgumentNullException(nameof(commandExecutor));
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+            _systemDateTimeProvider = systemDateTimeProvider;
         }
 
         public async Task ProcessPendingAsync(CancellationToken cancellationToken)
         {
-            var pendingCommands = await _internalCommandAccessor.GetPendingAsync().ConfigureAwait(false);
+            var stopwatch = new Stopwatch();
+            var innerStopWatch = new Stopwatch();
+            stopwatch.Start();
+            var pendingCommands = await _internalCommandAccessor
+                .GetPendingAsync().ConfigureAwait(false);
 
             var executionPolicy = Policy
                 .Handle<Exception>()
@@ -62,6 +71,7 @@ namespace Infrastructure.Configuration.InternalCommands
 
             foreach (var queuedCommand in pendingCommands)
             {
+                innerStopWatch.Start();
                 var result = await executionPolicy.ExecuteAndCaptureAsync(() =>
                     ExecuteCommandAsync(queuedCommand)).ConfigureAwait(false);
 
@@ -75,7 +85,21 @@ namespace Infrastructure.Configuration.InternalCommands
                 {
                     await MarkAsProcessedAsync(queuedCommand, cancellationToken).ConfigureAwait(false);
                 }
+
+                innerStopWatch.Stop();
+                _logger?.Log(
+                    innerStopWatch.ElapsedMilliseconds < 500m
+                        ? LogLevel.Debug
+                        : LogLevel.Warning,
+                    "{Command} executed in {ElapsedMilliseconds} ms",
+                    queuedCommand.Type,
+                    innerStopWatch.ElapsedMilliseconds);
+
+                innerStopWatch.Reset();
             }
+
+            stopwatch.Stop();
+            _logger?.Log(LogLevel.Information, "Internal Command Processor executed in {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
         }
 
         private Task ExecuteCommandAsync(QueuedInternalCommand queuedInternalCommand)
@@ -95,7 +119,7 @@ namespace Infrastructure.Configuration.InternalCommands
                 "WHERE [Id] = @Id",
                 new
                 {
-                    NowDate = DateTime.UtcNow,
+                    NowDate = _systemDateTimeProvider.Now().ToDateTimeUtc(),
                     Error = exception,
                     queuedCommand.Id,
                 }).ConfigureAwait(false);
@@ -110,7 +134,7 @@ namespace Infrastructure.Configuration.InternalCommands
                 "WHERE [Id] = @Id",
                 new
                 {
-                    NowDate = DateTime.UtcNow,
+                    NowDate = _systemDateTimeProvider.Now().ToDateTimeUtc(),
                     queuedCommand.Id,
                 }).ConfigureAwait(false);
         }

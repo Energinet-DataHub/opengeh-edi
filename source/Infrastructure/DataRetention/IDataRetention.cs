@@ -12,25 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text.Json.Serialization;
-using Application.Configuration.Commands.Commands;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace IntegrationTests.Infrastructure.Configuration.InternalCommands;
+namespace Infrastructure.DataRetention;
 
-public class TestCommand : InternalCommand
+/// <summary>
+/// Represent the contract for data retention for a single data source.
+/// A data source can be a database table.
+/// </summary>
+public interface IDataRetention
 {
-    [JsonConstructor]
-    public TestCommand(Guid id, bool throwException)
-        : base(id)
-    {
-        ThrowException = throwException;
-    }
-
-    public TestCommand(bool throwException = false)
-    {
-        ThrowException = throwException;
-    }
-
-    public bool ThrowException { get; }
+    /// <summary>
+    /// Responsible for cleaning the no longer needed data.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
+    Task CleanupAsync(CancellationToken cancellationToken);
 }
