@@ -76,17 +76,17 @@ namespace Api
         {
             return new HostBuilder()
                 .ConfigureFunctionsWorkerDefaults(
-                    worker =>
-                    {
-                        worker.UseMiddleware<UnHandledExceptionMiddleware>();
-                        worker.UseMiddleware<CorrelationIdMiddleware>();
-                        /*worker.UseMiddleware<RequestResponseLoggingMiddleware>();*/
-                        ConfigureAuthenticationMiddleware(worker);
-                    },
-                    option =>
-                    {
-                        option.EnableUserCodeException = true;
-                    })
+                worker =>
+                {
+                    worker.UseMiddleware<UnHandledExceptionMiddleware>();
+                    worker.UseMiddleware<CorrelationIdMiddleware>();
+                    /*worker.UseMiddleware<RequestResponseLoggingMiddleware>();*/
+                    ConfigureAuthenticationMiddleware(worker);
+                },
+                option =>
+                {
+                    option.EnableUserCodeException = true;
+                })
                 .ConfigureServices(services =>
                 {
                     var databaseConnectionString = runtime.DB_CONNECTION_STRING;
