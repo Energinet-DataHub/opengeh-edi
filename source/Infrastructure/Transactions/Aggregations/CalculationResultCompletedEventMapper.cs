@@ -155,9 +155,9 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
             ProcessType.Aggregation => BusinessReason.PreliminaryAggregation.Name,
             ProcessType.BalanceFixing => BusinessReason.BalanceFixing.Name,
             ProcessType.WholesaleFixing => BusinessReason.WholesaleFixing.Name,
-            ProcessType.FirstCorrectionSettlement => BusinessReason.Correction.Name, // TODO: Check if this is correct
-            ProcessType.SecondCorrectionSettlement => BusinessReason.Correction.Name, // TODO: Check if this is correct
-            ProcessType.ThirdCorrectionSettlement => BusinessReason.Correction.Name, // TODO: Check if this is correct
+            ProcessType.FirstCorrectionSettlement => BusinessReason.Correction.Name,
+            ProcessType.SecondCorrectionSettlement => BusinessReason.Correction.Name,
+            ProcessType.ThirdCorrectionSettlement => BusinessReason.Correction.Name,
             ProcessType.Unspecified => throw new InvalidOperationException("Process type is not specified from Wholesales"),
             _ => throw new InvalidOperationException("Unknown process type from Wholesales"),
         };

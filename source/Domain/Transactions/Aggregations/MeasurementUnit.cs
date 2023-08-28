@@ -34,4 +34,9 @@ public class MeasurementUnit : EnumerationType
             type.Code.Equals(value, StringComparison.OrdinalIgnoreCase) ||
             type.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
     }
+
+    public static IReadOnlyCollection<MeasurementUnit> GetAll()
+    {
+        return GetAll<MeasurementUnit>().ToList();
+    }
 }

@@ -33,4 +33,9 @@ public class MeteringPointType : EnumerationType
 
         return meteringPointType;
     }
+
+    public static IReadOnlyCollection<MeteringPointType> GetAll()
+    {
+        return GetAll<MeteringPointType>().ToList();
+    }
 }

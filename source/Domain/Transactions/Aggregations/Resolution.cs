@@ -35,4 +35,9 @@ public class Resolution : EnumerationType
             resolution.Code.Equals(value, StringComparison.OrdinalIgnoreCase) ||
             resolution.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
     }
+
+    public static IReadOnlyCollection<Resolution> GetAll()
+    {
+        return GetAll<Resolution>().ToList();
+    }
 }
