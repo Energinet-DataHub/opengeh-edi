@@ -247,14 +247,6 @@ namespace Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddRequestHandler<TRequestHandler>()
-            where TRequestHandler : class
-        {
-            _services.AddTransient<TRequestHandler>();
-
-            return this;
-        }
-
         private void AddRemoteBusinessService<TRequest, TReply>(string responseQueueName)
             where TRequest : class
             where TReply : class

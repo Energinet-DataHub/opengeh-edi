@@ -15,18 +15,26 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.OutgoingMessages;
 using MediatR;
 
 namespace IntegrationTests.Infrastructure.Configuration.InternalCommands;
 
-public class TestCommandHandler : IRequestHandler<TestCommand, Unit>
+public class TestCreateOutgoingCommandHandler : IRequestHandler<TestCreateOutgoingMessageCommand, Unit>
 {
-    public Task<Unit> Handle(TestCommand request, CancellationToken cancellationToken)
+    private readonly IOutgoingMessageRepository _outgoingMessageRepository;
+
+    public TestCreateOutgoingCommandHandler(IOutgoingMessageRepository outgoingMessageRepository)
+    {
+        _outgoingMessageRepository = outgoingMessageRepository;
+    }
+
+    public Task<Unit> Handle(TestCreateOutgoingMessageCommand request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
-        if (request.ThrowException)
+        for (int i = 0; i < request.NumberOfOutgoingMessages; i++)
         {
-            throw new InvalidOperationException("This is a test exception");
+            _outgoingMessageRepository.Add(new TestOutgoingMessage());
         }
 
         return Unit.Task;

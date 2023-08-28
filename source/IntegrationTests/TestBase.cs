@@ -139,6 +139,11 @@ namespace IntegrationTests
             return ProcessBackgroundTasksAsync();
         }
 
+        protected Task ProcessReceivedInboxEventsAsync()
+        {
+            return ProcessBackgroundTasksAsync();
+        }
+
         private static string CreateFakeServiceBusConnectionString()
         {
             return new StringBuilder()
@@ -156,11 +161,6 @@ namespace IntegrationTests
             {
                 await ProcessInternalCommandsAsync();
             }
-        }
-
-        private Task ProcessReceivedInboxEventsAsync()
-        {
-            return ProcessBackgroundTasksAsync();
         }
 
         private Task ProcessReceivedIntegrationEventsAsync()
@@ -193,6 +193,9 @@ namespace IntegrationTests
             _services.AddTransient<INotificationHandler<IntegrationTests.Infrastructure.InboxEvents.TestNotification>>(
                 _ => InboxEventNotificationHandler);
 
+            _services.AddTransient<IRequestHandler<TestCommand, Unit>, TestCommandHandler>();
+            _services.AddTransient<IRequestHandler<TestCreateOutgoingMessageCommand, Unit>, TestCreateOutgoingCommandHandler>();
+
             CompositionRoot.Initialize(_services)
                 .AddAuthentication()
                 .AddAggregationsConfiguration()
@@ -209,7 +212,6 @@ namespace IntegrationTests
                     return correlation;
                 })
                 .AddMessagePublishing()
-                .AddRequestHandler<TestCommandHandler>()
                 .AddHttpClientAdapter(_ => _httpClientSpy)
                 .AddAggregatedMeasureDataServices()
                 .AddMoveInServices(

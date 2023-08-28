@@ -1,0 +1,4 @@
+﻿{
+  "AZP_TOKEN": "<acceptance test azp token using for auth token>",
+  "SHARED_KEYVAULT_NAME": "<key vault name>"
+}

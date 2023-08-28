@@ -12,25 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text.Json.Serialization;
-using Application.Configuration.Commands.Commands;
-
-namespace IntegrationTests.Infrastructure.Configuration.InternalCommands;
-
-public class TestCommand : InternalCommand
-{
-    [JsonConstructor]
-    public TestCommand(Guid id, bool throwException)
-        : base(id)
-    {
-        ThrowException = throwException;
-    }
-
-    public TestCommand(bool throwException = false)
-    {
-        ThrowException = throwException;
-    }
-
-    public bool ThrowException { get; }
-}
+global using Xunit;

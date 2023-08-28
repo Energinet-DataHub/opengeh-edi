@@ -12,25 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text.Json.Serialization;
-using Application.Configuration.Commands.Commands;
+namespace AcceptanceTest.Exceptions;
 
-namespace IntegrationTests.Infrastructure.Configuration.InternalCommands;
-
-public class TestCommand : InternalCommand
+public class UnexpectedPeekResponseException : Exception
 {
-    [JsonConstructor]
-    public TestCommand(Guid id, bool throwException)
-        : base(id)
+    public UnexpectedPeekResponseException(string message)
+        : base(message)
     {
-        ThrowException = throwException;
     }
 
-    public TestCommand(bool throwException = false)
+    public UnexpectedPeekResponseException()
     {
-        ThrowException = throwException;
     }
 
-    public bool ThrowException { get; }
+    public UnexpectedPeekResponseException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
 }
