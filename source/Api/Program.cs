@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Api.Configuration.Middleware;
@@ -25,6 +26,7 @@ using Application.Actors;
 using Application.Configuration.DataAccess;
 using Application.Transactions.MoveIn;
 using CimMessageAdapter.Messages.Queues;
+using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.Reflection;
@@ -37,6 +39,7 @@ using Infrastructure.Wholesale;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
@@ -72,12 +75,17 @@ namespace Api
             RuntimeEnvironment runtime)
         {
             return new HostBuilder()
-                .ConfigureFunctionsWorkerDefaults(worker =>
+                .ConfigureFunctionsWorkerDefaults(
+                worker =>
                 {
                     worker.UseMiddleware<UnHandledExceptionMiddleware>();
                     worker.UseMiddleware<CorrelationIdMiddleware>();
                     /*worker.UseMiddleware<RequestResponseLoggingMiddleware>();*/
                     ConfigureAuthenticationMiddleware(worker);
+                },
+                option =>
+                {
+                    option.EnableUserCodeException = true;
                 })
                 .ConfigureServices(services =>
                 {
@@ -86,6 +94,8 @@ namespace Api
                     services.AddSingleton(new MeteringPointServiceBusClientConfiguration(
                         "NotImplemented"));
 
+                    services.AddApplicationInsights();
+                    services.ConfigureFunctionsApplicationInsights();
                     services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration(
                         "NotImplemented"));
 
@@ -162,6 +172,18 @@ namespace Api
                         CalculationResultCompleted.Descriptor,
                     };
                     services.AddSubscriber<IntegrationEventHandler>(integrationEventDescriptors);
+                })
+                .ConfigureLogging(logging =>
+                {
+                    logging.Services.Configure<LoggerFilterOptions>(options =>
+                    {
+                        var defaultRule = options.Rules.FirstOrDefault(rule =>
+                            rule.ProviderName == "Microsoft.Extensions.Logging.ApplicationInsights.ApplicationInsightsLoggerProvider");
+                        if (defaultRule is not null)
+                        {
+                            options.Rules.Remove(defaultRule);
+                        }
+                    });
                 })
                 .Build();
         }
