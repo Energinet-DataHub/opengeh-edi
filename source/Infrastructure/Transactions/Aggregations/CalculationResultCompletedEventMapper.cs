@@ -41,6 +41,7 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
     {
         var integrationEvent =
             CalculationResultCompleted.Parser.ParseJson(payload);
+
         return new AggregationResultAvailable(
             new Aggregation(
                 MapPoints(integrationEvent.TimeSeriesPoints),
@@ -70,8 +71,66 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
         return integrationEvent.ToString();
     }
 
-    private static ActorGrouping MapActorGrouping(CalculationResultCompleted integrationEvent)
+    protected static string MapProcessType(ProcessType processType)
     {
+        return processType switch
+        {
+            ProcessType.Aggregation => BusinessReason.PreliminaryAggregation.Name,
+            ProcessType.BalanceFixing => BusinessReason.BalanceFixing.Name,
+            ProcessType.WholesaleFixing => BusinessReason.WholesaleFixing.Name,
+            ProcessType.FirstCorrectionSettlement => BusinessReason.Correction.Name,
+            ProcessType.SecondCorrectionSettlement => BusinessReason.Correction.Name,
+            ProcessType.ThirdCorrectionSettlement => BusinessReason.Correction.Name,
+            ProcessType.Unspecified => throw new InvalidOperationException("Process type is not specified from Wholesales"),
+            _ => throw new InvalidOperationException("Unknown process type from Wholesales"),
+        };
+    }
+
+    protected static string MapResolution(CalculationResultCompleted integrationEvent)
+    {
+        ArgumentNullException.ThrowIfNull(integrationEvent);
+
+        return integrationEvent.Resolution switch
+        {
+            Resolution.Quarter => Domain.Transactions.Aggregations.Resolution.QuarterHourly.Name,
+            Resolution.Unspecified => throw new InvalidOperationException("Could not map resolution type"),
+            _ => throw new InvalidOperationException("Unknown resolution type"),
+        };
+    }
+
+    protected static string MapUnitType(CalculationResultCompleted integrationEvent)
+    {
+        ArgumentNullException.ThrowIfNull(integrationEvent);
+
+        return integrationEvent.QuantityUnit switch
+        {
+            QuantityUnit.Kwh => MeasurementUnit.Kwh.Name,
+            QuantityUnit.Unspecified => throw new InvalidOperationException("Could not map unit type"),
+            _ => throw new InvalidOperationException("Unknown unit type"),
+        };
+    }
+
+    protected static string MapMeteringPointType(CalculationResultCompleted integrationEvent)
+    {
+        ArgumentNullException.ThrowIfNull(integrationEvent);
+
+        return integrationEvent.TimeSeriesType switch
+        {
+            TimeSeriesType.Production => MeteringPointType.Production.Name,
+            TimeSeriesType.FlexConsumption => MeteringPointType.Consumption.Name,
+            TimeSeriesType.NonProfiledConsumption => MeteringPointType.Consumption.Name,
+            TimeSeriesType.NetExchangePerGa => MeteringPointType.Exchange.Name,
+            TimeSeriesType.NetExchangePerNeighboringGa => MeteringPointType.Exchange.Name,
+            TimeSeriesType.TotalConsumption => MeteringPointType.Consumption.Name,
+            TimeSeriesType.Unspecified => throw new InvalidOperationException("Unknown metering point type"),
+            _ => throw new InvalidOperationException("Could not determine metering point type"),
+        };
+    }
+
+    protected static ActorGrouping MapActorGrouping(CalculationResultCompleted integrationEvent)
+    {
+        ArgumentNullException.ThrowIfNull(integrationEvent);
+
         return integrationEvent.AggregationLevelCase switch
         {
             CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerGridarea => new ActorGrouping(null, null),
@@ -99,41 +158,6 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
         return new Period(integrationEvent.PeriodStartUtc.ToInstant(), integrationEvent.PeriodEndUtc.ToInstant());
     }
 
-    private static string MapResolution(CalculationResultCompleted integrationEvent)
-    {
-        return integrationEvent.Resolution switch
-        {
-            Resolution.Quarter => Domain.Transactions.Aggregations.Resolution.QuarterHourly.Name,
-            Resolution.Unspecified => throw new InvalidOperationException("Could not map resolution type"),
-            _ => throw new InvalidOperationException("Unknown resolution type"),
-        };
-    }
-
-    private static string MapUnitType(CalculationResultCompleted integrationEvent)
-    {
-        return integrationEvent.QuantityUnit switch
-        {
-            QuantityUnit.Kwh => MeasurementUnit.Kwh.Name,
-            QuantityUnit.Unspecified => throw new InvalidOperationException("Could not map unit type"),
-            _ => throw new InvalidOperationException("Unknown unit type"),
-        };
-    }
-
-    private static string MapMeteringPointType(CalculationResultCompleted integrationEvent)
-    {
-        return integrationEvent.TimeSeriesType switch
-        {
-            TimeSeriesType.Production => MeteringPointType.Production.Name,
-            TimeSeriesType.FlexConsumption => MeteringPointType.Consumption.Name,
-            TimeSeriesType.NonProfiledConsumption => MeteringPointType.Consumption.Name,
-            TimeSeriesType.NetExchangePerGa => MeteringPointType.Exchange.Name,
-            TimeSeriesType.NetExchangePerNeighboringGa => MeteringPointType.Exchange.Name,
-            TimeSeriesType.TotalConsumption => MeteringPointType.Consumption.Name,
-            TimeSeriesType.Unspecified => throw new InvalidOperationException("Unknown metering point type"),
-            _ => throw new InvalidOperationException("Could not determine metering point type"),
-        };
-    }
-
     private static IReadOnlyList<Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
     {
         var points = new List<Point>();
@@ -146,21 +170,6 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
         }
 
         return points.AsReadOnly();
-    }
-
-    private static string MapProcessType(CalculationResultCompleted integrationEvent)
-    {
-        return integrationEvent.ProcessType switch
-        {
-            ProcessType.Aggregation => BusinessReason.PreliminaryAggregation.Name,
-            ProcessType.BalanceFixing => BusinessReason.BalanceFixing.Name,
-            ProcessType.WholesaleFixing => BusinessReason.WholesaleFixing.Name,
-            ProcessType.FirstCorrectionSettlement => BusinessReason.Correction.Name,
-            ProcessType.SecondCorrectionSettlement => BusinessReason.Correction.Name,
-            ProcessType.ThirdCorrectionSettlement => BusinessReason.Correction.Name,
-            ProcessType.Unspecified => throw new InvalidOperationException("Process type is not specified from Wholesales"),
-            _ => throw new InvalidOperationException("Unknown process type from Wholesales"),
-        };
     }
 
     private static string MapQuality(QuantityQuality quality)

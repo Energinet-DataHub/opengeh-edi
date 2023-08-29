@@ -21,8 +21,10 @@ using Application.Configuration.DataAccess;
 using Dapper;
 using Infrastructure.Configuration.DataAccess;
 using Infrastructure.Configuration.IntegrationEvents;
+using Infrastructure.InboxEvents;
 using IntegrationTests.Fixtures;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
@@ -133,7 +135,8 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
             GetService<IDatabaseConnectionFactory>(),
             GetService<IMediator>(),
             GetService<ISystemDateTimeProvider>(),
-            new[] { new TestIntegrationEventMapper(), });
+            new[] { new TestIntegrationEventMapper(), },
+            GetService<ILogger<IntegrationEventsProcessor>>());
         return inboxProcessor.ProcessMessagesAsync(CancellationToken.None);
     }
 

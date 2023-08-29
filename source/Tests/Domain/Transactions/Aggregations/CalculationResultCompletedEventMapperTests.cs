@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Domain.OutgoingMessages;
 using Domain.Transactions.Aggregations;
 using Energinet.DataHub.Wholesale.Contracts.Events;
+using Google.Protobuf.WellKnownTypes;
+using Infrastructure.Transactions.Aggregations;
 using Xunit;
 using Enum = System.Enum;
 using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
@@ -23,13 +26,46 @@ namespace Tests.Domain.Transactions.Aggregations;
 
 public class CalculationResultCompletedEventMapperTests
 {
-    public CalculationResultCompletedEventMapperTests()
+    private readonly CalculationResultCompletedEventMapper _calculationResultCompletedEventMapper;
+    private readonly CalculationResultCompletedEventMapperSpy _calculationResultCompletedEventMapperSpy;
+
+    public CalculationResultCompletedEventMapperTests(CalculationResultCompletedEventMapper calculationResultCompletedEventMapper, CalculationResultCompletedEventMapperSpy calculationResultCompletedEventMapperSpy)
     {
+        _calculationResultCompletedEventMapper = calculationResultCompletedEventMapper;
+        _calculationResultCompletedEventMapperSpy = calculationResultCompletedEventMapperSpy;
+    }
+
+    [Theory]
+    [InlineData(ProcessType.BalanceFixing, ProcessType.WholesaleFixing)]
+    public void Test_with()
+    {
+        CreateCalculationResultCompleted();
+        _calculationResultCompletedEventMapperSpy.MapProcessType();
+    }
+
+    private void CreateCalculationResultCompleted()
+    {
+        var processCompletedEvent = new CalculationResultCompleted()
+        {
+            Resolution = Resolution.Quarter,
+            QuantityUnit = QuantityUnit.Kwh,
+            ProcessType = ProcessType.BalanceFixing,
+            TimeSeriesType = TimeSeriesType.Production,
+            BatchId = Guid.NewGuid().ToString(),
+            AggregationPerGridarea = new AggregationPerGridArea()
+            {
+                GridAreaCode = "244",
+            },
+            PeriodEndUtc = DateTime.UtcNow.ToTimestamp(),
+            PeriodStartUtc = DateTime.UtcNow.ToTimestamp(),
+            TimeSeriesPoints = { new TimeSeriesPoint { Time = new Timestamp { Seconds = 100000 }, Quantity = new DecimalValue { Units = 123, Nanos = 1200000 }, QuantityQuality = QuantityQuality.Measured } },
+        };
     }
 
     [Fact]
     public void Calculation_result_completed_processType_from_wholesale_is_not_changed()
     {
+
         var processTypeTheirs = (ProcessType[])Enum.GetValues(typeof(ProcessType));
 
         Assert.Collection(
