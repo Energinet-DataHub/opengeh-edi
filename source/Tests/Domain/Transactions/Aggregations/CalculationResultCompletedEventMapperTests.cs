@@ -12,16 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq;
-using Domain.Actors;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Domain.Transactions;
-using Domain.Transactions.Aggregations;
 using Energinet.DataHub.Wholesale.Contracts.Events;
-using Google.Protobuf.WellKnownTypes;
-using Infrastructure.Transactions.Aggregations;
-using Tests.Factories;
 using Xunit;
 using Enum = System.Enum;
 using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
@@ -30,25 +21,13 @@ namespace Tests.Domain.Transactions.Aggregations;
 
 public class CalculationResultCompletedEventMapperTests
 {
-    private readonly AggregationResultBuilder _aggregationResult;
-
     public CalculationResultCompletedEventMapperTests()
     {
-        _aggregationResult = new AggregationResultBuilder();
     }
 
     [Fact]
-    public void Process_type_in_calculation_result_completed_in_contract_is_not_changed()
+    public void Calculation_result_completed_processType_from_wholesale_is_not_changed()
     {
-        //ProcessTypes in CalculatedResultCompleted
-        // [OriginalName("PROCESS_TYPE_UNSPECIFIED")] Unspecified,
-        // [OriginalName("PROCESS_TYPE_BALANCE_FIXING")] BalanceFixing,
-        // [OriginalName("PROCESS_TYPE_AGGREGATION")] Aggregation,
-        // [OriginalName("PROCESS_TYPE_WHOLESALE_FIXING")] WholesaleFixing,
-        // [OriginalName("PROCESS_TYPE_FIRST_CORRECTION_SETTLEMENT")] FirstCorrectionSettlement,
-        // [OriginalName("PROCESS_TYPE_SECOND_CORRECTION_SETTLEMENT")] SecondCorrectionSettlement,
-        // [OriginalName("PROCESS_TYPE_THIRD_CORRECTION_SETTLEMENT")] ThirdCorrectionSettlement,
-
         //mapped to
         //ProcessType.Aggregation => BusinessReason.PreliminaryAggregation.Name,
         // ProcessType.BalanceFixing => BusinessReason.BalanceFixing.Name,
@@ -57,80 +36,62 @@ public class CalculationResultCompletedEventMapperTests
         // ProcessType.SecondCorrectionSettlement => BusinessReason.Correction.Name, // TODO: Check if this is correct
         // ProcessType.ThirdCorrectionSettlement => BusinessReason.Correction.Name, // TODO: Check if this is correct
         // ProcessType.Unspecified => throw new InvalidOperationException("Process type is not specified from Wholesales"),
-        var processTypesTheirs = Enum.GetValues(typeof(ProcessType));
-        var businessReasons = BusinessReason.GetAll();
-
-        foreach (var processType in processTypesTheirs)
-        {
-            if (processType is null)
-            {
-                Assert.Equal(processType, processType);
-            }
-        }
-
-        foreach (var businessReason in businessReasons)
-        {
-            if (businessReason is null)
-            {
-                Assert.Equal(businessReason, businessReason);
-            }
-        }
+        var processTypeTheirs = (ProcessType[])Enum.GetValues(typeof(ProcessType));
+        Assert.Contains(processTypeTheirs, type => type == ProcessType.Unspecified);
+        Assert.Contains(processTypeTheirs, type => type == ProcessType.Aggregation);
+        Assert.Contains(processTypeTheirs, type => type == ProcessType.BalanceFixing);
+        Assert.Contains(processTypeTheirs, type => type == ProcessType.SecondCorrectionSettlement);
+        Assert.Contains(processTypeTheirs, type => type == ProcessType.WholesaleFixing);
+        Assert.Contains(processTypeTheirs, type => type == ProcessType.FirstCorrectionSettlement);
+        Assert.Contains(processTypeTheirs, type => type == ProcessType.ThirdCorrectionSettlement);
     }
 
     [Fact]
-    public void Resolution_in_calculation_result_completed_in_contract_is_not_changed()
+    public void Calculation_result_completed_resolution_from_wholesale_is_not_changed()
     {
-        //[OriginalName("RESOLUTION_UNSPECIFIED")] Unspecified,
-        //[OriginalName("RESOLUTION_QUARTER")] Quarter,
-        var resolutionTheirs = Enum.GetValues(typeof(Resolution));
-        //var businessReason = Domain.Transactions.Aggregations.;
+        var resolutionTheirs = (Resolution[])Enum.GetValues(typeof(Resolution));
+        Assert.Contains(resolutionTheirs, resolution => resolution == Resolution.Quarter);
+        Assert.Contains(resolutionTheirs, resolution => resolution == Resolution.Unspecified);
     }
 
     [Fact]
-    public void Quantity_unit__in_calculation_result_completed_in_contract_is_not_changed()
+    public void Calculation_result_completed_quantityQuality_from_wholesale_is_not_changed()
     {
-        //[OriginalName("QUANTITY_UNIT_UNSPECIFIED")] Unspecified,
-        //[OriginalName("QUANTITY_UNIT_KWH")] Kwh,
-        //Mapped to quality
-        var quantityUnitTheirs = Enum.GetValues(typeof(QuantityUnit));
-        var businessReason = Quality.GetAll();
+        var quantityQualityTheirs = (QuantityQuality[])Enum.GetValues(typeof(QuantityQuality));
+        Assert.Contains(quantityQualityTheirs, quality => quality == QuantityQuality.Unspecified);
+        Assert.Contains(quantityQualityTheirs, quality => quality == QuantityQuality.Calculated);
+        Assert.Contains(quantityQualityTheirs, quality => quality == QuantityQuality.Estimated);
+        Assert.Contains(quantityQualityTheirs, quality => quality == QuantityQuality.Incomplete);
+        Assert.Contains(quantityQualityTheirs, quality => quality == QuantityQuality.Measured);
+        Assert.Contains(quantityQualityTheirs, quality => quality == QuantityQuality.Missing);
+
+        //var businessReason = Quality.GetAll();
     }
 
     [Fact]
-    public void Time_series_type_in_calculation_result_completed_in_contract_is_not_changed()
+    public void Calculation_result_completed_timeSeriesType_from_wholesale_is_not_changed()
     {
-        // [OriginalName("TIME_SERIES_TYPE_UNSPECIFIED")] Unspecified,
-        // [OriginalName("TIME_SERIES_TYPE_PRODUCTION")] Production,
-        // [OriginalName("TIME_SERIES_TYPE_NON_PROFILED_CONSUMPTION")] NonProfiledConsumption,
-        // [OriginalName("TIME_SERIES_TYPE_FLEX_CONSUMPTION")] FlexConsumption,
-        // [OriginalName("TIME_SERIES_TYPE_NET_EXCHANGE_PER_GA")] NetExchangePerGa,
-        // [OriginalName("TIME_SERIES_TYPE_NET_EXCHANGE_PER_NEIGHBORING_GA")] NetExchangePerNeighboringGa,
-        // [OriginalName("TIME_SERIES_TYPE_GRID_LOSS")] GridLoss,
-        // [OriginalName("TIME_SERIES_TYPE_NEGATIVE_GRID_LOSS")] NegativeGridLoss,
-        // [OriginalName("TIME_SERIES_TYPE_POSITIVE_GRID_LOSS")] PositiveGridLoss,
-        // [OriginalName("TIME_SERIES_TYPE_TOTAL_CONSUMPTION")] TotalConsumption,
-        // [OriginalName("TIME_SERIES_TYPE_TEMP_FLEX_CONSUMPTION")] TempFlexConsumption,
-        // [OriginalName("TIME_SERIES_TYPE_TEMP_PRODUCTION")] TempProduction,
-        var timeSeriesTheirs = Enum.GetValues(typeof(TimeSeriesType));
-        var meteringPoint = MeteringPointType.GetAll();
+        var timeSeriesTypeTheirs = (TimeSeriesType[])Enum.GetValues(typeof(TimeSeriesType));
+        Assert.Contains(timeSeriesTypeTheirs, type => type == TimeSeriesType.Production);
+        Assert.Contains(timeSeriesTypeTheirs, type => type == TimeSeriesType.Production);
+        Assert.Contains(timeSeriesTypeTheirs, type => type == TimeSeriesType.NonProfiledConsumption);
+        Assert.Contains(timeSeriesTypeTheirs, type => type == TimeSeriesType.FlexConsumption);
+        Assert.Contains(timeSeriesTypeTheirs, type => type == TimeSeriesType.NetExchangePerGa);
+        Assert.Contains(timeSeriesTypeTheirs, type => type == TimeSeriesType.NetExchangePerNeighboringGa);
+        Assert.Contains(timeSeriesTypeTheirs, type => type == TimeSeriesType.GridLoss);
+        Assert.Contains(timeSeriesTypeTheirs, type => type == TimeSeriesType.NegativeGridLoss);
+        Assert.Contains(timeSeriesTypeTheirs, type => type == TimeSeriesType.PositiveGridLoss);
+        Assert.Contains(timeSeriesTypeTheirs, type => type == TimeSeriesType.TotalConsumption);
+        Assert.Contains(timeSeriesTypeTheirs, type => type == TimeSeriesType.TempFlexConsumption);
+        Assert.Contains(timeSeriesTypeTheirs, type => type == TimeSeriesType.TempProduction);
     }
 
     [Fact]
-    public void Quantity_unit_in_calculation_result_completed_in_contract_is_not_changed()
+    public void Calculation_result_completed_quantity_from_wholesale_is_not_changed()
     {
-        var measurementUnits = MeasurementUnit.GetAll();
-
+        //var measurementUnits = MeasurementUnit.GetAll();
         var measurementUnitTheirs = (QuantityUnit[])Enum.GetValues(typeof(QuantityUnit));
         Assert.Contains(measurementUnitTheirs, unit => unit == QuantityUnit.Unspecified);
         Assert.Contains(measurementUnitTheirs, unit => unit == QuantityUnit.Kwh);
-
-        // QuantityUnit.Kwh => MeasurementUnit.Kwh.Name,
-        //QuantityUnit.Unspecified => throw new InvalidOperationException("Could not map unit type"),
-        foreach (var value in measurementUnitTheirs)
-        {
-            var quantityUnit = (QuantityUnit)value;
-        }
-
-       // var measurementUnits = MeasurementUnit.GetAll();
     }
 }
