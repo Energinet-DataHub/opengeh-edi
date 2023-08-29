@@ -29,6 +29,38 @@ public class CalculationResultCompletedEventMapperTests
         }
     }
 
+    public static IEnumerable<object[]> QuantityQualities()
+    {
+        foreach (var number in Enum.GetValues(typeof(QuantityQuality)))
+        {
+            yield return new[] { number };
+        }
+    }
+
+    public static IEnumerable<object[]> Resolutions()
+    {
+        foreach (var number in Enum.GetValues(typeof(Resolution)))
+        {
+            yield return new[] { number };
+        }
+    }
+
+    public static IEnumerable<object[]> QuantityUnits()
+    {
+        foreach (var number in Enum.GetValues(typeof(QuantityUnit)))
+        {
+            yield return new[] { number };
+        }
+    }
+
+    public static IEnumerable<object[]> TimeSeriesTypes()
+    {
+        foreach (var number in Enum.GetValues(typeof(TimeSeriesType)))
+        {
+            yield return new[] { number };
+        }
+    }
+
     [Theory]
     [MemberData(nameof(ProcessTypes))]
     public void Ensure_handling_all_process_types(ProcessType processType)
@@ -40,7 +72,72 @@ public class CalculationResultCompletedEventMapperTests
         }
         else
         {
-            Assert.Throws<InvalidOperationException>(() => CalculationResultCompletedEventMapperSpy.MapProcessTypeSpy(processType));
+            Assert.Throws<InvalidOperationException>(() =>
+                CalculationResultCompletedEventMapperSpy.MapProcessTypeSpy(processType));
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(Resolutions))]
+    public void Ensure_handling_all_resolutions(Resolution resolution)
+    {
+        // Act
+        if (resolution != Resolution.Unspecified)
+        {
+            CalculationResultCompletedEventMapperSpy.MapResolutionSpy(resolution);
+        }
+        else
+        {
+            Assert.Throws<InvalidOperationException>(() =>
+                CalculationResultCompletedEventMapperSpy.MapResolutionSpy(resolution));
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(QuantityQualities))]
+    public void Ensure_handling_all_quantity_qualities(QuantityQuality quantityQuality)
+    {
+        // Act
+        if (quantityQuality != QuantityQuality.Unspecified)
+        {
+            CalculationResultCompletedEventMapperSpy.MapQuantityQualitySpy(quantityQuality);
+        }
+        else
+        {
+            Assert.Throws<InvalidOperationException>(() =>
+                CalculationResultCompletedEventMapperSpy.MapQuantityQualitySpy(quantityQuality));
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(QuantityUnits))]
+    public void Ensure_handling_all_quantity_units(QuantityUnit quantityUnit)
+    {
+        // Act
+        if (quantityUnit != QuantityUnit.Unspecified)
+        {
+            CalculationResultCompletedEventMapperSpy.MapQuantityUnitSpy(quantityUnit);
+        }
+        else
+        {
+            Assert.Throws<InvalidOperationException>(() =>
+                CalculationResultCompletedEventMapperSpy.MapQuantityUnitSpy(quantityUnit));
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(TimeSeriesTypes))]
+    public void Ensure_handling_all_timeSeries_types(TimeSeriesType timeSeriesType)
+    {
+        // Act
+        if (timeSeriesType != TimeSeriesType.Unspecified)
+        {
+            CalculationResultCompletedEventMapperSpy.MapTimeSeriesTypeSpy(timeSeriesType);
+        }
+        else
+        {
+            Assert.Throws<InvalidOperationException>(() =>
+                CalculationResultCompletedEventMapperSpy.MapTimeSeriesTypeSpy(timeSeriesType));
         }
     }
 }

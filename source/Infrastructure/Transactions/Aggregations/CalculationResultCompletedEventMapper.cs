@@ -45,9 +45,9 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
         return new AggregationResultAvailable(
             new Aggregation(
                 MapPoints(integrationEvent.TimeSeriesPoints),
-                MapMeteringPointType(integrationEvent),
-                MapUnitType(integrationEvent),
-                MapResolution(integrationEvent),
+                MapMeteringPointType(integrationEvent.TimeSeriesType),
+                MapUnitType(integrationEvent.QuantityUnit),
+                MapResolution(integrationEvent.Resolution),
                 MapPeriod(integrationEvent),
                 MapSettlementMethod(integrationEvent),
                 MapProcessType(integrationEvent.ProcessType),
@@ -86,11 +86,9 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
         };
     }
 
-    protected static string MapResolution(CalculationResultCompleted integrationEvent)
+    protected static string MapResolution(Resolution resolution)
     {
-        ArgumentNullException.ThrowIfNull(integrationEvent);
-
-        return integrationEvent.Resolution switch
+        return resolution switch
         {
             Resolution.Quarter => Domain.Transactions.Aggregations.Resolution.QuarterHourly.Name,
             Resolution.Unspecified => throw new InvalidOperationException("Could not map resolution type"),
@@ -98,11 +96,9 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
         };
     }
 
-    protected static string MapUnitType(CalculationResultCompleted integrationEvent)
+    protected static string MapUnitType(QuantityUnit quantityUnit)
     {
-        ArgumentNullException.ThrowIfNull(integrationEvent);
-
-        return integrationEvent.QuantityUnit switch
+        return quantityUnit switch
         {
             QuantityUnit.Kwh => MeasurementUnit.Kwh.Name,
             QuantityUnit.Unspecified => throw new InvalidOperationException("Could not map unit type"),
@@ -110,11 +106,9 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
         };
     }
 
-    protected static string MapMeteringPointType(CalculationResultCompleted integrationEvent)
+    protected static string MapMeteringPointType(TimeSeriesType timeSeriesType)
     {
-        ArgumentNullException.ThrowIfNull(integrationEvent);
-
-        return integrationEvent.TimeSeriesType switch
+        return timeSeriesType switch
         {
             TimeSeriesType.Production => MeteringPointType.Production.Name,
             TimeSeriesType.FlexConsumption => MeteringPointType.Consumption.Name,
@@ -122,6 +116,11 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
             TimeSeriesType.NetExchangePerGa => MeteringPointType.Exchange.Name,
             TimeSeriesType.NetExchangePerNeighboringGa => MeteringPointType.Exchange.Name,
             TimeSeriesType.TotalConsumption => MeteringPointType.Consumption.Name,
+            TimeSeriesType.GridLoss => MeteringPointType.Exchange.Name,
+            TimeSeriesType.TempProduction => MeteringPointType.Production.Name,
+            TimeSeriesType.NegativeGridLoss => MeteringPointType.Exchange.Name,
+            TimeSeriesType.PositiveGridLoss => MeteringPointType.Exchange.Name,
+            TimeSeriesType.TempFlexConsumption => MeteringPointType.Consumption.Name,
             TimeSeriesType.Unspecified => throw new InvalidOperationException("Unknown metering point type"),
             _ => throw new InvalidOperationException("Could not determine metering point type"),
         };
@@ -139,6 +138,20 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
             CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea => new ActorGrouping(integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.EnergySupplierGlnOrEic, integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.BalanceResponsiblePartyGlnOrEic),
             CalculationResultCompleted.AggregationLevelOneofCase.None => throw new InvalidOperationException("Aggregation level is not specified"),
             _ => throw new InvalidOperationException("Aggregation level is unknown"),
+        };
+    }
+
+    protected static string MapQuality(QuantityQuality quality)
+    {
+        return quality switch
+        {
+            QuantityQuality.Incomplete => Quality.Incomplete.Name,
+            QuantityQuality.Measured => Quality.Measured.Name,
+            QuantityQuality.Missing => Quality.Missing.Name,
+            QuantityQuality.Estimated => Quality.Estimated.Name,
+            QuantityQuality.Calculated => Quality.Calculated.Name,
+            QuantityQuality.Unspecified => throw new InvalidOperationException("Quality is not specified"),
+            _ => throw new InvalidOperationException("Unknown quality type"),
         };
     }
 
@@ -170,20 +183,6 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
         }
 
         return points.AsReadOnly();
-    }
-
-    private static string MapQuality(QuantityQuality quality)
-    {
-        return quality switch
-        {
-            QuantityQuality.Incomplete => Quality.Incomplete.Name,
-            QuantityQuality.Measured => Quality.Measured.Name,
-            QuantityQuality.Missing => Quality.Missing.Name,
-            QuantityQuality.Estimated => Quality.Estimated.Name,
-            QuantityQuality.Calculated => Quality.Calculated.Name,
-            QuantityQuality.Unspecified => throw new InvalidOperationException("Quality is not specified"),
-            _ => throw new InvalidOperationException("Unknown quality type"),
-        };
     }
 
     private static string? MapSettlementVersion(CalculationResultCompleted integrationEvent)

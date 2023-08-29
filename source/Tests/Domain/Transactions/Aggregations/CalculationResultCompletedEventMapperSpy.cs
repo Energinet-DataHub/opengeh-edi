@@ -29,4 +29,24 @@ public class CalculationResultCompletedEventMapperSpy : CalculationResultComplet
     {
         MapProcessType(processType);
     }
+
+    public static void MapTimeSeriesTypeSpy(TimeSeriesType timeSeriesType)
+    {
+        MapMeteringPointType(timeSeriesType);
+    }
+
+    public static void MapResolutionSpy(Resolution resolution)
+    {
+        MapResolution(resolution);
+    }
+
+    public static void MapQuantityQualitySpy(QuantityQuality quantityQuality)
+    {
+        MapQuality(quantityQuality);
+    }
+
+    public static void MapQuantityUnitSpy(QuantityUnit quantityUnit)
+    {
+        MapUnitType(quantityUnit);
+    }
 }
