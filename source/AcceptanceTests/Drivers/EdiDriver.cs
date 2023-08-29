@@ -18,6 +18,8 @@ using System.Net.Http.Headers;
 using System.Text;
 using AcceptanceTest.Exceptions;
 using AcceptanceTest.Factories;
+using Energinet.DataHub.Edi.Responses;
+using Google.Protobuf;
 
 namespace AcceptanceTest.Drivers;
 
@@ -25,10 +27,12 @@ internal sealed class EdiDriver : IDisposable
 {
     private readonly string _azpToken;
     private readonly HttpClient _httpClient;
+    private readonly InboxEventPublisher _inboxEventPublisher;
 
-    public EdiDriver(string azpToken)
+    public EdiDriver(string azpToken, InboxEventPublisher inboxEventPublisher)
     {
         _azpToken = azpToken;
+        _inboxEventPublisher = inboxEventPublisher;
         _httpClient = new HttpClient();
         _httpClient.BaseAddress = new Uri("https://func-api-edi-u-001.azurewebsites.net/");
     }
@@ -64,9 +68,21 @@ internal sealed class EdiDriver : IDisposable
         throw new TimeoutException("Unable to retrieve peek result within time limit");
     }
 
+    internal Task SendAggregatedMeasureDataAsync()
+    {
+        return _inboxEventPublisher.SendToInboxAsync(
+            "AggregatedMeasureDataAccepted",
+            CreateAggregationMeasureDataAccepted().ToByteArray());
+    }
+
     private static string GetMessageId(HttpResponseMessage peekResponse)
     {
         return peekResponse.Headers.GetValues("MessageId").First();
+    }
+
+    private static IMessage CreateAggregationMeasureDataAccepted()
+    {
+        return new AggregatedTimeSeriesRequestAccepted();
     }
 
     private async Task<HttpResponseMessage> PeekAsync(string token)

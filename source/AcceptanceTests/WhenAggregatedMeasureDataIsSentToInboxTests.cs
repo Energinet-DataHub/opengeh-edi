@@ -19,21 +19,20 @@ using Xunit.Categories;
 namespace AcceptanceTest;
 
 [IntegrationTest]
-public sealed class WhenAggregationResultIsPublishedTests : TestRunner
+public sealed class WhenAggregatedMeasureDataIsSentToInboxTests : TestRunner
 {
-    private readonly AggregationResultDsl _aggregations;
+    private readonly AggregatedMeasureDataDsl _aggregatedMeasure;
 
-    public WhenAggregationResultIsPublishedTests()
+    public WhenAggregatedMeasureDataIsSentToInboxTests()
     {
-        _aggregations = new AggregationResultDsl(
-            new EdiDriver(AzpToken, InboxPublisher),
-            new WholeSaleDriver(EventPublisher));
+        _aggregatedMeasure = new AggregatedMeasureDataDsl(
+            new EdiDriver(AzpToken, InboxPublisher));
     }
 
     [Fact]
-    public async Task Actor_can_fetch_aggregation_result()
+    public async Task Actor_can_fetch_message_after_aggregated_measure_data_request_has_been_accepted()
     {
-        await _aggregations.PublishResultFor(gridAreaCode: "543").ConfigureAwait(false);
-        await _aggregations.ConfirmResultIsAvailableFor(actorNumber: "5790000610976", actorRole: "metereddataresponsible").ConfigureAwait(false);
+        await _aggregatedMeasure.SendAggregatedMeasureDataToInbox().ConfigureAwait(false);
+        await _aggregatedMeasure.ConfirmResultIsAvailableFor(actorNumber: "5790000610976", actorRole: "metereddataresponsible").ConfigureAwait(false);
     }
 }
