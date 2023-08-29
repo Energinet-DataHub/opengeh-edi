@@ -21,7 +21,6 @@ using Application.Configuration.DataAccess;
 using Dapper;
 using Infrastructure.Configuration.DataAccess;
 using Infrastructure.Configuration.IntegrationEvents;
-using Infrastructure.InboxEvents;
 using IntegrationTests.Fixtures;
 using MediatR;
 using Microsoft.Extensions.Logging;
