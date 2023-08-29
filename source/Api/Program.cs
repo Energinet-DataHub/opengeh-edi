@@ -78,10 +78,10 @@ namespace Api
                 .ConfigureFunctionsWorkerDefaults(
                 worker =>
                 {
-                        worker.UseMiddleware<UnHandledExceptionMiddleware>();
-                        worker.UseMiddleware<CorrelationIdMiddleware>();
-                    /*worker.UseMiddleware<RequestResponseLoggingMiddleware>();*/
-                        ConfigureAuthenticationMiddleware(worker);
+                    worker.UseMiddleware<UnHandledExceptionMiddleware>();
+                    worker.UseMiddleware<CorrelationIdMiddleware>();
+               		/*worker.UseMiddleware<RequestResponseLoggingMiddleware>();*/
+                    ConfigureAuthenticationMiddleware(worker);
                 },
                 option =>
                 {
