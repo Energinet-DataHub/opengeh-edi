@@ -35,10 +35,4 @@ public sealed class BusinessReason : EnumerationType
             processType.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{valueToParse} is not a valid process type");
         return businessReason;
     }
-
-    public static IReadOnlyCollection<BusinessReason> GetAll()
-    {
-        var businessReasons = GetAll<BusinessReason>().ToList();
-        return businessReasons;
-    }
 }

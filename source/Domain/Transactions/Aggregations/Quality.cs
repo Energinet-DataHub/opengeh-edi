@@ -39,9 +39,4 @@ public class Quality : EnumerationType
             .First(quality => quality.Name.Equals(valueToParseFrom, StringComparison.OrdinalIgnoreCase) ||
                               quality.Code.Equals(valueToParseFrom, StringComparison.OrdinalIgnoreCase));
     }
-
-    public static IReadOnlyCollection<Quality> GetAll()
-    {
-        return GetAll<Quality>().ToList();
-    }
 }
