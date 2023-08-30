@@ -115,7 +115,13 @@ internal sealed class EdiDriver : IDisposable
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
         var aggregatedMeasureDataResponse = await _httpClient.SendAsync(request).ConfigureAwait(false);
+        if (aggregatedMeasureDataResponse.StatusCode == HttpStatusCode.BadRequest)
+        {
+            var responseContent = await aggregatedMeasureDataResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+        }
+
         aggregatedMeasureDataResponse.EnsureSuccessStatusCode();
+
         return aggregatedMeasureDataResponse;
     }
 

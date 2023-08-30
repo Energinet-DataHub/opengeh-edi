@@ -1,6 +1,6 @@
 {
   "RequestAggregatedMeasureData_MarketDocument": {
-    "mRID": "OWRBzO8nRhJrfDApP552R0zmzf70RRxraI4q",
+    "mRID": "OWRszO8nRhJrfDApP852R0zmzf70RRxraI4q",
     "businessSector.type": {
       "value": "23"
     },
@@ -17,17 +17,17 @@
     },
     "sender_MarketParticipant.mRID": {
       "codingScheme": "A10",
-      "value": "5790001687137"
+      "value": "5790000610976"
     },
     "sender_MarketParticipant.marketRole.type": {
-      "value": "DDK"
+      "value": "MDR"
     },
     "type": {
       "value": "E74"
     },
     "Series": [
       {
-        "mRID": "100195",
+        "mRID": "1001195",
         "balanceResponsibleParty_MarketParticipant.mRID": {
           "codingScheme": "A10",
           "value": "5790001687137"

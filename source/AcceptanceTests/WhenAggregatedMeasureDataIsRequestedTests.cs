@@ -33,10 +33,8 @@ public sealed class WhenAggregatedMeasureDataIsRequestedTests : TestRunner
     [Fact]
     public async Task Actor_can_fetch_message_after_aggregated_measure_data_has_been_requested()
     {
-        await _aggregatedMeasure.RequestAggregatedMeasureDataFor(actorNumber: "5790001687137", actorRole: "balanceresponsibleparty").ConfigureAwait(false);
-        //await _aggregatedMeasure.RequestAggregatedMeasureDataFor(actorNumber: "5790000610976", actorRole: "metereddataresponsible").ConfigureAwait(false);
+        await _aggregatedMeasure.RequestAggregatedMeasureDataFor(actorNumber: "5790000610976", actorRole: "metereddataresponsible").ConfigureAwait(false);
 
-        //await _aggregatedMeasure.SendAggregatedMeasureDataToInbox().ConfigureAwait(false);
-       // await _aggregatedMeasure.ConfirmResultIsAvailableFor(actorNumber: "5790001687137", actorRole: "balanceresponsibleparty").ConfigureAwait(false);
+        await _aggregatedMeasure.ConfirmResultIsAvailableFor(actorNumber: "5790000610976", actorRole: "metereddataresponsible").ConfigureAwait(false);
     }
 }
