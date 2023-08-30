@@ -19,14 +19,15 @@ using Xunit.Categories;
 namespace AcceptanceTest;
 
 [IntegrationTest]
-public sealed class WhenAggregatedMeasureDataIsSentToInboxTests : TestRunner
+public sealed class WhenAggregatedMeasureDataResponseIsSentToInboxTests : TestRunner
 {
     private readonly AggregatedMeasureDataDsl _aggregatedMeasure;
 
-    public WhenAggregatedMeasureDataIsSentToInboxTests()
+    public WhenAggregatedMeasureDataResponseIsSentToInboxTests()
     {
         _aggregatedMeasure = new AggregatedMeasureDataDsl(
-            new EdiDriver(AzpToken, InboxPublisher));
+            new EdiDriver(AzpToken, InboxPublisher),
+            new WholeSaleDriver(EventPublisher, InboxPublisher));
     }
 
     [Fact]

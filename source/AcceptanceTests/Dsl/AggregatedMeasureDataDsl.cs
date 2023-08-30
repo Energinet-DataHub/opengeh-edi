@@ -19,18 +19,21 @@ namespace AcceptanceTest.Dsl;
 internal sealed class AggregatedMeasureDataDsl
 {
     private readonly EdiDriver _edi;
+    private readonly WholeSaleDriver _wholesale;
 
 #pragma warning disable CA1822
 #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
 
-    internal AggregatedMeasureDataDsl(EdiDriver ediDriver)
+    internal AggregatedMeasureDataDsl(EdiDriver ediDriver, WholeSaleDriver wholesaleDriver)
     {
         _edi = ediDriver;
+        _wholesale = wholesaleDriver;
     }
 
     internal Task SendAggregatedMeasureDataToInbox()
     {
-        return _edi.SendAggregatedMeasureDataAsync();
+        return _wholesale.PublishToInboxAsync();
+        //return _edi.SendAggregatedMeasureDataAsync();
     }
 
     internal Task ConfirmResultIsAvailableFor(string actorNumber, string actorRole)

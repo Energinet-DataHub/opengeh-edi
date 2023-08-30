@@ -12,19 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
+using DecimalValue = Energinet.DataHub.Wholesale.Contracts.Events.DecimalValue;
+using QuantityQuality = Energinet.DataHub.Wholesale.Contracts.Events.QuantityQuality;
+using QuantityUnit = Energinet.DataHub.Wholesale.Contracts.Events.QuantityUnit;
+using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
+using TimeSeriesPoint = Energinet.DataHub.Wholesale.Contracts.Events.TimeSeriesPoint;
+using TimeSeriesType = Energinet.DataHub.Wholesale.Contracts.Events.TimeSeriesType;
 
 namespace AcceptanceTest.Drivers;
 
 internal sealed class WholeSaleDriver
 {
     private readonly IntegrationEventPublisher _integrationEventPublisher;
+    private readonly InboxPublisher _inboxPublisher;
 
-    internal WholeSaleDriver(IntegrationEventPublisher integrationEventPublisher)
+    internal WholeSaleDriver(IntegrationEventPublisher integrationEventPublisher, InboxPublisher inboxPublisher)
     {
         _integrationEventPublisher = integrationEventPublisher;
+        _inboxPublisher = inboxPublisher;
     }
 
     internal Task PublishAggregationResultAsync(string gridAreaCode)
@@ -32,6 +41,18 @@ internal sealed class WholeSaleDriver
         return _integrationEventPublisher.PublishAsync(
             "CalculationResultCompleted",
             CreateAggregationResultAvailableEventFor(gridAreaCode).ToByteArray());
+    }
+
+    internal Task PublishToInboxAsync()
+    {
+        return _inboxPublisher.SendToInboxAsync(
+            "AggregatedMeasureDataAccepted",
+            CreateAggregationMeasureDataAccepted().ToByteArray());
+    }
+
+    private static IMessage CreateAggregationMeasureDataAccepted()
+    {
+        return new AggregatedTimeSeriesRequestAccepted();
     }
 
     private static CalculationResultCompleted CreateAggregationResultAvailableEventFor(string gridAreaCode)

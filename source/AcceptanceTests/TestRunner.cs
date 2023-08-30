@@ -34,14 +34,14 @@ public class TestRunner : IAsyncDisposable
         var queueName = secretsConfiguration.GetValue<string>("sbt-sharedres-integrationevent-received-name")!;
 
         EventPublisher = new IntegrationEventPublisher(connectionString, topicName);
-        InboxPublisher = new InboxEventPublisher(connectionString, queueName);
+        InboxPublisher = new InboxPublisher(connectionString, queueName);
 
         AzpToken = root.GetValue<string>("AZP_TOKEN")!;
     }
 
     internal IntegrationEventPublisher EventPublisher { get; }
 
-    internal InboxEventPublisher InboxPublisher { get; }
+    internal InboxPublisher InboxPublisher { get; }
 
     internal string AzpToken { get; }
 

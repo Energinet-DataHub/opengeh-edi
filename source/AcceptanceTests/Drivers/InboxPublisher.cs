@@ -16,12 +16,12 @@ using Azure.Messaging.ServiceBus;
 
 namespace AcceptanceTest.Drivers;
 
-internal sealed class InboxEventPublisher : IAsyncDisposable
+internal sealed class InboxPublisher : IAsyncDisposable
 {
     private readonly ServiceBusClient _client;
     private readonly ServiceBusSender _sender;
 
-    internal InboxEventPublisher(string connectionString, string topicName)
+    internal InboxPublisher(string connectionString, string topicName)
     {
         _client = new ServiceBusClient(connectionString);
         _sender = _client.CreateSender(topicName);
