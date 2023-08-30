@@ -49,14 +49,11 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
                 MapUnitType(integrationEvent.QuantityUnit),
                 MapResolution(integrationEvent.Resolution),
                 MapPeriod(integrationEvent),
-                MapSettlementMethod(integrationEvent),
+                MapSettlementType(integrationEvent.TimeSeriesType),
                 MapProcessType(integrationEvent.ProcessType),
                 MapActorGrouping(integrationEvent),
                 await MapGridAreaDetailsAsync(integrationEvent).ConfigureAwait(false),
-                null,
-                null,
-                null,
-                MapSettlementVersion(integrationEvent)));
+                SettlementVersion: MapSettlementVersion(integrationEvent.ProcessType)));
     }
 
     public bool CanHandle(string eventType)
@@ -155,9 +152,9 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
         };
     }
 
-    private static string? MapSettlementMethod(CalculationResultCompleted integrationEvent)
+    private static string? MapSettlementType(TimeSeriesType timeSeriesType)
     {
-        return integrationEvent.TimeSeriesType switch
+        return timeSeriesType switch
         {
             TimeSeriesType.Production => null,
             TimeSeriesType.FlexConsumption => SettlementType.Flex.Name,
@@ -185,9 +182,9 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
         return points.AsReadOnly();
     }
 
-    private static string? MapSettlementVersion(CalculationResultCompleted integrationEvent)
+    private static string? MapSettlementVersion(ProcessType processType)
     {
-        return integrationEvent.ProcessType switch
+        return processType switch
         {
             ProcessType.FirstCorrectionSettlement => SettlementVersion.FirstCorrection.Name,
             ProcessType.SecondCorrectionSettlement => SettlementVersion.SecondCorrection.Name,
