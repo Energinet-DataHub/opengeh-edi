@@ -42,6 +42,20 @@ internal sealed class EdiDriver : IDisposable
         _httpClient.Dispose();
     }
 
+    public async Task<Stream> RequestAggregatedMeasureDataAsync(string actorNumber, string[] marketRoles)
+    {
+        var token = TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
+        var response = await RequestAggregatedMeasureDataAsync(token).ConfigureAwait(false);
+
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            //Throw exception
+        }
+
+        var document = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+        return document;
+    }
+
     public async Task<Stream> PeekMessageAsync(string actorNumber, string[] marketRoles)
     {
         var token = TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
@@ -83,6 +97,26 @@ internal sealed class EdiDriver : IDisposable
     private static IMessage CreateAggregationMeasureDataAccepted()
     {
         return new AggregatedTimeSeriesRequestAccepted();
+    }
+
+    private static string GetContent()
+    {
+        //var jsonFilePath = "RequestAggregatedMeasureData.json";
+        //var jsonContent = File.ReadAllText(jsonFilePath);
+        var jsonContent = File.ReadAllText($"Drivers/RequestAggregatedMeasureData.json");
+        return jsonContent;
+    }
+
+    private async Task<HttpResponseMessage> RequestAggregatedMeasureDataAsync(string token)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Post, "api/RequestAggregatedMeasureMessageReceiver");
+        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+        request.Content = new StringContent(GetContent(), Encoding.UTF8, "application/json");
+        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+        var aggregatedMeasureDataResponse = await _httpClient.SendAsync(request).ConfigureAwait(false);
+        aggregatedMeasureDataResponse.EnsureSuccessStatusCode();
+        return aggregatedMeasureDataResponse;
     }
 
     private async Task<HttpResponseMessage> PeekAsync(string token)

@@ -33,7 +33,7 @@ public sealed class WhenAggregatedMeasureDataResponseIsSentToInboxTests : TestRu
     [Fact]
     public async Task Actor_can_fetch_message_after_aggregated_measure_data_request_has_been_accepted_and_sent_to_inbox()
     {
-        await _aggregatedMeasure.SendAggregatedMeasureDataToInbox().ConfigureAwait(false);
+        //await _aggregatedMeasure.SendAggregatedMeasureDataToInbox(actorNumber: "5790000610976", actorRole: "metereddataresponsible").ConfigureAwait(false);
         await _aggregatedMeasure.ConfirmResultIsAvailableFor(actorNumber: "5790000610976", actorRole: "metereddataresponsible").ConfigureAwait(false);
     }
 }

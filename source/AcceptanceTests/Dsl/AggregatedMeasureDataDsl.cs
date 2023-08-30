@@ -35,6 +35,11 @@ internal sealed class AggregatedMeasureDataDsl
         return _wholesale.SendAggregatedMeasureDataAcceptedToInboxAsync();
     }
 
+    internal Task RequestAggregatedMeasureDataFor(string actorNumber, string actorRole)
+    {
+        return _edi.RequestAggregatedMeasureDataAsync(actorNumber, new[] { actorRole, });
+    }
+
     internal Task ConfirmResultIsAvailableFor(string actorNumber, string actorRole)
     {
         return _edi.PeekMessageAsync(actorNumber, new[] { actorRole, });
