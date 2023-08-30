@@ -45,7 +45,7 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
         }
 
         container dh3 "EDIDetailed" {
-            title "[Container] DataHub 3.0 - EDI (Detailed with OAuth)"
+            title "[Container] DataHub 3.0 - EDI (Detailed with authentication)"
             include ->ediDomain->
             exclude "relationship.tag==Simple View"
         }
