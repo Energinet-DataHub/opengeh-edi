@@ -31,17 +31,18 @@ public class TestRunner : IAsyncDisposable
         var connectionString = secretsConfiguration.GetValue<string>("sb-domain-relay-manage-connection-string")!;
         var topicName = secretsConfiguration.GetValue<string>("sbt-sharedres-integrationevent-received-name")!;
         //QueueName?
+        //https://sb-domain-relay-sharedres-u-001.servicebus.windows.net/sbq-edi-inbox
         var queueName = secretsConfiguration.GetValue<string>("sbt-sharedres-integrationevent-received-name")!;
 
         EventPublisher = new IntegrationEventPublisher(connectionString, topicName);
-        InboxPublisher = new InboxPublisher(connectionString, queueName);
+        EdiInboxPublisher = new EdiInboxPublisher(connectionString, queueName);
 
         AzpToken = root.GetValue<string>("AZP_TOKEN")!;
     }
 
     internal IntegrationEventPublisher EventPublisher { get; }
 
-    internal InboxPublisher InboxPublisher { get; }
+    internal EdiInboxPublisher EdiInboxPublisher { get; }
 
     internal string AzpToken { get; }
 

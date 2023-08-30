@@ -32,8 +32,7 @@ internal sealed class AggregatedMeasureDataDsl
 
     internal Task SendAggregatedMeasureDataToInbox()
     {
-        return _wholesale.PublishToInboxAsync();
-        //return _edi.SendAggregatedMeasureDataAsync();
+        return _wholesale.SendAggregatedMeasureDataAcceptedToInboxAsync();
     }
 
     internal Task ConfirmResultIsAvailableFor(string actorNumber, string actorRole)

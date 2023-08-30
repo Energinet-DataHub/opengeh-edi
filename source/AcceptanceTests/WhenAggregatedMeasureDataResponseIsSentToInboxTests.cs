@@ -26,8 +26,8 @@ public sealed class WhenAggregatedMeasureDataResponseIsSentToInboxTests : TestRu
     public WhenAggregatedMeasureDataResponseIsSentToInboxTests()
     {
         _aggregatedMeasure = new AggregatedMeasureDataDsl(
-            new EdiDriver(AzpToken, InboxPublisher),
-            new WholeSaleDriver(EventPublisher, InboxPublisher));
+            new EdiDriver(AzpToken, EdiInboxPublisher),
+            new WholeSaleDriver(EventPublisher, EdiInboxPublisher));
     }
 
     [Fact]

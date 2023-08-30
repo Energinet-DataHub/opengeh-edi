@@ -27,12 +27,12 @@ internal sealed class EdiDriver : IDisposable
 {
     private readonly string _azpToken;
     private readonly HttpClient _httpClient;
-    private readonly InboxPublisher _inboxPublisher;
+    private readonly EdiInboxPublisher _ediInboxPublisher;
 
-    public EdiDriver(string azpToken, InboxPublisher inboxPublisher)
+    public EdiDriver(string azpToken, EdiInboxPublisher ediInboxPublisher)
     {
         _azpToken = azpToken;
-        _inboxPublisher = inboxPublisher;
+        _ediInboxPublisher = ediInboxPublisher;
         _httpClient = new HttpClient();
         _httpClient.BaseAddress = new Uri("https://func-api-edi-u-001.azurewebsites.net/");
     }
@@ -70,7 +70,7 @@ internal sealed class EdiDriver : IDisposable
 
     internal Task SendAggregatedMeasureDataAsync()
     {
-        return _inboxPublisher.SendToInboxAsync(
+        return _ediInboxPublisher.SendToInboxAsync(
             "AggregatedMeasureDataAccepted",
             CreateAggregationMeasureDataAccepted().ToByteArray());
     }

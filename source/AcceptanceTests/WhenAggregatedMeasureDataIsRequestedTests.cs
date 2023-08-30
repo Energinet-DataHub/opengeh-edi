@@ -26,13 +26,14 @@ public sealed class WhenAggregatedMeasureDataIsRequestedTests : TestRunner
     public WhenAggregatedMeasureDataIsRequestedTests()
     {
         _aggregatedMeasure = new AggregatedMeasureDataDsl(
-            new EdiDriver(AzpToken, InboxPublisher),
-            new WholeSaleDriver(EventPublisher, InboxPublisher));
+            new EdiDriver(AzpToken, EdiInboxPublisher),
+            new WholeSaleDriver(EventPublisher, EdiInboxPublisher));
     }
 
     [Fact]
     public async Task Actor_can_fetch_message_after_aggregated_measure_data_has_been_requested()
     {
+        //"%INCOMING_AGGREGATED_MEASURE_DATA_QUEUE_NAME%"
         //https://func-api-edi-u-001.azurewebsites.netapi/RequestAggregatedMeasureMessageReceiver
         await _aggregatedMeasure.SendAggregatedMeasureDataToInbox().ConfigureAwait(false);
         await _aggregatedMeasure.ConfirmResultIsAvailableFor(actorNumber: "5790000610976", actorRole: "metereddataresponsible").ConfigureAwait(false);
