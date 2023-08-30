@@ -21,10 +21,10 @@ internal sealed class InboxPublisher : IAsyncDisposable
     private readonly ServiceBusClient _client;
     private readonly ServiceBusSender _sender;
 
-    internal InboxPublisher(string connectionString, string topicName)
+    internal InboxPublisher(string connectionString, string queueName)
     {
         _client = new ServiceBusClient(connectionString);
-        _sender = _client.CreateSender(topicName);
+        _sender = _client.CreateSender(queueName);
     }
 
     public async ValueTask DisposeAsync()
@@ -37,6 +37,8 @@ internal sealed class InboxPublisher : IAsyncDisposable
     internal Task SendToInboxAsync(string eventName, byte[] eventPayload)
     {
         return _sender.SendMessageAsync(CreateInboxEventMessage(eventName, eventPayload));
+
+        //return _sender.SendMessageAsync(CreateInboxEventMessage(eventName, eventPayload));
     }
 
     private static ServiceBusMessage CreateInboxEventMessage(string eventName, byte[] eventPayload)

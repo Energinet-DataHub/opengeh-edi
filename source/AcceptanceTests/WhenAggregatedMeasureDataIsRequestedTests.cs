@@ -19,11 +19,11 @@ using Xunit.Categories;
 namespace AcceptanceTest;
 
 [IntegrationTest]
-public sealed class WhenAggregatedMeasureDataResponseIsSentToInboxTests : TestRunner
+public sealed class WhenAggregatedMeasureDataIsRequestedTests : TestRunner
 {
     private readonly AggregatedMeasureDataDsl _aggregatedMeasure;
 
-    public WhenAggregatedMeasureDataResponseIsSentToInboxTests()
+    public WhenAggregatedMeasureDataIsRequestedTests()
     {
         _aggregatedMeasure = new AggregatedMeasureDataDsl(
             new EdiDriver(AzpToken, InboxPublisher),
@@ -31,8 +31,9 @@ public sealed class WhenAggregatedMeasureDataResponseIsSentToInboxTests : TestRu
     }
 
     [Fact]
-    public async Task Actor_can_fetch_message_after_aggregated_measure_data_request_has_been_accepted_and_sent_to_inbox()
+    public async Task Actor_can_fetch_message_after_aggregated_measure_data_has_been_requested()
     {
+        //https://func-api-edi-u-001.azurewebsites.netapi/RequestAggregatedMeasureMessageReceiver
         await _aggregatedMeasure.SendAggregatedMeasureDataToInbox().ConfigureAwait(false);
         await _aggregatedMeasure.ConfirmResultIsAvailableFor(actorNumber: "5790000610976", actorRole: "metereddataresponsible").ConfigureAwait(false);
     }
