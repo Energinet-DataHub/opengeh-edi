@@ -70,7 +70,7 @@ public class InboxEventsProcessor
             catch (Exception e)
             {
                 await MarkAsFailedAsync(inboxEvent, e, cancellationToken).ConfigureAwait(false);
-                _logger.LogError(e, "Failed to process inbox event. EventType {@Event}", inboxEvent);
+                _logger.LogError(e, "Failed to process inbox event. Id: {id}, EventType: {@Event}", inboxEvent.Id, inboxEvent.EventType);
             }
         }
     }
