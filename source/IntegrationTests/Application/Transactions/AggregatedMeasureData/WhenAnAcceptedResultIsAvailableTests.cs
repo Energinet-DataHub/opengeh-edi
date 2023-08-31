@@ -22,6 +22,7 @@ using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
+using Domain.Transactions.Aggregations;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
@@ -33,6 +34,7 @@ using IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
 using Period = Energinet.DataHub.Edi.Responses.Period;
+using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
 
 namespace IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
@@ -132,6 +134,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             Period = period,
             TimeSeriesPoints = { point },
             TimeSeriesType = TimeSeriesType.Production,
+            SettlementVersion = SettlementVersion.FirstCorrection.Name,
         };
     }
 
