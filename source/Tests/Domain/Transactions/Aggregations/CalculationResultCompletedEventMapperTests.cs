@@ -130,24 +130,24 @@ public class CalculationResultCompletedEventMapperTests
     public void Ensure_handling_all_timeSeries_types(TimeSeriesType timeSeriesType)
     {
         // Act
-        if (IsTimeSeriesTypeSupported(timeSeriesType))
-        {
-            CalculationResultCompletedEventMapperSpy.MapTimeSeriesTypeSpy(timeSeriesType);
-        }
-        else
+        if (IsUnsupportedTimeSeriesType(timeSeriesType))
         {
             Assert.Throws<InvalidOperationException>(() =>
                 CalculationResultCompletedEventMapperSpy.MapTimeSeriesTypeSpy(timeSeriesType));
         }
+        else
+        {
+            CalculationResultCompletedEventMapperSpy.MapTimeSeriesTypeSpy(timeSeriesType);
+        }
     }
 
-    private static bool IsTimeSeriesTypeSupported(TimeSeriesType timeSeriesType)
+    private static bool IsUnsupportedTimeSeriesType(TimeSeriesType timeSeriesType)
     {
-        return timeSeriesType is TimeSeriesType.Production
-            or TimeSeriesType.FlexConsumption
-            or TimeSeriesType.NonProfiledConsumption
-            or TimeSeriesType.NetExchangePerGa
-            or TimeSeriesType.NetExchangePerNeighboringGa
-            or TimeSeriesType.TotalConsumption;
+        return timeSeriesType is TimeSeriesType.GridLoss
+            or TimeSeriesType.TempProduction
+            or TimeSeriesType.NegativeGridLoss
+            or TimeSeriesType.PositiveGridLoss
+            or TimeSeriesType.TempFlexConsumption
+            or TimeSeriesType.Unspecified;
     }
 }
