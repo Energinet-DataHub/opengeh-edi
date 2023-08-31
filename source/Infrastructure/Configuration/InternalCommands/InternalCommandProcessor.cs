@@ -79,7 +79,7 @@ namespace Infrastructure.Configuration.InternalCommands
                 {
                     var exception = result.FinalException.ToString();
                     await MarkAsFailedAsync(queuedCommand, exception, cancellationToken).ConfigureAwait(false);
-                    _logger?.Log(LogLevel.Error, result.FinalException, $"Failed to process internal command {queuedCommand.Id}");
+                    _logger?.Log(LogLevel.Error, result.FinalException, "Failed to process internal command. Id: {CommandId}, Type: {CommandType}", queuedCommand.Id, queuedCommand.Type);
                 }
                 else
                 {
