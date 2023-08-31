@@ -1,6 +1,6 @@
 {
   "RequestAggregatedMeasureData_MarketDocument": {
-    "mRID": "OWRszO8nRhJrfDApP852R0zmzf70RRxraI4q",
+    "mRID": "{MessageId}",
     "businessSector.type": {
       "value": "23"
     },
@@ -27,13 +27,8 @@
     },
     "Series": [
       {
-        "mRID": "1001195",
-        "balanceResponsibleParty_MarketParticipant.mRID": {
-          "codingScheme": "A10",
-          "value": "5790001687137"
-        },
+        "mRID": "{TransactionId}",
         "end_DateAndOrTime.dateTime": "2022-07-22T22:00:00Z",
-
         "marketEvaluationPoint.settlementMethod": {
           "value": "D01"
         },
@@ -42,7 +37,7 @@
         },
         "meteringGridArea_Domain.mRID": {
           "codingScheme": "NDK",
-          "value": "244"
+          "value": "543"
         },
         "settlement_Series.version": {
           "value": "D01"

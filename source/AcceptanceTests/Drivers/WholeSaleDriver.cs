@@ -28,12 +28,10 @@ namespace AcceptanceTest.Drivers;
 internal sealed class WholeSaleDriver
 {
     private readonly IntegrationEventPublisher _integrationEventPublisher;
-    private readonly EdiInboxPublisher _ediInboxPublisher;
 
-    internal WholeSaleDriver(IntegrationEventPublisher integrationEventPublisher, EdiInboxPublisher ediInboxPublisher)
+    internal WholeSaleDriver(IntegrationEventPublisher integrationEventPublisher)
     {
         _integrationEventPublisher = integrationEventPublisher;
-        _ediInboxPublisher = ediInboxPublisher;
     }
 
     internal Task PublishAggregationResultAsync(string gridAreaCode)
@@ -41,13 +39,6 @@ internal sealed class WholeSaleDriver
         return _integrationEventPublisher.PublishAsync(
             "CalculationResultCompleted",
             CreateAggregationResultAvailableEventFor(gridAreaCode).ToByteArray());
-    }
-
-    internal Task SendAggregatedMeasureDataAcceptedToInboxAsync()
-    {
-        return _ediInboxPublisher.SendToInboxAsync(
-            "AggregatedMeasureDataAccepted",
-            CreateAggregationMeasureDataAccepted().ToByteArray());
     }
 
     private static IMessage CreateAggregationMeasureDataAccepted()

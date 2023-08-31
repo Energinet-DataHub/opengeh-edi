@@ -26,12 +26,19 @@ public sealed class WhenAggregatedMeasureDataIsRequestedTests : TestRunner
     public WhenAggregatedMeasureDataIsRequestedTests()
     {
         _aggregatedMeasure = new AggregatedMeasureDataDsl(
-            new EdiDriver(AzpToken, EdiInboxPublisher),
-            new WholeSaleDriver(EventPublisher, EdiInboxPublisher));
+            new EdiDriver(AzpToken));
     }
 
     [Fact]
     public async Task Actor_can_fetch_message_after_aggregated_measure_data_has_been_requested()
+    {
+        await _aggregatedMeasure.RequestAggregatedMeasureDataFor(actorNumber: "5790000610976", actorRole: "metereddataresponsible").ConfigureAwait(false);
+
+        await _aggregatedMeasure.ConfirmResultIsAvailableFor(actorNumber: "5790000610976", actorRole: "metereddataresponsible").ConfigureAwait(false);
+    }
+
+    [Fact]
+    public async Task Actor_can_fetch_message_after_aggregated_measure_data_has_been_requested2()
     {
         await _aggregatedMeasure.RequestAggregatedMeasureDataFor(actorNumber: "5790000610976", actorRole: "metereddataresponsible").ConfigureAwait(false);
 

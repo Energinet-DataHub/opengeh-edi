@@ -27,12 +27,10 @@ internal sealed class EdiDriver : IDisposable
 {
     private readonly string _azpToken;
     private readonly HttpClient _httpClient;
-    private readonly EdiInboxPublisher _ediInboxPublisher;
 
-    public EdiDriver(string azpToken, EdiInboxPublisher ediInboxPublisher)
+    public EdiDriver(string azpToken)
     {
         _azpToken = azpToken;
-        _ediInboxPublisher = ediInboxPublisher;
         _httpClient = new HttpClient();
         _httpClient.BaseAddress = new Uri("https://func-api-edi-u-001.azurewebsites.net/");
     }
@@ -82,28 +80,17 @@ internal sealed class EdiDriver : IDisposable
         throw new TimeoutException("Unable to retrieve peek result within time limit");
     }
 
-    internal Task SendAggregatedMeasureDataAsync()
-    {
-        return _ediInboxPublisher.SendToInboxAsync(
-            "AggregatedMeasureDataAccepted",
-            CreateAggregationMeasureDataAccepted().ToByteArray());
-    }
-
     private static string GetMessageId(HttpResponseMessage peekResponse)
     {
         return peekResponse.Headers.GetValues("MessageId").First();
     }
 
-    private static IMessage CreateAggregationMeasureDataAccepted()
-    {
-        return new AggregatedTimeSeriesRequestAccepted();
-    }
-
     private static string GetContent()
     {
-        //var jsonFilePath = "RequestAggregatedMeasureData.json";
-        //var jsonContent = File.ReadAllText(jsonFilePath);
         var jsonContent = File.ReadAllText($"Drivers/RequestAggregatedMeasureData.json");
+        jsonContent = jsonContent.Replace("{MessageId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
+        jsonContent = jsonContent.Replace("{TransactionId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
+
         return jsonContent;
     }
 
@@ -118,6 +105,7 @@ internal sealed class EdiDriver : IDisposable
         if (aggregatedMeasureDataResponse.StatusCode == HttpStatusCode.BadRequest)
         {
             var responseContent = await aggregatedMeasureDataResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+            throw new BadAggregatedMeasureDataRequestException($"responseContent: {responseContent}");
         }
 
         aggregatedMeasureDataResponse.EnsureSuccessStatusCode();
