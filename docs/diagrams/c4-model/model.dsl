@@ -4,17 +4,17 @@ ediDomain = group "EDI" {
     ediDb = container "EDI Database" {
         description "Stores information related to EDI operations"
         technology "SQL Server"
-        tags "Data Storage, Microsoft Azure - SQL Database" "Phoenix"
+        tags "Data Storage, Microsoft Azure - SQL Database" "Mosaic"
     }
     edi = container "EDI" {
         description "Backend server providing API for EDI operations"
         technology "Azure function, C#"
-        tags "Microsoft Azure - Function Apps" "Phoenix"
+        tags "Microsoft Azure - Function Apps" "Mosaic"
 
         ediPeekComponent = component "Peek component" {
             description "Handles peek requests from actors"
             technology "Http Trigger"
-            tags "Microsoft Azure - Function Apps" "Phoenix"
+            tags "Microsoft Azure - Function Apps" "Mosaic"
 
             # Domain relationships
             this -> ediDb "Stores messages and business transactions" "EF Core, Dapper"
@@ -22,7 +22,7 @@ ediDomain = group "EDI" {
         ediDequeueComponent = component "Dequeue component" {
             description "Handles dequeue requests from actors"
             technology "Http Trigger"
-            tags "Microsoft Azure - Function Apps" "Phoenix"
+            tags "Microsoft Azure - Function Apps" "Mosaic"
 
             # Domain relationships
             this -> ediDb "Deletes messages that have been peeked" "EF Core"
@@ -30,7 +30,7 @@ ediDomain = group "EDI" {
         ediTimeSeriesRequester = component "TimeSeries request component" {
             description "Fetches time series data from relevant domain"
             technology "<?> Trigger"
-            tags "Microsoft Azure - Function Apps" "Phoenix"
+            tags "Microsoft Azure - Function Apps" "Mosaic"
 
             # Domain relationships
             this -> ediDb "Writes time series data to database" "EF Core"
@@ -38,7 +38,7 @@ ediDomain = group "EDI" {
         ediTimeSeriesListener = component "TimeSeries listener" {
             description "Listens for integration events indicating time series data is ready"
             technology "Service Bus Trigger"
-            tags "Microsoft Azure - Function Apps" "Phoenix"
+            tags "Microsoft Azure - Function Apps" "Mosaic"
 
             # Base model relationships
             this -> dh3.sharedServiceBus "Subscribes to integration events"
@@ -53,9 +53,9 @@ ediDomain = group "EDI" {
         }
     }
     ediApi = container "EDI API" {
-        description "API Gateway to EDI Web API"
+        description "API Gateway policies for EDI Web API"
         technology "Azure API Management Service"
-        tags "Intermediate Technology" "Microsoft Azure - API Management Services" "Phoenix"
+        tags "Intermediate Technology" "Microsoft Azure - API Management Services" "Mosaic"
 
         # Base model relationships
         actorB2BSystem -> this "Requests eg. Peek and Dequeue"
@@ -65,8 +65,7 @@ ediDomain = group "EDI" {
         this -> ediDequeueComponent "Dequeue messages"
 
         # Domain-to-domain relationships
-        this -> dh3.sharedB2C "Validate OAuth token" "https" {
-            tags "OAuth"
+        this -> dh3.sharedB2C "Validate credentials" "https" {
         }
     }
 }
