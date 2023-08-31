@@ -29,6 +29,7 @@ using IntegrationTests.Assertions;
 using IntegrationTests.Factories;
 using IntegrationTests.Fixtures;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using MessageCategory = Domain.OutgoingMessages.Queueing.MessageCategory;
 
@@ -87,6 +88,33 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         var result = await PeekMessage(MessageCategory.MasterData).ConfigureAwait(false);
 
+        await AssertMessageIsArchived(result.MessageId);
+    }
+
+    [Fact]
+    public async Task Two_peek_request_at_same_time_from_same_actor()
+    {
+        // Arrange
+        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+
+        var serviceScopeFactory = GetService<IServiceScopeFactory>();
+        using var newScope = serviceScopeFactory.CreateScope();
+        var mediatr = newScope.ServiceProvider.GetRequiredService<IMediator>();
+
+        // Act
+        var task01 = PeekMessage(MessageCategory.MasterData);
+        // NEW SCOPE for second task.
+        var task02 = mediatr.Send(
+            new PeekCommand(
+                ActorNumber.Create(SampleData.NewEnergySupplierNumber),
+                MessageCategory.MasterData,
+                MarketRole.EnergySupplier,
+                DocumentFormat.Xml));
+
+        await Task.WhenAll(task01, task02).ConfigureAwait(false);
+        var result = await task01;
+
+        // Assert
         await AssertMessageIsArchived(result.MessageId);
     }
 
