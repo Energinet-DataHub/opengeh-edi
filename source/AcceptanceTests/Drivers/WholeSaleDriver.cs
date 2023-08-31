@@ -41,11 +41,6 @@ internal sealed class WholeSaleDriver
             CreateAggregationResultAvailableEventFor(gridAreaCode).ToByteArray());
     }
 
-    private static IMessage CreateAggregationMeasureDataAccepted()
-    {
-        return new AggregatedTimeSeriesRequestAccepted();
-    }
-
     private static CalculationResultCompleted CreateAggregationResultAvailableEventFor(string gridAreaCode)
     {
         var processCompletedEvent = new CalculationResultCompleted()
