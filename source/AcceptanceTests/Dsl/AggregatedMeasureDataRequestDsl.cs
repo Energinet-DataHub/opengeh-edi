@@ -16,25 +16,35 @@ using AcceptanceTest.Drivers;
 
 namespace AcceptanceTest.Dsl;
 
-internal sealed class AggregatedMeasureDataDsl
+internal sealed class AggregatedMeasureDataRequestDsl
 {
     private readonly EdiDriver _edi;
 
 #pragma warning disable CA1822
 #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
 
-    internal AggregatedMeasureDataDsl(EdiDriver ediDriver)
+    internal AggregatedMeasureDataRequestDsl(EdiDriver ediDriver)
     {
         _edi = ediDriver;
     }
 
-    internal Task RequestAggregatedMeasureDataFor(string actorNumber, string actorRole)
+    internal Task AggregatedMeasureDataFor(string actorNumber, string actorRole)
     {
         return _edi.RequestAggregatedMeasureDataAsync(actorNumber, new[] { actorRole, });
     }
 
-    internal Task ConfirmResultIsAvailableFor(string actorNumber, string actorRole)
+    internal Task ConfirmAcceptedResultIsAvailableFor(string actorNumber, string actorRole)
     {
-        return _edi.PeekMessageAsync(actorNumber, new[] { actorRole, });
+        return _edi.PeekAcceptedAggregationMessageAsync(actorNumber, new[] { actorRole, });
+    }
+
+    internal Task RejectedAggregatedMeasureDataFor(string actorNumber, string actorRole)
+    {
+        return _edi.BadRequestAggregatedMeasureDataAsync(actorNumber, new[] { actorRole, });
+    }
+
+    internal Task ConfirmRejectedResultIsAvailableFor(string actorNumber, string actorRole)
+    {
+        return _edi.PeekRejectedMessageAsync(actorNumber, new[] { actorRole, });
     }
 }

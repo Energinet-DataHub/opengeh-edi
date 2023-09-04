@@ -54,7 +54,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="Drivers\RequestAggregatedMeasureData.json">
+      <EmbeddedResource Include="Messages\json\BadRequestAggregatedMeasureData.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureData.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
     </ItemGroup>
