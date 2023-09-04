@@ -45,7 +45,7 @@ public class WhenADequeueIsRequestedTests : TestBase
     }
 
     [Fact]
-    public async Task Dequeue_is_unsuccessful_when_actor_queue_exits_without_a_open_bundle()
+    public async Task Dequeue_unknown_message_id_is_unsuccessful_when_actor_has_a_queue()
     {
         var unknownMessageId = Guid.NewGuid().ToString();
         // Created an Actor Queue with a bundle.
