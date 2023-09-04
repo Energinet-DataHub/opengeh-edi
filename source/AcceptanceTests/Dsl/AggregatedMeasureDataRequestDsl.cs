@@ -20,7 +20,6 @@ internal sealed class AggregatedMeasureDataRequestDsl
 {
     private readonly EdiDriver _edi;
 
-#pragma warning disable CA1822
 #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
 
     internal AggregatedMeasureDataRequestDsl(EdiDriver ediDriver)
@@ -40,7 +39,7 @@ internal sealed class AggregatedMeasureDataRequestDsl
 
     internal Task RejectedAggregatedMeasureDataFor(string actorNumber, string actorRole)
     {
-        return _edi.BadRequestAggregatedMeasureDataAsync(actorNumber, new[] { actorRole, });
+        return _edi.RequestAggregatedMeasureDataAsync(actorNumber, new[] { actorRole }, true);
     }
 
     internal Task ConfirmRejectedResultIsAvailableFor(string actorNumber, string actorRole)
