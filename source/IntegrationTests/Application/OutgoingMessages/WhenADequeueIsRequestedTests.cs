@@ -47,18 +47,10 @@ public class WhenADequeueIsRequestedTests : TestBase
     [Fact]
     public async Task Dequeue_is_unsuccessful_when_actor_queue_exits_without_a_open_bundle()
     {
-        // Ensures we have a Actor queue with a bundle.
+        // Created an Actor Queue with a bundle.
         await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
-        var peekResult = await InvokeCommandAsync(new PeekCommand(
-            ActorNumber.Create(SampleData.NewEnergySupplierNumber),
-            MessageCategory.MasterData,
-            MarketRole.EnergySupplier,
-            DocumentFormat.Xml)).ConfigureAwait(false);
 
-        // Close the bundle
-        _ = await InvokeCommandAsync(new DequeueCommand(peekResult.MessageId.GetValueOrDefault().ToString(), MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId))).ConfigureAwait(false);
-
-        var dequeueResult = await InvokeCommandAsync(new DequeueCommand(peekResult.MessageId.GetValueOrDefault().ToString(), MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId))).ConfigureAwait(false);
+        var dequeueResult = await InvokeCommandAsync(new DequeueCommand(Guid.NewGuid().ToString(), MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId))).ConfigureAwait(false);
 
         Assert.False(dequeueResult.Success);
     }
