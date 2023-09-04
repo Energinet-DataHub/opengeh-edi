@@ -47,9 +47,19 @@
       <None Update="appsettings.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="integrationtest.local.settings.json">
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\RequestResponse\source\RequestResponse\RequestResponse.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="Messages\json\BadRequestAggregatedMeasureData.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureData.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>

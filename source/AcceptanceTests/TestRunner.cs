@@ -32,6 +32,7 @@ public class TestRunner : IAsyncDisposable
         var topicName = secretsConfiguration.GetValue<string>("sbt-sharedres-integrationevent-received-name")!;
 
         EventPublisher = new IntegrationEventPublisher(connectionString, topicName);
+
         AzpToken = root.GetValue<string>("AZP_TOKEN")!;
     }
 
