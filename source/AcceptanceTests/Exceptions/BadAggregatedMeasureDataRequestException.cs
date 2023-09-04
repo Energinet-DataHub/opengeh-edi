@@ -12,6 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-global using Xunit;
+namespace AcceptanceTest.Exceptions;
 
-[assembly: CollectionBehavior(DisableTestParallelization = true)]
+public class BadAggregatedMeasureDataRequestException : Exception
+{
+    public BadAggregatedMeasureDataRequestException(string message)
+        : base(message)
+    {
+    }
+
+    public BadAggregatedMeasureDataRequestException()
+    {
+    }
+
+    public BadAggregatedMeasureDataRequestException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+}
