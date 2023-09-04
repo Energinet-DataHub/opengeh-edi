@@ -48,9 +48,9 @@ public class DequeueHandler : IRequestHandler<DequeueCommand, DequeCommandResult
             return new DequeCommandResult(false);
         }
 
-        actorQueue.Dequeue(bundleId);
+        var successful = actorQueue.Dequeue(bundleId);
 
-        return new DequeCommandResult(true);
+        return new DequeCommandResult(successful);
     }
 }
 

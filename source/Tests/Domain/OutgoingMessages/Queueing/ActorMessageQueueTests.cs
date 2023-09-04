@@ -77,8 +77,8 @@ public class ActorMessageQueueTests
         actorMessageQueue.Enqueue(outgoingMessage);
 
         var result = actorMessageQueue.Peek();
-        actorMessageQueue.Dequeue(result.BundleId!);
 
+        Assert.True(actorMessageQueue.Dequeue(result.BundleId!));
         Assert.Null(actorMessageQueue.Peek().BundleId);
     }
 
