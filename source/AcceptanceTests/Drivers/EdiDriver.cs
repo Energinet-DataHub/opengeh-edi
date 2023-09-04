@@ -39,19 +39,10 @@ internal sealed class EdiDriver : IDisposable
         _httpClient.Dispose();
     }
 
-    public async Task<Stream> RequestAggregatedMeasureDataAsync(string actorNumber, string[] marketRoles)
+    public async Task<Stream> RequestAggregatedMeasureDataAsync(string actorNumber, string[] marketRoles, bool badRequest = false)
     {
         var token = TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
-        var response = await RequestAggregatedMeasureDataAsync(token).ConfigureAwait(false);
-
-        var document = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-        return document;
-    }
-
-    public async Task<Stream> BadRequestAggregatedMeasureDataAsync(string actorNumber, string[] marketRoles)
-    {
-        var token = TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
-        var response = await RequestAggregatedMeasureDataAsync(token, true).ConfigureAwait(false);
+        var response = await RequestAggregatedMeasureDataAsync(token, badRequest).ConfigureAwait(false);
 
         var document = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
         return document;
@@ -123,8 +114,8 @@ internal sealed class EdiDriver : IDisposable
     private static string GetContent(bool badRequest = false)
     {
         var jsonContent = badRequest
-            ? File.ReadAllText($"Messages/json/BadRequestAggregatedMeasureData.json")
-            : File.ReadAllText($"Messages/json/RequestAggregatedMeasureData.json");
+            ? File.ReadAllText("Messages/json/RequestAggregatedMeasureDataWithWrongProcessType.json")
+            : File.ReadAllText("Messages/json/RequestAggregatedMeasureData.json");
 
         jsonContent = jsonContent.Replace("{MessageId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
         jsonContent = jsonContent.Replace("{TransactionId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
