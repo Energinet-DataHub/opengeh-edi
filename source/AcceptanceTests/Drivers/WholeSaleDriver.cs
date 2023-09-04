@@ -12,16 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
-using DecimalValue = Energinet.DataHub.Wholesale.Contracts.Events.DecimalValue;
-using QuantityQuality = Energinet.DataHub.Wholesale.Contracts.Events.QuantityQuality;
-using QuantityUnit = Energinet.DataHub.Wholesale.Contracts.Events.QuantityUnit;
-using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
-using TimeSeriesPoint = Energinet.DataHub.Wholesale.Contracts.Events.TimeSeriesPoint;
-using TimeSeriesType = Energinet.DataHub.Wholesale.Contracts.Events.TimeSeriesType;
 
 namespace AcceptanceTest.Drivers;
 
