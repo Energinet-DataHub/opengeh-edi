@@ -31,7 +31,7 @@ public sealed class WhenAggregationResultIsPublishedTests : TestRunner
     }
 
     [Fact]
-    public async Task Actor_can_fetch_aggregation_result()
+    public async Task Actor_can_peek_and_dequeue_aggregation_result()
     {
         await _aggregations.PublishResultFor(gridAreaCode: "543").ConfigureAwait(false);
         await _aggregations
