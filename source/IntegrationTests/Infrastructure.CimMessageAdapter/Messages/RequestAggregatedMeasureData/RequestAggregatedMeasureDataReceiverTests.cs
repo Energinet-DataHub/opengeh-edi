@@ -502,19 +502,17 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     }
 
     [Fact]
-    public async Task Transaction_ids_NEWNAME()
+    public async Task Transaction_ids_are_unique_across_scopes()
     {
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
             .Message();
 
         var messageParserResult1 = await ParseMessageAsync(message).ConfigureAwait(false);
+        var request = new ReceiveAggregatedMeasureDataRequest(messageParserResult1, message);
 
-        var request1 = new ReceiveAggregatedMeasureDataRequest(messageParserResult1, message);
-        var request2 = new ReceiveAggregatedMeasureDataRequest(messageParserResult1, message);
-
-        var result1 = InvokeCommandAsync(request1);
-        var result2 = InvokeCommandAsync(request2);
+        var result1 = InvokeCommandAsync(request);
+        var result2 = InvokeCommandAsync(request);
 
         await Task.WhenAll(result1, result2);
     }

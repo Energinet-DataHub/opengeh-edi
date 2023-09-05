@@ -25,7 +25,7 @@ limitations under the License.
     <cim:receiver_MarketParticipant.marketRole.type>DGL</cim:receiver_MarketParticipant.marketRole.type>
     <cim:createdDateTime>2022-12-17T09:30:47Z</cim:createdDateTime>
     <cim:Series>
-        <cim:mRID>123353185</cim:mRID>
+        <cim:mRID>123564789123564789123564789123564789</cim:mRID>
         <cim:settlement_Series.version>D01</cim:settlement_Series.version>
         <cim:marketEvaluationPoint.type>E17</cim:marketEvaluationPoint.type>
         <cim:marketEvaluationPoint.settlementMethod>D01</cim:marketEvaluationPoint.settlementMethod>
