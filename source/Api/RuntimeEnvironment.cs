@@ -34,6 +34,8 @@ namespace Api
 
         public virtual string? EDI_INBOX_MESSAGE_QUEUE_NAME => GetEnvironmentVariable(nameof(EDI_INBOX_MESSAGE_QUEUE_NAME));
 
+        public virtual string? WHOLESALE_INBOX_MESSAGE_QUEUE_NAME => GetEnvironmentVariable(nameof(WHOLESALE_INBOX_MESSAGE_QUEUE_NAME));
+
         public virtual string? REQUEST_RESPONSE_LOGGING_CONNECTION_STRING =>
             GetEnvironmentVariable(nameof(REQUEST_RESPONSE_LOGGING_CONNECTION_STRING));
 
