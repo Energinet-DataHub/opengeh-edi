@@ -24,7 +24,7 @@ limitations under the License.
     <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="6.0.2" />
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.16.1" />
     <PackageReference Include="Dapper-NodaTime" Version="0.1.0" />
-    <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="7.5.3" />
+    <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="7.6.0" />
     <PackageReference Include="Energinet.DataHub.Core.Logging" Version="2.2.8" />
     <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="3.1.0-alpha-124" />
     <PackageReference Include="Energinet.DataHub.EnergySupplying.IntegrationEvents" Version="1.0.2" />
