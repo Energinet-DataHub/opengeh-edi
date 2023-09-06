@@ -98,7 +98,7 @@ namespace Api
                         "NotImplemented"));
 
                     services.AddSingleton(new WholesaleServiceBusClientConfiguration(
-                        runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!));
+                        runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!));
 
                     services.AddSingleton(
                         _ => new RequestChangeOfSupplierTransaction(runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!));
