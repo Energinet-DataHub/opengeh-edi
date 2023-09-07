@@ -14,6 +14,7 @@
 
 using System;
 using Azure.Messaging.ServiceBus;
+using Domain.Actors;
 using Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.Edi.Requests;
 using Google.Protobuf;
@@ -46,9 +47,26 @@ public static class AggregatedMeasureDataResponseFactory
         {
             Period = MapPeriod(process),
             AggregationPerGridarea = MapGridArea(process),
-            TimeSeriesType = MapTimeSeriesType(process),
+            TimeSeriesType = process.RequestedByActorRoleCode == MarketRole.MeteredDataResponsible.Code
+                ? MapTimeSeriesTypeAsGridOperator(process)
+                : MapTimeSeriesType(process),
         };
         return response;
+    }
+
+    private static TimeSeriesType MapTimeSeriesType(AggregatedMeasureDataProcess process)
+    {
+        return process.MeteringPointType switch
+        {
+            "E18" => TimeSeriesType.Production,
+            "E17" => process.SettlementMethod switch
+            {
+                "D01" => TimeSeriesType.NonProfiledConsumption,
+                "E02" => TimeSeriesType.FlexConsumption,
+                _ => throw TimeSeriesException(process),
+            },
+            _ => throw TimeSeriesException(process),
+        };
     }
 
     private static Energinet.DataHub.Edi.Requests.Period MapPeriod(AggregatedMeasureDataProcess process)
@@ -69,7 +87,7 @@ public static class AggregatedMeasureDataResponseFactory
         };
     }
 
-    private static TimeSeriesType MapTimeSeriesType(AggregatedMeasureDataProcess process)
+    private static TimeSeriesType MapTimeSeriesTypeAsGridOperator(AggregatedMeasureDataProcess process)
     {
         return process.MeteringPointType switch
         {
@@ -80,11 +98,17 @@ public static class AggregatedMeasureDataResponseFactory
                 "D01" => TimeSeriesType.NonProfiledConsumption,
                 "E02" => TimeSeriesType.FlexConsumption,
                 null => TimeSeriesType.TotalConsumption,
-                _ => throw new InvalidOperationException(
-                    $"Unknown time series type for metering point type {process.MeteringPointType} and settlement method {process.SettlementMethod}"),
+                _ => throw TimeSeriesException(process),
             },
-            _ => throw new InvalidOperationException(
-                $"Unknown time series type for metering point type {process.MeteringPointType} and settlement method {process.SettlementMethod}"),
+            _ => throw TimeSeriesException(process),
         };
+    }
+
+    private static InvalidOperationException TimeSeriesException(AggregatedMeasureDataProcess process)
+    {
+        return new InvalidOperationException(
+            $"Unknown time series type for metering point type {process.MeteringPointType}" +
+            $" and settlement method {process.SettlementMethod}" +
+            $"as a {process.RequestedByActorRoleCode}");
     }
 }
