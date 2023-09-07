@@ -28,8 +28,6 @@ public class RequestAggregatedMeasureDataMessageBuilder
     private readonly string _startDateAndOrTimeDateTime = "2022-06-17T22:00:00Z";
     private readonly string _endDateAndOrTimeDateTime = "2022-07-22T22:00:00Z";
     private readonly string _meteringGridAreaDomainId = "244";
-    private readonly string _energySupplierMarketParticipantId = "5790001330552";
-    private readonly string _balanceResponsiblePartyMarketParticipantId = "5799999933318";
     private readonly string _messageType = NotSet;
     private readonly string _processType = "D03";
     private readonly string _senderId = "1234567891234567";
@@ -40,12 +38,8 @@ public class RequestAggregatedMeasureDataMessageBuilder
     private string _senderRole = "DDZ";
     private string _marketEvaluationPointType = "E17";
     private string? _marketEvaluationSettlementMethod = "D01";
-
-    public RequestAggregatedMeasureDataMessageBuilder SetMarketEvaluationSettlementMethod(string? marketEvaluationSettlementMethod)
-    {
-        _marketEvaluationSettlementMethod = marketEvaluationSettlementMethod;
-        return this;
-    }
+    private string? _energySupplierMarketParticipantId = "5790001330552";
+    private string? _balanceResponsiblePartyMarketParticipantId = "5799999933318";
 
     public RequestAggregatedMeasureDataMessageBuilder SetMarketEvaluationPointType(string marketEvaluationPointType)
     {
@@ -56,6 +50,24 @@ public class RequestAggregatedMeasureDataMessageBuilder
     public RequestAggregatedMeasureDataMessageBuilder SetSenderRole(string senderRole)
     {
         _senderRole = senderRole;
+        return this;
+    }
+
+    public RequestAggregatedMeasureDataMessageBuilder SetMarketEvaluationSettlementMethod(string? marketEvaluationSettlementMethod)
+    {
+        _marketEvaluationSettlementMethod = marketEvaluationSettlementMethod;
+        return this;
+    }
+
+    public RequestAggregatedMeasureDataMessageBuilder SetEnergySupplierId(string? energySupplierId = null)
+    {
+        _energySupplierMarketParticipantId = energySupplierId;
+        return this;
+    }
+
+    public RequestAggregatedMeasureDataMessageBuilder SetBalanceResponsibleId(string? balanceResponsibleId = null)
+    {
+        _balanceResponsiblePartyMarketParticipantId = balanceResponsibleId;
         return this;
     }
 

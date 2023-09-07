@@ -28,7 +28,6 @@ using IntegrationTests.Fixtures;
 using IntegrationTests.TestDoubles;
 using Xunit;
 using Xunit.Categories;
-using TimeSeriesType = Energinet.DataHub.Edi.Responses.TimeSeriesType;
 
 namespace IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
@@ -76,7 +75,6 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
             Build();
         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
-        //TODO: Should be AggregatedTimeSeriesRequestRequest when we communicate with Wholesales.
         var exceptedServiceBusMessageSubject = nameof(AggregatedTimeSeriesRequest);
 
         // Act
@@ -101,6 +99,8 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
             MessageBuilder().
             SetMarketEvaluationPointType("E18").
             SetSenderRole("MDR").
+            SetEnergySupplierId(null).
+            SetBalanceResponsibleId(null).
             Build();
         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
@@ -117,7 +117,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
 
         var response = AggregatedTimeSeriesRequest.Parser.ParseFrom(message.Body!);
 
-        Assert.Equal(TimeSeriesType.Production, (TimeSeriesType)response.TimeSeriesType);
+        Assert.Equal(TimeSeriesType.Production, response.TimeSeriesType);
         Assert.NotNull(response.AggregationPerGridarea);
         var aggregationPerGridArea = response.AggregationPerGridarea;
         Assert.Equal(aggregationPerGridArea.GridAreaCode, incomingMessage.MarketActivityRecord.MeteringGridAreaDomainId);
@@ -132,6 +132,8 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
             MessageBuilder().
             SetMarketEvaluationPointType("E20").
             SetSenderRole("MDR").
+            SetEnergySupplierId(null).
+            SetBalanceResponsibleId(null).
             Build();
         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
@@ -148,7 +150,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
 
         var response = AggregatedTimeSeriesRequest.Parser.ParseFrom(message.Body!);
 
-        Assert.Equal(TimeSeriesType.NetExchangePerGa, (TimeSeriesType)response.TimeSeriesType);
+        Assert.Equal(TimeSeriesType.NetExchangePerGa, response.TimeSeriesType);
         Assert.NotNull(response.AggregationPerGridarea);
     }
 
@@ -161,6 +163,8 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
             SetMarketEvaluationPointType("E17").
             SetMarketEvaluationSettlementMethod("D01").
             SetSenderRole("MDR").
+            SetEnergySupplierId(null).
+            SetBalanceResponsibleId(null).
             Build();
         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
@@ -177,7 +181,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
 
         var response = AggregatedTimeSeriesRequest.Parser.ParseFrom(message.Body!);
 
-        Assert.Equal(TimeSeriesType.NonProfiledConsumption, (TimeSeriesType)response.TimeSeriesType);
+        Assert.Equal(TimeSeriesType.NonProfiledConsumption, response.TimeSeriesType);
         Assert.NotNull(response.AggregationPerGridarea);
     }
 
@@ -190,6 +194,8 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
             SetMarketEvaluationPointType("E17").
             SetMarketEvaluationSettlementMethod("E02").
             SetSenderRole("MDR").
+            SetEnergySupplierId(null).
+            SetBalanceResponsibleId(null).
             Build();
         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
@@ -206,7 +212,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
 
         var response = AggregatedTimeSeriesRequest.Parser.ParseFrom(message.Body!);
 
-        Assert.Equal(TimeSeriesType.FlexConsumption, (TimeSeriesType)response.TimeSeriesType);
+        Assert.Equal(TimeSeriesType.FlexConsumption, response.TimeSeriesType);
         Assert.NotNull(response.AggregationPerGridarea);
     }
 
@@ -219,6 +225,8 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
             SetMarketEvaluationPointType("E17").
             SetMarketEvaluationSettlementMethod(null).
             SetSenderRole("MDR").
+            SetEnergySupplierId(null).
+            SetBalanceResponsibleId(null).
             Build();
         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
@@ -235,7 +243,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
 
         var response = AggregatedTimeSeriesRequest.Parser.ParseFrom(message.Body!);
 
-        Assert.Equal(TimeSeriesType.TotalConsumption, (TimeSeriesType)response.TimeSeriesType);
+        Assert.Equal(TimeSeriesType.TotalConsumption, response.TimeSeriesType);
         Assert.NotNull(response.AggregationPerGridarea);
     }
 
