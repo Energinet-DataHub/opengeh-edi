@@ -17,7 +17,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Application.Configuration.Commands.Commands;
 using Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.Edi.Requests;
 using Infrastructure.Configuration.DataAccess;
 using Infrastructure.Configuration.InternalCommands;
 using Infrastructure.Configuration.MessageBus;
@@ -74,7 +74,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
         //TODO: Should be AggregatedTimeSeriesRequestRequest when we communicate with Wholesales.
-        var exceptedServiceBusMessageSubject = nameof(AggregatedTimeSeriesRequestAccepted);
+        var exceptedServiceBusMessageSubject = nameof(AggregatedTimeSeriesRequest);
 
         // Act
         await InvokeCommandAsync(command).ConfigureAwait(false);

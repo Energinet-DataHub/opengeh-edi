@@ -71,21 +71,20 @@ public static class AggregatedMeasureDataResponseFactory
 
     private static TimeSeriesType MapTimeSeriesType(AggregatedMeasureDataProcess process)
     {
-        return process.SettlementMethod switch
+        return process.MeteringPointType switch
         {
-            _ => TimeSeriesType.Production,
-            // These might depend on more than one parameter, see documentation below.
-            // https://energinet.atlassian.net/wiki/spaces/D3/pages/275677228/EDI+domain
-            /*"E18" => TimeSeriesType.Production,
-            "E02" => TimeSeriesType.NonProfiledConsumption,
-            "D01" => TimeSeriesType.FlexConsumption,
-            "4" => TimeSeriesType.NetExchangePerGa,
-            "5" => TimeSeriesType.NetExchangePerNeighboringGa,
-            "6" => TimeSeriesType.GridLoss,
-            "7" => TimeSeriesType.NegativeGridLoss,
-            "8" => TimeSeriesType.PositiveGridLoss,
-            "9" => TimeSeriesType.TotalConsumption,
-            _ => null,*/
+            "E18" => TimeSeriesType.Production,
+            "E20" => TimeSeriesType.NetExchangePerGa,
+            "E17" => process.SettlementMethod switch
+            {
+                "D01" => TimeSeriesType.NonProfiledConsumption,
+                "E02" => TimeSeriesType.FlexConsumption,
+                null => TimeSeriesType.TotalConsumption,
+                _ => throw new InvalidOperationException(
+                    $"Unknown time series type for metering point type {process.MeteringPointType} and settlement method {process.SettlementMethod}"),
+            },
+            _ => throw new InvalidOperationException(
+                $"Unknown time series type for metering point type {process.MeteringPointType} and settlement method {process.SettlementMethod}"),
         };
     }
 }
