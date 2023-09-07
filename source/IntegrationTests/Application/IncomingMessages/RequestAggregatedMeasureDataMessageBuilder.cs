@@ -25,8 +25,6 @@ public class RequestAggregatedMeasureDataMessageBuilder
 {
     private const string NotSet = "NotSet";
     private readonly string _serieId = "123353185";
-    private readonly string _marketEvaluationPointType = "E17";
-    private readonly string _marketEvaluationSettlementMethod = "D01";
     private readonly string _startDateAndOrTimeDateTime = "2022-06-17T22:00:00Z";
     private readonly string _endDateAndOrTimeDateTime = "2022-07-22T22:00:00Z";
     private readonly string _meteringGridAreaDomainId = "244";
@@ -38,8 +36,28 @@ public class RequestAggregatedMeasureDataMessageBuilder
     private readonly ActorNumber _receiverId = DataHubDetails.IdentificationNumber;
     private readonly string _receiverRole = "DDQ";
     private readonly string _createdAt = SystemClock.Instance.GetCurrentInstant().ToString();
-    private readonly string _senderRole = "DDZ";
     private readonly string _messageId = Guid.NewGuid().ToString();
+    private string _senderRole = "DDZ";
+    private string _marketEvaluationPointType = "E17";
+    private string? _marketEvaluationSettlementMethod = "D01";
+
+    public RequestAggregatedMeasureDataMessageBuilder SetMarketEvaluationSettlementMethod(string? marketEvaluationSettlementMethod)
+    {
+        _marketEvaluationSettlementMethod = marketEvaluationSettlementMethod;
+        return this;
+    }
+
+    public RequestAggregatedMeasureDataMessageBuilder SetMarketEvaluationPointType(string marketEvaluationPointType)
+    {
+        _marketEvaluationPointType = marketEvaluationPointType;
+        return this;
+    }
+
+    public RequestAggregatedMeasureDataMessageBuilder SetSenderRole(string senderRole)
+    {
+        _senderRole = senderRole;
+        return this;
+    }
 
     internal RequestAggregatedMeasureDataTransaction Build()
     {

@@ -28,6 +28,7 @@ using IntegrationTests.Fixtures;
 using IntegrationTests.TestDoubles;
 using Xunit;
 using Xunit.Categories;
+using TimeSeriesType = Energinet.DataHub.Edi.Responses.TimeSeriesType;
 
 namespace IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
@@ -70,7 +71,9 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
     public async Task Aggregated_measure_data_process_was_send_to_wholesale()
     {
         // Arrange
-        var incomingMessage = MessageBuilder().Build();
+        var incomingMessage =
+            MessageBuilder().
+            Build();
         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
         //TODO: Should be AggregatedTimeSeriesRequestRequest when we communicate with Wholesales.
@@ -88,6 +91,152 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
         Assert.Equal(exceptedServiceBusMessageSubject, message!.Subject);
         Assert.Equal(process.BusinessTransactionId.Id, incomingMessage.MarketActivityRecord.Id);
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Sent);
+    }
+
+    [Fact]
+    public async Task Grid_operator_requesting_production_from_wholesale()
+    {
+        // Arrange
+        var incomingMessage =
+            MessageBuilder().
+            SetMarketEvaluationPointType("E18").
+            SetSenderRole("MDR").
+            Build();
+        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
+        var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
+
+        // Act
+        await InvokeCommandAsync(command).ConfigureAwait(false);
+
+        // Assert
+        var message = _senderSpy.Message;
+        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
+
+        Assert.NotNull(message);
+        Assert.NotNull(process);
+
+        var response = AggregatedTimeSeriesRequest.Parser.ParseFrom(message.Body!);
+
+        Assert.Equal(TimeSeriesType.Production, (TimeSeriesType)response.TimeSeriesType);
+        Assert.NotNull(response.AggregationPerGridarea);
+        var aggregationPerGridArea = response.AggregationPerGridarea;
+        Assert.Equal(aggregationPerGridArea.GridAreaCode, incomingMessage.MarketActivityRecord.MeteringGridAreaDomainId);
+        Assert.Equal(aggregationPerGridArea.GridResponsibleId, incomingMessage.MessageHeader.SenderId);
+    }
+
+    [Fact]
+    public async Task Grid_operator_requesting_net_exchange_from_wholesale()
+    {
+        // Arrange
+        var incomingMessage =
+            MessageBuilder().
+            SetMarketEvaluationPointType("E20").
+            SetSenderRole("MDR").
+            Build();
+        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
+        var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
+
+        // Act
+        await InvokeCommandAsync(command).ConfigureAwait(false);
+
+        // Assert
+        var message = _senderSpy.Message;
+        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
+
+        Assert.NotNull(message);
+        Assert.NotNull(process);
+
+        var response = AggregatedTimeSeriesRequest.Parser.ParseFrom(message.Body!);
+
+        Assert.Equal(TimeSeriesType.NetExchangePerGa, (TimeSeriesType)response.TimeSeriesType);
+        Assert.NotNull(response.AggregationPerGridarea);
+    }
+
+    [Fact]
+    public async Task Grid_operator_requesting_non_profiled_consumption_from_wholesale()
+    {
+        // Arrange
+        var incomingMessage =
+            MessageBuilder().
+            SetMarketEvaluationPointType("E17").
+            SetMarketEvaluationSettlementMethod("D01").
+            SetSenderRole("MDR").
+            Build();
+        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
+        var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
+
+        // Act
+        await InvokeCommandAsync(command).ConfigureAwait(false);
+
+        // Assert
+        var message = _senderSpy.Message;
+        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
+
+        Assert.NotNull(message);
+        Assert.NotNull(process);
+
+        var response = AggregatedTimeSeriesRequest.Parser.ParseFrom(message.Body!);
+
+        Assert.Equal(TimeSeriesType.NonProfiledConsumption, (TimeSeriesType)response.TimeSeriesType);
+        Assert.NotNull(response.AggregationPerGridarea);
+    }
+
+    [Fact]
+    public async Task Grid_operator_requesting_flex_consumption_from_wholesale()
+    {
+        // Arrange
+        var incomingMessage =
+            MessageBuilder().
+            SetMarketEvaluationPointType("E17").
+            SetMarketEvaluationSettlementMethod("E02").
+            SetSenderRole("MDR").
+            Build();
+        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
+        var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
+
+        // Act
+        await InvokeCommandAsync(command).ConfigureAwait(false);
+
+        // Assert
+        var message = _senderSpy.Message;
+        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
+
+        Assert.NotNull(message);
+        Assert.NotNull(process);
+
+        var response = AggregatedTimeSeriesRequest.Parser.ParseFrom(message.Body!);
+
+        Assert.Equal(TimeSeriesType.FlexConsumption, (TimeSeriesType)response.TimeSeriesType);
+        Assert.NotNull(response.AggregationPerGridarea);
+    }
+
+    [Fact]
+    public async Task Grid_operator_requesting_total_consumption_from_wholesale()
+    {
+        // Arrange
+        var incomingMessage =
+            MessageBuilder().
+            SetMarketEvaluationPointType("E17").
+            SetMarketEvaluationSettlementMethod(null).
+            SetSenderRole("MDR").
+            Build();
+        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
+        var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
+
+        // Act
+        await InvokeCommandAsync(command).ConfigureAwait(false);
+
+        // Assert
+        var message = _senderSpy.Message;
+        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
+
+        Assert.NotNull(message);
+        Assert.NotNull(process);
+
+        var response = AggregatedTimeSeriesRequest.Parser.ParseFrom(message.Body!);
+
+        Assert.Equal(TimeSeriesType.TotalConsumption, (TimeSeriesType)response.TimeSeriesType);
+        Assert.NotNull(response.AggregationPerGridarea);
     }
 
     protected override void Dispose(bool disposing)
