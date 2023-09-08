@@ -34,7 +34,6 @@ namespace Infrastructure.IncomingMessages
         {
             using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
 
-            transactionId = $"{senderId}_{transactionId}";
             var result = await connection.ExecuteAsync(
                     $"IF NOT EXISTS (SELECT * FROM dbo.TransactionRegistry WHERE TransactionId = @TransactionId AND SenderId = @SenderId)" +
                     $"INSERT INTO dbo.TransactionRegistry(TransactionId, SenderId) VALUES(@TransactionId, @SenderId)",

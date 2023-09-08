@@ -42,5 +42,16 @@ namespace Infrastructure.IncomingMessages
 
             return result == 1;
         }
+
+        public async Task<bool> MessageIdIsUniqueForSenderAsync(string senderId, string messageId, CancellationToken cancellationToken)
+        {
+            using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
+            var message = await connection.QueryFirstOrDefaultAsync(
+                    $"SELECT * FROM dbo.MessageRegistry WHERE MessageId = @MessageId AND SenderId = @SenderId",
+                    new { MessageId = messageId, SenderId = senderId })
+                .ConfigureAwait(false);
+
+            return message == null;
+        }
     }
 }

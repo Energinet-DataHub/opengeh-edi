@@ -29,5 +29,13 @@ namespace CimMessageAdapter.Messages
         /// <param name="messageId"></param>
         /// <param name="cancellationToken"></param>
         Task<bool> TryStoreAsync(string senderId, string messageId, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Check if <paramref name="messageId"/> is unique for the actor who made the request <paramref name="senderId"/>
+        /// </summary>
+        /// <param name="senderId"></param>
+        /// <param name="messageId"></param>
+        /// <param name="cancellationToken"></param>
+        Task<bool> MessageIdIsUniqueForSenderAsync(string senderId, string messageId, CancellationToken cancellationToken);
     }
 }
