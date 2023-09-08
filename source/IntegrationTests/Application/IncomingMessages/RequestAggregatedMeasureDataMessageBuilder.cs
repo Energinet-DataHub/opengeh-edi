@@ -53,7 +53,7 @@ public class RequestAggregatedMeasureDataMessageBuilder
         return this;
     }
 
-    public RequestAggregatedMeasureDataMessageBuilder SetMarketEvaluationSettlementMethod(string? marketEvaluationSettlementMethod)
+    public RequestAggregatedMeasureDataMessageBuilder SetMarketEvaluationSettlementMethod(string? marketEvaluationSettlementMethod = null)
     {
         _marketEvaluationSettlementMethod = marketEvaluationSettlementMethod;
         return this;

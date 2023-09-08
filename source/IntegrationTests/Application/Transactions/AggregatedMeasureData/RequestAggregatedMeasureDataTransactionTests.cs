@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Application.Configuration.Commands.Commands;
+using Domain.Actors;
 using Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.Edi.Requests;
 using Infrastructure.Configuration.DataAccess;
@@ -72,6 +74,9 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
         // Arrange
         var incomingMessage =
             MessageBuilder().
+            SetSenderRole(MarketRole.MeteredDataResponsible.Code).
+            SetEnergySupplierId(null).
+            SetBalanceResponsibleId(null).
             Build();
         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
@@ -98,7 +103,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
         var incomingMessage =
             MessageBuilder().
             SetMarketEvaluationPointType("E18").
-            SetSenderRole("MDR").
+            SetSenderRole(MarketRole.MeteredDataResponsible.Code).
             SetEnergySupplierId(null).
             SetBalanceResponsibleId(null).
             Build();
@@ -110,10 +115,8 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
 
         // Assert
         var message = _senderSpy.Message;
-        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
 
         Assert.NotNull(message);
-        Assert.NotNull(process);
 
         var response = AggregatedTimeSeriesRequest.Parser.ParseFrom(message.Body!);
 
@@ -143,10 +146,8 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
 
         // Assert
         var message = _senderSpy.Message;
-        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
 
         Assert.NotNull(message);
-        Assert.NotNull(process);
 
         var response = AggregatedTimeSeriesRequest.Parser.ParseFrom(message.Body!);
 
@@ -174,10 +175,8 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
 
         // Assert
         var message = _senderSpy.Message;
-        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
 
         Assert.NotNull(message);
-        Assert.NotNull(process);
 
         var response = AggregatedTimeSeriesRequest.Parser.ParseFrom(message.Body!);
 
@@ -205,10 +204,8 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
 
         // Assert
         var message = _senderSpy.Message;
-        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
 
         Assert.NotNull(message);
-        Assert.NotNull(process);
 
         var response = AggregatedTimeSeriesRequest.Parser.ParseFrom(message.Body!);
 
@@ -236,15 +233,35 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
 
         // Assert
         var message = _senderSpy.Message;
-        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
 
         Assert.NotNull(message);
-        Assert.NotNull(process);
 
         var response = AggregatedTimeSeriesRequest.Parser.ParseFrom(message.Body!);
 
         Assert.Equal(TimeSeriesType.TotalConsumption, response.TimeSeriesType);
         Assert.NotNull(response.AggregationPerGridarea);
+    }
+
+    [Fact]
+    public async Task Grid_operator_making_invalid_request_from_wholesale()
+    {
+        // Arrange
+        var incomingMessage =
+            MessageBuilder().
+            SetMarketEvaluationPointType("BAD").
+            SetSenderRole(MarketRole.MeteredDataResponsible.Code).
+            SetEnergySupplierId(null).
+            SetBalanceResponsibleId(null).
+            Build();
+        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
+        var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
+        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
+
+        // Act and assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => InvokeCommandAsync(command)).ConfigureAwait(false);
+        Assert.NotNull(process);
+
+        AssertProcessState(process, AggregatedMeasureDataProcess.State.Initialized);
     }
 
     protected override void Dispose(bool disposing)
