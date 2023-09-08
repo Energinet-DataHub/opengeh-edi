@@ -74,6 +74,18 @@ internal sealed class EdiDriver : IDisposable
         throw new TimeoutException("Unable to retrieve peek result within time limit");
     }
 
+    public async Task EmptyQueueAsync(string actorNumber, string[] marketRoles)
+    {
+        var token = TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
+        var peekResponse = await PeekAsync(token)
+                .ConfigureAwait(false);
+        if (peekResponse.StatusCode == HttpStatusCode.OK)
+        {
+            await DequeueAsync(token, GetMessageId(peekResponse)).ConfigureAwait(false);
+            await EmptyQueueAsync(actorNumber, marketRoles).ConfigureAwait(false);
+        }
+    }
+
     public async Task PeekAcceptedAggregationMessageAsync(string actorNumber, string[] roles)
     {
         var documentStream = await PeekMessageAsync(actorNumber, roles).ConfigureAwait(false);
