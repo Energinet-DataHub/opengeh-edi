@@ -47,6 +47,9 @@
       <None Update="appsettings.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="integrationtest.local.settings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
@@ -54,7 +57,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureDataWithWrongProcessType.json">
+      <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureDataWithWrongMarketEvaluationPoint.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureData.json">
