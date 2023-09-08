@@ -13,33 +13,35 @@
 // limitations under the License.
 
 using System;
+using Application.Configuration;
 using Azure.Messaging.ServiceBus;
-using Domain.OutgoingMessages;
+using Domain.Actors;
 using Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.Edi.Requests;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
-using Infrastructure.OutgoingMessages.Common;
-using Period = Energinet.DataHub.Edi.Responses.Period;
-using RejectReason = Energinet.DataHub.Edi.Responses.RejectReason;
-using Serie = Energinet.DataHub.Edi.Responses.Serie;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData;
 
-public static class AggregatedMeasureDataResponseFactory
+public class AggregatedMeasureDataResponseFactory
 {
-    public static ServiceBusMessage CreateServiceBusMessage(AggregatedMeasureDataProcess process)
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+
+    public AggregatedMeasureDataResponseFactory(ISystemDateTimeProvider systemDateTimeProvider)
+    {
+        _systemDateTimeProvider = systemDateTimeProvider ?? throw new ArgumentNullException(nameof(systemDateTimeProvider));
+    }
+
+    public ServiceBusMessage CreateServiceBusMessage(AggregatedMeasureDataProcess process)
     {
         if (process == null) throw new ArgumentNullException(nameof(process));
 
-        var bodyFromWholesaleMock = process.BusinessReason == CimCode.Of(BusinessReason.BalanceFixing)
-            ? CreateRejectedResponseFromWholesale()
-            : CreateAcceptedResponseFromWholesale(process);
+        var body = CreateAggregatedMeasureDataRequest(process);
 
         var message = new ServiceBusMessage()
         {
-            Body = new BinaryData(bodyFromWholesaleMock.ToByteArray()),
-            Subject = bodyFromWholesaleMock.GetType().Name,
+            Body = new BinaryData(body.ToByteArray()),
+            Subject = body.GetType().Name,
             MessageId = process.ProcessId.Id.ToString(),
         };
 
@@ -47,56 +49,127 @@ public static class AggregatedMeasureDataResponseFactory
         return message;
     }
 
-    private static IMessage CreateRejectedResponseFromWholesale()
+    private static bool IsValidRequestFromGridOperator(AggregatedMeasureDataProcess process)
     {
-        var wholesaleResponse = new AggregatedTimeSeriesRequestRejected();
-        wholesaleResponse.RejectReasons.Add(CreateRejectReason());
-        return wholesaleResponse;
+        return IsForGridArea(process)
+               && (process.RequestedByActorRoleCode == MarketRole.MeteredDataResponsible.Code
+                   || process.RequestedByActorRoleCode == MarketRole.GridOperator.Code);
     }
 
-    private static RejectReason CreateRejectReason()
+    private static bool IsForGridArea(AggregatedMeasureDataProcess process)
     {
-        return new RejectReason()
+        return process.EnergySupplierId is null && process.BalanceResponsibleId is null;
+    }
+
+    private static AggregationPerGridArea MapGridArea(AggregatedMeasureDataProcess process)
+    {
+        return new AggregationPerGridArea()
         {
-            ErrorCode = ErrorCodes.InvalidBalanceResponsibleForPeriod, ErrorMessage = "something went wrong",
+            GridAreaCode = process.MeteringGridAreaDomainId,
+            GridResponsibleId = process.RequestedByActorId.Value,
         };
     }
 
-    private static IMessage CreateAcceptedResponseFromWholesale(
-        AggregatedMeasureDataProcess aggregatedMeasureDataProcess)
+    private static AggregationPerEnergySupplierPerGridArea MapEnergySupplierPerGridArea(AggregatedMeasureDataProcess process)
     {
-        ArgumentNullException.ThrowIfNull(aggregatedMeasureDataProcess);
-
-        var wholesaleResponse = new AggregatedTimeSeriesRequestAccepted();
-        wholesaleResponse.Series.Add(CreateSerie(aggregatedMeasureDataProcess));
-
-        return wholesaleResponse;
+        return new AggregationPerEnergySupplierPerGridArea()
+        {
+            GridAreaCode = process.MeteringGridAreaDomainId,
+            BalanceResponsiblePartyId = string.Empty,
+            EnergySupplierId = process.EnergySupplierId,
+        };
     }
 
-    private static Serie CreateSerie(AggregatedMeasureDataProcess aggregatedMeasureDataProcess)
+    private static AggregationPerEnergySupplierPerBalanceResponsiblePartyPerGridArea MapEnergyAndBalancePerGridArea(AggregatedMeasureDataProcess process)
     {
-        var quantity = new DecimalValue() { Units = 12345, Nanos = 123450000, };
-        var point = new TimeSeriesPoint()
+        return new AggregationPerEnergySupplierPerBalanceResponsiblePartyPerGridArea()
         {
-            Quantity = quantity,
-            QuantityQuality = QuantityQuality.Incomplete,
-            Time = new Timestamp() { Seconds = 1, },
+            GridAreaCode = process.MeteringGridAreaDomainId,
+            BalanceResponsiblePartyId = process.BalanceResponsibleId,
+            EnergySupplierId = process.EnergySupplierId,
+        };
+    }
+
+    private static AggregationPerBalanceResponsiblePartyPerGridArea MapBalancePerGridArea(AggregatedMeasureDataProcess process)
+    {
+        return new AggregationPerBalanceResponsiblePartyPerGridArea()
+        {
+            GridAreaCode = process.MeteringGridAreaDomainId,
+            BalanceResponsiblePartyId = process.BalanceResponsibleId,
+            EnergySupplierId = string.Empty,
+        };
+    }
+
+    private static TimeSeriesType MapTimeSeriesTypeAsGridOperator(AggregatedMeasureDataProcess process)
+    {
+        return process.MeteringPointType switch
+        {
+            "E18" => TimeSeriesType.Production,
+            "E20" => TimeSeriesType.NetExchangePerGa,
+            "E17" => process.SettlementMethod switch
+            {
+                "D01" => TimeSeriesType.NonProfiledConsumption,
+                "E02" => TimeSeriesType.FlexConsumption,
+                null => TimeSeriesType.TotalConsumption,
+                _ => throw TimeSeriesException(process),
+            },
+            _ => throw TimeSeriesException(process),
+        };
+    }
+
+    private static TimeSeriesType MapTimeSeriesTypeAsBalanceResponsibleOrEnergySupplier(AggregatedMeasureDataProcess process)
+    {
+        return process.MeteringPointType switch
+        {
+            "E18" => TimeSeriesType.Production,
+            "E17" => process.SettlementMethod switch
+            {
+                "D01" => TimeSeriesType.NonProfiledConsumption,
+                "E02" => TimeSeriesType.FlexConsumption,
+                _ => throw TimeSeriesException(process),
+            },
+            _ => throw TimeSeriesException(process),
+        };
+    }
+
+    private static InvalidOperationException TimeSeriesException(AggregatedMeasureDataProcess process)
+    {
+        return new InvalidOperationException(
+            $"Unknown time series type for metering point type {process.MeteringPointType}" +
+            $" and settlement method {process.SettlementMethod}" +
+            $"as a {process.RequestedByActorRoleCode}");
+    }
+
+    private IMessage CreateAggregatedMeasureDataRequest(AggregatedMeasureDataProcess process)
+    {
+        var response = new AggregatedTimeSeriesRequest()
+        {
+            Period = MapPeriod(process),
+            TimeSeriesType = process.RequestedByActorRoleCode == MarketRole.MeteredDataResponsible.Code ||
+                             process.RequestedByActorRoleCode == MarketRole.GridOperator.Code
+                ? MapTimeSeriesTypeAsGridOperator(process)
+                : MapTimeSeriesTypeAsBalanceResponsibleOrEnergySupplier(process),
         };
 
-        var period = new Period()
+        if (IsValidRequestFromGridOperator(process))
         {
-            StartOfPeriod = new Timestamp() { Seconds = aggregatedMeasureDataProcess.StartOfPeriod.ToUnixTimeSeconds(), },
-            EndOfPeriod = new Timestamp() { Seconds = aggregatedMeasureDataProcess.EndOfPeriod?.ToUnixTimeSeconds() ?? 1, },
-            Resolution = Resolution.Pt15M,
-        };
+            response.AggregationPerGridarea = MapGridArea(process);
+            return response;
+        }
 
-        return new Serie()
+        throw new InvalidOperationException(
+            $"Invalid request by actor: {process.RequestedByActorId.Value}. " +
+            $"The combination of actor code: {process.RequestedByActorRoleCode}, " +
+            $"energy supplier id: {process.EnergySupplierId}," +
+            $"balance responsible id: {process.BalanceResponsibleId} is invalid");
+    }
+
+    private Energinet.DataHub.Edi.Requests.Period MapPeriod(AggregatedMeasureDataProcess process)
+    {
+        return new Energinet.DataHub.Edi.Requests.Period()
         {
-            GridArea = aggregatedMeasureDataProcess.MeteringGridAreaDomainId,
-            QuantityUnit = QuantityUnit.Kwh,
-            Period = period,
-            TimeSeriesPoints = { point },
-            TimeSeriesType = TimeSeriesType.Production,
+            StartOfPeriod = new Timestamp() { Seconds = process.StartOfPeriod.ToUnixTimeSeconds(), },
+            EndOfPeriod = new Timestamp() { Seconds = process.EndOfPeriod?.ToUnixTimeSeconds() ?? _systemDateTimeProvider.Now().ToUnixTimeSeconds(), },
         };
     }
 }

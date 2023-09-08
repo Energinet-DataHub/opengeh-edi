@@ -20,6 +20,7 @@ namespace Domain.OutgoingMessages.Queueing;
 #pragma warning disable CA1711 // Identifiers should not have incorrect suffix
 public class ActorMessageQueue : Entity
 {
+    // Used for persistent actor message queue entity.
     private readonly Guid _id;
     private readonly List<Bundle> _bundles = new();
 
@@ -71,10 +72,16 @@ public class ActorMessageQueue : Entity
         return new PeekResult(NextBundleToPeek(category)?.Id, NextBundleToPeek(category)?.DocumentTypeInBundle);
     }
 
-    public void Dequeue(BundleId bundleId)
+    public bool Dequeue(BundleId bundleId)
     {
         var bundle = _bundles.FirstOrDefault(bundle => bundle.Id == bundleId && bundle.IsDequeued == false);
-        bundle?.Dequeue();
+        if (bundle == null)
+        {
+            return false;
+        }
+
+        bundle.Dequeue();
+        return true;
     }
 
     private void EnsureApplicable(OutgoingMessage outgoingMessage)
