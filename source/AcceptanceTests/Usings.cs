@@ -13,3 +13,5 @@
 // limitations under the License.
 
 global using Xunit;
+
+[assembly: CollectionBehavior(DisableTestParallelization = true)]

@@ -73,7 +73,7 @@ public class MakeAggregatedMeasureAsAggregationResults : IRequestHandler<CreateA
                     process.BusinessTransactionId.Id,
                     process.RequestedByActorId.Value,
                     MapReceiverRole(process),
-                    timeSerie.SettlementVersion));
+                    MapSettlementVersion(timeSerie.SettlementVersion)));
 
             await _mediator.Publish(
                     notification,
@@ -119,6 +119,21 @@ public class MakeAggregatedMeasureAsAggregationResults : IRequestHandler<CreateA
         }
 
         return new ActorGrouping(null, null);
+    }
+
+    private static string? MapSettlementVersion(string? settlementVersion)
+    {
+        var settlementVersionName = null as string;
+        try
+        {
+            settlementVersionName = SettlementVersion.From(settlementVersion ?? string.Empty).Name;
+        }
+        catch (InvalidCastException)
+        {
+            // Settlement version is set to null.
+        }
+
+        return settlementVersionName;
     }
 
     private static string? MapSettlementMethod(AggregatedMeasureDataProcess process)

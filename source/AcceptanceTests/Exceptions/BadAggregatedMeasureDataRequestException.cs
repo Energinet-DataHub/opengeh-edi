@@ -12,24 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+namespace AcceptanceTest.Exceptions;
 
-namespace Domain.OutgoingMessages;
-
-public class ProductType : EnumerationType
+public class BadAggregatedMeasureDataRequestException : Exception
 {
-    public static readonly ProductType Energy = new(0, nameof(Energy));
-    public static readonly ProductType Tarif = new(1, nameof(Tarif));
-
-    private ProductType(int id, string name)
-        : base(id, name)
+    public BadAggregatedMeasureDataRequestException(string message)
+        : base(message)
     {
     }
 
-    public static ProductType From(string valueToParse)
+    public BadAggregatedMeasureDataRequestException()
     {
-        var productType = GetAll<ProductType>().FirstOrDefault(type => type.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{valueToParse} is not a valid product type");
+    }
 
-        return productType;
+    public BadAggregatedMeasureDataRequestException(string message, Exception innerException)
+        : base(message, innerException)
+    {
     }
 }

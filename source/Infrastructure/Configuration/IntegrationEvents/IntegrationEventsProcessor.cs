@@ -21,6 +21,7 @@ using Application.Configuration;
 using Application.Configuration.DataAccess;
 using Dapper;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Configuration.IntegrationEvents;
 
@@ -30,12 +31,14 @@ public class IntegrationEventsProcessor
     private readonly IMediator _mediator;
     private readonly ISystemDateTimeProvider _dateTimeProvider;
     private readonly List<IIntegrationEventMapper> _mappers;
+    private readonly ILogger<IntegrationEventsProcessor> _logger;
 
-    public IntegrationEventsProcessor(IDatabaseConnectionFactory connectionFactory, IMediator mediator, ISystemDateTimeProvider dateTimeProvider, IEnumerable<IIntegrationEventMapper> mappers)
+    public IntegrationEventsProcessor(IDatabaseConnectionFactory connectionFactory, IMediator mediator, ISystemDateTimeProvider dateTimeProvider, IEnumerable<IIntegrationEventMapper> mappers, ILogger<IntegrationEventsProcessor> logger)
     {
         _connectionFactory = connectionFactory;
         _mediator = mediator;
         _dateTimeProvider = dateTimeProvider;
+        _logger = logger;
         _mappers = mappers.ToList();
     }
 
@@ -53,6 +56,7 @@ public class IntegrationEventsProcessor
             #pragma warning disable CA1031 // We dont' the type of exception here
             catch (Exception e)
             {
+                _logger.LogError(e, "Unexpected Error when processing Integration Events. Id: {MessageId} and EventType: {MessageType}", message.Id, message.EventType);
                 await MarkAsFailedAsync(message, e, cancellationToken).ConfigureAwait(false);
             }
         }

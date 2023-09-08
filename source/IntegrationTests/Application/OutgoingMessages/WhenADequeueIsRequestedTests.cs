@@ -45,6 +45,18 @@ public class WhenADequeueIsRequestedTests : TestBase
     }
 
     [Fact]
+    public async Task Dequeue_unknown_message_id_is_unsuccessful_when_actor_has_a_queue()
+    {
+        var unknownMessageId = Guid.NewGuid().ToString();
+        // Created an Actor Queue with a bundle.
+        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+
+        var dequeueResult = await InvokeCommandAsync(new DequeueCommand(unknownMessageId, MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId))).ConfigureAwait(false);
+
+        Assert.False(dequeueResult.Success);
+    }
+
+    [Fact]
     public async Task Dequeue_is_Successful()
     {
         await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
