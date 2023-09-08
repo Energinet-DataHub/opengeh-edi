@@ -77,23 +77,18 @@ internal sealed class EdiDriver : IDisposable
     public async Task EmptyQueueAsync(string actorNumber, string[] marketRoles)
     {
         var token = TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
-        var stopWatch = Stopwatch.StartNew();
-        while (stopWatch.ElapsedMilliseconds < 60000)
+        var statusCode = HttpStatusCode.OK;
+        while (statusCode == HttpStatusCode.OK)
         {
             var peekResponse = await PeekAsync(token)
                 .ConfigureAwait(false);
-            if (peekResponse.StatusCode == HttpStatusCode.OK)
+            statusCode = peekResponse.StatusCode;
+            if (statusCode == HttpStatusCode.OK)
             {
                 await DequeueAsync(token, GetMessageId(peekResponse)).ConfigureAwait(false);
-            }
-
-            if (peekResponse.StatusCode == HttpStatusCode.BadRequest || peekResponse.StatusCode == HttpStatusCode.NoContent)
-            {
-                return;
+                await EmptyQueueAsync(actorNumber, marketRoles).ConfigureAwait(false);
             }
         }
-
-        throw new TimeoutException("Unable empty queue within time limit");
     }
 
     public async Task PeekAcceptedAggregationMessageAsync(string actorNumber, string[] roles)
