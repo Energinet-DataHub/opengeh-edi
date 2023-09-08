@@ -24,14 +24,17 @@ namespace Infrastructure.Wholesale;
 
 public class WholesaleInbox : IWholesaleInbox
 {
+    private readonly AggregatedMeasureDataResponseFactory _aggregatedMeasureDataResponseFactory;
     private readonly IServiceBusSenderAdapter _senderCreator;
 
     public WholesaleInbox(
         IServiceBusSenderFactory serviceBusSenderFactory,
-        WholesaleServiceBusClientConfiguration wholeSaleServiceBusClientConfiguration)
+        WholesaleServiceBusClientConfiguration wholeSaleServiceBusClientConfiguration,
+        AggregatedMeasureDataResponseFactory aggregatedMeasureDataResponseFactory)
     {
         if (serviceBusSenderFactory == null) throw new ArgumentNullException(nameof(serviceBusSenderFactory));
         if (wholeSaleServiceBusClientConfiguration == null) throw new ArgumentNullException(nameof(wholeSaleServiceBusClientConfiguration));
+        _aggregatedMeasureDataResponseFactory = aggregatedMeasureDataResponseFactory;
 
         _senderCreator = serviceBusSenderFactory.GetSender(wholeSaleServiceBusClientConfiguration.QueueName);
     }
@@ -45,7 +48,7 @@ public class WholesaleInbox : IWholesaleInbox
         // AggregatedMeasuredDataAcceptedResponse.proto and send it to our own inbox.
         // Such that we can continue implementing peek of aggregated measured data.
         await _senderCreator.SendAsync(
-            AggregatedMeasureDataResponseFactory.CreateServiceBusMessage(request),
+            _aggregatedMeasureDataResponseFactory.CreateServiceBusMessage(request),
             cancellationToken).ConfigureAwait(false);
     }
 }
