@@ -75,8 +75,8 @@ public class AggregatedMeasureDataResponseFactory
         return new AggregationPerEnergySupplierPerGridArea()
         {
             GridAreaCode = process.MeteringGridAreaDomainId,
-            BalanceResponsiblePartyGlnOrEic = string.Empty,
-            EnergySupplierGlnOrEic = process.EnergySupplierId,
+            BalanceResponsiblePartyId = string.Empty,
+            EnergySupplierId = process.EnergySupplierId,
         };
     }
 
@@ -85,8 +85,8 @@ public class AggregatedMeasureDataResponseFactory
         return new AggregationPerEnergySupplierPerBalanceResponsiblePartyPerGridArea()
         {
             GridAreaCode = process.MeteringGridAreaDomainId,
-            BalanceResponsiblePartyGlnOrEic = process.BalanceResponsibleId,
-            EnergySupplierGlnOrEic = process.EnergySupplierId,
+            BalanceResponsiblePartyId = process.BalanceResponsibleId,
+            EnergySupplierId = process.EnergySupplierId,
         };
     }
 
@@ -95,8 +95,8 @@ public class AggregatedMeasureDataResponseFactory
         return new AggregationPerBalanceResponsiblePartyPerGridArea()
         {
             GridAreaCode = process.MeteringGridAreaDomainId,
-            BalanceResponsiblePartyGlnOrEic = process.BalanceResponsibleId,
-            EnergySupplierGlnOrEic = string.Empty,
+            BalanceResponsiblePartyId = process.BalanceResponsibleId,
+            EnergySupplierId = string.Empty,
         };
     }
 
