@@ -29,12 +29,12 @@ internal sealed class AggregatedMeasureDataRequestDsl
 
     internal Task AggregatedMeasureDataFor(string actorNumber, string actorRole)
     {
-        return _edi.RequestAggregatedMeasureDataAsync(actorNumber, new[] { actorRole, });
+        return _edi.RequestAggregatedMeasureDataAsync(actorNumber, new[] { actorRole });
     }
 
     internal Task ConfirmAcceptedResultIsAvailableFor(string actorNumber, string actorRole)
     {
-        return _edi.PeekAcceptedAggregationMessageAsync(actorNumber, new[] { actorRole, });
+        return _edi.PeekAcceptedAggregationMessageAsync(actorNumber, new[] { actorRole });
     }
 
     internal Task RejectedAggregatedMeasureDataFor(string actorNumber, string actorRole)
@@ -44,6 +44,11 @@ internal sealed class AggregatedMeasureDataRequestDsl
 
     internal Task ConfirmRejectedResultIsAvailableFor(string actorNumber, string actorRole)
     {
-        return _edi.PeekRejectedMessageAsync(actorNumber, new[] { actorRole, });
+        return _edi.PeekRejectedMessageAsync(actorNumber, new[] { actorRole });
+    }
+
+    internal Task EmptyQueueForActor(string actorNumber, string actorRole)
+    {
+        return _edi.EmptyQueueAsync(actorNumber, new[] { actorRole });
     }
 }

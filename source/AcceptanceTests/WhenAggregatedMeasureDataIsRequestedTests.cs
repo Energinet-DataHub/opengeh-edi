@@ -31,6 +31,8 @@ public sealed class WhenAggregatedMeasureDataIsRequestedTests : TestRunner
     [Fact]
     public async Task Actor_can_peek_and_dequeue_message_after_aggregated_measure_data_has_been_requested()
     {
+        await _aggregationRequest.EmptyQueueForActor(actorNumber: "5790000610976", actorRole: "metereddataresponsible").ConfigureAwait(false);
+
         await _aggregationRequest.AggregatedMeasureDataFor(actorNumber: "5790000610976", actorRole: "metereddataresponsible").ConfigureAwait(false);
 
         await _aggregationRequest.ConfirmAcceptedResultIsAvailableFor(actorNumber: "5790000610976", actorRole: "metereddataresponsible").ConfigureAwait(false);
@@ -39,6 +41,8 @@ public sealed class WhenAggregatedMeasureDataIsRequestedTests : TestRunner
     [Fact]
     public async Task Actor_can_peek_and_dequeue_rejected_message_after_aggregated_measure_data_has_been_requested()
     {
+        await _aggregationRequest.EmptyQueueForActor(actorNumber: "5790000610976", actorRole: "metereddataresponsible").ConfigureAwait(false);
+
         await _aggregationRequest.RejectedAggregatedMeasureDataFor(actorNumber: "5790000610976", actorRole: "metereddataresponsible").ConfigureAwait(false);
 
         await _aggregationRequest.ConfirmRejectedResultIsAvailableFor(actorNumber: "5790000610976", actorRole: "metereddataresponsible").ConfigureAwait(false);
