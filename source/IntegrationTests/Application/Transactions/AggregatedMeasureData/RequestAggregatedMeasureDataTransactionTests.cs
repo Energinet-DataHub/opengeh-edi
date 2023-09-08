@@ -92,7 +92,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
         Assert.NotNull(process);
         Assert.Equal(process.ProcessId.Id.ToString(), message!.MessageId);
         Assert.Equal(exceptedServiceBusMessageSubject, message!.Subject);
-        Assert.Equal(process.BusinessTransactionId.Id, incomingMessage.MarketActivityRecord.Id);
+        Assert.Equal(incomingMessage.MarketActivityRecord.Id, process.BusinessTransactionId.Id);
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Sent);
     }
 
@@ -123,8 +123,8 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
         Assert.Equal(TimeSeriesType.Production, response.TimeSeriesType);
         Assert.NotNull(response.AggregationPerGridarea);
         var aggregationPerGridArea = response.AggregationPerGridarea;
-        Assert.Equal(aggregationPerGridArea.GridAreaCode, incomingMessage.MarketActivityRecord.MeteringGridAreaDomainId);
-        Assert.Equal(aggregationPerGridArea.GridResponsibleId, incomingMessage.MessageHeader.SenderId);
+        Assert.Equal(incomingMessage.MarketActivityRecord.MeteringGridAreaDomainId, aggregationPerGridArea.GridAreaCode);
+        Assert.Equal(incomingMessage.MessageHeader.SenderId, aggregationPerGridArea.GridResponsibleId);
     }
 
     [Fact]

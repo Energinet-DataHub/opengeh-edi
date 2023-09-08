@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Application.Configuration;
 using Azure.Messaging.ServiceBus;
 using Domain.Actors;
 using Domain.Transactions.AggregatedMeasureData;
@@ -22,9 +23,16 @@ using Google.Protobuf.WellKnownTypes;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData;
 
-public static class AggregatedMeasureDataResponseFactory
+public class AggregatedMeasureDataResponseFactory
 {
-    public static ServiceBusMessage CreateServiceBusMessage(AggregatedMeasureDataProcess process)
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+
+    public AggregatedMeasureDataResponseFactory(ISystemDateTimeProvider systemDateTimeProvider)
+    {
+        _systemDateTimeProvider = systemDateTimeProvider ?? throw new ArgumentNullException(nameof(systemDateTimeProvider));
+    }
+
+    public ServiceBusMessage CreateServiceBusMessage(AggregatedMeasureDataProcess process)
     {
         if (process == null) throw new ArgumentNullException(nameof(process));
 
@@ -41,28 +49,6 @@ public static class AggregatedMeasureDataResponseFactory
         return message;
     }
 
-    private static IMessage CreateAggregatedMeasureDataRequest(AggregatedMeasureDataProcess process)
-    {
-        var response = new AggregatedTimeSeriesRequest()
-        {
-            Period = MapPeriod(process),
-            TimeSeriesType = process.RequestedByActorRoleCode == MarketRole.MeteredDataResponsible.Code || process.RequestedByActorRoleCode == MarketRole.GridOperator.Code
-                ? MapTimeSeriesTypeAsGridOperator(process)
-                : MapTimeSeriesTypeAsBalanceResponsibleOrEnergySupplier(process),
-        };
-        if (IsValidRequestFromGridOperator(process))
-        {
-            response.AggregationPerGridarea = MapGridArea(process);
-            return response;
-        }
-
-        throw new InvalidOperationException(
-            $"Invalid request by actor: {process.RequestedByActorId.Value}. " +
-            $"The combination of actor code: {process.RequestedByActorRoleCode}, " +
-            $"energy supplier id: {process.EnergySupplierId}," +
-            $"balance responsible id: {process.BalanceResponsibleId} is invalid");
-    }
-
     private static bool IsValidRequestFromGridOperator(AggregatedMeasureDataProcess process)
     {
         return IsForGridArea(process)
@@ -73,15 +59,6 @@ public static class AggregatedMeasureDataResponseFactory
     private static bool IsForGridArea(AggregatedMeasureDataProcess process)
     {
         return process.EnergySupplierId is null && process.BalanceResponsibleId is null;
-    }
-
-    private static Energinet.DataHub.Edi.Requests.Period MapPeriod(AggregatedMeasureDataProcess process)
-    {
-        return new Energinet.DataHub.Edi.Requests.Period()
-        {
-            StartOfPeriod = new Timestamp() { Seconds = process.StartOfPeriod.ToUnixTimeSeconds(), },
-            EndOfPeriod = new Timestamp() { Seconds = process.EndOfPeriod?.ToUnixTimeSeconds() ?? 1, },
-        };
     }
 
     private static AggregationPerGridArea MapGridArea(AggregatedMeasureDataProcess process)
@@ -161,5 +138,38 @@ public static class AggregatedMeasureDataResponseFactory
             $"Unknown time series type for metering point type {process.MeteringPointType}" +
             $" and settlement method {process.SettlementMethod}" +
             $"as a {process.RequestedByActorRoleCode}");
+    }
+
+    private IMessage CreateAggregatedMeasureDataRequest(AggregatedMeasureDataProcess process)
+    {
+        var response = new AggregatedTimeSeriesRequest()
+        {
+            Period = MapPeriod(process),
+            TimeSeriesType = process.RequestedByActorRoleCode == MarketRole.MeteredDataResponsible.Code ||
+                             process.RequestedByActorRoleCode == MarketRole.GridOperator.Code
+                ? MapTimeSeriesTypeAsGridOperator(process)
+                : MapTimeSeriesTypeAsBalanceResponsibleOrEnergySupplier(process),
+        };
+
+        if (IsValidRequestFromGridOperator(process))
+        {
+            response.AggregationPerGridarea = MapGridArea(process);
+            return response;
+        }
+
+        throw new InvalidOperationException(
+            $"Invalid request by actor: {process.RequestedByActorId.Value}. " +
+            $"The combination of actor code: {process.RequestedByActorRoleCode}, " +
+            $"energy supplier id: {process.EnergySupplierId}," +
+            $"balance responsible id: {process.BalanceResponsibleId} is invalid");
+    }
+
+    private Energinet.DataHub.Edi.Requests.Period MapPeriod(AggregatedMeasureDataProcess process)
+    {
+        return new Energinet.DataHub.Edi.Requests.Period()
+        {
+            StartOfPeriod = new Timestamp() { Seconds = process.StartOfPeriod.ToUnixTimeSeconds(), },
+            EndOfPeriod = new Timestamp() { Seconds = process.EndOfPeriod?.ToUnixTimeSeconds() ?? _systemDateTimeProvider.Now().ToUnixTimeSeconds(), },
+        };
     }
 }
