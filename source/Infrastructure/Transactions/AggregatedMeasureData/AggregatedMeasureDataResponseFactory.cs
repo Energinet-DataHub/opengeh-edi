@@ -57,8 +57,8 @@ public static class AggregatedMeasureDataResponseFactory
         }
 
         throw new InvalidOperationException(
-            $"Invalid request by actor number: {process.RequestedByActorId.Value}. " +
-            $"The combination of {process.RequestedByActorRoleCode}, " +
+            $"Invalid request by actor: {process.RequestedByActorId.Value}. " +
+            $"The combination of actor code: {process.RequestedByActorRoleCode}, " +
             $"energy supplier id: {process.EnergySupplierId}," +
             $"balance responsible id: {process.BalanceResponsibleId} is invalid");
     }
