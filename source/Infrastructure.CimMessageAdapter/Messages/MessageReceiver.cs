@@ -81,8 +81,7 @@ namespace CimMessageAdapter.Messages
 
             var authorizeSenderTask = AuthorizeSenderAsync(messageHeader);
             var verifyReceiverTask = VerifyReceiverAsync(messageHeader);
-            var checkMessageIdTask =
-                CheckMessageIdAsync(messageHeader.SenderId, messageHeader.MessageId, cancellationToken);
+            var checkMessageIdTask = CheckMessageIdAsync(messageHeader.SenderId, messageHeader.MessageId, cancellationToken);
             var checkMessageTypeTask = CheckMessageTypeAsync(messageHeader.MessageType, cancellationToken);
             var checkProcessTypeTask = CheckProcessTypeAsync(messageHeader.BusinessReason, cancellationToken);
 
@@ -136,7 +135,7 @@ namespace CimMessageAdapter.Messages
             }
             catch (UnsuccessfulMessageIdStorageException)
             {
-                _errors.Add(new DuplicateMessageIdDetected("kenneth"));
+                _errors.Add(new DuplicateMessageIdDetected());
             }
 
             if (_errors.Count > 0)

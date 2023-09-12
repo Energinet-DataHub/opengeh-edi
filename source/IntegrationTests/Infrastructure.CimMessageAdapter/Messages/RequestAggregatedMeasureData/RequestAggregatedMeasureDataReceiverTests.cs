@@ -48,7 +48,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     private readonly ProcessTypeValidator _processTypeValidator;
     private readonly MessageTypeValidator _messageTypeValidator;
     private readonly CalculationResponsibleReceiverVerification _calculationResponsibleReceiverVerification;
-    private readonly MessageQueueDispatcherStub<global::CimMessageAdapter.Messages.Queues.RequestAggregatedMeasureDataTransactionQueues> _messageQueueDispatcherSpy = new();
+    private readonly MessageQueueDispatcherStub<RequestAggregatedMeasureDataTransactionQueues> _messageQueueDispatcherSpy = new();
     private readonly List<Claim> _claims = new()
     {
         new(ClaimsMap.UserId, new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.SenderId).B2CId),
@@ -486,6 +486,39 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             document.Header.SenderId,
             document.Header.MessageId,
             1).ConfigureAwait(false);
+    }
+
+    [Fact]
+    public async Task Message_id_and_transaction_id_are_not_stored_when_service_bus_commit_fails()
+    {
+        await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
+            .ConfigureAwait(false);
+        var knownReceiverId = "5790001330552";
+        var knownReceiverRole = "DGL";
+        await using var message = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .WithSenderRole(MarketRole.EnergySupplier.Code)
+            .WithSenderId(SampleData.SenderId)
+            .WithReceiverRole(knownReceiverRole)
+            .WithReceiverId(knownReceiverId)
+            .Message();
+
+        var serviceBusThatFails = new MessageQueueDispatcherThatFailsStub<RequestAggregatedMeasureDataTransactionQueues>();
+
+        var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
+        await Assert.ThrowsAsync<ServiceBusCommitException>(() =>
+                CreateMessageReceiver(serviceBusThatFails).ReceiveAsync(messageParserResult, CancellationToken.None))
+            .ConfigureAwait(false);
+
+        var document = messageParserResult!.IncomingMarketDocument!;
+        await AssertNumberOfSavedTransactionIdsAsync(
+            document.Header.SenderId,
+            document.MarketActivityRecords.First().Id,
+            0).ConfigureAwait(false);
+        await AssertNumberOfSavedMessageIds(
+            document.Header.SenderId,
+            document.Header.MessageId,
+            0).ConfigureAwait(false);
     }
 
     [Fact]
