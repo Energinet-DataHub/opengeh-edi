@@ -12,18 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.ValidationErrors
-{
-    public class DuplicateTransactionIdDetected : ValidationError
-    {
-        public DuplicateTransactionIdDetected(string transactionId)
-            : base($"Transaction id '{transactionId}' is not unique and will not be processed.", "00102", "TransactionId")
-        {
-        }
+using System;
 
-        public DuplicateTransactionIdDetected()
-            : base("Duplicated transaction id found", "00102", "TransactionId")
-        {
-        }
+namespace CimMessageAdapter.Messages.Exceptions;
+
+public class UnsuccessfulTransactionIdsStorageException
+    : Exception
+{
+    public UnsuccessfulTransactionIdsStorageException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+
+    public UnsuccessfulTransactionIdsStorageException()
+    {
+    }
+
+    public UnsuccessfulTransactionIdsStorageException(string message)
+        : base(message)
+    {
     }
 }

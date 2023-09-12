@@ -15,11 +15,11 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using CimMessageAdapter.Messages;
+using CimMessageAdapter.Messages.Exceptions;
 using Dapper;
 using Microsoft.Data.SqlClient;
 
@@ -77,11 +77,10 @@ namespace Infrastructure.IncomingMessages
 
                 await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             }
-            catch (DbException e)
+            catch (SqlException)
             {
-                var hej = e;
                 await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-                throw new NotImplementedException();
+                throw new UnsuccessfulTransactionIdsStorageException();
             }
 
             return true;

@@ -20,5 +20,10 @@ namespace CimMessageAdapter.ValidationErrors
             : base($"Message id '{messageId}' is not unique", "00101", "MessageId")
         {
         }
+
+        public DuplicateMessageIdDetected()
+            : base("Duplicated message id found", "00101", "TransactionId")
+        {
+        }
     }
 }

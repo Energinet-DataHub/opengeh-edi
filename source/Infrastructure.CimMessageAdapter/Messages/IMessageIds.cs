@@ -31,7 +31,7 @@ namespace CimMessageAdapter.Messages
         Task StoreAsync(string senderId, string messageId, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Check if <paramref name="messageId"/> is unique for the actor who made the request <paramref name="senderId"/>
+        /// Checks if <paramref name="messageId"/> is already registered by the sender <paramref name="senderId"/>
         /// </summary>
         /// <param name="senderId"></param>
         /// <param name="messageId"></param>

@@ -24,7 +24,7 @@ namespace CimMessageAdapter.Messages
     public interface ITransactionIds
     {
         /// <summary>
-        /// Check if <paramref name="transactionId"/> is unique for the actor who made the request <paramref name="senderId"/>
+        /// Checks if <paramref name="transactionId"/> is already registered by the sender <paramref name="senderId"/>
         /// </summary>
         /// <param name="senderId"></param>
         /// <param name="transactionId"></param>

@@ -123,15 +123,15 @@ public class RequestAggregatedMeasureMessageReceiver
         return CreateResponse(request, httpStatusCode, _responseFactory.From(result, cimFormat));
     }
 
-    private static ActorNumber? TryGetActorNumber(string messageHeaderSenderId)
+    private static ActorNumber? TryGetActorNumber(string? messageHeaderSenderId)
     {
+        if (messageHeaderSenderId == null) return null;
+
         try
         {
             return ActorNumber.Create(messageHeaderSenderId);
         }
-#pragma warning disable CA1031
-        catch
-#pragma warning restore CA1031
+        catch (InvalidActorNumberException)
         {
             return null;
         }

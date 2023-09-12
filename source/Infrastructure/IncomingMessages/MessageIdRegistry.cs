@@ -17,9 +17,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using CimMessageAdapter.Messages;
+using CimMessageAdapter.Messages.Exceptions;
 using Dapper;
 using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.IncomingMessages
 {
@@ -43,22 +43,10 @@ namespace Infrastructure.IncomingMessages
                         new { MessageId = messageId, SenderId = senderId })
                     .ConfigureAwait(false);
             }
-            catch (SqlException e)
+            catch (SqlException)
             {
-                Console.WriteLine(e);
-                throw;
+                throw new UnsuccessfulMessageIdStorageException();
             }
-
-            // var result = await connection.ExecuteAsync(
-            //         $"IF NOT EXISTS (SELECT * FROM dbo.MessageRegistry WHERE MessageId = @MessageId AND SenderId = @SenderId)" +
-            //         $"INSERT INTO dbo.MessageRegistry(MessageId, SenderId) VALUES(@MessageId, @SenderId)",
-            //         new { MessageId = messageId, SenderId = senderId })
-            //     .ConfigureAwait(false);
-            //
-            // if (result != 1)
-            // {
-            //     throw new DbUpdateException($"Failed to store message id: {messageId}");
-            // }
         }
 
         public async Task<bool> MessageIdIsUniqueForSenderAsync(string senderId, string messageId, CancellationToken cancellationToken)

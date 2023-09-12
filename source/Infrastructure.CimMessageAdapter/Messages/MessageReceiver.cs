@@ -19,12 +19,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 using Application.IncomingMessages;
+using CimMessageAdapter.Messages.Exceptions;
 using CimMessageAdapter.Messages.Queues;
 using CimMessageAdapter.ValidationErrors;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using MessageHeader = Application.IncomingMessages.MessageHeader;
-using NotImplementedException = System.NotImplementedException;
 
 namespace CimMessageAdapter.Messages
 {
@@ -120,6 +118,7 @@ namespace CimMessageAdapter.Messages
             try
             {
                 using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
                 var senderId = messageHeader.SenderId;
                 await _transactionIds.StoreTransactionIdsForSenderAsync(
                     senderId,
@@ -128,13 +127,14 @@ namespace CimMessageAdapter.Messages
                 await _messageIds.StoreAsync(senderId, messageHeader.MessageId, cancellationToken)
                     .ConfigureAwait(false);
                 await _messageQueueDispatcher.CommitAsync(cancellationToken).ConfigureAwait(false);
+
                 scope.Complete();
             }
-            catch (NotImplementedException)
+            catch (UnsuccessfulTransactionIdsStorageException)
             {
-                _errors.Add(new DuplicateTransactionIdDetected("karsten"));
+                _errors.Add(new DuplicateTransactionIdDetected());
             }
-            catch (SqlException)
+            catch (UnsuccessfulMessageIdStorageException)
             {
                 _errors.Add(new DuplicateMessageIdDetected("kenneth"));
             }
