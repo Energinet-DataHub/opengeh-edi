@@ -18,6 +18,8 @@ using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using CimMessageAdapter.Messages;
 using Dapper;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.IncomingMessages
 {
@@ -30,17 +32,33 @@ namespace Infrastructure.IncomingMessages
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
         }
 
-        public async Task<bool> TryStoreAsync(string senderId, string messageId, CancellationToken cancellationToken)
+        public async Task StoreAsync(string senderId, string messageId, CancellationToken cancellationToken)
         {
             using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
 
-            var result = await connection.ExecuteAsync(
-                    $"IF NOT EXISTS (SELECT * FROM dbo.MessageRegistry WHERE MessageId = @MessageId AND SenderId = @SenderId)" +
-                    $"INSERT INTO dbo.MessageRegistry(MessageId, SenderId) VALUES(@MessageId, @SenderId)",
-                    new { MessageId = messageId, SenderId = senderId })
-                .ConfigureAwait(false);
+            try
+            {
+                await connection.ExecuteAsync(
+                        $"INSERT INTO dbo.MessageRegistry(MessageId, SenderId) VALUES(@MessageId, @SenderId)",
+                        new { MessageId = messageId, SenderId = senderId })
+                    .ConfigureAwait(false);
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
 
-            return result == 1;
+            // var result = await connection.ExecuteAsync(
+            //         $"IF NOT EXISTS (SELECT * FROM dbo.MessageRegistry WHERE MessageId = @MessageId AND SenderId = @SenderId)" +
+            //         $"INSERT INTO dbo.MessageRegistry(MessageId, SenderId) VALUES(@MessageId, @SenderId)",
+            //         new { MessageId = messageId, SenderId = senderId })
+            //     .ConfigureAwait(false);
+            //
+            // if (result != 1)
+            // {
+            //     throw new DbUpdateException($"Failed to store message id: {messageId}");
+            // }
         }
 
         public async Task<bool> MessageIdIsUniqueForSenderAsync(string senderId, string messageId, CancellationToken cancellationToken)

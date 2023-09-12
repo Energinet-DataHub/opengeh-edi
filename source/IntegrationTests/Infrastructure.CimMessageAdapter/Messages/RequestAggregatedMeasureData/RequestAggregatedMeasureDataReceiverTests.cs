@@ -24,6 +24,7 @@ using Application.Configuration.Authentication;
 using Application.Configuration.DataAccess;
 using Application.IncomingMessages.RequestAggregatedMeasureData;
 using CimMessageAdapter.Messages;
+using CimMessageAdapter.Messages.Queues;
 using CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using CimMessageAdapter.ValidationErrors;
 using Dapper;
@@ -220,7 +221,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     }
 
     [Fact]
-    public async Task Series_must_have_unique_transaction_ids_across_senders()
+    public async Task Series_can_have_same_transaction_ids_across_senders()
     {
         var knownReceiverId = "5790001330552";
         var knownReceiverRole = "DDZ";
@@ -320,7 +321,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     }
 
     [Fact]
-    public async Task Message_ids_must_not_be_unique_across_senders()
+    public async Task Message_ids_must_be_unique_for_sender()
     {
         await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
             .ConfigureAwait(false);
@@ -330,42 +331,12 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .WithSenderId(SampleData.SenderId)
             .WithReceiverId("5790001330552")
             .Message();
-        await using var message02 = BusinessMessageBuilder
-            .RequestAggregatedMeasureData()
-            .Message();
 
         var messageParserResult01 = await ParseMessageAsync(message01).ConfigureAwait(false);
         var result01 = await CreateMessageReceiver().ReceiveAsync(messageParserResult01, CancellationToken.None).ConfigureAwait(false);
-
-        var messageParserResult02 = await ParseMessageAsync(message01).ConfigureAwait(false);
-        var result02 = await CreateMessageReceiver().ReceiveAsync(messageParserResult02, CancellationToken.None).ConfigureAwait(false);
+        var result02 = await CreateMessageReceiver().ReceiveAsync(messageParserResult01, CancellationToken.None).ConfigureAwait(false);
 
         Assert.True(result01.Success);
-        Assert.DoesNotContain(result01.Errors, error => error is DuplicateMessageIdDetected);
-        Assert.Contains(result02.Errors, error => error is DuplicateMessageIdDetected);
-    }
-
-    [Fact]
-    public async Task Series_must_have_unique_message_ids()
-    {
-        await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
-            .ConfigureAwait(false);
-        await using var message01 = BusinessMessageBuilder
-            .RequestAggregatedMeasureData()
-            .WithSenderRole(MarketRole.EnergySupplier.Code)
-            .WithSenderId(SampleData.SenderId)
-            .WithReceiverId("5790001330552")
-            .Message();
-        await using var message02 = BusinessMessageBuilder
-            .RequestAggregatedMeasureData()
-            .Message();
-
-        var messageParserResult01 = await ParseMessageAsync(message01).ConfigureAwait(false);
-        var result01 = await CreateMessageReceiver().ReceiveAsync(messageParserResult01, CancellationToken.None).ConfigureAwait(false);
-
-        var messageParserResult02 = await ParseMessageAsync(message01).ConfigureAwait(false);
-        var result02 = await CreateMessageReceiver().ReceiveAsync(messageParserResult02, CancellationToken.None).ConfigureAwait(false);
-
         Assert.DoesNotContain(result01.Errors, error => error is DuplicateMessageIdDetected);
         Assert.Contains(result02.Errors, error => error is DuplicateMessageIdDetected);
     }
@@ -565,6 +536,95 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     }
 
     [Fact]
+    public async Task Transaction_ids_or_message_id_are_not_saved_nor_send_to_queue_if_request_fails_across_scopes()
+    {
+        await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
+            .ConfigureAwait(false);
+        await using var message01 = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .WithSenderRole(MarketRole.EnergySupplier.Code)
+            .WithSenderId(SampleData.SenderId)
+            .WithReceiverId("5790001330552")
+            .WithReceiverRole("DGL")
+            .Message();
+        await using var message02 = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .WithSenderRole(MarketRole.EnergySupplier.Code)
+            .WithSenderId(SampleData.SenderId)
+            .WithReceiverId("5790001330552")
+            .WithReceiverRole("DGL")
+            .WithSeriesTransactionId("123564789123564789523564789123564789")
+            .Message();
+
+        var messageParserResult01 = await ParseMessageAsync(message01).ConfigureAwait(false);
+        var messageParserResult02 = await ParseMessageAsync(message02).ConfigureAwait(false);
+
+        // Act
+        var dispatcher2 =
+            new MessageQueueDispatcherStub<RequestAggregatedMeasureDataTransactionQueues>();
+
+        var receivedResult1 = CreateMessageReceiver().ReceiveAsync(messageParserResult01, CancellationToken.None);
+        var receivedResult2 = CreateMessageReceiver(dispatcher2).ReceiveAsync(messageParserResult02, CancellationToken.None);
+
+        await Task.WhenAll(receivedResult1, receivedResult2).ConfigureAwait(false);
+
+        // Assert
+        Assert.NotNull(receivedResult1);
+        Assert.NotNull(receivedResult2);
+
+        var firstSucceeded = false;
+        var result1 = await receivedResult1;
+        var result2 = await receivedResult2;
+
+        if (result1.Success)
+        {
+            firstSucceeded = true;
+            Assert.False(result2.Success);
+        }
+        else
+        {
+            Assert.True(result2.Success);
+        }
+
+        var document01 = messageParserResult01!.IncomingMarketDocument!;
+        var document02 = messageParserResult02!.IncomingMarketDocument!;
+
+        var successfulDocument = firstSucceeded
+            ? document01
+            : document02;
+        var unsuccessfulDocument = firstSucceeded
+            ? document02
+            : document01;
+
+        await AssertNumberOfSavedTransactionIdsAsync(
+            document01.Header.SenderId,
+            document01.MarketActivityRecords.First().Id,
+            1).ConfigureAwait(false);
+        await AssertNumberOfSavedMessageIds(
+            successfulDocument.Header.SenderId,
+            successfulDocument.Header.MessageId,
+            1).ConfigureAwait(false);
+
+        await AssertNumberOfSavedTransactionIdsAsync(
+            unsuccessfulDocument.Header.SenderId,
+            unsuccessfulDocument.MarketActivityRecords.First().Id,
+            0).ConfigureAwait(false);
+
+        var transactions1 = _messageQueueDispatcherSpy.CommittedItems;
+        var transactions2 = dispatcher2.CommittedItems;
+        if (firstSucceeded)
+        {
+            Assert.Single(transactions1);
+            Assert.Empty(transactions2);
+        }
+        else
+        {
+            Assert.Empty(transactions1);
+            Assert.Single(transactions2);
+        }
+    }
+
+    [Fact]
     public async Task Transaction_and_message_ids_are_not_saved_when_receiving_an_bad_message()
     {
         await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
@@ -674,11 +734,12 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .ConfigureAwait(false);
     }
 
-    private MessageReceiver<global::CimMessageAdapter.Messages.Queues.RequestAggregatedMeasureDataTransactionQueues> CreateMessageReceiver()
+    private MessageReceiver<RequestAggregatedMeasureDataTransactionQueues> CreateMessageReceiver(
+        MessageQueueDispatcherStub<RequestAggregatedMeasureDataTransactionQueues>? dispatcherSpy = null)
     {
         var messageReceiver = new RequestAggregatedMeasureDataReceiver(
             _messageIds,
-            _messageQueueDispatcherSpy,
+            dispatcherSpy ?? _messageQueueDispatcherSpy,
             _transactionIds,
             new SenderAuthorizer(_marketActorAuthenticator),
             _processTypeValidator,

@@ -23,6 +23,10 @@ using Application.Configuration;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using CimMessageAdapter.Response;
+using Domain.Actors;
+using Domain.ArchivedMessages;
+using Domain.Documents;
+using Infrastructure.Configuration.DataAccess;
 using Infrastructure.IncomingMessages;
 using Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using MediatR;
@@ -36,6 +40,10 @@ namespace Api.IncomingMessages;
 public class RequestAggregatedMeasureMessageReceiver
 {
     private readonly ILogger<RequestAggregatedMeasureMessageReceiver> _logger;
+    private readonly IArchivedMessageRepository _messageArchive;
+    private readonly B2BContext _dbContext;
+    private readonly RequestAggregatedMeasureDataReceiver _messageReceiver;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly MessageParser _messageParser;
     private readonly ResponseFactory _responseFactory;
     private readonly ICorrelationContext _correlationContext;
@@ -43,12 +51,20 @@ public class RequestAggregatedMeasureMessageReceiver
 
     public RequestAggregatedMeasureMessageReceiver(
         ILogger<RequestAggregatedMeasureMessageReceiver> logger,
+        IArchivedMessageRepository messageArchive,
+        B2BContext dbContext,
+        Receiver messageReceiver,
+        ISystemDateTimeProvider systemDateTimeProvider,
         MessageParser messageParser,
         ResponseFactory responseFactory,
         ICorrelationContext correlationContext,
         IMediator mediator)
         {
         _logger = logger;
+        _messageArchive = messageArchive;
+        _dbContext = dbContext;
+        _messageReceiver = messageReceiver;
+        _systemDateTimeProvider = systemDateTimeProvider;
         _messageParser = messageParser;
         _responseFactory = responseFactory;
         _correlationContext = correlationContext;
@@ -89,12 +105,36 @@ public class RequestAggregatedMeasureMessageReceiver
             return CreateResponse(request, httpErrorStatusCode, _responseFactory.From(errorResult, cimFormat));
         }
 
+        _messageArchive.Add(new ArchivedMessage(
+            Guid.NewGuid().ToString(),
+            messageHeader.MessageId,
+            IncomingDocumentType.RequestAggregatedMeasureData,
+            TryGetActorNumber(messageHeader.SenderId),
+            TryGetActorNumber(messageHeader.ReceiverId),
+            _systemDateTimeProvider.Now(),
+            messageHeader.BusinessReason,
+            request.Body));
+        await _dbContext.SaveChangesAsync(hostCancellationToken).ConfigureAwait(false);
+
         var result = await _mediator
-            .Send(new ReceiveAggregatedMeasureDataRequest(messageParserResult, request.Body), cancellationToken)
-            .ConfigureAwait(false);
+            .Send(new ReceiveAggregatedMeasureDataRequest(messageParserResult), cancellationToken).ConfigureAwait(false);
 
         var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
         return CreateResponse(request, httpStatusCode, _responseFactory.From(result, cimFormat));
+    }
+
+    private static ActorNumber? TryGetActorNumber(string messageHeaderSenderId)
+    {
+        try
+        {
+            return ActorNumber.Create(messageHeaderSenderId);
+        }
+#pragma warning disable CA1031
+        catch
+#pragma warning restore CA1031
+        {
+            return null;
+        }
     }
 
     private HttpResponseData CreateResponse(
