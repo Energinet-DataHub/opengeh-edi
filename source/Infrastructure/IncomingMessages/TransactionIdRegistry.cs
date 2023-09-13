@@ -83,9 +83,9 @@ namespace Infrastructure.IncomingMessages
             catch (SqlException e)
             {
                 await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-                for (var index = 0; index < e.Errors.Count; index++)
+                foreach (SqlError error in e.Errors)
                 {
-                    if (e.Errors[index].Number == 2627)
+                    if (error.Number == 2627)
                     {
                         _logger.LogError(
                             "Unable to insert transaction ids for sender: {SenderId} since one or more already exists in the database",
