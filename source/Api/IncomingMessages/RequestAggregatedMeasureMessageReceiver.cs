@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -20,6 +21,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Api.Common;
 using Application.Configuration;
+using Application.IncomingMessages;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using CimMessageAdapter.Response;
@@ -42,7 +44,6 @@ public class RequestAggregatedMeasureMessageReceiver
     private readonly ILogger<RequestAggregatedMeasureMessageReceiver> _logger;
     private readonly IArchivedMessageRepository _messageArchive;
     private readonly B2BContext _dbContext;
-    private readonly RequestAggregatedMeasureDataReceiver _messageReceiver;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly MessageParser _messageParser;
     private readonly ResponseFactory _responseFactory;
@@ -53,7 +54,6 @@ public class RequestAggregatedMeasureMessageReceiver
         ILogger<RequestAggregatedMeasureMessageReceiver> logger,
         IArchivedMessageRepository messageArchive,
         B2BContext dbContext,
-        Receiver messageReceiver,
         ISystemDateTimeProvider systemDateTimeProvider,
         MessageParser messageParser,
         ResponseFactory responseFactory,
@@ -63,7 +63,6 @@ public class RequestAggregatedMeasureMessageReceiver
         _logger = logger;
         _messageArchive = messageArchive;
         _dbContext = dbContext;
-        _messageReceiver = messageReceiver;
         _systemDateTimeProvider = systemDateTimeProvider;
         _messageParser = messageParser;
         _responseFactory = responseFactory;
@@ -105,16 +104,7 @@ public class RequestAggregatedMeasureMessageReceiver
             return CreateResponse(request, httpErrorStatusCode, _responseFactory.From(errorResult, cimFormat));
         }
 
-        _messageArchive.Add(new ArchivedMessage(
-            Guid.NewGuid().ToString(),
-            messageHeader.MessageId,
-            IncomingDocumentType.RequestAggregatedMeasureData,
-            TryGetActorNumber(messageHeader.SenderId),
-            TryGetActorNumber(messageHeader.ReceiverId),
-            _systemDateTimeProvider.Now(),
-            messageHeader.BusinessReason,
-            request.Body));
-        await _dbContext.SaveChangesAsync(hostCancellationToken).ConfigureAwait(false);
+        await SaveArchivedMessageAsync(messageHeader, request.Body, cancellationToken).ConfigureAwait(false);
 
         var result = await _mediator
             .Send(new ReceiveAggregatedMeasureDataRequest(messageParserResult), cancellationToken).ConfigureAwait(false);
@@ -135,6 +125,20 @@ public class RequestAggregatedMeasureMessageReceiver
         {
             return null;
         }
+    }
+
+    private async Task SaveArchivedMessageAsync(MessageHeader messageHeader, Stream document,  CancellationToken hostCancellationToken)
+    {
+        _messageArchive.Add(new ArchivedMessage(
+            Guid.NewGuid().ToString(),
+            messageHeader.MessageId,
+            IncomingDocumentType.RequestAggregatedMeasureData,
+            TryGetActorNumber(messageHeader.SenderId),
+            TryGetActorNumber(messageHeader.ReceiverId),
+            _systemDateTimeProvider.Now(),
+            messageHeader.BusinessReason,
+            document));
+        await _dbContext.SaveChangesAsync(hostCancellationToken).ConfigureAwait(false);
     }
 
     private HttpResponseData CreateResponse(
