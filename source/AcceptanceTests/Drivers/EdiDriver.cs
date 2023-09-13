@@ -126,7 +126,7 @@ internal sealed class EdiDriver : IDisposable
     private static string GetContent(bool badRequest = false)
     {
         var jsonContent = badRequest
-            ? File.ReadAllText("Messages/json/RequestAggregatedMeasureDataWithWrongMarketEvaluationPoint.json")
+            ? File.ReadAllText("Messages/json/RequestAggregatedMeasureDataWithBadPeriod.json")
             : File.ReadAllText("Messages/json/RequestAggregatedMeasureData.json");
 
         jsonContent = jsonContent.Replace("{MessageId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
