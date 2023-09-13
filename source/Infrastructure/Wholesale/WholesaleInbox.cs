@@ -43,10 +43,6 @@ public class WholesaleInbox : IWholesaleInbox
         AggregatedMeasureDataProcess request,
         CancellationToken cancellationToken)
     {
-        // We transform the request from our side to a response from wholesale,
-        // That is, we mimic the response from whole defined in the protobuf contract
-        // AggregatedMeasuredDataAcceptedResponse.proto and send it to our own inbox.
-        // Such that we can continue implementing peek of aggregated measured data.
         await _senderCreator.SendAsync(
             _aggregatedMeasureDataResponseFactory.CreateServiceBusMessage(request),
             cancellationToken).ConfigureAwait(false);

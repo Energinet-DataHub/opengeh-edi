@@ -49,55 +49,51 @@ public class AggregatedMeasureDataResponseFactory
         return message;
     }
 
-    private static bool IsValidRequestFromGridOperator(AggregatedMeasureDataProcess process)
+    private static AggregationPerGridArea? MapGridArea(AggregatedMeasureDataProcess process)
     {
-        return IsForGridArea(process)
-               && (process.RequestedByActorRoleCode == MarketRole.MeteredDataResponsible.Code
-                   || process.RequestedByActorRoleCode == MarketRole.GridOperator.Code);
+        return process.EnergySupplierId == null && process.BalanceResponsibleId == null
+            ? new AggregationPerGridArea()
+            {
+                GridAreaCode = process.MeteringGridAreaDomainId,
+                GridResponsibleId = process.RequestedByActorId.Value,
+            }
+            : null;
     }
 
-    private static bool IsForGridArea(AggregatedMeasureDataProcess process)
+    private static AggregationPerEnergySupplierPerGridArea? MapEnergySupplierPerGridArea(AggregatedMeasureDataProcess process)
     {
-        return process.EnergySupplierId is null && process.BalanceResponsibleId is null;
+        return process.EnergySupplierId != null && process.BalanceResponsibleId == null
+            ? new AggregationPerEnergySupplierPerGridArea()
+            {
+                GridAreaCode = process.MeteringGridAreaDomainId,
+                BalanceResponsiblePartyId = string.Empty,
+                EnergySupplierId = process.EnergySupplierId,
+            }
+            : null;
     }
 
-    private static AggregationPerGridArea MapGridArea(AggregatedMeasureDataProcess process)
+    private static AggregationPerEnergySupplierPerBalanceResponsiblePartyPerGridArea? MapEnergyAndBalancePerGridArea(AggregatedMeasureDataProcess process)
     {
-        return new AggregationPerGridArea()
-        {
-            GridAreaCode = process.MeteringGridAreaDomainId,
-            GridResponsibleId = process.RequestedByActorId.Value,
-        };
+        return process.EnergySupplierId != null && process.BalanceResponsibleId != null
+            ? new AggregationPerEnergySupplierPerBalanceResponsiblePartyPerGridArea()
+            {
+                GridAreaCode = process.MeteringGridAreaDomainId,
+                BalanceResponsiblePartyId = process.BalanceResponsibleId,
+                EnergySupplierId = process.EnergySupplierId,
+            }
+            : null;
     }
 
-    private static AggregationPerEnergySupplierPerGridArea MapEnergySupplierPerGridArea(AggregatedMeasureDataProcess process)
+    private static AggregationPerBalanceResponsiblePartyPerGridArea? MapBalancePerGridArea(AggregatedMeasureDataProcess process)
     {
-        return new AggregationPerEnergySupplierPerGridArea()
-        {
-            GridAreaCode = process.MeteringGridAreaDomainId,
-            BalanceResponsiblePartyId = string.Empty,
-            EnergySupplierId = process.EnergySupplierId,
-        };
-    }
-
-    private static AggregationPerEnergySupplierPerBalanceResponsiblePartyPerGridArea MapEnergyAndBalancePerGridArea(AggregatedMeasureDataProcess process)
-    {
-        return new AggregationPerEnergySupplierPerBalanceResponsiblePartyPerGridArea()
-        {
-            GridAreaCode = process.MeteringGridAreaDomainId,
-            BalanceResponsiblePartyId = process.BalanceResponsibleId,
-            EnergySupplierId = process.EnergySupplierId,
-        };
-    }
-
-    private static AggregationPerBalanceResponsiblePartyPerGridArea MapBalancePerGridArea(AggregatedMeasureDataProcess process)
-    {
-        return new AggregationPerBalanceResponsiblePartyPerGridArea()
-        {
-            GridAreaCode = process.MeteringGridAreaDomainId,
-            BalanceResponsiblePartyId = process.BalanceResponsibleId,
-            EnergySupplierId = string.Empty,
-        };
+        return process.EnergySupplierId == null && process.BalanceResponsibleId != null
+                ? new AggregationPerBalanceResponsiblePartyPerGridArea()
+                {
+                    GridAreaCode = process.MeteringGridAreaDomainId,
+                    BalanceResponsiblePartyId = process.BalanceResponsibleId,
+                    EnergySupplierId = string.Empty,
+                }
+                : null;
     }
 
     private static TimeSeriesType MapTimeSeriesTypeAsGridOperator(AggregatedMeasureDataProcess process)
@@ -142,26 +138,18 @@ public class AggregatedMeasureDataResponseFactory
 
     private IMessage CreateAggregatedMeasureDataRequest(AggregatedMeasureDataProcess process)
     {
-        var response = new AggregatedTimeSeriesRequest()
+        return new AggregatedTimeSeriesRequest()
         {
             Period = MapPeriod(process),
             TimeSeriesType = process.RequestedByActorRoleCode == MarketRole.MeteredDataResponsible.Code ||
                              process.RequestedByActorRoleCode == MarketRole.GridOperator.Code
                 ? MapTimeSeriesTypeAsGridOperator(process)
                 : MapTimeSeriesTypeAsBalanceResponsibleOrEnergySupplier(process),
+            AggregationPerGridarea = MapGridArea(process),
+            AggregationPerEnergysupplierPerGridarea = MapEnergySupplierPerGridArea(process),
+            AggregationPerBalanceresponsiblepartyPerGridarea = MapBalancePerGridArea(process),
+            AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea = MapEnergyAndBalancePerGridArea(process),
         };
-
-        if (IsValidRequestFromGridOperator(process))
-        {
-            response.AggregationPerGridarea = MapGridArea(process);
-            return response;
-        }
-
-        throw new InvalidOperationException(
-            $"Invalid request by actor: {process.RequestedByActorId.Value}. " +
-            $"The combination of actor code: {process.RequestedByActorRoleCode}, " +
-            $"energy supplier id: {process.EnergySupplierId}," +
-            $"balance responsible id: {process.BalanceResponsibleId} is invalid");
     }
 
     private Energinet.DataHub.Edi.Requests.Period MapPeriod(AggregatedMeasureDataProcess process)
