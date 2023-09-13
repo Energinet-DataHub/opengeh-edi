@@ -57,7 +57,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureDataWithWrongMarketEvaluationPoint.json">
+      <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureDataWithBadPeriod.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureData.json">
