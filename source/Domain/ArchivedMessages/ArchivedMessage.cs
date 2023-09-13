@@ -19,9 +19,6 @@ using NodaTime;
 namespace Domain.ArchivedMessages;
 
 public record ArchivedMessage(
-    // This is most likely a guid, but!
-    // We have examples of this being a 36 characters string not supporting the guid format in our DB.
-    // Hence we keep this as a string
     string Id,
     string? MessageId,
     DocumentType DocumentType,

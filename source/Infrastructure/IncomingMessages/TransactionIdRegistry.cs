@@ -22,16 +22,19 @@ using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.Exceptions;
 using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.IncomingMessages
 {
     public class TransactionIdRegistry : ITransactionIds
     {
         private readonly IDatabaseConnectionFactory _connectionFactory;
+        private readonly ILogger _logger;
 
-        public TransactionIdRegistry(IDatabaseConnectionFactory connectionFactory)
+        public TransactionIdRegistry(IDatabaseConnectionFactory connectionFactory, ILogger<TransactionIdRegistry> logger)
         {
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+            _logger = logger;
         }
 
         public async Task<bool> TransactionIdOfSenderIsUniqueAsync(string senderId, string transactionId, CancellationToken cancellationToken)
@@ -45,7 +48,7 @@ namespace Infrastructure.IncomingMessages
             return transaction == null;
         }
 
-        public async Task<bool> StoreTransactionIdsForSenderAsync(
+        public async Task StoreTransactionIdsForSenderAsync(
             string senderId,
             IReadOnlyList<string> transactionIds,
             CancellationToken cancellationToken)
@@ -77,13 +80,20 @@ namespace Infrastructure.IncomingMessages
 
                 await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             }
-            catch (SqlException)
+            catch (SqlException e)
             {
                 await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-                throw new UnsuccessfulTransactionIdsStorageException();
+                for (var index = 0; index < e.Errors.Count; index++)
+                {
+                    if (e.Errors[index].Number == 2627)
+                    {
+                        _logger.LogError(
+                            "Unable to insert transaction ids for sender: {SenderId} since one or more already exists in the database",
+                            senderId);
+                        throw new UnsuccessfulTransactionIdsStorageException();
+                    }
+                }
             }
-
-            return true;
         }
     }
 }

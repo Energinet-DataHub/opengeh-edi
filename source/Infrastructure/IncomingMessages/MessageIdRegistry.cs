@@ -20,16 +20,19 @@ using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.Exceptions;
 using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.IncomingMessages
 {
     public class MessageIdRegistry : IMessageIds
     {
         private readonly IDatabaseConnectionFactory _connectionFactory;
+        private readonly ILogger _logger;
 
-        public MessageIdRegistry(IDatabaseConnectionFactory connectionFactory)
+        public MessageIdRegistry(IDatabaseConnectionFactory connectionFactory, ILogger<MessageIdRegistry> logger)
         {
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+            _logger = logger;
         }
 
         public async Task StoreAsync(string senderId, string messageId, CancellationToken cancellationToken)
@@ -43,9 +46,22 @@ namespace Infrastructure.IncomingMessages
                         new { MessageId = messageId, SenderId = senderId })
                     .ConfigureAwait(false);
             }
-            catch (SqlException)
+            catch (SqlException e)
             {
-                throw new UnsuccessfulMessageIdStorageException();
+                for (var index = 0; index < e.Errors.Count; index++)
+                {
+                    if (e.Errors[index].Number == 2627)
+                    {
+                        _logger.LogError(
+                            "Unable to insert message id: {MessageId}" +
+                            " for sender: {SenderId} since it already exists in the database",
+                            messageId,
+                            senderId);
+                        throw new UnsuccessfulMessageIdStorageException();
+                    }
+                }
+
+                throw;
             }
         }
 
@@ -53,7 +69,7 @@ namespace Infrastructure.IncomingMessages
         {
             using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
             var message = await connection.QueryFirstOrDefaultAsync(
-                    $"SELECT * FROM dbo.MessageRegistry WHERE MessageId = @MessageId AND SenderId = @SenderId",
+                    $"SELECT TOP (1) * FROM dbo.MessageRegistry WHERE MessageId = @MessageId AND SenderId = @SenderId",
                     new { MessageId = messageId, SenderId = senderId })
                 .ConfigureAwait(false);
 

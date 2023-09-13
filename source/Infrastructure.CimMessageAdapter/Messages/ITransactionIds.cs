@@ -34,10 +34,7 @@ namespace CimMessageAdapter.Messages
         /// <summary>
         /// Store transaction ids for the specified sender
         /// </summary>
-        /// <param name="senderId"></param>
-        /// <param name="transactionIds"></param>
-        /// <param name="cancellationToken"></param>
-        Task<bool> StoreTransactionIdsForSenderAsync(
+        Task StoreTransactionIdsForSenderAsync(
             string senderId,
             IReadOnlyList<string> transactionIds,
             CancellationToken cancellationToken);
