@@ -195,7 +195,6 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
         var aggregationPerEnergySupplierPerGridArea = response.AggregationPerEnergysupplierPerGridarea;
         Assert.Equal(incomingMessage.MarketActivityRecord.MeteringGridAreaDomainId, aggregationPerEnergySupplierPerGridArea.GridAreaCode);
         Assert.Equal(incomingMessage.MarketActivityRecord.EnergySupplierMarketParticipantId, aggregationPerEnergySupplierPerGridArea.EnergySupplierId);
-        Assert.Equal(string.Empty, aggregationPerEnergySupplierPerGridArea.BalanceResponsiblePartyId);
     }
 
     [Theory]
@@ -261,7 +260,6 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
 
         var aggregationPerBalanceResponsible = response.AggregationPerBalanceresponsiblepartyPerGridarea;
         Assert.Equal(incomingMessage.MarketActivityRecord.MeteringGridAreaDomainId, aggregationPerBalanceResponsible.GridAreaCode);
-        Assert.Equal(string.Empty, aggregationPerBalanceResponsible.EnergySupplierId);
         Assert.Equal(incomingMessage.MarketActivityRecord.BalanceResponsiblePartyMarketParticipantId, aggregationPerBalanceResponsible.BalanceResponsiblePartyId);
     }
 
