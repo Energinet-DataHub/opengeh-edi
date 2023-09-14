@@ -74,10 +74,10 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
         // Arrange
         var incomingMessage =
             MessageBuilder().
-            SetSenderRole(MarketRole.MeteredDataResponsible.Code).
-            SetEnergySupplierId(null).
-            SetBalanceResponsibleId(null).
-            Build();
+                SetSenderRole(MarketRole.MeteredDataResponsible.Code).
+                SetEnergySupplierId(null).
+                SetBalanceResponsibleId(null).
+                Build();
         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
         var exceptedServiceBusMessageSubject = nameof(AggregatedTimeSeriesRequest);
@@ -192,10 +192,10 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
         Assert.Equal(expectedType, response.TimeSeriesType);
         Assert.NotNull(response.AggregationPerEnergysupplierPerGridarea);
 
-        var aggregationPerEnergysupplierPerGridarea = response.AggregationPerEnergysupplierPerGridarea;
-        Assert.Equal(incomingMessage.MarketActivityRecord.MeteringGridAreaDomainId, aggregationPerEnergysupplierPerGridarea.GridAreaCode);
-        Assert.Equal(incomingMessage.MarketActivityRecord.EnergySupplierMarketParticipantId, aggregationPerEnergysupplierPerGridarea.EnergySupplierId);
-        Assert.Equal(string.Empty, aggregationPerEnergysupplierPerGridarea.BalanceResponsiblePartyId);
+        var aggregationPerEnergySupplierPerGridArea = response.AggregationPerEnergysupplierPerGridarea;
+        Assert.Equal(incomingMessage.MarketActivityRecord.MeteringGridAreaDomainId, aggregationPerEnergySupplierPerGridArea.GridAreaCode);
+        Assert.Equal(incomingMessage.MarketActivityRecord.EnergySupplierMarketParticipantId, aggregationPerEnergySupplierPerGridArea.EnergySupplierId);
+        Assert.Equal(string.Empty, aggregationPerEnergySupplierPerGridArea.BalanceResponsiblePartyId);
     }
 
     [Theory]
