@@ -24,7 +24,7 @@ using Infrastructure.OutgoingMessages.Common.Xml;
 
 namespace Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 
-public class RejectRequestAggregatedMeasureDataXmlDocumentWriter : DocumentWriter
+public class RejectRequestAggregatedMeasureDataXmlDocumentWriter : EbixDocumentWriter
 {
     public RejectRequestAggregatedMeasureDataXmlDocumentWriter(IMessageRecordParser parser)
         : base(

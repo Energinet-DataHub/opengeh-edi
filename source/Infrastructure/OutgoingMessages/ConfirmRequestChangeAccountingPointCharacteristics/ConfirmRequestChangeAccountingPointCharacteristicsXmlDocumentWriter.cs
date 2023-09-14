@@ -23,7 +23,7 @@ using MarketActivityRecord = Domain.OutgoingMessages.MoveIn.ConfirmRequestChange
 
 namespace Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
 
-public class ConfirmRequestChangeAccountingPointCharacteristicsXmlDocumentWriter : DocumentWriter
+public class ConfirmRequestChangeAccountingPointCharacteristicsXmlDocumentWriter : EbixDocumentWriter
 {
     public ConfirmRequestChangeAccountingPointCharacteristicsXmlDocumentWriter(IMessageRecordParser parser)
         : base(

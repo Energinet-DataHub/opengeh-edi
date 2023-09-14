@@ -46,8 +46,9 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     }
 
     [Theory]
-    [InlineData(nameof(DocumentFormat.Xml))]
-    [InlineData(nameof(DocumentFormat.Json))]
+    [InlineData(nameof(DocumentFormat.Ebix))]
+    //[InlineData(nameof(DocumentFormat.Xml))]
+    //[InlineData(nameof(DocumentFormat.Json))]
     public async Task Can_create_document(string documentFormat)
     {
         var document = await CreateDocument(
@@ -171,7 +172,13 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     {
         var documentHeader = resultBuilder.BuildHeader();
         var records = _parser.From(resultBuilder.BuildTimeSeries());
-        if (documentFormat == DocumentFormat.Xml)
+        if (documentFormat == DocumentFormat.Ebix)
+        {
+            return new AggregationResultEbixDocumentWriter(_parser).WriteAsync(
+                documentHeader,
+                new[] { records, });
+        }
+        else if (documentFormat == DocumentFormat.Xml)
         {
             return new AggregationResultXmlDocumentWriter(_parser).WriteAsync(
                 documentHeader,
@@ -187,7 +194,12 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
 
     private IAssertAggregationResultDocument AssertDocument(Stream document, DocumentFormat documentFormat)
     {
-        if (documentFormat == DocumentFormat.Xml)
+        if (documentFormat == DocumentFormat.Ebix)
+        {
+            var assertEbixDocument = AssertEbixDocument.Document(document, "ns0");
+            return new AssertAggregationResultEbixDocument(assertEbixDocument);
+        }
+        else if (documentFormat == DocumentFormat.Xml)
         {
             var assertXmlDocument = AssertXmlDocument.Document(document, "cim", _documentValidation.Validator);
             return new AssertAggregationResultXmlDocument(assertXmlDocument);

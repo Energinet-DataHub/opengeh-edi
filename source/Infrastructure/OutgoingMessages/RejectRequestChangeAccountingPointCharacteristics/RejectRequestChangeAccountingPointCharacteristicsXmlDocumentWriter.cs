@@ -23,7 +23,7 @@ using Infrastructure.OutgoingMessages.Common.Xml;
 
 namespace Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 
-public class RejectRequestChangeAccountingPointCharacteristicsXmlDocumentWriter : DocumentWriter
+public class RejectRequestChangeAccountingPointCharacteristicsXmlDocumentWriter : EbixDocumentWriter
 {
     public RejectRequestChangeAccountingPointCharacteristicsXmlDocumentWriter(IMessageRecordParser parser)
         : base(

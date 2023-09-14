@@ -23,7 +23,7 @@ using Infrastructure.OutgoingMessages.Common.Xml;
 
 namespace Infrastructure.OutgoingMessages.GenericNotification;
 
-public class GenericNotificationXmlDocumentWriter : DocumentWriter
+public class GenericNotificationXmlDocumentWriter : EbixDocumentWriter
 {
     public GenericNotificationXmlDocumentWriter(IMessageRecordParser parser)
     : base(

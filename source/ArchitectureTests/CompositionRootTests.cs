@@ -47,7 +47,7 @@ namespace ArchitectureTests
             var constructorDependencies = ReflectionHelper.FindAllConstructorDependenciesForType();
 
             return ApplicationAssemblies.Infrastructure.GetTypes()
-                .Where(t => t.IsSubclassOf(typeof(DocumentWriter)))
+                .Where(t => t.IsSubclassOf(typeof(EbixDocumentWriter)))
                 .Select(t => new object[] { new Requirement(t.Name, constructorDependencies(t), t) });
         }
 
