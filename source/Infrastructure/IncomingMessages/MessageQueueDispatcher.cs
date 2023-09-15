@@ -57,11 +57,7 @@ namespace Infrastructure.IncomingMessages
 
         public async Task CommitAsync(CancellationToken cancellationToken)
         {
-            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-            {
-                await _senderCreator.SendAsync(_transactionQueue.AsReadOnly(), cancellationToken).ConfigureAwait(false);
-                scope.Complete();
-            }
+            await _senderCreator.SendAsync(_transactionQueue.AsReadOnly(), cancellationToken).ConfigureAwait(false);
         }
 
         private ServiceBusMessage CreateMessage(IMarketTransaction transaction)
