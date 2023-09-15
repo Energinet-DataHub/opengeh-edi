@@ -46,28 +46,35 @@ public class AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable : IRequest
         var process = await _aggregatedMeasureDataProcessRepository
             .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
-        var aggregations = new List<Aggregation>();
-        foreach (var timeSerie in request.AggregatedTimeSeries)
-        {
-            aggregations.Add(new Aggregation(
-                MapPoints(timeSerie.Points),
-                timeSerie.MeteringPointType,
-                timeSerie.UnitType,
-                timeSerie.Resolution,
-                MapPeriod(timeSerie.Period),
-                MapSettlementMethod(process),
-                MapBusinessReason(process),
-                MapActorGrouping(process),
-                MapGridAreaDetails(timeSerie.GridAreaDetails),
-                process.BusinessTransactionId.Id,
-                process.RequestedByActorId.Value,
-                MapReceiverRole(process),
-                MapSettlementVersion(timeSerie.SettlementVersion)));
-        }
+        var aggregations = GetAggregations(request, process);
 
         process.IsAccepted(aggregations);
 
         return Unit.Value;
+    }
+
+    private static List<Aggregation> GetAggregations(AcceptedAggregatedTimeSeries request, AggregatedMeasureDataProcess process)
+    {
+        var aggregations = new List<Aggregation>();
+        foreach (var aggregatedTimeSerie in request.AggregatedTimeSeries)
+        {
+            aggregations.Add(new Aggregation(
+                MapPoints(aggregatedTimeSerie.Points),
+                aggregatedTimeSerie.MeteringPointType,
+                aggregatedTimeSerie.UnitType,
+                aggregatedTimeSerie.Resolution,
+                MapPeriod(aggregatedTimeSerie.Period),
+                MapSettlementMethod(process),
+                MapBusinessReason(process),
+                MapActorGrouping(process),
+                MapGridAreaDetails(aggregatedTimeSerie.GridAreaDetails),
+                process.BusinessTransactionId.Id,
+                process.RequestedByActorId.Value,
+                MapReceiverRole(process),
+                MapSettlementVersion(aggregatedTimeSerie.SettlementVersion)));
+        }
+
+        return aggregations;
     }
 
     private static GridAreaDetails MapGridAreaDetails(Domain.Transactions.AggregatedMeasureData.GridAreaDetails timeSerieGridAreaDetails)
