@@ -107,23 +107,6 @@ namespace IntegrationTests.Infrastructure.CimMessageAdapter.Messages
             return message;
         }
 
-        public Stream MessageWithSize(int newFileSizeInMb)
-        {
-            var newFileSizeInBytes = newFileSizeInMb * 1024 * 1024;
-            var message = new MemoryStream();
-            _document.Save(message, SaveOptions.DisableFormatting);
-            message.Position = 0;
-            if (message.Length > newFileSizeInBytes) return message;
-
-            var remainSize = newFileSizeInBytes - message.Length;
-
-            byte[] data = new byte[remainSize];
-            message.Write(data);
-
-            message.Position = 0;
-            return message;
-        }
-
         public BusinessMessageBuilder DuplicateMarketActivityRecords()
         {
             var root = _document.Root;

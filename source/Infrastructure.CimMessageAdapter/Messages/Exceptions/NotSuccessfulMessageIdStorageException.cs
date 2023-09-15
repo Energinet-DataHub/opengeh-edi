@@ -16,19 +16,22 @@ using System;
 
 namespace CimMessageAdapter.Messages.Exceptions;
 
-public class UnsuccessfulMessageIdStorageException : Exception
+public class NotSuccessfulMessageIdStorageException : Exception
 {
-    public UnsuccessfulMessageIdStorageException(string message)
+    public NotSuccessfulMessageIdStorageException(string message)
         : base(message)
     {
+        MessageId = message;
     }
 
-    public UnsuccessfulMessageIdStorageException(string message, Exception innerException)
+    public NotSuccessfulMessageIdStorageException(string message, Exception innerException)
         : base(message, innerException)
     {
     }
 
-    public UnsuccessfulMessageIdStorageException()
+    public NotSuccessfulMessageIdStorageException()
     {
     }
+
+    public string MessageId { get; set; } = string.Empty;
 }

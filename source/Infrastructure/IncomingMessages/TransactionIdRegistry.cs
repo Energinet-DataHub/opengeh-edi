@@ -37,7 +37,7 @@ namespace Infrastructure.IncomingMessages
             _logger = logger;
         }
 
-        public async Task<bool> TransactionIdOfSenderIsUniqueAsync(string senderId, string transactionId, CancellationToken cancellationToken)
+        public async Task<bool> TransactionIdExistsAsync(string senderId, string transactionId, CancellationToken cancellationToken)
         {
             using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
             var transaction = await connection.QueryFirstOrDefaultAsync(
@@ -45,10 +45,10 @@ namespace Infrastructure.IncomingMessages
                     new { TransactionId = transactionId, SenderId = senderId })
                 .ConfigureAwait(false);
 
-            return transaction == null;
+            return transaction != null;
         }
 
-        public async Task StoreTransactionIdsForSenderAsync(
+        public async Task StoreAsync(
             string senderId,
             IReadOnlyList<string> transactionIds,
             CancellationToken cancellationToken)
@@ -72,9 +72,9 @@ namespace Infrastructure.IncomingMessages
                 {
                     command.Parameters.Clear();
                     command.Parameters.Add(
-                        "@TransactionId", SqlDbType.NChar).Value = transactionId;
+                        "@TransactionId", SqlDbType.VarChar).Value = transactionId;
                     command.Parameters.Add(
-                        "@SenderId", SqlDbType.NChar).Value = senderId;
+                        "@SenderId", SqlDbType.VarChar).Value = senderId;
                     await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
                 }
 
@@ -90,7 +90,7 @@ namespace Infrastructure.IncomingMessages
                         _logger.LogError(
                             "Unable to insert transaction ids for sender: {SenderId} since one or more already exists in the database",
                             senderId);
-                        throw new UnsuccessfulTransactionIdsStorageException();
+                        throw new NotSuccessfulTransactionIdsStorageException();
                     }
                 }
             }

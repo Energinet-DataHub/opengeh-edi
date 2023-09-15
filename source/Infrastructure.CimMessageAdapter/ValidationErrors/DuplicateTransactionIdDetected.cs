@@ -22,7 +22,7 @@ namespace CimMessageAdapter.ValidationErrors
         }
 
         public DuplicateTransactionIdDetected()
-            : base("Duplicated transaction id found", "00102", "TransactionId")
+            : base("Duplicated transaction id found", "00110", "TransactionId")
         {
         }
     }

@@ -16,19 +16,19 @@ using System;
 
 namespace CimMessageAdapter.Messages.Exceptions;
 
-public class UnsuccessfulTransactionIdsStorageException
+public class NotSuccessfulTransactionIdsStorageException
     : Exception
 {
-    public UnsuccessfulTransactionIdsStorageException(string message, Exception innerException)
+    public NotSuccessfulTransactionIdsStorageException(string message, Exception innerException)
         : base(message, innerException)
     {
     }
 
-    public UnsuccessfulTransactionIdsStorageException()
+    public NotSuccessfulTransactionIdsStorageException()
     {
     }
 
-    public UnsuccessfulTransactionIdsStorageException(string message)
+    public NotSuccessfulTransactionIdsStorageException(string message)
         : base(message)
     {
     }

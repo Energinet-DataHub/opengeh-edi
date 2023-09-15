@@ -36,6 +36,6 @@ namespace CimMessageAdapter.Messages
         /// <param name="senderId"></param>
         /// <param name="messageId"></param>
         /// <param name="cancellationToken"></param>
-        Task<bool> MessageIdIsUniqueForSenderAsync(string senderId, string messageId, CancellationToken cancellationToken);
+        Task<bool> MessageIdExistsAsync(string senderId, string messageId, CancellationToken cancellationToken);
     }
 }

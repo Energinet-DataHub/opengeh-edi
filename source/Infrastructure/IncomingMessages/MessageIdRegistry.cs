@@ -57,7 +57,7 @@ namespace Infrastructure.IncomingMessages
                             " for sender: {SenderId} since it already exists in the database",
                             messageId,
                             senderId);
-                        throw new UnsuccessfulMessageIdStorageException();
+                        throw new NotSuccessfulMessageIdStorageException(messageId);
                     }
                 }
 
@@ -65,7 +65,7 @@ namespace Infrastructure.IncomingMessages
             }
         }
 
-        public async Task<bool> MessageIdIsUniqueForSenderAsync(string senderId, string messageId, CancellationToken cancellationToken)
+        public async Task<bool> MessageIdExistsAsync(string senderId, string messageId, CancellationToken cancellationToken)
         {
             using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
             var message = await connection.QueryFirstOrDefaultAsync(
@@ -73,7 +73,7 @@ namespace Infrastructure.IncomingMessages
                     new { MessageId = messageId, SenderId = senderId })
                 .ConfigureAwait(false);
 
-            return message == null;
+            return message != null;
         }
     }
 }

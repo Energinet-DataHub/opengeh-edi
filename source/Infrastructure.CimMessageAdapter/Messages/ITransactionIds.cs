@@ -29,12 +29,12 @@ namespace CimMessageAdapter.Messages
         /// <param name="senderId"></param>
         /// <param name="transactionId"></param>
         /// <param name="cancellationToken"></param>
-        Task<bool> TransactionIdOfSenderIsUniqueAsync(string senderId, string transactionId, CancellationToken cancellationToken);
+        Task<bool> TransactionIdExistsAsync(string senderId, string transactionId, CancellationToken cancellationToken);
 
         /// <summary>
         /// Store transaction ids for the specified sender
         /// </summary>
-        Task StoreTransactionIdsForSenderAsync(
+        Task StoreAsync(
             string senderId,
             IReadOnlyList<string> transactionIds,
             CancellationToken cancellationToken);
