@@ -118,6 +118,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202308171049 Add ProcessDate index on ReceivedInboxEvents.sql" />
     <EmbeddedResource Include="Scripts\Model\202308221313 Add Constraint for ActorNumber and ActorRole on ActorMessageQueues.sql" />
     <EmbeddedResource Include="Scripts\Model\202308210829 make receiver and sender nullable ArchivedMessages.sql" />
+    <EmbeddedResource Include="Scripts\Model\202309151307 Add ProcessId to OutgoingMessage.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241101 Consolidated BtwoB model.sql" />
