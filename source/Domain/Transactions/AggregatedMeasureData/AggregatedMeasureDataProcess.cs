@@ -13,14 +13,18 @@
 // limitations under the License.
 
 using Domain.Actors;
+using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
 using Domain.SeedWork;
 using Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+using Domain.Transactions.Aggregations;
 using NodaTime;
 
 namespace Domain.Transactions.AggregatedMeasureData
 {
     public class AggregatedMeasureDataProcess : Entity
     {
+        private readonly List<OutgoingMessage> _messages = new();
         private State _state = State.Initialized;
 
         public AggregatedMeasureDataProcess(
@@ -73,7 +77,6 @@ namespace Domain.Transactions.AggregatedMeasureData
             Sent,
             Accepted,
             Rejected,
-            Completed,
         }
 
         public ProcessId ProcessId { get; }
@@ -116,32 +119,53 @@ namespace Domain.Transactions.AggregatedMeasureData
             }
         }
 
-        public void WasAccepted(string responseData)
+        public void IsAccepted(IReadOnlyCollection<Aggregation> aggregations)
         {
+            if (aggregations == null) throw new ArgumentNullException(nameof(aggregations));
+
             if (_state == State.Sent)
             {
+                foreach (var aggregation in aggregations)
+                {
+                    var aggregationResultForwarding = new AggregationResultForwarding(TransactionId.Create(ProcessId.Id));
+                    _messages.Add(aggregationResultForwarding.CreateMessage(aggregation));
+                }
+
                 _state = State.Accepted;
-                ResponseData = responseData;
-                AddDomainEvent(new AggregatedMeasureProcessWasAccepted(ProcessId));
             }
         }
 
-        public void WasRejected(string responseData)
+        public void IsRejected(RejectedRequest rejectRequest)
         {
+            if (rejectRequest == null) throw new ArgumentNullException(nameof(rejectRequest));
+
             if (_state == State.Sent)
             {
+                _messages.Add(CreateRejectedAggregationResultMessage(rejectRequest));
+
                 _state = State.Rejected;
-                ResponseData = responseData;
-                AddDomainEvent(new AggregatedMeasureProcessWasRejected(ProcessId));
             }
         }
 
-        public void IsCompleted()
+        private RejectedAggregationResultMessage CreateRejectedAggregationResultMessage(
+            RejectedRequest rejectedRequest)
         {
-            if (_state is State.Rejected or State.Accepted)
-            {
-                _state = State.Completed;
-            }
+            var transactionId = TransactionId.Create(ProcessId.Id);
+            var rejectedTimeSerie = new RejectedTimeSerie(
+                ProcessId.Id,
+                rejectedRequest.RejectReasons.Select(reason =>
+                        new Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData.RejectReason(
+                            reason.ErrorCode,
+                            reason.ErrorMessage))
+                    .ToList(),
+                BusinessTransactionId.Id);
+
+            return new RejectedAggregationResultMessage(
+                RequestedByActorId,
+                transactionId,
+                rejectedRequest.BusinessReason.Name,
+                MarketRole.FromCode(RequestedByActorRoleCode),
+                rejectedTimeSerie);
         }
     }
 }

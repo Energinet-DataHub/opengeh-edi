@@ -13,27 +13,30 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Actors;
 using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
-using Domain.Transactions.Exceptions;
-using Infrastructure.Configuration.Serialization;
+using Domain.Transactions.Aggregations;
+using Infrastructure.OutgoingMessages.Common;
 using MediatR;
+using GridAreaDetails = Domain.Transactions.Aggregations.GridAreaDetails;
+using Period = Domain.Transactions.Aggregations.Period;
+using Point = Domain.Transactions.Aggregations.Point;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
 
 public class AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable : IRequestHandler<AcceptedAggregatedTimeSeries, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
-    private readonly ISerializer _serializer;
 
     public AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable(
-        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository,
-        ISerializer serializer)
+        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
-        _serializer = serializer;
     }
 
     public async Task<Unit> Handle(AcceptedAggregatedTimeSeries request, CancellationToken cancellationToken)
@@ -43,8 +46,97 @@ public class AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable : IRequest
         var process = await _aggregatedMeasureDataProcessRepository
             .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
-        process.WasAccepted(_serializer.Serialize(request.NotificationAggregatedTimeSeries));
+        var aggregations = new List<Aggregation>();
+        foreach (var timeSerie in request.AggregatedTimeSeries)
+        {
+            aggregations.Add(new Aggregation(
+                MapPoints(timeSerie.Points),
+                timeSerie.MeteringPointType,
+                timeSerie.UnitType,
+                timeSerie.Resolution,
+                MapPeriod(timeSerie.Period),
+                MapSettlementMethod(process),
+                MapBusinessReason(process),
+                MapActorGrouping(process),
+                MapGridAreaDetails(timeSerie.GridAreaDetails),
+                process.BusinessTransactionId.Id,
+                process.RequestedByActorId.Value,
+                MapReceiverRole(process),
+                MapSettlementVersion(timeSerie.SettlementVersion)));
+        }
+
+        process.IsAccepted(aggregations);
 
         return Unit.Value;
+    }
+
+    private static GridAreaDetails MapGridAreaDetails(Domain.Transactions.AggregatedMeasureData.GridAreaDetails timeSerieGridAreaDetails)
+    {
+        return new GridAreaDetails(timeSerieGridAreaDetails.GridAreaCode, timeSerieGridAreaDetails.OperatorNumber);
+    }
+
+    private static Period MapPeriod(Domain.Transactions.AggregatedMeasureData.Period timeSeriePeriod)
+    {
+        return new Period(timeSeriePeriod.Start, timeSeriePeriod.End);
+    }
+
+    private static List<Point> MapPoints(IReadOnlyList<Domain.Transactions.AggregatedMeasureData.Point> points)
+    {
+        return points.Select(point => new Point(point.Position, point.Quantity, point.Quality, point.SampleTime)).ToList();
+    }
+
+    private static string MapReceiverRole(AggregatedMeasureDataProcess process)
+    {
+        return MarketRole.FromCode(process.RequestedByActorRoleCode).Name;
+    }
+
+    private static ActorGrouping MapActorGrouping(AggregatedMeasureDataProcess process)
+    {
+        if (process.RequestedByActorRoleCode == MarketRole.BalanceResponsibleParty.Code)
+        {
+            return new ActorGrouping(null, process.BalanceResponsibleId);
+        }
+
+        if (process.RequestedByActorRoleCode == MarketRole.EnergySupplier.Code)
+        {
+            return new ActorGrouping(process.EnergySupplierId, null);
+        }
+
+        return new ActorGrouping(null, null);
+    }
+
+    private static string? MapSettlementVersion(string? settlementVersion)
+    {
+        var settlementVersionName = null as string;
+        try
+        {
+            settlementVersionName = SettlementVersion.From(settlementVersion ?? string.Empty).Name;
+        }
+        catch (InvalidCastException)
+        {
+            // Settlement version is set to null.
+        }
+
+        return settlementVersionName;
+    }
+
+    private static string? MapSettlementMethod(AggregatedMeasureDataProcess process)
+    {
+        var settlementTypeName = null as string;
+        try
+        {
+            settlementTypeName = SettlementType.From(process.SettlementMethod ?? string.Empty).Name;
+        }
+        catch (InvalidCastException)
+        {
+            // Settlement type for Production is set to null.
+        }
+
+        return settlementTypeName;
+    }
+
+    private static string MapBusinessReason(AggregatedMeasureDataProcess process)
+    {
+        return CimCode.To(process.BusinessReason).Name;
     }
 }

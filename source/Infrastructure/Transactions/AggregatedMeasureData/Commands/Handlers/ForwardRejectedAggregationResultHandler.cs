@@ -29,6 +29,7 @@ using RejectReason = Domain.Transactions.AggregatedMeasureData.RejectReason;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
 
+[Obsolete("This can be delete when all ForwardRejectedAggregationResult commands has been processed.")]
 public class ForwardRejectedAggregationResultHandler : IRequestHandler<ForwardRejectedAggregationResult, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
@@ -57,8 +58,6 @@ public class ForwardRejectedAggregationResultHandler : IRequestHandler<ForwardRe
         _outgoingMessageRepository.Add(CreateRejectedAggregationResultMessage(
             process,
             rejectedReasons));
-
-        process.IsCompleted();
 
         return Unit.Value;
     }

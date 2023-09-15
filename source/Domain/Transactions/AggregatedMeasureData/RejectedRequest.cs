@@ -1,4 +1,4 @@
-﻿// Copyright 2020 Energinet DataHub A/S
+// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+using Domain.OutgoingMessages;
 
-namespace Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+namespace Domain.Transactions.AggregatedMeasureData;
 
-public class AggregatedMeasureProcessWasRejected : DomainEvent
-{
-    public AggregatedMeasureProcessWasRejected(ProcessId processId)
-    {
-        ProcessId = processId;
-    }
-
-    public ProcessId ProcessId { get; }
-}
+public record RejectedRequest(IReadOnlyCollection<RejectReason> RejectReasons, BusinessReason BusinessReason);
