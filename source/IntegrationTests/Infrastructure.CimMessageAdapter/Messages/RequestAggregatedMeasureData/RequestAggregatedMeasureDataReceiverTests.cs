@@ -209,8 +209,6 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .RequestAggregatedMeasureData()
             .WithReceiverRole(knownReceiverRole)
             .WithReceiverId(knownReceiverId)
-            .WithSenderRole(MarketRole.EnergySupplier.Code)
-            .WithSenderId(SampleData.SenderId)
             .DuplicateSeriesRecords()
             .Message();
 
@@ -231,8 +229,6 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .RequestAggregatedMeasureData()
             .WithReceiverRole(knownReceiverRole)
             .WithReceiverId(knownReceiverId)
-            .WithSenderRole(MarketRole.EnergySupplier.Code)
-            .WithSenderId(SampleData.SenderId)
             .Message();
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
@@ -244,8 +240,6 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .WithReceiverRole(knownReceiverRole)
             .WithReceiverId(knownReceiverId)
             .WithMessageId("123564789123564789123564789123564789")
-            .WithSenderRole(MarketRole.EnergySupplier.Code)
-            .WithSenderId(SampleData.SecondSenderId)
             .Message();
 
         await CreateSecondIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier }, SampleData.SecondSenderId, SampleData.SecondStsAssignedUserId)
@@ -268,8 +262,6 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .RequestAggregatedMeasureData()
             .WithReceiverRole(knownReceiverRole)
             .WithReceiverId(knownReceiverId)
-            .WithSenderRole(MarketRole.EnergySupplier.Code)
-            .WithSenderId(SampleData.SenderId)
             .WithSeriesTransactionId(string.Empty)
             .Message();
 
@@ -296,7 +288,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     }
 
     [Fact]
-    public async Task Message_ids_must_be_unique()
+    public async Task Message_id_may_be_reused_across_senders()
     {
         await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
             .ConfigureAwait(false);
@@ -305,7 +297,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .Message();
         await using var message02 = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
-            .WithSenderId(SampleData.SecondSenderId)
+            .WithSenderId("1212121212121")
             .Message();
 
         var messageParserResult01 = await ParseMessageAsync(message01).ConfigureAwait(false);
@@ -327,8 +319,6 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .ConfigureAwait(false);
         await using var message01 = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
-            .WithSenderRole(MarketRole.EnergySupplier.Code)
-            .WithSenderId(SampleData.SenderId)
             .WithReceiverId("5790001330552")
             .Message();
 
@@ -397,8 +387,6 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .WithProcessType(notAllowedProcessType)
             .WithReceiverRole(knownReceiverRole)
             .WithReceiverId(knownReceiverId)
-            .WithSenderRole(MarketRole.EnergySupplier.Code)
-            .WithSenderId(SampleData.SenderId)
             .Message();
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
@@ -421,8 +409,6 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .WithMessageType(notAllowedMessageType)
             .WithReceiverRole(knownReceiverRole)
             .WithReceiverId(knownReceiverId)
-            .WithSenderRole(MarketRole.EnergySupplier.Code)
-            .WithSenderId(SampleData.SenderId)
             .Message();
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
@@ -443,8 +429,6 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
             .WithMessageId(toShortMessageId)
-            .WithSenderRole(MarketRole.EnergySupplier.Code)
-            .WithSenderId(SampleData.SenderId)
             .WithReceiverRole(knownReceiverRole)
             .WithReceiverId(knownReceiverId)
             .Message();
@@ -464,8 +448,6 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var knownReceiverRole = "DGL";
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
-            .WithSenderRole(MarketRole.EnergySupplier.Code)
-            .WithSenderId(SampleData.SenderId)
             .WithReceiverRole(knownReceiverRole)
             .WithReceiverId(knownReceiverId)
             .Message();
@@ -495,8 +477,6 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .ConfigureAwait(false);
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
-            .WithSenderRole(MarketRole.EnergySupplier.Code)
-            .WithSenderId(SampleData.SenderId)
             .WithReceiverId("5790001330552")
             .WithReceiverRole("DGL")
             .Message();
@@ -544,8 +524,6 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var knownReceiverRole = "DGL";
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
-            .WithSenderRole(MarketRole.EnergySupplier.Code)
-            .WithSenderId(SampleData.SenderId)
             .WithReceiverRole(knownReceiverRole)
             .WithReceiverId(knownReceiverId)
             .Message();
@@ -575,15 +553,11 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .ConfigureAwait(false);
         await using var message01 = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
-            .WithSenderRole(MarketRole.EnergySupplier.Code)
-            .WithSenderId(SampleData.SenderId)
             .WithReceiverId("5790001330552")
             .WithReceiverRole("DGL")
             .Message();
         await using var message02 = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
-            .WithSenderRole(MarketRole.EnergySupplier.Code)
-            .WithSenderId(SampleData.SenderId)
             .WithReceiverId("5790001330552")
             .WithReceiverRole("DGL")
             .WithSeriesTransactionId("123564789123564789523564789123564789")
@@ -664,8 +638,6 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .ConfigureAwait(false);
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
-            .WithSenderRole(MarketRole.EnergySupplier.Code)
-            .WithSenderId(SampleData.SenderId)
             .WithReceiverId("5790001330552")
             .WithReceiverRole("MDR")
             .Message();
@@ -697,8 +669,6 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .ConfigureAwait(false);
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
-            .WithSenderRole(MarketRole.EnergySupplier.Code)
-            .WithSenderId(SampleData.SenderId)
             .WithSeriesTransactionId("12356478912356478912356478912356478")
             .Message();
 
@@ -715,8 +685,6 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .ConfigureAwait(false);
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
-            .WithSenderRole(MarketRole.EnergySupplier.Code)
-            .WithSenderId(SampleData.SenderId)
             .WithSeriesTransactionId("123564789123564789123564789123564789")
             .Message();
 
@@ -733,8 +701,6 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .ConfigureAwait(false);
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
-            .WithSenderRole(MarketRole.EnergySupplier.Code)
-            .WithSenderId(SampleData.SenderId)
             .WithSeriesTransactionId("123564789123564789123564789123564789_123564789123564789123564789123564789")
             .Message();
 
