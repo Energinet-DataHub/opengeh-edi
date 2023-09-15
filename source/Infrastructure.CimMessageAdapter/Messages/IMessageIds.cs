@@ -28,6 +28,14 @@ namespace CimMessageAdapter.Messages
         /// <param name="senderId"></param>
         /// <param name="messageId"></param>
         /// <param name="cancellationToken"></param>
-        Task<bool> TryStoreAsync(string senderId, string messageId, CancellationToken cancellationToken);
+        Task StoreAsync(string senderId, string messageId, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Checks if <paramref name="messageId"/> is already registered by the sender <paramref name="senderId"/>
+        /// </summary>
+        /// <param name="senderId"></param>
+        /// <param name="messageId"></param>
+        /// <param name="cancellationToken"></param>
+        Task<bool> MessageIdExistsAsync(string senderId, string messageId, CancellationToken cancellationToken);
     }
 }

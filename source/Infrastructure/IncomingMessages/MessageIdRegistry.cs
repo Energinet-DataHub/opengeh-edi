@@ -17,30 +17,63 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using CimMessageAdapter.Messages;
+using CimMessageAdapter.Messages.Exceptions;
 using Dapper;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.IncomingMessages
 {
     public class MessageIdRegistry : IMessageIds
     {
         private readonly IDatabaseConnectionFactory _connectionFactory;
+        private readonly ILogger _logger;
 
-        public MessageIdRegistry(IDatabaseConnectionFactory connectionFactory)
+        public MessageIdRegistry(IDatabaseConnectionFactory connectionFactory, ILogger<MessageIdRegistry> logger)
         {
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+            _logger = logger;
         }
 
-        public async Task<bool> TryStoreAsync(string senderId, string messageId, CancellationToken cancellationToken)
+        public async Task StoreAsync(string senderId, string messageId, CancellationToken cancellationToken)
         {
             using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
 
-            var result = await connection.ExecuteAsync(
-                    $"IF NOT EXISTS (SELECT * FROM dbo.MessageRegistry WHERE MessageId = @MessageId AND SenderId = @SenderId)" +
-                    $"INSERT INTO dbo.MessageRegistry(MessageId, SenderId) VALUES(@MessageId, @SenderId)",
+            try
+            {
+                await connection.ExecuteAsync(
+                        $"INSERT INTO dbo.MessageRegistry(MessageId, SenderId) VALUES(@MessageId, @SenderId)",
+                        new { MessageId = messageId, SenderId = senderId })
+                    .ConfigureAwait(false);
+            }
+            catch (SqlException e)
+            {
+                foreach (SqlError error in e.Errors)
+                {
+                    if (error.Number == 2627)
+                    {
+                        _logger.LogError(
+                            "Unable to insert message id: {MessageId}" +
+                            " for sender: {SenderId} since it already exists in the database",
+                            messageId,
+                            senderId);
+                        throw new NotSuccessfulMessageIdStorageException(messageId);
+                    }
+                }
+
+                throw;
+            }
+        }
+
+        public async Task<bool> MessageIdExistsAsync(string senderId, string messageId, CancellationToken cancellationToken)
+        {
+            using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
+            var message = await connection.QueryFirstOrDefaultAsync(
+                    $"SELECT TOP (1) * FROM dbo.MessageRegistry WHERE MessageId = @MessageId AND SenderId = @SenderId",
                     new { MessageId = messageId, SenderId = senderId })
                 .ConfigureAwait(false);
 
-            return result == 1;
+            return message != null;
         }
     }
 }

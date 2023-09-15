@@ -12,18 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.Configuration.Commands.Commands;
-using Application.IncomingMessages.RequestAggregatedMeasureData;
-using CimMessageAdapter.Messages;
+namespace CimMessageAdapter.ValidationErrors;
 
-namespace Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
-
-public class ReceiveAggregatedMeasureDataRequest : ICommand<Result>
+public class InvalidTransactionIdSize : ValidationError
 {
-    public ReceiveAggregatedMeasureDataRequest(MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> messageResult)
+    public InvalidTransactionIdSize(string transactionId)
+        : base($"Transaction id {transactionId} is invalid. Must contain 36 characters.", "00205", "transactionId")
     {
-        MessageResult = messageResult;
     }
-
-    public MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> MessageResult { get; }
 }

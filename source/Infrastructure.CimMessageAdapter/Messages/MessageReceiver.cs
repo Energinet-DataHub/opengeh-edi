@@ -17,7 +17,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Transactions;
 using Application.IncomingMessages;
+using CimMessageAdapter.Messages.Exceptions;
 using CimMessageAdapter.Messages.Queues;
 using CimMessageAdapter.ValidationErrors;
 using MessageHeader = Application.IncomingMessages.MessageHeader;
@@ -28,6 +30,7 @@ namespace CimMessageAdapter.Messages
         where TQueue : Queue
     {
         private const int MessageIdLength = 36;
+        private const int TransactionIdLength = 36;
         private readonly List<ValidationError> _errors = new();
         private readonly IMessageIds _messageIds;
         private readonly IMessageQueueDispatcher<TQueue> _messageQueueDispatcher;
@@ -74,8 +77,6 @@ namespace CimMessageAdapter.Messages
 
             ArgumentNullException.ThrowIfNull(marketDocument);
 
-            MessageIdIsEmpty(messageHeader.MessageId);
-
             var authorizeSenderTask = AuthorizeSenderAsync(messageHeader);
             var verifyReceiverTask = VerifyReceiverAsync(messageHeader);
             var checkMessageIdTask = CheckMessageIdAsync(messageHeader.SenderId, messageHeader.MessageId, cancellationToken);
@@ -89,19 +90,21 @@ namespace CimMessageAdapter.Messages
                 checkMessageTypeTask,
                 checkProcessTypeTask).ConfigureAwait(false);
 
-            foreach (var transaction in marketDocument.ToTransactions())
+            var transactions = marketDocument.ToTransactions();
+            var transactionIdsToBeStored = new List<string>();
+            foreach (var transaction in transactions)
             {
-                if (string.IsNullOrEmpty(transaction.MarketActivityRecord.Id))
-                {
-                    _errors.Add(new EmptyTransactionId());
-                }
+                var transactionId = transaction.MarketActivityRecord.Id;
 
-                if (!await TryStoreTransactionIdAsync(messageHeader.SenderId, transaction.MarketActivityRecord.Id, cancellationToken).ConfigureAwait(false))
+                if (await CheckTransactionIdAsync(
+                        transactionId,
+                        messageHeader.SenderId,
+                        transactionIdsToBeStored,
+                        cancellationToken).ConfigureAwait(false))
                 {
-                    _errors.Add(new DuplicateTransactionIdDetected(transaction.MarketActivityRecord.Id));
+                    transactionIdsToBeStored.Add(transactionId);
+                    await AddToTransactionQueueAsync(transaction, cancellationToken).ConfigureAwait(false);
                 }
-
-                await AddToTransactionQueueAsync(transaction, cancellationToken).ConfigureAwait(false);
             }
 
             if (_errors.Count > 0)
@@ -109,16 +112,73 @@ namespace CimMessageAdapter.Messages
                 return Result.Failure(_errors.ToArray());
             }
 
-            await _messageQueueDispatcher.CommitAsync(cancellationToken).ConfigureAwait(false);
+            try
+            {
+                using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+                var senderId = messageHeader.SenderId;
+                await _transactionIds.StoreAsync(
+                    senderId,
+                    transactionIdsToBeStored,
+                    cancellationToken).ConfigureAwait(false);
+                await _messageIds.StoreAsync(senderId, messageHeader.MessageId, cancellationToken)
+                    .ConfigureAwait(false);
+                await _messageQueueDispatcher.CommitAsync(cancellationToken).ConfigureAwait(false);
+
+                scope.Complete();
+            }
+            catch (NotSuccessfulTransactionIdsStorageException)
+            {
+                _errors.Add(new DuplicateTransactionIdDetected());
+            }
+            catch (NotSuccessfulMessageIdStorageException e)
+            {
+                _errors.Add(new DuplicateMessageIdDetected(e.MessageId));
+            }
+
+            if (_errors.Count > 0)
+            {
+                return Result.Failure(_errors.ToArray());
+            }
+
             return Result.Succeeded();
         }
 
-        private async Task<bool> TryStoreTransactionIdAsync(string senderId, string transactionId, CancellationToken cancellationToken)
+        private async Task<bool> CheckTransactionIdAsync(string transactionId, string senderId, List<string> transactionIdsToBeStored, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrEmpty(transactionId))
+            {
+                _errors.Add(new EmptyTransactionId());
+                return false;
+            }
+
+            if (transactionId.Length != TransactionIdLength)
+            {
+                _errors.Add(new InvalidTransactionIdSize(transactionId));
+                return false;
+            }
+
+            if (await TransactionIdIsDuplicatedAsync(senderId, transactionId, cancellationToken).ConfigureAwait(false))
+            {
+                _errors.Add(new DuplicateTransactionIdDetected(transactionId));
+                return false;
+            }
+
+            if (transactionIdsToBeStored.Contains(transactionId))
+            {
+                _errors.Add(new DuplicateTransactionIdDetected(transactionId));
+                return false;
+            }
+
+            return true;
+        }
+
+        private async Task<bool> TransactionIdIsDuplicatedAsync(string senderId, string transactionId, CancellationToken cancellationToken)
         {
             if (transactionId == null) throw new ArgumentNullException(nameof(transactionId));
 
             return await _transactionIds
-                .TryStoreAsync(senderId, transactionId, cancellationToken).ConfigureAwait(false);
+                .TransactionIdExistsAsync(senderId, transactionId, cancellationToken).ConfigureAwait(false);
         }
 
         private Task AddToTransactionQueueAsync(IMarketTransaction transaction, CancellationToken cancellationToken)
@@ -126,27 +186,18 @@ namespace CimMessageAdapter.Messages
             return _messageQueueDispatcher.AddAsync(transaction, cancellationToken);
         }
 
-        private bool MessageIdIsEmpty(string messageId)
+        private async Task CheckMessageIdAsync(string senderId, string messageId, CancellationToken cancellationToken)
         {
-            if (messageId == null) throw new ArgumentNullException(nameof(messageId));
             if (string.IsNullOrEmpty(messageId))
             {
                 _errors.Add(new EmptyMessageId());
-                return true;
             }
 
-            return false;
-        }
-
-        private async Task CheckMessageIdAsync(string senderId, string messageId, CancellationToken cancellationToken)
-        {
-            if (messageId == null) throw new ArgumentNullException(nameof(messageId));
             if (messageId.Length != MessageIdLength)
             {
                 _errors.Add(new InvalidMessageIdSize(messageId));
             }
-
-            if (!await _messageIds.TryStoreAsync(senderId, messageId, cancellationToken).ConfigureAwait(false))
+            else if (await _messageIds.MessageIdExistsAsync(senderId, messageId, cancellationToken).ConfigureAwait(false))
             {
                 _errors.Add(new DuplicateMessageIdDetected(messageId));
             }

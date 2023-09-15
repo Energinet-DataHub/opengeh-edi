@@ -19,13 +19,13 @@ limitations under the License.
     <cim:type>E74</cim:type>
     <cim:process.processType>D05</cim:process.processType>
     <cim:businessSector.type>23</cim:businessSector.type>
-    <cim:sender_MarketParticipant.mRID codingScheme="A10">5799999933318</cim:sender_MarketParticipant.mRID>
-    <cim:sender_MarketParticipant.marketRole.type>DDK</cim:sender_MarketParticipant.marketRole.type>
+    <cim:sender_MarketParticipant.mRID codingScheme="A10">1234567890123</cim:sender_MarketParticipant.mRID>
+    <cim:sender_MarketParticipant.marketRole.type>DDQ</cim:sender_MarketParticipant.marketRole.type>
     <cim:receiver_MarketParticipant.mRID codingScheme="A10">5790001330552</cim:receiver_MarketParticipant.mRID>
     <cim:receiver_MarketParticipant.marketRole.type>DGL</cim:receiver_MarketParticipant.marketRole.type>
     <cim:createdDateTime>2022-12-17T09:30:47Z</cim:createdDateTime>
     <cim:Series>
-        <cim:mRID>123353185</cim:mRID>
+        <cim:mRID>123564789123564789123564789123564789</cim:mRID>
         <cim:settlement_Series.version>D01</cim:settlement_Series.version>
         <cim:marketEvaluationPoint.type>E17</cim:marketEvaluationPoint.type>
         <cim:marketEvaluationPoint.settlementMethod>D01</cim:marketEvaluationPoint.settlementMethod>
