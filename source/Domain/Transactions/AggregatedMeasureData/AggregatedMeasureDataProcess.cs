@@ -135,25 +135,25 @@ namespace Domain.Transactions.AggregatedMeasureData
             }
         }
 
-        public void IsRejected(RejectedRequest rejectRequest)
+        public void IsRejected(RejectedAggregatedMeasureDataRequest rejectAggregatedMeasureDataRequest)
         {
-            if (rejectRequest == null) throw new ArgumentNullException(nameof(rejectRequest));
+            if (rejectAggregatedMeasureDataRequest == null) throw new ArgumentNullException(nameof(rejectAggregatedMeasureDataRequest));
 
             if (_state == State.Sent)
             {
-                _messages.Add(CreateRejectedAggregationResultMessage(rejectRequest));
+                _messages.Add(CreateRejectedAggregationResultMessage(rejectAggregatedMeasureDataRequest));
 
                 _state = State.Rejected;
             }
         }
 
         private RejectedAggregationResultMessage CreateRejectedAggregationResultMessage(
-            RejectedRequest rejectedRequest)
+            RejectedAggregatedMeasureDataRequest rejectedAggregatedMeasureDataRequest)
         {
             var transactionId = TransactionId.Create(ProcessId.Id);
             var rejectedTimeSerie = new RejectedTimeSerie(
                 ProcessId.Id,
-                rejectedRequest.RejectReasons.Select(reason =>
+                rejectedAggregatedMeasureDataRequest.RejectReasons.Select(reason =>
                         new Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData.RejectReason(
                             reason.ErrorCode,
                             reason.ErrorMessage))
@@ -163,7 +163,7 @@ namespace Domain.Transactions.AggregatedMeasureData
             return new RejectedAggregationResultMessage(
                 RequestedByActorId,
                 transactionId,
-                rejectedRequest.BusinessReason.Name,
+                rejectedAggregatedMeasureDataRequest.BusinessReason.Name,
                 MarketRole.FromCode(RequestedByActorRoleCode),
                 rejectedTimeSerie);
         }

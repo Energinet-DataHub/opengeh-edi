@@ -14,7 +14,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Energinet.DataHub.Wholesale.Contracts.Events;
+using Infrastructure.Transactions.Aggregations;
 using Xunit;
 
 namespace Tests.Domain.Transactions.Aggregations;
@@ -65,15 +67,16 @@ public class CalculationResultCompletedEventMapperTests
     [MemberData(nameof(ProcessTypes))]
     public void Ensure_handling_all_process_types(ProcessType processType)
     {
+        var method = GetMethod("MapProcessTypeFromCalculationResult");
+
         // Act
         if (processType != ProcessType.Unspecified)
         {
-            CalculationResultCompletedEventMapperSpy.MapProcessTypeSpy(processType);
+            method.Invoke(obj: null, parameters: new object[] { processType });
         }
         else
         {
-            Assert.Throws<InvalidOperationException>(() =>
-                CalculationResultCompletedEventMapperSpy.MapProcessTypeSpy(processType));
+            AssertExpectedUnhandledMapping(processType, method);
         }
     }
 
@@ -81,15 +84,16 @@ public class CalculationResultCompletedEventMapperTests
     [MemberData(nameof(Resolutions))]
     public void Ensure_handling_all_resolutions(Resolution resolution)
     {
+        var method = GetMethod("MapResolutionFromCalculationResult");
+
         // Act
         if (resolution != Resolution.Unspecified)
         {
-            CalculationResultCompletedEventMapperSpy.MapResolutionSpy(resolution);
+            method.Invoke(obj: null, parameters: new object[] { resolution });
         }
         else
         {
-            Assert.Throws<InvalidOperationException>(() =>
-                CalculationResultCompletedEventMapperSpy.MapResolutionSpy(resolution));
+            AssertExpectedUnhandledMapping(resolution, method);
         }
     }
 
@@ -97,15 +101,16 @@ public class CalculationResultCompletedEventMapperTests
     [MemberData(nameof(QuantityQualities))]
     public void Ensure_handling_all_quantity_qualities(QuantityQuality quantityQuality)
     {
+        var method = GetMethod("MapQualityFromCalculationResult");
+
         // Act
         if (quantityQuality != QuantityQuality.Unspecified)
         {
-            CalculationResultCompletedEventMapperSpy.MapQuantityQualitySpy(quantityQuality);
+            method.Invoke(obj: null, parameters: new object[] { quantityQuality });
         }
         else
         {
-            Assert.Throws<InvalidOperationException>(() =>
-                CalculationResultCompletedEventMapperSpy.MapQuantityQualitySpy(quantityQuality));
+            AssertExpectedUnhandledMapping(quantityQuality, method);
         }
     }
 
@@ -113,15 +118,16 @@ public class CalculationResultCompletedEventMapperTests
     [MemberData(nameof(QuantityUnits))]
     public void Ensure_handling_all_quantity_units(QuantityUnit quantityUnit)
     {
+        var method = GetMethod("MapQuantityUnitFromCalculationResult");
+
         // Act
         if (quantityUnit != QuantityUnit.Unspecified)
         {
-            CalculationResultCompletedEventMapperSpy.MapQuantityUnitSpy(quantityUnit);
+            method.Invoke(obj: null, parameters: new object[] { quantityUnit });
         }
         else
         {
-            Assert.Throws<InvalidOperationException>(() =>
-                CalculationResultCompletedEventMapperSpy.MapQuantityUnitSpy(quantityUnit));
+            AssertExpectedUnhandledMapping(quantityUnit, method);
         }
     }
 
@@ -129,15 +135,16 @@ public class CalculationResultCompletedEventMapperTests
     [MemberData(nameof(TimeSeriesTypes))]
     public void Ensure_handling_all_timeSeries_types(TimeSeriesType timeSeriesType)
     {
+        var method = GetMethod("MapMeteringPointTypeFromCalculationResult");
+
         // Act
         if (IsUnsupportedTimeSeriesType(timeSeriesType))
         {
-            Assert.Throws<InvalidOperationException>(() =>
-                CalculationResultCompletedEventMapperSpy.MapTimeSeriesTypeSpy(timeSeriesType));
+            AssertExpectedUnhandledMapping(timeSeriesType, method);
         }
         else
         {
-            CalculationResultCompletedEventMapperSpy.MapTimeSeriesTypeSpy(timeSeriesType);
+            method.Invoke(obj: null, parameters: new object[] { timeSeriesType });
         }
     }
 
@@ -149,5 +156,28 @@ public class CalculationResultCompletedEventMapperTests
             or TimeSeriesType.PositiveGridLoss
             or TimeSeriesType.TempFlexConsumption
             or TimeSeriesType.Unspecified;
+    }
+
+    private static MethodInfo GetMethod(string name)
+    {
+        var method = typeof(AggregationFactory).GetMethod(
+            name,
+            BindingFlags.Static | BindingFlags.NonPublic)!;
+        return method;
+    }
+
+    private static void AssertExpectedUnhandledMapping(object processType, MethodInfo method)
+    {
+        Assert.Throws<InvalidOperationException>(() =>
+        {
+            try
+            {
+                return method.Invoke(obj: null, parameters: new[] { processType });
+            }
+            catch (Exception e)
+            {
+                throw e.InnerException!;
+            }
+        });
     }
 }

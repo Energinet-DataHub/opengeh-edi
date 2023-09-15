@@ -39,7 +39,7 @@ public class RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable : IRequest
         var process = await _aggregatedMeasureDataProcessRepository
             .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
-        process.IsRejected(new RejectedRequest(request.RejectReasons, CimCode.To(process.BusinessReason)));
+        process.IsRejected(new RejectedAggregatedMeasureDataRequest(request.RejectReasons, CimCode.To(process.BusinessReason)));
 
         return Unit.Value;
     }

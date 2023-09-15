@@ -149,13 +149,13 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         };
     }
 
-    private static RejectedRequest CreateRejectRequest()
+    private static RejectedAggregatedMeasureDataRequest CreateRejectRequest()
     {
         var rejectReasons = new List<RejectReason>()
         {
             new("E86", "Invalid request"),
         };
-        return new RejectedRequest(rejectReasons, BusinessReason.BalanceFixing);
+        return new RejectedAggregatedMeasureDataRequest(rejectReasons, BusinessReason.BalanceFixing);
     }
 
     private static void AssertProcessState(AggregatedMeasureDataProcess process, AggregatedMeasureDataProcess.State state)

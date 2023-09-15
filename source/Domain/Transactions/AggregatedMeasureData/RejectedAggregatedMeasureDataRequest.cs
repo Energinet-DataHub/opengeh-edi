@@ -16,4 +16,4 @@ using Domain.OutgoingMessages;
 
 namespace Domain.Transactions.AggregatedMeasureData;
 
-public record RejectedRequest(IReadOnlyCollection<RejectReason> RejectReasons, BusinessReason BusinessReason);
+public record RejectedAggregatedMeasureDataRequest(IReadOnlyCollection<RejectReason> RejectReasons, BusinessReason BusinessReason);

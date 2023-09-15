@@ -25,7 +25,6 @@ internal static class AggregationsConfiguration
     {
         services.AddTransient(typeof(INotificationHandler<AggregationResultAvailable>), typeof(WhenAnAggregationResultIsAvailable));
         services.AddScoped<IAggregationResultForwardingRepository, AggregationResultForwardingRepository>();
-        services.AddSingleton<IGridAreaLookup, GridAreaLookup>();
         services.AddTransient<IRequestHandler<ForwardAggregationResult, Unit>, ForwardAggregationResultHandler>();
     }
 }
