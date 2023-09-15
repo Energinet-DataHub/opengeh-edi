@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Domain.Transactions.Exceptions;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Infrastructure.Transactions.Aggregations;
 using Xunit;
@@ -76,7 +77,7 @@ public class CalculationResultCompletedEventMapperTests
         }
         else
         {
-            AssertExpectedUnhandledMapping(processType, method);
+            AssertException<InvalidOperationException>(processType, method);
         }
     }
 
@@ -93,7 +94,7 @@ public class CalculationResultCompletedEventMapperTests
         }
         else
         {
-            AssertExpectedUnhandledMapping(resolution, method);
+            AssertException<InvalidOperationException>(resolution, method);
         }
     }
 
@@ -110,7 +111,7 @@ public class CalculationResultCompletedEventMapperTests
         }
         else
         {
-            AssertExpectedUnhandledMapping(quantityQuality, method);
+            AssertException<InvalidOperationException>(quantityQuality, method);
         }
     }
 
@@ -127,7 +128,7 @@ public class CalculationResultCompletedEventMapperTests
         }
         else
         {
-            AssertExpectedUnhandledMapping(quantityUnit, method);
+            AssertException<InvalidOperationException>(quantityUnit, method);
         }
     }
 
@@ -138,9 +139,13 @@ public class CalculationResultCompletedEventMapperTests
         var method = GetMethod("MapMeteringPointTypeFromCalculationResult");
 
         // Act
-        if (IsUnsupportedTimeSeriesType(timeSeriesType))
+        if (IsNotSupportedTimeSeriesType(timeSeriesType))
         {
-            AssertExpectedUnhandledMapping(timeSeriesType, method);
+            AssertException<NotSupportedTimeSeriesTypeException>(timeSeriesType, method);
+        }
+        else if (timeSeriesType is TimeSeriesType.Unspecified)
+        {
+            AssertException<InvalidOperationException>(timeSeriesType, method);
         }
         else
         {
@@ -148,14 +153,13 @@ public class CalculationResultCompletedEventMapperTests
         }
     }
 
-    private static bool IsUnsupportedTimeSeriesType(TimeSeriesType timeSeriesType)
+    private static bool IsNotSupportedTimeSeriesType(TimeSeriesType timeSeriesType)
     {
         return timeSeriesType is TimeSeriesType.GridLoss
             or TimeSeriesType.TempProduction
             or TimeSeriesType.NegativeGridLoss
             or TimeSeriesType.PositiveGridLoss
-            or TimeSeriesType.TempFlexConsumption
-            or TimeSeriesType.Unspecified;
+            or TimeSeriesType.TempFlexConsumption;
     }
 
     private static MethodInfo GetMethod(string name)
@@ -166,9 +170,10 @@ public class CalculationResultCompletedEventMapperTests
         return method;
     }
 
-    private static void AssertExpectedUnhandledMapping(object processType, MethodInfo method)
+    private static void AssertException<T>(object processType, MethodInfo method)
+        where T : Exception
     {
-        Assert.Throws<InvalidOperationException>(() =>
+        Assert.Throws<T>(() =>
         {
             try
             {

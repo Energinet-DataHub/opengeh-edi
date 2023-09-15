@@ -19,6 +19,7 @@ using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.Transactions.AggregatedMeasureData;
 using Domain.Transactions.Aggregations;
+using Domain.Transactions.Exceptions;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.Collections;
 using Infrastructure.OutgoingMessages.Common;
@@ -189,11 +190,11 @@ public static class AggregationFactory
             TimeSeriesType.NetExchangePerGa => MeteringPointType.Exchange.Name,
             TimeSeriesType.NetExchangePerNeighboringGa => MeteringPointType.Exchange.Name,
             TimeSeriesType.TotalConsumption => MeteringPointType.Consumption.Name,
-            TimeSeriesType.GridLoss => throw new InvalidOperationException("GridLoss is not a supported TimeSeriesType"),
-            TimeSeriesType.TempProduction => throw new InvalidOperationException("TempProduction is not a supported TimeSeriesType"),
-            TimeSeriesType.NegativeGridLoss => throw new InvalidOperationException("NegativeGridLoss is not a supported TimeSeriesType"),
-            TimeSeriesType.PositiveGridLoss => throw new InvalidOperationException("PositiveGridLoss is not a supported TimeSeriesType"),
-            TimeSeriesType.TempFlexConsumption => throw new InvalidOperationException("TempFlexConsumption is not a supported TimeSeriesType"),
+            TimeSeriesType.GridLoss => throw new NotSupportedTimeSeriesTypeException("GridLoss is not a supported TimeSeriesType"),
+            TimeSeriesType.TempProduction => throw new NotSupportedTimeSeriesTypeException("TempProduction is not a supported TimeSeriesType"),
+            TimeSeriesType.NegativeGridLoss => throw new NotSupportedTimeSeriesTypeException("NegativeGridLoss is not a supported TimeSeriesType"),
+            TimeSeriesType.PositiveGridLoss => throw new NotSupportedTimeSeriesTypeException("PositiveGridLoss is not a supported TimeSeriesType"),
+            TimeSeriesType.TempFlexConsumption => throw new NotSupportedTimeSeriesTypeException("TempFlexConsumption is not a supported TimeSeriesType"),
             TimeSeriesType.Unspecified => throw new InvalidOperationException("Unknown metering point type"),
             _ => throw new InvalidOperationException("Could not determine metering point type"),
         };
