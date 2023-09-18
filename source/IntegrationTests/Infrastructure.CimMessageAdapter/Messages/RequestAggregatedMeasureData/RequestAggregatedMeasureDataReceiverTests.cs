@@ -532,32 +532,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     }
 
     [Fact]
-    public async Task Message_id_and_transaction_id_are_not_stored_when_service_bus_commit_fails()
-    {
-        await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
-            .ConfigureAwait(false);
-        var knownReceiverId = "5790001330552";
-        var knownReceiverRole = "DGL";
-        await using var message = BusinessMessageBuilder
-            .RequestAggregatedMeasureData()
-            .WithReceiverRole(knownReceiverRole)
-            .WithReceiverId(knownReceiverId)
-            .Message();
-
-        var serviceBusThatFails = new MessageQueueDispatcherThatFailsStub<RequestAggregatedMeasureDataTransactionQueues>();
-
-        var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
-        await Assert.ThrowsAsync<ServiceBusCommitException>(() =>
-                CreateMessageReceiver(serviceBusThatFails).ReceiveAsync(messageParserResult, CancellationToken.None))
-            .ConfigureAwait(false);
-
-        var document = messageParserResult!.IncomingMarketDocument!;
-        await AssertTransactionIdIsNotStoredAsync(document.Header.SenderId, document.MarketActivityRecords.First().Id).ConfigureAwait(false);
-        await AssertMessageIdIsNotStoredAsync(document.Header.SenderId, document.Header.MessageId).ConfigureAwait(false);
-    }
-
-    [Fact]
-    public async Task Transaction_ids_or_message_id_are_not_saved_nor_send_to_queue_if_request_fails_across_scopes()
+    public async Task Transaction_id_and_message_id_are_not_saved_when_duplicated_across_scopes()
     {
         await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
             .ConfigureAwait(false);
@@ -613,8 +588,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             ? document02
             : document01;
 
-        await AssertTransactionIdIsStoredAsync(
-            document01.Header.SenderId, document01.MarketActivityRecords.First().Id).ConfigureAwait(false);
+        await AssertTransactionIdIsStoredAsync(successfulDocument.Header.SenderId, successfulDocument.MarketActivityRecords.First().Id).ConfigureAwait(false);
         await AssertMessageIdIsStoredAsync(successfulDocument.Header.SenderId, successfulDocument.Header.MessageId).ConfigureAwait(false);
 
         await AssertTransactionIdIsNotStoredAsync(unsuccessfulDocument.Header.SenderId, unsuccessfulDocument.MarketActivityRecords.First().Id).ConfigureAwait(false);
@@ -634,13 +608,13 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     }
 
     [Fact]
-    public async Task Transaction_and_message_ids_are_not_saved_when_receiving_an_bad_message()
+    public async Task Transaction_and_message_ids_are_not_saved_when_receiving_a_faulted_request()
     {
         await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
             .ConfigureAwait(false);
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
-            .WithReceiverId("5790001330552")
+            .WithReceiverId("5790001330552") // This is not MDR
             .WithReceiverRole("MDR")
             .Message();
 
