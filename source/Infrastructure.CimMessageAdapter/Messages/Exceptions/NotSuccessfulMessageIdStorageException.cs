@@ -12,18 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.Configuration.Commands.Commands;
-using Application.IncomingMessages.RequestAggregatedMeasureData;
-using CimMessageAdapter.Messages;
+using System;
 
-namespace Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
+namespace CimMessageAdapter.Messages.Exceptions;
 
-public class ReceiveAggregatedMeasureDataRequest : ICommand<Result>
+public class NotSuccessfulMessageIdStorageException : Exception
 {
-    public ReceiveAggregatedMeasureDataRequest(MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> messageResult)
+    public NotSuccessfulMessageIdStorageException(string message)
+        : base(message)
     {
-        MessageResult = messageResult;
+        MessageId = message;
     }
 
-    public MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> MessageResult { get; }
+    public NotSuccessfulMessageIdStorageException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+
+    public NotSuccessfulMessageIdStorageException()
+    {
+    }
+
+    public string MessageId { get; set; } = string.Empty;
 }
