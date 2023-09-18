@@ -30,10 +30,10 @@ public class WhenRequestIsReceivedTests : TestBase
     [Fact]
     public async Task Update_customer_master_data_transaction_is_started()
     {
-        var command = new UpdateCustomerMasterData(SampleData.MarketEvaluationPointNumber, SampleData.EffectiveDate, SampleData.TransactionId);
+        var command = new UpdateCustomerMasterData(SampleData.MarketEvaluationPointNumber, SampleData.EffectiveDate, SampleData.ProcessId);
 
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
-        await AssertTransaction.TransactionAsync(SampleData.TransactionId.ToString(), GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+        await AssertTransaction.TransactionAsync(SampleData.ProcessId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
     }
 }

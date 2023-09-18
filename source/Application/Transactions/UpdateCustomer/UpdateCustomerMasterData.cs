@@ -15,6 +15,7 @@
 using System;
 using System.Text.Json.Serialization;
 using Application.Configuration.Commands.Commands;
+using Domain.Transactions;
 using NodaTime;
 
 namespace Application.Transactions.UpdateCustomer;
@@ -22,16 +23,16 @@ namespace Application.Transactions.UpdateCustomer;
 public class UpdateCustomerMasterData : InternalCommand
 {
     [JsonConstructor]
-    public UpdateCustomerMasterData(string marketEvaluationPointNumber, Instant effectiveDate, Guid transactionId)
+    public UpdateCustomerMasterData(string marketEvaluationPointNumber, Instant effectiveDate, ProcessId processId)
     {
         MarketEvaluationPointNumber = marketEvaluationPointNumber;
         EffectiveDate = effectiveDate;
-        TransactionId = transactionId;
+        ProcessId = processId;
     }
 
     public string MarketEvaluationPointNumber { get; }
 
     public Instant EffectiveDate { get; }
 
-    public Guid TransactionId { get; }
+    public ProcessId ProcessId { get; }
 }

@@ -66,7 +66,7 @@ public class ForwardRejectedAggregationResultHandler : IRequestHandler<ForwardRe
         AggregatedMeasureDataProcess process,
         IReadOnlyList<RejectReason> rejectedReasons)
     {
-        var transactionId = TransactionId.Create(process.ProcessId.Id);
+        var transactionId = ProcessId.Create(process.ProcessId.Id);
         var rejectedTimeSerie = new RejectedTimeSerie(
                 transactionId.Id,
                 rejectedReasons.Select(reason =>

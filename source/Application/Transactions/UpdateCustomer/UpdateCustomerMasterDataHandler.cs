@@ -34,7 +34,7 @@ public class UpdateCustomerMasterDataHandler : IRequestHandler<UpdateCustomerMas
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var transaction = new UpdateCustomerMasterDataTransaction(TransactionId.Create(request.TransactionId));
+        var transaction = new UpdateCustomerMasterDataTransaction(request.ProcessId);
         _transactionRepository.Add(transaction);
         return Task.FromResult<Unit>(Unit.Value);
     }

@@ -35,16 +35,16 @@ namespace Infrastructure.Transactions
         public void Configure(EntityTypeBuilder<MoveInTransaction> builder)
         {
             builder.ToTable("MoveInTransactions", "dbo");
-            builder.HasKey(x => x.TransactionId);
-            builder.Property(entity => entity.TransactionId)
+            builder.HasKey(x => x.ProcessId);
+            builder.Property(entity => entity.ProcessId)
                 .HasConversion(
                     toDbValue => toDbValue.Id,
-                    fromDbValue => TransactionId.Create(fromDbValue));
+                    fromDbValue => ProcessId.Create(fromDbValue));
             builder.Property(entity => entity.ActorProvidedId)
                 .HasConversion(
                     toDbValue => toDbValue.Id,
                     fromDbValue => ActorProvidedId.Create(fromDbValue));
-            builder.Property(x => x.ProcessId);
+            builder.Property(x => x.BusinessProcessId);
             builder.Property(x => x.EffectiveDate);
             builder.Property(x => x.MarketEvaluationPointId);
             builder.Property(x => x.CurrentEnergySupplierId);
@@ -92,7 +92,7 @@ namespace Infrastructure.Transactions
 
             builder.HasMany<OutgoingMessage>("_messages")
                 .WithOne()
-                .HasForeignKey("TransactionId");
+                .HasForeignKey("ProcessId");
 
             builder.Ignore(x => x.DomainEvents);
         }

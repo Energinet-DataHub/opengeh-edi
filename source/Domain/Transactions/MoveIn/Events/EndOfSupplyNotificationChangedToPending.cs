@@ -19,15 +19,15 @@ namespace Domain.Transactions.MoveIn.Events;
 
 public class EndOfSupplyNotificationChangedToPending : DomainEvent
 {
-    public EndOfSupplyNotificationChangedToPending(Guid transactionId, Instant effectiveDate, string marketEvaluationPointId, string energySupplierId)
+    public EndOfSupplyNotificationChangedToPending(ProcessId processId, Instant effectiveDate, string marketEvaluationPointId, string energySupplierId)
     {
-        TransactionId = transactionId;
+        ProcessId = processId;
         EffectiveDate = effectiveDate;
         MarketEvaluationPointId = marketEvaluationPointId;
         EnergySupplierId = energySupplierId;
     }
 
-    public Guid TransactionId { get; }
+    public ProcessId ProcessId { get; }
 
     public Instant EffectiveDate { get; }
 

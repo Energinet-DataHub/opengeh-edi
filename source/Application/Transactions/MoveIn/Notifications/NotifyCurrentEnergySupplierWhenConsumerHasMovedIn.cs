@@ -35,7 +35,7 @@ public class NotifyCurrentEnergySupplierWhenConsumerHasMovedIn : INotificationHa
         if (notification == null) throw new ArgumentNullException(nameof(notification));
         return _commandScheduler.EnqueueAsync(
             new NotifyCurrentEnergySupplier(
-                notification.TransactionId,
+                notification.ProcessId,
                 notification.EffectiveDate,
                 notification.MarketEvaluationPointId,
                 notification.EnergySupplierId));

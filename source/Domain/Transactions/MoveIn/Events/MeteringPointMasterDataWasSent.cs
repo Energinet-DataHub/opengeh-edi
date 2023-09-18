@@ -18,10 +18,10 @@ namespace Domain.Transactions.MoveIn.Events;
 
 public class MeteringPointMasterDataWasSent : DomainEvent
 {
-    public MeteringPointMasterDataWasSent(Guid transactionId)
+    public MeteringPointMasterDataWasSent(ProcessId processId)
     {
-        TransactionId = transactionId;
+        ProcessId = processId;
     }
 
-    public Guid TransactionId { get; }
+    public ProcessId ProcessId { get; }
 }

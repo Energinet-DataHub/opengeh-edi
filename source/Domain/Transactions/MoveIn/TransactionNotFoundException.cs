@@ -32,9 +32,9 @@ public class TransactionNotFoundException : Exception
     {
     }
 
-    public static TransactionNotFoundException TransactionIdNotFound(Guid transactionId)
+    public static TransactionNotFoundException ProcessIdNotFound(string processId)
     {
-        return new TransactionNotFoundException($"Move in transaction {transactionId} was not found");
+        return new TransactionNotFoundException($"Move in transaction {processId} was not found");
     }
 
     public static TransactionNotFoundException TransactionForProcessIdNotFound(string processId)

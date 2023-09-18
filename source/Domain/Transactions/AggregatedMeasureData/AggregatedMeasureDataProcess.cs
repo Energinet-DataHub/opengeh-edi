@@ -127,8 +127,7 @@ namespace Domain.Transactions.AggregatedMeasureData
             {
                 foreach (var aggregation in aggregations)
                 {
-                    var aggregationResultForwarding = new AggregationResultForwarding(TransactionId.Create(ProcessId.Id));
-                    _messages.Add(aggregationResultForwarding.CreateMessage(aggregation));
+                    _messages.Add(AggregationResultMessageFactory.CreateMessage(aggregation, ProcessId));
                 }
 
                 _state = State.Accepted;
@@ -150,7 +149,6 @@ namespace Domain.Transactions.AggregatedMeasureData
         private RejectedAggregationResultMessage CreateRejectedAggregationResultMessage(
             RejectedAggregatedMeasureDataRequest rejectedAggregatedMeasureDataRequest)
         {
-            var transactionId = TransactionId.Create(ProcessId.Id);
             var rejectedTimeSerie = new RejectedTimeSerie(
                 ProcessId.Id,
                 rejectedAggregatedMeasureDataRequest.RejectReasons.Select(reason =>
@@ -162,7 +160,7 @@ namespace Domain.Transactions.AggregatedMeasureData
 
             return new RejectedAggregationResultMessage(
                 RequestedByActorId,
-                transactionId,
+                ProcessId,
                 rejectedAggregatedMeasureDataRequest.BusinessReason.Name,
                 MarketRole.FromCode(RequestedByActorRoleCode),
                 rejectedTimeSerie);

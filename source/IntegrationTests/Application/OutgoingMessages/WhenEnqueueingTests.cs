@@ -102,7 +102,7 @@ public class WhenEnqueueingTests : TestBase
         var message = AggregationResultMessage.Create(
             ActorNumber.Create("1234567891912"),
             MarketRole.MeteringDataAdministrator,
-            TransactionId.Create(Guid.NewGuid()),
+            ProcessId.Create(Guid.NewGuid()),
             new Aggregation(
                 points,
                 MeteringPointType.Consumption.Name,

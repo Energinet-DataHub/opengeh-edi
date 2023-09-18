@@ -42,7 +42,7 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
     public Task InitializeAsync()
     {
         return Scenario.Details(
-                SampleData.TransactionId,
+                SampleData.ProcessId,
                 SampleData.MarketEvaluationPointId,
                 SampleData.SupplyStart,
                 SampleData.CurrentEnergySupplierNumber,
@@ -121,7 +121,7 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
             SampleData.HasEnergySupplier,
             SampleData.SupplyStart,
             Array.Empty<UsagePointLocation>());
-        return new SetCurrentKnownCustomerMasterData(SampleData.TransactionId, customerMasterData);
+        return new SetCurrentKnownCustomerMasterData(SampleData.ProcessId, customerMasterData);
     }
 
     private static CustomerMasterData ParseFrom(CustomerMasterDataContent data)
@@ -142,7 +142,7 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
     private async Task<AssertOutgoingMessage> AssertOutgoingMessageAsync()
     {
         var assertMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
-            SampleData.TransactionId,
+            SampleData.ProcessId.Id,
             DocumentType.CharacteristicsOfACustomerAtAnAP.Name,
             BusinessReason.MoveIn.Name,
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
