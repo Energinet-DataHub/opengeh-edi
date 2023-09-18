@@ -12,27 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+using Domain.OutgoingMessages;
 
-namespace Domain.Transactions;
+namespace Domain.Transactions.AggregatedMeasureData;
 
-//TODO: This is going to be removed. We should use ProcessId instead for this.
-public class TransactionId : ValueObject
-{
-    private TransactionId(Guid id)
-    {
-        Id = id;
-    }
-
-    public Guid Id { get; }
-
-    public static TransactionId Create(Guid transactionId)
-    {
-        return new TransactionId(transactionId);
-    }
-
-    public static TransactionId New()
-    {
-        return new TransactionId(Guid.NewGuid());
-    }
-}
+public record RejectedAggregatedMeasureDataRequest(IReadOnlyCollection<RejectReason> RejectReasons, BusinessReason BusinessReason);

@@ -18,13 +18,13 @@ namespace Domain.Transactions.MoveIn.Events;
 
 public class MoveInWasStarted : DomainEvent
 {
-    public MoveInWasStarted(Guid transactionId, MoveInTransaction.NotificationState endOfSupplyNotificationState)
+    public MoveInWasStarted(ProcessId processId, MoveInTransaction.NotificationState endOfSupplyNotificationState)
     {
-        TransactionId = transactionId;
+        ProcessId = processId;
         EndOfSupplyNotificationState = endOfSupplyNotificationState;
     }
 
-    public Guid TransactionId { get; }
+    public ProcessId ProcessId { get; }
 
     public MoveInTransaction.NotificationState EndOfSupplyNotificationState { get; }
 }

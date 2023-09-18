@@ -35,30 +35,30 @@ public class AssertOutgoingMessage
         _message = message;
     }
 
-    public static async Task<AssertOutgoingMessage> OutgoingMessageAsync(Guid transactionId, string documentType, string businessReason, IDatabaseConnectionFactory connectionFactoryFactory)
+    public static async Task<AssertOutgoingMessage> OutgoingMessageAsync(Guid processId, string documentType, string businessReason, IDatabaseConnectionFactory connectionFactoryFactory)
     {
         if (connectionFactoryFactory == null) throw new ArgumentNullException(nameof(connectionFactoryFactory));
         using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var message = connection.QuerySingle(
-            $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.TransactionId, m.BusinessReason," +
+            $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.ProcessId, m.BusinessReason," +
             $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
             $" FROM [dbo].[OutgoingMessages] m" +
-            $" WHERE m.TransactionId = '{transactionId}' AND m.DocumentType = '{documentType}' AND m.BusinessReason = '{businessReason}'");
+            $" WHERE m.ProcessId = '{processId}' AND m.DocumentType = '{documentType}' AND m.BusinessReason = '{businessReason}'");
 
         Assert.NotNull(message);
         return new AssertOutgoingMessage(message);
     }
 
-    public static async Task<AssertOutgoingMessage> OutgoingMessageAsync(Guid transactionId, string documentType, string businessReason, MarketRole receiverRole, IDatabaseConnectionFactory connectionFactoryFactory)
+    public static async Task<AssertOutgoingMessage> OutgoingMessageAsync(Guid processId, string documentType, string businessReason, MarketRole receiverRole, IDatabaseConnectionFactory connectionFactoryFactory)
     {
         if (connectionFactoryFactory == null) throw new ArgumentNullException(nameof(connectionFactoryFactory));
         ArgumentNullException.ThrowIfNull(receiverRole);
         using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var message = connection.QuerySingle(
-            $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.TransactionId, m.BusinessReason," +
+            $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.ProcessId, m.BusinessReason," +
             $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
             $" FROM [dbo].[OutgoingMessages] m" +
-            $" WHERE m.TransactionId = '{transactionId}' AND m.DocumentType = '{documentType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Name}'");
+            $" WHERE m.ProcessId = '{processId}' AND m.DocumentType = '{documentType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Name}'");
 
         Assert.NotNull(message);
         return new AssertOutgoingMessage(message);
@@ -70,7 +70,7 @@ public class AssertOutgoingMessage
         ArgumentNullException.ThrowIfNull(receiverRole);
         using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var message = connection.QuerySingle(
-            $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.TransactionId, m.BusinessReason," +
+            $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.ProcessId, m.BusinessReason," +
             $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
             $" FROM [dbo].[OutgoingMessages] m" +
             $" WHERE m.DocumentType = '{messageType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Name}'");

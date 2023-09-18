@@ -46,11 +46,8 @@ public class SendCustomerMasterDataToGridOperatorHandler : IRequestHandler<SendC
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var transaction = _transactionRepository.GetById(TransactionId.Create(request.TransactionId));
-        if (transaction is null)
-        {
-            throw TransactionNotFoundException.TransactionIdNotFound(request.TransactionId);
-        }
+        var transaction = _transactionRepository.GetById(request.ProcessId)
+                          ?? throw TransactionNotFoundException.ProcessIdNotFound(request.ProcessId.Id.ToString());
 
         var gridOperatorNumber =
             await GetGridOperatorNumberAsync(transaction.MarketEvaluationPointId, cancellationToken)

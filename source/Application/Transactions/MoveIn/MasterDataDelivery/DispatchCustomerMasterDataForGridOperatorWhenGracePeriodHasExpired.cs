@@ -20,6 +20,7 @@ using Application.Configuration.Commands;
 using Application.Configuration.DataAccess;
 using Application.Configuration.TimeEvents;
 using Dapper;
+using Domain.Transactions;
 using Domain.Transactions.MoveIn;
 using MediatR;
 using NodaTime;
@@ -46,12 +47,12 @@ public class DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired 
     {
         ArgumentNullException.ThrowIfNull(notification);
 
-        var transactionIds = await TransactionsWhereCustomerMasterDataDispatchIsPendingAsync(notification.Now, cancellationToken)
+        var processIds = await TransactionsWhereCustomerMasterDataDispatchIsPendingAsync(notification.Now, cancellationToken)
             .ConfigureAwait(false);
 
-        foreach (var transactionId in transactionIds)
+        foreach (var processId in processIds)
         {
-            await _commandScheduler.EnqueueAsync(new SendCustomerMasterDataToGridOperator(transactionId))
+            await _commandScheduler.EnqueueAsync(new SendCustomerMasterDataToGridOperator(ProcessId.Create(processId)))
                 .ConfigureAwait(false);
         }
     }
@@ -60,7 +61,7 @@ public class DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired 
     {
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         return await connection.QueryAsync<Guid>(
-                @$"SELECT TransactionId FROM [dbo].[MoveInTransactions] " +
+                @$"SELECT ProcessId FROM [dbo].[MoveInTransactions] " +
                 $"WHERE GridOperator_MessageDeliveryState_CustomerMasterData = '{MoveInTransaction.MasterDataState.Pending}' " +
                 "AND CustomerMasterData IS NOT NULL AND DATEDIFF(day, EffectiveDate, @Now) >= @GracePeriod",
                 new

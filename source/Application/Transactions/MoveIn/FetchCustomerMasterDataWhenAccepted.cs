@@ -36,6 +36,6 @@ public class FetchCustomerMasterDataWhenAccepted : INotificationHandler<MoveInWa
         return _commandScheduler.EnqueueAsync(new FetchCustomerMasterData(
             notification.BusinessProcessId,
             notification.MarketEvaluationPointNumber,
-            notification.TransactionId));
+            notification.ProcessId));
     }
 }

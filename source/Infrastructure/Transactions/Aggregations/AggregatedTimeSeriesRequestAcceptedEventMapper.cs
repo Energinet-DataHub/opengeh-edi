@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Transactions.Aggregations;
 using Domain.OutgoingMessages;
 using Domain.Transactions.AggregatedMeasureData;
 using Domain.Transactions.Aggregations;
@@ -36,15 +35,7 @@ namespace Infrastructure.Transactions.Aggregations;
 
 public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
 {
-    private readonly IGridAreaLookup _gridAreaLookup;
-
-    public AggregatedTimeSeriesRequestAcceptedEventMapper(
-        IGridAreaLookup gridAreaLookup)
-    {
-        _gridAreaLookup = gridAreaLookup;
-    }
-
-    public async Task<INotification> MapFromAsync(string payload, Guid referenceId, CancellationToken cancellationToken)
+    public Task<INotification> MapFromAsync(string payload, Guid referenceId, CancellationToken cancellationToken)
     {
         var inboxEvent =
             AggregatedTimeSeriesRequestAccepted.Parser.ParseJson(payload);
@@ -60,13 +51,13 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
                     MapUnitType(serie),
                     MapResolution(serie.Period.Resolution),
                     MapPeriod(serie.Period),
-                    await MapGridAreaDetailsAsync(serie).ConfigureAwait(false),
+                    MapGridAreaDetails(serie),
                     MapSettlementVersion(serie)));
         }
 
-        return new AggregatedTimeSeriesRequestWasAccepted(
+        return Task.FromResult<INotification>(new AggregatedTimeSeriesRequestWasAccepted(
             referenceId,
-            aggregatedTimeSeries);
+            aggregatedTimeSeries));
     }
 
     public bool CanHandle(string eventType)
@@ -166,9 +157,9 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         return input.Units + (input.Nanos / nanoFactor);
     }
 
-    private async Task<GridAreaDetails> MapGridAreaDetailsAsync(Serie serie)
+    private static GridAreaDetails MapGridAreaDetails(Serie serie)
     {
-        var gridOperatorNumber = await _gridAreaLookup.GetGridOperatorForAsync(serie.GridArea).ConfigureAwait(false);
+        var gridOperatorNumber = GridAreaLookup.GetGridOperatorFor(serie.GridArea);
 
         return new GridAreaDetails(serie.GridArea, gridOperatorNumber.Value);
     }

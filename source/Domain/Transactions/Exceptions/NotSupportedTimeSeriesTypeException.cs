@@ -12,16 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+namespace Domain.Transactions.Exceptions;
 
-namespace Domain.Transactions.AggregatedMeasureData.ProcessEvents;
-
-public class AggregatedMeasureProcessWasRejected : DomainEvent
+public class NotSupportedTimeSeriesTypeException : Exception
 {
-    public AggregatedMeasureProcessWasRejected(ProcessId processId)
+    public NotSupportedTimeSeriesTypeException()
     {
-        ProcessId = processId;
     }
 
-    public ProcessId ProcessId { get; }
+    public NotSupportedTimeSeriesTypeException(string message)
+        : base(message)
+    {
+    }
+
+    public NotSupportedTimeSeriesTypeException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
 }

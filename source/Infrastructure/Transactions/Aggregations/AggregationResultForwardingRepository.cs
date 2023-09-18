@@ -35,10 +35,4 @@ internal sealed class AggregationResultForwardingRepository : IAggregationResult
         ArgumentNullException.ThrowIfNull(transaction);
         _context.AggregatedTimeSeriesTransactions.Add(transaction);
     }
-
-    public Task<AggregationResultForwarding?> GetAsync(TransactionId transactionId)
-    {
-        ArgumentNullException.ThrowIfNull(transactionId);
-        return _context.AggregatedTimeSeriesTransactions.Include("_messages").FirstOrDefaultAsync(t => t.Id == transactionId);
-    }
 }

@@ -16,26 +16,27 @@ using System;
 using System.Text.Json.Serialization;
 using Application.Configuration.Commands.Commands;
 using Application.MasterData;
+using Domain.Transactions;
 
 namespace Application.Transactions.MoveIn.MasterDataDelivery;
 
 public class SetCurrentKnownCustomerMasterData : InternalCommand
 {
-    public SetCurrentKnownCustomerMasterData(Guid transactionId, CustomerMasterDataContent data)
+    public SetCurrentKnownCustomerMasterData(ProcessId processId, CustomerMasterDataContent data)
     {
-        TransactionId = transactionId;
+        ProcessId = processId;
         Data = data;
     }
 
     [JsonConstructor]
-    public SetCurrentKnownCustomerMasterData(Guid id, Guid transactionId, CustomerMasterDataContent data)
+    public SetCurrentKnownCustomerMasterData(Guid id, ProcessId processId, CustomerMasterDataContent data)
         : base(id)
     {
-        TransactionId = transactionId;
+        ProcessId = processId;
         Data = data;
     }
 
-    public Guid TransactionId { get; }
+    public ProcessId ProcessId { get; }
 
     public CustomerMasterDataContent Data { get; }
 }

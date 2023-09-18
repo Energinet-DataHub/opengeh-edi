@@ -47,7 +47,7 @@ public class MoveInNotifications
         var message = new OutgoingMessage(
             DocumentType.GenericNotification,
             ActorNumber.Create(transaction.CurrentEnergySupplierId!),
-            transaction.TransactionId,
+            transaction.ProcessId,
             BusinessReason.MoveIn.Name,
             MarketRole.EnergySupplier,
             DataHubDetails.IdentificationNumber,
@@ -69,7 +69,7 @@ public class MoveInNotifications
         var message = new OutgoingMessage(
             DocumentType.GenericNotification,
             ActorNumber.Create(gridOperatorNumber),
-            transaction.TransactionId,
+            transaction.ProcessId,
             BusinessReason.MoveIn.Name,
             MarketRole.GridOperator,
             DataHubDetails.IdentificationNumber,

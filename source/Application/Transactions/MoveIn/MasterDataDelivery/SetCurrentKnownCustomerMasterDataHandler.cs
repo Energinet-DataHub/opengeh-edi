@@ -34,10 +34,10 @@ public class SetCurrentKnownCustomerMasterDataHandler : IRequestHandler<SetCurre
     public Task<Unit> Handle(SetCurrentKnownCustomerMasterData request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
-        var transaction = _transactionRepository.GetById(TransactionId.Create(request.TransactionId));
+        var transaction = _transactionRepository.GetById(request.ProcessId);
         if (transaction is null)
         {
-            throw TransactionNotFoundException.TransactionIdNotFound(request.TransactionId);
+            throw TransactionNotFoundException.ProcessIdNotFound(request.ProcessId.Id.ToString());
         }
 
         transaction.SetCurrentKnownCustomerMasterData(ParseFrom(request.Data));

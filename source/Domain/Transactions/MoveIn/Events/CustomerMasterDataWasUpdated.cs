@@ -18,10 +18,10 @@ namespace Domain.Transactions.MoveIn.Events;
 
 public class CustomerMasterDataWasUpdated : DomainEvent
 {
-    public CustomerMasterDataWasUpdated(Guid transactionId)
+    public CustomerMasterDataWasUpdated(ProcessId processId)
     {
-        TransactionId = transactionId;
+        ProcessId = processId;
     }
 
-    public Guid TransactionId { get; }
+    public ProcessId ProcessId { get; }
 }
