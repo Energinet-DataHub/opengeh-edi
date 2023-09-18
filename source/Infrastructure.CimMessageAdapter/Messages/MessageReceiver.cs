@@ -123,7 +123,6 @@ namespace CimMessageAdapter.Messages
                     cancellationToken).ConfigureAwait(false);
                 await _messageIds.StoreAsync(senderId, messageHeader.MessageId, cancellationToken)
                     .ConfigureAwait(false);
-                await _messageQueueDispatcher.CommitAsync(cancellationToken).ConfigureAwait(false);
 
                 scope.Complete();
             }
@@ -141,6 +140,7 @@ namespace CimMessageAdapter.Messages
                 return Result.Failure(_errors.ToArray());
             }
 
+            await _messageQueueDispatcher.CommitAsync(cancellationToken).ConfigureAwait(false);
             return Result.Succeeded();
         }
 
