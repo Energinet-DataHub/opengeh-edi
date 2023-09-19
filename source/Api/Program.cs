@@ -166,8 +166,7 @@ namespace Api
                         runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!,
                         runtime.INCOMING_AGGREGATED_MEASURE_DATA_QUEUE_NAME!,
                         runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!,
-                        runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!,
-                        runtime.AzureWebJobsStorage!);
+                        runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!);
                     services.AddSqlServerHealthCheck(runtime.DB_CONNECTION_STRING!);
 
                     var integrationEventDescriptors = new List<MessageDescriptor>
