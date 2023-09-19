@@ -22,14 +22,14 @@ namespace Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 
 public class AggregationResultMessage : OutgoingMessage
 {
-    private AggregationResultMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
-        : base(documentType, receiverId, transactionId, businessReason, receiverRole, senderId, senderRole, messageRecord)
+    private AggregationResultMessage(DocumentType documentType, ActorNumber receiverId, ProcessId processId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+        : base(documentType, receiverId, processId, businessReason, receiverRole, senderId, senderRole, messageRecord)
     {
         Series = new Serializer().Deserialize<TimeSeries>(messageRecord)!;
     }
 
-    private AggregationResultMessage(ActorNumber receiverId, TransactionId transactionId, string businessReason, MarketRole receiverRole, TimeSeries series)
-        : base(DocumentType.NotifyAggregatedMeasureData, receiverId, transactionId, businessReason, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringDataAdministrator, new Serializer().Serialize(series))
+    private AggregationResultMessage(ActorNumber receiverId, ProcessId processId, string businessReason, MarketRole receiverRole, TimeSeries series)
+        : base(DocumentType.NotifyAggregatedMeasureData, receiverId, processId, businessReason, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringDataAdministrator, new Serializer().Serialize(series))
     {
         Series = series;
     }
@@ -39,15 +39,15 @@ public class AggregationResultMessage : OutgoingMessage
     public static AggregationResultMessage Create(
         ActorNumber receiverNumber,
         MarketRole receiverRole,
-        TransactionId transactionId,
+        ProcessId processId,
         Aggregation result)
     {
-        ArgumentNullException.ThrowIfNull(transactionId);
+        ArgumentNullException.ThrowIfNull(processId);
         ArgumentNullException.ThrowIfNull(result);
         ArgumentNullException.ThrowIfNull(receiverNumber);
 
         var series = new TimeSeries(
-            transactionId.Id,
+            processId.Id,
             result.GridAreaDetails.GridAreaCode,
             result.MeteringPointType,
             result.SettlementType,
@@ -62,7 +62,7 @@ public class AggregationResultMessage : OutgoingMessage
 
         return new AggregationResultMessage(
             receiverNumber,
-            transactionId,
+            processId,
             EnumerationType.FromName<BusinessReason>(result.BusinessReason).Name,
             receiverRole,
             series);

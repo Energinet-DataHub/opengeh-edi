@@ -15,6 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Application.Transactions.MoveIn;
+using Domain.Transactions;
 using Energinet.DataHub.EnergySupplying.RequestResponse.Requests;
 using Infrastructure.Configuration.MessageBus;
 using IntegrationTests.Fixtures;
@@ -42,13 +43,13 @@ public class FetchCustomerMasterDataTests : TestBase
         var command = new FetchCustomerMasterData(
             Guid.NewGuid().ToString(),
             "123445611",
-            Guid.NewGuid());
+            ProcessId.Create(Guid.NewGuid()));
 
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
         var dispatchedMessage = _senderSpy.Message;
         Assert.NotNull(dispatchedMessage);
-        Assert.Equal(command.TransactionId.ToString(), dispatchedMessage?.CorrelationId);
+        Assert.Equal(command.ProcessId.ToString(), dispatchedMessage?.CorrelationId);
         var request = CustomerMasterDataRequest.Parser.ParseFrom(dispatchedMessage?.Body);
         Assert.Equal(command.BusinessProcessId, request.Processid);
     }

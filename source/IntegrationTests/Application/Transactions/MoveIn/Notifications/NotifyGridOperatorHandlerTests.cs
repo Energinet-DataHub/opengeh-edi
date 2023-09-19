@@ -38,7 +38,7 @@ public class NotifyGridOperatorHandlerTests
     public Task InitializeAsync()
     {
         return Scenario.Details(
-                SampleData.TransactionId,
+                SampleData.ProcessId,
                 SampleData.MeteringPointNumber,
                 SampleData.SupplyStart,
                 SampleData.CurrentEnergySupplierNumber,
@@ -64,13 +64,13 @@ public class NotifyGridOperatorHandlerTests
     [Fact]
     public async Task Grid_operator_is_notified_about_the_move_in()
     {
-        var command = new NotifyGridOperator(SampleData.TransactionId);
+        var command = new NotifyGridOperator(SampleData.ProcessId);
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
         var transaction = await AssertTransaction.TransactionAsync(SampleData.ActorProvidedId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
         transaction.HasGridOperatorNotificationState(MoveInTransaction.NotificationState.WasNotified);
         var outgoingMessageTransaction = await AssertOutgoingMessage.OutgoingMessageAsync(
-            SampleData.TransactionId,
+            SampleData.ProcessId.Id,
             DocumentType.GenericNotification.Name,
             BusinessReason.MoveIn.Name,
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);

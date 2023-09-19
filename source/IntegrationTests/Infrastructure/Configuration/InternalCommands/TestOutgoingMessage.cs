@@ -22,7 +22,7 @@ namespace IntegrationTests.Infrastructure.Configuration.InternalCommands;
 public class TestOutgoingMessage : OutgoingMessage
 {
     public TestOutgoingMessage()
-        : base(DocumentType.RejectAggregatedMeasureData, ActorNumber.Create("1234567891234"), TransactionId.New(), Domain.OutgoingMessages.BusinessReason.BalanceFixing.Name, MarketRole.EnergySupplier, ActorNumber.Create("1234567891234"), MarketRole.MeteringDataAdministrator, "data")
+        : base(DocumentType.RejectAggregatedMeasureData, ActorNumber.Create("1234567891234"), ProcessId.New(), Domain.OutgoingMessages.BusinessReason.BalanceFixing.Name, MarketRole.EnergySupplier, ActorNumber.Create("1234567891234"), MarketRole.MeteringDataAdministrator, "data")
     {
     }
 }

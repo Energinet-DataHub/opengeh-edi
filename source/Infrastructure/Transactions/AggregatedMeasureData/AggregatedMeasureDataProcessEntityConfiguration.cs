@@ -14,6 +14,7 @@
 
 using System;
 using Domain.Actors;
+using Domain.OutgoingMessages;
 using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
 using Microsoft.EntityFrameworkCore;
@@ -55,6 +56,10 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
                 toDbValue => toDbValue.ToString(),
                 fromDbValue => Enum.Parse<AggregatedMeasureDataProcess.State>(fromDbValue, true))
             .HasColumnName("State");
+
+        builder.HasMany<OutgoingMessage>("_messages")
+            .WithOne()
+            .HasForeignKey("ProcessId");
 
         builder.Ignore(x => x.DomainEvents);
     }

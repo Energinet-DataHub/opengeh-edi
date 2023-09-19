@@ -36,19 +36,19 @@ namespace Infrastructure.Transactions.MoveIn
             _b2BContext.Transactions.Add(moveInTransaction);
         }
 
-        public MoveInTransaction? GetById(TransactionId transactionId)
+        public MoveInTransaction? GetById(ProcessId processId)
         {
             return _b2BContext
                 .Transactions
                 .Include("_messages")
-                .FirstOrDefault(transaction => transaction.TransactionId == transactionId);
+                .FirstOrDefault(transaction => transaction.ProcessId == processId);
         }
 
         public Task<MoveInTransaction?> GetByProcessIdAsync(string processId)
         {
             return _b2BContext.Transactions
                 .Include("_messages")
-                .FirstOrDefaultAsync(transaction => transaction.ProcessId == processId);
+                .FirstOrDefaultAsync(transaction => transaction.BusinessProcessId == processId);
         }
 
         public Task<MoveInTransaction?> GetByEffectiveDateAsync(string meteringPointNumber, Instant effectiveDate)

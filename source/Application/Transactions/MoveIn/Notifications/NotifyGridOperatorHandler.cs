@@ -45,8 +45,8 @@ public class NotifyGridOperatorHandler : IRequestHandler<NotifyGridOperator, Uni
     public async Task<Unit> Handle(NotifyGridOperator request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        var transaction = _transactionRepository.GetById(TransactionId.Create(request.TransactionId))
-                          ?? throw TransactionNotFoundException.TransactionIdNotFound(request.TransactionId);
+        var transaction = _transactionRepository.GetById(request.ProcessId)
+                          ?? throw TransactionNotFoundException.ProcessIdNotFound(request.ProcessId.Id.ToString());
 
         var gridOperatorNumber = await GetGridOperatorNumberAsync(transaction.MarketEvaluationPointId, cancellationToken).ConfigureAwait(false);
         _notifications.NotifyGridOperator(transaction, gridOperatorNumber);

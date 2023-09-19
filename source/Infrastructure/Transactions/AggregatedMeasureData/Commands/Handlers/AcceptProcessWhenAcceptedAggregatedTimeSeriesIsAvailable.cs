@@ -13,12 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
-using Domain.Transactions.Exceptions;
-using Infrastructure.Configuration.Serialization;
+using Domain.Transactions.Aggregations;
+using Infrastructure.Transactions.Aggregations;
 using MediatR;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
@@ -26,14 +27,11 @@ namespace Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
 public class AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable : IRequestHandler<AcceptedAggregatedTimeSeries, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
-    private readonly ISerializer _serializer;
 
     public AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable(
-        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository,
-        ISerializer serializer)
+        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
-        _serializer = serializer;
     }
 
     public async Task<Unit> Handle(AcceptedAggregatedTimeSeries request, CancellationToken cancellationToken)
@@ -43,8 +41,21 @@ public class AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable : IRequest
         var process = await _aggregatedMeasureDataProcessRepository
             .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
-        process.WasAccepted(_serializer.Serialize(request.NotificationAggregatedTimeSeries));
+        var aggregations = GetAggregations(request, process);
+
+        process.IsAccepted(aggregations);
 
         return Unit.Value;
+    }
+
+    private static List<Aggregation> GetAggregations(AcceptedAggregatedTimeSeries request, AggregatedMeasureDataProcess process)
+    {
+        var aggregations = new List<Aggregation>();
+        foreach (var aggregatedTimeSerie in request.AggregatedTimeSeries)
+        {
+            aggregations.Add(AggregationFactory.Create(process, aggregatedTimeSerie));
+        }
+
+        return aggregations;
     }
 }

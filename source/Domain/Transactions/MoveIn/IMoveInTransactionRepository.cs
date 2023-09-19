@@ -30,9 +30,9 @@ namespace Domain.Transactions.MoveIn
         /// <summary>
         /// Find a transaction by transaction id
         /// </summary>
-        /// <param name="transactionId"></param>
+        /// <param name="processId"></param>
         /// <returns><see cref="MoveInTransaction"/></returns>
-        MoveInTransaction? GetById(TransactionId transactionId);
+        MoveInTransaction? GetById(ProcessId processId);
 
         /// <summary>
         /// Find transaction by business process id

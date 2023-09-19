@@ -35,10 +35,10 @@ public class NotifyCurrentEnergySupplierHandler : IRequestHandler<NotifyCurrentE
     public Task<Unit> Handle(NotifyCurrentEnergySupplier request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
-        var transaction = _repository.GetById(TransactionId.Create(request.TransactionId));
+        var transaction = _repository.GetById(request.ProcessId);
         if (transaction is null)
         {
-            throw TransactionNotFoundException.TransactionIdNotFound(request.TransactionId);
+            throw TransactionNotFoundException.ProcessIdNotFound(request.ProcessId.Id.ToString());
         }
 
         _notifications.InformCurrentEnergySupplierAboutEndOfSupply(transaction);

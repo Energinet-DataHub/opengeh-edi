@@ -32,6 +32,7 @@ using Point = Domain.Transactions.Aggregations.Point;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
 
+[Obsolete("This can be delete when all CreateAggregatedMeasureAggregationResults commands has been processed.")]
 public class MakeAggregatedMeasureAsAggregationResults : IRequestHandler<CreateAggregatedMeasureAggregationResults, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
@@ -80,8 +81,6 @@ public class MakeAggregatedMeasureAsAggregationResults : IRequestHandler<CreateA
                     cancellationToken)
                 .ConfigureAwait(false);
         }
-
-        process.IsCompleted();
 
         return Unit.Value;
     }

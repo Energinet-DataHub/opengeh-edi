@@ -18,16 +18,16 @@ namespace Domain.Transactions.MoveIn.Events;
 
 public class MoveInWasAccepted : DomainEvent
 {
-    public MoveInWasAccepted(string businessProcessId, string marketEvaluationPointNumber, Guid transactionId)
+    public MoveInWasAccepted(string businessProcessId, string marketEvaluationPointNumber, ProcessId processId)
     {
         BusinessProcessId = businessProcessId;
         MarketEvaluationPointNumber = marketEvaluationPointNumber;
-        TransactionId = transactionId;
+        ProcessId = processId;
     }
 
     public string BusinessProcessId { get; }
 
-    public Guid TransactionId { get; }
+    public ProcessId ProcessId { get; }
 
     public string MarketEvaluationPointNumber { get; }
 }

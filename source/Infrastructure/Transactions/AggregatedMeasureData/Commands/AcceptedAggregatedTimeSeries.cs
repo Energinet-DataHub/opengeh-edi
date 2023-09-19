@@ -23,13 +23,13 @@ namespace Infrastructure.Transactions.AggregatedMeasureData.Commands;
 public class AcceptedAggregatedTimeSeries : InternalCommand
 {
     [JsonConstructor]
-    public AcceptedAggregatedTimeSeries(Guid processId, IReadOnlyList<AggregatedTimeSerie> notificationAggregatedTimeSeries)
+    public AcceptedAggregatedTimeSeries(Guid processId, IReadOnlyList<AggregatedTimeSerie> aggregatedTimeSeries)
     {
         ProcessId = processId;
-        NotificationAggregatedTimeSeries = notificationAggregatedTimeSeries;
+        AggregatedTimeSeries = aggregatedTimeSeries;
     }
 
     public Guid ProcessId { get; }
 
-    public IReadOnlyList<AggregatedTimeSerie> NotificationAggregatedTimeSeries { get; }
+    public IReadOnlyList<AggregatedTimeSerie> AggregatedTimeSeries { get; }
 }

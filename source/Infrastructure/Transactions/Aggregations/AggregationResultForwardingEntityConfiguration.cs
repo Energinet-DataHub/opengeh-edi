@@ -37,7 +37,7 @@ internal sealed class AggregationResultForwardingEntityConfiguration : IEntityTy
         builder.ToTable("AggregatedTimeSeriesTransactions", "dbo");
         builder.HasKey(entity => entity.Id);
         builder.Property(entity => entity.Id)
-            .HasConversion(toDbValue => toDbValue.Id, fromDbValue => TransactionId.Create(fromDbValue));
+            .HasConversion(toDbValue => toDbValue.Id, fromDbValue => ProcessId.Create(fromDbValue));
         builder.Ignore(entity => entity.DomainEvents);
     }
 }

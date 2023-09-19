@@ -206,6 +206,6 @@ public class AggregationResultForwardingTests
     private static AggregationResultForwarding CreateTransaction()
     {
         return new AggregationResultForwarding(
-            TransactionId.New());
+            ProcessId.New());
     }
 }

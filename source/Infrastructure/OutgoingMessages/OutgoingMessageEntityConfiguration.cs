@@ -56,10 +56,10 @@ namespace Infrastructure.OutgoingMessages
                 .HasConversion(
                     toDbValue => toDbValue.ToString(),
                     fromDbValue => EnumerationType.FromName<MarketRole>(fromDbValue));
-            builder.Property(x => x.TransactionId)
+            builder.Property(x => x.ProcessId)
                 .HasConversion(
                     toDbValue => toDbValue.Id,
-                    fromDbValue => TransactionId.Create(fromDbValue));
+                    fromDbValue => ProcessId.Create(fromDbValue));
             builder.Property(x => x.BusinessReason);
             builder.Property(x => x.SenderId)
                 .HasConversion(

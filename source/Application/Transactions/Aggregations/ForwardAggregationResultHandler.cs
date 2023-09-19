@@ -36,7 +36,7 @@ public class ForwardAggregationResultHandler : IRequestHandler<ForwardAggregatio
     public Task<Unit> Handle(ForwardAggregationResult request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        var transaction = new AggregationResultForwarding(TransactionId.New());
+        var transaction = new AggregationResultForwarding(ProcessId.New());
         _transactions.Add(transaction);
         _outgoingMessageRepository.Add(transaction.CreateMessage(request.Result));
         return Unit.Task;
