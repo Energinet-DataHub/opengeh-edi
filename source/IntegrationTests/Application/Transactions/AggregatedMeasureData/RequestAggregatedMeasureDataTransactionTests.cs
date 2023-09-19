@@ -102,7 +102,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
     [InlineData("E20", null, TimeSeriesType.NetExchangePerGa)]
     [InlineData("E17", "D01", TimeSeriesType.NonProfiledConsumption)]
     [InlineData("E17", "E02", TimeSeriesType.FlexConsumption)]
-    public async Task Grid_Operator_requesting_time_series_from_wholesale(
+    public async Task Grid_Operator_requesting_aggregated_time_series_from_wholesale(
         string evaluationPointType,
         string? settlementMethod,
         TimeSeriesType expectedType)
@@ -137,7 +137,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
     }
 
     [Fact]
-    public async Task Grid_operator_making_invalid_request_from_wholesale()
+    public async Task Grid_operator_making_invalid_request_of_aggregated_time_series()
     {
         // Arrange
         var incomingMessage =
@@ -162,7 +162,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
     [InlineData("E18", null, TimeSeriesType.Production)]
     [InlineData("E17", "D01", TimeSeriesType.NonProfiledConsumption)]
     [InlineData("E17", "E02", TimeSeriesType.FlexConsumption)]
-    public async Task Energy_supplier_requesting_time_series_from_wholesale(
+    public async Task Energy_supplier_requesting_aggregated_time_series_from_wholesale(
         string evaluationPointType,
         string? settlementMethod,
         TimeSeriesType expectedType)
@@ -200,7 +200,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
     [Theory]
     [InlineData("E17", null)] // TimeSeriesType.TotalConsumption
     [InlineData("E20", null)] // TimeSeriesType.NetExchangePerGa
-    public async Task Energy_supplier_making_invalid_request_from_wholesale(
+    public async Task Energy_supplier_making_invalid_request_of_aggregated_time_series(
         string evaluationPointType,
         string? settlementMethod)
     {
@@ -228,7 +228,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
     [InlineData("E18", null, TimeSeriesType.Production)]
     [InlineData("E17", "D01", TimeSeriesType.NonProfiledConsumption)]
     [InlineData("E17", "E02", TimeSeriesType.FlexConsumption)]
-    public async Task Balance_responsible_requesting_time_series_from_wholesale(
+    public async Task Balance_responsible_requesting_aggregated_time_series_from_wholesale(
         string evaluationPointType,
         string? settlementMethod,
         TimeSeriesType expectedType)
@@ -266,7 +266,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
     [Theory]
     [InlineData("E17", null)] // TimeSeriesType.TotalConsumption
     [InlineData("E20", null)] // TimeSeriesType.NetExchangePerGa
-    public async Task Balance_responsible_making_invalid_request_from_wholesale(
+    public async Task Balance_responsible_making_invalid_request_of_aggregated_time_series(
         string evaluationPointType,
         string? settlementMethod)
     {
@@ -294,7 +294,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
     [InlineData("E18", null, TimeSeriesType.Production)]
     [InlineData("E17", "D01", TimeSeriesType.NonProfiledConsumption)]
     [InlineData("E17", "E02", TimeSeriesType.FlexConsumption)]
-    public async Task Energy_supplier_per_balance_responsible_requesting_time_series_from_wholesale(
+    public async Task Energy_supplier_per_balance_responsible_requesting_aggregated_time_series_from_wholesale(
         string evaluationPointType,
         string? settlementMethod,
         TimeSeriesType expectedType)
@@ -333,7 +333,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
     [Theory]
     [InlineData("E17", null)] // TimeSeriesType.TotalConsumption
     [InlineData("E20", null)] // TimeSeriesType.NetExchangePerGa
-    public async Task Energy_supplier_per_balance_responsible_making_invalid_request_from_wholesale(
+    public async Task Energy_supplier_per_balance_responsible_making_invalid_request_of_aggregated_time_series(
         string evaluationPointType,
         string? settlementMethod)
     {
