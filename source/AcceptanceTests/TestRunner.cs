@@ -34,11 +34,7 @@ public class TestRunner : IAsyncDisposable
         var dbConnectionString = root.GetValue<string>("EDI_DATABASE_CONNECTION_STRING")!;
         EventPublisher = new IntegrationEventPublisher(connectionString, topicName);
         AzpToken = root.GetValue<string>("AZP_TOKEN")!;
-
-        if (!string.IsNullOrWhiteSpace(dbConnectionString))
-        {
-            ActorFactory.InsertActor(dbConnectionString, AzpToken);
-        }
+        ActorFactory.InsertActor(dbConnectionString, AzpToken);
     }
 
     internal IntegrationEventPublisher EventPublisher { get; }
