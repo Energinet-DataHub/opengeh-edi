@@ -25,38 +25,38 @@ namespace IntegrationTests.Infrastructure.CimMessageAdapter.Stubs
     public class MessageQueueDispatcherThatFailsStub<TQueue> : MessageQueueDispatcherStub<TQueue>, IMessageQueueDispatcher<TQueue>
     where TQueue : Queue
     {
-    private readonly List<IMarketTransaction> _uncommittedItems = new();
+        private readonly List<IMarketTransaction> _uncommittedItems = new();
 
-    public new Task AddAsync(IMarketTransaction message, CancellationToken cancellationToken)
-    {
-        if (message == null) throw new ArgumentNullException(nameof(message));
-        _uncommittedItems.Add(message);
-        return Task.CompletedTask;
+        public new Task AddAsync(IMarketTransaction message, CancellationToken cancellationToken)
+        {
+            if (message == null) throw new ArgumentNullException(nameof(message));
+            _uncommittedItems.Add(message);
+            return Task.CompletedTask;
+        }
+
+        public new Task CommitAsync(CancellationToken cancellationToken)
+        {
+            _uncommittedItems.Clear();
+            throw new ServiceBusCommitException();
+        }
     }
 
-    public new Task CommitAsync(CancellationToken cancellationToken)
-    {
-        _uncommittedItems.Clear();
-        throw new ServiceBusCommitException();
-    }
-}
-
-#pragma warning disable SA1402
+    #pragma warning disable SA1402
     public class ServiceBusCommitException : Exception
-#pragma warning restore SA1402
-{
-    public ServiceBusCommitException(string message)
-        : base(message)
+    #pragma warning restore SA1402
     {
-    }
+        public ServiceBusCommitException(string message)
+            : base(message)
+        {
+        }
 
-    public ServiceBusCommitException()
-    {
-    }
+        public ServiceBusCommitException()
+        {
+        }
 
-    public ServiceBusCommitException(string message, Exception innerException)
-        : base(message, innerException)
-    {
+        public ServiceBusCommitException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
     }
-}
 }
