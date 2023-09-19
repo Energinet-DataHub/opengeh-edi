@@ -41,9 +41,9 @@ namespace IntegrationTests.Infrastructure.CimMessageAdapter.Stubs
         }
     }
 
-    #pragma warning disable SA1402
+#pragma warning disable SA1402
     public class ServiceBusCommitException : Exception
-    #pragma warning restore SA1402
+#pragma warning restore SA1402
     {
         public ServiceBusCommitException(string message)
             : base(message)
