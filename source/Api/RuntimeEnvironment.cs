@@ -54,6 +54,9 @@ namespace Api
         public virtual Uri AGGREGATION_RESULTS_API_URI =>
             new(GetEnvironmentVariable(nameof(AGGREGATION_RESULTS_API_URI))!);
 
+        public string? AzureWebJobsStorage =>
+            GetEnvironmentVariable(nameof(AzureWebJobsStorage));
+
         public virtual bool IsRunningLocally()
         {
             return AZURE_FUNCTIONS_ENVIRONMENT == "Development";
