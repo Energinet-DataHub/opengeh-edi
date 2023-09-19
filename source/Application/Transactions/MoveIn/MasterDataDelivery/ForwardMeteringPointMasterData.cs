@@ -16,19 +16,20 @@ using System;
 using System.Text.Json.Serialization;
 using Application.Configuration.Commands.Commands;
 using Application.MasterData;
+using Domain.Transactions;
 
 namespace Application.Transactions.MoveIn.MasterDataDelivery;
 
 public class ForwardMeteringPointMasterData : InternalCommand
 {
     [JsonConstructor]
-    public ForwardMeteringPointMasterData(Guid transactionId, MasterDataContent masterDataContent)
+    public ForwardMeteringPointMasterData(ProcessId processId, MasterDataContent masterDataContent)
     {
-        TransactionId = transactionId;
+        ProcessId = processId;
         MasterDataContent = masterDataContent;
     }
 
-    public Guid TransactionId { get; }
+    public ProcessId ProcessId { get; }
 
     public MasterDataContent MasterDataContent { get; set; }
 }

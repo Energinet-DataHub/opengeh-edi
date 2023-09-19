@@ -29,7 +29,7 @@ internal static class SampleData
 
     internal static string NewEnergySupplierNumber => "5790000555551";
 
-    internal static Guid TransactionId => Guid.Parse("8BA514FA-2E4D-4CB7-8B4A-1B1137185BD7");
+    internal static ProcessId ProcessId => ProcessId.Create(Guid.Parse("8BA514FA-2E4D-4CB7-8B4A-1B1137185BD7"));
 
     internal static ActorProvidedId ActorProvidedId => ActorProvidedId.Create("123456987");
 

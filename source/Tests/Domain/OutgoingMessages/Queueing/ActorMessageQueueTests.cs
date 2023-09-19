@@ -198,7 +198,7 @@ public class ActorMessageQueueTests
                 MarketRole.EnergySupplier),
             processType ?? BusinessReason.BalanceFixing,
             messageType ?? DocumentType.NotifyAggregatedMeasureData,
-            TransactionId.New(),
+            ProcessId.New(),
             ActorNumber.Create("1234567890987"),
             MarketRole.MeteringPointAdministrator,
             string.Empty);

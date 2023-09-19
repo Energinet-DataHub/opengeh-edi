@@ -21,11 +21,11 @@ namespace Domain.OutgoingMessages
 {
     public class OutgoingMessage
     {
-        public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+        public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, ProcessId processId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
         {
             DocumentType = documentType;
             ReceiverId = receiverId;
-            TransactionId = transactionId;
+            ProcessId = processId;
             BusinessReason = businessReason;
             ReceiverRole = receiverRole;
             SenderId = senderId;
@@ -42,7 +42,7 @@ namespace Domain.OutgoingMessages
 
         public DocumentType DocumentType { get; }
 
-        public TransactionId TransactionId { get; }
+        public ProcessId ProcessId { get; }
 
         public string BusinessReason { get; }
 
@@ -62,7 +62,7 @@ namespace Domain.OutgoingMessages
             Receiver receiver,
             BusinessReason businessReason,
             DocumentType documentType,
-            TransactionId transactionId,
+            ProcessId processId,
             ActorNumber senderId,
             MarketRole senderRole,
             string messageRecord)
@@ -73,7 +73,7 @@ namespace Domain.OutgoingMessages
             return new OutgoingMessage(
                 documentType,
                 receiver.Number,
-                transactionId,
+                processId,
                 businessReason.Name,
                 receiver.ActorRole,
                 senderId,

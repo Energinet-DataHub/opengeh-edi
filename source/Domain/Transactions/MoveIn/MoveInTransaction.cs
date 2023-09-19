@@ -35,14 +35,14 @@ namespace Domain.Transactions.MoveIn
         private MasterDataState _customerMasterDataForGridOperatorDeliveryState = MasterDataState.Pending;
         private CustomerMasterData? _customerMasterData;
 
-        public MoveInTransaction(TransactionId transactionId, ActorProvidedId actorProvidedId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType, ActorNumber requestedBy)
+        public MoveInTransaction(ProcessId processId, ActorProvidedId actorProvidedId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType, ActorNumber requestedBy)
         {
             _requestedBy = requestedBy;
             _businessProcessState = BusinessProcessState.Pending;
             _currentEnergySupplierNotificationState = currentEnergySupplierId is not null
                 ? NotificationState.Required
                 : NotificationState.NotNeeded;
-            TransactionId = transactionId;
+            ProcessId = processId;
             ActorProvidedId = actorProvidedId;
             MarketEvaluationPointId = marketEvaluationPointId;
             EffectiveDate = effectiveDate;
@@ -52,7 +52,7 @@ namespace Domain.Transactions.MoveIn
             ConsumerId = consumerId;
             ConsumerName = consumerName;
             ConsumerIdType = consumerIdType;
-            AddDomainEvent(new MoveInWasStarted(TransactionId.Id, _currentEnergySupplierNotificationState));
+            AddDomainEvent(new MoveInWasStarted(ProcessId, _currentEnergySupplierNotificationState));
         }
 
         public enum State
@@ -83,11 +83,11 @@ namespace Domain.Transactions.MoveIn
             Sent,
         }
 
-        public TransactionId TransactionId { get; }
+        public ProcessId ProcessId { get; }
 
         public ActorProvidedId ActorProvidedId { get; }
 
-        public string? ProcessId { get; private set; }
+        public string? BusinessProcessId { get; private set; }
 
         public string MarketEvaluationPointId { get; }
 
@@ -116,12 +116,12 @@ namespace Domain.Transactions.MoveIn
             }
 
             _businessProcessState = BusinessProcessState.Completed;
-            AddDomainEvent(new BusinessProcessWasCompleted(TransactionId.Id));
+            AddDomainEvent(new BusinessProcessWasCompleted(ProcessId));
 
             SetCurrentEnergySupplierNotificationToPending();
         }
 
-        public void Accept(string processId)
+        public void Accept(string businessProcessId)
         {
             if (_state != State.Started)
             {
@@ -131,11 +131,11 @@ namespace Domain.Transactions.MoveIn
             if (_businessProcessState == BusinessProcessState.Accepted)
                 return;
 
-            _messages.Add(ConfirmRequestChangeOfSupplierMessage.Create(TransactionId, ActorProvidedId, BusinessReason.MoveIn, MarketEvaluationPointId, _requestedBy));
+            _messages.Add(ConfirmRequestChangeOfSupplierMessage.Create(ProcessId, ActorProvidedId, BusinessReason.MoveIn, MarketEvaluationPointId, _requestedBy));
 
             _businessProcessState = BusinessProcessState.Accepted;
-            ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
-            AddDomainEvent(new MoveInWasAccepted(ProcessId, MarketEvaluationPointId, TransactionId.Id));
+            BusinessProcessId = businessProcessId ?? throw new ArgumentNullException(nameof(businessProcessId));
+            AddDomainEvent(new MoveInWasAccepted(BusinessProcessId, MarketEvaluationPointId, ProcessId));
         }
 
         public void Reject(IReadOnlyList<Reason> reasons)
@@ -144,7 +144,7 @@ namespace Domain.Transactions.MoveIn
                 throw new MoveInException($"Transaction has already been rejected");
 
             _messages.Add(RejectRequestChangeOfSupplierMessage.Create(
-                TransactionId,
+                ProcessId,
                 ActorProvidedId,
                 BusinessReason.MoveIn,
                 MarketEvaluationPointId,
@@ -152,7 +152,7 @@ namespace Domain.Transactions.MoveIn
                 reasons));
 
             _businessProcessState = BusinessProcessState.Rejected;
-            AddDomainEvent(new MoveInWasRejected(TransactionId.Id));
+            AddDomainEvent(new MoveInWasRejected(ProcessId));
         }
 
         public void MarkMeteringPointMasterDataAsSent()
@@ -161,7 +161,7 @@ namespace Domain.Transactions.MoveIn
                 return;
 
             _meteringPointMasterDataState = MasterDataState.Sent;
-            AddDomainEvent(new MeteringPointMasterDataWasSent(TransactionId.Id));
+            AddDomainEvent(new MeteringPointMasterDataWasSent(ProcessId));
         }
 
         public void SetCurrentEnergySupplierWasNotified()
@@ -189,7 +189,7 @@ namespace Domain.Transactions.MoveIn
 
         public void UpdateCustomerMasterData(CustomerMasterData customerMasterData)
         {
-            AddDomainEvent(new CustomerMasterDataWasUpdated(TransactionId.Id));
+            AddDomainEvent(new CustomerMasterDataWasUpdated(ProcessId));
         }
 
         public void SendCustomerMasterDataToGridOperator(ActorNumber gridOperatorNumber)
@@ -207,7 +207,7 @@ namespace Domain.Transactions.MoveIn
         {
             ThrowIfMessageExists<CharacteristicsOfACustomerAtAnApMessage>(_requestedBy);
             CreateCustomerMasterDataMessage(_requestedBy, MarketRole.EnergySupplier);
-            AddDomainEvent(new CustomerMasterDataWasSent(TransactionId.Id));
+            AddDomainEvent(new CustomerMasterDataWasSent(ProcessId));
         }
 
         private void ThrowIfMessageExists<TMessage>(ActorNumber receiverId)
@@ -224,14 +224,14 @@ namespace Domain.Transactions.MoveIn
             if (_currentEnergySupplierNotificationState == NotificationState.Required && CurrentEnergySupplierId is not null)
             {
                 _currentEnergySupplierNotificationState = NotificationState.Pending;
-                AddDomainEvent(new EndOfSupplyNotificationChangedToPending(TransactionId.Id, EffectiveDate, MarketEvaluationPointId, CurrentEnergySupplierId));
+                AddDomainEvent(new EndOfSupplyNotificationChangedToPending(ProcessId, EffectiveDate, MarketEvaluationPointId, CurrentEnergySupplierId));
             }
         }
 
         private void CreateCustomerMasterDataMessage(ActorNumber receiverNumber, MarketRole receiverRole)
         {
             _messages.Add(CharacteristicsOfACustomerAtAnApMessage.Create(
-                TransactionId,
+                ProcessId,
                 ActorProvidedId,
                 BusinessReason.MoveIn,
                 receiverNumber,

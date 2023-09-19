@@ -13,14 +13,18 @@
 // limitations under the License.
 
 using Domain.Actors;
+using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
 using Domain.SeedWork;
 using Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+using Domain.Transactions.Aggregations;
 using NodaTime;
 
 namespace Domain.Transactions.AggregatedMeasureData
 {
     public class AggregatedMeasureDataProcess : Entity
     {
+        private readonly List<OutgoingMessage> _messages = new();
         private State _state = State.Initialized;
 
         public AggregatedMeasureDataProcess(
@@ -73,7 +77,6 @@ namespace Domain.Transactions.AggregatedMeasureData
             Sent,
             Accepted,
             Rejected,
-            Completed,
         }
 
         public ProcessId ProcessId { get; }
@@ -116,32 +119,51 @@ namespace Domain.Transactions.AggregatedMeasureData
             }
         }
 
-        public void WasAccepted(string responseData)
+        public void IsAccepted(IReadOnlyCollection<Aggregation> aggregations)
         {
+            if (aggregations == null) throw new ArgumentNullException(nameof(aggregations));
+
             if (_state == State.Sent)
             {
+                foreach (var aggregation in aggregations)
+                {
+                    _messages.Add(AggregationResultMessageFactory.CreateMessage(aggregation, ProcessId));
+                }
+
                 _state = State.Accepted;
-                ResponseData = responseData;
-                AddDomainEvent(new AggregatedMeasureProcessWasAccepted(ProcessId));
             }
         }
 
-        public void WasRejected(string responseData)
+        public void IsRejected(RejectedAggregatedMeasureDataRequest rejectAggregatedMeasureDataRequest)
         {
+            if (rejectAggregatedMeasureDataRequest == null) throw new ArgumentNullException(nameof(rejectAggregatedMeasureDataRequest));
+
             if (_state == State.Sent)
             {
+                _messages.Add(CreateRejectedAggregationResultMessage(rejectAggregatedMeasureDataRequest));
+
                 _state = State.Rejected;
-                ResponseData = responseData;
-                AddDomainEvent(new AggregatedMeasureProcessWasRejected(ProcessId));
             }
         }
 
-        public void IsCompleted()
+        private RejectedAggregationResultMessage CreateRejectedAggregationResultMessage(
+            RejectedAggregatedMeasureDataRequest rejectedAggregatedMeasureDataRequest)
         {
-            if (_state is State.Rejected or State.Accepted)
-            {
-                _state = State.Completed;
-            }
+            var rejectedTimeSerie = new RejectedTimeSerie(
+                ProcessId.Id,
+                rejectedAggregatedMeasureDataRequest.RejectReasons.Select(reason =>
+                        new Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData.RejectReason(
+                            reason.ErrorCode,
+                            reason.ErrorMessage))
+                    .ToList(),
+                BusinessTransactionId.Id);
+
+            return new RejectedAggregationResultMessage(
+                RequestedByActorId,
+                ProcessId,
+                rejectedAggregatedMeasureDataRequest.BusinessReason.Name,
+                MarketRole.FromCode(RequestedByActorRoleCode),
+                rejectedTimeSerie);
         }
     }
 }

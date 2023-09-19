@@ -18,10 +18,10 @@ namespace Domain.Transactions.UpdateCustomer;
 
 public class UpdateCustomerMasterDataTransaction : Entity
 {
-    public UpdateCustomerMasterDataTransaction(TransactionId transactionId)
+    public UpdateCustomerMasterDataTransaction(ProcessId processId)
     {
-        TransactionId = transactionId;
+        ProcessId = processId;
     }
 
-    public TransactionId TransactionId { get; }
+    public ProcessId ProcessId { get; }
 }

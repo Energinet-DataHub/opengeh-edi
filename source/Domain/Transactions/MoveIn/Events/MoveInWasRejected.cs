@@ -18,10 +18,10 @@ namespace Domain.Transactions.MoveIn.Events;
 
 public class MoveInWasRejected : DomainEvent
 {
-    public MoveInWasRejected(Guid transactionId)
+    public MoveInWasRejected(ProcessId processId)
     {
-        TransactionId = transactionId;
+        ProcessId = processId;
     }
 
-    public Guid TransactionId { get; }
+    public ProcessId ProcessId { get; }
 }
