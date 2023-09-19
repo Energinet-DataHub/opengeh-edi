@@ -36,7 +36,7 @@ public static class HealthCheckRegistration
         {
             services.AddHealthChecks()
                 .AddAzureServiceBusQueue(
-                    name: name + "Exists",
+                    name: name + "Exists" + Guid.NewGuid(),
                     connectionString: serviceBusConnectionString,
                     queueName: name);
         }
@@ -52,7 +52,7 @@ public static class HealthCheckRegistration
         {
             services.AddHealthChecks()
                 .AddAzureServiceBusSubscription(
-                    name: name + "Exists",
+                    name: name + "Exists" + Guid.NewGuid(),
                     connectionString: serviceBusConnectionString,
                     topicName: topicName,
                     subscriptionName: name);
