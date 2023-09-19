@@ -168,6 +168,7 @@ namespace Api
                         runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!,
                         runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!);
                     services.AddSqlServerHealthCheck(runtime.DB_CONNECTION_STRING!);
+                    services.AddBlobStorageHealthCheck(runtime.AzureWebJobsStorage!);
 
                     var integrationEventDescriptors = new List<MessageDescriptor>
                     {
