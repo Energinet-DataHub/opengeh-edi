@@ -6,46 +6,20 @@ ediDomain = group "EDI" {
         technology "SQL Server"
         tags "Data Storage, Microsoft Azure - SQL Database" "Mosaic"
     }
+    ediStorageAccount = container "EDI Storage Account" {
+        description "Used by EDI azure functions to store state"
+        technology "Azure Blob Storage"
+        tags "Data Storage, Microsoft Azure - Storage Accounts" "Mosaic"
+    }
     edi = container "EDI" {
         description "Backend server providing API for EDI operations"
         technology "Azure function, C#"
         tags "Microsoft Azure - Function Apps" "Mosaic"
-
-        ediPeekComponent = component "Peek component" {
-            description "Handles peek requests from actors"
-            technology "Http Trigger"
-            tags "Microsoft Azure - Function Apps" "Mosaic"
-
-            # Domain relationships
-            this -> ediDb "Stores messages and business transactions" "EF Core, Dapper"
-        }
-        ediDequeueComponent = component "Dequeue component" {
-            description "Handles dequeue requests from actors"
-            technology "Http Trigger"
-            tags "Microsoft Azure - Function Apps" "Mosaic"
-
-            # Domain relationships
-            this -> ediDb "Deletes messages that have been peeked" "EF Core"
-        }
-        ediTimeSeriesRequester = component "TimeSeries request component" {
-            description "Fetches time series data from relevant domain"
-            technology "<?> Trigger"
-            tags "Microsoft Azure - Function Apps" "Mosaic"
-
-            # Domain relationships
-            this -> ediDb "Writes time series data to database" "EF Core"
-        }
-        ediTimeSeriesListener = component "TimeSeries listener" {
-            description "Listens for integration events indicating time series data is ready"
-            technology "Service Bus Trigger"
-            tags "Microsoft Azure - Function Apps" "Mosaic"
-
-            # Base model relationships
-            this -> dh3.sharedServiceBus "Subscribes to integration events"
-
-            # Domain relationships
-            this -> ediTimeSeriesRequester "Triggers requester to fetch time series data"
-        }
+        
+        # Domain relationships        
+        this -> ediDb "Used by EDI azure functions to store state"
+        this -> dh3.sharedServiceBus "Subscribes to integration events"
+        this -> ediStorageAccount "Stores state"
 
         # Base model relationships
         actorB2BSystem -> this "Requests" {
@@ -61,8 +35,7 @@ ediDomain = group "EDI" {
         actorB2BSystem -> this "Requests eg. Peek and Dequeue"
 
         # Domain relationships
-        this -> ediPeekComponent "Requests"
-        this -> ediDequeueComponent "Dequeue messages"
+        this -> edi "Forwards request to backend"
 
         # Domain-to-domain relationships
         this -> dh3.sharedB2C "Validate credentials" "https" {
