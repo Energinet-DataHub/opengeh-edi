@@ -28,9 +28,9 @@ public class ProcessId : ValueObject
 
     public Guid Id { get; }
 
-    public static ProcessId Create(Guid transactionId)
+    public static ProcessId Create(Guid processId)
     {
-        return new ProcessId(transactionId);
+        return new ProcessId(processId);
     }
 
     public static ProcessId New()

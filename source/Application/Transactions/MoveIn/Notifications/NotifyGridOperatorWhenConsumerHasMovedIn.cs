@@ -33,6 +33,6 @@ public class NotifyGridOperatorWhenConsumerHasMovedIn : INotificationHandler<Bus
     public Task Handle(BusinessProcessWasCompleted notification, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(notification);
-        return _commandScheduler.EnqueueAsync(new NotifyGridOperator(notification.TransactionId));
+        return _commandScheduler.EnqueueAsync(new NotifyGridOperator(notification.ProcessId));
     }
 }

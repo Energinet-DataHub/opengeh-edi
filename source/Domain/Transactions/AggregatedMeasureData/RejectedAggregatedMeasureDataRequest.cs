@@ -12,16 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+using Domain.OutgoingMessages;
 
-namespace Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+namespace Domain.Transactions.AggregatedMeasureData;
 
-public class AggregatedMeasureProcessWasAccepted : DomainEvent
-{
-    public AggregatedMeasureProcessWasAccepted(ProcessId processId)
-    {
-        ProcessId = processId;
-    }
-
-    public ProcessId ProcessId { get; }
-}
+public record RejectedAggregatedMeasureDataRequest(IReadOnlyCollection<RejectReason> RejectReasons, BusinessReason BusinessReason);

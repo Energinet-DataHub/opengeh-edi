@@ -15,6 +15,7 @@
 using System;
 using System.Text.Json.Serialization;
 using Application.Configuration.Commands.Commands;
+using Domain.Transactions;
 using NodaTime;
 
 namespace Application.Transactions.MoveIn.Notifications;
@@ -22,15 +23,15 @@ namespace Application.Transactions.MoveIn.Notifications;
 public class NotifyCurrentEnergySupplier : InternalCommand
 {
     [JsonConstructor]
-    public NotifyCurrentEnergySupplier(Guid transactionId, Instant effectiveDate, string marketEvaluationPointId, string energySupplierId)
+    public NotifyCurrentEnergySupplier(ProcessId processId, Instant effectiveDate, string marketEvaluationPointId, string energySupplierId)
     {
-        TransactionId = transactionId;
+        ProcessId = processId;
         EffectiveDate = effectiveDate;
         MarketEvaluationPointId = marketEvaluationPointId;
         EnergySupplierId = energySupplierId;
     }
 
-    public Guid TransactionId { get; }
+    public ProcessId ProcessId { get; }
 
     public Instant EffectiveDate { get; }
 

@@ -25,7 +25,7 @@ limitations under the License.
     <cim:receiver_MarketParticipant.marketRole.type>DDZ</cim:receiver_MarketParticipant.marketRole.type>
     <cim:createdDateTime>2022-12-17T09:30:47Z</cim:createdDateTime>
     <cim:MktActivityRecord>
-        <cim:mRID>253698254</cim:mRID>
+        <cim:mRID>123564789123564789123564789123564789</cim:mRID>
         <cim:start_DateAndOrTime.dateTime>2022-12-17T23:00:00Z</cim:start_DateAndOrTime.dateTime>
         <cim:MarketEvaluationPoint>
             <cim:mRID codingScheme="A10">579999993331812345</cim:mRID>

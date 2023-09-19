@@ -15,22 +15,23 @@
 using System;
 using System.Text.Json.Serialization;
 using Application.Configuration.Commands.Commands;
+using Domain.Transactions;
 
 namespace Application.Transactions.MoveIn.MasterDataDelivery;
 
 public class SendCustomerMasterDataToGridOperator : InternalCommand
 {
-    public SendCustomerMasterDataToGridOperator(Guid transactionId)
+    public SendCustomerMasterDataToGridOperator(ProcessId processId)
     {
-        TransactionId = transactionId;
+        ProcessId = processId;
     }
 
     [JsonConstructor]
-    public SendCustomerMasterDataToGridOperator(Guid id, Guid transactionId)
+    public SendCustomerMasterDataToGridOperator(Guid id, ProcessId processId)
         : base(id)
     {
-        TransactionId = transactionId;
+        ProcessId = processId;
     }
 
-    public Guid TransactionId { get; }
+    public ProcessId ProcessId { get; }
 }

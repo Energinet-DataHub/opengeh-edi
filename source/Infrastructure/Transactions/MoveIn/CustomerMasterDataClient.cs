@@ -57,7 +57,7 @@ public class CustomerMasterDataClient : ICustomerMasterDataClient
             ContentType = "application/octet-stream;charset=utf-8",
         };
 
-        serviceBusMessage.CorrelationId = fetchMeteringPointMasterData.TransactionId.ToString();
+        serviceBusMessage.CorrelationId = fetchMeteringPointMasterData.ProcessId.ToString();
 
         return serviceBusMessage;
     }

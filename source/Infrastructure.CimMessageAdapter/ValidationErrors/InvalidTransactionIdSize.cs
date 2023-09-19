@@ -12,27 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+namespace CimMessageAdapter.ValidationErrors;
 
-namespace Domain.Transactions;
-
-//TODO: This is going to be removed. We should use ProcessId instead for this.
-public class TransactionId : ValueObject
+public class InvalidTransactionIdSize : ValidationError
 {
-    private TransactionId(Guid id)
+    public InvalidTransactionIdSize(string transactionId)
+        : base($"Transaction id {transactionId} is invalid. Must contain 36 characters.", "00205", "transactionId")
     {
-        Id = id;
-    }
-
-    public Guid Id { get; }
-
-    public static TransactionId Create(Guid transactionId)
-    {
-        return new TransactionId(transactionId);
-    }
-
-    public static TransactionId New()
-    {
-        return new TransactionId(Guid.NewGuid());
     }
 }

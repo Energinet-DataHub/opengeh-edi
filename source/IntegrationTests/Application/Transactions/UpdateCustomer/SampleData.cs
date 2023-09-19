@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Domain.Transactions;
 using IntegrationTests.Factories;
 using NodaTime;
 
@@ -20,7 +21,7 @@ namespace IntegrationTests.Application.Transactions.UpdateCustomer;
 
 internal static class SampleData
 {
-    internal static Guid TransactionId => Guid.Parse("a761ca16-7fa6-4a04-8420-9f7bda780362");
+    internal static ProcessId ProcessId => ProcessId.Create(Guid.Parse("a761ca16-7fa6-4a04-8420-9f7bda780362"));
 
     internal static string MarketEvaluationPointNumber => "571234567891234568";
 

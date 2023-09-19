@@ -20,5 +20,10 @@ namespace CimMessageAdapter.ValidationErrors
             : base($"Transaction id '{transactionId}' is not unique and will not be processed.", "00102", "TransactionId")
         {
         }
+
+        public DuplicateTransactionIdDetected()
+            : base("Duplicated transaction id found", "00110", "TransactionId")
+        {
+        }
     }
 }

@@ -20,14 +20,14 @@ namespace Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
 
 public class RejectedAggregationResultMessage : OutgoingMessage
 {
-    public RejectedAggregationResultMessage(ActorNumber receiverId, TransactionId transactionId, string businessReason, MarketRole receiverRole, RejectedTimeSerie series)
-        : base(DocumentType.RejectRequestAggregatedMeasureData, receiverId, transactionId, businessReason, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringDataAdministrator, new Serializer().Serialize(series))
+    public RejectedAggregationResultMessage(ActorNumber receiverId, ProcessId processId, string businessReason, MarketRole receiverRole, RejectedTimeSerie series)
+        : base(DocumentType.RejectRequestAggregatedMeasureData, receiverId, processId, businessReason, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringDataAdministrator, new Serializer().Serialize(series))
     {
         Series = series;
     }
 
-    private RejectedAggregationResultMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
-        : base(documentType, receiverId, transactionId, businessReason, receiverRole, senderId, senderRole, messageRecord)
+    private RejectedAggregationResultMessage(DocumentType documentType, ActorNumber receiverId, ProcessId processId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+        : base(documentType, receiverId, processId, businessReason, receiverRole, senderId, senderRole, messageRecord)
     {
         Series = new Serializer().Deserialize<RejectedTimeSerie>(messageRecord)!;
     }

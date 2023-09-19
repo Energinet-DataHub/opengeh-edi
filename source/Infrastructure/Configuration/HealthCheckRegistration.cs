@@ -26,7 +26,7 @@ public static class HealthCheckRegistration
     {
         services.AddHealthChecks()
             .AddSqlServer(
-                name: "MarketRolesDB",
+                name: "EdiSqlDB",
                 connectionString: dbConnectionString);
     }
 
@@ -36,7 +36,7 @@ public static class HealthCheckRegistration
         {
             services.AddHealthChecks()
                 .AddAzureServiceBusQueue(
-                    name: name + "Exists" + Guid.NewGuid(),
+                    name: name + "Exists",
                     connectionString: serviceBusConnectionString,
                     queueName: name);
         }
@@ -52,7 +52,7 @@ public static class HealthCheckRegistration
         {
             services.AddHealthChecks()
                 .AddAzureServiceBusSubscription(
-                    name: name + "Exists" + Guid.NewGuid(),
+                    name: name + "Exists",
                     connectionString: serviceBusConnectionString,
                     topicName: topicName,
                     subscriptionName: name);

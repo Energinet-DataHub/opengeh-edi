@@ -15,22 +15,23 @@
 using System;
 using System.Text.Json.Serialization;
 using Application.Configuration.Commands.Commands;
+using Domain.Transactions;
 
 namespace Application.Transactions.MoveIn;
 
 public class FetchMeteringPointMasterData : InternalCommand
 {
     [JsonConstructor]
-    public FetchMeteringPointMasterData(string businessProcessId, string marketEvaluationPointNumber, Guid transactionId)
+    public FetchMeteringPointMasterData(string businessProcessId, string marketEvaluationPointNumber, ProcessId processId)
     {
         BusinessProcessId = businessProcessId;
         MarketEvaluationPointNumber = marketEvaluationPointNumber;
-        TransactionId = transactionId;
+        ProcessId = processId;
     }
 
     public string BusinessProcessId { get; }
 
-    public Guid TransactionId { get; }
+    public ProcessId ProcessId { get; }
 
     public string MarketEvaluationPointNumber { get; }
 }

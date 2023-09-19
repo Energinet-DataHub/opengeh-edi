@@ -49,7 +49,7 @@ public class RejectRequestChangeOfSupplierMessageTests
         }
 
         return RejectRequestChangeOfSupplierMessage.Create(
-            TransactionId.New(),
+            ProcessId.New(),
             ActorProvidedId.Create("123456789"),
             BusinessReason.MoveIn,
             string.Empty,

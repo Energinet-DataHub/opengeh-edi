@@ -45,7 +45,7 @@ public class Scenario
     }
 
     public static Scenario Details(
-        Guid transactionId,
+        ProcessId processId,
         string meteringPointNumber,
         Instant supplyStart,
         string currentEnergySupplierNumber,
@@ -58,7 +58,7 @@ public class Scenario
         B2BContext context)
     {
         _transaction = new MoveInTransaction(
-            TransactionId.Create(transactionId),
+            processId,
             SampleData.ActorProvidedId,
             meteringPointNumber,
             supplyStart,

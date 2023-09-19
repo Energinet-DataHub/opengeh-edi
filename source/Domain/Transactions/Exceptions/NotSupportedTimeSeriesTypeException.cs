@@ -12,20 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Domain.Actors;
+namespace Domain.Transactions.Exceptions;
 
-namespace Application.Transactions.Aggregations;
-
-/// <summary>
-/// Service looking up grid area details
-/// </summary>
-public interface IGridAreaLookup
+public class NotSupportedTimeSeriesTypeException : Exception
 {
-    /// <summary>
-    /// Finds the actor number of the grid operator of the specified grid area
-    /// </summary>
-    /// <param name="gridAreaCode"></param>
-    /// <returns><see cref="ActorNumber"/></returns>
-    Task<ActorNumber> GetGridOperatorForAsync(string gridAreaCode);
+    public NotSupportedTimeSeriesTypeException()
+    {
+    }
+
+    public NotSupportedTimeSeriesTypeException(string message)
+        : base(message)
+    {
+    }
+
+    public NotSupportedTimeSeriesTypeException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
 }

@@ -13,15 +13,16 @@
 // limitations under the License.
 
 using System;
+using Domain.Transactions;
 using NodaTime;
 
 namespace Tests.Domain.Transactions.MoveIn;
 
 internal sealed class SampleData
 {
-    internal static Guid TransactionId => Guid.Parse("17DE02FC-6A83-436F-BC89-779ABBD6AB35");
+    internal static ProcessId ProcessId => ProcessId.Create(Guid.Parse("17DE02FC-6A83-436F-BC89-779ABBD6AB35"));
 
-    internal static string ProcessId => "1F4D6E69-5C0D-461C-AB52-E34EF77E24D8";
+    internal static string BusinessProcessId => "1F4D6E69-5C0D-461C-AB52-E34EF77E24D8";
 
     internal static string MarketEvaluationPointId => "BFBB73FD-6CC1-4EC1-BA97-568589BF85AD";
 

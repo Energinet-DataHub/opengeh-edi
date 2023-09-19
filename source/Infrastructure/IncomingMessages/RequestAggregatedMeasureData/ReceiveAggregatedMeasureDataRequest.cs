@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IO;
 using Application.Configuration.Commands.Commands;
 using Application.IncomingMessages.RequestAggregatedMeasureData;
 using CimMessageAdapter.Messages;
@@ -21,15 +20,10 @@ namespace Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
 public class ReceiveAggregatedMeasureDataRequest : ICommand<Result>
 {
-    public ReceiveAggregatedMeasureDataRequest(
-        MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> messageResult,
-        Stream originalMessage)
+    public ReceiveAggregatedMeasureDataRequest(MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> messageResult)
     {
         MessageResult = messageResult;
-        OriginalMessage = originalMessage;
     }
 
     public MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> MessageResult { get; }
-
-    public Stream OriginalMessage { get; }
 }

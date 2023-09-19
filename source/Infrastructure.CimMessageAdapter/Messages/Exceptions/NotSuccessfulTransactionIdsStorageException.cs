@@ -12,16 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+using System;
 
-namespace Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+namespace CimMessageAdapter.Messages.Exceptions;
 
-public class AggregatedMeasureProcessWasRejected : DomainEvent
+public class NotSuccessfulTransactionIdsStorageException
+    : Exception
 {
-    public AggregatedMeasureProcessWasRejected(ProcessId processId)
+    public NotSuccessfulTransactionIdsStorageException(string message, Exception innerException)
+        : base(message, innerException)
     {
-        ProcessId = processId;
     }
 
-    public ProcessId ProcessId { get; }
+    public NotSuccessfulTransactionIdsStorageException()
+    {
+    }
+
+    public NotSuccessfulTransactionIdsStorageException(string message)
+        : base(message)
+    {
+    }
 }
