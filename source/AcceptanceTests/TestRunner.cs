@@ -15,7 +15,6 @@
 using AcceptanceTest.Drivers;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 
 namespace AcceptanceTest;
 
@@ -31,9 +30,15 @@ public class TestRunner : IAsyncDisposable
 
         var connectionString = secretsConfiguration.GetValue<string>("sb-domain-relay-manage-connection-string")!;
         var topicName = secretsConfiguration.GetValue<string>("sbt-shres-integrationevent-received-name")!;
-        var dbConnectionString = root.GetValue<string>("EDI_DATABASE_CONNECTION_STRING")!;
         EventPublisher = new IntegrationEventPublisher(connectionString, topicName);
         AzpToken = root.GetValue<string>("AZP_TOKEN")!;
+
+        var sqlServer = secretsConfiguration.GetValue<string>("mssql-data-url")!;
+        var sqlUserName = secretsConfiguration.GetValue<string>("mssql-data-admin-user-name")!;
+        var sqlUserPassword = secretsConfiguration.GetValue<string>("mssql-data-admin-user-password")!;
+        var sqlDatabaseName = "mssqldb-edi-edi-u-001";
+
+        var dbConnectionString = $"Server={sqlServer};Initial Catalog={sqlDatabaseName};User Id={sqlUserName};Password={sqlUserPassword};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
         ActorFactory.InsertActor(dbConnectionString, AzpToken);
     }
 
