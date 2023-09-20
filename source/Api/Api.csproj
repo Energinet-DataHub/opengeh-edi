@@ -19,6 +19,8 @@ limitations under the License.
         <AzureFunctionsVersion>v4</AzureFunctionsVersion>
         <OutputType>Exe</OutputType>
         <_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>
+        <AssemblyName>Energinet.DataHub.EDI.Api</AssemblyName>
+        <RootNamespace>Energinet.DataHub.EDI.Api</RootNamespace>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.16.1" />
