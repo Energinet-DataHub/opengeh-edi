@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using Domain.Actors;
+using Domain.Common;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
 using Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeOfSupplier;
 using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
-using Domain.SeedWork;
 using Domain.Transactions.MoveIn.Events;
 using NodaTime;
 

@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using Domain.Actors;
+using Domain.Common;
 using Domain.Documents;
-using Domain.SeedWork;
 using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 

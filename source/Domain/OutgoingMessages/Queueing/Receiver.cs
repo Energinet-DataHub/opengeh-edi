@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Domain.Actors;
-using Domain.SeedWork;
+using Domain.Common;
 
 namespace Domain.OutgoingMessages.Queueing;
 

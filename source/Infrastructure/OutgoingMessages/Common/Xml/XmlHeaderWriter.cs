@@ -17,8 +17,8 @@ using System.Threading.Tasks;
 using System.Xml;
 using Application.OutgoingMessages.Common.Xml;
 using Domain.Actors;
+using Domain.Common;
 using Domain.OutgoingMessages;
-using Domain.SeedWork;
 
 namespace Infrastructure.OutgoingMessages.Common.Xml;
 

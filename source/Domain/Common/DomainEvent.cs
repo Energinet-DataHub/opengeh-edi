@@ -15,7 +15,7 @@
 using MediatR;
 using NodaTime;
 
-namespace Domain.SeedWork
+namespace Domain.Common
 {
     public class DomainEvent : INotification
     {
