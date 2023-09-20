@@ -56,7 +56,7 @@ internal static class InternalCommandProcessing
         mapper.Add("UpdateCustomerMasterData", typeof(UpdateCustomerMasterData));
         mapper.Add("Aggregations.ForwardAggregationResult", typeof(ForwardAggregationResult));
         mapper.Add("SendAggregatedMeasureRequestToWholesale", typeof(SendAggregatedMeasureRequestToWholesale));
-        mapper.Add("AcceptedAggregatedTimeSeries", typeof(AcceptedAggregatedTimeSeries));
+        mapper.Add("AcceptedAggregatedTimeSerie", typeof(AcceptedAggregatedTimeSerie));
         mapper.Add("CreateAggregatedMeasureAggregationResults", typeof(CreateAggregatedMeasureAggregationResults));
         mapper.Add("RejectedAggregatedTimeSeries", typeof(RejectedAggregatedTimeSeries));
         mapper.Add("ForwardRejectedAggregationResult", typeof(ForwardRejectedAggregationResult));

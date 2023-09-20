@@ -44,7 +44,7 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
     {
         _processor = GetService<InboxEventsProcessor>();
         _aggregatedTimeSeriesRequestAcceptedEventMapper = GetService<AggregatedTimeSeriesRequestAcceptedEventMapper>();
-        _aggregatedTimeSeriesRequestAcceptedResponse = CreateResponseFromWholeSaleTemp();
+        _aggregatedTimeSeriesRequestAcceptedResponse = CreateResponseFromWholeSale();
         RegisterInboxEvent();
     }
 
@@ -57,15 +57,7 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
         await EventIsMarkedAsProcessedAsync(_eventId).ConfigureAwait(false);
     }
 
-    private static AggregatedTimeSeriesRequestAccepted CreateResponseFromWholeSaleTemp()
-    {
-        var wholesaleResponse = new AggregatedTimeSeriesRequestAccepted();
-        wholesaleResponse.Serie = CreateSerie();
-
-        return wholesaleResponse;
-    }
-
-    private static Serie CreateSerie()
+    private static AggregatedTimeSeriesRequestAccepted CreateResponseFromWholeSale()
     {
         var quantity = new DecimalValue() { Units = 12345, Nanos = 123450000, };
         var point = new TimeSeriesPoint()
@@ -82,7 +74,7 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
             Resolution = Resolution.Pt15M,
         };
 
-        return new Serie()
+        return new AggregatedTimeSeriesRequestAccepted()
         {
             SettlementVersion = "0",
             GridArea = "244",
