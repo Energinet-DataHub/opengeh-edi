@@ -41,7 +41,7 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
         _dbContext.ArchivedMessages.Add(message);
     }
 
-    public async Task<Stream?> GetDocumentAsync(string id, CancellationToken cancellationToken)
+    public async Task<Stream?> GetAsync(string id, CancellationToken cancellationToken)
     {
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         using var command = CreateCommand(

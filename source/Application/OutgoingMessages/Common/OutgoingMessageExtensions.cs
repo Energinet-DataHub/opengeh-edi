@@ -12,19 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+namespace Application.OutgoingMessages.Common;
 
-namespace Application.OutgoingMessages;
-
-public class BusinessReasonCode : EnumerationType
+public static class OutgoingMessageExtensions
 {
-    public static readonly BusinessReasonCode CustomerMoveInOrMoveOut = new(0, nameof(CustomerMoveInOrMoveOut), "E01");
-
-    private BusinessReasonCode(int id, string name, string code)
-        : base(id, name)
+    public static string ToStringValue(this bool value)
     {
-        Code = code;
+        return value ? "true" : "false";
     }
-
-    public string Code { get; }
 }

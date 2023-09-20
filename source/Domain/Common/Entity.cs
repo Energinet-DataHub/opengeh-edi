@@ -16,7 +16,7 @@ namespace Domain.SeedWork
 {
     public abstract class Entity
     {
-        private readonly List<DomainEvent> _domainEvents = new List<DomainEvent>();
+        private readonly List<DomainEvent> _domainEvents = new();
 
         /// <summary>
         /// Domain events occurred.

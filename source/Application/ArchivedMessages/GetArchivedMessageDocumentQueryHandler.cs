@@ -34,6 +34,6 @@ public class GetArchivedMessageDocumentQueryHandler : IRequestHandler<GetArchive
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        return await _archivedMessageRepository.GetDocumentAsync(request.Id, cancellationToken).ConfigureAwait(false);
+        return await _archivedMessageRepository.GetAsync(request.Id, cancellationToken).ConfigureAwait(false);
     }
 }

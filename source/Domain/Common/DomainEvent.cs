@@ -19,14 +19,8 @@ namespace Domain.SeedWork
 {
     public class DomainEvent : INotification
     {
-        public DomainEvent()
-        {
-            Id = Guid.NewGuid();
-            OccurredOn = SystemClock.Instance.GetCurrentInstant();
-        }
+        public Guid Id { get; } = Guid.NewGuid();
 
-        public Guid Id { get; }
-
-        public Instant OccurredOn { get; }
+        public Instant OccurredOn { get; } = SystemClock.Instance.GetCurrentInstant();
     }
 }

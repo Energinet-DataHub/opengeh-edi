@@ -44,7 +44,7 @@ internal static class InternalCommandProcessing
     private static InternalCommandMapper CreateInternalCommandMap()
     {
         var mapper = new InternalCommandMapper();
-        mapper.Add("CreateActor", typeof(CreateActor));
+        mapper.Add("CreateActor", typeof(CreateActorCommand));
         mapper.Add("FetchCustomerMasterData", typeof(FetchCustomerMasterData));
         mapper.Add("FetchMeteringPointMasterData", typeof(FetchMeteringPointMasterData));
         mapper.Add("ForwardMeteringPointMasterData", typeof(ForwardMeteringPointMasterData));

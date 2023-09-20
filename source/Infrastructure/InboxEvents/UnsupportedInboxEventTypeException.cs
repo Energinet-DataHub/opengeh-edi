@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Domain.EventListeners.Exceptions;
+using System;
+
+namespace Infrastructure.InboxEvents;
 
 public class UnsupportedInboxEventTypeException : Exception
 {

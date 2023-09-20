@@ -12,12 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Application.OutgoingMessages;
+using System.Text.Json.Serialization;
+using Application.Configuration.Commands.Commands;
 
-public static class OutgoingMessageExtensions
+namespace Application.Actors;
+
+public class CreateActorCommand : InternalCommand
 {
-    public static string ToStringValue(this bool value)
+    [JsonConstructor]
+    public CreateActorCommand(string actorId, string b2cId, string identificationNumber)
     {
-        return value ? "true" : "false";
+        ActorId = actorId;
+        IdentificationNumber = identificationNumber;
+        B2CId = b2cId;
     }
+
+    public string B2CId { get; }
+
+    public string ActorId { get; }
+
+    public string IdentificationNumber { get; }
 }

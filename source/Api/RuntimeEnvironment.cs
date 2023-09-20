@@ -51,9 +51,6 @@ namespace Api
         public virtual bool ALLOW_TEST_TOKENS =>
             bool.Parse(GetEnvironmentVariable(nameof(ALLOW_TEST_TOKENS)) ?? "false");
 
-        public virtual Uri AGGREGATION_RESULTS_API_URI =>
-            new(GetEnvironmentVariable(nameof(AGGREGATION_RESULTS_API_URI))!);
-
         public string? AzureWebJobsStorage =>
             GetEnvironmentVariable(nameof(AzureWebJobsStorage));
 
