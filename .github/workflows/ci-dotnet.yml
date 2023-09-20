@@ -29,7 +29,7 @@ jobs:
   integration_tests:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v12
     with:
-      tests_dll_file_path: \source\IntegrationTests\bin\Release\net7.0\IntegrationTests.dll
+      tests_dll_file_path: \source\IntegrationTests\bin\Release\net7.0\Energinet.DataHub.EDI.IntegrationTests.dll
       download_attempt_limit: 12
       dotnet_version: 7.0.200
 
@@ -37,7 +37,7 @@ jobs:
   architecture_tests:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v12
     with:
-      tests_dll_file_path: \source\ArchitectureTests\bin\Release\net7.0\ArchitectureTests.dll
+      tests_dll_file_path: \source\ArchitectureTests\bin\Release\net7.0\Energinet.DataHub.EDI.ArchitectureTests.dll
       download_attempt_limit: 12
       dotnet_version: 7.0.200
 
@@ -45,7 +45,7 @@ jobs:
   tests:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v12
     with:
-      tests_dll_file_path: \source\Tests\bin\Release\net7.0\Tests.dll
+      tests_dll_file_path: \source\Tests\bin\Release\net7.0\Energinet.DataHub.EDI.Tests.dll
       download_attempt_limit: 12
       dotnet_version: 7.0.200
 
