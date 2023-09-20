@@ -28,7 +28,7 @@ using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
 
 namespace IntegrationTests.Infrastructure.InboxEvents;
 
-public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>
+public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHandler<AggregatedTimeSerieRequestWasAccepted>
 {
     private static readonly List<INotification> _actualNotifications = new();
 
@@ -38,27 +38,26 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
 
         Assert.NotNull(_actualNotifications);
         Assert.Single(_actualNotifications);
-        Assert.Contains(_actualNotifications, notification => notification is AggregatedTimeSeriesRequestWasAccepted);
-        var actualNotification = _actualNotifications.Single() as AggregatedTimeSeriesRequestWasAccepted;
-        var actualTimeSerie = actualNotification!.AggregatedTimeSerie[0];
-        var exceptedTimeSerie = aggregatedTimeSeriesRequestAccepted.Series.First();
-        Assert.Equal(exceptedTimeSerie.GridArea, actualTimeSerie.GridAreaDetails.GridAreaCode);
-        Assert.Equal(exceptedTimeSerie.SettlementVersion, actualTimeSerie.SettlementVersion);
-        Assert.Equal(exceptedTimeSerie.Period.StartOfPeriod.ToInstant(), actualTimeSerie.Period.Start);
-        Assert.Equal(exceptedTimeSerie.Period.EndOfPeriod.ToInstant(), actualTimeSerie.Period.End);
-        Assert.Equal(MapUnitType(exceptedTimeSerie), actualTimeSerie.UnitType);
-        Assert.Equal(MapResolution(exceptedTimeSerie.Period.Resolution), actualTimeSerie.Resolution);
-        Assert.Equal(MapMeteringPointType(exceptedTimeSerie), actualTimeSerie.MeteringPointType);
+        Assert.Contains(_actualNotifications, notification => notification is AggregatedTimeSerieRequestWasAccepted);
+        var actualNotification = _actualNotifications.Single() as AggregatedTimeSerieRequestWasAccepted;
+        var actualTimeSerie = actualNotification!.AggregatedTimeSerie;
+        Assert.Equal(aggregatedTimeSeriesRequestAccepted.GridArea, actualTimeSerie.GridAreaDetails.GridAreaCode);
+        Assert.Equal(aggregatedTimeSeriesRequestAccepted.SettlementVersion, actualTimeSerie.SettlementVersion);
+        Assert.Equal(aggregatedTimeSeriesRequestAccepted.Period.StartOfPeriod.ToInstant(), actualTimeSerie.Period.Start);
+        Assert.Equal(aggregatedTimeSeriesRequestAccepted.Period.EndOfPeriod.ToInstant(), actualTimeSerie.Period.End);
+        Assert.Equal(MapUnitType(aggregatedTimeSeriesRequestAccepted), actualTimeSerie.UnitType);
+        Assert.Equal(MapResolution(aggregatedTimeSeriesRequestAccepted.Period.Resolution), actualTimeSerie.Resolution);
+        Assert.Equal(MapMeteringPointType(aggregatedTimeSeriesRequestAccepted), actualTimeSerie.MeteringPointType);
         foreach (var point in actualTimeSerie.Points)
         {
-            Assert.Contains(exceptedTimeSerie.TimeSeriesPoints, exceptedPoint =>
+            Assert.Contains(aggregatedTimeSeriesRequestAccepted.TimeSeriesPoints, exceptedPoint =>
                 exceptedPoint.Time.ToString() == point.SampleTime &&
                 MapQuality(exceptedPoint.QuantityQuality) == point.Quality &&
                 Parse(exceptedPoint.Quantity) == point.Quantity);
         }
     }
 
-    public Task Handle(AggregatedTimeSeriesRequestWasAccepted notification, CancellationToken cancellationToken)
+    public Task Handle(AggregatedTimeSerieRequestWasAccepted notification, CancellationToken cancellationToken)
     {
         _actualNotifications.Add(notification);
         return Task.CompletedTask;
@@ -88,9 +87,9 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
         return input.Units + (input.Nanos / nanoFactor);
     }
 
-    private static string MapMeteringPointType(Serie serie)
+    private static string MapMeteringPointType(AggregatedTimeSeriesRequestAccepted aggregation)
     {
-        return serie.TimeSeriesType switch
+        return aggregation.TimeSeriesType switch
         {
             TimeSeriesType.Production => MeteringPointType.Production.Name,
             TimeSeriesType.FlexConsumption => MeteringPointType.Consumption.Name,
@@ -114,9 +113,9 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
         };
     }
 
-    private static string MapUnitType(Serie serie)
+    private static string MapUnitType(AggregatedTimeSeriesRequestAccepted aggregation)
     {
-        return serie.QuantityUnit switch
+        return aggregation.QuantityUnit switch
         {
             QuantityUnit.Kwh => MeasurementUnit.Kwh.Name,
             QuantityUnit.Unspecified => throw new InvalidOperationException("Could not map unit type"),
