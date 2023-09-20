@@ -49,6 +49,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     private readonly MessageTypeValidator _messageTypeValidator;
     private readonly CalculationResponsibleReceiverVerification _calculationResponsibleReceiverVerification;
     private readonly MessageQueueDispatcherStub<RequestAggregatedMeasureDataTransactionQueues> _messageQueueDispatcherSpy = new();
+    private readonly MessageQueueDispatcherThatFailsStub<RequestAggregatedMeasureDataTransactionQueues> _messageQueueDispatcherThatFailsStub = new();
     private readonly List<Claim> _claims = new()
     {
         new(ClaimsMap.UserId, new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.SenderId).B2CId),
@@ -464,8 +465,32 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         await AssertMessageIdIsStoredAsync(document.Header.SenderId, document.Header.MessageId).ConfigureAwait(false);
     }
 
+    // This is a unpleasant implementation, but it's the current implementation.
+    // Since it is not possible to make a database transaction and a service bus commit
+    // in the same transaction scope.
     [Fact]
-    public async Task Valid_multiple_activity_records_are_extracted_and_committed_to_queue()
+    public async Task Transaction_and_message_ids_are_stored_when_commit_to_queue_fails()
+    {
+        await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
+            .ConfigureAwait(false);
+        var knownReceiverId = "5790001330552";
+        var knownReceiverRole = "DGL";
+        await using var message = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .WithReceiverRole(knownReceiverRole)
+            .WithReceiverId(knownReceiverId)
+            .Message();
+
+        var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
+        await Assert.ThrowsAsync<ServiceBusCommitException>(() => CreateMessageReceiver(_messageQueueDispatcherThatFailsStub).ReceiveAsync(messageParserResult, CancellationToken.None)).ConfigureAwait(false);
+
+        var document = messageParserResult!.IncomingMarketDocument!;
+        await AssertTransactionIdIsStoredAsync(document.Header.SenderId, document.MarketActivityRecords.First().Id).ConfigureAwait(false);
+        await AssertMessageIdIsStoredAsync(document.Header.SenderId, document.Header.MessageId).ConfigureAwait(false);
+    }
+
+    [Fact]
+    public async Task Multiple_activity_records_are_committed_to_queue()
     {
         await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
             .ConfigureAwait(false);
@@ -482,9 +507,10 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
 
-        var transaction = _messageQueueDispatcherSpy.CommittedItems.FirstOrDefault();
+        var transaction = _messageQueueDispatcherSpy.CommittedItems;
         Assert.True(result.Success);
         Assert.NotNull(transaction);
+        Assert.Equal(messageParserResult.IncomingMarketDocument!.MarketActivityRecords.Count, transaction.Count);
 
         var document = messageParserResult!.IncomingMarketDocument!;
         await AssertTransactionIdIsStoredAsync(document.Header.SenderId, document.MarketActivityRecords.First().Id).ConfigureAwait(false);
@@ -532,7 +558,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     }
 
     [Fact]
-    public async Task Transaction_id_and_message_id_are_not_saved_when_duplicated_across_scopes()
+    public async Task Transaction_id_and_message_id_are_not_registered_when_duplicated_across_scopes()
     {
         await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
             .ConfigureAwait(false);
