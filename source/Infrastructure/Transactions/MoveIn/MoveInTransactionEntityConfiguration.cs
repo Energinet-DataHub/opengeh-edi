@@ -21,7 +21,7 @@ using Infrastructure.Configuration.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Transactions
+namespace Infrastructure.Transactions.MoveIn
 {
     internal sealed class MoveInTransactionEntityConfiguration : IEntityTypeConfiguration<MoveInTransaction>
     {

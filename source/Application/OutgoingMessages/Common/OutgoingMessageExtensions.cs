@@ -12,21 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
-using NodaTime;
+namespace Application.OutgoingMessages.Common;
 
-namespace Domain.SeedWork
+public static class OutgoingMessageExtensions
 {
-    public class DomainEvent : INotification
+    public static string ToStringValue(this bool value)
     {
-        public DomainEvent()
-        {
-            Id = Guid.NewGuid();
-            OccurredOn = SystemClock.Instance.GetCurrentInstant();
-        }
-
-        public Guid Id { get; }
-
-        public Instant OccurredOn { get; }
+        return value ? "true" : "false";
     }
 }

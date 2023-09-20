@@ -26,7 +26,7 @@ using Domain.Documents;
 using Domain.OutgoingMessages.Queueing;
 using MediatR;
 
-namespace Application.OutgoingMessages.Peek;
+namespace Application.OutgoingMessages;
 
 public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
 {
@@ -76,7 +76,7 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
         {
             var timestamp = _systemDateTimeProvider.Now();
 
-            var outgoingMessages = await _outgoingMessageRepository.GetByAssignedBundleIdAsync(peekResult.BundleId).ConfigureAwait(false);
+            var outgoingMessages = await _outgoingMessageRepository.GetAsync(peekResult.BundleId).ConfigureAwait(false);
             var result = await _documentFactory.CreateFromAsync(outgoingMessages, request.DocumentFormat, timestamp).ConfigureAwait(false);
 
             document = new MarketDocument(result, peekResult.BundleId);

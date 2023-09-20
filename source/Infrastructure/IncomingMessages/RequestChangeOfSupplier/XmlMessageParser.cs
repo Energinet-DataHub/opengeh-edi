@@ -29,7 +29,7 @@ using DocumentFormat = Domain.Documents.DocumentFormat;
 
 namespace Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 
-public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>
+public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";
@@ -43,7 +43,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
 
     public DocumentFormat HandledFormat => DocumentFormat.Xml;
 
-    public async Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseAsync(
+    public async Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>> ParseAsync(
         Stream message, CancellationToken cancellationToken)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
@@ -68,7 +68,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             .ConfigureAwait(true);
         if (xmlSchema is null)
         {
-            return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(
+            return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>(
                 new InvalidBusinessReasonOrVersion(businessProcessType, version));
         }
 
@@ -81,7 +81,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
 
                 if (_errors.Any())
                 {
-                    return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(_errors.ToArray());
+                    return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>(_errors.ToArray());
                 }
 
                 return parsedXmlData;
@@ -229,10 +229,10 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         return marketActivityRecord;
     }
 
-    private static MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction> InvalidXmlFailure(
+    private static MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand> InvalidXmlFailure(
         Exception exception)
     {
-        return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(
+        return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>(
             InvalidMessageStructure.From(exception));
     }
 
@@ -272,7 +272,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         return settings;
     }
 
-    private async Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseXmlDataAsync(
+    private async Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>> ParseXmlDataAsync(
         XmlReader reader, CancellationToken cancellationToken)
     {
         var root = await reader.ReadRootElementAsync().ConfigureAwait(false);
@@ -280,7 +280,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             .ExtractAsync(reader, root, HeaderElementName, MarketActivityRecordElementName, cancellationToken).ConfigureAwait(false);
         if (_errors.Count > 0)
         {
-            return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(_errors.ToArray());
+            return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>(_errors.ToArray());
         }
 
         var marketActivityRecords = new List<MarketActivityRecord>();
@@ -291,10 +291,10 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
 
         if (_errors.Count > 0)
         {
-            return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(_errors.ToArray());
+            return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>(_errors.ToArray());
         }
 
-        return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(
+        return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>(
             new RequestChangeOfSupplierIncomingMarketDocument(messageHeader, marketActivityRecords));
     }
 }

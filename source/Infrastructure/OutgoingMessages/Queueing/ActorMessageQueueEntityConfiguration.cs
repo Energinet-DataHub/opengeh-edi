@@ -14,10 +14,10 @@
 
 using System;
 using Domain.Actors;
+using Domain.Common;
 using Domain.Documents;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.Queueing;
-using Domain.SeedWork;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

@@ -52,7 +52,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     private readonly MessageQueueDispatcherThatFailsStub<RequestAggregatedMeasureDataTransactionQueues> _messageQueueDispatcherThatFailsStub = new();
     private readonly List<Claim> _claims = new()
     {
-        new(ClaimsMap.UserId, new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.SenderId).B2CId),
+        new(ClaimsMap.UserId, new CreateActorCommand(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.SenderId).B2CId),
     };
 
     public RequestAggregatedMeasureDataReceiverTests(DatabaseFixture databaseFixture)
@@ -79,8 +79,8 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     {
 #pragma warning disable CA2007
 
-        await InvokeCommandAsync(new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.SenderId)).ConfigureAwait(false);
-        await InvokeCommandAsync(new CreateActor(Guid.NewGuid().ToString(), SampleData.SecondStsAssignedUserId, SampleData.SecondSenderId)).ConfigureAwait(false);
+        await InvokeCommandAsync(new CreateActorCommand(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.SenderId)).ConfigureAwait(false);
+        await InvokeCommandAsync(new CreateActorCommand(Guid.NewGuid().ToString(), SampleData.SecondStsAssignedUserId, SampleData.SecondSenderId)).ConfigureAwait(false);
         //TODO: Consider removing authentication from validation (message receiver).
         await _marketActorAuthenticator.AuthenticateAsync(new ClaimsPrincipal(new ClaimsIdentity(_claims)), CancellationToken.None).ConfigureAwait(false);
     }
@@ -721,7 +721,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         {
             new(
                 ClaimsMap.UserId,
-                new CreateActor(Guid.NewGuid().ToString(), b2cId, senderId).B2CId),
+                new CreateActorCommand(Guid.NewGuid().ToString(), b2cId, senderId).B2CId),
         };
         claims.AddRange(roles.Select(ClaimsMap.RoleFrom));
         await _marketActorAuthenticator
@@ -743,7 +743,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         return messageReceiver;
     }
 
-    private Task<MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>> ParseMessageAsync(Stream message)
+    private Task<MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>> ParseMessageAsync(Stream message)
     {
         return _messageParser.ParseAsync(message, DocumentFormat.Xml, CancellationToken.None);
     }

@@ -194,7 +194,7 @@ namespace Infrastructure.Configuration
 
         public CompositionRoot AddMessagePublishing()
         {
-            _services.AddSingleton<IActorLookup, ActorLookup>();
+            _services.AddSingleton<IActorRepository, ActorRepository>();
             _services.AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>();
             _services.AddScoped<OutgoingMessageEnqueuer>();
             return this;
@@ -291,7 +291,7 @@ namespace Infrastructure.Configuration
 
         private void AddActorServices()
         {
-            _services.AddTransient<IRequestHandler<CreateActor, Unit>, CreateActorHandler>();
+            _services.AddTransient<IRequestHandler<CreateActorCommand, Unit>, CreateActorHandler>();
             _services.AddTransient<IActorRegistry, ActorRegistry>();
         }
 

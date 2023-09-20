@@ -14,13 +14,21 @@
 
 using System;
 
-namespace Application.OutgoingMessages
+namespace Infrastructure.InboxEvents;
+
+public class UnsupportedInboxEventTypeException : Exception
 {
-    public static class MessageIdGenerator
+    public UnsupportedInboxEventTypeException(string message)
+        : base(message)
     {
-        public static string Generate()
-        {
-            return Guid.NewGuid().ToString();
-        }
+    }
+
+    public UnsupportedInboxEventTypeException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+
+    private UnsupportedInboxEventTypeException()
+    {
     }
 }

@@ -51,9 +51,9 @@ public class CreateActorsTests : TestBase
         Assert.Equal(SampleData.B2CId, actor.B2CId);
     }
 
-    private static CreateActor CreateCommand()
+    private static CreateActorCommand CreateCommand()
     {
-        return new CreateActor(SampleData.ActorId, SampleData.B2CId.ToString(), SampleData.IdentificationNumber);
+        return new CreateActorCommand(SampleData.ActorId, SampleData.B2CId.ToString(), SampleData.IdentificationNumber);
     }
 
     private async Task<Actor> GetActor()

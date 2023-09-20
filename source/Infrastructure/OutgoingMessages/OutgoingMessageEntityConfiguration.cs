@@ -14,6 +14,7 @@
 
 using System;
 using Domain.Actors;
+using Domain.Common;
 using Domain.Documents;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics;
@@ -25,7 +26,6 @@ using Domain.OutgoingMessages.MoveIn.RejectRequestChangeAccountingPointCharacter
 using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.OutgoingMessages.Queueing;
-using Domain.SeedWork;
 using Domain.Transactions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

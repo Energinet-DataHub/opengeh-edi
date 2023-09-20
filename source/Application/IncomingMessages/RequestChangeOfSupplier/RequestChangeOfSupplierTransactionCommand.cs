@@ -19,10 +19,10 @@ using MediatR;
 
 namespace Application.IncomingMessages.RequestChangeOfSupplier
 {
-    public class RequestChangeOfSupplierTransaction : ICommand<Unit>, IMarketTransaction<MarketActivityRecord>
+    public class RequestChangeOfSupplierTransactionCommand : ICommand<Unit>, IMarketTransaction<MarketActivityRecord>
     {
         [JsonConstructor]
-        public RequestChangeOfSupplierTransaction(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
+        public RequestChangeOfSupplierTransactionCommand(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
         {
             MessageHeader = messageHeader;
             MarketActivityRecord = marketActivityRecord;
@@ -32,10 +32,10 @@ namespace Application.IncomingMessages.RequestChangeOfSupplier
 
         public MarketActivityRecord MarketActivityRecord { get; }
 
-        public static RequestChangeOfSupplierTransaction Create(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
+        public static RequestChangeOfSupplierTransactionCommand Create(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
         {
             if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
-            return new RequestChangeOfSupplierTransaction(messageHeader, marketActivityRecord);
+            return new RequestChangeOfSupplierTransactionCommand(messageHeader, marketActivityRecord);
         }
     }
 }

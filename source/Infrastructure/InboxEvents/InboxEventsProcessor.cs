@@ -20,7 +20,6 @@ using System.Threading.Tasks;
 using Application.Configuration;
 using Application.Configuration.DataAccess;
 using Dapper;
-using Domain.EventListeners.Exceptions;
 using MediatR;
 using Microsoft.Extensions.Logging;
 

@@ -28,8 +28,8 @@ using DocumentFormat = Domain.Documents.DocumentFormat;
 
 namespace Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
-public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureDataTransaction>,
-    IMessageParser<Serie, RequestAggregatedMeasureDataTransaction>
+public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureDataTransactionCommand>,
+    IMessageParser<Serie, RequestAggregatedMeasureDataTransactionCommand>
 {
     private const string SeriesElementName = "Series";
     private const string HeaderElementName = "RequestAggregatedMeasureData_MarketDocument";
@@ -42,7 +42,7 @@ public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureD
 
     public DocumentFormat HandledFormat => DocumentFormat.Json;
 
-    public async Task<MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>> ParseAsync(
+    public async Task<MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>> ParseAsync(
         Stream message,
         CancellationToken cancellationToken)
     {
@@ -51,7 +51,7 @@ public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureD
         var schema = await GetSchemaAsync(DocumentName, cancellationToken).ConfigureAwait(false);
         if (schema is null)
         {
-            return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(
+            return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>(
                 new InvalidBusinessReasonOrVersion(DocumentName, "0"));
         }
 
@@ -61,7 +61,7 @@ public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureD
 
         if (errors.Count > 0)
         {
-            return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(errors.ToArray());
+            return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>(errors.ToArray());
         }
 
         try
@@ -106,7 +106,7 @@ public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureD
         return element.TryGetProperty(propertyName, out var property) ? property.GetProperty("value").ToString() : null;
     }
 
-    private static MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> ParseJsonData(
+    private static MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand> ParseJsonData(
         MessageHeader header,
         JsonElement seriesJson)
     {
@@ -117,7 +117,7 @@ public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureD
             series.Add(SeriesFrom(jsonElement));
         }
 
-        return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(
+        return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>(
             new RequestAggregatedMeasureDataIncomingMarketDocument(header, series));
     }
 }

@@ -28,8 +28,8 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
     private readonly IActorRegistry _actorRegistry;
     private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public DevMarketActorAuthenticator(IActorLookup actorLookup, IActorRegistry actorRegistry, IDatabaseConnectionFactory connectionFactory)
-        : base(actorLookup)
+    public DevMarketActorAuthenticator(IActorRepository actorRepository, IActorRegistry actorRegistry, IDatabaseConnectionFactory connectionFactory)
+        : base(actorRepository)
     {
         _actorRegistry = actorRegistry;
         _connectionFactory = connectionFactory;
@@ -81,7 +81,7 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
 
     private Task RegisterActorAsync(Actor actor, CancellationToken cancellationToken)
     {
-        return _actorRegistry.TryStoreAsync(new CreateActor(Guid.NewGuid().ToString(),  actor.Id.ToString(), actor.Number), cancellationToken);
+        return _actorRegistry.TryStoreAsync(new CreateActorCommand(Guid.NewGuid().ToString(),  actor.Id.ToString(), actor.Number), cancellationToken);
     }
 
     #pragma warning disable

@@ -58,7 +58,7 @@ public class RequestAggregatedMeasureTransactionQueueListener
         var byteAsString = Encoding.UTF8.GetString(data);
 
         await _mediator.Send(
-                _jsonSerializer.Deserialize<RequestAggregatedMeasureDataTransaction>(byteAsString), cancellationToken)
+                _jsonSerializer.Deserialize<RequestAggregatedMeasureDataTransactionCommand>(byteAsString), cancellationToken)
             .ConfigureAwait(false);
     }
 

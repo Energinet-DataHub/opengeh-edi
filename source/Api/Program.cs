@@ -123,12 +123,12 @@ namespace Api
                             if (runtime.IsRunningLocally() || runtime.ALLOW_TEST_TOKENS)
                             {
                                 return new DevMarketActorAuthenticator(
-                                    sp.GetRequiredService<IActorLookup>(),
+                                    sp.GetRequiredService<IActorRepository>(),
                                     sp.GetRequiredService<IActorRegistry>(),
                                     sp.GetRequiredService<IDatabaseConnectionFactory>());
                             }
 
-                            return new MarketActorAuthenticator(sp.GetRequiredService<IActorLookup>());
+                            return new MarketActorAuthenticator(sp.GetRequiredService<IActorRepository>());
                         })
                         .AddDatabaseConnectionFactory(databaseConnectionString!)
                         .AddSystemClock(new SystemDateTimeProvider())

@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using Domain.Actors;
+using Domain.Common;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
-using Domain.SeedWork;
 using Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Domain.Transactions.Aggregations;
 using NodaTime;

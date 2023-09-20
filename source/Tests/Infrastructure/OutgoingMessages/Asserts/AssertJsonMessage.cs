@@ -15,8 +15,8 @@
 using System;
 using System.Text.Json;
 using Domain.Actors;
+using Domain.Common;
 using Domain.OutgoingMessages;
-using Domain.SeedWork;
 using Infrastructure.OutgoingMessages.Common;
 using Json.Schema;
 using Xunit;
