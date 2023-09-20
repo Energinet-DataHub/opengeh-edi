@@ -137,7 +137,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
     }
 
     [Fact]
-    public async Task Grid_operator_making_invalid_request_of_aggregated_time_series()
+    public async Task Grid_operator_requesting_invalid_time_series_types()
     {
         // Arrange
         var incomingMessage =
@@ -200,7 +200,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
     [Theory]
     [InlineData("E17", null)] // TimeSeriesType.TotalConsumption
     [InlineData("E20", null)] // TimeSeriesType.NetExchangePerGa
-    public async Task Energy_supplier_making_invalid_request_of_aggregated_time_series(
+    public async Task Energy_supplier_requesting_requesting_forbidding_time_series_types(
         string evaluationPointType,
         string? settlementMethod)
     {
@@ -221,6 +221,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
         await Assert.ThrowsAsync<InvalidOperationException>(() => InvokeCommandAsync(command)).ConfigureAwait(false);
         Assert.NotNull(process);
 
+        // Ensure that our process has not changed state
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Initialized);
     }
 
@@ -266,7 +267,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
     [Theory]
     [InlineData("E17", null)] // TimeSeriesType.TotalConsumption
     [InlineData("E20", null)] // TimeSeriesType.NetExchangePerGa
-    public async Task Balance_responsible_making_invalid_request_of_aggregated_time_series(
+    public async Task Balance_responsible_requesting_forbidding_time_series_types(
         string evaluationPointType,
         string? settlementMethod)
     {
@@ -333,7 +334,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
     [Theory]
     [InlineData("E17", null)] // TimeSeriesType.TotalConsumption
     [InlineData("E20", null)] // TimeSeriesType.NetExchangePerGa
-    public async Task Energy_supplier_per_balance_responsible_making_invalid_request_of_aggregated_time_series(
+    public async Task Energy_supplier_per_balance_responsible_requesting_forbidding_time_series_types(
         string evaluationPointType,
         string? settlementMethod)
     {
