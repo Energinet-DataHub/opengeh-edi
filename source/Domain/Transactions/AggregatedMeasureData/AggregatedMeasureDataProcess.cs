@@ -119,17 +119,13 @@ namespace Domain.Transactions.AggregatedMeasureData
             }
         }
 
-        public void IsAccepted(IReadOnlyCollection<Aggregation> aggregations)
+        public void IsAccepted(Aggregation aggregation)
         {
-            if (aggregations == null) throw new ArgumentNullException(nameof(aggregations));
+            if (aggregation == null) throw new ArgumentNullException(nameof(aggregation));
 
             if (_state == State.Sent)
             {
-                foreach (var aggregation in aggregations)
-                {
-                    _messages.Add(AggregationResultMessageFactory.CreateMessage(aggregation, ProcessId));
-                }
-
+                _messages.Add(AggregationResultMessageFactory.CreateMessage(aggregation, ProcessId));
                 _state = State.Accepted;
             }
         }

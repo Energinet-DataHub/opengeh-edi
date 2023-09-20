@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Domain.Actors;
@@ -61,7 +60,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
-        var timeSerie = acceptedEvent.Series.First();
+        var timeSerie = acceptedEvent;
         outgoingMessage
             .HasBusinessReason(CimCode.To(process.BusinessReason).Name)
             .HasReceiverId(process.RequestedByActorId.Value)
@@ -86,7 +85,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
-        var timeSerie = acceptedEvent.Series.First();
+        var timeSerie = acceptedEvent;
         outgoingMessage
             .HasBusinessReason(CimCode.To(process.BusinessReason).Name)
             .HasReceiverId(process.RequestedByActorId.Value)
@@ -104,13 +103,10 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
     private static AggregatedTimeSeriesRequestAccepted GetAcceptedEvent(AggregatedMeasureDataProcess aggregatedMeasureDataProcess)
     {
-        var acceptedResponse = new AggregatedTimeSeriesRequestAccepted();
-        acceptedResponse.Series.Add(CreateSerie(aggregatedMeasureDataProcess));
-
-        return acceptedResponse;
+        return CreateAggregation(aggregatedMeasureDataProcess);
     }
 
-    private static Serie CreateSerie(AggregatedMeasureDataProcess aggregatedMeasureDataProcess)
+    private static AggregatedTimeSeriesRequestAccepted CreateAggregation(AggregatedMeasureDataProcess aggregatedMeasureDataProcess)
     {
         var quantity = new DecimalValue() { Units = 12345, Nanos = 123450000, };
         var point = new TimeSeriesPoint()
@@ -127,7 +123,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             Resolution = Resolution.Pt15M,
         };
 
-        return new Serie()
+        return new AggregatedTimeSeriesRequestAccepted()
         {
             GridArea = aggregatedMeasureDataProcess.MeteringGridAreaDomainId,
             QuantityUnit = QuantityUnit.Kwh,
