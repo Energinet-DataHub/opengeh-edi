@@ -15,7 +15,6 @@
 using AcceptanceTest.Drivers;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 
 namespace AcceptanceTest;
 
