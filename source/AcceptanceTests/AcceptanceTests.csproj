@@ -4,7 +4,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
-        <RootNamespace>AcceptanceTest</RootNamespace>
+        <AssemblyName>Energinet.DataHub.EDI.AcceptanceTests</AssemblyName>
+        <RootNamespace>Energinet.DataHub.EDI.AcceptanceTests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
