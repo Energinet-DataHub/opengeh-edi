@@ -12,19 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+using System.Text.Json.Serialization;
+using Application.Configuration.Commands.Commands;
 
-namespace Application.OutgoingMessages;
+namespace Application.Actors;
 
-public class BusinessReasonCode : EnumerationType
+public class CreateActorCommand : InternalCommand
 {
-    public static readonly BusinessReasonCode CustomerMoveInOrMoveOut = new(0, nameof(CustomerMoveInOrMoveOut), "E01");
-
-    private BusinessReasonCode(int id, string name, string code)
-        : base(id, name)
+    [JsonConstructor]
+    public CreateActorCommand(string actorId, string b2cId, string identificationNumber)
     {
-        Code = code;
+        ActorId = actorId;
+        IdentificationNumber = identificationNumber;
+        B2CId = b2cId;
     }
 
-    public string Code { get; }
+    public string B2CId { get; }
+
+    public string ActorId { get; }
+
+    public string IdentificationNumber { get; }
 }

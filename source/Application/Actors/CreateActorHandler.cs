@@ -19,7 +19,7 @@ using MediatR;
 
 namespace Application.Actors;
 
-public class CreateActorHandler : IRequestHandler<CreateActor, Unit>
+public class CreateActorHandler : IRequestHandler<CreateActorCommand, Unit>
 {
     private readonly IActorRegistry _actorRegistry;
 
@@ -28,7 +28,7 @@ public class CreateActorHandler : IRequestHandler<CreateActor, Unit>
         _actorRegistry = actorRegistry;
     }
 
-    public async Task<Unit> Handle(CreateActor request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(CreateActorCommand request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
 

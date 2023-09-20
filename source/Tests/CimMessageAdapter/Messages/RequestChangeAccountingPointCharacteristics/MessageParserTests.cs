@@ -38,7 +38,7 @@ public class MessageParserTests
     public MessageParserTests()
     {
         _messageParser = new MessageParser(
-            new IMessageParser<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>[]
+            new IMessageParser<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransactionCommand>[]
             {
                 new XmlMessageParser(),
             });
@@ -108,7 +108,7 @@ public class MessageParserTests
     [Fact]
     public async Task Throw_if_message_format_is_not_known()
     {
-        var parser = new MessageParser(new List<IMessageParser<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>>());
+        var parser = new MessageParser(new List<IMessageParser<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransactionCommand>>());
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => parser.ParseAsync(CreateXmlMessage(), DocumentFormat.Xml, CancellationToken.None)).ConfigureAwait(false);
     }

@@ -12,18 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.Configuration.Commands.Commands;
-using Application.IncomingMessages.RequestAggregatedMeasureData;
-using CimMessageAdapter.Messages;
+using MediatR;
+using NodaTime;
 
-namespace Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
-
-public class ReceiveAggregatedMeasureDataRequest : ICommand<Result>
+namespace Domain.Common
 {
-    public ReceiveAggregatedMeasureDataRequest(MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> messageResult)
+    public class DomainEvent : INotification
     {
-        MessageResult = messageResult;
-    }
+        public Guid Id { get; } = Guid.NewGuid();
 
-    public MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> MessageResult { get; }
+        public Instant OccurredOn { get; } = SystemClock.Instance.GetCurrentInstant();
+    }
 }

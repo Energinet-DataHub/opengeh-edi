@@ -14,7 +14,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Domain.SeedWork;
+using Domain.Common;
 using Infrastructure.Configuration.DataAccess;
 
 namespace Infrastructure.Configuration.Processing;

@@ -22,7 +22,7 @@ namespace Application.Actors;
 /// <summary>
 /// Service for looking up actor details
 /// </summary>
-public interface IActorLookup
+public interface IActorRepository
 {
     /// <summary>
     /// Get actor number by id

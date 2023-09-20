@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Domain.SeedWork
+namespace Domain.Common
 {
     public abstract class Entity
     {
-        private readonly List<DomainEvent> _domainEvents = new List<DomainEvent>();
+        private readonly List<DomainEvent> _domainEvents = new();
 
         /// <summary>
         /// Domain events occurred.

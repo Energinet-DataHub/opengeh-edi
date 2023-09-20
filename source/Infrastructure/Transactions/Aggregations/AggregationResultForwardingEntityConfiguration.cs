@@ -14,7 +14,6 @@
 
 using Domain.Actors;
 using Domain.OutgoingMessages;
-using Domain.SeedWork;
 using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;

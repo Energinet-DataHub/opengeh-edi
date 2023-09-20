@@ -37,7 +37,7 @@ public class AggregatedMeasureDataProcessRepository : IAggregatedMeasureDataProc
         _b2BContext.AggregatedMeasureDataProcesses.Add(process);
     }
 
-    public async Task<AggregatedMeasureDataProcess> GetByIdAsync(ProcessId processId, CancellationToken cancellationToken)
+    public async Task<AggregatedMeasureDataProcess> GetAsync(ProcessId processId, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(processId);
         return await _b2BContext

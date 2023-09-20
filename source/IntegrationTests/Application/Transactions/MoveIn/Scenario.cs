@@ -136,7 +136,7 @@ public class Scenario
             marketEvaluationPoint.SetGridOperatorId(_gridOperatorId);
             _context.MarketEvaluationPoints.Add(marketEvaluationPoint);
 
-            await _mediator.Send(new CreateActor(_gridOperatorId.ToString(), Guid.NewGuid().ToString(), _gridOperatorNumber))
+            await _mediator.Send(new CreateActorCommand(_gridOperatorId.ToString(), Guid.NewGuid().ToString(), _gridOperatorNumber))
                 .ConfigureAwait(false);
         }
     }

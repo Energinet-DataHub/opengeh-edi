@@ -12,21 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Domain.EventListeners.Exceptions;
+using Application.Configuration.Commands.Commands;
+using MediatR;
 
-public class UnsupportedInboxEventTypeException : Exception
+namespace Application.IncomingMessages.RequestAggregatedMeasureData;
+
+public class RequestAggregatedMeasureDataTransactionCommand : ICommand<Unit>, IMarketTransaction<Serie>
 {
-    public UnsupportedInboxEventTypeException(string message)
-        : base(message)
+    public RequestAggregatedMeasureDataTransactionCommand(MessageHeader messageHeader, Serie marketActivityRecord)
     {
+        MessageHeader = messageHeader;
+        MarketActivityRecord = marketActivityRecord;
     }
 
-    public UnsupportedInboxEventTypeException(string message, Exception innerException)
-        : base(message, innerException)
-    {
-    }
+    public MessageHeader MessageHeader { get; }
 
-    private UnsupportedInboxEventTypeException()
-    {
-    }
+    public Serie MarketActivityRecord { get; }
 }

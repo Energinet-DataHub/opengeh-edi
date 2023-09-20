@@ -22,9 +22,9 @@ using Application.OutgoingMessages;
 using Application.OutgoingMessages.Common;
 using Application.OutgoingMessages.Common.Xml;
 using Domain.Actors;
+using Domain.Common;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
-using Domain.SeedWork;
 using Infrastructure.OutgoingMessages.Common.Xml;
 
 namespace Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;

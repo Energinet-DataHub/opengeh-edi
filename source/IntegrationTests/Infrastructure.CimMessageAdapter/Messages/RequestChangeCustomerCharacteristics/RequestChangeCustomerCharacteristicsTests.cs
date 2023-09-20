@@ -67,7 +67,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
     {
 #pragma warning disable CA2007
         var createActorCommand =
-            new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.ActorNumber);
+            new CreateActorCommand(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.ActorNumber);
         await InvokeCommandAsync(createActorCommand).ConfigureAwait(false);
 
         _claims = new List<Claim>()

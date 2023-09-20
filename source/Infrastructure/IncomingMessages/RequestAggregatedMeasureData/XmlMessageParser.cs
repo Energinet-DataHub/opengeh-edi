@@ -29,7 +29,7 @@ using DocumentFormat = Domain.Documents.DocumentFormat;
 
 namespace Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
-public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDataTransaction>
+public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDataTransactionCommand>
 {
     private const string SeriesRecordElementName = "Series";
     private const string HeaderElementName = "RequestAggregatedMeasureData_MarketDocument";
@@ -43,7 +43,7 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
 
     public DocumentFormat HandledFormat => DocumentFormat.Xml;
 
-    public async Task<MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>> ParseAsync(Stream message, CancellationToken cancellationToken)
+    public async Task<MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>> ParseAsync(Stream message, CancellationToken cancellationToken)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
 
@@ -67,7 +67,7 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
             .ConfigureAwait(true);
         if (xmlSchema is null)
         {
-            return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(
+            return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>(
                 new InvalidBusinessReasonOrVersion(businessProcessType, version));
         }
 
@@ -75,7 +75,7 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
         using var reader = XmlReader.Create(message, CreateXmlReaderSettings(xmlSchema));
         if (_errors.Count > 0)
         {
-            return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(_errors.ToArray());
+            return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>(_errors.ToArray());
         }
 
         try
@@ -84,7 +84,7 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
 
             if (_errors.Any())
             {
-               return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(_errors.ToArray());
+               return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>(_errors.ToArray());
             }
 
             return parsedXmlData;
@@ -99,10 +99,10 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
         }
     }
 
-    private static MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> InvalidXmlFailure(
+    private static MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand> InvalidXmlFailure(
         Exception exception)
     {
-        return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(
+        return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>(
             InvalidMessageStructure.From(exception));
     }
 
@@ -147,7 +147,7 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
         return version;
     }
 
-    private static async Task<MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>> ParseXmlDataAsync(
+    private static async Task<MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>> ParseXmlDataAsync(
         XmlReader reader, CancellationToken cancellationToken)
     {
         var root = await reader.ReadRootElementAsync().ConfigureAwait(false);
@@ -161,7 +161,7 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
             series.Add(serie);
         }
 
-        return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>(
+        return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>(
             new RequestAggregatedMeasureDataIncomingMarketDocument(messageHeader, series));
     }
 

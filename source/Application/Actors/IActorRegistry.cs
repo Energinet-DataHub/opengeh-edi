@@ -25,7 +25,7 @@ public interface IActorRegistry
     /// <summary>
     /// Store actors
     /// </summary>
-    /// <param name="createActor"></param>
+    /// <param name="createActorCommand"></param>
     /// <param name="cancellationToken"></param>
-    Task<bool> TryStoreAsync(CreateActor createActor, CancellationToken cancellationToken);
+    Task<bool> TryStoreAsync(CreateActorCommand createActorCommand, CancellationToken cancellationToken);
 }

@@ -107,7 +107,7 @@ public class RequestAggregatedMeasureMessageReceiver
         await SaveArchivedMessageAsync(messageHeader, request.Body, cancellationToken).ConfigureAwait(false);
 
         var result = await _mediator
-            .Send(new ReceiveAggregatedMeasureDataRequest(messageParserResult), cancellationToken).ConfigureAwait(false);
+            .Send(new ReceiveAggregatedMeasureDataRequestCommand(messageParserResult), cancellationToken).ConfigureAwait(false);
 
         var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
         return CreateResponse(request, httpStatusCode, _responseFactory.From(result, cimFormat));

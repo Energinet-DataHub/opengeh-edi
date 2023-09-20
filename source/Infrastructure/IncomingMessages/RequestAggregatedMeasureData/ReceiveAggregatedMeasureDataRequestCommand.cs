@@ -12,12 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Application.OutgoingMessages;
+using Application.Configuration.Commands.Commands;
+using Application.IncomingMessages.RequestAggregatedMeasureData;
+using CimMessageAdapter.Messages;
 
-public static class OutgoingMessageExtensions
+namespace Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
+
+public class ReceiveAggregatedMeasureDataRequestCommand : ICommand<Result>
 {
-    public static string ToStringValue(this bool value)
+    public ReceiveAggregatedMeasureDataRequestCommand(MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand> messageResult)
     {
-        return value ? "true" : "false";
+        MessageResult = messageResult;
     }
+
+    public MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand> MessageResult { get; }
 }

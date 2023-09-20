@@ -37,7 +37,7 @@ namespace Infrastructure.OutgoingMessages
             _context.OutgoingMessages.Add(message);
         }
 
-        public async Task<IReadOnlyCollection<OutgoingMessage>> GetByAssignedBundleIdAsync(BundleId bundleId)
+        public async Task<IReadOnlyCollection<OutgoingMessage>> GetAsync(BundleId bundleId)
         {
             return (await _context.OutgoingMessages.Where(x => x.AssignedBundleId == bundleId)
                 .ToListAsync().ConfigureAwait(false)).AsReadOnly();

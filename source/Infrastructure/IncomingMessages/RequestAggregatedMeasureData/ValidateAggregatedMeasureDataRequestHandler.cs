@@ -24,7 +24,7 @@ using Receiver = CimMessageAdapter.Messages.RequestAggregatedMeasureData.Request
 namespace Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
 public class ValidateAggregatedMeasureDataRequestHandler
-    : IRequestHandler<ReceiveAggregatedMeasureDataRequest, Result>
+    : IRequestHandler<ReceiveAggregatedMeasureDataRequestCommand, Result>
 {
     private readonly RequestAggregatedMeasureDataReceiver _messageReceiver;
 
@@ -35,7 +35,7 @@ public class ValidateAggregatedMeasureDataRequestHandler
         _messageReceiver = messageReceiver;
     }
 
-    public async Task<Result> Handle(ReceiveAggregatedMeasureDataRequest request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(ReceiveAggregatedMeasureDataRequestCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 

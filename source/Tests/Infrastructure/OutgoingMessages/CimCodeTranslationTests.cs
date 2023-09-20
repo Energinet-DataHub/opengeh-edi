@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using Domain.Actors;
+using Domain.Common;
 using Domain.OutgoingMessages;
-using Domain.SeedWork;
 using Domain.Transactions.Aggregations;
 using Infrastructure.OutgoingMessages.Common;
 using Xunit;

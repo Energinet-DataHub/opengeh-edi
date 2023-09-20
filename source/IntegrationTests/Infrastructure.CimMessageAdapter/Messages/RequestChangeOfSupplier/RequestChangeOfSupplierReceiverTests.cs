@@ -64,10 +64,10 @@ namespace IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestChan
 
         public async Task InitializeAsync()
         {
-            await InvokeCommandAsync(new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.ActorNumber)).ConfigureAwait(false);
+            await InvokeCommandAsync(new CreateActorCommand(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.ActorNumber)).ConfigureAwait(false);
             _claims = new List<Claim>()
             {
-                new(ClaimsMap.UserId, new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.ActorNumber).B2CId),
+                new(ClaimsMap.UserId, new CreateActorCommand(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.ActorNumber).B2CId),
                 ClaimsMap.RoleFrom(MarketRole.EnergySupplier),
             };
 
@@ -245,7 +245,7 @@ namespace IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestChan
                 .ConfigureAwait(false);
         }
 
-        private Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseMessageAsync(Stream message)
+        private Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>> ParseMessageAsync(Stream message)
         {
             return _messageParser.ParseAsync(message, DocumentFormat.Xml, CancellationToken.None);
         }

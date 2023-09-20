@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Domain.Common;
 using Domain.OutgoingMessages.Queueing;
-using Domain.SeedWork;
 
 namespace Domain.Documents;
 
