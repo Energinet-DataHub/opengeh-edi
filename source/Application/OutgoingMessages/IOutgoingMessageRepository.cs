@@ -33,6 +33,6 @@ namespace Application.OutgoingMessages
         /// <summary>
         /// Get all messages assigned to a bundle by id.
         /// </summary>
-        Task<IReadOnlyCollection<OutgoingMessage>> GetAsync(BundleId bundleId);
+        Task<OutgoingMessageBundle> GetAsync(BundleId bundleId);
     }
 }

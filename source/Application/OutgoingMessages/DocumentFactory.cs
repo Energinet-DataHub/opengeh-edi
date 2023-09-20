@@ -33,33 +33,32 @@ public class DocumentFactory
         _documentWriters = documentWriters.ToList();
     }
 
-    public Task<Stream> CreateFromAsync(IReadOnlyCollection<OutgoingMessage> outgoingMessages, DocumentFormat documentFormat, Instant timestamp)
+    public Task<Stream> CreateFromAsync(OutgoingMessageBundle bundle, DocumentFormat documentFormat, Instant timestamp)
     {
         ArgumentNullException.ThrowIfNull(documentFormat);
-        ArgumentNullException.ThrowIfNull(outgoingMessages);
-        var outgoingMessage = outgoingMessages.First();
-        var documentType = outgoingMessage.DocumentType;
-        var bundledMessageId = outgoingMessage.AssignedBundleId;
-        var senderId = outgoingMessage.SenderId.Value;
-        var senderRole = outgoingMessage.SenderRole.Name;
-        var receiverId = outgoingMessage.Receiver.Number.Value;
-        var receiverRole = outgoingMessage.Receiver.ActorRole.Name;
-        var businessReason = outgoingMessage.BusinessReason;
+        ArgumentNullException.ThrowIfNull(bundle);
 
         var documentWriter =
             _documentWriters.FirstOrDefault(writer =>
             {
-                return writer.HandlesType(documentType) &&
+                return writer.HandlesType(bundle.DocumentType) &&
                        writer.HandlesFormat(documentFormat);
             });
 
         if (documentWriter is null)
         {
-            throw new OutgoingMessageException($"Could not handle document type {documentType} in format {documentFormat}");
+            throw new OutgoingMessageException($"Could not handle document type {bundle.DocumentType} in format {documentFormat}");
         }
 
         return documentWriter.WriteAsync(
-            new MessageHeader(businessReason, senderId, senderRole, receiverId, receiverRole, bundledMessageId!.Id.ToString(), timestamp),
-            outgoingMessages.Select(message => message.MessageRecord).ToList());
+            new MessageHeader(
+                bundle.BusinessReason,
+                bundle.SenderId.Value,
+                bundle.SenderRole.Name,
+                bundle.Receiver.Number.Value,
+                bundle.Receiver.ActorRole.Name,
+                bundle.AssignedBundleId!.ToString()!,
+                timestamp),
+            bundle.OutgoingMessages.Select(message => message.MessageRecord).ToList());
     }
 }
