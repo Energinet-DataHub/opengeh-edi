@@ -58,7 +58,7 @@ namespace Api.IncomingMessages
             _logger.LogInformation($"Received incoming message: {byteAsString}");
 
             await _mediator.Send(
-                    _jsonSerializer.Deserialize<RequestChangeOfSupplierTransaction>(byteAsString))
+                    _jsonSerializer.Deserialize<RequestChangeOfSupplierTransactionCommand>(byteAsString))
                 .ConfigureAwait(false);
 
             _logger.LogInformation("B2B transaction dequeued with correlation id: {CorrelationId}", _correlationContext.Id);

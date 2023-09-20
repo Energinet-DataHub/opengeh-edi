@@ -17,7 +17,7 @@ using System.Collections.ObjectModel;
 
 namespace Application.IncomingMessages.RequestChangeOfSupplier;
 
-public class RequestChangeOfSupplierIncomingMarketDocument : IIncomingMarketDocument<MarketActivityRecord, RequestChangeOfSupplierTransaction>
+public class RequestChangeOfSupplierIncomingMarketDocument : IIncomingMarketDocument<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>
 {
     public RequestChangeOfSupplierIncomingMarketDocument(MessageHeader header, IReadOnlyCollection<MarketActivityRecord> marketActivityRecords)
     {
@@ -29,12 +29,12 @@ public class RequestChangeOfSupplierIncomingMarketDocument : IIncomingMarketDocu
 
     public IReadOnlyCollection<MarketActivityRecord> MarketActivityRecords { get; }
 
-    public ReadOnlyCollection<RequestChangeOfSupplierTransaction> ToTransactions()
+    public ReadOnlyCollection<RequestChangeOfSupplierTransactionCommand> ToTransactions()
     {
-        var transactions = new List<RequestChangeOfSupplierTransaction>();
+        var transactions = new List<RequestChangeOfSupplierTransactionCommand>();
         foreach (var marketActivityRecord in MarketActivityRecords)
         {
-            transactions.Add(new RequestChangeOfSupplierTransaction(Header, marketActivityRecord));
+            transactions.Add(new RequestChangeOfSupplierTransactionCommand(Header, marketActivityRecord));
         }
 
         return transactions.AsReadOnly();

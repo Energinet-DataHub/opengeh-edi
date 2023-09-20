@@ -17,9 +17,9 @@ using MediatR;
 
 namespace Application.IncomingMessages.RequestAggregatedMeasureData;
 
-public class RequestAggregatedMeasureDataTransaction : ICommand<Unit>, IMarketTransaction<Serie>
+public class RequestAggregatedMeasureDataTransactionCommand : ICommand<Unit>, IMarketTransaction<Serie>
 {
-    public RequestAggregatedMeasureDataTransaction(MessageHeader messageHeader, Serie marketActivityRecord)
+    public RequestAggregatedMeasureDataTransactionCommand(MessageHeader messageHeader, Serie marketActivityRecord)
     {
         MessageHeader = messageHeader;
         MarketActivityRecord = marketActivityRecord;

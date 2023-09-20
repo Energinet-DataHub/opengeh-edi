@@ -32,7 +32,7 @@ internal static class RequestedAggregatedMeasureDataConfiguration
 {
     public static void Configure(IServiceCollection services)
     {
-        services.AddTransient<IRequestHandler<RequestAggregatedMeasureDataTransaction, Unit>, AggregatedMeasureDataRequestHandler>();
+        services.AddTransient<IRequestHandler<RequestAggregatedMeasureDataTransactionCommand, Unit>, AggregatedMeasureDataRequestHandler>();
 #pragma warning disable CS0618 // Type or member is obsolete
         services.AddTransient<IRequestHandler<CreateAggregatedMeasureAggregationResults, Unit>, MakeAggregatedMeasureAsAggregationResults>();
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -43,7 +43,7 @@ internal static class RequestedAggregatedMeasureDataConfiguration
         services.AddTransient<IRequestHandler<ForwardRejectedAggregationResult, Unit>, ForwardRejectedAggregationResultHandler>();
 #pragma warning restore CS0618 // Type or member is obsolete
         services.AddTransient<INotificationHandler<AggregatedMeasureProcessIsInitialized>, NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized>();
-        services.AddTransient<IRequestHandler<ReceiveAggregatedMeasureDataRequest, Result>, ValidateAggregatedMeasureDataRequestHandler>();
+        services.AddTransient<IRequestHandler<ReceiveAggregatedMeasureDataRequestCommand, Result>, ValidateAggregatedMeasureDataRequestHandler>();
         services.AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>, WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable>();
         services.AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasRejected>, WhenAnRejectedAggregatedTimeSeriesRequestIsAvailable>();
         services.AddScoped<WholesaleInbox>();

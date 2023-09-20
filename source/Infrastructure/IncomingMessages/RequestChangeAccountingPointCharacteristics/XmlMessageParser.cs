@@ -30,7 +30,7 @@ using MarketActivityRecord = Application.IncomingMessages.RequestChangeAccountPo
 
 namespace Infrastructure.IncomingMessages.RequestChangeAccountingPointCharacteristics;
 
-public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>
+public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransactionCommand>
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeAccountingPointCharacteristics_MarketDocument";
@@ -44,7 +44,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
 
     public DocumentFormat HandledFormat => DocumentFormat.Xml;
 
-    public async Task<MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>>
+    public async Task<MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransactionCommand>>
         ParseAsync(Stream message, CancellationToken cancellationToken)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
@@ -70,7 +70,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         if (xmlSchema is null)
         {
             return new
-                MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>(
+                MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransactionCommand>(
                     new InvalidBusinessReasonOrVersion(businessProcessType, version));
         }
 
@@ -83,7 +83,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
 
                 if (_errors.Any())
                 {
-                    return new MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>(_errors.ToArray());
+                    return new MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransactionCommand>(_errors.ToArray());
                 }
 
                 return parsedXmlData;
@@ -99,10 +99,10 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         }
     }
 
-    private static MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>
+    private static MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransactionCommand>
         InvalidXmlFailure(Exception exception)
     {
-        return new MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>(
+        return new MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransactionCommand>(
             InvalidMessageStructure.From(exception));
     }
 
@@ -547,7 +547,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
     }
 
     private async
-        Task<MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>>
+        Task<MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransactionCommand>>
         ParseXmlDataAsync(XmlReader reader, CancellationToken cancellationToken)
     {
         var root = await reader.ReadRootElementAsync().ConfigureAwait(false);
@@ -557,7 +557,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         if (_errors.Count > 0)
         {
             return new
-                MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>(
+                MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransactionCommand>(
                     _errors.ToArray());
         }
 
@@ -571,11 +571,11 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         if (_errors.Count > 0)
         {
             return new
-                MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>(
+                MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransactionCommand>(
                     _errors.ToArray());
         }
 
-        return new MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>(
+        return new MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransactionCommand>(
             new RequestChangeAccountingPointCharacteristicIncomingDocument(messageHeader, marketActivityRecords));
     }
 }

@@ -743,7 +743,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         return messageReceiver;
     }
 
-    private Task<MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction>> ParseMessageAsync(Stream message)
+    private Task<MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>> ParseMessageAsync(Stream message)
     {
         return _messageParser.ParseAsync(message, DocumentFormat.Xml, CancellationToken.None);
     }

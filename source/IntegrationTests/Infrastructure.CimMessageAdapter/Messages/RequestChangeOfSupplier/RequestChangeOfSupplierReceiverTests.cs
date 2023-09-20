@@ -245,7 +245,7 @@ namespace IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestChan
                 .ConfigureAwait(false);
         }
 
-        private Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseMessageAsync(Stream message)
+        private Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>> ParseMessageAsync(Stream message)
         {
             return _messageParser.ParseAsync(message, DocumentFormat.Xml, CancellationToken.None);
         }

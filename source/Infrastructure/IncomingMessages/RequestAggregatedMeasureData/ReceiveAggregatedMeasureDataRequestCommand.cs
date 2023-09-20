@@ -18,12 +18,12 @@ using CimMessageAdapter.Messages;
 
 namespace Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
-public class ReceiveAggregatedMeasureDataRequest : ICommand<Result>
+public class ReceiveAggregatedMeasureDataRequestCommand : ICommand<Result>
 {
-    public ReceiveAggregatedMeasureDataRequest(MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> messageResult)
+    public ReceiveAggregatedMeasureDataRequestCommand(MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand> messageResult)
     {
         MessageResult = messageResult;
     }
 
-    public MessageParserResult<Serie, RequestAggregatedMeasureDataTransaction> MessageResult { get; }
+    public MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand> MessageResult { get; }
 }
