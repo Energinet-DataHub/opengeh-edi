@@ -16,6 +16,8 @@ limitations under the License.
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+      <AssemblyName>Energinet.DataHub.EDI.Infrastructure</AssemblyName>
+      <RootNamespace>Energinet.DataHub.EDI.Infrastructure</RootNamespace>
     </PropertyGroup>
 
   <ItemGroup>

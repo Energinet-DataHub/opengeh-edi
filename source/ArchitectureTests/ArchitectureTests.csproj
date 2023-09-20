@@ -14,8 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <Project Sdk="Microsoft.NET.Sdk">
-
+  
     <PropertyGroup>
+        <AssemblyName>Energinet.DataHub.EDI.ArchitectureTests</AssemblyName>
+        <RootNamespace>Energinet.DataHub.EDI.ArchitectureTests</RootNamespace>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
