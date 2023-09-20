@@ -41,7 +41,7 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
         Assert.Contains(_actualNotifications, notification => notification is AggregatedTimeSeriesRequestWasAccepted);
         var actualNotification = _actualNotifications.Single() as AggregatedTimeSeriesRequestWasAccepted;
         var actualTimeSerie = actualNotification!.AggregatedTimeSerie[0];
-        var exceptedTimeSerie = aggregatedTimeSeriesRequestAccepted.Series.First();
+        var exceptedTimeSerie = aggregatedTimeSeriesRequestAccepted.Serie;
         Assert.Equal(exceptedTimeSerie.GridArea, actualTimeSerie.GridAreaDetails.GridAreaCode);
         Assert.Equal(exceptedTimeSerie.SettlementVersion, actualTimeSerie.SettlementVersion);
         Assert.Equal(exceptedTimeSerie.Period.StartOfPeriod.ToInstant(), actualTimeSerie.Period.Start);

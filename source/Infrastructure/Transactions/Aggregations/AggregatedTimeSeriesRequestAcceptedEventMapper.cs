@@ -42,18 +42,17 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
 
         var aggregatedTimeSeries = new List<AggregatedTimeSerie>();
 
-        foreach (var serie in inboxEvent.Series)
-        {
-            aggregatedTimeSeries.Add(
-                new AggregatedTimeSerie(
-                    MapPoints(serie.TimeSeriesPoints),
-                    MapMeteringPointType(serie),
-                    MapUnitType(serie),
-                    MapResolution(serie.Period.Resolution),
-                    MapPeriod(serie.Period),
-                    MapGridAreaDetails(serie),
-                    MapSettlementVersion(serie)));
-        }
+        var serie = inboxEvent.Serie;
+
+        aggregatedTimeSeries.Add(
+            new AggregatedTimeSerie(
+                MapPoints(serie.TimeSeriesPoints),
+                MapMeteringPointType(serie),
+                MapUnitType(serie),
+                MapResolution(serie.Period.Resolution),
+                MapPeriod(serie.Period),
+                MapGridAreaDetails(serie),
+                MapSettlementVersion(serie)));
 
         return Task.FromResult<INotification>(new AggregatedTimeSeriesRequestWasAccepted(
             referenceId,

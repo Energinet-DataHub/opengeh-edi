@@ -61,7 +61,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
-        var timeSerie = acceptedEvent.Series.First();
+        var timeSerie = acceptedEvent.Serie;
         outgoingMessage
             .HasBusinessReason(CimCode.To(process.BusinessReason).Name)
             .HasReceiverId(process.RequestedByActorId.Value)
@@ -86,7 +86,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
-        var timeSerie = acceptedEvent.Series.First();
+        var timeSerie = acceptedEvent.Serie;
         outgoingMessage
             .HasBusinessReason(CimCode.To(process.BusinessReason).Name)
             .HasReceiverId(process.RequestedByActorId.Value)
@@ -105,7 +105,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     private static AggregatedTimeSeriesRequestAccepted GetAcceptedEvent(AggregatedMeasureDataProcess aggregatedMeasureDataProcess)
     {
         var acceptedResponse = new AggregatedTimeSeriesRequestAccepted();
-        acceptedResponse.Series.Add(CreateSerie(aggregatedMeasureDataProcess));
+        acceptedResponse.Serie = CreateSerie(aggregatedMeasureDataProcess);
 
         return acceptedResponse;
     }

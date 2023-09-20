@@ -60,7 +60,7 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
     private static AggregatedTimeSeriesRequestAccepted CreateResponseFromWholeSaleTemp()
     {
         var wholesaleResponse = new AggregatedTimeSeriesRequestAccepted();
-        wholesaleResponse.Series.Add(CreateSerie());
+        wholesaleResponse.Serie = CreateSerie();
 
         return wholesaleResponse;
     }
