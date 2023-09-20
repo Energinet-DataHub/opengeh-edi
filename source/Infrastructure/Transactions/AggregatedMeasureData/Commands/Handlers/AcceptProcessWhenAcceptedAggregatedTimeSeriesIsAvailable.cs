@@ -13,12 +13,10 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
-using Domain.Transactions.Aggregations;
 using Infrastructure.Transactions.Aggregations;
 using MediatR;
 
