@@ -24,7 +24,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Xml;
 
 internal static class EbixHeaderWriter
 {
-    internal static async Task WriteAsync(XmlWriter writer, MessageHeader messageHeader, DocumentDetails documentDetails, string? reasonCode, string? processType)
+    internal static async Task WriteAsync(XmlWriter writer, MessageHeader messageHeader, DocumentDetails documentDetails, string? reasonCode, string? settlementVersion)
     {
         if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
         if (writer == null) throw new ArgumentNullException(nameof(writer));
@@ -36,6 +36,7 @@ internal static class EbixHeaderWriter
             documentDetails.Type,
             documentDetails.XmlNamespace).ConfigureAwait(false);
 
+        // Begin HeaderEnergyDocument
         await writer.WriteStartElementAsync(documentDetails.Prefix, "HeaderEnergyDocument", null).ConfigureAwait(false);
         await writer.WriteElementStringAsync(documentDetails.Prefix, "Identification", null, messageHeader.MessageId).ConfigureAwait(false);
         await writer.WriteStartElementAsync(documentDetails.Prefix, "DocumentType", null).ConfigureAwait(false);
@@ -59,8 +60,10 @@ internal static class EbixHeaderWriter
         await writer.WriteEndElementAsync().ConfigureAwait(false);
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-        await writer.WriteEndElementAsync().ConfigureAwait(false);  // end HeaderEnergyDocument
+        await writer.WriteEndElementAsync().ConfigureAwait(false);
+        // End HeaderEnergyDocument
 
+        // Begin ProcessEnergyContext
         await writer.WriteStartElementAsync(documentDetails.Prefix, "ProcessEnergyContext", null).ConfigureAwait(false);
 
         await writer.WriteStartElementAsync(documentDetails.Prefix, "EnergyBusinessProcess", null).ConfigureAwait(false);
@@ -79,15 +82,16 @@ internal static class EbixHeaderWriter
         writer.WriteValue(GeneralValues.SectorTypeCode);
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-        if (processType != null)
+        if (settlementVersion != null)
         {
             await writer.WriteStartElementAsync(documentDetails.Prefix, "ProcessVariant", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "listIdentifier", null, "DK").ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
-            writer.WriteValue(processType);
+            writer.WriteValue(settlementVersion);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
 
-        await writer.WriteEndElementAsync().ConfigureAwait(false); // end ProcessEnergyContext
+        await writer.WriteEndElementAsync().ConfigureAwait(false);
+        // End ProcessEnergyContext
     }
 }

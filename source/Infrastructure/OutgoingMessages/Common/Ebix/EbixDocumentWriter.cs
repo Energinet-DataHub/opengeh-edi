@@ -47,8 +47,8 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = new UTF8Encoding(false), Async = true, Indent = true };
         var stream = new MemoryStream();
         using var writer = XmlWriter.Create(stream, settings);
-        string? processType = ExtractProcessType(marketActivityRecords);
-        await WriteHeaderAsync(header, _documentDetails, writer, processType).ConfigureAwait(false);
+        string? settlementVersion = ExtractSettlementVersion(marketActivityRecords);
+        await WriteHeaderAsync(header, _documentDetails, writer, settlementVersion).ConfigureAwait(false);
         await WriteMarketActivityRecordsAsync(marketActivityRecords, writer).ConfigureAwait(false);
         await WriteEndAsync(writer).ConfigureAwait(false);
         stream.Position = 0;
@@ -66,7 +66,7 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         return format == DocumentFormat.Xml;
     }
 
-    protected virtual string? ExtractProcessType(IReadOnlyCollection<string> marketActivityPayloads)
+    protected virtual string? ExtractSettlementVersion(IReadOnlyCollection<string> marketActivityPayloads)
     {
         return null;
     }
@@ -116,8 +116,8 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         writer.Close();
     }
 
-    private Task WriteHeaderAsync(MessageHeader header, DocumentDetails documentDetails, XmlWriter writer, string? processType)
+    private Task WriteHeaderAsync(MessageHeader header, DocumentDetails documentDetails, XmlWriter writer, string? settlementVersion)
     {
-        return EbixHeaderWriter.WriteAsync(writer, header, documentDetails, _reasonCode, processType);
+        return EbixHeaderWriter.WriteAsync(writer, header, documentDetails, _reasonCode, settlementVersion);
     }
 }
