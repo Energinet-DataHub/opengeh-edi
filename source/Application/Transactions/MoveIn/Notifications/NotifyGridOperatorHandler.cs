@@ -15,13 +15,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Actors;
-using Domain.MasterData.MarketEvaluationPoints;
-using Domain.Transactions;
-using Domain.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Application.Actors;
+using Energinet.DataHub.EDI.Domain.MasterData.MarketEvaluationPoints;
+using Energinet.DataHub.EDI.Domain.Transactions.MoveIn;
 using MediatR;
 
-namespace Application.Transactions.MoveIn.Notifications;
+namespace Energinet.DataHub.EDI.Application.Transactions.MoveIn.Notifications;
 
 public class NotifyGridOperatorHandler : IRequestHandler<NotifyGridOperator, Unit>
 {

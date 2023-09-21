@@ -13,12 +13,12 @@
 // limitations under the License.
 
 using System.Text.Json;
-using Domain.Actors;
-using Domain.Documents;
-using Domain.OutgoingMessages.Exceptions;
-using Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.Exceptions;
+using Energinet.DataHub.EDI.Domain.Transactions;
 
-namespace Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
+namespace Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 
 public class RejectRequestChangeOfSupplierMessage : OutgoingMessage
 {

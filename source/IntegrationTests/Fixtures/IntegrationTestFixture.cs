@@ -14,7 +14,7 @@
 
 using Xunit;
 
-namespace IntegrationTests.Fixtures
+namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
 {
     [CollectionDefinition("IntegrationTest")]
     public class IntegrationTestFixture : ICollectionFixture<DatabaseFixture>

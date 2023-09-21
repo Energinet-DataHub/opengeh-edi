@@ -16,16 +16,16 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration;
-using Application.Configuration.Commands.Commands;
-using Application.Configuration.DataAccess;
-using Domain.Actors;
-using Domain.ArchivedMessages;
-using Domain.Documents;
-using Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.ArchivedMessages;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
 using MediatR;
 
-namespace Application.OutgoingMessages;
+namespace Energinet.DataHub.EDI.Application.OutgoingMessages;
 
 public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
 {

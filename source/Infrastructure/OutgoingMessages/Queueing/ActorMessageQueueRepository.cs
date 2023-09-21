@@ -15,12 +15,12 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Domain.Actors;
-using Domain.OutgoingMessages.Queueing;
-using Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.OutgoingMessages.Queueing;
+namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Queueing;
 
 public class ActorMessageQueueRepository : IActorMessageQueueRepository
 {

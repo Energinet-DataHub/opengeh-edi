@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.Configuration.TimeEvents;
-using Infrastructure.DataRetention;
-using Infrastructure.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
+using Energinet.DataHub.EDI.Infrastructure.DataRetention;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.Configuration.IntegrationEvents;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 
 public static class IntegrationEventsConfiguration
 {

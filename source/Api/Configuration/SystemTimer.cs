@@ -13,12 +13,12 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Application.Configuration;
-using Application.Configuration.TimeEvents;
+using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 
-namespace Api.Configuration
+namespace Energinet.DataHub.EDI.Api.Configuration
 {
     public class SystemTimer
     {

@@ -15,9 +15,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Actors;
 
-namespace Infrastructure.Configuration.Authentication;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 
 public static class ClaimsMap
 {

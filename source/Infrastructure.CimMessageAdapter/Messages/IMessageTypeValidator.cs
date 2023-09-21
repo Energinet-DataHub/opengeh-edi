@@ -15,7 +15,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CimMessageAdapter.Messages;
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 
 /// <summary>
 /// Validation for Message Type

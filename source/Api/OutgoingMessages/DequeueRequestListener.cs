@@ -15,13 +15,13 @@
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Application.Configuration.Authentication;
-using Application.OutgoingMessages;
+using Energinet.DataHub.EDI.Application.Configuration.Authentication;
+using Energinet.DataHub.EDI.Application.OutgoingMessages;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 
-namespace Api.OutgoingMessages;
+namespace Energinet.DataHub.EDI.Api.OutgoingMessages;
 
 public class DequeueRequestListener
 {

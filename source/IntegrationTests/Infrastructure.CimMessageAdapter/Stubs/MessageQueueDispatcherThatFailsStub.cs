@@ -16,11 +16,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.IncomingMessages;
-using CimMessageAdapter.Messages;
-using CimMessageAdapter.Messages.Queues;
+using Energinet.DataHub.EDI.Application.IncomingMessages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues;
 
-namespace IntegrationTests.Infrastructure.CimMessageAdapter.Stubs
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Stubs
 {
     public class MessageQueueDispatcherThatFailsStub<TQueue> : MessageQueueDispatcherStub<TQueue>, IMessageQueueDispatcher<TQueue>
     where TQueue : Queue

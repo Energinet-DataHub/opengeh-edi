@@ -14,15 +14,15 @@
 
 using System;
 using System.Threading.Tasks;
-using Application.Transactions.MoveIn;
-using Domain.Transactions;
+using Energinet.DataHub.EDI.Application.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EnergySupplying.RequestResponse.Requests;
-using Infrastructure.Configuration.MessageBus;
-using IntegrationTests.Fixtures;
-using IntegrationTests.TestDoubles;
 using Xunit;
 
-namespace IntegrationTests.Application.Transactions.MoveIn;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.MoveIn;
 
 public class FetchCustomerMasterDataTests : TestBase
 {

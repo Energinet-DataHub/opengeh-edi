@@ -15,10 +15,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.TimeEvents;
+using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
 using MediatR;
 
-namespace Infrastructure.Configuration.InternalCommands
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands
 {
     public class ProcessInternalCommandsOnTimeHasPassed : INotificationHandler<TenSecondsHasHasPassed>
     {

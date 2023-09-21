@@ -19,19 +19,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using Application.OutgoingMessages.Common;
-using DocumentValidation;
-using DocumentValidation.CimXml;
-using Domain.OutgoingMessages;
-using Infrastructure.Configuration.Serialization;
-using Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
-using Infrastructure.OutgoingMessages.Common;
-using Tests.Factories;
-using Tests.Infrastructure.OutgoingMessages.Asserts;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.CimXml;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Tests.Factories;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
-using MarketActivityRecord = Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics.MarketActivityRecord;
+using MarketActivityRecord = Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics.MarketActivityRecord;
 
-namespace Tests.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 
 public class AccountingPointCharacteristicsXmlDocumentWriterTests
 {

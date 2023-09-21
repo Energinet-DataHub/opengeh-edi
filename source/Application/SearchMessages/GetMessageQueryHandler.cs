@@ -16,11 +16,11 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.DataAccess;
 using Dapper;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using MediatR;
 
-namespace Application.SearchMessages;
+namespace Energinet.DataHub.EDI.Application.SearchMessages;
 
 public class GetMessageQueryHandler : IRequestHandler<GetMessagesQuery, MessageSearchResult>
 {

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
 internal static class SampleData
 {

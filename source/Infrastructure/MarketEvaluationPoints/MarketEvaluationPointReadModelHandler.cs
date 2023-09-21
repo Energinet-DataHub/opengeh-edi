@@ -14,14 +14,14 @@
 
 using System;
 using System.Threading.Tasks;
-using Domain.Actors;
-using Domain.MasterData.MarketEvaluationPoints;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.MasterData.MarketEvaluationPoints;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EnergySupplying.IntegrationEvents;
 using Energinet.DataHub.MeteringPoints.IntegrationEvents.CreateMeteringPoint;
-using Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.MarketEvaluationPoints;
+namespace Energinet.DataHub.EDI.Infrastructure.MarketEvaluationPoints;
 
 public class MarketEvaluationPointReadModelHandler
 {

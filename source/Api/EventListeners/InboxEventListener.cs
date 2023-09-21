@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
- using System;
- using System.Threading;
- using System.Threading.Tasks;
- using Api.Configuration;
- using Infrastructure.Configuration.Serialization;
- using Infrastructure.InboxEvents;
- using Microsoft.Azure.Functions.Worker;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Api.Configuration;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
+using Microsoft.Azure.Functions.Worker;
 
- namespace Api.EventListeners;
+namespace Energinet.DataHub.EDI.Api.EventListeners;
 
 public class InboxEventListener
 {

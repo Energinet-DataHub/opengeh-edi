@@ -13,24 +13,24 @@
 // limitations under the License.
 
 using System;
-using Domain.Actors;
-using Domain.Common;
-using Domain.Documents;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics;
-using Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
-using Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeAccountingPointCharacteristics;
-using Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeOfSupplier;
-using Domain.OutgoingMessages.MoveIn.GenericNotification;
-using Domain.OutgoingMessages.MoveIn.RejectRequestChangeAccountingPointCharacteristics;
-using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
-using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Domain.OutgoingMessages.Queueing;
-using Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeAccountingPointCharacteristics;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.GenericNotification;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeAccountingPointCharacteristics;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Domain.Transactions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.OutgoingMessages
+namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages
 {
     public class OutgoingMessageEntityConfiguration : IEntityTypeConfiguration<OutgoingMessage>
     {

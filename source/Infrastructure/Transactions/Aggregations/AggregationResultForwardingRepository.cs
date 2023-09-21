@@ -13,13 +13,10 @@
 // limitations under the License.
 
 using System;
-using System.Threading.Tasks;
-using Domain.Transactions;
-using Domain.Transactions.Aggregations;
-using Infrastructure.Configuration.DataAccess;
-using Microsoft.EntityFrameworkCore;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 
-namespace Infrastructure.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 
 internal sealed class AggregationResultForwardingRepository : IAggregationResultForwardingRepository
 {

@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Actors;
-using Domain.Documents;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Documents;
 using NodaTime;
 
-namespace Domain.ArchivedMessages;
+namespace Energinet.DataHub.EDI.Domain.ArchivedMessages;
 
 public record ArchivedMessage(
     string Id,

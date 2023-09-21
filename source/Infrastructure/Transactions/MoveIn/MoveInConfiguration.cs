@@ -13,20 +13,20 @@
 // limitations under the License.
 
 using System;
-using Application.Configuration.TimeEvents;
-using Application.IncomingMessages.RequestChangeOfSupplier;
-using Application.Transactions.MoveIn;
-using Application.Transactions.MoveIn.MasterDataDelivery;
-using Application.Transactions.MoveIn.Notifications;
-using Application.Transactions.MoveIn.UpdateCustomer;
-using Application.Transactions.UpdateCustomer;
-using Domain.Transactions.MoveIn;
-using Domain.Transactions.MoveIn.Events;
-using Infrastructure.Transactions.MoveIn.UpdateCustomer;
+using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Application.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Application.Transactions.MoveIn.MasterDataDelivery;
+using Energinet.DataHub.EDI.Application.Transactions.MoveIn.Notifications;
+using Energinet.DataHub.EDI.Application.Transactions.MoveIn.UpdateCustomer;
+using Energinet.DataHub.EDI.Application.Transactions.UpdateCustomer;
+using Energinet.DataHub.EDI.Domain.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Domain.Transactions.MoveIn.Events;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.MoveIn.UpdateCustomer;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.Transactions.MoveIn;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.MoveIn;
 
 internal static class MoveInConfiguration
 {

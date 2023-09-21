@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 
-namespace Infrastructure.Configuration.DataAccess
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 {
     public class UnitOfWork : IUnitOfWork
     {

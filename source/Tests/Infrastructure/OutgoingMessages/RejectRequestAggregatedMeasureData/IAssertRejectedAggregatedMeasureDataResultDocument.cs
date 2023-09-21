@@ -14,10 +14,10 @@
 
 using System;
 using System.Threading.Tasks;
-using Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using NodaTime;
 
-namespace Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 
 /// <summary>
 /// Assertion helper for aggregation result documents

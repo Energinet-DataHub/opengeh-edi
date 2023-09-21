@@ -14,21 +14,20 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Application.OutgoingMessages.Common;
-using Domain.Actors;
-using Domain.Documents;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Domain.Transactions.Aggregations;
-using Infrastructure.OutgoingMessages.Common;
-using Infrastructure.OutgoingMessages.Common.Json;
-using DocumentFormat = Domain.Documents.DocumentFormat;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Json;
+using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
 
-namespace Infrastructure.OutgoingMessages.AggregationResult;
+namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AggregationResult;
 
 public class AggregationResultJsonDocumentWriter : IDocumentWriter
 {

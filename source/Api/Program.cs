@@ -18,24 +18,24 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Api.Configuration.Middleware;
-using Api.Configuration.Middleware.Authentication.Bearer;
-using Api.Configuration.Middleware.Authentication.MarketActors;
-using Api.Configuration.Middleware.Correlation;
-using Application.Actors;
-using Application.Configuration.DataAccess;
-using Application.Transactions.MoveIn;
-using CimMessageAdapter.Messages.Queues;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.EDI.Api.Configuration.Middleware;
+using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.Bearer;
+using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.MarketActors;
+using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
+using Energinet.DataHub.EDI.Application.Actors;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Application.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues;
+using Energinet.DataHub.EDI.Infrastructure.Configuration;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
+using Energinet.DataHub.EDI.Infrastructure.Transactions;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.Reflection;
-using Infrastructure.Configuration;
-using Infrastructure.Configuration.Authentication;
-using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
-using Infrastructure.Transactions;
-using Infrastructure.Transactions.MoveIn;
-using Infrastructure.Wholesale;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -44,7 +44,7 @@ using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Api
+namespace Energinet.DataHub.EDI.Api
 {
     public static class Program
     {

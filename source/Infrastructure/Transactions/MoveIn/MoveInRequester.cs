@@ -17,12 +17,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Application.Transactions;
-using Application.Transactions.MoveIn;
-using Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Application.Transactions;
+using Energinet.DataHub.EDI.Application.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Microsoft.Extensions.Logging;
 
-namespace Infrastructure.Transactions.MoveIn;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.MoveIn;
 public sealed class MoveInRequester : IMoveInRequester
 {
     private readonly MoveInSettings _configuration;

@@ -15,13 +15,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Application.Configuration.Commands.Commands;
-using Infrastructure.Configuration;
-using Infrastructure.Configuration.InternalCommands;
-using IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Infrastructure.Configuration;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace IntegrationTests.Infrastructure.Configuration.InternalCommands;
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 
 public class InternalCommandRegistrationTests : TestBase
 {

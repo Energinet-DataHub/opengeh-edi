@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
+namespace Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
 
 public class RequestChangeAccountingPointCharacteristicIncomingDocument : IIncomingMarketDocument<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransactionCommand>
 {

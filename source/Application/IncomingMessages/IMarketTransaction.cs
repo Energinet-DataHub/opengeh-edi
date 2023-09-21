@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Application.IncomingMessages;
+namespace Energinet.DataHub.EDI.Application.IncomingMessages;
 
 /// <summary>
 /// Represents a single market transaction

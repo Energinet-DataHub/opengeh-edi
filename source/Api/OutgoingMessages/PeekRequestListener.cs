@@ -16,19 +16,18 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Api.Common;
-using Application.Configuration.Authentication;
-using Application.OutgoingMessages;
-using Domain.Common;
-using Domain.OutgoingMessages.Peek;
-using Domain.OutgoingMessages.Queueing;
-using Infrastructure.IncomingMessages;
+using Energinet.DataHub.EDI.Api.Common;
+using Energinet.DataHub.EDI.Application.Configuration.Authentication;
+using Energinet.DataHub.EDI.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 
-namespace Api.OutgoingMessages;
+namespace Energinet.DataHub.EDI.Api.OutgoingMessages;
 
 public class PeekRequestListener
 {

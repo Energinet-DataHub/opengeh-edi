@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.Transactions.Aggregations;
-using Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Application.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 
 internal static class AggregationsConfiguration
 {

@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Common;
-using Domain.Documents;
-using Domain.OutgoingMessages;
-using Infrastructure.IncomingMessages;
+using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 using Xunit;
 
-namespace Tests.Infrastructure.IncomingMessages;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.IncomingMessages;
 
 public class CimFormatParserTests
 {

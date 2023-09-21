@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Response
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response
 {
     public class ResponseMessage
     {

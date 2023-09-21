@@ -14,18 +14,17 @@
 
 using System.IO;
 using System.Threading.Tasks;
-using Application.OutgoingMessages.Common;
-using Infrastructure.Configuration.Serialization;
-using Infrastructure.OutgoingMessages.AggregationResult;
-using Infrastructure.OutgoingMessages.Common;
-using Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
-using Tests.Factories;
-using Tests.Fixtures;
-using Tests.Infrastructure.OutgoingMessages.Asserts;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Tests.Factories;
+using Energinet.DataHub.EDI.Tests.Fixtures;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
-using DocumentFormat = Domain.Documents.DocumentFormat;
+using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
 
-namespace Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 
 public class RejectRequestAggregatedMeasureDataResultDocumentWriterTests : IClassFixture<DocumentValidationFixture>
 {

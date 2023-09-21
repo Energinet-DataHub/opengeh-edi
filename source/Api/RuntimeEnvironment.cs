@@ -14,9 +14,8 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 
-namespace Api
+namespace Energinet.DataHub.EDI.Api
 {
     [SuppressMessage("Naming", "CA1707:Identifiers should not contain underscores", Justification = "Property name should match environment name")]
     public class RuntimeEnvironment

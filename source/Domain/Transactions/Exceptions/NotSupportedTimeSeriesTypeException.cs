@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Domain.Transactions.Exceptions;
+namespace Energinet.DataHub.EDI.Domain.Transactions.Exceptions;
 
 public class NotSupportedTimeSeriesTypeException : Exception
 {

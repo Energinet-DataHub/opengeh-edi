@@ -13,15 +13,15 @@
 // limitations under the License.
 
 using System;
-using Application.OutgoingMessages;
-using Application.OutgoingMessages.Common;
-using Domain.Actors;
-using Domain.Documents;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.MoveIn.GenericNotification;
-using Domain.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.GenericNotification;
+using Energinet.DataHub.EDI.Domain.Transactions.MoveIn;
 
-namespace Application.Transactions.MoveIn.Notifications;
+namespace Energinet.DataHub.EDI.Application.Transactions.MoveIn.Notifications;
 
 public class MoveInNotifications
 {

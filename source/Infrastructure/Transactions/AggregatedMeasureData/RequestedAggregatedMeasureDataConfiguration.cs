@@ -12,21 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.IncomingMessages.RequestAggregatedMeasureData;
-using Application.Transactions.AggregatedMeasureData;
-using CimMessageAdapter.Messages;
-using Domain.Transactions.AggregatedMeasureData;
-using Domain.Transactions.AggregatedMeasureData.ProcessEvents;
-using Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
-using Infrastructure.Transactions.AggregatedMeasureData.Commands;
-using Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
-using Infrastructure.Transactions.AggregatedMeasureData.Notifications;
-using Infrastructure.Transactions.AggregatedMeasureData.Notifications.Handlers;
-using Infrastructure.Wholesale;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Application.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Notifications.Handlers;
+using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData;
 
 internal static class RequestedAggregatedMeasureDataConfiguration
 {

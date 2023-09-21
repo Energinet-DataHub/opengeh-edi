@@ -15,7 +15,7 @@
 using System;
 using NodaTime;
 
-namespace Infrastructure.InboxEvents;
+namespace Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 
 public class ReceivedInboxEvent
 {

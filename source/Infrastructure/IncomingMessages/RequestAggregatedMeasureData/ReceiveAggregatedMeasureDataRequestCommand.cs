@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.Configuration.Commands.Commands;
-using Application.IncomingMessages.RequestAggregatedMeasureData;
-using CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 
-namespace Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
 public class ReceiveAggregatedMeasureDataRequestCommand : ICommand<Result>
 {

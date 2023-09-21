@@ -15,13 +15,13 @@
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration;
-using Application.Configuration.DataAccess;
-using Infrastructure.DataRetention;
+using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.DataRetention;
 using Microsoft.Data.SqlClient;
 using NodaTime;
 
-namespace Infrastructure.InboxEvents;
+namespace Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 
 public class ReceivedInboxEventsRetention : IDataRetention
 {

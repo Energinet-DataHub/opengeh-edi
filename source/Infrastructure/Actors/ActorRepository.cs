@@ -15,12 +15,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Actors;
-using Application.Configuration.DataAccess;
 using Dapper;
-using Domain.Actors;
+using Energinet.DataHub.EDI.Application.Actors;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Domain.Actors;
 
-namespace Infrastructure.Actors;
+namespace Energinet.DataHub.EDI.Infrastructure.Actors;
 
 public class ActorRepository : IActorRepository
 {

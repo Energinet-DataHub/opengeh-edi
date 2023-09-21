@@ -17,7 +17,7 @@ using Newtonsoft.Json.Linq;
 using NodaTime;
 using Xunit;
 
-namespace IntegrationTests.Assertions;
+namespace Energinet.DataHub.EDI.IntegrationTests.Assertions;
 
 public class AssertMarketActivityRecord
 {

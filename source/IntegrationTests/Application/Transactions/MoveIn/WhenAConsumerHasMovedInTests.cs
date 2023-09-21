@@ -14,19 +14,18 @@
 
 using System;
 using System.Threading.Tasks;
-using Application.Configuration.DataAccess;
-using Application.Transactions;
-using Application.Transactions.MoveIn;
-using Application.Transactions.MoveIn.Notifications;
-using Domain.Actors;
-using Domain.Transactions;
-using Domain.Transactions.MoveIn;
-using Infrastructure.Configuration.InternalCommands;
-using IntegrationTests.Assertions;
-using IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Application.Transactions;
+using Energinet.DataHub.EDI.Application.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Application.Transactions.MoveIn.Notifications;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
+using Energinet.DataHub.EDI.IntegrationTests.Assertions;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace IntegrationTests.Application.Transactions.MoveIn;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.MoveIn;
 
 public class WhenAConsumerHasMovedInTests : TestBase
 {

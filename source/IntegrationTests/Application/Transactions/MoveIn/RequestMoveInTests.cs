@@ -16,24 +16,24 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.DataAccess;
-using Application.Transactions.MoveIn;
 using Dapper;
-using Domain.Actors;
-using Domain.Documents;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeOfSupplier;
-using Domain.Transactions.MoveIn;
-using Infrastructure.Configuration.InternalCommands;
-using Infrastructure.Transactions;
-using IntegrationTests.Application.IncomingMessages;
-using IntegrationTests.Assertions;
-using IntegrationTests.Fixtures;
-using IntegrationTests.TestDoubles;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Application.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Domain.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
+using Energinet.DataHub.EDI.Infrastructure.Transactions;
+using Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
+using Energinet.DataHub.EDI.IntegrationTests.Assertions;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Xunit;
 using Xunit.Categories;
 
-namespace IntegrationTests.Application.Transactions.MoveIn
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.MoveIn
 {
     [IntegrationTest]
     public class RequestMoveInTests : TestBase

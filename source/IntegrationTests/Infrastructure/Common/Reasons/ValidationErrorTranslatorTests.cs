@@ -17,13 +17,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.DataAccess;
-using Application.OutgoingMessages.Common.Reasons;
 using Dapper;
-using IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Reasons;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace IntegrationTests.Infrastructure.Common.Reasons;
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Common.Reasons;
 
 public class ValidationErrorTranslatorTests : TestBase
 {

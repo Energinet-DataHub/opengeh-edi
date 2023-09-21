@@ -12,24 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
-using Application.OutgoingMessages.Common;
-using Domain.OutgoingMessages;
-using Domain.Transactions.Aggregations;
-using Infrastructure.Configuration.Serialization;
-using Infrastructure.OutgoingMessages.AggregationResult;
-using Infrastructure.OutgoingMessages.Common;
-using NodaTime.Text;
-using Tests.Factories;
-using Tests.Fixtures;
-using Tests.Infrastructure.OutgoingMessages.Asserts;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AggregationResult;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Tests.Factories;
+using Energinet.DataHub.EDI.Tests.Fixtures;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
-using DocumentFormat = Domain.Documents.DocumentFormat;
-using Point = Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
+using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
+using Point = Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
-namespace Tests.Infrastructure.OutgoingMessages.AggregationResult;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.AggregationResult;
 
 public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValidationFixture>
 {

@@ -19,7 +19,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 
-namespace IntegrationTests.Infrastructure.Authentication.MarketActors
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors
 {
     public class JwtBuilder
     {

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Domain.MasterData;
+namespace Energinet.DataHub.EDI.Domain.MasterData;
 
 public class ReadingDate
 {
