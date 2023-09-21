@@ -55,7 +55,7 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
             firstMessage.SenderRole,
             firstMessage.MessageRecord,
             firstMessage.IsPublished,
-            firstMessage.AssignedBundleId,
+            bundleId,
             outgoingMessages);
     }
 }
