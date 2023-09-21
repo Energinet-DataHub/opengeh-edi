@@ -29,6 +29,7 @@ using RejectReason = Domain.Transactions.AggregatedMeasureData.RejectReason;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
 
+[Obsolete("This can be delete when all ForwardRejectedAggregationResult commands has been processed.")]
 public class ForwardRejectedAggregationResultHandler : IRequestHandler<ForwardRejectedAggregationResult, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
@@ -48,7 +49,7 @@ public class ForwardRejectedAggregationResultHandler : IRequestHandler<ForwardRe
     public async Task<Unit> Handle(ForwardRejectedAggregationResult request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        var process = await _aggregatedMeasureDataProcessRepository.GetByIdAsync(
+        var process = await _aggregatedMeasureDataProcessRepository.GetAsync(
             ProcessId.Create(request.ProcessId),
             cancellationToken).ConfigureAwait(false);
 
@@ -58,8 +59,6 @@ public class ForwardRejectedAggregationResultHandler : IRequestHandler<ForwardRe
             process,
             rejectedReasons));
 
-        process.IsCompleted();
-
         return Unit.Value;
     }
 
@@ -67,7 +66,7 @@ public class ForwardRejectedAggregationResultHandler : IRequestHandler<ForwardRe
         AggregatedMeasureDataProcess process,
         IReadOnlyList<RejectReason> rejectedReasons)
     {
-        var transactionId = TransactionId.Create(process.ProcessId.Id);
+        var transactionId = ProcessId.Create(process.ProcessId.Id);
         var rejectedTimeSerie = new RejectedTimeSerie(
                 transactionId.Id,
                 rejectedReasons.Select(reason =>

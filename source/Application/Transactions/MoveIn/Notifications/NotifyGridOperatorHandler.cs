@@ -27,26 +27,26 @@ public class NotifyGridOperatorHandler : IRequestHandler<NotifyGridOperator, Uni
 {
     private readonly IMoveInTransactionRepository _transactionRepository;
     private readonly IMarketEvaluationPointRepository _marketEvaluationPointRepository;
-    private readonly IActorLookup _actorLookup;
+    private readonly IActorRepository _actorRepository;
     private readonly MoveInNotifications _notifications;
 
     public NotifyGridOperatorHandler(
         IMoveInTransactionRepository transactionRepository,
         IMarketEvaluationPointRepository marketEvaluationPointRepository,
-        IActorLookup actorLookup,
+        IActorRepository actorRepository,
         MoveInNotifications notifications)
     {
         _transactionRepository = transactionRepository;
         _marketEvaluationPointRepository = marketEvaluationPointRepository;
-        _actorLookup = actorLookup;
+        _actorRepository = actorRepository;
         _notifications = notifications;
     }
 
     public async Task<Unit> Handle(NotifyGridOperator request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        var transaction = _transactionRepository.GetById(TransactionId.Create(request.TransactionId))
-                          ?? throw TransactionNotFoundException.TransactionIdNotFound(request.TransactionId);
+        var transaction = _transactionRepository.GetById(request.ProcessId)
+                          ?? throw TransactionNotFoundException.ProcessIdNotFound(request.ProcessId.Id.ToString());
 
         var gridOperatorNumber = await GetGridOperatorNumberAsync(transaction.MarketEvaluationPointId, cancellationToken).ConfigureAwait(false);
         _notifications.NotifyGridOperator(transaction, gridOperatorNumber);
@@ -61,7 +61,7 @@ public class NotifyGridOperatorHandler : IRequestHandler<NotifyGridOperator, Uni
             await _marketEvaluationPointRepository.GetByNumberAsync(marketEvaluationPointNumber)
                 .ConfigureAwait(false) ?? throw new MoveInException($"Could not find market evaluation point with number {marketEvaluationPointNumber}");
 
-        return await _actorLookup
+        return await _actorRepository
             .GetActorNumberByIdAsync(marketEvaluationPoint.GridOperatorId.GetValueOrDefault(), cancellationToken)
             .ConfigureAwait(false);
     }

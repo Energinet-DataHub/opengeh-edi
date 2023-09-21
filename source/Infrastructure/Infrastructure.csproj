@@ -16,11 +16,13 @@ limitations under the License.
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+      <AssemblyName>Energinet.DataHub.EDI.Infrastructure</AssemblyName>
+      <RootNamespace>Energinet.DataHub.EDI.Infrastructure</RootNamespace>
     </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.AzureServiceBus" Version="6.1.0" />
+    <PackageReference Include="AspNetCore.HealthChecks.AzureStorage" Version="7.0.0" />
     <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="6.0.2" />
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.16.1" />
     <PackageReference Include="Dapper-NodaTime" Version="0.1.0" />
@@ -33,6 +35,7 @@ limitations under the License.
     <PackageReference Include="Energinet.DataHub.MeteringPoints.RequestResponse" Version="1.0.4" />
     <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="4.1.0" />
     <PackageReference Include="MediatR" Version="12.1.1" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Azure" Version="1.6.3" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
     <PackageReference Include="NodaTime.Serialization.Protobuf" Version="2.0.0" />

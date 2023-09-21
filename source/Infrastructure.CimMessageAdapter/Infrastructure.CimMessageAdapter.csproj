@@ -16,8 +16,8 @@ limitations under the License.
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
-        <RootNamespace>CimMessageAdapter</RootNamespace>
+      <AssemblyName>Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter</AssemblyName>
+      <RootNamespace>Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

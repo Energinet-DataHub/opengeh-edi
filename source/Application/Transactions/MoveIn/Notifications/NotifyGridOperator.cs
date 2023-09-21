@@ -15,16 +15,17 @@
 using System;
 using System.Text.Json.Serialization;
 using Application.Configuration.Commands.Commands;
+using Domain.Transactions;
 
 namespace Application.Transactions.MoveIn.Notifications;
 
 public class NotifyGridOperator : InternalCommand
 {
     [JsonConstructor]
-    public NotifyGridOperator(Guid transactionId)
+    public NotifyGridOperator(ProcessId processId)
     {
-        TransactionId = transactionId;
+        ProcessId = processId;
     }
 
-    public Guid TransactionId { get; }
+    public ProcessId ProcessId { get; }
 }

@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+using Domain.Common;
 
 namespace Domain.Transactions.MoveIn.Events;
 
 public class CustomerMasterDataWasSent : DomainEvent
 {
-    public CustomerMasterDataWasSent(Guid transactionId)
+    public CustomerMasterDataWasSent(ProcessId processId)
     {
-        TransactionId = transactionId;
+        ProcessId = processId;
     }
 
-    public Guid TransactionId { get; }
+    public ProcessId ProcessId { get; }
 }

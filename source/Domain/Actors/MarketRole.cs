@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+using Domain.Common;
 
 namespace Domain.Actors;
 
 public class MarketRole : EnumerationType
 {
-    public static readonly MarketRole MeteringPointAdministrator = new(0, "MeteringPointAdministrator", string.Empty);
+    public static readonly MarketRole MeteringPointAdministrator = new(0, "MeteringPointAdministrator", "DDZ");
     public static readonly MarketRole EnergySupplier = new(1, "EnergySupplier", "DDQ");
 
     // A grid operator has two roles.

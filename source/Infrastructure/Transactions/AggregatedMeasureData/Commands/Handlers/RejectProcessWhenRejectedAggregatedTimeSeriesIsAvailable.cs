@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
-using Infrastructure.Configuration.Serialization;
+using Infrastructure.OutgoingMessages.Common;
 using MediatR;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
@@ -25,14 +25,11 @@ namespace Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
 public class RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable : IRequestHandler<RejectedAggregatedTimeSeries, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
-    private readonly ISerializer _serializer;
 
     public RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable(
-        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository,
-        ISerializer serializer)
+        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
-        _serializer = serializer;
     }
 
     public async Task<Unit> Handle(RejectedAggregatedTimeSeries request, CancellationToken cancellationToken)
@@ -40,9 +37,10 @@ public class RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable : IRequest
         ArgumentNullException.ThrowIfNull(request);
 
         var process = await _aggregatedMeasureDataProcessRepository
-            .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
+            .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
-        process.WasRejected(_serializer.Serialize(request.RejectReasons));
+        process.IsRejected(new RejectedAggregatedMeasureDataRequest(request.RejectReasons, CimCode.To(process.BusinessReason)));
+
         return Unit.Value;
     }
 }

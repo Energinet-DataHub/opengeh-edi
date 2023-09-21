@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+using Domain.Common;
 
 namespace Domain.Transactions.UpdateCustomer;
 
 public class UpdateCustomerMasterDataTransaction : Entity
 {
-    public UpdateCustomerMasterDataTransaction(TransactionId transactionId)
+    public UpdateCustomerMasterDataTransaction(ProcessId processId)
     {
-        TransactionId = transactionId;
+        ProcessId = processId;
     }
 
-    public TransactionId TransactionId { get; }
+    public ProcessId ProcessId { get; }
 }

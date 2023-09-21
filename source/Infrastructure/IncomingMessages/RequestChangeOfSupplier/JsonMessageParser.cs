@@ -28,8 +28,8 @@ using MessageHeader = Application.IncomingMessages.MessageHeader;
 
 namespace Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 
-public class JsonMessageParser : JsonParserBase<MarketActivityRecord, RequestChangeOfSupplierTransaction>,
-    IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>
+public class JsonMessageParser : JsonParserBase<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>,
+    IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";
@@ -42,7 +42,7 @@ public class JsonMessageParser : JsonParserBase<MarketActivityRecord, RequestCha
 
     public DocumentFormat HandledFormat => DocumentFormat.Json;
 
-    public async Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseAsync(
+    public async Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>> ParseAsync(
         Stream message, CancellationToken cancellationToken)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
@@ -50,7 +50,7 @@ public class JsonMessageParser : JsonParserBase<MarketActivityRecord, RequestCha
         var schema = await GetSchemaAsync(DocumentName, cancellationToken).ConfigureAwait(false);
         if (schema is null)
         {
-            return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(
+            return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>(
                 new InvalidBusinessReasonOrVersion(DocumentName, "0"));
         }
 
@@ -60,7 +60,7 @@ public class JsonMessageParser : JsonParserBase<MarketActivityRecord, RequestCha
 
         if (errors.Count > 0)
         {
-            return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(errors.ToArray());
+            return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>(errors.ToArray());
         }
 
         try
@@ -87,7 +87,7 @@ public class JsonMessageParser : JsonParserBase<MarketActivityRecord, RequestCha
         }
     }
 
-    private MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction> ParseJsonData(
+    private MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand> ParseJsonData(
         MessageHeader header,
         JsonElement marketActivityRecordJson)
     {
@@ -98,7 +98,7 @@ public class JsonMessageParser : JsonParserBase<MarketActivityRecord, RequestCha
             marketActivityRecords.Add(MarketActivityRecordFrom(jsonElement));
         }
 
-        return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(
+        return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>(
             new RequestChangeOfSupplierIncomingMarketDocument(header, marketActivityRecords));
     }
 

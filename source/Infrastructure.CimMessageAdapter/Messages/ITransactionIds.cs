@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,11 +24,19 @@ namespace CimMessageAdapter.Messages
     public interface ITransactionIds
     {
         /// <summary>
-        /// Store transaction id
+        /// Checks if <paramref name="transactionId"/> is already registered by the sender <paramref name="senderId"/>
         /// </summary>
         /// <param name="senderId"></param>
         /// <param name="transactionId"></param>
         /// <param name="cancellationToken"></param>
-        Task<bool> TryStoreAsync(string senderId, string transactionId, CancellationToken cancellationToken);
+        Task<bool> TransactionIdExistsAsync(string senderId, string transactionId, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Store transaction ids for the specified sender
+        /// </summary>
+        Task StoreAsync(
+            string senderId,
+            IReadOnlyList<string> transactionIds,
+            CancellationToken cancellationToken);
     }
 }

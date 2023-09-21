@@ -12,22 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+using Domain.Common;
 using NodaTime;
 
 namespace Domain.Transactions.MoveIn.Events;
 
 public class EndOfSupplyNotificationChangedToPending : DomainEvent
 {
-    public EndOfSupplyNotificationChangedToPending(Guid transactionId, Instant effectiveDate, string marketEvaluationPointId, string energySupplierId)
+    public EndOfSupplyNotificationChangedToPending(ProcessId processId, Instant effectiveDate, string marketEvaluationPointId, string energySupplierId)
     {
-        TransactionId = transactionId;
+        ProcessId = processId;
         EffectiveDate = effectiveDate;
         MarketEvaluationPointId = marketEvaluationPointId;
         EnergySupplierId = energySupplierId;
     }
 
-    public Guid TransactionId { get; }
+    public ProcessId ProcessId { get; }
 
     public Instant EffectiveDate { get; }
 

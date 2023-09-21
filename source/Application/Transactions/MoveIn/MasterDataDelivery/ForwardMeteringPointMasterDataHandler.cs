@@ -53,10 +53,10 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
     public async Task<Unit> Handle(ForwardMeteringPointMasterData request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
-        var transaction = _transactionRepository.GetById(TransactionId.Create(request.TransactionId));
+        var transaction = _transactionRepository.GetById(request.ProcessId);
         if (transaction is null)
         {
-            throw new MoveInException($"Could not find move in transaction '{request.TransactionId}'");
+            throw new MoveInException($"Could not find move in transaction '{request.ProcessId.Id}'");
         }
 
         _outgoingMessageRepository.Add(AccountingPointCharacteristicsMessageFrom(request.MasterDataContent, transaction));
@@ -128,7 +128,7 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
         return new OutgoingMessage(
             DocumentType.AccountingPointCharacteristics,
             ActorNumber.Create(receiverId),
-            TransactionId.Create(id),
+            ProcessId.Create(id),
             processType,
             MarketRole.EnergySupplier,
             DataHubDetails.IdentificationNumber,
@@ -146,7 +146,7 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
             marketEvaluationPoint);
 
         return CreateOutgoingMessage(
-            transaction.TransactionId.Id,
+            transaction.ProcessId.Id,
             "E65",
             transaction.NewEnergySupplierId,
             _messageRecordParser.From(marketActivityRecord));

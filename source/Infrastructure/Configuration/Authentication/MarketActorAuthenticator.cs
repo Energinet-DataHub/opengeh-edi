@@ -26,11 +26,11 @@ namespace Infrastructure.Configuration.Authentication
 {
     public class MarketActorAuthenticator : IMarketActorAuthenticator
     {
-        private readonly IActorLookup _actorLookup;
+        private readonly IActorRepository _actorRepository;
 
-        public MarketActorAuthenticator(IActorLookup actorLookup)
+        public MarketActorAuthenticator(IActorRepository actorRepository)
         {
-            _actorLookup = actorLookup;
+            _actorRepository = actorRepository;
         }
 
         public MarketActorIdentity CurrentIdentity { get; private set; } = new NotAuthenticated();
@@ -53,7 +53,7 @@ namespace Infrastructure.Configuration.Authentication
                 return;
             }
 
-            var actorNumber = await _actorLookup.GetActorNumberByB2CIdAsync(Guid.Parse(userIdFromSts), cancellationToken).ConfigureAwait(false);
+            var actorNumber = await _actorRepository.GetActorNumberByB2CIdAsync(Guid.Parse(userIdFromSts), cancellationToken).ConfigureAwait(false);
             if (actorNumber is null)
             {
                 ActorIsNotAuthorized();

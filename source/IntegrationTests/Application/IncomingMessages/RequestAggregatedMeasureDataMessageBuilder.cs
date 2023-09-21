@@ -71,9 +71,9 @@ public class RequestAggregatedMeasureDataMessageBuilder
         return this;
     }
 
-    internal RequestAggregatedMeasureDataTransaction Build()
+    internal RequestAggregatedMeasureDataTransactionCommand Build()
     {
-        return new RequestAggregatedMeasureDataTransaction(
+        return new RequestAggregatedMeasureDataTransactionCommand(
             CreateHeader(),
             CreateSerieCreateRecord());
     }

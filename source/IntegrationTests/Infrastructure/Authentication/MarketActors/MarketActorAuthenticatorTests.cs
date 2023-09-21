@@ -115,7 +115,7 @@ namespace IntegrationTests.Infrastructure.Authentication.MarketActors
 
         private async Task CreateActorAsync()
         {
-            await InvokeCommandAsync(new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.ActorNumber)).ConfigureAwait(false);
+            await InvokeCommandAsync(new CreateActorCommand(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.ActorNumber)).ConfigureAwait(false);
         }
     }
 }

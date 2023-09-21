@@ -32,18 +32,20 @@ internal static class RequestedAggregatedMeasureDataConfiguration
 {
     public static void Configure(IServiceCollection services)
     {
-        services.AddTransient<IRequestHandler<RequestAggregatedMeasureDataTransaction, Unit>, AggregatedMeasureDataRequestHandler>();
+        services.AddTransient<IRequestHandler<RequestAggregatedMeasureDataTransactionCommand, Unit>, AggregatedMeasureDataRequestHandler>();
+#pragma warning disable CS0618 // Type or member is obsolete
         services.AddTransient<IRequestHandler<CreateAggregatedMeasureAggregationResults, Unit>, MakeAggregatedMeasureAsAggregationResults>();
+#pragma warning restore CS0618 // Type or member is obsolete
         services.AddTransient<IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>, SendAggregatedMeasuredDataToWholesale>();
-        services.AddTransient<IRequestHandler<AcceptedAggregatedTimeSeries, Unit>, AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable>();
+        services.AddTransient<IRequestHandler<AcceptedAggregatedTimeSerie, Unit>, AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable>();
         services.AddTransient<IRequestHandler<RejectedAggregatedTimeSeries, Unit>, RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable>();
+#pragma warning disable CS0618 // Type or member is obsolete
         services.AddTransient<IRequestHandler<ForwardRejectedAggregationResult, Unit>, ForwardRejectedAggregationResultHandler>();
+#pragma warning restore CS0618 // Type or member is obsolete
         services.AddTransient<INotificationHandler<AggregatedMeasureProcessIsInitialized>, NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized>();
-        services.AddTransient<INotificationHandler<AggregatedMeasureProcessWasAccepted>, AcceptedAggregatedMeasureProcessIsAvailable>();
-        services.AddTransient<IRequestHandler<ReceiveAggregatedMeasureDataRequest, Result>, ValidateAggregatedMeasureDataRequestHandler>();
-        services.AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>, WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable>();
+        services.AddTransient<IRequestHandler<ReceiveAggregatedMeasureDataRequestCommand, Result>, ValidateAggregatedMeasureDataRequestHandler>();
+        services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>, WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable>();
         services.AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasRejected>, WhenAnRejectedAggregatedTimeSeriesRequestIsAvailable>();
-        services.AddTransient<INotificationHandler<AggregatedMeasureProcessWasRejected>, RejectedAggregatedMeasureProcessIsAvailable>();
         services.AddScoped<WholesaleInbox>();
         services.AddScoped<IAggregatedMeasureDataProcessRepository, AggregatedMeasureDataProcessRepository>();
         services.AddScoped<AggregatedMeasureDataResponseFactory>();

@@ -39,7 +39,7 @@ public class SendCustomerMasterDataToGridOperatorTests
     public Task InitializeAsync()
     {
         return Scenario.Details(
-                SampleData.TransactionId,
+                SampleData.ProcessId,
                 SampleData.MeteringPointNumber,
                 SampleData.SupplyStart,
                 SampleData.CurrentEnergySupplierNumber,
@@ -76,7 +76,7 @@ public class SendCustomerMasterDataToGridOperatorTests
     [Fact]
     public async Task Message_is_delivered()
     {
-        await InvokeCommandAsync(new SendCustomerMasterDataToGridOperator(SampleData.TransactionId)).ConfigureAwait(false);
+        await InvokeCommandAsync(new SendCustomerMasterDataToGridOperator(SampleData.ProcessId)).ConfigureAwait(false);
 
         var assertMessage = await AssertOutgoingMessageAsync().ConfigureAwait(false);
         assertMessage.HasReceiverId(SampleData.NumberOfGridOperatorForMeteringPoint);
@@ -108,7 +108,7 @@ public class SendCustomerMasterDataToGridOperatorTests
     private async Task<AssertOutgoingMessage> AssertOutgoingMessageAsync()
     {
         var assertMessage = await Assertions.AssertOutgoingMessage.OutgoingMessageAsync(
-            SampleData.TransactionId,
+            SampleData.ProcessId.Id,
             DocumentType.CharacteristicsOfACustomerAtAnAP.Name,
             BusinessReason.MoveIn.Name,
             MarketRole.GridOperator,

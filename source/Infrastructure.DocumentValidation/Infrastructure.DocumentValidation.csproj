@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+      <AssemblyName>Energinet.DataHub.EDI.Infrastructure.DocumentValidation</AssemblyName>
+      <RootNamespace>Energinet.DataHub.EDI.Infrastructure.DocumentValidation</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <RootNamespace>DocumentValidation</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

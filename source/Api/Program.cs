@@ -123,12 +123,12 @@ namespace Api
                             if (runtime.IsRunningLocally() || runtime.ALLOW_TEST_TOKENS)
                             {
                                 return new DevMarketActorAuthenticator(
-                                    sp.GetRequiredService<IActorLookup>(),
+                                    sp.GetRequiredService<IActorRepository>(),
                                     sp.GetRequiredService<IActorRegistry>(),
                                     sp.GetRequiredService<IDatabaseConnectionFactory>());
                             }
 
-                            return new MarketActorAuthenticator(sp.GetRequiredService<IActorLookup>());
+                            return new MarketActorAuthenticator(sp.GetRequiredService<IActorRepository>());
                         })
                         .AddDatabaseConnectionFactory(databaseConnectionString!)
                         .AddSystemClock(new SystemDateTimeProvider())
@@ -165,8 +165,10 @@ namespace Api
                         runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
                         runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!,
                         runtime.INCOMING_AGGREGATED_MEASURE_DATA_QUEUE_NAME!,
-                        runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!);
+                        runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!,
+                        runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!);
                     services.AddSqlServerHealthCheck(runtime.DB_CONNECTION_STRING!);
+                    services.AddBlobStorageHealthCheck(runtime.AzureWebJobsStorage!);
 
                     var integrationEventDescriptors = new List<MessageDescriptor>
                     {

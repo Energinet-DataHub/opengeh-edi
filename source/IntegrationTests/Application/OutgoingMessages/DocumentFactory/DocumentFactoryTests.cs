@@ -14,8 +14,8 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Domain.Common;
 using Domain.Documents;
-using Domain.SeedWork;
 using IntegrationTests.Fixtures;
 using Xunit;
 

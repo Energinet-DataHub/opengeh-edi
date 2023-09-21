@@ -24,11 +24,4 @@ public interface IAggregationResultForwardingRepository
     /// </summary>
     /// <param name="transaction"></param>
     void Add(AggregationResultForwarding transaction);
-
-    /// <summary>
-    /// Retrieve a transaction by id
-    /// </summary>
-    /// <param name="transactionId"></param>
-    /// <returns><see cref="AggregationResultForwarding"/></returns>
-    Task<AggregationResultForwarding?> GetAsync(TransactionId transactionId);
 }

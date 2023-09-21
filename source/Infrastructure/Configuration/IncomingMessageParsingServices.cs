@@ -75,9 +75,9 @@ internal static class IncomingMessageParsingServices
         services.AddScoped<SenderAuthorizer>();
         services.AddScoped<RequestChangeOfSupplierReceiver>();
         services
-            .AddTransient<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>, JsonMessageParser>();
+            .AddTransient<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>, JsonMessageParser>();
         services
-            .AddTransient<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>, XmlMessageParser>();
+            .AddTransient<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>, XmlMessageParser>();
         services.AddTransient<MessageParser>();
         services.AddScoped<DefaultProcessTypeValidator>();
         services.AddScoped<DefaultMessageTypeValidator>();
@@ -87,13 +87,13 @@ internal static class IncomingMessageParsingServices
     private static void RegisterRequestAggregatedMeasureDataHandling(IServiceCollection services)
     {
         services
-            .AddScoped<IMessageParser<Serie, RequestAggregatedMeasureDataTransaction>, Infrastructure.IncomingMessages.RequestAggregatedMeasureData.XmlMessageParser>();
+            .AddScoped<IMessageParser<Serie, RequestAggregatedMeasureDataTransactionCommand>, Infrastructure.IncomingMessages.RequestAggregatedMeasureData.XmlMessageParser>();
         services
-            .AddScoped<IMessageParser<Serie, RequestAggregatedMeasureDataTransaction>, Infrastructure.IncomingMessages.RequestAggregatedMeasureData.JsonMessageParser>();
+            .AddScoped<IMessageParser<Serie, RequestAggregatedMeasureDataTransactionCommand>, Infrastructure.IncomingMessages.RequestAggregatedMeasureData.JsonMessageParser>();
         services.AddTransient<CimMessageAdapter.Messages.RequestAggregatedMeasureData.MessageParser>();
         services.AddTransient<RequestAggregatedMeasureDataReceiver>();
         services.AddTransient<CimMessageAdapter.Messages.RequestAggregatedMeasureData.SenderAuthorizer>();
-        services.AddTransient<RequestAggregatedMeasureDataTransaction>();
+        services.AddTransient<RequestAggregatedMeasureDataTransactionCommand>();
         services.AddScoped<ProcessTypeValidator>();
         services.AddScoped<MessageTypeValidator>();
         services.AddScoped<CalculationResponsibleReceiverVerification>();

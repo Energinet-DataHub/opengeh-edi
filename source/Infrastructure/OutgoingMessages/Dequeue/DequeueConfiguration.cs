@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.OutgoingMessages.Dequeue;
+using Application.OutgoingMessages;
 using Infrastructure.Configuration.Queueing;
 using Infrastructure.DataRetention;
 using MediatR;

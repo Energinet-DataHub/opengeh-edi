@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
@@ -26,8 +25,13 @@ public static class HealthCheckRegistration
     {
         services.AddHealthChecks()
             .AddSqlServer(
-                name: "MarketRolesDB",
+                name: "EdiSqlDB",
                 connectionString: dbConnectionString);
+    }
+
+    public static void AddBlobStorageHealthCheck(this IServiceCollection services,  string blobConnectionString)
+    {
+        services.AddHealthChecks().AddAzureBlobStorage(blobConnectionString);
     }
 
     public static void AddExternalDomainServiceBusQueuesHealthCheck(this IServiceCollection services, string serviceBusConnectionString, [NotNull] params string[] queueNames)
@@ -36,7 +40,7 @@ public static class HealthCheckRegistration
         {
             services.AddHealthChecks()
                 .AddAzureServiceBusQueue(
-                    name: name + "Exists" + Guid.NewGuid(),
+                    name: name + "Exists",
                     connectionString: serviceBusConnectionString,
                     queueName: name);
         }
@@ -52,7 +56,7 @@ public static class HealthCheckRegistration
         {
             services.AddHealthChecks()
                 .AddAzureServiceBusSubscription(
-                    name: name + "Exists" + Guid.NewGuid(),
+                    name: name + "Exists",
                     connectionString: serviceBusConnectionString,
                     topicName: topicName,
                     subscriptionName: name);

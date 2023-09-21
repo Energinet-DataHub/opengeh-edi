@@ -31,12 +31,12 @@ public class ActorRegistry : IActorRegistry
         _databaseConnectionFactory = databaseConnectionFactory;
     }
 
-    public async Task<bool> TryStoreAsync(CreateActor createActor, CancellationToken cancellationToken)
+    public async Task<bool> TryStoreAsync(CreateActorCommand createActorCommand, CancellationToken cancellationToken)
     {
-        if (createActor == null) throw new ArgumentNullException(nameof(createActor));
+        if (createActorCommand == null) throw new ArgumentNullException(nameof(createActorCommand));
         using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken)
             .ConfigureAwait(false);
-        var sqlStatement = @$"INSERT INTO [dbo].[Actor] ([Id], [B2CId], [IdentificationNumber]) VALUES ('{createActor.ActorId}', '{createActor.B2CId}', '{createActor.IdentificationNumber}')";
+        var sqlStatement = @$"INSERT INTO [dbo].[Actor] ([Id], [B2CId], [IdentificationNumber]) VALUES ('{createActorCommand.ActorId}', '{createActorCommand.B2CId}', '{createActorCommand.IdentificationNumber}')";
         try
         {
             await connection.ExecuteAsync(sqlStatement)

@@ -21,7 +21,7 @@ using MediatR;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData.Notifications.Handlers;
 
-public class WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable : INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>
+public class WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable : INotificationHandler<AggregatedTimeSerieRequestWasAccepted>
 {
     private readonly CommandSchedulerFacade _commandSchedulerFacade;
 
@@ -30,9 +30,9 @@ public class WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable : INotificatio
         _commandSchedulerFacade = commandSchedulerFacade;
     }
 
-    public Task Handle(AggregatedTimeSeriesRequestWasAccepted notification, CancellationToken cancellationToken)
+    public Task Handle(AggregatedTimeSerieRequestWasAccepted notification, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(notification);
-        return _commandSchedulerFacade.EnqueueAsync(new AcceptedAggregatedTimeSeries(notification.ProcessId, notification.AggregatedTimeSerie));
+        return _commandSchedulerFacade.EnqueueAsync(new AcceptedAggregatedTimeSerie(notification.ProcessId, notification.AggregatedTimeSerie));
     }
 }

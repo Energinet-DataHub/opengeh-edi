@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Transactions.MoveIn;
-using NodaTime;
-
 namespace Domain.Transactions.AggregatedMeasureData
 {
     /// <summary>
@@ -23,7 +20,7 @@ namespace Domain.Transactions.AggregatedMeasureData
     public interface IAggregatedMeasureDataProcessRepository
     {
         /// <summary>
-        /// Adds a new process to store
+        /// Adds a new process to database
         /// </summary>
         /// <param name="process"></param>
         void Add(AggregatedMeasureDataProcess process);
@@ -33,6 +30,6 @@ namespace Domain.Transactions.AggregatedMeasureData
         /// </summary>
         /// <param name="processId"></param>
         /// <param name="cancellationToken"></param>
-        Task<AggregatedMeasureDataProcess> GetByIdAsync(ProcessId processId, CancellationToken cancellationToken);
+        Task<AggregatedMeasureDataProcess> GetAsync(ProcessId processId, CancellationToken cancellationToken);
     }
 }

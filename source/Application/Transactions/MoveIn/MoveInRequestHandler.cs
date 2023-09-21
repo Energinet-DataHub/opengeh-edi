@@ -29,7 +29,7 @@ using NodaTime.Text;
 
 namespace Application.Transactions.MoveIn
 {
-    public class MoveInRequestHandler : IRequestHandler<RequestChangeOfSupplierTransaction, Unit>
+    public class MoveInRequestHandler : IRequestHandler<RequestChangeOfSupplierTransactionCommand, Unit>
     {
         private readonly IMoveInTransactionRepository _moveInTransactionRepository;
         private readonly IMoveInRequester _moveInRequester;
@@ -48,7 +48,7 @@ namespace Application.Transactions.MoveIn
             _marketEvaluationPointRepository = marketEvaluationPointRepository;
         }
 
-        public async Task<Unit> Handle(RequestChangeOfSupplierTransaction request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(RequestChangeOfSupplierTransactionCommand request, CancellationToken cancellationToken)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
@@ -56,7 +56,7 @@ namespace Application.Transactions.MoveIn
                 await _marketEvaluationPointRepository.GetByNumberAsync(request.MarketActivityRecord.MarketEvaluationPointId).ConfigureAwait(false);
 
             var transaction = new MoveInTransaction(
-                TransactionId.New(),
+                ProcessId.New(),
                 ActorProvidedId.Create(request.MarketActivityRecord.Id),
                 request.MarketActivityRecord.MarketEvaluationPointId,
                 InstantPattern.General.Parse(request.MarketActivityRecord.EffectiveDate).GetValueOrThrow(),

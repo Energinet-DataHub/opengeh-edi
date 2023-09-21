@@ -13,15 +13,13 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Application.Transactions.Aggregations;
 using Domain.Actors;
 
 namespace Infrastructure.Transactions.Aggregations;
 
-public class GridAreaLookup : IGridAreaLookup
+public static class GridAreaLookup
 {
-    private readonly Dictionary<string, ActorNumber> _gridAreas = new()
+    private static readonly Dictionary<string, ActorNumber> _gridAreas = new()
     {
         { "003", ActorNumber.Create("5790002606892") },
         { "007", ActorNumber.Create("5790002606892") },
@@ -112,8 +110,8 @@ public class GridAreaLookup : IGridAreaLookup
         { "999", ActorNumber.Create("5790002606892") },
     };
 
-    public Task<ActorNumber> GetGridOperatorForAsync(string gridAreaCode)
+    public static ActorNumber GetGridOperatorFor(string gridAreaCode)
     {
-        return Task.FromResult(_gridAreas[gridAreaCode]);
+        return _gridAreas[gridAreaCode];
     }
 }

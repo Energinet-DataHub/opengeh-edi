@@ -18,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Dapper;
+using Domain.Transactions;
 using Xunit;
 
 namespace IntegrationTests.Application.Transactions.UpdateCustomer;
@@ -32,20 +33,21 @@ public class AssertTransaction
         _transaction = transaction;
     }
 
-    public static async Task<AssertTransaction> TransactionAsync(string transactionId, IDatabaseConnectionFactory connectionFactory)
+    public static async Task<AssertTransaction> TransactionAsync(ProcessId processId, IDatabaseConnectionFactory connectionFactory)
     {
+        if (processId == null) throw new ArgumentNullException(nameof(processId));
         if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
         using var connection = await connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
-        return new AssertTransaction(GetTransaction(transactionId, connection));
+        return new AssertTransaction(GetTransaction(processId.Id.ToString(), connection));
     }
 
-    private static dynamic? GetTransaction(string transactionId, IDbConnection connection)
+    private static dynamic? GetTransaction(string processId, IDbConnection connection)
     {
         return connection.QuerySingle(
-            $"SELECT * FROM dbo.UpdateCustomerMasterDataTransactions WHERE TransactionId = @TransactionId",
+            $"SELECT * FROM dbo.UpdateCustomerMasterDataTransactions WHERE ProcessId = @ProcessId",
             new
             {
-                TransactionId = transactionId,
+                ProcessId = processId,
             });
     }
 }

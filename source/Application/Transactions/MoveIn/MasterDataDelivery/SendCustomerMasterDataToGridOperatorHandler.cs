@@ -29,28 +29,25 @@ public class SendCustomerMasterDataToGridOperatorHandler : IRequestHandler<SendC
 {
     private readonly IMoveInTransactionRepository _transactionRepository;
     private readonly IMarketEvaluationPointRepository _marketEvaluationPointRepository;
-    private readonly IActorLookup _actorLookup;
+    private readonly IActorRepository _actorRepository;
 
     public SendCustomerMasterDataToGridOperatorHandler(
         IMoveInTransactionRepository transactionRepository,
         IOutgoingMessageRepository outgoingMessageRepository,
         IMarketEvaluationPointRepository marketEvaluationPointRepository,
-        IActorLookup actorLookup)
+        IActorRepository actorRepository)
     {
         _transactionRepository = transactionRepository;
         _marketEvaluationPointRepository = marketEvaluationPointRepository;
-        _actorLookup = actorLookup;
+        _actorRepository = actorRepository;
     }
 
     public async Task<Unit> Handle(SendCustomerMasterDataToGridOperator request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var transaction = _transactionRepository.GetById(TransactionId.Create(request.TransactionId));
-        if (transaction is null)
-        {
-            throw TransactionNotFoundException.TransactionIdNotFound(request.TransactionId);
-        }
+        var transaction = _transactionRepository.GetById(request.ProcessId)
+                          ?? throw TransactionNotFoundException.ProcessIdNotFound(request.ProcessId.Id.ToString());
 
         var gridOperatorNumber =
             await GetGridOperatorNumberAsync(transaction.MarketEvaluationPointId, cancellationToken)
@@ -67,7 +64,7 @@ public class SendCustomerMasterDataToGridOperatorHandler : IRequestHandler<SendC
     {
         var marketEvaluationPoint = await _marketEvaluationPointRepository
             .GetByNumberAsync(marketEvaluationPointNumber).ConfigureAwait(false);
-        return ActorNumber.Create(await _actorLookup
+        return ActorNumber.Create(await _actorRepository
             .GetActorNumberByIdAsync(marketEvaluationPoint!.GridOperatorId.GetValueOrDefault(), cancellationToken)
             .ConfigureAwait(false));
     }

@@ -25,7 +25,7 @@ limitations under the License.
 	<cim:receiver_MarketParticipant.marketRole.type>DDZ</cim:receiver_MarketParticipant.marketRole.type>
 	<cim:createdDateTime>2022-09-07T09:30:47Z</cim:createdDateTime>
 	<cim:MktActivityRecord>
-		<cim:mRID>12345689</cim:mRID>
+		<cim:mRID>123564789123564789123564789123564789</cim:mRID>
 		<cim:marketEvaluationPoint.mRID codingScheme="A10">579999993331812345</cim:marketEvaluationPoint.mRID>
 		<cim:marketEvaluationPoint.energySupplier_MarketParticipant.mRID codingScheme="A10">5799999933318</cim:marketEvaluationPoint.energySupplier_MarketParticipant.mRID>
 		<cim:marketEvaluationPoint.balanceResponsibleParty_MarketParticipant.mRID codingScheme="A10">5799999933340</cim:marketEvaluationPoint.balanceResponsibleParty_MarketParticipant.mRID>

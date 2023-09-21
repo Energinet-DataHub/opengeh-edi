@@ -83,14 +83,14 @@ public class WhenAConsumerHasMovedInTests : TestBase
     private async Task<MoveInTransaction> ConsumerHasMovedIn()
     {
         var transaction = await StartMoveInTransaction();
-        await InvokeCommandAsync(new SetConsumerHasMovedIn(transaction.ProcessId!)).ConfigureAwait(false);
+        await InvokeCommandAsync(new SetConsumerHasMovedIn(transaction.BusinessProcessId!)).ConfigureAwait(false);
         return transaction;
     }
 
     private async Task<MoveInTransaction> StartMoveInTransaction()
     {
         var transaction = new MoveInTransaction(
-            TransactionId.Create(SampleData.TransactionId),
+            SampleData.ProcessId,
             SampleData.ActorProvidedId,
             SampleData.MeteringPointNumber,
             SampleData.SupplyStart,

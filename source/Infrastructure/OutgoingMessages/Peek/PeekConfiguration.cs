@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.OutgoingMessages.Peek;
+using Application.OutgoingMessages;
 using Domain.OutgoingMessages.Queueing;
 using Infrastructure.OutgoingMessages.Queueing;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using PeekResult = Application.OutgoingMessages.Peek.PeekResult;
+using PeekResult = Application.OutgoingMessages.PeekResult;
 
 namespace Infrastructure.OutgoingMessages.Peek;
 

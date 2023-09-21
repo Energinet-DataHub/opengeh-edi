@@ -12,16 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Domain.OutgoingMessages;
 using Domain.Transactions.AggregatedMeasureData;
-using Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.DataAccess;
 using IntegrationTests.Application.IncomingMessages;
 using IntegrationTests.Fixtures;
+using NodaTime.Extensions;
 using Xunit;
 using Xunit.Categories;
+using GridAreaDetails = Domain.Transactions.Aggregations.GridAreaDetails;
+using Period = Domain.Transactions.Aggregations.Period;
+using Point = Domain.Transactions.Aggregations.Point;
 
 namespace IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
@@ -40,79 +47,78 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
     public async Task Aggregated_measure_data_response_was_accepted()
     {
         // Arrange
+        var expectedOutgoingMessages = 1;
         var incomingMessage = MessageBuilder().Build();
         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
         var process = GetProcess(incomingMessage.MessageHeader.SenderId);
         process!.WasSentToWholesale();
+        var acceptedAggregation = CreateAcceptedAggregation();
 
         // Act
-        process.WasAccepted(string.Empty);
+        process.IsAccepted(acceptedAggregation);
 
         // Assert
-        var domainEvents =
-            process.DomainEvents.Where(x => x is AggregatedMeasureProcessWasAccepted);
-
-        Assert.Single(domainEvents);
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);
+        AssertOutgoingMessageCreated(process, expectedOutgoingMessages);
     }
 
     [Fact]
     public async Task Aggregated_measure_data_process_accepted_will_only_be_processed_once()
     {
         // Arrange
+        var expectedOutgoingMessages = 1;
         var incomingMessage = MessageBuilder().Build();
         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
         var process = GetProcess(incomingMessage.MessageHeader.SenderId);
         process!.WasSentToWholesale();
+        var acceptedAggregation = CreateAcceptedAggregation();
 
         // Act
-        process.WasAccepted(string.Empty);
-        process.WasAccepted(string.Empty);
+        process.IsAccepted(acceptedAggregation);
+        process.IsAccepted(acceptedAggregation);
 
         // Assert
-        var domainEvents =
-            process.DomainEvents.Where(x => x is AggregatedMeasureProcessWasAccepted);
-        Assert.Equal(incomingMessage.MarketActivityRecord.Id, process.BusinessTransactionId.Id);
-        Assert.Single(domainEvents);
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);
+        AssertOutgoingMessageCreated(process, expectedOutgoingMessages);
+    }
+
+    [Fact]
+    public async Task Aggregated_measure_data_response_was_rejected()
+    {
+        // Arrange
+        var expectedOutgoingMessage = 1;
+        var incomingMessage = MessageBuilder().Build();
+        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
+        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
+        process!.WasSentToWholesale();
+        var rejectedRequest = CreateRejectRequest();
+
+        // Act
+        process.IsRejected(rejectedRequest);
+
+        // Assert
+        AssertProcessState(process, AggregatedMeasureDataProcess.State.Rejected);
+        AssertOutgoingMessageCreated(process, expectedOutgoingMessage);
     }
 
     [Fact]
     public async Task Aggregated_measure_data_process_rejected_will_only_be_processed_once()
     {
         // Arrange
+        var expectedOutgoingMessage = 1;
         var incomingMessage = MessageBuilder().Build();
         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
         var process = GetProcess(incomingMessage.MessageHeader.SenderId);
         process!.WasSentToWholesale();
+        var rejectedRequest = CreateRejectRequest();
 
         // Act
-        process.WasRejected(string.Empty);
-        process.WasRejected(string.Empty);
+        process.IsRejected(rejectedRequest);
+        process.IsRejected(rejectedRequest);
 
         // Assert
-        var domainEvents =
-            process.DomainEvents.Where(x => x is AggregatedMeasureProcessWasRejected);
-        Assert.Equal(incomingMessage.MarketActivityRecord.Id, process.BusinessTransactionId.Id);
-        Assert.Single(domainEvents);
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Rejected);
-    }
-
-    [Fact]
-    public async Task Aggregated_measure_data_process_is_completed()
-    {
-        // Arrange
-        var incomingMessage = MessageBuilder().Build();
-        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
-        process!.WasSentToWholesale();
-        process.WasAccepted(string.Empty);
-
-        // Act
-        process.IsCompleted();
-
-        // Assert
-        AssertProcessState(process, AggregatedMeasureDataProcess.State.Completed);
+        AssertOutgoingMessageCreated(process, expectedOutgoingMessage);
     }
 
     protected override void Dispose(bool disposing)
@@ -126,10 +132,42 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         return new RequestAggregatedMeasureDataMessageBuilder();
     }
 
+    private static Aggregation CreateAcceptedAggregation()
+    {
+        var points = Array.Empty<Point>();
+
+        return new Aggregation(
+            points,
+            MeteringPointType.Consumption.Name,
+            MeasurementUnit.Kwh.Name,
+            Resolution.Hourly.Name,
+            new Period(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant()),
+            SettlementType.NonProfiled.Name,
+            BusinessReason.BalanceFixing.Name,
+            new ActorGrouping("1234567891911", null),
+            new GridAreaDetails("805", "1234567891045"));
+    }
+
+    private static RejectedAggregatedMeasureDataRequest CreateRejectRequest()
+    {
+        var rejectReasons = new List<RejectReason>()
+        {
+            new("E86", "Invalid request"),
+        };
+        return new RejectedAggregatedMeasureDataRequest(rejectReasons, BusinessReason.BalanceFixing);
+    }
+
     private static void AssertProcessState(AggregatedMeasureDataProcess process, AggregatedMeasureDataProcess.State state)
     {
         var processState = typeof(AggregatedMeasureDataProcess).GetField("_state", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(process);
         Assert.Equal(state, processState);
+    }
+
+    private static void AssertOutgoingMessageCreated(AggregatedMeasureDataProcess process, int expectedOutgoingMessages)
+    {
+        var messages = typeof(AggregatedMeasureDataProcess).GetField("_messages", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(process) as IReadOnlyCollection<OutgoingMessage>;
+        Assert.NotNull(messages);
+        Assert.Equal(expectedOutgoingMessages, messages.Count);
     }
 
     private AggregatedMeasureDataProcess? GetProcess(string senderId)

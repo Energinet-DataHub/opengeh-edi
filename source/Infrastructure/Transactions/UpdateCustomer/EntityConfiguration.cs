@@ -26,9 +26,9 @@ public class EntityConfiguration : IEntityTypeConfiguration<UpdateCustomerMaster
     {
         ArgumentNullException.ThrowIfNull(builder);
         builder.ToTable("UpdateCustomerMasterDataTransactions", "dbo");
-        builder.HasKey(x => x.TransactionId);
-        builder.Property(entity => entity.TransactionId)
-            .HasConversion(toDbValue => toDbValue.Id, fromDbValue => TransactionId.Create(fromDbValue));
+        builder.HasKey(x => x.ProcessId);
+        builder.Property(entity => entity.ProcessId)
+            .HasConversion(toDbValue => toDbValue.Id, fromDbValue => ProcessId.Create(fromDbValue));
 
         builder.Ignore(entity => entity.DomainEvents);
     }

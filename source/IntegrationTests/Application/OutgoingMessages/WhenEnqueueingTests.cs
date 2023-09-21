@@ -17,8 +17,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.OutgoingMessages;
-using Application.OutgoingMessages.Dequeue;
-using Application.OutgoingMessages.Peek;
 using Dapper;
 using Domain.Actors;
 using Domain.Documents;
@@ -102,7 +100,7 @@ public class WhenEnqueueingTests : TestBase
         var message = AggregationResultMessage.Create(
             ActorNumber.Create("1234567891912"),
             MarketRole.MeteringDataAdministrator,
-            TransactionId.Create(Guid.NewGuid()),
+            ProcessId.Create(Guid.NewGuid()),
             new Aggregation(
                 points,
                 MeteringPointType.Consumption.Name,

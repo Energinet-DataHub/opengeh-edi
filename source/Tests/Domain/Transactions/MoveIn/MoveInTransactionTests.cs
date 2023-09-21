@@ -37,26 +37,26 @@ public class MoveInTransactionTests
     {
         var startedEvent = _transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasStarted) as MoveInWasStarted;
         Assert.NotNull(startedEvent);
-        Assert.Equal(SampleData.TransactionId, startedEvent?.TransactionId);
+        Assert.Equal(SampleData.ProcessId, startedEvent?.ProcessId);
         Assert.Equal(MoveInTransaction.NotificationState.Required, startedEvent?.EndOfSupplyNotificationState);
     }
 
     [Fact]
     public void Business_process_is_set_to_accepted()
     {
-        _transaction.Accept(SampleData.ProcessId);
+        _transaction.Accept(SampleData.BusinessProcessId);
 
         var acceptedEvent = _transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasAccepted) as MoveInWasAccepted;
         Assert.NotNull(acceptedEvent);
-        Assert.Equal(SampleData.ProcessId, acceptedEvent?.BusinessProcessId);
+        Assert.Equal(SampleData.BusinessProcessId, acceptedEvent?.BusinessProcessId);
     }
 
     [Fact]
     public void Business_process_can_be_marked_as_accepted_once_only()
     {
-        _transaction.Accept(SampleData.ProcessId);
+        _transaction.Accept(SampleData.BusinessProcessId);
 
-        _transaction.Accept(SampleData.ProcessId);
+        _transaction.Accept(SampleData.BusinessProcessId);
 
         Assert.Equal(1, _transaction.DomainEvents.Count(e => e is MoveInWasAccepted));
     }
@@ -68,7 +68,7 @@ public class MoveInTransactionTests
 
         var rejectedEvent = _transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasRejected) as MoveInWasRejected;
         Assert.NotNull(rejectedEvent);
-        Assert.Equal(SampleData.TransactionId, rejectedEvent?.TransactionId);
+        Assert.Equal(SampleData.ProcessId, rejectedEvent?.ProcessId);
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public class MoveInTransactionTests
     [Fact]
     public void Business_process_is_completed()
     {
-        _transaction.Accept(SampleData.ProcessId);
+        _transaction.Accept(SampleData.BusinessProcessId);
         _transaction.BusinessProcessCompleted();
 
         Assert.Contains(_transaction.DomainEvents, e => e is BusinessProcessWasCompleted);
@@ -100,7 +100,7 @@ public class MoveInTransactionTests
     [Fact]
     public void End_of_supply_notification_status_is_changed_to_pending_when_business_process_is_completed()
     {
-        _transaction.Accept(SampleData.ProcessId);
+        _transaction.Accept(SampleData.BusinessProcessId);
         _transaction.BusinessProcessCompleted();
 
         Assert.Contains(_transaction.DomainEvents, e => e is EndOfSupplyNotificationChangedToPending);
@@ -122,7 +122,7 @@ public class MoveInTransactionTests
 
         var domainEvent = _transaction.DomainEvents.FirstOrDefault(e => e is CustomerMasterDataWasSent) as CustomerMasterDataWasSent;
         Assert.NotNull(domainEvent);
-        Assert.Equal(_transaction.TransactionId.Id, domainEvent?.TransactionId);
+        Assert.Equal(_transaction.ProcessId, domainEvent?.ProcessId);
     }
 
     [Fact]
@@ -151,7 +151,7 @@ public class MoveInTransactionTests
 
         var domainEvent = _transaction.DomainEvents.FirstOrDefault(e => e is MeteringPointMasterDataWasSent) as MeteringPointMasterDataWasSent;
         Assert.NotNull(domainEvent);
-        Assert.Equal(_transaction.TransactionId.Id, domainEvent?.TransactionId);
+        Assert.Equal(_transaction.ProcessId, domainEvent?.ProcessId);
     }
 
     [Fact]
@@ -200,8 +200,8 @@ public class MoveInTransactionTests
     private static MoveInTransaction CreateTransaction(string? currentEnergySupplierId)
     {
         return new MoveInTransaction(
-            TransactionId.Create(SampleData.TransactionId),
-            ActorProvidedId.Create(SampleData.TransactionId.ToString()),
+            SampleData.ProcessId,
+            ActorProvidedId.Create(SampleData.ProcessId.Id.ToString()),
             SampleData.MarketEvaluationPointId,
             SampleData.EffectiveDate,
             currentEnergySupplierId,

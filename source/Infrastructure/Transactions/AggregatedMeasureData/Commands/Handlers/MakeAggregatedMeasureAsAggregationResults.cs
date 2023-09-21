@@ -32,6 +32,7 @@ using Point = Domain.Transactions.Aggregations.Point;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
 
+[Obsolete("This can be delete when all CreateAggregatedMeasureAggregationResults commands has been processed.")]
 public class MakeAggregatedMeasureAsAggregationResults : IRequestHandler<CreateAggregatedMeasureAggregationResults, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
@@ -53,7 +54,7 @@ public class MakeAggregatedMeasureAsAggregationResults : IRequestHandler<CreateA
         ArgumentNullException.ThrowIfNull(request);
 
         var process = await _aggregatedMeasureDataProcessRepository
-            .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
+            .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
         var responseData = _serializer.Deserialize<IList<AggregatedTimeSerie>>(process.ResponseData ?? string.Empty); //If type or its props is changed, serializer.Deserialize could throw an exception
 
@@ -80,8 +81,6 @@ public class MakeAggregatedMeasureAsAggregationResults : IRequestHandler<CreateA
                     cancellationToken)
                 .ConfigureAwait(false);
         }
-
-        process.IsCompleted();
 
         return Unit.Value;
     }
