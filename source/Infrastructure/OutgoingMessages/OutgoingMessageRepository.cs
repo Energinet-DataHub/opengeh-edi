@@ -43,7 +43,7 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
             .ToListAsync().ConfigureAwait(false)).AsReadOnly();
 
         //All messages in a bundle have the same meta data
-        var firstMessage = outgoingMessages.FirstOrDefault()!;
+        var firstMessage = outgoingMessages.First();
 
         return new OutgoingMessageBundle(
             firstMessage.DocumentType,
