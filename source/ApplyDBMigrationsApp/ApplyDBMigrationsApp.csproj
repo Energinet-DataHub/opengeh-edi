@@ -17,6 +17,8 @@ limitations under the License.
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <AssemblyName>Energinet.DataHub.EDI.ApplyDBMigrationsApp</AssemblyName>
+    <RootNamespace>Energinet.DataHub.EDI.ApplyDBMigrationsApp</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

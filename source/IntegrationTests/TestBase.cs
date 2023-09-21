@@ -188,7 +188,7 @@ namespace IntegrationTests
             _services.AddTransient<InboxEventsProcessor>();
             _services.AddTransient<AggregatedTimeSeriesRequestAcceptedEventMapper>();
             _services.AddTransient<INotificationHandler<TestNotification>>(_ => NotificationHandlerSpy);
-            _services.AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>>(_ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy);
+            _services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>>(_ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy);
             _services.AddTransient<INotificationHandler<IntegrationTests.Infrastructure.InboxEvents.TestNotification>>(
                 _ => InboxEventNotificationHandler);
 
