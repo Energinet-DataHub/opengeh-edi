@@ -21,9 +21,9 @@ using System.Xml.Linq;
 using System.Xml.Schema;
 using DocumentValidation.Xml;
 using Domain.Actors;
+using Domain.Common;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
-using Domain.SeedWork;
 using Infrastructure.OutgoingMessages.Common;
 using Xunit;
 
