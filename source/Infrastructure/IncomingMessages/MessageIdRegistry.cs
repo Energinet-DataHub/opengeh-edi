@@ -15,14 +15,14 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.DataAccess;
-using CimMessageAdapter.Messages;
-using CimMessageAdapter.Messages.Exceptions;
 using Dapper;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Exceptions;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 
-namespace Infrastructure.IncomingMessages
+namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages
 {
     public class MessageIdRegistry : IMessageIds
     {

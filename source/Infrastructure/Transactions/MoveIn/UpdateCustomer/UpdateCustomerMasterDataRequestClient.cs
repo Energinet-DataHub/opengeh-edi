@@ -13,10 +13,10 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Application.Transactions.MoveIn.UpdateCustomer;
-using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
+using Energinet.DataHub.EDI.Application.Transactions.MoveIn.UpdateCustomer;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 
-namespace Infrastructure.Transactions.MoveIn.UpdateCustomer;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.MoveIn.UpdateCustomer;
 
 public class UpdateCustomerMasterDataRequestClient : IUpdateCustomerMasterDataRequestClient
 {

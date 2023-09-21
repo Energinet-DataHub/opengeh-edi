@@ -17,13 +17,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration;
-using Application.Configuration.DataAccess;
 using Dapper;
+using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Infrastructure.Configuration.IntegrationEvents;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 
 public class IntegrationEventsProcessor
 {

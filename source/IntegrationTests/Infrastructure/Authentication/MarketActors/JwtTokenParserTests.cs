@@ -16,13 +16,13 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using Infrastructure.Configuration.Authentication;
-using Infrastructure.Configuration.Authentication.Errors;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication.Errors;
 using Microsoft.IdentityModel.Tokens;
 using Xunit;
 using Xunit.Categories;
 
-namespace IntegrationTests.Infrastructure.Authentication.MarketActors
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors
 {
     [IntegrationTest]
     public class JwtTokenParserTests

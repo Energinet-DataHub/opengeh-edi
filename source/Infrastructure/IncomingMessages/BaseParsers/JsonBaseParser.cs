@@ -20,13 +20,13 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.IncomingMessages;
-using CimMessageAdapter.Messages;
-using CimMessageAdapter.ValidationErrors;
-using DocumentValidation;
+using Energinet.DataHub.EDI.Application.IncomingMessages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 using Json.Schema;
 
-namespace Infrastructure.IncomingMessages.BaseParsers;
+namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.BaseParsers;
 
 public abstract class JsonParserBase<TTransactionType, TICommand>
 where TTransactionType : IMarketActivityRecord

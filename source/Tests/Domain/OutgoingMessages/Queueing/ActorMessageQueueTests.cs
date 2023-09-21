@@ -12,15 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Actors;
-using Domain.Documents;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.Peek;
-using Domain.OutgoingMessages.Queueing;
-using Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Domain.Transactions;
 using Xunit;
 
-namespace Tests.Domain.OutgoingMessages.Queueing;
+namespace Energinet.DataHub.EDI.Tests.Domain.OutgoingMessages.Queueing;
 
 public class ActorMessageQueueTests
 {

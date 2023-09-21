@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using System;
-using Application.Configuration.Commands.Commands;
-using Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using NodaTime;
 
-namespace Infrastructure.Configuration.InternalCommands
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands
 {
     public class QueuedInternalCommand
     {

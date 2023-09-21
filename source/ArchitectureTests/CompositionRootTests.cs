@@ -18,18 +18,17 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Api;
-using Domain.Documents;
-using Domain.OutgoingMessages;
-using Infrastructure.Configuration;
-using Infrastructure.OutgoingMessages.Common.Xml;
+using Energinet.DataHub.EDI.Api;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Infrastructure.Configuration;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Xml;
 using MediatR;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Xunit;
 
-namespace ArchitectureTests
+namespace Energinet.DataHub.EDI.ArchitectureTests
 {
     public class CompositionRootTests
     {

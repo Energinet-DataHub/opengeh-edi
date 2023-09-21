@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace DocumentValidation.CimXml
+namespace Energinet.DataHub.EDI.Infrastructure.DocumentValidation.CimXml
 {
     public sealed class CimXmlSchemas : SchemaBase, ISchema
     {

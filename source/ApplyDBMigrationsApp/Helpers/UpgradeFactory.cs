@@ -18,7 +18,7 @@ using DbUp.Reboot;
 using DbUp.Reboot.Engine;
 using Microsoft.Data.SqlClient;
 
-namespace ApplyDBMigrationsApp.Helpers
+namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers
 {
     public static class UpgradeFactory
     {

@@ -15,7 +15,7 @@
 using System.Threading.Tasks;
 using MediatR;
 
-namespace Infrastructure.Configuration.IntegrationEvents;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 
 /// <summary>
 /// Maps from an integration event to a notification

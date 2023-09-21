@@ -14,10 +14,10 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Application.IncomingMessages;
-using CimMessageAdapter.Messages.Queues;
+using Energinet.DataHub.EDI.Application.IncomingMessages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues;
 
-namespace CimMessageAdapter.Messages
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
 {
     /// <summary>
     /// Service for dispatching incoming messages to message queue

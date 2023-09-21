@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CimMessageAdapter.Messages
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
 {
     /// <summary>
     /// Store containing transaction id for all received market activity records

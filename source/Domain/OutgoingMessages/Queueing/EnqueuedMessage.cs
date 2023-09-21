@@ -12,6 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Domain.OutgoingMessages.Peek;
+namespace Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
 
 public record EnqueuedMessage(Guid Id, string ReceiverId, string ReceiverRole, string SenderId, string SenderRole, string DocumentType, string Category, string BusinessReason, string MessageRecord);

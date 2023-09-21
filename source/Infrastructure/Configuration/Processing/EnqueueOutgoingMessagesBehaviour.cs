@@ -16,16 +16,14 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.Commands.Commands;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.Peek;
-using Infrastructure.Configuration.DataAccess;
-using Infrastructure.OutgoingMessages;
-using Infrastructure.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Queueing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Configuration.Processing;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Processing;
 
 public class EnqueueOutgoingMessagesBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : ICommand<TResponse>

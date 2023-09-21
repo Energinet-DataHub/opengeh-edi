@@ -16,7 +16,7 @@ using System;
 using System.Linq;
 using System.Net.Http.Headers;
 
-namespace Api.Common;
+namespace Energinet.DataHub.EDI.Api.Common;
 
 internal static class HttpHeadersExtensions
 {

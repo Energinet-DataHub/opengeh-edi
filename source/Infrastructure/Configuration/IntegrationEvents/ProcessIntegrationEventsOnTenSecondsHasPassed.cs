@@ -14,10 +14,10 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.TimeEvents;
+using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
 using MediatR;
 
-namespace Infrastructure.Configuration.IntegrationEvents;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 
 public class ProcessIntegrationEventsOnTenSecondsHasPassed : INotificationHandler<TenSecondsHasHasPassed>
 {

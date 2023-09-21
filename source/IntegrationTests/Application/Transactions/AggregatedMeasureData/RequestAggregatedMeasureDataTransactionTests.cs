@@ -16,22 +16,22 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Application.Configuration.Commands.Commands;
-using Domain.Actors;
-using Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
+using Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.Edi.Requests;
-using Infrastructure.Configuration.DataAccess;
-using Infrastructure.Configuration.InternalCommands;
-using Infrastructure.Configuration.MessageBus;
-using Infrastructure.Configuration.Serialization;
-using Infrastructure.Transactions.AggregatedMeasureData.Commands;
-using IntegrationTests.Application.IncomingMessages;
-using IntegrationTests.Fixtures;
-using IntegrationTests.TestDoubles;
 using Xunit;
 using Xunit.Categories;
 
-namespace IntegrationTests.Application.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
 [IntegrationTest]
 public class RequestAggregatedMeasureDataTransactionTests : TestBase

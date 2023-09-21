@@ -17,10 +17,10 @@ using System.IO;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Infrastructure.Configuration.Serialization.Converters;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization.Converters;
 using NodaTime.Serialization.SystemTextJson;
 
-namespace Infrastructure.Configuration.Serialization
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization
 {
     /// <summary>
     /// JSON serializer that specifically support NodaTime's <see cref="NodaTime.Instant"/>.

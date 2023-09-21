@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Actors;
-using Domain.Common;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
-using Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeOfSupplier;
-using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
-using Domain.Transactions.MoveIn.Events;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Domain.Transactions.MoveIn.Events;
 using NodaTime;
 
-namespace Domain.Transactions.MoveIn
+namespace Energinet.DataHub.EDI.Domain.Transactions.MoveIn
 {
     public class MoveInTransaction : Entity
     {

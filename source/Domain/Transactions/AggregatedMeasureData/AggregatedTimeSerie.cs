@@ -14,7 +14,7 @@
 
 using NodaTime;
 
-namespace Domain.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 
 [Serializable]
 public record AggregatedTimeSerie(

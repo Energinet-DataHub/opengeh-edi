@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
+namespace Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
 public record MarketActivityRecord(
     string Id,
     string EffectiveDate,

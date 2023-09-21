@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.Wholesale;
+using Energinet.DataHub.EDI.Application.Wholesale;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.Wholesale;
+namespace Energinet.DataHub.EDI.Infrastructure.Wholesale;
 
 public static class WholesaleInboxConfiguration
 {

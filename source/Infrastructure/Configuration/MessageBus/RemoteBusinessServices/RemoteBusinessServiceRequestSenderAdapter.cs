@@ -16,7 +16,7 @@ using System;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 
-namespace Infrastructure.Configuration.MessageBus.RemoteBusinessServices
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices
 {
     public sealed class RemoteBusinessServiceRequestSenderAdapter<TRequest> : IRemoteBusinessServiceRequestSenderAdapter<TRequest>
     {

@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Transactions.UpdateCustomer;
+using Energinet.DataHub.EDI.Domain.Transactions.UpdateCustomer;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.Transactions.UpdateCustomer;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.UpdateCustomer;
 
 internal static class UpdateCustomerMasterDataConfiguration
 {

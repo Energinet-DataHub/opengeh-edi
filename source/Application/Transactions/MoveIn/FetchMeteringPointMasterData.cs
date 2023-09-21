@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Text.Json.Serialization;
-using Application.Configuration.Commands.Commands;
-using Domain.Transactions;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Domain.Transactions;
 
-namespace Application.Transactions.MoveIn;
+namespace Energinet.DataHub.EDI.Application.Transactions.MoveIn;
 
 public class FetchMeteringPointMasterData : InternalCommand
 {

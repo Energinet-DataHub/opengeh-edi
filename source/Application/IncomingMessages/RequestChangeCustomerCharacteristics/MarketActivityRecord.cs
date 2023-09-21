@@ -14,7 +14,7 @@
 
 using System.Collections.ObjectModel;
 
-namespace Application.IncomingMessages.RequestChangeCustomerCharacteristics;
+namespace Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 
 public record MarketActivityRecord(
     string Id,

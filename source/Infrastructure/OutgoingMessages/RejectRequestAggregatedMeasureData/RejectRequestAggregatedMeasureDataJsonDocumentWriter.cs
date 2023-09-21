@@ -17,14 +17,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Application.OutgoingMessages.Common;
-using Domain.Documents;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
-using Infrastructure.OutgoingMessages.Common.Json;
-using DocumentFormat = Domain.Documents.DocumentFormat;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Json;
+using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
 
-namespace Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 
 public class RejectRequestAggregatedMeasureDataJsonDocumentWriter : IDocumentWriter
 {

@@ -13,19 +13,19 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Application.Configuration.DataAccess;
-using Application.Configuration.TimeEvents;
-using Application.Transactions.MoveIn;
-using Application.Transactions.MoveIn.MasterDataDelivery;
-using Infrastructure.Configuration.DataAccess;
-using Infrastructure.Configuration.InternalCommands;
-using IntegrationTests.Assertions;
-using IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
+using Energinet.DataHub.EDI.Application.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Application.Transactions.MoveIn.MasterDataDelivery;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
+using Energinet.DataHub.EDI.IntegrationTests.Assertions;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using MediatR;
 using NodaTime;
 using Xunit;
 
-namespace IntegrationTests.Application.Transactions.MoveIn.MasterDataDelivery;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.MoveIn.MasterDataDelivery;
 
 public class DispatchCustomerMasterDataForGridOperatorTests : TestBase, IAsyncLifetime
 {

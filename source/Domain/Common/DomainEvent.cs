@@ -15,7 +15,7 @@
 using MediatR;
 using NodaTime;
 
-namespace Domain.Common
+namespace Energinet.DataHub.EDI.Domain.Common
 {
     public class DomainEvent : INotification
     {

@@ -16,10 +16,10 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Infrastructure.InboxEvents;
+using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using MediatR;
 
-namespace IntegrationTests.Infrastructure.InboxEvents;
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 
 public class TestInboxEventMapper : IInboxEventMapper
 {

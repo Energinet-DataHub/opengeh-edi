@@ -14,13 +14,13 @@
 
 using System;
 using System.Collections.Generic;
-using Domain.Actors;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 using NodaTime;
-using Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 
-namespace Tests.Factories;
+namespace Energinet.DataHub.EDI.Tests.Factories;
 
 public class RejectedTimeSeriesBuilder
 {

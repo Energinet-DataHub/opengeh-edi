@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Api.EventListeners;
+namespace Energinet.DataHub.EDI.Api.EventListeners;
 
 public record EventDetails(string EventId, string EventType)
 {

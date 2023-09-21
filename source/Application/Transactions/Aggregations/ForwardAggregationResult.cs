@@ -14,10 +14,10 @@
 
 using System;
 using System.Text.Json.Serialization;
-using Application.Configuration.Commands.Commands;
-using Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
-namespace Application.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Application.Transactions.Aggregations;
 
 public class ForwardAggregationResult : InternalCommand
 {

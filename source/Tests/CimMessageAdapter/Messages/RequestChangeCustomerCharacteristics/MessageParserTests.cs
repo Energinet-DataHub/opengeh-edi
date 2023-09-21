@@ -19,19 +19,19 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Application.IncomingMessages.RequestChangeCustomerCharacteristics;
-using CimMessageAdapter.Messages;
-using CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
-using CimMessageAdapter.ValidationErrors;
-using Domain.Documents;
-using Infrastructure.IncomingMessages.RequestChangeCustomerCharacteristics;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeCustomerCharacteristics;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestChangeCustomerCharacteristics;
 using Xunit;
-using Address = Application.IncomingMessages.RequestChangeCustomerCharacteristics.Address;
-using MarketActivityRecord = Application.IncomingMessages.RequestChangeCustomerCharacteristics.MarketActivityRecord;
-using MarketEvaluationPoint = Application.IncomingMessages.RequestChangeCustomerCharacteristics.MarketEvaluationPoint;
-using MessageHeader = Application.IncomingMessages.MessageHeader;
+using Address = Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeCustomerCharacteristics.Address;
+using MarketActivityRecord = Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeCustomerCharacteristics.MarketActivityRecord;
+using MarketEvaluationPoint = Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeCustomerCharacteristics.MarketEvaluationPoint;
+using MessageHeader = Energinet.DataHub.EDI.Application.IncomingMessages.MessageHeader;
 
-namespace Tests.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
+namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 
 public class MessageParserTests
 {

@@ -14,10 +14,10 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.TimeEvents;
+using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
 using MediatR;
 
-namespace Infrastructure.InboxEvents;
+namespace Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 
 public class ProcessInboxEventsOnTenSecondsHasPassed : INotificationHandler<TenSecondsHasHasPassed>
 {

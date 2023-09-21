@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System;
-using Application.Configuration;
+using Energinet.DataHub.EDI.Application.Configuration;
 
-namespace Api.Configuration.Middleware.Correlation
+namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation
 {
     //TODO: Invistigate why this is needed
     public sealed class CorrelationContext : ICorrelationContext

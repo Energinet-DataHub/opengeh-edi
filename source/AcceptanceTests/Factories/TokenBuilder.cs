@@ -17,7 +17,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace AcceptanceTest.Factories;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Factories;
 
 internal sealed class TokenBuilder
 {

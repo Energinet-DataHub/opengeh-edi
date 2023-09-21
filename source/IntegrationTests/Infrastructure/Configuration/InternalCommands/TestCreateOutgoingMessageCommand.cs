@@ -14,9 +14,9 @@
 
 using System;
 using System.Text.Json.Serialization;
-using Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
 
-namespace IntegrationTests.Infrastructure.Configuration.InternalCommands;
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 
 public class TestCreateOutgoingMessageCommand : InternalCommand
 {

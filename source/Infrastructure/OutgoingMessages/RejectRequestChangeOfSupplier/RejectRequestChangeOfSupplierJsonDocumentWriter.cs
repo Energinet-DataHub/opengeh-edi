@@ -17,13 +17,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Application.OutgoingMessages.Common;
-using Domain.Documents;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
-using Infrastructure.OutgoingMessages.Common.Json;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Json;
 
-namespace Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
+namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 
 public class RejectRequestChangeOfSupplierJsonDocumentWriter : IDocumentWriter
 {

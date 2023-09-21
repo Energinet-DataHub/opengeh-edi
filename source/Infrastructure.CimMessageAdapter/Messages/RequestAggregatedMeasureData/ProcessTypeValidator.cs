@@ -16,9 +16,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using CimMessageAdapter.ValidationErrors;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
 
-namespace CimMessageAdapter.Messages.RequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
 public class ProcessTypeValidator : IProcessTypeValidator
 {

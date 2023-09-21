@@ -19,25 +19,24 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Api.Common;
-using Application.Configuration;
-using Application.IncomingMessages;
-using CimMessageAdapter.Messages;
-using CimMessageAdapter.Messages.RequestAggregatedMeasureData;
-using CimMessageAdapter.Response;
-using Domain.Actors;
-using Domain.ArchivedMessages;
-using Domain.Documents;
-using Infrastructure.Configuration.DataAccess;
-using Infrastructure.IncomingMessages;
-using Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Api.Common;
+using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Application.IncomingMessages;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.ArchivedMessages;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
-using Receiver = CimMessageAdapter.Messages.RequestAggregatedMeasureData.RequestAggregatedMeasureDataReceiver;
 
-namespace Api.IncomingMessages;
+namespace Energinet.DataHub.EDI.Api.IncomingMessages;
 
 public class RequestAggregatedMeasureMessageReceiver
 {

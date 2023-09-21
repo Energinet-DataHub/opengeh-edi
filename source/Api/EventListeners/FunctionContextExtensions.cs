@@ -14,7 +14,7 @@
 
 using Microsoft.Azure.Functions.Worker;
 
-namespace Api.EventListeners;
+namespace Energinet.DataHub.EDI.Api.EventListeners;
 
 internal static class FunctionContextExtensions
 {

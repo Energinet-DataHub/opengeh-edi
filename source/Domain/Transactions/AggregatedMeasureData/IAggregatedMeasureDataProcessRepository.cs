@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Domain.Transactions.AggregatedMeasureData
+namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
 {
     /// <summary>
     /// Storage for Process

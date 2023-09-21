@@ -15,12 +15,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.OutgoingMessages;
-using Domain.Transactions;
-using Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using MediatR;
 
-namespace Application.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Application.Transactions.Aggregations;
 
 public class ForwardAggregationResultHandler : IRequestHandler<ForwardAggregationResult, Unit>
 {

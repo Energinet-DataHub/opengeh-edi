@@ -15,7 +15,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Application.Transactions.MoveIn;
+namespace Energinet.DataHub.EDI.Application.Transactions.MoveIn;
 
 /// <summary>
 /// Interface for fetching customer master data

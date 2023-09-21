@@ -17,10 +17,10 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using AcceptanceTest.Exceptions;
-using AcceptanceTest.Factories;
+using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
+using Energinet.DataHub.EDI.AcceptanceTests.Factories;
 
-namespace AcceptanceTest.Drivers;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 internal sealed class EdiDriver : IDisposable
 {

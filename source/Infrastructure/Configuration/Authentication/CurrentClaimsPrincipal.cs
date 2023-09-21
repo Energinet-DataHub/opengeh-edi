@@ -14,7 +14,7 @@
 
 using System.Security.Claims;
 
-namespace Infrastructure.Configuration.Authentication
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication
 {
     public class CurrentClaimsPrincipal
     {

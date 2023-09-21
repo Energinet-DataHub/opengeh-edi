@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Common;
+using Energinet.DataHub.EDI.Domain.Common;
 
-namespace Domain.Documents;
+namespace Energinet.DataHub.EDI.Domain.Documents;
 
 public class DocumentFormat : EnumerationType
 {

@@ -14,7 +14,7 @@
 
 using System.Data.SqlClient;
 
-namespace AcceptanceTest.Drivers;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 public static class ActorFactory
 {

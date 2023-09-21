@@ -19,15 +19,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using DocumentValidation.Xml;
-using Domain.Actors;
-using Domain.Common;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
-using Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.Xml;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Xunit;
 
-namespace Tests.Infrastructure.OutgoingMessages.Asserts
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts
 {
     internal static class AssertXmlMessage
     {

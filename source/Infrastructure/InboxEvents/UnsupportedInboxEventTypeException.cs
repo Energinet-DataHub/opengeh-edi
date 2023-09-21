@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Infrastructure.InboxEvents;
+namespace Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 
 public class UnsupportedInboxEventTypeException : Exception
 {

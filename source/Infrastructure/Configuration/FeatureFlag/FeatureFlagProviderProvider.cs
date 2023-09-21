@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Infrastructure.Configuration.FeatureFlag;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.FeatureFlag;
 
 public class FeatureFlagProviderProvider : IFeatureFlagProvider
 {

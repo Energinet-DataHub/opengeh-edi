@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Infrastructure.Configuration.Authentication.Errors
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication.Errors
 {
     public abstract class AuthenticationError
     {
