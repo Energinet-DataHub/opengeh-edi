@@ -98,6 +98,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
 
     [Theory]
     [InlineData("E18", null, TimeSeriesType.Production)]
+    [InlineData("E17", "", TimeSeriesType.TotalConsumption)]
     [InlineData("E17", null, TimeSeriesType.TotalConsumption)]
     [InlineData("E20", null, TimeSeriesType.NetExchangePerGa)]
     [InlineData("E17", "D01", TimeSeriesType.NonProfiledConsumption)]
@@ -198,6 +199,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
     }
 
     [Theory]
+    [InlineData("E17", "")] // TimeSeriesType.TotalConsumption
     [InlineData("E17", null)] // TimeSeriesType.TotalConsumption
     [InlineData("E20", null)] // TimeSeriesType.NetExchangePerGa
     public async Task Energy_supplier_requesting_requesting_forbidding_time_series_types(
@@ -266,6 +268,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
 
     [Theory]
     [InlineData("E17", null)] // TimeSeriesType.TotalConsumption
+    [InlineData("E17", "")] // TimeSeriesType.TotalConsumption
     [InlineData("E20", null)] // TimeSeriesType.NetExchangePerGa
     public async Task Balance_responsible_requesting_forbidding_time_series_types(
         string evaluationPointType,
@@ -333,6 +336,7 @@ public class RequestAggregatedMeasureDataTransactionTests : TestBase
 
     [Theory]
     [InlineData("E17", null)] // TimeSeriesType.TotalConsumption
+    [InlineData("E17", "")] // TimeSeriesType.TotalConsumption
     [InlineData("E20", null)] // TimeSeriesType.NetExchangePerGa
     public async Task Energy_supplier_per_balance_responsible_requesting_forbidding_time_series_types(
         string evaluationPointType,
