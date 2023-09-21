@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Domain.Actors;
-using Energinet.DataHub.EDI.Domain.Documents;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.Domain.ArchivedMessages;
 
 public record ArchivedMessage(
     string Id,
-    string? MessageId,
-    DocumentType DocumentType,
-    ActorNumber? SenderNumber,
-    ActorNumber? ReceiverNumber,
+    string MessageId,
+    string DocumentType,
+    string SenderNumber,
+    string ReceiverNumber,
     Instant CreatedAt,
     string? BusinessReason,
     Stream Document);
