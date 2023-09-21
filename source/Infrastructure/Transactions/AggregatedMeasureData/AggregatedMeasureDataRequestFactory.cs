@@ -116,6 +116,7 @@ public class AggregatedMeasureDataRequestFactory
             {
                 "D01" => TimeSeriesType.NonProfiledConsumption,
                 "E02" => TimeSeriesType.FlexConsumption,
+                "" => TimeSeriesType.TotalConsumption,
                 null => TimeSeriesType.TotalConsumption,
                 _ => throw TimeSeriesException(process),
             },
