@@ -17,7 +17,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
-using Domain.Transactions.Exceptions;
 using Infrastructure.Wholesale;
 using MediatR;
 
