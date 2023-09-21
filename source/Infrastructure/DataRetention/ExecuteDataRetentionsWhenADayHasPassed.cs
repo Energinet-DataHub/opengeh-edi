@@ -17,12 +17,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.TimeEvents;
+using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Polly;
 
-namespace Infrastructure.DataRetention;
+namespace Energinet.DataHub.EDI.Infrastructure.DataRetention;
 
 public class ExecuteDataRetentionsWhenADayHasPassed : INotificationHandler<ADayHasPassed>
 {

@@ -20,19 +20,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using Application.OutgoingMessages.Common;
-using DocumentValidation;
-using DocumentValidation.CimXml;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeOfSupplier;
-using Infrastructure.Configuration.Serialization;
-using Infrastructure.OutgoingMessages.Common;
-using Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
-using Tests.Factories;
-using Tests.Infrastructure.OutgoingMessages.Asserts;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.CimXml;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Tests.Factories;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 
-namespace Tests.Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier
 {
     public class ConfirmRequestChangeOfSupplierXmlDocumentWriterTests
     {

@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using CimMessageAdapter.Messages;
-using CimMessageAdapter.Response;
-using CimMessageAdapter.ValidationErrors;
-using Infrastructure.IncomingMessages.Response;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.Response;
 using Newtonsoft.Json.Linq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Tests.CimMessageAdapter.Response;
+namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Response;
 
 [UnitTest]
 public class JsonResponseFactoryTests

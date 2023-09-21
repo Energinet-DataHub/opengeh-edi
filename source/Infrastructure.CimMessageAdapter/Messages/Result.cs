@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using CimMessageAdapter.ValidationErrors;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
 
-namespace CimMessageAdapter.Messages
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
 {
     public class Result
     {

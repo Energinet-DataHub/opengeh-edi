@@ -12,6 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimMessageAdapter.Messages.Queues;
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues;
 
 public record RequestChangeCustomerCharacteristicsTransaction(string Name) : Queue;

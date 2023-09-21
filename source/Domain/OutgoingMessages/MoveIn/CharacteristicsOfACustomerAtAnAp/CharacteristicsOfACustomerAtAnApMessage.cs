@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Actors;
-using Domain.Documents;
-using Domain.Transactions;
-using Domain.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Transactions.MoveIn;
 using NodaTime;
 
-namespace Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
+namespace Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
 
 public class CharacteristicsOfACustomerAtAnApMessage : OutgoingMessage
 {

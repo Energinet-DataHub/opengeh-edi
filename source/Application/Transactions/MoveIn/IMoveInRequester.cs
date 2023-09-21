@@ -14,7 +14,7 @@
 
 using System.Threading.Tasks;
 
-namespace Application.Transactions.MoveIn
+namespace Energinet.DataHub.EDI.Application.Transactions.MoveIn
 {
     /// <summary>
     /// Interface for move in request adapter

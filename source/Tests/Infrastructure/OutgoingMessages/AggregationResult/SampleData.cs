@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using System;
-using Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Actors;
 using NodaTime;
 using NodaTime.Text;
 
-namespace Tests.Infrastructure.OutgoingMessages.AggregationResult;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.AggregationResult;
 
 internal static class SampleData
 {

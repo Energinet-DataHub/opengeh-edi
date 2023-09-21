@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Api.Configuration;
+namespace Energinet.DataHub.EDI.Api.Configuration;
 
 public class ServiceBusMessageMetadata
 {

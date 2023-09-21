@@ -20,17 +20,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
-using Application.IncomingMessages.RequestChangeCustomerCharacteristics;
-using CimMessageAdapter.Messages;
-using CimMessageAdapter.ValidationErrors;
-using DocumentValidation;
-using DocumentValidation.CimXml;
-using DocumentFormat = Domain.Documents.DocumentFormat;
-using MarketActivityRecord = Application.IncomingMessages.RequestChangeCustomerCharacteristics.MarketActivityRecord;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeCustomerCharacteristics;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.CimXml;
+using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
+using MarketActivityRecord = Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeCustomerCharacteristics.MarketActivityRecord;
 
-namespace Infrastructure.IncomingMessages.RequestChangeCustomerCharacteristics;
+namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestChangeCustomerCharacteristics;
 
-public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>
+public class XmlMessageParser : IMessageParser<Application.IncomingMessages.RequestChangeCustomerCharacteristics.MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeCustomerCharacteristics_MarketDocument";

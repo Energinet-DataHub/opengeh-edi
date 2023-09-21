@@ -15,12 +15,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.Commands;
-using Domain.Transactions.AggregatedMeasureData.ProcessEvents;
-using Infrastructure.Transactions.AggregatedMeasureData.Commands;
+using Energinet.DataHub.EDI.Application.Configuration.Commands;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using MediatR;
 
-namespace Infrastructure.Transactions.AggregatedMeasureData.Notifications.Handlers;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Notifications.Handlers;
 
 public class NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized : INotificationHandler<AggregatedMeasureProcessIsInitialized>
 {

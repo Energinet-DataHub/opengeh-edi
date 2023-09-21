@@ -14,12 +14,12 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Domain.Common;
-using Domain.Documents;
-using IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace IntegrationTests.Application.OutgoingMessages.DocumentFactory;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.DocumentFactory;
 
 public class DocumentFactoryTests
     : TestBase

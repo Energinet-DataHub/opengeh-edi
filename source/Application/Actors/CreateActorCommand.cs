@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System.Text.Json.Serialization;
-using Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
 
-namespace Application.Actors;
+namespace Energinet.DataHub.EDI.Application.Actors;
 
 public class CreateActorCommand : InternalCommand
 {

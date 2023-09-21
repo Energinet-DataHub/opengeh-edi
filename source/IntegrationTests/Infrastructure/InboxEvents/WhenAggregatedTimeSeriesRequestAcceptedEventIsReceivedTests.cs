@@ -15,20 +15,20 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration;
-using Application.Configuration.DataAccess;
 using Dapper;
+using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
-using Infrastructure.Configuration.DataAccess;
-using Infrastructure.InboxEvents;
-using Infrastructure.Transactions.Aggregations;
-using IntegrationTests.Fixtures;
 using Xunit;
 using Period = Energinet.DataHub.Edi.Responses.Period;
 
-namespace IntegrationTests.Infrastructure.InboxEvents;
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 
 public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestBase
 {

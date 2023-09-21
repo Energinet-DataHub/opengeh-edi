@@ -15,12 +15,12 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
-using Infrastructure.Configuration.Authentication;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
 
-namespace Api.Configuration.Middleware.Authentication.Bearer
+namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.Bearer
 {
     public class BearerAuthenticationMiddleware : IFunctionsWorkerMiddleware
     {

@@ -13,14 +13,14 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using Domain.Actors;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.Exceptions;
-using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
-using Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.Exceptions;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Domain.Transactions;
 using Xunit;
 
-namespace Tests.Domain.OutgoingMessages;
+namespace Energinet.DataHub.EDI.Tests.Domain.OutgoingMessages;
 
 public class RejectRequestChangeOfSupplierMessageTests
 {

@@ -16,16 +16,16 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.Commands;
-using Application.Configuration.DataAccess;
-using Application.Configuration.TimeEvents;
 using Dapper;
-using Domain.Transactions;
-using Domain.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Application.Configuration.Commands;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
+using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Transactions.MoveIn;
 using MediatR;
 using NodaTime;
 
-namespace Application.Transactions.MoveIn.MasterDataDelivery;
+namespace Energinet.DataHub.EDI.Application.Transactions.MoveIn.MasterDataDelivery;
 
 public class DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired : INotificationHandler<ADayHasPassed>
 {

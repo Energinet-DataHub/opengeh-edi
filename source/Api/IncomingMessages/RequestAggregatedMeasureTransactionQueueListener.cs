@@ -16,14 +16,14 @@ using System;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Api.Configuration;
-using Application.Configuration;
-using Application.IncomingMessages.RequestAggregatedMeasureData;
-using Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Api.Configuration;
+using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 
-namespace Api.IncomingMessages;
+namespace Energinet.DataHub.EDI.Api.IncomingMessages;
 
 public class RequestAggregatedMeasureTransactionQueueListener
 {

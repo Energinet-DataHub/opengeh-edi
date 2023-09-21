@@ -13,20 +13,20 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Application.Configuration.DataAccess;
-using Domain.Actors;
-using Domain.Documents;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.IntegrationTests.Assertions;
+using Energinet.DataHub.EDI.IntegrationTests.Factories;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.Wholesale.Contracts.Events;
-using IntegrationTests.Assertions;
-using IntegrationTests.Factories;
-using IntegrationTests.Fixtures;
 using Xunit;
 using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
 
-namespace IntegrationTests.Application.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.Aggregations;
 
 public class WhenAnAggregationResultIsAvailableTests : TestBase
 {

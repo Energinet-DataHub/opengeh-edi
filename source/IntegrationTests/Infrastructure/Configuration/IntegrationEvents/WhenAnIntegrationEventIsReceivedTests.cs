@@ -16,17 +16,17 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration;
-using Application.Configuration.DataAccess;
 using Dapper;
-using Infrastructure.Configuration.DataAccess;
-using Infrastructure.Configuration.IntegrationEvents;
-using IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Xunit;
 
-namespace IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
 public class WhenAnIntegrationEventIsReceivedTests : TestBase
 {

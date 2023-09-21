@@ -14,7 +14,7 @@
 
 using NodaTime;
 
-namespace Domain.OutgoingMessages.MoveIn.GenericNotification
+namespace Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.GenericNotification
 {
     public class MarketActivityRecord
     {

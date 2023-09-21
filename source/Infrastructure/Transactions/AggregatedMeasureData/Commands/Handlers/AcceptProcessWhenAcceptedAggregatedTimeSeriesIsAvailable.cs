@@ -15,12 +15,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Transactions;
-using Domain.Transactions.AggregatedMeasureData;
-using Infrastructure.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 using MediatR;
 
-namespace Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
 
 public class AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable : IRequestHandler<AcceptedAggregatedTimeSerie, Unit>
 {

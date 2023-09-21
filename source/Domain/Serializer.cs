@@ -15,7 +15,7 @@
 using System.Text.Json;
 using NodaTime.Serialization.SystemTextJson;
 
-namespace Domain;
+namespace Energinet.DataHub.EDI.Domain;
 
 public class Serializer
 {

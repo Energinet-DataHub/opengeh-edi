@@ -14,7 +14,7 @@
 
 using System.Threading.Tasks;
 
-namespace CimMessageAdapter.Messages;
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 
 /// <summary>
 /// Authorization policy used for authorizing the sender of a market document

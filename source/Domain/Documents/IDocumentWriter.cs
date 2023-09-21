@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 
-namespace Domain.Documents;
+namespace Energinet.DataHub.EDI.Domain.Documents;
 
 /// <summary>
 /// Writes outgoing messages

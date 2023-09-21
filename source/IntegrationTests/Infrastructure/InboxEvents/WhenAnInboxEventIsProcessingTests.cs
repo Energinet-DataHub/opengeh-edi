@@ -13,21 +13,20 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration;
-using Application.Configuration.DataAccess;
 using Dapper;
-using Infrastructure.Configuration.DataAccess;
-using Infrastructure.InboxEvents;
-using IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Xunit;
 
-namespace IntegrationTests.Infrastructure.InboxEvents;
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 
 public class WhenAnInboxEventIsProcessingTests : TestBase
 {

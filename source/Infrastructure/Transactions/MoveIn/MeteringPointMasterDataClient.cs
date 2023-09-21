@@ -15,13 +15,13 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Transactions.MoveIn;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.EDI.Application.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
 using Energinet.DataHub.MeteringPoints.RequestResponse.Requests;
 using Google.Protobuf;
-using Infrastructure.Configuration.MessageBus;
 
-namespace Infrastructure.Transactions.MoveIn;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.MoveIn;
 
 public class MeteringPointMasterDataClient : IMeteringPointMasterDataClient
 {

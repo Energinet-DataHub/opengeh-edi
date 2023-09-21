@@ -15,11 +15,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
-using Domain.Actors;
-using Domain.Common;
-using Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 
-namespace Infrastructure.OutgoingMessages.Common.Json;
+namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Json;
 
 internal static class JsonHeaderWriter
 {

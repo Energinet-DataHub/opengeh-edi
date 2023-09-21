@@ -19,23 +19,23 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Actors;
-using Application.Configuration.Authentication;
-using Application.IncomingMessages.RequestChangeOfSupplier;
-using CimMessageAdapter.Messages;
-using CimMessageAdapter.Messages.RequestChangeOfSupplier;
-using CimMessageAdapter.ValidationErrors;
-using Domain.Actors;
-using Domain.Documents;
-using Infrastructure.Configuration.Authentication;
-using IntegrationTests.Fixtures;
-using IntegrationTests.Infrastructure.CimMessageAdapter.Stubs;
+using Energinet.DataHub.EDI.Application.Actors;
+using Energinet.DataHub.EDI.Application.Configuration.Authentication;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Stubs;
 using Xunit;
 using Xunit.Categories;
-using Result = CimMessageAdapter.Messages.Result;
-using SenderAuthorizer = CimMessageAdapter.Messages.RequestChangeOfSupplier.SenderAuthorizer;
+using Result = Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Result;
+using SenderAuthorizer = Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestChangeOfSupplier.SenderAuthorizer;
 
-namespace IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestChangeOfSupplier
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestChangeOfSupplier
 {
     [IntegrationTest]
     public class RequestChangeOfSupplierReceiverTests : TestBase, IAsyncLifetime
@@ -47,7 +47,7 @@ namespace IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestChan
         private readonly DefaultProcessTypeValidator _processTypeValidator;
         private readonly DefaultMessageTypeValidator _messageTypeValidator;
         private readonly MasterDataReceiverResponsibleVerification _masterDataReceiverResponsibleVerification;
-        private MessageQueueDispatcherStub<global::CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> _messageQueueDispatcherSpy = new();
+        private MessageQueueDispatcherStub<global::Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> _messageQueueDispatcherSpy = new();
         private List<Claim> _claims = new();
 
         public RequestChangeOfSupplierReceiverTests(DatabaseFixture databaseFixture)
@@ -211,9 +211,9 @@ namespace IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestChan
                 .ReceiveAsync(await ParseMessageAsync(message).ConfigureAwait(false), CancellationToken.None);
         }
 
-        private MessageReceiver<global::CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> CreateMessageReceiver()
+        private MessageReceiver<global::Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> CreateMessageReceiver()
         {
-            _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<global::CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction>();
+            _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<global::Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction>();
             var messageReceiver = new RequestChangeOfSupplierReceiver(
                 _messageIds,
                 _messageQueueDispatcherSpy,
@@ -225,9 +225,9 @@ namespace IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestChan
             return messageReceiver;
         }
 
-        private MessageReceiver<global::CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> CreateMessageReceiver(IMessageIds messageIds)
+        private MessageReceiver<global::Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> CreateMessageReceiver(IMessageIds messageIds)
         {
-            _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<global::CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction>();
+            _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<global::Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction>();
             var messageReceiver = new RequestChangeOfSupplierReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, new SenderAuthorizer(_marketActorAuthenticator), _processTypeValidator, _messageTypeValidator, _masterDataReceiverResponsibleVerification);
             return messageReceiver;
         }

@@ -13,12 +13,12 @@
 // limitations under the License.
 
 using System;
-using Domain.MasterData;
-using Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics;
-using Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics.MarketEvaluationPointDetails;
-using Infrastructure.Configuration;
+using Energinet.DataHub.EDI.Domain.MasterData;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics.MarketEvaluationPointDetails;
+using Energinet.DataHub.EDI.Infrastructure.Configuration;
 
-namespace Tests.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 
 public class SampleData
 {

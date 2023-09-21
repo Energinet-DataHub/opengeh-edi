@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Common;
-using Domain.Documents;
+using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Domain.Documents;
 
-namespace Domain.OutgoingMessages.Queueing;
+namespace Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
 
 #pragma warning disable CA1711 // Identifiers should not have incorrect suffix
 public class ActorMessageQueue : Entity

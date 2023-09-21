@@ -14,7 +14,7 @@
 
 using System;
 
-namespace CimMessageAdapter.Messages.Exceptions;
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Exceptions;
 
 public class NotSuccessfulTransactionIdsStorageException
     : Exception

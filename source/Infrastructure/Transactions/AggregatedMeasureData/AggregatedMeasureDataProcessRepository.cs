@@ -15,13 +15,13 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Transactions;
-using Domain.Transactions.AggregatedMeasureData;
-using Domain.Transactions.Exceptions;
-using Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.Exceptions;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData;
 
 public class AggregatedMeasureDataProcessRepository : IAggregatedMeasureDataProcessRepository
 {

@@ -13,12 +13,12 @@
 // limitations under the License.
 
 using System;
-using Domain.Actors;
-using Domain.MasterData.MarketEvaluationPoints;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.MasterData.MarketEvaluationPoints;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.MasterData.MarketEvaluationPoints;
+namespace Energinet.DataHub.EDI.Infrastructure.MasterData.MarketEvaluationPoints;
 
 public class MarketEvaluationPointEntityConfiguration : IEntityTypeConfiguration<MarketEvaluationPoint>
 {

@@ -14,7 +14,7 @@
 
 using System;
 
-namespace IntegrationTests.Infrastructure.MarketEvaluationPoints;
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.MarketEvaluationPoints;
 
 public static class SampleData
 {

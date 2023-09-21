@@ -14,11 +14,11 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.Configuration.InternalCommands
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands
 {
     public class CommandExecutor
     {

@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 
-namespace Domain.OutgoingMessages.MoveIn.RejectRequestChangeAccountingPointCharacteristics;
+namespace Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeAccountingPointCharacteristics;
 
 public class MarketActivityRecord
 {

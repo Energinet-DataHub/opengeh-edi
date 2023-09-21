@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Common;
-using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 
-namespace Domain.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
 public class AggregationResultForwarding : Entity
 {

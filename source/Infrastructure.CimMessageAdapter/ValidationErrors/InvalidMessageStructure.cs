@@ -14,7 +14,7 @@
 
 using System;
 
-namespace CimMessageAdapter.ValidationErrors
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors
 {
     public class InvalidMessageStructure : ValidationError
     {

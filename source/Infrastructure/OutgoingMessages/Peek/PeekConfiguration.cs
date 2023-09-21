@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.OutgoingMessages;
-using Domain.OutgoingMessages.Queueing;
-using Infrastructure.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Queueing;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using PeekResult = Application.OutgoingMessages.PeekResult;
+using PeekResult = Energinet.DataHub.EDI.Application.OutgoingMessages.PeekResult;
 
-namespace Infrastructure.OutgoingMessages.Peek;
+namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Peek;
 
 internal static class PeekConfiguration
 {

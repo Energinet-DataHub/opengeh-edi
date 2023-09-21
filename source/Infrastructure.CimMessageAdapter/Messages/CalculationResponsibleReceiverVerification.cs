@@ -14,9 +14,9 @@
 
 using System;
 using System.Threading.Tasks;
-using CimMessageAdapter.ValidationErrors;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
 
-namespace CimMessageAdapter.Messages;
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 
 /// <summary>
 /// Responsible for verifying that the Receiver is a Calculation Responsible Receiver and Datahub

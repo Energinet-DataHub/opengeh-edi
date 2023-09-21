@@ -15,7 +15,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Application.Actors;
+namespace Energinet.DataHub.EDI.Application.Actors;
 
 /// <summary>
 /// Add new actors to DB

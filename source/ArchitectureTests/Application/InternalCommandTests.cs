@@ -17,11 +17,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using Application.Configuration.Commands.Commands;
-using Infrastructure.Configuration;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Xunit;
 
-namespace ArchitectureTests.Application;
+namespace Energinet.DataHub.EDI.ArchitectureTests.Application;
 
 public class InternalCommandTests
 {

@@ -15,11 +15,11 @@
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.DataAccess;
-using Infrastructure.DataRetention;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.DataRetention;
 using Microsoft.Data.SqlClient;
 
-namespace Infrastructure.Configuration.Queueing;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Queueing;
 
 public class DequeuedBundlesRetention : IDataRetention
 {

@@ -14,6 +14,6 @@
 
 using System.Collections.ObjectModel;
 
-namespace Application.SearchMessages;
+namespace Energinet.DataHub.EDI.Application.SearchMessages;
 
 public record MessageSearchResult(ReadOnlyCollection<MessageInfo> Messages);

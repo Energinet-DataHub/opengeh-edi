@@ -16,23 +16,24 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Application.Configuration.DataAccess;
-using Application.OutgoingMessages;
 using Dapper;
-using Domain.Actors;
-using Domain.Documents;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.Peek;
-using Infrastructure.OutgoingMessages;
-using IntegrationTests.Application.IncomingMessages;
-using IntegrationTests.Assertions;
-using IntegrationTests.Factories;
-using IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages;
+using Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
+using Energinet.DataHub.EDI.IntegrationTests.Assertions;
+using Energinet.DataHub.EDI.IntegrationTests.Factories;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using MediatR;
 using Xunit;
-using MessageCategory = Domain.OutgoingMessages.Queueing.MessageCategory;
+using MessageCategory = Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing.MessageCategory;
+using PeekResult = Energinet.DataHub.EDI.Application.OutgoingMessages.PeekResult;
 
-namespace IntegrationTests.Application.OutgoingMessages;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
 public class WhenAPeekIsRequestedTests : TestBase
 {

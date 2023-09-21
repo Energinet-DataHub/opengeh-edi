@@ -15,21 +15,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Domain.Actors;
-using Domain.OutgoingMessages;
-using Domain.Transactions.AggregatedMeasureData;
-using Domain.Transactions.Aggregations;
-using Domain.Transactions.Exceptions;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Domain.Transactions.Exceptions;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.Collections;
-using Infrastructure.OutgoingMessages.Common;
 using NodaTime.Serialization.Protobuf;
-using GridAreaDetails = Domain.Transactions.Aggregations.GridAreaDetails;
-using Period = Domain.Transactions.Aggregations.Period;
-using Point = Domain.Transactions.Aggregations.Point;
+using GridAreaDetails = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.GridAreaDetails;
+using Period = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Period;
+using Point = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Point;
 using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
 
-namespace Infrastructure.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 
 public static class AggregationFactory
 {

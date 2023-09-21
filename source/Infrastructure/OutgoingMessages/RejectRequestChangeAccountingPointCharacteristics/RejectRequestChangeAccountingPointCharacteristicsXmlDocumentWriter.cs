@@ -16,12 +16,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
-using Application.OutgoingMessages.Common;
-using Application.OutgoingMessages.Common.Xml;
-using Domain.OutgoingMessages.MoveIn.RejectRequestChangeAccountingPointCharacteristics;
-using Infrastructure.OutgoingMessages.Common.Xml;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Xml;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeAccountingPointCharacteristics;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Xml;
 
-namespace Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
+namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 
 public class RejectRequestChangeAccountingPointCharacteristicsXmlDocumentWriter : DocumentWriter
 {

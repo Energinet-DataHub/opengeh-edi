@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 
-namespace IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
 public class TestNotificationHandlerSpy : INotificationHandler<TestNotification>
 {

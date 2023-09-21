@@ -14,7 +14,7 @@
 
 using MediatR;
 
-namespace IntegrationTests.Infrastructure.InboxEvents;
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 
 #pragma warning disable
 public class TestNotification : INotification

@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using AcceptanceTest.Drivers;
+using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
-namespace AcceptanceTest.Dsl;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
 internal sealed class AggregatedMeasureDataRequestDsl
 {

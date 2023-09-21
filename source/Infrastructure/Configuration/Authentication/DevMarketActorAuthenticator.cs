@@ -17,11 +17,11 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Actors;
-using Application.Configuration.DataAccess;
 using Dapper;
+using Energinet.DataHub.EDI.Application.Actors;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 
-namespace Infrastructure.Configuration.Authentication;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 
 public class DevMarketActorAuthenticator : MarketActorAuthenticator
 {

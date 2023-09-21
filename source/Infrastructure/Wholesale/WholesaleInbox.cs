@@ -15,12 +15,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Wholesale;
-using Domain.Transactions.AggregatedMeasureData;
-using Infrastructure.Configuration.MessageBus;
-using Infrastructure.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Application.Wholesale;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData;
 
-namespace Infrastructure.Wholesale;
+namespace Energinet.DataHub.EDI.Infrastructure.Wholesale;
 
 public class WholesaleInbox : IWholesaleInbox
 {

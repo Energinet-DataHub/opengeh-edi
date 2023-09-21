@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Common;
+using Energinet.DataHub.EDI.Domain.Common;
 
-namespace Domain.Transactions.UpdateCustomer;
+namespace Energinet.DataHub.EDI.Domain.Transactions.UpdateCustomer;
 
 public class UpdateCustomerMasterDataTransaction : Entity
 {

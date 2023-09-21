@@ -14,7 +14,7 @@
 
 using NodaTime;
 
-namespace Domain.Transactions.MoveIn;
+namespace Energinet.DataHub.EDI.Domain.Transactions.MoveIn;
 
 public class TransactionNotFoundException : Exception
 {

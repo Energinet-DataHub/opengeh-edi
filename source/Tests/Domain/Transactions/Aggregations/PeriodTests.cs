@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using NodaTime.Text;
 using Xunit;
 
-namespace Tests.Domain.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Tests.Domain.Transactions.Aggregations;
 
 public class PeriodTests
 {

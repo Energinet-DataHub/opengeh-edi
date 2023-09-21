@@ -13,15 +13,15 @@
 // limitations under the License.
 
 using System;
-using Application.Configuration;
 using Azure.Messaging.ServiceBus;
-using Domain.Actors;
-using Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.Edi.Requests;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 
-namespace Infrastructure.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData;
 
 public class AggregatedMeasureDataRequestFactory
 {

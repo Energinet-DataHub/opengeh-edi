@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.IO;
-using Application.Configuration.Queries;
+using Energinet.DataHub.EDI.Application.Configuration.Queries;
 
-namespace Application.ArchivedMessages;
+namespace Energinet.DataHub.EDI.Application.ArchivedMessages;
 
 public record GetArchivedMessageDocumentQuery(string Id) : IQuery<Stream?>;
