@@ -23,7 +23,7 @@ using Infrastructure.OutgoingMessages.Common.Xml;
 
 namespace Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 
-public class RejectRequestChangeOfSupplierXmlDocumentWriter : EbixDocumentWriter
+public class RejectRequestChangeOfSupplierXmlDocumentWriter : DocumentWriter
 {
     public RejectRequestChangeOfSupplierXmlDocumentWriter(IMessageRecordParser parser)
         : base(

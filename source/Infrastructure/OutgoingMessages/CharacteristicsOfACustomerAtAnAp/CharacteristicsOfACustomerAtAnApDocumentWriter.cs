@@ -29,7 +29,7 @@ using Infrastructure.OutgoingMessages.Common.Xml;
 
 namespace Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 
-public class CharacteristicsOfACustomerAtAnApDocumentWriter : EbixDocumentWriter
+public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
 {
     private MessageHeader? _header;
 
