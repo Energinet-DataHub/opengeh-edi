@@ -47,7 +47,7 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = new UTF8Encoding(false), Async = true, Indent = true };
         var stream = new MemoryStream();
         using var writer = XmlWriter.Create(stream, settings);
-        string? processType = null; // TODO: Hvordan får jeg fat i processType / Variant fra MarketActivityRecord / Payload på dette tidspunkt?
+        string? processType = ExtractProcessType(marketActivityRecords);
         await WriteHeaderAsync(header, _documentDetails, writer, processType).ConfigureAwait(false);
         await WriteMarketActivityRecordsAsync(marketActivityRecords, writer).ConfigureAwait(false);
         await WriteEndAsync(writer).ConfigureAwait(false);
@@ -64,6 +64,11 @@ public abstract class EbixDocumentWriter : IDocumentWriter
     public bool HandlesFormat(DocumentFormat format)
     {
         return format == DocumentFormat.Xml;
+    }
+
+    protected virtual string? ExtractProcessType(IReadOnlyCollection<string> marketActivityPayloads)
+    {
+        return null;
     }
 
     protected abstract Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer);

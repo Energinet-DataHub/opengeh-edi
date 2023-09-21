@@ -44,4 +44,6 @@ internal static class SampleData
     public static Instant StartOfPeriod => InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value;
 
     public static Instant EndOfPeriod => InstantPattern.General.Parse("2022-02-13T23:00:00Z").Value;
+
+    public static string SettlementVersion => "D01";
 }
