@@ -144,8 +144,12 @@ public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
     {
         var receiverRole = EnumerationType
             .GetAll<MarketRole>()
-            .FirstOrDefault(t => t.Name.Equals(_header?.ReceiverRole, StringComparison.OrdinalIgnoreCase))
-            ?? throw new InvalidOperationException("Invalid receiver market role");
+            .FirstOrDefault(t => t.Name.Equals(_header?.ReceiverRole, StringComparison.OrdinalIgnoreCase));
+
+        if (receiverRole == null)
+        {
+            throw new InvalidOperationException("Invalid receiver market role");
+        }
 
         return receiverRole == marketRole;
     }
