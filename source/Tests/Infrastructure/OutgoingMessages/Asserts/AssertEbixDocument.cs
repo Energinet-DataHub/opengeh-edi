@@ -22,10 +22,10 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using DocumentValidation;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 using Xunit;
 
-namespace Tests.Infrastructure.OutgoingMessages.Asserts;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 
 public class AssertEbixDocument
 {

@@ -14,13 +14,13 @@
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
-using DocumentValidation;
-using Domain.OutgoingMessages;
-using Domain.Transactions.Aggregations;
-using Infrastructure.OutgoingMessages.Common;
-using Tests.Infrastructure.OutgoingMessages.Asserts;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 
-namespace Tests.Infrastructure.OutgoingMessages.AggregationResult;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.AggregationResult;
 
 public class AssertAggregationResultEbixDocument : IAssertAggregationResultDocument
 {

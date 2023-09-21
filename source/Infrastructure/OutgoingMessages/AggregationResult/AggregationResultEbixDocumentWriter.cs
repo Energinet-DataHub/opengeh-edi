@@ -18,18 +18,18 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
-using Application.IncomingMessages;
-using Application.OutgoingMessages.Common;
-using Application.OutgoingMessages.Common.Xml;
-using Domain.Actors;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Domain.Transactions.Aggregations;
-using Infrastructure.OutgoingMessages.Common;
-using Infrastructure.OutgoingMessages.Common.Xml;
-using Point = Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
+using Energinet.DataHub.EDI.Application.IncomingMessages;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Xml;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Xml;
+using Point = Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
-namespace Infrastructure.OutgoingMessages.AggregationResult;
+namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AggregationResult;
 
 public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
 {
