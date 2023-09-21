@@ -48,6 +48,6 @@ internal static class RequestedAggregatedMeasureDataConfiguration
         services.AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasRejected>, WhenAnRejectedAggregatedTimeSeriesRequestIsAvailable>();
         services.AddScoped<WholesaleInbox>();
         services.AddScoped<IAggregatedMeasureDataProcessRepository, AggregatedMeasureDataProcessRepository>();
-        services.AddScoped<AggregatedMeasureDataResponseFactory>();
+        services.AddScoped<AggregatedMeasureDataRequestFactory>();
     }
 }
