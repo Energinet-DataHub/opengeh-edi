@@ -18,36 +18,35 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Api.Configuration.Middleware.Correlation;
-using Application.Configuration;
-using Application.Configuration.Commands.Commands;
-using Application.Configuration.Queries;
-using Application.Configuration.TimeEvents;
-using Application.Transactions.Aggregations;
-using Application.Transactions.MoveIn;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
+using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Application.Configuration.Queries;
+using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
+using Energinet.DataHub.EDI.Application.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Infrastructure.Configuration;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
+using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Infrastructure.Wholesale;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
+using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
+using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Google.Protobuf;
-using Infrastructure.Configuration;
-using Infrastructure.Configuration.DataAccess;
-using Infrastructure.Configuration.IntegrationEvents;
-using Infrastructure.Configuration.MessageBus;
-using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
-using Infrastructure.InboxEvents;
-using Infrastructure.Transactions.AggregatedMeasureData.Notifications;
-using Infrastructure.Transactions.Aggregations;
-using Infrastructure.Transactions.MoveIn;
-using Infrastructure.Wholesale;
-using IntegrationTests.Fixtures;
-using IntegrationTests.Infrastructure.Configuration.InternalCommands;
-using IntegrationTests.Infrastructure.InboxEvents;
-using IntegrationTests.TestDoubles;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
-using TestNotification = IntegrationTests.Infrastructure.Configuration.IntegrationEvents.TestNotification;
-using TestNotificationHandlerSpy = IntegrationTests.Infrastructure.Configuration.IntegrationEvents.TestNotificationHandlerSpy;
+using TestNotification = Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.IntegrationEvents.TestNotification;
+using TestNotificationHandlerSpy = Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.IntegrationEvents.TestNotificationHandlerSpy;
 
-namespace IntegrationTests
+namespace Energinet.DataHub.EDI.IntegrationTests
 {
     [Collection("IntegrationTest")]
     public class TestBase : IDisposable

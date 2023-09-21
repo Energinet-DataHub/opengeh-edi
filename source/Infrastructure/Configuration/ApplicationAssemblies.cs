@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System.Reflection;
-using Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
 
-namespace Infrastructure.Configuration;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration;
 
 public static class ApplicationAssemblies
 {

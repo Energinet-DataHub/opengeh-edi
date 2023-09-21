@@ -14,7 +14,7 @@
 
 using System.Threading.Tasks;
 
-namespace Application.Transactions.MoveIn.UpdateCustomer;
+namespace Energinet.DataHub.EDI.Application.Transactions.MoveIn.UpdateCustomer;
 
 /// <summary>
 /// Service for sending update customer master data request to energy supplying business service

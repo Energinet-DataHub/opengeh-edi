@@ -14,7 +14,7 @@
 
 using MediatR;
 
-namespace Application.Configuration.Queries;
+namespace Energinet.DataHub.EDI.Application.Configuration.Queries;
 
 /// <summary>
 /// Data query

@@ -14,6 +14,6 @@
 
 using Dapper;
 
-namespace Application.SearchMessages;
+namespace Energinet.DataHub.EDI.Application.SearchMessages;
 
 public record QueryInput(string SqlStatement, DynamicParameters Parameters);

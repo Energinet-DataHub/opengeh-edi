@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Application.OutgoingMessages;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.Queueing;
-using Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.OutgoingMessages;
+namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages;
 
 public class OutgoingMessageRepository : IOutgoingMessageRepository
 {

@@ -18,10 +18,10 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
-using Domain.Documents;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
+using Energinet.DataHub.EDI.Domain.Documents;
 
-namespace CimMessageAdapter.Messages.RequestChangeAccountingPointCharacteristics;
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestChangeAccountingPointCharacteristics;
 
 public class MessageParser
 {

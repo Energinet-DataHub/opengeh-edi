@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace AcceptanceTest.Exceptions;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
 
 public class UnexpectedPeekResponseException : Exception
 {

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestChangeOfSupplier;
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 
 internal static class SampleData
 {

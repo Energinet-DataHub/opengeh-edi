@@ -17,17 +17,17 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.IncomingMessages.RequestChangeOfSupplier;
-using Application.OutgoingMessages.Common.Reasons;
-using Domain.Actors;
-using Domain.MasterData.MarketEvaluationPoints;
-using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
-using Domain.Transactions;
-using Domain.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Reasons;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.MasterData.MarketEvaluationPoints;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Transactions.MoveIn;
 using MediatR;
 using NodaTime.Text;
 
-namespace Application.Transactions.MoveIn
+namespace Energinet.DataHub.EDI.Application.Transactions.MoveIn
 {
     public class MoveInRequestHandler : IRequestHandler<RequestChangeOfSupplierTransactionCommand, Unit>
     {

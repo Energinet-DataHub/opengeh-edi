@@ -19,24 +19,24 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Actors;
-using Application.Configuration.Authentication;
-using Application.Configuration.DataAccess;
-using Application.IncomingMessages.RequestAggregatedMeasureData;
-using CimMessageAdapter.Messages;
-using CimMessageAdapter.Messages.Queues;
-using CimMessageAdapter.Messages.RequestAggregatedMeasureData;
-using CimMessageAdapter.ValidationErrors;
 using Dapper;
-using Domain.Actors;
-using Domain.Documents;
-using Infrastructure.Configuration.Authentication;
-using IntegrationTests.Fixtures;
-using IntegrationTests.Infrastructure.CimMessageAdapter.Stubs;
+using Energinet.DataHub.EDI.Application.Actors;
+using Energinet.DataHub.EDI.Application.Configuration.Authentication;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Stubs;
 using Xunit;
 using Xunit.Categories;
 
-namespace IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
 [IntegrationTest]
 public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetime

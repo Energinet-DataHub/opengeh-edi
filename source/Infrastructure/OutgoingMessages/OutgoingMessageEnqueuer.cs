@@ -14,10 +14,10 @@
 
 using System;
 using System.Threading.Tasks;
-using Domain.OutgoingMessages.Peek;
-using Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 
-namespace Infrastructure.OutgoingMessages;
+namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages;
 
 public class OutgoingMessageEnqueuer
 {

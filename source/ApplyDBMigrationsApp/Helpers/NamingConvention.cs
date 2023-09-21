@@ -14,7 +14,7 @@
 
 using System.Text.RegularExpressions;
 
-namespace ApplyDBMigrationsApp.Helpers
+namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers
 {
     public static class NamingConvention
     {

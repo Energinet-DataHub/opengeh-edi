@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using System;
-using Domain.Actors;
-using IntegrationTests.Factories;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using NodaTime;
 
-namespace IntegrationTests.Application.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.Aggregations;
 
 internal sealed class SampleData
 {

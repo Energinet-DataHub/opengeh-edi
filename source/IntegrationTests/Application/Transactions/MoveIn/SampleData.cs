@@ -14,12 +14,12 @@
 
 using System;
 using System.Collections.Generic;
-using Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
-using Domain.Transactions;
-using IntegrationTests.Factories;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
+using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using NodaTime;
 
-namespace IntegrationTests.Application.Transactions.MoveIn;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.MoveIn;
 
 internal static class SampleData
 {

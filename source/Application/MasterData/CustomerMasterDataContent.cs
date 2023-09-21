@@ -14,10 +14,10 @@
 
 using System;
 using System.Collections.Generic;
-using Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
 using NodaTime;
 
-namespace Application.MasterData;
+namespace Energinet.DataHub.EDI.Application.MasterData;
 
 public class CustomerMasterDataContent
 {

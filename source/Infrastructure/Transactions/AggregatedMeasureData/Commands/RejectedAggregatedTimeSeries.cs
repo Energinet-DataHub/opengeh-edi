@@ -15,10 +15,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using Application.Configuration.Commands.Commands;
-using Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 
-namespace Infrastructure.Transactions.AggregatedMeasureData.Commands;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 
 public class RejectedAggregatedTimeSeries : InternalCommand
 {

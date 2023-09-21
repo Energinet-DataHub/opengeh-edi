@@ -13,12 +13,12 @@
 // limitations under the License.
 
 using System;
-using Domain.Transactions;
-using Domain.Transactions.UpdateCustomer;
+using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Transactions.UpdateCustomer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Transactions.UpdateCustomer;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.UpdateCustomer;
 
 public class EntityConfiguration : IEntityTypeConfiguration<UpdateCustomerMasterDataTransaction>
 {

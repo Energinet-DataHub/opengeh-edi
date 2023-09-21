@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.DataAccess;
-using Domain.ArchivedMessages;
-using Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Domain.ArchivedMessages;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Microsoft.Data.SqlClient;
 
-namespace Infrastructure.ArchivedMessages;
+namespace Energinet.DataHub.EDI.Infrastructure.ArchivedMessages;
 
 public class ArchivedMessageRepository : IArchivedMessageRepository
 {

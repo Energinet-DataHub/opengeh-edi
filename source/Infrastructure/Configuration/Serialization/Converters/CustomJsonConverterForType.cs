@@ -16,7 +16,7 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Infrastructure.Configuration.Serialization.Converters
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization.Converters
 {
     /// <summary>
     /// Workaround for System.Type with System.Text.Json using converters

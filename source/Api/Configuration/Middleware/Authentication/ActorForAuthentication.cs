@@ -14,6 +14,6 @@
 
 using System;
 
-namespace Api.Configuration.Middleware.Authentication;
+namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication;
 
 public record ActorForAuthentication(Guid ActorId, string Identifier);

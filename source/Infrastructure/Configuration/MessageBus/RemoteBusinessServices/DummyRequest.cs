@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 
 public record DummyRequest;
 

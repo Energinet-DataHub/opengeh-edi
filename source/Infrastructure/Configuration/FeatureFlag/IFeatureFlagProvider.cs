@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Infrastructure.Configuration.FeatureFlag;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.FeatureFlag;
 
 #pragma warning disable
 public interface IFeatureFlagProvider

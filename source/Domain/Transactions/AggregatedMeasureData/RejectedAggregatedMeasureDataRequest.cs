@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 
-namespace Domain.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 
 public record RejectedAggregatedMeasureDataRequest(IReadOnlyCollection<RejectReason> RejectReasons, BusinessReason BusinessReason);

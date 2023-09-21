@@ -16,7 +16,7 @@ using System;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace Infrastructure.IncomingMessages;
+namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 
 internal static class XmlReaderExtensions
 {

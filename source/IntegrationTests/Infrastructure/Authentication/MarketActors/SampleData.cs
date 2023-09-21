@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace IntegrationTests.Infrastructure.Authentication.MarketActors;
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
 
 internal static class SampleData
 {

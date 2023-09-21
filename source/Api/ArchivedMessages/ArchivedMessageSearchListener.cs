@@ -18,14 +18,14 @@ using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.SearchMessages;
-using Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Application.SearchMessages;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using NodaTime;
 
-namespace Api.ArchivedMessages;
+namespace Energinet.DataHub.EDI.Api.ArchivedMessages;
 
 public class ArchivedMessageSearchListener
 {

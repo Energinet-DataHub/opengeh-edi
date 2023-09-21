@@ -13,10 +13,10 @@
 // limitations under the License.
 
 using System;
-using Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Transactions;
 using NodaTime;
 
-namespace Tests.Domain.Transactions.MoveIn;
+namespace Energinet.DataHub.EDI.Tests.Domain.Transactions.MoveIn;
 
 internal sealed class SampleData
 {

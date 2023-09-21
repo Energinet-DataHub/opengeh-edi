@@ -15,12 +15,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.MasterData;
-using Domain.Transactions;
-using Domain.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Application.MasterData;
+using Energinet.DataHub.EDI.Domain.Transactions.MoveIn;
 using MediatR;
 
-namespace Application.Transactions.MoveIn.MasterDataDelivery;
+namespace Energinet.DataHub.EDI.Application.Transactions.MoveIn.MasterDataDelivery;
 
 public class SetCurrentKnownCustomerMasterDataHandler : IRequestHandler<SetCurrentKnownCustomerMasterData, Unit>
 {

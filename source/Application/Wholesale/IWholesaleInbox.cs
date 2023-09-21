@@ -14,9 +14,9 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 
-namespace Application.Wholesale;
+namespace Energinet.DataHub.EDI.Application.Wholesale;
 
 /// <summary>
 /// Interface for wholesale inbox

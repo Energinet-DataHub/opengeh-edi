@@ -14,10 +14,10 @@
 
 using System;
 using System.Linq;
-using Domain.Common;
-using Domain.Documents;
+using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Domain.Documents;
 
-namespace Infrastructure.IncomingMessages;
+namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 
 public static class CimFormatParser
 {

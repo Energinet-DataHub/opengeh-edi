@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Actors;
 
-namespace Domain.MasterData.MarketEvaluationPoints;
+namespace Energinet.DataHub.EDI.Domain.MasterData.MarketEvaluationPoints;
 
 public class MarketEvaluationPoint
 {

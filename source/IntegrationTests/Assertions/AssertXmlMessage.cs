@@ -17,13 +17,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using Domain.Actors;
-using Domain.Documents;
-using Domain.OutgoingMessages;
-using Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Xunit;
 
-namespace IntegrationTests.Assertions
+namespace Energinet.DataHub.EDI.IntegrationTests.Assertions
 {
     internal sealed class AssertXmlMessage
     {

@@ -15,11 +15,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.Commands;
-using Domain.Transactions.MoveIn.Events;
+using Energinet.DataHub.EDI.Application.Configuration.Commands;
+using Energinet.DataHub.EDI.Domain.Transactions.MoveIn.Events;
 using MediatR;
 
-namespace Application.Transactions.MoveIn.Notifications;
+namespace Energinet.DataHub.EDI.Application.Transactions.MoveIn.Notifications;
 
 public class NotifyGridOperatorWhenConsumerHasMovedIn : INotificationHandler<BusinessProcessWasCompleted>
 {

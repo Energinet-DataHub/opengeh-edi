@@ -16,20 +16,20 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.OutgoingMessages;
-using Domain.Transactions.AggregatedMeasureData;
-using Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.Collections;
-using Infrastructure.InboxEvents;
-using Infrastructure.Transactions.AggregatedMeasureData.Notifications;
 using MediatR;
 using NodaTime.Serialization.Protobuf;
-using GridAreaDetails = Domain.Transactions.AggregatedMeasureData.GridAreaDetails;
-using Point = Domain.Transactions.AggregatedMeasureData.Point;
+using GridAreaDetails = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.GridAreaDetails;
+using Point = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.Point;
 using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
 
-namespace Infrastructure.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 
 public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
 {

@@ -13,15 +13,15 @@
 // limitations under the License.
 
 using System;
-using Domain.Actors;
-using Domain.Common;
-using Domain.Documents;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.OutgoingMessages.Queueing;
+namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Queueing;
 
 public class ActorMessageQueueEntityConfiguration : IEntityTypeConfiguration<ActorMessageQueue>
 {

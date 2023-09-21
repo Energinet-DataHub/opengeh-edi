@@ -12,24 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.IncomingMessages.RequestAggregatedMeasureData;
-using Application.IncomingMessages.RequestChangeCustomerCharacteristics;
-using Application.IncomingMessages.RequestChangeOfSupplier;
-using CimMessageAdapter.Messages;
-using CimMessageAdapter.Messages.RequestAggregatedMeasureData;
-using CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
-using CimMessageAdapter.Messages.RequestChangeOfSupplier;
-using CimMessageAdapter.Response;
-using DocumentValidation;
-using DocumentValidation.CimXml;
-using Infrastructure.IncomingMessages.RequestChangeOfSupplier;
-using Infrastructure.IncomingMessages.Response;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeCustomerCharacteristics;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.CimXml;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.Response;
 using Microsoft.Extensions.DependencyInjection;
-using MarketActivityRecord = Application.IncomingMessages.RequestChangeOfSupplier.MarketActivityRecord;
-using MessageParser = CimMessageAdapter.Messages.RequestChangeOfSupplier.MessageParser;
-using SenderAuthorizer = CimMessageAdapter.Messages.RequestChangeOfSupplier.SenderAuthorizer;
+using MarketActivityRecord = Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeOfSupplier.MarketActivityRecord;
+using MessageParser = Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestChangeOfSupplier.MessageParser;
+using SenderAuthorizer = Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestChangeOfSupplier.SenderAuthorizer;
 
-namespace Infrastructure.Configuration;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration;
 
 internal static class IncomingMessageParsingServices
 {

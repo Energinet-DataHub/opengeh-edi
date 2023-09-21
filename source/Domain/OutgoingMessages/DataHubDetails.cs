@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Actors;
 
-namespace Domain.OutgoingMessages
+namespace Energinet.DataHub.EDI.Domain.OutgoingMessages
 {
     public static class DataHubDetails
     {

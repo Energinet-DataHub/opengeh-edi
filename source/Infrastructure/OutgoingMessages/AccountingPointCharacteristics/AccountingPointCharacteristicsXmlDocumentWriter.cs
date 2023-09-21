@@ -16,13 +16,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
-using Application.OutgoingMessages.Common;
-using Application.OutgoingMessages.Common.Xml;
-using Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics;
-using Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics.MarketEvaluationPointDetails;
-using Infrastructure.OutgoingMessages.Common.Xml;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Xml;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics.MarketEvaluationPointDetails;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Xml;
 
-namespace Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
+namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 
 public class AccountingPointCharacteristicsXmlDocumentWriter : DocumentWriter
 {

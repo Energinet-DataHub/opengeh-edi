@@ -14,15 +14,14 @@
 
 using System;
 using System.Collections.Generic;
-using CimMessageAdapter.Messages;
-using CimMessageAdapter.Response;
-using Domain.Documents;
-using Domain.OutgoingMessages;
-using Infrastructure.IncomingMessages.Response;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.Response;
 using Xunit;
 using Xunit.Categories;
 
-namespace Tests.CimMessageAdapter.Response;
+namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Response;
 
 [UnitTest]
 public class ResponseFactoryTests

@@ -16,7 +16,7 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Infrastructure.Configuration.Serialization.Converters
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization.Converters
 {
     public class ObjectToInferredTypesConverter : JsonConverter<object>
     {

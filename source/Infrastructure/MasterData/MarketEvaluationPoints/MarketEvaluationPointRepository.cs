@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Domain.MasterData.MarketEvaluationPoints;
-using Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Domain.MasterData.MarketEvaluationPoints;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.MasterData.MarketEvaluationPoints;
+namespace Energinet.DataHub.EDI.Infrastructure.MasterData.MarketEvaluationPoints;
 
 public class MarketEvaluationPointRepository : IMarketEvaluationPointRepository
 {

@@ -15,7 +15,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace Application.IncomingMessages;
+namespace Energinet.DataHub.EDI.Application.IncomingMessages;
 
 /// <summary>
 /// Incoming EDI market document

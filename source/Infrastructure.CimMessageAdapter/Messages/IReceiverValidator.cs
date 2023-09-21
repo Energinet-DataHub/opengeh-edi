@@ -14,7 +14,7 @@
 
 using System.Threading.Tasks;
 
-namespace CimMessageAdapter.Messages;
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 
 /// <summary>
 /// Responsible for verifying that the message contains the expected receiver

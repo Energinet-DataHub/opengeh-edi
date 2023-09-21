@@ -15,10 +15,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.OutgoingMessages;
+using Energinet.DataHub.EDI.Application.OutgoingMessages;
 using MediatR;
 
-namespace IntegrationTests.Infrastructure.Configuration.InternalCommands;
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 
 public class TestCreateOutgoingCommandHandler : IRequestHandler<TestCreateOutgoingMessageCommand, Unit>
 {

@@ -14,11 +14,11 @@
 
 using System;
 using System.Text.Json.Serialization;
-using Application.Configuration.Commands.Commands;
-using Application.MasterData;
-using Domain.Transactions;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Application.MasterData;
+using Energinet.DataHub.EDI.Domain.Transactions;
 
-namespace Application.Transactions.MoveIn.MasterDataDelivery;
+namespace Energinet.DataHub.EDI.Application.Transactions.MoveIn.MasterDataDelivery;
 
 public class SetCurrentKnownCustomerMasterData : InternalCommand
 {

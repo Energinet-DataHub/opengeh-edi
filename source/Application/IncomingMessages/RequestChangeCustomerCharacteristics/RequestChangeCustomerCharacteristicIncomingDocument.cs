@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace Application.IncomingMessages.RequestChangeCustomerCharacteristics;
+namespace Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 
 public class RequestChangeCustomerCharacteristicIncomingDocument : IIncomingMarketDocument<MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>
 {

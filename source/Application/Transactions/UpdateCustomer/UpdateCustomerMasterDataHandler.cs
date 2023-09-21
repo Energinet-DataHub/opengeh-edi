@@ -15,11 +15,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Transactions;
-using Domain.Transactions.UpdateCustomer;
+using Energinet.DataHub.EDI.Domain.Transactions.UpdateCustomer;
 using MediatR;
 
-namespace Application.Transactions.UpdateCustomer;
+namespace Energinet.DataHub.EDI.Application.Transactions.UpdateCustomer;
 
 public class UpdateCustomerMasterDataHandler : IRequestHandler<UpdateCustomerMasterData, Unit>
 {
