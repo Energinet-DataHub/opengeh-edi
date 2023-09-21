@@ -15,14 +15,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Application.Configuration.DataAccess;
 using Dapper;
-using Infrastructure.Configuration.InternalCommands;
-using Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Xunit;
 using Xunit.Sdk;
 
-namespace IntegrationTests.Assertions;
+namespace Energinet.DataHub.EDI.IntegrationTests.Assertions;
 
 public class AssertQueuedCommand
 {

@@ -20,20 +20,20 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using Application.OutgoingMessages.Common;
-using DocumentValidation;
-using DocumentValidation.CimXml;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
-using Infrastructure.Configuration.Serialization;
-using Infrastructure.OutgoingMessages.Common;
-using Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
-using Tests.Factories;
-using Tests.Infrastructure.OutgoingMessages.Asserts;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.CimXml;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
+using Energinet.DataHub.EDI.Tests.Factories;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
-using MarketActivityRecord = Domain.OutgoingMessages.MoveIn.RejectRequestChangeAccountingPointCharacteristics.MarketActivityRecord;
+using MarketActivityRecord = Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeAccountingPointCharacteristics.MarketActivityRecord;
 
-namespace Tests.Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 
 public class RejectRequestChangeAccountingPointCharacteristicsXmlDocumentWriterTests
 {

@@ -14,14 +14,14 @@
 
 using System;
 using System.Threading.Tasks;
-using Application.Configuration.Authentication;
-using Infrastructure.Configuration.Authentication;
-using Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Application.Configuration.Authentication;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
 
-namespace Api.Configuration.Middleware.Authentication.MarketActors
+namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.MarketActors
 {
     public class MarketActorAuthenticatorMiddleware : IFunctionsWorkerMiddleware
     {

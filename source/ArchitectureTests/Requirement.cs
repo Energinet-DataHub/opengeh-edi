@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ArchitectureTests;
+namespace Energinet.DataHub.EDI.ArchitectureTests;
 
 public record Requirement(string Name, IEnumerable<Type> DependentOn, Type? ActualType = null)
 {

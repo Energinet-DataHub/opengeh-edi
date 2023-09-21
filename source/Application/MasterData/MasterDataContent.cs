@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Application.MasterData;
+namespace Energinet.DataHub.EDI.Application.MasterData;
 
 public class MasterDataContent
 {

@@ -14,7 +14,7 @@
 
 using System.Collections;
 
-namespace Domain.OutgoingMessages.Exceptions
+namespace Energinet.DataHub.EDI.Domain.OutgoingMessages.Exceptions
 {
     public class ReceiverIdsDoesNotMatchException : Exception
     {

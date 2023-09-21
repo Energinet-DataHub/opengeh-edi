@@ -15,11 +15,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Application.Configuration.Authentication;
-using CimMessageAdapter.ValidationErrors;
-using Domain.Actors;
+using Energinet.DataHub.EDI.Application.Configuration.Authentication;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
 
-namespace CimMessageAdapter.Messages.RequestAggregatedMeasureData
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData
 {
     public class SenderAuthorizer : ISenderAuthorizer
     {

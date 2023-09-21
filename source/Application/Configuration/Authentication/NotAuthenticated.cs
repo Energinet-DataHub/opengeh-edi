@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System;
-using Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Actors;
 
-namespace Application.Configuration.Authentication
+namespace Energinet.DataHub.EDI.Application.Configuration.Authentication
 {
     public class NotAuthenticated : MarketActorIdentity
     {

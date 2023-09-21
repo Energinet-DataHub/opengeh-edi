@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System.Xml.Schema;
-using DocumentValidation.Xml;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.Xml;
 
-namespace DocumentValidation.CimXml;
+namespace Energinet.DataHub.EDI.Infrastructure.DocumentValidation.CimXml;
 
 public class CimXmlValidator : IValidator
 {

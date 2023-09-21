@@ -13,12 +13,12 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Application.Configuration.DataAccess;
-using Application.Transactions.UpdateCustomer;
-using IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Application.Transactions.UpdateCustomer;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace IntegrationTests.Application.Transactions.UpdateCustomer;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.UpdateCustomer;
 
 public class WhenRequestIsReceivedTests : TestBase
 {

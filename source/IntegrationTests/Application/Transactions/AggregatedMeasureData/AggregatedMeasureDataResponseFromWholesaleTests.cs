@@ -17,20 +17,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Domain.OutgoingMessages;
-using Domain.Transactions.AggregatedMeasureData;
-using Domain.Transactions.Aggregations;
-using Infrastructure.Configuration.DataAccess;
-using IntegrationTests.Application.IncomingMessages;
-using IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using NodaTime.Extensions;
 using Xunit;
 using Xunit.Categories;
-using GridAreaDetails = Domain.Transactions.Aggregations.GridAreaDetails;
-using Period = Domain.Transactions.Aggregations.Period;
-using Point = Domain.Transactions.Aggregations.Point;
+using GridAreaDetails = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.GridAreaDetails;
+using Period = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Period;
+using Point = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Point;
 
-namespace IntegrationTests.Application.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
 [IntegrationTest]
 public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase

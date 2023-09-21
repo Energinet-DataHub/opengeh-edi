@@ -17,16 +17,15 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Transactions;
-using Application.Configuration;
-using Application.IncomingMessages;
 using Azure.Messaging.ServiceBus;
-using CimMessageAdapter.Messages;
-using CimMessageAdapter.Messages.Queues;
-using Infrastructure.Configuration.MessageBus;
-using Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Application.IncomingMessages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 
-namespace Infrastructure.IncomingMessages
+namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages
 {
     public class MessageQueueDispatcher<TQueue> : IMessageQueueDispatcher<TQueue>
     where TQueue : Queue

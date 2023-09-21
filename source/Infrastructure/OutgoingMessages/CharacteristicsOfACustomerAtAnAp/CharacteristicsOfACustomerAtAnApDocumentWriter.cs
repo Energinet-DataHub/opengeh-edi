@@ -18,16 +18,15 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
-using Application.OutgoingMessages;
-using Application.OutgoingMessages.Common;
-using Application.OutgoingMessages.Common.Xml;
-using Domain.Actors;
-using Domain.Common;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
-using Infrastructure.OutgoingMessages.Common.Xml;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Xml;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Xml;
 
-namespace Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 
 public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
 {

@@ -14,9 +14,9 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Application.Transactions.MoveIn;
 
-namespace Infrastructure.Transactions.MoveIn;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.MoveIn;
 
 public class FakeCustomerMasterDataClient : ICustomerMasterDataClient
 {

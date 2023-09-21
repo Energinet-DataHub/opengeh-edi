@@ -16,10 +16,10 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.ArchivedMessages;
+using Energinet.DataHub.EDI.Domain.ArchivedMessages;
 using MediatR;
 
-namespace Application.ArchivedMessages;
+namespace Energinet.DataHub.EDI.Application.ArchivedMessages;
 
 public class GetArchivedMessageDocumentQueryHandler : IRequestHandler<GetArchivedMessageDocumentQuery, Stream?>
 {

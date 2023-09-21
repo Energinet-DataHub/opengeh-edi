@@ -16,12 +16,12 @@ using System;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.DataAccess;
 using Dapper;
-using Domain.Transactions;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Domain.Transactions;
 using Xunit;
 
-namespace IntegrationTests.Application.Transactions.UpdateCustomer;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.UpdateCustomer;
 
 public class AssertTransaction
 {

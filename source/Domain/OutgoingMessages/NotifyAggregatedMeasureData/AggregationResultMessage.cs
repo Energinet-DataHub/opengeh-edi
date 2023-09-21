@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Actors;
-using Domain.Common;
-using Domain.Documents;
-using Domain.Transactions;
-using Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
-namespace Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 
 public class AggregationResultMessage : OutgoingMessage
 {

@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using System;
-using Domain.Transactions;
-using IntegrationTests.Factories;
+using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using NodaTime;
 
-namespace IntegrationTests.Application.Transactions.UpdateCustomer;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.UpdateCustomer;
 
 internal static class SampleData
 {

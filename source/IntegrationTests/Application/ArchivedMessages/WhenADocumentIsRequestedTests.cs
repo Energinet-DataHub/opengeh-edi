@@ -15,19 +15,19 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Application.ArchivedMessages;
-using Application.Configuration;
-using Application.Configuration.DataAccess;
-using Application.SearchMessages;
-using Domain.Actors;
-using Domain.ArchivedMessages;
-using Domain.Common;
-using Domain.Documents;
-using Domain.OutgoingMessages;
-using IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Application.ArchivedMessages;
+using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Application.SearchMessages;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.ArchivedMessages;
+using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace IntegrationTests.Application.ArchivedMessages;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.ArchivedMessages;
 
 public class WhenADocumentIsRequestedTests : TestBase
 {

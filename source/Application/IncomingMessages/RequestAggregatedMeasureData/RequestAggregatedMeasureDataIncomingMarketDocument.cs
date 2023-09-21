@@ -15,7 +15,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace Application.IncomingMessages.RequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
 
 public class RequestAggregatedMeasureDataIncomingMarketDocument : IIncomingMarketDocument<Serie, RequestAggregatedMeasureDataTransactionCommand>
 {

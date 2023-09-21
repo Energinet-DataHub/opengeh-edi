@@ -14,14 +14,14 @@
 
 using System;
 using System.Text.Json;
-using Domain.Actors;
-using Domain.Common;
-using Domain.OutgoingMessages;
-using Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Json.Schema;
 using Xunit;
 
-namespace Tests.Infrastructure.OutgoingMessages.Asserts;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 
 public static class AssertJsonMessage
 {

@@ -16,12 +16,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
-using Application.OutgoingMessages.Common;
-using Application.OutgoingMessages.Common.Xml;
-using Infrastructure.OutgoingMessages.Common.Xml;
-using MarketActivityRecord = Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeAccountingPointCharacteristics.MarketActivityRecord;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Xml;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Xml;
+using MarketActivityRecord = Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeAccountingPointCharacteristics.MarketActivityRecord;
 
-namespace Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
+namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
 
 public class ConfirmRequestChangeAccountingPointCharacteristicsXmlDocumentWriter : DocumentWriter
 {

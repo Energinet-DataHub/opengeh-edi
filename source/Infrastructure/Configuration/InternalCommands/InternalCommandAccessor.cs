@@ -16,10 +16,10 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Configuration.InternalCommands
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands
 {
     public class InternalCommandAccessor
     {

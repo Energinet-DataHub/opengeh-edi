@@ -14,7 +14,7 @@
 
 using System;
 
-namespace IntegrationTests.Application.OutgoingMessages;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
 internal static class SampleData
 {

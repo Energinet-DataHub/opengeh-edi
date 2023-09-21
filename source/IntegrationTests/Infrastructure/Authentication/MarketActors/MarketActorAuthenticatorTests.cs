@@ -17,15 +17,15 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Actors;
-using Application.Configuration.Authentication;
-using Domain.Actors;
-using Infrastructure.Configuration.Authentication;
-using IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Application.Actors;
+using Energinet.DataHub.EDI.Application.Configuration.Authentication;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
 
-namespace IntegrationTests.Infrastructure.Authentication.MarketActors
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors
 {
     [IntegrationTest]
     public class MarketActorAuthenticatorTests : TestBase

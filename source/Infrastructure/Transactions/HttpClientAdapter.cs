@@ -16,7 +16,7 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Infrastructure.Transactions;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions;
 
 public class HttpClientAdapter : IHttpClientAdapter
 {

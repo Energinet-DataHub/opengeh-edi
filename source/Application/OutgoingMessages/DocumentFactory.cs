@@ -17,12 +17,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Domain.Documents;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.Exceptions;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.Exceptions;
 using NodaTime;
 
-namespace Application.OutgoingMessages;
+namespace Energinet.DataHub.EDI.Application.OutgoingMessages;
 
 public class DocumentFactory
 {
@@ -57,7 +57,7 @@ public class DocumentFactory
                 bundle.SenderRole.Name,
                 bundle.Receiver.Number.Value,
                 bundle.Receiver.ActorRole.Name,
-                bundle.AssignedBundleId!.ToString()!,
+                bundle.AssignedBundleId!.Id.ToString(),
                 timestamp),
             bundle.OutgoingMessages.Select(message => message.MessageRecord).ToList());
     }

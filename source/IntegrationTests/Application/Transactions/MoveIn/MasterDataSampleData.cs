@@ -16,7 +16,7 @@ using System;
 using System.Globalization;
 using NodaTime;
 
-namespace IntegrationTests.Application.Transactions.MoveIn
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.MoveIn
 {
     internal static class MasterDataSampleData
     {

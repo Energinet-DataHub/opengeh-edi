@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Infrastructure.OutgoingMessages.Common;
+namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 
 internal sealed class GeneralValues
 {

@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Actors;
 using Xunit;
 
-namespace Tests.Domain.Actors;
+namespace Energinet.DataHub.EDI.Tests.Domain.Actors;
 
 public class ActorNumberTests
 {

@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using System;
-using Domain.Actors;
-using Domain.OutgoingMessages;
-using Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
-namespace Infrastructure.OutgoingMessages.Common;
+namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 
 public static class CimCode
 {

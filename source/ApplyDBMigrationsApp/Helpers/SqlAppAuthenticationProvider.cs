@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Data.SqlClient;
 
-namespace ApplyDBMigrationsApp.Helpers
+namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers
 {
     /// <summary>
     /// An implementation of SqlAuthenticationProvider that implements Active Directory Interactive SQL authentication.

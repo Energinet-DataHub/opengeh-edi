@@ -15,11 +15,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CimMessageAdapter.Messages;
-using Domain.Documents;
-using Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 
-namespace CimMessageAdapter.Response;
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
 
 public class ResponseFactory
 {

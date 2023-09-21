@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System.Linq;
-using ApplyDBMigrationsApp.Helpers;
+using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
 
-namespace ApplyDBMigrationsApp
+namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp
 {
     public static class Program
     {

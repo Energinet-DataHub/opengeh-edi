@@ -20,7 +20,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Api.Configuration.Middleware
+namespace Energinet.DataHub.EDI.Api.Configuration.Middleware
 {
     public static class FunctionContextExtensions
     {

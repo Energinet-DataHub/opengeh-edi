@@ -14,7 +14,7 @@
 
 using NodaTime;
 
-namespace Infrastructure.Configuration.IntegrationEvents;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 
 public class ReceivedIntegrationEvent
 {

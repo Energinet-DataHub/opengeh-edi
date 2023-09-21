@@ -16,7 +16,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.InboxEvents;
+namespace Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 
 public class ReceivedInboxEventEntityConfiguration : IEntityTypeConfiguration<ReceivedInboxEvent>
 {

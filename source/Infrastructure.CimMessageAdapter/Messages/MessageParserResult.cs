@@ -13,10 +13,10 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using Application.IncomingMessages;
-using CimMessageAdapter.ValidationErrors;
+using Energinet.DataHub.EDI.Application.IncomingMessages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
 
-namespace CimMessageAdapter.Messages
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
 {
     public class MessageParserResult<TMarketActivityRecordType, TMarketTransactionType>
         where TMarketActivityRecordType : IMarketActivityRecord

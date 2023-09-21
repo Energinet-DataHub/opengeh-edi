@@ -15,12 +15,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Application.Configuration;
-using Google.Protobuf;
-using Infrastructure.Configuration.DataAccess;
-using NodaTime.Serialization.Protobuf;
+using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 
-namespace Infrastructure.Configuration.IntegrationEvents;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 
 public class IntegrationEventReceiver
 {

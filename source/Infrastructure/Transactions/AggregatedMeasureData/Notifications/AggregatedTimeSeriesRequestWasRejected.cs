@@ -14,11 +14,10 @@
 
 using System;
 using System.Collections.Generic;
-using Domain.Transactions.AggregatedMeasureData;
-using Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using MediatR;
 
-namespace Infrastructure.Transactions.AggregatedMeasureData.Notifications;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
 
 public record AggregatedTimeSeriesRequestWasRejected(
     Guid ReferenceId,

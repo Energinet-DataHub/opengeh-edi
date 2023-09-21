@@ -15,18 +15,17 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration;
-using CimMessageAdapter.Messages;
-using CimMessageAdapter.Messages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using MediatR;
-using Receiver = CimMessageAdapter.Messages.RequestAggregatedMeasureData.RequestAggregatedMeasureDataReceiver;
+using Receiver = Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData.RequestAggregatedMeasureDataReceiver;
 
-namespace Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
 public class ValidateAggregatedMeasureDataRequestHandler
     : IRequestHandler<ReceiveAggregatedMeasureDataRequestCommand, Result>
 {
-    private readonly RequestAggregatedMeasureDataReceiver _messageReceiver;
+    private readonly Receiver _messageReceiver;
 
     public ValidateAggregatedMeasureDataRequestHandler(
         Receiver messageReceiver,

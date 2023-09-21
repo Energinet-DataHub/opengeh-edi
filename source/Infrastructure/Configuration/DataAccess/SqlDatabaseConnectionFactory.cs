@@ -15,10 +15,10 @@
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Microsoft.Data.SqlClient;
 
-namespace Infrastructure.Configuration.DataAccess
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 {
     public class SqlDatabaseConnectionFactory : IDatabaseConnectionFactory
     {

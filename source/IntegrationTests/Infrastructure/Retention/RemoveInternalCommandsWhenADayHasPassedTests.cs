@@ -16,14 +16,14 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration;
-using Application.Configuration.DataAccess;
-using Infrastructure.Configuration.DataAccess;
-using Infrastructure.Configuration.InternalCommands;
-using IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace IntegrationTests.Infrastructure.Retention;
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Retention;
 
 public class RemoveInternalCommandsWhenADayHasPassedTests : TestBase
 {

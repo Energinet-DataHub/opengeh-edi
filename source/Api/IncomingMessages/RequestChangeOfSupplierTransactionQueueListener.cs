@@ -15,15 +15,15 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
-using Api.Configuration;
-using Application.Configuration;
-using Application.IncomingMessages.RequestChangeOfSupplier;
-using Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Api.Configuration;
+using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace Api.IncomingMessages
+namespace Energinet.DataHub.EDI.Api.IncomingMessages
 {
     public class RequestChangeOfSupplierTransactionQueueListener
     {

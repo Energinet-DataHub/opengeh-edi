@@ -15,9 +15,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
-using Application.IncomingMessages;
+using Energinet.DataHub.EDI.Application.IncomingMessages;
 
-namespace Infrastructure.IncomingMessages;
+namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 
 internal static class MessageHeaderExtractor
 {

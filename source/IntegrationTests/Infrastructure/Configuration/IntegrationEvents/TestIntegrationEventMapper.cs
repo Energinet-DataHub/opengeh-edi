@@ -15,10 +15,10 @@
 using System;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Infrastructure.Configuration.IntegrationEvents;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 using MediatR;
 
-namespace IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
 public class TestIntegrationEventMapper : IIntegrationEventMapper
 {

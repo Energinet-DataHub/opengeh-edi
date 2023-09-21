@@ -15,7 +15,7 @@
 using System.Globalization;
 using NodaTime;
 
-namespace Domain.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
 public record Period(Instant Start, Instant End)
 {

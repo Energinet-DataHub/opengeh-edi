@@ -15,11 +15,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Transactions;
-using Domain.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Domain.Transactions.MoveIn;
 using MediatR;
 
-namespace Application.Transactions.MoveIn.Notifications;
+namespace Energinet.DataHub.EDI.Application.Transactions.MoveIn.Notifications;
 
 public class NotifyCurrentEnergySupplierHandler : IRequestHandler<NotifyCurrentEnergySupplier, Unit>
 {

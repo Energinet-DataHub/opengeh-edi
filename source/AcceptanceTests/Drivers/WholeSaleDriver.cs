@@ -16,7 +16,7 @@ using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 
-namespace AcceptanceTest.Drivers;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 internal sealed class WholeSaleDriver
 {
