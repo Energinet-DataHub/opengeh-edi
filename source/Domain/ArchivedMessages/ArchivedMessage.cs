@@ -18,10 +18,10 @@ namespace Energinet.DataHub.EDI.Domain.ArchivedMessages;
 
 public record ArchivedMessage(
     string Id,
-    string MessageId,
+    string? MessageId,
     string DocumentType,
-    string SenderNumber,
-    string ReceiverNumber,
+    string? SenderNumber,
+    string? ReceiverNumber,
     Instant CreatedAt,
     string? BusinessReason,
     Stream Document);
