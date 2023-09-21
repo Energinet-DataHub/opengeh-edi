@@ -17,7 +17,7 @@ using System.Collections.ObjectModel;
 
 namespace Application.IncomingMessages.RequestAggregatedMeasureData;
 
-public class RequestAggregatedMeasureDataIncomingMarketDocument : IIncomingMarketDocument<Serie, RequestAggregatedMeasureDataTransaction>
+public class RequestAggregatedMeasureDataIncomingMarketDocument : IIncomingMarketDocument<Serie, RequestAggregatedMeasureDataTransactionCommand>
 {
     public RequestAggregatedMeasureDataIncomingMarketDocument(MessageHeader header, IReadOnlyCollection<Serie> series)
     {
@@ -29,12 +29,12 @@ public class RequestAggregatedMeasureDataIncomingMarketDocument : IIncomingMarke
 
     public IReadOnlyCollection<Serie> MarketActivityRecords { get; }
 
-    public ReadOnlyCollection<RequestAggregatedMeasureDataTransaction> ToTransactions()
+    public ReadOnlyCollection<RequestAggregatedMeasureDataTransactionCommand> ToTransactions()
     {
-        var transactions = new List<RequestAggregatedMeasureDataTransaction>();
+        var transactions = new List<RequestAggregatedMeasureDataTransactionCommand>();
         foreach (var marketActivityRecord in MarketActivityRecords)
         {
-            transactions.Add(new RequestAggregatedMeasureDataTransaction(Header, marketActivityRecord));
+            transactions.Add(new RequestAggregatedMeasureDataTransactionCommand(Header, marketActivityRecord));
         }
 
         return transactions.AsReadOnly();

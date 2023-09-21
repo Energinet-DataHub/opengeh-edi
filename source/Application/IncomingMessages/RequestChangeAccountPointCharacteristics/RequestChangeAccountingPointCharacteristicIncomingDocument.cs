@@ -18,7 +18,7 @@ using System.Linq;
 
 namespace Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
 
-public class RequestChangeAccountingPointCharacteristicIncomingDocument : IIncomingMarketDocument<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>
+public class RequestChangeAccountingPointCharacteristicIncomingDocument : IIncomingMarketDocument<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransactionCommand>
 {
     public RequestChangeAccountingPointCharacteristicIncomingDocument(MessageHeader header, IReadOnlyCollection<MarketActivityRecord> marketActivityRecords)
     {
@@ -30,10 +30,10 @@ public class RequestChangeAccountingPointCharacteristicIncomingDocument : IIncom
 
     public IReadOnlyCollection<MarketActivityRecord> MarketActivityRecords { get; }
 
-    public ReadOnlyCollection<RequestChangeAccountingPointCharacteristicsTransaction> ToTransactions()
+    public ReadOnlyCollection<RequestChangeAccountingPointCharacteristicsTransactionCommand> ToTransactions()
     {
         var transactions = MarketActivityRecords
-            .Select(marketActivityRecord => new RequestChangeAccountingPointCharacteristicsTransaction(Header, marketActivityRecord))
+            .Select(marketActivityRecord => new RequestChangeAccountingPointCharacteristicsTransactionCommand(Header, marketActivityRecord))
             .ToList();
 
         return transactions.AsReadOnly();

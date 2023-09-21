@@ -16,8 +16,8 @@ using System;
 using System.IO;
 using Domain.Actors;
 using Domain.ArchivedMessages;
+using Domain.Common;
 using Domain.Documents;
-using Domain.SeedWork;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

@@ -25,14 +25,14 @@ namespace CimMessageAdapter.Messages.RequestChangeAccountingPointCharacteristics
 
 public class MessageParser
 {
-    private readonly IEnumerable<IMessageParser<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>> _parsers;
+    private readonly IEnumerable<IMessageParser<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransactionCommand>> _parsers;
 
-    public MessageParser(IEnumerable<IMessageParser<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>> parsers)
+    public MessageParser(IEnumerable<IMessageParser<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransactionCommand>> parsers)
     {
         _parsers = parsers;
     }
 
-    public Task<MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>> ParseAsync(
+    public Task<MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransactionCommand>> ParseAsync(
         Stream message, DocumentFormat documentFormat, CancellationToken cancellationToken)
     {
         var parser = _parsers.FirstOrDefault(parser => parser.HandledFormat.Equals(documentFormat));

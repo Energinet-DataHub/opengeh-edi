@@ -14,7 +14,6 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration;
@@ -26,7 +25,7 @@ using Domain.Documents;
 using Domain.OutgoingMessages.Queueing;
 using MediatR;
 
-namespace Application.OutgoingMessages.Peek;
+namespace Application.OutgoingMessages;
 
 public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
 {
@@ -76,25 +75,20 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
         {
             var timestamp = _systemDateTimeProvider.Now();
 
-            var outgoingMessages = await _outgoingMessageRepository.GetByAssignedBundleIdAsync(peekResult.BundleId).ConfigureAwait(false);
-            var result = await _documentFactory.CreateFromAsync(outgoingMessages, request.DocumentFormat, timestamp).ConfigureAwait(false);
+            var outgoingMessageBundle = await _outgoingMessageRepository.GetAsync(peekResult.BundleId).ConfigureAwait(false);
+            var result = await _documentFactory.CreateFromAsync(outgoingMessageBundle, request.DocumentFormat, timestamp).ConfigureAwait(false);
 
             document = new MarketDocument(result, peekResult.BundleId);
             await _marketDocumentRepository.AddAsync(document).ConfigureAwait(false);
 
-            var outgoingMessage = outgoingMessages.First();
-            var documentType = outgoingMessage.DocumentType;
-            var senderId = outgoingMessage.SenderId.Value;
-            var receiverId = outgoingMessage.Receiver.Number.Value;
-            var businessReason = outgoingMessage.BusinessReason;
             _archivedMessageRepository.Add(new ArchivedMessage(
                 peekResult.BundleId.Id.ToString(),
                 peekResult.BundleId.Id.ToString(),
-                documentType,
-                ActorNumber.Create(senderId),
-                ActorNumber.Create(receiverId),
+                outgoingMessageBundle.DocumentType,
+                ActorNumber.Create(outgoingMessageBundle.SenderId.Value),
+                ActorNumber.Create(outgoingMessageBundle.Receiver.Number.Value),
                 timestamp,
-                businessReason,
+                outgoingMessageBundle.BusinessReason,
                 result));
         }
 

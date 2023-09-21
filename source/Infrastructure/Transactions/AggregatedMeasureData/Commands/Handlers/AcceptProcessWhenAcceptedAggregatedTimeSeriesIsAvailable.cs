@@ -13,18 +13,16 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Transactions;
 using Domain.Transactions.AggregatedMeasureData;
-using Domain.Transactions.Aggregations;
 using Infrastructure.Transactions.Aggregations;
 using MediatR;
 
 namespace Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
 
-public class AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable : IRequestHandler<AcceptedAggregatedTimeSeries, Unit>
+public class AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable : IRequestHandler<AcceptedAggregatedTimeSerie, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
 
@@ -34,28 +32,17 @@ public class AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable : IRequest
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
     }
 
-    public async Task<Unit> Handle(AcceptedAggregatedTimeSeries request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(AcceptedAggregatedTimeSerie request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         var process = await _aggregatedMeasureDataProcessRepository
-            .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
+            .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
-        var aggregations = GetAggregations(request, process);
+        var aggregation = AggregationFactory.Create(process, request.AggregatedTimeSerie);
 
-        process.IsAccepted(aggregations);
+        process.IsAccepted(aggregation);
 
         return Unit.Value;
-    }
-
-    private static List<Aggregation> GetAggregations(AcceptedAggregatedTimeSeries request, AggregatedMeasureDataProcess process)
-    {
-        var aggregations = new List<Aggregation>();
-        foreach (var aggregatedTimeSerie in request.AggregatedTimeSeries)
-        {
-            aggregations.Add(AggregationFactory.Create(process, aggregatedTimeSerie));
-        }
-
-        return aggregations;
     }
 }

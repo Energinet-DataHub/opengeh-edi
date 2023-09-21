@@ -20,7 +20,7 @@ using Domain.Actors;
 using Domain.OutgoingMessages.Queueing;
 using MediatR;
 
-namespace Application.OutgoingMessages.Dequeue;
+namespace Application.OutgoingMessages;
 
 public class DequeueHandler : IRequestHandler<DequeueCommand, DequeCommandResult>
 {

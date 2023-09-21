@@ -12,21 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Domain.EventListeners.Exceptions;
+using System.Text.Json.Serialization;
+using Application.Configuration.Commands.Commands;
 
-public class UnsupportedInboxEventTypeException : Exception
+namespace Application.Actors;
+
+public class CreateActorCommand : InternalCommand
 {
-    public UnsupportedInboxEventTypeException(string message)
-        : base(message)
+    [JsonConstructor]
+    public CreateActorCommand(string actorId, string b2cId, string identificationNumber)
     {
+        ActorId = actorId;
+        IdentificationNumber = identificationNumber;
+        B2CId = b2cId;
     }
 
-    public UnsupportedInboxEventTypeException(string message, Exception innerException)
-        : base(message, innerException)
-    {
-    }
+    public string B2CId { get; }
 
-    private UnsupportedInboxEventTypeException()
-    {
-    }
+    public string ActorId { get; }
+
+    public string IdentificationNumber { get; }
 }

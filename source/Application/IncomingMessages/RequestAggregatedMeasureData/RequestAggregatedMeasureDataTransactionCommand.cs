@@ -12,22 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using Domain.Transactions.AggregatedMeasureData;
+using Application.Configuration.Commands.Commands;
 using MediatR;
 
-namespace Infrastructure.Transactions.AggregatedMeasureData.Notifications;
+namespace Application.IncomingMessages.RequestAggregatedMeasureData;
 
-public class AggregatedTimeSeriesRequestWasAccepted : INotification
+public class RequestAggregatedMeasureDataTransactionCommand : ICommand<Unit>, IMarketTransaction<Serie>
 {
-    public AggregatedTimeSeriesRequestWasAccepted(Guid processId, IReadOnlyList<AggregatedTimeSerie> aggregatedTimeSerie)
+    public RequestAggregatedMeasureDataTransactionCommand(MessageHeader messageHeader, Serie marketActivityRecord)
     {
-        ProcessId = processId;
-        AggregatedTimeSerie = aggregatedTimeSerie;
+        MessageHeader = messageHeader;
+        MarketActivityRecord = marketActivityRecord;
     }
 
-    public Guid ProcessId { get; }
+    public MessageHeader MessageHeader { get; }
 
-    public IReadOnlyList<AggregatedTimeSerie> AggregatedTimeSerie { get; }
+    public Serie MarketActivityRecord { get; }
 }

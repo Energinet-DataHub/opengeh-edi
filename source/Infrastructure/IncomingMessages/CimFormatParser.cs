@@ -14,8 +14,8 @@
 
 using System;
 using System.Linq;
+using Domain.Common;
 using Domain.Documents;
-using Domain.SeedWork;
 
 namespace Infrastructure.IncomingMessages;
 

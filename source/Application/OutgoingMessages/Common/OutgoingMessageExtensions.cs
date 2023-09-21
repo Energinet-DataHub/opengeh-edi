@@ -12,15 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+namespace Application.OutgoingMessages.Common;
 
-namespace Application.OutgoingMessages
+public static class OutgoingMessageExtensions
 {
-    public static class MessageIdGenerator
+    public static string ToStringValue(this bool value)
     {
-        public static string Generate()
-        {
-            return Guid.NewGuid().ToString();
-        }
+        return value ? "true" : "false";
     }
 }

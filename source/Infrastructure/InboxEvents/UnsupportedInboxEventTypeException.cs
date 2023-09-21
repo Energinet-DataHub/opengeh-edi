@@ -13,23 +13,22 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
-using Application.Configuration.Commands.Commands;
-using Domain.Transactions.AggregatedMeasureData;
 
-namespace Infrastructure.Transactions.AggregatedMeasureData.Commands;
+namespace Infrastructure.InboxEvents;
 
-public class AcceptedAggregatedTimeSeries : InternalCommand
+public class UnsupportedInboxEventTypeException : Exception
 {
-    [JsonConstructor]
-    public AcceptedAggregatedTimeSeries(Guid processId, IReadOnlyList<AggregatedTimeSerie> aggregatedTimeSeries)
+    public UnsupportedInboxEventTypeException(string message)
+        : base(message)
     {
-        ProcessId = processId;
-        AggregatedTimeSeries = aggregatedTimeSeries;
     }
 
-    public Guid ProcessId { get; }
+    public UnsupportedInboxEventTypeException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
 
-    public IReadOnlyList<AggregatedTimeSerie> AggregatedTimeSeries { get; }
+    private UnsupportedInboxEventTypeException()
+    {
+    }
 }

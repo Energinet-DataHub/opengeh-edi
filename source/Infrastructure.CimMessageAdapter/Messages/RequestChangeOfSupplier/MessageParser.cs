@@ -25,14 +25,14 @@ namespace CimMessageAdapter.Messages.RequestChangeOfSupplier;
 
 public class MessageParser
 {
-    private readonly IEnumerable<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>> _parsers;
+    private readonly IEnumerable<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>> _parsers;
 
-    public MessageParser(IEnumerable<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>> parsers)
+    public MessageParser(IEnumerable<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>> parsers)
     {
         _parsers = parsers;
     }
 
-    public Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseAsync(
+    public Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>> ParseAsync(
         Stream message, DocumentFormat documentFormat, CancellationToken cancellationToken)
     {
         var parser = _parsers.FirstOrDefault(parser => parser.HandledFormat.Equals(documentFormat));

@@ -24,7 +24,7 @@ using NodaTime.Text;
 
 namespace Application.Transactions.AggregatedMeasureData;
 
-public class AggregatedMeasureDataRequestHandler : IRequestHandler<RequestAggregatedMeasureDataTransaction, Unit>
+public class AggregatedMeasureDataRequestHandler : IRequestHandler<RequestAggregatedMeasureDataTransactionCommand, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
 
@@ -33,7 +33,7 @@ public class AggregatedMeasureDataRequestHandler : IRequestHandler<RequestAggreg
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
     }
 
-    public Task<Unit> Handle(RequestAggregatedMeasureDataTransaction request, CancellationToken cancellationToken)
+    public Task<Unit> Handle(RequestAggregatedMeasureDataTransactionCommand request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
         var requestMessageHeader = request.MessageHeader;

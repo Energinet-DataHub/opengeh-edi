@@ -21,26 +21,41 @@ using Domain.OutgoingMessages.Queueing;
 using Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.OutgoingMessages
+namespace Infrastructure.OutgoingMessages;
+
+public class OutgoingMessageRepository : IOutgoingMessageRepository
 {
-    public class OutgoingMessageRepository : IOutgoingMessageRepository
+    private readonly B2BContext _context;
+
+    public OutgoingMessageRepository(B2BContext context)
     {
-        private readonly B2BContext _context;
+        _context = context;
+    }
 
-        public OutgoingMessageRepository(B2BContext context)
-        {
-            _context = context;
-        }
+    public void Add(OutgoingMessage message)
+    {
+        _context.OutgoingMessages.Add(message);
+    }
 
-        public void Add(OutgoingMessage message)
-        {
-            _context.OutgoingMessages.Add(message);
-        }
+    public async Task<OutgoingMessageBundle> GetAsync(BundleId bundleId)
+    {
+        var outgoingMessages = (await _context.OutgoingMessages.Where(x => x.AssignedBundleId == bundleId)
+            .ToListAsync().ConfigureAwait(false)).AsReadOnly();
 
-        public async Task<IReadOnlyCollection<OutgoingMessage>> GetByAssignedBundleIdAsync(BundleId bundleId)
-        {
-            return (await _context.OutgoingMessages.Where(x => x.AssignedBundleId == bundleId)
-                .ToListAsync().ConfigureAwait(false)).AsReadOnly();
-        }
+        //All messages in a bundle have the same meta data
+        var firstMessage = outgoingMessages.FirstOrDefault()!;
+
+        return new OutgoingMessageBundle(
+            firstMessage.DocumentType,
+            firstMessage.ReceiverId,
+            firstMessage.ProcessId,
+            firstMessage.BusinessReason,
+            firstMessage.ReceiverRole,
+            firstMessage.SenderId,
+            firstMessage.SenderRole,
+            firstMessage.MessageRecord,
+            firstMessage.IsPublished,
+            firstMessage.AssignedBundleId,
+            outgoingMessages);
     }
 }

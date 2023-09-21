@@ -19,10 +19,10 @@ using MediatR;
 
 namespace Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
 
-public class RequestChangeAccountingPointCharacteristicsTransaction : ICommand<Unit>, IMarketTransaction<MarketActivityRecord>
+public class RequestChangeAccountingPointCharacteristicsTransactionCommand : ICommand<Unit>, IMarketTransaction<MarketActivityRecord>
 {
     [JsonConstructor]
-    public RequestChangeAccountingPointCharacteristicsTransaction(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
+    public RequestChangeAccountingPointCharacteristicsTransactionCommand(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
     {
         MessageHeader = messageHeader;
         MarketActivityRecord = marketActivityRecord;
@@ -32,9 +32,9 @@ public class RequestChangeAccountingPointCharacteristicsTransaction : ICommand<U
 
     public MarketActivityRecord MarketActivityRecord { get; }
 
-    public static RequestChangeAccountingPointCharacteristicsTransaction Create(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
+    public static RequestChangeAccountingPointCharacteristicsTransactionCommand Create(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
     {
         if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
-        return new RequestChangeAccountingPointCharacteristicsTransaction(messageHeader, marketActivityRecord);
+        return new RequestChangeAccountingPointCharacteristicsTransactionCommand(messageHeader, marketActivityRecord);
     }
 }

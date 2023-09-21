@@ -99,9 +99,9 @@ namespace IntegrationTests.Application.IncomingMessages
             return this;
         }
 
-        internal RequestChangeOfSupplierTransaction Build()
+        internal RequestChangeOfSupplierTransactionCommand Build()
         {
-            return RequestChangeOfSupplierTransaction.Create(
+            return RequestChangeOfSupplierTransactionCommand.Create(
                 CreateHeader(),
                 CreateMarketActivityRecord());
         }

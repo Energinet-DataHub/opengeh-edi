@@ -22,11 +22,11 @@ using Domain.Actors;
 
 namespace Infrastructure.Actors;
 
-public class ActorLookup : IActorLookup
+public class ActorRepository : IActorRepository
 {
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
 
-    public ActorLookup(IDatabaseConnectionFactory databaseConnectionFactory)
+    public ActorRepository(IDatabaseConnectionFactory databaseConnectionFactory)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
     }

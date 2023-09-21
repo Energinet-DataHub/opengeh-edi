@@ -38,6 +38,7 @@ using Infrastructure.OutgoingMessages.Queueing;
 using Infrastructure.Transactions;
 using Infrastructure.Transactions.AggregatedMeasureData;
 using Infrastructure.Transactions.Aggregations;
+using Infrastructure.Transactions.MoveIn;
 using Infrastructure.Transactions.UpdateCustomer;
 using Microsoft.EntityFrameworkCore;
 using MarketEvaluationPoint = Domain.MasterData.MarketEvaluationPoints.MarketEvaluationPoint;

@@ -43,7 +43,7 @@ public class SendAggregatedMeasuredDataToWholesale
         ArgumentNullException.ThrowIfNull(request);
 
         var process = await _aggregatedMeasureDataProcessRepository
-            .GetByIdAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
+            .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
         await _wholesaleInbox.SendAsync(
             process,

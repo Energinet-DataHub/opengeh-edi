@@ -16,8 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using Domain.Actors;
+using Domain.Common;
 using Domain.OutgoingMessages;
-using Domain.SeedWork;
 
 namespace Infrastructure.OutgoingMessages.Common.Json;
 

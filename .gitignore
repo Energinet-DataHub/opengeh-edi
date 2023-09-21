@@ -376,7 +376,7 @@ MigrationBackup/
 .ionide/
 
 # Local settings
-local.settings.json
+*local.settings.json
 appsettings.json
 appsettings.*.json
 

@@ -66,7 +66,7 @@ internal static class MoveInConfiguration
 
         services.AddScoped<MoveInNotifications>();
         services.AddScoped<IMoveInTransactionRepository, MoveInTransactionRepository>();
-        services.AddTransient<IRequestHandler<RequestChangeOfSupplierTransaction, Unit>, MoveInRequestHandler>();
+        services.AddTransient<IRequestHandler<RequestChangeOfSupplierTransactionCommand, Unit>, MoveInRequestHandler>();
         services.AddTransient<IRequestHandler<FetchCustomerMasterData, Unit>, FetchCustomerMasterDataHandler>();
         services.AddTransient<IRequestHandler<FetchMeteringPointMasterData, Unit>, FetchMeteringPointMasterDataHandler>();
         services.AddTransient<IRequestHandler<SetConsumerHasMovedIn, Unit>, SetConsumerHasMovedInHandler>();

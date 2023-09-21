@@ -21,9 +21,9 @@ using Application.Configuration.DataAccess;
 using Application.SearchMessages;
 using Domain.Actors;
 using Domain.ArchivedMessages;
+using Domain.Common;
 using Domain.Documents;
 using Domain.OutgoingMessages;
-using Domain.SeedWork;
 using IntegrationTests.Fixtures;
 using Xunit;
 

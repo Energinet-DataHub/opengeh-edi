@@ -12,19 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+using System;
+using System.Text.Json.Serialization;
+using Application.Configuration.Commands.Commands;
+using Domain.Transactions.AggregatedMeasureData;
 
-namespace Application.OutgoingMessages;
+namespace Infrastructure.Transactions.AggregatedMeasureData.Commands;
 
-public class BusinessReasonCode : EnumerationType
+public class AcceptedAggregatedTimeSerie : InternalCommand
 {
-    public static readonly BusinessReasonCode CustomerMoveInOrMoveOut = new(0, nameof(CustomerMoveInOrMoveOut), "E01");
-
-    private BusinessReasonCode(int id, string name, string code)
-        : base(id, name)
+    [JsonConstructor]
+    public AcceptedAggregatedTimeSerie(Guid processId, AggregatedTimeSerie aggregatedTimeSerie)
     {
-        Code = code;
+        ProcessId = processId;
+        AggregatedTimeSerie = aggregatedTimeSerie;
     }
 
-    public string Code { get; }
+    public Guid ProcessId { get; }
+
+    public AggregatedTimeSerie AggregatedTimeSerie { get; }
 }

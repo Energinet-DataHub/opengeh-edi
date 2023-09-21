@@ -17,8 +17,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.OutgoingMessages;
-using Application.OutgoingMessages.Dequeue;
-using Application.OutgoingMessages.Peek;
 using Dapper;
 using Domain.Actors;
 using Domain.Documents;

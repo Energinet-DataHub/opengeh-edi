@@ -47,37 +47,39 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
     public async Task Aggregated_measure_data_response_was_accepted()
     {
         // Arrange
+        var expectedOutgoingMessages = 1;
         var incomingMessage = MessageBuilder().Build();
         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
         var process = GetProcess(incomingMessage.MessageHeader.SenderId);
         process!.WasSentToWholesale();
-        var acceptedAggregations = CreateAcceptedAggregations();
+        var acceptedAggregation = CreateAcceptedAggregation();
 
         // Act
-        process.IsAccepted(acceptedAggregations);
+        process.IsAccepted(acceptedAggregation);
 
         // Assert
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);
-        AssertOutgoingMessageCreated(process, acceptedAggregations.Count);
+        AssertOutgoingMessageCreated(process, expectedOutgoingMessages);
     }
 
     [Fact]
     public async Task Aggregated_measure_data_process_accepted_will_only_be_processed_once()
     {
         // Arrange
+        var expectedOutgoingMessages = 1;
         var incomingMessage = MessageBuilder().Build();
         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
         var process = GetProcess(incomingMessage.MessageHeader.SenderId);
         process!.WasSentToWholesale();
-        var acceptedAggregations = CreateAcceptedAggregations();
+        var acceptedAggregation = CreateAcceptedAggregation();
 
         // Act
-        process.IsAccepted(acceptedAggregations);
-        process.IsAccepted(acceptedAggregations);
+        process.IsAccepted(acceptedAggregation);
+        process.IsAccepted(acceptedAggregation);
 
         // Assert
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);
-        AssertOutgoingMessageCreated(process, acceptedAggregations.Count);
+        AssertOutgoingMessageCreated(process, expectedOutgoingMessages);
     }
 
     [Fact]
@@ -130,23 +132,20 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         return new RequestAggregatedMeasureDataMessageBuilder();
     }
 
-    private static IReadOnlyCollection<Aggregation> CreateAcceptedAggregations()
+    private static Aggregation CreateAcceptedAggregation()
     {
         var points = Array.Empty<Point>();
 
-        return new List<Aggregation>()
-        {
-            new(
-                points,
-                MeteringPointType.Consumption.Name,
-                MeasurementUnit.Kwh.Name,
-                Resolution.Hourly.Name,
-                new Period(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant()),
-                SettlementType.NonProfiled.Name,
-                BusinessReason.BalanceFixing.Name,
-                new ActorGrouping("1234567891911", null),
-                new GridAreaDetails("805", "1234567891045")),
-        };
+        return new Aggregation(
+            points,
+            MeteringPointType.Consumption.Name,
+            MeasurementUnit.Kwh.Name,
+            Resolution.Hourly.Name,
+            new Period(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant()),
+            SettlementType.NonProfiled.Name,
+            BusinessReason.BalanceFixing.Name,
+            new ActorGrouping("1234567891911", null),
+            new GridAreaDetails("805", "1234567891045"));
     }
 
     private static RejectedAggregatedMeasureDataRequest CreateRejectRequest()

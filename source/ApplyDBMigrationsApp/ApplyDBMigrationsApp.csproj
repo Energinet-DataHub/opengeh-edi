@@ -17,8 +17,8 @@ limitations under the License.
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
-    <LangVersion>9.0</LangVersion>
+    <AssemblyName>Energinet.DataHub.EDI.ApplyDBMigrationsApp</AssemblyName>
+    <RootNamespace>Energinet.DataHub.EDI.ApplyDBMigrationsApp</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

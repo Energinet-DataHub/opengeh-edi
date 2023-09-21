@@ -45,7 +45,7 @@ public class MessageParserTests
     public MessageParserTests()
     {
         _messageParser = new MessageParser(
-            new IMessageParser<Serie, RequestAggregatedMeasureDataTransaction>[]
+            new IMessageParser<Serie, RequestAggregatedMeasureDataTransactionCommand>[]
             {
                 new XmlMessageParser(),
                 new JsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
