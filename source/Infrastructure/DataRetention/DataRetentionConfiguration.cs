@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.Configuration.TimeEvents;
+using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.DataRetention;
+namespace Energinet.DataHub.EDI.Infrastructure.DataRetention;
 
 public static class DataRetentionConfiguration
 {

@@ -15,7 +15,7 @@
 using System;
 using System.Globalization;
 
-namespace IntegrationTests.Factories;
+namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
 internal static class ConsumerFactory
 {

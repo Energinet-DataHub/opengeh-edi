@@ -16,23 +16,23 @@ using System;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.MasterData;
-using Application.OutgoingMessages;
-using Application.OutgoingMessages.Common;
-using Domain.Actors;
-using Domain.Documents;
-using Domain.MasterData.Dictionaries;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics;
-using Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics.MarketEvaluationPointDetails;
-using Domain.Transactions;
-using Domain.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Application.MasterData;
+using Energinet.DataHub.EDI.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Domain.MasterData.Dictionaries;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics.MarketEvaluationPointDetails;
+using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Transactions.MoveIn;
 using MediatR;
 using NodaTime.Extensions;
-using Address = Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics.MarketEvaluationPointDetails.Address;
-using Series = Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics.MarketEvaluationPointDetails.Series;
+using Address = Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics.MarketEvaluationPointDetails.Address;
+using Series = Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics.MarketEvaluationPointDetails.Series;
 
-namespace Application.Transactions.MoveIn.MasterDataDelivery;
+namespace Energinet.DataHub.EDI.Application.Transactions.MoveIn.MasterDataDelivery;
 
 public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMeteringPointMasterData, Unit>
 {

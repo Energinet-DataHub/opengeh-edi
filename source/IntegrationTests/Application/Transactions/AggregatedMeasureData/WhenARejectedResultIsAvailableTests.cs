@@ -14,23 +14,23 @@
 
 using System;
 using System.Threading.Tasks;
-using Application.Configuration.DataAccess;
-using Domain.Actors;
-using Domain.Documents;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
-using Domain.Transactions;
-using Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.IntegrationTests.Assertions;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.Edi.Responses;
-using Infrastructure.Configuration.DataAccess;
-using Infrastructure.OutgoingMessages.Common;
-using IntegrationTests.Assertions;
-using IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
 using RejectReason = Energinet.DataHub.Edi.Responses.RejectReason;
 
-namespace IntegrationTests.Application.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
 [IntegrationTest]
 public class WhenARejectedResultIsAvailableTests : TestBase

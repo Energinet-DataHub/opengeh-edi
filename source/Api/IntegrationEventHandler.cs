@@ -16,10 +16,10 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 using Google.Protobuf;
-using Infrastructure.Configuration.IntegrationEvents;
 
-namespace Api;
+namespace Energinet.DataHub.EDI.Api;
 
 #pragma warning disable CA1711
 public class IntegrationEventHandler : IIntegrationEventHandler

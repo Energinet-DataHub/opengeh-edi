@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Application.Transactions.MoveIn;
+namespace Energinet.DataHub.EDI.Application.Transactions.MoveIn;
 
 public class BusinessService
 {

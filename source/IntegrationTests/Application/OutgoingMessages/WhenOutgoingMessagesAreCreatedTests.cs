@@ -14,16 +14,16 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.DataAccess;
 using Dapper;
-using Domain.Actors;
-using Domain.Documents;
-using Domain.OutgoingMessages;
-using IntegrationTests.Application.IncomingMessages;
-using IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace IntegrationTests.Application.OutgoingMessages;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
 public class WhenOutgoingMessagesAreCreatedTests : TestBase
 {

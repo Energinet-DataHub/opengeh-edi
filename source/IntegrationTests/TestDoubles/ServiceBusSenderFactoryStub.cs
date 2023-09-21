@@ -16,9 +16,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Infrastructure.Configuration.MessageBus;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
 
-namespace IntegrationTests.TestDoubles
+namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles
 {
     public sealed class ServiceBusSenderFactoryStub : IServiceBusSenderFactory
     {

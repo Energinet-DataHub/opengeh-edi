@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
 
-namespace Application.OutgoingMessages
+namespace Energinet.DataHub.EDI.Application.OutgoingMessages
 {
     /// <summary>
     /// Store for outgoing actor messages

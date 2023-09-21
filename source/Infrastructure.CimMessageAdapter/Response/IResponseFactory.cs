@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using CimMessageAdapter.Messages;
-using Domain.Documents;
-using Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 
-namespace CimMessageAdapter.Response;
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
 
 /// <summary>
 /// Factory responsible for creating B2B response messages

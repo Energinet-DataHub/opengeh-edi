@@ -16,15 +16,15 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Application.Transactions.MoveIn;
-using Infrastructure.Transactions;
-using Infrastructure.Transactions.MoveIn;
-using IntegrationTests.Fixtures;
-using IntegrationTests.TestDoubles;
+using Energinet.DataHub.EDI.Application.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Infrastructure.Transactions;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.MoveIn;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using NodaTime;
 using Xunit;
 
-namespace IntegrationTests.Infrastructure.Transactions.MoveIn;
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Transactions.MoveIn;
 
 public class MoveInRequesterTests : TestBase
 {

@@ -14,11 +14,11 @@
 
 using System;
 using System.IO;
-using Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.OutgoingMessages.Queueing;
+namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Queueing;
 
 public class MarketDocumentEntityConfiguration : IEntityTypeConfiguration<MarketDocument>
 {

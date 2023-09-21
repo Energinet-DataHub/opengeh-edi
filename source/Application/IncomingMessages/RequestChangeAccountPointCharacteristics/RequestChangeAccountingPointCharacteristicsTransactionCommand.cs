@@ -14,10 +14,10 @@
 
 using System;
 using System.Text.Json.Serialization;
-using Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
 using MediatR;
 
-namespace Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
+namespace Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
 
 public class RequestChangeAccountingPointCharacteristicsTransactionCommand : ICommand<Unit>, IMarketTransaction<MarketActivityRecord>
 {

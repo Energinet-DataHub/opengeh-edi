@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Actors;
-using Domain.Common;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Common;
 
-namespace Domain.OutgoingMessages.Queueing;
+namespace Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
 
 public class Receiver : ValueObject
 {

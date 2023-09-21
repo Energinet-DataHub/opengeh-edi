@@ -21,7 +21,7 @@ using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
 
-namespace Api.Configuration.Middleware;
+namespace Energinet.DataHub.EDI.Api.Configuration.Middleware;
 
 /// <summary>
 /// Ensure we dont leak exception details for http triggers.

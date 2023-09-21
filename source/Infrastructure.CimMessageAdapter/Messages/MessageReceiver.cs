@@ -18,13 +18,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
-using Application.IncomingMessages;
-using CimMessageAdapter.Messages.Exceptions;
-using CimMessageAdapter.Messages.Queues;
-using CimMessageAdapter.ValidationErrors;
-using MessageHeader = Application.IncomingMessages.MessageHeader;
+using Energinet.DataHub.EDI.Application.IncomingMessages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Exceptions;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
+using MessageHeader = Energinet.DataHub.EDI.Application.IncomingMessages.MessageHeader;
 
-namespace CimMessageAdapter.Messages
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
 {
     public abstract class MessageReceiver<TQueue>
         where TQueue : Queue

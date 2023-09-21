@@ -19,16 +19,16 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Application.IncomingMessages.RequestAggregatedMeasureData;
-using CimMessageAdapter.Messages;
-using CimMessageAdapter.Messages.RequestAggregatedMeasureData;
-using CimMessageAdapter.ValidationErrors;
-using DocumentValidation;
-using Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Xunit;
-using DocumentFormat = Domain.Documents.DocumentFormat;
+using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
 
-namespace Tests.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
 public class MessageParserTests
 {

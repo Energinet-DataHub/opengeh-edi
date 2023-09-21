@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using AcceptanceTest.Drivers;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
+using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Microsoft.Extensions.Configuration;
 
-namespace AcceptanceTest;
+namespace Energinet.DataHub.EDI.AcceptanceTests;
 
 public class TestRunner : IAsyncDisposable
 {

@@ -17,16 +17,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.OutgoingMessages;
-using Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
 using Energinet.DataHub.Edi.Responses;
-using Infrastructure.Transactions.AggregatedMeasureData.Notifications;
 using MediatR;
 using NodaTime.Serialization.Protobuf;
 using Xunit;
 using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
 
-namespace IntegrationTests.Infrastructure.InboxEvents;
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 
 public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHandler<AggregatedTimeSerieRequestWasAccepted>
 {

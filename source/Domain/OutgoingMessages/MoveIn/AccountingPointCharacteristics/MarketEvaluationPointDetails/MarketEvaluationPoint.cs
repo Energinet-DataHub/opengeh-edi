@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.MasterData;
+using Energinet.DataHub.EDI.Domain.MasterData;
 using NodaTime;
 
-namespace Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics.MarketEvaluationPointDetails;
+namespace Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 
 public class MarketEvaluationPoint
 {

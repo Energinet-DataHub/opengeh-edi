@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
-using Application.Configuration.Queries;
+using Energinet.DataHub.EDI.Application.Configuration.Queries;
 using NodaTime;
 
-namespace Application.SearchMessages;
+namespace Energinet.DataHub.EDI.Application.SearchMessages;
 
 public sealed record GetMessagesQuery(
     MessageCreationPeriod? CreationPeriod = null,

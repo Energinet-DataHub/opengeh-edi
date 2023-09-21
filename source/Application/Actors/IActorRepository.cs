@@ -15,9 +15,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Actors;
 
-namespace Application.Actors;
+namespace Energinet.DataHub.EDI.Application.Actors;
 
 /// <summary>
 /// Service for looking up actor details

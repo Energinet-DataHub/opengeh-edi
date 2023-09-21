@@ -17,16 +17,16 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Api.Common;
-using Application.Configuration;
-using CimMessageAdapter.Messages.RequestChangeOfSupplier;
-using CimMessageAdapter.Response;
-using Infrastructure.IncomingMessages;
+using Energinet.DataHub.EDI.Api.Common;
+using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 
-namespace Api.IncomingMessages
+namespace Energinet.DataHub.EDI.Api.IncomingMessages
 {
     public class RequestChangeOfSupplierMessageReceiver
     {

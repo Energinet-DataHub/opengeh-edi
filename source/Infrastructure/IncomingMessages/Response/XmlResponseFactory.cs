@@ -16,12 +16,11 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Xml;
-using CimMessageAdapter.Messages;
-using CimMessageAdapter.Response;
-using Domain.Documents;
-using Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
 
-namespace Infrastructure.IncomingMessages.Response
+namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.Response
 {
     public class XmlResponseFactory : IResponseFactory
     {

@@ -12,6 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeAccountingPointCharacteristics;
+namespace Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeAccountingPointCharacteristics;
 
 public record MarketActivityRecord(string Id, string OriginalTransactionId, string MarketEvaluationPointId);

@@ -17,13 +17,13 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Infrastructure.Transactions;
-using Infrastructure.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Infrastructure.Transactions;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.MoveIn;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
-namespace IntegrationTests.TestDoubles;
+namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 
 public class HttpClientSpy : IHttpClientAdapter
 {

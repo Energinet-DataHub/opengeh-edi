@@ -14,7 +14,7 @@
 
 using Azure.Messaging.ServiceBus;
 
-namespace AcceptanceTest.Drivers;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 internal sealed class IntegrationEventPublisher : IAsyncDisposable
 {

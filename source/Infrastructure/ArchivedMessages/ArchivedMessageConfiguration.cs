@@ -13,13 +13,13 @@
 // limitations under the License.
 
 using System.IO;
-using Application.ArchivedMessages;
-using Application.SearchMessages;
-using Domain.ArchivedMessages;
+using Energinet.DataHub.EDI.Application.ArchivedMessages;
+using Energinet.DataHub.EDI.Application.SearchMessages;
+using Energinet.DataHub.EDI.Domain.ArchivedMessages;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.ArchivedMessages;
+namespace Energinet.DataHub.EDI.Infrastructure.ArchivedMessages;
 
 public static class ArchivedMessageConfiguration
 {

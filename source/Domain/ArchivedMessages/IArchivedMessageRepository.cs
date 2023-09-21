@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Domain.ArchivedMessages;
+namespace Energinet.DataHub.EDI.Domain.ArchivedMessages;
 
 /// <summary>
 /// Responsible for archiving messages.

@@ -17,9 +17,9 @@ using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Infrastructure.Configuration.MessageBus;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
 
-namespace IntegrationTests.TestDoubles
+namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles
 {
     public sealed class ServiceBusSenderSpy : IServiceBusSenderAdapter
     {

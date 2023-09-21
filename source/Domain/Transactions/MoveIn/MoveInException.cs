@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Domain.Transactions.MoveIn;
+namespace Energinet.DataHub.EDI.Domain.Transactions.MoveIn;
 
 public class MoveInException : Exception
 {

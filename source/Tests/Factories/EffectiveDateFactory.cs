@@ -15,7 +15,7 @@
 using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using NodaTime;
 
-namespace Tests.Factories;
+namespace Energinet.DataHub.EDI.Tests.Factories;
 
 internal static class EffectiveDateFactory
 {

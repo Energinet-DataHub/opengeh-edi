@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Actors;
-using Domain.Common;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
-using Domain.Transactions.AggregatedMeasureData.ProcessEvents;
-using Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using NodaTime;
 
-namespace Domain.Transactions.AggregatedMeasureData
+namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
 {
     public class AggregatedMeasureDataProcess : Entity
     {

@@ -14,7 +14,7 @@
 
 using System.Reflection;
 
-namespace Domain.Common
+namespace Energinet.DataHub.EDI.Domain.Common
 {
     public abstract class ValueObject : IEquatable<ValueObject>
     {

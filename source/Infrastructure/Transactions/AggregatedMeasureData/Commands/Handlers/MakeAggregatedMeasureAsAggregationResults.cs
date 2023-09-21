@@ -17,20 +17,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Transactions.Aggregations;
-using Domain.Actors;
-using Domain.Transactions;
-using Domain.Transactions.AggregatedMeasureData;
-using Domain.Transactions.Aggregations;
-using Domain.Transactions.Exceptions;
-using Infrastructure.Configuration.Serialization;
-using Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Application.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using MediatR;
-using GridAreaDetails = Domain.Transactions.Aggregations.GridAreaDetails;
-using Period = Domain.Transactions.Aggregations.Period;
-using Point = Domain.Transactions.Aggregations.Point;
+using GridAreaDetails = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.GridAreaDetails;
+using Period = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Period;
+using Point = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Point;
 
-namespace Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
 
 [Obsolete("This can be delete when all CreateAggregatedMeasureAggregationResults commands has been processed.")]
 public class MakeAggregatedMeasureAsAggregationResults : IRequestHandler<CreateAggregatedMeasureAggregationResults, Unit>

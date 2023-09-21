@@ -14,13 +14,13 @@
 
 using System;
 using System.Threading.Tasks;
-using Application.Configuration;
-using Application.Configuration.Commands;
-using Application.Configuration.Commands.Commands;
-using Infrastructure.Configuration.DataAccess;
-using Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Application.Configuration.Commands;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 
-namespace Infrastructure.Configuration.InternalCommands
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands
 {
     public class CommandScheduler : ICommandScheduler
     {

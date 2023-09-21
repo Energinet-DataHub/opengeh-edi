@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using System.Text.Json;
-using Domain.Actors;
-using Domain.Documents;
-using Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Domain.Transactions;
 
-namespace Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeAccountingPointCharacteristics;
+namespace Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeAccountingPointCharacteristics;
 
 public class ConfirmRequestChangeAccountingPointCharacteristicsMessage : OutgoingMessage
 {

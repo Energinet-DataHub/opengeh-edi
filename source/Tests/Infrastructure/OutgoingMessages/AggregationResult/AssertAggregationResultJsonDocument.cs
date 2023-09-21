@@ -19,14 +19,14 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using DocumentValidation;
-using Domain.OutgoingMessages;
-using Domain.Transactions.Aggregations;
-using Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Json.Schema;
 using Xunit;
 
-namespace Tests.Infrastructure.OutgoingMessages.AggregationResult;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.AggregationResult;
 
 internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationResultDocument
 {

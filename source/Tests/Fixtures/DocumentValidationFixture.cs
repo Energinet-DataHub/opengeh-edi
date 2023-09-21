@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using DocumentValidation;
-using DocumentValidation.CimXml;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.CimXml;
 
-namespace Tests.Fixtures;
+namespace Energinet.DataHub.EDI.Tests.Fixtures;
 
 public class DocumentValidationFixture
 {

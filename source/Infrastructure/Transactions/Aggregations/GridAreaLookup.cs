@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Actors;
 
-namespace Infrastructure.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 
 public static class GridAreaLookup
 {

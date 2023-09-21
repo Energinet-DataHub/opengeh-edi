@@ -14,16 +14,16 @@
 
 using System;
 using System.Threading.Tasks;
-using Application.Actors;
-using Domain.Actors;
-using Domain.MasterData.MarketEvaluationPoints;
-using Domain.Transactions;
-using Domain.Transactions.MoveIn;
-using Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Application.Actors;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.MasterData.MarketEvaluationPoints;
+using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using MediatR;
 using NodaTime;
 
-namespace IntegrationTests.Application.Transactions.MoveIn;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.MoveIn;
 
 public class Scenario
 {

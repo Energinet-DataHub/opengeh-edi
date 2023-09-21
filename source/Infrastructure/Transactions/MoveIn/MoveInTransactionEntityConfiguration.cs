@@ -13,15 +13,15 @@
 // limitations under the License.
 
 using System;
-using Domain.Actors;
-using Domain.OutgoingMessages;
-using Domain.Transactions;
-using Domain.Transactions.MoveIn;
-using Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Transactions.MoveIn
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.MoveIn
 {
     internal sealed class MoveInTransactionEntityConfiguration : IEntityTypeConfiguration<MoveInTransaction>
     {

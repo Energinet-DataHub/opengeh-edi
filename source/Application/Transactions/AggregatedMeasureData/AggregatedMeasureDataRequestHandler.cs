@@ -15,14 +15,14 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.IncomingMessages.RequestAggregatedMeasureData;
-using Domain.Actors;
-using Domain.Transactions;
-using Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using MediatR;
 using NodaTime.Text;
 
-namespace Application.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Application.Transactions.AggregatedMeasureData;
 
 public class AggregatedMeasureDataRequestHandler : IRequestHandler<RequestAggregatedMeasureDataTransactionCommand, Unit>
 {

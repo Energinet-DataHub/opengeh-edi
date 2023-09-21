@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 
-namespace IntegrationTests.Infrastructure.Configuration.InternalCommands;
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 
 public class TestCommandHandler : IRequestHandler<TestCommand, Unit>
 {

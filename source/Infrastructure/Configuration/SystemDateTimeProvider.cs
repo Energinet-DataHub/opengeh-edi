@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.Configuration;
+using Energinet.DataHub.EDI.Application.Configuration;
 using NodaTime;
 
-namespace Infrastructure.Configuration
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration
 {
     public class SystemDateTimeProvider : ISystemDateTimeProvider
     {

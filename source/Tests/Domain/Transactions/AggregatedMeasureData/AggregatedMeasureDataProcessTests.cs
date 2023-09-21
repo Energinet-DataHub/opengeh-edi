@@ -14,10 +14,10 @@
 
 using System;
 using System.Collections.Generic;
-using Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Xunit;
 
-namespace Tests.Domain.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Tests.Domain.Transactions.AggregatedMeasureData;
 
 public class AggregatedMeasureDataProcessTests
 {

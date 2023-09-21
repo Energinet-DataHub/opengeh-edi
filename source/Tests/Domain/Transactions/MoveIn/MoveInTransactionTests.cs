@@ -14,14 +14,14 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Domain.Actors;
-using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
-using Domain.Transactions;
-using Domain.Transactions.MoveIn;
-using Domain.Transactions.MoveIn.Events;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Domain.Transactions.MoveIn.Events;
 using Xunit;
 
-namespace Tests.Domain.Transactions.MoveIn;
+namespace Energinet.DataHub.EDI.Tests.Domain.Transactions.MoveIn;
 
 public class MoveInTransactionTests
 {

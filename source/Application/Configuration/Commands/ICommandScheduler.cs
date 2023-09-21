@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
 
-namespace Application.Configuration.Commands
+namespace Energinet.DataHub.EDI.Application.Configuration.Commands
 {
     /// <summary>
     /// Service for scheduling and enqueueing internal commands for later processing

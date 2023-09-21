@@ -20,14 +20,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
-using Application.IncomingMessages.RequestChangeOfSupplier;
-using CimMessageAdapter.Messages;
-using CimMessageAdapter.ValidationErrors;
-using DocumentValidation;
-using DocumentValidation.CimXml;
-using DocumentFormat = Domain.Documents.DocumentFormat;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.CimXml;
+using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
 
-namespace Infrastructure.IncomingMessages.RequestChangeOfSupplier;
+namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 
 public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>
 {

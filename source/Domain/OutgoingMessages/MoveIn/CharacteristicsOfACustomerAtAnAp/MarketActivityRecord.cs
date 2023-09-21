@@ -14,7 +14,7 @@
 
 using NodaTime;
 
-namespace Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
+namespace Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
 
 public record MarketActivityRecord(string Id, string OriginalTransactionId, Instant ValidityStart, MarketEvaluationPoint MarketEvaluationPoint);
 

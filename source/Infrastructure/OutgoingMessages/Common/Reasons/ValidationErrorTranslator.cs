@@ -17,12 +17,12 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.DataAccess;
-using Application.OutgoingMessages.Common.Reasons;
 using Dapper;
-using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Reasons;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 
-namespace Infrastructure.OutgoingMessages.Common.Reasons;
+namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Reasons;
 
 internal sealed class ValidationErrorTranslator : IValidationErrorTranslator
 {

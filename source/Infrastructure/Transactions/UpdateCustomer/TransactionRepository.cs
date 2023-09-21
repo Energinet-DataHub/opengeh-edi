@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Transactions.UpdateCustomer;
-using Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Domain.Transactions.UpdateCustomer;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 
-namespace Infrastructure.Transactions.UpdateCustomer;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.UpdateCustomer;
 
 public class TransactionRepository : IUpdateCustomerMasterDataTransactionRepository
 {

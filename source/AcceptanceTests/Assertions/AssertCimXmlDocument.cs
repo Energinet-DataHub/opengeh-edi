@@ -14,7 +14,7 @@
 
 using System.Xml.Linq;
 
-namespace AcceptanceTest.Assertions;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Assertions;
 
 public class AssertCimXmlDocument
 {

@@ -17,25 +17,24 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Application.Configuration;
-using Application.OutgoingMessages;
-using Application.OutgoingMessages.Common;
-using DocumentValidation;
-using Domain.Actors;
-using Domain.Common;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
-using Infrastructure.Configuration;
-using Infrastructure.Configuration.Serialization;
-using Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
-using Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
+using Energinet.DataHub.EDI.Infrastructure.Configuration;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Tests.Factories;
+using Energinet.DataHub.EDI.Tests.Fixtures;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using NodaTime;
-using Tests.Factories;
-using Tests.Fixtures;
-using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 
-namespace Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
 {
     public class CharacteristicsOfACustomerAtAnApXmlDocumentWriterTests : IClassFixture<DocumentValidationFixture>
     {

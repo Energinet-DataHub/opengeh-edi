@@ -14,13 +14,13 @@
 
 using System;
 using System.Threading.Tasks;
-using ApplyDBMigrationsApp.Helpers;
-using Infrastructure.Configuration.DataAccess;
-using Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace IntegrationTests.Fixtures
+namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
 {
     public class DatabaseFixture : IDisposable, IAsyncLifetime
     {
