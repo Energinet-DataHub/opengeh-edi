@@ -55,7 +55,7 @@ public class ExecuteDataRetentionsWhenADayHasPassed : INotificationHandler<ADayH
 
             if (result.Outcome == OutcomeType.Failure)
             {
-                _logger?.Log(LogLevel.Error, result.FinalException, "Type {DataCleaner} failed to clean up", nameof(dataCleaner));
+                _logger?.Log(LogLevel.Error, result.FinalException, "Type {DataCleaner} failed to clean up", dataCleaner.GetType().FullName);
             }
         }
     }
