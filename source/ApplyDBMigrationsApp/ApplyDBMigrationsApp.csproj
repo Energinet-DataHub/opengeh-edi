@@ -148,7 +148,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202309181436 Rename TransactionId to ProcessId on MoveInTransactions.sql" />
     <None Remove="Scripts\Model\202309151307 Rename TransactionId to ProcessId on OutgoingMessage.sql" />
     <EmbeddedResource Include="Scripts\Model\202309151307 Rename TransactionId to ProcessId on OutgoingMessage.sql" />
-    <EmbeddedResource Include="Scripts\Model\202309211415 ArchivedMessage MessageId is varchar255.sql" />
+    <EmbeddedResource Include="Scripts\Model\202309211415 ArchivedMessage MessageId is longer.sql" />
   </ItemGroup>
 
   <ItemGroup>
