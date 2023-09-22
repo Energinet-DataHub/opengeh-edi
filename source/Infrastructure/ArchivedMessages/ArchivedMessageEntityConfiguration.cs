@@ -33,18 +33,9 @@ public class ArchivedMessageEntityConfiguration : IEntityTypeConfiguration<Archi
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .ValueGeneratedNever();
-        builder.Property(x => x.DocumentType)
-            .HasConversion(
-                toDbValue => toDbValue.Name,
-                fromDbValue => EnumerationType.FromName<DocumentType>(fromDbValue));
-        builder.Property(x => x.SenderNumber)
-            .HasConversion(
-            toDbValue => toDbValue == null ? null : toDbValue.Value,
-            fromDbValue => fromDbValue == null ? null : ActorNumber.Create(fromDbValue));
-        builder.Property(x => x.ReceiverNumber)
-            .HasConversion(
-            toDbValue => toDbValue == null ? null : toDbValue.Value,
-            fromDbValue => fromDbValue == null ? null : ActorNumber.Create(fromDbValue));
+        builder.Property(x => x.DocumentType);
+        builder.Property(x => x.SenderNumber);
+        builder.Property(x => x.ReceiverNumber);
         builder.Property(x => x.CreatedAt);
         builder.Property(x => x.BusinessReason);
         builder.Property(x => x.Document)
@@ -52,13 +43,6 @@ public class ArchivedMessageEntityConfiguration : IEntityTypeConfiguration<Archi
             .HasConversion(
                 toDbValue => ((MemoryStream)toDbValue).ToArray(),
                 fromDbValue => new MemoryStream(fromDbValue));
-        builder.Property(x => x.MessageId)
-            .HasConversion(
-                toDbValue => string.IsNullOrEmpty(toDbValue)
-                    ? null
-                    : toDbValue.Length > 36
-                        ? toDbValue.Substring(0, 36)
-                        : toDbValue,
-                fromDbValue => fromDbValue);
+        builder.Property(x => x.MessageId);
     }
 }

@@ -112,28 +112,14 @@ public class RequestAggregatedMeasureMessageReceiver
         return CreateResponse(request, httpStatusCode, _responseFactory.From(result, cimFormat));
     }
 
-    private static ActorNumber? TryGetActorNumber(string? messageHeaderSenderId)
-    {
-        if (messageHeaderSenderId == null) return null;
-
-        try
-        {
-            return ActorNumber.Create(messageHeaderSenderId);
-        }
-        catch (InvalidActorNumberException)
-        {
-            return null;
-        }
-    }
-
     private async Task SaveArchivedMessageAsync(MessageHeader messageHeader, Stream document,  CancellationToken hostCancellationToken)
     {
         _messageArchive.Add(new ArchivedMessage(
             Guid.NewGuid().ToString(),
             messageHeader.MessageId,
-            IncomingDocumentType.RequestAggregatedMeasureData,
-            TryGetActorNumber(messageHeader.SenderId),
-            TryGetActorNumber(messageHeader.ReceiverId),
+            IncomingDocumentType.RequestAggregatedMeasureData.Name,
+            messageHeader.SenderId,
+            messageHeader.ReceiverId,
             _systemDateTimeProvider.Now(),
             messageHeader.BusinessReason,
             document));
