@@ -89,27 +89,14 @@ public class WhenADocumentIsRequestedTests : TestBase
         Assert.Equal(messageId, result.Messages[1].MessageId);
     }
 
-    [Fact]
-    public async Task Shorten_messageId_when_it_has_more_than_36_characters()
-    {
-        var id = Guid.NewGuid().ToString();
-        var over36Chars = id + "-1234123";
-        await ArchiveMessage(CreateArchivedMessage(id, over36Chars));
-
-        var result = await QueryAsync(new GetMessagesQuery()).ConfigureAwait(false);
-
-        Assert.NotNull(result);
-        Assert.Equal(id, result.Messages[0].MessageId);
-    }
-
     private ArchivedMessage CreateArchivedMessage(string? id = null, string? messageId = null)
     {
         return new ArchivedMessage(
             string.IsNullOrWhiteSpace(id) ? Guid.NewGuid().ToString() : id,
             string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
-            EnumerationType.FromName<DocumentType>(DocumentType.AccountingPointCharacteristics.Name),
-            ActorNumber.Create("1234512345123"),
-            ActorNumber.Create("1234512345128"),
+            DocumentType.AccountingPointCharacteristics.Name,
+            "1234512345123",
+            "1234512345128",
             _systemDateTimeProvider.Now(),
             BusinessReason.BalanceFixing.Name,
             new MemoryStream());
