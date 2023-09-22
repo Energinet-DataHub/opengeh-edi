@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
@@ -27,13 +28,16 @@ public class ReceivedIntegrationEventsRetention : IDataRetention
 {
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly ILogger<ReceivedIntegrationEventsRetention> _logger;
 
     public ReceivedIntegrationEventsRetention(
         IDatabaseConnectionFactory databaseConnectionFactory,
-        ISystemDateTimeProvider systemDateTimeProvider)
+        ISystemDateTimeProvider systemDateTimeProvider,
+        ILogger<ReceivedIntegrationEventsRetention> logger)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
         _systemDateTimeProvider = systemDateTimeProvider;
+        _logger = logger;
     }
 
     public async Task CleanupAsync(CancellationToken cancellationToken)
@@ -68,11 +72,12 @@ public class ReceivedIntegrationEventsRetention : IDataRetention
             try
             {
                 amountOfOldEvents = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+                _logger.LogInformation("Remaining old integration events: {AmountOfOldEvents} to be deleted", amountOfOldEvents);
                 await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             }
-            catch (DbException)
+            catch (DbException e)
             {
-                // Add exception logging
+                _logger.LogError(e, "Failed to delete old integration events: {ErrorMessage}", e.Message);
                 await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
                 throw; // re-throw exception
             }
