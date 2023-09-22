@@ -32,7 +32,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
         private const int MessageIdLength = 36;
         private const int TransactionIdLength = 36;
         private readonly List<ValidationError> _errors = new();
-        private readonly IMessageIds _messageIds;
+        private readonly IMessageIdRepository _messageIdRepository;
         private readonly IMessageQueueDispatcher<TQueue> _messageQueueDispatcher;
         private readonly ITransactionIds _transactionIds;
         private readonly ISenderAuthorizer _senderAuthorizer;
@@ -41,7 +41,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
         private readonly IReceiverValidator _receiverValidator;
 
         protected MessageReceiver(
-            IMessageIds messageIds,
+            IMessageIdRepository messageIdRepository,
             IMessageQueueDispatcher<TQueue> messageQueueDispatcher,
             ITransactionIds transactionIds,
             ISenderAuthorizer senderAuthorizer,
@@ -49,7 +49,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
             IMessageTypeValidator messageTypeValidator,
             IReceiverValidator receiverValidator)
         {
-            _messageIds = messageIds ?? throw new ArgumentNullException(nameof(messageIds));
+            _messageIdRepository = messageIdRepository ?? throw new ArgumentNullException(nameof(messageIdRepository));
             _messageQueueDispatcher = messageQueueDispatcher ??
                                              throw new ArgumentNullException(nameof(messageQueueDispatcher));
             _transactionIds = transactionIds;
@@ -121,7 +121,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
                     senderId,
                     transactionIdsToBeStored,
                     cancellationToken).ConfigureAwait(false);
-                await _messageIds.StoreAsync(senderId, messageHeader.MessageId, cancellationToken)
+                await _messageIdRepository.StoreAsync(senderId, messageHeader.MessageId, cancellationToken)
                     .ConfigureAwait(false);
 
                 scope.Complete();
@@ -197,7 +197,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
             {
                 _errors.Add(new InvalidMessageIdSize(messageId));
             }
-            else if (await _messageIds.MessageIdExistsAsync(senderId, messageId, cancellationToken).ConfigureAwait(false))
+            else if (await _messageIdRepository.MessageIdExistsAsync(senderId, messageId, cancellationToken).ConfigureAwait(false))
             {
                 _errors.Add(new DuplicateMessageIdDetected(messageId));
             }

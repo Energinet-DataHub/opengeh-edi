@@ -24,12 +24,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages
 {
-    public class MessageIdRegistry : IMessageIds
+    public class MessageIdRepositoryRegistry : IMessageIdRepository
     {
         private readonly IDatabaseConnectionFactory _connectionFactory;
         private readonly ILogger _logger;
 
-        public MessageIdRegistry(IDatabaseConnectionFactory connectionFactory, ILogger<MessageIdRegistry> logger)
+        public MessageIdRepositoryRegistry(IDatabaseConnectionFactory connectionFactory, ILogger<MessageIdRepositoryRegistry> logger)
         {
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
             _logger = logger;

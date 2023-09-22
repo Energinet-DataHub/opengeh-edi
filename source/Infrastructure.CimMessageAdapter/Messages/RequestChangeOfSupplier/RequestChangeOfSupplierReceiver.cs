@@ -19,14 +19,14 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
 public class RequestChangeOfSupplierReceiver : MessageReceiver<RequestChangeOfSupplierTransaction>
 {
     public RequestChangeOfSupplierReceiver(
-        IMessageIds messageIds,
+        IMessageIdRepository messageIdRepository,
         IMessageQueueDispatcher<RequestChangeOfSupplierTransaction> messageQueueDispatcher,
         ITransactionIds transactionIds,
         SenderAuthorizer senderAuthorizer,
         DefaultProcessTypeValidator defaultProcessTypeValidator,
         DefaultMessageTypeValidator defaultMessageTypeValidator,
         MasterDataReceiverResponsibleVerification masterDataReceiverResponsibleVerification)
-        : base(messageIds, messageQueueDispatcher, transactionIds, senderAuthorizer, defaultProcessTypeValidator, defaultMessageTypeValidator, masterDataReceiverResponsibleVerification)
+        : base(messageIdRepository, messageQueueDispatcher, transactionIds, senderAuthorizer, defaultProcessTypeValidator, defaultMessageTypeValidator, masterDataReceiverResponsibleVerification)
     {
     }
 }
