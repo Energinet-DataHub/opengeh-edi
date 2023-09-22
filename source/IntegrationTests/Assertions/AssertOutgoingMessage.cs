@@ -15,13 +15,13 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.DataAccess;
 using Dapper;
-using Domain.Actors;
-using Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Xunit;
 
-namespace IntegrationTests.Assertions;
+namespace Energinet.DataHub.EDI.IntegrationTests.Assertions;
 
 public class AssertOutgoingMessage
 {

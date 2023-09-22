@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Xunit;
 
-namespace IntegrationTests.Infrastructure.InboxEvents;
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 
 public class TestNotificationHandlerSpy : INotificationHandler<TestNotification>
 {

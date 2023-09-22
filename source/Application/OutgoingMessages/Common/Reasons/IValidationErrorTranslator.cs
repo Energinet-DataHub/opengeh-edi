@@ -16,9 +16,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 
-namespace Application.OutgoingMessages.Common.Reasons;
+namespace Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Reasons;
 
 /// <summary>
 /// Translates from validation errors returned from business request processing to reasons to be included in reject messages

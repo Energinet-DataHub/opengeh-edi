@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 
-namespace Application.Actors;
+namespace Energinet.DataHub.EDI.Application.Actors;
 
 public class CreateActorHandler : IRequestHandler<CreateActorCommand, Unit>
 {

@@ -14,10 +14,10 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Domain.Common;
-using Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 
-namespace Infrastructure.Configuration.Processing;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Processing;
 
 public class DomainEventsAccessor
 {

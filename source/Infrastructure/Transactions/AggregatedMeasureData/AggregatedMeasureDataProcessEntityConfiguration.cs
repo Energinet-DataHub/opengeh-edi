@@ -13,14 +13,14 @@
 // limitations under the License.
 
 using System;
-using Domain.Actors;
-using Domain.OutgoingMessages;
-using Domain.Transactions;
-using Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData;
 
 internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityTypeConfiguration<AggregatedMeasureDataProcess>
 {

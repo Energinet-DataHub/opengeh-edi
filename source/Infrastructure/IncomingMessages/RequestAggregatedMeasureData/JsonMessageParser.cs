@@ -18,15 +18,15 @@ using System.IO;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.IncomingMessages;
-using Application.IncomingMessages.RequestAggregatedMeasureData;
-using CimMessageAdapter.Messages;
-using CimMessageAdapter.ValidationErrors;
-using DocumentValidation;
-using Infrastructure.IncomingMessages.BaseParsers;
-using DocumentFormat = Domain.Documents.DocumentFormat;
+using Energinet.DataHub.EDI.Application.IncomingMessages;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.BaseParsers;
+using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
 
-namespace Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
 public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureDataTransactionCommand>,
     IMessageParser<Serie, RequestAggregatedMeasureDataTransactionCommand>

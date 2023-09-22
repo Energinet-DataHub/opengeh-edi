@@ -18,10 +18,10 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.IncomingMessages.RequestAggregatedMeasureData;
-using Domain.Documents;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Documents;
 
-namespace CimMessageAdapter.Messages.RequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
 public class MessageParser
 {

@@ -15,7 +15,7 @@
 using System.Xml;
 using System.Xml.Schema;
 
-namespace DocumentValidation.Xml
+namespace Energinet.DataHub.EDI.Infrastructure.DocumentValidation.Xml
 {
     public static class XmlDocumentValidator
     {

@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
 
-namespace Domain.Documents;
+namespace Energinet.DataHub.EDI.Domain.Documents;
 
 public class IncomingDocumentType : DocumentType
 {

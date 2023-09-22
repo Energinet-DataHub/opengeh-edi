@@ -19,21 +19,21 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration;
-using Application.OutgoingMessages.Common;
-using DocumentValidation;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
-using Infrastructure.Configuration;
-using Infrastructure.Configuration.Serialization;
-using Infrastructure.OutgoingMessages.Common;
-using Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Infrastructure.Configuration;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Tests.Factories;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Json.Schema;
-using Tests.Factories;
-using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 
-namespace Tests.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 
 public class RejectRequestChangeOfSupplierJsonDocumentWriterTests
 {

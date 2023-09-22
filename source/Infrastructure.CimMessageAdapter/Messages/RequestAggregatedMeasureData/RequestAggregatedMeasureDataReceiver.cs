@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using CimMessageAdapter.Messages.Queues;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues;
 
-namespace CimMessageAdapter.Messages.RequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
 public class RequestAggregatedMeasureDataReceiver : MessageReceiver<RequestAggregatedMeasureDataTransactionQueues>
 {

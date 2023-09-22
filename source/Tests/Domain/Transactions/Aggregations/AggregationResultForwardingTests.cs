@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Actors;
-using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Domain.Transactions;
-using Domain.Transactions.Aggregations;
-using Tests.Factories;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Tests.Factories;
 using Xunit;
 
-namespace Tests.Domain.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Tests.Domain.Transactions.Aggregations;
 
 public class AggregationResultForwardingTests
 {

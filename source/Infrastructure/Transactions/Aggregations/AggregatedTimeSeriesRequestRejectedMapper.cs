@@ -17,15 +17,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.Collections;
-using Infrastructure.InboxEvents;
-using Infrastructure.Transactions.AggregatedMeasureData.Notifications;
 using MediatR;
-using RejectReason = Domain.Transactions.AggregatedMeasureData.RejectReason;
+using RejectReason = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.RejectReason;
 
-namespace Infrastructure.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 
 public class AggregatedTimeSeriesRequestRejectedMapper : IInboxEventMapper
 {

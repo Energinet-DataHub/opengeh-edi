@@ -15,10 +15,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.Commands;
+using Energinet.DataHub.EDI.Application.Configuration.Commands;
 using MediatR;
 
-namespace Application.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Application.Transactions.Aggregations;
 
 public class WhenAnAggregationResultIsAvailable : INotificationHandler<AggregationResultAvailable>
 {

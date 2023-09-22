@@ -15,14 +15,14 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Actors;
-using Application.Configuration.DataAccess;
 using Dapper;
-using IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Application.Actors;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using MediatR;
 using Xunit;
 
-namespace IntegrationTests.Application.Actors;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.Actors;
 
 public class CreateActorsTests : TestBase
 {

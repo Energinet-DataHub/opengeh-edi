@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 
-namespace Application.Transactions.MoveIn;
+namespace Energinet.DataHub.EDI.Application.Transactions.MoveIn;
 
 public class FetchMeteringPointMasterDataHandler : IRequestHandler<FetchMeteringPointMasterData, Unit>
 {

@@ -13,37 +13,35 @@
 // limitations under the License.
 
 using System;
-using Domain.ArchivedMessages;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics;
-using Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
-using Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeAccountingPointCharacteristics;
-using Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeOfSupplier;
-using Domain.OutgoingMessages.MoveIn.GenericNotification;
-using Domain.OutgoingMessages.MoveIn.RejectRequestChangeAccountingPointCharacteristics;
-using Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
-using Domain.OutgoingMessages.Peek;
-using Domain.OutgoingMessages.Queueing;
-using Domain.Transactions.AggregatedMeasureData;
-using Domain.Transactions.Aggregations;
-using Domain.Transactions.MoveIn;
-using Infrastructure.ArchivedMessages;
-using Infrastructure.Configuration.IntegrationEvents;
-using Infrastructure.Configuration.InternalCommands;
-using Infrastructure.Configuration.Serialization;
-using Infrastructure.InboxEvents;
-using Infrastructure.MasterData.MarketEvaluationPoints;
-using Infrastructure.OutgoingMessages;
-using Infrastructure.OutgoingMessages.Queueing;
-using Infrastructure.Transactions;
-using Infrastructure.Transactions.AggregatedMeasureData;
-using Infrastructure.Transactions.Aggregations;
-using Infrastructure.Transactions.MoveIn;
-using Infrastructure.Transactions.UpdateCustomer;
+using Energinet.DataHub.EDI.Domain.ArchivedMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeAccountingPointCharacteristics;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.GenericNotification;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeAccountingPointCharacteristics;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Domain.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Infrastructure.ArchivedMessages;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
+using Energinet.DataHub.EDI.Infrastructure.MasterData.MarketEvaluationPoints;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.UpdateCustomer;
 using Microsoft.EntityFrameworkCore;
-using MarketEvaluationPoint = Domain.MasterData.MarketEvaluationPoints.MarketEvaluationPoint;
+using MarketEvaluationPoint = Energinet.DataHub.EDI.Domain.MasterData.MarketEvaluationPoints.MarketEvaluationPoint;
 
-namespace Infrastructure.Configuration.DataAccess
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 {
     public class B2BContext : DbContext
     {

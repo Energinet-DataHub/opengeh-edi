@@ -14,12 +14,12 @@
 
 using System;
 using System.Threading.Tasks;
-using Application.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Application.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 using Energinet.DataHub.Wholesale.Contracts.Events;
-using Infrastructure.Configuration.IntegrationEvents;
 using MediatR;
 
-namespace Infrastructure.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 
 public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
 {

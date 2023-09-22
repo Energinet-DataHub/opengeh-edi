@@ -13,10 +13,10 @@
 // limitations under the License.
 
 using System;
-using Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using MediatR;
 
-namespace Infrastructure.Transactions.AggregatedMeasureData.Notifications;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
 
 public class AggregatedTimeSerieRequestWasAccepted : INotification
 {

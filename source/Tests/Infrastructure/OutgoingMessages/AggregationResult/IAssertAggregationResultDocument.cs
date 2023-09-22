@@ -14,11 +14,10 @@
 
 using System;
 using System.Threading.Tasks;
-using Domain.OutgoingMessages;
-using NodaTime;
-using Period = Domain.Transactions.Aggregations.Period;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Period = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Period;
 
-namespace Tests.Infrastructure.OutgoingMessages.AggregationResult;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.AggregationResult;
 
 /// <summary>
 /// Assertion helper for aggregation result documents

@@ -18,14 +18,14 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using DocumentValidation;
-using Domain.OutgoingMessages;
-using Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Json.Schema;
 using NodaTime;
 using Xunit;
 
-namespace Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 
 internal sealed class RejectRequestAggregatedMeasureDataResultJsonDocument : IAssertRejectedAggregatedMeasureDataResultDocument
 {

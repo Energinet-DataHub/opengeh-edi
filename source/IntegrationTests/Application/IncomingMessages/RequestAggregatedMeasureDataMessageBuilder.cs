@@ -13,13 +13,13 @@
 // limitations under the License.
 
 using System;
-using Application.IncomingMessages.RequestAggregatedMeasureData;
-using Domain.Actors;
-using Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using NodaTime;
-using MessageHeader = Application.IncomingMessages.MessageHeader;
+using MessageHeader = Energinet.DataHub.EDI.Application.IncomingMessages.MessageHeader;
 
-namespace IntegrationTests.Application.IncomingMessages;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 
 public class RequestAggregatedMeasureDataMessageBuilder
 {

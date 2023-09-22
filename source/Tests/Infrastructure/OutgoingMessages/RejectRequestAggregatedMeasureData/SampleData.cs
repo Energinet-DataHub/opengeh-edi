@@ -13,12 +13,12 @@
 // limitations under the License.
 
 using System;
-using Domain.Actors;
-using Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using NodaTime;
 using NodaTime.Text;
 
-namespace Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 
 internal static class SampleData
 {

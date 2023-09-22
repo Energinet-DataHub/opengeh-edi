@@ -17,17 +17,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.OutgoingMessages;
-using Domain.Actors;
-using Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
-using Domain.Transactions;
-using Domain.Transactions.AggregatedMeasureData;
-using Infrastructure.Configuration.Serialization;
-using Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using MediatR;
-using RejectReason = Domain.Transactions.AggregatedMeasureData.RejectReason;
+using RejectReason = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.RejectReason;
 
-namespace Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
 
 [Obsolete("This can be delete when all ForwardRejectedAggregationResult commands has been processed.")]
 public class ForwardRejectedAggregationResultHandler : IRequestHandler<ForwardRejectedAggregationResult, Unit>

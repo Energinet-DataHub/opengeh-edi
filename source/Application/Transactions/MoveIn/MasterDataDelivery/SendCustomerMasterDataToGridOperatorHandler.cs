@@ -15,15 +15,14 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Actors;
-using Application.OutgoingMessages;
-using Domain.Actors;
-using Domain.MasterData.MarketEvaluationPoints;
-using Domain.Transactions;
-using Domain.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Application.Actors;
+using Energinet.DataHub.EDI.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.MasterData.MarketEvaluationPoints;
+using Energinet.DataHub.EDI.Domain.Transactions.MoveIn;
 using MediatR;
 
-namespace Application.Transactions.MoveIn.MasterDataDelivery;
+namespace Energinet.DataHub.EDI.Application.Transactions.MoveIn.MasterDataDelivery;
 
 public class SendCustomerMasterDataToGridOperatorHandler : IRequestHandler<SendCustomerMasterDataToGridOperator, Unit>
 {

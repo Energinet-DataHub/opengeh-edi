@@ -15,26 +15,26 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Wholesale;
-using Domain.Transactions.AggregatedMeasureData;
-using Infrastructure.Configuration.MessageBus;
-using Infrastructure.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Application.Wholesale;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData;
 
-namespace Infrastructure.Wholesale;
+namespace Energinet.DataHub.EDI.Infrastructure.Wholesale;
 
 public class WholesaleInbox : IWholesaleInbox
 {
-    private readonly AggregatedMeasureDataResponseFactory _aggregatedMeasureDataResponseFactory;
+    private readonly AggregatedMeasureDataRequestFactory _aggregatedMeasureDataRequestFactory;
     private readonly IServiceBusSenderAdapter _senderCreator;
 
     public WholesaleInbox(
         IServiceBusSenderFactory serviceBusSenderFactory,
         WholesaleServiceBusClientConfiguration wholeSaleServiceBusClientConfiguration,
-        AggregatedMeasureDataResponseFactory aggregatedMeasureDataResponseFactory)
+        AggregatedMeasureDataRequestFactory aggregatedMeasureDataRequestFactory)
     {
         if (serviceBusSenderFactory == null) throw new ArgumentNullException(nameof(serviceBusSenderFactory));
         if (wholeSaleServiceBusClientConfiguration == null) throw new ArgumentNullException(nameof(wholeSaleServiceBusClientConfiguration));
-        _aggregatedMeasureDataResponseFactory = aggregatedMeasureDataResponseFactory;
+        _aggregatedMeasureDataRequestFactory = aggregatedMeasureDataRequestFactory;
 
         _senderCreator = serviceBusSenderFactory.GetSender(wholeSaleServiceBusClientConfiguration.QueueName);
     }
@@ -44,7 +44,7 @@ public class WholesaleInbox : IWholesaleInbox
         CancellationToken cancellationToken)
     {
         await _senderCreator.SendAsync(
-            _aggregatedMeasureDataResponseFactory.CreateServiceBusMessage(request),
+            _aggregatedMeasureDataRequestFactory.CreateServiceBusMessage(request),
             cancellationToken).ConfigureAwait(false);
     }
 }

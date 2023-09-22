@@ -15,7 +15,7 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace Api.Configuration;
+namespace Energinet.DataHub.EDI.Api.Configuration;
 
 public class InboxMessageMetadata
 {

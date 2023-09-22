@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Domain.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
 public record Aggregation(
     IReadOnlyList<Point> Points,

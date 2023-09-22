@@ -15,11 +15,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.Commands;
-using Infrastructure.Transactions.AggregatedMeasureData.Commands;
+using Energinet.DataHub.EDI.Application.Configuration.Commands;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using MediatR;
 
-namespace Infrastructure.Transactions.AggregatedMeasureData.Notifications.Handlers;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Notifications.Handlers;
 
 public class WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable : INotificationHandler<AggregatedTimeSerieRequestWasAccepted>
 {

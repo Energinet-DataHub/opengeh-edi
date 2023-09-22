@@ -20,17 +20,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
-using Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
-using CimMessageAdapter.Messages;
-using CimMessageAdapter.ValidationErrors;
-using DocumentValidation;
-using DocumentValidation.CimXml;
-using DocumentFormat = Domain.Documents.DocumentFormat;
-using MarketActivityRecord = Application.IncomingMessages.RequestChangeAccountPointCharacteristics.MarketActivityRecord;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.CimXml;
+using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
+using MarketActivityRecord = Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeAccountPointCharacteristics.MarketActivityRecord;
 
-namespace Infrastructure.IncomingMessages.RequestChangeAccountingPointCharacteristics;
+namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestChangeAccountingPointCharacteristics;
 
-public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransactionCommand>
+public class XmlMessageParser : IMessageParser<Application.IncomingMessages.RequestChangeAccountPointCharacteristics.MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransactionCommand>
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeAccountingPointCharacteristics_MarketDocument";

@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Xml.Schema;
-using DocumentValidation.Xml;
-
-namespace DocumentValidation;
+namespace Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 
 public class DocumentValidator
 {

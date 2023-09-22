@@ -15,12 +15,12 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Domain.Transactions.Exceptions;
+using Energinet.DataHub.EDI.Domain.Transactions.Exceptions;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 using Energinet.DataHub.Wholesale.Contracts.Events;
-using Infrastructure.Transactions.Aggregations;
 using Xunit;
 
-namespace Tests.Domain.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Tests.Domain.Transactions.Aggregations;
 
 public class CalculationResultCompletedEventMapperTests
 {

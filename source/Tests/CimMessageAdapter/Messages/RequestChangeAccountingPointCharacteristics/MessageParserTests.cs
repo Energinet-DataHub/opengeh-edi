@@ -19,17 +19,17 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
-using CimMessageAdapter.Messages;
-using CimMessageAdapter.Messages.RequestChangeAccountingPointCharacteristics;
-using CimMessageAdapter.ValidationErrors;
-using Domain.Documents;
-using Infrastructure.IncomingMessages.RequestChangeAccountingPointCharacteristics;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestChangeAccountingPointCharacteristics;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestChangeAccountingPointCharacteristics;
 using Xunit;
-using MarketActivityRecord = Application.IncomingMessages.RequestChangeAccountPointCharacteristics.MarketActivityRecord;
-using MessageHeader = Application.IncomingMessages.MessageHeader;
+using MarketActivityRecord = Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeAccountPointCharacteristics.MarketActivityRecord;
+using MessageHeader = Energinet.DataHub.EDI.Application.IncomingMessages.MessageHeader;
 
-namespace Tests.CimMessageAdapter.Messages.RequestChangeAccountingPointCharacteristics;
+namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.RequestChangeAccountingPointCharacteristics;
 
 public class MessageParserTests
 {

@@ -15,7 +15,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace Application.IncomingMessages.RequestChangeOfSupplier;
+namespace Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeOfSupplier;
 
 public class RequestChangeOfSupplierIncomingMarketDocument : IIncomingMarketDocument<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>
 {

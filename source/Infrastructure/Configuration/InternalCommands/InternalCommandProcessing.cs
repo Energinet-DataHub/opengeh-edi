@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.Actors;
-using Application.Configuration.Commands;
-using Application.Configuration.TimeEvents;
-using Application.Transactions.Aggregations;
-using Application.Transactions.MoveIn;
-using Application.Transactions.MoveIn.MasterDataDelivery;
-using Application.Transactions.MoveIn.Notifications;
-using Application.Transactions.UpdateCustomer;
-using Infrastructure.DataRetention;
-using Infrastructure.Transactions.AggregatedMeasureData.Commands;
+using Energinet.DataHub.EDI.Application.Actors;
+using Energinet.DataHub.EDI.Application.Configuration.Commands;
+using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
+using Energinet.DataHub.EDI.Application.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Application.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Application.Transactions.MoveIn.MasterDataDelivery;
+using Energinet.DataHub.EDI.Application.Transactions.MoveIn.Notifications;
+using Energinet.DataHub.EDI.Application.Transactions.UpdateCustomer;
+using Energinet.DataHub.EDI.Infrastructure.DataRetention;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.Configuration.InternalCommands;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
 
 internal static class InternalCommandProcessing
 {

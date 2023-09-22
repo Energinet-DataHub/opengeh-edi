@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Application.Configuration.Queries;
+namespace Energinet.DataHub.EDI.Application.Configuration.Queries;
 
 public class QueryResult<TData>
 {

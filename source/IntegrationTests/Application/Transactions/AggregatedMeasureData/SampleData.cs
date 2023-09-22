@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Actors;
-using IntegrationTests.Factories;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using NodaTime;
 
-namespace IntegrationTests.Application.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
 internal sealed class SampleData
 {

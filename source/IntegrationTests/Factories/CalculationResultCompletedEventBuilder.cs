@@ -15,13 +15,12 @@
 using System;
 using System.Collections.Generic;
 using Energinet.DataHub.Wholesale.Contracts.Events;
-using Google.Protobuf.Collections;
 using Google.Protobuf.WellKnownTypes;
 using NodaTime;
 using NodaTime.Serialization.Protobuf;
 using Duration = NodaTime.Duration;
 
-namespace IntegrationTests.Factories;
+namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
 internal sealed class CalculationResultCompletedEventBuilder
 {

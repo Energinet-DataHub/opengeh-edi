@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics.MarketEvaluationPointDetails;
+namespace Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 
 public class RelatedMarketEvaluationPoint
 {

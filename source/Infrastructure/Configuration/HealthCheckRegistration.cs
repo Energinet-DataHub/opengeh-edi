@@ -17,7 +17,7 @@ using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.Configuration;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration;
 
 public static class HealthCheckRegistration
 {

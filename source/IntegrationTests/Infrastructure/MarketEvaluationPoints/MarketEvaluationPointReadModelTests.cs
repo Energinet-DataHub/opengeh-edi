@@ -14,15 +14,15 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.DataAccess;
 using Dapper;
+using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.MarketEvaluationPoints;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EnergySupplying.IntegrationEvents;
 using Energinet.DataHub.MeteringPoints.IntegrationEvents.CreateMeteringPoint;
-using Infrastructure.MarketEvaluationPoints;
-using IntegrationTests.Fixtures;
 using Xunit;
 
-namespace IntegrationTests.Infrastructure.MarketEvaluationPoints;
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.MarketEvaluationPoints;
 
 public class MarketEvaluationPointReadModelTests : TestBase
 {

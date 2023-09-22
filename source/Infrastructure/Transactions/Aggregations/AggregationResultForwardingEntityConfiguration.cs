@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Actors;
-using Domain.OutgoingMessages;
-using Domain.Transactions;
-using Domain.Transactions.Aggregations;
-using Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 
 internal sealed class AggregationResultForwardingEntityConfiguration : IEntityTypeConfiguration<AggregationResultForwarding>
 {

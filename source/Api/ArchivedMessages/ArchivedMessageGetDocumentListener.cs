@@ -16,12 +16,12 @@ using System;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.ArchivedMessages;
+using Energinet.DataHub.EDI.Application.ArchivedMessages;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 
-namespace Api.ArchivedMessages
+namespace Energinet.DataHub.EDI.Api.ArchivedMessages
 {
     public partial class ArchivedMessageGetDocumentListener
     {

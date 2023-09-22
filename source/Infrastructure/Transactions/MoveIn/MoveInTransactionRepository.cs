@@ -14,13 +14,13 @@
 
 using System.Linq;
 using System.Threading.Tasks;
-using Domain.Transactions;
-using Domain.Transactions.MoveIn;
-using Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.Domain.Transactions.MoveIn;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
 
-namespace Infrastructure.Transactions.MoveIn
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.MoveIn
 {
     public class MoveInTransactionRepository : IMoveInTransactionRepository
     {

@@ -20,16 +20,16 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Application.IncomingMessages.RequestChangeOfSupplier;
-using CimMessageAdapter.Messages;
-using CimMessageAdapter.Messages.RequestChangeOfSupplier;
-using CimMessageAdapter.ValidationErrors;
-using DocumentValidation;
-using Infrastructure.IncomingMessages.RequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 using Xunit;
-using DocumentFormat = Domain.Documents.DocumentFormat;
+using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
 
-namespace Tests.CimMessageAdapter.Messages.RequestChangeOfSupplier;
+namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 
 public class MessageParserTests
 {

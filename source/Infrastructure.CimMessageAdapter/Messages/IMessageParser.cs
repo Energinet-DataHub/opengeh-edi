@@ -15,10 +15,10 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.IncomingMessages;
-using Domain.Documents;
+using Energinet.DataHub.EDI.Application.IncomingMessages;
+using Energinet.DataHub.EDI.Domain.Documents;
 
-namespace CimMessageAdapter.Messages;
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 
 /// <summary>
 /// Parses CIM messages from a stream

@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.Configuration;
+using Energinet.DataHub.EDI.Application.Configuration;
 using NodaTime;
 
-namespace IntegrationTests.TestDoubles
+namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles
 {
     public class SystemDateTimeProviderStub : ISystemDateTimeProvider
     {

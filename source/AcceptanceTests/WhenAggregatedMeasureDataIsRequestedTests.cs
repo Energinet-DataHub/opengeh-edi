@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using AcceptanceTest.Drivers;
-using AcceptanceTest.Dsl;
+using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 using Xunit.Categories;
 
-namespace AcceptanceTest;
+namespace Energinet.DataHub.EDI.AcceptanceTests;
 
 [IntegrationTest]
 public sealed class WhenAggregatedMeasureDataIsRequestedTests : TestRunner

@@ -14,7 +14,7 @@
 
 using System.Threading.Tasks;
 
-namespace Application.Configuration.DataAccess
+namespace Energinet.DataHub.EDI.Application.Configuration.DataAccess
 {
     /// <summary>
     /// Unit of work

@@ -18,7 +18,7 @@ using DbUp.Reboot;
 using DbUp.Reboot.Engine;
 using DbUp.Reboot.Helpers;
 
-namespace ApplyDBMigrationsApp.Helpers
+namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers
 {
     /// <summary>
     /// Updates with model and seed scripts according to normal journaling.

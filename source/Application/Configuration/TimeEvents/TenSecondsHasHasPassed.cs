@@ -15,7 +15,7 @@
 using MediatR;
 using NodaTime;
 
-namespace Application.Configuration.TimeEvents
+namespace Energinet.DataHub.EDI.Application.Configuration.TimeEvents
 {
     public class TenSecondsHasHasPassed : INotification
     {

@@ -16,7 +16,7 @@ using Dapper;
 using Dapper.NodaTime;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.Configuration;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration;
 
 internal static class QueryHandlingConfiguration
 {

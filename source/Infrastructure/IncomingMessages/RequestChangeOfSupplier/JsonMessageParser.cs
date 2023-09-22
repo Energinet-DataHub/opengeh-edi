@@ -18,15 +18,15 @@ using System.IO;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.IncomingMessages.RequestChangeOfSupplier;
-using CimMessageAdapter.Messages;
-using CimMessageAdapter.ValidationErrors;
-using DocumentValidation;
-using Infrastructure.IncomingMessages.BaseParsers;
-using DocumentFormat = Domain.Documents.DocumentFormat;
-using MessageHeader = Application.IncomingMessages.MessageHeader;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.BaseParsers;
+using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
+using MessageHeader = Energinet.DataHub.EDI.Application.IncomingMessages.MessageHeader;
 
-namespace Infrastructure.IncomingMessages.RequestChangeOfSupplier;
+namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 
 public class JsonMessageParser : JsonParserBase<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>,
     IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>
