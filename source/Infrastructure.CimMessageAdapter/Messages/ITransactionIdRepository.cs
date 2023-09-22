@@ -21,7 +21,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
     /// <summary>
     /// Store containing transaction id for all received market activity records
     /// </summary>
-    public interface ITransactionIds
+    public interface ITransactionIdRepository
     {
         /// <summary>
         /// Checks if <paramref name="transactionId"/> is already registered by the sender <paramref name="senderId"/>
