@@ -15,15 +15,16 @@
 using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
 using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.MarketTransactions;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
 public class ReceiveAggregatedMeasureDataRequestCommand : ICommand<Result>
 {
-    public ReceiveAggregatedMeasureDataRequestCommand(MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand> messageResult)
+    public ReceiveAggregatedMeasureDataRequestCommand(MessageParserResult<Serie, RequestAggregatedMeasureDataMarketTransaction> messageResult)
     {
         MessageResult = messageResult;
     }
 
-    public MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand> MessageResult { get; }
+    public MessageParserResult<Serie, RequestAggregatedMeasureDataMarketTransaction> MessageResult { get; }
 }

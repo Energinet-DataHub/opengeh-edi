@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.MarketTransactions;
+
 namespace Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeOfSupplier
 {
     public class MarketActivityRecord : IMarketActivityRecord

@@ -14,6 +14,7 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Energinet.DataHub.EDI.MarketTransactions;
 
 namespace Energinet.DataHub.EDI.Application.IncomingMessages;
 

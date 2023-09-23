@@ -23,8 +23,8 @@ using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.BaseParsers;
+using Energinet.DataHub.EDI.MarketTransactions;
 using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
-using MessageHeader = Energinet.DataHub.EDI.Application.IncomingMessages.MessageHeader;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 

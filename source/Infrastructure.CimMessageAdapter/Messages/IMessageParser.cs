@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.MarketTransactions;
 
 namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 

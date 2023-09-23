@@ -16,6 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
+using Energinet.DataHub.EDI.MarketTransactions;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 

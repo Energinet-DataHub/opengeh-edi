@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcceptanceTests", "Acceptan
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Apps", "Apps", "{94212340-B43E-4FBB-A844-A86557DCBA72}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarketTransactions", "MarketTransactions\MarketTransactions.csproj", "{89F8244C-182C-4375-A8B4-7981B1F5EA1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,6 +93,10 @@ Global
 		{2310420F-0099-4FB3-B46A-1A34E7A919F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2310420F-0099-4FB3-B46A-1A34E7A919F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2310420F-0099-4FB3-B46A-1A34E7A919F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89F8244C-182C-4375-A8B4-7981B1F5EA1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89F8244C-182C-4375-A8B4-7981B1F5EA1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89F8244C-182C-4375-A8B4-7981B1F5EA1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89F8244C-182C-4375-A8B4-7981B1F5EA1D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

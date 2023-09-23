@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.Api.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.MarketTransactions;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 
@@ -56,9 +57,10 @@ public class RequestAggregatedMeasureTransactionQueueListener
         SetCorrelationIdFromServiceBusMessage(context);
 
         var byteAsString = Encoding.UTF8.GetString(data);
-
+        var marketTransaction =
+            _jsonSerializer.Deserialize<RequestAggregatedMeasureDataMarketTransaction>(byteAsString);
         await _mediator.Send(
-                _jsonSerializer.Deserialize<RequestAggregatedMeasureDataTransactionCommand>(byteAsString), cancellationToken)
+                new RequestAggregatedMeasureDataTransactionCommand(marketTransaction.MessageHeader, marketTransaction.MarketActivityRecord), cancellationToken)
             .ConfigureAwait(false);
     }
 

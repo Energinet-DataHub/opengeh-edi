@@ -12,14 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.MarketTransactions;
 
-public record Serie(
-    string Id,
-    string? MarketEvaluationPointType,
-    string? MarketEvaluationSettlementMethod,
-    string StartDateAndOrTimeDateTime,
-    string? EndDateAndOrTimeDateTime,
-    string? MeteringGridAreaDomainId,
-    string? EnergySupplierMarketParticipantId,
-    string? BalanceResponsiblePartyMarketParticipantId) : IMarketActivityRecord;
+public class RequestAggregatedMeasureDataMarketTransaction : IMarketTransaction<Serie>
+{
+    public RequestAggregatedMeasureDataMarketTransaction(MessageHeader messageHeader, Serie marketActivityRecord)
+    {
+        MessageHeader = messageHeader;
+        MarketActivityRecord = marketActivityRecord;
+    }
+
+    public MessageHeader MessageHeader { get; }
+
+    public Serie MarketActivityRecord { get; }
+}

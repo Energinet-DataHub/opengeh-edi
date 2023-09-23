@@ -25,6 +25,7 @@ using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAgg
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.MarketTransactions;
 using Xunit;
 using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
 
@@ -45,7 +46,7 @@ public class MessageParserTests
     public MessageParserTests()
     {
         _messageParser = new MessageParser(
-            new IMessageParser<Serie, RequestAggregatedMeasureDataTransactionCommand>[]
+            new IMessageParser<Serie, RequestAggregatedMeasureDataMarketTransaction>[]
             {
                 new XmlMessageParser(),
                 new JsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),

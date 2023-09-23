@@ -31,6 +31,7 @@ using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.MarketTransactions;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;

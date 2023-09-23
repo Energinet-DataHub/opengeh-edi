@@ -15,6 +15,7 @@
 using System;
 using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.MarketTransactions;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeOfSupplier

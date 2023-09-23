@@ -15,6 +15,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Energinet.DataHub.EDI.MarketTransactions;
 
 namespace Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 

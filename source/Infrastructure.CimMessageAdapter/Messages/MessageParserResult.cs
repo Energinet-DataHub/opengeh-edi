@@ -15,6 +15,7 @@
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
+using Energinet.DataHub.EDI.MarketTransactions;
 
 namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
 {

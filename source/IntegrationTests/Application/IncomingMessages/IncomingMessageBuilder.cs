@@ -17,7 +17,7 @@ using Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeOfSupplier
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using NodaTime;
-using MessageHeader = Energinet.DataHub.EDI.Application.IncomingMessages.MessageHeader;
+using MessageHeader = Energinet.DataHub.EDI.MarketTransactions.MessageHeader;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages
 {
