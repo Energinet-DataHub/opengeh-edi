@@ -43,7 +43,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 {
     private readonly MessageParser _messageParser;
     private readonly IMarketActorAuthenticator _marketActorAuthenticator;
-    private readonly ITransactionIds _transactionIds;
+    private readonly ITransactionIdRepository _transactionIdRepository;
     private readonly IMessageIdRepository _messageIdRepository;
     private readonly ProcessTypeValidator _processTypeValidator;
     private readonly MessageTypeValidator _messageTypeValidator;
@@ -59,7 +59,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         : base(databaseFixture)
     {
         _messageParser = GetService<MessageParser>();
-        _transactionIds = GetService<ITransactionIds>();
+        _transactionIdRepository = GetService<ITransactionIdRepository>();
         _messageIdRepository = GetService<IMessageIdRepository>();
         _marketActorAuthenticator = GetService<IMarketActorAuthenticator>();
         _processTypeValidator = GetService<ProcessTypeValidator>();
@@ -735,7 +735,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var messageReceiver = new RequestAggregatedMeasureDataReceiver(
             _messageIdRepository,
             dispatcherSpy ?? _messageQueueDispatcherSpy,
-            _transactionIds,
+            _transactionIdRepository,
             new SenderAuthorizer(_marketActorAuthenticator),
             _processTypeValidator,
             _messageTypeValidator,

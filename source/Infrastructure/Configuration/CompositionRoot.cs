@@ -80,7 +80,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             _services = services;
             services.AddSingleton<HttpClient>();
             services.AddSingleton<ISerializer, Serializer>();
-            services.AddScoped<ITransactionIds, TransactionIdRegistry>();
+            services.AddScoped<ITransactionIdRepository, TransactionIdRepositoryRegistry>();
             services.AddScoped<IMessageIdRepository, MessageIdRepositoryRegistry>();
             services.AddScoped(typeof(IMessageQueueDispatcher<>), typeof(MessageQueueDispatcher<>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -271,6 +271,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             _services.AddScoped<IDocumentWriter, RejectRequestChangeOfSupplierJsonDocumentWriter>();
             _services.AddScoped<IDocumentWriter, AggregationResultXmlDocumentWriter>();
             _services.AddScoped<IDocumentWriter, AggregationResultJsonDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, AggregationResultEbixDocumentWriter>();
             _services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataXmlDocumentWriter>();
             _services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataJsonDocumentWriter>();
 

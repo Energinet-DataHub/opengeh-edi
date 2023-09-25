@@ -42,7 +42,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapte
     {
         private readonly MessageParser _messageParser;
         private readonly IMarketActorAuthenticator _marketActorAuthenticator;
-        private readonly ITransactionIds _transactionIds;
+        private readonly ITransactionIdRepository _transactionIdRepository;
         private readonly IMessageIdRepository _messageIdRepository;
         private readonly DefaultProcessTypeValidator _processTypeValidator;
         private readonly DefaultMessageTypeValidator _messageTypeValidator;
@@ -54,7 +54,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapte
             : base(databaseFixture)
         {
             _messageParser = GetService<MessageParser>();
-            _transactionIds = GetService<ITransactionIds>();
+            _transactionIdRepository = GetService<ITransactionIdRepository>();
             _messageIdRepository = GetService<IMessageIdRepository>();
             _marketActorAuthenticator = GetService<IMarketActorAuthenticator>();
             _processTypeValidator = GetService<DefaultProcessTypeValidator>();
@@ -217,7 +217,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapte
             var messageReceiver = new RequestChangeOfSupplierReceiver(
                 _messageIdRepository,
                 _messageQueueDispatcherSpy,
-                _transactionIds,
+                _transactionIdRepository,
                 new SenderAuthorizer(_marketActorAuthenticator),
                 _processTypeValidator,
                 _messageTypeValidator,
@@ -228,7 +228,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapte
         private MessageReceiver<global::Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> CreateMessageReceiver(IMessageIdRepository messageIdRepository)
         {
             _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<global::Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction>();
-            var messageReceiver = new RequestChangeOfSupplierReceiver(messageIdRepository, _messageQueueDispatcherSpy, _transactionIds, new SenderAuthorizer(_marketActorAuthenticator), _processTypeValidator, _messageTypeValidator, _masterDataReceiverResponsibleVerification);
+            var messageReceiver = new RequestChangeOfSupplierReceiver(messageIdRepository, _messageQueueDispatcherSpy, _transactionIdRepository, new SenderAuthorizer(_marketActorAuthenticator), _processTypeValidator, _messageTypeValidator, _masterDataReceiverResponsibleVerification);
             return messageReceiver;
         }
 

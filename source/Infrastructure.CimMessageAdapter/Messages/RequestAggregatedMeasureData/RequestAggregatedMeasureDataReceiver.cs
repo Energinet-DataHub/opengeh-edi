@@ -21,12 +21,12 @@ public class RequestAggregatedMeasureDataReceiver : MessageReceiver<RequestAggre
     public RequestAggregatedMeasureDataReceiver(
         IMessageIdRepository messageIdRepository,
         IMessageQueueDispatcher<RequestAggregatedMeasureDataTransactionQueues> messageQueueDispatcher,
-        ITransactionIds transactionIds,
+        ITransactionIdRepository transactionIdRepository,
         SenderAuthorizer senderAuthorizer,
         ProcessTypeValidator processTypeValidator,
         MessageTypeValidator messageTypeValidator,
         CalculationResponsibleReceiverVerification calculationResponsibleReceiverVerification)
-        : base(messageIdRepository, messageQueueDispatcher, transactionIds, senderAuthorizer, processTypeValidator, messageTypeValidator, calculationResponsibleReceiverVerification)
+        : base(messageIdRepository, messageQueueDispatcher, transactionIdRepository, senderAuthorizer, processTypeValidator, messageTypeValidator, calculationResponsibleReceiverVerification)
     {
     }
 }

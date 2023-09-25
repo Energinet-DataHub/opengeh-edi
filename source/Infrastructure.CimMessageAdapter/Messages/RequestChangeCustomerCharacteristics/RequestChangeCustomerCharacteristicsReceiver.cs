@@ -21,12 +21,12 @@ public class RequestChangeCustomerCharacteristicsReceiver : MessageReceiver<Requ
     public RequestChangeCustomerCharacteristicsReceiver(
         IMessageIdRepository messageIdRepository,
         IMessageQueueDispatcher<RequestChangeCustomerCharacteristicsTransaction> messageQueueDispatcher,
-        ITransactionIds transactionIds,
+        ITransactionIdRepository transactionIdRepository,
         SenderAuthorizer senderAuthorizer,
         DefaultProcessTypeValidator defaultProcessTypeValidator,
         DefaultMessageTypeValidator defaultMessageTypeValidator,
         MasterDataReceiverResponsibleVerification masterDataReceiverResponsibleVerification)
-        : base(messageIdRepository, messageQueueDispatcher, transactionIds, senderAuthorizer, defaultProcessTypeValidator, defaultMessageTypeValidator, masterDataReceiverResponsibleVerification)
+        : base(messageIdRepository, messageQueueDispatcher, transactionIdRepository, senderAuthorizer, defaultProcessTypeValidator, defaultMessageTypeValidator, masterDataReceiverResponsibleVerification)
     {
     }
 }
