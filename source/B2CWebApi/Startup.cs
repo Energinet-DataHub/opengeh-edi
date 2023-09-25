@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Microsoft.OpenApi.Models;
+
 namespace Energinet.DataHub.EDI.B2CWebApi;
 
 public class Startup
@@ -28,13 +30,29 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection serviceCollection)
     {
-        serviceCollection.AddSwaggerGen();
+        serviceCollection.AddSwaggerGen(config =>
+            config.SwaggerDoc("v1", new OpenApiInfo { Title = "B2C web api for EDI", Version = "v1" }));
         serviceCollection.AddControllers();
     }
 
     public void Configure(IApplicationBuilder app)
     {
-        app.UseSwagger();
-        app.UseSwaggerUI();
+        app.UseRouting();
+        if (Environment.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
+
+        app.UseRouting();
+
+        app.UseHttpsRedirection();
+        app.UseAuthentication();
+        app.UseAuthorization();
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+        });
     }
 }

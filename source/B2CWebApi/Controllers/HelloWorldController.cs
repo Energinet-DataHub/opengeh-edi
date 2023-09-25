@@ -12,22 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace B2CWebApi.Responses;
+using Microsoft.AspNetCore.Mvc;
 
-public class ResponseMessage
+namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
+
+[ApiController]
+[Route("[controller]")]
+public class HelloWorldController : ControllerBase
 {
-    public ResponseMessage(string messageBody)
+    [HttpPost]
+    public new string Request()
     {
-        IsErrorResponse = true;
-        MessageBody = messageBody;
+        return "Hello World";
     }
-
-    public ResponseMessage()
-    {
-        IsErrorResponse = false;
-    }
-
-    public string MessageBody { get; } = string.Empty;
-
-    public bool IsErrorResponse { get; }
-    }
+}
