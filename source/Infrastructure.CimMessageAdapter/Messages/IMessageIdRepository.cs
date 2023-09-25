@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
     /// <summary>
     /// Store containing message id for all received market documents
     /// </summary>
-    public interface IMessageIds
+    public interface IMessageIdRepository
     {
         /// <summary>
         /// Store message id
