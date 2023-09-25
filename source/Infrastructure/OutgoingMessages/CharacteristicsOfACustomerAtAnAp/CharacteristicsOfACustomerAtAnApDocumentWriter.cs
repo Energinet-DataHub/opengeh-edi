@@ -146,7 +146,7 @@ public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
             .GetAll<MarketRole>()
             .FirstOrDefault(t => t.Name.Equals(_header?.ReceiverRole, StringComparison.OrdinalIgnoreCase));
 
-        if (receiverRole is null)
+        if (receiverRole == null)
         {
             throw new InvalidOperationException("Invalid receiver market role");
         }
