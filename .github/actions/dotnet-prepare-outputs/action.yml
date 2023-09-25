@@ -71,7 +71,7 @@ runs:
           --no-restore \
           --configuration Release \
           --output '${{ inputs.output_path }}\AcceptanceTests'
-          
+
     - name: Publish B2CWebApi
       shell: bash
       run: |
