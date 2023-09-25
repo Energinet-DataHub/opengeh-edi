@@ -20,13 +20,12 @@ public class RequestChangeOfSupplierReceiver : MessageReceiver<RequestChangeOfSu
 {
     public RequestChangeOfSupplierReceiver(
         IMessageIds messageIds,
-        IMessageQueueDispatcher<RequestChangeOfSupplierTransaction> messageQueueDispatcher,
         ITransactionIdRepository transactionIdRepository,
         SenderAuthorizer senderAuthorizer,
         DefaultProcessTypeValidator defaultProcessTypeValidator,
         DefaultMessageTypeValidator defaultMessageTypeValidator,
         MasterDataReceiverResponsibleVerification masterDataReceiverResponsibleVerification)
-        : base(messageIds, messageQueueDispatcher, transactionIdRepository, senderAuthorizer, defaultProcessTypeValidator, defaultMessageTypeValidator, masterDataReceiverResponsibleVerification)
+        : base(messageIds, transactionIdRepository, senderAuthorizer, defaultProcessTypeValidator, defaultMessageTypeValidator, masterDataReceiverResponsibleVerification)
     {
     }
 }

@@ -22,7 +22,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
     /// <summary>
     /// Service for dispatching incoming messages to message queue
     /// </summary>
-    public interface IMessageQueueDispatcher<TQueue>
+    public interface IMessageQueueDispatcher2<TQueue>
     where TQueue : Queue
     {
         /// <summary>
