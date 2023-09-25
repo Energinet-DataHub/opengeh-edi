@@ -43,7 +43,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapte
         private readonly MessageParser _messageParser;
         private readonly IMarketActorAuthenticator _marketActorAuthenticator;
         private readonly ITransactionIdRepository _transactionIdRepository;
-        private readonly IMessageIds _messageIds;
+        private readonly IMessageIdRepository _messageIdRepository;
         private readonly DefaultProcessTypeValidator _processTypeValidator;
         private readonly DefaultMessageTypeValidator _messageTypeValidator;
         private readonly MasterDataReceiverResponsibleVerification _masterDataReceiverResponsibleVerification;
@@ -55,7 +55,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapte
         {
             _messageParser = GetService<MessageParser>();
             _transactionIdRepository = GetService<ITransactionIdRepository>();
-            _messageIds = GetService<IMessageIds>();
+            _messageIdRepository = GetService<IMessageIdRepository>();
             _marketActorAuthenticator = GetService<IMarketActorAuthenticator>();
             _processTypeValidator = GetService<DefaultProcessTypeValidator>();
             _messageTypeValidator = GetService<DefaultMessageTypeValidator>();
@@ -179,7 +179,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapte
         [Fact]
         public async Task Activity_records_are_not_committed_to_queue_if_any_message_header_values_are_invalid()
         {
-            await SimulateDuplicationOfMessageIds(_messageIds).ConfigureAwait(false);
+            await SimulateDuplicationOfMessageIds(_messageIdRepository).ConfigureAwait(false);
 
             Assert.Empty(_messageQueueDispatcherSpy.CommittedItems);
         }
@@ -215,7 +215,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapte
         {
             _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<global::Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction>();
             var messageReceiver = new RequestChangeOfSupplierReceiver(
-                _messageIds,
+                _messageIdRepository,
                 _messageQueueDispatcherSpy,
                 _transactionIdRepository,
                 new SenderAuthorizer(_marketActorAuthenticator),
@@ -225,23 +225,23 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapte
             return messageReceiver;
         }
 
-        private MessageReceiver<global::Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> CreateMessageReceiver(IMessageIds messageIds)
+        private MessageReceiver<global::Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> CreateMessageReceiver(IMessageIdRepository messageIdRepository)
         {
             _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<global::Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction>();
-            var messageReceiver = new RequestChangeOfSupplierReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIdRepository, new SenderAuthorizer(_marketActorAuthenticator), _processTypeValidator, _messageTypeValidator, _masterDataReceiverResponsibleVerification);
+            var messageReceiver = new RequestChangeOfSupplierReceiver(messageIdRepository, _messageQueueDispatcherSpy, _transactionIdRepository, new SenderAuthorizer(_marketActorAuthenticator), _processTypeValidator, _messageTypeValidator, _masterDataReceiverResponsibleVerification);
             return messageReceiver;
         }
 
-        private async Task SimulateDuplicationOfMessageIds(IMessageIds messageIds)
+        private async Task SimulateDuplicationOfMessageIds(IMessageIdRepository messageIdRepository)
         {
             var messageBuilder = BusinessMessageBuilder.RequestChangeOfSupplier();
 
             using var originalMessage = messageBuilder.Message();
-            await CreateMessageReceiver(messageIds).ReceiveAsync(await ParseMessageAsync(originalMessage).ConfigureAwait(false), CancellationToken.None)
+            await CreateMessageReceiver(messageIdRepository).ReceiveAsync(await ParseMessageAsync(originalMessage).ConfigureAwait(false), CancellationToken.None)
                 .ConfigureAwait(false);
 
             using var duplicateMessage = messageBuilder.Message();
-            await CreateMessageReceiver(messageIds).ReceiveAsync(await ParseMessageAsync(duplicateMessage).ConfigureAwait(false), CancellationToken.None)
+            await CreateMessageReceiver(messageIdRepository).ReceiveAsync(await ParseMessageAsync(duplicateMessage).ConfigureAwait(false), CancellationToken.None)
                 .ConfigureAwait(false);
         }
 
