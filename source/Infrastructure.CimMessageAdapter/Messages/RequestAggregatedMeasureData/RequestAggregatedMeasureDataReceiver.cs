@@ -19,14 +19,14 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
 public class RequestAggregatedMeasureDataReceiver : MessageReceiver<RequestAggregatedMeasureDataTransactionQueues>
 {
     public RequestAggregatedMeasureDataReceiver(
-        IMessageIds messageIds,
+        IMessageIdRepository messageIdRepository,
         IMessageQueueDispatcher<RequestAggregatedMeasureDataTransactionQueues> messageQueueDispatcher,
         ITransactionIdRepository transactionIdRepository,
         SenderAuthorizer senderAuthorizer,
         ProcessTypeValidator processTypeValidator,
         MessageTypeValidator messageTypeValidator,
         CalculationResponsibleReceiverVerification calculationResponsibleReceiverVerification)
-        : base(messageIds, messageQueueDispatcher, transactionIdRepository, senderAuthorizer, processTypeValidator, messageTypeValidator, calculationResponsibleReceiverVerification)
+        : base(messageIdRepository, messageQueueDispatcher, transactionIdRepository, senderAuthorizer, processTypeValidator, messageTypeValidator, calculationResponsibleReceiverVerification)
     {
     }
 }
