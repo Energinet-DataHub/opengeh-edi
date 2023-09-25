@@ -147,18 +147,13 @@ public class ActorMessageQueueTests
     }
 
     [Fact]
-    public void Bundle_size_is_6_for_aggregations_message_category()
+    public void Bundle_size_is_1_for_aggregations_message_category()
     {
         var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), MarketRole.EnergySupplier);
         var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
 
-        var messageAssignedToFirstBundle = null as OutgoingMessage;
-
-        for (var i = 0; i < 6; i++)
-        {
-            messageAssignedToFirstBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing, DocumentType.NotifyAggregatedMeasureData);
-            actorMessageQueue.Enqueue(messageAssignedToFirstBundle);
-        }
+        var messageAssignedToFirstBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing, DocumentType.NotifyAggregatedMeasureData);
+        actorMessageQueue.Enqueue(messageAssignedToFirstBundle);
 
         var messageAssignedToSecondBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
         actorMessageQueue.Enqueue(messageAssignedToSecondBundle);
