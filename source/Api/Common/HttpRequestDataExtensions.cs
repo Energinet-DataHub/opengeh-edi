@@ -12,14 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
+using System;
+using System.Threading;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 
-public record Serie(
-    string Id,
-    string? MarketEvaluationPointType,
-    string? MarketEvaluationSettlementMethod,
-    string StartDateAndOrTimeDateTime,
-    string? EndDateAndOrTimeDateTime,
-    string? MeteringGridAreaDomainId,
-    string? EnergySupplierMarketParticipantId,
-    string? BalanceResponsiblePartyMarketParticipantId) : IMarketActivityRecord;
+namespace Energinet.DataHub.EDI.Api.Common;
+
+public static class HttpRequestDataExtensions
+{
+    public static CancellationToken CreateCancellationToken(
+        this HttpRequestData request,
+        CancellationToken hostCancellationToken)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+        return request.FunctionContext.CreateCancellationToken(hostCancellationToken);
+    }
+}

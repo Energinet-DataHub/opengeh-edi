@@ -29,7 +29,7 @@ using Xunit;
 using Address = Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeCustomerCharacteristics.Address;
 using MarketActivityRecord = Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeCustomerCharacteristics.MarketActivityRecord;
 using MarketEvaluationPoint = Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeCustomerCharacteristics.MarketEvaluationPoint;
-using MessageHeader = Energinet.DataHub.EDI.Application.IncomingMessages.MessageHeader;
+using MessageHeader = Energinet.DataHub.EDI.MarketTransactions.MessageHeader;
 
 namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 

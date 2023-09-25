@@ -16,10 +16,12 @@ using System;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.Api.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.MarketTransactions;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 
@@ -47,18 +49,14 @@ public class RequestAggregatedMeasureTransactionQueueListener
         if (data == null) throw new ArgumentNullException(nameof(data));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        using var cancellationTokenSource =
-            CancellationTokenSource.CreateLinkedTokenSource(
-                hostCancellationToken,
-                context.CancellationToken);
-
-        var cancellationToken = cancellationTokenSource.Token;
+        var cancellationToken = context.CreateCancellationToken(hostCancellationToken);
         SetCorrelationIdFromServiceBusMessage(context);
 
         var byteAsString = Encoding.UTF8.GetString(data);
-
+        var marketTransaction =
+            _jsonSerializer.Deserialize<RequestAggregatedMeasureDataMarketTransaction>(byteAsString);
         await _mediator.Send(
-                _jsonSerializer.Deserialize<RequestAggregatedMeasureDataTransactionCommand>(byteAsString), cancellationToken)
+                new RequestAggregatedMeasureDataTransactionCommand(marketTransaction.MessageHeader, marketTransaction.MarketActivityRecord), cancellationToken)
             .ConfigureAwait(false);
     }
 

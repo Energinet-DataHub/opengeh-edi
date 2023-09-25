@@ -33,6 +33,7 @@ using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Stubs;
+using Energinet.DataHub.EDI.MarketTransactions;
 using Xunit;
 using Xunit.Categories;
 
@@ -743,7 +744,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         return messageReceiver;
     }
 
-    private Task<MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>> ParseMessageAsync(Stream message)
+    private Task<MessageParserResult<Serie, RequestAggregatedMeasureDataMarketTransaction>> ParseMessageAsync(Stream message)
     {
         return _messageParser.ParseAsync(message, DocumentFormat.Xml, CancellationToken.None);
     }

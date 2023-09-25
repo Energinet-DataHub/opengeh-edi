@@ -16,8 +16,9 @@ using System;
 using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.MarketTransactions;
 using NodaTime;
-using MessageHeader = Energinet.DataHub.EDI.Application.IncomingMessages.MessageHeader;
+using MessageHeader = Energinet.DataHub.EDI.MarketTransactions.MessageHeader;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 

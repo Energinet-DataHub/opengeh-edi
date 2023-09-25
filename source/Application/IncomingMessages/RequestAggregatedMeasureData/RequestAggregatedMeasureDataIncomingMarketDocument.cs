@@ -14,10 +14,11 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Energinet.DataHub.EDI.MarketTransactions;
 
 namespace Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
 
-public class RequestAggregatedMeasureDataIncomingMarketDocument : IIncomingMarketDocument<Serie, RequestAggregatedMeasureDataTransactionCommand>
+public class RequestAggregatedMeasureDataIncomingMarketDocument : IIncomingMarketDocument<Serie, RequestAggregatedMeasureDataMarketTransaction>
 {
     public RequestAggregatedMeasureDataIncomingMarketDocument(MessageHeader header, IReadOnlyCollection<Serie> series)
     {
@@ -29,12 +30,12 @@ public class RequestAggregatedMeasureDataIncomingMarketDocument : IIncomingMarke
 
     public IReadOnlyCollection<Serie> MarketActivityRecords { get; }
 
-    public ReadOnlyCollection<RequestAggregatedMeasureDataTransactionCommand> ToTransactions()
+    public ReadOnlyCollection<RequestAggregatedMeasureDataMarketTransaction> ToTransactions()
     {
-        var transactions = new List<RequestAggregatedMeasureDataTransactionCommand>();
+        var transactions = new List<RequestAggregatedMeasureDataMarketTransaction>();
         foreach (var marketActivityRecord in MarketActivityRecords)
         {
-            transactions.Add(new RequestAggregatedMeasureDataTransactionCommand(Header, marketActivityRecord));
+            transactions.Add(new RequestAggregatedMeasureDataMarketTransaction(Header, marketActivityRecord));
         }
 
         return transactions.AsReadOnly();

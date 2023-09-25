@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.CimXml;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.Response;
+using Energinet.DataHub.EDI.MarketTransactions;
 using Microsoft.Extensions.DependencyInjection;
 using MarketActivityRecord = Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeOfSupplier.MarketActivityRecord;
 using MessageParser = Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestChangeOfSupplier.MessageParser;
@@ -87,9 +88,9 @@ internal static class IncomingMessageParsingServices
     private static void RegisterRequestAggregatedMeasureDataHandling(IServiceCollection services)
     {
         services
-            .AddScoped<IMessageParser<Serie, RequestAggregatedMeasureDataTransactionCommand>, Infrastructure.IncomingMessages.RequestAggregatedMeasureData.XmlMessageParser>();
+            .AddScoped<IMessageParser<Serie, RequestAggregatedMeasureDataMarketTransaction>, Infrastructure.IncomingMessages.RequestAggregatedMeasureData.XmlMessageParser>();
         services
-            .AddScoped<IMessageParser<Serie, RequestAggregatedMeasureDataTransactionCommand>, Infrastructure.IncomingMessages.RequestAggregatedMeasureData.JsonMessageParser>();
+            .AddScoped<IMessageParser<Serie, RequestAggregatedMeasureDataMarketTransaction>, Infrastructure.IncomingMessages.RequestAggregatedMeasureData.JsonMessageParser>();
         services.AddTransient<CimMessageAdapter.Messages.RequestAggregatedMeasureData.MessageParser>();
         services.AddTransient<RequestAggregatedMeasureDataReceiver>();
         services.AddTransient<CimMessageAdapter.Messages.RequestAggregatedMeasureData.SenderAuthorizer>();

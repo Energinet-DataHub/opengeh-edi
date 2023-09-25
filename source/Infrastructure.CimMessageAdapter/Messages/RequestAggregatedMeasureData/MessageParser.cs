@@ -20,19 +20,20 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.MarketTransactions;
 
 namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
 public class MessageParser
 {
-    private readonly IEnumerable<IMessageParser<Serie, RequestAggregatedMeasureDataTransactionCommand>> _parsers;
+    private readonly IEnumerable<IMessageParser<Serie, RequestAggregatedMeasureDataMarketTransaction>> _parsers;
 
-    public MessageParser(IEnumerable<IMessageParser<Serie, RequestAggregatedMeasureDataTransactionCommand>> parsers)
+    public MessageParser(IEnumerable<IMessageParser<Serie, RequestAggregatedMeasureDataMarketTransaction>> parsers)
     {
         _parsers = parsers;
     }
 
-    public Task<MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>> ParseAsync(
+    public Task<MessageParserResult<Serie, RequestAggregatedMeasureDataMarketTransaction>> ParseAsync(
         Stream message, DocumentFormat documentFormat, CancellationToken cancellationToken)
     {
         var parser = _parsers.FirstOrDefault(parser => parser.HandledFormat.Equals(documentFormat));

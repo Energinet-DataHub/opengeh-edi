@@ -27,7 +27,7 @@ using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestChangeAccountingPointCharacteristics;
 using Xunit;
 using MarketActivityRecord = Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeAccountPointCharacteristics.MarketActivityRecord;
-using MessageHeader = Energinet.DataHub.EDI.Application.IncomingMessages.MessageHeader;
+using MessageHeader = Energinet.DataHub.EDI.MarketTransactions.MessageHeader;
 
 namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.RequestChangeAccountingPointCharacteristics;
 

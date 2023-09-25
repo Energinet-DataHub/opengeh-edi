@@ -12,15 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
-using Energinet.DataHub.EDI.MarketTransactions;
-using MediatR;
+namespace Energinet.DataHub.EDI.MarketTransactions;
 
-namespace Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
-
-public class RequestAggregatedMeasureDataTransactionCommand : ICommand<Unit>
+public class RequestAggregatedMeasureDataMarketTransaction : IMarketTransaction<Serie>
 {
-    public RequestAggregatedMeasureDataTransactionCommand(MessageHeader messageHeader, Serie marketActivityRecord)
+    public RequestAggregatedMeasureDataMarketTransaction(MessageHeader messageHeader, Serie marketActivityRecord)
     {
         MessageHeader = messageHeader;
         MarketActivityRecord = marketActivityRecord;
