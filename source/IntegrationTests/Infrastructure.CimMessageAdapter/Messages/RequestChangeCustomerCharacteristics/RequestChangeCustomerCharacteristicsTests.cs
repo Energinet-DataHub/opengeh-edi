@@ -43,7 +43,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
 {
     private readonly MessageParser _messageParser;
     private readonly IMarketActorAuthenticator _marketActorAuthenticator;
-    private readonly ITransactionIds _transactionIds;
+    private readonly ITransactionIdRepository _transactionIdRepository;
     private readonly IMessageIds _messageIds;
     private readonly DefaultProcessTypeValidator _processTypeValidator;
     private readonly DefaultMessageTypeValidator _messageTypeValidator;
@@ -55,7 +55,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
         : base(databaseFixture)
     {
         _messageParser = GetService<MessageParser>();
-        _transactionIds = GetService<ITransactionIds>();
+        _transactionIdRepository = GetService<ITransactionIdRepository>();
         _messageIds = GetService<IMessageIds>();
         _marketActorAuthenticator = GetService<IMarketActorAuthenticator>();
         _processTypeValidator = GetService<DefaultProcessTypeValidator>();
@@ -237,7 +237,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
         var messageReceiver = new RequestChangeCustomerCharacteristicsReceiver(
             _messageIds,
             _messageQueueDispatcherSpy,
-            _transactionIds,
+            _transactionIdRepository,
             new SenderAuthorizer(_marketActorAuthenticator),
             _processTypeValidator,
             _messageTypeValidator,
@@ -248,7 +248,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
     private MessageReceiver<global::Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction> CreateMessageReceiver(IMessageIds messageIds)
     {
         _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<global::Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction>();
-        var messageReceiver = new RequestChangeCustomerCharacteristicsReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, new SenderAuthorizer(_marketActorAuthenticator), _processTypeValidator, _messageTypeValidator, _masterDataReceiverResponsibleVerification);
+        var messageReceiver = new RequestChangeCustomerCharacteristicsReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIdRepository, new SenderAuthorizer(_marketActorAuthenticator), _processTypeValidator, _messageTypeValidator, _masterDataReceiverResponsibleVerification);
         return messageReceiver;
     }
 

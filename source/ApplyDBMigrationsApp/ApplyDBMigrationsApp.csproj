@@ -119,6 +119,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202308221313 Add Constraint for ActorNumber and ActorRole on ActorMessageQueues.sql" />
     <EmbeddedResource Include="Scripts\Model\202308210829 make receiver and sender nullable ArchivedMessages.sql" />
     <EmbeddedResource Include="Scripts\Model\202309181437 Rename ProcessId to BusinessProcessId on UpdateCustomerMasterDataTransactions.sql" />
+    <EmbeddedResource Include="Scripts\Model\202309221259 Add unique key constraint on BusinessTransactionId in AggregatedMeasureDataProcesses.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241101 Consolidated BtwoB model.sql" />
@@ -148,6 +149,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202309181436 Rename TransactionId to ProcessId on MoveInTransactions.sql" />
     <None Remove="Scripts\Model\202309151307 Rename TransactionId to ProcessId on OutgoingMessage.sql" />
     <EmbeddedResource Include="Scripts\Model\202309151307 Rename TransactionId to ProcessId on OutgoingMessage.sql" />
+    <EmbeddedResource Include="Scripts\Model\202309211415 ArchivedMessage MessageId is longer.sql" />
   </ItemGroup>
 
   <ItemGroup>
