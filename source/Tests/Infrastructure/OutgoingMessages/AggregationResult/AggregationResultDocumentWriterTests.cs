@@ -44,6 +44,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     }
 
     [Theory]
+    [InlineData(nameof(DocumentFormat.Ebix))]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     public async Task Can_create_document(string documentFormat)
@@ -80,6 +81,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     }
 
     [Theory]
+    [InlineData(nameof(DocumentFormat.Ebix))]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     public async Task Point_quantity_element_is_excluded_if_no_value(string documentFormat)
@@ -108,6 +110,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     }
 
     [Theory]
+    [InlineData(nameof(DocumentFormat.Ebix))]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     public async Task Settlement_method_is_excluded(string documentFormat)
@@ -123,6 +126,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     }
 
     [Theory]
+    [InlineData(nameof(DocumentFormat.Ebix))]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     public async Task Energy_supplier_number_is_excluded(string documentFormat)
@@ -137,6 +141,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     }
 
     [Theory]
+    [InlineData(nameof(DocumentFormat.Ebix))]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     public async Task Balance_responsible_number_is_excluded(string documentFormat)
@@ -151,8 +156,10 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     }
 
     [Theory]
+    [InlineData(nameof(DocumentFormat.Ebix), nameof(BusinessReason.PreliminaryAggregation))]
     [InlineData(nameof(DocumentFormat.Xml), nameof(BusinessReason.PreliminaryAggregation))]
     [InlineData(nameof(DocumentFormat.Json), nameof(BusinessReason.PreliminaryAggregation))]
+    [InlineData(nameof(DocumentFormat.Ebix), nameof(BusinessReason.BalanceFixing))]
     [InlineData(nameof(DocumentFormat.Xml), nameof(BusinessReason.BalanceFixing))]
     [InlineData(nameof(DocumentFormat.Json), nameof(BusinessReason.BalanceFixing))]
     public async Task Business_reason_is_translated(string documentFormat, string processType)
@@ -169,7 +176,13 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     {
         var documentHeader = resultBuilder.BuildHeader();
         var records = _parser.From(resultBuilder.BuildTimeSeries());
-        if (documentFormat == DocumentFormat.Xml)
+        if (documentFormat == DocumentFormat.Ebix)
+        {
+            return new AggregationResultEbixDocumentWriter(_parser).WriteAsync(
+                documentHeader,
+                new[] { records, });
+        }
+        else if (documentFormat == DocumentFormat.Xml)
         {
             return new AggregationResultXmlDocumentWriter(_parser).WriteAsync(
                 documentHeader,
@@ -185,7 +198,12 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
 
     private IAssertAggregationResultDocument AssertDocument(Stream document, DocumentFormat documentFormat)
     {
-        if (documentFormat == DocumentFormat.Xml)
+        if (documentFormat == DocumentFormat.Ebix)
+        {
+            var assertEbixDocument = AssertEbixDocument.Document(document, "ns0");
+            return new AssertAggregationResultEbixDocument(assertEbixDocument);
+        }
+        else if (documentFormat == DocumentFormat.Xml)
         {
             var assertXmlDocument = AssertXmlDocument.Document(document, "cim", _documentValidation.Validator);
             return new AssertAggregationResultXmlDocument(assertXmlDocument);

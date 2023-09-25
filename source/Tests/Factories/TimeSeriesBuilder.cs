@@ -43,6 +43,8 @@ public class TimeSeriesBuilder
     private Resolution _resolution = Resolution.QuarterHourly;
     private string? _energySupplierNumber;
     private string? _balanceResponsibleNumber;
+    private string? _originalTransactionIdReference;
+    private string? _settlementVersion;
     private Period _period = new(SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)), SystemClock.Instance.GetCurrentInstant());
 
     public static TimeSeriesBuilder AggregationResult()
@@ -144,6 +146,18 @@ public class TimeSeriesBuilder
         return this;
     }
 
+    public TimeSeriesBuilder WithOriginalTransactionIdReference(string originalTransactionIdReference)
+    {
+        _originalTransactionIdReference = originalTransactionIdReference;
+        return this;
+    }
+
+    public TimeSeriesBuilder WithSettlementVersion(string settlementVersion)
+    {
+        _settlementVersion = settlementVersion;
+        return this;
+    }
+
     public MessageHeader BuildHeader()
     {
         return new MessageHeader(
@@ -168,7 +182,9 @@ public class TimeSeriesBuilder
             _energySupplierNumber,
             _balanceResponsibleNumber,
             _period,
-            _points);
+            _points,
+            _originalTransactionIdReference,
+            _settlementVersion);
     }
 
     private static Instant ParseTimeStamp(string timestamp)
