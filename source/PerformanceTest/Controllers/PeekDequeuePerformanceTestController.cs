@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Collections.ObjectModel;
-using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using PerformanceTest.Actors;
 using PerformanceTest.MoveIn;
