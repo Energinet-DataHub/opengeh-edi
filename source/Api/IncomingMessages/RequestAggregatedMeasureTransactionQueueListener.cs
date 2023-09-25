@@ -16,6 +16,7 @@ using System;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.Api.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
@@ -48,12 +49,7 @@ public class RequestAggregatedMeasureTransactionQueueListener
         if (data == null) throw new ArgumentNullException(nameof(data));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        using var cancellationTokenSource =
-            CancellationTokenSource.CreateLinkedTokenSource(
-                hostCancellationToken,
-                context.CancellationToken);
-
-        var cancellationToken = cancellationTokenSource.Token;
+        var cancellationToken = context.CreateCancellationToken(hostCancellationToken);
         SetCorrelationIdFromServiceBusMessage(context);
 
         var byteAsString = Encoding.UTF8.GetString(data);

@@ -60,12 +60,7 @@ namespace Energinet.DataHub.EDI.Api.IncomingMessages
 
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            using var cancellationTokenSource =
-                CancellationTokenSource.CreateLinkedTokenSource(
-                    hostCancellationToken,
-                    request.FunctionContext.CancellationToken);
-
-            var cancellationToken = cancellationTokenSource.Token;
+            var cancellationToken = request.CreateCancellationToken(hostCancellationToken);
 
             var contentType = request.Headers.GetContentType();
             var cimFormat = CimFormatParser.ParseFromContentTypeHeaderValue(contentType);
