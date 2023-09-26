@@ -41,7 +41,7 @@ public class Startup
     {
         app.UseRouting();
 
-        if (Environment.IsDevelopment() && false)
+        if (Environment.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
         }
