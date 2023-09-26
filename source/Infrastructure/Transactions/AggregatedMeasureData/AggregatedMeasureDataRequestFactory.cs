@@ -53,6 +53,7 @@ public class AggregatedMeasureDataRequestFactory
     {
         if (process.EnergySupplierId == null && process.BalanceResponsibleId == null)
         {
+            if (string.IsNullOrWhiteSpace(process.MeteringGridAreaDomainId)) throw new InvalidOperationException("Missing grid area code for grid responsible");
             request.AggregationPerGridarea = new AggregationPerGridArea()
             {
                 GridAreaCode = process.MeteringGridAreaDomainId,
@@ -67,6 +68,7 @@ public class AggregatedMeasureDataRequestFactory
     {
         if (process.EnergySupplierId != null && process.BalanceResponsibleId == null)
         {
+            if (string.IsNullOrWhiteSpace(process.MeteringGridAreaDomainId)) throw new InvalidOperationException($"Missing grid area code for energy supplier: {process.EnergySupplierId}");
             request.AggregationPerEnergysupplierPerGridarea = new AggregationPerEnergySupplierPerGridArea()
             {
                 GridAreaCode = process.MeteringGridAreaDomainId,
@@ -81,6 +83,7 @@ public class AggregatedMeasureDataRequestFactory
     {
         if (process.EnergySupplierId != null && process.BalanceResponsibleId != null)
         {
+            if (string.IsNullOrWhiteSpace(process.MeteringGridAreaDomainId)) throw new InvalidOperationException($"Missing grid area code for energy supplier: {process.EnergySupplierId} per balance responsible: {process.BalanceResponsibleId}");
             request.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea =
                 new AggregationPerEnergySupplierPerBalanceResponsiblePartyPerGridArea()
                 {
@@ -97,6 +100,7 @@ public class AggregatedMeasureDataRequestFactory
     {
         if (process.EnergySupplierId == null && process.BalanceResponsibleId != null)
         {
+            if (string.IsNullOrWhiteSpace(process.MeteringGridAreaDomainId)) throw new InvalidOperationException($"Missing grid area code for balance responsible: {process.BalanceResponsibleId}");
             request.AggregationPerBalanceresponsiblepartyPerGridarea =
                 new AggregationPerBalanceResponsiblePartyPerGridArea()
                 {
