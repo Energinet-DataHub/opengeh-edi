@@ -461,7 +461,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var result = await CreateInitializeRequestAggregatedMeasureProcessesHandler()
-            .Handle(new ReceiveAggregatedMeasureDataRequestCommand(messageParserResult), CancellationToken.None);
+            .Handle(new InitializeAggregatedMeasureDataProcessesCommand(messageParserResult), CancellationToken.None);
 
         var process = _b2BContext.AggregatedMeasureDataProcesses.Local.FirstOrDefault();
         Assert.True(result.Success);
@@ -489,7 +489,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var result = await CreateInitializeRequestAggregatedMeasureProcessesHandler()
-            .Handle(new ReceiveAggregatedMeasureDataRequestCommand(messageParserResult), CancellationToken.None);
+            .Handle(new InitializeAggregatedMeasureDataProcessesCommand(messageParserResult), CancellationToken.None);
 
         var processes = _b2BContext.AggregatedMeasureDataProcesses.Local.ToList();
         Assert.True(result.Success);
@@ -697,9 +697,9 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .ConfigureAwait(false);
     }
 
-    private InitializeRequestAggregatedMeasureProcessesHandler CreateInitializeRequestAggregatedMeasureProcessesHandler()
+    private InitializeAggregatedMeasureProcessesHandler CreateInitializeRequestAggregatedMeasureProcessesHandler()
     {
-        return new InitializeRequestAggregatedMeasureProcessesHandler(CreateMessageReceiver(), _aggregatedMeasureDataProcessRepository);
+        return new InitializeAggregatedMeasureProcessesHandler(CreateMessageReceiver(), _aggregatedMeasureDataProcessRepository);
     }
 
     private RequestAggregatedMeasureDataReceiver CreateMessageReceiver()

@@ -28,13 +28,13 @@ using Receiver =
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
-public class InitializeRequestAggregatedMeasureProcessesHandler
-    : IRequestHandler<ReceiveAggregatedMeasureDataRequestCommand, Result>
+public class InitializeAggregatedMeasureProcessesHandler
+    : IRequestHandler<InitializeAggregatedMeasureDataProcessesCommand, Result>
 {
     private readonly Receiver _messageReceiver;
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
 
-    public InitializeRequestAggregatedMeasureProcessesHandler(
+    public InitializeAggregatedMeasureProcessesHandler(
         Receiver messageReceiver,
         IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
@@ -43,7 +43,7 @@ public class InitializeRequestAggregatedMeasureProcessesHandler
     }
 
     public async Task<Result> Handle(
-        ReceiveAggregatedMeasureDataRequestCommand request,
+        InitializeAggregatedMeasureDataProcessesCommand request,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -58,17 +58,17 @@ public class InitializeRequestAggregatedMeasureProcessesHandler
     }
 
     private void CreateAggregatedMeasureDataProcess(
-        RequestAggregatedMeasureDocument marketDocument)
+        RequestAggregatedMeasureMarketDocument marketMarketDocument)
     {
-        foreach (var serie in marketDocument.Series)
+        foreach (var serie in marketMarketDocument.Series)
         {
             _aggregatedMeasureDataProcessRepository.Add(
                 new AggregatedMeasureDataProcess(
                     ProcessId.New(),
                     BusinessTransactionId.Create(serie.Id),
-                    ActorNumber.Create(marketDocument.SenderId),
-                    marketDocument.SenderRole,
-                    marketDocument.BusinessReason,
+                    ActorNumber.Create(marketMarketDocument.SenderId),
+                    marketMarketDocument.SenderRole,
+                    marketMarketDocument.BusinessReason,
                     serie.MarketEvaluationPointType,
                     serie.MarketEvaluationSettlementMethod,
                     InstantPattern.General.Parse(serie.StartDateAndOrTimeDateTime)
