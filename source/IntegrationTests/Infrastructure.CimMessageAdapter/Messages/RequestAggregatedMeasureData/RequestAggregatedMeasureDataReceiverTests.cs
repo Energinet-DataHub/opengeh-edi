@@ -26,15 +26,18 @@ using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Stubs;
 using Xunit;
 using Xunit.Categories;
+using Serie = Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData.Serie;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
@@ -48,8 +51,8 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     private readonly ProcessTypeValidator _processTypeValidator;
     private readonly MessageTypeValidator _messageTypeValidator;
     private readonly CalculationResponsibleReceiverVerification _calculationResponsibleReceiverVerification;
-    private readonly MessageQueueDispatcherStub<RequestAggregatedMeasureDataTransactionQueues> _messageQueueDispatcherSpy = new();
-    private readonly MessageQueueDispatcherThatFailsStub<RequestAggregatedMeasureDataTransactionQueues> _messageQueueDispatcherThatFailsStub = new();
+    private readonly B2BContext _b2BContext;
+    private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
     private readonly List<Claim> _claims = new()
     {
         new(ClaimsMap.UserId, new CreateActorCommand(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.SenderId).B2CId),
@@ -65,6 +68,8 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         _processTypeValidator = GetService<ProcessTypeValidator>();
         _messageTypeValidator = GetService<MessageTypeValidator>();
         _calculationResponsibleReceiverVerification = GetService<CalculationResponsibleReceiverVerification>();
+        _b2BContext = GetService<B2BContext>();
+        _aggregatedMeasureDataProcessRepository = GetService<IAggregatedMeasureDataProcessRepository>();
     }
 
     public static IEnumerable<object[]> AllowedActorRoles =>
@@ -87,6 +92,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
     public Task DisposeAsync()
     {
+        _b2BContext.Dispose();
         return Task.CompletedTask;
     }
 
@@ -441,7 +447,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     }
 
     [Fact]
-    public async Task Valid_activity_records_are_extracted_and_committed_to_queue()
+    public async Task Valid_activity_records_are_extracted_and_committed_as_a_process()
     {
         await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
             .ConfigureAwait(false);
@@ -454,35 +460,12 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .Message();
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
-        var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
+        var result = await CreateInitializeRequestAggregatedMeasureProcessesHandler()
+            .Handle(new InitializeAggregatedMeasureDataProcessesCommand(messageParserResult), CancellationToken.None);
 
-        var transaction = _messageQueueDispatcherSpy.CommittedItems.FirstOrDefault();
+        var process = _b2BContext.AggregatedMeasureDataProcesses.Local.FirstOrDefault();
         Assert.True(result.Success);
-        Assert.NotNull(transaction);
-
-        var document = messageParserResult!.IncomingMarketDocument!;
-        await AssertTransactionIdIsStoredAsync(document.Header.SenderId, document.MarketActivityRecords.First().Id).ConfigureAwait(false);
-        await AssertMessageIdIsStoredAsync(document.Header.SenderId, document.Header.MessageId).ConfigureAwait(false);
-    }
-
-    // This is a unpleasant implementation, but it's the current implementation.
-    // Since it is not possible to make a database transaction and a service bus commit
-    // in the same transaction scope.
-    [Fact]
-    public async Task Transaction_and_message_ids_are_stored_when_commit_to_queue_fails()
-    {
-        await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
-            .ConfigureAwait(false);
-        var knownReceiverId = "5790001330552";
-        var knownReceiverRole = "DGL";
-        await using var message = BusinessMessageBuilder
-            .RequestAggregatedMeasureData()
-            .WithReceiverRole(knownReceiverRole)
-            .WithReceiverId(knownReceiverId)
-            .Message();
-
-        var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
-        await Assert.ThrowsAsync<ServiceBusCommitException>(() => CreateMessageReceiver(_messageQueueDispatcherThatFailsStub).ReceiveAsync(messageParserResult, CancellationToken.None)).ConfigureAwait(false);
+        Assert.NotNull(process);
 
         var document = messageParserResult!.IncomingMarketDocument!;
         await AssertTransactionIdIsStoredAsync(document.Header.SenderId, document.MarketActivityRecords.First().Id).ConfigureAwait(false);
@@ -490,7 +473,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     }
 
     [Fact]
-    public async Task Multiple_activity_records_are_committed_to_queue()
+    public async Task Multiple_activity_records_are_committed_as_processes()
     {
         await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
             .ConfigureAwait(false);
@@ -505,12 +488,13 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .Message();
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
-        var result = await CreateMessageReceiver().ReceiveAsync(messageParserResult, CancellationToken.None).ConfigureAwait(false);
+        var result = await CreateInitializeRequestAggregatedMeasureProcessesHandler()
+            .Handle(new InitializeAggregatedMeasureDataProcessesCommand(messageParserResult), CancellationToken.None);
 
-        var transaction = _messageQueueDispatcherSpy.CommittedItems;
+        var processes = _b2BContext.AggregatedMeasureDataProcesses.Local.ToList();
         Assert.True(result.Success);
-        Assert.NotNull(transaction);
-        Assert.Equal(messageParserResult.IncomingMarketDocument!.MarketActivityRecords.Count, transaction.Count);
+        Assert.NotNull(processes);
+        Assert.Equal(messageParserResult.IncomingMarketDocument!.MarketActivityRecords.Count, processes.Count);
 
         var document = messageParserResult!.IncomingMarketDocument!;
         await AssertTransactionIdIsStoredAsync(document.Header.SenderId, document.MarketActivityRecords.First().Id).ConfigureAwait(false);
@@ -578,11 +562,8 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var messageParserResult02 = await ParseMessageAsync(message02).ConfigureAwait(false);
 
         // Act
-        var dispatcher2 =
-            new MessageQueueDispatcherStub<RequestAggregatedMeasureDataTransactionQueues>();
-
         var receivedResult1 = CreateMessageReceiver().ReceiveAsync(messageParserResult01, CancellationToken.None);
-        var receivedResult2 = CreateMessageReceiver(dispatcher2).ReceiveAsync(messageParserResult02, CancellationToken.None);
+        var receivedResult2 = CreateMessageReceiver().ReceiveAsync(messageParserResult02, CancellationToken.None);
 
         await Task.WhenAll(receivedResult1, receivedResult2).ConfigureAwait(false);
 
@@ -618,19 +599,6 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         await AssertMessageIdIsStoredAsync(successfulDocument.Header.SenderId, successfulDocument.Header.MessageId).ConfigureAwait(false);
 
         await AssertTransactionIdIsNotStoredAsync(unsuccessfulDocument.Header.SenderId, unsuccessfulDocument.MarketActivityRecords.First().Id).ConfigureAwait(false);
-
-        var transactions1 = _messageQueueDispatcherSpy.CommittedItems;
-        var transactions2 = dispatcher2.CommittedItems;
-        if (firstSucceeded)
-        {
-            Assert.Single(transactions1);
-            Assert.Empty(transactions2);
-        }
-        else
-        {
-            Assert.Empty(transactions1);
-            Assert.Single(transactions2);
-        }
     }
 
     [Fact]
@@ -729,12 +697,15 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .ConfigureAwait(false);
     }
 
-    private MessageReceiver<RequestAggregatedMeasureDataTransactionQueues> CreateMessageReceiver(
-        MessageQueueDispatcherStub<RequestAggregatedMeasureDataTransactionQueues>? dispatcherSpy = null)
+    private InitializeAggregatedMeasureDataProcessesHandler CreateInitializeRequestAggregatedMeasureProcessesHandler()
+    {
+        return new InitializeAggregatedMeasureDataProcessesHandler(CreateMessageReceiver(), _aggregatedMeasureDataProcessRepository);
+    }
+
+    private RequestAggregatedMeasureDataReceiver CreateMessageReceiver()
     {
         var messageReceiver = new RequestAggregatedMeasureDataReceiver(
             _messageIdRepository,
-            dispatcherSpy ?? _messageQueueDispatcherSpy,
             _transactionIdRepository,
             new SenderAuthorizer(_marketActorAuthenticator),
             _processTypeValidator,
