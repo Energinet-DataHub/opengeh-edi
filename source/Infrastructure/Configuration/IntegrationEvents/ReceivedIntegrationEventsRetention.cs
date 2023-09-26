@@ -43,20 +43,17 @@ public class ReceivedIntegrationEventsRetention : IDataRetention
     public async Task CleanupAsync(CancellationToken cancellationToken)
     {
         var monthAgo = _systemDateTimeProvider.Now().Plus(-Duration.FromDays(30));
-        var amountOfOldEvents = 1;
+        var amountOfOldEvents = await GetAmountOfOldEventsAsync(monthAgo, cancellationToken).ConfigureAwait(false);
         while (amountOfOldEvents > 0)
         {
             const string deleteStmt = @"
                 WITH CTE AS
                  (
-                     SELECT TOP 10000 *
+                     SELECT TOP 100 *
                      FROM [dbo].[ReceivedIntegrationEvents]
                      WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL AND [ProcessedDate] < @LastMonthInstant
                  )
-                DELETE FROM CTE;
-
-                SELECT Count(*) FROM [dbo].[ReceivedIntegrationEvents]
-                    WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL AND [ProcessedDate] < @LastMonthInstant";
+                DELETE FROM CTE;";
 
             using var connection =
                 (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken)
@@ -71,8 +68,7 @@ public class ReceivedIntegrationEventsRetention : IDataRetention
 
             try
             {
-                amountOfOldEvents = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
-                _logger.LogInformation("Remaining old integration events: {AmountOfOldEvents} to be deleted", amountOfOldEvents);
+                amountOfOldEvents = await GetAmountOfOldEventsAsync(monthAgo, cancellationToken).ConfigureAwait(false);
                 await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             }
             catch (DbException e)
@@ -81,6 +77,33 @@ public class ReceivedIntegrationEventsRetention : IDataRetention
                 await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
                 throw; // re-throw exception
             }
+        }
+    }
+
+    private async Task<int> GetAmountOfOldEventsAsync(Instant monthAgo, CancellationToken cancellationToken)
+    {
+        const string selectStmt = @"SELECT Count(*) FROM [dbo].[ReceivedIntegrationEvents]
+                    WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL AND [ProcessedDate] < @LastMonthInstant";
+
+        using var connection =
+            (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken)
+                .ConfigureAwait(false);
+        using var command = connection.CreateCommand();
+        command.Parameters.AddWithValue(
+            "@LastMonthInstant",
+            monthAgo.ToDateTimeUtc());
+        command.CommandText = selectStmt;
+
+        try
+        {
+            var amountOfOldEvents = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+            _logger.LogInformation("Number of old integration events: {AmountOfOldEvents} to be deleted", amountOfOldEvents);
+            return amountOfOldEvents;
+        }
+        catch (DbException e)
+        {
+            _logger.LogError(e, "Failed to get number of old integration events: {ErrorMessage}", e.Message);
+            throw; // re-throw exception
         }
     }
 }
