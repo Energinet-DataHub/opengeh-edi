@@ -213,7 +213,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapte
                 .ReceiveAsync(await ParseMessageAsync(message).ConfigureAwait(false), CancellationToken.None);
         }
 
-        private MessageReceiver<global::Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> CreateMessageReceiver()
+        private MessageReceiver CreateMessageReceiver()
         {
             var messageReceiver = new RequestChangeOfSupplierReceiver(
                 _messageIdRepository,
@@ -225,7 +225,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapte
             return messageReceiver;
         }
 
-        private MessageReceiver<global::Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> CreateMessageReceiver(IMessageIdRepository messageIdRepository)
+        private MessageReceiver CreateMessageReceiver(IMessageIdRepository messageIdRepository)
         {
             var messageReceiver = new RequestChangeOfSupplierReceiver(messageIdRepository, _transactionIdRepository, new SenderAuthorizer(_marketActorAuthenticator), _processTypeValidator, _messageTypeValidator, _masterDataReceiverResponsibleVerification);
             return messageReceiver;

@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues;
-
 namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 
-public class RequestChangeOfSupplierReceiver : MessageReceiver<RequestChangeOfSupplierTransaction>
+public class RequestChangeOfSupplierReceiver : MessageReceiver
 {
     public RequestChangeOfSupplierReceiver(
         IMessageIdRepository messageIdRepository,

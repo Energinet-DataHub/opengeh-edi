@@ -22,7 +22,6 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
-using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.ArchivedMessages;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
@@ -94,7 +93,6 @@ public class RequestAggregatedMeasureMessageReceiver
         }
 
         var messageParserResult = await _messageParser.ParseAsync(request.Body, cimFormat, cancellationToken).ConfigureAwait(false);
-
         var messageHeader = messageParserResult.IncomingMarketDocument?.Header;
         if (messageHeader is null || messageParserResult.Errors.Any())
         {

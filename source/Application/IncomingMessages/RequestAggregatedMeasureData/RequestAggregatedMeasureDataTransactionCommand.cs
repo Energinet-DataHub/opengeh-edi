@@ -17,6 +17,7 @@ using MediatR;
 
 namespace Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
 
+// TODO: "Should be removed when the new implementation of message parser is in place"
 public class RequestAggregatedMeasureDataTransactionCommand : ICommand<Unit>, IMarketTransaction<Serie>
 {
     public RequestAggregatedMeasureDataTransactionCommand(MessageHeader messageHeader, Serie marketActivityRecord)

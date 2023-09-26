@@ -233,7 +233,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
         return _messageParser.ParseAsync(message, DocumentFormat.Xml, CancellationToken.None);
     }
 
-    private MessageReceiver<global::Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction> CreateMessageReceiver()
+    private MessageReceiver CreateMessageReceiver()
     {
         var messageReceiver = new RequestChangeCustomerCharacteristicsReceiver(
             _messageIdRepository,
@@ -245,7 +245,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
         return messageReceiver;
     }
 
-    private MessageReceiver<global::Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction> CreateMessageReceiver(IMessageIdRepository messageIdRepository)
+    private MessageReceiver CreateMessageReceiver(IMessageIdRepository messageIdRepository)
     {
         var messageReceiver = new RequestChangeCustomerCharacteristicsReceiver(messageIdRepository, _transactionIdRepository, new SenderAuthorizer(_marketActorAuthenticator), _processTypeValidator, _messageTypeValidator, _masterDataReceiverResponsibleVerification);
         return messageReceiver;

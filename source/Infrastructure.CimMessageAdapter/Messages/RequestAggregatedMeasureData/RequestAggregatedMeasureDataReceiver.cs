@@ -16,7 +16,7 @@ using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues;
 
 namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
-public class RequestAggregatedMeasureDataReceiver : MessageReceiver<RequestAggregatedMeasureDataTransactionQueues>
+public class RequestAggregatedMeasureDataReceiver : MessageReceiver
 {
     public RequestAggregatedMeasureDataReceiver(
         IMessageIdRepository messageIdRepository,

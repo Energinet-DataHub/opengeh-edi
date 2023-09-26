@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
@@ -32,7 +30,6 @@ internal static class RequestedAggregatedMeasureDataConfiguration
 {
     public static void Configure(IServiceCollection services)
     {
-        services.AddTransient<IRequestHandler<RequestAggregatedMeasureDataTransactionCommand, Unit>, AggregatedMeasureDataRequestHandler>();
         services.AddTransient<IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>, SendAggregatedMeasuredDataToWholesale>();
         services.AddTransient<IRequestHandler<AcceptedAggregatedTimeSerie, Unit>, AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable>();
         services.AddTransient<IRequestHandler<RejectedAggregatedTimeSeries, Unit>, RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable>();

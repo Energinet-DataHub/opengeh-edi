@@ -13,69 +13,72 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using NodaTime;
 using MessageHeader = Energinet.DataHub.EDI.Application.IncomingMessages.MessageHeader;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 
-public class RequestAggregatedMeasureDataMessageBuilder
+public class RequestAggregatedMeasureDataMarketDocumentBuilder
 {
-    private const string NotSet = "NotSet";
-    private readonly string _serieId = "123353185";
+    private readonly string _serieId = Guid.NewGuid().ToString();
     private readonly string _startDateAndOrTimeDateTime = "2022-06-17T22:00:00Z";
     private readonly string _endDateAndOrTimeDateTime = "2022-07-22T22:00:00Z";
     private readonly string _meteringGridAreaDomainId = "244";
-    private readonly string _messageType = NotSet;
+    private readonly string _messageType = "E74";
     private readonly string _processType = "D03";
-    private readonly string _senderId = "1234567891234567";
+    private readonly string _senderId = "0000000000000";
     private readonly ActorNumber _receiverId = DataHubDetails.IdentificationNumber;
-    private readonly string _receiverRole = "DDQ";
+    private readonly string _receiverRole = "DGL";
     private readonly string _createdAt = SystemClock.Instance.GetCurrentInstant().ToString();
     private readonly string _messageId = Guid.NewGuid().ToString();
-    private string _senderRole = "DDZ";
+    private string _senderRole = "DDQ";
     private string _marketEvaluationPointType = "E17";
     private string? _marketEvaluationSettlementMethod = "D01";
     private string? _energySupplierMarketParticipantId = "5790001330552";
     private string? _balanceResponsiblePartyMarketParticipantId = "5799999933318";
 
-    public RequestAggregatedMeasureDataMessageBuilder SetMarketEvaluationPointType(string marketEvaluationPointType)
+    public RequestAggregatedMeasureDataMarketDocumentBuilder SetMarketEvaluationPointType(string marketEvaluationPointType)
     {
         _marketEvaluationPointType = marketEvaluationPointType;
         return this;
     }
 
-    public RequestAggregatedMeasureDataMessageBuilder SetSenderRole(string senderRole)
+    public RequestAggregatedMeasureDataMarketDocumentBuilder SetSenderRole(string senderRole)
     {
         _senderRole = senderRole;
         return this;
     }
 
-    public RequestAggregatedMeasureDataMessageBuilder SetMarketEvaluationSettlementMethod(string? marketEvaluationSettlementMethod = null)
+    public RequestAggregatedMeasureDataMarketDocumentBuilder SetMarketEvaluationSettlementMethod(string? marketEvaluationSettlementMethod = null)
     {
         _marketEvaluationSettlementMethod = marketEvaluationSettlementMethod;
         return this;
     }
 
-    public RequestAggregatedMeasureDataMessageBuilder SetEnergySupplierId(string? energySupplierId = null)
+    public RequestAggregatedMeasureDataMarketDocumentBuilder SetEnergySupplierId(string? energySupplierId = null)
     {
         _energySupplierMarketParticipantId = energySupplierId;
         return this;
     }
 
-    public RequestAggregatedMeasureDataMessageBuilder SetBalanceResponsibleId(string? balanceResponsibleId = null)
+    public RequestAggregatedMeasureDataMarketDocumentBuilder SetBalanceResponsibleId(string? balanceResponsibleId = null)
     {
         _balanceResponsiblePartyMarketParticipantId = balanceResponsibleId;
         return this;
     }
 
-    internal RequestAggregatedMeasureDataTransactionCommand Build()
+    // TODO: this is going to be responsible for creating a RequestAggregatedMeasureDataProcessMarketDocument
+    internal MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand> Build()
     {
-        return new RequestAggregatedMeasureDataTransactionCommand(
-            CreateHeader(),
-            CreateSerieCreateRecord());
+        return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>(
+            new RequestAggregatedMeasureDataIncomingMarketDocument(
+                CreateHeader(),
+                new List<Serie> { CreateSerieCreateRecord() }));
     }
 
     private Serie CreateSerieCreateRecord() =>
@@ -99,6 +102,8 @@ public class RequestAggregatedMeasureDataMessageBuilder
             _senderRole,
             _receiverId.Value,
             _receiverRole,
-            _createdAt);
+            _createdAt,
+            _senderId,
+            _senderRole);
     }
 }
