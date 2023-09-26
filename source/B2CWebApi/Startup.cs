@@ -40,7 +40,7 @@ public class Startup
     public void Configure(IApplicationBuilder app)
     {
         app.UseRouting();
-        if (Environment.IsDevelopment())
+        if (Environment.IsDevelopment() || true)
         {
             app.UseDeveloperExceptionPage();
             app.UseSwagger();
