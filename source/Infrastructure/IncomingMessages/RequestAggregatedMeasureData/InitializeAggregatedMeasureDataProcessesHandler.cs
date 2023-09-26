@@ -28,13 +28,13 @@ using Receiver =
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
-public class InitializeAggregatedMeasureProcessesHandler
+public class InitializeAggregatedMeasureDataProcessesHandler
     : IRequestHandler<InitializeAggregatedMeasureDataProcessesCommand, Result>
 {
     private readonly Receiver _messageReceiver;
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
 
-    public InitializeAggregatedMeasureProcessesHandler(
+    public InitializeAggregatedMeasureDataProcessesHandler(
         Receiver messageReceiver,
         IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
@@ -58,17 +58,17 @@ public class InitializeAggregatedMeasureProcessesHandler
     }
 
     private void CreateAggregatedMeasureDataProcess(
-        RequestAggregatedMeasureMarketDocument marketMarketDocument)
+        RequestAggregatedMeasureDataMarketDocument marketDocument)
     {
-        foreach (var serie in marketMarketDocument.Series)
+        foreach (var serie in marketDocument.Series)
         {
             _aggregatedMeasureDataProcessRepository.Add(
                 new AggregatedMeasureDataProcess(
                     ProcessId.New(),
                     BusinessTransactionId.Create(serie.Id),
-                    ActorNumber.Create(marketMarketDocument.SenderId),
-                    marketMarketDocument.SenderRole,
-                    marketMarketDocument.BusinessReason,
+                    ActorNumber.Create(marketDocument.SenderId),
+                    marketDocument.SenderRole,
+                    marketDocument.BusinessReason,
                     serie.MarketEvaluationPointType,
                     serie.MarketEvaluationSettlementMethod,
                     InstantPattern.General.Parse(serie.StartDateAndOrTimeDateTime)

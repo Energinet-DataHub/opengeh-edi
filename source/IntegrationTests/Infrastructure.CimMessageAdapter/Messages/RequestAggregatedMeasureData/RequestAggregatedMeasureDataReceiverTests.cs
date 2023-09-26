@@ -697,9 +697,9 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .ConfigureAwait(false);
     }
 
-    private InitializeAggregatedMeasureProcessesHandler CreateInitializeRequestAggregatedMeasureProcessesHandler()
+    private InitializeAggregatedMeasureDataProcessesHandler CreateInitializeRequestAggregatedMeasureProcessesHandler()
     {
-        return new InitializeAggregatedMeasureProcessesHandler(CreateMessageReceiver(), _aggregatedMeasureDataProcessRepository);
+        return new InitializeAggregatedMeasureDataProcessesHandler(CreateMessageReceiver(), _aggregatedMeasureDataProcessRepository);
     }
 
     private RequestAggregatedMeasureDataReceiver CreateMessageReceiver()

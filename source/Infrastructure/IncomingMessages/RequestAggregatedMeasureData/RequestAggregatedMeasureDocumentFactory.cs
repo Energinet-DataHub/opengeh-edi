@@ -24,7 +24,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregate
 
 public static class RequestAggregatedMeasureDocumentFactory
 {
-    public static RequestAggregatedMeasureMarketDocument Created(
+    public static RequestAggregatedMeasureDataMarketDocument Created(
         IIncomingMarketDocument<Serie, RequestAggregatedMeasureDataTransactionCommand>
             incomingMarketDocument)
     {
@@ -41,7 +41,7 @@ public static class RequestAggregatedMeasureDocumentFactory
                 activityRecord.EnergySupplierMarketParticipantId,
                 activityRecord.BalanceResponsiblePartyMarketParticipantId)).ToList();
 
-        return new RequestAggregatedMeasureMarketDocument(
+        return new RequestAggregatedMeasureDataMarketDocument(
             incomingMarketDocument.Header.SenderId,
             incomingMarketDocument.Header.SenderRole,
             incomingMarketDocument.Header.BusinessReason,

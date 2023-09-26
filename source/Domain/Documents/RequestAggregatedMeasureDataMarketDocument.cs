@@ -14,7 +14,7 @@
 
 namespace Energinet.DataHub.EDI.Domain.Documents;
 
-public record RequestAggregatedMeasureMarketDocument(
+public record RequestAggregatedMeasureDataMarketDocument(
     string SenderId,
     string SenderRole,
     string BusinessReason,
