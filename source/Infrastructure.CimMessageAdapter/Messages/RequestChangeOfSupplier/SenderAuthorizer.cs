@@ -31,7 +31,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
             _marketActorAuthenticator = marketActorAuthenticator ?? throw new ArgumentNullException(nameof(marketActorAuthenticator));
         }
 
-        public Task<Result> AuthorizeAsync(string senderId, string senderRole)
+        public Task<Result> AuthorizeAsync(string senderId, string senderRole, string? authenticatedUser = null, string? authenticatedUserRole = null)
         {
             if (senderId == null) throw new ArgumentNullException(nameof(senderId));
             if (senderRole == null) throw new ArgumentNullException(nameof(senderRole));

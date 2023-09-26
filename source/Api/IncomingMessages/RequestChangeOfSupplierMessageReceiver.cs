@@ -77,6 +77,7 @@ namespace Energinet.DataHub.EDI.Api.IncomingMessages
             }
 
             var messageParserResult = await _messageParser.ParseAsync(request.Body, cimFormat, cancellationToken).ConfigureAwait(false);
+            // TODO: should be refactored to raise a command like RequestAggregatedMeasureMessageReceiver.cs
             var result = await _messageReceiver.ReceiveAsync(messageParserResult, cancellationToken)
                 .ConfigureAwait(false);
 

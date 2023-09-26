@@ -63,7 +63,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
 
             var messageHeader = messageParserResult.IncomingMarketDocument?.Header;
             var marketDocument = messageParserResult.IncomingMarketDocument;
-
             if (messageHeader is null)
             {
                 return Result.Failure(messageParserResult.Errors.ToArray());
@@ -204,7 +203,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
 
         private async Task AuthorizeSenderAsync(MessageHeader messageHeader)
         {
-            var result = await _senderAuthorizer.AuthorizeAsync(messageHeader.SenderId, messageHeader.SenderRole).ConfigureAwait(false);
+            var result = await _senderAuthorizer.AuthorizeAsync(messageHeader.SenderId, messageHeader.SenderRole, messageHeader.AuthenticatedUser, messageHeader.AuthenticatedUserRole).ConfigureAwait(false);
             _errors.AddRange(result.Errors);
         }
 
