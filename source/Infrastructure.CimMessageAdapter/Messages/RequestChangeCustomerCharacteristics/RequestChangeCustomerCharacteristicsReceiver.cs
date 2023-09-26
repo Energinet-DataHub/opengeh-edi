@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues;
-
 namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 
-public class RequestChangeCustomerCharacteristicsReceiver : MessageReceiver<RequestChangeCustomerCharacteristicsTransaction>
+public class RequestChangeCustomerCharacteristicsReceiver : MessageReceiver
 {
     public RequestChangeCustomerCharacteristicsReceiver(
         IMessageIdRepository messageIdRepository,

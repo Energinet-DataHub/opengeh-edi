@@ -20,14 +20,12 @@ using System.Threading.Tasks;
 using System.Transactions;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Exceptions;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
 using MessageHeader = Energinet.DataHub.EDI.Application.IncomingMessages.MessageHeader;
 
 namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
 {
-    public abstract class MessageReceiver<TQueue>
-        where TQueue : Queue
+    public abstract class MessageReceiver
     {
         private const int MessageIdLength = 36;
         private const int TransactionIdLength = 36;
@@ -65,7 +63,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
 
             var messageHeader = messageParserResult.IncomingMarketDocument?.Header;
             var marketDocument = messageParserResult.IncomingMarketDocument;
-
             if (messageHeader is null)
             {
                 return Result.Failure(messageParserResult.Errors.ToArray());
@@ -206,7 +203,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
 
         private async Task AuthorizeSenderAsync(MessageHeader messageHeader)
         {
-            var result = await _senderAuthorizer.AuthorizeAsync(messageHeader.SenderId, messageHeader.SenderRole).ConfigureAwait(false);
+            var result = await _senderAuthorizer.AuthorizeAsync(messageHeader.SenderId, messageHeader.SenderRole, messageHeader.AuthenticatedUser, messageHeader.AuthenticatedUserRole).ConfigureAwait(false);
             _errors.AddRange(result.Errors);
         }
 
