@@ -40,14 +40,10 @@ public class Startup
     public void Configure(IApplicationBuilder app)
     {
         app.UseRouting();
-        // temporary fix for health checks,
-        // since they do not work without this, in the current setup
-        if (Environment.IsDevelopment() || true)
-        {
-            app.UseDeveloperExceptionPage();
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
+
+        app.UseDeveloperExceptionPage();
+        app.UseSwagger();
+        app.UseSwaggerUI();
 
         app.UseRouting();
 
