@@ -68,8 +68,6 @@ public class ReceivedInboxEventsRetention : IDataRetention
 
             try
             {
-                amountOfOldEvents = await GetAmountOfOldEventsAsync(monthAgo, cancellationToken).ConfigureAwait(false);
-                _logger.LogInformation("Remaining old inbox events: {AmountOfOldEvents} to be deleted", amountOfOldEvents);
                 await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             }
             catch (DbException e)
@@ -78,6 +76,8 @@ public class ReceivedInboxEventsRetention : IDataRetention
                 await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
                 throw; // re-throw exception
             }
+
+            amountOfOldEvents = await GetAmountOfOldEventsAsync(monthAgo, cancellationToken).ConfigureAwait(false);
         }
     }
 

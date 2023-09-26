@@ -68,7 +68,6 @@ public class ReceivedIntegrationEventsRetention : IDataRetention
 
             try
             {
-                amountOfOldEvents = await GetAmountOfOldEventsAsync(monthAgo, cancellationToken).ConfigureAwait(false);
                 await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             }
             catch (DbException e)
@@ -77,6 +76,8 @@ public class ReceivedIntegrationEventsRetention : IDataRetention
                 await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
                 throw; // re-throw exception
             }
+
+            amountOfOldEvents = await GetAmountOfOldEventsAsync(monthAgo, cancellationToken).ConfigureAwait(false);
         }
     }
 
