@@ -118,9 +118,9 @@ public class AggregatedMeasureDataRequestFactory
                 "E02" => TimeSeriesType.FlexConsumption,
                 "" => TimeSeriesType.TotalConsumption,
                 null => TimeSeriesType.TotalConsumption,
-                _ => throw TimeSeriesException(process),
+                _ => ThrowInvalidOperationExceptionForTimeSeries(process),
             },
-            _ => throw TimeSeriesException(process),
+            _ => ThrowInvalidOperationExceptionForTimeSeries(process),
         };
     }
 
@@ -133,18 +133,18 @@ public class AggregatedMeasureDataRequestFactory
             {
                 "D01" => TimeSeriesType.NonProfiledConsumption,
                 "E02" => TimeSeriesType.FlexConsumption,
-                _ => throw TimeSeriesException(process),
+                _ => ThrowInvalidOperationExceptionForTimeSeries(process),
             },
-            _ => throw TimeSeriesException(process),
+            _ => ThrowInvalidOperationExceptionForTimeSeries(process),
         };
     }
 
-    private static InvalidOperationException TimeSeriesException(AggregatedMeasureDataProcess process)
+    private static TimeSeriesType ThrowInvalidOperationExceptionForTimeSeries(AggregatedMeasureDataProcess process)
     {
-        return new InvalidOperationException(
+        throw new InvalidOperationException(
             $"Unknown time series type for metering point type {process.MeteringPointType}" +
             $" and settlement method {process.SettlementMethod}" +
-            $"as a {process.RequestedByActorRoleCode}");
+            $"as a {MarketRole.FromCode(process.RequestedByActorRoleCode).Name}");
     }
 
     private IMessage CreateAggregatedMeasureDataRequest(AggregatedMeasureDataProcess process)
