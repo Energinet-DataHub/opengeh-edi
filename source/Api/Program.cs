@@ -160,7 +160,6 @@ namespace Energinet.DataHub.EDI.Api
                     services.AddLiveHealthCheck();
                     services.AddExternalDomainServiceBusQueuesHealthCheck(
                         runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
-                        runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!,
                         runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!,
                         runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!);
                     services.AddSqlServerHealthCheck(runtime.DB_CONNECTION_STRING!);
