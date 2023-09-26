@@ -41,7 +41,11 @@ public class Startup
     {
         app.UseRouting();
 
-        app.UseDeveloperExceptionPage();
+        if (Environment.IsDevelopment() && false)
+        {
+            app.UseDeveloperExceptionPage();
+        }
+
         app.UseSwagger();
         app.UseSwaggerUI();
 
