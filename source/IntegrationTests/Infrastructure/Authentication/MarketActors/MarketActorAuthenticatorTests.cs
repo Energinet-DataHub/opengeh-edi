@@ -35,7 +35,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
         public MarketActorAuthenticatorTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
-            _authenticator = new MarketActorAuthenticator(GetService<IActorRepository>());
+            _authenticator = GetService<IMarketActorAuthenticator>();
         }
 
         [Fact]

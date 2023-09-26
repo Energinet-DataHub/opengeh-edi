@@ -195,7 +195,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
             _services.AddTransient<IRequestHandler<TestCommand, Unit>, TestCommandHandler>();
             _services.AddTransient<IRequestHandler<TestCreateOutgoingMessageCommand, Unit>, TestCreateOutgoingCommandHandler>();
-            _services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticatorStub>();
 
             CompositionRoot.Initialize(_services)
                 .AddAuthentication()
