@@ -18,9 +18,9 @@ using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
-public class ReceiveAggregatedMeasureDataRequestCommand : ICommand<Result>
+public class InitializeAggregatedMeasureDataProcessesCommand : ICommand<Result>
 {
-    public ReceiveAggregatedMeasureDataRequestCommand(MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand> messageResult)
+    public InitializeAggregatedMeasureDataProcessesCommand(MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand> messageResult)
     {
         MessageResult = messageResult;
     }
