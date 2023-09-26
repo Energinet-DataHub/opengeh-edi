@@ -33,7 +33,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
         private const int TransactionIdLength = 36;
         private readonly List<ValidationError> _errors = new();
         private readonly IMessageIdRepository _messageIdRepository;
-        private readonly IMessageQueueDispatcher<TQueue> _messageQueueDispatcher;
         private readonly ITransactionIdRepository _transactionIdRepository;
         private readonly ISenderAuthorizer _senderAuthorizer;
         private readonly IProcessTypeValidator _processTypeValidator;
@@ -42,7 +41,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
 
         protected MessageReceiver(
             IMessageIdRepository messageIdRepository,
-            IMessageQueueDispatcher<TQueue> messageQueueDispatcher,
             ITransactionIdRepository transactionIdRepository,
             ISenderAuthorizer senderAuthorizer,
             IProcessTypeValidator processTypeValidator,
@@ -50,8 +48,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
             IReceiverValidator receiverValidator)
         {
             _messageIdRepository = messageIdRepository ?? throw new ArgumentNullException(nameof(messageIdRepository));
-            _messageQueueDispatcher = messageQueueDispatcher ??
-                                             throw new ArgumentNullException(nameof(messageQueueDispatcher));
             _transactionIdRepository = transactionIdRepository;
             _senderAuthorizer = senderAuthorizer;
             _processTypeValidator = processTypeValidator;
@@ -103,7 +99,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
                         cancellationToken).ConfigureAwait(false))
                 {
                     transactionIdsToBeStored.Add(transactionId);
-                    await AddToTransactionQueueAsync(transaction, cancellationToken).ConfigureAwait(false);
                 }
             }
 
@@ -140,7 +135,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
                 return Result.Failure(_errors.ToArray());
             }
 
-            await _messageQueueDispatcher.CommitAsync(cancellationToken).ConfigureAwait(false);
             return Result.Succeeded();
         }
 
@@ -179,11 +173,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
 
             return await _transactionIdRepository
                 .TransactionIdExistsAsync(senderId, transactionId, cancellationToken).ConfigureAwait(false);
-        }
-
-        private Task AddToTransactionQueueAsync(IMarketTransaction transaction, CancellationToken cancellationToken)
-        {
-            return _messageQueueDispatcher.AddAsync(transaction, cancellationToken);
         }
 
         private async Task CheckMessageIdAsync(string senderId, string messageId, CancellationToken cancellationToken)
