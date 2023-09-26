@@ -59,7 +59,7 @@ public class ActorMessageQueue : Entity
         if (maxNumberOfMessagesInABundle != null)
             return maxNumberOfMessagesInABundle.Value;
 
-        return documentType.Category == MessageCategory.Aggregations ? 3 : 10000;
+        return documentType.Category == MessageCategory.Aggregations ? 1 : 10000;
     }
 
     public PeekResult Peek()

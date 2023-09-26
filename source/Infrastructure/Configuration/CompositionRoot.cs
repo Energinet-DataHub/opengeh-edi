@@ -81,7 +81,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             services.AddSingleton<HttpClient>();
             services.AddSingleton<ISerializer, Serializer>();
             services.AddScoped<ITransactionIdRepository, TransactionIdRepositoryRegistry>();
-            services.AddScoped<IMessageIds, MessageIdRegistry>();
+            services.AddScoped<IMessageIdRepository, MessageIdRepositoryRegistry>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>();
             services.AddScoped<IFeatureFlagProvider, FeatureFlagProviderProvider>();
