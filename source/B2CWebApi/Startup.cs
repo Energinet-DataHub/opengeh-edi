@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 
 namespace Energinet.DataHub.EDI.B2CWebApi;
@@ -33,17 +34,20 @@ public class Startup
         serviceCollection.AddSwaggerGen(config =>
             config.SwaggerDoc("v1", new OpenApiInfo { Title = "B2C web api for EDI", Version = "v1" }));
         serviceCollection.AddControllers();
+        serviceCollection.AddHealthChecks();
     }
 
     public void Configure(IApplicationBuilder app)
     {
         app.UseRouting();
+
         if (Environment.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
-            app.UseSwagger();
-            app.UseSwaggerUI();
         }
+
+        app.UseSwagger();
+        app.UseSwaggerUI();
 
         app.UseRouting();
 
@@ -53,6 +57,8 @@ public class Startup
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers();
+            endpoints.MapLiveHealthChecks();
+            endpoints.MapReadyHealthChecks();
         });
     }
 }
