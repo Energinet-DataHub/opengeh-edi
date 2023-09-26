@@ -20,14 +20,12 @@ using System.Threading.Tasks;
 using System.Transactions;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Exceptions;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
 using MessageHeader = Energinet.DataHub.EDI.Application.IncomingMessages.MessageHeader;
 
 namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
 {
-    public abstract class MessageReceiver<TQueue>
-        where TQueue : Queue
+    public abstract class MessageReceiver
     {
         private const int MessageIdLength = 36;
         private const int TransactionIdLength = 36;
