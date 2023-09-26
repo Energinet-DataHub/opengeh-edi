@@ -447,7 +447,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     }
 
     [Fact]
-    public async Task Valid_activity_records_are_extracted_and_committed_to_process()
+    public async Task Valid_activity_records_are_extracted_and_committed_as_a_process()
     {
         await CreateIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier })
             .ConfigureAwait(false);
