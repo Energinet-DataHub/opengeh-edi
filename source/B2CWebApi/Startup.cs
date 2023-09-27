@@ -36,9 +36,27 @@ public class Startup
     public void ConfigureServices(IServiceCollection serviceCollection)
     {
         serviceCollection.AddSwaggerGen(config =>
-            config.SwaggerDoc("v1", new OpenApiInfo { Title = "B2C web api for EDI", Version = "v1" }));
+        {
+            config.SwaggerDoc("v1", new OpenApiInfo { Title = "B2C web api for EDI", Version = "v1" });
+            var securitySchema = new OpenApiSecurityScheme
+            {
+                Description =
+                    "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer", },
+            };
+
+            config.AddSecurityDefinition("Bearer", securitySchema);
+            var securityRequirement = new OpenApiSecurityRequirement { { securitySchema, new[] { "Bearer" } }, };
+
+            config.AddSecurityRequirement(securityRequirement);
+        });
         serviceCollection.AddControllers();
         serviceCollection.AddHealthChecks();
+        serviceCollection.AddHttpContextAccessor();
 
         serviceCollection.AddOptions<JwtOptions>().Bind(Configuration);
 
