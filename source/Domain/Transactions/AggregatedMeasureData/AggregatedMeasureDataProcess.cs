@@ -109,8 +109,6 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
 
         public string RequestedByActorRoleCode { get; }
 
-        public string? ResponseData { get; set; }
-
         public void WasSentToWholesale()
         {
             if (_state == State.Initialized)

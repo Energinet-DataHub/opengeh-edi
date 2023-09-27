@@ -57,6 +57,11 @@ public class InitializeAggregatedMeasureDataProcessesHandler
         return result;
     }
 
+    private static string? IdOrNull(string? id)
+    {
+        return string.IsNullOrWhiteSpace(id) ? null : id;
+    }
+
     private void CreateAggregatedMeasureDataProcess(
         RequestAggregatedMeasureDataMarketDocument marketDocument)
     {
@@ -75,8 +80,8 @@ public class InitializeAggregatedMeasureDataProcessesHandler
                         .GetValueOrThrow(),
                     serie.EndDateAndOrTimeDateTime is not null ? InstantPattern.General.Parse(serie.EndDateAndOrTimeDateTime).GetValueOrThrow() : null,
                     serie.MeteringGridAreaDomainId,
-                    serie.EnergySupplierMarketParticipantId,
-                    serie.BalanceResponsiblePartyMarketParticipantId));
+                    IdOrNull(serie.EnergySupplierMarketParticipantId),
+                    IdOrNull(serie.BalanceResponsiblePartyMarketParticipantId)));
         }
     }
 }
