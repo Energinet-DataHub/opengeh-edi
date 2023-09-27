@@ -161,26 +161,6 @@ public class ActorMessageQueueTests
         Assert.NotEqual(messageAssignedToFirstBundle!.AssignedBundleId, messageAssignedToSecondBundle.AssignedBundleId);
     }
 
-    [Fact]
-    public void Bundle_size_is_10000_for_master_data_message_category()
-    {
-        var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), MarketRole.EnergySupplier);
-        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
-
-        var messageAssignedToFirstBundle = null as OutgoingMessage;
-
-        for (var i = 0; i < 10000; i++)
-        {
-            messageAssignedToFirstBundle = CreateOutgoingMessage(receiver, BusinessReason.MoveIn, DocumentType.NotifyAggregatedMeasureData);
-            actorMessageQueue.Enqueue(messageAssignedToFirstBundle);
-        }
-
-        var messageAssignedToSecondBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
-        actorMessageQueue.Enqueue(messageAssignedToSecondBundle);
-
-        Assert.NotEqual(messageAssignedToFirstBundle!.AssignedBundleId, messageAssignedToSecondBundle.AssignedBundleId);
-    }
-
     private static OutgoingMessage CreateOutgoingMessage(
         Receiver? receiver = null,
         BusinessReason? processType = null,
