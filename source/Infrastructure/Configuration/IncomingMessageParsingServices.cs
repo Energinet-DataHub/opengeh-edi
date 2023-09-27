@@ -13,21 +13,13 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeCustomerCharacteristics;
-using Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeOfSupplier;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.CimXml;
-using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.Response;
 using Microsoft.Extensions.DependencyInjection;
-using MarketActivityRecord = Energinet.DataHub.EDI.Application.IncomingMessages.RequestChangeOfSupplier.MarketActivityRecord;
-using MessageParser = Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestChangeOfSupplier.MessageParser;
-using SenderAuthorizer = Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestChangeOfSupplier.SenderAuthorizer;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration;
 
@@ -58,13 +50,6 @@ internal static class IncomingMessageParsingServices
 
     private static void RegisterRequestChangeOfCustomerCharacteristicsMessageHandling(IServiceCollection services)
     {
-        services.AddScoped<CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.SenderAuthorizer>();
-        services.AddScoped<RequestChangeCustomerCharacteristicsReceiver>();
-        services
-            .AddTransient<IMessageParser<Application.IncomingMessages.RequestChangeCustomerCharacteristics.
-                    MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>,
-                IncomingMessages.RequestChangeCustomerCharacteristics.XmlMessageParser>();
-        services.AddTransient<CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.MessageParser>();
         services.AddScoped<DefaultProcessTypeValidator>();
         services.AddScoped<DefaultMessageTypeValidator>();
         services.AddScoped<MasterDataReceiverResponsibleVerification>();
@@ -73,11 +58,6 @@ internal static class IncomingMessageParsingServices
     private static void RegisterRequestChangeOfSupplierMessageHandling(IServiceCollection services)
     {
         services.AddScoped<SenderAuthorizer>();
-        services.AddScoped<RequestChangeOfSupplierReceiver>();
-        services
-            .AddTransient<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>, JsonMessageParser>();
-        services
-            .AddTransient<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>, XmlMessageParser>();
         services.AddTransient<MessageParser>();
         services.AddScoped<DefaultProcessTypeValidator>();
         services.AddScoped<DefaultMessageTypeValidator>();
@@ -87,12 +67,12 @@ internal static class IncomingMessageParsingServices
     private static void RegisterRequestAggregatedMeasureDataHandling(IServiceCollection services)
     {
         services
-            .AddScoped<IMessageParser<Serie, RequestAggregatedMeasureDataTransactionCommand>, Infrastructure.IncomingMessages.RequestAggregatedMeasureData.XmlMessageParser>();
+            .AddScoped<IMessageParser<Serie, RequestAggregatedMeasureDataTransactionCommand>, IncomingMessages.RequestAggregatedMeasureData.XmlMessageParser>();
         services
-            .AddScoped<IMessageParser<Serie, RequestAggregatedMeasureDataTransactionCommand>, Infrastructure.IncomingMessages.RequestAggregatedMeasureData.JsonMessageParser>();
-        services.AddTransient<CimMessageAdapter.Messages.RequestAggregatedMeasureData.MessageParser>();
+            .AddScoped<IMessageParser<Serie, RequestAggregatedMeasureDataTransactionCommand>, IncomingMessages.RequestAggregatedMeasureData.JsonMessageParser>();
+        services.AddTransient<MessageParser>();
         services.AddTransient<RequestAggregatedMeasureDataReceiver>();
-        services.AddTransient<CimMessageAdapter.Messages.RequestAggregatedMeasureData.SenderAuthorizer>();
+        services.AddTransient<SenderAuthorizer>();
         services.AddTransient<RequestAggregatedMeasureDataTransactionCommand>();
         services.AddScoped<ProcessTypeValidator>();
         services.AddScoped<MessageTypeValidator>();

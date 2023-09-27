@@ -22,7 +22,6 @@ using System.Xml.Schema;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Common;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.Xml;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Xunit;

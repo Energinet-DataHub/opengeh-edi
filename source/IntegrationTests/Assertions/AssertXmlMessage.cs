@@ -28,6 +28,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Assertions
     internal sealed class AssertXmlMessage
     {
         private const string MarketActivityRecordElementName = "MktActivityRecord";
+        private const string SerieRecordElementName = "Series";
         private readonly XDocument _document;
 
         private AssertXmlMessage(XDocument document)
@@ -70,6 +71,13 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Assertions
                 .ToList() ?? new List<XElement>();
         }
 
+        internal static List<XElement> GetSerieRecords(XDocument document)
+        {
+            return document.Root?.Elements()
+                .Where(x => x.Name.LocalName.Equals(SerieRecordElementName, StringComparison.OrdinalIgnoreCase))
+                .ToList() ?? new List<XElement>();
+        }
+
         internal static void AssertHasHeaderValue(XDocument document, string elementName, string? expectedValue)
         {
             Assert.Equal(expectedValue, GetMessageHeaderValue(document, elementName));
@@ -83,6 +91,12 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Assertions
         internal AssertXmlMessage HasMarketActivityRecordCount(int expectedCount)
         {
             Assert.Equal(expectedCount, GetMarketActivityRecords(_document).Count);
+            return this;
+        }
+
+        internal AssertXmlMessage HasSerieRecordCount(int expectedCount)
+        {
+            Assert.Equal(expectedCount, GetSerieRecords(_document).Count);
             return this;
         }
 
