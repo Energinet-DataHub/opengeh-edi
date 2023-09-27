@@ -22,10 +22,7 @@ using Energinet.DataHub.EDI.Application.Configuration.Authentication;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
-using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Reasons;
-using Energinet.DataHub.EDI.Application.Transactions.MoveIn;
 using Energinet.DataHub.EDI.Domain.Documents;
-using Energinet.DataHub.EDI.Domain.MasterData.MarketEvaluationPoints;
 using Energinet.DataHub.EDI.Infrastructure.Actors;
 using Energinet.DataHub.EDI.Infrastructure.ArchivedMessages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
@@ -41,26 +38,15 @@ using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
-using Energinet.DataHub.EDI.Infrastructure.MasterData.MarketEvaluationPoints;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AggregationResult;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Reasons;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Dequeue;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.GenericNotification;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Peek;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Energinet.DataHub.EDI.Infrastructure.Transactions;
 using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.MoveIn;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.UpdateCustomer;
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using MediatR;
 using MediatR.Registration;
@@ -90,12 +76,9 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             services.AddLogging();
             InternalCommandProcessing.Configure(_services);
             AddMessageGenerationServices();
-            AddMasterDataServices();
             AddActorServices();
             AddProcessing();
             AddWholeSaleInBox();
-            ReadModelHandlingConfiguration.AddReadModelHandling(services);
-            UpdateCustomerMasterDataConfiguration.Configure(services);
             DequeueConfiguration.Configure(services);
             IntegrationEventsConfiguration.Configure(services);
             InboxEventsConfiguration.Configure(services);
@@ -199,16 +182,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddMoveInServices(
-            MoveInSettings settings,
-            Func<IServiceProvider, IMoveInRequester>? addMoveInRequestService = null,
-            Func<IServiceProvider, ICustomerMasterDataClient>? addCustomerMasterDataClient = null,
-            Func<IServiceProvider, IMeteringPointMasterDataClient>? addMeteringPointMasterDataClient = null)
-        {
-            MoveInConfiguration.Configure(_services, settings, addMoveInRequestService, addCustomerMasterDataClient, addMeteringPointMasterDataClient);
-            return this;
-        }
-
         public CompositionRoot AddAggregatedMeasureDataServices()
         {
             RequestedAggregatedMeasureDataConfiguration.Configure(_services);
@@ -259,22 +232,12 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
         private void AddMessageGenerationServices()
         {
             _services.AddScoped<DocumentFactory>();
-            _services.AddScoped<IDocumentWriter, ConfirmChangeOfSupplierXmlDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, ConfirmChangeOfSupplierJsonDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, RejectRequestChangeOfSupplierXmlDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, GenericNotificationXmlDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, AccountingPointCharacteristicsXmlDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, ConfirmRequestChangeAccountingPointCharacteristicsXmlDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, RejectRequestChangeAccountingPointCharacteristicsXmlDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, CharacteristicsOfACustomerAtAnApDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, RejectRequestChangeOfSupplierJsonDocumentWriter>();
             _services.AddScoped<IDocumentWriter, AggregationResultXmlDocumentWriter>();
             _services.AddScoped<IDocumentWriter, AggregationResultJsonDocumentWriter>();
             _services.AddScoped<IDocumentWriter, AggregationResultEbixDocumentWriter>();
             _services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataXmlDocumentWriter>();
             _services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataJsonDocumentWriter>();
 
-            _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
             _services.AddScoped<IMessageRecordParser, MessageRecordParser>();
         }
 
@@ -282,11 +245,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
         {
             var configuration = new MediatRServiceConfiguration();
             ServiceRegistrar.AddRequiredServices(_services, configuration);
-        }
-
-        private void AddMasterDataServices()
-        {
-            _services.AddScoped<IMarketEvaluationPointRepository, MarketEvaluationPointRepository>();
         }
 
         private void AddActorServices()

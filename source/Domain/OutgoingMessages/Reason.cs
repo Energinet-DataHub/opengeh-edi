@@ -12,11 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
+namespace Energinet.DataHub.EDI.Domain.OutgoingMessages;
 
-internal static class SampleData
+public class Reason
 {
-    internal static string ActorNumber => "1234567890123";
+    public Reason(string text, string code)
+    {
+        Text = text;
+        Code = code;
+    }
 
-    internal static string StsAssignedUserId => "267DAC56-8CDC-43F8-BE16-91A297F37DE6";
+    public string Code { get; }
+
+    public string Text { get; }
 }

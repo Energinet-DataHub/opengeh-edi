@@ -103,16 +103,16 @@ public class ActorMessageQueueTests
     {
         var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), MarketRole.EnergySupplier);
         var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
-        actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.MoveIn, DocumentType.RejectRequestChangeOfSupplier), maxNumberOfMessagesInABundle: 2);
-        actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing, DocumentType.NotifyAggregatedMeasureData), maxNumberOfMessagesInABundle: 2);
+        actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.MoveIn, DocumentType.NotifyAggregatedMeasureData), maxNumberOfMessagesInABundle: 2);
+        actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing, DocumentType.RejectRequestAggregatedMeasureData), maxNumberOfMessagesInABundle: 2);
 
         var firstPeekResult = actorMessageQueue.Peek(MessageCategory.Aggregations);
         actorMessageQueue.Dequeue(firstPeekResult.BundleId!);
-        var secondPeekResult = actorMessageQueue.Peek(MessageCategory.MasterData);
+        var secondPeekResult = actorMessageQueue.Peek(MessageCategory.Aggregations);
         actorMessageQueue.Dequeue(secondPeekResult.BundleId!);
 
         Assert.Equal(DocumentType.NotifyAggregatedMeasureData, firstPeekResult.DocumentType);
-        Assert.Equal(DocumentType.RejectRequestChangeOfSupplier, secondPeekResult.DocumentType);
+        Assert.Equal(DocumentType.RejectRequestAggregatedMeasureData, secondPeekResult.DocumentType);
         Assert.NotEqual(firstPeekResult.BundleId, secondPeekResult.BundleId);
     }
 
@@ -154,26 +154,6 @@ public class ActorMessageQueueTests
 
         var messageAssignedToFirstBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing, DocumentType.NotifyAggregatedMeasureData);
         actorMessageQueue.Enqueue(messageAssignedToFirstBundle);
-
-        var messageAssignedToSecondBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
-        actorMessageQueue.Enqueue(messageAssignedToSecondBundle);
-
-        Assert.NotEqual(messageAssignedToFirstBundle!.AssignedBundleId, messageAssignedToSecondBundle.AssignedBundleId);
-    }
-
-    [Fact]
-    public void Bundle_size_is_10000_for_master_data_message_category()
-    {
-        var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), MarketRole.EnergySupplier);
-        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
-
-        var messageAssignedToFirstBundle = null as OutgoingMessage;
-
-        for (var i = 0; i < 10000; i++)
-        {
-            messageAssignedToFirstBundle = CreateOutgoingMessage(receiver, BusinessReason.MoveIn, DocumentType.AccountingPointCharacteristics);
-            actorMessageQueue.Enqueue(messageAssignedToFirstBundle);
-        }
 
         var messageAssignedToSecondBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
         actorMessageQueue.Enqueue(messageAssignedToSecondBundle);

@@ -39,11 +39,9 @@ public class RejectRequestAggregatedMeasureDataXmlDocumentWriter : DocumentWrite
     {
     }
 
-    // TODO: This document type is obsolete and should not be used. Can be deleted after 2023-08-20
     public override bool HandlesType(DocumentType documentType)
     {
-        return DocumentType.RejectAggregatedMeasureData == documentType
-               || DocumentType.RejectRequestAggregatedMeasureData == documentType;
+        return DocumentType.RejectRequestAggregatedMeasureData == documentType;
     }
 
     protected override async Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer)

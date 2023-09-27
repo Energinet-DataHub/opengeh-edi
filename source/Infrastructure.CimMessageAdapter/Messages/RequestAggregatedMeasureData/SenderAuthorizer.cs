@@ -35,8 +35,8 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
         {
             if (senderId == null) throw new ArgumentNullException(nameof(senderId));
             if (senderRole == null) throw new ArgumentNullException(nameof(senderRole));
-            EnsureSenderIdMatches(senderId);
-            EnsureSenderRole(senderRole, authenticatedUser);
+            EnsureSenderIdMatches(senderId, authenticatedUser);
+            EnsureSenderRole(senderRole);
             EnsureCurrentUserHasRequiredRole(senderRole, authenticatedUserRole);
 
             return Task.FromResult(_validationErrors.Count == 0 ? Result.Succeeded() : Result.Failure(_validationErrors.ToArray()));
@@ -51,20 +51,20 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
             }
         }
 
-        private void EnsureSenderRole(string senderRole, string? authenticatedUser = null)
+        private void EnsureSenderRole(string senderRole)
         {
             if (!senderRole.Equals(MarketRole.EnergySupplier.Code, StringComparison.OrdinalIgnoreCase)
                 && !senderRole.Equals(MarketRole.MeteredDataResponsible.Code, StringComparison.OrdinalIgnoreCase)
-                && !senderRole.Equals(MarketRole.BalanceResponsibleParty.Code, StringComparison.OrdinalIgnoreCase)
-                && !(!string.IsNullOrWhiteSpace(authenticatedUser) && authenticatedUser.Equals(senderRole, StringComparison.Ordinal)))
+                && !senderRole.Equals(MarketRole.BalanceResponsibleParty.Code, StringComparison.OrdinalIgnoreCase))
             {
                 _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
             }
         }
 
-        private void EnsureSenderIdMatches(string senderId)
+        private void EnsureSenderIdMatches(string senderId, string? authenticatedUser = null)
         {
-            if (_marketActorAuthenticator.CurrentIdentity.Number?.Value.Equals(senderId, StringComparison.OrdinalIgnoreCase) == false)
+            if (_marketActorAuthenticator.CurrentIdentity.Number?.Value.Equals(senderId, StringComparison.OrdinalIgnoreCase) == false
+                && !(!string.IsNullOrWhiteSpace(authenticatedUser) && authenticatedUser.Equals(authenticatedUser, StringComparison.Ordinal)))
             {
                 _validationErrors.Add(new AuthenticatedUserDoesNotMatchSenderId());
             }

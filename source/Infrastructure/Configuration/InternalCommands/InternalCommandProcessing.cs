@@ -16,10 +16,6 @@ using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration.Commands;
 using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
 using Energinet.DataHub.EDI.Application.Transactions.Aggregations;
-using Energinet.DataHub.EDI.Application.Transactions.MoveIn;
-using Energinet.DataHub.EDI.Application.Transactions.MoveIn.MasterDataDelivery;
-using Energinet.DataHub.EDI.Application.Transactions.MoveIn.Notifications;
-using Energinet.DataHub.EDI.Application.Transactions.UpdateCustomer;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
 using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using MediatR;
@@ -45,15 +41,6 @@ internal static class InternalCommandProcessing
     {
         var mapper = new InternalCommandMapper();
         mapper.Add("CreateActor", typeof(CreateActorCommand));
-        mapper.Add("FetchCustomerMasterData", typeof(FetchCustomerMasterData));
-        mapper.Add("FetchMeteringPointMasterData", typeof(FetchMeteringPointMasterData));
-        mapper.Add("ForwardMeteringPointMasterData", typeof(ForwardMeteringPointMasterData));
-        mapper.Add("SetCurrentKnownCustomerMasterData", typeof(SetCurrentKnownCustomerMasterData));
-        mapper.Add("SendCustomerMasterDataToGridOperator", typeof(SendCustomerMasterDataToGridOperator));
-        mapper.Add("NotifyCurrentEnergySupplier", typeof(NotifyCurrentEnergySupplier));
-        mapper.Add("NotifyGridOperator", typeof(NotifyGridOperator));
-        mapper.Add("SetConsumerHasMovedIn", typeof(SetConsumerHasMovedIn));
-        mapper.Add("UpdateCustomerMasterData", typeof(UpdateCustomerMasterData));
         mapper.Add("Aggregations.ForwardAggregationResult", typeof(ForwardAggregationResult));
         mapper.Add("SendAggregatedMeasureRequestToWholesale", typeof(SendAggregatedMeasureRequestToWholesale));
         mapper.Add("AcceptedAggregatedTimeSerie", typeof(AcceptedAggregatedTimeSerie));

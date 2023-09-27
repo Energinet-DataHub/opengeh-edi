@@ -26,16 +26,6 @@ public class DocumentFactoryTests
 {
     private readonly IEnumerable<IDocumentWriter> _documentWriters;
 
-    private readonly List<DocumentType> _documentTypesNotSupportedByJson = new()
-    {
-        DocumentType.AccountingPointCharacteristics,
-        DocumentType.CharacteristicsOfACustomerAtAnAP,
-        DocumentType.ConfirmRequestChangeAccountingPointCharacteristics,
-        DocumentType.GenericNotification,
-        DocumentType.RejectAggregatedMeasureData,
-        DocumentType.RejectRequestChangeAccountingPointCharacteristics,
-    };
-
     public DocumentFactoryTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
@@ -65,13 +55,6 @@ public class DocumentFactoryTests
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Json));
 
-        if (_documentTypesNotSupportedByJson.Contains(documentType))
-        {
-            Assert.Null(writer);
-        }
-        else
-        {
-            Assert.NotNull(writer);
-        }
+        Assert.NotNull(writer);
     }
 }
