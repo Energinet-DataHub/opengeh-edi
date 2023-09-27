@@ -22,11 +22,8 @@ using Energinet.DataHub.EDI.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages;
-using Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
-using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using MediatR;
 using Xunit;
@@ -37,17 +34,21 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
 public class WhenAPeekIsRequestedTests : TestBase
 {
+    private readonly RequestAggregatedMeasuredDataProcessInvoker _requestAggregatedMeasuredDataProcessInvoker;
+
     public WhenAPeekIsRequestedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
+        _requestAggregatedMeasuredDataProcessInvoker =
+            new RequestAggregatedMeasuredDataProcessInvoker(GetService<IMediator>(), GetService<B2BContext>());
     }
 
     [Fact]
     public async Task When_no_messages_are_available_return_empty_result()
     {
-        await GivenTwoRequestAggregatedMeasuredDataHasBeenAccepted().ConfigureAwait(false);
+        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync().ConfigureAwait(false);
 
-        var result = await PeekMessage(MessageCategory.Aggregations).ConfigureAwait(false);
+        var result = await PeekMessage(MessageCategory.None).ConfigureAwait(false);
 
         Assert.Null(result.Bundle);
         Assert.True(await BundleIsRegistered().ConfigureAwait(false));
@@ -56,25 +57,25 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task A_message_bundle_is_returned()
     {
-        await GivenTwoRequestAggregatedMeasuredDataHasBeenAccepted();
+        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync().ConfigureAwait(false);
 
-        var result = await PeekMessage(MessageCategory.MasterData).ConfigureAwait(false);
+        var result = await PeekMessage(MessageCategory.Aggregations).ConfigureAwait(false);
 
         Assert.NotNull(result.Bundle);
 
         AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
-            .IsDocumentType(DocumentType.ConfirmRequestChangeOfSupplier)
-            .IsBusinessReason(BusinessReason.MoveIn)
-            .HasMarketActivityRecordCount(2);
+            .IsDocumentType(DocumentType.NotifyAggregatedMeasureData)
+            .IsBusinessReason(BusinessReason.PreliminaryAggregation)
+            .HasSerieRecordCount(1);
     }
 
     [Fact]
     public async Task Ensure_same_bundle_is_returned_if_not_dequeued()
     {
-        await GivenTwoRequestAggregatedMeasuredDataHasBeenAccepted().ConfigureAwait(false);
+        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync().ConfigureAwait(false);
 
-        var firstPeekResult = await PeekMessage(MessageCategory.MasterData).ConfigureAwait(false);
-        var secondPeekResult = await PeekMessage(MessageCategory.MasterData).ConfigureAwait(false);
+        var firstPeekResult = await PeekMessage(MessageCategory.Aggregations).ConfigureAwait(false);
+        var secondPeekResult = await PeekMessage(MessageCategory.Aggregations).ConfigureAwait(false);
 
         Assert.NotNull(firstPeekResult.MessageId);
         Assert.NotNull(secondPeekResult.MessageId);
@@ -84,50 +85,11 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task The_generated_document_is_archived()
     {
-        await GivenTwoRequestAggregatedMeasuredDataHasBeenAccepted().ConfigureAwait(false);
+        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync().ConfigureAwait(false);
 
-        var result = await PeekMessage(MessageCategory.MasterData).ConfigureAwait(false);
+        var result = await PeekMessage(MessageCategory.Aggregations).ConfigureAwait(false);
 
         await AssertMessageIsArchived(result.MessageId);
-    }
-
-    private async Task InsertFakeMessagesAsync(string receiverId, MarketRole receiverRole, MessageCategory category, BusinessReason businessReason, DocumentType documentType)
-    {
-        var messageEnqueuer = GetService<OutgoingMessageEnqueuer>();
-
-        for (var i = 0; i < 3; i++)
-        {
-            var message = new EnqueuedMessage(
-                Guid.NewGuid(),
-                receiverId,
-                receiverRole.Name,
-                Guid.NewGuid().ToString(),
-                "FakeSenderRole",
-                documentType.Name,
-                category.Name,
-                businessReason.Name,
-                "MessageRecord");
-
-            await messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
-        }
-    }
-
-    private async Task GivenARequestAggregatedMeasuredDataHasBeenAccepted()
-    {
-        var builder = new RequestAggregatedMeasureDataMarketDocumentBuilder();
-        var incomingMessage = builder.BuildCommand();
-
-        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-    }
-
-    private async Task GivenTwoRequestAggregatedMeasuredDataHasBeenAccepted()
-    {
-        await GivenARequestAggregatedMeasuredDataHasBeenAccepted().ConfigureAwait(false);
-
-        var builder = new RequestAggregatedMeasureDataMarketDocumentBuilder();
-        var incomingMessage = builder.BuildCommand();
-
-        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
     }
 
     private async Task<bool> BundleIsRegistered()
@@ -147,7 +109,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     private async Task AssertMessageIsArchived(Guid? messageId)
     {
         var sqlStatement =
-            $"SELECT COUNT(*) FROM [dbo].[ArchivedMessages] WHERE Id = '{messageId}'";
+            $"SELECT COUNT(*) FROM [dbo].[ArchivedMessages] WHERE MessageId = '{messageId}'";
         using var connection =
             await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var found = await connection.ExecuteScalarAsync<bool>(sqlStatement).ConfigureAwait(false);

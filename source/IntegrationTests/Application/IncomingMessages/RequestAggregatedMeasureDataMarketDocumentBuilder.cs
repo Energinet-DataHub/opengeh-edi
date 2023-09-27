@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 using NodaTime;
 using MessageHeader = Energinet.DataHub.EDI.Application.IncomingMessages.MessageHeader;
 
@@ -32,15 +33,15 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
     private readonly string _meteringGridAreaDomainId = "244";
     private readonly string _messageType = "E74";
     private readonly string _processType = "D03";
-    private readonly string _senderId = "0000000000000";
+    private readonly string _senderId = SampleData.NewEnergySupplierNumber;
     private readonly ActorNumber _receiverId = DataHubDetails.IdentificationNumber;
     private readonly string _receiverRole = "DGL";
     private readonly string _createdAt = SystemClock.Instance.GetCurrentInstant().ToString();
     private string _messageId = Guid.NewGuid().ToString();
-    private string _senderRole = "DDQ";
+    private string _senderRole = MarketRole.EnergySupplier.Code;
     private string _marketEvaluationPointType = "E17";
     private string? _marketEvaluationSettlementMethod = "D01";
-    private string? _energySupplierMarketParticipantId = "5790001330552";
+    private string? _energySupplierMarketParticipantId = SampleData.NewEnergySupplierNumber;
     private string? _balanceResponsiblePartyMarketParticipantId = "5799999933318";
 
     public RequestAggregatedMeasureDataMarketDocumentBuilder SetMessageId(string id)

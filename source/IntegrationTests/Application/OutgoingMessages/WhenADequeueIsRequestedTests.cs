@@ -20,19 +20,23 @@ using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Documents;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
-using Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using MediatR;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
 public class WhenADequeueIsRequestedTests : TestBase
 {
+    private readonly RequestAggregatedMeasuredDataProcessInvoker _requestAggregatedMeasuredDataProcessInvoker;
+
     public WhenADequeueIsRequestedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
+        _requestAggregatedMeasuredDataProcessInvoker =
+            new RequestAggregatedMeasuredDataProcessInvoker(GetService<IMediator>(), GetService<B2BContext>());
     }
 
     [Fact]
@@ -48,7 +52,7 @@ public class WhenADequeueIsRequestedTests : TestBase
     {
         var unknownMessageId = Guid.NewGuid().ToString();
         // Created an Actor Queue with a bundle.
-        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync().ConfigureAwait(false);
 
         var dequeueResult = await InvokeCommandAsync(new DequeueCommand(unknownMessageId, MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId))).ConfigureAwait(false);
 
@@ -58,10 +62,10 @@ public class WhenADequeueIsRequestedTests : TestBase
     [Fact]
     public async Task Dequeue_is_Successful()
     {
-        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync().ConfigureAwait(false);
         var peekResult = await InvokeCommandAsync(new PeekCommand(
             ActorNumber.Create(SampleData.NewEnergySupplierNumber),
-            MessageCategory.MasterData,
+            MessageCategory.Aggregations,
             MarketRole.EnergySupplier,
             DocumentFormat.Xml)).ConfigureAwait(false);
 
@@ -74,12 +78,5 @@ public class WhenADequeueIsRequestedTests : TestBase
 
         Assert.True(dequeueResult.Success);
         Assert.True(found);
-    }
-
-    private async Task GivenAMoveInTransactionHasBeenAccepted()
-    {
-        var incomingMessage = new RequestAggregatedMeasureDataMarketDocumentBuilder().BuildCommand();
-
-        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
     }
 }

@@ -28,8 +28,10 @@ public class DocumentFactoryTests
 
     private readonly List<DocumentType> _documentTypesNotSupportedByJson = new()
     {
-        DocumentType.RejectAggregatedMeasureData,
-        DocumentType.RejectRequestChangeAccountingPointCharacteristics,
+    };
+
+    private readonly List<DocumentType> _documentTypesNotSupportedByXml = new()
+    {
     };
 
     public DocumentFactoryTests(DatabaseFixture databaseFixture)
@@ -51,7 +53,14 @@ public class DocumentFactoryTests
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Xml));
 
-        Assert.NotNull(writer);
+        if (_documentTypesNotSupportedByXml.Contains(documentType))
+        {
+            Assert.Null(writer);
+        }
+        else
+        {
+            Assert.NotNull(writer);
+        }
     }
 
     [Theory]
