@@ -15,13 +15,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.Transactions;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using MediatR;
-using NodaTime.Text;
 using Receiver =
     Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData.
     RequestAggregatedMeasureDataReceiver;
@@ -47,33 +45,36 @@ public class InitializeAggregatedMeasureDataProcessesHandler
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(request.MessageResult.IncomingMarketDocument);
 
-        var result = await _messageReceiver.ReceiveAsync(request.MessageResult, cancellationToken)
+        var marketDocument =
+            RequestAggregatedMeasureDocumentFactory.Created(request.MessageResult.IncomingMarketDocument);
+
+        var result = await _messageReceiver.ReceiveAsync(marketDocument, cancellationToken)
             .ConfigureAwait(false);
 
-        if (result.Errors.Count == 0 && request.MessageResult.IncomingMarketDocument != null)
+        if (result.Errors.Count == 0)
             CreateAggregatedMeasureDataProcess(RequestAggregatedMeasureDocumentFactory.Created(request.MessageResult.IncomingMarketDocument));
 
         return result;
     }
 
     private void CreateAggregatedMeasureDataProcess(
-        RequestAggregatedMeasureDataMarketDocument marketDocument)
+        RequestAggregatedMeasureDataMarketMessage marketMessage)
     {
-        foreach (var serie in marketDocument.Series)
+        foreach (var serie in marketMessage.MarketTransactions)
         {
             _aggregatedMeasureDataProcessRepository.Add(
                 new AggregatedMeasureDataProcess(
                     ProcessId.New(),
                     BusinessTransactionId.Create(serie.Id),
-                    ActorNumber.Create(marketDocument.SenderId),
-                    marketDocument.SenderRole,
-                    marketDocument.BusinessReason,
+                    marketMessage.SenderNumber,
+                    marketMessage.SenderRole.Code,
+                    marketMessage.BusinessReason.Name,
                     serie.MarketEvaluationPointType,
                     serie.MarketEvaluationSettlementMethod,
-                    InstantPattern.General.Parse(serie.StartDateAndOrTimeDateTime)
-                        .GetValueOrThrow(),
-                    serie.EndDateAndOrTimeDateTime is not null ? InstantPattern.General.Parse(serie.EndDateAndOrTimeDateTime).GetValueOrThrow() : null,
+                    serie.StartDateAndOrTimeDateTime,
+                    serie.EndDateAndOrTimeDateTime,
                     serie.MeteringGridAreaDomainId,
                     serie.EnergySupplierMarketParticipantId,
                     serie.BalanceResponsiblePartyMarketParticipantId));

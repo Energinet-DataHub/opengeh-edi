@@ -78,11 +78,12 @@ namespace Energinet.DataHub.EDI.Api.IncomingMessages
 
             var messageParserResult = await _messageParser.ParseAsync(request.Body, cimFormat, cancellationToken).ConfigureAwait(false);
             // TODO: should be refactored to raise a command like RequestAggregatedMeasureMessageReceiver.cs
-            var result = await _messageReceiver.ReceiveAsync(messageParserResult, cancellationToken)
-                .ConfigureAwait(false);
-
-            var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
-            return CreateResponse(request, httpStatusCode, _responseFactory.From(result, cimFormat));
+            throw new NotImplementedException("updated");
+            // var result = await _messageReceiver.ReceiveAsync(messageParserResult, cancellationToken)
+            //     .ConfigureAwait(false);
+            //
+            // var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
+            // return CreateResponse(request, httpStatusCode, _responseFactory.From(result, cimFormat));
         }
 
         private HttpResponseData CreateResponse(

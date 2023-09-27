@@ -12,20 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using NodaTime;
+
 namespace Energinet.DataHub.EDI.Domain.Documents;
 
-public record RequestAggregatedMeasureDataMarketDocument(
-    string SenderId,
-    string SenderRole,
-    string BusinessReason,
-    IReadOnlyCollection<Serie> Series);
+public record RequestAggregatedMeasureDataMarketMessage(
+    ActorNumber SenderNumber,
+    MarketRole SenderRole,
+    ActorNumber ReceiverNumber,
+    MarketRole ReceiverRole,
+    BusinessReason BusinessReason,
+    string? AuthenticatedUser,
+    string? AuthenticatedUserRole,
+    string MessageType,
+    string MessageId,
+    IReadOnlyCollection<Serie> Series) : MarketMessage(SenderNumber, SenderRole, ReceiverNumber, ReceiverRole, BusinessReason, AuthenticatedUser, AuthenticatedUserRole, MessageType, MessageId, Series);
+
+public record MarketMessage(
+    ActorNumber SenderNumber,
+    MarketRole SenderRole,
+    ActorNumber ReceiverNumber,
+    MarketRole ReceiverRole,
+    BusinessReason BusinessReason,
+    string? AuthenticatedUser,
+    string? AuthenticatedUserRole,
+    string MessageType,
+    string MessageId,
+    IReadOnlyCollection<Serie> MarketTransactions);
 
 public record Serie(
     string Id,
     string? MarketEvaluationPointType,
     string? MarketEvaluationSettlementMethod,
-    string StartDateAndOrTimeDateTime,
-    string? EndDateAndOrTimeDateTime,
+    Instant StartDateAndOrTimeDateTime,
+    Instant? EndDateAndOrTimeDateTime,
     string? MeteringGridAreaDomainId,
     string? EnergySupplierMarketParticipantId,
     string? BalanceResponsiblePartyMarketParticipantId);
