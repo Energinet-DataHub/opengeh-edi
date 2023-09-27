@@ -18,7 +18,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Infrastructure.Transactions;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.MoveIn;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -66,8 +65,7 @@ public class HttpClientSpy : IHttpClientAdapter
 
     private HttpResponseMessage CreateResponseFromProcessing()
     {
-        var businessProcessResponse = new MoveInResponse(_validationErrors, _businessProcessId);
-        var content = new StringContent(JsonConvert.SerializeObject(businessProcessResponse));
+        var content = new StringContent(JsonConvert.SerializeObject(null));
         var response = new HttpResponseMessage(_responseCode);
         response.Content = content;
         return response;
