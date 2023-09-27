@@ -1,4 +1,4 @@
-﻿// Copyright 2020 Energinet DataHub A/S
+// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -13,12 +13,13 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.Domain.Actors;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.Domain.Documents;
 
-public record RequestAggregatedMeasureDataMarketMessage(
+/// <summary>
+/// Represents a base market message.
+/// </summary>
+public record MarketMessage(
     ActorNumber SenderNumber,
     MarketRole SenderRole,
     ActorNumber ReceiverNumber,
@@ -28,14 +29,4 @@ public record RequestAggregatedMeasureDataMarketMessage(
     string? AuthenticatedUserRole,
     string MessageType,
     string MessageId,
-    IReadOnlyCollection<Serie> Series) : MarketMessage(SenderNumber, SenderRole, ReceiverNumber, ReceiverRole, BusinessReason, AuthenticatedUser, AuthenticatedUserRole, MessageType, MessageId, Series);
-
-public record Serie(
-    string Id,
-    string? MarketEvaluationPointType,
-    string? MarketEvaluationSettlementMethod,
-    Instant StartDateAndOrTimeDateTime,
-    Instant? EndDateAndOrTimeDateTime,
-    string? MeteringGridAreaDomainId,
-    string? EnergySupplierMarketParticipantId,
-    string? BalanceResponsiblePartyMarketParticipantId);
+    IReadOnlyCollection<Serie> MarketTransactions);
