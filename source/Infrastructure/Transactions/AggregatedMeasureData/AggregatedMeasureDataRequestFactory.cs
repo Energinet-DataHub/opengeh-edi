@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.Edi.Requests;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData;
 
