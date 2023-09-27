@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestChangeOfSupplier;
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 
-public class RequestChangeOfSupplierReceiver : MessageReceiver
+public class RequestChangeCustomerCharacteristicsValidator : MarketMessageValidator
 {
-    public RequestChangeOfSupplierReceiver(
+    public RequestChangeCustomerCharacteristicsValidator(
         IMessageIdRepository messageIdRepository,
         ITransactionIdRepository transactionIdRepository,
         SenderAuthorizer senderAuthorizer,

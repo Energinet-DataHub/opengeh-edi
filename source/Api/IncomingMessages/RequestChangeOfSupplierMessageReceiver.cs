@@ -32,20 +32,20 @@ namespace Energinet.DataHub.EDI.Api.IncomingMessages
     {
         private readonly ILogger<RequestChangeOfSupplierMessageReceiver> _logger;
         private readonly ICorrelationContext _correlationContext;
-        private readonly RequestChangeOfSupplierReceiver _messageReceiver;
+        private readonly RequestChangeOfSupplierValidator _messageValidator;
         private readonly ResponseFactory _responseFactory;
         private readonly MessageParser _messageParser;
 
         public RequestChangeOfSupplierMessageReceiver(
             ILogger<RequestChangeOfSupplierMessageReceiver> logger,
             ICorrelationContext correlationContext,
-            RequestChangeOfSupplierReceiver messageReceiver,
+            RequestChangeOfSupplierValidator messageValidator,
             ResponseFactory responseFactory,
             MessageParser messageParser)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _correlationContext = correlationContext ?? throw new ArgumentNullException(nameof(correlationContext));
-            _messageReceiver = messageReceiver ?? throw new ArgumentNullException(nameof(messageReceiver));
+            _messageValidator = messageValidator ?? throw new ArgumentNullException(nameof(messageValidator));
             _responseFactory = responseFactory ?? throw new ArgumentNullException(nameof(responseFactory));
             _messageParser = messageParser ?? throw new ArgumentNullException(nameof(messageParser));
         }

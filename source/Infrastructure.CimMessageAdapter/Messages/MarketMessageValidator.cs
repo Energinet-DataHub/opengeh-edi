@@ -28,7 +28,7 @@ using MessageHeader = Energinet.DataHub.EDI.Application.IncomingMessages.Message
 
 namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
 {
-    public abstract class MessageReceiver
+    public abstract class MarketMessageValidator
     {
         private const int MessageIdLength = 36;
         private const int TransactionIdLength = 36;
@@ -40,7 +40,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
         private readonly IMessageTypeValidator _messageTypeValidator;
         private readonly IReceiverValidator _receiverValidator;
 
-        protected MessageReceiver(
+        protected MarketMessageValidator(
             IMessageIdRepository messageIdRepository,
             ITransactionIdRepository transactionIdRepository,
             ISenderAuthorizer senderAuthorizer,
@@ -56,7 +56,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
             _receiverValidator = receiverValidator;
         }
 
-        public async Task<Result> ReceiveAsync(
+        public async Task<Result> ValidateAsync(
             MarketMessage marketMessage,
             CancellationToken cancellationToken)
         {

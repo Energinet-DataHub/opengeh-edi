@@ -12,20 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues;
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 
-namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
-
-public class RequestAggregatedMeasureDataReceiver : MessageReceiver
+public class RequestChangeOfSupplierValidator : MarketMessageValidator
 {
-    public RequestAggregatedMeasureDataReceiver(
+    public RequestChangeOfSupplierValidator(
         IMessageIdRepository messageIdRepository,
         ITransactionIdRepository transactionIdRepository,
         SenderAuthorizer senderAuthorizer,
-        ProcessTypeValidator processTypeValidator,
-        MessageTypeValidator messageTypeValidator,
-        CalculationResponsibleReceiverVerification calculationResponsibleReceiverVerification)
-        : base(messageIdRepository, transactionIdRepository, senderAuthorizer, processTypeValidator, messageTypeValidator, calculationResponsibleReceiverVerification)
+        DefaultProcessTypeValidator defaultProcessTypeValidator,
+        DefaultMessageTypeValidator defaultMessageTypeValidator,
+        MasterDataReceiverResponsibleVerification masterDataReceiverResponsibleVerification)
+        : base(messageIdRepository, transactionIdRepository, senderAuthorizer, defaultProcessTypeValidator, defaultMessageTypeValidator, masterDataReceiverResponsibleVerification)
     {
     }
 }

@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
-public class RequestChangeCustomerCharacteristicsReceiver : MessageReceiver
+public class RequestAggregatedMeasureDataValidator : MarketMessageValidator
 {
-    public RequestChangeCustomerCharacteristicsReceiver(
+    public RequestAggregatedMeasureDataValidator(
         IMessageIdRepository messageIdRepository,
         ITransactionIdRepository transactionIdRepository,
         SenderAuthorizer senderAuthorizer,
-        DefaultProcessTypeValidator defaultProcessTypeValidator,
-        DefaultMessageTypeValidator defaultMessageTypeValidator,
-        MasterDataReceiverResponsibleVerification masterDataReceiverResponsibleVerification)
-        : base(messageIdRepository, transactionIdRepository, senderAuthorizer, defaultProcessTypeValidator, defaultMessageTypeValidator, masterDataReceiverResponsibleVerification)
+        ProcessTypeValidator processTypeValidator,
+        MessageTypeValidator messageTypeValidator,
+        CalculationResponsibleReceiverVerification calculationResponsibleReceiverVerification)
+        : base(messageIdRepository, transactionIdRepository, senderAuthorizer, processTypeValidator, messageTypeValidator, calculationResponsibleReceiverVerification)
     {
     }
 }

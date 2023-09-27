@@ -59,7 +59,7 @@ internal static class IncomingMessageParsingServices
     private static void RegisterRequestChangeOfCustomerCharacteristicsMessageHandling(IServiceCollection services)
     {
         services.AddScoped<CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.SenderAuthorizer>();
-        services.AddScoped<RequestChangeCustomerCharacteristicsReceiver>();
+        services.AddScoped<RequestChangeCustomerCharacteristicsValidator>();
         services
             .AddTransient<IMessageParser<Application.IncomingMessages.RequestChangeCustomerCharacteristics.
                     MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>,
@@ -73,7 +73,7 @@ internal static class IncomingMessageParsingServices
     private static void RegisterRequestChangeOfSupplierMessageHandling(IServiceCollection services)
     {
         services.AddScoped<SenderAuthorizer>();
-        services.AddScoped<RequestChangeOfSupplierReceiver>();
+        services.AddScoped<RequestChangeOfSupplierValidator>();
         services
             .AddTransient<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransactionCommand>, JsonMessageParser>();
         services
@@ -91,7 +91,7 @@ internal static class IncomingMessageParsingServices
         services
             .AddScoped<IMessageParser<Serie, RequestAggregatedMeasureDataTransactionCommand>, Infrastructure.IncomingMessages.RequestAggregatedMeasureData.JsonMessageParser>();
         services.AddTransient<CimMessageAdapter.Messages.RequestAggregatedMeasureData.MessageParser>();
-        services.AddTransient<RequestAggregatedMeasureDataReceiver>();
+        services.AddTransient<RequestAggregatedMeasureDataValidator>();
         services.AddTransient<CimMessageAdapter.Messages.RequestAggregatedMeasureData.SenderAuthorizer>();
         services.AddTransient<RequestAggregatedMeasureDataTransactionCommand>();
         services.AddScoped<ProcessTypeValidator>();

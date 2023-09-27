@@ -109,7 +109,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var marketDocument = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
-        var result = await CreateMessageReceiver().ReceiveAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
 
         Assert.Contains(result.Errors, error => error is InvalidReceiverId);
     }
@@ -125,7 +125,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var marketDocument = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
-        var result = await CreateMessageReceiver().ReceiveAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
 
         Assert.DoesNotContain(result.Errors, error => error is InvalidReceiverId);
     }
@@ -140,7 +140,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var marketDocument = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
-        var result = await CreateMessageReceiver().ReceiveAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
 
         Assert.DoesNotContain(result.Errors, error => error is InvalidReceiverRole);
     }
@@ -173,7 +173,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var marketDocument = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
-        var result = await CreateMessageReceiver().ReceiveAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
 
         Assert.DoesNotContain(result.Errors, error => error is AuthenticatedUserDoesNotMatchSenderId);
     }
@@ -191,7 +191,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var marketDocument = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
-        var result = await CreateMessageReceiver().ReceiveAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
 
         Assert.Contains(result.Errors, error => error is AuthenticatedUserDoesNotMatchSenderId);
     }
@@ -205,7 +205,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var marketDocument = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
-        var result = await CreateMessageReceiver().ReceiveAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
 
         Assert.Contains(result.Errors, error => error is AuthenticatedUserDoesNotHoldRequiredRoleType);
     }
@@ -226,7 +226,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var marketDocument = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
-        var result = await CreateMessageReceiver().ReceiveAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
 
         Assert.Contains(result.Errors, error => error is DuplicateTransactionIdDetected);
     }
@@ -246,7 +246,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var marketDocument = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
-        var resultFromFirstMessage = await CreateMessageReceiver().ReceiveAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
+        var resultFromFirstMessage = await CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
 
         // Request from a second sender.
         await using var message02 = BusinessMessageBuilder
@@ -260,7 +260,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .ConfigureAwait(false);
         var messageParserResult2 = await ParseMessageAsync(message02).ConfigureAwait(false);
         var marketDocument2 = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult2.IncomingMarketDocument!);
-        var resultFromSecondMessage = await CreateMessageReceiver().ReceiveAsync(marketDocument2, CancellationToken.None).ConfigureAwait(false);
+        var resultFromSecondMessage = await CreateMessageReceiver().ValidateAsync(marketDocument2, CancellationToken.None).ConfigureAwait(false);
 
         Assert.DoesNotContain(resultFromFirstMessage.Errors, error => error is DuplicateTransactionIdDetected);
         Assert.DoesNotContain(resultFromSecondMessage.Errors, error => error is DuplicateTransactionIdDetected);
@@ -282,7 +282,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var marketDocument = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
-        var result = await CreateMessageReceiver().ReceiveAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
 
         Assert.Contains(result.Errors, error => error is EmptyTransactionId);
     }
@@ -299,7 +299,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var marketDocument = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
-        var result = await CreateMessageReceiver().ReceiveAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
 
         Assert.Contains(result.Errors, error => error is EmptyMessageId);
     }
@@ -319,13 +319,13 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var messageParserResult01 = await ParseMessageAsync(message01).ConfigureAwait(false);
         var marketDocument = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult01.IncomingMarketDocument!);
-        var result01 = await CreateMessageReceiver().ReceiveAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
+        var result01 = await CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
 
         await CreateSecondIdentityWithRoles(new List<MarketRole> { MarketRole.EnergySupplier }, SampleData.SecondSenderId, SampleData.SecondStsAssignedUserId)
             .ConfigureAwait(false);
         var messageParserResult02 = await ParseMessageAsync(message02).ConfigureAwait(false);
         var marketDocument02 = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult02.IncomingMarketDocument!);
-        var result02 = await CreateMessageReceiver().ReceiveAsync(marketDocument02, CancellationToken.None).ConfigureAwait(false);
+        var result02 = await CreateMessageReceiver().ValidateAsync(marketDocument02, CancellationToken.None).ConfigureAwait(false);
 
         Assert.DoesNotContain(result01.Errors, error => error is DuplicateMessageIdDetected);
         Assert.DoesNotContain(result02.Errors, error => error is DuplicateMessageIdDetected);
@@ -343,8 +343,8 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var messageParserResult01 = await ParseMessageAsync(message01).ConfigureAwait(false);
         var marketDocument = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult01.IncomingMarketDocument!);
-        var result01 = await CreateMessageReceiver().ReceiveAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
-        var result02 = await CreateMessageReceiver().ReceiveAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
+        var result01 = await CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
+        var result02 = await CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
 
         Assert.True(result01.Success);
         Assert.DoesNotContain(result01.Errors, error => error is DuplicateMessageIdDetected);
@@ -362,7 +362,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var marketDocument = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
-        var result = await CreateMessageReceiver().ReceiveAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
 
         Assert.DoesNotContain(result.Errors, error => error is SenderRoleTypeIsNotAuthorized);
     }
@@ -376,7 +376,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var marketDocument = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
-        var result = await CreateMessageReceiver().ReceiveAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
 
         Assert.False(result.Success);
         Assert.Contains(result.Errors, error => error is InvalidBusinessReasonOrVersion);
@@ -391,7 +391,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var marketDocument = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
-        var result = await CreateMessageReceiver().ReceiveAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
 
         Assert.False(result.Success);
         Assert.Contains(result.Errors, error => error is InvalidMessageStructure);
@@ -458,7 +458,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var marketDocument = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
-        var result = await CreateMessageReceiver().ReceiveAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
 
         Assert.Contains(result.Errors, error => error is InvalidMessageIdSize);
     }
@@ -534,8 +534,8 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         // Act
         var marketDocument = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
-        var receivedResult1 = CreateMessageReceiver().ReceiveAsync(marketDocument, CancellationToken.None);
-        var receivedResult2 = CreateMessageReceiver().ReceiveAsync(marketDocument, CancellationToken.None);
+        var receivedResult1 = CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None);
+        var receivedResult2 = CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None);
 
         await Task.WhenAll(receivedResult1, receivedResult2).ConfigureAwait(false);
 
@@ -582,8 +582,8 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var marketDocument02 = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult02.IncomingMarketDocument!);
 
         // Act
-        var receivedResult1 = CreateMessageReceiver().ReceiveAsync(marketDocument01, CancellationToken.None);
-        var receivedResult2 = CreateMessageReceiver().ReceiveAsync(marketDocument02, CancellationToken.None);
+        var receivedResult1 = CreateMessageReceiver().ValidateAsync(marketDocument01, CancellationToken.None);
+        var receivedResult2 = CreateMessageReceiver().ValidateAsync(marketDocument02, CancellationToken.None);
 
         await Task.WhenAll(receivedResult1, receivedResult2).ConfigureAwait(false);
 
@@ -636,7 +636,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var marketDocument = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
 
         // Act
-        var result = await CreateMessageReceiver().ReceiveAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
 
         // Assert
         Assert.NotNull(result);
@@ -659,7 +659,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var marketDocument = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
-        var result = await CreateMessageReceiver().ReceiveAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
 
         Assert.Contains(result.Errors, error => error is InvalidTransactionIdSize);
     }
@@ -676,7 +676,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var marketDocument = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
-        var result = await CreateMessageReceiver().ReceiveAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
 
         Assert.DoesNotContain(result.Errors, error => error is InvalidTransactionIdSize);
     }
@@ -693,7 +693,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
         var marketDocument = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
-        var result = await CreateMessageReceiver().ReceiveAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
+        var result = await CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
 
         Assert.Contains(result.Errors, error => error is InvalidTransactionIdSize);
     }
@@ -726,9 +726,9 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         return new InitializeAggregatedMeasureDataProcessesHandler(CreateMessageReceiver(), _aggregatedMeasureDataProcessRepository);
     }
 
-    private RequestAggregatedMeasureDataReceiver CreateMessageReceiver()
+    private RequestAggregatedMeasureDataValidator CreateMessageReceiver()
     {
-        var messageReceiver = new RequestAggregatedMeasureDataReceiver(
+        var messageReceiver = new RequestAggregatedMeasureDataValidator(
             _messageIdRepository,
             _transactionIdRepository,
             new SenderAuthorizer(_marketActorAuthenticator),

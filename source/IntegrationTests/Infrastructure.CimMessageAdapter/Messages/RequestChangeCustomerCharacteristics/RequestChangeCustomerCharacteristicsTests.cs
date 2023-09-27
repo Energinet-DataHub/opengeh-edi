@@ -214,18 +214,18 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
         var messageBuilder = BusinessMessageBuilder.RequestChangeCustomerCharacteristics();
 
         using var originalMessage = messageBuilder.Message();
-        await CreateMessageReceiver(messageIdRepository).ReceiveAsync(await ParseMessageAsync(originalMessage).ConfigureAwait(false), CancellationToken.None)
+        await CreateMessageReceiver(messageIdRepository).ValidateAsync(await ParseMessageAsync(originalMessage).ConfigureAwait(false), CancellationToken.None)
             .ConfigureAwait(false);
 
         using var duplicateMessage = messageBuilder.Message();
-        await CreateMessageReceiver(messageIdRepository).ReceiveAsync(await ParseMessageAsync(duplicateMessage).ConfigureAwait(false), CancellationToken.None)
+        await CreateMessageReceiver(messageIdRepository).ValidateAsync(await ParseMessageAsync(duplicateMessage).ConfigureAwait(false), CancellationToken.None)
             .ConfigureAwait(false);
     }
 
     private async Task<Result> ReceiveRequestChangeCustomerCharacteristicsMessage(Stream message)
     {
         return await CreateMessageReceiver()
-            .ReceiveAsync(await ParseMessageAsync(message).ConfigureAwait(false), CancellationToken.None);
+            .ValidateAsync(await ParseMessageAsync(message).ConfigureAwait(false), CancellationToken.None);
     }
 
     private Task<MessageParserResult<MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>> ParseMessageAsync(Stream message)
@@ -233,9 +233,9 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
         return _messageParser.ParseAsync(message, DocumentFormat.Xml, CancellationToken.None);
     }
 
-    private MessageReceiver CreateMessageReceiver()
+    private MarketMessageValidator CreateMessageReceiver()
     {
-        var messageReceiver = new RequestChangeCustomerCharacteristicsReceiver(
+        var messageReceiver = new RequestChangeCustomerCharacteristicsValidator(
             _messageIdRepository,
             _transactionIdRepository,
             new SenderAuthorizer(_marketActorAuthenticator),
@@ -245,9 +245,9 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
         return messageReceiver;
     }
 
-    private MessageReceiver CreateMessageReceiver(IMessageIdRepository messageIdRepository)
+    private MarketMessageValidator CreateMessageReceiver(IMessageIdRepository messageIdRepository)
     {
-        var messageReceiver = new RequestChangeCustomerCharacteristicsReceiver(messageIdRepository, _transactionIdRepository, new SenderAuthorizer(_marketActorAuthenticator), _processTypeValidator, _messageTypeValidator, _masterDataReceiverResponsibleVerification);
+        var messageReceiver = new RequestChangeCustomerCharacteristicsValidator(messageIdRepository, _transactionIdRepository, new SenderAuthorizer(_marketActorAuthenticator), _processTypeValidator, _messageTypeValidator, _masterDataReceiverResponsibleVerification);
         return messageReceiver;
     }
 
