@@ -19,18 +19,8 @@ namespace Energinet.DataHub.EDI.Domain.Documents;
 
 public class DocumentType : EnumerationType
 {
-    public static readonly DocumentType GenericNotification = new(0, "GenericNotification", MessageCategory.MasterData);
-    public static readonly DocumentType ConfirmRequestChangeOfSupplier = new(1, nameof(ConfirmRequestChangeOfSupplier), MessageCategory.MasterData);
-    public static readonly DocumentType RejectRequestChangeOfSupplier = new(2, nameof(RejectRequestChangeOfSupplier), MessageCategory.MasterData);
-    public static readonly DocumentType AccountingPointCharacteristics = new(3, nameof(AccountingPointCharacteristics), MessageCategory.MasterData);
-    public static readonly DocumentType CharacteristicsOfACustomerAtAnAP = new(4, nameof(CharacteristicsOfACustomerAtAnAP), MessageCategory.MasterData);
-    public static readonly DocumentType ConfirmRequestChangeAccountingPointCharacteristics = new(5, nameof(ConfirmRequestChangeAccountingPointCharacteristics), MessageCategory.MasterData);
-    public static readonly DocumentType RejectRequestChangeAccountingPointCharacteristics = new(6, nameof(RejectRequestChangeAccountingPointCharacteristics), MessageCategory.MasterData);
     public static readonly DocumentType NotifyAggregatedMeasureData = new(7, nameof(NotifyAggregatedMeasureData), MessageCategory.Aggregations);
     public static readonly DocumentType RejectRequestAggregatedMeasureData = new(8, nameof(RejectRequestAggregatedMeasureData), MessageCategory.Aggregations);
-
-    // TODO: This document type is obsolete and should not be used. Can be deleted after 2023-08-20
-    public static readonly DocumentType RejectAggregatedMeasureData = new(9, nameof(RejectAggregatedMeasureData), MessageCategory.Aggregations);
 
     protected DocumentType(int id, string name, MessageCategory category)
         : base(id, name)

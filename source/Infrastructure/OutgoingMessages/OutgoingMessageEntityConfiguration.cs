@@ -17,13 +17,6 @@ using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Common;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeAccountingPointCharacteristics;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeOfSupplier;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.GenericNotification;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeAccountingPointCharacteristics;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Domain.Transactions;
@@ -79,13 +72,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages
             builder
                 .HasDiscriminator<string>("Discriminator")
                 .HasValue<OutgoingMessage>(nameof(OutgoingMessage))
-                .HasValue<ConfirmRequestChangeOfSupplierMessage>(DocumentType.ConfirmRequestChangeOfSupplier.Name)
-                .HasValue<RejectRequestChangeOfSupplierMessage>(DocumentType.RejectRequestChangeOfSupplier.Name)
-                .HasValue<GenericNotificationMessage>(DocumentType.GenericNotification.Name)
-                .HasValue<AccountingPointCharacteristicsMessage>(DocumentType.AccountingPointCharacteristics.Name)
-                .HasValue<CharacteristicsOfACustomerAtAnApMessage>(DocumentType.CharacteristicsOfACustomerAtAnAP.Name)
-                .HasValue<ConfirmRequestChangeAccountingPointCharacteristicsMessage>(DocumentType.ConfirmRequestChangeAccountingPointCharacteristics.Name)
-                .HasValue<RejectRequestChangeAccountingPointCharacteristicsMessage>(DocumentType.RejectRequestChangeAccountingPointCharacteristics.Name)
                 .HasValue<AggregationResultMessage>(DocumentType.NotifyAggregatedMeasureData.Name)
                 .IsComplete(false);
         }
