@@ -49,8 +49,12 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
             StartOfPeriod = startOfPeriod;
             EndOfPeriod = endOfPeriod;
             MeteringGridAreaDomainId = meteringGridAreaDomainId;
-            EnergySupplierId = energySupplierId;
-            BalanceResponsibleId = balanceResponsibleId;
+            EnergySupplierId = string.IsNullOrWhiteSpace(energySupplierId)
+                ? null
+                : energySupplierId;
+            BalanceResponsibleId = string.IsNullOrWhiteSpace(balanceResponsibleId)
+                ? null
+                : balanceResponsibleId;
             RequestedByActorId = requestedByActorId;
             RequestedByActorRoleCode = requestedByActorRoleCode;
             AddDomainEvent(new AggregatedMeasureProcessIsInitialized(processId));
