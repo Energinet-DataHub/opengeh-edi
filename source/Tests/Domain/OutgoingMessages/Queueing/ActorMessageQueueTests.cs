@@ -103,8 +103,8 @@ public class ActorMessageQueueTests
     {
         var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), MarketRole.EnergySupplier);
         var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
-        actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.MoveIn, DocumentType.RejectRequestAggregatedMeasureData), maxNumberOfMessagesInABundle: 2);
-        actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing, DocumentType.NotifyAggregatedMeasureData), maxNumberOfMessagesInABundle: 2);
+        actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.MoveIn, DocumentType.NotifyAggregatedMeasureData), maxNumberOfMessagesInABundle: 2);
+        actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing, DocumentType.RejectRequestAggregatedMeasureData), maxNumberOfMessagesInABundle: 2);
 
         var firstPeekResult = actorMessageQueue.Peek(MessageCategory.Aggregations);
         actorMessageQueue.Dequeue(firstPeekResult.BundleId!);
