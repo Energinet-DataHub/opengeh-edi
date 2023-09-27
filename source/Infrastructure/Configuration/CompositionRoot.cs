@@ -22,7 +22,6 @@ using Energinet.DataHub.EDI.Application.Configuration.Authentication;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
-using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Reasons;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Infrastructure.Actors;
 using Energinet.DataHub.EDI.Infrastructure.ArchivedMessages;
@@ -42,7 +41,6 @@ using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AggregationResult;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Reasons;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Dequeue;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Peek;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
@@ -240,7 +238,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             _services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataXmlDocumentWriter>();
             _services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataJsonDocumentWriter>();
 
-            _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
             _services.AddScoped<IMessageRecordParser, MessageRecordParser>();
         }
 
