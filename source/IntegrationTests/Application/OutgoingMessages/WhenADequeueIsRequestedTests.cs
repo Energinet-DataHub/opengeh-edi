@@ -78,16 +78,7 @@ public class WhenADequeueIsRequestedTests : TestBase
 
     private async Task GivenAMoveInTransactionHasBeenAccepted()
     {
-        var incomingMessage = new IncomingMessageBuilder()
-            .WithMarketEvaluationPointId(SampleData.MeteringPointNumber)
-            .WithBusinessReason(BusinessReason.MoveIn)
-            .WithReceiver(SampleData.ReceiverId)
-            .WithSenderId(SampleData.SenderId)
-            .WithConsumerName(SampleData.ConsumerName)
-            .WithEnergySupplierId(SampleData.NewEnergySupplierNumber)
-            .WithMessageId(SampleData.OriginalMessageId)
-            .WithTransactionId(SampleData.TransactionId)
-            .Build();
+        var incomingMessage = new RequestAggregatedMeasureDataMarketDocumentBuilder().BuildCommand();
 
         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
     }

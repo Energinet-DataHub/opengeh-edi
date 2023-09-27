@@ -54,22 +54,17 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase
         Assert.NotNull(result.MessageRecord);
     }
 
-    private static IncomingMessageBuilder MessageBuilder()
+    private static RequestAggregatedMeasureDataMarketDocumentBuilder MessageBuilder()
     {
-        return new IncomingMessageBuilder()
-            .WithEnergySupplierId(SampleData.NewEnergySupplierNumber)
-            .WithMessageId(SampleData.OriginalMessageId)
-            .WithTransactionId(SampleData.TransactionId);
+        return new RequestAggregatedMeasureDataMarketDocumentBuilder()
+            .SetEnergySupplierId(SampleData.NewEnergySupplierNumber)
+            .SetMessageId(SampleData.OriginalMessageId);
     }
 
     private async Task GivenRequestHasBeenAccepted()
     {
         var incomingMessage = MessageBuilder()
-            .WithBusinessReason(BusinessReason.MoveIn)
-            .WithReceiver(SampleData.ReceiverId)
-            .WithSenderId(SampleData.SenderId)
-            .WithConsumerName(SampleData.ConsumerName)
-            .Build();
+            .BuildCommand();
 
         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
     }

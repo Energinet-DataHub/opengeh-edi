@@ -28,10 +28,6 @@ public class DocumentFactoryTests
 
     private readonly List<DocumentType> _documentTypesNotSupportedByJson = new()
     {
-        DocumentType.AccountingPointCharacteristics,
-        DocumentType.CharacteristicsOfACustomerAtAnAP,
-        DocumentType.ConfirmRequestChangeAccountingPointCharacteristics,
-        DocumentType.GenericNotification,
         DocumentType.RejectAggregatedMeasureData,
         DocumentType.RejectRequestChangeAccountingPointCharacteristics,
     };

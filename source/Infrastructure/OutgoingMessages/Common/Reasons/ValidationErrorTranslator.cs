@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Reasons;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 
 namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Reasons;
 

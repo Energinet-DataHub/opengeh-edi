@@ -45,7 +45,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task When_no_messages_are_available_return_empty_result()
     {
-        await GivenTwoMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+        await GivenTwoRequestAggregatedMeasuredDataHasBeenAccepted().ConfigureAwait(false);
 
         var result = await PeekMessage(MessageCategory.Aggregations).ConfigureAwait(false);
 
@@ -56,7 +56,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task A_message_bundle_is_returned()
     {
-        await GivenTwoMoveInTransactionHasBeenAccepted();
+        await GivenTwoRequestAggregatedMeasuredDataHasBeenAccepted();
 
         var result = await PeekMessage(MessageCategory.MasterData).ConfigureAwait(false);
 
@@ -71,7 +71,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task Ensure_same_bundle_is_returned_if_not_dequeued()
     {
-        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+        await GivenTwoRequestAggregatedMeasuredDataHasBeenAccepted().ConfigureAwait(false);
 
         var firstPeekResult = await PeekMessage(MessageCategory.MasterData).ConfigureAwait(false);
         var secondPeekResult = await PeekMessage(MessageCategory.MasterData).ConfigureAwait(false);
@@ -84,19 +84,11 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task The_generated_document_is_archived()
     {
-        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+        await GivenTwoRequestAggregatedMeasuredDataHasBeenAccepted().ConfigureAwait(false);
 
         var result = await PeekMessage(MessageCategory.MasterData).ConfigureAwait(false);
 
         await AssertMessageIsArchived(result.MessageId);
-    }
-
-    private static IncomingMessageBuilder MessageBuilder()
-    {
-        return new IncomingMessageBuilder()
-            .WithEnergySupplierId(SampleData.NewEnergySupplierNumber)
-            .WithMessageId(SampleData.OriginalMessageId)
-            .WithTransactionId(SampleData.TransactionId);
     }
 
     private async Task InsertFakeMessagesAsync(string receiverId, MarketRole receiverRole, MessageCategory category, BusinessReason businessReason, DocumentType documentType)
@@ -120,33 +112,22 @@ public class WhenAPeekIsRequestedTests : TestBase
         }
     }
 
-    private async Task GivenAMoveInTransactionHasBeenAccepted()
+    private async Task GivenARequestAggregatedMeasuredDataHasBeenAccepted()
     {
-        var incomingMessage = MessageBuilder()
-            .WithMarketEvaluationPointId(SampleData.MeteringPointNumber)
-            .WithBusinessReason(BusinessReason.MoveIn)
-            .WithReceiver(SampleData.ReceiverId)
-            .WithSenderId(SampleData.SenderId)
-            .WithConsumerName(SampleData.ConsumerName)
-            .Build();
+        var builder = new RequestAggregatedMeasureDataMarketDocumentBuilder();
+        var incomingMessage = builder.BuildCommand();
 
         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
     }
 
-    private async Task GivenTwoMoveInTransactionHasBeenAccepted()
+    private async Task GivenTwoRequestAggregatedMeasuredDataHasBeenAccepted()
     {
-        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+        await GivenARequestAggregatedMeasuredDataHasBeenAccepted().ConfigureAwait(false);
 
-        var message = MessageBuilder()
-            .WithBusinessReason(BusinessReason.MoveIn)
-            .WithReceiver(SampleData.ReceiverId)
-            .WithSenderId(SampleData.SenderId)
-            .WithEffectiveDate(EffectiveDateFactory.OffsetDaysFromToday(1))
-            .WithConsumerId(ConsumerFactory.CreateConsumerId())
-            .WithConsumerName(ConsumerFactory.CreateConsumerName())
-            .WithTransactionId(Guid.NewGuid().ToString()).Build();
+        var builder = new RequestAggregatedMeasureDataMarketDocumentBuilder();
+        var incomingMessage = builder.BuildCommand();
 
-        await InvokeCommandAsync(message).ConfigureAwait(false);
+        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
     }
 
     private async Task<bool> BundleIsRegistered()

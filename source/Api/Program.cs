@@ -26,13 +26,11 @@ using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.MarketAc
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Application.Transactions.MoveIn;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.Infrastructure.Transactions;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.MoveIn;
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.Reflection;
@@ -91,12 +89,6 @@ namespace Energinet.DataHub.EDI.Api
                 {
                     var databaseConnectionString = runtime.DB_CONNECTION_STRING;
 
-                    services.AddSingleton(new MeteringPointServiceBusClientConfiguration(
-                        "NotImplemented"));
-
-                    services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration(
-                        "NotImplemented"));
-
                     services.AddSingleton(new WholesaleServiceBusClientConfiguration(
                         runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!));
 
@@ -144,17 +136,6 @@ namespace Energinet.DataHub.EDI.Api
                         .AddMessagePublishing()
                         .AddHttpClientAdapter(sp => new HttpClientAdapter(sp.GetRequiredService<HttpClient>()))
                         .AddAggregatedMeasureDataServices()
-                        .AddMoveInServices(
-                            new MoveInSettings(
-                                new MessageDelivery(
-                                    new GridOperator()
-                                    {
-                                        GracePeriodInDaysAfterEffectiveDateIfNotUpdated = 15,
-                                    }),
-                                new BusinessService(new Uri("http://NotImplemented"))),
-                            _ => new FakeMoveInRequester(),
-                            _ => new FakeCustomerMasterDataClient(),
-                            _ => new FakeMeteringPointMasterDataClient())
                         .AddMessageParserServices();
 
                     services.AddLiveHealthCheck();
