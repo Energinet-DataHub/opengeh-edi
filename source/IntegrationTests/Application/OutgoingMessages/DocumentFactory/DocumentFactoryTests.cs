@@ -26,14 +26,6 @@ public class DocumentFactoryTests
 {
     private readonly IEnumerable<IDocumentWriter> _documentWriters;
 
-    private readonly List<DocumentType> _documentTypesNotSupportedByJson = new()
-    {
-    };
-
-    private readonly List<DocumentType> _documentTypesNotSupportedByXml = new()
-    {
-    };
-
     public DocumentFactoryTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
@@ -53,14 +45,7 @@ public class DocumentFactoryTests
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Xml));
 
-        if (_documentTypesNotSupportedByXml.Contains(documentType))
-        {
-            Assert.Null(writer);
-        }
-        else
-        {
-            Assert.NotNull(writer);
-        }
+        Assert.NotNull(writer);
     }
 
     [Theory]
@@ -70,13 +55,6 @@ public class DocumentFactoryTests
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Json));
 
-        if (_documentTypesNotSupportedByJson.Contains(documentType))
-        {
-            Assert.Null(writer);
-        }
-        else
-        {
-            Assert.NotNull(writer);
-        }
+        Assert.NotNull(writer);
     }
 }
