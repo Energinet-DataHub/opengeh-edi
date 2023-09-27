@@ -49,8 +49,12 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
             StartOfPeriod = startOfPeriod;
             EndOfPeriod = endOfPeriod;
             MeteringGridAreaDomainId = meteringGridAreaDomainId;
-            EnergySupplierId = energySupplierId;
-            BalanceResponsibleId = balanceResponsibleId;
+            EnergySupplierId = string.IsNullOrWhiteSpace(energySupplierId)
+                ? null
+                : energySupplierId;
+            BalanceResponsibleId = string.IsNullOrWhiteSpace(balanceResponsibleId)
+                ? null
+                : balanceResponsibleId;
             RequestedByActorId = requestedByActorId;
             RequestedByActorRoleCode = requestedByActorRoleCode;
             AddDomainEvent(new AggregatedMeasureProcessIsInitialized(processId));
@@ -108,8 +112,6 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
         public ActorNumber RequestedByActorId { get; set; }
 
         public string RequestedByActorRoleCode { get; }
-
-        public string? ResponseData { get; set; }
 
         public void WasSentToWholesale()
         {
