@@ -375,11 +375,9 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .Message();
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
-        var marketDocument = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
-        var result = await CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
 
-        Assert.False(result.Success);
-        Assert.Contains(result.Errors, error => error is InvalidBusinessReasonOrVersion);
+        Assert.False(messageParserResult.Success);
+        Assert.Contains(messageParserResult.Errors, error => error is InvalidBusinessReasonOrVersion);
     }
 
     [Fact]
@@ -390,11 +388,9 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .Message();
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
-        var marketDocument = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
-        var result = await CreateMessageReceiver().ValidateAsync(marketDocument, CancellationToken.None).ConfigureAwait(false);
 
-        Assert.False(result.Success);
-        Assert.Contains(result.Errors, error => error is InvalidMessageStructure);
+        Assert.False(messageParserResult.Success);
+        Assert.Contains(messageParserResult.Errors, error => error is InvalidMessageStructure);
     }
 
     [Fact]
@@ -477,8 +473,9 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .Message();
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
+        var marketMessage = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
         var result = await CreateInitializeRequestAggregatedMeasureProcessesHandler()
-            .Handle(new InitializeAggregatedMeasureDataProcessesCommand(messageParserResult), CancellationToken.None);
+            .Handle(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage), CancellationToken.None);
 
         var process = _b2BContext.AggregatedMeasureDataProcesses.Local.FirstOrDefault();
         Assert.True(result.Success);
@@ -505,8 +502,9 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .Message();
 
         var messageParserResult = await ParseMessageAsync(message).ConfigureAwait(false);
+        var marketMessage = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
         var result = await CreateInitializeRequestAggregatedMeasureProcessesHandler()
-            .Handle(new InitializeAggregatedMeasureDataProcessesCommand(messageParserResult), CancellationToken.None);
+            .Handle(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage), CancellationToken.None);
 
         var processes = _b2BContext.AggregatedMeasureDataProcesses.Local.ToList();
         Assert.True(result.Success);

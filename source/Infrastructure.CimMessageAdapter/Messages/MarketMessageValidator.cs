@@ -185,9 +185,9 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
             _errors.AddRange(result.Errors);
         }
 
-        private async Task CheckBusinessReasonAsync(BusinessReason businessReason, CancellationToken cancellationToken)
+        private async Task CheckBusinessReasonAsync(string businessReason, CancellationToken cancellationToken)
         {
-            var result = await _processTypeValidator.ValidateAsync(businessReason.Name, cancellationToken).ConfigureAwait(false);
+            var result = await _processTypeValidator.ValidateAsync(businessReason, cancellationToken).ConfigureAwait(false);
             _errors.AddRange(result.Errors);
         }
 

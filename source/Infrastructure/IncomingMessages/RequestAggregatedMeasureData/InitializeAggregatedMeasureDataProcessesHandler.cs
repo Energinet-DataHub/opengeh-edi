@@ -65,7 +65,7 @@ public class InitializeAggregatedMeasureDataProcessesHandler
                     BusinessTransactionId.Create(serie.Id),
                     marketMessage.SenderNumber,
                     marketMessage.SenderRole.Code,
-                    marketMessage.BusinessReason.Name,
+                    marketMessage.BusinessReason,
                     serie.MarketEvaluationPointType,
                     serie.MarketEvaluationSettlementMethod,
                     serie.StartDateAndOrTimeDateTime,

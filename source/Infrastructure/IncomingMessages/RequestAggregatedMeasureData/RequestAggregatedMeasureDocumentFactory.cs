@@ -50,7 +50,7 @@ public static class RequestAggregatedMeasureDocumentFactory
             MarketRole.FromCode(incomingMarketDocument.Header.SenderRole),
             ActorNumber.Create(incomingMarketDocument.Header.ReceiverId),
             MarketRole.FromCode(incomingMarketDocument.Header.ReceiverRole),
-            BusinessReason.From(incomingMarketDocument.Header.BusinessReason),
+            incomingMarketDocument.Header.BusinessReason,
             incomingMarketDocument.Header.AuthenticatedUser,
             incomingMarketDocument.Header.AuthenticatedUserRole,
             incomingMarketDocument.Header.MessageType,
