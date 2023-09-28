@@ -38,6 +38,11 @@ public class DequeuedBundlesRetention : IDataRetention
             FROM [dbo].[Bundles]
             WHERE [IsDequeued] = 1)
 
+            DELETE FROM [dbo].[OutgoingMessages]
+            WHERE [AssignedBundleId] IN (SELECT [Id]
+            FROM [dbo].[Bundles]
+            WHERE [IsDequeued] = 1)
+
             DELETE FROM [dbo].[Bundles]
             WHERE [IsDequeued] = 1";
 
