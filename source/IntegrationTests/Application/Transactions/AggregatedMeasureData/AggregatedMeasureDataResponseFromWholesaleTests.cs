@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using NodaTime.Extensions;
@@ -49,8 +50,8 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         // Arrange
         var expectedOutgoingMessages = 1;
         var incomingMessage = MessageBuilder().Build();
-        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(incomingMessage)).ConfigureAwait(false);
+        var process = GetProcess(incomingMessage.IncomingMarketDocument!.Header.SenderId);
         process!.WasSentToWholesale();
         var acceptedAggregation = CreateAcceptedAggregation();
 
@@ -68,8 +69,8 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         // Arrange
         var expectedOutgoingMessages = 1;
         var incomingMessage = MessageBuilder().Build();
-        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(incomingMessage)).ConfigureAwait(false);
+        var process = GetProcess(incomingMessage.IncomingMarketDocument!.Header.SenderId);
         process!.WasSentToWholesale();
         var acceptedAggregation = CreateAcceptedAggregation();
 
@@ -88,8 +89,8 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         // Arrange
         var expectedOutgoingMessage = 1;
         var incomingMessage = MessageBuilder().Build();
-        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(incomingMessage)).ConfigureAwait(false);
+        var process = GetProcess(incomingMessage.IncomingMarketDocument!.Header.SenderId);
         process!.WasSentToWholesale();
         var rejectedRequest = CreateRejectRequest();
 
@@ -107,8 +108,8 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         // Arrange
         var expectedOutgoingMessage = 1;
         var incomingMessage = MessageBuilder().Build();
-        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-        var process = GetProcess(incomingMessage.MessageHeader.SenderId);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(incomingMessage)).ConfigureAwait(false);
+        var process = GetProcess(incomingMessage.IncomingMarketDocument!.Header.SenderId);
         process!.WasSentToWholesale();
         var rejectedRequest = CreateRejectRequest();
 
@@ -127,9 +128,9 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         _b2BContext.Dispose();
     }
 
-    private static RequestAggregatedMeasureDataMessageBuilder MessageBuilder()
+    private static RequestAggregatedMeasureDataMarketDocumentBuilder MessageBuilder()
     {
-        return new RequestAggregatedMeasureDataMessageBuilder();
+        return new RequestAggregatedMeasureDataMarketDocumentBuilder();
     }
 
     private static Aggregation CreateAcceptedAggregation()

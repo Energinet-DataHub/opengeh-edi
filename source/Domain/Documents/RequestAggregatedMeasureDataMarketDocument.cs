@@ -12,17 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+namespace Energinet.DataHub.EDI.Domain.Documents;
 
-namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+public record RequestAggregatedMeasureDataMarketDocument(
+    string SenderId,
+    string SenderRole,
+    string BusinessReason,
+    IReadOnlyCollection<Serie> Series);
 
-/// <summary>
-/// Authorization policy used for authorizing the sender of a market document
-/// </summary>
-public interface ISenderAuthorizer
-{
-    /// <summary>
-    /// Authorize sender
-    /// </summary>
-    Task<Result> AuthorizeAsync(string senderId, string senderRole, string? authenticatedUser = null, string? authenticatedUserRole = null);
-}
+public record Serie(
+    string Id,
+    string? MarketEvaluationPointType,
+    string? MarketEvaluationSettlementMethod,
+    string StartDateAndOrTimeDateTime,
+    string? EndDateAndOrTimeDateTime,
+    string? MeteringGridAreaDomainId,
+    string? EnergySupplierMarketParticipantId,
+    string? BalanceResponsiblePartyMarketParticipantId);

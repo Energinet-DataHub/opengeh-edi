@@ -24,7 +24,6 @@ using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
 using Energinet.DataHub.EDI.Application.Configuration.Queries;
 using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
-using Energinet.DataHub.EDI.Application.Transactions.MoveIn;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
@@ -33,7 +32,6 @@ using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusine
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
 using Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.MoveIn;
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
@@ -178,7 +176,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
             _services = new ServiceCollection();
 
-            _services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration("Fake"));
             _services.AddSingleton(new WholesaleServiceBusClientConfiguration("Fake"));
             _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
             _services.AddSingleton(
@@ -212,10 +209,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 .AddMessagePublishing()
                 .AddHttpClientAdapter(_ => _httpClientSpy)
                 .AddAggregatedMeasureDataServices()
-                .AddMoveInServices(
-                    new MoveInSettings(
-                        new MessageDelivery(new GridOperator() { GracePeriodInDaysAfterEffectiveDateIfNotUpdated = 1, }),
-                        new BusinessService(new Uri("http://someuri"))))
                 .AddMessageParserServices();
             _serviceProvider = _services.BuildServiceProvider();
         }

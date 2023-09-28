@@ -15,31 +15,19 @@
 using System;
 using Energinet.DataHub.EDI.Domain.ArchivedMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.AccountingPointCharacteristics;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.CharacteristicsOfACustomerAtAnAp;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeAccountingPointCharacteristics;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.ConfirmRequestChangeOfSupplier;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.GenericNotification;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeAccountingPointCharacteristics;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.MoveIn.RejectRequestChangeOfSupplier;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
-using Energinet.DataHub.EDI.Domain.Transactions.MoveIn;
 using Energinet.DataHub.EDI.Infrastructure.ArchivedMessages;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
-using Energinet.DataHub.EDI.Infrastructure.MasterData.MarketEvaluationPoints;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.MoveIn;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.UpdateCustomer;
 using Microsoft.EntityFrameworkCore;
-using MarketEvaluationPoint = Energinet.DataHub.EDI.Domain.MasterData.MarketEvaluationPoints.MarketEvaluationPoint;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 {
@@ -58,8 +46,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
         {
         }
 
-        public DbSet<MoveInTransaction> Transactions { get; private set; }
-
         public DbSet<AggregatedMeasureDataProcess> AggregatedMeasureDataProcesses { get; private set; }
 
         public DbSet<AggregationResultForwarding> AggregatedTimeSeriesTransactions { get; private set; }
@@ -67,8 +53,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
         public DbSet<OutgoingMessage> OutgoingMessages { get; private set; }
 
         public DbSet<QueuedInternalCommand> QueuedInternalCommands { get; private set; }
-
-        public DbSet<MarketEvaluationPoint> MarketEvaluationPoints { get; private set; }
 
         public DbSet<EnqueuedMessage> EnqueuedMessages { get; private set; }
 
@@ -86,33 +70,15 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
 
-            modelBuilder.ApplyConfiguration(new MoveInTransactionEntityConfiguration(_serializer));
             modelBuilder.ApplyConfiguration(new AggregatedMeasureDataProcessEntityConfiguration());
             modelBuilder.ApplyConfiguration(new AggregationResultForwardingEntityConfiguration(_serializer));
-            modelBuilder.ApplyConfiguration(new EntityConfiguration());
             modelBuilder.ApplyConfiguration(new OutgoingMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QueuedInternalCommandEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ReceivedIntegrationEventEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new MarketEvaluationPointEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ArchivedMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ActorMessageQueueEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MarketDocumentEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ReceivedInboxEventEntityConfiguration());
-
-            modelBuilder.Entity<GenericNotificationMessage>()
-                .Ignore(entity => entity.MarketActivityRecord);
-            modelBuilder.Entity<ConfirmRequestChangeOfSupplierMessage>()
-                .Ignore(entity => entity.MarketActivityRecord);
-            modelBuilder.Entity<RejectRequestChangeOfSupplierMessage>()
-                .Ignore(entity => entity.MarketActivityRecord);
-            modelBuilder.Entity<AccountingPointCharacteristicsMessage>()
-                .Ignore(entity => entity.MarketActivityRecord);
-            modelBuilder.Entity<CharacteristicsOfACustomerAtAnApMessage>()
-                .Ignore(entity => entity.MarketActivityRecord);
-            modelBuilder.Entity<ConfirmRequestChangeAccountingPointCharacteristicsMessage>()
-                .Ignore(entity => entity.MarketActivityRecord);
-            modelBuilder.Entity<RejectRequestChangeAccountingPointCharacteristicsMessage>()
-                .Ignore(entity => entity.MarketActivityRecord);
         }
     }
 }

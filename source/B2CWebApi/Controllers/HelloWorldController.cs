@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
-namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 
-/// <summary>
-/// Authorization policy used for authorizing the sender of a market document
-/// </summary>
-public interface ISenderAuthorizer
+[ApiController]
+[Route("[controller]")]
+public class HelloWorldController : ControllerBase
 {
-    /// <summary>
-    /// Authorize sender
-    /// </summary>
-    Task<Result> AuthorizeAsync(string senderId, string senderRole, string? authenticatedUser = null, string? authenticatedUserRole = null);
+    [HttpPost]
+    public new string Request()
+    {
+        return "Hello World";
+    }
 }

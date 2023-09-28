@@ -31,20 +31,21 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
             _marketActorAuthenticator = marketActorAuthenticator ?? throw new ArgumentNullException(nameof(marketActorAuthenticator));
         }
 
-        public Task<Result> AuthorizeAsync(string senderId, string senderRole)
+        public Task<Result> AuthorizeAsync(string senderId, string senderRole, string? authenticatedUser = null, string? authenticatedUserRole = null)
         {
             if (senderId == null) throw new ArgumentNullException(nameof(senderId));
             if (senderRole == null) throw new ArgumentNullException(nameof(senderRole));
-            EnsureSenderIdMatches(senderId);
+            EnsureSenderIdMatches(senderId, authenticatedUser);
             EnsureSenderRole(senderRole);
-            EnsureCurrentUserHasRequiredRole(senderRole);
+            EnsureCurrentUserHasRequiredRole(senderRole, authenticatedUserRole);
 
             return Task.FromResult(_validationErrors.Count == 0 ? Result.Succeeded() : Result.Failure(_validationErrors.ToArray()));
         }
 
-        private void EnsureCurrentUserHasRequiredRole(string senderRole)
+        private void EnsureCurrentUserHasRequiredRole(string senderRole, string? authenticatedUserRole = null)
         {
-            if (!_marketActorAuthenticator.CurrentIdentity.HasRole(senderRole))
+            if (!_marketActorAuthenticator.CurrentIdentity.HasRole(senderRole)
+                && !(!string.IsNullOrWhiteSpace(authenticatedUserRole) && authenticatedUserRole.Equals(senderRole, StringComparison.Ordinal)))
             {
                 _validationErrors.Add(new AuthenticatedUserDoesNotHoldRequiredRoleType());
             }
@@ -60,9 +61,10 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
             }
         }
 
-        private void EnsureSenderIdMatches(string senderId)
+        private void EnsureSenderIdMatches(string senderId, string? authenticatedUser = null)
         {
-            if (_marketActorAuthenticator.CurrentIdentity.Number?.Value.Equals(senderId, StringComparison.OrdinalIgnoreCase) == false)
+            if (_marketActorAuthenticator.CurrentIdentity.Number?.Value.Equals(senderId, StringComparison.OrdinalIgnoreCase) == false
+                && !(!string.IsNullOrWhiteSpace(authenticatedUser) && authenticatedUser.Equals(authenticatedUser, StringComparison.Ordinal)))
             {
                 _validationErrors.Add(new AuthenticatedUserDoesNotMatchSenderId());
             }

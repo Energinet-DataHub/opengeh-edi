@@ -13,20 +13,17 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
-using MediatR;
+using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 
-namespace Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
-// TODO: "Should be removed when the new implementation of message parser is in place"
-public class RequestAggregatedMeasureDataTransactionCommand : ICommand<Unit>, IMarketTransaction<Serie>
+public class InitializeAggregatedMeasureDataProcessesCommand : ICommand<Result>
 {
-    public RequestAggregatedMeasureDataTransactionCommand(MessageHeader messageHeader, Serie marketActivityRecord)
+    public InitializeAggregatedMeasureDataProcessesCommand(MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand> messageResult)
     {
-        MessageHeader = messageHeader;
-        MarketActivityRecord = marketActivityRecord;
+        MessageResult = messageResult;
     }
 
-    public MessageHeader MessageHeader { get; }
-
-    public Serie MarketActivityRecord { get; }
+    public MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand> MessageResult { get; }
 }

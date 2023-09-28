@@ -94,7 +94,7 @@ public class WhenADocumentIsRequestedTests : TestBase
         return new ArchivedMessage(
             string.IsNullOrWhiteSpace(id) ? Guid.NewGuid().ToString() : id,
             string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
-            DocumentType.AccountingPointCharacteristics.Name,
+            DocumentType.NotifyAggregatedMeasureData.Name,
             "1234512345123",
             "1234512345128",
             _systemDateTimeProvider.Now(),

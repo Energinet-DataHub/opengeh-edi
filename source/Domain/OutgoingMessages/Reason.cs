@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+namespace Energinet.DataHub.EDI.Domain.OutgoingMessages;
 
-namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
-
-/// <summary>
-/// Authorization policy used for authorizing the sender of a market document
-/// </summary>
-public interface ISenderAuthorizer
+public class Reason
 {
-    /// <summary>
-    /// Authorize sender
-    /// </summary>
-    Task<Result> AuthorizeAsync(string senderId, string senderRole, string? authenticatedUser = null, string? authenticatedUserRole = null);
+    public Reason(string text, string code)
+    {
+        Text = text;
+        Code = code;
+    }
+
+    public string Code { get; }
+
+    public string Text { get; }
 }

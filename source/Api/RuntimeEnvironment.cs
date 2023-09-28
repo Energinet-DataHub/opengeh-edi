@@ -27,10 +27,6 @@ namespace Energinet.DataHub.EDI.Api
         public virtual string? SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND =>
             GetEnvironmentVariable(nameof(SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND));
 
-        public virtual string? INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME => GetEnvironmentVariable(nameof(INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME));
-
-        public virtual string? INCOMING_AGGREGATED_MEASURE_DATA_QUEUE_NAME => GetEnvironmentVariable(nameof(INCOMING_AGGREGATED_MEASURE_DATA_QUEUE_NAME));
-
         public virtual string? EDI_INBOX_MESSAGE_QUEUE_NAME => GetEnvironmentVariable(nameof(EDI_INBOX_MESSAGE_QUEUE_NAME));
 
         public virtual string? WHOLESALE_INBOX_MESSAGE_QUEUE_NAME => GetEnvironmentVariable(nameof(WHOLESALE_INBOX_MESSAGE_QUEUE_NAME));

@@ -53,6 +53,7 @@ public class AggregatedMeasureDataRequestFactory
     {
         if (process.EnergySupplierId == null && process.BalanceResponsibleId == null)
         {
+            if (string.IsNullOrWhiteSpace(process.MeteringGridAreaDomainId)) throw new InvalidOperationException("Missing grid area code for grid responsible");
             request.AggregationPerGridarea = new AggregationPerGridArea()
             {
                 GridAreaCode = process.MeteringGridAreaDomainId,
@@ -67,6 +68,7 @@ public class AggregatedMeasureDataRequestFactory
     {
         if (process.EnergySupplierId != null && process.BalanceResponsibleId == null)
         {
+            if (string.IsNullOrWhiteSpace(process.MeteringGridAreaDomainId)) throw new InvalidOperationException($"Missing grid area code for energy supplier: {process.EnergySupplierId}");
             request.AggregationPerEnergysupplierPerGridarea = new AggregationPerEnergySupplierPerGridArea()
             {
                 GridAreaCode = process.MeteringGridAreaDomainId,
@@ -81,6 +83,7 @@ public class AggregatedMeasureDataRequestFactory
     {
         if (process.EnergySupplierId != null && process.BalanceResponsibleId != null)
         {
+            if (string.IsNullOrWhiteSpace(process.MeteringGridAreaDomainId)) throw new InvalidOperationException($"Missing grid area code for energy supplier: {process.EnergySupplierId} per balance responsible: {process.BalanceResponsibleId}");
             request.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea =
                 new AggregationPerEnergySupplierPerBalanceResponsiblePartyPerGridArea()
                 {
@@ -97,6 +100,7 @@ public class AggregatedMeasureDataRequestFactory
     {
         if (process.EnergySupplierId == null && process.BalanceResponsibleId != null)
         {
+            if (string.IsNullOrWhiteSpace(process.MeteringGridAreaDomainId)) throw new InvalidOperationException($"Missing grid area code for balance responsible: {process.BalanceResponsibleId}");
             request.AggregationPerBalanceresponsiblepartyPerGridarea =
                 new AggregationPerBalanceResponsiblePartyPerGridArea()
                 {
@@ -118,9 +122,9 @@ public class AggregatedMeasureDataRequestFactory
                 "E02" => TimeSeriesType.FlexConsumption,
                 "" => TimeSeriesType.TotalConsumption,
                 null => TimeSeriesType.TotalConsumption,
-                _ => throw TimeSeriesException(process),
+                _ => ThrowInvalidOperationExceptionForTimeSeries(process),
             },
-            _ => throw TimeSeriesException(process),
+            _ => ThrowInvalidOperationExceptionForTimeSeries(process),
         };
     }
 
@@ -133,18 +137,18 @@ public class AggregatedMeasureDataRequestFactory
             {
                 "D01" => TimeSeriesType.NonProfiledConsumption,
                 "E02" => TimeSeriesType.FlexConsumption,
-                _ => throw TimeSeriesException(process),
+                _ => ThrowInvalidOperationExceptionForTimeSeries(process),
             },
-            _ => throw TimeSeriesException(process),
+            _ => ThrowInvalidOperationExceptionForTimeSeries(process),
         };
     }
 
-    private static InvalidOperationException TimeSeriesException(AggregatedMeasureDataProcess process)
+    private static TimeSeriesType ThrowInvalidOperationExceptionForTimeSeries(AggregatedMeasureDataProcess process)
     {
-        return new InvalidOperationException(
+        throw new InvalidOperationException(
             $"Unknown time series type for metering point type {process.MeteringPointType}" +
             $" and settlement method {process.SettlementMethod}" +
-            $"as a {process.RequestedByActorRoleCode}");
+            $"as a {MarketRole.FromCode(process.RequestedByActorRoleCode).Name}");
     }
 
     private IMessage CreateAggregatedMeasureDataRequest(AggregatedMeasureDataProcess process)

@@ -19,23 +19,28 @@ using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using MediatR;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
 public class WhenOutgoingMessagesAreCreatedTests : TestBase
 {
+    private readonly RequestAggregatedMeasuredDataProcessInvoker _requestAggregatedMeasuredDataProcessInvoker;
+
     public WhenOutgoingMessagesAreCreatedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
+        _requestAggregatedMeasuredDataProcessInvoker =
+            new RequestAggregatedMeasuredDataProcessInvoker(GetService<IMediator>(), GetService<B2BContext>());
     }
 
     [Fact]
     public async Task Outgoing_message_is_enqueued()
     {
-        await GivenRequestHasBeenAccepted().ConfigureAwait(false);
+        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync().ConfigureAwait(false);
 
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var sql = $"SELECT * FROM [dbo].[OutgoingMessages]";
@@ -45,32 +50,12 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase
             .ConfigureAwait(false);
 
         Assert.NotNull(result);
-        Assert.Equal(result.DocumentType, DocumentType.ConfirmRequestChangeOfSupplier.Name);
+        Assert.Equal(result.DocumentType, DocumentType.NotifyAggregatedMeasureData.Name);
         Assert.Equal(result.ReceiverId, SampleData.NewEnergySupplierNumber);
         Assert.Equal(result.ReceiverRole, MarketRole.EnergySupplier.Name);
         Assert.Equal(result.SenderId, DataHubDetails.IdentificationNumber.Value);
-        Assert.Equal(result.SenderRole, MarketRole.MeteringPointAdministrator.Name);
-        Assert.Equal(BusinessReason.MoveIn.Name, result.BusinessReason);
+        Assert.Equal(result.SenderRole, MarketRole.MeteringDataAdministrator.Name);
+        Assert.Equal(BusinessReason.PreliminaryAggregation.Name, result.BusinessReason);
         Assert.NotNull(result.MessageRecord);
-    }
-
-    private static IncomingMessageBuilder MessageBuilder()
-    {
-        return new IncomingMessageBuilder()
-            .WithEnergySupplierId(SampleData.NewEnergySupplierNumber)
-            .WithMessageId(SampleData.OriginalMessageId)
-            .WithTransactionId(SampleData.TransactionId);
-    }
-
-    private async Task GivenRequestHasBeenAccepted()
-    {
-        var incomingMessage = MessageBuilder()
-            .WithBusinessReason(BusinessReason.MoveIn)
-            .WithReceiver(SampleData.ReceiverId)
-            .WithSenderId(SampleData.SenderId)
-            .WithConsumerName(SampleData.ConsumerName)
-            .Build();
-
-        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
     }
 }

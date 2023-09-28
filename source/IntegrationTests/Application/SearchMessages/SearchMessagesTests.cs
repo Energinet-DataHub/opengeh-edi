@@ -147,8 +147,8 @@ public class SearchMessagesTests : TestBase
     public async Task Filter_messages_by_document_types()
     {
         // Arrange
-        var confirmRequestChangeOfSupplier = DocumentType.ConfirmRequestChangeOfSupplier.Name;
-        var rejectRequestChangeOfSupplier = DocumentType.RejectRequestChangeOfSupplier.Name;
+        var confirmRequestChangeOfSupplier = DocumentType.NotifyAggregatedMeasureData.Name;
+        var rejectRequestChangeOfSupplier = DocumentType.RejectRequestAggregatedMeasureData.Name;
         await ArchiveMessage(CreateArchivedMessage(documentType: confirmRequestChangeOfSupplier));
         await ArchiveMessage(CreateArchivedMessage(documentType: rejectRequestChangeOfSupplier));
         await ArchiveMessage(CreateArchivedMessage());
@@ -212,7 +212,7 @@ public class SearchMessagesTests : TestBase
         return new ArchivedMessage(
             string.IsNullOrWhiteSpace(id) ? Guid.NewGuid().ToString() : id,
             messageId ?? "MessageId",
-            documentType ?? DocumentType.AccountingPointCharacteristics.Name,
+            documentType ?? DocumentType.NotifyAggregatedMeasureData.Name,
             senderNumber ?? "1234512345123",
             receiverNumber ?? "1234512345128",
             createdAt.GetValueOrDefault(_systemDateTimeProvider.Now()),

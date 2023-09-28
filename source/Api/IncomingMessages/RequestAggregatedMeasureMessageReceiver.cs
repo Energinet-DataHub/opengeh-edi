@@ -22,7 +22,6 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
-using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.ArchivedMessages;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
@@ -94,7 +93,6 @@ public class RequestAggregatedMeasureMessageReceiver
         }
 
         var messageParserResult = await _messageParser.ParseAsync(request.Body, cimFormat, cancellationToken).ConfigureAwait(false);
-
         var messageHeader = messageParserResult.IncomingMarketDocument?.Header;
         if (messageHeader is null || messageParserResult.Errors.Any())
         {
@@ -106,7 +104,7 @@ public class RequestAggregatedMeasureMessageReceiver
         await SaveArchivedMessageAsync(messageHeader, request.Body, cancellationToken).ConfigureAwait(false);
 
         var result = await _mediator
-            .Send(new ReceiveAggregatedMeasureDataRequestCommand(messageParserResult), cancellationToken).ConfigureAwait(false);
+            .Send(new InitializeAggregatedMeasureDataProcessesCommand(messageParserResult), cancellationToken).ConfigureAwait(false);
 
         var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
         return CreateResponse(request, httpStatusCode, _responseFactory.From(result, cimFormat));

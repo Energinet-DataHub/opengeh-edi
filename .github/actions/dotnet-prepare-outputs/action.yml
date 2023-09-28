@@ -71,3 +71,13 @@ runs:
           --no-restore \
           --configuration Release \
           --output '${{ inputs.output_path }}\AcceptanceTests'
+
+    - name: Publish B2CWebApi
+      shell: bash
+      run: |
+        dotnet publish \
+          'source/B2CWebApi/B2CWebApi.csproj' \
+          --no-build \
+          --no-restore \
+          --configuration Release \
+          --output '${{ inputs.output_path }}\b2cwebapi'
