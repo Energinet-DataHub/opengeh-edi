@@ -152,4 +152,16 @@ public class AssertAggregationResultEbixDocument : IAssertAggregationResultDocum
         _documentAsserter.HasValue("ProcessEnergyContext/ProcessVariant", EbixCode.Of(settlementVersion));
         return this;
     }
+
+    public IAssertAggregationResultDocument SettlementVersionIsNotPresent()
+    {
+        _documentAsserter.IsNotPresent("ProcessEnergyContext/ProcessVariant");
+        return this;
+    }
+
+    public IAssertAggregationResultDocument HasOriginalTransactionIdReference(string originalTransactionIdReference)
+    {
+        _documentAsserter.HasValue("PayloadEnergyTimeSeries[1]/OriginalBusinessDocument", originalTransactionIdReference);
+        return this;
+    }
 }

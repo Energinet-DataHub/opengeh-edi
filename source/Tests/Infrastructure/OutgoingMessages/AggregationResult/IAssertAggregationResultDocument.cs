@@ -103,6 +103,11 @@ public interface IAssertAggregationResultDocument
     IAssertAggregationResultDocument SettlementMethodIsNotPresent();
 
     /// <summary>
+    /// Asserts the settlement version is not present
+    /// </summary>
+    IAssertAggregationResultDocument SettlementVersionIsNotPresent();
+
+    /// <summary>
     /// Asserts the energy supplier number is not present
     /// </summary>
     IAssertAggregationResultDocument EnergySupplierNumberIsNotPresent();
@@ -135,4 +140,10 @@ public interface IAssertAggregationResultDocument
     /// </summary>
     /// <param name="settlementVersion"></param>
     IAssertAggregationResultDocument HasSettlementVersion(SettlementVersion settlementVersion);
+
+    /// <summary>
+    /// Asserts the OriginalTransactionIdReference
+    /// </summary>
+    /// <param name="originalTransactionIdReference"></param>
+    IAssertAggregationResultDocument HasOriginalTransactionIdReference(string originalTransactionIdReference);
 }

@@ -64,7 +64,7 @@ public abstract class EbixDocumentWriter : IDocumentWriter
 
     public bool HandlesFormat(DocumentFormat format)
     {
-        return format == DocumentFormat.Xml;
+        return format == DocumentFormat.Ebix;
     }
 
     protected virtual SettlementVersion? ExtractSettlementVersion(IReadOnlyCollection<string> marketActivityPayloads)

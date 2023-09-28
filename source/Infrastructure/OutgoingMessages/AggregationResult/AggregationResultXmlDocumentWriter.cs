@@ -53,14 +53,12 @@ public class AggregationResultXmlDocumentWriter : DocumentWriter
         {
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Series", null).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, timeSeries.TransactionId.ToString()).ConfigureAwait(false);
-
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "marketEvaluationPoint.type", null, CimCode.Of(MeteringPointType.From(timeSeries.MeteringPointType))).ConfigureAwait(false);
-            await WriteElementIfHasValueAsync(
-                "marketEvaluationPoint.settlementMethod", timeSeries.SettlementType is null ? null : CimCode.Of(SettlementType.From(timeSeries.SettlementType)), writer).ConfigureAwait(false);
-            await WriteElementIfHasValueAsync(
-                "settlement_Series.version", timeSeries.SettlementVersion is null ? null : CimCode.Of(SettlementVersion.From(timeSeries.SettlementVersion)), writer).ConfigureAwait(false);
+            // TODO XJOHO: We are currently not receiving version from Wholesale - bug team-phoenix #78
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "version", null, "1").ConfigureAwait(false);
+            await WriteElementIfHasValueAsync("settlement_Series.version", timeSeries.SettlementVersion is null ? null : CimCode.Of(SettlementVersion.From(timeSeries.SettlementVersion)), writer).ConfigureAwait(false);
             await WriteElementIfHasValueAsync("originalTransactionIDReference_Series.mRID", timeSeries.OriginalTransactionIdReference, writer).ConfigureAwait(false);
-
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "marketEvaluationPoint.type", null, CimCode.Of(MeteringPointType.From(timeSeries.MeteringPointType))).ConfigureAwait(false);
+            await WriteElementIfHasValueAsync("marketEvaluationPoint.settlementMethod", timeSeries.SettlementType is null ? null : CimCode.Of(SettlementType.From(timeSeries.SettlementType)), writer).ConfigureAwait(false);
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "meteringGridArea_Domain.mRID", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "codingScheme", null, "NDK").ConfigureAwait(false);
             await writer.WriteStringAsync(timeSeries.GridAreaCode).ConfigureAwait(false);
@@ -76,8 +74,7 @@ public class AggregationResultXmlDocumentWriter : DocumentWriter
 
             if (timeSeries.BalanceResponsibleNumber is not null)
             {
-                await writer
-                    .WriteStartElementAsync(DocumentDetails.Prefix, "balanceResponsibleParty_MarketParticipant.mRID", null).ConfigureAwait(false);
+                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "balanceResponsibleParty_MarketParticipant.mRID", null).ConfigureAwait(false);
                 await writer.WriteAttributeStringAsync(null, "codingScheme", null, CimCode.CodingSchemeOf(ActorNumber.Create(timeSeries.BalanceResponsibleNumber))).ConfigureAwait(false);
                 await writer.WriteStringAsync(timeSeries.BalanceResponsibleNumber).ConfigureAwait(false);
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
