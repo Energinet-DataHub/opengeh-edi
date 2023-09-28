@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using MediatR;
+using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
@@ -57,7 +58,7 @@ public class InitializeAggregatedMeasureDataProcessesHandler
     private void CreateAggregatedMeasureDataProcess(
         RequestAggregatedMeasureDataMarketMessage marketMessage)
     {
-        foreach (var serie in marketMessage.MarketTransactions)
+        foreach (var serie in marketMessage.Series)
         {
             _aggregatedMeasureDataProcessRepository.Add(
                 new AggregatedMeasureDataProcess(
@@ -68,8 +69,9 @@ public class InitializeAggregatedMeasureDataProcessesHandler
                     marketMessage.BusinessReason,
                     serie.MarketEvaluationPointType,
                     serie.MarketEvaluationSettlementMethod,
-                    serie.StartDateAndOrTimeDateTime,
-                    serie.EndDateAndOrTimeDateTime,
+                    InstantPattern.General.Parse(serie.StartDateAndOrTimeDateTime)
+                        .GetValueOrThrow(),
+                    serie.EndDateAndOrTimeDateTime is not null ? InstantPattern.General.Parse(serie.EndDateAndOrTimeDateTime).GetValueOrThrow() : null,
                     serie.MeteringGridAreaDomainId,
                     serie.EnergySupplierMarketParticipantId,
                     serie.BalanceResponsiblePartyMarketParticipantId));

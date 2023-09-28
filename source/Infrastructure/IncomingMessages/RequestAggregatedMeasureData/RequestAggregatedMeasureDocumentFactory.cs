@@ -38,9 +38,8 @@ public static class RequestAggregatedMeasureDocumentFactory
                 activityRecord.Id,
                 activityRecord.MarketEvaluationPointType,
                 activityRecord.MarketEvaluationSettlementMethod,
-                InstantPattern.General.Parse(activityRecord.StartDateAndOrTimeDateTime)
-                    .GetValueOrThrow(),
-                activityRecord.EndDateAndOrTimeDateTime is not null ? InstantPattern.General.Parse(activityRecord.EndDateAndOrTimeDateTime).GetValueOrThrow() : null,
+                activityRecord.StartDateAndOrTimeDateTime,
+                activityRecord.EndDateAndOrTimeDateTime,
                 activityRecord.MeteringGridAreaDomainId,
                 activityRecord.EnergySupplierMarketParticipantId,
                 activityRecord.BalanceResponsiblePartyMarketParticipantId)).ToList();

@@ -28,7 +28,7 @@ using MessageHeader = Energinet.DataHub.EDI.Application.IncomingMessages.Message
 
 namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
 {
-    public abstract class MarketMessageValidator
+    public abstract class RequestAggregatedMeasureDataMarketMessageValidator
     {
         private const int MessageIdLength = 36;
         private const int TransactionIdLength = 36;
@@ -40,7 +40,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
         private readonly IMessageTypeValidator _messageTypeValidator;
         private readonly IReceiverValidator _receiverValidator;
 
-        protected MarketMessageValidator(
+        protected RequestAggregatedMeasureDataMarketMessageValidator(
             IMessageIdRepository messageIdRepository,
             ITransactionIdRepository transactionIdRepository,
             ISenderAuthorizer senderAuthorizer,
@@ -57,16 +57,16 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
         }
 
         public async Task<Result> ValidateAsync(
-            MarketMessage marketMessage,
+            RequestAggregatedMeasureDataMarketMessage requestAggregatedMeasureDataMarketMessage,
             CancellationToken cancellationToken)
         {
-            ArgumentNullException.ThrowIfNull(marketMessage);
+            ArgumentNullException.ThrowIfNull(requestAggregatedMeasureDataMarketMessage);
 
-            var authorizeSenderTask = AuthorizeSenderAsync(marketMessage);
-            var verifyReceiverTask = VerifyReceiverAsync(marketMessage);
-            var checkMessageIdTask = CheckMessageIdAsync(marketMessage.SenderNumber, marketMessage.MessageId, cancellationToken);
-            var checkMessageTypeTask = CheckMessageTypeAsync(marketMessage.MessageType, cancellationToken);
-            var checkProcessTypeTask = CheckBusinessReasonAsync(marketMessage.BusinessReason, cancellationToken);
+            var authorizeSenderTask = AuthorizeSenderAsync(requestAggregatedMeasureDataMarketMessage);
+            var verifyReceiverTask = VerifyReceiverAsync(requestAggregatedMeasureDataMarketMessage);
+            var checkMessageIdTask = CheckMessageIdAsync(requestAggregatedMeasureDataMarketMessage.SenderNumber, requestAggregatedMeasureDataMarketMessage.MessageId, cancellationToken);
+            var checkMessageTypeTask = CheckMessageTypeAsync(requestAggregatedMeasureDataMarketMessage.MessageType, cancellationToken);
+            var checkProcessTypeTask = CheckBusinessReasonAsync(requestAggregatedMeasureDataMarketMessage.BusinessReason, cancellationToken);
 
             await Task.WhenAll(
                 authorizeSenderTask,
@@ -76,13 +76,13 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
                 checkProcessTypeTask).ConfigureAwait(false);
 
             var transactionIdsToBeStored = new List<string>();
-            foreach (var transaction in marketMessage.MarketTransactions)
+            foreach (var serie in requestAggregatedMeasureDataMarketMessage.Series)
             {
-                var transactionId = transaction.Id;
+                var transactionId = serie.Id;
 
                 if (await CheckTransactionIdAsync(
                         transactionId,
-                        marketMessage.SenderNumber,
+                        requestAggregatedMeasureDataMarketMessage.SenderNumber,
                         transactionIdsToBeStored,
                         cancellationToken).ConfigureAwait(false))
                 {
@@ -100,10 +100,10 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
                 using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
                 await _transactionIdRepository.StoreAsync(
-                    marketMessage.SenderNumber.Value,
+                    requestAggregatedMeasureDataMarketMessage.SenderNumber.Value,
                     transactionIdsToBeStored,
                     cancellationToken).ConfigureAwait(false);
-                await _messageIdRepository.StoreAsync(marketMessage.SenderNumber, marketMessage.MessageId, cancellationToken)
+                await _messageIdRepository.StoreAsync(requestAggregatedMeasureDataMarketMessage.SenderNumber, requestAggregatedMeasureDataMarketMessage.MessageId, cancellationToken)
                     .ConfigureAwait(false);
 
                 scope.Complete();
@@ -191,13 +191,13 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
             _errors.AddRange(result.Errors);
         }
 
-        private async Task AuthorizeSenderAsync(MarketMessage marketMessage)
+        private async Task AuthorizeSenderAsync(RequestAggregatedMeasureDataMarketMessage marketMessage)
         {
             var result = await _senderAuthorizer.AuthorizeAsync(marketMessage.SenderNumber, marketMessage.SenderRole, marketMessage.AuthenticatedUser, marketMessage.AuthenticatedUserRole).ConfigureAwait(false);
             _errors.AddRange(result.Errors);
         }
 
-        private async Task VerifyReceiverAsync(MarketMessage marketMessage)
+        private async Task VerifyReceiverAsync(RequestAggregatedMeasureDataMarketMessage marketMessage)
         {
             var receiverVerification = await _receiverValidator.VerifyAsync(marketMessage.ReceiverNumber, marketMessage.ReceiverRole).ConfigureAwait(false);
             _errors.AddRange(receiverVerification.Errors);

@@ -14,7 +14,7 @@
 
 namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
-public class RequestAggregatedMeasureDataValidator : MarketMessageValidator
+public class RequestAggregatedMeasureDataValidator : RequestAggregatedMeasureDataMarketMessageValidator
 {
     public RequestAggregatedMeasureDataValidator(
         IMessageIdRepository messageIdRepository,

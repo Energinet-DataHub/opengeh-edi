@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.Domain.Actors;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.Domain.Documents;
 
@@ -28,14 +26,14 @@ public record RequestAggregatedMeasureDataMarketMessage(
     string? AuthenticatedUserRole,
     string MessageType,
     string MessageId,
-    IReadOnlyCollection<Serie> Series) : MarketMessage(SenderNumber, SenderRole, ReceiverNumber, ReceiverRole, BusinessReason, AuthenticatedUser, AuthenticatedUserRole, MessageType, MessageId, Series);
+    IReadOnlyCollection<Serie> Series);
 
 public record Serie(
     string Id,
     string? MarketEvaluationPointType,
     string? MarketEvaluationSettlementMethod,
-    Instant StartDateAndOrTimeDateTime,
-    Instant? EndDateAndOrTimeDateTime,
+    string StartDateAndOrTimeDateTime,
+    string? EndDateAndOrTimeDateTime,
     string? MeteringGridAreaDomainId,
     string? EnergySupplierMarketParticipantId,
     string? BalanceResponsiblePartyMarketParticipantId);
