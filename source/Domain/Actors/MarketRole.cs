@@ -31,6 +31,9 @@ public class MarketRole : EnumerationType
     public static readonly MarketRole MeteredDataResponsible = new(4, "MeteredDataResponsible", "MDR");
     public static readonly MarketRole BalanceResponsibleParty = new(5, "BalanceResponsibleParty", "DDK");
 
+    public static readonly MarketRole CalculationResponsibleRole = new(5, "CalculationResponsibleRole", "DGL");
+    public static readonly MarketRole MasterDataResponsibleRole = new(6, "MasterDataResponsibleRole", "DDZ");
+
     private MarketRole(int id, string name, string code)
         : base(id, name)
     {

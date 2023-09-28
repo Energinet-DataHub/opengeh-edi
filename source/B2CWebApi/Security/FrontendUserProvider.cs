@@ -12,18 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Domain.Actors;
+using System.Security.Claims;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 
-namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+namespace Energinet.DataHub.EDI.B2CWebApi.Security;
 
-/// <summary>
-/// Authorization policy used for authorizing the sender of a market document
-/// </summary>
-public interface ISenderAuthorizer
+public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
 {
-    /// <summary>
-    /// Authorize sender
-    /// </summary>
-    Task<Result> AuthorizeAsync(ActorNumber senderNumber, MarketRole senderRole, string? authenticatedUser = null, string? authenticatedUserRole = null);
+    public Task<FrontendUser?> ProvideUserAsync(
+        Guid userId,
+        Guid actorId,
+        bool isFas,
+        IEnumerable<Claim> claims)
+    {
+        return Task.FromResult<FrontendUser?>(new FrontendUser(
+            userId,
+            actorId,
+            isFas));
+    }
 }
