@@ -47,9 +47,9 @@ namespace Energinet.DataHub.EDI.Application.IncomingMessages
         public string CreatedAt { get; }
 
         //Todo: temp solution until messageReceiver doesn't depend on authenticated user
-        public string? AuthenticatedUser { get; }
+        public string? AuthenticatedUser { get; set; }
 
         // Todo: temp solution until messageReceiver doesn't depend on authenticated user
-        public string? AuthenticatedUserRole { get; }
+        public string? AuthenticatedUserRole { get; set; }
     }
 }

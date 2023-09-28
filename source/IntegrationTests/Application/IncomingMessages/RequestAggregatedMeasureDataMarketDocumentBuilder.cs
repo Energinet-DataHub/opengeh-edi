@@ -89,7 +89,7 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
             new RequestAggregatedMeasureDataIncomingMarketDocument(
                 CreateHeader(),
                 new List<Serie> { CreateSerieCreateRecord() }));
-        return RequestAggregatedMeasureDocumentFactory.Created(messageParser.IncomingMarketDocument!);
+        return RequestAggregatedMeasureDataMarketMessageFactory.Created(messageParser.IncomingMarketDocument!);
     }
 
     private Serie CreateSerieCreateRecord() =>

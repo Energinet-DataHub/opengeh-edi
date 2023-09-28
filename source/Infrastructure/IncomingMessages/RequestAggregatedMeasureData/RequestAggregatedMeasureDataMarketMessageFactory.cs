@@ -23,7 +23,7 @@ using SerieDocument = Energinet.DataHub.EDI.Domain.Documents.Serie;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
-public static class RequestAggregatedMeasureDocumentFactory
+public static class RequestAggregatedMeasureDataMarketMessageFactory
 {
     public static RequestAggregatedMeasureDataMarketMessage Created(
         IIncomingMarketDocument<Serie, RequestAggregatedMeasureDataTransactionCommand>
