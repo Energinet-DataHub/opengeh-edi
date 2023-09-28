@@ -15,6 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using Period = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Period;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.AggregationResult;
@@ -128,4 +129,10 @@ public interface IAssertAggregationResultDocument
     /// </summary>
     /// <param name="businessReason"></param>
     IAssertAggregationResultDocument HasBusinessReason(BusinessReason businessReason);
+
+    /// <summary>
+    /// Asserts the SettlementVersion
+    /// </summary>
+    /// <param name="settlementVersion"></param>
+    IAssertAggregationResultDocument HasSettlementVersion(SettlementVersion settlementVersion);
 }

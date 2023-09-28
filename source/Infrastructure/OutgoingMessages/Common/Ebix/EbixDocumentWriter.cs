@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Xml;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
 namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Xml;
 
@@ -47,7 +48,7 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = new UTF8Encoding(false), Async = true, Indent = true };
         var stream = new MemoryStream();
         using var writer = XmlWriter.Create(stream, settings);
-        string? settlementVersion = ExtractSettlementVersion(marketActivityRecords);
+        SettlementVersion? settlementVersion = ExtractSettlementVersion(marketActivityRecords);
         await WriteHeaderAsync(header, _documentDetails, writer, settlementVersion).ConfigureAwait(false);
         await WriteMarketActivityRecordsAsync(marketActivityRecords, writer).ConfigureAwait(false);
         await WriteEndAsync(writer).ConfigureAwait(false);
@@ -66,7 +67,7 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         return format == DocumentFormat.Xml;
     }
 
-    protected virtual string? ExtractSettlementVersion(IReadOnlyCollection<string> marketActivityPayloads)
+    protected virtual SettlementVersion? ExtractSettlementVersion(IReadOnlyCollection<string> marketActivityPayloads)
     {
         return null;
     }
@@ -116,7 +117,7 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         writer.Close();
     }
 
-    private Task WriteHeaderAsync(MessageHeader header, DocumentDetails documentDetails, XmlWriter writer, string? settlementVersion)
+    private Task WriteHeaderAsync(MessageHeader header, DocumentDetails documentDetails, XmlWriter writer, SettlementVersion? settlementVersion)
     {
         return EbixHeaderWriter.WriteAsync(writer, header, documentDetails, _reasonCode, settlementVersion);
     }

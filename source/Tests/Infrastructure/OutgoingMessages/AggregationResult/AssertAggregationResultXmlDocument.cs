@@ -145,4 +145,10 @@ public class AssertAggregationResultXmlDocument : IAssertAggregationResultDocume
         _documentAsserter.HasValue("process.processType", CimCode.Of(businessReason));
         return this;
     }
+
+    public IAssertAggregationResultDocument HasSettlementVersion(SettlementVersion settlementVersion)
+    {
+        _documentAsserter.HasValue("Series[1]/settlement_Series.version", CimCode.Of(settlementVersion));
+        return this;
+    }
 }

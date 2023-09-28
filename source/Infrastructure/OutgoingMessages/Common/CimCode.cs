@@ -65,6 +65,22 @@ public static class CimCode
         throw NoBusinessReasonFoundFor(businessReasonCode);
     }
 
+    public static string Of(SettlementVersion settlementVersion)
+    {
+        ArgumentNullException.ThrowIfNull(settlementVersion);
+
+        if (settlementVersion == SettlementVersion.FirstCorrection)
+            return "D01";
+
+        if (settlementVersion == SettlementVersion.SecondCorrection)
+            return "D02";
+
+        if (settlementVersion == SettlementVersion.ThirdCorrection)
+            return "D03";
+
+        throw NoCodeFoundFor(settlementVersion.Name);
+    }
+
     public static string Of(MeteringPointType meteringPointType)
     {
         ArgumentNullException.ThrowIfNull(meteringPointType);

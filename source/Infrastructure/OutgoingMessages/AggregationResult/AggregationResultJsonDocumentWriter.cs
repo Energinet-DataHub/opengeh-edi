@@ -108,7 +108,7 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
 
             if (series.SettlementVersion is not null)
             {
-                writer.WriteProperty("settlement_Series.version", series.SettlementVersion);
+                writer.WriteProperty("settlement_Series.version", CimCode.Of(SettlementVersion.From(series.SettlementVersion)));
             }
 
             if (series.OriginalTransactionIdReference is not null)

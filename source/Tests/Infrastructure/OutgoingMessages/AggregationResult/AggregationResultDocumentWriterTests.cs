@@ -172,6 +172,24 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .HasBusinessReason(BusinessReason.From(processType));
     }
 
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Ebix), nameof(BusinessReason.Correction), nameof(SettlementVersion.FirstCorrection))]
+    [InlineData(nameof(DocumentFormat.Xml), nameof(BusinessReason.Correction), nameof(SettlementVersion.FirstCorrection))]
+    [InlineData(nameof(DocumentFormat.Json), nameof(BusinessReason.Correction), nameof(SettlementVersion.FirstCorrection))]
+    public async Task Business_reason_and_SettlementVersionn_is_translated(string documentFormat, string processType, string settlementVersion)
+    {
+        _timeSeries
+            .WithBusinessReason(BusinessReason.From(processType))
+            .WithSettlementVersion(SettlementVersion.From(settlementVersion));
+
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
+
+        await AssertDocument(document, DocumentFormat.From(documentFormat))
+            .HasBusinessReason(BusinessReason.From(processType))
+            .HasSettlementVersion(SettlementVersion.From(settlementVersion))
+            .DocumentIsValidAsync().ConfigureAwait(false);
+    }
+
     private Task<Stream> CreateDocument(TimeSeriesBuilder resultBuilder, DocumentFormat documentFormat)
     {
         var documentHeader = resultBuilder.BuildHeader();

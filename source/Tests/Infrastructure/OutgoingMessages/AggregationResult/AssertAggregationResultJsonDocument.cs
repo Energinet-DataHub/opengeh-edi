@@ -185,6 +185,12 @@ internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationRe
         return this;
     }
 
+    public IAssertAggregationResultDocument HasSettlementVersion(SettlementVersion settlementVersion)
+    {
+        Assert.Equal(CimCode.Of(settlementVersion), FirstTimeSeriesElement().GetProperty("settlement_Series.version").ToString());
+        return this;
+    }
+
     private JsonElement FirstTimeSeriesElement()
     {
         return _root.GetProperty("Series").EnumerateArray().ToList()[0];
