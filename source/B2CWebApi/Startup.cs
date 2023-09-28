@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.Core.App.WebApp.Authentication;
+using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
+using Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
+using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Microsoft.OpenApi.Models;
 
 namespace Energinet.DataHub.EDI.B2CWebApi;
@@ -32,9 +36,31 @@ public class Startup
     public void ConfigureServices(IServiceCollection serviceCollection)
     {
         serviceCollection.AddSwaggerGen(config =>
-            config.SwaggerDoc("v1", new OpenApiInfo { Title = "B2C web api for EDI", Version = "v1" }));
+        {
+            config.SwaggerDoc("v1", new OpenApiInfo { Title = "B2C web api for EDI", Version = "v1" });
+            var securitySchema = new OpenApiSecurityScheme
+            {
+                Description =
+                    "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer", },
+            };
+
+            config.AddSecurityDefinition("Bearer", securitySchema);
+            var securityRequirement = new OpenApiSecurityRequirement { { securitySchema, new[] { "Bearer" } }, };
+
+            config.AddSecurityRequirement(securityRequirement);
+        });
         serviceCollection.AddControllers();
         serviceCollection.AddHealthChecks();
+        serviceCollection.AddHttpContextAccessor();
+
+        serviceCollection.AddOptions<JwtOptions>().Bind(Configuration);
+
+        AddJwtTokenSecurity(serviceCollection);
     }
 
     public void Configure(IApplicationBuilder app)
@@ -54,11 +80,23 @@ public class Startup
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();
+        app.UseUserMiddleware<FrontendUser>();
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers();
             endpoints.MapLiveHealthChecks();
             endpoints.MapReadyHealthChecks();
         });
+    }
+
+    /// <summary>
+    /// Adds registrations of JwtTokenMiddleware and corresponding dependencies.
+    /// </summary>
+    private void AddJwtTokenSecurity(IServiceCollection serviceCollection)
+    {
+        var options = Configuration.Get<JwtOptions>()!;
+        serviceCollection.AddJwtBearerAuthentication(options.EXTERNAL_OPEN_ID_URL, options.INTERNAL_OPEN_ID_URL, options.BACKEND_BFF_APP_ID);
+        serviceCollection.AddUserAuthentication<FrontendUser, FrontendUserProvider>();
+        serviceCollection.AddPermissionAuthorization();
     }
 }
