@@ -23,13 +23,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
 {
     public class SenderAuthorizer : ISenderAuthorizer
     {
-        private readonly IMarketActorAuthenticator _marketActorAuthenticator;
         private readonly List<ValidationError> _validationErrors = new();
-
-        public SenderAuthorizer(IMarketActorAuthenticator marketActorAuthenticator)
-        {
-            _marketActorAuthenticator = marketActorAuthenticator ?? throw new ArgumentNullException(nameof(marketActorAuthenticator));
-        }
 
         public Task<Result> AuthorizeAsync(ActorNumber senderNumber, MarketRole senderRole, string? authenticatedUser = null, string? authenticatedUserRole = null)
         {
@@ -42,10 +36,19 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
             return Task.FromResult(_validationErrors.Count == 0 ? Result.Succeeded() : Result.Failure(_validationErrors.ToArray()));
         }
 
+        private static bool SenderNumberDoesNotMatchAuthorizedUserNumber(string? authenticatedUser)
+        {
+            return string.IsNullOrWhiteSpace(authenticatedUser) || !authenticatedUser.Equals(authenticatedUser, StringComparison.Ordinal);
+        }
+
+        private static bool SenderRoleDoesNotMatchAuthorizedUserRole(string senderRole, string? authenticatedUserRole)
+        {
+            return string.IsNullOrWhiteSpace(authenticatedUserRole) || !authenticatedUserRole.Equals(senderRole, StringComparison.Ordinal);
+        }
+
         private void EnsureCurrentUserHasRequiredRole(string senderRole, string? authenticatedUserRole = null)
         {
-            if (!_marketActorAuthenticator.CurrentIdentity.HasRole(senderRole)
-                && !(!string.IsNullOrWhiteSpace(authenticatedUserRole) && authenticatedUserRole.Equals(senderRole, StringComparison.Ordinal)))
+            if (SenderRoleDoesNotMatchAuthorizedUserRole(senderRole, authenticatedUserRole))
             {
                 _validationErrors.Add(new AuthenticatedUserDoesNotHoldRequiredRoleType());
             }
@@ -63,8 +66,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
 
         private void EnsureSenderIdMatches(string senderId, string? authenticatedUser = null)
         {
-            if (_marketActorAuthenticator.CurrentIdentity.Number?.Value.Equals(senderId, StringComparison.OrdinalIgnoreCase) == false
-                && !(!string.IsNullOrWhiteSpace(authenticatedUser) && authenticatedUser.Equals(authenticatedUser, StringComparison.Ordinal)))
+            if (SenderNumberDoesNotMatchAuthorizedUserNumber(authenticatedUser))
             {
                 _validationErrors.Add(new AuthenticatedUserDoesNotMatchSenderId());
             }
