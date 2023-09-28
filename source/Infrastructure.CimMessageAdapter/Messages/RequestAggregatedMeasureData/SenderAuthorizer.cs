@@ -36,19 +36,19 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
             return Task.FromResult(_validationErrors.Count == 0 ? Result.Succeeded() : Result.Failure(_validationErrors.ToArray()));
         }
 
-        private static bool SenderNumberIsNotEqualSenderNumberOfAuthorizedUser(string? authenticatedUser)
+        private static bool SenderNumberDoesNotMatchAuthorizedUserNumber(string? authenticatedUser)
         {
             return string.IsNullOrWhiteSpace(authenticatedUser) || !authenticatedUser.Equals(authenticatedUser, StringComparison.Ordinal);
         }
 
-        private static bool SenderRoleIsNotEqualRoleOfAuthorizedUser(string senderRole, string? authenticatedUserRole)
+        private static bool SenderRoleDoesNotMatchAuthorizedUserRole(string senderRole, string? authenticatedUserRole)
         {
             return string.IsNullOrWhiteSpace(authenticatedUserRole) || !authenticatedUserRole.Equals(senderRole, StringComparison.Ordinal);
         }
 
         private void EnsureCurrentUserHasRequiredRole(string senderRole, string? authenticatedUserRole = null)
         {
-            if (SenderRoleIsNotEqualRoleOfAuthorizedUser(senderRole, authenticatedUserRole))
+            if (SenderRoleDoesNotMatchAuthorizedUserRole(senderRole, authenticatedUserRole))
             {
                 _validationErrors.Add(new AuthenticatedUserDoesNotHoldRequiredRoleType());
             }
@@ -66,7 +66,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
 
         private void EnsureSenderIdMatches(string senderId, string? authenticatedUser = null)
         {
-            if (SenderNumberIsNotEqualSenderNumberOfAuthorizedUser(authenticatedUser))
+            if (SenderNumberDoesNotMatchAuthorizedUserNumber(authenticatedUser))
             {
                 _validationErrors.Add(new AuthenticatedUserDoesNotMatchSenderId());
             }
