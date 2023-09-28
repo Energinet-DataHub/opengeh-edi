@@ -77,6 +77,9 @@ limitations under the License.
       <CompileOutputs>True</CompileOutputs>
       <Generator>MSBuild:Compile</Generator>
     </Protobuf>
+          <Protobuf Update="Requests\RequestAggregatedMeasureData.proto">
+            <OutputDir>obj\Debug\net7.0\</OutputDir>
+          </Protobuf>
     </ItemGroup>
 
 </Project>
