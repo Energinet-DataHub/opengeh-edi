@@ -76,12 +76,7 @@ public class RequestAggregatedMeasureMessageReceiver
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        using var cancellationTokenSource =
-            CancellationTokenSource.CreateLinkedTokenSource(
-                hostCancellationToken,
-                request.FunctionContext.CancellationToken);
-
-        var cancellationToken = cancellationTokenSource.Token;
+        var cancellationToken = request.GetCancellationToken(hostCancellationToken);
 
         var contentType = request.Headers.GetContentType();
         var cimFormat = CimFormatParser.ParseFromContentTypeHeaderValue(contentType);

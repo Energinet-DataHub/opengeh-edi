@@ -18,8 +18,6 @@ using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Documents;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using NodaTime.Text;
 using Serie = Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData.Serie;
 using SerieDocument = Energinet.DataHub.EDI.Domain.Documents.Serie;
 
@@ -54,6 +52,34 @@ public static class RequestAggregatedMeasureDocumentFactory
             incomingMarketDocument.Header.AuthenticatedUserRole,
             incomingMarketDocument.Header.MessageType,
             incomingMarketDocument.Header.MessageId,
+            series);
+    }
+
+    public static RequestAggregatedMeasureDataMarketMessage Created(Edi.Requests.RequestAggregatedMeasureData requestAggregatedMeasureData)
+    {
+        if (requestAggregatedMeasureData == null) throw new ArgumentNullException(nameof(requestAggregatedMeasureData));
+
+        var series = requestAggregatedMeasureData.Series
+            .Select(serie => new SerieDocument(
+                serie.Id,
+                serie.MarketEvaluationPointType,
+                serie.MarketEvaluationSettlementMethod,
+                serie.StartDateAndOrTimeDateTime,
+                serie.EndDateAndOrTimeDateTime,
+                serie.MeteringGridAreaDomainId,
+                serie.EnergySupplierMarketParticipantId,
+                serie.BalanceResponsiblePartyMarketParticipantId)).ToList();
+
+        return new RequestAggregatedMeasureDataMarketMessage(
+            ActorNumber.Create(requestAggregatedMeasureData.SenderId),
+            MarketRole.FromCode(requestAggregatedMeasureData.SenderRole),
+            ActorNumber.Create(requestAggregatedMeasureData.ReceiverId),
+            MarketRole.FromCode(requestAggregatedMeasureData.ReceiverRole),
+            requestAggregatedMeasureData.BusinessReason,
+            requestAggregatedMeasureData.AuthenticatedUser,
+            requestAggregatedMeasureData.AuthenticatedUserRole,
+            requestAggregatedMeasureData.MessageType,
+            requestAggregatedMeasureData.MessageId,
             series);
     }
 }
