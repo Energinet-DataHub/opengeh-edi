@@ -102,9 +102,10 @@ public class RequestAggregatedMeasureMessageReceiver
         }
 
         await SaveArchivedMessageAsync(messageHeader, request.Body, cancellationToken).ConfigureAwait(false);
+        var marketMessage = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
 
         var result = await _mediator
-            .Send(new InitializeAggregatedMeasureDataProcessesCommand(messageParserResult), cancellationToken).ConfigureAwait(false);
+            .Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage), cancellationToken).ConfigureAwait(false);
 
         var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
         return CreateResponse(request, httpStatusCode, _responseFactory.From(result, cimFormat));

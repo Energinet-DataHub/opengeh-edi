@@ -14,6 +14,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Domain.Actors;
 
 namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
 {
@@ -25,17 +26,17 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
         /// <summary>
         /// Store message id
         /// </summary>
-        /// <param name="senderId"></param>
+        /// <param name="senderNumber"></param>
         /// <param name="messageId"></param>
         /// <param name="cancellationToken"></param>
-        Task StoreAsync(string senderId, string messageId, CancellationToken cancellationToken);
+        Task StoreAsync(ActorNumber senderNumber, string messageId, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Checks if <paramref name="messageId"/> is already registered by the sender <paramref name="senderId"/>
+        /// Checks if <paramref name="messageId"/> is already registered by the sender <paramref name="senderNumber"/>
         /// </summary>
-        /// <param name="senderId"></param>
+        /// <param name="senderNumber"></param>
         /// <param name="messageId"></param>
         /// <param name="cancellationToken"></param>
-        Task<bool> MessageIdExistsAsync(string senderId, string messageId, CancellationToken cancellationToken);
+        Task<bool> MessageIdExistsAsync(ActorNumber senderNumber, string messageId, CancellationToken cancellationToken);
     }
 }
