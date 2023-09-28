@@ -36,7 +36,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages
             _logger = logger;
         }
 
-        public async Task StoreAsync(ActorNumber senderNumber, string messageId, CancellationToken cancellationToken)
+        public async Task StoreAsync(string senderNumber, string messageId, CancellationToken cancellationToken)
         {
             if (senderNumber == null) throw new ArgumentNullException(nameof(senderNumber));
 
@@ -46,7 +46,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages
             {
                 await connection.ExecuteAsync(
                         $"INSERT INTO dbo.MessageRegistry(MessageId, SenderId) VALUES(@MessageId, @SenderId)",
-                        new { MessageId = messageId, SenderId = senderNumber.Value })
+                        new { MessageId = messageId, SenderId = senderNumber })
                     .ConfigureAwait(false);
             }
             catch (SqlException e)
@@ -59,7 +59,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages
                             "Unable to insert message id: {MessageId}" +
                             " for sender: {SenderId} since it already exists in the database",
                             messageId,
-                            senderNumber.Value);
+                            senderNumber);
                         throw new NotSuccessfulMessageIdStorageException(messageId);
                     }
                 }
@@ -68,14 +68,14 @@ namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages
             }
         }
 
-        public async Task<bool> MessageIdExistsAsync(ActorNumber senderNumber, string messageId, CancellationToken cancellationToken)
+        public async Task<bool> MessageIdExistsAsync(string senderNumber, string messageId, CancellationToken cancellationToken)
         {
             if (senderNumber == null) throw new ArgumentNullException(nameof(senderNumber));
 
             using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
             var message = await connection.QueryFirstOrDefaultAsync(
                     $"SELECT TOP (1) * FROM dbo.MessageRegistry WHERE MessageId = @MessageId AND SenderId = @SenderId",
-                    new { MessageId = messageId, SenderId = senderNumber.Value })
+                    new { MessageId = messageId, SenderId = senderNumber })
                 .ConfigureAwait(false);
 
             return message != null;

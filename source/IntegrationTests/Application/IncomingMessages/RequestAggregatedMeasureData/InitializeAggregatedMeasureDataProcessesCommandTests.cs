@@ -134,7 +134,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         Assert.NotNull(response.AggregationPerGridarea);
         var aggregationPerGridArea = response.AggregationPerGridarea;
         Assert.Equal(marketMessage.Series.First().MeteringGridAreaDomainId, aggregationPerGridArea.GridAreaCode);
-        Assert.Equal(marketMessage.SenderNumber.Value, aggregationPerGridArea.GridResponsibleId);
+        Assert.Equal(marketMessage.SenderNumber, aggregationPerGridArea.GridResponsibleId);
     }
 
     [Fact]
@@ -391,10 +391,10 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         return (InternalCommand)_serializer.Deserialize(queuedInternalCommand.Data, commandMetaData.CommandType);
     }
 
-    private AggregatedMeasureDataProcess? GetProcess(ActorNumber senderNumber)
+    private AggregatedMeasureDataProcess? GetProcess(string senderNumber)
     {
         return _b2BContext.AggregatedMeasureDataProcesses
             .ToList()
-            .FirstOrDefault(x => x.RequestedByActorId.Value == senderNumber.Value);
+            .FirstOrDefault(x => x.RequestedByActorId.Value == senderNumber);
     }
 }

@@ -14,7 +14,7 @@
 
 namespace Energinet.DataHub.EDI.Application.IncomingMessages
 {
-    public class MessageHeader
+    public class MessageHeader // DElete everything is the namespace
     {
         public MessageHeader(string messageId, string messageType, string businessReason, string senderId, string senderRole, string receiverId, string receiverRole, string createdAt, string? authenticatedUser = null, string? authenticatedUserRole = null)
         {

@@ -25,5 +25,5 @@ public interface ISenderAuthorizer
     /// <summary>
     /// Authorize sender
     /// </summary>
-    Task<Result> AuthorizeAsync(ActorNumber senderNumber, MarketRole senderRole, string? authenticatedUser = null, string? authenticatedUserRole = null);
+    Task<Result> AuthorizeAsync(string senderNumber, string senderRole, string? authenticatedUser = null, string? authenticatedUserRole = null);
 }

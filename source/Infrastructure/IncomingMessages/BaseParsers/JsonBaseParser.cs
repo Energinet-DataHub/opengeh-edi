@@ -28,9 +28,7 @@ using Json.Schema;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.BaseParsers;
 
-public abstract class JsonParserBase<TTransactionType, TICommand>
-where TTransactionType : IMarketActivityRecord
-where TICommand : IMarketTransaction<TTransactionType>
+public abstract class JsonParserBase<TMarketMessageType>
 {
     private readonly ISchemaProvider _schemaProvider;
     private readonly List<ValidationError> _errors = new();
@@ -69,10 +67,10 @@ where TICommand : IMarketTransaction<TTransactionType>
             message.Position = 0;
     }
 
-    protected MessageParserResult<TTransactionType, TICommand> InvalidJsonFailure(
+    protected RequestAggregatedMeasureDataMarketMessageParserResult InvalidJsonFailure(
         Exception exception)
     {
-        return new MessageParserResult<TTransactionType, TICommand>(
+        return new RequestAggregatedMeasureDataMarketMessageParserResult(
             InvalidMessageStructure.From(exception));
     }
 

@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Domain.Actors;
-
 namespace Energinet.DataHub.EDI.Domain.Documents;
 
+/// <summary>
+/// Responsible for carrying the market message data from the incoming message before any data validation.
+/// </summary>
 public record RequestAggregatedMeasureDataMarketMessage(
-    ActorNumber SenderNumber,
-    MarketRole SenderRole,
-    ActorNumber ReceiverNumber,
-    MarketRole ReceiverRole,
+    string SenderNumber,
+    string SenderRoleCode,
+    string ReceiverNumber,
+    string ReceiverRoleCode,
     string BusinessReason,
     string? AuthenticatedUser,
     string? AuthenticatedUserRole,
