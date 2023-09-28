@@ -58,7 +58,6 @@ internal static class IncomingMessageParsingServices
     private static void RegisterRequestChangeOfSupplierMessageHandling(IServiceCollection services)
     {
         services.AddScoped<SenderAuthorizer>();
-        services.AddTransient<RequestAggregatedMeasureDataMarketMessageParser>();
         services.AddScoped<DefaultProcessTypeValidator>();
         services.AddScoped<DefaultMessageTypeValidator>();
         services.AddScoped<MasterDataReceiverResponsibleVerification>();
@@ -70,7 +69,7 @@ internal static class IncomingMessageParsingServices
             .AddScoped<IMessageParser<RequestAggregatedMeasureDataMarketMessage>, IncomingMessages.RequestAggregatedMeasureData.XmlMessageParser>();
         services
             .AddScoped<IMessageParser<RequestAggregatedMeasureDataMarketMessage>, IncomingMessages.RequestAggregatedMeasureData.JsonMessageParser>();
-        services.AddTransient<RequestAggregatedMeasureDataMarketMessageParser>();
+        services.AddScoped<RequestAggregatedMeasureDataMarketMessageParser>();
         services.AddTransient<RequestAggregatedMeasureDataValidator>();
         services.AddTransient<SenderAuthorizer>();
         services.AddScoped<ProcessTypeValidator>();
