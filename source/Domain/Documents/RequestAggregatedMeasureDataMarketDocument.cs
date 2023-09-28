@@ -12,12 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.Domain.Actors;
+
 namespace Energinet.DataHub.EDI.Domain.Documents;
 
-public record RequestAggregatedMeasureDataMarketDocument(
-    string SenderId,
-    string SenderRole,
+public record RequestAggregatedMeasureDataMarketMessage(
+    ActorNumber SenderNumber,
+    MarketRole SenderRole,
+    ActorNumber ReceiverNumber,
+    MarketRole ReceiverRole,
     string BusinessReason,
+    string? AuthenticatedUser,
+    string? AuthenticatedUserRole,
+    string MessageType,
+    string MessageId,
     IReadOnlyCollection<Serie> Series);
 
 public record Serie(

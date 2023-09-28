@@ -31,13 +31,13 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
             _marketActorAuthenticator = marketActorAuthenticator ?? throw new ArgumentNullException(nameof(marketActorAuthenticator));
         }
 
-        public Task<Result> AuthorizeAsync(string senderId, string senderRole, string? authenticatedUser = null, string? authenticatedUserRole = null)
+        public Task<Result> AuthorizeAsync(ActorNumber senderNumber, MarketRole senderRole, string? authenticatedUser = null, string? authenticatedUserRole = null)
         {
-            if (senderId == null) throw new ArgumentNullException(nameof(senderId));
+            if (senderNumber == null) throw new ArgumentNullException(nameof(senderNumber));
             if (senderRole == null) throw new ArgumentNullException(nameof(senderRole));
-            EnsureSenderIdMatches(senderId, authenticatedUser);
-            EnsureSenderRole(senderRole);
-            EnsureCurrentUserHasRequiredRole(senderRole, authenticatedUserRole);
+            EnsureSenderIdMatches(senderNumber.Value, authenticatedUser);
+            EnsureSenderRole(senderRole.Code);
+            EnsureCurrentUserHasRequiredRole(senderRole.Code, authenticatedUserRole);
 
             return Task.FromResult(_validationErrors.Count == 0 ? Result.Succeeded() : Result.Failure(_validationErrors.ToArray()));
         }

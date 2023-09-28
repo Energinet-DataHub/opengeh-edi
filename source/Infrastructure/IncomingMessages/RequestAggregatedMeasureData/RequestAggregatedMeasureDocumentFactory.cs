@@ -16,7 +16,10 @@ using System;
 using System.Linq;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using NodaTime.Text;
 using Serie = Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData.Serie;
 using SerieDocument = Energinet.DataHub.EDI.Domain.Documents.Serie;
 
@@ -24,7 +27,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregate
 
 public static class RequestAggregatedMeasureDocumentFactory
 {
-    public static RequestAggregatedMeasureDataMarketDocument Created(
+    public static RequestAggregatedMeasureDataMarketMessage Created(
         IIncomingMarketDocument<Serie, RequestAggregatedMeasureDataTransactionCommand>
             incomingMarketDocument)
     {
@@ -41,10 +44,16 @@ public static class RequestAggregatedMeasureDocumentFactory
                 activityRecord.EnergySupplierMarketParticipantId,
                 activityRecord.BalanceResponsiblePartyMarketParticipantId)).ToList();
 
-        return new RequestAggregatedMeasureDataMarketDocument(
-            incomingMarketDocument.Header.SenderId,
-            incomingMarketDocument.Header.SenderRole,
+        return new RequestAggregatedMeasureDataMarketMessage(
+            ActorNumber.Create(incomingMarketDocument.Header.SenderId),
+            MarketRole.FromCode(incomingMarketDocument.Header.SenderRole),
+            ActorNumber.Create(incomingMarketDocument.Header.ReceiverId),
+            MarketRole.FromCode(incomingMarketDocument.Header.ReceiverRole),
             incomingMarketDocument.Header.BusinessReason,
+            incomingMarketDocument.Header.AuthenticatedUser,
+            incomingMarketDocument.Header.AuthenticatedUserRole,
+            incomingMarketDocument.Header.MessageType,
+            incomingMarketDocument.Header.MessageId,
             series);
     }
 }
