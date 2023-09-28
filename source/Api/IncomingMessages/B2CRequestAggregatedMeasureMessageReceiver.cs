@@ -13,11 +13,15 @@
 // limitations under the License.
 
 using System;
+using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Domain.ArchivedMessages;
+using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.Edi.Requests;
 using MediatR;
@@ -29,13 +33,22 @@ namespace Energinet.DataHub.EDI.Api.IncomingMessages;
 public class B2CRequestAggregatedMeasureMessageReceiver
 {
     private readonly ICorrelationContext _correlationContext;
+    private readonly IArchivedMessageRepository _messageArchive;
+    private readonly B2BContext _dbContext;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMediator _mediator;
 
     public B2CRequestAggregatedMeasureMessageReceiver(
         ICorrelationContext correlationContext,
+        IArchivedMessageRepository messageArchive,
+        B2BContext dbContext,
+        ISystemDateTimeProvider systemDateTimeProvider,
         IMediator mediator)
         {
         _correlationContext = correlationContext;
+        _messageArchive = messageArchive;
+        _dbContext = dbContext;
+        _systemDateTimeProvider = systemDateTimeProvider;
         _mediator = mediator;
         }
 
@@ -50,6 +63,7 @@ public class B2CRequestAggregatedMeasureMessageReceiver
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);
 
         var requestAggregatedMeasureData = RequestAggregatedMeasureData.Parser.ParseFrom(request.Body);
+        await SaveArchivedMessageAsync(requestAggregatedMeasureData, request.Body, cancellationToken).ConfigureAwait(false);
         var marketMessage = RequestAggregatedMeasureDocumentFactory.Created(requestAggregatedMeasureData);
 
         var result = await _mediator
@@ -65,5 +79,19 @@ public class B2CRequestAggregatedMeasureMessageReceiver
         var response = request.CreateResponse(statusCode);
         response.Headers.Add("CorrelationId", _correlationContext.Id);
         return response;
+    }
+
+    private async Task SaveArchivedMessageAsync(RequestAggregatedMeasureData requestAggregatedMeasureData, Stream document,  CancellationToken hostCancellationToken)
+    {
+        _messageArchive.Add(new ArchivedMessage(
+            Guid.NewGuid().ToString(),
+            requestAggregatedMeasureData.MessageId,
+            IncomingDocumentType.RequestAggregatedMeasureData.Name,
+            requestAggregatedMeasureData.SenderId,
+            requestAggregatedMeasureData.ReceiverId,
+            _systemDateTimeProvider.Now(),
+            requestAggregatedMeasureData.BusinessReason,
+            document));
+        await _dbContext.SaveChangesAsync(hostCancellationToken).ConfigureAwait(false);
     }
 }
