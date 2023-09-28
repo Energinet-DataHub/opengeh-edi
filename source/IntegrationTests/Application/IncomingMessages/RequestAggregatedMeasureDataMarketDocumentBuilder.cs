@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
@@ -24,7 +23,6 @@ using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 using NodaTime;
 using MessageHeader = Energinet.DataHub.EDI.Application.IncomingMessages.MessageHeader;
-using Serie = Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData.Serie;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 
@@ -85,11 +83,11 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
 
     internal RequestAggregatedMeasureDataMarketMessage Build()
     {
-        var messageParser = new MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>(
-            new RequestAggregatedMeasureDataIncomingMarketDocument(
+        var messageParser = new RequestAggregatedMeasureDataMarketMessageParserResult(
+            RequestAggregatedMeasureDataMarketMessageFactory.Create(
                 CreateHeader(),
-                new List<Serie> { CreateSerieCreateRecord() }));
-        return RequestAggregatedMeasureDataMarketMessageFactory.Created(messageParser.IncomingMarketDocument!);
+                new List<Serie> { CreateSerieCreateRecord() }.AsReadOnly()));
+        return messageParser.MarketMessage!;
     }
 
     private Serie CreateSerieCreateRecord() =>

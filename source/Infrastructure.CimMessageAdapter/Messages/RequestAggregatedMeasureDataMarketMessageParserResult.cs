@@ -14,29 +14,27 @@
 
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
+using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
 
 namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
 {
-    public class MessageParserResult<TMarketActivityRecordType, TMarketTransactionType>
-        where TMarketActivityRecordType : IMarketActivityRecord
-        where TMarketTransactionType : IMarketTransaction<TMarketActivityRecordType>
+    public class RequestAggregatedMeasureDataMarketMessageParserResult
     {
-        public MessageParserResult(params ValidationError[] errors)
+        public RequestAggregatedMeasureDataMarketMessageParserResult(params ValidationError[] errors)
         {
             Errors = errors;
         }
 
-        public MessageParserResult(
-            IIncomingMarketDocument<TMarketActivityRecordType, TMarketTransactionType> incomingMarketDocument)
+        public RequestAggregatedMeasureDataMarketMessageParserResult(RequestAggregatedMeasureDataMarketMessage marketMessage)
         {
-            IncomingMarketDocument = incomingMarketDocument;
+            MarketMessage = marketMessage;
         }
 
         public IReadOnlyCollection<ValidationError> Errors { get; } = new List<ValidationError>();
 
         public bool Success => Errors.Count == 0;
 
-        public IIncomingMarketDocument<TMarketActivityRecordType, TMarketTransactionType>? IncomingMarketDocument { get; }
+        public RequestAggregatedMeasureDataMarketMessage? MarketMessage { get; }
     }
 }

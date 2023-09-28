@@ -20,7 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
-using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
@@ -29,7 +29,7 @@ using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
-public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDataTransactionCommand>
+public class XmlMessageParser : IMessageParser<RequestAggregatedMeasureDataMarketMessage>
 {
     private const string SeriesRecordElementName = "Series";
     private const string HeaderElementName = "RequestAggregatedMeasureData_MarketDocument";
@@ -43,7 +43,7 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
 
     public DocumentFormat HandledFormat => DocumentFormat.Xml;
 
-    public async Task<MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>> ParseAsync(Stream message, CancellationToken cancellationToken)
+    public async Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(Stream message, CancellationToken cancellationToken)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
 
@@ -67,7 +67,7 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
             .ConfigureAwait(true);
         if (xmlSchema is null)
         {
-            return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>(
+            return new RequestAggregatedMeasureDataMarketMessageParserResult(
                 new InvalidBusinessReasonOrVersion(businessProcessType, version));
         }
 
@@ -75,7 +75,7 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
         using var reader = XmlReader.Create(message, CreateXmlReaderSettings(xmlSchema));
         if (_errors.Count > 0)
         {
-            return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>(_errors.ToArray());
+            return new RequestAggregatedMeasureDataMarketMessageParserResult(_errors.ToArray());
         }
 
         try
@@ -84,7 +84,7 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
 
             if (_errors.Any())
             {
-               return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>(_errors.ToArray());
+               return new RequestAggregatedMeasureDataMarketMessageParserResult(_errors.ToArray());
             }
 
             return parsedXmlData;
@@ -99,10 +99,10 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
         }
     }
 
-    private static MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand> InvalidXmlFailure(
+    private static RequestAggregatedMeasureDataMarketMessageParserResult InvalidXmlFailure(
         Exception exception)
     {
-        return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>(
+        return new RequestAggregatedMeasureDataMarketMessageParserResult(
             InvalidMessageStructure.From(exception));
     }
 
@@ -147,7 +147,7 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
         return version;
     }
 
-    private static async Task<MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>> ParseXmlDataAsync(
+    private static async Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseXmlDataAsync(
         XmlReader reader, CancellationToken cancellationToken)
     {
         var root = await reader.ReadRootElementAsync().ConfigureAwait(false);
@@ -161,8 +161,8 @@ public class XmlMessageParser : IMessageParser<Serie, RequestAggregatedMeasureDa
             series.Add(serie);
         }
 
-        return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>(
-            new RequestAggregatedMeasureDataIncomingMarketDocument(messageHeader, series));
+        return new RequestAggregatedMeasureDataMarketMessageParserResult(
+            RequestAggregatedMeasureDataMarketMessageFactory.Create(messageHeader, series.AsReadOnly()));
     }
 
     private static async IAsyncEnumerable<Serie> ParseSerieAsync(XmlReader reader, RootElement rootElement)

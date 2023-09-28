@@ -96,7 +96,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
                 using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
                 await _transactionIdRepository.StoreAsync(
-                    requestAggregatedMeasureDataMarketMessage.SenderNumber.Value,
+                    requestAggregatedMeasureDataMarketMessage.SenderNumber,
                     transactionIdsToBeStored,
                     cancellationToken).ConfigureAwait(false);
                 await _messageIdRepository.StoreAsync(requestAggregatedMeasureDataMarketMessage.SenderNumber, requestAggregatedMeasureDataMarketMessage.MessageId, cancellationToken)
@@ -121,7 +121,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
             return Result.Succeeded();
         }
 
-        private async Task<bool> CheckTransactionIdAsync(string transactionId, ActorNumber senderNumber, List<string> transactionIdsToBeStored, CancellationToken cancellationToken)
+        private async Task<bool> CheckTransactionIdAsync(string transactionId, string senderNumber, List<string> transactionIdsToBeStored, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(transactionId))
             {
@@ -150,15 +150,15 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
             return true;
         }
 
-        private async Task<bool> TransactionIdIsDuplicatedAsync(ActorNumber senderNumber, string transactionId, CancellationToken cancellationToken)
+        private async Task<bool> TransactionIdIsDuplicatedAsync(string senderNumber, string transactionId, CancellationToken cancellationToken)
         {
             if (transactionId == null) throw new ArgumentNullException(nameof(transactionId));
 
             return await _transactionIdRepository
-                .TransactionIdExistsAsync(senderNumber.Value, transactionId, cancellationToken).ConfigureAwait(false);
+                .TransactionIdExistsAsync(senderNumber, transactionId, cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task CheckMessageIdAsync(ActorNumber senderNumber, string messageId, CancellationToken cancellationToken)
+        private async Task CheckMessageIdAsync(string senderNumber, string messageId, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(messageId))
             {
@@ -189,13 +189,13 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
 
         private async Task AuthorizeSenderAsync(RequestAggregatedMeasureDataMarketMessage marketMessage)
         {
-            var result = await _senderAuthorizer.AuthorizeAsync(marketMessage.SenderNumber, marketMessage.SenderRole, marketMessage.AuthenticatedUser, marketMessage.AuthenticatedUserRole).ConfigureAwait(false);
+            var result = await _senderAuthorizer.AuthorizeAsync(marketMessage.SenderNumber, marketMessage.SenderRoleCode, marketMessage.AuthenticatedUser, marketMessage.AuthenticatedUserRole).ConfigureAwait(false);
             _errors.AddRange(result.Errors);
         }
 
         private async Task VerifyReceiverAsync(RequestAggregatedMeasureDataMarketMessage marketMessage)
         {
-            var receiverVerification = await _receiverValidator.VerifyAsync(marketMessage.ReceiverNumber, marketMessage.ReceiverRole).ConfigureAwait(false);
+            var receiverVerification = await _receiverValidator.VerifyAsync(marketMessage.ReceiverNumber, marketMessage.ReceiverRoleCode).ConfigureAwait(false);
             _errors.AddRange(receiverVerification.Errors);
         }
     }

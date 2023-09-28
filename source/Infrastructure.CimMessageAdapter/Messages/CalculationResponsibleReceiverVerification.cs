@@ -27,19 +27,19 @@ public class CalculationResponsibleReceiverVerification : IReceiverValidator
     private const string CalculationResponsibleRole = "DGL";
     private const string GlnOfDataHub = "5790001330552";
 
-    public Task<Result> VerifyAsync(ActorNumber receiverNumber, MarketRole receiverRole)
+    public Task<Result> VerifyAsync(string receiverNumber, string receiverRole)
     {
         if (receiverNumber == null) throw new ArgumentNullException(nameof(receiverNumber));
         if (receiverRole == null) throw new ArgumentNullException(nameof(receiverRole));
 
-        if (IsCalculationResponsible(receiverRole.Code) == false)
+        if (IsCalculationResponsible(receiverRole) == false)
         {
             return Task.FromResult(Result.Failure(new InvalidReceiverRole()));
         }
 
-        if (ReceiverIsDataHub(receiverNumber.Value) == false)
+        if (ReceiverIsDataHub(receiverNumber) == false)
         {
-            return Task.FromResult(Result.Failure(new InvalidReceiverId(receiverNumber.Value)));
+            return Task.FromResult(Result.Failure(new InvalidReceiverId(receiverNumber)));
         }
 
         return Task.FromResult(Result.Succeeded());
