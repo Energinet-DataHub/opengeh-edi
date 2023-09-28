@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Domain.Actors;
 
 namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 
@@ -24,8 +25,6 @@ public interface IReceiverValidator
     /// <summary>
     /// Verify the receiver Id and role
     /// </summary>
-    /// <param name="receiverId"></param>
-    /// <param name="role"></param>
     /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
-    Task<Result> VerifyAsync(string receiverId, string role);
+    Task<Result> VerifyAsync(ActorNumber receiverNumber, MarketRole receiverRole);
 }

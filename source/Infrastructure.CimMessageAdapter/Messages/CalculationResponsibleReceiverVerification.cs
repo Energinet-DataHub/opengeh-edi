@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
 
 namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
@@ -26,19 +27,19 @@ public class CalculationResponsibleReceiverVerification : IReceiverValidator
     private const string CalculationResponsibleRole = "DGL";
     private const string GlnOfDataHub = "5790001330552";
 
-    public Task<Result> VerifyAsync(string receiverId, string role)
+    public Task<Result> VerifyAsync(ActorNumber receiverNumber, MarketRole receiverRole)
     {
-        if (receiverId == null) throw new ArgumentNullException(nameof(receiverId));
-        if (role == null) throw new ArgumentNullException(nameof(role));
+        if (receiverNumber == null) throw new ArgumentNullException(nameof(receiverNumber));
+        if (receiverRole == null) throw new ArgumentNullException(nameof(receiverRole));
 
-        if (IsCalculationResponsible(role) == false)
+        if (IsCalculationResponsible(receiverRole.Code) == false)
         {
             return Task.FromResult(Result.Failure(new InvalidReceiverRole()));
         }
 
-        if (ReceiverIsDataHub(receiverId) == false)
+        if (ReceiverIsDataHub(receiverNumber.Value) == false)
         {
-            return Task.FromResult(Result.Failure(new InvalidReceiverId(receiverId)));
+            return Task.FromResult(Result.Failure(new InvalidReceiverId(receiverNumber.Value)));
         }
 
         return Task.FromResult(Result.Succeeded());

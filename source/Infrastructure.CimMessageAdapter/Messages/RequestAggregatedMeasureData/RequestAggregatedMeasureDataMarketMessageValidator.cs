@@ -14,18 +14,17 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
-using Energinet.DataHub.EDI.Application.IncomingMessages;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Exceptions;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
-using MessageHeader = Energinet.DataHub.EDI.Application.IncomingMessages.MessageHeader;
 
-namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData
 {
-    public abstract class MessageReceiver
+    public abstract class RequestAggregatedMeasureDataMarketMessageValidator
     {
         private const int MessageIdLength = 36;
         private const int TransactionIdLength = 36;
@@ -37,7 +36,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
         private readonly IMessageTypeValidator _messageTypeValidator;
         private readonly IReceiverValidator _receiverValidator;
 
-        protected MessageReceiver(
+        protected RequestAggregatedMeasureDataMarketMessageValidator(
             IMessageIdRepository messageIdRepository,
             ITransactionIdRepository transactionIdRepository,
             ISenderAuthorizer senderAuthorizer,
@@ -53,28 +52,17 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
             _receiverValidator = receiverValidator;
         }
 
-        public async Task<Result> ReceiveAsync<TMarketActivityRecordType, TMarketTransactionType>(
-            MessageParserResult<TMarketActivityRecordType, TMarketTransactionType> messageParserResult,
+        public async Task<Result> ValidateAsync(
+            RequestAggregatedMeasureDataMarketMessage requestAggregatedMeasureDataMarketMessage,
             CancellationToken cancellationToken)
-            where TMarketActivityRecordType : IMarketActivityRecord
-            where TMarketTransactionType : IMarketTransaction<TMarketActivityRecordType>
         {
-            ArgumentNullException.ThrowIfNull(messageParserResult);
+            ArgumentNullException.ThrowIfNull(requestAggregatedMeasureDataMarketMessage);
 
-            var messageHeader = messageParserResult.IncomingMarketDocument?.Header;
-            var marketDocument = messageParserResult.IncomingMarketDocument;
-            if (messageHeader is null)
-            {
-                return Result.Failure(messageParserResult.Errors.ToArray());
-            }
-
-            ArgumentNullException.ThrowIfNull(marketDocument);
-
-            var authorizeSenderTask = AuthorizeSenderAsync(messageHeader);
-            var verifyReceiverTask = VerifyReceiverAsync(messageHeader);
-            var checkMessageIdTask = CheckMessageIdAsync(messageHeader.SenderId, messageHeader.MessageId, cancellationToken);
-            var checkMessageTypeTask = CheckMessageTypeAsync(messageHeader.MessageType, cancellationToken);
-            var checkProcessTypeTask = CheckProcessTypeAsync(messageHeader.BusinessReason, cancellationToken);
+            var authorizeSenderTask = AuthorizeSenderAsync(requestAggregatedMeasureDataMarketMessage);
+            var verifyReceiverTask = VerifyReceiverAsync(requestAggregatedMeasureDataMarketMessage);
+            var checkMessageIdTask = CheckMessageIdAsync(requestAggregatedMeasureDataMarketMessage.SenderNumber, requestAggregatedMeasureDataMarketMessage.MessageId, cancellationToken);
+            var checkMessageTypeTask = CheckMessageTypeAsync(requestAggregatedMeasureDataMarketMessage.MessageType, cancellationToken);
+            var checkProcessTypeTask = CheckBusinessReasonAsync(requestAggregatedMeasureDataMarketMessage.BusinessReason, cancellationToken);
 
             await Task.WhenAll(
                 authorizeSenderTask,
@@ -83,15 +71,14 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
                 checkMessageTypeTask,
                 checkProcessTypeTask).ConfigureAwait(false);
 
-            var transactions = marketDocument.ToTransactions();
             var transactionIdsToBeStored = new List<string>();
-            foreach (var transaction in transactions)
+            foreach (var serie in requestAggregatedMeasureDataMarketMessage.Series)
             {
-                var transactionId = transaction.MarketActivityRecord.Id;
+                var transactionId = serie.Id;
 
                 if (await CheckTransactionIdAsync(
                         transactionId,
-                        messageHeader.SenderId,
+                        requestAggregatedMeasureDataMarketMessage.SenderNumber,
                         transactionIdsToBeStored,
                         cancellationToken).ConfigureAwait(false))
                 {
@@ -108,12 +95,11 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
             {
                 using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-                var senderId = messageHeader.SenderId;
                 await _transactionIdRepository.StoreAsync(
-                    senderId,
+                    requestAggregatedMeasureDataMarketMessage.SenderNumber.Value,
                     transactionIdsToBeStored,
                     cancellationToken).ConfigureAwait(false);
-                await _messageIdRepository.StoreAsync(senderId, messageHeader.MessageId, cancellationToken)
+                await _messageIdRepository.StoreAsync(requestAggregatedMeasureDataMarketMessage.SenderNumber, requestAggregatedMeasureDataMarketMessage.MessageId, cancellationToken)
                     .ConfigureAwait(false);
 
                 scope.Complete();
@@ -135,7 +121,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
             return Result.Succeeded();
         }
 
-        private async Task<bool> CheckTransactionIdAsync(string transactionId, string senderId, List<string> transactionIdsToBeStored, CancellationToken cancellationToken)
+        private async Task<bool> CheckTransactionIdAsync(string transactionId, ActorNumber senderNumber, List<string> transactionIdsToBeStored, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(transactionId))
             {
@@ -149,7 +135,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
                 return false;
             }
 
-            if (await TransactionIdIsDuplicatedAsync(senderId, transactionId, cancellationToken).ConfigureAwait(false))
+            if (await TransactionIdIsDuplicatedAsync(senderNumber, transactionId, cancellationToken).ConfigureAwait(false))
             {
                 _errors.Add(new DuplicateTransactionIdDetected(transactionId));
                 return false;
@@ -164,15 +150,15 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
             return true;
         }
 
-        private async Task<bool> TransactionIdIsDuplicatedAsync(string senderId, string transactionId, CancellationToken cancellationToken)
+        private async Task<bool> TransactionIdIsDuplicatedAsync(ActorNumber senderNumber, string transactionId, CancellationToken cancellationToken)
         {
             if (transactionId == null) throw new ArgumentNullException(nameof(transactionId));
 
             return await _transactionIdRepository
-                .TransactionIdExistsAsync(senderId, transactionId, cancellationToken).ConfigureAwait(false);
+                .TransactionIdExistsAsync(senderNumber.Value, transactionId, cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task CheckMessageIdAsync(string senderId, string messageId, CancellationToken cancellationToken)
+        private async Task CheckMessageIdAsync(ActorNumber senderNumber, string messageId, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(messageId))
             {
@@ -183,7 +169,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
             {
                 _errors.Add(new InvalidMessageIdSize(messageId));
             }
-            else if (await _messageIdRepository.MessageIdExistsAsync(senderId, messageId, cancellationToken).ConfigureAwait(false))
+            else if (await _messageIdRepository.MessageIdExistsAsync(senderNumber, messageId, cancellationToken).ConfigureAwait(false))
             {
                 _errors.Add(new DuplicateMessageIdDetected(messageId));
             }
@@ -195,21 +181,21 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
             _errors.AddRange(result.Errors);
         }
 
-        private async Task CheckProcessTypeAsync(string processType, CancellationToken cancellationToken)
+        private async Task CheckBusinessReasonAsync(string businessReason, CancellationToken cancellationToken)
         {
-            var result = await _processTypeValidator.ValidateAsync(processType, cancellationToken).ConfigureAwait(false);
+            var result = await _processTypeValidator.ValidateAsync(businessReason, cancellationToken).ConfigureAwait(false);
             _errors.AddRange(result.Errors);
         }
 
-        private async Task AuthorizeSenderAsync(MessageHeader messageHeader)
+        private async Task AuthorizeSenderAsync(RequestAggregatedMeasureDataMarketMessage marketMessage)
         {
-            var result = await _senderAuthorizer.AuthorizeAsync(messageHeader.SenderId, messageHeader.SenderRole, messageHeader.AuthenticatedUser, messageHeader.AuthenticatedUserRole).ConfigureAwait(false);
+            var result = await _senderAuthorizer.AuthorizeAsync(marketMessage.SenderNumber, marketMessage.SenderRole, marketMessage.AuthenticatedUser, marketMessage.AuthenticatedUserRole).ConfigureAwait(false);
             _errors.AddRange(result.Errors);
         }
 
-        private async Task VerifyReceiverAsync(MessageHeader messageHeader)
+        private async Task VerifyReceiverAsync(RequestAggregatedMeasureDataMarketMessage marketMessage)
         {
-            var receiverVerification = await _receiverValidator.VerifyAsync(messageHeader.ReceiverId, messageHeader.ReceiverRole).ConfigureAwait(false);
+            var receiverVerification = await _receiverValidator.VerifyAsync(marketMessage.ReceiverNumber, marketMessage.ReceiverRole).ConfigureAwait(false);
             _errors.AddRange(receiverVerification.Errors);
         }
     }
