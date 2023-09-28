@@ -52,7 +52,7 @@ public class B2CRequestAggregatedMeasureMessageReceiver
         _mediator = mediator;
         }
 
-    [Function(nameof(RequestAggregatedMeasureMessageReceiver))]
+    [Function(nameof(B2CRequestAggregatedMeasureMessageReceiver))]
     public async Task<HttpResponseData> RunAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
         HttpRequestData request,
