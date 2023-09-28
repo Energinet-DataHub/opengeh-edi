@@ -176,7 +176,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     [InlineData(nameof(DocumentFormat.Ebix), nameof(BusinessReason.Correction), nameof(SettlementVersion.FirstCorrection))]
     [InlineData(nameof(DocumentFormat.Xml), nameof(BusinessReason.Correction), nameof(SettlementVersion.FirstCorrection))]
     [InlineData(nameof(DocumentFormat.Json), nameof(BusinessReason.Correction), nameof(SettlementVersion.FirstCorrection))]
-    public async Task Business_reason_and_SettlementVersionn_is_translated(string documentFormat, string processType, string settlementVersion)
+    public async Task Business_reason_and_SettlementVersion_is_translated(string documentFormat, string processType, string settlementVersion)
     {
         _timeSeries
             .WithBusinessReason(BusinessReason.From(processType))
