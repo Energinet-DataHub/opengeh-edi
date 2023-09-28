@@ -97,7 +97,7 @@ public class RequestAggregatedMeasureMessageReceiver
         }
 
         await SaveArchivedMessageAsync(messageHeader, request.Body, cancellationToken).ConfigureAwait(false);
-        var marketMessage = RequestAggregatedMeasureDocumentFactory.Created(messageParserResult.IncomingMarketDocument!);
+        var marketMessage = RequestAggregatedMeasureDataMarketMessageFactory.Created(messageParserResult.IncomingMarketDocument!);
 
         var result = await _mediator
             .Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage), cancellationToken).ConfigureAwait(false);
