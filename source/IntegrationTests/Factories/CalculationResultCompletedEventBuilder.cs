@@ -24,6 +24,16 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
 internal sealed class CalculationResultCompletedEventBuilder
 {
+    private readonly List<TimeSeriesPoint> _timeSeriesPoints = new()
+    {
+        new TimeSeriesPoint()
+        {
+            Time = Timestamp.FromDateTime(DateTime.UtcNow),
+            Quantity = new DecimalValue() { Nanos = 1, Units = 1 },
+            QuantityQuality = QuantityQuality.Measured,
+        },
+    };
+
     private ProcessType _processType = ProcessType.BalanceFixing;
     private Resolution _resolution = Resolution.Quarter;
     private QuantityUnit _measurementUnit = QuantityUnit.Kwh;
@@ -34,15 +44,6 @@ internal sealed class CalculationResultCompletedEventBuilder
     private Timestamp _startOfPeriod = SystemClock.Instance.GetCurrentInstant().ToTimestamp();
     private Timestamp _endOfPeriod = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(1)).ToTimestamp();
     private TimeSeriesType _timeSeriesType = TimeSeriesType.NonProfiledConsumption;
-    private List<TimeSeriesPoint> _timeSeriesPoints = new List<TimeSeriesPoint>()
-    {
-        new TimeSeriesPoint()
-        {
-            Time = Timestamp.FromDateTime(DateTime.UtcNow),
-            Quantity = new DecimalValue() { Nanos = 1, Units = 1 },
-            QuantityQuality = QuantityQuality.Measured,
-        },
-    };
 
     internal CalculationResultCompleted Build()
     {

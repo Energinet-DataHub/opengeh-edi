@@ -24,8 +24,8 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
     /// </summary>
     public class MasterDataReceiverResponsibleVerification : IReceiverValidator
     {
-        private const string MasterDataResponsibleRole = "DDZ";
         private const string GlnOfDataHub = "5790001330552";
+        private static readonly string MasterDataResponsibleRole = MarketRole.MasterDataResponsibleRole.Code;
 
         public Task<Result> VerifyAsync(ActorNumber receiverNumber, MarketRole receiverRole)
         {
