@@ -70,16 +70,13 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-          <Protobuf Include="**/*.proto">
-      <GrpcServices>None</GrpcServices>
-      <Access>Public</Access>
-      <ProtoCompile>True</ProtoCompile>
-      <CompileOutputs>True</CompileOutputs>
-      <Generator>MSBuild:Compile</Generator>
-    </Protobuf>
-          <Protobuf Update="Requests\RequestAggregatedMeasureData.proto">
-            <OutputDir>obj\Debug\net7.0\</OutputDir>
-          </Protobuf>
+      <Protobuf Include="**/*.proto">
+        <GrpcServices>None</GrpcServices>
+        <Access>Public</Access>
+        <ProtoCompile>True</ProtoCompile>
+        <CompileOutputs>True</CompileOutputs>
+        <Generator>MSBuild:Compile</Generator>
+      </Protobuf>
     </ItemGroup>
 
 </Project>
