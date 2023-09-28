@@ -35,7 +35,7 @@ message Serie {
   string Id = 1;
   optional string MarketEvaluationPointType = 2;
   optional string MarketEvaluationSettlementMethod = 3;
-  optional string StartDateAndOrTimeDateTime = 4;
+  string StartDateAndOrTimeDateTime = 4;
   optional string EndDateAndOrTimeDateTime = 5;
   optional string MeteringGridAreaDomainId = 6;
   optional string EnergySupplierMarketParticipantId = 7;
