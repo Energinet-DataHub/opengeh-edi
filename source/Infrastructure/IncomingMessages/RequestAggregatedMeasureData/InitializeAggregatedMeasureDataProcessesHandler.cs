@@ -15,6 +15,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.Transactions;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
@@ -64,8 +65,8 @@ public class InitializeAggregatedMeasureDataProcessesHandler
                 new AggregatedMeasureDataProcess(
                     ProcessId.New(),
                     BusinessTransactionId.Create(serie.Id),
-                    marketMessage.SenderNumber,
-                    marketMessage.SenderRole.Code,
+                    ActorNumber.Create(marketMessage.SenderNumber),
+                    marketMessage.SenderRoleCode,
                     marketMessage.BusinessReason,
                     serie.MarketEvaluationPointType,
                     serie.MarketEvaluationSettlementMethod,

@@ -23,9 +23,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 /// <summary>
 /// Parses CIM messages from a stream
 /// </summary>
-public interface IMessageParser<TMarketActivityRecordType, TMarketTransactionType>
-    where TMarketActivityRecordType : IMarketActivityRecord
-    where TMarketTransactionType : IMarketTransaction<TMarketActivityRecordType>
+public interface IMessageParser<TMarketMessageType>
 {
     /// <summary>
     /// The CIM format handled
@@ -35,8 +33,6 @@ public interface IMessageParser<TMarketActivityRecordType, TMarketTransactionTyp
     /// <summary>
     /// Parse from stream
     /// </summary>
-    /// <param name="message"></param>
-    /// <param name="cancellationToken"></param>
-    Task<MessageParserResult<TMarketActivityRecordType, TMarketTransactionType>> ParseAsync(
+    Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(
         Stream message, CancellationToken cancellationToken);
 }

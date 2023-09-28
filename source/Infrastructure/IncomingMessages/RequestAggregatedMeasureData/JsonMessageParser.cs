@@ -15,11 +15,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
-using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
@@ -28,8 +29,8 @@ using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
-public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureDataTransactionCommand>,
-    IMessageParser<Serie, RequestAggregatedMeasureDataTransactionCommand>
+public class JsonMessageParser : JsonParserBase<RequestAggregatedMeasureDataMarketMessage>,
+    IMessageParser<RequestAggregatedMeasureDataMarketMessage>
 {
     private const string SeriesElementName = "Series";
     private const string HeaderElementName = "RequestAggregatedMeasureData_MarketDocument";
@@ -42,7 +43,7 @@ public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureD
 
     public DocumentFormat HandledFormat => DocumentFormat.Json;
 
-    public async Task<MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>> ParseAsync(
+    public async Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(
         Stream message,
         CancellationToken cancellationToken)
     {
@@ -51,7 +52,7 @@ public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureD
         var schema = await GetSchemaAsync(DocumentName, cancellationToken).ConfigureAwait(false);
         if (schema is null)
         {
-            return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>(
+            return new RequestAggregatedMeasureDataMarketMessageParserResult(
                 new InvalidBusinessReasonOrVersion(DocumentName, "0"));
         }
 
@@ -61,7 +62,7 @@ public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureD
 
         if (errors.Count > 0)
         {
-            return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>(errors.ToArray());
+            return new RequestAggregatedMeasureDataMarketMessageParserResult(errors.ToArray());
         }
 
         try
@@ -106,7 +107,7 @@ public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureD
         return element.TryGetProperty(propertyName, out var property) ? property.GetProperty("value").ToString() : null;
     }
 
-    private static MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand> ParseJsonData(
+    private static RequestAggregatedMeasureDataMarketMessageParserResult ParseJsonData(
         MessageHeader header,
         JsonElement seriesJson)
     {
@@ -117,7 +118,7 @@ public class JsonMessageParser : JsonParserBase<Serie, RequestAggregatedMeasureD
             series.Add(SeriesFrom(jsonElement));
         }
 
-        return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>(
-            new RequestAggregatedMeasureDataIncomingMarketDocument(header, series));
+        return new RequestAggregatedMeasureDataMarketMessageParserResult(
+            RequestAggregatedMeasureDataMarketMessageFactory.Create(header, series.AsReadOnly()));
     }
 }

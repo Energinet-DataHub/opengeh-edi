@@ -172,10 +172,10 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         Assert.Equal(expectedOutgoingMessages, messages.Count);
     }
 
-    private AggregatedMeasureDataProcess? GetProcess(ActorNumber senderNumber)
+    private AggregatedMeasureDataProcess? GetProcess(string senderNumber)
     {
         return _b2BContext.AggregatedMeasureDataProcesses
             .ToList()
-            .FirstOrDefault(x => x.RequestedByActorId.Value == senderNumber.Value);
+            .FirstOrDefault(x => x.RequestedByActorId.Value == senderNumber);
     }
 }
