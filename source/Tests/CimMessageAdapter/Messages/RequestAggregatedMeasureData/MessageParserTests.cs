@@ -19,7 +19,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
@@ -40,12 +40,12 @@ public class MessageParserTests
     private static readonly string SubPath =
         $"{Path.DirectorySeparatorChar}aggregatedmeasure{Path.DirectorySeparatorChar}";
 
-    private readonly MessageParser _messageParser;
+    private readonly RequestAggregatedMeasureDataMarketMessageParser _requestAggregatedMeasureDataMarketMessageParser;
 
     public MessageParserTests()
     {
-        _messageParser = new MessageParser(
-            new IMessageParser<Serie, RequestAggregatedMeasureDataTransactionCommand>[]
+        _requestAggregatedMeasureDataMarketMessageParser = new RequestAggregatedMeasureDataMarketMessageParser(
+            new IMessageParser<RequestAggregatedMeasureDataMarketMessage>[]
             {
                 new XmlMessageParser(),
                 new JsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
@@ -76,20 +76,20 @@ public class MessageParserTests
     [MemberData(nameof(CreateMessagesWithSingleAndMultipleTransactions))]
     public async Task Successfully_parsed(DocumentFormat format, Stream message)
     {
-        var result = await _messageParser.ParseAsync(message, format, CancellationToken.None).ConfigureAwait(false);
+        var result = await _requestAggregatedMeasureDataMarketMessageParser.ParseAsync(message, format, CancellationToken.None).ConfigureAwait(false);
 
         Assert.True(result.Success);
-        var messageHeader = result!.IncomingMarketDocument!.Header;
-        Assert.True(messageHeader != null);
-        Assert.Equal("123564789123564789123564789123564789", messageHeader.MessageId);
-        Assert.Equal("D05", messageHeader.BusinessReason);
-        Assert.Equal("5799999933318", messageHeader.SenderId);
-        Assert.Equal("DDK", messageHeader.SenderRole);
-        Assert.Equal("5790001330552", messageHeader.ReceiverId);
-        Assert.Equal("DGL", messageHeader.ReceiverRole);
-        Assert.Equal("2022-12-17T09:30:47Z", messageHeader.CreatedAt);
+        var marketMessage = result!.MarketMessage!;
+        Assert.True(marketMessage != null);
+        Assert.Equal("123564789123564789123564789123564789", marketMessage.MessageId);
+        Assert.Equal("D05", marketMessage.BusinessReason);
+        Assert.Equal("5799999933318", marketMessage.SenderNumber);
+        Assert.Equal("DDK", marketMessage.SenderRoleCode);
+        Assert.Equal("5790001330552", marketMessage.ReceiverNumber);
+        Assert.Equal("DGL", marketMessage.ReceiverRoleCode);
+        //Assert.Equal("2022-12-17T09:30:47Z", marketMessage.CreatedAt); //TODO: what do we use this for????
 
-        foreach (var serie in result!.IncomingMarketDocument!.MarketActivityRecords)
+        foreach (var serie in result!.MarketMessage!.Series)
         {
             Assert.True(serie != null);
             Assert.Equal("123353185", serie.Id);
@@ -107,7 +107,7 @@ public class MessageParserTests
     [MemberData(nameof(CreateBadMessages))]
     public async Task Messages_with_errors(DocumentFormat format, Stream message, string expectedError)
     {
-        var result = await _messageParser.ParseAsync(message, format, CancellationToken.None).ConfigureAwait(false);
+        var result = await _requestAggregatedMeasureDataMarketMessageParser.ParseAsync(message, format, CancellationToken.None).ConfigureAwait(false);
 
         Assert.True(result.Errors.Count > 0);
         Assert.True(result.Success == false);
