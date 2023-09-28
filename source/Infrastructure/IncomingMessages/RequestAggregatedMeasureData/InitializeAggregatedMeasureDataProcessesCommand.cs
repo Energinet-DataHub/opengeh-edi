@@ -13,17 +13,17 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
-using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
 public class InitializeAggregatedMeasureDataProcessesCommand : ICommand<Result>
 {
-    public InitializeAggregatedMeasureDataProcessesCommand(MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand> messageResult)
+    public InitializeAggregatedMeasureDataProcessesCommand(RequestAggregatedMeasureDataMarketMessage marketMessage)
     {
-        MessageResult = messageResult;
+        MarketMessage = marketMessage;
     }
 
-    public MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand> MessageResult { get; }
+    public RequestAggregatedMeasureDataMarketMessage MarketMessage { get; }
 }

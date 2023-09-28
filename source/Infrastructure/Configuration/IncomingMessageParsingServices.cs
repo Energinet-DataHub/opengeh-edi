@@ -71,7 +71,7 @@ internal static class IncomingMessageParsingServices
         services
             .AddScoped<IMessageParser<Serie, RequestAggregatedMeasureDataTransactionCommand>, IncomingMessages.RequestAggregatedMeasureData.JsonMessageParser>();
         services.AddTransient<MessageParser>();
-        services.AddTransient<RequestAggregatedMeasureDataReceiver>();
+        services.AddTransient<RequestAggregatedMeasureDataValidator>();
         services.AddTransient<SenderAuthorizer>();
         services.AddTransient<RequestAggregatedMeasureDataTransactionCommand>();
         services.AddScoped<ProcessTypeValidator>();

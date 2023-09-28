@@ -57,14 +57,14 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
     public async Task Aggregated_measure_data_process_is_created()
     {
         // Arrange
-        var incomingMessage = MessageBuilder().Build();
+        var marketMessage = MessageBuilder().Build();
 
         // Act
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(incomingMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
 
         // Assert
-        var process = GetProcess(incomingMessage.IncomingMarketDocument!.Header.SenderId);
-        Assert.Equal(incomingMessage.IncomingMarketDocument.MarketActivityRecords.First().Id, process!.BusinessTransactionId.Id);
+        var process = GetProcess(marketMessage.SenderNumber);
+        Assert.Equal(marketMessage.Series.First().Id, process!.BusinessTransactionId.Id);
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Initialized);
     }
 
@@ -72,13 +72,13 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
     public async Task Aggregated_measure_data_process_was_send_to_wholesale()
     {
         // Arrange
-        var incomingMessage =
+        var marketMessage =
             MessageBuilder().
                 SetSenderRole(MarketRole.MeteredDataResponsible.Code).
                 SetEnergySupplierId(null).
                 SetBalanceResponsibleId(null).
                 Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(incomingMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
         var exceptedServiceBusMessageSubject = nameof(AggregatedTimeSeriesRequest);
 
@@ -87,12 +87,12 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
 
         // Assert
         var message = _senderSpy.Message;
-        var process = GetProcess(incomingMessage.IncomingMarketDocument!.Header.SenderId);
+        var process = GetProcess(marketMessage.SenderNumber);
         Assert.NotNull(message);
         Assert.NotNull(process);
         Assert.Equal(process.ProcessId.Id.ToString(), message!.MessageId);
         Assert.Equal(exceptedServiceBusMessageSubject, message!.Subject);
-        Assert.Equal(incomingMessage.IncomingMarketDocument.MarketActivityRecords.First().Id, process!.BusinessTransactionId.Id);
+        Assert.Equal(marketMessage.Series.First().Id, process!.BusinessTransactionId.Id);
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Sent);
     }
 
@@ -109,7 +109,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         TimeSeriesType expectedType)
     {
         // Arrange
-        var incomingMessage =
+        var marketMessage =
             MessageBuilder().
                 SetMarketEvaluationPointType(evaluationPointType).
                 SetMarketEvaluationSettlementMethod(settlementMethod).
@@ -117,7 +117,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                 SetEnergySupplierId(null).
                 SetBalanceResponsibleId(null).
                 Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(incomingMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
 
         // Act
@@ -133,24 +133,24 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         Assert.Equal(expectedType, response.TimeSeriesType);
         Assert.NotNull(response.AggregationPerGridarea);
         var aggregationPerGridArea = response.AggregationPerGridarea;
-        Assert.Equal(incomingMessage.IncomingMarketDocument!.MarketActivityRecords.First().MeteringGridAreaDomainId, aggregationPerGridArea.GridAreaCode);
-        Assert.Equal(incomingMessage.IncomingMarketDocument.Header.SenderId, aggregationPerGridArea.GridResponsibleId);
+        Assert.Equal(marketMessage.Series.First().MeteringGridAreaDomainId, aggregationPerGridArea.GridAreaCode);
+        Assert.Equal(marketMessage.SenderNumber.Value, aggregationPerGridArea.GridResponsibleId);
     }
 
     [Fact]
     public async Task Grid_operator_requesting_invalid_time_series_types()
     {
         // Arrange
-        var incomingMessage =
+        var marketMessage =
             MessageBuilder().
                 SetMarketEvaluationPointType("BAD").
                 SetSenderRole(MarketRole.MeteredDataResponsible.Code).
                 SetEnergySupplierId(null).
                 SetBalanceResponsibleId(null).
                 Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(incomingMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
-        var process = GetProcess(incomingMessage.IncomingMarketDocument!.Header.SenderId);
+        var process = GetProcess(marketMessage.SenderNumber);
 
         // Act and assert
         await Assert.ThrowsAsync<InvalidOperationException>(() => InvokeCommandAsync(command)).ConfigureAwait(false);
@@ -169,7 +169,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         TimeSeriesType expectedType)
     {
         // Arrange
-        var incomingMessage =
+        var marketMessage =
             MessageBuilder().
                 SetMarketEvaluationPointType(evaluationPointType).
                 SetMarketEvaluationSettlementMethod(settlementMethod).
@@ -177,7 +177,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                 SetEnergySupplierId("1232132132132").
                 SetBalanceResponsibleId(null).
                 Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(incomingMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
 
         // Act
@@ -194,8 +194,8 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         Assert.NotNull(response.AggregationPerEnergysupplierPerGridarea);
 
         var aggregationPerEnergySupplierPerGridArea = response.AggregationPerEnergysupplierPerGridarea;
-        Assert.Equal(incomingMessage.IncomingMarketDocument!.MarketActivityRecords.First().MeteringGridAreaDomainId, aggregationPerEnergySupplierPerGridArea.GridAreaCode);
-        Assert.Equal(incomingMessage.IncomingMarketDocument!.MarketActivityRecords.First().EnergySupplierMarketParticipantId, aggregationPerEnergySupplierPerGridArea.EnergySupplierId);
+        Assert.Equal(marketMessage.Series.First().MeteringGridAreaDomainId, aggregationPerEnergySupplierPerGridArea.GridAreaCode);
+        Assert.Equal(marketMessage.Series.First().EnergySupplierMarketParticipantId, aggregationPerEnergySupplierPerGridArea.EnergySupplierId);
     }
 
     [Theory]
@@ -207,7 +207,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         string? settlementMethod)
     {
         // Arrange
-        var incomingMessage =
+        var marketMessage =
             MessageBuilder().
                 SetMarketEvaluationPointType(evaluationPointType).
                 SetMarketEvaluationSettlementMethod(settlementMethod).
@@ -215,9 +215,9 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                 SetEnergySupplierId("1232132132132").
                 SetBalanceResponsibleId(null).
                 Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(incomingMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
-        var process = GetProcess(incomingMessage.IncomingMarketDocument!.Header.SenderId);
+        var process = GetProcess(marketMessage.SenderNumber);
 
         // Act and assert
         await Assert.ThrowsAsync<InvalidOperationException>(() => InvokeCommandAsync(command)).ConfigureAwait(false);
@@ -237,7 +237,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         TimeSeriesType expectedType)
     {
         // Arrange
-        var incomingMessage =
+        var marketMessage =
             MessageBuilder().
                 SetMarketEvaluationPointType(evaluationPointType).
                 SetMarketEvaluationSettlementMethod(settlementMethod).
@@ -245,7 +245,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                 SetEnergySupplierId(null).
                 SetBalanceResponsibleId("1232132132132").
                 Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(incomingMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
 
         // Act
@@ -262,8 +262,8 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         Assert.NotNull(response.AggregationPerBalanceresponsiblepartyPerGridarea);
 
         var aggregationPerBalanceResponsible = response.AggregationPerBalanceresponsiblepartyPerGridarea;
-        Assert.Equal(incomingMessage.IncomingMarketDocument!.MarketActivityRecords.First().MeteringGridAreaDomainId, aggregationPerBalanceResponsible.GridAreaCode);
-        Assert.Equal(incomingMessage.IncomingMarketDocument!.MarketActivityRecords.First().BalanceResponsiblePartyMarketParticipantId, aggregationPerBalanceResponsible.BalanceResponsiblePartyId);
+        Assert.Equal(marketMessage.Series.First().MeteringGridAreaDomainId, aggregationPerBalanceResponsible.GridAreaCode);
+        Assert.Equal(marketMessage.Series.First().BalanceResponsiblePartyMarketParticipantId, aggregationPerBalanceResponsible.BalanceResponsiblePartyId);
     }
 
     [Theory]
@@ -275,7 +275,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         string? settlementMethod)
     {
         // Arrange
-        var incomingMessage =
+        var marketMessage =
             MessageBuilder().
                 SetMarketEvaluationPointType(evaluationPointType).
                 SetMarketEvaluationSettlementMethod(settlementMethod).
@@ -283,9 +283,9 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                 SetEnergySupplierId(null).
                 SetBalanceResponsibleId("1232132132132").
                 Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(incomingMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
-        var process = GetProcess(incomingMessage.IncomingMarketDocument!.Header.SenderId);
+        var process = GetProcess(marketMessage.SenderNumber);
 
         // Act and assert
         await Assert.ThrowsAsync<InvalidOperationException>(() => InvokeCommandAsync(command)).ConfigureAwait(false);
@@ -304,7 +304,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         TimeSeriesType expectedType)
     {
         // Arrange
-        var incomingMessage =
+        var marketMessage =
             MessageBuilder().
                 SetMarketEvaluationPointType(evaluationPointType).
                 SetMarketEvaluationSettlementMethod(settlementMethod).
@@ -312,7 +312,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                 SetEnergySupplierId("9232132132999").
                 SetBalanceResponsibleId("1232132132132").
                 Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(incomingMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
 
         // Act
@@ -329,9 +329,9 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         Assert.NotNull(response.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea);
 
         var aggregationPerEnergySupplierPerBalanceResponsible = response.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea;
-        Assert.Equal(incomingMessage.IncomingMarketDocument!.MarketActivityRecords.First().MeteringGridAreaDomainId, aggregationPerEnergySupplierPerBalanceResponsible.GridAreaCode);
-        Assert.Equal(incomingMessage.IncomingMarketDocument!.MarketActivityRecords.First().EnergySupplierMarketParticipantId, aggregationPerEnergySupplierPerBalanceResponsible.EnergySupplierId);
-        Assert.Equal(incomingMessage.IncomingMarketDocument!.MarketActivityRecords.First().BalanceResponsiblePartyMarketParticipantId, aggregationPerEnergySupplierPerBalanceResponsible.BalanceResponsiblePartyId);
+        Assert.Equal(marketMessage.Series.First().MeteringGridAreaDomainId, aggregationPerEnergySupplierPerBalanceResponsible.GridAreaCode);
+        Assert.Equal(marketMessage.Series.First().EnergySupplierMarketParticipantId, aggregationPerEnergySupplierPerBalanceResponsible.EnergySupplierId);
+        Assert.Equal(marketMessage.Series.First().BalanceResponsiblePartyMarketParticipantId, aggregationPerEnergySupplierPerBalanceResponsible.BalanceResponsiblePartyId);
     }
 
     [Theory]
@@ -343,7 +343,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         string? settlementMethod)
     {
         // Arrange
-        var incomingMessage =
+        var marketMessage =
             MessageBuilder().
                 SetMarketEvaluationPointType(evaluationPointType).
                 SetMarketEvaluationSettlementMethod(settlementMethod).
@@ -351,9 +351,9 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                 SetEnergySupplierId("9232132132999").
                 SetBalanceResponsibleId("1232132132132").
                 Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(incomingMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
-        var process = GetProcess(incomingMessage.IncomingMarketDocument!.Header.SenderId);
+        var process = GetProcess(marketMessage.SenderNumber);
 
         // Act and assert
         await Assert.ThrowsAsync<InvalidOperationException>(() => InvokeCommandAsync(command)).ConfigureAwait(false);
@@ -391,10 +391,10 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         return (InternalCommand)_serializer.Deserialize(queuedInternalCommand.Data, commandMetaData.CommandType);
     }
 
-    private AggregatedMeasureDataProcess? GetProcess(string senderId)
+    private AggregatedMeasureDataProcess? GetProcess(ActorNumber senderNumber)
     {
         return _b2BContext.AggregatedMeasureDataProcesses
             .ToList()
-            .FirstOrDefault(x => x.RequestedByActorId.Value == senderId);
+            .FirstOrDefault(x => x.RequestedByActorId.Value == senderNumber.Value);
     }
 }

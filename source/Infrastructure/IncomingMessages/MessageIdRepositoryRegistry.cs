@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Exceptions;
 using Microsoft.Data.SqlClient;
@@ -35,15 +36,17 @@ namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages
             _logger = logger;
         }
 
-        public async Task StoreAsync(string senderId, string messageId, CancellationToken cancellationToken)
+        public async Task StoreAsync(ActorNumber senderNumber, string messageId, CancellationToken cancellationToken)
         {
+            if (senderNumber == null) throw new ArgumentNullException(nameof(senderNumber));
+
             using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
 
             try
             {
                 await connection.ExecuteAsync(
                         $"INSERT INTO dbo.MessageRegistry(MessageId, SenderId) VALUES(@MessageId, @SenderId)",
-                        new { MessageId = messageId, SenderId = senderId })
+                        new { MessageId = messageId, SenderId = senderNumber.Value })
                     .ConfigureAwait(false);
             }
             catch (SqlException e)
@@ -56,7 +59,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages
                             "Unable to insert message id: {MessageId}" +
                             " for sender: {SenderId} since it already exists in the database",
                             messageId,
-                            senderId);
+                            senderNumber.Value);
                         throw new NotSuccessfulMessageIdStorageException(messageId);
                     }
                 }
@@ -65,12 +68,14 @@ namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages
             }
         }
 
-        public async Task<bool> MessageIdExistsAsync(string senderId, string messageId, CancellationToken cancellationToken)
+        public async Task<bool> MessageIdExistsAsync(ActorNumber senderNumber, string messageId, CancellationToken cancellationToken)
         {
+            if (senderNumber == null) throw new ArgumentNullException(nameof(senderNumber));
+
             using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
             var message = await connection.QueryFirstOrDefaultAsync(
                     $"SELECT TOP (1) * FROM dbo.MessageRegistry WHERE MessageId = @MessageId AND SenderId = @SenderId",
-                    new { MessageId = messageId, SenderId = senderId })
+                    new { MessageId = messageId, SenderId = senderNumber.Value })
                 .ConfigureAwait(false);
 
             return message != null;
