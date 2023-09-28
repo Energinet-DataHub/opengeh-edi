@@ -15,31 +15,37 @@
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
+using NodaTime;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Queueing;
+namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages;
 
-public class DequeuedBundlesRetention : IDataRetention
+public class OutgoingMessageRetention : IDataRetention
 {
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly ILogger<OutgoingMessageRetention> _logger;
 
-    public DequeuedBundlesRetention(IDatabaseConnectionFactory databaseConnectionFactory)
+    public OutgoingMessageRetention(
+        IDatabaseConnectionFactory databaseConnectionFactory,
+        ISystemDateTimeProvider systemDateTimeProvider,
+        ILogger<OutgoingMessageRetention> logger)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
+        _systemDateTimeProvider = systemDateTimeProvider;
+        _logger = logger;
     }
 
     public async Task CleanupAsync(CancellationToken cancellationToken)
     {
+        var monthAgo = _systemDateTimeProvider.Now().Plus(-Duration.FromDays(30));
         const string deleteStmt = @"
             DELETE FROM [dbo].[MarketDocuments]
             WHERE [BundleId] IN (SELECT [Id]
-            FROM [dbo].[Bundles]
-            WHERE [IsDequeued] = 1)
-
-            DELETE FROM [dbo].[OutgoingMessages]
-            WHERE [AssignedBundleId] IN (SELECT [Id]
             FROM [dbo].[Bundles]
             WHERE [IsDequeued] = 1)
 
