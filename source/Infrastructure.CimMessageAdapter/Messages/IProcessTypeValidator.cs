@@ -29,11 +29,3 @@ public interface IProcessTypeValidator
     /// <param name="cancellationToken"></param>
     public Task<Result> ValidateAsync(string processType, CancellationToken cancellationToken);
 }
-
-public class DefaultProcessTypeValidator : IProcessTypeValidator
-{
-    public Task<Result> ValidateAsync(string processType, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(Result.Succeeded());
-    }
-}
