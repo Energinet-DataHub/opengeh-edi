@@ -43,9 +43,9 @@ public class ExecuteDataRetentionsWhenADayHasPassed : INotificationHandler<ADayH
             .Handle<Exception>()
             .WaitAndRetryAsync(new[]
             {
-                TimeSpan.FromSeconds(1),
-                TimeSpan.FromSeconds(2),
-                TimeSpan.FromSeconds(4),
+                TimeSpan.FromSeconds(10),
+                TimeSpan.FromSeconds(15),
+                TimeSpan.FromSeconds(30),
             });
 
         foreach (var dataCleaner in _dataRetentions)
