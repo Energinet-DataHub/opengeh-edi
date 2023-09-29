@@ -29,11 +29,3 @@ public interface IMessageTypeValidator
     /// <param name="cancellationToken"></param>
     public Task<Result> ValidateAsync(string messageType, CancellationToken cancellationToken);
 }
-
-public class DefaultMessageTypeValidator : IMessageTypeValidator
-{
-    public Task<Result> ValidateAsync(string messageType, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(Result.Succeeded());
-    }
-}

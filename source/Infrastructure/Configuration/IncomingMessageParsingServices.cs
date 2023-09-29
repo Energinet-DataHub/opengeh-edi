@@ -29,9 +29,7 @@ internal static class IncomingMessageParsingServices
     {
         RegisterB2BResponseServices(services);
         RegisterSchemaProviders(services);
-        RegisterRequestChangeOfSupplierMessageHandling(services);
         RegisterRequestAggregatedMeasureDataHandling(services);
-        RegisterRequestChangeOfCustomerCharacteristicsMessageHandling(services);
     }
 
     private static void RegisterB2BResponseServices(IServiceCollection services)
@@ -46,21 +44,6 @@ internal static class IncomingMessageParsingServices
         services.AddSingleton<CimJsonSchemas>();
         services.AddSingleton<CimXmlSchemaProvider>();
         services.AddSingleton<JsonSchemaProvider>();
-    }
-
-    private static void RegisterRequestChangeOfCustomerCharacteristicsMessageHandling(IServiceCollection services)
-    {
-        services.AddScoped<DefaultProcessTypeValidator>();
-        services.AddScoped<DefaultMessageTypeValidator>();
-        services.AddScoped<MasterDataReceiverResponsibleVerification>();
-    }
-
-    private static void RegisterRequestChangeOfSupplierMessageHandling(IServiceCollection services)
-    {
-        services.AddScoped<SenderAuthorizer>();
-        services.AddScoped<DefaultProcessTypeValidator>();
-        services.AddScoped<DefaultMessageTypeValidator>();
-        services.AddScoped<MasterDataReceiverResponsibleVerification>();
     }
 
     private static void RegisterRequestAggregatedMeasureDataHandling(IServiceCollection services)
