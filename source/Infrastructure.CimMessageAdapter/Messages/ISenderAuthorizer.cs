@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Domain.Actors;
 
 namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 
@@ -24,5 +25,5 @@ public interface ISenderAuthorizer
     /// <summary>
     /// Authorize sender
     /// </summary>
-    Task<Result> AuthorizeAsync(string senderId, string senderRole, string? authenticatedUser = null, string? authenticatedUserRole = null);
+    Task<Result> AuthorizeAsync(string senderNumber, string senderRole, string? authenticatedUser = null, string? authenticatedUserRole = null);
 }

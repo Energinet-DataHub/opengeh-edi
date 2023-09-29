@@ -12,18 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
-using Energinet.DataHub.EDI.Domain.Documents;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+namespace Energinet.DataHub.EDI.B2CWebApi.Security;
 
-namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
-
-public class InitializeAggregatedMeasureDataProcessesCommand : ICommand<Result>
+public sealed class FrontendUser
 {
-    public InitializeAggregatedMeasureDataProcessesCommand(RequestAggregatedMeasureDataMarketMessage marketMessage)
+    public FrontendUser(Guid userId, Guid actorId, bool isFas)
     {
-        MarketMessage = marketMessage;
+        UserId = userId;
+        ActorId = actorId;
+        IsFas = isFas;
     }
 
-    public RequestAggregatedMeasureDataMarketMessage MarketMessage { get; }
+    public Guid UserId { get; }
+
+    public Guid ActorId { get; }
+
+    public bool IsFas { get; }
 }

@@ -20,25 +20,23 @@ using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.Transactions;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using MediatR;
 using NodaTime.Text;
-using Receiver =
-    Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData.
-    RequestAggregatedMeasureDataReceiver;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
 public class InitializeAggregatedMeasureDataProcessesHandler
     : IRequestHandler<InitializeAggregatedMeasureDataProcessesCommand, Result>
 {
-    private readonly Receiver _messageReceiver;
+    private readonly RequestAggregatedMeasureDataValidator _messageValidator;
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
 
     public InitializeAggregatedMeasureDataProcessesHandler(
-        Receiver messageReceiver,
+        RequestAggregatedMeasureDataValidator messageValidator,
         IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
-        _messageReceiver = messageReceiver;
+        _messageValidator = messageValidator;
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
     }
 
@@ -47,28 +45,29 @@ public class InitializeAggregatedMeasureDataProcessesHandler
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(request.MarketMessage);
 
-        var result = await _messageReceiver.ReceiveAsync(request.MessageResult, cancellationToken)
+        var result = await _messageValidator.ValidateAsync(request.MarketMessage, cancellationToken)
             .ConfigureAwait(false);
 
-        if (result.Errors.Count == 0 && request.MessageResult.IncomingMarketDocument != null)
-            CreateAggregatedMeasureDataProcess(RequestAggregatedMeasureDocumentFactory.Created(request.MessageResult.IncomingMarketDocument));
+        if (result.Errors.Count == 0)
+            CreateAggregatedMeasureDataProcess(request.MarketMessage);
 
         return result;
     }
 
     private void CreateAggregatedMeasureDataProcess(
-        RequestAggregatedMeasureDataMarketDocument marketDocument)
+        RequestAggregatedMeasureDataMarketMessage marketMessage)
     {
-        foreach (var serie in marketDocument.Series)
+        foreach (var serie in marketMessage.Series)
         {
             _aggregatedMeasureDataProcessRepository.Add(
                 new AggregatedMeasureDataProcess(
                     ProcessId.New(),
                     BusinessTransactionId.Create(serie.Id),
-                    ActorNumber.Create(marketDocument.SenderId),
-                    marketDocument.SenderRole,
-                    marketDocument.BusinessReason,
+                    ActorNumber.Create(marketMessage.SenderNumber),
+                    marketMessage.SenderRoleCode,
+                    marketMessage.BusinessReason,
                     serie.MarketEvaluationPointType,
                     serie.MarketEvaluationSettlementMethod,
                     InstantPattern.General.Parse(serie.StartDateAndOrTimeDateTime)

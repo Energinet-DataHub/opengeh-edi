@@ -12,14 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
+using System.Security.Claims;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 
-public record Serie(
-    string Id,
-    string? MarketEvaluationPointType,
-    string? MarketEvaluationSettlementMethod,
-    string StartDateAndOrTimeDateTime,
-    string? EndDateAndOrTimeDateTime,
-    string? MeteringGridAreaDomainId,
-    string? EnergySupplierMarketParticipantId,
-    string? BalanceResponsiblePartyMarketParticipantId) : IMarketActivityRecord;
+namespace Energinet.DataHub.EDI.B2CWebApi.Security;
+
+public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
+{
+    public Task<FrontendUser?> ProvideUserAsync(
+        Guid userId,
+        Guid actorId,
+        bool isFas,
+        IEnumerable<Claim> claims)
+    {
+        return Task.FromResult<FrontendUser?>(new FrontendUser(
+            userId,
+            actorId,
+            isFas));
+    }
+}

@@ -14,10 +14,19 @@
 
 namespace Energinet.DataHub.EDI.Domain.Documents;
 
-public record RequestAggregatedMeasureDataMarketDocument(
-    string SenderId,
-    string SenderRole,
+/// <summary>
+/// Responsible for carrying the market message data from the incoming message before any data validation.
+/// </summary>
+public record RequestAggregatedMeasureDataMarketMessage(
+    string SenderNumber,
+    string SenderRoleCode,
+    string ReceiverNumber,
+    string ReceiverRoleCode,
     string BusinessReason,
+    string? AuthenticatedUser,
+    string? AuthenticatedUserRole,
+    string MessageType,
+    string MessageId,
     IReadOnlyCollection<Serie> Series);
 
 public record Serie(

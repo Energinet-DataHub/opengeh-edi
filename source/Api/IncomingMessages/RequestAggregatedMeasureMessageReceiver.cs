@@ -21,7 +21,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.Application.Configuration;
-using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Domain.ArchivedMessages;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
@@ -43,7 +42,7 @@ public class RequestAggregatedMeasureMessageReceiver
     private readonly IArchivedMessageRepository _messageArchive;
     private readonly B2BContext _dbContext;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-    private readonly MessageParser _messageParser;
+    private readonly RequestAggregatedMeasureDataMarketMessageParser _requestAggregatedMeasureDataMarketMessageParser;
     private readonly ResponseFactory _responseFactory;
     private readonly ICorrelationContext _correlationContext;
     private readonly IMediator _mediator;
@@ -53,7 +52,7 @@ public class RequestAggregatedMeasureMessageReceiver
         IArchivedMessageRepository messageArchive,
         B2BContext dbContext,
         ISystemDateTimeProvider systemDateTimeProvider,
-        MessageParser messageParser,
+        RequestAggregatedMeasureDataMarketMessageParser requestAggregatedMeasureDataMarketMessageParser,
         ResponseFactory responseFactory,
         ICorrelationContext correlationContext,
         IMediator mediator)
@@ -62,7 +61,7 @@ public class RequestAggregatedMeasureMessageReceiver
         _messageArchive = messageArchive;
         _dbContext = dbContext;
         _systemDateTimeProvider = systemDateTimeProvider;
-        _messageParser = messageParser;
+        _requestAggregatedMeasureDataMarketMessageParser = requestAggregatedMeasureDataMarketMessageParser;
         _responseFactory = responseFactory;
         _correlationContext = correlationContext;
         _mediator = mediator;
@@ -76,12 +75,7 @@ public class RequestAggregatedMeasureMessageReceiver
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        using var cancellationTokenSource =
-            CancellationTokenSource.CreateLinkedTokenSource(
-                hostCancellationToken,
-                request.FunctionContext.CancellationToken);
-
-        var cancellationToken = cancellationTokenSource.Token;
+        var cancellationToken = request.GetCancellationToken(hostCancellationToken);
 
         var contentType = request.Headers.GetContentType();
         var cimFormat = CimFormatParser.ParseFromContentTypeHeaderValue(contentType);
@@ -92,34 +86,35 @@ public class RequestAggregatedMeasureMessageReceiver
             return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
         }
 
-        var messageParserResult = await _messageParser.ParseAsync(request.Body, cimFormat, cancellationToken).ConfigureAwait(false);
-        var messageHeader = messageParserResult.IncomingMarketDocument?.Header;
-        if (messageHeader is null || messageParserResult.Errors.Any())
+        var messageParserResult = await _requestAggregatedMeasureDataMarketMessageParser
+            .ParseAsync(request.Body, cimFormat, cancellationToken).ConfigureAwait(false);
+        var marketMessage = messageParserResult.MarketMessage;
+        if (marketMessage is null || messageParserResult.Errors.Any())
         {
             var errorResult = Result.Failure(messageParserResult.Errors.ToArray());
             var httpErrorStatusCode = HttpStatusCode.BadRequest;
             return CreateResponse(request, httpErrorStatusCode, _responseFactory.From(errorResult, cimFormat));
         }
 
-        await SaveArchivedMessageAsync(messageHeader, request.Body, cancellationToken).ConfigureAwait(false);
+        await SaveArchivedMessageAsync(marketMessage, request.Body, cancellationToken).ConfigureAwait(false);
 
         var result = await _mediator
-            .Send(new InitializeAggregatedMeasureDataProcessesCommand(messageParserResult), cancellationToken).ConfigureAwait(false);
+            .Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage), cancellationToken).ConfigureAwait(false);
 
         var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
         return CreateResponse(request, httpStatusCode, _responseFactory.From(result, cimFormat));
     }
 
-    private async Task SaveArchivedMessageAsync(MessageHeader messageHeader, Stream document,  CancellationToken hostCancellationToken)
+    private async Task SaveArchivedMessageAsync(RequestAggregatedMeasureDataMarketMessage marketMessage, Stream document, CancellationToken hostCancellationToken)
     {
         _messageArchive.Add(new ArchivedMessage(
             Guid.NewGuid().ToString(),
-            messageHeader.MessageId,
+            marketMessage.MessageId,
             IncomingDocumentType.RequestAggregatedMeasureData.Name,
-            messageHeader.SenderId,
-            messageHeader.ReceiverId,
+            marketMessage.SenderNumber,
+            marketMessage.ReceiverNumber,
             _systemDateTimeProvider.Now(),
-            messageHeader.BusinessReason,
+            marketMessage.BusinessReason,
             document));
         await _dbContext.SaveChangesAsync(hostCancellationToken).ConfigureAwait(false);
     }

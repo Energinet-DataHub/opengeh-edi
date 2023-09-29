@@ -43,9 +43,9 @@ public class RequestAggregatedMeasuredDataProcessInvoker
 
     public async Task HasBeenAcceptedAsync()
     {
-        var marketDocument = new RequestAggregatedMeasureDataMarketDocumentBuilder().Build();
-        await _mediator.Send(new InitializeAggregatedMeasureDataProcessesCommand(marketDocument)).ConfigureAwait(false);
-        var process = GetProcess(marketDocument.IncomingMarketDocument!.Header.SenderId);
+        var marketMessage = new RequestAggregatedMeasureDataMarketDocumentBuilder().Build();
+        await _mediator.Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
+        var process = GetProcess(marketMessage.SenderNumber);
         process!.WasSentToWholesale();
         _b2BContext.SaveChanges();
         var acceptedAggregation = CreateAggregatedTimeSerie();
