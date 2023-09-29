@@ -18,34 +18,37 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
 
 public class InternalCommandsRetention : IDataRetention
 {
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
+    private readonly ILogger<InternalCommandsRetention> _logger;
 
-    public InternalCommandsRetention(IDatabaseConnectionFactory databaseConnectionFactory)
+    public InternalCommandsRetention(
+        IDatabaseConnectionFactory databaseConnectionFactory,
+        ILogger<InternalCommandsRetention> logger)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
+        _logger = logger;
     }
 
     public async Task CleanupAsync(CancellationToken cancellationToken)
     {
-        var amountOfOldEvents = 1;
+        var amountOfOldEvents = await GetAmountOfRemainingCommandsAsync(cancellationToken).ConfigureAwait(false);
         while (amountOfOldEvents > 0)
         {
             const string deleteStmt = @"
                 WITH CTE AS
                  (
-                     SELECT TOP 10000 *
+                     SELECT TOP 500 *
                      FROM [dbo].[QueuedInternalCommands]
                       WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL
                  )
-                DELETE FROM CTE;
-
-                SELECT Count(*) FROM [dbo].[QueuedInternalCommands]
-                    WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL";
+                DELETE FROM CTE;";
 
             using var connection =
                 (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
@@ -56,8 +59,9 @@ public class InternalCommandsRetention : IDataRetention
 
             try
             {
-                amountOfOldEvents = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+                var numberDeletedRecords = await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
                 await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+                _logger.LogInformation("Successfully deleted {NumberDeletedQueuedInternalCommand} of old commands", numberDeletedRecords);
             }
             catch (DbException)
             {
@@ -65,6 +69,32 @@ public class InternalCommandsRetention : IDataRetention
                 await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
                 throw; // re-throw exception
             }
+
+            amountOfOldEvents = await GetAmountOfRemainingCommandsAsync(cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    private async Task<int> GetAmountOfRemainingCommandsAsync(CancellationToken cancellationToken)
+    {
+        const string selectStmt = @"SELECT Count(*) FROM [dbo].[QueuedInternalCommands]
+                    WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL";
+
+        using var connection =
+            (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken)
+                .ConfigureAwait(false);
+        using var command = connection.CreateCommand();
+        command.CommandText = selectStmt;
+
+        try
+        {
+            var amountOfOldEvents = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+            _logger.LogInformation("Number of old integration events: {AmountOfOldEvents} to be deleted", amountOfOldEvents);
+            return amountOfOldEvents;
+        }
+        catch (DbException e)
+        {
+            _logger.LogError(e, "Failed to get number of old integration events: {ErrorMessage}", e.Message);
+            throw; // re-throw exception
         }
     }
 }
