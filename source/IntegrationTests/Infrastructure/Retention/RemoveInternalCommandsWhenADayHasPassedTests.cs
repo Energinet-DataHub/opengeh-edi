@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Retention;
@@ -37,7 +38,7 @@ public class RemoveInternalCommandsWhenADayHasPassedTests : TestBase
     {
         _b2BContext = GetService<B2BContext>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
-        _sut = new InternalCommandsRetention(GetService<IDatabaseConnectionFactory>());
+        _sut = new InternalCommandsRetention(GetService<IDatabaseConnectionFactory>(), GetService<ILogger<InternalCommandsRetention>>());
     }
 
     [Fact]
