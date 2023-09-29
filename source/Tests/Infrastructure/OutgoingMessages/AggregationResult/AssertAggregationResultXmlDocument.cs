@@ -145,4 +145,22 @@ public class AssertAggregationResultXmlDocument : IAssertAggregationResultDocume
         _documentAsserter.HasValue("process.processType", CimCode.Of(businessReason));
         return this;
     }
+
+    public IAssertAggregationResultDocument HasSettlementVersion(SettlementVersion settlementVersion)
+    {
+        _documentAsserter.HasValue("Series[1]/settlement_Series.version", CimCode.Of(settlementVersion));
+        return this;
+    }
+
+    public IAssertAggregationResultDocument SettlementVersionIsNotPresent()
+    {
+        _documentAsserter.IsNotPresent("Series[1]/settlement_Series.version");
+        return this;
+    }
+
+    public IAssertAggregationResultDocument HasOriginalTransactionIdReference(string originalTransactionIdReference)
+    {
+        _documentAsserter.HasValue("Series[1]/originalTransactionIDReference_Series.mRID", originalTransactionIdReference);
+        return this;
+    }
 }

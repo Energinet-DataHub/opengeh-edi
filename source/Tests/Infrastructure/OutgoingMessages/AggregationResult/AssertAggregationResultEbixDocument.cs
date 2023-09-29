@@ -143,7 +143,25 @@ public class AssertAggregationResultEbixDocument : IAssertAggregationResultDocum
 
     public IAssertAggregationResultDocument HasBusinessReason(BusinessReason businessReason)
     {
-        _documentAsserter.HasValue("ProcessEnergyContext/EnergyBusinessProcess", CimCode.Of(businessReason));
+        _documentAsserter.HasValue("ProcessEnergyContext/EnergyBusinessProcess", EbixCode.Of(businessReason));
+        return this;
+    }
+
+    public IAssertAggregationResultDocument HasSettlementVersion(SettlementVersion settlementVersion)
+    {
+        _documentAsserter.HasValue("ProcessEnergyContext/ProcessVariant", EbixCode.Of(settlementVersion));
+        return this;
+    }
+
+    public IAssertAggregationResultDocument SettlementVersionIsNotPresent()
+    {
+        _documentAsserter.IsNotPresent("ProcessEnergyContext/ProcessVariant");
+        return this;
+    }
+
+    public IAssertAggregationResultDocument HasOriginalTransactionIdReference(string originalTransactionIdReference)
+    {
+        _documentAsserter.HasValue("PayloadEnergyTimeSeries[1]/OriginalBusinessDocument", originalTransactionIdReference);
         return this;
     }
 }

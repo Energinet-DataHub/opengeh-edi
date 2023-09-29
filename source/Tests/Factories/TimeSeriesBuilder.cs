@@ -44,7 +44,7 @@ public class TimeSeriesBuilder
     private string? _energySupplierNumber;
     private string? _balanceResponsibleNumber;
     private string? _originalTransactionIdReference;
-    private string? _settlementVersion;
+    private SettlementVersion? _settlementVersion;
     private Period _period = new(SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)), SystemClock.Instance.GetCurrentInstant());
 
     public static TimeSeriesBuilder AggregationResult()
@@ -152,7 +152,7 @@ public class TimeSeriesBuilder
         return this;
     }
 
-    public TimeSeriesBuilder WithSettlementVersion(string settlementVersion)
+    public TimeSeriesBuilder WithSettlementVersion(SettlementVersion? settlementVersion)
     {
         _settlementVersion = settlementVersion;
         return this;
@@ -184,7 +184,7 @@ public class TimeSeriesBuilder
             _period,
             _points,
             _originalTransactionIdReference,
-            _settlementVersion);
+            _settlementVersion?.Name);
     }
 
     private static Instant ParseTimeStamp(string timestamp)

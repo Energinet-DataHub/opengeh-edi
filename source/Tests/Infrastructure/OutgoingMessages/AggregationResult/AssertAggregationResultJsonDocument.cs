@@ -185,6 +185,26 @@ internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationRe
         return this;
     }
 
+    public IAssertAggregationResultDocument HasSettlementVersion(SettlementVersion settlementVersion)
+    {
+        Assert.Equal(CimCode.Of(settlementVersion), FirstTimeSeriesElement().GetProperty("settlement_Series.version").GetProperty("value").ToString());
+        return this;
+    }
+
+    public IAssertAggregationResultDocument SettlementVersionIsNotPresent()
+    {
+        Assert.Throws<KeyNotFoundException>(() => FirstTimeSeriesElement().GetProperty("settlement_Series.version"));
+        return this;
+    }
+
+    public IAssertAggregationResultDocument HasOriginalTransactionIdReference(string originalTransactionIdReference)
+    {
+        Assert.Equal(originalTransactionIdReference, FirstTimeSeriesElement()
+            .GetProperty("originalTransactionIDReference_Series.mRID")
+            .ToString());
+        return this;
+    }
+
     private JsonElement FirstTimeSeriesElement()
     {
         return _root.GetProperty("Series").EnumerateArray().ToList()[0];
