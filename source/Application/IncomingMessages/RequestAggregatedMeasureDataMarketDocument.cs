@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Domain.Documents;
+using System.Collections.Generic;
+
+namespace Energinet.DataHub.EDI.Application.IncomingMessages;
 
 /// <summary>
 /// Responsible for carrying the market message data from the incoming message before any data validation.
@@ -27,6 +29,7 @@ public record RequestAggregatedMeasureDataMarketMessage(
     string? AuthenticatedUserRole,
     string MessageType,
     string MessageId,
+    string CreatedAt,
     IReadOnlyCollection<Serie> Series);
 
 public record Serie(

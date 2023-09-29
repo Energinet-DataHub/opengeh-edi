@@ -18,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Domain.Documents;
 
 namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;

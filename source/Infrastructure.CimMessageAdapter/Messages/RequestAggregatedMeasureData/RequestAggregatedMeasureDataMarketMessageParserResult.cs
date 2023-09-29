@@ -14,10 +14,9 @@
 
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
-using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
 
-namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData
 {
     public class RequestAggregatedMeasureDataMarketMessageParserResult
     {

@@ -17,8 +17,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
-using Energinet.DataHub.EDI.Domain.Actors;
-using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Exceptions;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
 
