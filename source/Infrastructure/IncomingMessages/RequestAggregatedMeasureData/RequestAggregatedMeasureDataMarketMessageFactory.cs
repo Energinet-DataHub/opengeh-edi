@@ -18,6 +18,7 @@ using System.Linq;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Documents;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
@@ -40,10 +41,13 @@ public static class RequestAggregatedMeasureDataMarketMessageFactory
             header.AuthenticatedUserRole,
             header.MessageType,
             header.MessageId,
+            header.CreatedAt,
             series);
     }
 
-    public static RequestAggregatedMeasureDataMarketMessage Create(Edi.Requests.RequestAggregatedMeasureData requestAggregatedMeasureData)
+    public static RequestAggregatedMeasureDataMarketMessage Create(
+        Edi.Requests.RequestAggregatedMeasureData requestAggregatedMeasureData,
+        Instant createdAt)
     {
         if (requestAggregatedMeasureData == null) throw new ArgumentNullException(nameof(requestAggregatedMeasureData));
 
@@ -68,6 +72,7 @@ public static class RequestAggregatedMeasureDataMarketMessageFactory
             requestAggregatedMeasureData.AuthenticatedUserRole,
             requestAggregatedMeasureData.MessageType,
             requestAggregatedMeasureData.MessageId,
+            createdAt.ToString(),
             series);
     }
 }
