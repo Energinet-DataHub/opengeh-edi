@@ -49,7 +49,7 @@ public class ReceivedIntegrationEventsRetention : IDataRetention
             const string deleteStmt = @"
                 WITH CTE AS
                  (
-                     SELECT TOP 100 *
+                     SELECT TOP 500 *
                      FROM [dbo].[ReceivedIntegrationEvents]
                      WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL AND [ProcessedDate] < @LastMonthInstant
                  )
@@ -68,7 +68,9 @@ public class ReceivedIntegrationEventsRetention : IDataRetention
 
             try
             {
+                var numberDeletedRecords = await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
                 await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+                _logger.LogInformation("Successfully deleted {NumberDeletedIntegrationEvents} of integration events", numberDeletedRecords);
             }
             catch (DbException e)
             {
