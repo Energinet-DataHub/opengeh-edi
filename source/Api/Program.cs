@@ -26,7 +26,6 @@ using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.MarketAc
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Queues;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
@@ -91,9 +90,6 @@ namespace Energinet.DataHub.EDI.Api
 
                     services.AddSingleton(new WholesaleServiceBusClientConfiguration(
                         runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!));
-
-                    services.AddSingleton(
-                        _ => new RequestChangeCustomerCharacteristicsTransaction("NotImplemented"));
 
                     services.AddApplicationInsights();
                     services.ConfigureFunctionsApplicationInsights();

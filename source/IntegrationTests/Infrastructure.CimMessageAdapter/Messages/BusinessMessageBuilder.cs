@@ -30,19 +30,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapte
             _document = XDocument.Load(pathToXmlFile);
         }
 
-        public static BusinessMessageBuilder RequestChangeOfSupplier(string pathToXmlFile = "Infrastructure.CimMessageAdapter//Messages//Xml//RequestChangeOfSupplier.xml")
-        {
-            return new BusinessMessageBuilder(pathToXmlFile, "urn:ediel.org:structure:requestchangeofsupplier:0:1");
-        }
-
         public static BusinessMessageBuilder RequestAggregatedMeasureData(string pathToXmlFile = "Infrastructure.CimMessageAdapter//Messages//Xml//RequestAggregatedMeasureData.xml")
         {
             return new BusinessMessageBuilder(pathToXmlFile, "urn:ediel.org:measure:requestaggregatedmeasuredata:0:1");
-        }
-
-        public static BusinessMessageBuilder RequestChangeCustomerCharacteristics(string pathToXmlFile = "Infrastructure.CimMessageAdapter//Messages//Xml//RequestChangeCustomerCharacteristics.xml")
-        {
-            return new BusinessMessageBuilder(pathToXmlFile, "urn:ediel.org:structure:requestchangecustomercharacteristics:0:1");
         }
 
         public BusinessMessageBuilder WithSenderRole(string roleType)
