@@ -77,6 +77,8 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
             writer.WriteStartObject();
 
             writer.WriteProperty("mRID", series.TransactionId.ToString());
+            // TODO XJOHO: We are currently not receiving version from Wholesale - bug team-phoenix #78
+            writer.WriteProperty("version", "1");
 
             writer.WriteObject(
                 "meteringGridArea_Domain.mRID",
@@ -106,11 +108,6 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
                     new KeyValuePair<string, string>("value", CimCode.Of(SettlementType.From(series.SettlementType))));
             }
 
-            if (series.SettlementVersion is not null)
-            {
-                writer.WriteProperty("settlement_Series.version", series.SettlementVersion);
-            }
-
             if (series.OriginalTransactionIdReference is not null)
             {
                 writer.WriteProperty("originalTransactionIDReference_Series.mRID", series.OriginalTransactionIdReference);
@@ -119,6 +116,11 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
             writer.WriteObject("marketEvaluationPoint.type", new KeyValuePair<string, string>("value", CimCode.Of(MeteringPointType.From(series.MeteringPointType))));
             writer.WriteProperty("product", GeneralValues.ProductCode);
             writer.WriteObject("quantity_Measure_Unit.name", new KeyValuePair<string, string>("value", CimCode.Of(MeasurementUnit.From(series.MeasureUnitType))));
+
+            if (series.SettlementVersion is not null)
+            {
+                writer.WriteObject("settlement_Series.version", new KeyValuePair<string, string>("value", CimCode.Of(SettlementVersion.From(series.SettlementVersion))));
+            }
 
             writer.WritePropertyName("Period");
             writer.WriteStartObject();
