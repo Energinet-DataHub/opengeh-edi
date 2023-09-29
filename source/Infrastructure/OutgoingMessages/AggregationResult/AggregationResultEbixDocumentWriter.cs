@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Xml;
 using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
@@ -44,6 +45,12 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
             parser,
             null)
     {
+    }
+
+    public override bool HandlesType(DocumentType documentType)
+    {
+        if (documentType == null) throw new ArgumentNullException(nameof(documentType));
+        return documentType.Name.Equals("NotifyAggregatedMeasureData_MarketDocument", StringComparison.OrdinalIgnoreCase);
     }
 
     protected override SettlementVersion? ExtractSettlementVersion(IReadOnlyCollection<string> marketActivityPayloads)

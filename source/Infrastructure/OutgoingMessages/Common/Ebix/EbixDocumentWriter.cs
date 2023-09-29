@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -23,7 +22,6 @@ using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Xml;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
 namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Xml;
@@ -56,11 +54,7 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         return stream;
     }
 
-    public virtual bool HandlesType(DocumentType documentType)
-    {
-        if (documentType == null) throw new ArgumentNullException(nameof(documentType));
-        return documentType.Name.Equals(_documentDetails.Type.Split("_")[0], StringComparison.OrdinalIgnoreCase);
-    }
+    public abstract bool HandlesType(DocumentType documentType);
 
     public bool HandlesFormat(DocumentFormat format)
     {
