@@ -19,12 +19,13 @@ using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Xml;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Common;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
 namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Xml;
 
 internal static class EbixHeaderWriter
 {
-    internal static async Task WriteAsync(XmlWriter writer, MessageHeader messageHeader, DocumentDetails documentDetails, string? reasonCode, string? settlementVersion)
+    internal static async Task WriteAsync(XmlWriter writer, MessageHeader messageHeader, DocumentDetails documentDetails, string? reasonCode, SettlementVersion? settlementVersion)
     {
         if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
         if (writer == null) throw new ArgumentNullException(nameof(writer));
@@ -82,12 +83,12 @@ internal static class EbixHeaderWriter
         writer.WriteValue(GeneralValues.SectorTypeCode);
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-        if (settlementVersion != null)
+        if (settlementVersion is not null)
         {
             await writer.WriteStartElementAsync(documentDetails.Prefix, "ProcessVariant", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "listIdentifier", null, "DK").ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
-            writer.WriteValue(settlementVersion);
+            writer.WriteValue(EbixCode.Of(settlementVersion));
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
 

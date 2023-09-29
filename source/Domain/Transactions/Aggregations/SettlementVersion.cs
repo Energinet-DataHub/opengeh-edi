@@ -34,12 +34,8 @@ public class SettlementVersion : EnumerationType
     {
         var settlementVersion = GetAll<SettlementVersion>()
             .FirstOrDefault(type => type.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase) ||
-                                    type.Code.Equals(valueToParse, StringComparison.OrdinalIgnoreCase));
-
-        if (settlementVersion is null)
-        {
-            throw new InvalidCastException($"Could not parse {valueToParse} to settlement version");
-        }
+                                    type.Code.Equals(valueToParse, StringComparison.OrdinalIgnoreCase)) ??
+                                    throw new InvalidCastException($"Could not parse {valueToParse} to settlement version");
 
         return settlementVersion;
     }

@@ -60,7 +60,8 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
                     .WithBalanceResponsibleNumber(SampleData.BalanceResponsibleNumber)
                     .WithEnergySupplierNumber(SampleData.EnergySupplierNumber)
                     .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
-                    .WithPoint(new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z")),
+                    .WithPoint(new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z"))
+                    .WithOriginalTransactionIdReference(SampleData.OriginalTransactionIdReference),
                 DocumentFormat.From(documentFormat))
             .ConfigureAwait(false);
 
@@ -77,6 +78,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .HasPeriod(
                 new Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod))
             .HasPoint(1, 1)
+            .HasOriginalTransactionIdReference(SampleData.OriginalTransactionIdReference)
             .DocumentIsValidAsync().ConfigureAwait(false);
     }
 
@@ -169,7 +171,26 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
 
         AssertDocument(document, DocumentFormat.From(documentFormat))
-            .HasBusinessReason(BusinessReason.From(processType));
+            .HasBusinessReason(BusinessReason.From(processType))
+            .SettlementVersionIsNotPresent();
+    }
+
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Ebix), nameof(BusinessReason.Correction), nameof(SettlementVersion.FirstCorrection))]
+    [InlineData(nameof(DocumentFormat.Xml), nameof(BusinessReason.Correction), nameof(SettlementVersion.FirstCorrection))]
+    [InlineData(nameof(DocumentFormat.Json), nameof(BusinessReason.Correction), nameof(SettlementVersion.FirstCorrection))]
+    public async Task Business_reason_and_settlement_version_is_translated(string documentFormat, string processType, string settlementVersion)
+    {
+        _timeSeries
+            .WithBusinessReason(BusinessReason.From(processType))
+            .WithSettlementVersion(SettlementVersion.From(settlementVersion));
+
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
+
+        await AssertDocument(document, DocumentFormat.From(documentFormat))
+            .HasBusinessReason(BusinessReason.From(processType))
+            .HasSettlementVersion(SettlementVersion.From(settlementVersion))
+            .DocumentIsValidAsync().ConfigureAwait(false);
     }
 
     private Task<Stream> CreateDocument(TimeSeriesBuilder resultBuilder, DocumentFormat documentFormat)
