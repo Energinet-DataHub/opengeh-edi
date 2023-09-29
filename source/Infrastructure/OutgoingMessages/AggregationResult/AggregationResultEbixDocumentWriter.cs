@@ -50,7 +50,7 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
     public override bool HandlesType(DocumentType documentType)
     {
         if (documentType == null) throw new ArgumentNullException(nameof(documentType));
-        return documentType.Name.Equals("NotifyAggregatedMeasureData_MarketDocument", StringComparison.OrdinalIgnoreCase);
+        return documentType.Name.Equals("NotifyAggregatedMeasureData", StringComparison.OrdinalIgnoreCase);
     }
 
     protected override SettlementVersion? ExtractSettlementVersion(IReadOnlyCollection<string> marketActivityPayloads)
