@@ -23,6 +23,6 @@ public class HelloWorldController : ControllerBase
     [HttpPost]
     public new string Request()
     {
-        return "Hello World";
+        return "Hello World 2";
     }
 }
