@@ -46,17 +46,17 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
     {
     }
 
-    protected override string? ExtractSettlementVersion(IReadOnlyCollection<string> marketActivityPayloads)
+    protected override SettlementVersion? ExtractSettlementVersion(IReadOnlyCollection<string> marketActivityPayloads)
     {
         var payloads = ParseFrom<TimeSeries>(marketActivityPayloads);
-        var settlementVersions = payloads.Select(ts => ts.SettlementVersion)?.Distinct();
+        var settlementVersions = payloads.Where(ts => ts.SettlementVersion is not null).Select(ts => ts.SettlementVersion)?.Distinct();
         if (settlementVersions?.Count() > 1)
         {
             throw new NotSupportedException("Multiple diffent settlementVersions in same message is not supported in ebIX");
         }
         else if (settlementVersions?.Count() == 1)
         {
-            return settlementVersions.First();
+            return SettlementVersion.From(settlementVersions.First()!);
         }
         else
         {
