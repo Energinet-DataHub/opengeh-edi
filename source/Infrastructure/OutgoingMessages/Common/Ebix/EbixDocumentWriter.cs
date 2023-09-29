@@ -54,11 +54,7 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         return stream;
     }
 
-    public virtual bool HandlesType(DocumentType documentType)
-    {
-        if (documentType == null) throw new ArgumentNullException(nameof(documentType));
-        return documentType.Name.Equals("NotifyAggregatedMeasureData_MarketDocument", StringComparison.OrdinalIgnoreCase);
-    }
+    public abstract bool HandlesType(DocumentType documentType);
 
     public bool HandlesFormat(DocumentFormat format)
     {
