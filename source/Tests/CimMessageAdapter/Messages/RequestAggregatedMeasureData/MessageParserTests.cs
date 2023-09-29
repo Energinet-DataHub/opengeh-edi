@@ -19,7 +19,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
@@ -87,7 +87,7 @@ public class MessageParserTests
         Assert.Equal("DDK", marketMessage.SenderRoleCode);
         Assert.Equal("5790001330552", marketMessage.ReceiverNumber);
         Assert.Equal("DGL", marketMessage.ReceiverRoleCode);
-        //Assert.Equal("2022-12-17T09:30:47Z", marketMessage.CreatedAt); //TODO: what do we use this for????
+        Assert.Equal("2022-12-17T09:30:47Z", marketMessage.CreatedAt);
 
         foreach (var serie in result!.MarketMessage!.Series)
         {
