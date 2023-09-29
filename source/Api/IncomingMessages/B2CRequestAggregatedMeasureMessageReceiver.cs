@@ -64,7 +64,7 @@ public class B2CRequestAggregatedMeasureMessageReceiver
 
         var requestAggregatedMeasureData = RequestAggregatedMeasureData.Parser.ParseFrom(request.Body);
         await SaveArchivedMessageAsync(requestAggregatedMeasureData, request.Body, cancellationToken).ConfigureAwait(false);
-        var marketMessage = RequestAggregatedMeasureDataMarketMessageFactory.Create(requestAggregatedMeasureData);
+        var marketMessage = RequestAggregatedMeasureDataMarketMessageFactory.Create(requestAggregatedMeasureData, _systemDateTimeProvider.Now());
 
         var result = await _mediator
             .Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage), cancellationToken).ConfigureAwait(false);

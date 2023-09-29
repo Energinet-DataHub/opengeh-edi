@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Application.IncomingMessages
+namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages
 {
-    public class MessageHeader // DElete everything is the namespace
+    public class MessageHeader
     {
         public MessageHeader(string messageId, string messageType, string businessReason, string senderId, string senderRole, string receiverId, string receiverRole, string createdAt, string? authenticatedUser = null, string? authenticatedUserRole = null)
         {

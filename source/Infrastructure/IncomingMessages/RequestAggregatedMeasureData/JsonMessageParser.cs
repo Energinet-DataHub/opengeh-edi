@@ -29,7 +29,7 @@ using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
-public class JsonMessageParser : JsonParserBase<RequestAggregatedMeasureDataMarketMessage>,
+public class JsonMessageParser : JsonParserBase,
     IMessageParser<RequestAggregatedMeasureDataMarketMessage>
 {
     private const string SeriesElementName = "Series";
