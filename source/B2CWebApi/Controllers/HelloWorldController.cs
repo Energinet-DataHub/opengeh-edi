@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Net;
+using Energinet.DataHub.EDI.B2CWebApi.Clients;
+using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
@@ -20,9 +23,25 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 [Route("[controller]")]
 public class HelloWorldController : ControllerBase
 {
-    [HttpPost]
-    public new string Request()
+    private readonly RequestAggregatedMeasureDataHttpClient _requestAggregatedMeasureDataHttpClient;
+
+    public HelloWorldController(RequestAggregatedMeasureDataHttpClient requestAggregatedMeasureDataHttpClient)
     {
-        return "Hello World 2";
+        _requestAggregatedMeasureDataHttpClient = requestAggregatedMeasureDataHttpClient;
+    }
+
+    [HttpPost]
+    public async Task<ActionResult> RequestAsync(CancellationToken cancellationToken)
+    {
+        var token = TokenBuilder.BuildToken("unknown", new[] { "unknown" }, "unknown");
+        var response = await _requestAggregatedMeasureDataHttpClient.RequestAsync(RequestAggregatedMeasureDataHttpFactory.Create(), token, cancellationToken).ConfigureAwait(false);
+
+        if (response.IsSuccessStatusCode)
+            return Ok("Hello World!");
+
+        if (response.StatusCode == HttpStatusCode.BadRequest)
+            return BadRequest(await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false));
+
+        return StatusCode((int)response.StatusCode);
     }
 }
