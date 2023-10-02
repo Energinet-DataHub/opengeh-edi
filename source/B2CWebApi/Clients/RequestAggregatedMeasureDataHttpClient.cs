@@ -29,7 +29,7 @@ public class RequestAggregatedMeasureDataHttpClient
         _httpClient.BaseAddress = baseUri;
     }
 
-    public async Task<HttpResponseMessage> RequestAsync(RequestAggregatedMeasureData requestAggregatedMeasureData, string token, CancellationToken cancellationToken)
+    public async Task<string> RequestAsync(RequestAggregatedMeasureData requestAggregatedMeasureData, string token, CancellationToken cancellationToken)
     {
         if (requestAggregatedMeasureData == null) throw new ArgumentNullException(nameof(requestAggregatedMeasureData));
 
@@ -40,10 +40,10 @@ public class RequestAggregatedMeasureDataHttpClient
 
         var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
-        if (response.StatusCode == HttpStatusCode.BadRequest) return response;
+        if (response.StatusCode == HttpStatusCode.BadRequest)
+            return await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
         response.EnsureSuccessStatusCode();
-
-        return response;
+        return string.Empty;
     }
 }

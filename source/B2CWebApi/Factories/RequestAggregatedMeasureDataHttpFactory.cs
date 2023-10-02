@@ -12,25 +12,71 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.Edi.Requests;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Factories;
 
 public static class RequestAggregatedMeasureDataHttpFactory
 {
-    public static RequestAggregatedMeasureData Create()
+    public static RequestAggregatedMeasureData Create(
+        RequestAggregatedMeasureDataMarketRequest request,
+        string actorNumber,
+        string role)
     {
-        return new RequestAggregatedMeasureData
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
+        var data = new RequestAggregatedMeasureData
         {
             MessageId = Guid.NewGuid().ToString(),
-            SenderId = "5790000701414",
-            SenderRole = "DDQ",
+            SenderId = actorNumber,
+            SenderRole = role,
             ReceiverId = "5790001330552",
             ReceiverRole = "DGL",
-            AuthenticatedUser = "5790000701414",
-            AuthenticatedUserRole = "DDQ",
-            BusinessReason = "D05",
-            MessageType = "E17",
+            AuthenticatedUser = actorNumber,
+            AuthenticatedUserRole = role,
+            BusinessReason = request.BusinessReason,
+            MessageType = "E74",
         };
+
+        var serie = new Serie()
+        {
+            Id = Guid.NewGuid().ToString(),
+            StartDateAndOrTimeDateTime = request.StartDate,
+            EndDateAndOrTimeDateTime = request.EndDate,
+            MeteringGridAreaDomainId = request.GridArea,
+            EnergySupplierMarketParticipantId = request.EnergySupplierId,
+            BalanceResponsiblePartyMarketParticipantId = request.BalanceResponsibleId,
+        };
+
+        MapEvaluationPointTypeAndSettlementMethod(serie, request);
+
+        data.Series.Add(serie);
+
+        return data;
+    }
+
+    private static void MapEvaluationPointTypeAndSettlementMethod(Serie serie, RequestAggregatedMeasureDataMarketRequest request)
+    {
+        switch (request.MeteringPointType)
+        {
+            case MeteringPointType.Production:
+                serie.MarketEvaluationPointType = "E18";
+                break;
+            case MeteringPointType.FlexConsumption:
+                serie.MarketEvaluationPointType = "E17";
+                serie.MarketEvaluationSettlementMethod = "D01";
+                break;
+            case MeteringPointType.TotalConsumption:
+                serie.MarketEvaluationPointType = "E17";
+                break;
+            case MeteringPointType.NonProfiledConsumption:
+                serie.MarketEvaluationPointType = "E17";
+                serie.MarketEvaluationSettlementMethod = "E02";
+                break;
+            case MeteringPointType.Exchange:
+                serie.MarketEvaluationPointType = "E20";
+                break;
+        }
     }
 }

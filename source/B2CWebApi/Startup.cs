@@ -80,7 +80,12 @@ public class Startup
         }
 
         app.UseSwagger();
-        app.UseSwaggerUI();
+
+        app.UseSwaggerUI(options =>
+        {
+            if (!Environment.IsDevelopment()) return;
+            options.EnableTryItOutByDefault();
+        });
 
         app.UseRouting();
 
