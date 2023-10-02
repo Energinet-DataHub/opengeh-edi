@@ -39,4 +39,9 @@ internal sealed class AggregationResultDsl
     {
         return _edi.PeekMessageAsync(actorNumber, new[] { actorRole, });
     }
+
+    internal async Task EmptyQueueForActor(string actorNumber, string actorRole)
+    {
+        await _edi.EmptyQueueAsync(actorNumber, new[] { actorRole, }).ConfigureAwait(false);
+    }
 }

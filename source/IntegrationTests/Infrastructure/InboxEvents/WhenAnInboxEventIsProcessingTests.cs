@@ -53,9 +53,9 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
     [Fact]
     public async Task Event_is_marked_as_processed_when_a_handler_has_handled_it_successfully()
     {
-        await ProcessInboxMessages().ConfigureAwait(false);
+        await ProcessInboxMessages();
 
-        await EventIsMarkedAsProcessed(_eventId).ConfigureAwait(false);
+        await EventIsMarkedAsProcessed(_eventId);
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
     {
         TestNotificationHandlerSpy.AddNotification("Event1");
 
-        await ProcessInboxMessages().ConfigureAwait(false);
+        await ProcessInboxMessages();
 
         TestNotificationHandlerSpy.AssertExpectedNotifications();
     }
@@ -78,7 +78,7 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
             Array.Empty<IInboxEventMapper>(),
             GetService<ILogger<InboxEventsProcessor>>());
 
-        await inboxProcessor.ProcessEventsAsync(CancellationToken.None).ConfigureAwait(false);
+        await inboxProcessor.ProcessEventsAsync(CancellationToken.None);
 
         await EventIsMarkedAsFailed(_eventId);
     }
@@ -90,14 +90,14 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
 
     private async Task EventIsMarkedAsProcessed(string eventId)
     {
-        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var isProcessed = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM dbo.ReceivedInboxEvents WHERE Id = @EventId AND ProcessedDate IS NOT NULL", new { EventId = eventId, });
         Assert.True(isProcessed);
     }
 
     private async Task EventIsMarkedAsFailed(string eventId)
     {
-        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var isFailed = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM dbo.ReceivedInboxEvents WHERE Id = @EventId AND ProcessedDate IS NOT NULL AND ErrorMessage IS NOT NULL", new { EventId = eventId, });
         Assert.True(isFailed);
     }

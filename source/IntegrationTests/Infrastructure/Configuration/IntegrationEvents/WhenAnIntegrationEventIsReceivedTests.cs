@@ -69,9 +69,9 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
     [Fact]
     public async Task Event_registration_is_omitted_if_already_registered()
     {
-        await EventIsReceived(_eventId).ConfigureAwait(false);
+        await EventIsReceived(_eventId);
 
-        await EventIsReceived(_eventId).ConfigureAwait(false);
+        await EventIsReceived(_eventId);
 
         await EventIsRegisteredWithInbox(_eventId);
     }
@@ -79,20 +79,20 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
     [Fact]
     public async Task Event_is_marked_as_processed_when_a_handler_has_handled_it_successfully()
     {
-        await EventIsReceived(_eventId).ConfigureAwait(false);
+        await EventIsReceived(_eventId);
 
-        await ProcessInboxMessages().ConfigureAwait(false);
+        await ProcessInboxMessages();
 
-        await EventIsMarkedAsProcessed(_eventId).ConfigureAwait(false);
+        await EventIsMarkedAsProcessed(_eventId);
     }
 
     [Fact]
     public async Task Event_is_marked_as_failed_if_the_event_handler_throws_an_exception()
     {
         ExceptEventHandlerToFail();
-        await EventIsReceived(_eventId).ConfigureAwait(false);
+        await EventIsReceived(_eventId);
 
-        await ProcessInboxMessages().ConfigureAwait(false);
+        await ProcessInboxMessages();
 
         await EventIsMarkedAsFailed(_eventId);
     }
@@ -109,21 +109,21 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
 
     private async Task EventIsRegisteredWithInbox(string eventId, bool isExpectedToBeRegistered = true)
     {
-        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var isRegistered = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM dbo.ReceivedIntegrationEvents WHERE Id = @EventId", new { EventId = eventId, });
         Assert.Equal(isExpectedToBeRegistered, isRegistered);
     }
 
     private async Task EventIsMarkedAsProcessed(string eventId)
     {
-        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var isProcessed = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM dbo.ReceivedIntegrationEvents WHERE Id = @EventId AND ProcessedDate IS NOT NULL", new { EventId = eventId, });
         Assert.True(isProcessed);
     }
 
     private async Task EventIsMarkedAsFailed(string eventId)
     {
-        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var isFailed = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM dbo.ReceivedIntegrationEvents WHERE Id = @EventId AND ProcessedDate IS NOT NULL AND ErrorMessage IS NOT NULL", new { EventId = eventId, });
         Assert.True(isFailed);
     }

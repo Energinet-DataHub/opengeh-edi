@@ -18,6 +18,8 @@ using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
+
 [IntegrationTest]
 public sealed class WhenAggregationResultIsPublishedTests : TestRunner
 {
@@ -33,9 +35,11 @@ public sealed class WhenAggregationResultIsPublishedTests : TestRunner
     [Fact]
     public async Task Actor_can_peek_and_dequeue_aggregation_result()
     {
-        await _aggregations.PublishResultFor(gridAreaCode: "543").ConfigureAwait(false);
+        await _aggregations.EmptyQueueForActor(actorNumber: "5790000610976", actorRole: "metereddataresponsible");
+
+        await _aggregations.PublishResultFor(gridAreaCode: "543");
+
         await _aggregations
-            .ConfirmResultIsAvailableFor(actorNumber: "5790000610976", actorRole: "metereddataresponsible")
-            .ConfigureAwait(false);
+            .ConfirmResultIsAvailableFor(actorNumber: "5790000610976", actorRole: "metereddataresponsible");
     }
 }
