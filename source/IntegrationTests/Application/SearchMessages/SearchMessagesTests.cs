@@ -49,7 +49,7 @@ public class SearchMessagesTests : TestBase
         var archivedMessage = CreateArchivedMessage(_systemDateTimeProvider.Now());
         await ArchiveMessage(archivedMessage);
 
-        var result = await QueryAsync(new GetMessagesQuery()).ConfigureAwait(false);
+        var result = await QueryAsync(new GetMessagesQuery());
 
         var messageInfo = result.Messages.FirstOrDefault(message => message.Id == archivedMessage.Id);
         Assert.NotNull(messageInfo);
@@ -68,7 +68,7 @@ public class SearchMessagesTests : TestBase
 
         var result = await QueryAsync(new GetMessagesQuery(new MessageCreationPeriod(
             CreatedAt("2023-05-01T22:00:00Z"),
-            CreatedAt("2023-05-02T22:00:00Z")))).ConfigureAwait(false);
+            CreatedAt("2023-05-02T22:00:00Z"))));
 
         Assert.Single(result.Messages);
         Assert.Equal(CreatedAt("2023-05-01T22:00:00Z"), result.Messages[0].CreatedAt);
@@ -87,7 +87,7 @@ public class SearchMessagesTests : TestBase
             new MessageCreationPeriod(
             CreatedAt("2023-05-01T22:00:00Z"),
             CreatedAt("2023-05-02T22:00:00Z")),
-            messageId)).ConfigureAwait(false);
+            messageId));
 
         //Assert
         Assert.Single(result.Messages);
@@ -104,7 +104,7 @@ public class SearchMessagesTests : TestBase
 
         //Act
         var result = await QueryAsync(new GetMessagesQuery(
-            MessageId: messageId)).ConfigureAwait(false);
+            MessageId: messageId));
 
         //Assert
         Assert.Single(result.Messages);
@@ -120,7 +120,7 @@ public class SearchMessagesTests : TestBase
         await ArchiveMessage(CreateArchivedMessage());
 
         //Act
-        var result = await QueryAsync(new GetMessagesQuery(SenderNumber: senderNumber)).ConfigureAwait(false);
+        var result = await QueryAsync(new GetMessagesQuery(SenderNumber: senderNumber));
 
         //Assert
         Assert.Single(result.Messages);
@@ -136,7 +136,7 @@ public class SearchMessagesTests : TestBase
         await ArchiveMessage(CreateArchivedMessage());
 
         // Act
-        var result = await QueryAsync(new GetMessagesQuery(ReceiverNumber: receiverNumber)).ConfigureAwait(false);
+        var result = await QueryAsync(new GetMessagesQuery(ReceiverNumber: receiverNumber));
 
         // Assert
         Assert.Single(result.Messages);
@@ -158,7 +158,7 @@ public class SearchMessagesTests : TestBase
         {
             confirmRequestChangeOfSupplier,
             rejectRequestChangeOfSupplier,
-        })).ConfigureAwait(false);
+        }));
 
         // Assert
         Assert.Contains(
@@ -184,7 +184,7 @@ public class SearchMessagesTests : TestBase
         {
             moveIn.Name,
             balanceFixing.Name,
-        })).ConfigureAwait(false);
+        }));
 
         // Assert
         Assert.Contains(
@@ -223,6 +223,6 @@ public class SearchMessagesTests : TestBase
     private async Task ArchiveMessage(ArchivedMessage archivedMessage)
     {
         _archivedMessageRepository.Add(archivedMessage);
-        await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
+        await GetService<IUnitOfWork>().CommitAsync();
     }
 }

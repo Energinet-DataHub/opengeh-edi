@@ -40,14 +40,13 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase
     [Fact]
     public async Task Outgoing_message_is_enqueued()
     {
-        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync().ConfigureAwait(false);
+        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync();
 
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = $"SELECT * FROM [dbo].[OutgoingMessages]";
         var result = await
             connection
-            .QuerySingleOrDefaultAsync(sql)
-            .ConfigureAwait(false);
+            .QuerySingleOrDefaultAsync(sql);
 
         Assert.NotNull(result);
         Assert.Equal(result.DocumentType, DocumentType.NotifyAggregatedMeasureData.Name);

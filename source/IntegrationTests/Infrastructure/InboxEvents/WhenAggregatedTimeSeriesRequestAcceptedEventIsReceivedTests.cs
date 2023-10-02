@@ -54,7 +54,7 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
         await _processor.ProcessEventsAsync(CancellationToken.None);
 
         TestAggregatedTimeSeriesRequestAcceptedHandlerSpy.AssertExpectedNotifications(_aggregatedTimeSeriesRequestAcceptedResponse);
-        await EventIsMarkedAsProcessedAsync(_eventId).ConfigureAwait(false);
+        await EventIsMarkedAsProcessedAsync(_eventId);
     }
 
     private static AggregatedTimeSeriesRequestAccepted CreateResponseFromWholeSale()
@@ -99,7 +99,7 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
 
     private async Task EventIsMarkedAsProcessedAsync(string eventId)
     {
-        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var isProcessed = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM dbo.ReceivedInboxEvents WHERE Id = @EventId AND ProcessedDate IS NOT NULL", new { EventId = eventId, });
         Assert.True(isProcessed);
     }
