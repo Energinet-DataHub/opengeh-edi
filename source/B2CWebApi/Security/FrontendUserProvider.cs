@@ -33,8 +33,12 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
         string? azp = null;
         foreach (var claim in claims)
         {
-            if (actorNumber is not null && role is not null)
+            if (actorNumber is not null
+                && role is not null
+                && azp is not null)
+            {
                 break;
+            }
 
             if (claim.Type.Equals("actornumber", StringComparison.OrdinalIgnoreCase))
                 actorNumber = claim.Value;
