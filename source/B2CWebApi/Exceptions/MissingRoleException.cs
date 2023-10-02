@@ -12,29 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Security;
+namespace Energinet.DataHub.EDI.B2CWebApi.Exceptions;
 
-public sealed class FrontendUser
+public class MissingRoleException : Exception
 {
-    public FrontendUser(Guid userId, Guid actorId, bool isFas, string actorNumber, string role, string azp)
+    public MissingRoleException()
     {
-        UserId = userId;
-        ActorId = actorId;
-        IsFas = isFas;
-        ActorNumber = actorNumber;
-        Role = role;
-        Azp = azp;
     }
 
-    public Guid UserId { get; }
+    public MissingRoleException(string message)
+        : base(message)
+    {
+    }
 
-    public Guid ActorId { get; }
-
-    public bool IsFas { get; }
-
-    public string ActorNumber { get; }
-
-    public string Role { get; }
-
-    public string Azp { get; }
+    public MissingRoleException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
 }
