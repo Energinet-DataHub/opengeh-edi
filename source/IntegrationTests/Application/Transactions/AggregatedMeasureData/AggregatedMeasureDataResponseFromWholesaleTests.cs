@@ -51,7 +51,7 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         // Arrange
         var expectedOutgoingMessages = 1;
         var marketMessage = MessageBuilder().Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
         process!.WasSentToWholesale();
         var acceptedAggregation = CreateAcceptedAggregation();
@@ -70,7 +70,7 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         // Arrange
         var expectedOutgoingMessages = 1;
         var marketMessage = MessageBuilder().Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
         process!.WasSentToWholesale();
         var acceptedAggregation = CreateAcceptedAggregation();
@@ -90,7 +90,7 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         // Arrange
         var expectedOutgoingMessage = 1;
         var marketMessage = MessageBuilder().Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
         process!.WasSentToWholesale();
         var rejectedRequest = CreateRejectRequest();
@@ -109,7 +109,7 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         // Arrange
         var expectedOutgoingMessage = 1;
         var marketMessage = MessageBuilder().Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
         process!.WasSentToWholesale();
         var rejectedRequest = CreateRejectRequest();

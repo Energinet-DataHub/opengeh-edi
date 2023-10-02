@@ -56,7 +56,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         var acceptedEvent = GetAcceptedEvent(process);
 
         // Act
-        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id).ConfigureAwait(false);
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id);
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
@@ -143,7 +143,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
                 Guid.NewGuid().ToString(),
                 nameof(AggregatedTimeSeriesRequestAccepted),
                 process.ProcessId.Id,
-                acceptedEvent.ToByteArray()).ConfigureAwait(false);
+                acceptedEvent.ToByteArray());
     }
 
     private async Task<AssertOutgoingMessage> OutgoingMessageAsync(
@@ -154,7 +154,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             DocumentType.NotifyAggregatedMeasureData.Name,
             businessReason.Name,
             roleOfReceiver,
-            GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+            GetService<IDatabaseConnectionFactory>());
     }
 
     private AggregatedMeasureDataProcess BuildProcess(MarketRole? receiverRole = null)

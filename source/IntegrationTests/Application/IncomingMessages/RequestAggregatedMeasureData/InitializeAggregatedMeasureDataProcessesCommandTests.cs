@@ -60,7 +60,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         var marketMessage = MessageBuilder().Build();
 
         // Act
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
 
         // Assert
         var process = GetProcess(marketMessage.SenderNumber);
@@ -78,12 +78,12 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                 SetEnergySupplierId(null).
                 SetBalanceResponsibleId(null).
                 Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
         var exceptedServiceBusMessageSubject = nameof(AggregatedTimeSeriesRequest);
 
         // Act
-        await InvokeCommandAsync(command).ConfigureAwait(false);
+        await InvokeCommandAsync(command);
 
         // Assert
         var message = _senderSpy.Message;
@@ -117,11 +117,11 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                 SetEnergySupplierId(null).
                 SetBalanceResponsibleId(null).
                 Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
 
         // Act
-        await InvokeCommandAsync(command).ConfigureAwait(false);
+        await InvokeCommandAsync(command);
 
         // Assert
         var message = _senderSpy.Message;
@@ -148,12 +148,12 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                 SetEnergySupplierId(null).
                 SetBalanceResponsibleId(null).
                 Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
         var process = GetProcess(marketMessage.SenderNumber);
 
         // Act and assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => InvokeCommandAsync(command)).ConfigureAwait(false);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => InvokeCommandAsync(command));
         Assert.NotNull(process);
 
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Initialized);
@@ -177,11 +177,11 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                 SetEnergySupplierId("1232132132132").
                 SetBalanceResponsibleId(null).
                 Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
 
         // Act
-        await InvokeCommandAsync(command).ConfigureAwait(false);
+        await InvokeCommandAsync(command);
 
         // Assert
         var message = _senderSpy.Message;
@@ -215,12 +215,12 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                 SetEnergySupplierId("1232132132132").
                 SetBalanceResponsibleId(null).
                 Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
         var process = GetProcess(marketMessage.SenderNumber);
 
         // Act and assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => InvokeCommandAsync(command)).ConfigureAwait(false);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => InvokeCommandAsync(command));
         Assert.NotNull(process);
 
         // Ensure that our process has not changed state
@@ -245,11 +245,11 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                 SetEnergySupplierId(null).
                 SetBalanceResponsibleId("1232132132132").
                 Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
 
         // Act
-        await InvokeCommandAsync(command).ConfigureAwait(false);
+        await InvokeCommandAsync(command);
 
         // Assert
         var message = _senderSpy.Message;
@@ -283,12 +283,12 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                 SetEnergySupplierId(null).
                 SetBalanceResponsibleId("1232132132132").
                 Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
         var process = GetProcess(marketMessage.SenderNumber);
 
         // Act and assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => InvokeCommandAsync(command)).ConfigureAwait(false);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => InvokeCommandAsync(command));
         Assert.NotNull(process);
 
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Initialized);
@@ -312,11 +312,11 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                 SetEnergySupplierId("9232132132999").
                 SetBalanceResponsibleId("1232132132132").
                 Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
 
         // Act
-        await InvokeCommandAsync(command).ConfigureAwait(false);
+        await InvokeCommandAsync(command);
 
         // Assert
         var message = _senderSpy.Message;
@@ -351,12 +351,12 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                 SetEnergySupplierId("9232132132999").
                 SetBalanceResponsibleId("1232132132132").
                 Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
         var process = GetProcess(marketMessage.SenderNumber);
 
         // Act and assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => InvokeCommandAsync(command)).ConfigureAwait(false);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => InvokeCommandAsync(command));
         Assert.NotNull(process);
 
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Initialized);

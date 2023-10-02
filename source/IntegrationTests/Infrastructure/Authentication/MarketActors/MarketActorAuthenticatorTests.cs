@@ -47,7 +47,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
         [Fact]
         public async Task Cannot_authenticate_when_user_has_no_roles()
         {
-            await CreateActorAsync().ConfigureAwait(false);
+            await CreateActorAsync();
             var claims = new List<Claim>()
             {
                 new(ClaimsMap.UserId, SampleData.StsAssignedUserId),
@@ -77,7 +77,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
         [Fact]
         public async Task Current_user_is_authenticated()
         {
-            await CreateActorAsync().ConfigureAwait(false);
+            await CreateActorAsync();
             var claims = new List<Claim>()
             {
                 new(ClaimsMap.UserId, SampleData.StsAssignedUserId),

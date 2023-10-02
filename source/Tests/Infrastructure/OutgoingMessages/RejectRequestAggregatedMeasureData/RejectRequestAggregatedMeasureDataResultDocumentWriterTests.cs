@@ -47,8 +47,7 @@ public class RejectRequestAggregatedMeasureDataResultDocumentWriterTests : IClas
     {
         var document = await CreateDocument(
                 _rejectedTimeSeries,
-                DocumentFormat.From(documentFormat))
-            .ConfigureAwait(false);
+                DocumentFormat.From(documentFormat));
 
         await AssertDocument(document, DocumentFormat.From(documentFormat))
             .HasMessageId(SampleData.MessageId)
@@ -61,7 +60,7 @@ public class RejectRequestAggregatedMeasureDataResultDocumentWriterTests : IClas
             .HasSerieReasonCode(SampleData.SerieReasonCode)
             .HasSerieReasonMessage(SampleData.SerieReasonMessage)
             .HasOriginalTransactionId(SampleData.OriginalTransactionId)
-            .DocumentIsValidAsync().ConfigureAwait(false);
+            .DocumentIsValidAsync();
     }
 
     private Task<Stream> CreateDocument(RejectedTimeSeriesBuilder resultBuilder, DocumentFormat documentFormat)
