@@ -21,7 +21,7 @@ using Energinet.DataHub.EDI.Domain.Common;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
-namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Xml;
+namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Ebix;
 
 internal static class EbixHeaderWriter
 {
