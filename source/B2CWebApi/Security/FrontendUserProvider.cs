@@ -14,6 +14,7 @@
 
 using System.Security.Claims;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
+using Energinet.DataHub.EDI.B2CWebApi.Exceptions;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Security;
 
@@ -25,9 +26,45 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
         bool isFas,
         IEnumerable<Claim> claims)
     {
+        if (claims == null) throw new ArgumentNullException(nameof(claims));
+
+        string? actorNumber = null;
+        string? role = null;
+        string? azp = null;
+        foreach (var claim in claims)
+        {
+            if (actorNumber is not null
+                && role is not null
+                && azp is not null)
+            {
+                break;
+            }
+
+            if (claim.Type.Equals("actornumber", StringComparison.OrdinalIgnoreCase))
+                actorNumber = claim.Value;
+
+            if (claim.Type.Equals("marketroles", StringComparison.OrdinalIgnoreCase))
+                role = claim.Value;
+
+            if (claim.Type.Equals("azp", StringComparison.OrdinalIgnoreCase))
+                azp = claim.Value;
+        }
+
+        if (actorNumber is null)
+            throw new MissingActorNumberException();
+
+        if (role is null)
+            throw new MissingRoleException();
+
+        if (azp is null)
+            throw new MissingAzpException();
+
         return Task.FromResult<FrontendUser?>(new FrontendUser(
             userId,
             actorId,
-            isFas));
+            isFas,
+            actorNumber,
+            role,
+            azp));
     }
 }

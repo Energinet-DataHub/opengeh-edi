@@ -15,6 +15,7 @@
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
+using Energinet.DataHub.EDI.B2CWebApi.Clients;
 using Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Microsoft.OpenApi.Models;
@@ -59,8 +60,14 @@ public class Startup
         serviceCollection.AddHttpContextAccessor();
 
         serviceCollection.AddOptions<JwtOptions>().Bind(Configuration);
+        serviceCollection.AddOptions<EdiOptions>().Bind(Configuration);
 
         AddJwtTokenSecurity(serviceCollection);
+        serviceCollection
+            .AddHttpClient();
+        var ediClientOptions = Configuration.Get<EdiOptions>()!;
+        serviceCollection.AddScoped(provider => new RequestAggregatedMeasureDataHttpClient(
+            provider.GetRequiredService<IHttpClientFactory>(), new Uri(ediClientOptions.EDI_BASE_URL)));
     }
 
     public void Configure(IApplicationBuilder app)
@@ -73,7 +80,12 @@ public class Startup
         }
 
         app.UseSwagger();
-        app.UseSwaggerUI();
+
+        app.UseSwaggerUI(options =>
+        {
+            if (!Environment.IsDevelopment()) return;
+            options.EnableTryItOutByDefault();
+        });
 
         app.UseRouting();
 

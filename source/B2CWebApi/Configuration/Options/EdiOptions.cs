@@ -12,29 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Security;
+namespace Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
 
-public sealed class FrontendUser
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1707", Justification = "To match naming in other domains")]
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1056", Justification = "Nuget expects a string")]
+public class EdiOptions
 {
-    public FrontendUser(Guid userId, Guid actorId, bool isFas, string actorNumber, string role, string azp)
-    {
-        UserId = userId;
-        ActorId = actorId;
-        IsFas = isFas;
-        ActorNumber = actorNumber;
-        Role = role;
-        Azp = azp;
-    }
-
-    public Guid UserId { get; }
-
-    public Guid ActorId { get; }
-
-    public bool IsFas { get; }
-
-    public string ActorNumber { get; }
-
-    public string Role { get; }
-
-    public string Azp { get; }
+    public string EDI_BASE_URL { get; set; } = string.Empty;
 }
