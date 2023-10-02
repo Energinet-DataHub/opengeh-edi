@@ -21,26 +21,26 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Factories;
 
 internal sealed class TokenBuilder
 {
-    public static string BuildToken(string uniqueActorNumber, IEnumerable<string> roles, string azpToken)
+    public static string BuildToken(string uniqueActorNumber, string role, string azpToken)
     {
         var token = new JwtSecurityToken(
             "https://login.microsoftonline.com/4a7411ea-ac71-4b63-9647-b8bd4c5a20e0/v2.0",
             "c7e5dc5c-2ee0-420c-b5d2-586e7527302c",
-            CreateClaims(uniqueActorNumber, roles, azpToken),
+            CreateClaims(uniqueActorNumber, role, azpToken),
             expires: DateTime.Now.AddMinutes(30),
             signingCredentials: SetupCredentials());
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    private static List<Claim> CreateClaims(string uniqueActorNumber, IEnumerable<string> roles, string azpToken)
+    private static List<Claim> CreateClaims(string uniqueActorNumber, string role, string azpToken)
     {
         var claims = new List<Claim>()
         {
             new("test-actornumber", uniqueActorNumber),
             new("azp", azpToken),
         };
-        claims.AddRange(roles.Select(role => new Claim("roles", role)));
+        claims.Add(new Claim("roles", role));
         return claims;
     }
 

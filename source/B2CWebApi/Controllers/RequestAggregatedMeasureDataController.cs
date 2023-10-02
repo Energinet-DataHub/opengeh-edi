@@ -57,12 +57,9 @@ public class RequestAggregatedMeasureDataController : ControllerBase
     {
         return TokenBuilder.BuildToken(
             currentUser.ActorNumber,
-            new[]
-            {
 #pragma warning disable CA1308
-                currentUser.Role.ToLowerInvariant(),
+            currentUser.Role.ToLowerInvariant(),
 #pragma warning restore CA1308
-            },
             currentUser.Azp);
     }
 }

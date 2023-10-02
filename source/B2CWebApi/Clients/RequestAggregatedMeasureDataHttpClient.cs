@@ -36,7 +36,6 @@ public class RequestAggregatedMeasureDataHttpClient
         using var request = new HttpRequestMessage(HttpMethod.Post, "api/B2CRequestAggregatedMeasureMessageReceiver");
         request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
         request.Content = new ByteArrayContent(requestAggregatedMeasureData.ToByteArray());
-        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
         var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
