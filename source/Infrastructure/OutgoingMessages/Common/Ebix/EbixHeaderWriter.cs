@@ -42,7 +42,7 @@ internal static class EbixHeaderWriter
         await writer.WriteElementStringAsync(documentDetails.Prefix, "Identification", null, messageHeader.MessageId).ConfigureAwait(false);
         await writer.WriteStartElementAsync(documentDetails.Prefix, "DocumentType", null).ConfigureAwait(false);
         await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
-        writer.WriteValue("E31");
+        writer.WriteValue(documentDetails.TypeCode);
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 
         await writer.WriteElementStringAsync(documentDetails.Prefix, "Creation", null, messageHeader.TimeStamp.ToString()).ConfigureAwait(false);

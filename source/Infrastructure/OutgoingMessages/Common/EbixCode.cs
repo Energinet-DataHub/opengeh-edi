@@ -165,6 +165,18 @@ public static class EbixCode
         throw NoCodeFoundFor(quality.Name);
     }
 
+    public static string Of(ReasonCode reasonCode)
+    {
+        ArgumentNullException.ThrowIfNull(reasonCode);
+
+        if (reasonCode == ReasonCode.FullyAcceptet)
+            return "39";
+        if (reasonCode == ReasonCode.FullyRejected)
+            return "41";
+
+        throw NoCodeFoundFor(reasonCode.Name);
+    }
+
     private static Exception NoCodeFoundFor(string domainType)
     {
         return new InvalidOperationException($"No code has been defined for {domainType}");

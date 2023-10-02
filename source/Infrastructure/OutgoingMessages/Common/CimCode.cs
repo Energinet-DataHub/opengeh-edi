@@ -169,6 +169,18 @@ public static class CimCode
         throw NoCodeFoundFor(quality.Name);
     }
 
+    public static string Of(ReasonCode reasonCode)
+    {
+        ArgumentNullException.ThrowIfNull(reasonCode);
+
+        if (reasonCode == ReasonCode.FullyAcceptet)
+            return "A01";
+        if (reasonCode == ReasonCode.FullyRejected)
+            return "A02";
+
+        throw NoCodeFoundFor(reasonCode.Name);
+    }
+
     public static string CodingSchemeOf(ActorNumber actorNumber)
     {
         ArgumentNullException.ThrowIfNull(actorNumber);
