@@ -12,29 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Security;
+namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
-public sealed class FrontendUser
+/// <summary>
+/// Responsible for carrying the market message data from the incoming message before any data validation.
+/// </summary>
+public record RequestAggregatedMeasureDataMarketRequest(
+    string BusinessReason,
+    string Id,
+    MeteringPointType MeteringPointType,
+    string StartDate,
+    string? EndDate,
+    string? GridArea,
+    string? EnergySupplierId,
+    string? BalanceResponsibleId);
+
+public enum MeteringPointType
 {
-    public FrontendUser(Guid userId, Guid actorId, bool isFas, string actorNumber, string role, string azp)
-    {
-        UserId = userId;
-        ActorId = actorId;
-        IsFas = isFas;
-        ActorNumber = actorNumber;
-        Role = role;
-        Azp = azp;
-    }
-
-    public Guid UserId { get; }
-
-    public Guid ActorId { get; }
-
-    public bool IsFas { get; }
-
-    public string ActorNumber { get; }
-
-    public string Role { get; }
-
-    public string Azp { get; }
+    Production,
+    FlexConsumption,
+    TotalConsumption,
+    NonProfiledConsumption,
+    Exchange,
 }

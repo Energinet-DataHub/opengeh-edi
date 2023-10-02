@@ -12,17 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.AspNetCore.Mvc;
+namespace Energinet.DataHub.EDI.B2CWebApi.Exceptions;
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
-
-[ApiController]
-[Route("[controller]")]
-public class HelloWorldController : ControllerBase
+public class MissingAzpException : Exception
 {
-    [HttpPost]
-    public new string Request()
+    public MissingAzpException()
     {
-        return "Hello World";
+    }
+
+    public MissingAzpException(string message)
+        : base(message)
+    {
+    }
+
+    public MissingAzpException(string message, Exception innerException)
+        : base(message, innerException)
+    {
     }
 }
