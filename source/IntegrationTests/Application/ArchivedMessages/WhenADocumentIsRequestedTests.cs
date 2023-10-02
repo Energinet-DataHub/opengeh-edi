@@ -49,7 +49,7 @@ public class WhenADocumentIsRequestedTests : TestBase
         await ArchiveMessage(CreateArchivedMessage(id));
         await ArchiveMessage(CreateArchivedMessage());
 
-        var result = await QueryAsync(new GetArchivedMessageDocumentQuery(id)).ConfigureAwait(false);
+        var result = await QueryAsync(new GetArchivedMessageDocumentQuery(id));
 
         Assert.NotNull(result);
     }
@@ -60,7 +60,7 @@ public class WhenADocumentIsRequestedTests : TestBase
         var id = Guid.NewGuid().ToString();
         await ArchiveMessage(CreateArchivedMessage(id));
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => ArchiveMessage(CreateArchivedMessage(id))).ConfigureAwait(false);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => ArchiveMessage(CreateArchivedMessage(id)));
     }
 
     [Fact]
@@ -82,7 +82,7 @@ public class WhenADocumentIsRequestedTests : TestBase
             Assert.Fail("We should be able to save multiple messages with the same message id");
         }
 
-        var result = await QueryAsync(new GetMessagesQuery()).ConfigureAwait(false);
+        var result = await QueryAsync(new GetMessagesQuery());
 
         Assert.Equal(2, result.Messages.Count);
         Assert.Equal(messageId, result.Messages[0].MessageId);

@@ -78,9 +78,9 @@ public class WhenAnInboxEventIsReceivedTests : TestBase
     public async Task Event_registration_is_omitted_if_already_registered()
     {
         // Act
-        await EventIsReceived(_eventId).ConfigureAwait(false);
+        await EventIsReceived(_eventId);
 
-        await EventIsReceived(_eventId).ConfigureAwait(false);
+        await EventIsReceived(_eventId);
 
         // Assert
         await EventIsRegisteredWithInbox(_eventId, 1);
@@ -98,7 +98,7 @@ public class WhenAnInboxEventIsReceivedTests : TestBase
 
     private async Task EventIsRegisteredWithInbox(string eventId, int expectedNumberOfRegisteredEvents = 1)
     {
-        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var numberOfRegisteredEvents = connection.ExecuteScalar<int>($"SELECT COUNT(*) FROM dbo.ReceivedInboxEvents WHERE Id = @EventId", new { EventId = eventId, });
         Assert.Equal(expectedNumberOfRegisteredEvents, numberOfRegisteredEvents);
     }
