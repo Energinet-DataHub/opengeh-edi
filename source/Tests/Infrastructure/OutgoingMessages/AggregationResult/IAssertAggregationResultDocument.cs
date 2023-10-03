@@ -146,4 +146,9 @@ public interface IAssertAggregationResultDocument
     /// </summary>
     /// <param name="originalTransactionIdReference"></param>
     IAssertAggregationResultDocument HasOriginalTransactionIdReference(string originalTransactionIdReference);
+
+    /// <summary>
+    /// Asserts the settlement method
+    /// </summary>
+    IAssertAggregationResultDocument HasSettlementMethod(SettlementType settlementMethod);
 }

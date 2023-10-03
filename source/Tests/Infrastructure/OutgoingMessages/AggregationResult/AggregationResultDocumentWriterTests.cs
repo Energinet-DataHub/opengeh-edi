@@ -61,7 +61,8 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
                     .WithEnergySupplierNumber(SampleData.EnergySupplierNumber)
                     .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
                     .WithPoint(new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z"))
-                    .WithOriginalTransactionIdReference(SampleData.OriginalTransactionIdReference),
+                    .WithOriginalTransactionIdReference(SampleData.OriginalTransactionIdReference)
+                    .WithSettlementMethod(SettlementType.NonProfiled),
                 DocumentFormat.From(documentFormat));
 
         await AssertDocument(document, DocumentFormat.From(documentFormat))
@@ -78,6 +79,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
                 new Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod))
             .HasPoint(1, 1)
             .HasOriginalTransactionIdReference(SampleData.OriginalTransactionIdReference)
+            .HasSettlementMethod(SettlementType.NonProfiled)
             .DocumentIsValidAsync();
     }
 
