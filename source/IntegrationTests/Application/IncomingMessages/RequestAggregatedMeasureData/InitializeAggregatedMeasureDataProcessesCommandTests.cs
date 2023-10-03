@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -28,6 +29,7 @@ using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Co
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.Edi.Requests;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Categories;
 
@@ -65,6 +67,73 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         // Assert
         var process = GetProcess(marketMessage.SenderNumber);
         Assert.Equal(marketMessage.Series.First().Id, process!.BusinessTransactionId.Id);
+        AssertProcessState(process, AggregatedMeasureDataProcess.State.Initialized);
+    }
+
+    [Fact]
+    public async Task Duplicated_transaction_id_across_commands_one_aggregated_measure_data_process_is_created()
+    {
+        // Arrange
+        var marketMessage01 = MessageBuilder()
+            .SetTransactionId("d0100662-1e08-477a-94a8-0f02d52be925")
+            .Build();
+
+        var marketMessage02 = MessageBuilder()
+            .SetTransactionId("d0100662-1e08-477a-94a8-0f02d52be925")
+            .Build();
+
+        // Act
+        var task01 = InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage01));
+        var task02 = InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage02));
+
+        try
+        {
+            await Task.WhenAll(task01, task02);
+        }
+        catch (DbUpdateException e)
+        {
+            // Assert
+            Assert.Contains("Violation of PRIMARY KEY constraint", e.InnerException?.Message, StringComparison.InvariantCulture);
+        }
+
+        var processes = GetProcesses(marketMessage01.SenderNumber);
+        Assert.Single(processes);
+        var process = processes.First();
+        Assert.Equal(marketMessage01.Series.First().Id, process!.BusinessTransactionId.Id);
+        AssertProcessState(process, AggregatedMeasureDataProcess.State.Initialized);
+    }
+
+    [Fact]
+    public async Task Duplicated_message_id_across_commands_one_aggregated_measure_data_process_is_created()
+    {
+        // Arrange
+        var marketMessage01 = MessageBuilder()
+            .SetMessageId("d0100662-1e08-477a-94a8-0f02d52be924")
+            .Build();
+
+        var marketMessage02 = MessageBuilder()
+            .SetMessageId("d0100662-1e08-477a-94a8-0f02d52be924")
+            .Build();
+
+        // Act
+        var task01 = InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage01));
+        var task02 = InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage02));
+
+        try
+        {
+            await Task.WhenAll(task01, task02);
+        }
+        catch (DbUpdateException e)
+        {
+            // Assert
+            Assert.Contains("Violation of PRIMARY KEY constraint", e.InnerException?.Message, StringComparison.InvariantCulture);
+        }
+
+        // Assert
+        var processes = GetProcesses(marketMessage01.SenderNumber);
+        Assert.Single(processes);
+        var process = processes.First();
+        Assert.Equal(marketMessage01.Series.First().Id, process!.BusinessTransactionId.Id);
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Initialized);
     }
 
@@ -396,5 +465,12 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         return _b2BContext.AggregatedMeasureDataProcesses
             .ToList()
             .FirstOrDefault(x => x.RequestedByActorId.Value == senderNumber);
+    }
+
+    private IEnumerable<AggregatedMeasureDataProcess> GetProcesses(string senderNumber)
+    {
+        return _b2BContext.AggregatedMeasureDataProcesses
+            .ToList()
+            .Where(x => x.RequestedByActorId.Value == senderNumber);
     }
 }

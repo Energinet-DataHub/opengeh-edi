@@ -23,6 +23,7 @@ using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData;
@@ -66,6 +67,8 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 
         public DbSet<ReceivedInboxEvent> ReceivedInboxEvents { get; private set; }
 
+        public DbSet<TransactionIdForSender> TransactionIds { get; private set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
@@ -79,6 +82,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
             modelBuilder.ApplyConfiguration(new ActorMessageQueueEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MarketDocumentEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ReceivedInboxEventEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new TransactionIdEntityConfiguration());
         }
     }
 }
