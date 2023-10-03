@@ -28,7 +28,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 
 public class RequestAggregatedMeasureDataMarketDocumentBuilder
 {
-    private readonly string _serieId = Guid.NewGuid().ToString();
     private readonly string _startDateAndOrTimeDateTime = "2022-06-17T22:00:00Z";
     private readonly string _endDateAndOrTimeDateTime = "2022-07-22T22:00:00Z";
     private readonly string _meteringGridAreaDomainId = "244";
@@ -39,6 +38,7 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
     private readonly MarketRole _receiverRole = MarketRole.CalculationResponsibleRole;
     private readonly string _createdAt = SystemClock.Instance.GetCurrentInstant().ToString();
     private string _messageId = Guid.NewGuid().ToString();
+    private string _serieId = Guid.NewGuid().ToString();
     private string _senderRole = MarketRole.EnergySupplier.Code;
     private string _marketEvaluationPointType = "E17";
     private string? _marketEvaluationSettlementMethod = "D01";
@@ -78,6 +78,12 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
     public RequestAggregatedMeasureDataMarketDocumentBuilder SetBalanceResponsibleId(string? balanceResponsibleId = null)
     {
         _balanceResponsiblePartyMarketParticipantId = balanceResponsibleId;
+        return this;
+    }
+
+    public RequestAggregatedMeasureDataMarketDocumentBuilder SetTransactionId(string transactionId)
+    {
+        _serieId = transactionId;
         return this;
     }
 

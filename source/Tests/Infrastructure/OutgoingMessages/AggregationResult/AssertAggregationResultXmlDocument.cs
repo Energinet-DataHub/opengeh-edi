@@ -163,4 +163,10 @@ public class AssertAggregationResultXmlDocument : IAssertAggregationResultDocume
         _documentAsserter.HasValue("Series[1]/originalTransactionIDReference_Series.mRID", originalTransactionIdReference);
         return this;
     }
+
+    public IAssertAggregationResultDocument HasSettlementMethod(SettlementType settlementMethod)
+    {
+        _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.settlementMethod", CimCode.Of(settlementMethod));
+        return this;
+    }
 }

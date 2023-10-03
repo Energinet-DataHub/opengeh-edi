@@ -12,25 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Models;
+using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-/// <summary>
-/// Responsible for carrying the market message data from the incoming message before any data validation.
-/// </summary>
-public record RequestAggregatedMeasureDataMarketRequest(
-    string BusinessReason,
-    MeteringPointType MeteringPointType,
-    string StartDate,
-    string? EndDate,
-    string? GridArea,
-    string? EnergySupplierId,
-    string? BalanceResponsibleId);
+namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 
-public enum MeteringPointType
+public class MessageIdEntityConfiguration : IEntityTypeConfiguration<MessageIdForSender>
 {
-    Production,
-    FlexConsumption,
-    TotalConsumption,
-    NonProfiledConsumption,
-    Exchange,
+    public void Configure(EntityTypeBuilder<MessageIdForSender> builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        builder.ToTable("MessageRegistry", "dbo");
+        builder.HasKey(entity => entity.MessageId);
+        builder.Property(entity => entity.MessageId);
+        builder.Property(entity => entity.SenderId);
+    }
 }

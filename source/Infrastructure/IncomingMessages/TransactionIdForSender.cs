@@ -12,25 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Models;
+namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 
-/// <summary>
-/// Responsible for carrying the market message data from the incoming message before any data validation.
-/// </summary>
-public record RequestAggregatedMeasureDataMarketRequest(
-    string BusinessReason,
-    MeteringPointType MeteringPointType,
-    string StartDate,
-    string? EndDate,
-    string? GridArea,
-    string? EnergySupplierId,
-    string? BalanceResponsibleId);
-
-public enum MeteringPointType
+public class TransactionIdForSender
 {
-    Production,
-    FlexConsumption,
-    TotalConsumption,
-    NonProfiledConsumption,
-    Exchange,
+    public TransactionIdForSender(string transactionId, string senderId)
+    {
+        TransactionId = transactionId;
+        SenderId = senderId;
+    }
+
+    public string TransactionId { get; set; }
+
+    public string SenderId { get; set; }
 }
