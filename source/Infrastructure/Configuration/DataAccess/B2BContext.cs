@@ -69,6 +69,8 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 
         public DbSet<TransactionIdForSender> TransactionIds { get; private set; }
 
+        public DbSet<MessageIdForSender> MessageIds { get; private set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
@@ -83,6 +85,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
             modelBuilder.ApplyConfiguration(new MarketDocumentEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ReceivedInboxEventEntityConfiguration());
             modelBuilder.ApplyConfiguration(new TransactionIdEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new MessageIdEntityConfiguration());
         }
     }
 }
