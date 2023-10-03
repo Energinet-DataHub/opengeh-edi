@@ -18,12 +18,11 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 
 public class ReceivedIntegrationEvent
 {
-    public ReceivedIntegrationEvent(string id, string eventType, string eventPayload, Instant occurredOn)
+    public ReceivedIntegrationEvent(string id, string eventType, Instant occurredOn)
     {
         Id = id;
         OccurredOn = occurredOn;
         EventType = eventType;
-        EventPayload = eventPayload;
     }
 
     #pragma warning disable CS8618 // Needed by ORM
@@ -36,6 +35,4 @@ public class ReceivedIntegrationEvent
     public Instant OccurredOn { get; }
 
     public string EventType { get; }
-
-    public string EventPayload { get; }
 }

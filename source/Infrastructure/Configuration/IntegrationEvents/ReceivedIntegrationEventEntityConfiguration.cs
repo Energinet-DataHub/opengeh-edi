@@ -29,6 +29,5 @@ public class ReceivedIntegrationEventEntityConfiguration : IEntityTypeConfigurat
         builder.Property(entity => entity.Id);
         builder.Property(entity => entity.OccurredOn);
         builder.Property(entity => entity.EventType);
-        builder.Property(entity => entity.EventPayload);
     }
 }
