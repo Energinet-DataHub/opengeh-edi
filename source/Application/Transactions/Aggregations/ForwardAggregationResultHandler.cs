@@ -24,21 +24,21 @@ namespace Energinet.DataHub.EDI.Application.Transactions.Aggregations;
 
 public class ForwardAggregationResultHandler : IRequestHandler<ForwardAggregationResult, Unit>
 {
-    private readonly IAggregationResultForwardingRepository _transactions;
+    private readonly IAggregationResultForwardingRepository _aggregationResultForwardingRepository;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
 
-    public ForwardAggregationResultHandler(IAggregationResultForwardingRepository transactions, IOutgoingMessageRepository outgoingMessageRepository)
+    public ForwardAggregationResultHandler(IAggregationResultForwardingRepository aggregationResultForwardingRepository, IOutgoingMessageRepository outgoingMessageRepository)
     {
-        _transactions = transactions;
+        _aggregationResultForwardingRepository = aggregationResultForwardingRepository;
         _outgoingMessageRepository = outgoingMessageRepository;
     }
 
     public Task<Unit> Handle(ForwardAggregationResult request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        var transaction = new AggregationResultForwarding(ProcessId.New());
-        _transactions.Add(transaction);
-        _outgoingMessageRepository.Add(transaction.CreateMessage(request.Result));
+        var aggregationResultForwarding = new AggregationResultForwarding(ProcessId.New());
+        _aggregationResultForwardingRepository.Add(aggregationResultForwarding);
+        _outgoingMessageRepository.Add(aggregationResultForwarding.CreateMessage(request.Result));
         return Unit.Task;
     }
 }
