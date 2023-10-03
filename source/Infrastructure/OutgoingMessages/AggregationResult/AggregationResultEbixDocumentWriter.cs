@@ -18,10 +18,8 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
-using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Xml;
-using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
@@ -141,7 +139,7 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
                 }
 
                 await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, "260").ConfigureAwait(false);
-                await writer.WriteStringAsync(timeSeries.SettlementType).ConfigureAwait(false);
+                await writer.WriteStringAsync(CimCode.Of(SettlementType.From(timeSeries.SettlementType))).ConfigureAwait(false);
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
             }
 
