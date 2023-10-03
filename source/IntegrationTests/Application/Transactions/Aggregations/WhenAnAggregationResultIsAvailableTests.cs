@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Domain.Actors;
@@ -19,10 +20,12 @@ using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.Wholesale.Contracts.Events;
+using Google.Protobuf;
 using Xunit;
 using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
 
@@ -40,14 +43,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     [Fact]
     public async Task Non_profiled_consumption_result_is_sent_the_energy_supplier()
     {
-        _eventBuilder
-            .WithProcessType(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing)
-            .AggregatedBy(SampleData.GridAreaCode, null, SampleData.EnergySupplierNumber.Value)
-            .ResultOf(TimeSeriesType.NonProfiledConsumption)
-            .WithResolution(Resolution.Quarter)
-            .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod);
-
-        await HavingReceivedIntegrationEventAsync(CalculationResultCompleted.EventName, _eventBuilder.Build()).ConfigureAwait(false);
+        await HavingReceivedIntegrationEventAsync(CalculationResultCompleted.EventName).ConfigureAwait(false);
 
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.EnergySupplier, BusinessReason.BalanceFixing);
         outgoingMessage
@@ -226,5 +222,12 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             completedAggregationType.Name,
             roleOfReceiver,
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+    }
+
+    private async Task HavingReceivedIntegrationEventAsync(string eventType)
+    {
+        await GetService<IntegrationEventRegistrar>().RegisterAsync(Guid.NewGuid().ToString(), eventType).ConfigureAwait(false);
+        await ProcessReceivedIntegrationEventsAsync().ConfigureAwait(false);
+        await HavingProcessedInternalTasksAsync().ConfigureAwait(false);
     }
 }
