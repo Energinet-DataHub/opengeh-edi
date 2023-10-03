@@ -430,7 +430,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var document = messageParserResult.MarketMessage!;
         AssertTransactionIdIsStored(messageParserResult.MarketMessage!.SenderNumber, messageParserResult.MarketMessage!.Series.First().Id);
-        await AssertMessageIdIsStoredAsync(messageParserResult.MarketMessage!.SenderNumber, messageParserResult.MarketMessage!.MessageId);
+        AssertMessageIdIsStored(messageParserResult.MarketMessage!.SenderNumber, messageParserResult.MarketMessage!.MessageId);
     }
 
     [Fact]
@@ -458,7 +458,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var document = messageParserResult.MarketMessage!;
         AssertTransactionIdIsStored(messageParserResult.MarketMessage!.SenderNumber, document.Series.First().Id);
         AssertTransactionIdIsStored(messageParserResult.MarketMessage!.SenderNumber, document.Series.Last().Id);
-        await AssertMessageIdIsStoredAsync(messageParserResult.MarketMessage!.SenderNumber, messageParserResult.MarketMessage!.MessageId);
+        AssertMessageIdIsStored(messageParserResult.MarketMessage!.SenderNumber, messageParserResult.MarketMessage!.MessageId);
     }
 
     [Fact]
@@ -565,13 +565,12 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         Assert.Null(transaction);
     }
 
-    private async Task AssertMessageIdIsStoredAsync(string senderId, string messageId)
+    private void AssertMessageIdIsStored(string senderId, string messageId)
     {
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-        var sql =
-            "SELECT * FROM dbo.MessageRegistry WHERE MessageId = @MessageId AND SenderId = @SenderId";
-        var message = await connection.QueryFirstOrDefaultAsync(sql, new { MessageId = messageId, SenderId = senderId });
-        Assert.NotNull(message);
+        var messages = _b2BContext.MessageIds.Local.Where(x => x.MessageId == messageId && x.SenderId == senderId)
+            .ToList();
+        Assert.NotNull(messages);
+        Assert.Single(messages);
     }
 
     private async Task AssertMessageIdIsNotStoredAsync(string senderId, string messageId)
