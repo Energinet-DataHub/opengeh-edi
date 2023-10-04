@@ -26,7 +26,7 @@ public static class RequestAggregatedMeasureDataHttpFactory
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
 
-        string senderRoleCode = EnsureRoleCode(role);
+        string senderRoleCode = MapRoleNameToCode(role);
         var data = new RequestAggregatedMeasureData
         {
             MessageId = Guid.NewGuid().ToString(),
@@ -81,25 +81,25 @@ public static class RequestAggregatedMeasureDataHttpFactory
         }
     }
 
-    private static string EnsureRoleCode(string senderRole)
+    private static string MapRoleNameToCode(string roleName)
     {
-        if (senderRole == null) throw new ArgumentNullException(nameof(senderRole));
+        if (roleName == null) throw new ArgumentNullException(nameof(roleName));
 
-        if (senderRole.Equals(MarketRole.MeteredDataResponsible.Name, StringComparison.OrdinalIgnoreCase))
+        if (roleName.Equals(MarketRole.MeteredDataResponsible.Name, StringComparison.OrdinalIgnoreCase))
         {
             return MarketRole.MeteredDataResponsible.Code;
         }
 
-        if (senderRole.Equals(MarketRole.EnergySupplier.Name, StringComparison.OrdinalIgnoreCase))
+        if (roleName.Equals(MarketRole.EnergySupplier.Name, StringComparison.OrdinalIgnoreCase))
         {
             return MarketRole.EnergySupplier.Code;
         }
 
-        if (senderRole.Equals(MarketRole.BalanceResponsibleParty.Name, StringComparison.OrdinalIgnoreCase))
+        if (roleName.Equals(MarketRole.BalanceResponsibleParty.Name, StringComparison.OrdinalIgnoreCase))
         {
             return MarketRole.BalanceResponsibleParty.Code;
         }
 
-        return senderRole;
+        return roleName;
     }
 }
