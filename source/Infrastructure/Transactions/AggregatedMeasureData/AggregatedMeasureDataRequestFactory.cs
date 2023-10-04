@@ -118,8 +118,8 @@ public class AggregatedMeasureDataRequestFactory
             "E20" => TimeSeriesType.NetExchangePerGa,
             "E17" => process.SettlementMethod switch
             {
-                "D01" => TimeSeriesType.NonProfiledConsumption,
-                "E02" => TimeSeriesType.FlexConsumption,
+                "E02" => TimeSeriesType.NonProfiledConsumption,
+                "D01" => TimeSeriesType.FlexConsumption,
                 "" => TimeSeriesType.TotalConsumption,
                 null => TimeSeriesType.TotalConsumption,
                 _ => ThrowInvalidOperationExceptionForTimeSeries(process),
@@ -135,8 +135,8 @@ public class AggregatedMeasureDataRequestFactory
             "E18" => TimeSeriesType.Production,
             "E17" => process.SettlementMethod switch
             {
-                "D01" => TimeSeriesType.NonProfiledConsumption,
-                "E02" => TimeSeriesType.FlexConsumption,
+                "E02" => TimeSeriesType.NonProfiledConsumption,
+                "D01" => TimeSeriesType.FlexConsumption,
                 _ => ThrowInvalidOperationExceptionForTimeSeries(process),
             },
             _ => ThrowInvalidOperationExceptionForTimeSeries(process),
@@ -170,9 +170,9 @@ public class AggregatedMeasureDataRequestFactory
         return request;
     }
 
-    private Energinet.DataHub.Edi.Requests.Period MapPeriod(AggregatedMeasureDataProcess process)
+    private Edi.Requests.Period MapPeriod(AggregatedMeasureDataProcess process)
     {
-        return new Energinet.DataHub.Edi.Requests.Period()
+        return new Edi.Requests.Period()
         {
             StartOfPeriod = new Timestamp() { Seconds = process.StartOfPeriod.ToUnixTimeSeconds(), },
             EndOfPeriod = new Timestamp() { Seconds = process.EndOfPeriod?.ToUnixTimeSeconds() ?? _systemDateTimeProvider.Now().ToUnixTimeSeconds(), },
