@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Json.Serialization;
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
@@ -56,7 +57,8 @@ public class Startup
 
             config.AddSecurityRequirement(securityRequirement);
         });
-        serviceCollection.AddControllers();
+        serviceCollection.AddControllers()
+            .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
         serviceCollection.AddHealthChecks();
         serviceCollection.AddHttpContextAccessor();
 
