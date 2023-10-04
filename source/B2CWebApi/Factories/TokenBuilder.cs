@@ -39,6 +39,9 @@ internal sealed class TokenBuilder
         {
             new("test-actornumber", uniqueActorNumber),
             new("azp", azpToken),
+
+            // TODO: temporary hack to allow easier validation
+            new("token", "token"),
         };
         claims.Add(new Claim("roles", role));
         return claims;
