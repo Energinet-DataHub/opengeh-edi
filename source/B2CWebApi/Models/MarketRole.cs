@@ -19,6 +19,11 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 [SuppressMessage("Usage", "CA1034", Justification = "Nested types should not be visible")]
 public static class MarketRole
 {
+    public static class CalculationResponsibleRole
+    {
+        public const string Code = "DGL";
+    }
+
     public static class EnergySupplier
     {
         public const string Code = "DDQ";

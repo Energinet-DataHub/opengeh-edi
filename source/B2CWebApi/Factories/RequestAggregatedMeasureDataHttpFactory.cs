@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Globalization;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.Edi.Requests;
 
@@ -32,11 +31,11 @@ public static class RequestAggregatedMeasureDataHttpFactory
         {
             MessageId = Guid.NewGuid().ToString(),
             SenderId = actorNumber,
-            SenderRole = senderRoleCode,
+            SenderRoleCode = senderRoleCode,
             ReceiverId = "5790001330552",
-            ReceiverRole = "DGL",
+            ReceiverRoleCode = MarketRole.CalculationResponsibleRole.Code,
             AuthenticatedUser = actorNumber,
-            AuthenticatedUserRole = senderRoleCode,
+            AuthenticatedUserRoleCode = senderRoleCode,
             BusinessReason = request.BusinessReason,
             MessageType = "E74",
         };
