@@ -64,12 +64,12 @@ public static class RequestAggregatedMeasureDataMarketMessageFactory
 
         return new RequestAggregatedMeasureDataMarketMessage(
             requestAggregatedMeasureData.SenderId,
-            requestAggregatedMeasureData.SenderRole,
+            requestAggregatedMeasureData.SenderRoleCode,
             requestAggregatedMeasureData.ReceiverId,
-            requestAggregatedMeasureData.ReceiverRole,
+            requestAggregatedMeasureData.ReceiverRoleCode,
             requestAggregatedMeasureData.BusinessReason,
             requestAggregatedMeasureData.AuthenticatedUser,
-            requestAggregatedMeasureData.AuthenticatedUserRole,
+            requestAggregatedMeasureData.AuthenticatedUserRoleCode,
             requestAggregatedMeasureData.MessageType,
             requestAggregatedMeasureData.MessageId,
             createdAt.ToString(),
