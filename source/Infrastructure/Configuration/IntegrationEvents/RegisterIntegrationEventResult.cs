@@ -18,5 +18,4 @@ public enum RegisterIntegrationEventResult
 {
     EventRegistered,
     EventIsAlreadyRegistered,
-    EventTypeIsUnknown,
 }

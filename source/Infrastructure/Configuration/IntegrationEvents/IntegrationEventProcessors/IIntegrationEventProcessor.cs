@@ -26,27 +26,25 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.I
 public interface IIntegrationEventProcessor
 {
     /// <summary>
-    /// Collection of event types the processor handles
+    /// Event type the processor handles
     /// </summary>
-    public ReadOnlyCollection<string> EventTypesToHandle { get; }
+    public string EventTypeToHandle { get; }
 
     /// <summary>
     /// Process a single integration event
     /// </summary>
-    /// <param name="integrationEvent">The integration event to process</param>
-    /// <returns>A async task</returns>
     public Task ProcessAsync(IntegrationEvent integrationEvent);
 
     /// <summary>
     /// Determines whether the specified event type can be handled by the processor
     /// </summary>
-    /// <param name="eventType">The event type</param>
+    /// <param name="eventType">The event type, something like IntegrationEvent.EventName</param>
     /// <returns>Whether the processor can handle the supplied event type</returns>
     public bool CanHandle(string eventType)
     {
         if (string.IsNullOrWhiteSpace(eventType))
             throw new ArgumentNullException(nameof(eventType));
 
-        return EventTypesToHandle.Any(e => e.Equals(eventType, StringComparison.OrdinalIgnoreCase));
+        return EventTypeToHandle.Equals(eventType, StringComparison.OrdinalIgnoreCase);
     }
 }

@@ -13,30 +13,26 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.Application.Transactions.Aggregations;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.Mediator;
 using Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf;
+using MediatR;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventProcessors;
 
 public class CalculationResultCompletedProcessor : IIntegrationEventProcessor
 {
-    private readonly ScopedMediatorFactory _scopedMediatorFactory;
+    private readonly IMediator _mediator;
 
-    public CalculationResultCompletedProcessor(ScopedMediatorFactory scopedMediatorFactory)
+    public CalculationResultCompletedProcessor(IMediator mediator)
     {
-        _scopedMediatorFactory = scopedMediatorFactory;
+        _mediator = mediator;
     }
 
-    public ReadOnlyCollection<string> EventTypesToHandle => new(new[]
-    {
-        CalculationResultCompleted.EventName,
-    });
+    public string EventTypeToHandle => CalculationResultCompleted.EventName;
 
     public Task ProcessAsync(IntegrationEvent integrationEvent)
     {
@@ -47,8 +43,7 @@ public class CalculationResultCompletedProcessor : IIntegrationEventProcessor
 
         var forwardAggregationResult = CreateForwardAggregationResult(calculationResultCompletedIntegrationEvent);
 
-        using var scopedMediator = _scopedMediatorFactory.Create();
-        var task = scopedMediator.Mediator.Send(forwardAggregationResult);
+        var task = _mediator.Send(forwardAggregationResult);
 
         return task;
     }
@@ -61,7 +56,8 @@ public class CalculationResultCompletedProcessor : IIntegrationEventProcessor
 
     private static CalculationResultCompleted ParseIntegrationEvent(IntegrationEvent integrationEvent)
     {
-        var messageByteArray = integrationEvent.Message.ToByteArray();
-        return CalculationResultCompleted.Parser.ParseFrom(messageByteArray);
+        var message = (CalculationResultCompleted)integrationEvent.Message;
+
+        return message;
     }
 }

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventProcessors;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.Mediator;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -25,9 +24,7 @@ public static class IntegrationEventsConfiguration
     {
         services.AddTransient<IDataRetention, ReceivedIntegrationEventsRetention>();
 
-        services.AddTransient<IntegrationEventRegistrar>();
+        services.AddTransient<IntegrationEventRegister>();
         services.AddTransient<IIntegrationEventProcessor, CalculationResultCompletedProcessor>();
-
-        services.AddTransient<ScopedMediatorFactory>();
     }
 }

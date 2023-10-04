@@ -13,6 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
@@ -28,21 +31,29 @@ public class IntegrationEventHandler : IIntegrationEventHandler
 #pragma warning restore CA1711
 {
     private readonly ILogger<IntegrationEventHandler> _logger;
-    private readonly IntegrationEventRegistrar _integrationEventRegistrar;
-    private readonly IntegrationEventProcessorFactory _integrationEventProcessorFactory;
+    private readonly IntegrationEventRegister _integrationEventRegister;
+    private readonly ReadOnlyCollection<IIntegrationEventProcessor> _integrationEventProcessors;
 
-    public IntegrationEventHandler(ILogger<IntegrationEventHandler> logger, IntegrationEventRegistrar integrationEventRegistrar, IntegrationEventProcessorFactory integrationEventProcessorFactory)
+    public IntegrationEventHandler(ILogger<IntegrationEventHandler> logger, IntegrationEventRegister integrationEventRegister, IEnumerable<IIntegrationEventProcessor> integrationEventProcessors)
     {
         _logger = logger;
-        _integrationEventRegistrar = integrationEventRegistrar;
-        _integrationEventProcessorFactory = integrationEventProcessorFactory;
+        _integrationEventRegister = integrationEventRegister;
+        _integrationEventProcessors = new ReadOnlyCollection<IIntegrationEventProcessor>(integrationEventProcessors.ToList());
     }
 
     public async Task HandleAsync(IntegrationEvent integrationEvent)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        var registerResult = await _integrationEventRegistrar.RegisterAsync(integrationEvent.EventIdentification.ToString(), integrationEvent.EventName).ConfigureAwait(false);
+        var processorResult = GetProcessor(integrationEvent.EventName);
+
+        if (!processorResult.CanHandle)
+            return;
+
+        if (processorResult.Processor == null)
+            throw new ArgumentNullException(nameof(processorResult.Processor), "Processor shouldn't be null if CanHandle is true");
+
+        var registerResult = await _integrationEventRegister.RegisterAsync(integrationEvent.EventIdentification.ToString(), integrationEvent.EventName).ConfigureAwait(false);
 
         if (registerResult != RegisterIntegrationEventResult.EventRegistered)
         {
@@ -50,7 +61,13 @@ public class IntegrationEventHandler : IIntegrationEventHandler
             return;
         }
 
-        var processor = _integrationEventProcessorFactory.Get(integrationEvent.EventName);
-        await processor.ProcessAsync(integrationEvent).ConfigureAwait(false);
+        await processorResult.Processor.ProcessAsync(integrationEvent).ConfigureAwait(false);
+    }
+
+    private (IIntegrationEventProcessor? Processor, bool CanHandle) GetProcessor(string eventType)
+    {
+        var processor = _integrationEventProcessors.SingleOrDefault(i => i.CanHandle(eventType));
+
+        return (processor, processor != null);
     }
 }

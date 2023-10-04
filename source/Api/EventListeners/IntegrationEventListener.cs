@@ -25,13 +25,13 @@ namespace Energinet.DataHub.EDI.Api.EventListeners;
 public class IntegrationEventListener
 {
     private readonly ILogger<IntegrationEventListener> _logger;
-    private readonly IntegrationEventRegistrar _eventRegistrar;
+    private readonly IntegrationEventRegister _eventRegister;
     private readonly ISubscriber _subscriber;
 
-    public IntegrationEventListener(ILogger<IntegrationEventListener> logger, IntegrationEventRegistrar eventRegistrar, ISubscriber subscriber)
+    public IntegrationEventListener(ILogger<IntegrationEventListener> logger, IntegrationEventRegister eventRegister, ISubscriber subscriber)
     {
         _logger = logger;
-        _eventRegistrar = eventRegistrar;
+        _eventRegister = eventRegister;
         _subscriber = subscriber;
     }
 
