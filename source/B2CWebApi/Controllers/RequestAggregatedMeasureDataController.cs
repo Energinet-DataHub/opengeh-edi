@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.B2CWebApi.Clients;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
@@ -37,6 +38,7 @@ public class RequestAggregatedMeasureDataController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "request-aggregated-measured-data:view")]
     public async Task<ActionResult> RequestAsync(RequestAggregatedMeasureDataMarketRequest request, CancellationToken cancellationToken)
     {
         var currentUser = _userContext.CurrentUser;
