@@ -14,6 +14,9 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
+using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Documents;
@@ -34,6 +37,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.Aggreg
 public class WhenAnAggregationResultIsAvailableTests : TestBase
 {
     private readonly CalculationResultCompletedEventBuilder _eventBuilder = new();
+    private readonly Guid _eventId1 = Guid.NewGuid();
 
     public WhenAnAggregationResultIsAvailableTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
@@ -43,7 +47,14 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     [Fact]
     public async Task Non_profiled_consumption_result_is_sent_the_energy_supplier()
     {
-        await HavingReceivedIntegrationEventAsync(CalculationResultCompleted.EventName).ConfigureAwait(false);
+        _eventBuilder
+            .WithProcessType(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing)
+            .AggregatedBy(SampleData.GridAreaCode, null, SampleData.EnergySupplierNumber.Value)
+            .ResultOf(TimeSeriesType.NonProfiledConsumption)
+            .WithResolution(Resolution.Quarter)
+            .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod);
+
+        await HavingReceivedIntegrationEventAsync(CalculationResultCompleted.EventName, _eventBuilder.Build()).ConfigureAwait(false);
 
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.EnergySupplier, BusinessReason.BalanceFixing);
         outgoingMessage
@@ -224,10 +235,15 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
     }
 
-    private async Task HavingReceivedIntegrationEventAsync(string eventType)
+    private async Task HavingReceivedIntegrationEventAsync(string eventType, CalculationResultCompleted calculationResultCompleted)
     {
-        await GetService<IntegrationEventRegistrar>().RegisterAsync(Guid.NewGuid().ToString(), eventType).ConfigureAwait(false);
-        await ProcessReceivedIntegrationEventsAsync().ConfigureAwait(false);
-        await HavingProcessedInternalTasksAsync().ConfigureAwait(false);
+        var integrationEventHandler = GetService<IIntegrationEventHandler>();
+
+        var integrationEvent = new IntegrationEvent(_eventId1, eventType, 1, calculationResultCompleted);
+
+        await integrationEventHandler.HandleAsync(integrationEvent).ConfigureAwait(false);
+        // await GetService<IntegrationEventRegister>().RegisterAsync(Guid.NewGuid().ToString(), eventType).ConfigureAwait(false);
+        // await ProcessReceivedIntegrationEventsAsync().ConfigureAwait(false);
+        // await HavingProcessedInternalTasksAsync().ConfigureAwait(false);
     }
 }

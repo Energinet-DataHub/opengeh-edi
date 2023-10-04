@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventProcessors;
@@ -21,10 +20,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.In
 
 public class TestIntegrationEventProcessor : IIntegrationEventProcessor
 {
-    public ReadOnlyCollection<string> EventTypesToHandle => new(new[] { nameof(TestIntegrationEvent) });
+    public string EventTypeToHandle => nameof(TestIntegrationEvent);
+
+    public int ProcessedCount { get; set; }
 
     public Task ProcessAsync(IntegrationEvent integrationEvent)
     {
-        throw new System.NotImplementedException();
+        ProcessedCount++;
+
+        return Task.CompletedTask;
     }
 }

@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Text.Json;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
+using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventProcessors;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using MediatR;
 using Microsoft.Extensions.Logging;
 using Xunit;
 
@@ -32,63 +30,66 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.In
 public class WhenAnIntegrationEventIsReceivedTests : TestBase
 {
     private readonly string _testIntegrationEventType = nameof(TestIntegrationEvent);
-    private readonly string _eventId1 = "1";
+    private readonly IntegrationEvent _testIntegrationEvent1;
+    private readonly IntegrationEvent _unknownIntegrationEvent;
 
-    private readonly IntegrationEventRegistrar _registrar;
+    private readonly TestIntegrationEventProcessor _testIntegrationEventProcessor;
+    private readonly IIntegrationEventHandler _handler;
 
     public WhenAnIntegrationEventIsReceivedTests(DatabaseFixture databaseFixture)
      : base(databaseFixture)
     {
-        _registrar = new IntegrationEventRegistrar(GetService<B2BContext>(), GetService<ISystemDateTimeProvider>(), new IIntegrationEventProcessor[]
-        {
-            new TestIntegrationEventProcessor(),
-        });
+        _testIntegrationEventProcessor = new TestIntegrationEventProcessor();
+        _handler = new IntegrationEventHandler(
+                GetService<ILogger<IntegrationEventHandler>>(),
+                GetService<IntegrationEventRegister>(),
+                new[] { _testIntegrationEventProcessor })
+            ;
+
+        _testIntegrationEvent1 = new IntegrationEvent(Guid.NewGuid(), _testIntegrationEventType, 1, new TestIntegrationEvent());
+        _unknownIntegrationEvent = new IntegrationEvent(Guid.NewGuid(), "unknown-event-type", 1, null!);
     }
 
+    private string EventId1 => _testIntegrationEvent1.EventIdentification.ToString();
+
+    private string EventIdUnknown => _unknownIntegrationEvent.EventIdentification.ToString();
+
     [Fact]
-    public async Task Event_is_registered_if_it_is_a_known_event()
+    public async Task Event_is_registered_and_processed_if_it_is_a_known_event()
     {
-        var registeredResult = await RegisterEvent(_eventId1, _testIntegrationEventType).ConfigureAwait(false);
+        await HandleEvent(_testIntegrationEvent1).ConfigureAwait(false);
 
-        var isRegistered = await EventIsRegisteredInDatabase(_eventId1).ConfigureAwait(false);
-
-        Assert.Equal(RegisterIntegrationEventResult.EventRegistered, registeredResult);
+        var isRegistered = await EventIsRegisteredInDatabase(EventId1).ConfigureAwait(false);
         Assert.True(isRegistered);
+        Assert.Equal(1, _testIntegrationEventProcessor.ProcessedCount);
     }
 
     [Fact]
-    public async Task Event_is_not_registered_if_it_is_unknown()
+    public async Task Event_is_not_registered_and_processed_if_it_is_unknown()
     {
-        var unknownEventTypeResult = await RegisterEvent(_eventId1, "unknown-event-type").ConfigureAwait(false);
+        await HandleEvent(_unknownIntegrationEvent).ConfigureAwait(false);
 
-        var isRegistered = await EventIsRegisteredInDatabase(_eventId1).ConfigureAwait(false);
+        var isRegistered = await EventIsRegisteredInDatabase(EventIdUnknown).ConfigureAwait(false);
 
-        Assert.Equal(RegisterIntegrationEventResult.EventTypeIsUnknown, unknownEventTypeResult);
         Assert.False(isRegistered);
+        Assert.Equal(0, _testIntegrationEventProcessor.ProcessedCount);
     }
 
     [Fact]
     public async Task Event_registration_is_omitted_if_already_registered()
     {
-        var firstRegisterResult = await RegisterEvent(_eventId1, _testIntegrationEventType).ConfigureAwait(false);
+        await HandleEvent(_testIntegrationEvent1).ConfigureAwait(false);
+        await HandleEvent(_testIntegrationEvent1).ConfigureAwait(false);
 
-        var secondRegisterResult = await RegisterEvent(_eventId1, _testIntegrationEventType).ConfigureAwait(false);
+        var isRegistered = await EventIsRegisteredInDatabase(EventId1).ConfigureAwait(false);
 
-        var isRegistered = await EventIsRegisteredInDatabase(_eventId1).ConfigureAwait(false);
-
-        Assert.Equal(RegisterIntegrationEventResult.EventRegistered, firstRegisterResult);
-        Assert.Equal(RegisterIntegrationEventResult.EventIsAlreadyRegistered, secondRegisterResult);
         Assert.True(isRegistered);
+        Assert.Equal(1, _testIntegrationEventProcessor.ProcessedCount);
     }
 
-    private static byte[] CreateEventPayload(TestIntegrationEvent @event)
+    private Task HandleEvent(IntegrationEvent integrationEvent)
     {
-        return JsonSerializer.SerializeToUtf8Bytes(@event);
-    }
-
-    private Task<RegisterIntegrationEventResult> RegisterEvent(string eventId, string eventType)
-    {
-        return _registrar.RegisterAsync(eventId, eventType);
+        return _handler.HandleAsync(integrationEvent);
     }
 
     private async Task<bool> EventIsRegisteredInDatabase(string eventId)

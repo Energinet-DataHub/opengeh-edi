@@ -13,12 +13,15 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
+using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
@@ -119,11 +122,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             await ProcessInternalCommandsAsync().ConfigureAwait(false);
         }
 
-        protected Task HavingProcessedInternalTasksAsync()
-        {
-            return ProcessBackgroundTasksAsync();
-        }
-
         protected Task ProcessReceivedInboxEventsAsync()
         {
             return ProcessBackgroundTasksAsync();
@@ -146,11 +144,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             {
                 await ProcessInternalCommandsAsync();
             }
-        }
-
-        private Task ProcessReceivedIntegrationEventsAsync()
-        {
-            return ProcessBackgroundTasksAsync();
         }
 
         private Task ProcessBackgroundTasksAsync()
@@ -177,6 +170,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
             _services.AddTransient<IRequestHandler<TestCommand, Unit>, TestCommandHandler>();
             _services.AddTransient<IRequestHandler<TestCreateOutgoingMessageCommand, Unit>, TestCreateOutgoingCommandHandler>();
+
+            _services.AddTransient<IIntegrationEventHandler, IntegrationEventHandler>();
 
             CompositionRoot.Initialize(_services)
                 .AddAuthentication()

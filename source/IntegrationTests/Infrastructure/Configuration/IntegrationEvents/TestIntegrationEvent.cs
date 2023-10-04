@@ -11,10 +11,29 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+using System;
+using Google.Protobuf;
+using Google.Protobuf.Reflection;
+
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
-#pragma warning disable
-public class TestIntegrationEvent
+public class TestIntegrationEvent : IMessage
 {
-    public string Property1 { get; set; } = "Test";
+    public MessageDescriptor Descriptor { get; } = null!;
+
+    public void MergeFrom(CodedInputStream input)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void WriteTo(CodedOutputStream output)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int CalculateSize()
+    {
+        throw new NotImplementedException();
+    }
 }
