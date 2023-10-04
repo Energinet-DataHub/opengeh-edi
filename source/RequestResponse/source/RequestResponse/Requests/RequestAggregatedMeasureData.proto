@@ -21,11 +21,11 @@ option csharp_namespace = "Energinet.DataHub.Edi.Requests";
 message RequestAggregatedMeasureData {
   string MessageId = 1;
   string SenderId = 2;
-  string SenderRole = 3;
+  string SenderRoleCode = 3;
   string ReceiverId = 4;
-  string ReceiverRole = 5;
+  string ReceiverRoleCode = 5;
   string AuthenticatedUser = 6;
-  string AuthenticatedUserRole = 7;
+  string AuthenticatedUserRoleCode = 7;
   optional string BusinessReason = 8;
   optional string MessageType = 9;
   repeated Serie Series = 10;
