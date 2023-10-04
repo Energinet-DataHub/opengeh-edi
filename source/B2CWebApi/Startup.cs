@@ -26,6 +26,8 @@ namespace Energinet.DataHub.EDI.B2CWebApi;
 
 public class Startup
 {
+    private const string DomainName = "EDI.B2CWebApi";
+
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
     {
         Configuration = configuration;
@@ -65,6 +67,7 @@ public class Startup
 
         serviceCollection.AddOptions<JwtOptions>().Bind(Configuration);
         serviceCollection.AddOptions<EdiOptions>().Bind(Configuration);
+        serviceCollection.AddHttpLoggingScope(DomainName);
 
         AddJwtTokenSecurity(serviceCollection);
         serviceCollection
