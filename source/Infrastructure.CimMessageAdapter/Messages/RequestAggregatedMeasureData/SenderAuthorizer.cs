@@ -31,13 +31,13 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
             _marketActorAuthenticator = marketActorAuthenticator;
         }
 
-        public Task<Result> AuthorizeAsync(string senderNumber, string senderRole, string? authenticatedUser = null, string? authenticatedUserRole = null)
+        public Task<Result> AuthorizeAsync(string senderNumber, string senderRoleCode, string? authenticatedUser = null, string? authenticatedUserRole = null)
         {
             if (senderNumber == null) throw new ArgumentNullException(nameof(senderNumber));
-            if (senderRole == null) throw new ArgumentNullException(nameof(senderRole));
+            if (senderRoleCode == null) throw new ArgumentNullException(nameof(senderRoleCode));
             EnsureSenderIdMatches(senderNumber, authenticatedUser);
-            EnsureSenderRole(senderRole);
-            EnsureCurrentUserHasRequiredRole(senderRole, authenticatedUserRole);
+            EnsureSenderRoleCode(senderRoleCode);
+            EnsureCurrentUserHasRequiredRole(senderRoleCode, authenticatedUserRole);
 
             return Task.FromResult(_validationErrors.Count == 0 ? Result.Succeeded() : Result.Failure(_validationErrors.ToArray()));
         }
@@ -62,11 +62,11 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
             }
         }
 
-        private void EnsureSenderRole(string senderRole)
+        private void EnsureSenderRoleCode(string senderRoleCode)
         {
-            if (!senderRole.Equals(MarketRole.EnergySupplier.Code, StringComparison.OrdinalIgnoreCase)
-                && !senderRole.Equals(MarketRole.MeteredDataResponsible.Code, StringComparison.OrdinalIgnoreCase)
-                && !senderRole.Equals(MarketRole.BalanceResponsibleParty.Code, StringComparison.OrdinalIgnoreCase))
+            if (!senderRoleCode.Equals(MarketRole.EnergySupplier.Code, StringComparison.OrdinalIgnoreCase)
+                && !senderRoleCode.Equals(MarketRole.MeteredDataResponsible.Code, StringComparison.OrdinalIgnoreCase)
+                && !senderRoleCode.Equals(MarketRole.BalanceResponsibleParty.Code, StringComparison.OrdinalIgnoreCase))
             {
                 _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
             }

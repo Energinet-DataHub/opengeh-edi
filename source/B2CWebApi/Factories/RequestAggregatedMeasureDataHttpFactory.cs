@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Globalization;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.Edi.Requests;
 
@@ -26,15 +27,16 @@ public static class RequestAggregatedMeasureDataHttpFactory
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
 
+        string senderRoleCode = EnsureRoleCode(role);
         var data = new RequestAggregatedMeasureData
         {
             MessageId = Guid.NewGuid().ToString(),
             SenderId = actorNumber,
-            SenderRole = role,
+            SenderRole = senderRoleCode,
             ReceiverId = "5790001330552",
             ReceiverRole = "DGL",
             AuthenticatedUser = actorNumber,
-            AuthenticatedUserRole = role,
+            AuthenticatedUserRole = senderRoleCode,
             BusinessReason = request.BusinessReason,
             MessageType = "E74",
         };
@@ -78,5 +80,27 @@ public static class RequestAggregatedMeasureDataHttpFactory
                 serie.MarketEvaluationPointType = "E20";
                 break;
         }
+    }
+
+    private static string EnsureRoleCode(string senderRole)
+    {
+        if (senderRole == null) throw new ArgumentNullException(nameof(senderRole));
+
+        if (senderRole.Equals(MarketRole.MeteredDataResponsible.Name, StringComparison.OrdinalIgnoreCase))
+        {
+            return MarketRole.MeteredDataResponsible.Code;
+        }
+
+        if (senderRole.Equals(MarketRole.EnergySupplier.Name, StringComparison.OrdinalIgnoreCase))
+        {
+            return MarketRole.EnergySupplier.Code;
+        }
+
+        if (senderRole.Equals(MarketRole.BalanceResponsibleParty.Name, StringComparison.OrdinalIgnoreCase))
+        {
+            return MarketRole.BalanceResponsibleParty.Code;
+        }
+
+        return senderRole;
     }
 }
