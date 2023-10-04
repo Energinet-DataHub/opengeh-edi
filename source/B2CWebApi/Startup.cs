@@ -16,6 +16,7 @@ using System.Text.Json.Serialization;
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
+using Energinet.DataHub.Core.Logging.LoggingMiddleware;
 using Energinet.DataHub.EDI.B2CWebApi.Clients;
 using Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
@@ -90,6 +91,7 @@ public class Startup
             options.EnableTryItOutByDefault();
         });
 
+        app.UseLoggingScope();
         app.UseRouting();
 
         app.UseHttpsRedirection();
