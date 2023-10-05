@@ -58,9 +58,9 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
     [Fact]
     public async Task Event_is_registered_and_processed_if_it_is_a_known_event()
     {
-        await HandleEvent(_testIntegrationEvent1).ConfigureAwait(false);
+        await HandleEvent(_testIntegrationEvent1);
 
-        var isRegistered = await EventIsRegisteredInDatabase(EventId1).ConfigureAwait(false);
+        var isRegistered = await EventIsRegisteredInDatabase(EventId1);
         Assert.True(isRegistered);
         Assert.Equal(1, _testIntegrationEventProcessor.ProcessedCount);
     }
@@ -68,9 +68,9 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
     [Fact]
     public async Task Event_is_not_registered_and_processed_if_it_is_unknown()
     {
-        await HandleEvent(_unknownIntegrationEvent).ConfigureAwait(false);
+        await HandleEvent(_unknownIntegrationEvent);
 
-        var isRegistered = await EventIsRegisteredInDatabase(EventIdUnknown).ConfigureAwait(false);
+        var isRegistered = await EventIsRegisteredInDatabase(EventIdUnknown);
 
         Assert.False(isRegistered);
         Assert.Equal(0, _testIntegrationEventProcessor.ProcessedCount);
@@ -82,7 +82,7 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
         await HandleEvent(_testIntegrationEvent1);
         await HandleEvent(_testIntegrationEvent1);
 
-        var isRegistered = await EventIsRegisteredInDatabase(EventId1).ConfigureAwait(false);
+        var isRegistered = await EventIsRegisteredInDatabase(EventId1);
 
         Assert.True(isRegistered);
         Assert.Equal(1, _testIntegrationEventProcessor.ProcessedCount);
@@ -100,7 +100,7 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
 
         await Task.WhenAll(tasks);
 
-        var isRegistered = await EventIsRegisteredInDatabase(EventId1).ConfigureAwait(false);
+        var isRegistered = await EventIsRegisteredInDatabase(EventId1);
 
         Assert.True(isRegistered);
         Assert.Equal(1, _testIntegrationEventProcessor.ProcessedCount);
