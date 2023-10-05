@@ -237,6 +237,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             _services.AddScoped<IDocumentWriter, AggregationResultEbixDocumentWriter>();
             _services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataXmlDocumentWriter>();
             _services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataJsonDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataEbixDocumentWriter>();
 
             _services.AddScoped<IMessageRecordParser, MessageRecordParser>();
         }
