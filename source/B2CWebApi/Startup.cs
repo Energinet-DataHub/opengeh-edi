@@ -104,7 +104,6 @@ public class Startup
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers().RequireAuthorization();
-            endpoints.MapControllers();
             endpoints.MapLiveHealthChecks();
             endpoints.MapReadyHealthChecks();
         });
