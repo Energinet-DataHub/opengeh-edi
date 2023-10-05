@@ -23,7 +23,6 @@ internal static class AggregationsConfiguration
 {
     internal static void Configure(IServiceCollection services)
     {
-        services.AddScoped<IAggregationResultForwardingRepository, AggregationResultForwardingRepository>();
         services.AddTransient<IRequestHandler<ForwardAggregationResult, Unit>, ForwardAggregationResultHandler>();
     }
 }

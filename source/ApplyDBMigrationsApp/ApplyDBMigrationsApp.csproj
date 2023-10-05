@@ -121,6 +121,8 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202309181437 Rename ProcessId to BusinessProcessId on UpdateCustomerMasterDataTransactions.sql" />
     <EmbeddedResource Include="Scripts\Model\202309221259 Add unique key constraint on BusinessTransactionId in AggregatedMeasureDataProcesses.sql" />
     <EmbeddedResource Include="Scripts\Model\202310021322 Remove EventPayload from ReceivedIntegrationEvent table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202310051507 Remove columns from ReceivedIntegrationEvent table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202310051531 Drop AggregatedTimeSeriesTransactions table.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241101 Consolidated BtwoB model.sql" />

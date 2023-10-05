@@ -71,7 +71,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
         {
             var cleanupStatement =
                 $"DELETE FROM [dbo].[MoveInTransactions] " +
-                $"DELETE FROM [dbo].[AggregatedTimeSeriesTransactions] " +
                 $"DELETE FROM [dbo].[UpdateCustomerMasterDataTransactions] " +
                 $"DELETE FROM [dbo].[MessageRegistry] " +
                 $"DELETE FROM [dbo].[TransactionRegistry]" +

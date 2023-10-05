@@ -49,8 +49,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 
         public DbSet<AggregatedMeasureDataProcess> AggregatedMeasureDataProcesses { get; private set; }
 
-        public DbSet<AggregationResultForwarding> AggregatedTimeSeriesTransactions { get; private set; }
-
         public DbSet<OutgoingMessage> OutgoingMessages { get; private set; }
 
         public DbSet<QueuedInternalCommand> QueuedInternalCommands { get; private set; }
@@ -58,8 +56,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
         public DbSet<EnqueuedMessage> EnqueuedMessages { get; private set; }
 
         public DbSet<ArchivedMessage> ArchivedMessages { get; private set; }
-
-        public DbSet<ReceivedIntegrationEvent> ReceivedIntegrationEvents { get; private set; }
 
         public DbSet<ActorMessageQueue> ActorMessageQueues { get; private set; }
 
@@ -76,10 +72,8 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
 
             modelBuilder.ApplyConfiguration(new AggregatedMeasureDataProcessEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new AggregationResultForwardingEntityConfiguration(_serializer));
             modelBuilder.ApplyConfiguration(new OutgoingMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QueuedInternalCommandEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new ReceivedIntegrationEventEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ArchivedMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ActorMessageQueueEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MarketDocumentEntityConfiguration());
