@@ -139,7 +139,7 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
                 }
 
                 await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, "260").ConfigureAwait(false);
-                await writer.WriteStringAsync(CimCode.Of(SettlementType.From(timeSeries.SettlementType))).ConfigureAwait(false);
+                await writer.WriteStringAsync(EbixCode.Of(SettlementType.From(timeSeries.SettlementType))).ConfigureAwait(false);
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
             }
 
