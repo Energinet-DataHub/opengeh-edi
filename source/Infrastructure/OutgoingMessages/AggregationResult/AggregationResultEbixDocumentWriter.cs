@@ -54,13 +54,9 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
         {
             throw new NotSupportedException("Multiple diffent settlementVersions in same message is not supported in ebIX");
         }
-        else if (settlementVersions?.Count() == 1)
-        {
-            return settlementVersions.First();
-        }
         else
         {
-            return null;
+            return settlementVersions?.Count() == 1 ? settlementVersions.First() : null;
         }
     }
 

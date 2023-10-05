@@ -16,6 +16,9 @@ using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AggregationResult;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Xunit;
 
@@ -200,7 +203,7 @@ public class AggregationResultForwardingTests
     private static AggregationResultMessage CreateMessage(Aggregation result)
     {
         var transaction = CreateTransaction();
-        return transaction.CreateMessage(result);
+        return transaction.CreateMessage(result, new AggregationResultXmlDocumentWriter(new MessageRecordParser(new Serializer())));
     }
 
     private static AggregationResultForwarding CreateTransaction()

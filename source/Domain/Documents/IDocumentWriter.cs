@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 
 namespace Energinet.DataHub.EDI.Domain.Documents;
 
@@ -39,4 +40,18 @@ public interface IDocumentWriter
     /// <param name="header"></param>
     /// <param name="marketActivityRecords"></param>
     Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords);
+
+    /// <summary>
+    /// Write a payloadpart of the message. To be used when bundling messages
+    /// </summary>
+    /// <param name="marketActivityRecord"></param>
+    /// <returns>A string containing the output</returns>
+    Task<string> WritePayloadAsync(string marketActivityRecord);
+
+    /// <summary>
+    /// Write a payloadpart of the message. Uses the provided data as input as input
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns>A string containing</returns>
+    Task<string> WritePayloadAsync<T>(object data);
 }

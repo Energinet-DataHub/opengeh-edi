@@ -44,12 +44,19 @@ public abstract class EbixDocumentWriter : IDocumentWriter
 
     public virtual async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
     {
+        ArgumentNullException.ThrowIfNull(marketActivityRecords);
         var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = new UTF8Encoding(false), Async = true, Indent = true };
         var stream = new MemoryStream();
         using var writer = XmlWriter.Create(stream, settings);
         string? settlementVersion = ExtractSettlementVersion(marketActivityRecords);
         await WriteHeaderAsync(header, _documentDetails, writer, settlementVersion).ConfigureAwait(false);
+        foreach (var marketActivityRecord in marketActivityRecords)
+        {
+            await writer.WriteRawAsync(marketActivityRecord).ConfigureAwait(false);
+        }
+
         await WriteMarketActivityRecordsAsync(marketActivityRecords, writer).ConfigureAwait(false);
+
         await WriteEndAsync(writer).ConfigureAwait(false);
         stream.Position = 0;
         return stream;
@@ -63,7 +70,17 @@ public abstract class EbixDocumentWriter : IDocumentWriter
 
     public bool HandlesFormat(DocumentFormat format)
     {
-        return format == DocumentFormat.Xml;
+        return format == DocumentFormat.Ebix;
+    }
+
+    public async Task<string> WritePayloadAsync(string marketActivityRecord)
+    {
+        return await WritePayloadInternalAsync(marketActivityRecord).ConfigureAwait(false);
+    }
+
+    public async Task<string> WritePayloadAsync<T>(object data)
+    {
+        return await WritePayloadInternalAsync(_parser.From((T)data)).ConfigureAwait(false);
     }
 
     protected virtual string? ExtractSettlementVersion(IReadOnlyCollection<string> marketActivityPayloads)
@@ -119,5 +136,16 @@ public abstract class EbixDocumentWriter : IDocumentWriter
     private Task WriteHeaderAsync(MessageHeader header, DocumentDetails documentDetails, XmlWriter writer, string? settlementVersion)
     {
         return EbixHeaderWriter.WriteAsync(writer, header, documentDetails, _reasonCode, settlementVersion);
+    }
+
+    private async Task<string> WritePayloadInternalAsync(string marketActivityRecord)
+    {
+        var settings = new XmlWriterSettings { OmitXmlDeclaration = true, Encoding = new UTF8Encoding(false), Async = true, Indent = true };
+        var stream = new MemoryStream();
+        using var writer = XmlWriter.Create(stream, settings);
+        await WriteMarketActivityRecordsAsync(new List<string>() { marketActivityRecord }, writer).ConfigureAwait(false);
+        stream.Position = 0;
+        using var streamReader = new StreamReader(stream);
+        return await streamReader.ReadToEndAsync().ConfigureAwait(false);
     }
 }

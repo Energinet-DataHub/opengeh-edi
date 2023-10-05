@@ -22,16 +22,18 @@ public sealed class Bundle
     private int _messageCount;
 
 #pragma warning disable
+
     private Bundle()
     {
     }
 
-    internal Bundle(BundleId id, BusinessReason businessReason, DocumentType documentTypeInBundle, int maxNumberOfMessagesInABundle)
+    internal Bundle(BundleId id, BusinessReason businessReason, DocumentType documentTypeInBundle, int maxNumberOfMessagesInABundle, DocumentFormat outputFormat)
     {
         _maxNumberOfMessagesInABundle = maxNumberOfMessagesInABundle;
         Id = id;
         BusinessReason = businessReason;
         DocumentTypeInBundle = documentTypeInBundle;
+        OutputFormat = outputFormat;
     }
 
     internal DocumentType DocumentTypeInBundle { get; }
@@ -44,9 +46,12 @@ public sealed class Bundle
 
     public bool IsDequeued { get; private set; }
 
+    internal DocumentFormat OutputFormat { get; }
+
     internal void Add(OutgoingMessage outgoingMessage)
     {
-        if (IsClosed) return;
+        if (IsClosed)
+            return;
         outgoingMessage.AssignToBundle(Id);
         _messageCount++;
         CloseBundleIfFull();

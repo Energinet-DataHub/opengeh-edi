@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.Exceptions;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.Application.OutgoingMessages;
@@ -33,22 +34,19 @@ public class DocumentFactory
         _documentWriters = documentWriters.ToList();
     }
 
+    public IDocumentWriter GetWriter(DocumentType documentType, DocumentFormat documentFormat)
+    {
+        var documentWriter = _documentWriters.FirstOrDefault(writer => writer.HandlesType(documentType) && writer.HandlesFormat(documentFormat));
+
+        return documentWriter ?? throw new OutgoingMessageException($"Could not handle document type {documentType} in format {documentFormat}");
+    }
+
     public Task<Stream> CreateFromAsync(OutgoingMessageBundle bundle, DocumentFormat documentFormat, Instant timestamp)
     {
         ArgumentNullException.ThrowIfNull(documentFormat);
         ArgumentNullException.ThrowIfNull(bundle);
 
-        var documentWriter =
-            _documentWriters.FirstOrDefault(writer =>
-            {
-                return writer.HandlesType(bundle.DocumentType) &&
-                       writer.HandlesFormat(documentFormat);
-            });
-
-        if (documentWriter is null)
-        {
-            throw new OutgoingMessageException($"Could not handle document type {bundle.DocumentType} in format {documentFormat}");
-        }
+        var documentWriter = GetWriter(bundle.DocumentType, documentFormat);
 
         return documentWriter.WriteAsync(
             new MessageHeader(
@@ -60,5 +58,20 @@ public class DocumentFactory
                 bundle.AssignedBundleId.Id.ToString(),
                 timestamp),
             bundle.OutgoingMessages.Select(message => message.MessageRecord).ToList());
+    }
+
+    public async Task<string> CreatePayloadAsync(string payload, DocumentFormat documentFormat, DocumentType documentType)
+    {
+        ArgumentNullException.ThrowIfNull(documentFormat);
+        ArgumentNullException.ThrowIfNull(payload);
+
+        var documentWriter =
+            _documentWriters.FirstOrDefault(writer =>
+            {
+                return writer.HandlesType(documentType) &&
+                       writer.HandlesFormat(documentFormat);
+            }) ?? throw new OutgoingMessageException($"Could not handle document type {documentType} in format {documentFormat}");
+
+        return await documentWriter.WritePayloadAsync(payload).ConfigureAwait(false);
     }
 }

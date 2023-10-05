@@ -13,8 +13,10 @@
 // limitations under the License.
 
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 using Dapper;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Application.OutgoingMessages;
@@ -24,6 +26,9 @@ using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AggregationResult;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using NodaTime.Extensions;
@@ -80,6 +85,24 @@ public class WhenEnqueueingTests : TestBase
     }
 
     [Fact]
+    public async Task Can_peek_message_in_right_format()
+    {
+        var message = CreateOutgoingMessage();
+        await EnqueueMessage(message);
+        var command = new PeekCommand(message.ReceiverId, message.DocumentType.Category, message.ReceiverRole, DocumentFormat.Xml);
+
+        var result = await InvokeCommandAsync(command);
+
+        var xml = new XmlDocument();
+        if (result.Bundle is not null)
+        {
+            xml.Load(result.Bundle);
+        }
+
+        Assert.NotNull(xml);
+    }
+
+    [Fact]
     public async Task Can_dequeue_bundle()
     {
         var message = CreateOutgoingMessage();
@@ -110,7 +133,8 @@ public class WhenEnqueueingTests : TestBase
                 SettlementType.NonProfiled.Name,
                 BusinessReason.BalanceFixing.Name,
                 new ActorGrouping("1234567891911", null),
-                new GridAreaDetails("805", "1234567891045")));
+                new GridAreaDetails("805", "1234567891045")),
+            new AggregationResultXmlDocumentWriter(new MessageRecordParser(new Serializer())));
         return message;
     }
 

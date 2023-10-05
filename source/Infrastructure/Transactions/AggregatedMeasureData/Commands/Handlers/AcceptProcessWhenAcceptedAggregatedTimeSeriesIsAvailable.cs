@@ -15,8 +15,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.Transactions;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 using MediatR;
 
@@ -25,11 +29,17 @@ namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureDat
 public class AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable : IRequestHandler<AcceptedAggregatedTimeSerie, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
+    private readonly IOutgoingMessagesConfigurationRepository _outgoingMessagesConfigurationRepository;
+    private readonly DocumentFactory _documentFactory;
 
     public AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable(
-        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
+        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository,
+        IOutgoingMessagesConfigurationRepository outgoingMessagesConfigurationRepository,
+        DocumentFactory documentFactory)
     {
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
+        _outgoingMessagesConfigurationRepository = outgoingMessagesConfigurationRepository;
+        _documentFactory = documentFactory;
     }
 
     public async Task<Unit> Handle(AcceptedAggregatedTimeSerie request, CancellationToken cancellationToken)
@@ -40,8 +50,11 @@ public class AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable : IRequest
             .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
         var aggregation = AggregationFactory.Create(process, request.AggregatedTimeSerie);
+        var documentFormat = await _outgoingMessagesConfigurationRepository.GetDocumentFormatAsync(process.RequestedByActorId, MarketRole.FromCode(process.RequestedByActorRoleCode), DocumentType.NotifyAggregatedMeasureData).ConfigureAwait(false);
 
-        process.IsAccepted(aggregation);
+        var documentWriter = _documentFactory.GetWriter(DocumentType.NotifyAggregatedMeasureData, documentFormat);
+
+        process.IsAccepted(aggregation, documentWriter);
 
         return Unit.Value;
     }

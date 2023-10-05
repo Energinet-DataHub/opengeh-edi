@@ -42,6 +42,7 @@ using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AggregationResult;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Dequeue;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.OutgoingMessagesConfiguration;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Peek;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.Transactions;
@@ -179,6 +180,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             _services.AddSingleton<IActorRepository, ActorRepository>();
             _services.AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>();
             _services.AddScoped<OutgoingMessageEnqueuer>();
+            _services.AddSingleton<IOutgoingMessagesConfigurationRepository, OutgoingMessagesConfigurationRepository>();
             return this;
         }
 

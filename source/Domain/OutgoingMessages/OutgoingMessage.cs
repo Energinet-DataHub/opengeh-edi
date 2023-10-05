@@ -52,7 +52,7 @@ namespace Energinet.DataHub.EDI.Domain.OutgoingMessages
 
         public MarketRole SenderRole { get; }
 
-        public string MessageRecord { get; }
+        public string MessageRecord { get; private set; }
 
         public Receiver Receiver => Receiver.Create(ReceiverId, ReceiverRole);
 
@@ -84,6 +84,11 @@ namespace Energinet.DataHub.EDI.Domain.OutgoingMessages
         public void AssignToBundle(BundleId bundleId)
         {
             AssignedBundleId = bundleId;
+        }
+
+        public void ChangeMessageRecord(string newRecord)
+        {
+            MessageRecord = newRecord;
         }
     }
 }

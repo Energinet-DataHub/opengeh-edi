@@ -15,9 +15,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Linq;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Xml;
 using Energinet.DataHub.EDI.Domain.Documents;
@@ -42,11 +44,18 @@ public abstract class DocumentWriter : IDocumentWriter
 
     public virtual async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
     {
+        ArgumentNullException.ThrowIfNull(marketActivityRecords);
+
         var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = new UTF8Encoding(false), Async = true, Indent = true };
         var stream = new MemoryStream();
         using var writer = XmlWriter.Create(stream, settings);
         await WriteHeaderAsync(header, _documentDetails, writer).ConfigureAwait(false);
-        await WriteMarketActivityRecordsAsync(marketActivityRecords, writer).ConfigureAwait(false);
+        foreach (var marketActivityRecord in marketActivityRecords)
+        {
+            await writer.WriteRawAsync(marketActivityRecord).ConfigureAwait(false);
+        }
+
+        //await WriteMarketActivityRecordsAsync(marketActivityRecords, writer).ConfigureAwait(false);
         await WriteEndAsync(writer).ConfigureAwait(false);
         stream.Position = 0;
         return stream;
@@ -61,6 +70,16 @@ public abstract class DocumentWriter : IDocumentWriter
     public bool HandlesFormat(DocumentFormat format)
     {
         return format == DocumentFormat.Xml;
+    }
+
+    public async Task<string> WritePayloadAsync(string marketActivityRecord)
+    {
+        return await WritePayloadInternalAsync(marketActivityRecord).ConfigureAwait(false);
+    }
+
+    public async Task<string> WritePayloadAsync<T>(object data)
+    {
+        return await WritePayloadInternalAsync(_parser.From((T)data)).ConfigureAwait(false);
     }
 
     protected abstract Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer);
@@ -111,5 +130,30 @@ public abstract class DocumentWriter : IDocumentWriter
     private Task WriteHeaderAsync(MessageHeader header, DocumentDetails documentDetails, XmlWriter writer)
     {
         return XmlHeaderWriter.WriteAsync(writer, header, documentDetails, _reasonCode);
+    }
+
+    private async Task<string> WritePayloadInternalAsync(string marketActivityRecord)
+    {
+        var settings = new XmlWriterSettings { OmitXmlDeclaration = true, Encoding = new UTF8Encoding(false), Async = true, Indent = true };
+        var stream = new MemoryStream();
+        using var writer = XmlWriter.Create(stream, settings);
+        await writer.WriteStartDocumentAsync().ConfigureAwait(false);
+        await writer.WriteStartElementAsync(
+            _documentDetails.Prefix,
+            _documentDetails.Type,
+            _documentDetails.XmlNamespace).ConfigureAwait(false);
+
+        await WriteMarketActivityRecordsAsync(new List<string>() { marketActivityRecord }, writer).ConfigureAwait(false);
+        await WriteEndAsync(writer).ConfigureAwait(false);
+
+        stream.Position = 0;
+
+        var xmlDocument = new XmlDocument();
+        xmlDocument.Load(stream);
+        var ret = xmlDocument.DocumentElement?.InnerXml;
+
+        var ns = $" xmlns:{_documentDetails.Prefix}=\"{_documentDetails.XmlNamespace}\""; //xmlns:cim=\"urn:ediel.org:measure:notifyaggregatedmeasuredata:0:1\
+        ret = ret?.Replace(ns, string.Empty, StringComparison.InvariantCultureIgnoreCase);
+        return ret ?? string.Empty;
     }
 }

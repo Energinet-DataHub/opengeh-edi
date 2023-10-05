@@ -21,7 +21,10 @@ using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AggregationResult;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using NodaTime.Extensions;
@@ -56,7 +59,7 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         var acceptedAggregation = CreateAcceptedAggregation();
 
         // Act
-        process.IsAccepted(acceptedAggregation);
+        process.IsAccepted(acceptedAggregation, new AggregationResultXmlDocumentWriter(new MessageRecordParser(new Serializer())));
 
         // Assert
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);
@@ -75,8 +78,8 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         var acceptedAggregation = CreateAcceptedAggregation();
 
         // Act
-        process.IsAccepted(acceptedAggregation);
-        process.IsAccepted(acceptedAggregation);
+        process.IsAccepted(acceptedAggregation, new AggregationResultXmlDocumentWriter(new MessageRecordParser(new Serializer())));
+        process.IsAccepted(acceptedAggregation, new AggregationResultXmlDocumentWriter(new MessageRecordParser(new Serializer())));
 
         // Assert
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);

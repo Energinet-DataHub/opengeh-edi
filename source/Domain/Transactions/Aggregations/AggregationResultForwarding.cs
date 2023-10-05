@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 
 namespace Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
@@ -27,10 +28,10 @@ public class AggregationResultForwarding : Entity
 
     public ProcessId Id { get; }
 
-    public AggregationResultMessage CreateMessage(Aggregation result)
+    public AggregationResultMessage CreateMessage(Aggregation result, IDocumentWriter documentWriter)
     {
         ArgumentNullException.ThrowIfNull(result);
 
-        return AggregationResultMessageFactory.CreateMessage(result, Id);
+        return AggregationResultMessageFactory.CreateMessage(result, Id, documentWriter);
     }
 }

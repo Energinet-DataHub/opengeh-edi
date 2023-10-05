@@ -42,14 +42,14 @@ public class ActorMessageQueue : Entity
         return new ActorMessageQueue(receiver);
     }
 
-    public void Enqueue(OutgoingMessage outgoingMessage, int? maxNumberOfMessagesInABundle = null)
+    public void Enqueue(OutgoingMessage outgoingMessage, DocumentFormat documentFormat,  int? maxNumberOfMessagesInABundle = null)
     {
         ArgumentNullException.ThrowIfNull(outgoingMessage);
         EnsureApplicable(outgoingMessage);
 
-        var currentBundle = CurrentBundleOf(BusinessReason.From(outgoingMessage.BusinessReason), outgoingMessage.DocumentType) ??
+        var currentBundle = CurrentBundleOf(BusinessReason.From(outgoingMessage.BusinessReason), outgoingMessage.DocumentType, documentFormat) ??
                             CreateBundleOf(BusinessReason.From(outgoingMessage.BusinessReason), outgoingMessage.DocumentType,
-                                SetMaxNumberOfMessagesInABundle(maxNumberOfMessagesInABundle, outgoingMessage.DocumentType));
+                                SetMaxNumberOfMessagesInABundle(maxNumberOfMessagesInABundle, outgoingMessage.DocumentType), documentFormat);
 
         currentBundle.Add(outgoingMessage);
     }
@@ -92,17 +92,18 @@ public class ActorMessageQueue : Entity
         }
     }
 
-    private Bundle? CurrentBundleOf(BusinessReason businessReason, DocumentType messageType)
+    private Bundle? CurrentBundleOf(BusinessReason businessReason, DocumentType messageType, DocumentFormat documentFormat)
     {
         return _bundles.FirstOrDefault(bundle =>
             bundle.IsClosed == false
             && bundle.DocumentTypeInBundle == messageType
-            && bundle.BusinessReason == businessReason);
+            && bundle.BusinessReason == businessReason
+            && bundle.OutputFormat == documentFormat);
     }
 
-    private Bundle CreateBundleOf(BusinessReason businessReason, DocumentType messageType, int maxNumberOfMessagesInABundle)
+    private Bundle CreateBundleOf(BusinessReason businessReason, DocumentType messageType, int maxNumberOfMessagesInABundle, DocumentFormat documentFormat)
     {
-        var bundle = new Bundle(BundleId.New(), businessReason, messageType, maxNumberOfMessagesInABundle);
+        var bundle = new Bundle(BundleId.New(), businessReason, messageType, maxNumberOfMessagesInABundle, documentFormat);
         _bundles.Add(bundle);
         return bundle;
     }

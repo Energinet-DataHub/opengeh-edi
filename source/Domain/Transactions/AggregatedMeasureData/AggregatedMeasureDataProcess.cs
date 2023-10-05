@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
@@ -121,13 +122,13 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
             }
         }
 
-        public void IsAccepted(Aggregation aggregation)
+        public void IsAccepted(Aggregation aggregation, IDocumentWriter documentWriter)
         {
             if (aggregation == null) throw new ArgumentNullException(nameof(aggregation));
 
             if (_state == State.Sent)
             {
-                _messages.Add(AggregationResultMessageFactory.CreateMessage(aggregation, ProcessId));
+                _messages.Add(AggregationResultMessageFactory.CreateMessage(aggregation, ProcessId, documentWriter));
                 _state = State.Accepted;
             }
         }

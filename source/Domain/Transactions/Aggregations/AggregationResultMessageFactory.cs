@@ -13,64 +13,68 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 
 namespace Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
 public static class AggregationResultMessageFactory
 {
-    public static AggregationResultMessage CreateMessage(Aggregation result, ProcessId processId)
+    public static AggregationResultMessage CreateMessage(Aggregation result, ProcessId processId, IDocumentWriter documentWriter)
     {
         if (result == null) throw new ArgumentNullException(nameof(result));
         if (processId == null) throw new ArgumentNullException(nameof(processId));
 
         if (IsTotalResultPerGridArea(result))
         {
-            return MessageForTheGridOperator(result, processId);
+            return MessageForTheGridOperator(result, processId, documentWriter);
         }
 
         if (ResultIsForTheEnergySupplier(result))
         {
-            return MessageForTheEnergySupplier(result, processId);
+            return MessageForTheEnergySupplier(result, processId, documentWriter);
         }
 
         if (ResultIsForTheBalanceResponsible(result))
         {
-            return MessageForTheBalanceResponsible(result, processId);
+            return MessageForTheBalanceResponsible(result, processId, documentWriter);
         }
 
         throw new InvalidOperationException("Could not determine the receiver of the aggregation result");
     }
 
-    private static bool ResultIsForTheEnergySupplier(Aggregation result)
+    public static bool ResultIsForTheEnergySupplier(Aggregation result)
     {
-        return result.ActorGrouping!.EnergySupplierNumber is not null &&
+        ArgumentException.ThrowIfNullOrEmpty(nameof(result));
+        return result?.ActorGrouping!.EnergySupplierNumber is not null &&
                result.ActorGrouping?.BalanceResponsibleNumber is null;
     }
 
-    private static bool IsTotalResultPerGridArea(Aggregation result)
+    public static bool IsTotalResultPerGridArea(Aggregation result)
     {
-        return result.ActorGrouping?.BalanceResponsibleNumber == null &&
-               result.ActorGrouping?.EnergySupplierNumber == null;
+        ArgumentException.ThrowIfNullOrEmpty(nameof(result));
+        return result?.ActorGrouping?.BalanceResponsibleNumber == null &&
+               result?.ActorGrouping?.EnergySupplierNumber == null;
     }
 
-    private static bool ResultIsForTheBalanceResponsible(Aggregation result)
+    public static bool ResultIsForTheBalanceResponsible(Aggregation result)
     {
-        return result.ActorGrouping!.BalanceResponsibleNumber is not null;
+        ArgumentException.ThrowIfNullOrEmpty(nameof(result));
+        return result?.ActorGrouping!.BalanceResponsibleNumber is not null;
     }
 
-    private static AggregationResultMessage MessageForTheGridOperator(Aggregation result, ProcessId processId)
+    private static AggregationResultMessage MessageForTheGridOperator(Aggregation result, ProcessId processId, IDocumentWriter documentWriter)
     {
-        return AggregationResultMessage.Create(ActorNumber.Create(result.GridAreaDetails!.OperatorNumber), MarketRole.MeteredDataResponsible, processId, result);
+        return AggregationResultMessage.Create(ActorNumber.Create(result.GridAreaDetails!.OperatorNumber), MarketRole.MeteredDataResponsible, processId, result, documentWriter);
     }
 
-    private static AggregationResultMessage MessageForTheEnergySupplier(Aggregation result, ProcessId processId)
+    private static AggregationResultMessage MessageForTheEnergySupplier(Aggregation result, ProcessId processId, IDocumentWriter documentWriter)
     {
-        return AggregationResultMessage.Create(ActorNumber.Create(result.ActorGrouping!.EnergySupplierNumber!), MarketRole.EnergySupplier, processId, result);
+        return AggregationResultMessage.Create(ActorNumber.Create(result.ActorGrouping!.EnergySupplierNumber!), MarketRole.EnergySupplier, processId, result, documentWriter);
     }
 
-    private static AggregationResultMessage MessageForTheBalanceResponsible(Aggregation result, ProcessId processId)
+    private static AggregationResultMessage MessageForTheBalanceResponsible(Aggregation result, ProcessId processId, IDocumentWriter documentWriter)
     {
-        return AggregationResultMessage.Create(ActorNumber.Create(result.ActorGrouping!.BalanceResponsibleNumber!), MarketRole.BalanceResponsibleParty, processId, result);
+        return AggregationResultMessage.Create(ActorNumber.Create(result.ActorGrouping!.BalanceResponsibleNumber!), MarketRole.BalanceResponsibleParty, processId, result, documentWriter);
     }
 }
