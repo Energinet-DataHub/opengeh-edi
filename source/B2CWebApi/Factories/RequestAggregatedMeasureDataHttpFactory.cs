@@ -26,15 +26,16 @@ public static class RequestAggregatedMeasureDataHttpFactory
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
 
+        string senderRoleCode = MapRoleNameToCode(role);
         var data = new RequestAggregatedMeasureData
         {
             MessageId = Guid.NewGuid().ToString(),
             SenderId = actorNumber,
-            SenderRole = role,
+            SenderRoleCode = senderRoleCode,
             ReceiverId = "5790001330552",
-            ReceiverRole = "DGL",
+            ReceiverRoleCode = MarketRole.CalculationResponsibleRole.Code,
             AuthenticatedUser = actorNumber,
-            AuthenticatedUserRole = role,
+            AuthenticatedUserRoleCode = senderRoleCode,
             BusinessReason = request.BusinessReason,
             MessageType = "E74",
         };
@@ -78,5 +79,27 @@ public static class RequestAggregatedMeasureDataHttpFactory
                 serie.MarketEvaluationPointType = "E20";
                 break;
         }
+    }
+
+    private static string MapRoleNameToCode(string roleName)
+    {
+        if (roleName == null) throw new ArgumentNullException(nameof(roleName));
+
+        if (roleName.Equals(MarketRole.MeteredDataResponsible.Name, StringComparison.OrdinalIgnoreCase))
+        {
+            return MarketRole.MeteredDataResponsible.Code;
+        }
+
+        if (roleName.Equals(MarketRole.EnergySupplier.Name, StringComparison.OrdinalIgnoreCase))
+        {
+            return MarketRole.EnergySupplier.Code;
+        }
+
+        if (roleName.Equals(MarketRole.BalanceResponsibleParty.Name, StringComparison.OrdinalIgnoreCase))
+        {
+            return MarketRole.BalanceResponsibleParty.Code;
+        }
+
+        return roleName;
     }
 }

@@ -170,8 +170,8 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
     [InlineData("E17", "", TimeSeriesType.TotalConsumption)]
     [InlineData("E17", null, TimeSeriesType.TotalConsumption)]
     [InlineData("E20", null, TimeSeriesType.NetExchangePerGa)]
-    [InlineData("E17", "D01", TimeSeriesType.NonProfiledConsumption)]
-    [InlineData("E17", "E02", TimeSeriesType.FlexConsumption)]
+    [InlineData("E17", "E02", TimeSeriesType.NonProfiledConsumption)]
+    [InlineData("E17", "D01", TimeSeriesType.FlexConsumption)]
     public async Task Grid_Operator_requesting_aggregated_time_series_from_wholesale(
         string evaluationPointType,
         string? settlementMethod,
@@ -230,8 +230,8 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
 
     [Theory]
     [InlineData("E18", null, TimeSeriesType.Production)]
-    [InlineData("E17", "D01", TimeSeriesType.NonProfiledConsumption)]
-    [InlineData("E17", "E02", TimeSeriesType.FlexConsumption)]
+    [InlineData("E17", "E02", TimeSeriesType.NonProfiledConsumption)]
+    [InlineData("E17", "D01", TimeSeriesType.FlexConsumption)]
     public async Task Energy_supplier_requesting_aggregated_time_series_from_wholesale(
         string evaluationPointType,
         string? settlementMethod,
@@ -298,8 +298,8 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
 
     [Theory]
     [InlineData("E18", null, TimeSeriesType.Production)]
-    [InlineData("E17", "D01", TimeSeriesType.NonProfiledConsumption)]
-    [InlineData("E17", "E02", TimeSeriesType.FlexConsumption)]
+    [InlineData("E17", "E02", TimeSeriesType.NonProfiledConsumption)]
+    [InlineData("E17", "D01", TimeSeriesType.FlexConsumption)]
     public async Task Balance_responsible_requesting_aggregated_time_series_from_wholesale(
         string evaluationPointType,
         string? settlementMethod,
@@ -365,8 +365,8 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
 
     [Theory]
     [InlineData("E18", null, TimeSeriesType.Production)]
-    [InlineData("E17", "D01", TimeSeriesType.NonProfiledConsumption)]
-    [InlineData("E17", "E02", TimeSeriesType.FlexConsumption)]
+    [InlineData("E17", "E02", TimeSeriesType.NonProfiledConsumption)]
+    [InlineData("E17", "D01", TimeSeriesType.FlexConsumption)]
     public async Task Energy_supplier_per_balance_responsible_requesting_aggregated_time_series_from_wholesale(
         string evaluationPointType,
         string? settlementMethod,
