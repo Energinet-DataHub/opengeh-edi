@@ -36,7 +36,7 @@ public static class RequestAggregatedMeasureDataHttpFactory
             ReceiverRoleCode = MarketRole.CalculationResponsibleRole.Code,
             AuthenticatedUser = actorNumber,
             AuthenticatedUserRoleCode = senderRoleCode,
-            BusinessReason = request.BusinessReason,
+            BusinessReason = MapBusinessReason(request.BusinessReason),
             MessageType = "E74",
         };
 
@@ -55,6 +55,25 @@ public static class RequestAggregatedMeasureDataHttpFactory
         data.Series.Add(serie);
 
         return data;
+    }
+
+    private static string MapBusinessReason(BusinessReason businessReason)
+    {
+        switch (businessReason)
+        {
+            case BusinessReason.BalanceFixing:
+                return "D04";
+            case BusinessReason.PreliminaryAggregation:
+                return "D03";
+            case BusinessReason.WholesaleFixing:
+                return "D05";
+            case BusinessReason.Correction:
+                return "D32";
+            case BusinessReason.LatestAvailableResult:
+                return "D09";
+            default:
+                throw new ArgumentOutOfRangeException(nameof(businessReason), businessReason, "Unknown business reason");
+        }
     }
 
     private static void MapEvaluationPointTypeAndSettlementMethod(Serie serie, RequestAggregatedMeasureDataMarketRequest request)
