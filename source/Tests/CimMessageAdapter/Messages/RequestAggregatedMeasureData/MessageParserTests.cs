@@ -76,7 +76,7 @@ public class MessageParserTests
     [MemberData(nameof(CreateMessagesWithSingleAndMultipleTransactions))]
     public async Task Successfully_parsed(DocumentFormat format, Stream message)
     {
-        var result = await _requestAggregatedMeasureDataMarketMessageParser.ParseAsync(message, format, CancellationToken.None).ConfigureAwait(false);
+        var result = await _requestAggregatedMeasureDataMarketMessageParser.ParseAsync(message, format, CancellationToken.None);
 
         Assert.True(result.Success);
         var marketMessage = result!.MarketMessage!;
@@ -107,7 +107,7 @@ public class MessageParserTests
     [MemberData(nameof(CreateBadMessages))]
     public async Task Messages_with_errors(DocumentFormat format, Stream message, string expectedError)
     {
-        var result = await _requestAggregatedMeasureDataMarketMessageParser.ParseAsync(message, format, CancellationToken.None).ConfigureAwait(false);
+        var result = await _requestAggregatedMeasureDataMarketMessageParser.ParseAsync(message, format, CancellationToken.None);
 
         Assert.True(result.Errors.Count > 0);
         Assert.True(result.Success == false);
@@ -151,13 +151,13 @@ public class MessageParserTests
     private static string ChangeJsonFileSizeTo(string jsonDoc, int addSeriesUntilMbSize)
     {
         var newFileSizeInBytes = addSeriesUntilMbSize * 1024 * 1024;
-        int indexOfSeries = jsonDoc.IndexOf("Series", StringComparison.Ordinal);
+        var indexOfSeries = jsonDoc.IndexOf("Series", StringComparison.Ordinal);
         if (indexOfSeries < 0)
         {
             return jsonDoc;
         }
 
-        int seriesStartAtIndex = indexOfSeries + "Series".Length + 4;
+        var seriesStartAtIndex = indexOfSeries + "Series".Length + 4;
         var jsonDocSb = new StringBuilder(jsonDoc);
 
         while (jsonDocSb.Length < newFileSizeInBytes)

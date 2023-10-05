@@ -205,6 +205,14 @@ internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationRe
         return this;
     }
 
+    public IAssertAggregationResultDocument HasSettlementMethod(SettlementType settlementMethod)
+    {
+        Assert.Equal(CimCode.Of(settlementMethod), FirstTimeSeriesElement()
+            .GetProperty("marketEvaluationPoint.settlementMethod").GetProperty("value")
+            .ToString());
+        return this;
+    }
+
     private JsonElement FirstTimeSeriesElement()
     {
         return _root.GetProperty("Series").EnumerateArray().ToList()[0];

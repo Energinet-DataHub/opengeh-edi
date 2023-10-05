@@ -62,7 +62,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
         };
 
         // Act
-        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestRejected), rejectEvent, process.ProcessId.Id).ConfigureAwait(false);
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestRejected), rejectEvent, process.ProcessId.Id);
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
@@ -90,7 +90,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
             DocumentType.RejectRequestAggregatedMeasureData.Name,
             businessReason.Name,
             roleOfReceiver,
-            GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+            GetService<IDatabaseConnectionFactory>());
     }
 
     private AggregatedMeasureDataProcess BuildProcess()

@@ -24,7 +24,7 @@ using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
-namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Xml;
+namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Ebix;
 
 public abstract class EbixDocumentWriter : IDocumentWriter
 {

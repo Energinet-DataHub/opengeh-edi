@@ -42,7 +42,7 @@ public class WhenADequeueIsRequestedTests : TestBase
     [Fact]
     public async Task Dequeue_is_unsuccessful_when_bundle_does_not_exist()
     {
-        var dequeueResult = await InvokeCommandAsync(new DequeueCommand(Guid.NewGuid().ToString(), MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId))).ConfigureAwait(false);
+        var dequeueResult = await InvokeCommandAsync(new DequeueCommand(Guid.NewGuid().ToString(), MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)));
 
         Assert.False(dequeueResult.Success);
     }
@@ -52,9 +52,9 @@ public class WhenADequeueIsRequestedTests : TestBase
     {
         var unknownMessageId = Guid.NewGuid().ToString();
         // Created an Actor Queue with a bundle.
-        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync().ConfigureAwait(false);
+        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync();
 
-        var dequeueResult = await InvokeCommandAsync(new DequeueCommand(unknownMessageId, MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId))).ConfigureAwait(false);
+        var dequeueResult = await InvokeCommandAsync(new DequeueCommand(unknownMessageId, MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)));
 
         Assert.False(dequeueResult.Success);
     }
@@ -62,19 +62,18 @@ public class WhenADequeueIsRequestedTests : TestBase
     [Fact]
     public async Task Dequeue_is_Successful()
     {
-        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync().ConfigureAwait(false);
+        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync();
         var peekResult = await InvokeCommandAsync(new PeekCommand(
             ActorNumber.Create(SampleData.NewEnergySupplierNumber),
             MessageCategory.Aggregations,
             MarketRole.EnergySupplier,
-            DocumentFormat.Xml)).ConfigureAwait(false);
+            DocumentFormat.Xml));
 
-        var dequeueResult = await InvokeCommandAsync(new DequeueCommand(peekResult.MessageId.GetValueOrDefault().ToString(), MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId))).ConfigureAwait(false);
+        var dequeueResult = await InvokeCommandAsync(new DequeueCommand(peekResult.MessageId.GetValueOrDefault().ToString(), MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)));
 
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var found = await connection
-            .QuerySingleOrDefaultAsync<bool>("SELECT IsDequeued FROM [dbo].Bundles")
-            .ConfigureAwait(false);
+            .QuerySingleOrDefaultAsync<bool>("SELECT IsDequeued FROM [dbo].Bundles");
 
         Assert.True(dequeueResult.Success);
         Assert.True(found);

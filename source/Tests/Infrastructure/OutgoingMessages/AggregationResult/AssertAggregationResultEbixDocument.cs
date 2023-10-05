@@ -164,4 +164,10 @@ public class AssertAggregationResultEbixDocument : IAssertAggregationResultDocum
         _documentAsserter.HasValue("PayloadEnergyTimeSeries[1]/OriginalBusinessDocument", originalTransactionIdReference);
         return this;
     }
+
+    public IAssertAggregationResultDocument HasSettlementMethod(SettlementType settlementMethod)
+    {
+        _documentAsserter.HasValue("PayloadEnergyTimeSeries[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod", EbixCode.Of(settlementMethod));
+        return this;
+    }
 }

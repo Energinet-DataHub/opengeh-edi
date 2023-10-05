@@ -12,17 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.AspNetCore.Mvc;
+namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
+/// <summary>
+/// Responsible for carrying the market message data from the incoming message before any data validation.
+/// </summary>
+public record RequestAggregatedMeasureDataMarketRequest(
+    string BusinessReason,
+    MeteringPointType MeteringPointType,
+    string StartDate,
+    string? EndDate,
+    string? GridArea,
+    string? EnergySupplierId,
+    string? BalanceResponsibleId);
 
-[ApiController]
-[Route("[controller]")]
-public class HelloWorldController : ControllerBase
+public enum MeteringPointType
 {
-    [HttpPost]
-    public new string Request()
-    {
-        return "Hello World";
-    }
+    Production,
+    FlexConsumption,
+    TotalConsumption,
+    NonProfiledConsumption,
+    Exchange,
 }

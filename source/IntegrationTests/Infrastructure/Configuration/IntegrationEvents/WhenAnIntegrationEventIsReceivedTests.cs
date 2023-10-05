@@ -79,8 +79,8 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
     [Fact]
     public async Task Event_registration_is_omitted_if_already_registered()
     {
-        await HandleEvent(_testIntegrationEvent1).ConfigureAwait(false);
-        await HandleEvent(_testIntegrationEvent1).ConfigureAwait(false);
+        await HandleEvent(_testIntegrationEvent1);
+        await HandleEvent(_testIntegrationEvent1);
 
         var isRegistered = await EventIsRegisteredInDatabase(EventId1).ConfigureAwait(false);
 
@@ -98,7 +98,7 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
             tasks.Add(task);
         });
 
-        await Task.WhenAll(tasks).ConfigureAwait(false);
+        await Task.WhenAll(tasks);
 
         var isRegistered = await EventIsRegisteredInDatabase(EventId1).ConfigureAwait(false);
 
@@ -113,7 +113,7 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
 
     private async Task<bool> EventIsRegisteredInDatabase(string eventId)
     {
-        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var isRegistered = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM dbo.ReceivedIntegrationEvents WHERE Id = @EventId", new { EventId = eventId, });
         return isRegistered;
     }
