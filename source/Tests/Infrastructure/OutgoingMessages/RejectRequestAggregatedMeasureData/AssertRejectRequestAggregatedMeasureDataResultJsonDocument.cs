@@ -27,13 +27,13 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 
-internal sealed class RejectRequestAggregatedMeasureDataResultJsonDocument : IAssertRejectedAggregatedMeasureDataResultDocument
+internal sealed class AssertRejectRequestAggregatedMeasureDataResultJsonDocument : IAssertRejectedAggregatedMeasureDataResultDocument
 {
     private readonly JsonSchemaProvider _schemas = new(new CimJsonSchemas());
     private readonly JsonDocument _document;
     private readonly JsonElement _root;
 
-    public RejectRequestAggregatedMeasureDataResultJsonDocument(Stream document)
+    public AssertRejectRequestAggregatedMeasureDataResultJsonDocument(Stream document)
     {
         _document = JsonDocument.Parse(document);
         _root = _document.RootElement.GetProperty("RejectRequestAggregatedMeasureData_MarketDocument");

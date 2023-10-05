@@ -16,10 +16,12 @@ using System.IO;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AggregationResult;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.AggregationResult;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
@@ -43,6 +45,7 @@ public class RejectRequestAggregatedMeasureDataResultDocumentWriterTests : IClas
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
+    [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Can_create_document(string documentFormat)
     {
         var document = await CreateDocument(
@@ -67,7 +70,13 @@ public class RejectRequestAggregatedMeasureDataResultDocumentWriterTests : IClas
     {
         var documentHeader = resultBuilder.BuildHeader();
         var records = _parser.From(resultBuilder.BuildRejectedTimeSerie());
-        if (documentFormat == DocumentFormat.Xml)
+        if (documentFormat == DocumentFormat.Ebix)
+        {
+            return new RejectRequestAggregatedMeasureDataEbixDocumentWriter(_parser).WriteAsync(
+                documentHeader,
+                new[] { records, });
+        }
+        else if (documentFormat == DocumentFormat.Xml)
         {
             return new RejectRequestAggregatedMeasureDataXmlDocumentWriter(_parser).WriteAsync(
                 documentHeader,
@@ -83,14 +92,19 @@ public class RejectRequestAggregatedMeasureDataResultDocumentWriterTests : IClas
 
     private IAssertRejectedAggregatedMeasureDataResultDocument AssertDocument(Stream document, DocumentFormat documentFormat)
     {
-        if (documentFormat == DocumentFormat.Xml)
+        if (documentFormat == DocumentFormat.Ebix)
+        {
+            var assertEbixDocument = AssertEbixDocument.Document(document, "ns0");
+            return new AssertRejectedAggregatedMeasureDataResultEbixDocument(assertEbixDocument);
+        }
+        else if (documentFormat == DocumentFormat.Xml)
         {
             var assertXmlDocument = AssertXmlDocument.Document(document, "cim", _documentValidation.Validator);
             return new AssertRejectedAggregatedMeasureDataResultXmlDocument(assertXmlDocument);
         }
         else
         {
-            return new RejectRequestAggregatedMeasureDataResultJsonDocument(document);
+            return new AssertRejectRequestAggregatedMeasureDataResultJsonDocument(document);
         }
     }
 }

@@ -20,6 +20,8 @@ using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Xml;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Xml;
 
 namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
@@ -35,12 +37,13 @@ public class RejectRequestAggregatedMeasureDataXmlDocumentWriter : DocumentWrite
                 "cim",
                 "ERR"),
             parser,
-            "A02")
+            CimCode.Of(ReasonCode.FullyRejected))
     {
     }
 
     public override bool HandlesType(DocumentType documentType)
     {
+        if (documentType == null) throw new ArgumentNullException(nameof(documentType));
         return DocumentType.RejectRequestAggregatedMeasureData == documentType;
     }
 
