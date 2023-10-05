@@ -18,7 +18,7 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
 public class ReasonCode : EnumerationType
 {
-    public static readonly ReasonCode FullyAcceptet = new(0, nameof(FullyAcceptet), "A01");
+    public static readonly ReasonCode FullyAccepted = new(0, nameof(FullyAccepted), "A01");
     public static readonly ReasonCode FullyRejected = new(1, nameof(FullyRejected), "A02");
 
     public ReasonCode(int id, string name, string code)

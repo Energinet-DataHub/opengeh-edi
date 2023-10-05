@@ -169,7 +169,7 @@ public static class EbixCode
     {
         ArgumentNullException.ThrowIfNull(reasonCode);
 
-        if (reasonCode == ReasonCode.FullyAcceptet)
+        if (reasonCode == ReasonCode.FullyAccepted)
             return "39";
         if (reasonCode == ReasonCode.FullyRejected)
             return "41";

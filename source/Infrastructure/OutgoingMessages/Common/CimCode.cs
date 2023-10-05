@@ -173,7 +173,7 @@ public static class CimCode
     {
         ArgumentNullException.ThrowIfNull(reasonCode);
 
-        if (reasonCode == ReasonCode.FullyAcceptet)
+        if (reasonCode == ReasonCode.FullyAccepted)
             return "A01";
         if (reasonCode == ReasonCode.FullyRejected)
             return "A02";
