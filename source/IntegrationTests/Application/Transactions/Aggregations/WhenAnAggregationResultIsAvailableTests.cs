@@ -16,19 +16,16 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
-using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.Wholesale.Contracts.Events;
-using Google.Protobuf;
 using Xunit;
 using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
 
@@ -48,7 +45,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     public async Task Non_profiled_consumption_result_is_sent_the_energy_supplier()
     {
         _eventBuilder
-            .WithProcessType(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing)
+            .WithProcessType(ProcessType.BalanceFixing)
             .AggregatedBy(SampleData.GridAreaCode, null, SampleData.EnergySupplierNumber.Value)
             .ResultOf(TimeSeriesType.NonProfiledConsumption)
             .WithResolution(Resolution.Quarter)
@@ -72,7 +69,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     public async Task Total_non_profiled_consumption_is_sent_to_the_grid_operator()
     {
         _eventBuilder
-            .WithProcessType(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing)
+            .WithProcessType(ProcessType.BalanceFixing)
             .WithResolution(Resolution.Quarter)
             .WithMeasurementUnit(QuantityUnit.Kwh)
             .AggregatedBy(SampleData.GridAreaCode, null, null)
@@ -95,7 +92,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     public async Task Total_production_result_is_sent_to_the_grid_operator()
     {
         _eventBuilder
-            .WithProcessType(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing)
+            .WithProcessType(ProcessType.BalanceFixing)
             .WithResolution(Resolution.Quarter)
             .WithMeasurementUnit(QuantityUnit.Kwh)
             .AggregatedBy(SampleData.GridAreaCode, null, null)
@@ -122,7 +119,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     public async Task Consumption_per_energy_supplier_result_is_sent_to_the_balance_responsible()
     {
         _eventBuilder
-            .WithProcessType(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing)
+            .WithProcessType(ProcessType.BalanceFixing)
             .WithResolution(Resolution.Quarter)
             .WithMeasurementUnit(QuantityUnit.Kwh)
             .AggregatedBy(SampleData.GridAreaCode, SampleData.BalanceResponsibleNumber.Value, SampleData.EnergySupplierNumber.Value)
@@ -151,7 +148,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     public async Task Total_non_profiled_consumption_result_is_sent_to_the_balance_responsible()
     {
         _eventBuilder
-            .WithProcessType(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing)
+            .WithProcessType(ProcessType.BalanceFixing)
             .WithResolution(Resolution.Quarter)
             .WithMeasurementUnit(QuantityUnit.Kwh)
             .AggregatedBy(SampleData.GridAreaCode, SampleData.BalanceResponsibleNumber.Value, null)
@@ -177,10 +174,10 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     }
 
     [Theory]
-    [InlineData(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing, nameof(BusinessReason.BalanceFixing), TimeSeriesType.NetExchangePerGa)]
-    [InlineData(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing, nameof(BusinessReason.BalanceFixing), TimeSeriesType.NetExchangePerNeighboringGa)]
-    [InlineData(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.NetExchangePerGa)]
-    [InlineData(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.NetExchangePerNeighboringGa)]
+    [InlineData(ProcessType.BalanceFixing, nameof(BusinessReason.BalanceFixing), TimeSeriesType.NetExchangePerGa)]
+    [InlineData(ProcessType.BalanceFixing, nameof(BusinessReason.BalanceFixing), TimeSeriesType.NetExchangePerNeighboringGa)]
+    [InlineData(ProcessType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.NetExchangePerGa)]
+    [InlineData(ProcessType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.NetExchangePerNeighboringGa)]
     public async Task Exchange_is_sent_to_the_grid_operator(ProcessType processType, string businessReason, TimeSeriesType timeSeriesType)
     {
         _eventBuilder
@@ -203,8 +200,8 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     }
 
     [Theory]
-    [InlineData(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing, nameof(BusinessReason.BalanceFixing), TimeSeriesType.TotalConsumption)]
-    [InlineData(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.TotalConsumption)]
+    [InlineData(ProcessType.BalanceFixing, nameof(BusinessReason.BalanceFixing), TimeSeriesType.TotalConsumption)]
+    [InlineData(ProcessType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.TotalConsumption)]
     public async Task Total_consumption_is_sent_to_the_grid_operator(ProcessType processType, string businessReason, TimeSeriesType timeSeriesType)
     {
         _eventBuilder
@@ -242,8 +239,5 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         var integrationEvent = new IntegrationEvent(_eventId1, eventType, 1, calculationResultCompleted);
 
         await integrationEventHandler.HandleAsync(integrationEvent).ConfigureAwait(false);
-        // await GetService<IntegrationEventRegister>().RegisterAsync(Guid.NewGuid().ToString(), eventType).ConfigureAwait(false);
-        // await ProcessReceivedIntegrationEventsAsync().ConfigureAwait(false);
-        // await HavingProcessedInternalTasksAsync().ConfigureAwait(false);
     }
 }

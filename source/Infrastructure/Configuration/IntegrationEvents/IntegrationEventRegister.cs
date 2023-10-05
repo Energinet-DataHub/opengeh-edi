@@ -12,34 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventProcessors;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 
 public class IntegrationEventRegister
 {
-    private readonly B2BContext _context;
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
     private readonly ISystemDateTimeProvider _dateTimeProvider;
-    private readonly IReadOnlyCollection<IIntegrationEventProcessor> _processors;
 
-    public IntegrationEventRegister(B2BContext context, IDatabaseConnectionFactory databaseConnectionFactory, ISystemDateTimeProvider dateTimeProvider, IEnumerable<IIntegrationEventProcessor> processors)
+    public IntegrationEventRegister(IDatabaseConnectionFactory databaseConnectionFactory, ISystemDateTimeProvider dateTimeProvider)
     {
-        _context = context;
         _databaseConnectionFactory = databaseConnectionFactory;
         _dateTimeProvider = dateTimeProvider;
-        _processors = new ReadOnlyCollection<IIntegrationEventProcessor>(processors.ToList());
     }
 
     public async Task<RegisterIntegrationEventResult> RegisterAsync(string eventId, string eventType)

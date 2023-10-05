@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.In
 
 public class TestIntegrationEvent : IMessage
 {
-    public MessageDescriptor Descriptor { get; } = null!;
+    public MessageDescriptor Descriptor => null!;
 
     public void MergeFrom(CodedInputStream input)
     {
