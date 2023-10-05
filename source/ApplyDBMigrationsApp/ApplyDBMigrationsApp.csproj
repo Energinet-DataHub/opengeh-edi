@@ -120,12 +120,12 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202308210829 make receiver and sender nullable ArchivedMessages.sql" />
     <EmbeddedResource Include="Scripts\Model\202309181437 Rename ProcessId to BusinessProcessId on UpdateCustomerMasterDataTransactions.sql" />
     <EmbeddedResource Include="Scripts\Model\202309221259 Add unique key constraint on BusinessTransactionId in AggregatedMeasureDataProcesses.sql" />
+    <EmbeddedResource Include="Scripts\Model\202310051510 Change start and end time to strings on AggregatedMeasureDataProcesses.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241101 Consolidated BtwoB model.sql" />
     <EmbeddedResource Include="Scripts\Model\202225081511 Add grid operator id.sql" />
     <EmbeddedResource Include="Scripts\Model\202226081400 Make EnergySupplierNumber nullable.sql" />
-    <EmbeddedResource Include="Scripts\Seed\202210041540 Remove failed outgoing messages.sql" />
     <EmbeddedResource Include="Scripts\Seed\202301301357 Insert Reasons.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202322051044 Add Document to ArchivedMessage.sql" />
