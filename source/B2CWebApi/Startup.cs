@@ -16,6 +16,7 @@ using System.Text.Json.Serialization;
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
+using Energinet.DataHub.Core.Logging.LoggingMiddleware;
 using Energinet.DataHub.EDI.B2CWebApi.Clients;
 using Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
@@ -25,6 +26,8 @@ namespace Energinet.DataHub.EDI.B2CWebApi;
 
 public class Startup
 {
+    private const string DomainName = "EDI.B2CWebApi";
+
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
     {
         Configuration = configuration;
@@ -64,6 +67,7 @@ public class Startup
 
         serviceCollection.AddOptions<JwtOptions>().Bind(Configuration);
         serviceCollection.AddOptions<EdiOptions>().Bind(Configuration);
+        serviceCollection.AddHttpLoggingScope(DomainName);
 
         AddJwtTokenSecurity(serviceCollection);
         serviceCollection
@@ -90,6 +94,7 @@ public class Startup
             options.EnableTryItOutByDefault();
         });
 
+        app.UseLoggingScope();
         app.UseRouting();
 
         app.UseHttpsRedirection();
