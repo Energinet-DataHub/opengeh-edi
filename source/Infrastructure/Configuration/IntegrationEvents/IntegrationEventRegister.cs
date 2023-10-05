@@ -12,18 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Microsoft.Data.SqlClient;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 
 public class IntegrationEventRegister
 {
+    private const int UniqueConstraintSqlException = 2627;
+
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
     private readonly ISystemDateTimeProvider _dateTimeProvider;
 
@@ -40,7 +45,17 @@ public class IntegrationEventRegister
         if (await EventIsAlreadyRegisteredAsync(dbConnection, eventId).ConfigureAwait(false))
             return RegisterIntegrationEventResult.EventIsAlreadyRegistered;
 
-        await RegisterEventAsync(dbConnection, eventId, eventType, _dateTimeProvider.Now()).ConfigureAwait(false);
+        try
+        {
+            await RegisterEventAsync(dbConnection, eventId, eventType, _dateTimeProvider.Now()).ConfigureAwait(false);
+        }
+        catch (SqlException sqlException)
+        {
+            if (sqlException.Number == UniqueConstraintSqlException && sqlException.Message.Contains($"Violation of PRIMARY KEY constraint 'PK_Inbox'. Cannot insert duplicate key in object 'dbo.ReceivedIntegrationEvents'", StringComparison.OrdinalIgnoreCase))
+                return RegisterIntegrationEventResult.EventIsAlreadyRegistered;
+
+            throw;
+        }
 
         return RegisterIntegrationEventResult.EventRegistered;
     }

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
@@ -80,6 +81,24 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
     {
         await HandleEvent(_testIntegrationEvent1).ConfigureAwait(false);
         await HandleEvent(_testIntegrationEvent1).ConfigureAwait(false);
+
+        var isRegistered = await EventIsRegisteredInDatabase(EventId1).ConfigureAwait(false);
+
+        Assert.True(isRegistered);
+        Assert.Equal(1, _testIntegrationEventProcessor.ProcessedCount);
+    }
+
+    [Fact]
+    public async Task Event_registration_is_omitted_if_run_in_parallel()
+    {
+        var tasks = new List<Task>();
+        Parallel.For(0, 10, (i) =>
+        {
+            var task = HandleEvent(_testIntegrationEvent1);
+            tasks.Add(task);
+        });
+
+        await Task.WhenAll(tasks).ConfigureAwait(false);
 
         var isRegistered = await EventIsRegisteredInDatabase(EventId1).ConfigureAwait(false);
 
