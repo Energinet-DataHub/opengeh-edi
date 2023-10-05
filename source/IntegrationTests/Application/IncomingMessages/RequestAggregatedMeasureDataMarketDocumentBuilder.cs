@@ -16,12 +16,15 @@ using System;
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 using NodaTime;
 using MessageHeader = Energinet.DataHub.EDI.Application.IncomingMessages.MessageHeader;
+using Serie = Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData.Serie;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 
@@ -32,10 +35,10 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
     private readonly string _endDateAndOrTimeDateTime = "2022-07-22T22:00:00Z";
     private readonly string _meteringGridAreaDomainId = "244";
     private readonly string _messageType = "E74";
-    private readonly string _processType = "D03";
+    private readonly BusinessReason _businesReason = BusinessReason.PreliminaryAggregation;
     private readonly string _senderId = SampleData.NewEnergySupplierNumber;
     private readonly ActorNumber _receiverId = DataHubDetails.IdentificationNumber;
-    private readonly string _receiverRole = "DGL";
+    private readonly MarketRole _receiverRole = MarketRole.CalculationResponsibleRole;
     private readonly string _createdAt = SystemClock.Instance.GetCurrentInstant().ToString();
     private string _messageId = Guid.NewGuid().ToString();
     private string _senderRole = MarketRole.EnergySupplier.Code;
@@ -80,19 +83,13 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
         return this;
     }
 
-    // TODO: this is going to be responsible for creating a RequestAggregatedMeasureDataProcessMarketDocument
-    internal MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand> Build()
+    internal RequestAggregatedMeasureDataMarketMessage Build()
     {
-        return new MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>(
+        var messageParser = new MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>(
             new RequestAggregatedMeasureDataIncomingMarketDocument(
                 CreateHeader(),
                 new List<Serie> { CreateSerieCreateRecord() }));
-    }
-
-    // TODO: this is going to be responsible for creating a RequestAggregatedMeasureDataProcessMarketDocument
-    internal InitializeAggregatedMeasureDataProcessesCommand BuildCommand()
-    {
-        return new InitializeAggregatedMeasureDataProcessesCommand(Build());
+        return RequestAggregatedMeasureDataMarketMessageFactory.Created(messageParser.IncomingMarketDocument!);
     }
 
     private Serie CreateSerieCreateRecord() =>
@@ -111,11 +108,11 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
         return new MessageHeader(
             _messageId,
             _messageType,
-            _processType,
+            CimCode.Of(_businesReason),
             _senderId,
             _senderRole,
             _receiverId.Value,
-            _receiverRole,
+            _receiverRole.Code,
             _createdAt,
             _senderId,
             _senderRole);
