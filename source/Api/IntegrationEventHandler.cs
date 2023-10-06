@@ -13,11 +13,17 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventProcessors;
 using Google.Protobuf;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.Api;
 
@@ -25,16 +31,36 @@ namespace Energinet.DataHub.EDI.Api;
 public class IntegrationEventHandler : IIntegrationEventHandler
 #pragma warning restore CA1711
 {
-    private readonly IntegrationEventReceiver _integrationEventReceiver;
+    private readonly ILogger<IntegrationEventHandler> _logger;
+    private readonly IReceivedIntegrationEventRepository _receivedIntegrationEventRepository;
+    private readonly ReadOnlyCollection<IIntegrationEventProcessor> _integrationEventProcessors;
 
-    public IntegrationEventHandler(IntegrationEventReceiver integrationEventReceiver)
+    public IntegrationEventHandler(ILogger<IntegrationEventHandler> logger, IReceivedIntegrationEventRepository receivedIntegrationEventRepository, IEnumerable<IIntegrationEventProcessor> integrationEventProcessors)
     {
-        _integrationEventReceiver = integrationEventReceiver;
+        _logger = logger;
+        _receivedIntegrationEventRepository = receivedIntegrationEventRepository;
+        _integrationEventProcessors = new ReadOnlyCollection<IIntegrationEventProcessor>(integrationEventProcessors.ToList());
     }
 
     public async Task HandleAsync(IntegrationEvent integrationEvent)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
-        await _integrationEventReceiver.ReceiveAsync(integrationEvent.EventIdentification.ToString(), integrationEvent.EventName, integrationEvent.Message.ToByteArray()).ConfigureAwait(false);
+
+        var processor = _integrationEventProcessors.SingleOrDefault(i => i.CanHandle(integrationEvent.EventName));
+
+        if (!ShouldHandleEvent(processor))
+            return;
+
+        var addResult = await _receivedIntegrationEventRepository.AddIfNotExistsAsync(integrationEvent.EventIdentification, integrationEvent.EventName).ConfigureAwait(false);
+
+        if (addResult != AddReceivedIntegrationEventResult.EventRegistered)
+        {
+            _logger.LogWarning("Integration event \"{EventIdentification}\" with event type \"{EventType}\" wasn't registered successfully. Registration result: {RegisterIntegrationEventResult}", integrationEvent.EventIdentification, integrationEvent.EventName, addResult.ToString());
+            return;
+        }
+
+        await processor.ProcessAsync(integrationEvent).ConfigureAwait(false);
     }
+
+    private static bool ShouldHandleEvent([NotNullWhen(true)] IIntegrationEventProcessor? processor) => processor != null;
 }

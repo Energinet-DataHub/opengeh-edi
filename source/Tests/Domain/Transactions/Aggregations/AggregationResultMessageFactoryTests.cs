@@ -21,11 +21,11 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Domain.Transactions.Aggregations;
 
-public class AggregationResultForwardingTests
+public class AggregationResultMessageFactoryTests
 {
     private readonly AggregationResultBuilder _aggregationResult;
 
-    public AggregationResultForwardingTests()
+    public AggregationResultMessageFactoryTests()
     {
         _aggregationResult = new AggregationResultBuilder();
     }
@@ -199,13 +199,6 @@ public class AggregationResultForwardingTests
 
     private static AggregationResultMessage CreateMessage(Aggregation result)
     {
-        var transaction = CreateTransaction();
-        return transaction.CreateMessage(result);
-    }
-
-    private static AggregationResultForwarding CreateTransaction()
-    {
-        return new AggregationResultForwarding(
-            ProcessId.New());
+        return AggregationResultMessageFactory.CreateMessage(result, ProcessId.New());
     }
 }

@@ -11,10 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
-#pragma warning disable
-public class TestIntegrationEvent
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
+
+public enum AddReceivedIntegrationEventResult
 {
-    public string Property1 { get; set; } = "Test";
+    EventRegistered,
+    EventIsAlreadyRegistered,
 }

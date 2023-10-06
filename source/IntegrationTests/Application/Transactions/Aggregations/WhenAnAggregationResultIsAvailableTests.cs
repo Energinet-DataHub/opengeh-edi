@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Documents;
@@ -226,5 +229,14 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             completedAggregationType.Name,
             roleOfReceiver,
             GetService<IDatabaseConnectionFactory>());
+    }
+
+    private async Task HavingReceivedIntegrationEventAsync(string eventType, CalculationResultCompleted calculationResultCompleted)
+    {
+        var integrationEventHandler = GetService<IIntegrationEventHandler>();
+
+        var integrationEvent = new IntegrationEvent(Guid.NewGuid(), eventType, 1, calculationResultCompleted);
+
+        await integrationEventHandler.HandleAsync(integrationEvent).ConfigureAwait(false);
     }
 }

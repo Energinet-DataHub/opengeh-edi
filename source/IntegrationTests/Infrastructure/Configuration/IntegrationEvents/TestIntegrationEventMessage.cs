@@ -13,23 +13,29 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Google.Protobuf;
+using Google.Protobuf.Reflection;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
-internal sealed class AggregationResultForwardingRepository : IAggregationResultForwardingRepository
+public class TestIntegrationEventMessage : IMessage
 {
-    private readonly B2BContext _context;
+    public const string TestIntegrationEventName = "test-integration-event";
 
-    public AggregationResultForwardingRepository(B2BContext context)
+    public MessageDescriptor Descriptor => null!;
+
+    public void MergeFrom(CodedInputStream input)
     {
-        _context = context;
+        throw new NotImplementedException();
     }
 
-    public void Add(AggregationResultForwarding transaction)
+    public void WriteTo(CodedOutputStream output)
     {
-        ArgumentNullException.ThrowIfNull(transaction);
-        _context.AggregatedTimeSeriesTransactions.Add(transaction);
+        throw new NotImplementedException();
+    }
+
+    public int CalculateSize()
+    {
+        throw new NotImplementedException();
     }
 }
