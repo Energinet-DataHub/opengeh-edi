@@ -18,7 +18,7 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 /// Responsible for carrying the market message data from the incoming message before any data validation.
 /// </summary>
 public record RequestAggregatedMeasureDataMarketRequest(
-    string BusinessReason,
+    ProcessType ProcessType,
     MeteringPointType MeteringPointType,
     string StartDate,
     string? EndDate,
@@ -33,4 +33,12 @@ public enum MeteringPointType
     TotalConsumption,
     NonProfiledConsumption,
     Exchange,
+}
+
+public enum ProcessType
+{
+    PreliminaryAggregation,
+    BalanceFixing,
+    WholesaleFixing,
+    Correction,
 }
