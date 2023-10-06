@@ -22,9 +22,9 @@ internal sealed class SampleData
 {
     internal static string GridAreaCode => "805";
 
-    internal static Instant StartOfPeriod => EffectiveDateFactory.InstantAsOfToday();
+    internal static string StartOfPeriod => EffectiveDateFactory.InstantAsOfToday().ToString();
 
-    internal static Instant EndOfPeriod => EffectiveDateFactory.OffsetDaysFromToday(1);
+    internal static string EndOfPeriod => EffectiveDateFactory.OffsetDaysFromToday(1).ToString();
 
     internal static ActorNumber ReceiverNumber => ActorNumber.Create("8200000007743");
 
