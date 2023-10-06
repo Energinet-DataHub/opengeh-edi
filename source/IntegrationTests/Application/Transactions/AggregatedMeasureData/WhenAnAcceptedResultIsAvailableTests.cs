@@ -30,6 +30,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
+using NodaTime.Text;
 using Xunit;
 using Xunit.Categories;
 using Period = Energinet.DataHub.Edi.Responses.Period;
@@ -118,8 +119,17 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
         var period = new Period()
         {
-            StartOfPeriod = new Timestamp() { Seconds = aggregatedMeasureDataProcess.StartOfPeriod.ToUnixTimeSeconds(), },
-            EndOfPeriod = new Timestamp() { Seconds = aggregatedMeasureDataProcess.EndOfPeriod?.ToUnixTimeSeconds() ?? 1, },
+            StartOfPeriod = new Timestamp()
+            {
+                Seconds = InstantPattern.General.Parse(aggregatedMeasureDataProcess.StartOfPeriod)
+                .GetValueOrThrow().ToUnixTimeSeconds(),
+            },
+            EndOfPeriod = new Timestamp()
+            {
+                Seconds = aggregatedMeasureDataProcess.EndOfPeriod is not null
+                ? InstantPattern.General.Parse(aggregatedMeasureDataProcess.EndOfPeriod).GetValueOrThrow().ToUnixTimeSeconds()
+                : 1,
+            },
             Resolution = Resolution.Pt15M,
         };
 
