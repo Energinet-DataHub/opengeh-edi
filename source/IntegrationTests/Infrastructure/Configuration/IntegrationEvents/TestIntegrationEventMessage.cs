@@ -12,22 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Energinet.DataHub.Core.Messaging.Communication;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventProcessors;
+using System;
+using Google.Protobuf;
+using Google.Protobuf.Reflection;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
-public class TestIntegrationEventProcessor : IIntegrationEventProcessor
+public class TestIntegrationEventMessage : IMessage
 {
-    public string EventTypeToHandle => TestIntegrationEventMessage.TestIntegrationEventName;
+    public const string TestIntegrationEventName = "test-integration-event";
 
-    public int ProcessedCount { get; set; }
+    public MessageDescriptor Descriptor => null!;
 
-    public Task ProcessAsync(IntegrationEvent integrationEvent)
+    public void MergeFrom(CodedInputStream input)
     {
-        ProcessedCount++;
+        throw new NotImplementedException();
+    }
 
-        return Task.CompletedTask;
+    public void WriteTo(CodedOutputStream output)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int CalculateSize()
+    {
+        throw new NotImplementedException();
     }
 }

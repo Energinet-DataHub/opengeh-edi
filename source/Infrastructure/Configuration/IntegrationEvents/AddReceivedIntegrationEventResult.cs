@@ -12,28 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Google.Protobuf;
-using Google.Protobuf.Reflection;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
-
-public class TestIntegrationEvent : IMessage
+public enum AddReceivedIntegrationEventResult
 {
-    public MessageDescriptor Descriptor => null!;
-
-    public void MergeFrom(CodedInputStream input)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void WriteTo(CodedOutputStream output)
-    {
-        throw new NotImplementedException();
-    }
-
-    public int CalculateSize()
-    {
-        throw new NotImplementedException();
-    }
+    EventRegistered,
+    EventIsAlreadyRegistered,
 }

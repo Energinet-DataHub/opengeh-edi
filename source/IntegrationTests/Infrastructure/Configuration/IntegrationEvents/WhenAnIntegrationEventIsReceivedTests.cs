@@ -30,7 +30,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.In
 
 public class WhenAnIntegrationEventIsReceivedTests : TestBase
 {
-    private readonly string _testIntegrationEventType = nameof(TestIntegrationEvent);
     private readonly IntegrationEvent _testIntegrationEvent1;
     private readonly IntegrationEvent _unknownIntegrationEvent;
 
@@ -43,11 +42,11 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
         _testIntegrationEventProcessor = new TestIntegrationEventProcessor();
         _handler = new IntegrationEventHandler(
                 GetService<ILogger<IntegrationEventHandler>>(),
-                GetService<IntegrationEventRegister>(),
+                GetService<IReceivedIntegrationEventRepository>(),
                 new[] { _testIntegrationEventProcessor })
             ;
 
-        _testIntegrationEvent1 = new IntegrationEvent(Guid.NewGuid(), _testIntegrationEventType, 1, new TestIntegrationEvent());
+        _testIntegrationEvent1 = new IntegrationEvent(Guid.NewGuid(), TestIntegrationEventMessage.TestIntegrationEventName, 1, new TestIntegrationEventMessage());
         _unknownIntegrationEvent = new IntegrationEvent(Guid.NewGuid(), "unknown-event-type", 1, null!);
     }
 

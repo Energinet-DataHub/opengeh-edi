@@ -41,7 +41,8 @@ public class CalculationResultCompletedProcessor : IIntegrationEventProcessor
 
         var calculationResultCompletedIntegrationEvent = (CalculationResultCompleted)integrationEvent.Message;
 
-        var forwardAggregationResult = AggregationFactory.Create(calculationResultCompletedIntegrationEvent);
+        var aggregation = AggregationFactory.Create(calculationResultCompletedIntegrationEvent);
+        var forwardAggregationResult = new ForwardAggregationResult(aggregation);
 
         var task = _mediator.Send(forwardAggregationResult);
 

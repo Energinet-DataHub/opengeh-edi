@@ -12,10 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Threading.Tasks;
+
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 
-public enum RegisterIntegrationEventResult
+/// <summary>
+/// Persists received integration event metadata
+/// </summary>
+public interface IReceivedIntegrationEventRepository
 {
-    EventRegistered,
-    EventIsAlreadyRegistered,
+    /// <summary>
+    /// Add a Received Integration Event to the database, if it doesn't already exists
+    /// </summary>
+    /// <returns>Returns true if the event was added to the database, and false if the event wasn't added because it already exists</returns>
+    Task<AddReceivedIntegrationEventResult> AddIfNotExistsAsync(Guid eventId, string eventType);
 }

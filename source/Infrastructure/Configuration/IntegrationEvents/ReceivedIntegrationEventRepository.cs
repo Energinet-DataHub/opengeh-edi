@@ -25,7 +25,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 
-public class IntegrationEventRegister
+public class ReceivedIntegrationEventRepository : IReceivedIntegrationEventRepository
 {
     // Error code can be found here: https://learn.microsoft.com/en-us/sql/relational-databases/errors-events/database-engine-events-and-errors-2000-to-2999?view=sql-server-ver16
     private const int UniqueConstraintSqlException = 2627;
@@ -33,42 +33,31 @@ public class IntegrationEventRegister
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
     private readonly ISystemDateTimeProvider _dateTimeProvider;
 
-    public IntegrationEventRegister(IDatabaseConnectionFactory databaseConnectionFactory, ISystemDateTimeProvider dateTimeProvider)
+    public ReceivedIntegrationEventRepository(IDatabaseConnectionFactory databaseConnectionFactory, ISystemDateTimeProvider dateTimeProvider)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task<RegisterIntegrationEventResult> RegisterAsync(string eventId, string eventType)
+    public async Task<AddReceivedIntegrationEventResult> AddIfNotExistsAsync(Guid eventId, string eventType)
     {
         using var dbConnection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
 
         try
         {
-            await RegisterEventAsync(dbConnection, eventId, eventType, _dateTimeProvider.Now()).ConfigureAwait(false);
+            await dbConnection.ExecuteAsync(
+                    "INSERT INTO [dbo].[ReceivedIntegrationEvents] ([Id], [EventType], [OccurredOn]) VALUES (@id, @eventType, @occuredOn)",
+                    new { id = eventId.ToString(), eventType = eventType, occuredOn = _dateTimeProvider.Now() })
+                .ConfigureAwait(false);
         }
         catch (SqlException sqlException)
         {
             if (sqlException.Number == UniqueConstraintSqlException && sqlException.Message.Contains($"Violation of PRIMARY KEY constraint 'PK_Inbox'. Cannot insert duplicate key in object 'dbo.ReceivedIntegrationEvents'", StringComparison.OrdinalIgnoreCase))
-                return RegisterIntegrationEventResult.EventIsAlreadyRegistered;
+                return AddReceivedIntegrationEventResult.EventIsAlreadyRegistered;
 
             throw;
         }
 
-        return RegisterIntegrationEventResult.EventRegistered;
-    }
-
-    private static Task RegisterEventAsync(IDbConnection dbConnection, string eventId, string eventType, Instant now)
-    {
-        return dbConnection.ExecuteAsync(
-            "INSERT INTO [dbo].[ReceivedIntegrationEvents] ([Id], [EventType], [OccurredOn]) VALUES (@id, @eventType, @occuredOn)",
-            new { id = eventId, eventType = eventType, occuredOn = now });
-    }
-
-    private static Task<bool> EventIsAlreadyRegisteredAsync(IDbConnection dbConnection, string eventId)
-    {
-        return dbConnection.ExecuteScalarAsync<bool>(
-            "SELECT COUNT(1) FROM [dbo].[ReceivedIntegrationEvents] WHERE Id=@eventId",
-            new { eventId });
+        return AddReceivedIntegrationEventResult.EventRegistered;
     }
 }
