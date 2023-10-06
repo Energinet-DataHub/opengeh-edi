@@ -45,13 +45,11 @@ public class IntegrationEventHandler : IIntegrationEventHandler
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        var processorResult = GetProcessor(integrationEvent.EventName);
+        var processor = _integrationEventProcessors.SingleOrDefault(i => i.CanHandle(integrationEvent.EventName));
 
-        if (!processorResult.CanHandle)
+        var shouldHandle = processor != null;
+        if (!shouldHandle)
             return;
-
-        if (processorResult.Processor == null)
-            throw new ArgumentNullException(nameof(processorResult.Processor), "Processor shouldn't be null if CanHandle is true");
 
         var registerResult = await _integrationEventRegister.RegisterAsync(integrationEvent.EventIdentification.ToString(), integrationEvent.EventName).ConfigureAwait(false);
 
@@ -61,13 +59,6 @@ public class IntegrationEventHandler : IIntegrationEventHandler
             return;
         }
 
-        await processorResult.Processor.ProcessAsync(integrationEvent).ConfigureAwait(false);
-    }
-
-    private (IIntegrationEventProcessor? Processor, bool CanHandle) GetProcessor(string eventType)
-    {
-        var processor = _integrationEventProcessors.SingleOrDefault(i => i.CanHandle(eventType));
-
-        return (processor, processor != null);
+        await processor!.ProcessAsync(integrationEvent).ConfigureAwait(false);
     }
 }

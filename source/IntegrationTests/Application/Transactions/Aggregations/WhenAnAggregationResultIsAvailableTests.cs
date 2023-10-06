@@ -34,7 +34,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.Aggreg
 public class WhenAnAggregationResultIsAvailableTests : TestBase
 {
     private readonly CalculationResultCompletedEventBuilder _eventBuilder = new();
-    private readonly Guid _eventId1 = Guid.NewGuid();
 
     public WhenAnAggregationResultIsAvailableTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
@@ -236,7 +235,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     {
         var integrationEventHandler = GetService<IIntegrationEventHandler>();
 
-        var integrationEvent = new IntegrationEvent(_eventId1, eventType, 1, calculationResultCompleted);
+        var integrationEvent = new IntegrationEvent(Guid.NewGuid(), eventType, 1, calculationResultCompleted);
 
         await integrationEventHandler.HandleAsync(integrationEvent).ConfigureAwait(false);
     }

@@ -23,7 +23,6 @@ public static class IntegrationEventsConfiguration
     public static void Configure(IServiceCollection services)
     {
         services.AddTransient<IDataRetention, ReceivedIntegrationEventsRetention>();
-
         services.AddTransient<IntegrationEventRegister>();
         services.AddTransient<IIntegrationEventProcessor, CalculationResultCompletedProcessor>();
     }

@@ -39,25 +39,12 @@ public class CalculationResultCompletedProcessor : IIntegrationEventProcessor
         if (integrationEvent == null)
             throw new ArgumentNullException(nameof(integrationEvent));
 
-        var calculationResultCompletedIntegrationEvent = ParseIntegrationEvent(integrationEvent);
+        var calculationResultCompletedIntegrationEvent = (CalculationResultCompleted)integrationEvent.Message;
 
-        var forwardAggregationResult = CreateForwardAggregationResult(calculationResultCompletedIntegrationEvent);
+        var forwardAggregationResult = AggregationFactory.Create(calculationResultCompletedIntegrationEvent);
 
         var task = _mediator.Send(forwardAggregationResult);
 
         return task;
-    }
-
-    private static ForwardAggregationResult CreateForwardAggregationResult(CalculationResultCompleted calculationResultCompletedIntegrationEvent)
-    {
-        var aggregation = AggregationFactory.Create(calculationResultCompletedIntegrationEvent);
-        return new ForwardAggregationResult(aggregation);
-    }
-
-    private static CalculationResultCompleted ParseIntegrationEvent(IntegrationEvent integrationEvent)
-    {
-        var message = (CalculationResultCompleted)integrationEvent.Message;
-
-        return message;
     }
 }

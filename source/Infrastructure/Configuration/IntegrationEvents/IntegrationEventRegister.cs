@@ -27,6 +27,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 
 public class IntegrationEventRegister
 {
+    // Error code can be found here: https://learn.microsoft.com/en-us/sql/relational-databases/errors-events/database-engine-events-and-errors-2000-to-2999?view=sql-server-ver16
     private const int UniqueConstraintSqlException = 2627;
 
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
@@ -41,9 +42,6 @@ public class IntegrationEventRegister
     public async Task<RegisterIntegrationEventResult> RegisterAsync(string eventId, string eventType)
     {
         using var dbConnection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
-
-        if (await EventIsAlreadyRegisteredAsync(dbConnection, eventId).ConfigureAwait(false))
-            return RegisterIntegrationEventResult.EventIsAlreadyRegistered;
 
         try
         {
