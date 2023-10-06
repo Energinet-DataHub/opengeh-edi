@@ -103,7 +103,7 @@ public class Startup
         app.UseUserMiddleware<FrontendUser>();
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapControllers();
+            endpoints.MapControllers().RequireAuthorization();
             endpoints.MapLiveHealthChecks();
             endpoints.MapReadyHealthChecks();
         });

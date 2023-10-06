@@ -14,7 +14,6 @@
 
 using System;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.Edi.Requests;
@@ -23,16 +22,9 @@ using Google.Protobuf.WellKnownTypes;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData;
 
-public class AggregatedMeasureDataRequestFactory
+public static class AggregatedMeasureDataRequestFactory
 {
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-
-    public AggregatedMeasureDataRequestFactory(ISystemDateTimeProvider systemDateTimeProvider)
-    {
-        _systemDateTimeProvider = systemDateTimeProvider ?? throw new ArgumentNullException(nameof(systemDateTimeProvider));
-    }
-
-    public ServiceBusMessage CreateServiceBusMessage(AggregatedMeasureDataProcess process)
+    public static ServiceBusMessage CreateServiceBusMessage(AggregatedMeasureDataProcess process)
     {
         if (process == null) throw new ArgumentNullException(nameof(process));
 
@@ -151,7 +143,16 @@ public class AggregatedMeasureDataRequestFactory
             $"as a {MarketRole.FromCode(process.RequestedByActorRoleCode).Name}");
     }
 
-    private IMessage CreateAggregatedMeasureDataRequest(AggregatedMeasureDataProcess process)
+    private static Edi.Requests.Period MapPeriod(AggregatedMeasureDataProcess process)
+    {
+        return new Edi.Requests.Period
+        {
+            Start = process.StartOfPeriod,
+            End = process.StartOfPeriod,
+        };
+    }
+
+    private static IMessage CreateAggregatedMeasureDataRequest(AggregatedMeasureDataProcess process)
     {
         var request = new AggregatedTimeSeriesRequest()
         {
@@ -168,14 +169,5 @@ public class AggregatedMeasureDataRequestFactory
         MapEnergyPerBalancePerGridArea(request, process);
 
         return request;
-    }
-
-    private Edi.Requests.Period MapPeriod(AggregatedMeasureDataProcess process)
-    {
-        return new Edi.Requests.Period()
-        {
-            StartOfPeriod = new Timestamp() { Seconds = process.StartOfPeriod.ToUnixTimeSeconds(), },
-            EndOfPeriod = new Timestamp() { Seconds = process.EndOfPeriod?.ToUnixTimeSeconds() ?? _systemDateTimeProvider.Now().ToUnixTimeSeconds(), },
-        };
     }
 }

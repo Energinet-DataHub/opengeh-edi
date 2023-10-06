@@ -26,7 +26,7 @@ public static class RequestAggregatedMeasureDataHttpFactory
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
 
-        string senderRoleCode = MapRoleNameToCode(role);
+        var senderRoleCode = MapRoleNameToCode(role);
         var data = new RequestAggregatedMeasureData
         {
             MessageId = Guid.NewGuid().ToString(),
@@ -36,7 +36,7 @@ public static class RequestAggregatedMeasureDataHttpFactory
             ReceiverRoleCode = MarketRole.CalculationResponsibleRole.Code,
             AuthenticatedUser = actorNumber,
             AuthenticatedUserRoleCode = senderRoleCode,
-            BusinessReason = request.BusinessReason,
+            BusinessReason = MapToBusinessReasonCode(request.ProcessType),
             MessageType = "E74",
         };
 
@@ -55,6 +55,18 @@ public static class RequestAggregatedMeasureDataHttpFactory
         data.Series.Add(serie);
 
         return data;
+    }
+
+    private static string MapToBusinessReasonCode(ProcessType requestProcessType)
+    {
+        return requestProcessType switch
+        {
+            ProcessType.PreliminaryAggregation => "D03",
+            ProcessType.BalanceFixing => "D04",
+            ProcessType.WholesaleFixing => "D05",
+            ProcessType.Correction => "D32",
+            _ => throw new ArgumentOutOfRangeException(nameof(requestProcessType), requestProcessType, "Unknown ProcessType"),
+        };
     }
 
     private static void MapEvaluationPointTypeAndSettlementMethod(Serie serie, RequestAggregatedMeasureDataMarketRequest request)

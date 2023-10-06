@@ -24,17 +24,14 @@ namespace Energinet.DataHub.EDI.Infrastructure.Wholesale;
 
 public class WholesaleInbox : IWholesaleInbox
 {
-    private readonly AggregatedMeasureDataRequestFactory _aggregatedMeasureDataRequestFactory;
     private readonly IServiceBusSenderAdapter _senderCreator;
 
     public WholesaleInbox(
         IServiceBusSenderFactory serviceBusSenderFactory,
-        WholesaleServiceBusClientConfiguration wholeSaleServiceBusClientConfiguration,
-        AggregatedMeasureDataRequestFactory aggregatedMeasureDataRequestFactory)
+        WholesaleServiceBusClientConfiguration wholeSaleServiceBusClientConfiguration)
     {
         if (serviceBusSenderFactory == null) throw new ArgumentNullException(nameof(serviceBusSenderFactory));
         if (wholeSaleServiceBusClientConfiguration == null) throw new ArgumentNullException(nameof(wholeSaleServiceBusClientConfiguration));
-        _aggregatedMeasureDataRequestFactory = aggregatedMeasureDataRequestFactory;
 
         _senderCreator = serviceBusSenderFactory.GetSender(wholeSaleServiceBusClientConfiguration.QueueName);
     }
@@ -44,7 +41,7 @@ public class WholesaleInbox : IWholesaleInbox
         CancellationToken cancellationToken)
     {
         await _senderCreator.SendAsync(
-            _aggregatedMeasureDataRequestFactory.CreateServiceBusMessage(request),
+            AggregatedMeasureDataRequestFactory.CreateServiceBusMessage(request),
             cancellationToken).ConfigureAwait(false);
     }
 }
