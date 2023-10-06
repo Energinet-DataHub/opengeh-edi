@@ -12,17 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using System.Threading.Tasks;
+using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventProcessors;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
-#pragma warning disable
-public class TestNotification : INotification
+public class TestIntegrationEventProcessor : IIntegrationEventProcessor
 {
-    public TestNotification(string aProperty)
-    {
-        AProperty = aProperty;
-    }
+    public string EventTypeToHandle => TestIntegrationEventMessage.TestIntegrationEventName;
 
-    public string AProperty { get; }
+    public int ProcessedCount { get; set; }
+
+    public Task ProcessAsync(IntegrationEvent integrationEvent)
+    {
+        ProcessedCount++;
+
+        return Task.CompletedTask;
+    }
 }

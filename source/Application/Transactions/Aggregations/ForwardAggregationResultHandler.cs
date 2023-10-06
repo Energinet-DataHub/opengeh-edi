@@ -24,21 +24,18 @@ namespace Energinet.DataHub.EDI.Application.Transactions.Aggregations;
 
 public class ForwardAggregationResultHandler : IRequestHandler<ForwardAggregationResult, Unit>
 {
-    private readonly IAggregationResultForwardingRepository _transactions;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
 
-    public ForwardAggregationResultHandler(IAggregationResultForwardingRepository transactions, IOutgoingMessageRepository outgoingMessageRepository)
+    public ForwardAggregationResultHandler(IOutgoingMessageRepository outgoingMessageRepository)
     {
-        _transactions = transactions;
         _outgoingMessageRepository = outgoingMessageRepository;
     }
 
     public Task<Unit> Handle(ForwardAggregationResult request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        var transaction = new AggregationResultForwarding(ProcessId.New());
-        _transactions.Add(transaction);
-        _outgoingMessageRepository.Add(transaction.CreateMessage(request.Result));
+        var message = AggregationResultMessageFactory.CreateMessage(request.Result, ProcessId.New());
+        _outgoingMessageRepository.Add(message);
         return Unit.Task;
     }
 }
