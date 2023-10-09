@@ -112,9 +112,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
 
         private static void CreateSchema()
         {
-            var databaseUpgradeResult = DefaultUpgrader.Upgrade(ConnectionString);
-            if (!databaseUpgradeResult.Successful)
-                throw new InvalidOperationException("Database upgrade failed", databaseUpgradeResult.Error);
+            var upgradeResult = DbUpgradeRunner.RunDbUpgrade(ConnectionString);
+            if (!upgradeResult.Successful)
+                throw new InvalidOperationException("Database upgrade failed", upgradeResult.Error);
         }
     }
 }
