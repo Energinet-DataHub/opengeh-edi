@@ -52,23 +52,8 @@ public class AggregatedTimeSeriesRequestRejectedMapper : IInboxEventMapper
         return inboxEvent.ToString();
     }
 
-    private static string MapErrorCode(ErrorCodes reasonErrorCode)
-    {
-        return reasonErrorCode switch
-        {
-            ErrorCodes.InvalidEnergySupplierForPeriod => RejectedErrorCode.InvalidEnergySupplierForPeriod.Name,
-            ErrorCodes.InvalidBalanceResponsibleForPeriod => RejectedErrorCode.InvalidBalanceResponsibleForPeriod.Name,
-            ErrorCodes.InvalidGridOperator => RejectedErrorCode.InvalidGridOperator.Name,
-            ErrorCodes.NoDataForPeriod => RejectedErrorCode.NoDataForPeriod.Name,
-            ErrorCodes.InvalidPeriod => RejectedErrorCode.InvalidPeriod.Name,
-            ErrorCodes.ImpossibleSearchCriteriaCombination => RejectedErrorCode.InvalidSearchCriteria.Name,
-            ErrorCodes.Unspecified => throw new InvalidOperationException("ErrorCode is not specified"),
-            _ => throw new InvalidOperationException("Unknown ErrorCode type"),
-        };
-    }
-
     private static IReadOnlyList<RejectReason> MapRejectReasons(RepeatedField<Energinet.DataHub.Edi.Responses.RejectReason> rejectReasons)
     {
-        return rejectReasons.Select(reason => new RejectReason(MapErrorCode(reason.ErrorCode), reason.ErrorMessage)).ToList();
+        return rejectReasons.Select(reason => new RejectReason(reason.ErrorCode, reason.ErrorMessage)).ToList();
     }
 }

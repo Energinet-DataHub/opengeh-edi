@@ -50,11 +50,11 @@ public class WhenARejectedResultIsAvailableTests : TestBase
         var process = BuildProcess();
         var rejectReason = new RejectReason()
         {
-            ErrorCode = ErrorCodes.NoDataForPeriod,
+            ErrorCode = "ER0",
         };
         var rejectReason2 = new RejectReason()
         {
-            ErrorCode = ErrorCodes.InvalidPeriod,
+            ErrorCode = "ER1",
         };
         var rejectEvent = new AggregatedTimeSeriesRequestRejected()
         {
@@ -72,8 +72,8 @@ public class WhenARejectedResultIsAvailableTests : TestBase
             .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons[0].ErrorCode, rejectReason.ErrorCode.ToString())
-            .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons[1].ErrorCode, rejectReason2.ErrorCode.ToString());
+            .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons[0].ErrorCode, rejectReason.ErrorCode)
+            .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons[1].ErrorCode, rejectReason2.ErrorCode);
     }
 
     protected override void Dispose(bool disposing)

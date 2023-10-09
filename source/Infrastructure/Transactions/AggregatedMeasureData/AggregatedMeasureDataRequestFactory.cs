@@ -148,7 +148,7 @@ public static class AggregatedMeasureDataRequestFactory
         return new Edi.Requests.Period
         {
             Start = process.StartOfPeriod,
-            End = process.StartOfPeriod,
+            End = process.EndOfPeriod,
         };
     }
 
