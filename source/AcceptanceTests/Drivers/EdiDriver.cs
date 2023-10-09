@@ -91,11 +91,11 @@ internal sealed class EdiDriver : IDisposable
         var documentStream = await PeekMessageAsync(actorNumber, roles).ConfigureAwait(false);
         var jsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(documentStream).ConfigureAwait(false);
 
-        Assert.True(
-            jsonElement.TryGetProperty(
-                "NotifyAggregatedMeasureData_MarketDocument",
-                out var marketDocument),
-            "Remember to clean Actor queue by dequeuing all existing messages.");
+        var documentIsOfExpectedType = jsonElement.TryGetProperty(
+            "NotifyAggregatedMeasureData_MarketDocument",
+            out var marketDocument);
+
+        Assert.True(documentIsOfExpectedType, "\nAccepted message failed with wrong message type\n");
         Assert.Equal("E31", marketDocument
             .GetProperty("type")
             .GetProperty("value")
@@ -107,11 +107,11 @@ internal sealed class EdiDriver : IDisposable
         var documentStream = await PeekMessageAsync(actorNumber, roles).ConfigureAwait(false);
         var jsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(documentStream).ConfigureAwait(false);
 
-        Assert.True(
-            jsonElement.TryGetProperty(
-                "RejectRequestAggregatedMeasureData_MarketDocument",
-                out var marketDocument),
-            "Remember to clean Actor queue by dequeuing all existing messages.");
+        var documentIsOfExpectedType = jsonElement.TryGetProperty(
+            "RejectRequestAggregatedMeasureData_MarketDocument",
+            out var marketDocument);
+
+        Assert.True(documentIsOfExpectedType, "\nRejected message failed with wrong message type\n");
         Assert.Equal("ERR", marketDocument
             .GetProperty("type")
             .GetProperty("value")
