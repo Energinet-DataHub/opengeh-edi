@@ -129,8 +129,8 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202205241101 Consolidated BtwoB model.sql" />
     <EmbeddedResource Include="Scripts\Model\202225081511 Add grid operator id.sql" />
     <EmbeddedResource Include="Scripts\Model\202226081400 Make EnergySupplierNumber nullable.sql" />
-    <EmbeddedResource Include="Scripts\Seed\202301301357 Insert Reasons.sql" />
     <EmbeddedResource Include="Scripts\Seed\202210041540 Remove failed outgoing messages.sql" />
+    <EmbeddedResource Include="Scripts\Seed\202301301357 Insert Reasons.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202322051044 Add Document to ArchivedMessage.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
