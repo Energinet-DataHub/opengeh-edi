@@ -22,14 +22,11 @@ namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp
         public static int Main(string[] args)
         {
             var connectionString = ParseConnectionStringFrom(args);
-            var filter = EnvironmentFilter.GetFilter(args);
             var isDryRun = args.Contains("dryRun");
 
-            var upgrader = UpgradeFactory.GetUpgradeEngine(connectionString, filter, isDryRun);
+            var upgradeResult = DbUpgradeRunner.RunDbUpgrade(connectionString, isDryRun);
 
-            var result = upgrader.PerformUpgrade();
-
-            return ResultReporter.ReportResult(result);
+            return ResultReporter.ReportResult(upgradeResult);
         }
 
         private static string ParseConnectionStringFrom(string[] args)
