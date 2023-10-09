@@ -106,7 +106,7 @@ public class AssertAggregationResultEbixDocument : IAssertAggregationResultDocum
 
     public async Task<IAssertAggregationResultDocument> DocumentIsValidAsync()
     {
-        await _documentAsserter.HasValidStructureAsync(DocumentType.AggregationResult).ConfigureAwait(false);
+        await _documentAsserter.HasValidStructureAsync(DocumentType.AggregationResult, "3").ConfigureAwait(false);
         return this;
     }
 

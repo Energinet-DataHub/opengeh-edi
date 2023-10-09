@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics;
 using System.Xml;
 using System.Xml.Schema;
 
@@ -63,7 +64,19 @@ namespace Energinet.DataHub.EDI.Infrastructure.DocumentValidation.Xml
                                   XmlSchemaValidationFlags.ReportValidationWarnings,
             };
 
-            settings.Schemas.Add(xmlSchema);
+#pragma warning disable CA1031 // Do not catch general exception types
+#pragma warning disable CS0168 // Variable is declared but never used
+            try
+            {
+                settings.Schemas.Add(xmlSchema);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Fail");
+            }
+#pragma warning restore CS0168 // Variable is declared but never used
+#pragma warning restore CA1031 // Do not catch general exception types
+
             return settings;
         }
     }

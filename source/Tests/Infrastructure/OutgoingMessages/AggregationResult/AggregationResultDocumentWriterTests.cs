@@ -222,7 +222,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     {
         if (documentFormat == DocumentFormat.Ebix)
         {
-            var assertEbixDocument = AssertEbixDocument.Document(document, "ns0");
+            var assertEbixDocument = AssertEbixDocument.Document(document, "ns0", _documentValidation.Validator);
             return new AssertAggregationResultEbixDocument(assertEbixDocument);
         }
         else if (documentFormat == DocumentFormat.Xml)
