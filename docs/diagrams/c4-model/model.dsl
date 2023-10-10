@@ -41,4 +41,15 @@ ediDomain = group "EDI" {
         this -> dh3.sharedB2C "Validate credentials" "https" {
         }
     }
+    ediB2cWebApi = container "EDI B2C WEB API" {
+        description "An Web API for EDI B2C operations"
+        technology "Asp.Net Core Web API"
+        tags "Microsoft Azure - App Services" "Mosaic"
+
+        # Base model relationships
+        dh3User -> this "Requests eg. Aggregated Measure data"
+
+        # Domain relationships
+        this -> edi "Forwards request to backend"
+    }
 }
