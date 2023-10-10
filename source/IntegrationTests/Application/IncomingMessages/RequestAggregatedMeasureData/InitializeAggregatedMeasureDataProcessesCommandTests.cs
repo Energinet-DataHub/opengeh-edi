@@ -134,7 +134,6 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         var processes = GetProcesses(marketMessage01.SenderNumber).ToList();
 
         Assert.Single(processes);
-        var process = processes.First();
 
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         Assert.Single(tasks.Where(t => t.Status == TaskStatus.RanToCompletion));
@@ -143,6 +142,8 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
 
         var completedTaskIndex = tasks.ToList().FindIndex(t => t.Status == TaskStatus.RanToCompletion);
         var completedTaskMessage = completedTaskIndex == 0 ? marketMessage01 : marketMessage02;
+
+        var process = processes.First();
 
         Assert.Equal(completedTaskMessage.Series.First().Id, process.BusinessTransactionId.Id);
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Initialized);
