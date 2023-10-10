@@ -119,9 +119,10 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         var task01 = InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage01));
         var task02 = InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage02));
 
+        var tasks = new[] { task01, task02 };
         try
         {
-            await Task.WhenAll(task01, task02);
+            await Task.WhenAll(tasks);
         }
         catch (DbUpdateException e)
         {
@@ -130,10 +131,20 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         }
 
         // Assert
-        var processes = GetProcesses(marketMessage01.SenderNumber);
+        var processes = GetProcesses(marketMessage01.SenderNumber).ToList();
+
         Assert.Single(processes);
         var process = processes.First();
-        Assert.Equal(marketMessage01.Series.First().Id, process!.BusinessTransactionId.Id);
+
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+        Assert.Single(tasks.Where(t => t.Status == TaskStatus.RanToCompletion));
+        Assert.Single(tasks.Where(t => t.Status == TaskStatus.Faulted));
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+
+        var completedTaskIndex = tasks.ToList().FindIndex(t => t.Status == TaskStatus.RanToCompletion);
+        var completedTaskMessage = completedTaskIndex == 0 ? marketMessage01 : marketMessage02;
+
+        Assert.Equal(completedTaskMessage.Series.First().Id, process.BusinessTransactionId.Id);
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Initialized);
     }
 
