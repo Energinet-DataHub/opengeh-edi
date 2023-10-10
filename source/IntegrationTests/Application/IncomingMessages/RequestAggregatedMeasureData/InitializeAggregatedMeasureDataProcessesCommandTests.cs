@@ -120,6 +120,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         var task02 = InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage02));
 
         var tasks = new[] { task01, task02 };
+
         try
         {
             await Task.WhenAll(tasks);
@@ -135,12 +136,11 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
 
         Assert.Single(processes);
 
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-        Assert.Single(tasks.Where(t => t.Status == TaskStatus.RanToCompletion));
-        Assert.Single(tasks.Where(t => t.Status == TaskStatus.Faulted));
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+        var taskStatuses = tasks.Select(t => t.Status).ToList();
+        Assert.Single(taskStatuses.Where(status => status == TaskStatus.RanToCompletion));
+        Assert.Single(taskStatuses.Where(status => status == TaskStatus.Faulted));
 
-        var completedTaskIndex = tasks.ToList().FindIndex(t => t.Status == TaskStatus.RanToCompletion);
+        var completedTaskIndex = taskStatuses.FindIndex(status => status == TaskStatus.RanToCompletion);
         var completedTaskMessage = completedTaskIndex == 0 ? marketMessage01 : marketMessage02;
 
         var process = processes.First();
