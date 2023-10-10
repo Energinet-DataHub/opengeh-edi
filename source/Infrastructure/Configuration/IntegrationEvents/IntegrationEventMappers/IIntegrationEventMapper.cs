@@ -13,17 +13,15 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventProcessors;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 
 /// <summary>
 /// Process specific type(s) of integration events
 /// </summary>
-public interface IIntegrationEventProcessor
+public interface IIntegrationEventMapper
 {
     /// <summary>
     /// Event type the processor handles
@@ -33,7 +31,7 @@ public interface IIntegrationEventProcessor
     /// <summary>
     /// Process a single integration event
     /// </summary>
-    public Task ProcessAsync(IntegrationEvent integrationEvent);
+    public InternalCommand MapToCommand(IntegrationEvent integrationEvent);
 
     /// <summary>
     /// Determines whether the specified event type can be handled by the processor
