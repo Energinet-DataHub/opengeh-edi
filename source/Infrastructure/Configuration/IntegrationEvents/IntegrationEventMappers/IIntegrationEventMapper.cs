@@ -32,17 +32,4 @@ public interface IIntegrationEventMapper
     /// Process a single integration event
     /// </summary>
     public InternalCommand MapToCommand(IntegrationEvent integrationEvent);
-
-    /// <summary>
-    /// Determines whether the specified event type can be handled by the processor
-    /// </summary>
-    /// <param name="eventType">The event type, something like IntegrationEvent.EventName</param>
-    /// <returns>Whether the processor can handle the supplied event type</returns>
-    public bool CanHandle(string eventType)
-    {
-        if (string.IsNullOrWhiteSpace(eventType))
-            throw new ArgumentNullException(nameof(eventType));
-
-        return EventTypeToHandle.Equals(eventType, StringComparison.OrdinalIgnoreCase);
-    }
 }
