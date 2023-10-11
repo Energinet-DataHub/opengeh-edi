@@ -14,11 +14,9 @@
 
 using System;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.Edi.Requests;
 using Google.Protobuf;
-using Google.Protobuf.WellKnownTypes;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData;
 
@@ -102,47 +100,6 @@ public static class AggregatedMeasureDataRequestFactory
         }
     }
 
-    private static TimeSeriesType MapTimeSeriesTypeAsGridOperator(AggregatedMeasureDataProcess process)
-    {
-        return process.MeteringPointType switch
-        {
-            "E18" => TimeSeriesType.Production,
-            "E20" => TimeSeriesType.NetExchangePerGa,
-            "E17" => process.SettlementMethod switch
-            {
-                "E02" => TimeSeriesType.NonProfiledConsumption,
-                "D01" => TimeSeriesType.FlexConsumption,
-                "" => TimeSeriesType.TotalConsumption,
-                null => TimeSeriesType.TotalConsumption,
-                _ => ThrowInvalidOperationExceptionForTimeSeries(process),
-            },
-            _ => ThrowInvalidOperationExceptionForTimeSeries(process),
-        };
-    }
-
-    private static TimeSeriesType MapTimeSeriesTypeAsBalanceResponsibleOrEnergySupplier(AggregatedMeasureDataProcess process)
-    {
-        return process.MeteringPointType switch
-        {
-            "E18" => TimeSeriesType.Production,
-            "E17" => process.SettlementMethod switch
-            {
-                "E02" => TimeSeriesType.NonProfiledConsumption,
-                "D01" => TimeSeriesType.FlexConsumption,
-                _ => ThrowInvalidOperationExceptionForTimeSeries(process),
-            },
-            _ => ThrowInvalidOperationExceptionForTimeSeries(process),
-        };
-    }
-
-    private static TimeSeriesType ThrowInvalidOperationExceptionForTimeSeries(AggregatedMeasureDataProcess process)
-    {
-        throw new InvalidOperationException(
-            $"Unknown time series type for metering point type {process.MeteringPointType}" +
-            $" and settlement method {process.SettlementMethod}" +
-            $"as a {MarketRole.FromCode(process.RequestedByActorRoleCode).Name}");
-    }
-
     private static Edi.Requests.Period MapPeriod(AggregatedMeasureDataProcess process)
     {
         return new Edi.Requests.Period
@@ -157,10 +114,8 @@ public static class AggregatedMeasureDataRequestFactory
         var request = new AggregatedTimeSeriesRequest()
         {
             Period = MapPeriod(process),
-            TimeSeriesType = process.RequestedByActorRoleCode == MarketRole.MeteredDataResponsible.Code ||
-                             process.RequestedByActorRoleCode == MarketRole.GridOperator.Code
-                ? MapTimeSeriesTypeAsGridOperator(process)
-                : MapTimeSeriesTypeAsBalanceResponsibleOrEnergySupplier(process),
+            MeteringPointType = process.MeteringPointType,
+            SettlementMethod = process.SettlementMethod,
         };
 
         MapGridArea(request, process);
