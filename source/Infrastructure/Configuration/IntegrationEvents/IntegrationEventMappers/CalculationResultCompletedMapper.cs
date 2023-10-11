@@ -13,28 +13,19 @@
 // limitations under the License.
 
 using System;
-using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
 using Energinet.DataHub.EDI.Application.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 using Energinet.DataHub.Wholesale.Contracts.Events;
-using Google.Protobuf;
-using MediatR;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventProcessors;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 
-public class CalculationResultCompletedProcessor : IIntegrationEventProcessor
+public class CalculationResultCompletedMapper : IIntegrationEventMapper
 {
-    private readonly IMediator _mediator;
-
-    public CalculationResultCompletedProcessor(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
     public string EventTypeToHandle => CalculationResultCompleted.EventName;
 
-    public Task ProcessAsync(IntegrationEvent integrationEvent)
+    public InternalCommand MapToCommand(IntegrationEvent integrationEvent)
     {
         if (integrationEvent == null)
             throw new ArgumentNullException(nameof(integrationEvent));
@@ -44,8 +35,6 @@ public class CalculationResultCompletedProcessor : IIntegrationEventProcessor
         var aggregation = AggregationFactory.Create(calculationResultCompletedIntegrationEvent);
         var forwardAggregationResult = new ForwardAggregationResult(aggregation);
 
-        var task = _mediator.Send(forwardAggregationResult);
-
-        return task;
+        return forwardAggregationResult;
     }
 }

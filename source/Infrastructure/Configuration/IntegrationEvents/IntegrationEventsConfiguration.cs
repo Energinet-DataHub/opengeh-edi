@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventProcessors;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,6 +27,8 @@ public static class IntegrationEventsConfiguration
     {
         services.AddTransient<IDataRetention, ReceivedIntegrationEventsRetention>();
         services.AddTransient<IReceivedIntegrationEventRepository, ReceivedIntegrationEventRepository>();
-        services.AddTransient<IIntegrationEventProcessor, CalculationResultCompletedProcessor>();
+        services.AddTransient<IIntegrationEventMapper, CalculationResultCompletedMapper>();
+
+        services.AddTransient<IReadOnlyDictionary<string, IIntegrationEventMapper>>(sp => sp.GetServices<IIntegrationEventMapper>().ToDictionary(m => m.EventTypeToHandle, m => m));
     }
 }

@@ -119,9 +119,11 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         var task01 = InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage01));
         var task02 = InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage02));
 
+        var tasks = new[] { task01, task02 };
+
         try
         {
-            await Task.WhenAll(task01, task02);
+            await Task.WhenAll(tasks);
         }
         catch (DbUpdateException e)
         {
@@ -130,10 +132,20 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         }
 
         // Assert
-        var processes = GetProcesses(marketMessage01.SenderNumber);
+        var processes = GetProcesses(marketMessage01.SenderNumber).ToList();
+
         Assert.Single(processes);
+
+        var taskStatuses = tasks.Select(t => t.Status).ToList();
+        Assert.Single(taskStatuses.Where(status => status == TaskStatus.RanToCompletion));
+        Assert.Single(taskStatuses.Where(status => status == TaskStatus.Faulted));
+
+        var completedTaskIndex = taskStatuses.FindIndex(status => status == TaskStatus.RanToCompletion);
+        var completedTaskMessage = completedTaskIndex == 0 ? marketMessage01 : marketMessage02;
+
         var process = processes.First();
-        Assert.Equal(marketMessage01.Series.First().Id, process!.BusinessTransactionId.Id);
+
+        Assert.Equal(completedTaskMessage.Series.First().Id, process.BusinessTransactionId.Id);
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Initialized);
     }
 
