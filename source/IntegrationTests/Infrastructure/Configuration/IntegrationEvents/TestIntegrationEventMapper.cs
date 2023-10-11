@@ -14,20 +14,22 @@
 
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventProcessors;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
+using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
-public class TestIntegrationEventProcessor : IIntegrationEventProcessor
+public class TestIntegrationEventMapper : IIntegrationEventMapper
 {
     public string EventTypeToHandle => TestIntegrationEventMessage.TestIntegrationEventName;
 
-    public int ProcessedCount { get; set; }
+    public int MappedCount { get; private set; }
 
-    public Task ProcessAsync(IntegrationEvent integrationEvent)
+    public InternalCommand MapToCommand(IntegrationEvent integrationEvent)
     {
-        ProcessedCount++;
+        MappedCount++;
 
-        return Task.CompletedTask;
+        return new TestCommand();
     }
 }
