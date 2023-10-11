@@ -18,15 +18,15 @@ syntax = "proto3";
 option csharp_namespace = "Energinet.DataHub.Edi.Requests";
 
 message AggregatedTimeSeriesRequest {
-  Period period = 2;
+  Period period = 1;
   oneof aggregation_level {
-    AggregationPerGridArea aggregation_per_gridarea = 3;
-    AggregationPerEnergySupplierPerGridArea aggregation_per_energysupplier_per_gridarea = 4;
-    AggregationPerBalanceResponsiblePartyPerGridArea aggregation_per_balanceresponsibleparty_per_gridarea = 5;
-    AggregationPerEnergySupplierPerBalanceResponsiblePartyPerGridArea aggregation_per_energysupplier_per_balanceresponsibleparty_per_gridarea = 6;
+    AggregationPerGridArea aggregation_per_gridarea = 2;
+    AggregationPerEnergySupplierPerGridArea aggregation_per_energysupplier_per_gridarea = 3;
+    AggregationPerBalanceResponsiblePartyPerGridArea aggregation_per_balanceresponsibleparty_per_gridarea = 4;
+    AggregationPerEnergySupplierPerBalanceResponsiblePartyPerGridArea aggregation_per_energysupplier_per_balanceresponsibleparty_per_gridarea = 5;
   }
-  string metering_point_type = 7;
-  optional string settlement_method = 8;
+  string metering_point_type = 6;
+  optional string settlement_method = 7;
 }
 
 message Period {
