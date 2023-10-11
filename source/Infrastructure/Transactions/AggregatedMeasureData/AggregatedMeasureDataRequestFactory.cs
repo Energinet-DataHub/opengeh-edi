@@ -116,7 +116,12 @@ public static class AggregatedMeasureDataRequestFactory
             Period = MapPeriod(process),
             MeteringPointType = process.MeteringPointType,
             SettlementMethod = process.SettlementMethod,
+            RequestedByActorId = process.RequestedByActorId.Value,
+            RequestedByActorRole = process.RequestedByActorRoleCode,
         };
+
+        if (process.EnergySupplierId != null)
+            request.EnergySupplierId = process.EnergySupplierId;
 
         MapGridArea(request, process);
         MapEnergySupplierPerGridArea(request, process);
