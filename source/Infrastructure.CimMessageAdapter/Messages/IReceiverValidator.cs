@@ -26,5 +26,5 @@ public interface IReceiverValidator
     /// Verify the receiver Id and role
     /// </summary>
     /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
-    Task<Result> VerifyAsync(ActorNumber receiverNumber, MarketRole receiverRole);
+    Task<Result> VerifyAsync(string receiverNumber, string receiverRole);
 }

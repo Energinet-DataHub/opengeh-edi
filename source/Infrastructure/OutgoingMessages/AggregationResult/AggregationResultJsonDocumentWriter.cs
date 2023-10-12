@@ -96,6 +96,8 @@ public class AggregationResultJsonDocumentWriter : JsonDocumentWriter
             writer.WriteStartObject();
 
             writer.WriteProperty("mRID", series.TransactionId.ToString());
+            // TODO XJOHO: We are currently not receiving version from Wholesale - bug team-phoenix #78
+            writer.WriteProperty("version", "1");
 
             writer.WriteObject(
                 "meteringGridArea_Domain.mRID",

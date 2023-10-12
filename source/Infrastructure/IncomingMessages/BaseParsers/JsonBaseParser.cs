@@ -20,17 +20,14 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.IncomingMessages;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 using Json.Schema;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.BaseParsers;
 
-public abstract class JsonParserBase<TTransactionType, TICommand>
-where TTransactionType : IMarketActivityRecord
-where TICommand : IMarketTransaction<TTransactionType>
+public abstract class JsonParserBase
 {
     private readonly ISchemaProvider _schemaProvider;
     private readonly List<ValidationError> _errors = new();
@@ -40,17 +37,20 @@ where TICommand : IMarketTransaction<TTransactionType>
         _schemaProvider = schemaProvider;
     }
 
-    protected Task<JsonSchema?> GetSchemaAsync(string documentName, CancellationToken cancellationToken)
+    public static void ResetMessagePosition(Stream message)
     {
-        if (documentName == null)
-        {
-            throw new ArgumentNullException(nameof(documentName));
-        }
-
-        return _schemaProvider.GetSchemaAsync<JsonSchema>(documentName.ToUpper(CultureInfo.InvariantCulture), "0", cancellationToken);
+        if (message is { CanRead: true } && message.Position > 0)
+            message.Position = 0;
     }
 
-    protected MessageHeader MessageHeaderFrom(JsonElement element)
+    protected static RequestAggregatedMeasureDataMarketMessageParserResult InvalidJsonFailure(
+        Exception exception)
+    {
+        return new RequestAggregatedMeasureDataMarketMessageParserResult(
+            InvalidMessageStructure.From(exception));
+    }
+
+    protected static MessageHeader MessageHeaderFrom(JsonElement element)
     {
         return new MessageHeader(
             element.GetProperty("mRID").ToString(),
@@ -63,17 +63,14 @@ where TICommand : IMarketTransaction<TTransactionType>
             GetJsonDateStringWithoutQuotes(element.GetProperty("createdDateTime")));
     }
 
-    protected void ResetMessagePosition(Stream message)
+    protected Task<JsonSchema?> GetSchemaAsync(string documentName, CancellationToken cancellationToken)
     {
-        if (message is { CanRead: true } && message.Position > 0)
-            message.Position = 0;
-    }
+        if (documentName == null)
+        {
+            throw new ArgumentNullException(nameof(documentName));
+        }
 
-    protected MessageParserResult<TTransactionType, TICommand> InvalidJsonFailure(
-        Exception exception)
-    {
-        return new MessageParserResult<TTransactionType, TICommand>(
-            InvalidMessageStructure.From(exception));
+        return _schemaProvider.GetSchemaAsync<JsonSchema>(documentName.ToUpper(CultureInfo.InvariantCulture), "0", cancellationToken);
     }
 
     protected async Task<List<ValidationError>> ValidateMessageAsync(JsonSchema schema, Stream message)
@@ -90,7 +87,7 @@ where TICommand : IMarketTransaction<TTransactionType>
         return _errors.DistinctBy(x => x.Message).ToList();
     }
 
-    protected string GetJsonDateStringWithoutQuotes(JsonElement element)
+    private static string GetJsonDateStringWithoutQuotes(JsonElement element)
     {
         return element.ToString().Trim('"');
     }

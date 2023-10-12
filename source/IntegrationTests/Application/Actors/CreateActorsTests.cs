@@ -41,9 +41,9 @@ public class CreateActorsTests : TestBase
     {
         var command = CreateCommand();
 
-        await _mediator.Send(command).ConfigureAwait(false);
+        await _mediator.Send(command);
 
-        var actor = await GetActor().ConfigureAwait(false);
+        var actor = await GetActor();
 
         Assert.NotNull(actor);
         Assert.Equal(SampleData.ActorId, actor.Id.ToString());
@@ -58,9 +58,9 @@ public class CreateActorsTests : TestBase
 
     private async Task<Actor> GetActor()
     {
-        using var connection = await _connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = $"SELECT Id, B2CId, IdentificationNUmber FROM [dbo].[Actor] WHERE Id = '{SampleData.ActorId}'";
-        return await connection.QuerySingleOrDefaultAsync<Actor>(sql).ConfigureAwait(false);
+        return await connection.QuerySingleOrDefaultAsync<Actor>(sql);
     }
 
 #pragma warning disable

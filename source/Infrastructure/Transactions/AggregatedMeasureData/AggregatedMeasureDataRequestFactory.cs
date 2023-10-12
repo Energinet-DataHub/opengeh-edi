@@ -14,25 +14,15 @@
 
 using System;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.EDI.Application.Configuration;
-using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.Edi.Requests;
 using Google.Protobuf;
-using Google.Protobuf.WellKnownTypes;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData;
 
-public class AggregatedMeasureDataRequestFactory
+public static class AggregatedMeasureDataRequestFactory
 {
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-
-    public AggregatedMeasureDataRequestFactory(ISystemDateTimeProvider systemDateTimeProvider)
-    {
-        _systemDateTimeProvider = systemDateTimeProvider ?? throw new ArgumentNullException(nameof(systemDateTimeProvider));
-    }
-
-    public ServiceBusMessage CreateServiceBusMessage(AggregatedMeasureDataProcess process)
+    public static ServiceBusMessage CreateServiceBusMessage(AggregatedMeasureDataProcess process)
     {
         if (process == null) throw new ArgumentNullException(nameof(process));
 
@@ -110,57 +100,28 @@ public class AggregatedMeasureDataRequestFactory
         }
     }
 
-    private static TimeSeriesType MapTimeSeriesTypeAsGridOperator(AggregatedMeasureDataProcess process)
+    private static Edi.Requests.Period MapPeriod(AggregatedMeasureDataProcess process)
     {
-        return process.MeteringPointType switch
+        return new Edi.Requests.Period
         {
-            "E18" => TimeSeriesType.Production,
-            "E20" => TimeSeriesType.NetExchangePerGa,
-            "E17" => process.SettlementMethod switch
-            {
-                "D01" => TimeSeriesType.NonProfiledConsumption,
-                "E02" => TimeSeriesType.FlexConsumption,
-                "" => TimeSeriesType.TotalConsumption,
-                null => TimeSeriesType.TotalConsumption,
-                _ => ThrowInvalidOperationExceptionForTimeSeries(process),
-            },
-            _ => ThrowInvalidOperationExceptionForTimeSeries(process),
+            Start = process.StartOfPeriod,
+            End = process.EndOfPeriod,
         };
     }
 
-    private static TimeSeriesType MapTimeSeriesTypeAsBalanceResponsibleOrEnergySupplier(AggregatedMeasureDataProcess process)
-    {
-        return process.MeteringPointType switch
-        {
-            "E18" => TimeSeriesType.Production,
-            "E17" => process.SettlementMethod switch
-            {
-                "D01" => TimeSeriesType.NonProfiledConsumption,
-                "E02" => TimeSeriesType.FlexConsumption,
-                _ => ThrowInvalidOperationExceptionForTimeSeries(process),
-            },
-            _ => ThrowInvalidOperationExceptionForTimeSeries(process),
-        };
-    }
-
-    private static TimeSeriesType ThrowInvalidOperationExceptionForTimeSeries(AggregatedMeasureDataProcess process)
-    {
-        throw new InvalidOperationException(
-            $"Unknown time series type for metering point type {process.MeteringPointType}" +
-            $" and settlement method {process.SettlementMethod}" +
-            $"as a {MarketRole.FromCode(process.RequestedByActorRoleCode).Name}");
-    }
-
-    private IMessage CreateAggregatedMeasureDataRequest(AggregatedMeasureDataProcess process)
+    private static IMessage CreateAggregatedMeasureDataRequest(AggregatedMeasureDataProcess process)
     {
         var request = new AggregatedTimeSeriesRequest()
         {
             Period = MapPeriod(process),
-            TimeSeriesType = process.RequestedByActorRoleCode == MarketRole.MeteredDataResponsible.Code ||
-                             process.RequestedByActorRoleCode == MarketRole.GridOperator.Code
-                ? MapTimeSeriesTypeAsGridOperator(process)
-                : MapTimeSeriesTypeAsBalanceResponsibleOrEnergySupplier(process),
+            MeteringPointType = process.MeteringPointType,
+            SettlementMethod = process.SettlementMethod,
+            RequestedByActorId = process.RequestedByActorId.Value,
+            RequestedByActorRole = process.RequestedByActorRoleCode,
         };
+
+        if (process.EnergySupplierId != null)
+            request.EnergySupplierId = process.EnergySupplierId;
 
         MapGridArea(request, process);
         MapEnergySupplierPerGridArea(request, process);
@@ -168,14 +129,5 @@ public class AggregatedMeasureDataRequestFactory
         MapEnergyPerBalancePerGridArea(request, process);
 
         return request;
-    }
-
-    private Energinet.DataHub.Edi.Requests.Period MapPeriod(AggregatedMeasureDataProcess process)
-    {
-        return new Energinet.DataHub.Edi.Requests.Period()
-        {
-            StartOfPeriod = new Timestamp() { Seconds = process.StartOfPeriod.ToUnixTimeSeconds(), },
-            EndOfPeriod = new Timestamp() { Seconds = process.EndOfPeriod?.ToUnixTimeSeconds() ?? _systemDateTimeProvider.Now().ToUnixTimeSeconds(), },
-        };
     }
 }

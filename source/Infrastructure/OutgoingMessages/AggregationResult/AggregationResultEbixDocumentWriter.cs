@@ -25,7 +25,7 @@ using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Xml;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Ebix;
 using Point = Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
 namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AggregationResult;
@@ -50,17 +50,21 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
         return documentType == DocumentType.NotifyAggregatedMeasureData;
     }
 
-    protected override string? ExtractSettlementVersion(IReadOnlyCollection<string> marketActivityPayloads)
+    protected override SettlementVersion? ExtractSettlementVersion(IReadOnlyCollection<string> marketActivityPayloads)
     {
         var payloads = ParseFrom<TimeSeries>(marketActivityPayloads);
-        var settlementVersions = payloads.Select(ts => ts.SettlementVersion)?.Distinct();
+        var settlementVersions = payloads.Where(ts => ts.SettlementVersion is not null).Select(ts => ts.SettlementVersion)?.Distinct();
         if (settlementVersions?.Count() > 1)
         {
             throw new NotSupportedException("Multiple diffent settlementVersions in same message is not supported in ebIX");
         }
+        else if (settlementVersions?.Count() == 1)
+        {
+            return SettlementVersion.From(settlementVersions.First()!);
+        }
         else
         {
-            return settlementVersions?.Count() == 1 ? settlementVersions.First() : null;
+            return null;
         }
     }
 
@@ -134,7 +138,7 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
                 }
 
                 await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, "260").ConfigureAwait(false);
-                await writer.WriteStringAsync(timeSeries.SettlementType).ConfigureAwait(false);
+                await writer.WriteStringAsync(EbixCode.Of(SettlementType.From(timeSeries.SettlementType))).ConfigureAwait(false);
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
             }
 

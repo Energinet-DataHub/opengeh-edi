@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
@@ -30,6 +31,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
 
         public DatabaseFixture()
         {
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.local.json", optional: true)
+                .Build();
+
+            var connectionStringFromConfig = configuration.GetConnectionString("Default");
+            if (!string.IsNullOrEmpty(connectionStringFromConfig))
+                _connectionString = connectionStringFromConfig;
+
             var environmentVariableConnectionString = Environment.GetEnvironmentVariable("B2B_MESSAGING_CONNECTION_STRING");
             if (!string.IsNullOrWhiteSpace(environmentVariableConnectionString))
             {
@@ -62,7 +71,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
         {
             var cleanupStatement =
                 $"DELETE FROM [dbo].[MoveInTransactions] " +
-                $"DELETE FROM [dbo].[AggregatedTimeSeriesTransactions] " +
                 $"DELETE FROM [dbo].[UpdateCustomerMasterDataTransactions] " +
                 $"DELETE FROM [dbo].[MessageRegistry] " +
                 $"DELETE FROM [dbo].[TransactionRegistry]" +
@@ -78,6 +86,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
                 $"DELETE FROM [dbo].[Bundles]" +
                 $"DELETE FROM [dbo].[ActorMessageQueues]" +
                 $"DELETE FROM [dbo].[ReceivedInboxEvents]" +
+                $"DELETE FROM [dbo].[MessageRegistry]" +
+                $"DELETE FROM [dbo].[TransactionRegistry]" +
                 $"DELETE FROM [dbo].[OutgoingMessagesConfiguration]";
             _context.Database.ExecuteSqlRaw(cleanupStatement);
         }
@@ -102,9 +112,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
 
         private static void CreateSchema()
         {
-            var databaseUpgradeResult = DefaultUpgrader.Upgrade(ConnectionString);
-            if (!databaseUpgradeResult.Successful)
-                throw new InvalidOperationException("Database upgrade failed", databaseUpgradeResult.Error);
+            var upgradeResult = DbUpgradeRunner.RunDbUpgrade(ConnectionString);
+            if (!upgradeResult.Successful)
+                throw new InvalidOperationException("Database upgrade failed", upgradeResult.Error);
         }
     }
 }

@@ -49,9 +49,9 @@ public class ReceivedIntegrationEventsRetention : IDataRetention
             const string deleteStmt = @"
                 WITH CTE AS
                  (
-                     SELECT TOP 100 *
+                     SELECT TOP 500 *
                      FROM [dbo].[ReceivedIntegrationEvents]
-                     WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL AND [ProcessedDate] < @LastMonthInstant
+                     WHERE [OccurredOn] < @LastMonthInstant
                  )
                 DELETE FROM CTE;";
 
@@ -68,7 +68,9 @@ public class ReceivedIntegrationEventsRetention : IDataRetention
 
             try
             {
+                var numberDeletedRecords = await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
                 await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+                _logger.LogInformation("Successfully deleted {NumberDeletedIntegrationEvents} of integration events", numberDeletedRecords);
             }
             catch (DbException e)
             {
@@ -84,7 +86,7 @@ public class ReceivedIntegrationEventsRetention : IDataRetention
     private async Task<int> GetAmountOfOldEventsAsync(Instant monthAgo, CancellationToken cancellationToken)
     {
         const string selectStmt = @"SELECT Count(*) FROM [dbo].[ReceivedIntegrationEvents]
-                    WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL AND [ProcessedDate] < @LastMonthInstant";
+                     WHERE [OccurredOn] < @LastMonthInstant";
 
         using var connection =
             (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken)

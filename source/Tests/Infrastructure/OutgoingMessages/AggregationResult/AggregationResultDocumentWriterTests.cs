@@ -60,9 +60,10 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
                     .WithBalanceResponsibleNumber(SampleData.BalanceResponsibleNumber)
                     .WithEnergySupplierNumber(SampleData.EnergySupplierNumber)
                     .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
-                    .WithPoint(new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z")),
-                DocumentFormat.From(documentFormat))
-            .ConfigureAwait(false);
+                    .WithPoint(new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z"))
+                    .WithOriginalTransactionIdReference(SampleData.OriginalTransactionIdReference)
+                    .WithSettlementMethod(SettlementType.NonProfiled),
+                DocumentFormat.From(documentFormat));
 
         await AssertDocument(document, DocumentFormat.From(documentFormat))
             .HasMessageId(SampleData.MessageId)
@@ -77,7 +78,9 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .HasPeriod(
                 new Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod))
             .HasPoint(1, 1)
-            .DocumentIsValidAsync().ConfigureAwait(false);
+            .HasOriginalTransactionIdReference(SampleData.OriginalTransactionIdReference)
+            .HasSettlementMethod(SettlementType.NonProfiled)
+            .DocumentIsValidAsync();
     }
 
     [Theory]
@@ -89,7 +92,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         _timeSeries
             .WithPoint(new Point(1, null, Quality.Missing.Name, "2022-12-12T23:00:00Z"));
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
 
         AssertDocument(document, DocumentFormat.From(documentFormat))
             .QuantityIsNotPresentForPosition(1);
@@ -103,7 +106,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         _timeSeries
             .WithPoint(new Point(1, 1, Quality.Measured.Name, "2022-12-12T23:00:00Z"));
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
 
         AssertDocument(document, DocumentFormat.From(documentFormat))
             .QualityIsNotPresentForPosition(1);
@@ -119,7 +122,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .WithMeteringPointType(MeteringPointType.Production)
             .WithSettlementMethod(null);
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
 
         AssertDocument(document, DocumentFormat.From(documentFormat))
             .SettlementMethodIsNotPresent();
@@ -134,7 +137,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         _timeSeries
             .WithEnergySupplierNumber(null);
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
 
         AssertDocument(document, DocumentFormat.From(documentFormat))
             .EnergySupplierNumberIsNotPresent();
@@ -149,7 +152,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         _timeSeries
             .WithBalanceResponsibleNumber(null);
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
 
         AssertDocument(document, DocumentFormat.From(documentFormat))
             .BalanceResponsibleNumberIsNotPresent();
@@ -166,10 +169,29 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     {
         _timeSeries.WithBusinessReason(BusinessReason.From(processType));
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
 
         AssertDocument(document, DocumentFormat.From(documentFormat))
-            .HasBusinessReason(BusinessReason.From(processType));
+            .HasBusinessReason(BusinessReason.From(processType))
+            .SettlementVersionIsNotPresent();
+    }
+
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Ebix), nameof(BusinessReason.Correction), nameof(SettlementVersion.FirstCorrection))]
+    [InlineData(nameof(DocumentFormat.Xml), nameof(BusinessReason.Correction), nameof(SettlementVersion.FirstCorrection))]
+    [InlineData(nameof(DocumentFormat.Json), nameof(BusinessReason.Correction), nameof(SettlementVersion.FirstCorrection))]
+    public async Task Business_reason_and_settlement_version_is_translated(string documentFormat, string processType, string settlementVersion)
+    {
+        _timeSeries
+            .WithBusinessReason(BusinessReason.From(processType))
+            .WithSettlementVersion(SettlementVersion.From(settlementVersion));
+
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
+
+        await AssertDocument(document, DocumentFormat.From(documentFormat))
+            .HasBusinessReason(BusinessReason.From(processType))
+            .HasSettlementVersion(SettlementVersion.From(settlementVersion))
+            .DocumentIsValidAsync();
     }
 
     private async Task<Stream> CreateDocument(TimeSeriesBuilder resultBuilder, DocumentFormat documentFormat)

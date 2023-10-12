@@ -36,8 +36,8 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
             string businessReason,
             string? meteringPointType,
             string? settlementMethod,
-            Instant startOfPeriod,
-            Instant? endOfPeriod,
+            string startOfPeriod,
+            string? endOfPeriod,
             string? meteringGridAreaDomainId,
             string? energySupplierId,
             string? balanceResponsibleId)
@@ -100,9 +100,9 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
         /// </summary>
         public string? SettlementMethod { get; }
 
-        public Instant StartOfPeriod { get; }
+        public string StartOfPeriod { get; }
 
-        public Instant? EndOfPeriod { get; }
+        public string? EndOfPeriod { get; }
 
         public string? MeteringGridAreaDomainId { get; }
 

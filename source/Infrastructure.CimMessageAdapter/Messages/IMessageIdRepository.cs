@@ -24,19 +24,13 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages
     public interface IMessageIdRepository
     {
         /// <summary>
-        /// Store message id
+        /// Store message id for the sender
         /// </summary>
-        /// <param name="senderNumber"></param>
-        /// <param name="messageId"></param>
-        /// <param name="cancellationToken"></param>
-        Task StoreAsync(ActorNumber senderNumber, string messageId, CancellationToken cancellationToken);
+        Task StoreAsync(string senderNumber, string messageId, CancellationToken cancellationToken);
 
         /// <summary>
         /// Checks if <paramref name="messageId"/> is already registered by the sender <paramref name="senderNumber"/>
         /// </summary>
-        /// <param name="senderNumber"></param>
-        /// <param name="messageId"></param>
-        /// <param name="cancellationToken"></param>
-        Task<bool> MessageIdExistsAsync(ActorNumber senderNumber, string messageId, CancellationToken cancellationToken);
+        Task<bool> MessageIdExistsAsync(string senderNumber, string messageId, CancellationToken cancellationToken);
     }
 }

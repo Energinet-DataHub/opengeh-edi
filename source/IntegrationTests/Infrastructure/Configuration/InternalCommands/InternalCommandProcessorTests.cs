@@ -56,11 +56,10 @@ public class InternalCommandProcessorTests : TestBase
     [Fact]
     public async Task Scheduled_commands_are_processed()
     {
-        var yesterday = _timeProvider.Now().Minus(Duration.FromDays(1));
         var command = new TestCommand();
-        await Schedule(command).ConfigureAwait(false);
+        await Schedule(command);
 
-        await ProcessPendingCommands().ConfigureAwait(false);
+        await ProcessPendingCommands();
 
         AssertIsProcessedSuccessful(command);
     }
@@ -69,9 +68,9 @@ public class InternalCommandProcessorTests : TestBase
     public async Task When_execution_fails_the_exception_is_logged_and_command_is_marked_as_processed()
     {
         var commandThatThrows = new TestCommand(throwException: true);
-        await Schedule(commandThatThrows).ConfigureAwait(false);
+        await Schedule(commandThatThrows);
 
-        await ProcessPendingCommands().ConfigureAwait(false);
+        await ProcessPendingCommands();
 
         AssertHasErrorMessage(commandThatThrows);
     }
@@ -85,14 +84,14 @@ public class InternalCommandProcessorTests : TestBase
         var internalCommandProcessor = newScope.ServiceProvider.GetRequiredService<InternalCommandProcessor>();
         var command = new TestCreateOutgoingMessageCommand(1);
 
-        await Schedule(command).ConfigureAwait(false);
+        await Schedule(command);
 
         var task1 = ProcessPendingCommands();
 
          // NEW SCOPE for second task.
         var task2 = internalCommandProcessor.ProcessPendingAsync(CancellationToken.None);
 
-        await Task.WhenAll(task1, task2).ConfigureAwait(false);
+        await Task.WhenAll(task1, task2);
         AssertSingleActorMessageQueue();
         AssertOutgoingMessage(1);
         AssertIsProcessedSuccessful(command);
@@ -104,9 +103,9 @@ public class InternalCommandProcessorTests : TestBase
         // Arrange
         var command = new TestCreateOutgoingMessageCommand(2);
 
-        await Schedule(command).ConfigureAwait(false);
+        await Schedule(command);
 
-        await ProcessPendingCommands().ConfigureAwait(false);
+        await ProcessPendingCommands();
 
         AssertSingleActorMessageQueue();
         AssertOutgoingMessage(2);
@@ -150,12 +149,12 @@ public class InternalCommandProcessorTests : TestBase
 
     private async Task ProcessPendingCommands()
     {
-        await _processor.ProcessPendingAsync(CancellationToken.None).ConfigureAwait(false);
+        await _processor.ProcessPendingAsync(CancellationToken.None);
     }
 
     private async Task Schedule(InternalCommand command)
     {
-        await _scheduler.EnqueueAsync(command).ConfigureAwait(false);
-        await _unitOfWork.CommitAsync().ConfigureAwait(false);
+        await _scheduler.EnqueueAsync(command);
+        await _unitOfWork.CommitAsync();
     }
 }

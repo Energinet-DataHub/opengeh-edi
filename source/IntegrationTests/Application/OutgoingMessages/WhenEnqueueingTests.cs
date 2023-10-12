@@ -62,12 +62,11 @@ public class WhenEnqueueingTests : TestBase
         var message = CreateOutgoingMessage(_outgoingMessagesConfigurationRepository, _documentFactory);
         await EnqueueMessage(message);
         // TODO: (LRN) Ensure we have a ActorQueue with a bundle with the expected OutgoingMessage.
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = "SELECT * FROM [dbo].[OutgoingMessages]";
         var result = await
             connection
-                .QuerySingleOrDefaultAsync(sql)
-                .ConfigureAwait(false);
+                .QuerySingleOrDefaultAsync(sql);
         Assert.NotNull(result);
         Assert.Equal(result.DocumentType, message.DocumentType.Name);
         Assert.Equal(result.ReceiverId, message.ReceiverId.Value);
@@ -104,7 +103,7 @@ public class WhenEnqueueingTests : TestBase
         if (result.Bundle is not null)
         {
             var validator = new CimXmlValidator(new CimXmlSchemaProvider());
-            var resultValidation = await validator.ValidateAsync(result.Bundle, EDI.Infrastructure.DocumentValidation.DocumentType.AggregationResult, "0.1", CancellationToken.None).ConfigureAwait(false);
+            var resultValidation = await validator.ValidateAsync(result.Bundle, EDI.Infrastructure.DocumentValidation.DocumentType.AggregationResult, "0.1", CancellationToken.None);
             Assert.True(resultValidation.IsValid);
         }
     }
@@ -127,7 +126,7 @@ public class WhenEnqueueingTests : TestBase
         if (result.Bundle is not null)
         {
             var validator = new CimXmlValidator(new CimXmlSchemaProvider());
-            var resultValidation = await validator.ValidateAsync(result.Bundle, EDI.Infrastructure.DocumentValidation.DocumentType.AggregationResult, "0.1", CancellationToken.None).ConfigureAwait(false);
+            var resultValidation = await validator.ValidateAsync(result.Bundle, EDI.Infrastructure.DocumentValidation.DocumentType.AggregationResult, "0.1", CancellationToken.None);
             Assert.True(resultValidation.IsValid);
         }
     }
@@ -136,9 +135,9 @@ public class WhenEnqueueingTests : TestBase
     public async Task Can_peek_message_in_JSON_format()
     {
         JsonSchemaProvider schemas = new(new CimJsonSchemas());
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = "insert into OutgoingMessagesConfiguration values('1234567891912','MeteringDataAdministrator','NotifyAggregatedMeasureData','json')";
-        _ = await connection.ExecuteAsync(sql).ConfigureAwait(false);
+        _ = await connection.ExecuteAsync(sql);
 
         var message = CreateOutgoingMessage(_outgoingMessagesConfigurationRepository, _documentFactory);
         await EnqueueMessage(message);
@@ -149,8 +148,8 @@ public class WhenEnqueueingTests : TestBase
         Assert.NotNull(result.Bundle);
         if (result.Bundle is not null)
         {
-            var document = await JsonDocument.ParseAsync(result.Bundle).ConfigureAwait(false);
-            var schema = await schemas.GetSchemaAsync<JsonSchema>("NOTIFYAGGREGATEDMEASUREDATA", "0", CancellationToken.None).ConfigureAwait(false);
+            var document = await JsonDocument.ParseAsync(result.Bundle);
+            var schema = await schemas.GetSchemaAsync<JsonSchema>("NOTIFYAGGREGATEDMEASUREDATA", "0", CancellationToken.None);
             var validationOptions = new EvaluationOptions()
             {
                 OutputFormat = OutputFormat.List,
@@ -165,9 +164,9 @@ public class WhenEnqueueingTests : TestBase
     public async Task Can_peek_multiple_messages_in_JSON_format()
     {
         JsonSchemaProvider schemas = new(new CimJsonSchemas());
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = "insert into OutgoingMessagesConfiguration values('1234567891912','MeteringDataAdministrator','NotifyAggregatedMeasureData','json')";
-        _ = await connection.ExecuteAsync(sql).ConfigureAwait(false);
+        _ = await connection.ExecuteAsync(sql);
 
         var message = CreateOutgoingMessage(_outgoingMessagesConfigurationRepository, _documentFactory);
         await EnqueueMessage(message);
@@ -186,8 +185,8 @@ public class WhenEnqueueingTests : TestBase
             var text = await sr.ReadToEndAsync();
 
             result.Bundle.Position = 0;
-            var document = await JsonDocument.ParseAsync(result.Bundle).ConfigureAwait(false);
-            var schema = await schemas.GetSchemaAsync<JsonSchema>("NOTIFYAGGREGATEDMEASUREDATA", "0", CancellationToken.None).ConfigureAwait(false);
+            var document = await JsonDocument.ParseAsync(result.Bundle);
+            var schema = await schemas.GetSchemaAsync<JsonSchema>("NOTIFYAGGREGATEDMEASUREDATA", "0", CancellationToken.None);
             var validationOptions = new EvaluationOptions()
             {
                 OutputFormat = OutputFormat.List,
@@ -201,9 +200,9 @@ public class WhenEnqueueingTests : TestBase
     [Fact]
     public async Task Can_peek_message_in_Ebix()
     {
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = "insert into OutgoingMessagesConfiguration values('1234567891912','MeteringDataAdministrator','NotifyAggregatedMeasureData','ebix')";
-        _ = await connection.ExecuteAsync(sql).ConfigureAwait(false);
+        _ = await connection.ExecuteAsync(sql);
         var message = CreateOutgoingMessage(_outgoingMessagesConfigurationRepository, _documentFactory);
         await EnqueueMessage(message);
         var command = new PeekCommand(message.ReceiverId, message.DocumentType.Category, message.ReceiverRole, Domain.Documents.DocumentFormat.Ebix);

@@ -36,12 +36,13 @@ public class RejectRequestAggregatedMeasureDataXmlDocumentWriter : CimDocumentWr
                 "cim",
                 "ERR"),
             parser,
-            "A02")
+            CimCode.Of(Domain.Transactions.Aggregations.ReasonCode.FullyRejected))
     {
     }
 
     public override bool HandlesType(DocumentType documentType)
     {
+        if (documentType == null) throw new ArgumentNullException(nameof(documentType));
         return DocumentType.RejectRequestAggregatedMeasureData == documentType;
     }
 

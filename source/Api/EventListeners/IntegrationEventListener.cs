@@ -25,13 +25,11 @@ namespace Energinet.DataHub.EDI.Api.EventListeners;
 public class IntegrationEventListener
 {
     private readonly ILogger<IntegrationEventListener> _logger;
-    private readonly IntegrationEventReceiver _eventReceiver;
     private readonly ISubscriber _subscriber;
 
-    public IntegrationEventListener(ILogger<IntegrationEventListener> logger, IntegrationEventReceiver eventReceiver, ISubscriber subscriber)
+    public IntegrationEventListener(ILogger<IntegrationEventListener> logger, ISubscriber subscriber)
     {
         _logger = logger;
-        _eventReceiver = eventReceiver;
         _subscriber = subscriber;
     }
 
@@ -47,7 +45,7 @@ public class IntegrationEventListener
         ArgumentNullException.ThrowIfNull(context);
 
         var eventDetails = context.ExtractEventDetails();
-        _logger.LogInformation($"Integration event details: {eventDetails}");
+        _logger.LogInformation("Integration event details: {EventDetails}", eventDetails);
 
         await _subscriber.HandleAsync(IntegrationEventServiceBusMessage.Create(eventData, context.BindingContext.BindingData!)).ConfigureAwait(false);
     }

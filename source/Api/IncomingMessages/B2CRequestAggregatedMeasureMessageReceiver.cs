@@ -15,12 +15,14 @@
 using System;
 using System.IO;
 using System.Net;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Domain.ArchivedMessages;
 using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.Edi.Requests;
@@ -32,23 +34,23 @@ namespace Energinet.DataHub.EDI.Api.IncomingMessages;
 
 public class B2CRequestAggregatedMeasureMessageReceiver
 {
-    private readonly ICorrelationContext _correlationContext;
     private readonly IArchivedMessageRepository _messageArchive;
     private readonly B2BContext _dbContext;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly ResponseFactory _responseFactory;
     private readonly IMediator _mediator;
 
     public B2CRequestAggregatedMeasureMessageReceiver(
-        ICorrelationContext correlationContext,
         IArchivedMessageRepository messageArchive,
         B2BContext dbContext,
         ISystemDateTimeProvider systemDateTimeProvider,
+        ResponseFactory responseFactory,
         IMediator mediator)
         {
-        _correlationContext = correlationContext;
         _messageArchive = messageArchive;
         _dbContext = dbContext;
         _systemDateTimeProvider = systemDateTimeProvider;
+        _responseFactory = responseFactory;
         _mediator = mediator;
         }
 
@@ -64,20 +66,20 @@ public class B2CRequestAggregatedMeasureMessageReceiver
 
         var requestAggregatedMeasureData = RequestAggregatedMeasureData.Parser.ParseFrom(request.Body);
         await SaveArchivedMessageAsync(requestAggregatedMeasureData, request.Body, cancellationToken).ConfigureAwait(false);
-        var marketMessage = RequestAggregatedMeasureDataMarketMessageFactory.Created(requestAggregatedMeasureData);
+        var marketMessage = RequestAggregatedMeasureDataMarketMessageFactory.Create(requestAggregatedMeasureData, _systemDateTimeProvider.Now());
 
         var result = await _mediator
             .Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage), cancellationToken).ConfigureAwait(false);
 
         var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
-        return CreateResponse(request, httpStatusCode);
+        return CreateResponse(request, httpStatusCode, _responseFactory.From(result, DocumentFormat.Json));
     }
 
-    private HttpResponseData CreateResponse(
-        HttpRequestData request, HttpStatusCode statusCode)
+    private static HttpResponseData CreateResponse(
+        HttpRequestData request, HttpStatusCode statusCode, ResponseMessage responseMessage)
     {
         var response = request.CreateResponse(statusCode);
-        response.Headers.Add("CorrelationId", _correlationContext.Id);
+        response.WriteString(responseMessage.MessageBody, Encoding.UTF8);
         return response;
     }
 

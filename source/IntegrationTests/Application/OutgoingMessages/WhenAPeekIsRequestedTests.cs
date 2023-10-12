@@ -46,20 +46,20 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task When_no_messages_are_available_return_empty_result()
     {
-        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync().ConfigureAwait(false);
+        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync();
 
-        var result = await PeekMessage(MessageCategory.None).ConfigureAwait(false);
+        var result = await PeekMessage(MessageCategory.None);
 
         Assert.Null(result.Bundle);
-        Assert.True(await BundleIsRegistered().ConfigureAwait(false));
+        Assert.True(await BundleIsRegistered());
     }
 
     [Fact]
     public async Task A_message_bundle_is_returned()
     {
-        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync().ConfigureAwait(false);
+        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync();
 
-        var result = await PeekMessage(MessageCategory.Aggregations).ConfigureAwait(false);
+        var result = await PeekMessage(MessageCategory.Aggregations);
 
         Assert.NotNull(result.Bundle);
 
@@ -72,10 +72,10 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task Ensure_same_bundle_is_returned_if_not_dequeued()
     {
-        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync().ConfigureAwait(false);
+        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync();
 
-        var firstPeekResult = await PeekMessage(MessageCategory.Aggregations).ConfigureAwait(false);
-        var secondPeekResult = await PeekMessage(MessageCategory.Aggregations).ConfigureAwait(false);
+        var firstPeekResult = await PeekMessage(MessageCategory.Aggregations);
+        var secondPeekResult = await PeekMessage(MessageCategory.Aggregations);
 
         Assert.NotNull(firstPeekResult.MessageId);
         Assert.NotNull(secondPeekResult.MessageId);
@@ -85,18 +85,18 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task The_generated_document_is_archived()
     {
-        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync().ConfigureAwait(false);
+        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync();
 
-        var result = await PeekMessage(MessageCategory.Aggregations).ConfigureAwait(false);
+        var result = await PeekMessage(MessageCategory.Aggregations);
 
         await AssertMessageIsArchived(result.MessageId);
     }
 
     private async Task<bool> BundleIsRegistered()
     {
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var numberOfBundles = await connection
-            .ExecuteScalarAsync<int>("SELECT COUNT(*) FROM dbo.Bundles").ConfigureAwait(false);
+            .ExecuteScalarAsync<int>("SELECT COUNT(*) FROM dbo.Bundles");
         return numberOfBundles == 1;
     }
 
@@ -111,8 +111,8 @@ public class WhenAPeekIsRequestedTests : TestBase
         var sqlStatement =
             $"SELECT COUNT(*) FROM [dbo].[ArchivedMessages] WHERE MessageId = '{messageId}'";
         using var connection =
-            await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
-        var found = await connection.ExecuteScalarAsync<bool>(sqlStatement).ConfigureAwait(false);
+            await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+        var found = await connection.ExecuteScalarAsync<bool>(sqlStatement);
         Assert.True(found);
     }
 }

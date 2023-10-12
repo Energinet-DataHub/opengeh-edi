@@ -14,23 +14,20 @@
 
 using System;
 using System.Collections.Generic;
-using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Domain.Actors;
-using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 using NodaTime;
-using MessageHeader = Energinet.DataHub.EDI.Application.IncomingMessages.MessageHeader;
-using Serie = Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData.Serie;
+using MessageHeader = Energinet.DataHub.EDI.Infrastructure.IncomingMessages.MessageHeader;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 
 public class RequestAggregatedMeasureDataMarketDocumentBuilder
 {
-    private readonly string _serieId = Guid.NewGuid().ToString();
     private readonly string _startDateAndOrTimeDateTime = "2022-06-17T22:00:00Z";
     private readonly string _endDateAndOrTimeDateTime = "2022-07-22T22:00:00Z";
     private readonly string _meteringGridAreaDomainId = "244";
@@ -41,6 +38,7 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
     private readonly MarketRole _receiverRole = MarketRole.CalculationResponsibleRole;
     private readonly string _createdAt = SystemClock.Instance.GetCurrentInstant().ToString();
     private string _messageId = Guid.NewGuid().ToString();
+    private string _serieId = Guid.NewGuid().ToString();
     private string _senderRole = MarketRole.EnergySupplier.Code;
     private string _marketEvaluationPointType = "E17";
     private string? _marketEvaluationSettlementMethod = "D01";
@@ -83,13 +81,19 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
         return this;
     }
 
+    public RequestAggregatedMeasureDataMarketDocumentBuilder SetTransactionId(string transactionId)
+    {
+        _serieId = transactionId;
+        return this;
+    }
+
     internal RequestAggregatedMeasureDataMarketMessage Build()
     {
-        var messageParser = new MessageParserResult<Serie, RequestAggregatedMeasureDataTransactionCommand>(
-            new RequestAggregatedMeasureDataIncomingMarketDocument(
+        var messageParser = new RequestAggregatedMeasureDataMarketMessageParserResult(
+            RequestAggregatedMeasureDataMarketMessageFactory.Create(
                 CreateHeader(),
-                new List<Serie> { CreateSerieCreateRecord() }));
-        return RequestAggregatedMeasureDataMarketMessageFactory.Created(messageParser.IncomingMarketDocument!);
+                new List<Serie> { CreateSerieCreateRecord() }.AsReadOnly()));
+        return messageParser.MarketMessage!;
     }
 
     private Serie CreateSerieCreateRecord() =>

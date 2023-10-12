@@ -50,11 +50,11 @@ public class WhenARejectedResultIsAvailableTests : TestBase
         var process = BuildProcess();
         var rejectReason = new RejectReason()
         {
-            ErrorCode = ErrorCodes.NoDataForPeriod,
+            ErrorCode = "ER0",
         };
         var rejectReason2 = new RejectReason()
         {
-            ErrorCode = ErrorCodes.InvalidPeriod,
+            ErrorCode = "ER1",
         };
         var rejectEvent = new AggregatedTimeSeriesRequestRejected()
         {
@@ -62,7 +62,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
         };
 
         // Act
-        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestRejected), rejectEvent, process.ProcessId.Id).ConfigureAwait(false);
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestRejected), rejectEvent, process.ProcessId.Id);
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
@@ -72,8 +72,8 @@ public class WhenARejectedResultIsAvailableTests : TestBase
             .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons[0].ErrorCode, rejectReason.ErrorCode.ToString())
-            .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons[1].ErrorCode, rejectReason2.ErrorCode.ToString());
+            .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons[0].ErrorCode, rejectReason.ErrorCode)
+            .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons[1].ErrorCode, rejectReason2.ErrorCode);
     }
 
     protected override void Dispose(bool disposing)
@@ -90,7 +90,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
             DocumentType.RejectRequestAggregatedMeasureData.Name,
             businessReason.Name,
             roleOfReceiver,
-            GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+            GetService<IDatabaseConnectionFactory>());
     }
 
     private AggregatedMeasureDataProcess BuildProcess()

@@ -23,6 +23,7 @@ using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData;
@@ -48,8 +49,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 
         public DbSet<AggregatedMeasureDataProcess> AggregatedMeasureDataProcesses { get; private set; }
 
-        public DbSet<AggregationResultForwarding> AggregatedTimeSeriesTransactions { get; private set; }
-
         public DbSet<OutgoingMessage> OutgoingMessages { get; private set; }
 
         public DbSet<QueuedInternalCommand> QueuedInternalCommands { get; private set; }
@@ -58,27 +57,29 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 
         public DbSet<ArchivedMessage> ArchivedMessages { get; private set; }
 
-        public DbSet<ReceivedIntegrationEvent> ReceivedIntegrationEvents { get; private set; }
-
         public DbSet<ActorMessageQueue> ActorMessageQueues { get; private set; }
 
         public DbSet<MarketDocument> MarketDocuments { get; private set; }
 
         public DbSet<ReceivedInboxEvent> ReceivedInboxEvents { get; private set; }
 
+        public DbSet<TransactionIdForSender> TransactionIds { get; private set; }
+
+        public DbSet<MessageIdForSender> MessageIds { get; private set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
 
             modelBuilder.ApplyConfiguration(new AggregatedMeasureDataProcessEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new AggregationResultForwardingEntityConfiguration(_serializer));
             modelBuilder.ApplyConfiguration(new OutgoingMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QueuedInternalCommandEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new ReceivedIntegrationEventEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ArchivedMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ActorMessageQueueEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MarketDocumentEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ReceivedInboxEventEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new TransactionIdEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new MessageIdEntityConfiguration());
         }
     }
 }

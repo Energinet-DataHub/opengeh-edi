@@ -22,8 +22,10 @@ using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Xml;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
-namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Xml;
+namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Ebix;
 
 public abstract class EbixDocumentWriter : DocumentWriter
 {
@@ -47,7 +49,7 @@ public abstract class EbixDocumentWriter : DocumentWriter
         var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = new UTF8Encoding(false), Async = true, Indent = true };
         var stream = new MemoryStream();
         using var writer = XmlWriter.Create(stream, settings);
-        string? settlementVersion = ExtractSettlementVersion(originalData);
+        SettlementVersion? settlementVersion = ExtractSettlementVersion(originalData);
         await WriteHeaderAsync(header, DocumentDetails, writer, settlementVersion).ConfigureAwait(false);
         foreach (var marketActivityRecord in marketActivityRecords)
         {
@@ -76,7 +78,7 @@ public abstract class EbixDocumentWriter : DocumentWriter
 
     protected abstract Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer);
 
-    protected virtual string? ExtractSettlementVersion(IReadOnlyCollection<string> marketActivityPayloads)
+    protected virtual SettlementVersion? ExtractSettlementVersion(IReadOnlyCollection<string> marketActivityPayloads)
     {
         return null;
     }
@@ -129,7 +131,7 @@ public abstract class EbixDocumentWriter : DocumentWriter
         writer.Close();
     }
 
-    private Task WriteHeaderAsync(MessageHeader header, DocumentDetails documentDetails, XmlWriter writer, string? settlementVersion)
+    private Task WriteHeaderAsync(MessageHeader header, DocumentDetails documentDetails, XmlWriter writer, SettlementVersion? settlementVersion)
     {
         return EbixHeaderWriter.WriteAsync(writer, header, documentDetails, ReasonCode, settlementVersion);
     }

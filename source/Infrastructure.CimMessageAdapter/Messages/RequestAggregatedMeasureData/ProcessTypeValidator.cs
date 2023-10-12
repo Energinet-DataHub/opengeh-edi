@@ -22,7 +22,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
 
 public class ProcessTypeValidator : IProcessTypeValidator
 {
-    private static readonly IReadOnlyCollection<string> _whiteList = new[] { "D03", "D04", "D05", "D09", "D32" };
+    private static readonly IReadOnlyCollection<string> _whiteList = new[] { "D03", "D04", "D05", "D32" };
 
     public async Task<Result> ValidateAsync(string processType, CancellationToken cancellationToken)
     {

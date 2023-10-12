@@ -65,6 +65,22 @@ public static class EbixCode
         throw NoBusinessReasonFoundFor(businessReasonCode);
     }
 
+    public static string Of(SettlementVersion settlementVersion)
+    {
+        ArgumentNullException.ThrowIfNull(settlementVersion);
+
+        if (settlementVersion == SettlementVersion.FirstCorrection)
+            return "D01";
+
+        if (settlementVersion == SettlementVersion.SecondCorrection)
+            return "D02";
+
+        if (settlementVersion == SettlementVersion.ThirdCorrection)
+            return "D03";
+
+        throw NoCodeFoundFor(settlementVersion.Name);
+    }
+
     public static string Of(MeteringPointType meteringPointType)
     {
         ArgumentNullException.ThrowIfNull(meteringPointType);
@@ -147,6 +163,18 @@ public static class EbixCode
             return "E01";
 
         throw NoCodeFoundFor(quality.Name);
+    }
+
+    public static string Of(ReasonCode reasonCode)
+    {
+        ArgumentNullException.ThrowIfNull(reasonCode);
+
+        if (reasonCode == ReasonCode.FullyAccepted)
+            return "39";
+        if (reasonCode == ReasonCode.FullyRejected)
+            return "41";
+
+        throw NoCodeFoundFor(reasonCode.Name);
     }
 
     private static Exception NoCodeFoundFor(string domainType)

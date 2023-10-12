@@ -83,8 +83,7 @@ public class AggregationResultXmlDocumentWriter : CimDocumentWriter
 
             if (timeSeries.BalanceResponsibleNumber is not null)
             {
-                await writer
-                    .WriteStartElementAsync(DocumentDetails.Prefix, "balanceResponsibleParty_MarketParticipant.mRID", null).ConfigureAwait(false);
+                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "balanceResponsibleParty_MarketParticipant.mRID", null).ConfigureAwait(false);
                 await writer.WriteAttributeStringAsync(null, "codingScheme", null, CimCode.CodingSchemeOf(ActorNumber.Create(timeSeries.BalanceResponsibleNumber))).ConfigureAwait(false);
                 await writer.WriteStringAsync(timeSeries.BalanceResponsibleNumber).ConfigureAwait(false);
                 await writer.WriteEndElementAsync().ConfigureAwait(false);

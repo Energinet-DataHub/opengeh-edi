@@ -13,54 +13,46 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
-using Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Documents;
-using Serie = Energinet.DataHub.EDI.Application.IncomingMessages.RequestAggregatedMeasureData.Serie;
-using SerieDocument = Energinet.DataHub.EDI.Domain.Documents.Serie;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
 public static class RequestAggregatedMeasureDataMarketMessageFactory
 {
-    public static RequestAggregatedMeasureDataMarketMessage Created(
-        IIncomingMarketDocument<Serie, RequestAggregatedMeasureDataTransactionCommand>
-            incomingMarketDocument)
+    public static RequestAggregatedMeasureDataMarketMessage Create(
+        MessageHeader header,
+        ReadOnlyCollection<Serie> series)
     {
-        if (incomingMarketDocument == null) throw new ArgumentNullException(nameof(incomingMarketDocument));
-
-        var series = incomingMarketDocument.MarketActivityRecords
-            .Select(activityRecord => new SerieDocument(
-                activityRecord.Id,
-                activityRecord.MarketEvaluationPointType,
-                activityRecord.MarketEvaluationSettlementMethod,
-                activityRecord.StartDateAndOrTimeDateTime,
-                activityRecord.EndDateAndOrTimeDateTime,
-                activityRecord.MeteringGridAreaDomainId,
-                activityRecord.EnergySupplierMarketParticipantId,
-                activityRecord.BalanceResponsiblePartyMarketParticipantId)).ToList();
+        if (header == null) throw new ArgumentNullException(nameof(header));
+        if (series == null) throw new ArgumentNullException(nameof(series));
 
         return new RequestAggregatedMeasureDataMarketMessage(
-            ActorNumber.Create(incomingMarketDocument.Header.SenderId),
-            MarketRole.FromCode(incomingMarketDocument.Header.SenderRole),
-            ActorNumber.Create(incomingMarketDocument.Header.ReceiverId),
-            MarketRole.FromCode(incomingMarketDocument.Header.ReceiverRole),
-            incomingMarketDocument.Header.BusinessReason,
-            incomingMarketDocument.Header.AuthenticatedUser,
-            incomingMarketDocument.Header.AuthenticatedUserRole,
-            incomingMarketDocument.Header.MessageType,
-            incomingMarketDocument.Header.MessageId,
+            header.SenderId,
+            header.SenderRole,
+            header.ReceiverId,
+            header.ReceiverRole,
+            header.BusinessReason,
+            header.AuthenticatedUser,
+            header.AuthenticatedUserRole,
+            header.MessageType,
+            header.MessageId,
+            header.CreatedAt,
             series);
     }
 
-    public static RequestAggregatedMeasureDataMarketMessage Created(Edi.Requests.RequestAggregatedMeasureData requestAggregatedMeasureData)
+    public static RequestAggregatedMeasureDataMarketMessage Create(
+        Edi.Requests.RequestAggregatedMeasureData requestAggregatedMeasureData,
+        Instant createdAt)
     {
         if (requestAggregatedMeasureData == null) throw new ArgumentNullException(nameof(requestAggregatedMeasureData));
 
         var series = requestAggregatedMeasureData.Series
-            .Select(serie => new SerieDocument(
+            .Select(serie => new Serie(
                 serie.Id,
                 serie.MarketEvaluationPointType,
                 serie.MarketEvaluationSettlementMethod,
@@ -71,15 +63,16 @@ public static class RequestAggregatedMeasureDataMarketMessageFactory
                 serie.BalanceResponsiblePartyMarketParticipantId)).ToList();
 
         return new RequestAggregatedMeasureDataMarketMessage(
-            ActorNumber.Create(requestAggregatedMeasureData.SenderId),
-            MarketRole.FromCode(requestAggregatedMeasureData.SenderRole),
-            ActorNumber.Create(requestAggregatedMeasureData.ReceiverId),
-            MarketRole.FromCode(requestAggregatedMeasureData.ReceiverRole),
+            requestAggregatedMeasureData.SenderId,
+            requestAggregatedMeasureData.SenderRoleCode,
+            requestAggregatedMeasureData.ReceiverId,
+            requestAggregatedMeasureData.ReceiverRoleCode,
             requestAggregatedMeasureData.BusinessReason,
             requestAggregatedMeasureData.AuthenticatedUser,
-            requestAggregatedMeasureData.AuthenticatedUserRole,
+            requestAggregatedMeasureData.AuthenticatedUserRoleCode,
             requestAggregatedMeasureData.MessageType,
             requestAggregatedMeasureData.MessageId,
+            createdAt.ToString(),
             series);
     }
 }

@@ -26,14 +26,12 @@ namespace Energinet.DataHub.EDI.Application.Transactions.Aggregations;
 
 public class ForwardAggregationResultHandler : IRequestHandler<ForwardAggregationResult, Unit>
 {
-    private readonly IAggregationResultForwardingRepository _transactions;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly IOutgoingMessagesConfigurationRepository _outgoingMessagesConfigurationRepository;
     private readonly DocumentFactory _documentFactory;
 
-    public ForwardAggregationResultHandler(IAggregationResultForwardingRepository transactions, IOutgoingMessageRepository outgoingMessageRepository, IOutgoingMessagesConfigurationRepository outgoingMessagesConfigurationRepository, DocumentFactory documentFactory)
+    public ForwardAggregationResultHandler(IOutgoingMessageRepository outgoingMessageRepository, IOutgoingMessagesConfigurationRepository outgoingMessagesConfigurationRepository, DocumentFactory documentFactory)
     {
-        _transactions = transactions;
         _outgoingMessageRepository = outgoingMessageRepository;
         _outgoingMessagesConfigurationRepository = outgoingMessagesConfigurationRepository;
         _documentFactory = documentFactory;
@@ -42,8 +40,6 @@ public class ForwardAggregationResultHandler : IRequestHandler<ForwardAggregatio
     public async Task<Unit> Handle(ForwardAggregationResult request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        var transaction = new AggregationResultForwarding(ProcessId.New());
-        _transactions.Add(transaction);
 
         var documentFormat = DocumentFormat.Xml;
 
@@ -52,7 +48,7 @@ public class ForwardAggregationResultHandler : IRequestHandler<ForwardAggregatio
             documentFormat = await _outgoingMessagesConfigurationRepository.GetDocumentFormatAsync(ActorNumber.Create(request.Result.GridAreaDetails!.OperatorNumber), MarketRole.MeteredDataResponsible, DocumentType.NotifyAggregatedMeasureData).ConfigureAwait(false);
         }
         else if (AggregationResultMessageFactory.ResultIsForTheEnergySupplier(request.Result))
-            {
+        {
             documentFormat = await _outgoingMessagesConfigurationRepository.GetDocumentFormatAsync(ActorNumber.Create(request.Result.ActorGrouping!.EnergySupplierNumber!), MarketRole.EnergySupplier, DocumentType.NotifyAggregatedMeasureData).ConfigureAwait(false);
         }
         else if (AggregationResultMessageFactory.ResultIsForTheBalanceResponsible(request.Result))
@@ -61,7 +57,7 @@ public class ForwardAggregationResultHandler : IRequestHandler<ForwardAggregatio
         }
 
         var documentWriter = _documentFactory.GetWriter(DocumentType.NotifyAggregatedMeasureData, documentFormat);
-        _outgoingMessageRepository.Add(transaction.CreateMessage(request.Result, documentWriter));
+        _outgoingMessageRepository.Add(AggregationResultMessageFactory.CreateMessage(request.Result, ProcessId.New(), documentWriter));
         return Unit.Value;
     }
 }

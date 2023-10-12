@@ -1,0 +1,117 @@
+﻿// Copyright 2020 Energinet DataHub A/S
+//
+// Licensed under the Apache License, Version 2.0 (the "License2");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using Energinet.DataHub.EDI.B2CWebApi.Models;
+using Energinet.DataHub.Edi.Requests;
+
+namespace Energinet.DataHub.EDI.B2CWebApi.Factories;
+
+public static class RequestAggregatedMeasureDataHttpFactory
+{
+    public static RequestAggregatedMeasureData Create(
+        RequestAggregatedMeasureDataMarketRequest request,
+        string actorNumber,
+        string role)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
+        var senderRoleCode = MapRoleNameToCode(role);
+        var data = new RequestAggregatedMeasureData
+        {
+            MessageId = Guid.NewGuid().ToString(),
+            SenderId = actorNumber,
+            SenderRoleCode = senderRoleCode,
+            ReceiverId = "5790001330552",
+            ReceiverRoleCode = MarketRole.CalculationResponsibleRole.Code,
+            AuthenticatedUser = actorNumber,
+            AuthenticatedUserRoleCode = senderRoleCode,
+            BusinessReason = MapToBusinessReasonCode(request.ProcessType),
+            MessageType = "E74",
+        };
+
+        var serie = new Serie()
+        {
+            Id = Guid.NewGuid().ToString(),
+            StartDateAndOrTimeDateTime = request.StartDate,
+            EndDateAndOrTimeDateTime = request.EndDate,
+            MeteringGridAreaDomainId = request.GridArea,
+            EnergySupplierMarketParticipantId = request.EnergySupplierId,
+            BalanceResponsiblePartyMarketParticipantId = request.BalanceResponsibleId,
+        };
+
+        MapEvaluationPointTypeAndSettlementMethod(serie, request);
+
+        data.Series.Add(serie);
+
+        return data;
+    }
+
+    private static string MapToBusinessReasonCode(ProcessType requestProcessType)
+    {
+        return requestProcessType switch
+        {
+            ProcessType.PreliminaryAggregation => "D03",
+            ProcessType.BalanceFixing => "D04",
+            ProcessType.WholesaleFixing => "D05",
+            ProcessType.Correction => "D32",
+            _ => throw new ArgumentOutOfRangeException(nameof(requestProcessType), requestProcessType, "Unknown ProcessType"),
+        };
+    }
+
+    private static void MapEvaluationPointTypeAndSettlementMethod(Serie serie, RequestAggregatedMeasureDataMarketRequest request)
+    {
+        switch (request.MeteringPointType)
+        {
+            case MeteringPointType.Production:
+                serie.MarketEvaluationPointType = "E18";
+                break;
+            case MeteringPointType.FlexConsumption:
+                serie.MarketEvaluationPointType = "E17";
+                serie.MarketEvaluationSettlementMethod = "D01";
+                break;
+            case MeteringPointType.TotalConsumption:
+                serie.MarketEvaluationPointType = "E17";
+                break;
+            case MeteringPointType.NonProfiledConsumption:
+                serie.MarketEvaluationPointType = "E17";
+                serie.MarketEvaluationSettlementMethod = "E02";
+                break;
+            case MeteringPointType.Exchange:
+                serie.MarketEvaluationPointType = "E20";
+                break;
+        }
+    }
+
+    private static string MapRoleNameToCode(string roleName)
+    {
+        if (roleName == null) throw new ArgumentNullException(nameof(roleName));
+
+        if (roleName.Equals(MarketRole.MeteredDataResponsible.Name, StringComparison.OrdinalIgnoreCase))
+        {
+            return MarketRole.MeteredDataResponsible.Code;
+        }
+
+        if (roleName.Equals(MarketRole.EnergySupplier.Name, StringComparison.OrdinalIgnoreCase))
+        {
+            return MarketRole.EnergySupplier.Code;
+        }
+
+        if (roleName.Equals(MarketRole.BalanceResponsibleParty.Name, StringComparison.OrdinalIgnoreCase))
+        {
+            return MarketRole.BalanceResponsibleParty.Code;
+        }
+
+        return roleName;
+    }
+}

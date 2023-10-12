@@ -23,6 +23,11 @@ public static class Program
 
     private static IHostBuilder CreateWebHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
+            .ConfigureLogging((_, logging) =>
+            {
+                logging.ClearProviders();
+                logging.AddApplicationInsights();
+            })
             .ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.UseStartup<Startup>();

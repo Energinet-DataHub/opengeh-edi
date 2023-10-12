@@ -13,12 +13,15 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
+using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
@@ -41,8 +44,6 @@ using Google.Protobuf;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
-using TestNotification = Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.IntegrationEvents.TestNotification;
-using TestNotificationHandlerSpy = Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.IntegrationEvents.TestNotificationHandlerSpy;
 
 namespace Energinet.DataHub.EDI.IntegrationTests
 {
@@ -62,14 +63,11 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             databaseFixture.CleanupDatabase();
             _httpClientSpy = new HttpClientSpy();
             _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
-            NotificationHandlerSpy = new TestNotificationHandlerSpy();
             TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
             InboxEventNotificationHandler = new IntegrationTests.Infrastructure.InboxEvents.TestNotificationHandlerSpy();
             BuildServices();
             _b2BContext = GetService<B2BContext>();
         }
-
-        protected TestNotificationHandlerSpy NotificationHandlerSpy { get; }
 
         protected TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
 
@@ -111,13 +109,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return GetService<IMediator>().Send(query, CancellationToken.None);
         }
 
-        protected async Task HavingReceivedIntegrationEventAsync(string eventType, IMessage eventPayload)
-        {
-            await GetService<IntegrationEventReceiver>().ReceiveAsync(Guid.NewGuid().ToString(), eventType, eventPayload.ToByteArray()).ConfigureAwait(false);
-            await ProcessReceivedIntegrationEventsAsync().ConfigureAwait(false);
-            await HavingProcessedInternalTasksAsync().ConfigureAwait(false);
-        }
-
         protected async Task HavingReceivedInboxEventAsync(string eventType, IMessage eventPayload, Guid processId)
         {
             await GetService<InboxEventReceiver>().
@@ -129,11 +120,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 .ConfigureAwait(false);
             await ProcessReceivedInboxEventsAsync().ConfigureAwait(false);
             await ProcessInternalCommandsAsync().ConfigureAwait(false);
-        }
-
-        protected Task HavingProcessedInternalTasksAsync()
-        {
-            return ProcessBackgroundTasksAsync();
         }
 
         protected Task ProcessReceivedInboxEventsAsync()
@@ -160,11 +146,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             }
         }
 
-        private Task ProcessReceivedIntegrationEventsAsync()
-        {
-            return ProcessBackgroundTasksAsync();
-        }
-
         private Task ProcessBackgroundTasksAsync()
         {
             var datetimeProvider = GetService<ISystemDateTimeProvider>();
@@ -183,13 +164,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
             _services.AddTransient<InboxEventsProcessor>();
             _services.AddTransient<AggregatedTimeSeriesRequestAcceptedEventMapper>();
-            _services.AddTransient<INotificationHandler<TestNotification>>(_ => NotificationHandlerSpy);
             _services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>>(_ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy);
             _services.AddTransient<INotificationHandler<IntegrationTests.Infrastructure.InboxEvents.TestNotification>>(
                 _ => InboxEventNotificationHandler);
 
             _services.AddTransient<IRequestHandler<TestCommand, Unit>, TestCommandHandler>();
             _services.AddTransient<IRequestHandler<TestCreateOutgoingMessageCommand, Unit>, TestCreateOutgoingCommandHandler>();
+
+            _services.AddTransient<IIntegrationEventHandler, IntegrationEventHandler>();
 
             CompositionRoot.Initialize(_services)
                 .AddAuthentication()

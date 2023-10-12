@@ -16,11 +16,14 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Security;
 
 public sealed class FrontendUser
 {
-    public FrontendUser(Guid userId, Guid actorId, bool isFas)
+    public FrontendUser(Guid userId, Guid actorId, bool isFas, string actorNumber, string role, string azp)
     {
         UserId = userId;
         ActorId = actorId;
         IsFas = isFas;
+        ActorNumber = actorNumber;
+        Role = role;
+        Azp = azp;
     }
 
     public Guid UserId { get; }
@@ -28,4 +31,10 @@ public sealed class FrontendUser
     public Guid ActorId { get; }
 
     public bool IsFas { get; }
+
+    public string ActorNumber { get; }
+
+    public string Role { get; }
+
+    public string Azp { get; }
 }

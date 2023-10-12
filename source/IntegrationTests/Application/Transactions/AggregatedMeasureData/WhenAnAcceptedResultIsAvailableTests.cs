@@ -30,6 +30,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
+using NodaTime.Text;
 using Xunit;
 using Xunit.Categories;
 using Period = Energinet.DataHub.Edi.Responses.Period;
@@ -56,7 +57,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         var acceptedEvent = GetAcceptedEvent(process);
 
         // Act
-        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id).ConfigureAwait(false);
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id);
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
@@ -118,8 +119,17 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
         var period = new Period()
         {
-            StartOfPeriod = new Timestamp() { Seconds = aggregatedMeasureDataProcess.StartOfPeriod.ToUnixTimeSeconds(), },
-            EndOfPeriod = new Timestamp() { Seconds = aggregatedMeasureDataProcess.EndOfPeriod?.ToUnixTimeSeconds() ?? 1, },
+            StartOfPeriod = new Timestamp()
+            {
+                Seconds = InstantPattern.General.Parse(aggregatedMeasureDataProcess.StartOfPeriod)
+                .GetValueOrThrow().ToUnixTimeSeconds(),
+            },
+            EndOfPeriod = new Timestamp()
+            {
+                Seconds = aggregatedMeasureDataProcess.EndOfPeriod is not null
+                ? InstantPattern.General.Parse(aggregatedMeasureDataProcess.EndOfPeriod).GetValueOrThrow().ToUnixTimeSeconds()
+                : 1,
+            },
             Resolution = Resolution.Pt15M,
         };
 
@@ -143,7 +153,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
                 Guid.NewGuid().ToString(),
                 nameof(AggregatedTimeSeriesRequestAccepted),
                 process.ProcessId.Id,
-                acceptedEvent.ToByteArray()).ConfigureAwait(false);
+                acceptedEvent.ToByteArray());
     }
 
     private async Task<AssertOutgoingMessage> OutgoingMessageAsync(
@@ -154,7 +164,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             DocumentType.NotifyAggregatedMeasureData.Name,
             businessReason.Name,
             roleOfReceiver,
-            GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+            GetService<IDatabaseConnectionFactory>());
     }
 
     private AggregatedMeasureDataProcess BuildProcess(MarketRole? receiverRole = null)

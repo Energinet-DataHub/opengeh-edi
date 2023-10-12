@@ -21,6 +21,8 @@ using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Json;
 using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
 
@@ -53,7 +55,7 @@ public class RejectRequestAggregatedMeasureDataJsonDocumentWriter : IDocumentWri
         var options = new JsonWriterOptions() { Indented = true };
         using var writer = new Utf8JsonWriter(stream, options);
 
-        JsonHeaderWriter.Write(header, DocumentType, TypeCode, "A02", writer);
+        JsonHeaderWriter.Write(header, DocumentType, TypeCode, CimCode.Of(ReasonCode.FullyRejected), writer);
         WriteSeries(marketActivityRecords, writer);
         writer.WriteEndObject();
         await writer.FlushAsync().ConfigureAwait(false);

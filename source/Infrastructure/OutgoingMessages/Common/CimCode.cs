@@ -65,6 +65,22 @@ public static class CimCode
         throw NoBusinessReasonFoundFor(businessReasonCode);
     }
 
+    public static string Of(SettlementVersion settlementVersion)
+    {
+        ArgumentNullException.ThrowIfNull(settlementVersion);
+
+        if (settlementVersion == SettlementVersion.FirstCorrection)
+            return "D01";
+
+        if (settlementVersion == SettlementVersion.SecondCorrection)
+            return "D02";
+
+        if (settlementVersion == SettlementVersion.ThirdCorrection)
+            return "D03";
+
+        throw NoCodeFoundFor(settlementVersion.Name);
+    }
+
     public static string Of(MeteringPointType meteringPointType)
     {
         ArgumentNullException.ThrowIfNull(meteringPointType);
@@ -113,20 +129,6 @@ public static class CimCode
         throw NoCodeFoundFor(settlementType.Name);
     }
 
-    public static string Of(SettlementVersion settlementVersion)
-    {
-        ArgumentNullException.ThrowIfNull(settlementVersion);
-
-        if (settlementVersion == SettlementVersion.FirstCorrection)
-            return "D01";
-        if (settlementVersion == SettlementVersion.SecondCorrection)
-            return "D02";
-        if (settlementVersion == SettlementVersion.ThirdCorrection)
-            return "D03";
-
-        throw NoCodeFoundFor(settlementVersion.Name);
-    }
-
     public static string Of(MeasurementUnit measurementUnit)
     {
         ArgumentNullException.ThrowIfNull(measurementUnit);
@@ -165,6 +167,18 @@ public static class CimCode
             return "A02";
 
         throw NoCodeFoundFor(quality.Name);
+    }
+
+    public static string Of(ReasonCode reasonCode)
+    {
+        ArgumentNullException.ThrowIfNull(reasonCode);
+
+        if (reasonCode == ReasonCode.FullyAccepted)
+            return "A01";
+        if (reasonCode == ReasonCode.FullyRejected)
+            return "A02";
+
+        throw NoCodeFoundFor(reasonCode.Name);
     }
 
     public static string CodingSchemeOf(ActorNumber actorNumber)
