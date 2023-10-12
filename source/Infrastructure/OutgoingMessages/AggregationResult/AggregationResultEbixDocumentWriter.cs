@@ -26,6 +26,7 @@ using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Ebix;
+using Energinet.DataHub.MeteringPoints.RequestResponse.Response;
 using Point = Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
 namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AggregationResult;
@@ -37,7 +38,6 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
             new DocumentDetails(
             "DK_AggregatedMeteredDataTimeSeries",
             string.Empty,
-            //"un:unece:260:data:EEM-DK_AggregatedMeteredDataTimeSeries:v3 ebIX_DK_AggregatedMeteredDataTimeSeries_0p9pC.xsd",
             "un:unece:260:data:EEM-DK_AggregatedMeteredDataTimeSeries:v3",
             "ns0",
             "E31"),
@@ -89,8 +89,8 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
             // Begin ObservationTimeSeriesPeriod
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "ObservationTimeSeriesPeriod", null).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "ResolutionDuration", null, EbixCode.Of(Resolution.From(timeSeries.Resolution))).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Start", null, timeSeries.Period.StartToString()).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "End", null, timeSeries.Period.EndToString()).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Start", null, timeSeries.Period.StartToEbixString()).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "End", null, timeSeries.Period.EndToEbixString()).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             // End ObservationTimeSeriesPeriod
 

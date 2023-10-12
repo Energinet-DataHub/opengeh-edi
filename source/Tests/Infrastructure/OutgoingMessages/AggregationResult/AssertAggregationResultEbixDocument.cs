@@ -91,8 +91,8 @@ public class AssertAggregationResultEbixDocument : IAssertAggregationResultDocum
     {
         ArgumentNullException.ThrowIfNull(expectedPeriod);
         _documentAsserter
-            .HasValue("PayloadEnergyTimeSeries[1]/ObservationTimeSeriesPeriod/Start", expectedPeriod.StartToString())
-            .HasValue("PayloadEnergyTimeSeries[1]/ObservationTimeSeriesPeriod/End", expectedPeriod.EndToString());
+            .HasValue("PayloadEnergyTimeSeries[1]/ObservationTimeSeriesPeriod/Start", expectedPeriod.StartToEbixString())
+            .HasValue("PayloadEnergyTimeSeries[1]/ObservationTimeSeriesPeriod/End", expectedPeriod.EndToEbixString());
         return this;
     }
 

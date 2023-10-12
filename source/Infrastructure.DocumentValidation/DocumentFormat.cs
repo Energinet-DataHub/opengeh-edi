@@ -17,5 +17,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 public enum DocumentFormat
 {
     CimXml,
+    CimJson,
     Ebix,
 }
