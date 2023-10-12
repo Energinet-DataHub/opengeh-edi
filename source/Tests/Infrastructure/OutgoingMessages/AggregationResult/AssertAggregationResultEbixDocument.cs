@@ -59,7 +59,7 @@ public class AssertAggregationResultEbixDocument : IAssertAggregationResultDocum
 
     public IAssertAggregationResultDocument HasTransactionId(Guid expectedTransactionId)
     {
-        _documentAsserter.HasValue($"PayloadEnergyTimeSeries[1]/Identification", expectedTransactionId.ToString());
+        _documentAsserter.HasValue($"PayloadEnergyTimeSeries[1]/Identification", expectedTransactionId.ToString("N"));
         return this;
     }
 

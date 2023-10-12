@@ -80,7 +80,7 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
             // Begin PayloadEnergyTimeSeries
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "PayloadEnergyTimeSeries", null).ConfigureAwait(false);
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Identification", null, timeSeries.TransactionId.ToString()).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Identification", null, timeSeries.TransactionId.ToString("N")).ConfigureAwait(false);
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Function", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "6").ConfigureAwait(false);
             await writer.WriteStringAsync("9").ConfigureAwait(false);
@@ -98,7 +98,7 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
             {
                 // Begin BalanceResponsibleEnergyParty
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "BalanceResponsibleEnergyParty", null).ConfigureAwait(false);
-                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Identification", null, timeSeries.BalanceResponsibleNumber).ConfigureAwait(false);
+                await WriteEbixSchemeCodeWithAttributesAsync("Identification", timeSeries.BalanceResponsibleNumber, writer).ConfigureAwait(false);
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
                 // End BalanceResponsibleEnergyParty
             }
@@ -107,7 +107,7 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
             {
                 // Begin BalanceSupplierEnergyParty
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "BalanceSupplierEnergyParty", null).ConfigureAwait(false);
-                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Identification", null, timeSeries.EnergySupplierNumber).ConfigureAwait(false);
+                await WriteEbixSchemeCodeWithAttributesAsync("Identification", timeSeries.EnergySupplierNumber, writer).ConfigureAwait(false);
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
                 // End BalanceSupplierEnergyParty
             }
@@ -118,30 +118,17 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
             await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "9").ConfigureAwait(false);
             await writer.WriteStringAsync(GeneralValues.ProductCode).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "UnitType", null).ConfigureAwait(false);
-            await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
-            await writer.WriteStringAsync(EbixCode.Of(MeasurementUnit.From(timeSeries.MeasureUnitType))).ConfigureAwait(false);
-            await writer.WriteEndElementAsync().ConfigureAwait(false);
+            await WriteEbixCodeWithAttributesAsync("UnitType", EbixCode.Of(MeasurementUnit.From(timeSeries.MeasureUnitType)), writer).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             // End IncludedProductCharacteristic
 
             // Begin DetailMeasurementMeteringPointCharacteristic
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "DetailMeasurementMeteringPointCharacteristic", null).ConfigureAwait(false);
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "TypeOfMeteringPoint", null).ConfigureAwait(false);
-            await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
-            await writer.WriteStringAsync(EbixCode.Of(MeteringPointType.From(timeSeries.MeteringPointType))).ConfigureAwait(false);
-            await writer.WriteEndElementAsync().ConfigureAwait(false);
+            await WriteEbixCodeWithAttributesAsync("TypeOfMeteringPoint", EbixCode.Of(MeteringPointType.From(timeSeries.MeteringPointType)), writer).ConfigureAwait(false);
+
             if (timeSeries.SettlementType != null)
             {
-                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "SettlementMethod", null).ConfigureAwait(false);
-                if (timeSeries.SettlementType.StartsWith('D'))
-                {
-                    await writer.WriteAttributeStringAsync(null, "schemeIdentifier", null, "DK").ConfigureAwait(false);
-                }
-
-                await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, "260").ConfigureAwait(false);
-                await writer.WriteStringAsync(CimCode.Of(SettlementType.From(timeSeries.SettlementType))).ConfigureAwait(false);
-                await writer.WriteEndElementAsync().ConfigureAwait(false);
+                await WriteEbixCodeWithAttributesAsync("SettlementMethod", EbixCode.Of(SettlementType.From(timeSeries.SettlementType)), writer).ConfigureAwait(false);
             }
 
             await writer.WriteEndElementAsync().ConfigureAwait(false);
@@ -165,7 +152,7 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
                 if (point.Quantity is not null)
                 {
                     await writer.WriteElementStringAsync(DocumentDetails.Prefix, "EnergyQuantity", null, point.Quantity.ToString()!).ConfigureAwait(false);
-                    await WriteQualityIfRequiredAsync(writer, point).ConfigureAwait(false);
+                    await WriteEbixCodeWithAttributesAsync("QuantityQuality", EbixCode.Of(Quality.From(point.Quality)), writer).ConfigureAwait(false);
                 }
                 else
                 {
@@ -184,13 +171,5 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             // End PayloadEnergyTimeSeries
         }
-    }
-
-    private Task WriteQualityIfRequiredAsync(XmlWriter writer, Point point)
-    {
-        if (point.Quality is null)
-            return Task.CompletedTask;
-
-        return writer.WriteElementStringAsync(DocumentDetails.Prefix, "QuantityQuality", null, EbixCode.Of(Quality.From(point.Quality)));
     }
 }

@@ -23,6 +23,7 @@ using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Xml;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using NodaTime;
 
@@ -86,6 +87,67 @@ public abstract class EbixDocumentWriter : IDocumentWriter
     {
         if (writer == null) throw new ArgumentNullException(nameof(writer));
         return writer.WriteElementStringAsync(DocumentDetails.Prefix, name, null, value);
+    }
+
+    protected async Task WriteEbixCodeWithAttributesAsync(string name, string ebixCode, XmlWriter writer)
+    {
+        if (name == null) throw new ArgumentNullException(nameof(name));
+        if (ebixCode == null) throw new ArgumentNullException(nameof(ebixCode));
+        if (writer == null) throw new ArgumentNullException(nameof(writer));
+
+        await writer.WriteStartElementAsync(DocumentDetails.Prefix, name, null).ConfigureAwait(false);
+        if (long.TryParse(ebixCode, out _))
+        {
+            // UN/CEFACT codelist
+            await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "6").ConfigureAwait(false);
+        }
+        else if (ebixCode.StartsWith("D", StringComparison.InvariantCulture) && ebixCode.Length == 3)
+        {
+            // Danish codelist
+            await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
+            await writer.WriteAttributeStringAsync(null, "listIdentifier", null, "DK").ConfigureAwait(false);
+        }
+        else
+        {
+            // ebIX codelist
+            await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
+        }
+
+        await writer.WriteStringAsync(ebixCode).ConfigureAwait(false);
+        await writer.WriteEndElementAsync().ConfigureAwait(false);
+    }
+
+    protected async Task WriteEbixSchemeCodeWithAttributesAsync(string name, string ebixSchemeCode, XmlWriter writer)
+    {
+        if (name == null) throw new ArgumentNullException(nameof(name));
+        if (ebixSchemeCode == null) throw new ArgumentNullException(nameof(ebixSchemeCode));
+        if (writer == null) throw new ArgumentNullException(nameof(writer));
+
+        await writer.WriteStartElementAsync(DocumentDetails.Prefix, name, null).ConfigureAwait(false);
+        if (long.TryParse(ebixSchemeCode, out _))
+        {
+            if (ebixSchemeCode.Length == 13 || ebixSchemeCode.Length == 18)
+            {
+                // GLN or GSNR number from GS1
+                await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, "9").ConfigureAwait(false);
+            }
+            else if (ebixSchemeCode.Length == 16)
+            {
+                // EIC code
+                await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, "305").ConfigureAwait(false);
+            }
+            else
+            {
+                throw new InvalidOperationException($"Invalid schemecode '{ebixSchemeCode}'");
+            }
+        }
+        else
+        {
+            throw new InvalidOperationException($"Invalid schemecode '{ebixSchemeCode}'");
+        }
+
+        await writer.WriteStringAsync(ebixSchemeCode).ConfigureAwait(false);
+        await writer.WriteEndElementAsync().ConfigureAwait(false);
     }
 
     protected Task WriteElementIfHasValueAsync(string name, string? value, XmlWriter writer)
