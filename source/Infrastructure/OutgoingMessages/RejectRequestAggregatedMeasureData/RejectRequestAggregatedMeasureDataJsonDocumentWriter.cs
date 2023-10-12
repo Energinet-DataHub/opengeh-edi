@@ -49,7 +49,7 @@ public class RejectRequestAggregatedMeasureDataJsonDocumentWriter : IDocumentWri
         return documentType == Domain.Documents.DocumentType.RejectRequestAggregatedMeasureData;
     }
 
-    public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
+    public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords, IReadOnlyCollection<string> originalData)
     {
         var stream = new MemoryStream();
         var options = new JsonWriterOptions() { Indented = true };
@@ -63,10 +63,22 @@ public class RejectRequestAggregatedMeasureDataJsonDocumentWriter : IDocumentWri
         return stream;
     }
 
+    public async Task<string> WritePayloadAsync(string marketActivityRecord)
+    {
+        return await WritePayloadInternalAsync(marketActivityRecord).ConfigureAwait(false);
+    }
+
+    public async Task<string> WritePayloadAsync<T>(object data)
+    {
+        return await WritePayloadInternalAsync(_parser.From((T)data)).ConfigureAwait(false);
+    }
+
     private void WriteSeries(IReadOnlyCollection<string> marketActivityRecords, Utf8JsonWriter writer)
     {
-        if (marketActivityRecords == null) throw new ArgumentNullException(nameof(marketActivityRecords));
-        if (writer == null) throw new ArgumentNullException(nameof(writer));
+        if (marketActivityRecords == null)
+            throw new ArgumentNullException(nameof(marketActivityRecords));
+        if (writer == null)
+            throw new ArgumentNullException(nameof(writer));
 
         writer.WritePropertyName("Series");
         writer.WriteStartArray();
@@ -105,7 +117,8 @@ public class RejectRequestAggregatedMeasureDataJsonDocumentWriter : IDocumentWri
 
     private IReadOnlyCollection<RejectedTimeSerie> ParseFrom(IReadOnlyCollection<string> payloads)
     {
-        if (payloads == null) throw new ArgumentNullException(nameof(payloads));
+        if (payloads == null)
+            throw new ArgumentNullException(nameof(payloads));
         var timeSeries = new List<RejectedTimeSerie>();
         foreach (var payload in payloads)
         {
@@ -113,5 +126,17 @@ public class RejectRequestAggregatedMeasureDataJsonDocumentWriter : IDocumentWri
         }
 
         return timeSeries;
+    }
+
+    private async Task<string> WritePayloadInternalAsync(string marketActivityRecord)
+    {
+        var stream = new MemoryStream();
+        var options = new JsonWriterOptions() { Indented = true };
+        using var writer = new Utf8JsonWriter(stream, options);
+
+        WriteSeries(new List<string> { marketActivityRecord }, writer);
+        await writer.FlushAsync().ConfigureAwait(false);
+        stream.Position = 0;
+        return string.Empty;
     }
 }

@@ -51,6 +51,8 @@ public class ActorMessageQueueEntityConfiguration : IEntityTypeConfiguration<Act
                 .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<DocumentType>(fromDbValue));
             navigationBuilder.Property<BusinessReason>("BusinessReason").HasColumnName("BusinessReason")
                 .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<BusinessReason>(fromDbValue));
+            navigationBuilder.Property<DocumentFormat>("OutputFormat").HasColumnName("OutputFormat")
+                .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<DocumentFormat>(fromDbValue));
             navigationBuilder.Property<int>("_messageCount").HasColumnName("MessageCount");
             navigationBuilder.Property<int>("_maxNumberOfMessagesInABundle").HasColumnName("MaxMessageCount");
             navigationBuilder.WithOwner().HasForeignKey("ActorMessageQueueId");

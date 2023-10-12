@@ -66,27 +66,37 @@ public class RejectRequestAggregatedMeasureDataResultDocumentWriterTests : IClas
             .DocumentIsValidAsync();
     }
 
-    private Task<Stream> CreateDocument(RejectedTimeSeriesBuilder resultBuilder, DocumentFormat documentFormat)
+    private async Task<Stream> CreateDocument(RejectedTimeSeriesBuilder resultBuilder, DocumentFormat documentFormat)
     {
         var documentHeader = resultBuilder.BuildHeader();
         var records = _parser.From(resultBuilder.BuildRejectedTimeSerie());
         if (documentFormat == DocumentFormat.Ebix)
         {
-            return new RejectRequestAggregatedMeasureDataEbixDocumentWriter(_parser).WriteAsync(
+            var writer = new RejectRequestAggregatedMeasureDataEbixDocumentWriter(_parser);
+            var payload = await writer.WritePayloadAsync(records).ConfigureAwait(false);
+
+            return await writer.WriteAsync(
                 documentHeader,
-                new[] { records, });
+                new[] { payload, },
+                new[] { records, }).ConfigureAwait(false);
         }
         else if (documentFormat == DocumentFormat.Xml)
         {
-            return new RejectRequestAggregatedMeasureDataXmlDocumentWriter(_parser).WriteAsync(
+            var writer = new RejectRequestAggregatedMeasureDataXmlDocumentWriter(_parser);
+            var payload = await writer.WritePayloadAsync(records).ConfigureAwait(false);
+
+            return await writer.WriteAsync(
                 documentHeader,
-                new[] { records, });
+                new[] { payload, },
+                new[] { records, }).ConfigureAwait(false);
         }
         else
         {
-            return new RejectRequestAggregatedMeasureDataJsonDocumentWriter(_parser).WriteAsync(
+            var writer = new RejectRequestAggregatedMeasureDataJsonDocumentWriter(_parser);
+            return await writer.WriteAsync(
                 documentHeader,
-                new[] { records, });
+                new[] { records, },
+                new[] { records, }).ConfigureAwait(false);
         }
     }
 

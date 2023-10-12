@@ -14,6 +14,8 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
 
@@ -22,10 +24,12 @@ namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Queueing;
 public class MessageEnqueuer
 {
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
+    private readonly IOutgoingMessagesConfigurationRepository _outgoingMessagesConfigurationRepository;
 
-    public MessageEnqueuer(IActorMessageQueueRepository actorMessageQueueRepository)
+    public MessageEnqueuer(IActorMessageQueueRepository actorMessageQueueRepository, IOutgoingMessagesConfigurationRepository outgoingMessagesConfigurationRepository)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
+        _outgoingMessagesConfigurationRepository = outgoingMessagesConfigurationRepository;
     }
 
     public async Task EnqueueAsync(OutgoingMessage message)
@@ -42,6 +46,7 @@ public class MessageEnqueuer
             await _actorMessageQueueRepository.AddAsync(messageQueue).ConfigureAwait(false);
         }
 
-        messageQueue.Enqueue(message);
+        var documentFormat = await _outgoingMessagesConfigurationRepository.GetDocumentFormatAsync(message.ReceiverId, message.Receiver.ActorRole, message.DocumentType).ConfigureAwait(false);
+        messageQueue.Enqueue(message, documentFormat);
     }
 }

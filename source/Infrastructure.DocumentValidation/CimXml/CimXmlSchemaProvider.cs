@@ -57,11 +57,7 @@ public class CimXmlSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
         where T : default
     {
         using var reader = new XmlTextReader(location);
-        var xmlSchema = XmlSchema.Read(reader, null);
-        if (xmlSchema is null)
-        {
-            throw new XmlSchemaException($"Could not read schema at {location}");
-        }
+        var xmlSchema = XmlSchema.Read(reader, null) ?? throw new XmlSchemaException($"Could not read schema at {location}");
 
         foreach (XmlSchemaExternal external in xmlSchema.Includes)
         {

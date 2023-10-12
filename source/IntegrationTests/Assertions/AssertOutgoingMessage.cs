@@ -71,7 +71,7 @@ public class AssertOutgoingMessage
         using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var message = connection.QuerySingle(
             $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.ProcessId, m.BusinessReason," +
-            $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
+            $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord, m.OriginalData " +
             $" FROM [dbo].[OutgoingMessages] m" +
             $" WHERE m.DocumentType = '{messageType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Name}'");
 
@@ -111,13 +111,13 @@ public class AssertOutgoingMessage
 
     public AssertMarketActivityRecord WithMarketActivityRecord()
     {
-        return new AssertMarketActivityRecord(_message.MessageRecord);
+        return new AssertMarketActivityRecord(_message.OriginalData);
     }
 
     public AssertOutgoingMessage HasMessageRecordValue<TMessageRecord>(
         Func<TMessageRecord, object?> propertySelector, object? expectedValue)
     {
-        var sut = _serializer.Deserialize<TMessageRecord>(_message.MessageRecord);
+        var sut = _serializer.Deserialize<TMessageRecord>(_message.OriginalData);
         Assert.Equal(expectedValue, propertySelector(sut));
         return this;
     }

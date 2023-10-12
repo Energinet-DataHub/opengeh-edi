@@ -15,9 +15,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Json;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
@@ -25,54 +27,71 @@ using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Json;
-using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
 
 namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AggregationResult;
 
-public class AggregationResultJsonDocumentWriter : IDocumentWriter
+public class AggregationResultJsonDocumentWriter : JsonDocumentWriter
 {
-    private const string DocumentType = "NotifyAggregatedMeasureData_MarketDocument";
-    private const string TypeCode = "E31";
-    private readonly IMessageRecordParser _parser;
-
     public AggregationResultJsonDocumentWriter(IMessageRecordParser parser)
+        : base(
+            new DocumentDetails(
+                "NotifyAggregatedMeasureData_MarketDocument",
+                "E31",
+                null),
+            parser)
     {
-        _parser = parser;
     }
 
-    public bool HandlesFormat(DocumentFormat format)
-    {
-        return format == DocumentFormat.Json;
-    }
-
-    public bool HandlesType(DocumentType documentType)
+    public override bool HandlesType(DocumentType documentType)
     {
         return documentType == Domain.Documents.DocumentType.NotifyAggregatedMeasureData;
     }
 
-    public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
+    public override async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords, IReadOnlyCollection<string> originalData)
     {
+        ArgumentNullException.ThrowIfNull(marketActivityRecords, nameof(marketActivityRecords));
+
         var stream = new MemoryStream();
         var options = new JsonWriterOptions() { Indented = true };
         using var writer = new Utf8JsonWriter(stream, options);
 
-        JsonHeaderWriter.Write(header, DocumentType, TypeCode, null, writer);
-        WriteSeries(marketActivityRecords, writer);
+        JsonHeaderWriter.Write(header, DocumentDetails.DocumentType, DocumentDetails.TypeCode, DocumentDetails.ReasonCode, writer);
+        writer.WritePropertyName("Series");
+        writer.WriteStartArray();
+        foreach (var marketActivityRecord in marketActivityRecords)
+        {
+            writer.WriteRawValue(marketActivityRecord);
+        }
+
+        writer.WriteEndArray();
+        writer.WriteEndObject();
         writer.WriteEndObject();
         await writer.FlushAsync().ConfigureAwait(false);
         stream.Position = 0;
         return stream;
     }
 
+    public override async Task<string> WritePayloadAsync(string marketActivityRecord)
+    {
+        return await WritePayloadInternalAsync(marketActivityRecord).ConfigureAwait(false);
+    }
+
+    public override async Task<string> WritePayloadAsync<T>(object data)
+    {
+        return await WritePayloadInternalAsync(Parser.From((T)data)).ConfigureAwait(false);
+    }
+
     private void WriteSeries(IReadOnlyCollection<string> marketActivityRecords, Utf8JsonWriter writer)
     {
-        if (marketActivityRecords == null) throw new ArgumentNullException(nameof(marketActivityRecords));
-        if (writer == null) throw new ArgumentNullException(nameof(writer));
+        if (marketActivityRecords == null)
+            throw new ArgumentNullException(nameof(marketActivityRecords));
+        if (writer == null)
+            throw new ArgumentNullException(nameof(writer));
 
         writer.WritePropertyName("Series");
         writer.WriteStartArray();
 
-        foreach (var series in ParseFrom(marketActivityRecords))
+        foreach (var series in ParseFrom<TimeSeries>(marketActivityRecords))
         {
             writer.WriteStartObject();
 
@@ -108,6 +127,13 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
                     new KeyValuePair<string, string>("value", CimCode.Of(SettlementType.From(series.SettlementType))));
             }
 
+            if (series.SettlementVersion is not null)
+            {
+                writer.WriteObject(
+                    "settlement_Series.version",
+                    new KeyValuePair<string, string>("value", CimCode.Of(SettlementVersion.From(series.SettlementVersion))));
+            }
+
             if (series.OriginalTransactionIdReference is not null)
             {
                 writer.WriteProperty("originalTransactionIDReference_Series.mRID", series.OriginalTransactionIdReference);
@@ -116,11 +142,6 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
             writer.WriteObject("marketEvaluationPoint.type", new KeyValuePair<string, string>("value", CimCode.Of(MeteringPointType.From(series.MeteringPointType))));
             writer.WriteProperty("product", GeneralValues.ProductCode);
             writer.WriteObject("quantity_Measure_Unit.name", new KeyValuePair<string, string>("value", CimCode.Of(MeasurementUnit.From(series.MeasureUnitType))));
-
-            if (series.SettlementVersion is not null)
-            {
-                writer.WriteObject("settlement_Series.version", new KeyValuePair<string, string>("value", CimCode.Of(SettlementVersion.From(series.SettlementVersion))));
-            }
 
             writer.WritePropertyName("Period");
             writer.WriteStartObject();
@@ -171,15 +192,33 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
         writer.WriteEndObject();
     }
 
-    private IReadOnlyCollection<TimeSeries> ParseFrom(IReadOnlyCollection<string> payloads)
-    {
-        if (payloads == null) throw new ArgumentNullException(nameof(payloads));
-        var timeSeries = new List<TimeSeries>();
-        foreach (var payload in payloads)
-        {
-            timeSeries.Add(_parser.From<TimeSeries>(payload));
-        }
+    //private IReadOnlyCollection<TimeSeries> ParseFrom(IReadOnlyCollection<string> payloads)
+    //{
+    //    if (payloads == null)
+    //        throw new ArgumentNullException(nameof(payloads));
+    //    var timeSeries = new List<TimeSeries>();
+    //    foreach (var payload in payloads)
+    //    {
+    //        timeSeries.Add(_parser.From<TimeSeries>(payload));
+    //    }
 
-        return timeSeries;
+    //    return timeSeries;
+    //}
+
+    private async Task<string> WritePayloadInternalAsync(string marketActivityRecord)
+    {
+        var stream = new MemoryStream();
+        var options = new JsonWriterOptions() { Indented = true };
+        using var writer = new Utf8JsonWriter(stream, options);
+
+        writer.WriteStartObject();
+        WriteSeries(new List<string>() { marketActivityRecord }, writer);
+        await writer.FlushAsync().ConfigureAwait(false);
+        stream.Position = 0;
+
+        using var jsonParse = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
+        var array = jsonParse.RootElement.GetProperty("Series").EnumerateArray();
+        var ret = array.First().GetRawText();
+        return ret;
     }
 }

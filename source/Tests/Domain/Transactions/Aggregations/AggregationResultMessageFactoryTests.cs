@@ -16,6 +16,9 @@ using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AggregationResult;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Xunit;
 
@@ -67,7 +70,7 @@ public class AggregationResultMessageFactoryTests
 
         Assert.Equal(MarketRole.MeteredDataResponsible, message.ReceiverRole);
         Assert.Equal(result.GridAreaDetails?.OperatorNumber, message.ReceiverId.Value);
-        Assert.Equal(SettlementType.NonProfiled.Name, message.Series.SettlementType);
+        Assert.Equal(SettlementType.NonProfiled.Name, message.Series?.SettlementType);
     }
 
     /// <summary>
@@ -86,7 +89,7 @@ public class AggregationResultMessageFactoryTests
 
         Assert.Equal(MarketRole.MeteredDataResponsible, message.ReceiverRole);
         Assert.Equal(result.GridAreaDetails?.OperatorNumber, message.ReceiverId.Value);
-        Assert.Equal(SettlementType.Flex.Name, message.Series.SettlementType);
+        Assert.Equal(SettlementType.Flex.Name, message.Series?.SettlementType);
     }
 
     /// <summary>
@@ -121,7 +124,7 @@ public class AggregationResultMessageFactoryTests
 
         Assert.Equal(MarketRole.EnergySupplier, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.EnergySupplierNumber, message.ReceiverId.Value);
-        Assert.Equal(SettlementType.NonProfiled.Name, message.Series.SettlementType);
+        Assert.Equal(SettlementType.NonProfiled.Name, message.Series?.SettlementType);
     }
 
     [Fact]
@@ -136,7 +139,7 @@ public class AggregationResultMessageFactoryTests
 
         Assert.Equal(MarketRole.BalanceResponsibleParty, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.BalanceResponsibleNumber, message.ReceiverId.Value);
-        Assert.Equal(SettlementType.NonProfiled.Name, message.Series.SettlementType);
+        Assert.Equal(SettlementType.NonProfiled.Name, message.Series?.SettlementType);
     }
 
     [Fact]
@@ -165,7 +168,7 @@ public class AggregationResultMessageFactoryTests
 
         Assert.Equal(MarketRole.BalanceResponsibleParty, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.BalanceResponsibleNumber, message.ReceiverId.Value);
-        Assert.Equal(SettlementType.Flex.Name, message.Series.SettlementType);
+        Assert.Equal(SettlementType.Flex.Name, message.Series?.SettlementType);
     }
 
     [Fact]
@@ -180,7 +183,7 @@ public class AggregationResultMessageFactoryTests
 
         Assert.Equal(MarketRole.EnergySupplier, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.EnergySupplierNumber, message.ReceiverId.Value);
-        Assert.Equal(SettlementType.Flex.Name, message.Series.SettlementType);
+        Assert.Equal(SettlementType.Flex.Name, message.Series?.SettlementType);
     }
 
     [Fact]
@@ -199,6 +202,6 @@ public class AggregationResultMessageFactoryTests
 
     private static AggregationResultMessage CreateMessage(Aggregation result)
     {
-        return AggregationResultMessageFactory.CreateMessage(result, ProcessId.New());
+        return AggregationResultMessageFactory.CreateMessage(result, ProcessId.New(), new AggregationResultXmlDocumentWriter(new MessageRecordParser(new Serializer())));
     }
 }

@@ -194,27 +194,37 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .DocumentIsValidAsync();
     }
 
-    private Task<Stream> CreateDocument(TimeSeriesBuilder resultBuilder, DocumentFormat documentFormat)
+    private async Task<Stream> CreateDocument(TimeSeriesBuilder resultBuilder, DocumentFormat documentFormat)
     {
         var documentHeader = resultBuilder.BuildHeader();
         var records = _parser.From(resultBuilder.BuildTimeSeries());
         if (documentFormat == DocumentFormat.Ebix)
         {
-            return new AggregationResultEbixDocumentWriter(_parser).WriteAsync(
+            var writer = new AggregationResultEbixDocumentWriter(_parser);
+            var payload = await writer.WritePayloadAsync(records).ConfigureAwait(false);
+
+            return await writer.WriteAsync(
                 documentHeader,
-                new[] { records, });
+                new[] { payload, },
+                new[] { records, }).ConfigureAwait(false);
         }
         else if (documentFormat == DocumentFormat.Xml)
         {
-            return new AggregationResultXmlDocumentWriter(_parser).WriteAsync(
+            var writer = new AggregationResultXmlDocumentWriter(_parser);
+            var payload = await writer.WritePayloadAsync(records).ConfigureAwait(false);
+            return await writer.WriteAsync(
                 documentHeader,
-                new[] { records, });
+                new[] { payload, },
+                new[] { records, }).ConfigureAwait(false);
         }
         else
         {
-            return new AggregationResultJsonDocumentWriter(_parser).WriteAsync(
+            var writer = new AggregationResultJsonDocumentWriter(_parser);
+            var payload = await writer.WritePayloadAsync(records).ConfigureAwait(false);
+            return await writer.WriteAsync(
                 documentHeader,
-                new[] { records, });
+                new[] { payload, },
+                new[] { records, }).ConfigureAwait(false);
         }
     }
 

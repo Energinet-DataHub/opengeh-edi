@@ -38,7 +38,7 @@ public class RejectRequestAggregatedMeasureDataEbixDocumentWriter : EbixDocument
             "ns0",
             "ERR"),
             parser,
-            EbixCode.Of(ReasonCode.FullyRejected))
+            EbixCode.Of(Domain.Transactions.Aggregations.ReasonCode.FullyRejected))
     {
     }
 
@@ -65,7 +65,7 @@ public class RejectRequestAggregatedMeasureDataEbixDocumentWriter : EbixDocument
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "StatusType", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "6").ConfigureAwait(false);
-            await writer.WriteStringAsync(EbixCode.Of(ReasonCode.FullyRejected)).ConfigureAwait(false);
+            await writer.WriteStringAsync(EbixCode.Of(Domain.Transactions.Aggregations.ReasonCode.FullyRejected)).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "ResponseReasonType", null).ConfigureAwait(false);

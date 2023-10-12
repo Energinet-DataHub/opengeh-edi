@@ -24,9 +24,10 @@ limitations under the License.
 
     <ItemGroup>
       <PackageReference Include="MediatR" Version="12.1.1" />
+      <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.7.30" />
       <PackageReference Include="NodaTime" Version="3.1.9" />
       <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.0.0" />
-      <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.6.40">
+      <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.7.30">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
