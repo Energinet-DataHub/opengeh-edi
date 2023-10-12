@@ -38,7 +38,7 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
             "DK_AggregatedMeteredDataTimeSeries",
             string.Empty,
             //"un:unece:260:data:EEM-DK_AggregatedMeteredDataTimeSeries:v3 ebIX_DK_AggregatedMeteredDataTimeSeries_0p9pC.xsd",
-            "un:unece:260:data:EEM-DK_AggregatedMeteredDataTimeSeries",
+            "un:unece:260:data:EEM-DK_AggregatedMeteredDataTimeSeries:v3",
             "ns0",
             "E31"),
             parser,
