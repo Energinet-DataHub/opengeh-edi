@@ -21,7 +21,7 @@ using System.Text;
 using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Xml;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using MediatR;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.DependencyInjection;

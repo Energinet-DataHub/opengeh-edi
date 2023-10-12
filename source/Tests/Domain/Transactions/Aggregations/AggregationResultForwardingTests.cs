@@ -70,7 +70,7 @@ public class AggregationResultForwardingTests
 
         Assert.Equal(MarketRole.MeteredDataResponsible, message.ReceiverRole);
         Assert.Equal(result.GridAreaDetails?.OperatorNumber, message.ReceiverId.Value);
-        Assert.Equal(SettlementType.NonProfiled.Name, message.Series.SettlementType);
+        Assert.Equal(SettlementType.NonProfiled.Name, message.Series?.SettlementType);
     }
 
     /// <summary>
@@ -89,7 +89,7 @@ public class AggregationResultForwardingTests
 
         Assert.Equal(MarketRole.MeteredDataResponsible, message.ReceiverRole);
         Assert.Equal(result.GridAreaDetails?.OperatorNumber, message.ReceiverId.Value);
-        Assert.Equal(SettlementType.Flex.Name, message.Series.SettlementType);
+        Assert.Equal(SettlementType.Flex.Name, message.Series?.SettlementType);
     }
 
     /// <summary>
@@ -124,7 +124,7 @@ public class AggregationResultForwardingTests
 
         Assert.Equal(MarketRole.EnergySupplier, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.EnergySupplierNumber, message.ReceiverId.Value);
-        Assert.Equal(SettlementType.NonProfiled.Name, message.Series.SettlementType);
+        Assert.Equal(SettlementType.NonProfiled.Name, message.Series?.SettlementType);
     }
 
     [Fact]
@@ -139,7 +139,7 @@ public class AggregationResultForwardingTests
 
         Assert.Equal(MarketRole.BalanceResponsibleParty, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.BalanceResponsibleNumber, message.ReceiverId.Value);
-        Assert.Equal(SettlementType.NonProfiled.Name, message.Series.SettlementType);
+        Assert.Equal(SettlementType.NonProfiled.Name, message.Series?.SettlementType);
     }
 
     [Fact]
@@ -168,7 +168,7 @@ public class AggregationResultForwardingTests
 
         Assert.Equal(MarketRole.BalanceResponsibleParty, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.BalanceResponsibleNumber, message.ReceiverId.Value);
-        Assert.Equal(SettlementType.Flex.Name, message.Series.SettlementType);
+        Assert.Equal(SettlementType.Flex.Name, message.Series?.SettlementType);
     }
 
     [Fact]
@@ -183,7 +183,7 @@ public class AggregationResultForwardingTests
 
         Assert.Equal(MarketRole.EnergySupplier, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.EnergySupplierNumber, message.ReceiverId.Value);
-        Assert.Equal(SettlementType.Flex.Name, message.Series.SettlementType);
+        Assert.Equal(SettlementType.Flex.Name, message.Series?.SettlementType);
     }
 
     [Fact]

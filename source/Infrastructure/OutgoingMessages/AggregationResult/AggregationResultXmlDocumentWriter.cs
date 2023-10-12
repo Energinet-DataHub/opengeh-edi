@@ -15,11 +15,14 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Xml;
 using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
@@ -29,7 +32,7 @@ using Point = Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeas
 
 namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AggregationResult;
 
-public class AggregationResultXmlDocumentWriter : DocumentWriter
+public class AggregationResultXmlDocumentWriter : CimDocumentWriter
 {
     public AggregationResultXmlDocumentWriter(IMessageRecordParser parser)
         : base(
@@ -44,6 +47,11 @@ public class AggregationResultXmlDocumentWriter : DocumentWriter
     {
     }
 
+    public override bool HandlesType(DocumentType documentType)
+    {
+        return documentType == DocumentType.NotifyAggregatedMeasureData;
+    }
+
     protected override async Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer)
     {
         ArgumentNullException.ThrowIfNull(marketActivityPayloads);
@@ -53,13 +61,13 @@ public class AggregationResultXmlDocumentWriter : DocumentWriter
         {
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Series", null).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, timeSeries.TransactionId.ToString()).ConfigureAwait(false);
-
+            await WriteElementIfHasValueAsync("version", timeSeries.Version, writer).ConfigureAwait(false);
+            await WriteElementIfHasValueAsync(
+                "settlement_Series.version", timeSeries.SettlementVersion is null ? null : CimCode.Of(SettlementVersion.From(timeSeries.SettlementVersion)), writer).ConfigureAwait(false);
+            await WriteElementIfHasValueAsync("originalTransactionIDReference_Series.mRID", timeSeries.OriginalTransactionIdReference, writer).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "marketEvaluationPoint.type", null, CimCode.Of(MeteringPointType.From(timeSeries.MeteringPointType))).ConfigureAwait(false);
             await WriteElementIfHasValueAsync(
                 "marketEvaluationPoint.settlementMethod", timeSeries.SettlementType is null ? null : CimCode.Of(SettlementType.From(timeSeries.SettlementType)), writer).ConfigureAwait(false);
-            await WriteElementIfHasValueAsync("settlement_Series.version", timeSeries.SettlementVersion, writer).ConfigureAwait(false);
-            await WriteElementIfHasValueAsync("originalTransactionIDReference_Series.mRID", timeSeries.OriginalTransactionIdReference, writer).ConfigureAwait(false);
-
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "meteringGridArea_Domain.mRID", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "codingScheme", null, "NDK").ConfigureAwait(false);
             await writer.WriteStringAsync(timeSeries.GridAreaCode).ConfigureAwait(false);

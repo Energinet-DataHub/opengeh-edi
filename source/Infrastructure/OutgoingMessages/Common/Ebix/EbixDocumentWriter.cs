@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -23,88 +22,84 @@ using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Xml;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 
 namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Xml;
 
-public abstract class EbixDocumentWriter : IDocumentWriter
+public abstract class EbixDocumentWriter : DocumentWriter
 {
     private readonly DocumentDetails _documentDetails;
-    private readonly IMessageRecordParser _parser;
     private readonly string? _reasonCode;
 
     protected EbixDocumentWriter(DocumentDetails documentDetails, IMessageRecordParser parser, string? reasonCode = null)
+        : base(parser)
     {
         _documentDetails = documentDetails;
-        _parser = parser;
         _reasonCode = reasonCode;
     }
 
-    protected DocumentDetails DocumentDetails => _documentDetails;
+    internal DocumentDetails DocumentDetails => _documentDetails;
 
-    public virtual async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
+    internal string? ReasonCode => _reasonCode;
+
+    public override async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords, IReadOnlyCollection<string> originalData)
     {
         ArgumentNullException.ThrowIfNull(marketActivityRecords);
         var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = new UTF8Encoding(false), Async = true, Indent = true };
         var stream = new MemoryStream();
         using var writer = XmlWriter.Create(stream, settings);
-        string? settlementVersion = ExtractSettlementVersion(marketActivityRecords);
-        await WriteHeaderAsync(header, _documentDetails, writer, settlementVersion).ConfigureAwait(false);
+        string? settlementVersion = ExtractSettlementVersion(originalData);
+        await WriteHeaderAsync(header, DocumentDetails, writer, settlementVersion).ConfigureAwait(false);
         foreach (var marketActivityRecord in marketActivityRecords)
         {
             await writer.WriteRawAsync(marketActivityRecord).ConfigureAwait(false);
         }
-
-        await WriteMarketActivityRecordsAsync(marketActivityRecords, writer).ConfigureAwait(false);
 
         await WriteEndAsync(writer).ConfigureAwait(false);
         stream.Position = 0;
         return stream;
     }
 
-    public virtual bool HandlesType(DocumentType documentType)
-    {
-        if (documentType == null) throw new ArgumentNullException(nameof(documentType));
-        return documentType.Name.Equals(_documentDetails.Type.Split("_")[0], StringComparison.OrdinalIgnoreCase);
-    }
-
-    public bool HandlesFormat(DocumentFormat format)
+    public override bool HandlesFormat(DocumentFormat format)
     {
         return format == DocumentFormat.Ebix;
     }
 
-    public async Task<string> WritePayloadAsync(string marketActivityRecord)
+    public override async Task<string> WritePayloadAsync(string marketActivityRecord)
     {
         return await WritePayloadInternalAsync(marketActivityRecord).ConfigureAwait(false);
     }
 
-    public async Task<string> WritePayloadAsync<T>(object data)
+    public override async Task<string> WritePayloadAsync<T>(object data)
     {
-        return await WritePayloadInternalAsync(_parser.From((T)data)).ConfigureAwait(false);
+        return await WritePayloadInternalAsync(Parser.From((T)data)).ConfigureAwait(false);
     }
+
+    protected abstract Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer);
 
     protected virtual string? ExtractSettlementVersion(IReadOnlyCollection<string> marketActivityPayloads)
     {
         return null;
     }
 
-    protected abstract Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer);
+    //protected abstract Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer);
 
-    protected IReadOnlyCollection<TMarketActivityRecord> ParseFrom<TMarketActivityRecord>(IReadOnlyCollection<string> payloads)
-    {
-        if (payloads == null) throw new ArgumentNullException(nameof(payloads));
-        var marketActivityRecords = new List<TMarketActivityRecord>();
-        foreach (var payload in payloads)
-        {
-            marketActivityRecords.Add(_parser.From<TMarketActivityRecord>(payload));
-        }
+    //protected IReadOnlyCollection<TMarketActivityRecord> ParseFrom<TMarketActivityRecord>(IReadOnlyCollection<string> payloads)
+    //{
+    //    if (payloads == null)
+    //        throw new ArgumentNullException(nameof(payloads));
+    //    var marketActivityRecords = new List<TMarketActivityRecord>();
+    //    foreach (var payload in payloads)
+    //    {
+    //        marketActivityRecords.Add(_parser.From<TMarketActivityRecord>(payload));
+    //    }
 
-        return marketActivityRecords;
-    }
+    //    return marketActivityRecords;
+    //}
 
     protected Task WriteElementAsync(string name, string value, XmlWriter writer)
     {
-        if (writer == null) throw new ArgumentNullException(nameof(writer));
+        if (writer == null)
+            throw new ArgumentNullException(nameof(writer));
         return writer.WriteElementStringAsync(DocumentDetails.Prefix, name, null, value);
     }
 
@@ -120,7 +115,8 @@ public abstract class EbixDocumentWriter : IDocumentWriter
 
     protected async Task WriteMridAsync(string localName, string id, string codingScheme, XmlWriter writer)
     {
-        if (writer == null) throw new ArgumentNullException(nameof(writer));
+        if (writer == null)
+            throw new ArgumentNullException(nameof(writer));
         await writer.WriteStartElementAsync(DocumentDetails.Prefix, localName, null).ConfigureAwait(false);
         await writer.WriteAttributeStringAsync(null, "codingScheme", null, codingScheme).ConfigureAwait(false);
         writer.WriteValue(id);
@@ -135,7 +131,7 @@ public abstract class EbixDocumentWriter : IDocumentWriter
 
     private Task WriteHeaderAsync(MessageHeader header, DocumentDetails documentDetails, XmlWriter writer, string? settlementVersion)
     {
-        return EbixHeaderWriter.WriteAsync(writer, header, documentDetails, _reasonCode, settlementVersion);
+        return EbixHeaderWriter.WriteAsync(writer, header, documentDetails, ReasonCode, settlementVersion);
     }
 
     private async Task<string> WritePayloadInternalAsync(string marketActivityRecord)
@@ -143,9 +139,23 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         var settings = new XmlWriterSettings { OmitXmlDeclaration = true, Encoding = new UTF8Encoding(false), Async = true, Indent = true };
         var stream = new MemoryStream();
         using var writer = XmlWriter.Create(stream, settings);
+        await writer.WriteStartDocumentAsync().ConfigureAwait(false);
+        await writer.WriteStartElementAsync(
+            DocumentDetails.Prefix,
+            DocumentDetails.Type,
+            DocumentDetails.XmlNamespace).ConfigureAwait(false);
+
         await WriteMarketActivityRecordsAsync(new List<string>() { marketActivityRecord }, writer).ConfigureAwait(false);
+        await WriteEndAsync(writer).ConfigureAwait(false);
+
         stream.Position = 0;
-        using var streamReader = new StreamReader(stream);
-        return await streamReader.ReadToEndAsync().ConfigureAwait(false);
+
+        var xmlDocument = new XmlDocument();
+        xmlDocument.Load(stream);
+        var ret = xmlDocument.DocumentElement?.InnerXml;
+
+        var ns = $" xmlns:{DocumentDetails.Prefix}=\"{DocumentDetails.XmlNamespace}\""; //xmlns:cim=\"urn:ediel.org:measure:notifyaggregatedmeasuredata:0:1\
+        ret = ret?.Replace(ns, string.Empty, StringComparison.InvariantCultureIgnoreCase);
+        return ret ?? string.Empty;
     }
 }

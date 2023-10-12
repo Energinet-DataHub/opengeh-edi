@@ -20,11 +20,12 @@ using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Xml;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Xml;
 
 namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 
-public class RejectRequestAggregatedMeasureDataXmlDocumentWriter : DocumentWriter
+public class RejectRequestAggregatedMeasureDataXmlDocumentWriter : CimDocumentWriter
 {
     public RejectRequestAggregatedMeasureDataXmlDocumentWriter(IMessageRecordParser parser)
         : base(

@@ -57,7 +57,8 @@ public class DocumentFactory
                 bundle.Receiver.ActorRole.Name,
                 bundle.AssignedBundleId.Id.ToString(),
                 timestamp),
-            bundle.OutgoingMessages.Select(message => message.MessageRecord).ToList());
+            bundle.OutgoingMessages.Select(message => message.MessageRecord).ToList(),
+            bundle.OutgoingMessages.Select(message => message.OriginalData).ToList());
     }
 
     public async Task<string> CreatePayloadAsync(string payload, DocumentFormat documentFormat, DocumentType documentType)

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Net.Http.Headers;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Common;
 using Energinet.DataHub.EDI.Domain.Documents;
@@ -93,6 +92,7 @@ public record TimeSeries(
     Period Period,
     IReadOnlyList<Point> Point,
     string? OriginalTransactionIdReference = null,
-    string? SettlementVersion = null);
+    string? SettlementVersion = null,
+    string? Version = null);
 
 public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);

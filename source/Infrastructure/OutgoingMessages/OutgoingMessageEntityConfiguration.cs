@@ -66,7 +66,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages
             builder.Property(x => x.AssignedBundleId).HasConversion(
                 toDbValue => toDbValue == null ? Guid.Empty : toDbValue.Id,
                 fromDbValue => fromDbValue == Guid.Empty ? null : BundleId.Create(fromDbValue));
-
+            builder.Property(x => x.OriginalData);
             builder.Ignore(x => x.Receiver);
 
             builder

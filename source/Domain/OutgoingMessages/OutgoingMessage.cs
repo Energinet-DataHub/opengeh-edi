@@ -32,6 +32,7 @@ namespace Energinet.DataHub.EDI.Domain.OutgoingMessages
             SenderRole = senderRole;
             MessageRecord = messageRecord;
             Id = Guid.NewGuid();
+            OriginalData = messageRecord;
         }
 
         public Guid Id { get; }
@@ -57,6 +58,8 @@ namespace Energinet.DataHub.EDI.Domain.OutgoingMessages
         public Receiver Receiver => Receiver.Create(ReceiverId, ReceiverRole);
 
         public BundleId? AssignedBundleId { get; private set; }
+
+        public string OriginalData { get; }
 
         public static OutgoingMessage Create(
             Receiver receiver,

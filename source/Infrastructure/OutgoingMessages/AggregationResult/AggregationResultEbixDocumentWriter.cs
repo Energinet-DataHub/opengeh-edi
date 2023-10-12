@@ -18,10 +18,9 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
-using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Xml;
-using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
@@ -44,6 +43,11 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
             parser,
             null)
     {
+    }
+
+    public override bool HandlesType(DocumentType documentType)
+    {
+        return documentType == DocumentType.NotifyAggregatedMeasureData;
     }
 
     protected override string? ExtractSettlementVersion(IReadOnlyCollection<string> marketActivityPayloads)

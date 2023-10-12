@@ -47,7 +47,7 @@ public class RejectRequestAggregatedMeasureDataJsonDocumentWriter : IDocumentWri
         return documentType == Domain.Documents.DocumentType.RejectRequestAggregatedMeasureData;
     }
 
-    public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
+    public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords, IReadOnlyCollection<string> originalData)
     {
         var stream = new MemoryStream();
         var options = new JsonWriterOptions() { Indented = true };

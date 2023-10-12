@@ -12,20 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
-using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.CimXml;
-
-namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-
-public class CimXMLDocumentValidationFixture
+namespace Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Json
 {
-    public CimXMLDocumentValidationFixture()
+    public class DocumentDetails
     {
-        Validator = new DocumentValidator(new[]
+        public DocumentDetails(string documentType, string typeCode, string? reasonCode)
         {
-            new CimXmlValidator(new CimXmlSchemaProvider()),
-        });
-    }
+            DocumentType = documentType;
+            TypeCode = typeCode;
+            ReasonCode = reasonCode;
+        }
 
-    public DocumentValidator Validator { get; }
+        public string DocumentType { get; }
+
+        public string? ReasonCode { get; }
+
+        public string TypeCode { get; }
+    }
 }
