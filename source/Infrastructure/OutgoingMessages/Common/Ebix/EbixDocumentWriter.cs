@@ -117,6 +117,12 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         await writer.WriteEndElementAsync().ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Will write the ebIX xmlnode with the schemeAgencyIdentifier attribute for a GLN number, EIC code or a GSRN number
+    /// </summary>
+    /// <param name="name">Name of the xmlnode</param>
+    /// <param name="ebixSchemeCode">GLN number, EIC code or a GSRN number</param>
+    /// <param name="writer">The XmlWriter</param>
     protected async Task WriteEbixSchemeCodeWithAttributesAsync(string name, string ebixSchemeCode, XmlWriter writer)
     {
         if (name == null) throw new ArgumentNullException(nameof(name));
