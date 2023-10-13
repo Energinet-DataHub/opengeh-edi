@@ -15,23 +15,28 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 
 public class AssertEbixDocument
 {
+    private readonly Stream _stream;
     private readonly string _prefix;
+    private readonly DocumentValidator? _documentValidator;
     private readonly XDocument _document;
     private readonly XmlNamespaceManager _xmlNamespaceManager;
 
     private AssertEbixDocument(Stream stream, string prefix)
     {
+        _stream = stream;
         _prefix = prefix;
         using var reader = XmlReader.Create(stream);
         _document = XDocument.Load(reader);
@@ -39,9 +44,20 @@ public class AssertEbixDocument
         _xmlNamespaceManager.AddNamespace(prefix, _document.Root!.Name.NamespaceName);
     }
 
+    private AssertEbixDocument(Stream stream, string prefix, DocumentValidator documentValidator)
+        : this(stream, prefix)
+    {
+        _documentValidator = documentValidator;
+    }
+
     public static AssertEbixDocument Document(Stream document, string prefix)
     {
         return new AssertEbixDocument(document, prefix);
+    }
+
+    public static AssertEbixDocument Document(Stream document, string prefix, DocumentValidator validator)
+    {
+        return new AssertEbixDocument(document, prefix, validator);
     }
 
     public AssertEbixDocument HasValue(string xpath, string expectedValue)
@@ -60,9 +76,8 @@ public class AssertEbixDocument
 
     public async Task<AssertEbixDocument> HasValidStructureAsync(DocumentType type, string version = "0.1")
     {
-        //TODO: Schema validation will be implemented later
-        await Task.CompletedTask.ConfigureAwait(true);
-        Assert.True(true);
+        var validationResult = await _documentValidator!.ValidateAsync(_stream, DocumentFormat.Ebix, type, CancellationToken.None, version).ConfigureAwait(false);
+        Assert.True(validationResult.IsValid);
         return this;
     }
 
