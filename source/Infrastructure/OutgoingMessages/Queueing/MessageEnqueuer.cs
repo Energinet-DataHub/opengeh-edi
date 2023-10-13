@@ -13,29 +13,39 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Queueing;
 
 public class MessageEnqueuer
 {
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
+    private readonly ILogger<MessageEnqueuer> _logger;
 
-    public MessageEnqueuer(IActorMessageQueueRepository actorMessageQueueRepository)
+    public MessageEnqueuer(
+        IActorMessageQueueRepository actorMessageQueueRepository,
+        ILogger<MessageEnqueuer> logger)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
+        _logger = logger;
     }
 
     public async Task EnqueueAsync(OutgoingMessage message)
     {
         ArgumentNullException.ThrowIfNull(message);
-
+        var watch = new Stopwatch();
+        watch.Start();
+        _logger.LogInformation("Enqueue outgoing message \"{MessageId}\" for receiver \"{Receiver}\".", message.Id, message.Receiver);
         var messageQueue = await _actorMessageQueueRepository.ActorMessageQueueForAsync(
             message.Receiver.Number,
             message.Receiver.ActorRole).ConfigureAwait(false);
 
+        watch.Stop();
+        _logger.LogInformation("Outgoing message \"{MessageId}\" for receiver \"{Receiver}\" was enqueued successfully. Time elapsed: {TimeElapsed}", message.Id, message.Receiver, watch.Elapsed);
         if (messageQueue == null)
         {
             messageQueue = ActorMessageQueue.CreateFor(message.Receiver);
