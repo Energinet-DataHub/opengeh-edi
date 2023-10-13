@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
@@ -47,7 +48,9 @@ public class UnitOfWorkBehaviour<TRequest, TResponse> : IPipelineBehavior<TReque
         CancellationToken cancellationToken)
     {
         if (next == null) throw new ArgumentNullException(nameof(next));
-
+        var watch = new Stopwatch();
+        watch.Start();
+        _logger.LogInformation("Start handling command of type {CommandType}", request.GetType().Name);
         var result = await next().ConfigureAwait(false);
 
         if (await InternalCommandAlreadyMarkedAsProcessedAsync(request, cancellationToken).ConfigureAwait(false))
@@ -64,6 +67,8 @@ public class UnitOfWorkBehaviour<TRequest, TResponse> : IPipelineBehavior<TReque
             await _unitOfWork.CommitAsync().ConfigureAwait(false);
         }
 
+        watch.Stop();
+        _logger.LogInformation("Command of type {CommandType} was handled successfully. Time elapsed: {TimeElapsed}", request.GetType().Name, watch.Elapsed);
         return result;
     }
 

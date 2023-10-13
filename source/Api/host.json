@@ -7,15 +7,5 @@
                 "excludedTypes": "Request;Exception"
             }
         }
-    },
-  "extensions": {
-    "serviceBus": {
-      "messageHandlerOptions": {
-        "maxConcurrentCalls": 8
-      },
-      "sessionHandlerOptions": {
-        "maxConcurrentSessions": 8
-      }
     }
-  }
 }
