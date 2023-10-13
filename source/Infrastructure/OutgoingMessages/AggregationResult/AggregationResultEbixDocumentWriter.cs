@@ -26,8 +26,6 @@ using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Ebix;
-using Energinet.DataHub.MeteringPoints.RequestResponse.Response;
-using Point = Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
 namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AggregationResult;
 
