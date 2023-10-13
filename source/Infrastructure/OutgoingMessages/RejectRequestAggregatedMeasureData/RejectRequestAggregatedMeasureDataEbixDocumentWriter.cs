@@ -79,12 +79,4 @@ public class RejectRequestAggregatedMeasureDataEbixDocumentWriter : EbixDocument
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
     }
-
-    private Task WriteQualityIfRequiredAsync(XmlWriter writer, Point point)
-    {
-        if (point.Quality is null)
-            return Task.CompletedTask;
-
-        return writer.WriteElementStringAsync(DocumentDetails.Prefix, "QuantityQuality", null, EbixCode.Of(Quality.From(point.Quality)));
-    }
 }
