@@ -22,7 +22,7 @@ namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers
 {
     public static class UpgradeFactory
     {
-        public static UpgradeEngine GetUpgradeEngine(string connectionString, Func<string, bool> scriptFilter, bool isDryRun = false)
+        public static UpgradeEngine GetUpgradeEngine(string connectionString, bool isDryRun = false)
         {
             if (string.IsNullOrWhiteSpace(connectionString))
             {
@@ -36,7 +36,10 @@ namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers
             var builder = DeployChanges.To
                 .SqlDatabase(connectionString)
                 .WithScriptNameComparer(new ScriptComparer())
-                .WithScripts(new CustomScriptProvider(Assembly.GetExecutingAssembly(), scriptFilter))
+                .WithScripts(
+                    new CustomScriptProvider(
+                        Assembly.GetExecutingAssembly(),
+                        file => file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) && file.Contains(".Scripts.Model.", StringComparison.OrdinalIgnoreCase)))
                 .LogToConsole();
 
             if (isDryRun)

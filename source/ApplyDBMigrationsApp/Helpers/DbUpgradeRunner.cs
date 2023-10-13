@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using DbUp.Reboot.Engine;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
+namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
 
-#pragma warning disable
-public class TestNotification : INotification
+public static class DbUpgradeRunner
 {
-    public TestNotification(string aProperty)
+    public static DatabaseUpgradeResult RunDbUpgrade(string connectionString, bool isDryRun = false)
     {
-        AProperty = aProperty;
-    }
+        var upgrader = UpgradeFactory.GetUpgradeEngine(connectionString, isDryRun);
 
-    public string AProperty { get; }
+        var result = upgrader.PerformUpgrade();
+
+        return result;
+    }
 }

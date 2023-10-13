@@ -167,7 +167,7 @@ public class AssertAggregationResultEbixDocument : IAssertAggregationResultDocum
 
     public IAssertAggregationResultDocument HasSettlementMethod(SettlementType settlementMethod)
     {
-        _documentAsserter.HasValue("PayloadEnergyTimeSeries[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod", CimCode.Of(settlementMethod));
+        _documentAsserter.HasValue("PayloadEnergyTimeSeries[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod", EbixCode.Of(settlementMethod));
         return this;
     }
 }

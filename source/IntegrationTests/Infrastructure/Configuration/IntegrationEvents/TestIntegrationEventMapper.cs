@@ -12,32 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text.Json;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
-using MediatR;
+using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
+using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
 public class TestIntegrationEventMapper : IIntegrationEventMapper
 {
-    #pragma warning disable // Method cannot be static since inherited from the interface
-    public Task<INotification> MapFromAsync(string payload)
-    {
-        var integrationEvent = JsonSerializer.Deserialize<TestIntegrationEvent>(payload);
-        return Task.FromResult((INotification)new TestNotification(integrationEvent!.Property1));
-    }
+    public string EventTypeToHandle => TestIntegrationEventMessage.TestIntegrationEventName;
 
-    public bool CanHandle(string eventType)
-    {
-        ArgumentNullException.ThrowIfNull(eventType);
-        return eventType.Equals(nameof(TestIntegrationEvent), StringComparison.OrdinalIgnoreCase);
-    }
+    public int MappedCount { get; private set; }
 
-    public string ToJson(byte[] payload)
+    public InternalCommand MapToCommand(IntegrationEvent integrationEvent)
     {
-        var integrationEvent = JsonSerializer.Deserialize<TestIntegrationEvent>(payload);
-        return JsonSerializer.Serialize(integrationEvent);
+        MappedCount++;
+
+        return new TestCommand();
     }
 }

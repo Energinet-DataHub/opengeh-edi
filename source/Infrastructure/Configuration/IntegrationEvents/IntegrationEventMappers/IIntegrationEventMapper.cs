@@ -12,32 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using MediatR;
+using System;
+using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 
 /// <summary>
-/// Maps from an integration event to a notification
+/// Process specific type(s) of integration events
 /// </summary>
 public interface IIntegrationEventMapper
 {
     /// <summary>
-    /// Map payload to a notification
+    /// Event type the processor handles
     /// </summary>
-    /// <param name="payload"></param>
-    /// <returns><see cref="INotification"/></returns>
-    Task<INotification> MapFromAsync(string payload);
+    public string EventTypeToHandle { get; }
 
     /// <summary>
-    /// Determines whether the specified event type can be handled by the mapper
+    /// Process a single integration event
     /// </summary>
-    /// <param name="eventType"></param>
-    bool CanHandle(string eventType);
-
-    /// <summary>
-    /// Parses the event to JSON
-    /// </summary>
-    /// <param name="payload"></param>
-    string ToJson(byte[] payload);
+    public InternalCommand MapToCommand(IntegrationEvent integrationEvent);
 }

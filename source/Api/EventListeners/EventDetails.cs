@@ -14,7 +14,9 @@
 
 namespace Energinet.DataHub.EDI.Api.EventListeners;
 
+// ReSharper disable NotAccessedPositionalProperty.Global -- Properties are used for logging
 public record EventDetails(string EventId, string EventType)
+// ReSharper restore NotAccessedPositionalProperty.Global
 {
     public static EventDetails Empty()
     {

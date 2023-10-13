@@ -12,15 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
+using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -30,117 +32,94 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.In
 
 public class WhenAnIntegrationEventIsReceivedTests : TestBase
 {
-    private readonly string _eventType = nameof(TestIntegrationEvent);
-    private readonly TestIntegrationEvent _event;
-    private readonly byte[] _eventPayload;
-    private readonly string _eventId = "1";
-    private IntegrationEventReceiver _receiver;
+    private readonly IntegrationEvent _testIntegrationEvent1;
+    private readonly IntegrationEvent _unknownIntegrationEvent;
+
+    private readonly TestIntegrationEventMapper _testIntegrationEventMapper;
+    private readonly IIntegrationEventHandler _handler;
 
     public WhenAnIntegrationEventIsReceivedTests(DatabaseFixture databaseFixture)
      : base(databaseFixture)
     {
-        _receiver = new IntegrationEventReceiver(GetService<B2BContext>(), GetService<ISystemDateTimeProvider>(), new IIntegrationEventMapper[]
-        {
-            new TestIntegrationEventMapper(),
-        });
-        _event = new TestIntegrationEvent();
-        _eventPayload = CreateEventPayload(_event);
+        _testIntegrationEventMapper = new TestIntegrationEventMapper();
+        _handler = new IntegrationEventHandler(
+                GetService<ILogger<IntegrationEventHandler>>(),
+                GetService<IMediator>(),
+                GetService<IReceivedIntegrationEventRepository>(),
+                new Dictionary<string, IIntegrationEventMapper>
+                {
+                    { _testIntegrationEventMapper.EventTypeToHandle, _testIntegrationEventMapper },
+                })
+            ;
+
+        _testIntegrationEvent1 = new IntegrationEvent(Guid.NewGuid(), TestIntegrationEventMessage.TestIntegrationEventName, 1, new TestIntegrationEventMessage());
+        _unknownIntegrationEvent = new IntegrationEvent(Guid.NewGuid(), "unknown-event-type", 1, null!);
+    }
+
+    private string EventId1 => _testIntegrationEvent1.EventIdentification.ToString();
+
+    private string EventIdUnknown => _unknownIntegrationEvent.EventIdentification.ToString();
+
+    [Fact]
+    public async Task Event_is_registered_and_mapped_if_it_is_a_known_event()
+    {
+        await HandleEvent(_testIntegrationEvent1);
+
+        var isRegistered = await EventIsRegisteredInDatabase(EventId1);
+        Assert.True(isRegistered);
+        Assert.Equal(1, _testIntegrationEventMapper.MappedCount);
     }
 
     [Fact]
-    public async Task Event_is_registered_if_it_is_a_known_event()
+    public async Task Event_is_not_registered_and_mapped_if_it_is_unknown()
     {
-        await EventIsReceived(_eventId);
+        await HandleEvent(_unknownIntegrationEvent);
 
-        await EventIsRegisteredWithInbox(_eventId);
-    }
+        var isRegistered = await EventIsRegisteredInDatabase(EventIdUnknown);
 
-    [Fact]
-    public async Task Event_is_not_registered_if_it_is_unknown()
-    {
-        var noIntegrationEventMappers = new List<IIntegrationEventMapper>();
-        _receiver = new IntegrationEventReceiver(GetService<B2BContext>(), GetService<ISystemDateTimeProvider>(), noIntegrationEventMappers);
-
-        await EventIsReceived(_eventId);
-
-        await EventIsRegisteredWithInbox(_eventId, false);
+        Assert.False(isRegistered);
+        Assert.Equal(0, _testIntegrationEventMapper.MappedCount);
     }
 
     [Fact]
     public async Task Event_registration_is_omitted_if_already_registered()
     {
-        await EventIsReceived(_eventId);
+        await HandleEvent(_testIntegrationEvent1);
+        await HandleEvent(_testIntegrationEvent1);
 
-        await EventIsReceived(_eventId);
+        var isRegistered = await EventIsRegisteredInDatabase(EventId1);
 
-        await EventIsRegisteredWithInbox(_eventId);
+        Assert.True(isRegistered);
+        Assert.Equal(1, _testIntegrationEventMapper.MappedCount);
     }
 
     [Fact]
-    public async Task Event_is_marked_as_processed_when_a_handler_has_handled_it_successfully()
+    public async Task Event_registration_is_omitted_if_run_in_parallel()
     {
-        await EventIsReceived(_eventId);
+        var tasks = new List<Task>();
+        Parallel.For(0, 10, (i) =>
+        {
+            var task = HandleEvent(_testIntegrationEvent1);
+            tasks.Add(task);
+        });
 
-        await ProcessInboxMessages();
+        await Task.WhenAll(tasks);
 
-        await EventIsMarkedAsProcessed(_eventId);
+        var isRegistered = await EventIsRegisteredInDatabase(EventId1);
+
+        Assert.True(isRegistered);
+        Assert.Equal(1, _testIntegrationEventMapper.MappedCount);
     }
 
-    [Fact]
-    public async Task Event_is_marked_as_failed_if_the_event_handler_throws_an_exception()
+    private Task HandleEvent(IntegrationEvent integrationEvent)
     {
-        ExceptEventHandlerToFail();
-        await EventIsReceived(_eventId);
-
-        await ProcessInboxMessages();
-
-        await EventIsMarkedAsFailed(_eventId);
+        return _handler.HandleAsync(integrationEvent);
     }
 
-    private static byte[] CreateEventPayload(TestIntegrationEvent @event)
-    {
-        return JsonSerializer.SerializeToUtf8Bytes(@event);
-    }
-
-    private Task EventIsReceived(string eventId)
-    {
-        return _receiver.ReceiveAsync(eventId, _eventType, _eventPayload);
-    }
-
-    private async Task EventIsRegisteredWithInbox(string eventId, bool isExpectedToBeRegistered = true)
+    private async Task<bool> EventIsRegisteredInDatabase(string eventId)
     {
         var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var isRegistered = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM dbo.ReceivedIntegrationEvents WHERE Id = @EventId", new { EventId = eventId, });
-        Assert.Equal(isExpectedToBeRegistered, isRegistered);
-    }
-
-    private async Task EventIsMarkedAsProcessed(string eventId)
-    {
-        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-        var isProcessed = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM dbo.ReceivedIntegrationEvents WHERE Id = @EventId AND ProcessedDate IS NOT NULL", new { EventId = eventId, });
-        Assert.True(isProcessed);
-    }
-
-    private async Task EventIsMarkedAsFailed(string eventId)
-    {
-        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-        var isFailed = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM dbo.ReceivedIntegrationEvents WHERE Id = @EventId AND ProcessedDate IS NOT NULL AND ErrorMessage IS NOT NULL", new { EventId = eventId, });
-        Assert.True(isFailed);
-    }
-
-    private Task ProcessInboxMessages()
-    {
-        var inboxProcessor = new IntegrationEventsProcessor(
-            GetService<IDatabaseConnectionFactory>(),
-            GetService<IMediator>(),
-            GetService<ISystemDateTimeProvider>(),
-            new[] { new TestIntegrationEventMapper(), },
-            GetService<ILogger<IntegrationEventsProcessor>>());
-        return inboxProcessor.ProcessMessagesAsync(CancellationToken.None);
-    }
-
-    private void ExceptEventHandlerToFail()
-    {
-        NotificationHandlerSpy.ShouldThrowException();
+        return isRegistered;
     }
 }

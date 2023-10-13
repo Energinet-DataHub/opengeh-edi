@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
@@ -24,11 +25,10 @@ public static class IntegrationEventsConfiguration
 {
     public static void Configure(IServiceCollection services)
     {
-        services.AddTransient<INotificationHandler<TenSecondsHasHasPassed>,
-            ProcessIntegrationEventsOnTenSecondsHasPassed>();
         services.AddTransient<IDataRetention, ReceivedIntegrationEventsRetention>();
-        services.AddTransient<IntegrationEventReceiver>();
-        services.AddTransient<IntegrationEventsProcessor>();
-        services.AddTransient<IIntegrationEventMapper, CalculationResultCompletedEventMapper>();
+        services.AddTransient<IReceivedIntegrationEventRepository, ReceivedIntegrationEventRepository>();
+        services.AddTransient<IIntegrationEventMapper, CalculationResultCompletedMapper>();
+
+        services.AddTransient<IReadOnlyDictionary<string, IIntegrationEventMapper>>(sp => sp.GetServices<IIntegrationEventMapper>().ToDictionary(m => m.EventTypeToHandle, m => m));
     }
 }

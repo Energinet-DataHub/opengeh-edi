@@ -70,9 +70,8 @@ public class InitializeAggregatedMeasureDataProcessesHandler
                     marketMessage.BusinessReason,
                     serie.MarketEvaluationPointType,
                     serie.MarketEvaluationSettlementMethod,
-                    InstantPattern.General.Parse(serie.StartDateAndOrTimeDateTime)
-                        .GetValueOrThrow(),
-                    serie.EndDateAndOrTimeDateTime is not null ? InstantPattern.General.Parse(serie.EndDateAndOrTimeDateTime).GetValueOrThrow() : null,
+                    serie.StartDateAndOrTimeDateTime,
+                    serie.EndDateAndOrTimeDateTime,
                     serie.MeteringGridAreaDomainId,
                     serie.EnergySupplierMarketParticipantId,
                     serie.BalanceResponsiblePartyMarketParticipantId));
