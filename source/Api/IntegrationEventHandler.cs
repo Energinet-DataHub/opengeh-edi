@@ -14,15 +14,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
-using Google.Protobuf;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
