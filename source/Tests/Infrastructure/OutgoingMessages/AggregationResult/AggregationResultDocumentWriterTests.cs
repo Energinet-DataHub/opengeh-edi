@@ -183,8 +183,12 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     public async Task Business_reason_and_settlement_version_is_translated(string documentFormat, string processType, string settlementVersion)
     {
         _timeSeries
+            .WithMessageId(SampleData.MessageId)
+            .WithTransactionId(SampleData.TransactionId)
             .WithBusinessReason(BusinessReason.From(processType))
-            .WithSettlementVersion(SettlementVersion.From(settlementVersion));
+            .WithSettlementVersion(SettlementVersion.From(settlementVersion))
+            .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
+            .WithPoint(new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z"));
 
         var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
 
@@ -222,7 +226,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     {
         if (documentFormat == DocumentFormat.Ebix)
         {
-            var assertEbixDocument = AssertEbixDocument.Document(document, "ns0");
+            var assertEbixDocument = AssertEbixDocument.Document(document, "ns0", _documentValidation.Validator);
             return new AssertAggregationResultEbixDocument(assertEbixDocument);
         }
         else if (documentFormat == DocumentFormat.Xml)

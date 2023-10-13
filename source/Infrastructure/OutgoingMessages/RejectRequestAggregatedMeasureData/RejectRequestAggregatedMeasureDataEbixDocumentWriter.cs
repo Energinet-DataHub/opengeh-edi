@@ -61,7 +61,7 @@ public class RejectRequestAggregatedMeasureDataEbixDocumentWriter : EbixDocument
             // Begin PayloadResponseEvent
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "PayloadResponseEvent", null).ConfigureAwait(false);
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Identification", null, rejectedTimeSerie.TransactionId.ToString()).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Identification", null, rejectedTimeSerie.TransactionId.ToString("N")).ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "StatusType", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "6").ConfigureAwait(false);
@@ -78,13 +78,5 @@ public class RejectRequestAggregatedMeasureDataEbixDocumentWriter : EbixDocument
             // End PayloadResponseEvent
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
-    }
-
-    private Task WriteQualityIfRequiredAsync(XmlWriter writer, Point point)
-    {
-        if (point.Quality is null)
-            return Task.CompletedTask;
-
-        return writer.WriteElementStringAsync(DocumentDetails.Prefix, "QuantityQuality", null, EbixCode.Of(Quality.From(point.Quality)));
     }
 }

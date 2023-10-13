@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.CimXml;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.Ebix;
 
 namespace Energinet.DataHub.EDI.Tests.Fixtures;
 
@@ -23,7 +24,8 @@ public class DocumentValidationFixture
     {
         Validator = new DocumentValidator(new[]
         {
-            new CimXmlValidator(new CimXmlSchemaProvider()),
+            new CimXmlValidator(new CimXmlSchemaProvider()) as IValidator,
+            new EbixValidator(new EbixSchemaProvider()) as IValidator,
         });
     }
 
