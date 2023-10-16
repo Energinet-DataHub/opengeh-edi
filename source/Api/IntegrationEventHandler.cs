@@ -14,15 +14,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
-using Google.Protobuf;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -53,8 +50,12 @@ public class IntegrationEventHandler : IIntegrationEventHandler
 
         if (!shouldHandleEvent)
             return;
-
+        var watch = new Stopwatch();
+        watch.Start();
+        _logger.LogInformation("Store Integration event \"{EventIdentification}\" with event type \"{EventType}\".");
         var addResult = await _receivedIntegrationEventRepository.AddIfNotExistsAsync(integrationEvent.EventIdentification, integrationEvent.EventName).ConfigureAwait(false);
+        watch.Stop();
+        _logger.LogInformation("Integration event \"{EventIdentification}\" with event type \"{EventType}\" was registered successfully. Registration result: {RegisterIntegrationEventResult}. Time elapsed: {TimeElapsed}", integrationEvent.EventIdentification, integrationEvent.EventName, addResult.ToString(), watch.Elapsed);
 
         if (addResult != AddReceivedIntegrationEventResult.EventRegistered)
         {
