@@ -13,29 +13,58 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs;
 using Energinet.DataHub.EDI.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.Transactions;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.Application.Transactions.Aggregations;
 
 public class ForwardAggregationResultHandler : IRequestHandler<ForwardAggregationResult, Unit>
 {
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
+    private readonly ILogger<ForwardAggregationResultHandler> _logger;
 
-    public ForwardAggregationResultHandler(IOutgoingMessageRepository outgoingMessageRepository)
+    public ForwardAggregationResultHandler(IOutgoingMessageRepository outgoingMessageRepository, ILogger<ForwardAggregationResultHandler> logger)
     {
         _outgoingMessageRepository = outgoingMessageRepository;
+        _logger = logger;
     }
 
-    public Task<Unit> Handle(ForwardAggregationResult request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(ForwardAggregationResult request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
+        var sw = new Stopwatch();
+        sw.Start();
         var message = AggregationResultMessageFactory.CreateMessage(request.Result, ProcessId.New());
+        var connstring = Environment.GetEnvironmentVariable("Storage_Account_Container_Connection_String");
+
+        var blobServiceClient = new BlobServiceClient(connstring);
+
+        BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient("edi");
+
+        var blobClient = containerClient.GetBlobClient(message.Id.ToString());
+
+        using var memoryStream = new MemoryStream();
+        using var streamWriter = new StreamWriter(memoryStream);
+        await streamWriter.WriteAsync(message.MessageRecord).ConfigureAwait(false);
+        await streamWriter.FlushAsync().ConfigureAwait(false);
+
+        memoryStream.Position = 0;
+
+        await blobClient.UploadAsync(memoryStream, cancellationToken).ConfigureAwait(false);
+
+        message.MessageRecord = string.Empty;
+
         _outgoingMessageRepository.Add(message);
-        return Unit.Task;
+        sw.Stop();
+        _logger.LogInformation($"ForwardAggregationResultHandler took {sw.ElapsedMilliseconds} ms");
+        return Unit.Value;
     }
 }

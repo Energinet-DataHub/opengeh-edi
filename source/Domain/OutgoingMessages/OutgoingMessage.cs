@@ -52,7 +52,7 @@ namespace Energinet.DataHub.EDI.Domain.OutgoingMessages
 
         public MarketRole SenderRole { get; }
 
-        public string MessageRecord { get; }
+        public string MessageRecord { get; set; }
 
         public Receiver Receiver => Receiver.Create(ReceiverId, ReceiverRole);
 
