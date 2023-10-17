@@ -88,6 +88,7 @@ public class MessageParserTests
         Assert.Equal("5790001330552", marketMessage.ReceiverNumber);
         Assert.Equal("DGL", marketMessage.ReceiverRoleCode);
         Assert.Equal("2022-12-17T09:30:47Z", marketMessage.CreatedAt);
+        Assert.Equal("23", marketMessage.BusinessType);
 
         foreach (var serie in result!.MarketMessage!.Series)
         {

@@ -22,8 +22,9 @@ public class RequestAggregatedMeasureDataValidator : RequestAggregatedMeasureDat
         SenderAuthorizer senderAuthorizer,
         ProcessTypeValidator processTypeValidator,
         MessageTypeValidator messageTypeValidator,
-        CalculationResponsibleReceiverVerification calculationResponsibleReceiverVerification)
-        : base(messageIdRepository, transactionIdRepository, senderAuthorizer, processTypeValidator, messageTypeValidator, calculationResponsibleReceiverVerification)
+        CalculationResponsibleReceiverVerification calculationResponsibleReceiverVerification,
+        BusinessTypeValidator businessTypeValidator)
+        : base(messageIdRepository, transactionIdRepository, senderAuthorizer, processTypeValidator, messageTypeValidator, calculationResponsibleReceiverVerification, businessTypeValidator)
     {
     }
 }

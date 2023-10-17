@@ -34,6 +34,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
         private readonly IProcessTypeValidator _processTypeValidator;
         private readonly IMessageTypeValidator _messageTypeValidator;
         private readonly IReceiverValidator _receiverValidator;
+        private readonly IBusinessTypeValidator _businessTypeValidator;
 
         protected RequestAggregatedMeasureDataMarketMessageValidator(
             IMessageIdRepository messageIdRepository,
@@ -41,7 +42,8 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
             ISenderAuthorizer senderAuthorizer,
             IProcessTypeValidator processTypeValidator,
             IMessageTypeValidator messageTypeValidator,
-            IReceiverValidator receiverValidator)
+            IReceiverValidator receiverValidator,
+            IBusinessTypeValidator businessTypeValidator)
         {
             _messageIdRepository = messageIdRepository ?? throw new ArgumentNullException(nameof(messageIdRepository));
             _transactionIdRepository = transactionIdRepository;
@@ -49,6 +51,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
             _processTypeValidator = processTypeValidator;
             _messageTypeValidator = messageTypeValidator;
             _receiverValidator = receiverValidator;
+            _businessTypeValidator = businessTypeValidator;
         }
 
         public async Task<Result> ValidateAsync(
@@ -62,13 +65,15 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
             var checkMessageIdTask = CheckMessageIdAsync(requestAggregatedMeasureDataMarketMessage.SenderNumber, requestAggregatedMeasureDataMarketMessage.MessageId, cancellationToken);
             var checkMessageTypeTask = CheckMessageTypeAsync(requestAggregatedMeasureDataMarketMessage.MessageType, cancellationToken);
             var checkProcessTypeTask = CheckBusinessReasonAsync(requestAggregatedMeasureDataMarketMessage.BusinessReason, cancellationToken);
+            var checkBusinessTypeTask = CheckBusinessTypeAsync(requestAggregatedMeasureDataMarketMessage.BusinessType, cancellationToken);
 
             await Task.WhenAll(
                 authorizeSenderTask,
                 verifyReceiverTask,
                 checkMessageIdTask,
                 checkMessageTypeTask,
-                checkProcessTypeTask).ConfigureAwait(false);
+                checkProcessTypeTask,
+                checkBusinessTypeTask).ConfigureAwait(false);
 
             var transactionIdsToBeStored = new List<string>();
             foreach (var serie in requestAggregatedMeasureDataMarketMessage.Series)
@@ -196,6 +201,12 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Reques
         {
             var receiverVerification = await _receiverValidator.VerifyAsync(marketMessage.ReceiverNumber, marketMessage.ReceiverRoleCode).ConfigureAwait(false);
             _errors.AddRange(receiverVerification.Errors);
+        }
+
+        private async Task CheckBusinessTypeAsync(string? businessType, CancellationToken cancellationToken)
+        {
+            var result = await _businessTypeValidator.ValidateAsync(businessType, cancellationToken).ConfigureAwait(false);
+            _errors.AddRange(result.Errors);
         }
     }
 }
