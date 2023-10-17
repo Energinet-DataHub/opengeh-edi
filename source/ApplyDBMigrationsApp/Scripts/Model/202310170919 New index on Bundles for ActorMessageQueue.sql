@@ -1,1 +1,0 @@
-﻿CREATE INDEX IX_Bundles_ActorMessageQueueId ON [dbo].[Bundles] ([ActorMessageQueueId])
