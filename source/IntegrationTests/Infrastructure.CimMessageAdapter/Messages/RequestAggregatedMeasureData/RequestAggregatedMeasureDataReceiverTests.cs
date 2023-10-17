@@ -527,7 +527,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     }
 
     [Fact]
-    public async Task Business_type_23_is_allowed()
+    public async Task Business_type_is_allowed()
     {
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
@@ -542,7 +542,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     }
 
     [Fact]
-    public async Task Business_type_27_is_not_allowed()
+    public async Task Business_type_is_not_allowed()
     {
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()

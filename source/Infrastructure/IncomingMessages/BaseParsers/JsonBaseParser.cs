@@ -61,7 +61,7 @@ public abstract class JsonParserBase
             element.GetProperty("receiver_MarketParticipant.mRID").GetProperty("value").ToString(),
             element.GetProperty("receiver_MarketParticipant.marketRole.type").GetProperty("value").ToString(),
             GetJsonDateStringWithoutQuotes(element.GetProperty("createdDateTime")),
-            GetProcessKind(element));
+            GetBusinessType(element));
     }
 
     protected Task<JsonSchema?> GetSchemaAsync(string documentName, CancellationToken cancellationToken)
@@ -98,7 +98,7 @@ public abstract class JsonParserBase
         return schema.Evaluate(document, new EvaluationOptions() { OutputFormat = OutputFormat.Flag, }).IsValid;
     }
 
-    private static string? GetProcessKind(JsonElement element)
+    private static string? GetBusinessType(JsonElement element)
     {
         return element.TryGetProperty("businessSector.type", out var property) ? property.GetProperty("value").ToString() : null;
     }
