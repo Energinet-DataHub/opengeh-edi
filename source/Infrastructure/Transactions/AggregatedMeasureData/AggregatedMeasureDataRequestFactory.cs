@@ -115,10 +115,12 @@ public static class AggregatedMeasureDataRequestFactory
         {
             Period = MapPeriod(process),
             MeteringPointType = process.MeteringPointType,
-            SettlementMethod = process.SettlementMethod,
             RequestedByActorId = process.RequestedByActorId.Value,
             RequestedByActorRole = process.RequestedByActorRoleCode,
         };
+
+        if (process.SettlementMethod != null)
+            request.SettlementMethod = process.SettlementMethod;
 
         if (process.EnergySupplierId != null)
             request.EnergySupplierId = process.EnergySupplierId;
