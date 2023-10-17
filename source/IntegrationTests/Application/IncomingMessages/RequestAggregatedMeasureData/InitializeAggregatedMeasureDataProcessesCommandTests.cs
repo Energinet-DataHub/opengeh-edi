@@ -150,7 +150,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
     }
 
     [Fact]
-    public async Task Aggregated_measure_data_process_was_send_to_wholesale()
+    public async Task Aggregated_measure_data_process_was_sent_to_wholesale()
     {
         // Arrange
         var marketMessage =
@@ -175,6 +175,25 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         Assert.Equal(exceptedServiceBusMessageSubject, message!.Subject);
         Assert.Equal(marketMessage.Series.First().Id, process!.BusinessTransactionId.Id);
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Sent);
+    }
+
+    [Fact]
+    public async Task Aggregated_measure_data_process_without_settlement_method_was_sent_to_wholesale()
+    {
+        // Arrange
+        var marketMessage =
+            MessageBuilder().
+                SetMarketEvaluationSettlementMethod(null).
+                Build();
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
+        var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
+
+        // Act
+        await InvokeCommandAsync(command);
+
+        // Assert
+        var message = _senderSpy.Message;
+        Assert.NotNull(message);
     }
 
     protected override void Dispose(bool disposing)
