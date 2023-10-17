@@ -42,7 +42,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.DocumentValidation.Ebix
                     var filename = Path.GetFileNameWithoutExtension(schema);
                     filename = filename.Replace("-", "_", StringComparison.InvariantCulture);
                     var filenameSplit = filename.Split('_');
-                    if ((filenameSplit.Length >= 3) && (filenameSplit[0] == "ebIX") && (filenameSplit[1] == "DK"))
+                    if (filenameSplit.Length >= 3 && filenameSplit[0] == "ebIX" && filenameSplit[1] == "DK")
                     {
                         schemaDictionary.Add(
                             new KeyValuePair<string, string>(filenameSplit[1] + "_" + filenameSplit[2], "3"),
