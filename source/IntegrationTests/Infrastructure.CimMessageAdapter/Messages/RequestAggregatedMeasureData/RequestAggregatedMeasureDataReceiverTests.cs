@@ -525,9 +525,9 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         Assert.Contains(result.Errors, error => error is InvalidTransactionIdSize);
     }
 
-    private InitializeAggregatedMeasureDataProcessesHandler CreateInitializeRequestAggregatedMeasureProcessesHandler()
+    private InitializeAggregatedMeasureDataProcessesCommandHandler CreateInitializeRequestAggregatedMeasureProcessesHandler()
     {
-        return new InitializeAggregatedMeasureDataProcessesHandler(CreateMessageReceiver(), _aggregatedMeasureDataProcessRepository);
+        return new InitializeAggregatedMeasureDataProcessesCommandHandler(CreateMessageReceiver(), _aggregatedMeasureDataProcessRepository);
     }
 
     private RequestAggregatedMeasureDataValidator CreateMessageReceiver()

@@ -30,11 +30,11 @@ internal static class RequestedAggregatedMeasureDataConfiguration
 {
     public static void Configure(IServiceCollection services)
     {
-        services.AddTransient<IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>, SendAggregatedMeasuredDataToWholesale>();
-        services.AddTransient<IRequestHandler<AcceptedAggregatedTimeSerie, Unit>, AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable>();
-        services.AddTransient<IRequestHandler<RejectedAggregatedTimeSeries, Unit>, RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable>();
+        services.AddTransient<IRequestHandler<SendAggregatedMeasureRequestToWholesaleCommand, Unit>, SendAggregatedMeasureRequestToWholesaleCommandHandler>();
+        services.AddTransient<IRequestHandler<AcceptedAggregatedTimeSerieCommand, Unit>, AcceptedAggregatedTimeSerieCommandHandler>();
+        services.AddTransient<IRequestHandler<RejectedAggregatedTimeSeriesCommand, Unit>, RejectedAggregatedTimeSeriesCommandHandler>();
         services.AddTransient<INotificationHandler<AggregatedMeasureProcessIsInitialized>, NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized>();
-        services.AddTransient<IRequestHandler<InitializeAggregatedMeasureDataProcessesCommand, Result>, InitializeAggregatedMeasureDataProcessesHandler>();
+        services.AddTransient<IRequestHandler<InitializeAggregatedMeasureDataProcessesCommand, Result>, InitializeAggregatedMeasureDataProcessesCommandHandler>();
         services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>, WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable>();
         services.AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasRejected>, WhenAnRejectedAggregatedTimeSeriesRequestIsAvailable>();
         services.AddScoped<WholesaleInbox>();

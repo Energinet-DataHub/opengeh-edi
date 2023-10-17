@@ -13,25 +13,23 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
-using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 
-namespace Energinet.DataHub.EDI.Application.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 
-public class ForwardAggregationResult : InternalCommand
+public class RejectedAggregatedTimeSeriesCommand : InternalCommand
 {
     [JsonConstructor]
-    public ForwardAggregationResult(Guid id, Aggregation result)
-    : base(id)
+    public RejectedAggregatedTimeSeriesCommand(Guid processId, IReadOnlyList<RejectReason> rejectReasons)
     {
-        Result = result;
+        ProcessId = processId;
+        RejectReasons = rejectReasons;
     }
 
-    public ForwardAggregationResult(Aggregation result)
-    {
-        Result = result;
-    }
+    public Guid ProcessId { get; }
 
-    public Aggregation Result { get; }
+    public IReadOnlyList<RejectReason> RejectReasons { get; }
 }

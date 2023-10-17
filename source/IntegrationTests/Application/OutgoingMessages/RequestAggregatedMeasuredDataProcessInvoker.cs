@@ -49,7 +49,7 @@ public class RequestAggregatedMeasuredDataProcessInvoker
         process!.WasSentToWholesale();
         _b2BContext.SaveChanges();
         var acceptedAggregation = CreateAggregatedTimeSerie();
-        await _mediator.Send(new AcceptedAggregatedTimeSerie(process.ProcessId.Id, acceptedAggregation)).ConfigureAwait(false);
+        await _mediator.Send(new AcceptedAggregatedTimeSerieCommand(process.ProcessId.Id, acceptedAggregation)).ConfigureAwait(false);
     }
 
     private static AggregatedTimeSerie CreateAggregatedTimeSerie()

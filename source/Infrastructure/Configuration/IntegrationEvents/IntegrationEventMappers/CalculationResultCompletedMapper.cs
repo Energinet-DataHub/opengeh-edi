@@ -33,7 +33,7 @@ public class CalculationResultCompletedMapper : IIntegrationEventMapper
         var calculationResultCompletedIntegrationEvent = (CalculationResultCompleted)integrationEvent.Message;
 
         var aggregation = AggregationFactory.Create(calculationResultCompletedIntegrationEvent);
-        var forwardAggregationResult = new ForwardAggregationResult(aggregation);
+        var forwardAggregationResult = new ForwardAggregationResultCommand(aggregation);
 
         return forwardAggregationResult;
     }

@@ -19,11 +19,11 @@ using MediatR;
 
 namespace Energinet.DataHub.EDI.Application.Actors;
 
-public class CreateActorHandler : IRequestHandler<CreateActorCommand, Unit>
+public class CreateActorCommandHandler : IRequestHandler<CreateActorCommand, Unit>
 {
     private readonly IActorRegistry _actorRegistry;
 
-    public CreateActorHandler(IActorRegistry actorRegistry)
+    public CreateActorCommandHandler(IActorRegistry actorRegistry)
     {
         _actorRegistry = actorRegistry;
     }

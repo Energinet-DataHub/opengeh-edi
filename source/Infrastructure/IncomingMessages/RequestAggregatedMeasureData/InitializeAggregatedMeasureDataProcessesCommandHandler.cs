@@ -26,13 +26,13 @@ using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
-public class InitializeAggregatedMeasureDataProcessesHandler
+public class InitializeAggregatedMeasureDataProcessesCommandHandler
     : IRequestHandler<InitializeAggregatedMeasureDataProcessesCommand, Result>
 {
     private readonly RequestAggregatedMeasureDataValidator _messageValidator;
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
 
-    public InitializeAggregatedMeasureDataProcessesHandler(
+    public InitializeAggregatedMeasureDataProcessesCommandHandler(
         RequestAggregatedMeasureDataValidator messageValidator,
         IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {

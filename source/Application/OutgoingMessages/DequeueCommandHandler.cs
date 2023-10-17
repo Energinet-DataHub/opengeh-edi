@@ -22,11 +22,11 @@ using MediatR;
 
 namespace Energinet.DataHub.EDI.Application.OutgoingMessages;
 
-public class DequeueHandler : IRequestHandler<DequeueCommand, DequeCommandResult>
+public class DequeueCommandHandler : IRequestHandler<DequeueCommand, DequeCommandResult>
 {
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
 
-    public DequeueHandler(IActorMessageQueueRepository actorMessageQueueRepository)
+    public DequeueCommandHandler(IActorMessageQueueRepository actorMessageQueueRepository)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
     }

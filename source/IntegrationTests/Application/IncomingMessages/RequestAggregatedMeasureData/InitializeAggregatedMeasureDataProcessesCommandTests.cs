@@ -160,7 +160,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                 SetBalanceResponsibleId(null).
                 Build();
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
-        var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
+        var command = LoadCommand("SendAggregatedMeasureRequestToWholesale");
         var exceptedServiceBusMessageSubject = nameof(AggregatedTimeSeriesRequest);
 
         // Act

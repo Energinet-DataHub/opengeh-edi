@@ -23,6 +23,6 @@ internal static class AggregationsConfiguration
 {
     internal static void Configure(IServiceCollection services)
     {
-        services.AddTransient<IRequestHandler<ForwardAggregationResult, Unit>, ForwardAggregationResultHandler>();
+        services.AddTransient<IRequestHandler<ForwardAggregationResultCommand, Unit>, ForwardAggregationResultCommandHandler>();
     }
 }

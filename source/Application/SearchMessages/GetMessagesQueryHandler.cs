@@ -22,11 +22,11 @@ using MediatR;
 
 namespace Energinet.DataHub.EDI.Application.SearchMessages;
 
-public class GetMessageQueryHandler : IRequestHandler<GetMessagesQuery, MessageSearchResult>
+public class GetMessagesQueryHandler : IRequestHandler<GetMessagesQuery, MessageSearchResult>
 {
     private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public GetMessageQueryHandler(IDatabaseConnectionFactory connectionFactory)
+    public GetMessagesQueryHandler(IDatabaseConnectionFactory connectionFactory)
     {
         _connectionFactory = connectionFactory;
     }

@@ -22,16 +22,16 @@ using MediatR;
 
 namespace Energinet.DataHub.EDI.Application.Transactions.Aggregations;
 
-public class ForwardAggregationResultHandler : IRequestHandler<ForwardAggregationResult, Unit>
+public class ForwardAggregationResultCommandHandler : IRequestHandler<ForwardAggregationResultCommand, Unit>
 {
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
 
-    public ForwardAggregationResultHandler(IOutgoingMessageRepository outgoingMessageRepository)
+    public ForwardAggregationResultCommandHandler(IOutgoingMessageRepository outgoingMessageRepository)
     {
         _outgoingMessageRepository = outgoingMessageRepository;
     }
 
-    public Task<Unit> Handle(ForwardAggregationResult request, CancellationToken cancellationToken)
+    public Task<Unit> Handle(ForwardAggregationResultCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
         var message = AggregationResultMessageFactory.CreateMessage(request.Result, ProcessId.New());

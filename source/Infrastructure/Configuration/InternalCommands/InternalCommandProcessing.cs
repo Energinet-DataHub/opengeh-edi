@@ -41,10 +41,10 @@ internal static class InternalCommandProcessing
     {
         var mapper = new InternalCommandMapper();
         mapper.Add("CreateActor", typeof(CreateActorCommand));
-        mapper.Add("Aggregations.ForwardAggregationResult", typeof(ForwardAggregationResult));
-        mapper.Add("SendAggregatedMeasureRequestToWholesale", typeof(SendAggregatedMeasureRequestToWholesale));
-        mapper.Add("AcceptedAggregatedTimeSerie", typeof(AcceptedAggregatedTimeSerie));
-        mapper.Add("RejectedAggregatedTimeSeries", typeof(RejectedAggregatedTimeSeries));
+        mapper.Add("Aggregations.ForwardAggregationResult", typeof(ForwardAggregationResultCommand));
+        mapper.Add("SendAggregatedMeasureRequestToWholesale", typeof(SendAggregatedMeasureRequestToWholesaleCommand));
+        mapper.Add("AcceptedAggregatedTimeSerie", typeof(AcceptedAggregatedTimeSerieCommand));
+        mapper.Add("RejectedAggregatedTimeSeries", typeof(RejectedAggregatedTimeSeriesCommand));
 
         return mapper;
     }

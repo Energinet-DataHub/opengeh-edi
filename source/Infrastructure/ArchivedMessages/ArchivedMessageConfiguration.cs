@@ -25,7 +25,7 @@ public static class ArchivedMessageConfiguration
 {
     public static void Configure(IServiceCollection services)
     {
-        services.AddTransient<IRequestHandler<GetMessagesQuery, MessageSearchResult>, GetMessageQueryHandler>();
+        services.AddTransient<IRequestHandler<GetMessagesQuery, MessageSearchResult>, GetMessagesQueryHandler>();
         services.AddScoped<IArchivedMessageRepository, ArchivedMessageRepository>();
 
         services.AddTransient<IRequestHandler<GetArchivedMessageDocumentQuery, Stream?>, GetArchivedMessageDocumentQueryHandler>();

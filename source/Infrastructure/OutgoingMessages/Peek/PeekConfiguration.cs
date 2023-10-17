@@ -28,6 +28,6 @@ internal static class PeekConfiguration
         services.AddScoped<MessageEnqueuer>();
         services.AddScoped<IActorMessageQueueRepository, ActorMessageQueueRepository>();
         services.AddScoped<IMarketDocumentRepository, MarketDocumentRepository>();
-        services.AddTransient<IRequestHandler<PeekCommand, PeekResult>, PeekHandler>();
+        services.AddTransient<IRequestHandler<PeekCommand, PeekResult>, PeekCommandHandler>();
     }
 }

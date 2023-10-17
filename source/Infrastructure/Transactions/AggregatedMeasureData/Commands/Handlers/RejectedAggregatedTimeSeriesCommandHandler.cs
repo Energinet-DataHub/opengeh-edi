@@ -17,39 +17,29 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Domain.Transactions;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.Wholesale;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
 
-public class SendAggregatedMeasuredDataToWholesale
-    : IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>
+public class RejectedAggregatedTimeSeriesCommandHandler : IRequestHandler<RejectedAggregatedTimeSeriesCommand, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
-    private readonly WholesaleInbox _wholesaleInbox;
 
-    public SendAggregatedMeasuredDataToWholesale(
-        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository,
-        WholesaleInbox wholesaleInbox)
+    public RejectedAggregatedTimeSeriesCommandHandler(
+        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
-        _wholesaleInbox = wholesaleInbox;
     }
 
-    public async Task<Unit> Handle(
-        SendAggregatedMeasureRequestToWholesale request,
-        CancellationToken cancellationToken)
+    public async Task<Unit> Handle(RejectedAggregatedTimeSeriesCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         var process = await _aggregatedMeasureDataProcessRepository
             .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
-        await _wholesaleInbox.SendAsync(
-            process,
-            cancellationToken).ConfigureAwait(false);
-
-        process.WasSentToWholesale();
+        process.IsRejected(new RejectedAggregatedMeasureDataRequest(request.RejectReasons, CimCode.To(process.BusinessReason)));
 
         return Unit.Value;
     }

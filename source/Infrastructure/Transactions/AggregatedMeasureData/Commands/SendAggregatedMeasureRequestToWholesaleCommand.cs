@@ -18,10 +18,10 @@ using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 
-public class SendAggregatedMeasureRequestToWholesale : InternalCommand
+public class SendAggregatedMeasureRequestToWholesaleCommand : InternalCommand
 {
     [JsonConstructor]
-    public SendAggregatedMeasureRequestToWholesale(Guid processId)
+    public SendAggregatedMeasureRequestToWholesaleCommand(Guid processId)
     {
         ProcessId = processId;
     }

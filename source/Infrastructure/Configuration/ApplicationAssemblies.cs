@@ -14,6 +14,7 @@
 
 using System.Reflection;
 using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Domain.Common;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration;
 
@@ -22,4 +23,6 @@ public static class ApplicationAssemblies
     public static Assembly Application => typeof(InternalCommand).Assembly;
 
     public static Assembly Infrastructure => typeof(ApplicationAssemblies).Assembly;
+
+    public static Assembly Domain => typeof(DomainEvent).Assembly;
 }

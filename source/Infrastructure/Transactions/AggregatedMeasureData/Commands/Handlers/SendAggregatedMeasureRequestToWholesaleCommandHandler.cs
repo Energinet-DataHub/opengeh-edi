@@ -17,29 +17,39 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Domain.Transactions;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
 
-public class RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable : IRequestHandler<RejectedAggregatedTimeSeries, Unit>
+public class SendAggregatedMeasureRequestToWholesaleCommandHandler
+    : IRequestHandler<SendAggregatedMeasureRequestToWholesaleCommand, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
+    private readonly WholesaleInbox _wholesaleInbox;
 
-    public RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable(
-        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
+    public SendAggregatedMeasureRequestToWholesaleCommandHandler(
+        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository,
+        WholesaleInbox wholesaleInbox)
     {
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
+        _wholesaleInbox = wholesaleInbox;
     }
 
-    public async Task<Unit> Handle(RejectedAggregatedTimeSeries request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(
+        SendAggregatedMeasureRequestToWholesaleCommand request,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         var process = await _aggregatedMeasureDataProcessRepository
             .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
-        process.IsRejected(new RejectedAggregatedMeasureDataRequest(request.RejectReasons, CimCode.To(process.BusinessReason)));
+        await _wholesaleInbox.SendAsync(
+            process,
+            cancellationToken).ConfigureAwait(false);
+
+        process.WasSentToWholesale();
 
         return Unit.Value;
     }

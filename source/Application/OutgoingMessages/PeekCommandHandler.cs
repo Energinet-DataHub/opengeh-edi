@@ -27,7 +27,7 @@ using MediatR;
 
 namespace Energinet.DataHub.EDI.Application.OutgoingMessages;
 
-public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
+public class PeekCommandHandler : IRequestHandler<PeekCommand, PeekResult>
 {
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
     private readonly IMarketDocumentRepository _marketDocumentRepository;
@@ -37,7 +37,7 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
     private readonly IUnitOfWork _unitOfWork;
     private readonly IArchivedMessageRepository _archivedMessageRepository;
 
-    public PeekHandler(
+    public PeekCommandHandler(
         IActorMessageQueueRepository actorMessageQueueRepository,
         IMarketDocumentRepository marketDocumentRepository,
         DocumentFactory documentFactory,

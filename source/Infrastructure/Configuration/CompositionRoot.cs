@@ -250,7 +250,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
 
         private void AddActorServices()
         {
-            _services.AddTransient<IRequestHandler<CreateActorCommand, Unit>, CreateActorHandler>();
+            _services.AddTransient<IRequestHandler<CreateActorCommand, Unit>, CreateActorCommandHandler>();
             _services.AddTransient<IActorRegistry, ActorRegistry>();
         }
 

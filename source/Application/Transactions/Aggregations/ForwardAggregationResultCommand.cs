@@ -15,20 +15,23 @@
 using System;
 using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
-using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
+namespace Energinet.DataHub.EDI.Application.Transactions.Aggregations;
 
-public class AcceptedAggregatedTimeSerie : InternalCommand
+public class ForwardAggregationResultCommand : InternalCommand
 {
     [JsonConstructor]
-    public AcceptedAggregatedTimeSerie(Guid processId, AggregatedTimeSerie aggregatedTimeSerie)
+    public ForwardAggregationResultCommand(Guid id, Aggregation result)
+    : base(id)
     {
-        ProcessId = processId;
-        AggregatedTimeSerie = aggregatedTimeSerie;
+        Result = result;
     }
 
-    public Guid ProcessId { get; }
+    public ForwardAggregationResultCommand(Aggregation result)
+    {
+        Result = result;
+    }
 
-    public AggregatedTimeSerie AggregatedTimeSerie { get; }
+    public Aggregation Result { get; }
 }
