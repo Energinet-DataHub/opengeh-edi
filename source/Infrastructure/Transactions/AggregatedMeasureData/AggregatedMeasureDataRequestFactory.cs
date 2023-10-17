@@ -118,11 +118,9 @@ public static class AggregatedMeasureDataRequestFactory
             RequestedByActorId = process.RequestedByActorId.Value,
             RequestedByActorRole = process.RequestedByActorRoleCode,
         };
-        var settlementMethod = process.SettlementMethod;
-        if (settlementMethod != null)
-        {
-            request.SettlementMethod = settlementMethod;
-        }
+
+        if (process.SettlementMethod != null)
+            request.SettlementMethod = process.SettlementMethod;
 
         if (process.EnergySupplierId != null)
             request.EnergySupplierId = process.EnergySupplierId;
