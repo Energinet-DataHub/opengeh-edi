@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using DbUp.Reboot.Engine;
+using DbUp.Engine;
 
 namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
 
