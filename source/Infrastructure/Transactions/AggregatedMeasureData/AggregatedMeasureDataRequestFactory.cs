@@ -125,6 +125,9 @@ public static class AggregatedMeasureDataRequestFactory
         if (process.EnergySupplierId != null)
             request.EnergySupplierId = process.EnergySupplierId;
 
+        if (process.BalanceResponsibleId != null)
+            request.BalanceResponsibleId = process.BalanceResponsibleId;
+
         MapGridArea(request, process);
         MapEnergySupplierPerGridArea(request, process);
         MapBalanceResponsiblePerGridArea(request, process);
