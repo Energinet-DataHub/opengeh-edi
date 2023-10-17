@@ -14,9 +14,8 @@
 
 using System;
 using System.Reflection;
-using DbUp.Reboot;
-using DbUp.Reboot.Engine;
-using Microsoft.Data.SqlClient;
+using DbUp;
+using DbUp.Engine;
 
 namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers
 {
@@ -28,8 +27,6 @@ namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers
             {
                 throw new ArgumentException("Connection string must have a value");
             }
-
-            SqlAuthenticationProvider.SetProvider(SqlAuthenticationMethod.ActiveDirectoryInteractive, new SqlAppAuthenticationProvider());
 
             EnsureDatabase.For.SqlDatabase(connectionString);
 
