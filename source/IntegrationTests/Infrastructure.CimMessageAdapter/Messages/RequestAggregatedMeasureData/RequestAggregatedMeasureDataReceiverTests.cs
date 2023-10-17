@@ -32,7 +32,6 @@ using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Categories;
 
@@ -50,6 +49,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     private readonly B2BContext _b2BContext;
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
     private readonly IMarketActorAuthenticator _marketActorAuthenticator;
+    private readonly BusinessTypeValidator _businessTypeValidator;
 
     public RequestAggregatedMeasureDataReceiverTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
@@ -63,6 +63,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         _b2BContext = GetService<B2BContext>();
         _aggregatedMeasureDataProcessRepository = GetService<IAggregatedMeasureDataProcessRepository>();
         _marketActorAuthenticator = new MarketActorAuthenticatorSpy(ActorNumber.Create("1234567890123"), "DDQ");
+        _businessTypeValidator = GetService<BusinessTypeValidator>();
     }
 
     public static IEnumerable<object[]> AllowedActorRoles =>
@@ -525,6 +526,35 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         Assert.Contains(result.Errors, error => error is InvalidTransactionIdSize);
     }
 
+    [Fact]
+    public async Task Business_type_23_is_allowed()
+    {
+        await using var message = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .WithBusinessType("23")
+            .Message();
+
+        var messageParserResult = await ParseMessageAsync(message);
+        var result = await CreateMessageReceiver().ValidateAsync(messageParserResult.MarketMessage!, CancellationToken.None);
+
+        Assert.NotNull(result);
+        Assert.True(result.Success);
+    }
+
+    [Fact]
+    public async Task Business_type_27_is_not_allowed()
+    {
+        await using var message = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .WithBusinessType("27")
+            .Message();
+
+        var messageParserResult = await ParseMessageAsync(message);
+        var result = await CreateMessageReceiver().ValidateAsync(messageParserResult.MarketMessage!, CancellationToken.None);
+
+        Assert.Contains(result.Errors, error => error is NotSupportedBusinessType);
+    }
+
     private InitializeAggregatedMeasureDataProcessesHandler CreateInitializeRequestAggregatedMeasureProcessesHandler()
     {
         return new InitializeAggregatedMeasureDataProcessesHandler(CreateMessageReceiver(), _aggregatedMeasureDataProcessRepository);
@@ -538,7 +568,8 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             new SenderAuthorizer(_marketActorAuthenticator),
             _processTypeValidator,
             _messageTypeValidator,
-            _calculationResponsibleReceiverVerification);
+            _calculationResponsibleReceiverVerification,
+            _businessTypeValidator);
         return messageReceiver;
     }
 

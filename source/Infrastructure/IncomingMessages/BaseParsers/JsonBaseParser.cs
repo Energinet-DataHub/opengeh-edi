@@ -60,7 +60,8 @@ public abstract class JsonParserBase
             element.GetProperty("sender_MarketParticipant.marketRole.type").GetProperty("value").ToString(),
             element.GetProperty("receiver_MarketParticipant.mRID").GetProperty("value").ToString(),
             element.GetProperty("receiver_MarketParticipant.marketRole.type").GetProperty("value").ToString(),
-            GetJsonDateStringWithoutQuotes(element.GetProperty("createdDateTime")));
+            GetJsonDateStringWithoutQuotes(element.GetProperty("createdDateTime")),
+            GetProcessKind(element));
     }
 
     protected Task<JsonSchema?> GetSchemaAsync(string documentName, CancellationToken cancellationToken)
@@ -95,6 +96,11 @@ public abstract class JsonParserBase
     private static bool IsValid(JsonDocument document, JsonSchema schema)
     {
         return schema.Evaluate(document, new EvaluationOptions() { OutputFormat = OutputFormat.Flag, }).IsValid;
+    }
+
+    private static string? GetProcessKind(JsonElement element)
+    {
+        return element.TryGetProperty("businessSector.type", out var property) ? property.GetProperty("value").ToString() : null;
     }
 
     private void ExtractValidationErrors(JsonDocument jsonDocument, JsonSchema schema)
