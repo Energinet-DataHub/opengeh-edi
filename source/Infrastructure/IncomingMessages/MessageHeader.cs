@@ -16,7 +16,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages
 {
     public class MessageHeader
     {
-        public MessageHeader(string messageId, string messageType, string businessReason, string senderId, string senderRole, string receiverId, string receiverRole, string createdAt, string? authenticatedUser = null, string? authenticatedUserRole = null)
+        public MessageHeader(string messageId, string messageType, string businessReason, string senderId, string senderRole, string receiverId, string receiverRole, string createdAt, string? businessType = null, string? authenticatedUser = null, string? authenticatedUserRole = null)
         {
             MessageId = messageId;
             MessageType = messageType;
@@ -26,6 +26,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages
             ReceiverId = receiverId;
             ReceiverRole = receiverRole;
             CreatedAt = createdAt;
+            BusinessType = businessType;
             AuthenticatedUser = authenticatedUser;
             AuthenticatedUserRole = authenticatedUserRole;
         }
@@ -45,6 +46,8 @@ namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages
         public string ReceiverRole { get; }
 
         public string CreatedAt { get; }
+
+        public string? BusinessType { get; }
 
         //Todo: temp solution until messageReceiver doesn't depend on authenticated user
         public string? AuthenticatedUser { get; set; }

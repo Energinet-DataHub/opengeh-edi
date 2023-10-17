@@ -16,8 +16,6 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
-using Energinet.DataHub.EDI.Domain.Actors;
-using Energinet.DataHub.EDI.Domain.Documents;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
@@ -42,6 +40,7 @@ public static class RequestAggregatedMeasureDataMarketMessageFactory
             header.MessageType,
             header.MessageId,
             header.CreatedAt,
+            header.BusinessType,
             series);
     }
 
@@ -73,6 +72,7 @@ public static class RequestAggregatedMeasureDataMarketMessageFactory
             requestAggregatedMeasureData.MessageType,
             requestAggregatedMeasureData.MessageId,
             createdAt.ToString(),
+            BusinessType: "23",
             series);
     }
 }

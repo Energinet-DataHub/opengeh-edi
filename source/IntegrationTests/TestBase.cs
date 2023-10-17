@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -29,7 +28,6 @@ using Energinet.DataHub.EDI.Application.Configuration.Queries;
 using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
