@@ -32,7 +32,8 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
     private readonly string _endDateAndOrTimeDateTime = "2022-07-22T22:00:00Z";
     private readonly string _meteringGridAreaDomainId = "244";
     private readonly string _messageType = "E74";
-    private readonly BusinessReason _businesReason = BusinessReason.PreliminaryAggregation;
+    private readonly string _businessType = "23";
+    private readonly BusinessReason _businessReason = BusinessReason.PreliminaryAggregation;
     private readonly string _senderId = SampleData.NewEnergySupplierNumber;
     private readonly ActorNumber _receiverId = DataHubDetails.IdentificationNumber;
     private readonly MarketRole _receiverRole = MarketRole.CalculationResponsibleRole;
@@ -112,12 +113,13 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
         return new MessageHeader(
             _messageId,
             _messageType,
-            CimCode.Of(_businesReason),
+            CimCode.Of(_businessReason),
             _senderId,
             _senderRole,
             _receiverId.Value,
             _receiverRole.Code,
             _createdAt,
+            _businessType,
             _senderId,
             _senderRole);
     }

@@ -30,6 +30,7 @@ public record RequestAggregatedMeasureDataMarketMessage(
     string MessageType,
     string MessageId,
     string CreatedAt,
+    string? BusinessType,
     IReadOnlyCollection<Serie> Series);
 
 public record Serie(

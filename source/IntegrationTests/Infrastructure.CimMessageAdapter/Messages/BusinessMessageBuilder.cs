@@ -77,6 +77,12 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapte
             return this;
         }
 
+        public BusinessMessageBuilder WithBusinessType(string businessType)
+        {
+            SetRootChildElementValue("businessSector.type", businessType);
+            return this;
+        }
+
         public BusinessMessageBuilder WithSeriesTransactionId(string transactionId)
         {
             var root = _document.Root;

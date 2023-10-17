@@ -57,6 +57,7 @@ internal static class IncomingMessageParsingServices
         services.AddTransient<SenderAuthorizer>();
         services.AddScoped<ProcessTypeValidator>();
         services.AddScoped<MessageTypeValidator>();
+        services.AddScoped<BusinessTypeValidator>();
         services.AddScoped<CalculationResponsibleReceiverVerification>();
     }
 }
