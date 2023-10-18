@@ -35,7 +35,7 @@ internal static class MessageHeaderExtractor
         var receiverId = string.Empty;
         var receiverRole = string.Empty;
         var createdAt = string.Empty;
-        var businessType = string.Empty;
+        string? businessType = null;
         var ns = rootElement.DefaultNamespace;
 
         await reader.AdvanceToAsync(headerElementName, rootElement.DefaultNamespace).ConfigureAwait(false);
