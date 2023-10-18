@@ -107,6 +107,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
           SampleData.EndOfPeriod,
           SampleData.GridAreaCode,
           null,
+          null,
           null);
 
         process.WasSentToWholesale();
