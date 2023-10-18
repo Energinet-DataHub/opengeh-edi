@@ -98,7 +98,8 @@ public class JsonMessageParser : JsonParserBase,
             element.TryGetProperty("end_DateAndOrTime.dateTime", out var endDateProperty) ? endDateProperty.ToString() : null,
             GetPropertyWithValue(element, "meteringGridArea_Domain.mRID"),
             GetPropertyWithValue(element, "energySupplier_MarketParticipant.mRID"),
-            GetPropertyWithValue(element, "balanceResponsibleParty_MarketParticipant.mRID"));
+            GetPropertyWithValue(element, "balanceResponsibleParty_MarketParticipant.mRID"),
+            GetPropertyWithValue(element, "settlement_Series"));
     }
 
     private static string? GetPropertyWithValue(JsonElement element, string propertyName)

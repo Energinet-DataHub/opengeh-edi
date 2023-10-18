@@ -59,7 +59,8 @@ public static class RequestAggregatedMeasureDataMarketMessageFactory
                 serie.EndDateAndOrTimeDateTime,
                 serie.MeteringGridAreaDomainId,
                 serie.EnergySupplierMarketParticipantId,
-                serie.BalanceResponsiblePartyMarketParticipantId)).ToList();
+                serie.BalanceResponsiblePartyMarketParticipantId,
+                serie.SettlementSeries)).ToList();
 
         return new RequestAggregatedMeasureDataMarketMessage(
             requestAggregatedMeasureData.SenderId,
