@@ -40,5 +40,5 @@ message Serie {
   optional string MeteringGridAreaDomainId = 6;
   optional string EnergySupplierMarketParticipantId = 7;
   optional string BalanceResponsiblePartyMarketParticipantId = 8;
-  optional string SettlementSeries = 9;
+  optional string SettlementSeriesVersion = 9;
 }

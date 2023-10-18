@@ -68,7 +68,7 @@ public static class RequestAggregatedMeasureDataHttpFactory
 
         if (request.ProcessType == ProcessType.FirstCorrection || request.ProcessType == ProcessType.SecondCorrection || request.ProcessType == ProcessType.ThirdCorrection)
         {
-            serie.SettlementSeries = SetSettlementSeries(request.ProcessType);
+            serie.SettlementSeriesVersion = SetSettlementSeries(request.ProcessType);
         }
 
         MapEvaluationPointTypeAndSettlementMethod(serie, request);

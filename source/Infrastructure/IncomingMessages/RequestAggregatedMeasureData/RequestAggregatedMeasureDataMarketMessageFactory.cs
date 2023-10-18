@@ -60,7 +60,7 @@ public static class RequestAggregatedMeasureDataMarketMessageFactory
                 serie.MeteringGridAreaDomainId,
                 serie.EnergySupplierMarketParticipantId,
                 serie.BalanceResponsiblePartyMarketParticipantId,
-                serie.SettlementSeries)).ToList();
+                serie.SettlementSeriesVersion)).ToList();
 
         return new RequestAggregatedMeasureDataMarketMessage(
             requestAggregatedMeasureData.SenderId,
