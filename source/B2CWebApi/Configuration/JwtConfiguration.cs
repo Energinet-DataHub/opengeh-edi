@@ -1,0 +1,33 @@
+﻿// Copyright 2020 Energinet DataHub A/S
+//
+// Licensed under the Apache License, Version 2.0 (the "License2");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using Energinet.DataHub.Core.App.WebApp.Authentication;
+using Energinet.DataHub.Core.App.WebApp.Authorization;
+using Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
+using Energinet.DataHub.EDI.B2CWebApi.Security;
+
+namespace Energinet.DataHub.EDI.B2CWebApi.Configuration;
+
+public static class JwtConfiguration
+{
+    public static void AddJwtTokenSecurity(
+        this IServiceCollection serviceCollection,
+        IConfiguration configuration)
+    {
+        var options = configuration.Get<JwtOptions>()!;
+        serviceCollection.AddJwtBearerAuthentication(options.EXTERNAL_OPEN_ID_URL, options.INTERNAL_OPEN_ID_URL, options.BACKEND_BFF_APP_ID);
+        serviceCollection.AddUserAuthentication<FrontendUser, FrontendUserProvider>();
+        serviceCollection.AddPermissionAuthorization();
+    }
+}
