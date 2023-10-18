@@ -170,12 +170,12 @@ public class XmlMessageParser : IMessageParser<RequestAggregatedMeasureDataMarke
     {
         var id = string.Empty;
         var marketEvaluationPointType = string.Empty;
-        var marketEvaluationSettlementMethod = string.Empty;
+        string? marketEvaluationSettlementMethod = null;
         var startDateAndOrTimeDateTime = string.Empty;
         var endDateAndOrTimeDateTime = string.Empty;
         var meteringGridAreaDomainId = string.Empty;
-        var energySupplierMarketParticipantId = string.Empty;
-        var balanceResponsiblePartyMarketParticipantId = string.Empty;
+        string? energySupplierMarketParticipantId = null;
+        string? balanceResponsiblePartyMarketParticipantId = null;
         var ns = rootElement.DefaultNamespace;
 
         await reader.AdvanceToAsync(SeriesRecordElementName, ns).ConfigureAwait(false);
@@ -240,13 +240,13 @@ public class XmlMessageParser : IMessageParser<RequestAggregatedMeasureDataMarke
 
     private static Serie CreateSerie(
         ref string id,
-        ref string marketEvaluationPointType,
-        ref string marketEvaluationSettlementMethod,
+        ref string? marketEvaluationPointType,
+        ref string? marketEvaluationSettlementMethod,
         ref string startDateAndOrTimeDateTime,
-        ref string endDateAndOrTimeDateTime,
-        ref string meteringGridAreaDomainId,
-        ref string energySupplierMarketParticipantId,
-        ref string balanceResponsiblePartyMarketParticipantId)
+        ref string? endDateAndOrTimeDateTime,
+        ref string? meteringGridAreaDomainId,
+        ref string? energySupplierMarketParticipantId,
+        ref string? balanceResponsiblePartyMarketParticipantId)
     {
         var serie = new Serie(
             id,
@@ -259,13 +259,13 @@ public class XmlMessageParser : IMessageParser<RequestAggregatedMeasureDataMarke
             balanceResponsiblePartyMarketParticipantId);
 
         id = string.Empty;
-        marketEvaluationPointType = string.Empty;
-        marketEvaluationSettlementMethod = string.Empty;
+        marketEvaluationPointType = null;
+        marketEvaluationSettlementMethod = null;
         startDateAndOrTimeDateTime = string.Empty;
-        endDateAndOrTimeDateTime = string.Empty;
-        meteringGridAreaDomainId = string.Empty;
-        energySupplierMarketParticipantId = string.Empty;
-        balanceResponsiblePartyMarketParticipantId = string.Empty;
+        endDateAndOrTimeDateTime = null;
+        meteringGridAreaDomainId = null;
+        energySupplierMarketParticipantId = null;
+        balanceResponsiblePartyMarketParticipantId = null;
 
         return serie;
     }

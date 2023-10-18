@@ -18,7 +18,6 @@ using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
 {
@@ -45,12 +44,12 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
             BusinessTransactionId = businessTransactionId;
             BusinessReason = businessReason;
             MeteringPointType = meteringPointType;
-            SettlementMethod = string.IsNullOrWhiteSpace(settlementMethod) ? null : settlementMethod;
+            SettlementMethod = settlementMethod;
             StartOfPeriod = startOfPeriod;
             EndOfPeriod = endOfPeriod;
             MeteringGridAreaDomainId = meteringGridAreaDomainId;
-            EnergySupplierId = string.IsNullOrWhiteSpace(energySupplierId) ? null : energySupplierId;
-            BalanceResponsibleId = string.IsNullOrWhiteSpace(balanceResponsibleId) ? null : balanceResponsibleId;
+            EnergySupplierId = energySupplierId;
+            BalanceResponsibleId = balanceResponsibleId;
             RequestedByActorId = requestedByActorId;
             RequestedByActorRoleCode = requestedByActorRoleCode;
             AddDomainEvent(new AggregatedMeasureProcessIsInitialized(processId));
