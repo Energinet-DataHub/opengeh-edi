@@ -45,16 +45,12 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
             BusinessTransactionId = businessTransactionId;
             BusinessReason = businessReason;
             MeteringPointType = meteringPointType;
-            SettlementMethod = settlementMethod;
+            SettlementMethod = string.IsNullOrWhiteSpace(settlementMethod) ? null : settlementMethod;
             StartOfPeriod = startOfPeriod;
             EndOfPeriod = endOfPeriod;
             MeteringGridAreaDomainId = meteringGridAreaDomainId;
-            EnergySupplierId = string.IsNullOrWhiteSpace(energySupplierId)
-                ? null
-                : energySupplierId;
-            BalanceResponsibleId = string.IsNullOrWhiteSpace(balanceResponsibleId)
-                ? null
-                : balanceResponsibleId;
+            EnergySupplierId = string.IsNullOrWhiteSpace(energySupplierId) ? null : energySupplierId;
+            BalanceResponsibleId = string.IsNullOrWhiteSpace(balanceResponsibleId) ? null : balanceResponsibleId;
             RequestedByActorId = requestedByActorId;
             RequestedByActorRoleCode = requestedByActorRoleCode;
             AddDomainEvent(new AggregatedMeasureProcessIsInitialized(processId));
