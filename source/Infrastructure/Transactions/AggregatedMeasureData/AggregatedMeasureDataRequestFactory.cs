@@ -102,11 +102,15 @@ public static class AggregatedMeasureDataRequestFactory
 
     private static Edi.Requests.Period MapPeriod(AggregatedMeasureDataProcess process)
     {
-        return new Edi.Requests.Period
+        var period = new Edi.Requests.Period
         {
             Start = process.StartOfPeriod,
-            End = process.EndOfPeriod,
         };
+
+        if (process.EndOfPeriod != null)
+            period.End = process.EndOfPeriod;
+
+        return period;
     }
 
     private static IMessage CreateAggregatedMeasureDataRequest(AggregatedMeasureDataProcess process)
@@ -127,6 +131,9 @@ public static class AggregatedMeasureDataRequestFactory
 
         if (process.BalanceResponsibleId != null)
             request.BalanceResponsibleId = process.BalanceResponsibleId;
+
+        if (process.SettlementVersion != null)
+            request.SettlementSeriesVersion = process.SettlementVersion;
 
         MapGridArea(request, process);
         MapEnergySupplierPerGridArea(request, process);
