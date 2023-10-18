@@ -101,6 +101,7 @@ public class MessageParserTests
             Assert.Equal("D01", serie.MarketEvaluationSettlementMethod);
             Assert.Equal("2022-07-22T22:00:00Z", serie.EndDateAndOrTimeDateTime);
             Assert.Equal("2022-06-17T22:00:00Z", serie.StartDateAndOrTimeDateTime);
+            Assert.Equal("D01", serie.SettlementSeries);
         }
     }
 
