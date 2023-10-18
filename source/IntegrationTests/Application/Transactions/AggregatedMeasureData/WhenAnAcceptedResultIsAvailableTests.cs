@@ -183,7 +183,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
           SampleData.EndOfPeriod,
           SampleData.GridAreaCode,
           receiverRole == MarketRole.EnergySupplier ? SampleData.ReceiverNumber.Value : null,
-          receiverRole == MarketRole.BalanceResponsibleParty ? SampleData.ReceiverNumber.Value : null);
+          receiverRole == MarketRole.BalanceResponsibleParty ? SampleData.ReceiverNumber.Value : null,
+          "1");
 
         process.WasSentToWholesale();
         _b2BContext.AggregatedMeasureDataProcesses.Add(process);
