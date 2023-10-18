@@ -135,6 +135,9 @@ public static class AggregatedMeasureDataRequestFactory
         if (process.SettlementVersion != null)
             request.SettlementSeriesVersion = process.SettlementVersion;
 
+        if (process.MeteringGridAreaDomainId != null)
+            request.GridAreaCode = process.MeteringGridAreaDomainId;
+
         MapGridArea(request, process);
         MapEnergySupplierPerGridArea(request, process);
         MapBalanceResponsiblePerGridArea(request, process);
