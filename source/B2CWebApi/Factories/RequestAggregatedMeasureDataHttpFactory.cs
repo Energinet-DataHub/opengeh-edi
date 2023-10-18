@@ -40,21 +40,62 @@ public static class RequestAggregatedMeasureDataHttpFactory
             MessageType = "E74",
         };
 
-        var serie = new Serie()
+        var serie = new Serie
         {
             Id = Guid.NewGuid().ToString(),
             StartDateAndOrTimeDateTime = request.StartDate,
-            EndDateAndOrTimeDateTime = request.EndDate,
-            MeteringGridAreaDomainId = request.GridArea,
-            EnergySupplierMarketParticipantId = request.EnergySupplierId,
-            BalanceResponsiblePartyMarketParticipantId = request.BalanceResponsibleId,
         };
+
+        if (request.EndDate != null)
+        {
+            serie.EndDateAndOrTimeDateTime = request.EndDate;
+        }
+
+        if (request.GridArea != null)
+        {
+            serie.MeteringGridAreaDomainId = request.GridArea;
+        }
+
+        if (request.EnergySupplierId != null)
+        {
+            serie.EnergySupplierMarketParticipantId = request.EnergySupplierId;
+        }
+
+        if (request.BalanceResponsibleId != null)
+        {
+            serie.BalanceResponsiblePartyMarketParticipantId = request.BalanceResponsibleId;
+        }
+
+        if (request.ProcessType == ProcessType.FirstCorrection || request.ProcessType == ProcessType.SecondCorrection || request.ProcessType == ProcessType.ThirdCorrection)
+        {
+            serie.SettlementSeriesVersion = SetSettlementSeriesVersion(request.ProcessType);
+        }
 
         MapEvaluationPointTypeAndSettlementMethod(serie, request);
 
         data.Series.Add(serie);
 
         return data;
+    }
+
+    private static string SetSettlementSeriesVersion(ProcessType processType)
+    {
+        if (processType == ProcessType.FirstCorrection)
+        {
+            return "D01";
+        }
+
+        if (processType == ProcessType.SecondCorrection)
+        {
+            return "D02";
+        }
+
+        if (processType == ProcessType.ThirdCorrection)
+        {
+            return "D03";
+        }
+
+        throw new ArgumentOutOfRangeException(nameof(processType), processType, "Unknown ProcessType for setting SettlementSeriesVersion");
     }
 
     private static string MapToBusinessReasonCode(ProcessType requestProcessType)
@@ -64,7 +105,9 @@ public static class RequestAggregatedMeasureDataHttpFactory
             ProcessType.PreliminaryAggregation => "D03",
             ProcessType.BalanceFixing => "D04",
             ProcessType.WholesaleFixing => "D05",
-            ProcessType.Correction => "D32",
+            ProcessType.FirstCorrection => "D32",
+            ProcessType.SecondCorrection => "D32",
+            ProcessType.ThirdCorrection => "D32",
             _ => throw new ArgumentOutOfRangeException(nameof(requestProcessType), requestProcessType, "Unknown ProcessType"),
         };
     }
@@ -95,7 +138,7 @@ public static class RequestAggregatedMeasureDataHttpFactory
 
     private static string MapRoleNameToCode(string roleName)
     {
-        if (roleName == null) throw new ArgumentNullException(nameof(roleName));
+        ArgumentException.ThrowIfNullOrEmpty(roleName);
 
         if (roleName.Equals(MarketRole.MeteredDataResponsible.Name, StringComparison.OrdinalIgnoreCase))
         {
@@ -112,6 +155,6 @@ public static class RequestAggregatedMeasureDataHttpFactory
             return MarketRole.BalanceResponsibleParty.Code;
         }
 
-        return roleName;
+        throw new ArgumentException($"roleName: {roleName}. is unsupported to map to a role name");
     }
 }

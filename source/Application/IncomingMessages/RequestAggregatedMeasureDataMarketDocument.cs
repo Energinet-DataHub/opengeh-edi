@@ -41,4 +41,5 @@ public record Serie(
     string? EndDateAndOrTimeDateTime,
     string? MeteringGridAreaDomainId,
     string? EnergySupplierMarketParticipantId,
-    string? BalanceResponsiblePartyMarketParticipantId);
+    string? BalanceResponsiblePartyMarketParticipantId,
+    string? SettlementSeriesVersion);
