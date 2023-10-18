@@ -40,5 +40,7 @@ public enum ProcessType
     PreliminaryAggregation,
     BalanceFixing,
     WholesaleFixing,
-    Correction,
+    FirstCorrection,
+    SecondCorrection,
+    ThirdCorrection,
 }

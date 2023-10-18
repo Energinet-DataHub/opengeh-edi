@@ -176,6 +176,7 @@ public class XmlMessageParser : IMessageParser<RequestAggregatedMeasureDataMarke
         var meteringGridAreaDomainId = string.Empty;
         string? energySupplierMarketParticipantId = null;
         string? balanceResponsiblePartyMarketParticipantId = null;
+        string? settlementSeriesVersion = null;
         var ns = rootElement.DefaultNamespace;
 
         await reader.AdvanceToAsync(SeriesRecordElementName, ns).ConfigureAwait(false);
@@ -192,7 +193,8 @@ public class XmlMessageParser : IMessageParser<RequestAggregatedMeasureDataMarke
                     ref endDateAndOrTimeDateTime,
                     ref meteringGridAreaDomainId,
                     ref energySupplierMarketParticipantId,
-                    ref balanceResponsiblePartyMarketParticipantId);
+                    ref balanceResponsiblePartyMarketParticipantId,
+                    ref settlementSeriesVersion);
                 yield return record;
             }
 
@@ -231,6 +233,10 @@ public class XmlMessageParser : IMessageParser<RequestAggregatedMeasureDataMarke
             {
                 balanceResponsiblePartyMarketParticipantId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
+            else if (reader.Is("settlement_Series.version", ns))
+            {
+                settlementSeriesVersion = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
             else
             {
                 await reader.ReadAsync().ConfigureAwait(false);
@@ -246,7 +252,8 @@ public class XmlMessageParser : IMessageParser<RequestAggregatedMeasureDataMarke
         ref string? endDateAndOrTimeDateTime,
         ref string? meteringGridAreaDomainId,
         ref string? energySupplierMarketParticipantId,
-        ref string? balanceResponsiblePartyMarketParticipantId)
+        ref string? balanceResponsiblePartyMarketParticipantId,
+        ref string? settlementSeriesVersion)
     {
         var serie = new Serie(
             id,
@@ -256,7 +263,8 @@ public class XmlMessageParser : IMessageParser<RequestAggregatedMeasureDataMarke
             endDateAndOrTimeDateTime,
             meteringGridAreaDomainId,
             energySupplierMarketParticipantId,
-            balanceResponsiblePartyMarketParticipantId);
+            balanceResponsiblePartyMarketParticipantId,
+            settlementSeriesVersion);
 
         id = string.Empty;
         marketEvaluationPointType = null;

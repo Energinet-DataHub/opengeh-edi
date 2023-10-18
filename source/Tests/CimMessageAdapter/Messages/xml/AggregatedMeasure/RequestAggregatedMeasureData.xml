@@ -26,6 +26,7 @@ limitations under the License.
     <cim:createdDateTime>2022-12-17T09:30:47Z</cim:createdDateTime>
     <cim:Series>
         <cim:mRID>123353185</cim:mRID>
+        <cim:settlement_Series.version>D01</cim:settlement_Series.version>
         <cim:marketEvaluationPoint.type>E17</cim:marketEvaluationPoint.type>
         <cim:marketEvaluationPoint.settlementMethod>D01</cim:marketEvaluationPoint.settlementMethod>
         <cim:start_DateAndOrTime.dateTime>2022-06-17T22:00:00Z</cim:start_DateAndOrTime.dateTime>
