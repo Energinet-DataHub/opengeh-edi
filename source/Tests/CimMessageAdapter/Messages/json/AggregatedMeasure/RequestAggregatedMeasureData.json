@@ -47,8 +47,11 @@
 					"codingScheme": "NDK",
 					"value": "244"
 				},
-				"start_DateAndOrTime.dateTime": "2022-06-17T22:00:00Z"
-			}
+				"start_DateAndOrTime.dateTime": "2022-06-17T22:00:00Z",
+        "settlement_Series.version": {
+          "value": "D01"
+        }
+      }
 		]
 	}
 }
