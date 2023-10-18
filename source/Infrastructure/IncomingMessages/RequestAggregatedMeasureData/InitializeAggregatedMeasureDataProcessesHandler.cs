@@ -73,7 +73,8 @@ public class InitializeAggregatedMeasureDataProcessesHandler
                     serie.EndDateAndOrTimeDateTime,
                     serie.MeteringGridAreaDomainId,
                     serie.EnergySupplierMarketParticipantId,
-                    serie.BalanceResponsiblePartyMarketParticipantId));
+                    serie.BalanceResponsiblePartyMarketParticipantId,
+                    serie.SettlementSeriesVersion));
         }
     }
 }

@@ -38,7 +38,8 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
             string? endOfPeriod,
             string? meteringGridAreaDomainId,
             string? energySupplierId,
-            string? balanceResponsibleId)
+            string? balanceResponsibleId,
+            string? settlementVersion)
         {
             ProcessId = processId;
             BusinessTransactionId = businessTransactionId;
@@ -50,6 +51,7 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
             MeteringGridAreaDomainId = meteringGridAreaDomainId;
             EnergySupplierId = energySupplierId;
             BalanceResponsibleId = balanceResponsibleId;
+            SettlementVersion = settlementVersion;
             RequestedByActorId = requestedByActorId;
             RequestedByActorRoleCode = requestedByActorRoleCode;
             AddDomainEvent(new AggregatedMeasureProcessIsInitialized(processId));
@@ -103,6 +105,8 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
         public string? EnergySupplierId { get; }
 
         public string? BalanceResponsibleId { get; }
+
+        public string? SettlementVersion { get; }
 
         public ActorNumber RequestedByActorId { get; set; }
 
