@@ -1,0 +1,1 @@
+﻿CREATE INDEX IX_ActorMessageQueues_ActorRole_ActorNumber ON [dbo].[ActorMessageQueues] ([ActorNumber], [ActorRole])
