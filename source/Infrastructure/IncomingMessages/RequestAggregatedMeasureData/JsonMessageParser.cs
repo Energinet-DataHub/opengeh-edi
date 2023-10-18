@@ -99,7 +99,7 @@ public class JsonMessageParser : JsonParserBase,
             GetPropertyWithValue(element, "meteringGridArea_Domain.mRID"),
             GetPropertyWithValue(element, "energySupplier_MarketParticipant.mRID"),
             GetPropertyWithValue(element, "balanceResponsibleParty_MarketParticipant.mRID"),
-            GetPropertyWithValue(element, "settlement_Series"));
+            GetPropertyWithValue(element, "settlement_Series.version"));
     }
 
     private static string? GetPropertyWithValue(JsonElement element, string propertyName)

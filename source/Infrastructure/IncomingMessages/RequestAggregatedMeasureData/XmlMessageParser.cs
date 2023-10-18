@@ -233,7 +233,7 @@ public class XmlMessageParser : IMessageParser<RequestAggregatedMeasureDataMarke
             {
                 balanceResponsiblePartyMarketParticipantId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
-            else if (reader.Is("settlement_Series", ns))
+            else if (reader.Is("settlement_Series.version", ns))
             {
                 settlementSeries = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
