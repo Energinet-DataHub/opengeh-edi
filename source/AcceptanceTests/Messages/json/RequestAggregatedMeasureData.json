@@ -13,7 +13,7 @@
       "value": "5790001330552"
     },
     "receiver_MarketParticipant.marketRole.type": {
-      "value": "DGL"
+        "value": "DGL"
     },
     "sender_MarketParticipant.mRID": {
       "codingScheme": "A10",
@@ -33,7 +33,7 @@
           "value": "D01"
         },
         "marketEvaluationPoint.type": {
-          "value": "E18"
+          "value": "E17"
         },
         "meteringGridArea_Domain.mRID": {
           "codingScheme": "NDK",

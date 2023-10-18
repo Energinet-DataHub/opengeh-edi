@@ -170,12 +170,13 @@ public class XmlMessageParser : IMessageParser<RequestAggregatedMeasureDataMarke
     {
         var id = string.Empty;
         var marketEvaluationPointType = string.Empty;
-        var marketEvaluationSettlementMethod = string.Empty;
+        string? marketEvaluationSettlementMethod = null;
         var startDateAndOrTimeDateTime = string.Empty;
         var endDateAndOrTimeDateTime = string.Empty;
         var meteringGridAreaDomainId = string.Empty;
-        var energySupplierMarketParticipantId = string.Empty;
-        var balanceResponsiblePartyMarketParticipantId = string.Empty;
+        string? energySupplierMarketParticipantId = null;
+        string? balanceResponsiblePartyMarketParticipantId = null;
+        string? settlementSeriesVersion = null;
         var ns = rootElement.DefaultNamespace;
 
         await reader.AdvanceToAsync(SeriesRecordElementName, ns).ConfigureAwait(false);
@@ -192,7 +193,8 @@ public class XmlMessageParser : IMessageParser<RequestAggregatedMeasureDataMarke
                     ref endDateAndOrTimeDateTime,
                     ref meteringGridAreaDomainId,
                     ref energySupplierMarketParticipantId,
-                    ref balanceResponsiblePartyMarketParticipantId);
+                    ref balanceResponsiblePartyMarketParticipantId,
+                    ref settlementSeriesVersion);
                 yield return record;
             }
 
@@ -231,6 +233,10 @@ public class XmlMessageParser : IMessageParser<RequestAggregatedMeasureDataMarke
             {
                 balanceResponsiblePartyMarketParticipantId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
+            else if (reader.Is("settlement_Series.version", ns))
+            {
+                settlementSeriesVersion = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
             else
             {
                 await reader.ReadAsync().ConfigureAwait(false);
@@ -240,13 +246,14 @@ public class XmlMessageParser : IMessageParser<RequestAggregatedMeasureDataMarke
 
     private static Serie CreateSerie(
         ref string id,
-        ref string marketEvaluationPointType,
-        ref string marketEvaluationSettlementMethod,
+        ref string? marketEvaluationPointType,
+        ref string? marketEvaluationSettlementMethod,
         ref string startDateAndOrTimeDateTime,
-        ref string endDateAndOrTimeDateTime,
-        ref string meteringGridAreaDomainId,
-        ref string energySupplierMarketParticipantId,
-        ref string balanceResponsiblePartyMarketParticipantId)
+        ref string? endDateAndOrTimeDateTime,
+        ref string? meteringGridAreaDomainId,
+        ref string? energySupplierMarketParticipantId,
+        ref string? balanceResponsiblePartyMarketParticipantId,
+        ref string? settlementSeriesVersion)
     {
         var serie = new Serie(
             id,
@@ -256,16 +263,17 @@ public class XmlMessageParser : IMessageParser<RequestAggregatedMeasureDataMarke
             endDateAndOrTimeDateTime,
             meteringGridAreaDomainId,
             energySupplierMarketParticipantId,
-            balanceResponsiblePartyMarketParticipantId);
+            balanceResponsiblePartyMarketParticipantId,
+            settlementSeriesVersion);
 
         id = string.Empty;
-        marketEvaluationPointType = string.Empty;
-        marketEvaluationSettlementMethod = string.Empty;
+        marketEvaluationPointType = null;
+        marketEvaluationSettlementMethod = null;
         startDateAndOrTimeDateTime = string.Empty;
-        endDateAndOrTimeDateTime = string.Empty;
-        meteringGridAreaDomainId = string.Empty;
-        energySupplierMarketParticipantId = string.Empty;
-        balanceResponsiblePartyMarketParticipantId = string.Empty;
+        endDateAndOrTimeDateTime = null;
+        meteringGridAreaDomainId = null;
+        energySupplierMarketParticipantId = null;
+        balanceResponsiblePartyMarketParticipantId = null;
 
         return serie;
     }
