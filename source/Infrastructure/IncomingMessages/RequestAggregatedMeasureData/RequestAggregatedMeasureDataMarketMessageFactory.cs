@@ -53,14 +53,14 @@ public static class RequestAggregatedMeasureDataMarketMessageFactory
         var series = requestAggregatedMeasureData.Series
             .Select(serie => new Serie(
                 serie.Id,
-                serie.MarketEvaluationPointType,
-                serie.MarketEvaluationSettlementMethod,
+                string.IsNullOrWhiteSpace(serie.MarketEvaluationPointType) ? null : serie.MarketEvaluationPointType,
+                string.IsNullOrWhiteSpace(serie.MarketEvaluationSettlementMethod) ? null : serie.MarketEvaluationSettlementMethod,
                 serie.StartDateAndOrTimeDateTime,
-                serie.EndDateAndOrTimeDateTime,
-                serie.MeteringGridAreaDomainId,
-                serie.EnergySupplierMarketParticipantId,
-                serie.BalanceResponsiblePartyMarketParticipantId,
-                serie.SettlementSeriesVersion)).ToList();
+                string.IsNullOrWhiteSpace(serie.EndDateAndOrTimeDateTime) ? null : serie.EndDateAndOrTimeDateTime,
+                string.IsNullOrWhiteSpace(serie.MeteringGridAreaDomainId) ? null : serie.MeteringGridAreaDomainId,
+                string.IsNullOrWhiteSpace(serie.EnergySupplierMarketParticipantId) ? null : serie.EnergySupplierMarketParticipantId,
+                string.IsNullOrWhiteSpace(serie.BalanceResponsiblePartyMarketParticipantId) ? null : serie.BalanceResponsiblePartyMarketParticipantId,
+                string.IsNullOrWhiteSpace(serie.SettlementSeriesVersion) ? null : serie.SettlementSeriesVersion)).ToList();
 
         return new RequestAggregatedMeasureDataMarketMessage(
             requestAggregatedMeasureData.SenderId,
