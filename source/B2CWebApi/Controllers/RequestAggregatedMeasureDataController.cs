@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 
@@ -28,13 +29,16 @@ public class RequestAggregatedMeasureDataController : ControllerBase
 {
     private readonly RequestAggregatedMeasureDataHttpClient _requestAggregatedMeasureDataHttpClient;
     private readonly UserContext<FrontendUser> _userContext;
+    private readonly DateTimeZone _dateTimeZone;
 
     public RequestAggregatedMeasureDataController(
         RequestAggregatedMeasureDataHttpClient requestAggregatedMeasureDataHttpClient,
-        UserContext<FrontendUser> userContext)
+        UserContext<FrontendUser> userContext,
+        DateTimeZone dateTimeZone)
     {
         _requestAggregatedMeasureDataHttpClient = requestAggregatedMeasureDataHttpClient;
         _userContext = userContext;
+        _dateTimeZone = dateTimeZone;
     }
 
     [HttpPost]
@@ -45,7 +49,7 @@ public class RequestAggregatedMeasureDataController : ControllerBase
         var token = GetToken(currentUser);
 
         var validationMessage = await _requestAggregatedMeasureDataHttpClient.RequestAsync(
-            RequestAggregatedMeasureDataHttpFactory.Create(request, currentUser.ActorNumber, currentUser.Role),
+            RequestAggregatedMeasureDataHttpFactory.Create(request, currentUser.ActorNumber, currentUser.Role, _dateTimeZone),
             token,
             cancellationToken).ConfigureAwait(false);
 
