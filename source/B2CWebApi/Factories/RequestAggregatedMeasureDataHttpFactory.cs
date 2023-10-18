@@ -68,7 +68,7 @@ public static class RequestAggregatedMeasureDataHttpFactory
 
         if (request.ProcessType == ProcessType.FirstCorrection || request.ProcessType == ProcessType.SecondCorrection || request.ProcessType == ProcessType.ThirdCorrection)
         {
-            serie.SettlementSeriesVersion = SetSettlementSeries(request.ProcessType);
+            serie.SettlementSeriesVersion = SetSettlementSeriesVersion(request.ProcessType);
         }
 
         MapEvaluationPointTypeAndSettlementMethod(serie, request);
@@ -78,7 +78,7 @@ public static class RequestAggregatedMeasureDataHttpFactory
         return data;
     }
 
-    private static string SetSettlementSeries(ProcessType processType)
+    private static string SetSettlementSeriesVersion(ProcessType processType)
     {
         if (processType == ProcessType.FirstCorrection)
         {
@@ -95,7 +95,7 @@ public static class RequestAggregatedMeasureDataHttpFactory
             return "D03";
         }
 
-        throw new ArgumentOutOfRangeException(nameof(processType), processType, "Unknown ProcessType for setting SettlementSeries");
+        throw new ArgumentOutOfRangeException(nameof(processType), processType, "Unknown ProcessType for setting SettlementSeriesVersion");
     }
 
     private static string MapToBusinessReasonCode(ProcessType requestProcessType)

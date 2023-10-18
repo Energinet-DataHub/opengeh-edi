@@ -176,7 +176,7 @@ public class XmlMessageParser : IMessageParser<RequestAggregatedMeasureDataMarke
         var meteringGridAreaDomainId = string.Empty;
         var energySupplierMarketParticipantId = string.Empty;
         var balanceResponsiblePartyMarketParticipantId = string.Empty;
-        var settlementSeries = string.Empty;
+        string? settlementSeriesVersion = null;
         var ns = rootElement.DefaultNamespace;
 
         await reader.AdvanceToAsync(SeriesRecordElementName, ns).ConfigureAwait(false);
@@ -194,7 +194,7 @@ public class XmlMessageParser : IMessageParser<RequestAggregatedMeasureDataMarke
                     ref meteringGridAreaDomainId,
                     ref energySupplierMarketParticipantId,
                     ref balanceResponsiblePartyMarketParticipantId,
-                    ref settlementSeries);
+                    ref settlementSeriesVersion);
                 yield return record;
             }
 
@@ -235,7 +235,7 @@ public class XmlMessageParser : IMessageParser<RequestAggregatedMeasureDataMarke
             }
             else if (reader.Is("settlement_Series.version", ns))
             {
-                settlementSeries = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                settlementSeriesVersion = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
             else
             {
@@ -253,7 +253,7 @@ public class XmlMessageParser : IMessageParser<RequestAggregatedMeasureDataMarke
         ref string meteringGridAreaDomainId,
         ref string energySupplierMarketParticipantId,
         ref string balanceResponsiblePartyMarketParticipantId,
-        ref string settlementSeries)
+        ref string? settlementSeriesVersion)
     {
         var serie = new Serie(
             id,
@@ -264,7 +264,7 @@ public class XmlMessageParser : IMessageParser<RequestAggregatedMeasureDataMarke
             meteringGridAreaDomainId,
             energySupplierMarketParticipantId,
             balanceResponsiblePartyMarketParticipantId,
-            settlementSeries);
+            settlementSeriesVersion);
 
         id = string.Empty;
         marketEvaluationPointType = string.Empty;

@@ -42,4 +42,4 @@ public record Serie(
     string? MeteringGridAreaDomainId,
     string? EnergySupplierMarketParticipantId,
     string? BalanceResponsiblePartyMarketParticipantId,
-    string? SettlementSeries);
+    string? SettlementSeriesVersion);
