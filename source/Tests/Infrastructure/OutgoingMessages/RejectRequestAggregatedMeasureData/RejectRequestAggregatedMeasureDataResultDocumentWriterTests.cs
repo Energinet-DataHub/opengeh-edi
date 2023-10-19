@@ -94,7 +94,7 @@ public class RejectRequestAggregatedMeasureDataResultDocumentWriterTests : IClas
     {
         if (documentFormat == DocumentFormat.Ebix)
         {
-            var assertEbixDocument = AssertEbixDocument.Document(document, "ns0");
+            var assertEbixDocument = AssertEbixDocument.Document(document, "ns0", _documentValidation.Validator);
             return new AssertRejectedAggregatedMeasureDataResultEbixDocument(assertEbixDocument);
         }
         else if (documentFormat == DocumentFormat.Xml)

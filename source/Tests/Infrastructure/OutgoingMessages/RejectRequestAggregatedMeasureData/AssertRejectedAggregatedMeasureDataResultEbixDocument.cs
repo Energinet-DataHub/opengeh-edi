@@ -37,7 +37,7 @@ public class AssertRejectedAggregatedMeasureDataResultEbixDocument : IAssertReje
 
     public async Task<IAssertRejectedAggregatedMeasureDataResultDocument> DocumentIsValidAsync()
     {
-        await _documentAsserter.HasValidStructureAsync(DocumentType.RejectRequestAggregatedMeasureData).ConfigureAwait(false);
+        await _documentAsserter.HasValidStructureAsync(DocumentType.RejectRequestAggregatedMeasureData, "3").ConfigureAwait(false);
         return this;
     }
 
@@ -80,7 +80,7 @@ public class AssertRejectedAggregatedMeasureDataResultEbixDocument : IAssertReje
 
     public IAssertRejectedAggregatedMeasureDataResultDocument HasTransactionId(Guid expectedTransactionId)
     {
-        _documentAsserter.HasValue($"PayloadResponseEvent[1]/Identification", expectedTransactionId.ToString());
+        _documentAsserter.HasValue($"PayloadResponseEvent[1]/Identification", expectedTransactionId.ToString("N"));
         return this;
     }
 

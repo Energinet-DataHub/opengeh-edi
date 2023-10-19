@@ -59,7 +59,7 @@ public class AssertAggregationResultEbixDocument : IAssertAggregationResultDocum
 
     public IAssertAggregationResultDocument HasTransactionId(Guid expectedTransactionId)
     {
-        _documentAsserter.HasValue($"PayloadEnergyTimeSeries[1]/Identification", expectedTransactionId.ToString());
+        _documentAsserter.HasValue($"PayloadEnergyTimeSeries[1]/Identification", expectedTransactionId.ToString("N"));
         return this;
     }
 
@@ -91,8 +91,8 @@ public class AssertAggregationResultEbixDocument : IAssertAggregationResultDocum
     {
         ArgumentNullException.ThrowIfNull(expectedPeriod);
         _documentAsserter
-            .HasValue("PayloadEnergyTimeSeries[1]/ObservationTimeSeriesPeriod/Start", expectedPeriod.StartToString())
-            .HasValue("PayloadEnergyTimeSeries[1]/ObservationTimeSeriesPeriod/End", expectedPeriod.EndToString());
+            .HasValue("PayloadEnergyTimeSeries[1]/ObservationTimeSeriesPeriod/Start", expectedPeriod.StartToEbixString())
+            .HasValue("PayloadEnergyTimeSeries[1]/ObservationTimeSeriesPeriod/End", expectedPeriod.EndToEbixString());
         return this;
     }
 
@@ -106,7 +106,7 @@ public class AssertAggregationResultEbixDocument : IAssertAggregationResultDocum
 
     public async Task<IAssertAggregationResultDocument> DocumentIsValidAsync()
     {
-        await _documentAsserter.HasValidStructureAsync(DocumentType.AggregationResult).ConfigureAwait(false);
+        await _documentAsserter.HasValidStructureAsync(DocumentType.AggregationResult, "3").ConfigureAwait(false);
         return this;
     }
 

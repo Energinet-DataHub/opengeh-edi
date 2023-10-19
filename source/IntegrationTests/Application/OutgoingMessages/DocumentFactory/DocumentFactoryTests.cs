@@ -57,4 +57,14 @@ public class DocumentFactoryTests
 
         Assert.NotNull(writer);
     }
+
+    [Theory]
+    [MemberData(nameof(GetDocumentTypes))]
+    public void Ensure_that_all_document_writers_but_listed_support_ebix(DocumentType documentType)
+    {
+        var writer = _documentWriters.FirstOrDefault(writer =>
+            writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Ebix));
+
+        Assert.NotNull(writer);
+    }
 }
