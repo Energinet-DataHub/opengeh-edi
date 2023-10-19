@@ -16,18 +16,15 @@ using Energinet.DataHub.EDI.Domain.Common;
 
 namespace Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
-public class Resolution : EnumerationType
+public class Resolution : EnumerationCodeType
 {
     public static readonly Resolution Hourly = new(0, nameof(Hourly), "PT1H");
-    public static readonly Resolution QuarterHourly = new(1, nameof(QuarterHourly), "XXXX");
+    public static readonly Resolution QuarterHourly = new(1, nameof(QuarterHourly), "PT15M");
 
     private Resolution(int id, string name, string code)
-        : base(id, name)
+        : base(id, name, code)
     {
-        Code = code;
     }
-
-    public string Code { get; }
 
     public static Resolution From(string value)
     {

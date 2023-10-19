@@ -32,6 +32,11 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
 {
     private static readonly List<INotification> _actualNotifications = new();
 
+    public TestAggregatedTimeSeriesRequestAcceptedHandlerSpy()
+    {
+        _actualNotifications.Clear();
+    }
+
     public static void AssertExpectedNotifications(AggregatedTimeSeriesRequestAccepted aggregatedTimeSeriesRequestAccepted)
     {
         if (aggregatedTimeSeriesRequestAccepted == null) throw new ArgumentNullException(nameof(aggregatedTimeSeriesRequestAccepted));

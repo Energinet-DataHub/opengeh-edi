@@ -70,12 +70,12 @@ internal static class EbixHeaderWriter
         await writer.WriteStartElementAsync(documentDetails.Prefix, "EnergyBusinessProcess", null).ConfigureAwait(false);
         await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
         await writer.WriteAttributeStringAsync(null, "listIdentifier", null, "DK").ConfigureAwait(false);
-        writer.WriteValue(EbixCode.Of(BusinessReason.From(messageHeader.BusinessReason)));
+        writer.WriteValue(EbixCode.Of<BusinessReason>(messageHeader.BusinessReason));
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 
         await writer.WriteStartElementAsync(documentDetails.Prefix, "EnergyBusinessProcessRole", null).ConfigureAwait(false);
         await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
-        writer.WriteValue(EbixCode.Of(EnumerationType.FromName<MarketRole>(messageHeader.SenderRole)));
+        writer.WriteValue(EbixCode.Of<MarketRole>(messageHeader.SenderRole));
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 
         await writer.WriteStartElementAsync(documentDetails.Prefix, "EnergyIndustryClassification", null).ConfigureAwait(false);
@@ -88,7 +88,7 @@ internal static class EbixHeaderWriter
             await writer.WriteStartElementAsync(documentDetails.Prefix, "ProcessVariant", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "listIdentifier", null, "DK").ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
-            writer.WriteValue(EbixCode.Of(settlementVersion));
+            writer.WriteValue(settlementVersion.Code);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
 

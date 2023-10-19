@@ -16,16 +16,16 @@ using Energinet.DataHub.EDI.Domain.Common;
 
 namespace Energinet.DataHub.EDI.Domain.OutgoingMessages;
 
-public sealed class BusinessReason : EnumerationType
+public sealed class BusinessReason : EnumerationCodeType
 {
-    public static readonly BusinessReason MoveIn = new(0, nameof(MoveIn));
-    public static readonly BusinessReason BalanceFixing = new(1, nameof(BalanceFixing));
-    public static readonly BusinessReason PreliminaryAggregation = new(2, nameof(PreliminaryAggregation));
-    public static readonly BusinessReason WholesaleFixing = new(3, nameof(WholesaleFixing));    //Engrosafiksering
-    public static readonly BusinessReason Correction = new(5, nameof(Correction));
+    public static readonly BusinessReason MoveIn = new(0, nameof(MoveIn), "E65");
+    public static readonly BusinessReason BalanceFixing = new(1, nameof(BalanceFixing), "D04");
+    public static readonly BusinessReason PreliminaryAggregation = new(2, nameof(PreliminaryAggregation), "D03");
+    public static readonly BusinessReason WholesaleFixing = new(3, nameof(WholesaleFixing), "D05");    //Engrosafiksering
+    public static readonly BusinessReason Correction = new(5, nameof(Correction), "D32");
 
-    private BusinessReason(int id, string name)
-     : base(id, name)
+    private BusinessReason(int id, string name, string code)
+     : base(id, name, code)
     {
     }
 

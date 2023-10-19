@@ -143,13 +143,15 @@ public class AssertAggregationResultEbixDocument : IAssertAggregationResultDocum
 
     public IAssertAggregationResultDocument HasBusinessReason(BusinessReason businessReason)
     {
-        _documentAsserter.HasValue("ProcessEnergyContext/EnergyBusinessProcess", EbixCode.Of(businessReason));
+        ArgumentNullException.ThrowIfNull(businessReason, nameof(businessReason));
+        _documentAsserter.HasValue("ProcessEnergyContext/EnergyBusinessProcess", EbixCode.Of<BusinessReason>(businessReason.Name));
         return this;
     }
 
     public IAssertAggregationResultDocument HasSettlementVersion(SettlementVersion settlementVersion)
     {
-        _documentAsserter.HasValue("ProcessEnergyContext/ProcessVariant", EbixCode.Of(settlementVersion));
+        ArgumentNullException.ThrowIfNull(settlementVersion, nameof(settlementVersion));
+        _documentAsserter.HasValue("ProcessEnergyContext/ProcessVariant", EbixCode.Of<SettlementVersion>(settlementVersion.Name));
         return this;
     }
 
@@ -167,7 +169,8 @@ public class AssertAggregationResultEbixDocument : IAssertAggregationResultDocum
 
     public IAssertAggregationResultDocument HasSettlementMethod(SettlementType settlementMethod)
     {
-        _documentAsserter.HasValue("PayloadEnergyTimeSeries[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod", EbixCode.Of(settlementMethod));
+        ArgumentNullException.ThrowIfNull(settlementMethod, nameof(settlementMethod));
+        _documentAsserter.HasValue("PayloadEnergyTimeSeries[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod", EbixCode.Of<SettlementType>(settlementMethod.Name));
         return this;
     }
 }

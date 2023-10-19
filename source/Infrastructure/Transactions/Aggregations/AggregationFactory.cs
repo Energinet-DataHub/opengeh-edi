@@ -92,7 +92,7 @@ public static class AggregationFactory
 
     private static string MapReceiverRole(AggregatedMeasureDataProcess process)
     {
-        return MarketRole.FromCode(process.RequestedByActorRoleCode).Name;
+        return MarketRole.FromCode<MarketRole>(process.RequestedByActorRoleCode).Name;
     }
 
     private static ActorGrouping MapActorGrouping(AggregatedMeasureDataProcess process)

@@ -15,6 +15,7 @@
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Domain.Common;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
@@ -42,13 +43,14 @@ public class AssertRejectedAggregatedMeasureDataResultEbixDocument : IAssertReje
 
     public IAssertRejectedAggregatedMeasureDataResultDocument HasBusinessReason(BusinessReason businessReason)
     {
-        _documentAsserter.HasValue("ProcessEnergyContext/EnergyBusinessProcess", EbixCode.Of(businessReason));
+        ArgumentNullException.ThrowIfNull(businessReason, nameof(businessReason));
+        _documentAsserter.HasValue("ProcessEnergyContext/EnergyBusinessProcess", EbixCode.Of<BusinessReason>(businessReason.Name));
         return this;
     }
 
     public IAssertRejectedAggregatedMeasureDataResultDocument HasReasonCode(string reasonCode)
     {
-        _documentAsserter.HasValue("PayloadResponseEvent[1]/StatusType", EbixCode.Of(ReasonCode.From(reasonCode)));
+        _documentAsserter.HasValue("PayloadResponseEvent[1]/StatusType", EbixCode.Of(EnumerationCodeType.FromCode<ReasonCode>(reasonCode)));
         return this;
     }
 

@@ -61,7 +61,7 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
         }
         else if (settlementVersions?.Count() == 1)
         {
-            return SettlementVersion.From(settlementVersions.First()!);
+            return Domain.Common.EnumerationType.FromName<SettlementVersion>(settlementVersions.First()!);
         }
         else
         {
@@ -87,7 +87,7 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
 
             // Begin ObservationTimeSeriesPeriod
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "ObservationTimeSeriesPeriod", null).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "ResolutionDuration", null, EbixCode.Of(Resolution.From(timeSeries.Resolution))).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "ResolutionDuration", null, EbixCode.Of<Resolution>(timeSeries.Resolution)).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Start", null, timeSeries.Period.StartToString()).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "End", null, timeSeries.Period.EndToString()).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
@@ -119,7 +119,7 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "UnitType", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
-            await writer.WriteStringAsync(EbixCode.Of(MeasurementUnit.From(timeSeries.MeasureUnitType))).ConfigureAwait(false);
+            await writer.WriteStringAsync(EbixCode.Of<MeasurementUnit>(timeSeries.MeasureUnitType)).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             // End IncludedProductCharacteristic
@@ -128,7 +128,7 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "DetailMeasurementMeteringPointCharacteristic", null).ConfigureAwait(false);
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "TypeOfMeteringPoint", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
-            await writer.WriteStringAsync(EbixCode.Of(MeteringPointType.From(timeSeries.MeteringPointType))).ConfigureAwait(false);
+            await writer.WriteStringAsync(EbixCode.Of<MeteringPointType>(timeSeries.MeteringPointType)).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             if (timeSeries.SettlementType != null)
             {
@@ -139,7 +139,7 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
                 }
 
                 await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, "260").ConfigureAwait(false);
-                await writer.WriteStringAsync(EbixCode.Of(SettlementType.From(timeSeries.SettlementType))).ConfigureAwait(false);
+                await writer.WriteStringAsync(EbixCode.Of<SettlementType>(timeSeries.SettlementType)).ConfigureAwait(false);
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
             }
 

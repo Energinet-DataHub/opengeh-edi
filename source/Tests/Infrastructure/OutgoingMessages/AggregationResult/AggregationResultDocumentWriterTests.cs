@@ -184,13 +184,13 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     {
         _timeSeries
             .WithBusinessReason(BusinessReason.From(processType))
-            .WithSettlementVersion(SettlementVersion.From(settlementVersion));
+            .WithSettlementVersion(SettlementVersion.FromName<SettlementVersion>(settlementVersion));
 
         var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
 
         await AssertDocument(document, DocumentFormat.From(documentFormat))
             .HasBusinessReason(BusinessReason.From(processType))
-            .HasSettlementVersion(SettlementVersion.From(settlementVersion))
+            .HasSettlementVersion(SettlementVersion.FromName<SettlementVersion>(settlementVersion))
             .DocumentIsValidAsync();
     }
 

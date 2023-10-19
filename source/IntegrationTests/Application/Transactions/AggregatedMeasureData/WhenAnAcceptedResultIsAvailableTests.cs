@@ -65,7 +65,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         outgoingMessage
             .HasBusinessReason(CimCode.To(process.BusinessReason).Name)
             .HasReceiverId(process.RequestedByActorId.Value)
-            .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
+            .HasReceiverRole(MarketRole.FromCode<MarketRole>(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion, timeSerie.SettlementVersion)
@@ -90,7 +90,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         outgoingMessage
             .HasBusinessReason(CimCode.To(process.BusinessReason).Name)
             .HasReceiverId(process.RequestedByActorId.Value)
-            .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
+            .HasReceiverRole(MarketRole.FromCode<MarketRole>(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion!, timeSerie.SettlementVersion);
