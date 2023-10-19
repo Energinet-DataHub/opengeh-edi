@@ -14,6 +14,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,12 +37,19 @@ public class AssertEbixDocument
 
     private AssertEbixDocument(Stream stream, string prefix)
     {
-        _stream = stream;
         _prefix = prefix;
         using var reader = XmlReader.Create(stream);
-        _document = XDocument.Load(reader);
+        var msg = XDocument.Load(reader);
+
+        var elm = msg.Root!.Descendants().Single(x => x.Name.LocalName == "Payload").Descendants().First();
+        _document = XDocument.Parse(elm.ToString());
+
         _xmlNamespaceManager = new XmlNamespaceManager(reader.NameTable);
-        _xmlNamespaceManager.AddNamespace(prefix, _document.Root!.Name.NamespaceName);
+        _xmlNamespaceManager.AddNamespace(prefix, _document!.Root!.Name.NamespaceName);
+        stream = new MemoryStream();
+        _document.Save(stream);
+        stream.Position = 0;
+        _stream = stream;
     }
 
     private AssertEbixDocument(Stream stream, string prefix, DocumentValidator documentValidator)

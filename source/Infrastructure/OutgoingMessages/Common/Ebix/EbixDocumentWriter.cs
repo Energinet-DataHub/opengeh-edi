@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,9 +22,7 @@ using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Xml;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Ebix;
 
@@ -73,7 +70,8 @@ public abstract class EbixDocumentWriter : IDocumentWriter
 
     protected IReadOnlyCollection<TMarketActivityRecord> ParseFrom<TMarketActivityRecord>(IReadOnlyCollection<string> payloads)
     {
-        if (payloads == null) throw new ArgumentNullException(nameof(payloads));
+        if (payloads == null)
+            throw new ArgumentNullException(nameof(payloads));
         var marketActivityRecords = new List<TMarketActivityRecord>();
         foreach (var payload in payloads)
         {
@@ -85,15 +83,19 @@ public abstract class EbixDocumentWriter : IDocumentWriter
 
     protected Task WriteElementAsync(string name, string value, XmlWriter writer)
     {
-        if (writer == null) throw new ArgumentNullException(nameof(writer));
+        if (writer == null)
+            throw new ArgumentNullException(nameof(writer));
         return writer.WriteElementStringAsync(DocumentDetails.Prefix, name, null, value);
     }
 
     protected async Task WriteEbixCodeWithAttributesAsync(string name, string ebixCode, XmlWriter writer)
     {
-        if (name == null) throw new ArgumentNullException(nameof(name));
-        if (ebixCode == null) throw new ArgumentNullException(nameof(ebixCode));
-        if (writer == null) throw new ArgumentNullException(nameof(writer));
+        if (name == null)
+            throw new ArgumentNullException(nameof(name));
+        if (ebixCode == null)
+            throw new ArgumentNullException(nameof(ebixCode));
+        if (writer == null)
+            throw new ArgumentNullException(nameof(writer));
 
         await writer.WriteStartElementAsync(DocumentDetails.Prefix, name, null).ConfigureAwait(false);
         if (long.TryParse(ebixCode, out _))
@@ -125,9 +127,12 @@ public abstract class EbixDocumentWriter : IDocumentWriter
     /// <param name="writer">The XmlWriter</param>
     protected async Task WriteEbixSchemeCodeWithAttributesAsync(string name, string ebixSchemeCode, XmlWriter writer)
     {
-        if (name == null) throw new ArgumentNullException(nameof(name));
-        if (ebixSchemeCode == null) throw new ArgumentNullException(nameof(ebixSchemeCode));
-        if (writer == null) throw new ArgumentNullException(nameof(writer));
+        if (name == null)
+            throw new ArgumentNullException(nameof(name));
+        if (ebixSchemeCode == null)
+            throw new ArgumentNullException(nameof(ebixSchemeCode));
+        if (writer == null)
+            throw new ArgumentNullException(nameof(writer));
 
         await writer.WriteStartElementAsync(DocumentDetails.Prefix, name, null).ConfigureAwait(false);
         if (long.TryParse(ebixSchemeCode, out _))
@@ -168,7 +173,8 @@ public abstract class EbixDocumentWriter : IDocumentWriter
 
     protected async Task WriteMridAsync(string localName, string id, string codingScheme, XmlWriter writer)
     {
-        if (writer == null) throw new ArgumentNullException(nameof(writer));
+        if (writer == null)
+            throw new ArgumentNullException(nameof(writer));
         await writer.WriteStartElementAsync(DocumentDetails.Prefix, localName, null).ConfigureAwait(false);
         await writer.WriteAttributeStringAsync(null, "codingScheme", null, codingScheme).ConfigureAwait(false);
         writer.WriteValue(id);
@@ -178,6 +184,9 @@ public abstract class EbixDocumentWriter : IDocumentWriter
     private static async Task WriteEndAsync(XmlWriter writer)
     {
         await writer.WriteEndElementAsync().ConfigureAwait(false);
+        await writer.WriteEndElementAsync().ConfigureAwait(false);
+        await writer.WriteEndElementAsync().ConfigureAwait(false);
+
         writer.Close();
     }
 
