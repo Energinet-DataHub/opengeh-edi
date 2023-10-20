@@ -75,7 +75,7 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
 
         return await connection
             .QueryFirstOrDefaultAsync<Actor>(
-                "SELECT B2CId AS Id, IdentificationNumber AS Number FROM dbo.Actor WHERE IdentificationNumber = @ActorNumber",
+                "SELECT ExternalId AS Id, ActorNumber AS Number FROM dbo.Actor WHERE ActorNumber = @ActorNumber",
                 new { ActorNumber = actorNumber })
             .ConfigureAwait(false);
     }
