@@ -12,14 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.RegularExpressions;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 
-namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers
+public partial class ActorActivated
 {
-    public static class NamingConvention
-    {
-        // Matches                                                  {type} {timestamp } {name}
-        // Energinet.DataHub.MarketData.ApplyDBMigrationsApp.Scripts.Model.202103021434 First.sql
-        public static readonly Regex Regex = new Regex(@".*Scripts\.(?<type>Model|Seed|Test)\.(?<timestamp>\d{12}) (?<name>).*\b.sql");
-    }
+    public const string EventName = "ActorActivated";
+    public const int CurrentMinorVersion = 1;
 }
