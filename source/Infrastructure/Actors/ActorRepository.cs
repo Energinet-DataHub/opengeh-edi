@@ -35,15 +35,6 @@ public class ActorRepository : IActorRepository
         _dbContext = dbContext;
     }
 
-    public async Task<string> GetActorNumberByIdAsync(Guid actorId, CancellationToken cancellationToken)
-    {
-        using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
-        return await connection
-            .ExecuteScalarAsync<string>(
-                "SELECT ActorNumber FROM [dbo].[Actor] WHERE Id = @ActorId",
-                new { ActorId = actorId, }).ConfigureAwait(false);
-    }
-
     public async Task<ActorNumber?> GetActorNumberByB2CIdAsync(Guid actorId, CancellationToken cancellationToken)
     {
         using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
