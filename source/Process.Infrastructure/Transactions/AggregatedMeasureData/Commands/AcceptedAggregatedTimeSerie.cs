@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Text.Json.Serialization;
+using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 

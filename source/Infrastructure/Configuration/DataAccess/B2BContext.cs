@@ -14,20 +14,14 @@
 
 using System;
 using Energinet.DataHub.EDI.Domain.ArchivedMessages;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
-using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Infrastructure.ArchivedMessages;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Queueing;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess

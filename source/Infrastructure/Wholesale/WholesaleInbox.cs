@@ -15,10 +15,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.Application.Wholesale;
-using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Wholesale;
 
@@ -37,11 +37,9 @@ public class WholesaleInbox : IWholesaleInbox
     }
 
     public async Task SendAsync(
-        AggregatedMeasureDataProcess request,
+        ServiceBusMessage request,
         CancellationToken cancellationToken)
     {
-        await _senderCreator.SendAsync(
-            AggregatedMeasureDataRequestFactory.CreateServiceBusMessage(request),
-            cancellationToken).ConfigureAwait(false);
+        await _senderCreator.SendAsync(request, cancellationToken).ConfigureAwait(false);
     }
 }

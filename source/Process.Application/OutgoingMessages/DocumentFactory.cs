@@ -51,7 +51,7 @@ public class DocumentFactory
         }
 
         return documentWriter.WriteAsync(
-            new MessageHeader(
+            new OutgoingMessageHeader(
                 bundle.BusinessReason,
                 bundle.SenderId.Value,
                 bundle.SenderRole.Name,

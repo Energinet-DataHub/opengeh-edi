@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Process.Application.OutgoingMessages.Common;
+
 namespace Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common
 {
     public class MessageRecordParser : IMessageRecordParser

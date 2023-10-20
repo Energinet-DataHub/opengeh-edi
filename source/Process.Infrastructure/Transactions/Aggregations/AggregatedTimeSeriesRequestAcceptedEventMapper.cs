@@ -12,9 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
-using GridAreaDetails = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.GridAreaDetails;
-using Point = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.Point;
+using Energinet.DataHub.Edi.Responses;
+using Google.Protobuf.Collections;
+using MediatR;
+using NodaTime.Serialization.Protobuf;
+using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.Aggregations;
 
@@ -72,14 +83,14 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         };
     }
 
-    private static IReadOnlyList<Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
+    private static IReadOnlyList<Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
     {
-        var points = new List<Point>();
+        var points = new List<Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.Point>();
 
         var pointPosition = 1;
         foreach (var point in timeSeriesPoints)
         {
-            points.Add(new Point(pointPosition, Parse(point.Quantity), MapQuality(point.QuantityQuality), point.Time.ToString()));
+            points.Add(new Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.Point(pointPosition, Parse(point.Quantity), MapQuality(point.QuantityQuality), point.Time.ToString()));
             pointPosition++;
         }
 
@@ -136,10 +147,10 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         return input.Units + (input.Nanos / nanoFactor);
     }
 
-    private static GridAreaDetails MapGridAreaDetails(AggregatedTimeSeriesRequestAccepted aggregation)
+    private static Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.GridAreaDetails MapGridAreaDetails(AggregatedTimeSeriesRequestAccepted aggregation)
     {
         var gridOperatorNumber = GridAreaLookup.GetGridOperatorFor(aggregation.GridArea);
 
-        return new GridAreaDetails(aggregation.GridArea, gridOperatorNumber.Value);
+        return new Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.GridAreaDetails(aggregation.GridArea, gridOperatorNumber.Value);
     }
 }

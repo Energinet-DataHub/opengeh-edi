@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
+
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.Aggregations;
 
 internal static class AggregationsConfiguration

@@ -16,15 +16,17 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Xml;
-using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.Response
 {
     public class XmlResponseFactory : IResponseFactory
     {
-        public DocumentFormat HandledFormat => DocumentFormat.Xml;
+#pragma warning disable CA1822
+        public DocumentFormat HandledFormat => DocumentFormat.CimXml;
+#pragma warning restore CA1822
 
         public ResponseMessage From(Result result)
         {

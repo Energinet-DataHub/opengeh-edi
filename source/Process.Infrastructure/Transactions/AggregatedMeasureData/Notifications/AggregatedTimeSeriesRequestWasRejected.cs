@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using MediatR;
+
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
 
-public record AggregatedTimeSeriesRequestWasRejected(
-    Guid ReferenceId,
-    IReadOnlyList<RejectReason> RejectReasons)
-    : INotification;
+public record AggregatedTimeSeriesRequestWasRejected(Guid ReferenceId, IReadOnlyList<RejectReason> RejectReasons) : INotification;

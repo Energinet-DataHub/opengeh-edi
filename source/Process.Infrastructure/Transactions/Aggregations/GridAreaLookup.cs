@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using Energinet.DataHub.EDI.Common.Actors;
+
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.Aggregations;
 
 public static class GridAreaLookup

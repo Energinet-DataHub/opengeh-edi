@@ -15,12 +15,16 @@
 using System;
 using System.Threading.Tasks;
 using System.Xml;
+using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Process.Application.OutgoingMessages.Common.Xml;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common.Xml;
 
 internal static class XmlHeaderWriter
 {
-    internal static async Task WriteAsync(XmlWriter writer, MessageHeader messageHeader, DocumentDetails documentDetails, string? reasonCode)
+    internal static async Task WriteAsync(XmlWriter writer, OutgoingMessageHeader messageHeader, DocumentDetails documentDetails, string? reasonCode)
     {
         if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
         if (writer == null) throw new ArgumentNullException(nameof(writer));

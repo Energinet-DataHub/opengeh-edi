@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Queueing;
+using Energinet.DataHub.EDI.Infrastructure.DataRetention;
+using Energinet.DataHub.EDI.Process.Application.OutgoingMessages;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
+
 namespace Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Dequeue;
 
 internal static class DequeueConfiguration

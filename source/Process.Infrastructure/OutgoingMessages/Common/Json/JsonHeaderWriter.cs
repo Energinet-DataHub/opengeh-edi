@@ -15,12 +15,15 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common.Json;
 
 internal static class JsonHeaderWriter
 {
-    internal static void Write(MessageHeader messageHeader, string documentType, string typeCode, string? reasonCode, Utf8JsonWriter writer)
+    internal static void Write(OutgoingMessageHeader messageHeader, string documentType, string typeCode, string? reasonCode, Utf8JsonWriter writer)
     {
         if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
         if (documentType == null) throw new ArgumentNullException(nameof(documentType));

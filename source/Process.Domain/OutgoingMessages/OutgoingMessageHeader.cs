@@ -16,7 +16,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.Process.Domain.OutgoingMessages
 {
-    public record MessageHeader(
+    public record OutgoingMessageHeader(
         string BusinessReason,
         string SenderId,
         string SenderRole,

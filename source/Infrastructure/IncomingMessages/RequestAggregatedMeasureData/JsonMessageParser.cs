@@ -19,12 +19,12 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.BaseParsers;
-using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
@@ -40,7 +40,9 @@ public class JsonMessageParser : JsonParserBase,
     {
     }
 
-    public DocumentFormat HandledFormat => DocumentFormat.Json;
+#pragma warning disable CA1822
+    public DocumentFormat HandledFormat => DocumentFormat.CimJson;
+#pragma warning restore CA1822
 
     public async Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(
         Stream message,

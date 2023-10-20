@@ -17,15 +17,17 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
-using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
+using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.Response;
 
 public class JsonResponseFactory : IResponseFactory
 {
-    public DocumentFormat HandledFormat => DocumentFormat.Json;
+#pragma warning disable CA1822
+    public DocumentFormat HandledFormat => DocumentFormat.CimJson;
+#pragma warning restore CA1822
 
     public ResponseMessage From(Result result)
     {

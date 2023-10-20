@@ -18,6 +18,11 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Energinet.DataHub.EDI.Process.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Process.Application.OutgoingMessages.Common.Xml;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common.Ebix;
 
@@ -36,7 +41,7 @@ public abstract class EbixDocumentWriter : IDocumentWriter
 
     protected DocumentDetails DocumentDetails => _documentDetails;
 
-    public virtual async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
+    public virtual async Task<Stream> WriteAsync(OutgoingMessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
     {
         var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = new UTF8Encoding(false), Async = true, Indent = true };
         var stream = new MemoryStream();
@@ -173,7 +178,7 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         writer.Close();
     }
 
-    private Task WriteHeaderAsync(MessageHeader header, DocumentDetails documentDetails, XmlWriter writer, SettlementVersion? settlementVersion)
+    private Task WriteHeaderAsync(OutgoingMessageHeader header, DocumentDetails documentDetails, XmlWriter writer, SettlementVersion? settlementVersion)
     {
         return EbixHeaderWriter.WriteAsync(writer, header, documentDetails, _reasonCode, settlementVersion);
     }

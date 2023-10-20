@@ -12,8 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.Process.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Queueing;
-using PeekResult = Energinet.DataHub.EDI.Application.OutgoingMessages.PeekResult;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
+using PeekResult = Energinet.DataHub.EDI.Process.Application.OutgoingMessages.PeekResult;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Peek;
 

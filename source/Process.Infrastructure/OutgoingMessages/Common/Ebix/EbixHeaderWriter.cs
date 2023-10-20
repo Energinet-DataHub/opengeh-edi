@@ -15,12 +15,17 @@
 using System;
 using System.Threading.Tasks;
 using System.Xml;
+using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Process.Application.OutgoingMessages.Common.Xml;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common.Ebix;
 
 internal static class EbixHeaderWriter
 {
-    internal static async Task WriteAsync(XmlWriter writer, MessageHeader messageHeader, DocumentDetails documentDetails, string? reasonCode, SettlementVersion? settlementVersion)
+    internal static async Task WriteAsync(XmlWriter writer, OutgoingMessageHeader messageHeader, DocumentDetails documentDetails, string? reasonCode, SettlementVersion? settlementVersion)
     {
         if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
         if (writer == null) throw new ArgumentNullException(nameof(writer));

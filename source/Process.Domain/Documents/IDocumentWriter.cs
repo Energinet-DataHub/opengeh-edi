@@ -41,5 +41,5 @@ public interface IDocumentWriter
     /// </summary>
     /// <param name="header"></param>
     /// <param name="marketActivityRecords"></param>
-    Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords);
+    Task<Stream> WriteAsync(OutgoingMessageHeader header, IReadOnlyCollection<string> marketActivityRecords);
 }

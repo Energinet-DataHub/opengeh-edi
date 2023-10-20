@@ -12,10 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Infrastructure.Wholesale;
+using Energinet.DataHub.EDI.Process.Domain.Transactions;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using MediatR;
+
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
 
-public class SendAggregatedMeasuredDataToWholesale
-    : IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>
+public class SendAggregatedMeasuredDataToWholesale : IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
     private readonly WholesaleInbox _wholesaleInbox;
@@ -36,10 +43,8 @@ public class SendAggregatedMeasuredDataToWholesale
 
         var process = await _aggregatedMeasureDataProcessRepository
             .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
-
-        await _wholesaleInbox.SendAsync(
-            process,
-            cancellationToken).ConfigureAwait(false);
+        var serviceBusMessage = AggregatedMeasureDataRequestFactory.CreateServiceBusMessage(process);
+        await _wholesaleInbox.SendAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
 
         process.WasSentToWholesale();
 

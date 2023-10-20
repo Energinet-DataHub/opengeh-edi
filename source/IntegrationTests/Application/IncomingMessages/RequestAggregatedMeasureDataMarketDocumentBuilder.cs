@@ -22,7 +22,7 @@ using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMea
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 using NodaTime;
-using MessageHeader = Energinet.DataHub.EDI.Infrastructure.IncomingMessages.MessageHeader;
+using MessageHeader = Energinet.DataHub.EDI.Common.MessageHeader;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 

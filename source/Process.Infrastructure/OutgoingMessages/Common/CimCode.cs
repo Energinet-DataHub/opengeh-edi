@@ -13,6 +13,9 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common;
 

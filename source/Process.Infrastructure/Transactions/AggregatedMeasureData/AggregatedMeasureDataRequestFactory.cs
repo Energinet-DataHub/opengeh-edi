@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.Edi.Requests;
+using Google.Protobuf;
+
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
 
 public static class AggregatedMeasureDataRequestFactory

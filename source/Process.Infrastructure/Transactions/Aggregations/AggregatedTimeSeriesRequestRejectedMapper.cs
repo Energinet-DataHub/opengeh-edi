@@ -12,8 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
-using RejectReason = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.RejectReason;
+using Energinet.DataHub.Edi.Responses;
+using Google.Protobuf.Collections;
+using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.Aggregations;
 
@@ -42,8 +50,8 @@ public class AggregatedTimeSeriesRequestRejectedMapper : IInboxEventMapper
         return inboxEvent.ToString();
     }
 
-    private static IReadOnlyList<RejectReason> MapRejectReasons(RepeatedField<Energinet.DataHub.Edi.Responses.RejectReason> rejectReasons)
+    private static IReadOnlyList<Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.RejectReason> MapRejectReasons(RepeatedField<RejectReason> rejectReasons)
     {
-        return rejectReasons.Select(reason => new RejectReason(reason.ErrorCode, reason.ErrorMessage)).ToList();
+        return rejectReasons.Select(reason => new Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.RejectReason(reason.ErrorCode, reason.ErrorMessage)).ToList();
     }
 }

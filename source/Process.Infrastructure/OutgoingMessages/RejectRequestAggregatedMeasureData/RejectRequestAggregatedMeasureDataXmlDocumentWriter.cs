@@ -16,6 +16,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
+using Energinet.DataHub.EDI.Process.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Process.Application.OutgoingMessages.Common.Xml;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common.Xml;
 
