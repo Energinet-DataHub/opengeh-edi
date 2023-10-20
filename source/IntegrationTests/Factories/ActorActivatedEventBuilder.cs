@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
 internal static class ActorActivatedEventBuilder
 {
-    private static readonly string _actorNumber = ActorNumber.Create("1234567890123").ToString()!;
+    private static readonly string _actorNumber = ActorNumber.Create("1234567890123").Value;
     private static readonly string _externalActorId = Guid.NewGuid().ToString();
 
     internal static ActorActivated Build()

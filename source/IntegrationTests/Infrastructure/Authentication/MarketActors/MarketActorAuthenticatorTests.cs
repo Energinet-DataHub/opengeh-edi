@@ -115,7 +115,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
 
         private async Task CreateActorAsync()
         {
-            await InvokeCommandAsync(new CreateActorCommand(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.ActorNumber)).ConfigureAwait(false);
+            await InvokeCommandAsync(new CreateActorCommand(SampleData.StsAssignedUserId, ActorNumber.Create(SampleData.ActorNumber))).ConfigureAwait(false);
         }
     }
 }

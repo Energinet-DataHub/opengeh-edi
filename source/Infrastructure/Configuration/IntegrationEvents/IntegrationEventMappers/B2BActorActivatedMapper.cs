@@ -16,6 +16,7 @@ using System;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
@@ -31,6 +32,6 @@ public class B2BActorActivatedMapper : IIntegrationEventMapper
 
         var actorActivatedEvent = (ActorActivated)integrationEvent.Message;
 
-        return new CreateActorCommand(Guid.NewGuid().ToString(), actorActivatedEvent.ExternalActorId, actorActivatedEvent.ActorNumber);
+        return new CreateActorCommand(actorActivatedEvent.ExternalActorId, ActorNumber.Create(actorActivatedEvent.ActorNumber));
     }
 }
