@@ -46,6 +46,8 @@ public class IntegrationEventListener
         var eventDetails = context.ExtractEventDetails();
         _logger.LogInformation("Integration event details: {EventDetails}", eventDetails);
 
-        await _subscriber.HandleAsync(IntegrationEventServiceBusMessage.Create(eventData, context.BindingContext.BindingData!)).ConfigureAwait(false);
+        await _subscriber
+            .HandleAsync(IntegrationEventServiceBusMessage.Create(eventData, context.BindingContext.BindingData!))
+            .ConfigureAwait(false);
     }
 }

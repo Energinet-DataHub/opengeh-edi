@@ -12,14 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.RegularExpressions;
+using System;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 
-namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers
+namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
+
+internal static class ActorActivatedEventBuilder
 {
-    public static class NamingConvention
+    private static readonly string _actorNumber = ActorNumber.Create("1234567890123").ToString()!;
+    private static readonly string _externalActorId = Guid.NewGuid().ToString();
+
+    internal static ActorActivated Build()
     {
-        // Matches                                                  {type} {timestamp } {name}
-        // Energinet.DataHub.MarketData.ApplyDBMigrationsApp.Scripts.Model.202103021434 First.sql
-        public static readonly Regex Regex = new Regex(@".*Scripts\.(?<type>Model|Seed|Test)\.(?<timestamp>\d{12}) (?<name>).*\b.sql");
+        return new ActorActivated()
+        {
+            ActorNumber = _actorNumber,
+            ExternalActorId = _externalActorId,
+        };
     }
 }
