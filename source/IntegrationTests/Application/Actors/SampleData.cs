@@ -20,5 +20,5 @@ internal static class SampleData
 {
     internal static string ActorNumber => "5148796574821";
 
-    internal static Guid ExternalId => Guid.Parse("9222905B-8B02-4D8B-A2C1-3BD51B1AD8D9");
+    internal static string ExternalId => Guid.Parse("9222905B-8B02-4D8B-A2C1-3BD51B1AD8D9").ToString();
 }
