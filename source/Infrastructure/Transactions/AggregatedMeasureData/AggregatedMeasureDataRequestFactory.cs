@@ -121,6 +121,7 @@ public static class AggregatedMeasureDataRequestFactory
             MeteringPointType = process.MeteringPointType,
             RequestedByActorId = process.RequestedByActorId.Value,
             RequestedByActorRole = process.RequestedByActorRoleCode,
+            BusinessReason = process.BusinessReason,
         };
 
         if (process.SettlementMethod != null)
