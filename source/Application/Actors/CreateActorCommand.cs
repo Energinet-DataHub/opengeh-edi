@@ -23,8 +23,8 @@ public class CreateActorCommand : InternalCommand
     [JsonConstructor]
     public CreateActorCommand(string externalId, ActorNumber actorNumber)
     {
-        ActorNumber = actorNumber;
         ExternalId = externalId;
+        ActorNumber = actorNumber;
     }
 
     public string ExternalId { get; }
