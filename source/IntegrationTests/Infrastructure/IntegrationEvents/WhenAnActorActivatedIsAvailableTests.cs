@@ -72,11 +72,11 @@ public class WhenAnActorActivatedIsAvailableTests : TestBase
     private async Task<IEnumerable<Actor>> GetActors(string actorNumber, string externalActorId)
     {
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
-        var sql = $"SELECT Id, B2CId, IdentificationNUmber FROM [dbo].[Actor] WHERE IdentificationNumber = '{actorNumber}' AND B2CId = '{externalActorId}'";
+        var sql = $"SELECT Id, ActorNumber, ExternalId FROM [dbo].[Actor] WHERE ActorNumber = '{actorNumber}' AND ExternalId = '{externalActorId}'";
         return await connection.QueryAsync<Actor>(sql);
     }
 
 #pragma warning disable
-    public record Actor(Guid Id, Guid B2CId, string IdentificationNumber);
+    public record Actor(Guid Id, string ActorNumber, string ExternalId);
 #pragma warning restore
 }

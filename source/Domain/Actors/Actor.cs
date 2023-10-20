@@ -12,13 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+namespace Energinet.DataHub.EDI.Domain.Actors;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Application.Actors;
-
-internal static class SampleData
+public class Actor
 {
-    internal static string ActorNumber => "5148796574821";
+    private readonly Guid _id;
 
-    internal static Guid ExternalId => Guid.Parse("9222905B-8B02-4D8B-A2C1-3BD51B1AD8D9");
+    public Actor(ActorNumber actorNumber, string externalId)
+    {
+        _id = Guid.NewGuid();
+        ActorNumber = actorNumber;
+        ExternalId = externalId;
+    }
+
+    #pragma warning disable
+    private Actor()
+    {
+    }
+
+    public ActorNumber ActorNumber { get; set; }
+
+    public string ExternalId { get; set; }
 }

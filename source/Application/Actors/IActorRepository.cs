@@ -37,4 +37,9 @@ public interface IActorRepository
     /// <param name="actorId"></param>
     /// <param name="cancellationToken"></param>
     Task<ActorNumber?> GetActorNumberByB2CIdAsync(Guid actorId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Creates a new actor
+    /// </summary>
+    Task CreateIfNotExistAsync(string externalId, ActorNumber actorNumber, CancellationToken cancellationToken);
 }

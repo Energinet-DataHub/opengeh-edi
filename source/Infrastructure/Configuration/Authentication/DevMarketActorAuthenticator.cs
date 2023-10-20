@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Domain.Actors;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 
@@ -81,7 +82,7 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
 
     private Task RegisterActorAsync(Actor actor, CancellationToken cancellationToken)
     {
-        return _actorRegistry.TryStoreAsync(new CreateActorCommand(Guid.NewGuid().ToString(),  actor.Id.ToString(), actor.Number), cancellationToken);
+        return _actorRegistry.TryStoreAsync(new CreateActorCommand(actor.Id.ToString(), ActorNumber.Create(actor.Number)), cancellationToken);
     }
 
     #pragma warning disable

@@ -13,22 +13,27 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Actors;
 
 public class ActorRepository : IActorRepository
 {
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
+    private readonly B2BContext _dbContext;
 
-    public ActorRepository(IDatabaseConnectionFactory databaseConnectionFactory)
+    public ActorRepository(IDatabaseConnectionFactory databaseConnectionFactory, B2BContext dbContext)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
+        _dbContext = dbContext;
     }
 
     public async Task<Guid> GetIdByActorNumberAsync(string actorNumber, CancellationToken cancellationToken)
@@ -36,7 +41,7 @@ public class ActorRepository : IActorRepository
         using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         return await connection
             .ExecuteScalarAsync<Guid>(
-                "SELECT Id FROM [dbo].[Actor] WHERE IdentificationNumber = @Number",
+                "SELECT Id FROM [dbo].[Actor] WHERE ActorNumber = @Number",
                 new { ActorNumber = actorNumber, }).ConfigureAwait(false);
     }
 
@@ -45,7 +50,7 @@ public class ActorRepository : IActorRepository
         using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         return await connection
             .ExecuteScalarAsync<string>(
-                "SELECT IdentificationNumber FROM [dbo].[Actor] WHERE Id = @ActorId",
+                "SELECT ActorNumber FROM [dbo].[Actor] WHERE Id = @ActorId",
                 new { ActorId = actorId, }).ConfigureAwait(false);
     }
 
@@ -54,7 +59,7 @@ public class ActorRepository : IActorRepository
         using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         var actorNumber = await connection
             .ExecuteScalarAsync<string>(
-                "SELECT IdentificationNumber AS Identifier FROM [dbo].[Actor] WHERE B2CId=@ActorId",
+                "SELECT ActorNumber AS Identifier FROM [dbo].[Actor] WHERE ExternalId=@ActorId",
                 new { ActorId = actorId, })
             .ConfigureAwait(false);
         if (string.IsNullOrWhiteSpace(actorNumber))
@@ -63,5 +68,21 @@ public class ActorRepository : IActorRepository
         }
 
         return ActorNumber.Create(actorNumber);
+    }
+
+    public async Task CreateIfNotExistAsync(string externalId, ActorNumber actorNumber, CancellationToken cancellationToken)
+    {
+        if (await ActorDoesNotExistsAsync(externalId, actorNumber, cancellationToken).ConfigureAwait(false))
+            await _dbContext.Actors.AddAsync(new Actor(actorNumber, externalId), cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task<bool> ActorDoesNotExistsAsync(string externalId, ActorNumber actorNumber, CancellationToken cancellationToken)
+    {
+        return !await _dbContext.Actors
+            .AnyAsync(
+                actor => actor.ActorNumber == actorNumber
+                               && actor.ExternalId == externalId,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
     }
 }
