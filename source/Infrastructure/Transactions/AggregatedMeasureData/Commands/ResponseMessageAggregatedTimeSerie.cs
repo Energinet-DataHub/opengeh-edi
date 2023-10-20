@@ -19,10 +19,10 @@ using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 
-public class AcceptedAggregatedTimeSerie : InternalCommand
+public class ResponseMessageAggregatedTimeSerie : InternalCommand
 {
     [JsonConstructor]
-    public AcceptedAggregatedTimeSerie(Guid processId, AggregatedTimeSerie aggregatedTimeSerie)
+    public ResponseMessageAggregatedTimeSerie(Guid processId, AggregatedTimeSerie aggregatedTimeSerie)
     {
         ProcessId = processId;
         AggregatedTimeSerie = aggregatedTimeSerie;

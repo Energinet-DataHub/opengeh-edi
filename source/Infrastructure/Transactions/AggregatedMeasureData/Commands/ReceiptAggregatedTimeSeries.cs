@@ -13,12 +13,20 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Application.Actors;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 
-internal static class SampleData
+public class ReceiptAggregatedTimeSeries : InternalCommand
 {
-    internal static string ActorNumber => "5148796574821";
+    public ReceiptAggregatedTimeSeries(Guid processId, ReadOnlyCollection<string> gridAreas)
+    {
+        ProcessId = processId;
+        GridAreas = gridAreas;
+    }
 
-    internal static string ExternalId => Guid.Parse("9222905B-8B02-4D8B-A2C1-3BD51B1AD8D9").ToString();
+    public Guid ProcessId { get; }
+
+    public ReadOnlyCollection<string> GridAreas { get; }
 }

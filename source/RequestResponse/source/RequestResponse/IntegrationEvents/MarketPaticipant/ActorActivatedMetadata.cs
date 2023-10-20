@@ -12,13 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Application.Actors;
-
-internal static class SampleData
+public partial class ActorActivated
 {
-    internal static string ActorNumber => "5148796574821";
-
-    internal static string ExternalId => Guid.Parse("9222905B-8B02-4D8B-A2C1-3BD51B1AD8D9").ToString();
+    public const string EventName = "ActorActivated";
+    public const int CurrentMinorVersion = 1;
 }

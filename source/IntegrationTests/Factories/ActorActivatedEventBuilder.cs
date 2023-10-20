@@ -13,12 +13,22 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Application.Actors;
+namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
-internal static class SampleData
+internal static class ActorActivatedEventBuilder
 {
-    internal static string ActorNumber => "5148796574821";
+    private static readonly string _actorNumber = ActorNumber.Create("1234567890123").Value;
+    private static readonly string _externalActorId = Guid.NewGuid().ToString();
 
-    internal static string ExternalId => Guid.Parse("9222905B-8B02-4D8B-A2C1-3BD51B1AD8D9").ToString();
+    internal static ActorActivated Build()
+    {
+        return new ActorActivated()
+        {
+            ActorNumber = _actorNumber,
+            ExternalActorId = _externalActorId,
+        };
+    }
 }

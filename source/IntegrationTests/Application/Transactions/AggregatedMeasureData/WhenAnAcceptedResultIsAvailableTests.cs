@@ -57,7 +57,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         var acceptedEvent = GetAcceptedEvent(process);
 
         // Act
-        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id);
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestResponseMessage), acceptedEvent, process.ProcessId.Id);
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
@@ -82,7 +82,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
         // Act
         await AddInboxEvent(process, acceptedEvent);
-        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id);
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestResponseMessage), acceptedEvent, process.ProcessId.Id);
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
@@ -102,12 +102,12 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         _b2BContext.Dispose();
     }
 
-    private static AggregatedTimeSeriesRequestAccepted GetAcceptedEvent(AggregatedMeasureDataProcess aggregatedMeasureDataProcess)
+    private static AggregatedTimeSeriesRequestResponseMessage GetAcceptedEvent(AggregatedMeasureDataProcess aggregatedMeasureDataProcess)
     {
         return CreateAggregation(aggregatedMeasureDataProcess);
     }
 
-    private static AggregatedTimeSeriesRequestAccepted CreateAggregation(AggregatedMeasureDataProcess aggregatedMeasureDataProcess)
+    private static AggregatedTimeSeriesRequestResponseMessage CreateAggregation(AggregatedMeasureDataProcess aggregatedMeasureDataProcess)
     {
         var quantity = new DecimalValue() { Units = 12345, Nanos = 123450000, };
         var point = new TimeSeriesPoint()
@@ -133,7 +133,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             Resolution = Resolution.Pt15M,
         };
 
-        return new AggregatedTimeSeriesRequestAccepted()
+        return new AggregatedTimeSeriesRequestResponseMessage()
         {
             GridArea = aggregatedMeasureDataProcess.MeteringGridAreaDomainId,
             QuantityUnit = QuantityUnit.Kwh,
@@ -146,12 +146,12 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
     private async Task AddInboxEvent(
         AggregatedMeasureDataProcess process,
-        AggregatedTimeSeriesRequestAccepted acceptedEvent)
+        AggregatedTimeSeriesRequestResponseMessage acceptedEvent)
     {
         await GetService<InboxEventReceiver>()
             .ReceiveAsync(
                 Guid.NewGuid().ToString(),
-                nameof(AggregatedTimeSeriesRequestAccepted),
+                nameof(AggregatedTimeSeriesRequestResponseMessage),
                 process.ProcessId.Id,
                 acceptedEvent.ToByteArray());
     }

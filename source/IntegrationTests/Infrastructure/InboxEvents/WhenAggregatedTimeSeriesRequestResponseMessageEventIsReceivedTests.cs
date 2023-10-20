@@ -30,20 +30,20 @@ using Period = Energinet.DataHub.Edi.Responses.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 
-public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestBase
+public class WhenAggregatedTimeSeriesRequestResponseMessageEventIsReceivedTests : TestBase
 {
-    private readonly string _eventType = nameof(AggregatedTimeSeriesRequestAccepted);
+    private readonly string _eventType = nameof(AggregatedTimeSeriesRequestResponseMessage);
     private readonly Guid _referenceId = Guid.NewGuid();
     private readonly string _eventId = "1";
     private readonly InboxEventsProcessor _processor;
-    private readonly AggregatedTimeSeriesRequestAcceptedEventMapper _aggregatedTimeSeriesRequestAcceptedEventMapper;
-    private readonly AggregatedTimeSeriesRequestAccepted _aggregatedTimeSeriesRequestAcceptedResponse;
+    private readonly AggregatedTimeSeriesRequestResponseMessageEventMapper _aggregatedTimeSeriesRequestResponseMessageEventMapper;
+    private readonly AggregatedTimeSeriesRequestResponseMessage _aggregatedTimeSeriesRequestAcceptedResponse;
 
-    public WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests(DatabaseFixture databaseFixture)
+    public WhenAggregatedTimeSeriesRequestResponseMessageEventIsReceivedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _processor = GetService<InboxEventsProcessor>();
-        _aggregatedTimeSeriesRequestAcceptedEventMapper = GetService<AggregatedTimeSeriesRequestAcceptedEventMapper>();
+        _aggregatedTimeSeriesRequestResponseMessageEventMapper = GetService<AggregatedTimeSeriesRequestResponseMessageEventMapper>();
         _aggregatedTimeSeriesRequestAcceptedResponse = CreateResponseFromWholeSale();
         RegisterInboxEvent();
     }
@@ -53,11 +53,11 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
     {
         await _processor.ProcessEventsAsync(CancellationToken.None);
 
-        TestAggregatedTimeSeriesRequestAcceptedHandlerSpy.AssertExpectedNotifications(_aggregatedTimeSeriesRequestAcceptedResponse);
+        TestAggregatedTimeSeriesRequestResponseMessageHandlerSpy.AssertExpectedNotifications(_aggregatedTimeSeriesRequestAcceptedResponse);
         await EventIsMarkedAsProcessedAsync(_eventId);
     }
 
-    private static AggregatedTimeSeriesRequestAccepted CreateResponseFromWholeSale()
+    private static AggregatedTimeSeriesRequestResponseMessage CreateResponseFromWholeSale()
     {
         var quantity = new DecimalValue() { Units = 12345, Nanos = 123450000, };
         var point = new TimeSeriesPoint()
@@ -74,7 +74,7 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
             Resolution = Resolution.Pt15M,
         };
 
-        return new AggregatedTimeSeriesRequestAccepted()
+        return new AggregatedTimeSeriesRequestResponseMessage()
         {
             SettlementVersion = "0",
             GridArea = "244",
@@ -106,6 +106,6 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
 
     private string ToJson()
     {
-        return _aggregatedTimeSeriesRequestAcceptedEventMapper.ToJson(_aggregatedTimeSeriesRequestAcceptedResponse.ToByteArray());
+        return _aggregatedTimeSeriesRequestResponseMessageEventMapper.ToJson(_aggregatedTimeSeriesRequestAcceptedResponse.ToByteArray());
     }
 }

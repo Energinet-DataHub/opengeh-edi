@@ -36,7 +36,7 @@ public class ActorRegistry : IActorRegistry
         if (createActorCommand == null) throw new ArgumentNullException(nameof(createActorCommand));
         using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken)
             .ConfigureAwait(false);
-        var sqlStatement = @$"INSERT INTO [dbo].[Actor] ([Id], [B2CId], [IdentificationNumber]) VALUES ('{createActorCommand.ActorId}', '{createActorCommand.B2CId}', '{createActorCommand.IdentificationNumber}')";
+        var sqlStatement = @$"INSERT INTO [dbo].[Actor] ([Id], [B2CId], [IdentificationNumber]) VALUES ('{Guid.NewGuid()}', '{createActorCommand.ExternalId}', '{createActorCommand.ActorNumber}')";
         try
         {
             await connection.ExecuteAsync(sqlStatement)

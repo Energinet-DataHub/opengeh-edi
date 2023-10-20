@@ -31,12 +31,12 @@ using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 
-public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
+public class AggregatedTimeSeriesRequestResponseMessageEventMapper : IInboxEventMapper
 {
     public Task<INotification> MapFromAsync(string payload, Guid referenceId, CancellationToken cancellationToken)
     {
         var aggregation =
-            AggregatedTimeSeriesRequestAccepted.Parser.ParseJson(payload);
+            AggregatedTimeSeriesRequestResponseMessage.Parser.ParseJson(payload);
 
         var aggregatiedTimeSerie = new AggregatedTimeSerie(
                 MapPoints(aggregation.TimeSeriesPoints),
@@ -47,7 +47,7 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
                 MapGridAreaDetails(aggregation),
                 MapSettlementVersion(aggregation));
 
-        return Task.FromResult<INotification>(new AggregatedTimeSerieRequestWasAccepted(
+        return Task.FromResult<INotification>(new AggregatedTimeSerieRequestResponse(
             referenceId,
             aggregatiedTimeSerie));
     }
@@ -55,22 +55,22 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
     public bool CanHandle(string eventType)
     {
         ArgumentNullException.ThrowIfNull(eventType);
-        return eventType.Equals(nameof(AggregatedTimeSeriesRequestAccepted), StringComparison.OrdinalIgnoreCase);
+        return eventType.Equals(nameof(AggregatedTimeSeriesRequestResponseMessage), StringComparison.OrdinalIgnoreCase);
     }
 
     public string ToJson(byte[] payload)
     {
-        var inboxEvent = AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(
+        var inboxEvent = AggregatedTimeSeriesRequestResponseMessage.Parser.ParseFrom(
             payload);
         return inboxEvent.ToString();
     }
 
-    private static string? MapSettlementVersion(AggregatedTimeSeriesRequestAccepted aggregation)
+    private static string? MapSettlementVersion(AggregatedTimeSeriesRequestResponseMessage aggregation)
     {
         return aggregation.SettlementVersion;
     }
 
-    private static string MapMeteringPointType(AggregatedTimeSeriesRequestAccepted aggregation)
+    private static string MapMeteringPointType(AggregatedTimeSeriesRequestResponseMessage aggregation)
     {
         return aggregation.TimeSeriesType switch
         {
@@ -99,12 +99,12 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         return points.AsReadOnly();
     }
 
-    private static Domain.Transactions.AggregatedMeasureData.Period MapPeriod(AggregatedTimeSeriesRequestAccepted aggregation)
+    private static Domain.Transactions.AggregatedMeasureData.Period MapPeriod(AggregatedTimeSeriesRequestResponseMessage aggregation)
     {
         return new Domain.Transactions.AggregatedMeasureData.Period(aggregation.Period.StartOfPeriod.ToInstant(), aggregation.Period.EndOfPeriod.ToInstant());
     }
 
-    private static string MapResolution(AggregatedTimeSeriesRequestAccepted aggregation)
+    private static string MapResolution(AggregatedTimeSeriesRequestResponseMessage aggregation)
     {
         return aggregation.Period.Resolution switch
         {
@@ -115,7 +115,7 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         };
     }
 
-    private static string MapUnitType(AggregatedTimeSeriesRequestAccepted aggregation)
+    private static string MapUnitType(AggregatedTimeSeriesRequestResponseMessage aggregation)
     {
         return aggregation.QuantityUnit switch
         {
@@ -149,7 +149,7 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         return input.Units + (input.Nanos / nanoFactor);
     }
 
-    private static GridAreaDetails MapGridAreaDetails(AggregatedTimeSeriesRequestAccepted aggregation)
+    private static GridAreaDetails MapGridAreaDetails(AggregatedTimeSeriesRequestResponseMessage aggregation)
     {
         var gridOperatorNumber = GridAreaLookup.GetGridOperatorFor(aggregation.GridArea);
 

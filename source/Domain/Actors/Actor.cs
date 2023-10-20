@@ -12,21 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
-using MediatR;
+namespace Energinet.DataHub.EDI.Domain.Actors;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
-
-public class AggregatedTimeSerieRequestWasAccepted : INotification
+public class Actor
 {
-    public AggregatedTimeSerieRequestWasAccepted(Guid processId, AggregatedTimeSerie aggregatedTimeSerie)
+    private readonly Guid _id;
+
+    public Actor(ActorNumber actorNumber, string externalId)
     {
-        ProcessId = processId;
-        AggregatedTimeSerie = aggregatedTimeSerie;
+        _id = Guid.NewGuid();
+        ActorNumber = actorNumber;
+        ExternalId = externalId;
     }
 
-    public Guid ProcessId { get; }
+    #pragma warning disable
+    private Actor()
+    {
+    }
 
-    public AggregatedTimeSerie AggregatedTimeSerie { get; }
+    public ActorNumber ActorNumber { get; set; }
+
+    public string ExternalId { get; set; }
 }
