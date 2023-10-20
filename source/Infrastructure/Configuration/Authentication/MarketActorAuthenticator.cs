@@ -53,7 +53,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication
                 return;
             }
 
-            var actorNumber = await _actorRepository.GetActorNumberByExternalIdAsync(Guid.Parse(userIdFromSts), cancellationToken).ConfigureAwait(false);
+            var actorNumber = await _actorRepository.GetActorNumberByExternalIdAsync(userIdFromSts, cancellationToken).ConfigureAwait(false);
             if (actorNumber is null)
             {
                 ActorIsNotAuthorized();

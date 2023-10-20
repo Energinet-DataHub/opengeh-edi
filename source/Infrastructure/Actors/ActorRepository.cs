@@ -35,13 +35,13 @@ public class ActorRepository : IActorRepository
         _dbContext = dbContext;
     }
 
-    public async Task<ActorNumber?> GetActorNumberByExternalIdAsync(Guid actorId, CancellationToken cancellationToken)
+    public async Task<ActorNumber?> GetActorNumberByExternalIdAsync(string externalId, CancellationToken cancellationToken)
     {
         using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         var actorNumber = await connection
             .ExecuteScalarAsync<string>(
-                "SELECT ActorNumber AS Identifier FROM [dbo].[Actor] WHERE ExternalId=@ActorId",
-                new { ActorId = actorId, })
+                "SELECT ActorNumber AS Identifier FROM [dbo].[Actor] WHERE ExternalId=@ExternalId",
+                new { ExternalId = externalId, })
             .ConfigureAwait(false);
         if (string.IsNullOrWhiteSpace(actorNumber))
         {

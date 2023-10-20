@@ -27,9 +27,7 @@ public interface IActorRepository
     /// <summary>
     /// Get actor number by id
     /// </summary>
-    /// <param name="actorId"></param>
-    /// <param name="cancellationToken"></param>
-    Task<ActorNumber?> GetActorNumberByExternalIdAsync(Guid actorId, CancellationToken cancellationToken);
+    Task<ActorNumber?> GetActorNumberByExternalIdAsync(string externalId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Creates a new actor
