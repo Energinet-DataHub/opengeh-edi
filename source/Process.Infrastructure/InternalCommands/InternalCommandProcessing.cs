@@ -15,13 +15,13 @@
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration.Commands;
 using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
-using Energinet.DataHub.EDI.Application.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
+using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
+namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 
 internal static class InternalCommandProcessing
 {

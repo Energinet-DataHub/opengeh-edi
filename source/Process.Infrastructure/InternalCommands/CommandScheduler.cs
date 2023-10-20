@@ -20,7 +20,7 @@ using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands
+namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
 {
     public class CommandScheduler : ICommandScheduler
     {

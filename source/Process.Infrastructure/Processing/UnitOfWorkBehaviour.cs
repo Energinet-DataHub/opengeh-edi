@@ -22,7 +22,7 @@ using MediatR;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Processing;
+namespace Energinet.DataHub.EDI.Process.Infrastructure.Processing;
 
 public class UnitOfWorkBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : ICommand<TResponse>

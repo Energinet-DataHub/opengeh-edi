@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands
+namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
 {
     public class InternalCommandMapper
     {

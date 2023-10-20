@@ -24,7 +24,7 @@ using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Microsoft.Extensions.Logging;
 using Polly;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands
+namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
 {
     public class InternalCommandProcessor
     {

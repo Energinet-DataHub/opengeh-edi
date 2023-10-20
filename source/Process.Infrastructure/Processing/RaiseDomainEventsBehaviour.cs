@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Processing;
+namespace Energinet.DataHub.EDI.Process.Infrastructure.Processing;
 
 public class RaiseDomainEventsBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>

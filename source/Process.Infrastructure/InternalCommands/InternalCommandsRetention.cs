@@ -19,9 +19,8 @@ using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
-using NodaTime;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
+namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 
 public class InternalCommandsRetention : IDataRetention
 {

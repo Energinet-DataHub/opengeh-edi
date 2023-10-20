@@ -18,7 +18,7 @@ using Energinet.DataHub.EDI.Common;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands
+namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
 {
     public class CommandExecutor
     {

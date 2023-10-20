@@ -14,18 +14,21 @@
 
 using System;
 using Energinet.DataHub.Core.Messaging.Communication;
-using Energinet.DataHub.EDI.Application.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
+using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.Aggregations;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
+namespace Energinet.DataHub.EDI.Process.Infrastructure.IntegrationEvents;
 
 public class CalculationResultCompletedMapper : IIntegrationEventMapper
 {
     public string EventTypeToHandle => CalculationResultCompleted.EventName;
 
+#pragma warning disable CA1822
     public InternalCommand MapToCommand(IntegrationEvent integrationEvent)
+#pragma warning restore CA1822
     {
         if (integrationEvent == null)
             throw new ArgumentNullException(nameof(integrationEvent));

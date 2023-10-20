@@ -18,10 +18,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Queueing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Processing;
+namespace Energinet.DataHub.EDI.Process.Infrastructure.Processing;
 
 public class EnqueueOutgoingMessagesBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : ICommand<TResponse>

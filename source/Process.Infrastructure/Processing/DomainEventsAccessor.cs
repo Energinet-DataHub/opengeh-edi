@@ -17,7 +17,7 @@ using System.Linq;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Processing;
+namespace Energinet.DataHub.EDI.Process.Infrastructure.Processing;
 
 public class DomainEventsAccessor
 {
