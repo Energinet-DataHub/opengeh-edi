@@ -14,7 +14,7 @@
 
 using System;
 using System.Linq;
-using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Domain.Documents;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages;

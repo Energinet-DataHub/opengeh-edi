@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.Application.Configuration.Authentication;
 using Energinet.DataHub.EDI.Application.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 using MediatR;

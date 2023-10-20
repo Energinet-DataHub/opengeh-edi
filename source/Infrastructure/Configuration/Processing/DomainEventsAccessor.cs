@@ -14,7 +14,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Processing;

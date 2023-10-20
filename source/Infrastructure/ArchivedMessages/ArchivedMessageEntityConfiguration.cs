@@ -16,7 +16,6 @@ using System;
 using System.IO;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.ArchivedMessages;
-using Energinet.DataHub.EDI.Domain.Common;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

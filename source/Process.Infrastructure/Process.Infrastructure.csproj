@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Energinet.DataHub.EDI.Process.Infrastructure</AssemblyName>
+    <RootNamespace>Energinet.DataHub.EDI.Process.Infrastructure</RootNamespace>
+  </PropertyGroup>
+
+</Project>
