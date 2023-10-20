@@ -14,7 +14,7 @@
 
 using MediatR;
 
-namespace Energinet.DataHub.EDI.Application.Configuration.Commands.Commands
+namespace Energinet.DataHub.EDI.Common
 {
     #pragma warning disable CA1040
     /// <summary>

@@ -12,26 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Domain.Actors;
+namespace Energinet.DataHub.EDI.Process.Application.OutgoingMessages.Common;
 
-public class InvalidActorNumberException : Exception
+public static class OutgoingMessageExtensions
 {
-    private InvalidActorNumberException(string message)
-        : base(message)
+    public static string ToStringValue(this bool value)
     {
-    }
-
-    private InvalidActorNumberException()
-    {
-    }
-
-    private InvalidActorNumberException(string message, Exception innerException)
-        : base(message, innerException)
-    {
-    }
-
-    public static InvalidActorNumberException Create(string invalidActorNumber)
-    {
-        return new InvalidActorNumberException($"{invalidActorNumber} is not a valid actor number");
+        return value ? "true" : "false";
     }
 }

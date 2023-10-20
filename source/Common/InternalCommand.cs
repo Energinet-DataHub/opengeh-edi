@@ -15,7 +15,7 @@
 using System;
 using MediatR;
 
-namespace Energinet.DataHub.EDI.Application.Configuration.Commands.Commands
+namespace Energinet.DataHub.EDI.Common
 {
     [Serializable]
     public abstract class InternalCommand : ICommand<Unit>

@@ -16,16 +16,15 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.Configuration;
-using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
-using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Domain.ArchivedMessages;
-using Energinet.DataHub.EDI.Domain.Documents;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
 using MediatR;
+using NodaTime;
 
-namespace Energinet.DataHub.EDI.Application.OutgoingMessages;
+namespace Energinet.DataHub.EDI.Process.Application.OutgoingMessages;
 
 public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
 {
@@ -33,16 +32,14 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
     private readonly IMarketDocumentRepository _marketDocumentRepository;
     private readonly DocumentFactory _documentFactory;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IArchivedMessageRepository _archivedMessageRepository;
+    private readonly IArchivedMessageRepository _archivedMessageRepository; //TODO: Should be a client ref
 
     public PeekHandler(
         IActorMessageQueueRepository actorMessageQueueRepository,
         IMarketDocumentRepository marketDocumentRepository,
         DocumentFactory documentFactory,
         IOutgoingMessageRepository outgoingMessageRepository,
-        ISystemDateTimeProvider systemDateTimeProvider,
         IUnitOfWork unitOfWork,
         IArchivedMessageRepository archivedMessageRepository)
     {
@@ -50,7 +47,6 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
         _marketDocumentRepository = marketDocumentRepository;
         _documentFactory = documentFactory;
         _outgoingMessageRepository = outgoingMessageRepository;
-        _systemDateTimeProvider = systemDateTimeProvider;
         _unitOfWork = unitOfWork;
         _archivedMessageRepository = archivedMessageRepository;
     }
@@ -73,7 +69,7 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
 
         if (document == null)
         {
-            var timestamp = _systemDateTimeProvider.Now();
+            var timestamp = SystemClock.Instance.GetCurrentInstant();
 
             var outgoingMessageBundle = await _outgoingMessageRepository.GetAsync(peekResult.BundleId).ConfigureAwait(false);
             var result = await _documentFactory.CreateFromAsync(outgoingMessageBundle, request.DocumentFormat, timestamp).ConfigureAwait(false);

@@ -12,12 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
 
-public static class OutgoingMessageExtensions
+namespace Energinet.DataHub.EDI.Process.Domain.Documents;
+
+public class IncomingDocumentType : DocumentType
 {
-    public static string ToStringValue(this bool value)
+    public static readonly IncomingDocumentType RequestAggregatedMeasureData = new(0, nameof(RequestAggregatedMeasureData), MessageCategory.None);
+
+    public IncomingDocumentType(int id, string name, MessageCategory category)
+        : base(id, name, category)
     {
-        return value ? "true" : "false";
     }
 }

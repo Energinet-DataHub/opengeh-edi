@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.Common;
+
 namespace Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
 
 public class MessageCategory : EnumerationType

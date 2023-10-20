@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Text.Json.Serialization;
-using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Common;
 
 namespace Energinet.DataHub.EDI.Application.Actors;
 

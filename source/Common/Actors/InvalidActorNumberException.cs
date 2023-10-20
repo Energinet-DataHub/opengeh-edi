@@ -12,18 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+using System;
 
-namespace Energinet.DataHub.EDI.Application.Configuration.DataAccess
+namespace Energinet.DataHub.EDI.Common.Actors;
+
+public class InvalidActorNumberException : Exception
 {
-    /// <summary>
-    /// Unit of work
-    /// </summary>
-    public interface IUnitOfWork
+    private InvalidActorNumberException(string message)
+        : base(message)
     {
-        /// <summary>
-        /// Commits current transaction
-        /// </summary>
-        Task CommitAsync();
+    }
+
+    private InvalidActorNumberException()
+    {
+    }
+
+    private InvalidActorNumberException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+
+    public static InvalidActorNumberException Create(string invalidActorNumber)
+    {
+        return new InvalidActorNumberException($"{invalidActorNumber} is not a valid actor number");
     }
 }

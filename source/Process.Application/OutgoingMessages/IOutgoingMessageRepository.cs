@@ -12,24 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Application.OutgoingMessages.Common
+using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
+
+namespace Energinet.DataHub.EDI.Process.Application.OutgoingMessages
 {
     /// <summary>
-    /// Service for parsing a message record to- and from a string payload
+    /// Store for outgoing actor messages
     /// </summary>
-    public interface IMessageRecordParser
+    public interface IOutgoingMessageRepository
     {
         /// <summary>
-        /// Parses a message record to a string
+        /// Add message to queue
         /// </summary>
-        /// <param name="messageRecord"></param>
-        /// <returns><see cref="string"/></returns>
-        string From<TMessageRecord>(TMessageRecord messageRecord);
+        /// <param name="message"></param>
+        void Add(OutgoingMessage message);
 
         /// <summary>
-        /// Parses a market activity record from a string payload
+        /// Get all messages assigned to a bundle by id.
         /// </summary>
-        /// <param name="payload"></param>
-        TMessageRecord From<TMessageRecord>(string payload);
+        Task<OutgoingMessageBundle> GetAsync(BundleId bundleId);
     }
 }

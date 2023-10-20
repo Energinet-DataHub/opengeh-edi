@@ -15,7 +15,7 @@
 using System;
 using System.Text.Json;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Json.Schema;

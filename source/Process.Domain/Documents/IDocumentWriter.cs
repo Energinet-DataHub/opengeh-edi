@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
 
-namespace Energinet.DataHub.EDI.Domain.Documents;
+namespace Energinet.DataHub.EDI.Process.Domain.Documents;
 
 /// <summary>
 /// Writes outgoing messages

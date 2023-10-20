@@ -12,16 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
+using System.Threading.Tasks;
 
-namespace Energinet.DataHub.EDI.Domain.Documents;
-
-public class IncomingDocumentType : DocumentType
+namespace Energinet.DataHub.EDI.Common
 {
-    public static readonly IncomingDocumentType RequestAggregatedMeasureData = new(0, nameof(RequestAggregatedMeasureData), MessageCategory.None);
-
-    public IncomingDocumentType(int id, string name, MessageCategory category)
-        : base(id, name, category)
+    /// <summary>
+    /// Unit of work
+    /// </summary>
+    public interface IUnitOfWork
     {
+        /// <summary>
+        /// Commits current transaction
+        /// </summary>
+        Task CommitAsync();
     }
 }

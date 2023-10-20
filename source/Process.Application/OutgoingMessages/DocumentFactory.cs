@@ -17,12 +17,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Domain.Documents;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.Exceptions;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Exceptions;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.Application.OutgoingMessages;
+namespace Energinet.DataHub.EDI.Process.Application.OutgoingMessages;
 
 public class DocumentFactory
 {

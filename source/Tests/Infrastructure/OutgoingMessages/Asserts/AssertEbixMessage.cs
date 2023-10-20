@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.Xml;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;

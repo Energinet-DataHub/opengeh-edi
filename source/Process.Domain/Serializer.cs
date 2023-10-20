@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Text.Json;
 using NodaTime.Serialization.SystemTextJson;
 
-namespace Energinet.DataHub.EDI.Domain;
+namespace Energinet.DataHub.EDI.Process.Domain;
 
 public class Serializer
 {

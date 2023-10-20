@@ -15,12 +15,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
-using Energinet.DataHub.EDI.Domain.Actors;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
 using MediatR;
 
-namespace Energinet.DataHub.EDI.Application.OutgoingMessages;
+namespace Energinet.DataHub.EDI.Process.Application.OutgoingMessages;
 
 public class DequeueHandler : IRequestHandler<DequeueCommand, DequeCommandResult>
 {

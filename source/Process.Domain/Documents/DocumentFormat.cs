@@ -12,26 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Linq;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
 
-namespace Energinet.DataHub.EDI.Domain.Documents;
+namespace Energinet.DataHub.EDI.Process.Domain.Documents;
 
-public class DocumentType : EnumerationType
+public class DocumentFormat : EnumerationType
 {
-    public static readonly DocumentType NotifyAggregatedMeasureData = new(7, nameof(NotifyAggregatedMeasureData), MessageCategory.Aggregations);
-    public static readonly DocumentType RejectRequestAggregatedMeasureData = new(8, nameof(RejectRequestAggregatedMeasureData), MessageCategory.Aggregations);
+    public static readonly DocumentFormat Xml = new(0, nameof(Xml));
+    public static readonly DocumentFormat Json = new(1, nameof(Json));
+    public static readonly DocumentFormat Ebix = new(2, nameof(Ebix));
 
-    protected DocumentType(int id, string name, MessageCategory category)
+    private DocumentFormat(int id, string name)
         : base(id, name)
     {
-        Category = category;
     }
 
-    public MessageCategory Category { get; }
-
-    public override string ToString()
+    public static DocumentFormat From(string valueToParse)
     {
-        return Name;
+        return GetAll<DocumentFormat>()
+            .First(format => format.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase));
     }
 }
