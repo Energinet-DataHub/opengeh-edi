@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
@@ -34,15 +33,6 @@ public class ActorRepository : IActorRepository
     {
         _databaseConnectionFactory = databaseConnectionFactory;
         _dbContext = dbContext;
-    }
-
-    public async Task<Guid> GetIdByActorNumberAsync(string actorNumber, CancellationToken cancellationToken)
-    {
-        using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
-        return await connection
-            .ExecuteScalarAsync<Guid>(
-                "SELECT Id FROM [dbo].[Actor] WHERE ActorNumber = @Number",
-                new { ActorNumber = actorNumber, }).ConfigureAwait(false);
     }
 
     public async Task<string> GetActorNumberByIdAsync(Guid actorId, CancellationToken cancellationToken)

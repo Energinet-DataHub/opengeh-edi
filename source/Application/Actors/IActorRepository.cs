@@ -29,13 +29,6 @@ public interface IActorRepository
     /// </summary>
     /// <param name="actorId"></param>
     /// <param name="cancellationToken"></param>
-    Task<string> GetActorNumberByIdAsync(Guid actorId, CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Get actor number by id
-    /// </summary>
-    /// <param name="actorId"></param>
-    /// <param name="cancellationToken"></param>
     Task<ActorNumber?> GetActorNumberByB2CIdAsync(Guid actorId, CancellationToken cancellationToken);
 
     /// <summary>
