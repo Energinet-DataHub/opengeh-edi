@@ -38,7 +38,7 @@ public class WhenAnActorActivatedIsAvailableTests : TestBase
     }
 
     [Fact]
-    public async Task New_actor_event_was_received()
+    public async Task New_actor_event_is_received_stores_actor()
     {
         var actorActivatedEvent = ActorActivatedEventBuilder.Build();
 
@@ -49,11 +49,11 @@ public class WhenAnActorActivatedIsAvailableTests : TestBase
     }
 
     [Fact]
-    public async Task New_actor_event_was_received_with_existing_actor()
+    public async Task New_actor_event_is_received_with_existing_actor_does_not_store_second_actor()
     {
         var actorActivatedEvent = ActorActivatedEventBuilder.Build();
-
         await HavingReceivedAndHandledIntegrationEventAsync(ActorActivated.EventName, actorActivatedEvent);
+
         await HavingReceivedAndHandledIntegrationEventAsync(ActorActivated.EventName, actorActivatedEvent);
 
         var actors = await GetActors(actorActivatedEvent.ActorNumber, actorActivatedEvent.ExternalActorId);
