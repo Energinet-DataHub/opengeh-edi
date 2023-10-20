@@ -13,11 +13,13 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.ArchivedMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.Actors;
 using Energinet.DataHub.EDI.Infrastructure.ArchivedMessages;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
@@ -67,6 +69,8 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 
         public DbSet<MessageIdForSender> MessageIds { get; private set; }
 
+        public DbSet<Actor> Actors { get; private set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
@@ -80,6 +84,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
             modelBuilder.ApplyConfiguration(new ReceivedInboxEventEntityConfiguration());
             modelBuilder.ApplyConfiguration(new TransactionIdEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MessageIdEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new ActorEntityConfiguration());
         }
     }
 }

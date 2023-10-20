@@ -87,7 +87,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
                 $"DELETE FROM [dbo].[ActorMessageQueues]" +
                 $"DELETE FROM [dbo].[ReceivedInboxEvents]" +
                 $"DELETE FROM [dbo].[MessageRegistry]" +
-                $"DELETE FROM [dbo].[TransactionRegistry]";
+                $"DELETE FROM [dbo].[TransactionRegistry]" +
+                $"DELETE FROM [dbo].[Actor]";
 
             _context.Database.ExecuteSqlRaw(cleanupStatement);
         }
