@@ -35,13 +35,13 @@ public class ActorRepository : IActorRepository
         _dbContext = dbContext;
     }
 
-    public async Task<ActorNumber?> GetActorNumberByB2CIdAsync(Guid actorId, CancellationToken cancellationToken)
+    public async Task<ActorNumber?> GetActorNumberByExternalIdAsync(string externalId, CancellationToken cancellationToken)
     {
         using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         var actorNumber = await connection
             .ExecuteScalarAsync<string>(
-                "SELECT ActorNumber AS Identifier FROM [dbo].[Actor] WHERE ExternalId=@ActorId",
-                new { ActorId = actorId, })
+                "SELECT ActorNumber AS Identifier FROM [dbo].[Actor] WHERE ExternalId=@ExternalId",
+                new { ExternalId = externalId, })
             .ConfigureAwait(false);
         if (string.IsNullOrWhiteSpace(actorNumber))
         {
@@ -51,13 +51,13 @@ public class ActorRepository : IActorRepository
         return ActorNumber.Create(actorNumber);
     }
 
-    public async Task CreateIfNotExistAsync(string externalId, ActorNumber actorNumber, CancellationToken cancellationToken)
+    public async Task CreateIfNotExistAsync(ActorNumber actorNumber, string externalId, CancellationToken cancellationToken)
     {
-        if (await ActorDoesNotExistsAsync(externalId, actorNumber, cancellationToken).ConfigureAwait(false))
+        if (await ActorDoesNotExistsAsync(actorNumber, externalId, cancellationToken).ConfigureAwait(false))
             await _dbContext.Actors.AddAsync(new Actor(actorNumber, externalId), cancellationToken).ConfigureAwait(false);
     }
 
-    private async Task<bool> ActorDoesNotExistsAsync(string externalId, ActorNumber actorNumber, CancellationToken cancellationToken)
+    private async Task<bool> ActorDoesNotExistsAsync(ActorNumber actorNumber, string externalId, CancellationToken cancellationToken)
     {
         return !await _dbContext.Actors
             .AnyAsync(

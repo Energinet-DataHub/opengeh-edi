@@ -48,12 +48,12 @@ public class CreateActorsTests : TestBase
 
         Assert.NotNull(actor);
         Assert.Equal(SampleData.ActorNumber, actor.ActorNumber);
-        Assert.Equal(SampleData.ExternalId.ToString(), actor.ExternalId);
+        Assert.Equal(SampleData.ExternalId, actor.ExternalId);
     }
 
     private static CreateActorCommand CreateCommand()
     {
-        return new CreateActorCommand(SampleData.ExternalId.ToString(), ActorNumber.Create(SampleData.ActorNumber));
+        return new CreateActorCommand(SampleData.ExternalId, ActorNumber.Create(SampleData.ActorNumber));
     }
 
     private async Task<Actor> GetActor()

@@ -32,7 +32,7 @@ public class CreateActorHandler : IRequestHandler<CreateActorCommand, Unit>
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
 
-        await _actorRepository.CreateIfNotExistAsync(request.ExternalId, request.ActorNumber, cancellationToken).ConfigureAwait(false);
+        await _actorRepository.CreateIfNotExistAsync(request.ActorNumber, request.ExternalId, cancellationToken).ConfigureAwait(false);
 
         return Unit.Value;
     }

@@ -27,12 +27,10 @@ public interface IActorRepository
     /// <summary>
     /// Get actor number by id
     /// </summary>
-    /// <param name="actorId"></param>
-    /// <param name="cancellationToken"></param>
-    Task<ActorNumber?> GetActorNumberByB2CIdAsync(Guid actorId, CancellationToken cancellationToken);
+    Task<ActorNumber?> GetActorNumberByExternalIdAsync(string externalId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Creates a new actor
     /// </summary>
-    Task CreateIfNotExistAsync(string externalId, ActorNumber actorNumber, CancellationToken cancellationToken);
+    Task CreateIfNotExistAsync(ActorNumber actorNumber, string externalId, CancellationToken cancellationToken);
 }
