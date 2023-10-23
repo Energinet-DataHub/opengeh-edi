@@ -26,12 +26,13 @@ public sealed class Bundle
     {
     }
 
-    internal Bundle(BundleId id, BusinessReason businessReason, DocumentType documentTypeInBundle, int maxNumberOfMessagesInABundle)
+    internal Bundle(BundleId id, BusinessReason businessReason, DocumentType documentTypeInBundle, int maxNumberOfMessagesInABundle, DateTime createdTS)
     {
         _maxNumberOfMessagesInABundle = maxNumberOfMessagesInABundle;
         Id = id;
         BusinessReason = businessReason;
         DocumentTypeInBundle = documentTypeInBundle;
+        CreatedTS = createdTS;
     }
 
     internal DocumentType DocumentTypeInBundle { get; }
@@ -43,6 +44,8 @@ public sealed class Bundle
     internal bool IsClosed { get; private set; }
 
     public bool IsDequeued { get; private set; }
+
+    public DateTime CreatedTS { get ; private set; }
 
     internal void Add(OutgoingMessage outgoingMessage)
     {

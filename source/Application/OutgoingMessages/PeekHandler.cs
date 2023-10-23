@@ -64,7 +64,8 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
             _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.ActorRole).ConfigureAwait(false);
         if (actorMessageQueue is null)
             return new PeekResult(null);
-        var peekResult = actorMessageQueue.Peek(request.MessageCategory);
+
+        var peekResult = request.DocumentFormat == DocumentFormat.Ebix ? actorMessageQueue.Peek() : actorMessageQueue.Peek(request.MessageCategory);
 
         if (peekResult.BundleId == null)
             return new PeekResult(null);

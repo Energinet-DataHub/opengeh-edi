@@ -42,14 +42,14 @@ public class ActorMessageQueue : Entity
         return new ActorMessageQueue(receiver);
     }
 
-    public void Enqueue(OutgoingMessage outgoingMessage, int? maxNumberOfMessagesInABundle = null)
+    public void Enqueue(OutgoingMessage outgoingMessage, DateTime timeStamp, int? maxNumberOfMessagesInABundle = null)
     {
         ArgumentNullException.ThrowIfNull(outgoingMessage);
         EnsureApplicable(outgoingMessage);
 
         var currentBundle = CurrentBundleOf(BusinessReason.From(outgoingMessage.BusinessReason), outgoingMessage.DocumentType) ??
-                            CreateBundleOf(BusinessReason.From(outgoingMessage.BusinessReason), outgoingMessage.DocumentType,
-                                SetMaxNumberOfMessagesInABundle(maxNumberOfMessagesInABundle, outgoingMessage.DocumentType));
+                            CreateBundleOf(BusinessReason.From(outgoingMessage.BusinessReason), outgoingMessage.DocumentType, 
+                                SetMaxNumberOfMessagesInABundle(maxNumberOfMessagesInABundle, outgoingMessage.DocumentType), timeStamp);
 
         currentBundle.Add(outgoingMessage);
     }
@@ -100,9 +100,9 @@ public class ActorMessageQueue : Entity
             && bundle.BusinessReason == businessReason);
     }
 
-    private Bundle CreateBundleOf(BusinessReason businessReason, DocumentType messageType, int maxNumberOfMessagesInABundle)
+    private Bundle CreateBundleOf(BusinessReason businessReason, DocumentType messageType, int maxNumberOfMessagesInABundle, DateTime timeStamp)
     {
-        var bundle = new Bundle(BundleId.New(), businessReason, messageType, maxNumberOfMessagesInABundle);
+        var bundle = new Bundle(BundleId.New(), businessReason, messageType, maxNumberOfMessagesInABundle, timeStamp);
         _bundles.Add(bundle);
         return bundle;
     }
@@ -110,8 +110,8 @@ public class ActorMessageQueue : Entity
     private Bundle? NextBundleToPeek(MessageCategory? category = null)
     {
         var nextBundleToPeek = category is not null ?
-            _bundles.FirstOrDefault(bundle => bundle.IsDequeued == false && bundle.DocumentTypeInBundle.Category.Equals(category)) :
-            _bundles.FirstOrDefault(bundle => bundle.IsDequeued == false);
+            _bundles.Where(bundle => !bundle.IsDequeued && bundle.DocumentTypeInBundle.Category.Equals(category)).OrderBy(bundle => bundle.CreatedTS).FirstOrDefault() :
+            _bundles.Where(bundle => !bundle.IsDequeued).OrderBy(bundle => bundle.CreatedTS).FirstOrDefault();
 
         nextBundleToPeek?.CloseBundle();
 
