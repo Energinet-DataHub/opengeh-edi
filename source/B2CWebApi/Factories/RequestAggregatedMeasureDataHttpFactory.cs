@@ -83,8 +83,10 @@ public static class RequestAggregatedMeasureDataHttpFactory
     {
         _date = InstantPattern.General.Parse(dateString).Value;
         var zonedDateTime = new ZonedDateTime(_date, dateTimeZone);
-        var dateTimeZoneAtMidnight = zonedDateTime.Date.At(LocalTime.Midnight);
-        return dateTimeZoneAtMidnight.ToString();
+        var dateTimeZoneAtMidnight = zonedDateTime.Date
+            .At(LocalTime.Midnight)
+            .InZoneStrictly(dateTimeZone);
+        return dateTimeZoneAtMidnight.ToInstant().ToString();
     }
 
     private static string SetSettlementSeriesVersion(ProcessType processType)
