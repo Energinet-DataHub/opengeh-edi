@@ -176,7 +176,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
 
         public CompositionRoot AddMessagePublishing()
         {
-            _services.AddSingleton<IActorRepository, ActorRepository>();
+            _services.AddScoped<IActorRepository, ActorRepository>();
             _services.AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>();
             _services.AddScoped<OutgoingMessageEnqueuer>();
             return this;
