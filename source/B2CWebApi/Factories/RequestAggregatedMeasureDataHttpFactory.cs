@@ -81,7 +81,7 @@ public static class RequestAggregatedMeasureDataHttpFactory
 
     private static string SetTimeToMidnight(string dateString, DateTimeZone dateTimeZone)
     {
-        _date = InstantPattern.General.Parse(dateString).Value;
+        _date = InstantPattern.ExtendedIso.Parse(dateString).Value;
         var zonedDateTime = new ZonedDateTime(_date, dateTimeZone);
         var dateTimeZoneAtMidnight = zonedDateTime.Date
             .At(LocalTime.Midnight)
