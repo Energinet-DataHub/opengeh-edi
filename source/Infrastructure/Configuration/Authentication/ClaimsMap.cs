@@ -24,7 +24,7 @@ public static class ClaimsMap
     private static readonly Dictionary<string, MarketRole> _rolesMap = new()
     {
         { "energysupplier", MarketRole.EnergySupplier },
-        { "gridoperator", MarketRole.GridOperator },
+        { "gridaccessprovider", MarketRole.GridOperator },
         { "metereddataresponsible", MarketRole.MeteredDataResponsible },
         { "balanceresponsibleparty", MarketRole.BalanceResponsibleParty },
     };
