@@ -42,6 +42,16 @@ public class GridAreaRepository : IGridAreaRepository
             await _dbContext.GridAreas.AddAsync(new GridArea(gridAreaCode, validFrom, actorNumber), cancellationToken).ConfigureAwait(false);
     }
 
+    public async Task<ActorNumber> GetGridOperatorForAsync(string gridAreaCode, CancellationToken cancellationToken)
+    {
+        var gridAreaByCode = await _dbContext.GridAreas
+            .FirstAsync(
+                gridArea => gridArea.GridAreaCode == gridAreaCode,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+        return gridAreaByCode.ActorNumber;
+    }
+
     private async Task<bool> GridAreaDoesNotExistsAsync(
         string gridAreaCode,
         CancellationToken cancellationToken)

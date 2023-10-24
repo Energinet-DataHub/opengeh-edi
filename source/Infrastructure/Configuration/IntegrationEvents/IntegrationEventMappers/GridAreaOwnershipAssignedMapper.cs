@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
-using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
 using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.Domain.Actors;
@@ -27,13 +27,13 @@ public class GridAreaOwnershipAssignedMapper : IIntegrationEventMapper
 {
     public string EventTypeToHandle => GridAreaOwnershipAssigned.EventName;
 
-    public InternalCommand MapToCommand(IntegrationEvent integrationEvent)
+    public Task<InternalCommand> MapToCommandAsync(IntegrationEvent integrationEvent)
     {
         if (integrationEvent == null)
             throw new ArgumentNullException(nameof(integrationEvent));
 
         var gridAreaOwnershipAssignedEvent = (GridAreaOwnershipAssigned)integrationEvent.Message;
 
-        return new CreateGridAreaCommand(gridAreaOwnershipAssignedEvent.GridAreaCode, gridAreaOwnershipAssignedEvent.ValidFrom.ToInstant(), ActorNumber.Create(gridAreaOwnershipAssignedEvent.ActorNumber));
+        return Task.FromResult<InternalCommand>(new CreateGridAreaCommand(gridAreaOwnershipAssignedEvent.GridAreaCode, gridAreaOwnershipAssignedEvent.ValidFrom.ToInstant(), ActorNumber.Create(gridAreaOwnershipAssignedEvent.ActorNumber)));
     }
 }

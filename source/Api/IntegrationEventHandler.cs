@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
@@ -62,7 +63,7 @@ public class IntegrationEventHandler : IIntegrationEventHandler
             return;
         }
 
-        var internalCommand = integrationEventMapper!.MapToCommand(integrationEvent);
+        var internalCommand = await integrationEventMapper!.MapToCommandAsync(integrationEvent).ConfigureAwait(false);
 
         await _mediator.Send(internalCommand).ConfigureAwait(false);
     }
