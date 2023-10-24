@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.Process.Domain.Documents;
 using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.IntegrationEvents;
 using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.AggregationResult;
@@ -38,6 +39,7 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasur
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Notifications.Handlers;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.Aggregations;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using PeekResult = Energinet.DataHub.EDI.Process.Application.OutgoingMessages.PeekResult;
 
@@ -45,8 +47,12 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration;
 
 public static class ProcessConfiguration
 {
-    public static void Configure(IServiceCollection services)
+    public static void Configure(IServiceCollection services, string databaseConnectionString)
     {
+        services.AddDbContext<ProcessContext>(options =>
+            options.UseSqlServer(databaseConnectionString));
+
+        //EventsConfiguration
         services.AddTransient<IIntegrationEventMapper, CalculationResultCompletedMapper>();
         services.AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestAcceptedEventMapper>();
         services.AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestRejectedMapper>();
@@ -61,9 +67,11 @@ public static class ProcessConfiguration
         services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataEbixDocumentWriter>();
         services.AddScoped<IMessageRecordParser, MessageRecordParser>();
 
+        //MessageEnqueueingConfiguration
         services.AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>();
         services.AddScoped<OutgoingMessageEnqueuer>();
 
+        //ProcessingConfiguration
         services.AddScoped<DomainEventsAccessor>();
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RaiseDomainEventsBehaviour<,>));
@@ -71,11 +79,13 @@ public static class ProcessConfiguration
 
         //AggregationsConfiguration
         services.AddTransient<IRequestHandler<ForwardAggregationResult, Unit>, ForwardAggregationResultHandler>();
+
         //PeekConfiguration
         services.AddScoped<MessageEnqueuer>();
         services.AddScoped<IActorMessageQueueRepository, ActorMessageQueueRepository>();
         services.AddScoped<IMarketDocumentRepository, MarketDocumentRepository>();
         services.AddTransient<IRequestHandler<PeekCommand, PeekResult>, PeekHandler>();
+
         // RequestedAggregatedMeasureDataConfiguration
         services.AddTransient<IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>, SendAggregatedMeasuredDataToWholesale>();
         services.AddTransient<IRequestHandler<AcceptedAggregatedTimeSerie, Unit>, AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable>();

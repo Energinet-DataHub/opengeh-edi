@@ -29,6 +29,7 @@ using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.Reflection;
 using Microsoft.Azure.Functions.Worker;
@@ -91,11 +92,10 @@ namespace Energinet.DataHub.EDI.Api
 
                     services.AddApplicationInsights();
                     services.ConfigureFunctionsApplicationInsights();
+                    ProcessConfiguration.Configure(services, databaseConnectionString!);
 
                     CompositionRoot.Initialize(services)
                         .AddMessageBus(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!)
-                        .ProcessConfiguration()
-                        .AddAggregationsConfiguration()
                         .AddRemoteBusinessService<DummyRequest, DummyReply>("Dummy", "Dummy")
                         .AddBearerAuthentication(tokenValidationParameters)
                         .AddAuthentication(sp =>
@@ -125,8 +125,6 @@ namespace Energinet.DataHub.EDI.Api
                             runtime.REQUEST_RESPONSE_LOGGING_CONNECTION_STRING!,
                             runtime.REQUEST_RESPONSE_LOGGING_CONTAINER_NAME!)
                         .AddMessagePublishing()
-                        //.AddHttpClientAdapter(sp => new HttpClientAdapter(sp.GetRequiredService<HttpClient>())) TODO: remove this and the implementation?
-                        .AddAggregatedMeasureDataServices()
                         .AddMessageParserServices();
 
                     services.AddLiveHealthCheck();
