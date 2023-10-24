@@ -57,6 +57,8 @@ public static class AggregationFactory
         if (aggregatedMeasureDataProcess == null) throw new ArgumentNullException(nameof(aggregatedMeasureDataProcess));
         if (aggregatedTimeSerie == null) throw new ArgumentNullException(nameof(aggregatedTimeSerie));
 
+        // TODO: Validate fields from process & timeserie (request from wholesale) is equal
+
         return new Aggregation(
             MapPoints(aggregatedTimeSerie.Points),
             aggregatedTimeSerie.MeteringPointType,
@@ -64,7 +66,7 @@ public static class AggregationFactory
             aggregatedTimeSerie.Resolution,
             MapPeriod(aggregatedTimeSerie.Period),
             MapSettlementMethod(aggregatedMeasureDataProcess),
-            MapBusinessReason(aggregatedMeasureDataProcess),
+            aggregatedMeasureDataProcess.BusinessReason.Name,
             MapActorGrouping(aggregatedMeasureDataProcess),
             MapGridAreaDetails(aggregatedTimeSerie.GridAreaDetails),
             aggregatedMeasureDataProcess.BusinessTransactionId.Id,
@@ -110,12 +112,12 @@ public static class AggregationFactory
         return new ActorGrouping(null, null);
     }
 
-    private static string? MapSettlementVersion(string? settlementVersion)
+    private static string? MapSettlementVersion(string? settlementVersionCode)
     {
         var settlementVersionName = null as string;
         try
         {
-            settlementVersionName = SettlementVersion.From(settlementVersion ?? string.Empty).Name;
+            settlementVersionName = SettlementVersion.FromCode(settlementVersionCode ?? string.Empty).Name;
         }
         catch (InvalidCastException)
         {
@@ -138,11 +140,6 @@ public static class AggregationFactory
         }
 
         return settlementTypeName;
-    }
-
-    private static string MapBusinessReason(AggregatedMeasureDataProcess process)
-    {
-        return CimCode.To(process.BusinessReason).Name;
     }
 
     private static string MapProcessTypeFromCalculationResult(ProcessType processType)

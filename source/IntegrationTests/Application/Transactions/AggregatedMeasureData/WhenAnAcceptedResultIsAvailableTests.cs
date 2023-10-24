@@ -24,7 +24,6 @@ using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.Edi.Responses;
@@ -61,14 +60,15 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
-        var timeSerie = acceptedEvent;
+
+        var expectedSettlementVersionName = SettlementVersion.FromCode(acceptedEvent.SettlementVersion).Name;
         outgoingMessage
-            .HasBusinessReason(CimCode.To(process.BusinessReason).Name)
+            .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion, timeSerie.SettlementVersion)
+            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion, expectedSettlementVersionName)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId);
     }
@@ -86,14 +86,15 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
-        var timeSerie = acceptedEvent;
+
+        var expectedSettlementVersionName = SettlementVersion.FromCode(acceptedEvent.SettlementVersion).Name;
         outgoingMessage
-            .HasBusinessReason(CimCode.To(process.BusinessReason).Name)
+            .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion!, timeSerie.SettlementVersion);
+            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion, expectedSettlementVersionName);
     }
 
     protected override void Dispose(bool disposing)
@@ -140,7 +141,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             Period = period,
             TimeSeriesPoints = { point },
             TimeSeriesType = TimeSeriesType.Production,
-            SettlementVersion = SettlementVersion.FirstCorrection.Name,
+            SettlementVersion = aggregatedMeasureDataProcess.SettlementVersion?.Code,
         };
     }
 
@@ -176,7 +177,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
           BusinessTransactionId.Create(Guid.NewGuid().ToString()),
           SampleData.ReceiverNumber,
           receiverRole.Code,
-          CimCode.Of(BusinessReason.BalanceFixing),
+          BusinessReason.BalanceFixing,
           null,
           null,
           SampleData.StartOfPeriod,
@@ -184,11 +185,12 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
           SampleData.GridAreaCode,
           receiverRole == MarketRole.EnergySupplier ? SampleData.ReceiverNumber.Value : null,
           receiverRole == MarketRole.BalanceResponsibleParty ? SampleData.ReceiverNumber.Value : null,
-          "D01");
+          SettlementVersion.FirstCorrection);
 
         process.WasSentToWholesale();
         _b2BContext.AggregatedMeasureDataProcesses.Add(process);
         _b2BContext.SaveChanges();
+
         return process;
     }
 }
