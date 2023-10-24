@@ -11,4 +11,9 @@
   </ItemGroup>
 
 
+
+  <ItemGroup>
+    <Folder Include="OutgoingMessages\Peek\" />
+  </ItemGroup>
+
 </Project>

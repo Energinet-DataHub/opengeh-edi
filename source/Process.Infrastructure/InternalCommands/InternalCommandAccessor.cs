@@ -12,19 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 using System;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
 {
     public class InternalCommandAccessor
     {
-        private readonly B2BContext _context;
+        private readonly ProcessContext _context;
 
-        public InternalCommandAccessor(B2BContext context)
+        public InternalCommandAccessor(ProcessContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }

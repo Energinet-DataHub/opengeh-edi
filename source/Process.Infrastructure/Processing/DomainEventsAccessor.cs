@@ -16,14 +16,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Processing;
 
 public class DomainEventsAccessor
 {
-    private readonly B2BContext _context;
+    private readonly ProcessContext _context;
 
-    public DomainEventsAccessor(B2BContext context)
+    public DomainEventsAccessor(ProcessContext context)
     {
         _context = context;
     }

@@ -18,15 +18,16 @@ using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages;
 
 public class OutgoingMessageRepository : IOutgoingMessageRepository
 {
-    private readonly B2BContext _context;
+    private readonly ProcessContext _context;
 
-    public OutgoingMessageRepository(B2BContext context)
+    public OutgoingMessageRepository(ProcessContext context)
     {
         _context = context;
     }

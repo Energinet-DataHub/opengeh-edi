@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMea
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
@@ -24,7 +25,7 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasur
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration;
 
 internal static class RequestedAggregatedMeasureDataConfiguration
 {

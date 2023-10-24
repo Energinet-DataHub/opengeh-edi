@@ -19,15 +19,16 @@ using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Exceptions;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
 
 public class AggregatedMeasureDataProcessRepository : IAggregatedMeasureDataProcessRepository
 {
-    private readonly B2BContext _b2BContext;
+    private readonly ProcessContext _b2BContext;
 
-    public AggregatedMeasureDataProcessRepository(B2BContext b2BContext)
+    public AggregatedMeasureDataProcessRepository(ProcessContext b2BContext)
     {
         _b2BContext = b2BContext;
     }

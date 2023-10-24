@@ -15,15 +15,16 @@
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Queueing;
 
 public class MarketDocumentRepository : IMarketDocumentRepository
 {
-    private readonly B2BContext _b2BContext;
+    private readonly ProcessContext _b2BContext;
 
-    public MarketDocumentRepository(B2BContext b2BContext)
+    public MarketDocumentRepository(ProcessContext b2BContext)
     {
         _b2BContext = b2BContext;
     }

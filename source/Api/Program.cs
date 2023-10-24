@@ -94,7 +94,7 @@ namespace Energinet.DataHub.EDI.Api
 
                     CompositionRoot.Initialize(services)
                         .AddMessageBus(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!)
-                        .AddPeekConfiguration()
+                        .ProcessConfiguration()
                         .AddAggregationsConfiguration()
                         .AddRemoteBusinessService<DummyRequest, DummyReply>("Dummy", "Dummy")
                         .AddBearerAuthentication(tokenValidationParameters)

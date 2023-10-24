@@ -16,14 +16,15 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages;
 
 public class OutgoingMessageEnqueuer
 {
-    private readonly B2BContext _context;
+    private readonly ProcessContext _context;
 
-    public OutgoingMessageEnqueuer(B2BContext context)
+    public OutgoingMessageEnqueuer(ProcessContext context)
     {
         _context = context;
     }

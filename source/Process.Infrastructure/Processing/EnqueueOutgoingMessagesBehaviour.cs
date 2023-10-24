@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Queueing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -28,10 +29,10 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.Processing;
 public class EnqueueOutgoingMessagesBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : ICommand<TResponse>
 {
-    private readonly B2BContext _b2BContext;
+    private readonly ProcessContext _b2BContext;
     private readonly MessageEnqueuer _messageEnqueuer;
 
-    public EnqueueOutgoingMessagesBehaviour(B2BContext b2BContext, MessageEnqueuer messageEnqueuer)
+    public EnqueueOutgoingMessagesBehaviour(ProcessContext b2BContext, MessageEnqueuer messageEnqueuer)
     {
         _b2BContext = b2BContext;
         _messageEnqueuer = messageEnqueuer;

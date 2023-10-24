@@ -19,19 +19,20 @@ using Energinet.DataHub.EDI.Application.Configuration.Commands;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
 {
     public class CommandScheduler : ICommandScheduler
     {
         private readonly InternalCommandMapper _internalCommandMapper;
-        private readonly B2BContext _context;
+        private readonly ProcessContext _context;
         private readonly ISerializer _serializer;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
         public CommandScheduler(
             InternalCommandMapper internalCommandMapper,
-            B2BContext context,
+            ProcessContext context,
             ISerializer serializer,
             ISystemDateTimeProvider systemDateTimeProvider)
         {
