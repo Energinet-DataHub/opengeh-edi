@@ -21,6 +21,8 @@ public class DocumentType : EnumerationType
 {
     public static readonly DocumentType NotifyAggregatedMeasureData = new(7, nameof(NotifyAggregatedMeasureData), MessageCategory.Aggregations);
     public static readonly DocumentType RejectRequestAggregatedMeasureData = new(8, nameof(RejectRequestAggregatedMeasureData), MessageCategory.Aggregations);
+    public static readonly DocumentType NotifyAggregatedWholesaleData = new(9, nameof(NotifyAggregatedWholesaleData), MessageCategory.Aggregations);
+    public static readonly DocumentType RejectRequestAggregatedWholesaleData = new(10, nameof(RejectRequestAggregatedWholesaleData), MessageCategory.Aggregations);
 
     protected DocumentType(int id, string name, MessageCategory category)
         : base(id, name)
