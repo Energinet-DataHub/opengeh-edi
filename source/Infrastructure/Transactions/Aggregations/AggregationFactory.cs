@@ -57,7 +57,10 @@ public static class AggregationFactory
         if (aggregatedMeasureDataProcess == null) throw new ArgumentNullException(nameof(aggregatedMeasureDataProcess));
         if (aggregatedTimeSerie == null) throw new ArgumentNullException(nameof(aggregatedTimeSerie));
 
-        // TODO: Validate fields from process & timeserie (request from wholesale) is equal
+        if ((aggregatedMeasureDataProcess.MeteringPointType != null ? MeteringPointType.FromCode(aggregatedMeasureDataProcess.MeteringPointType).Name : null) != aggregatedTimeSerie.MeteringPointType) throw new ArgumentException("aggregatedTimeSerie.MeteringPointType isn't equal to aggregatedMeasureDataProcess.MeteringPointType", nameof(aggregatedTimeSerie));
+        if (aggregatedMeasureDataProcess.StartOfPeriod != aggregatedTimeSerie.Period.Start.ToString()) throw new ArgumentException("aggregatedTimeSerie.Period.Start isn't equal to aggregatedMeasureDataProcess.StartOfPeriod", nameof(aggregatedTimeSerie));
+        if (aggregatedMeasureDataProcess.EndOfPeriod != aggregatedTimeSerie.Period.End.ToString()) throw new ArgumentException("aggregatedTimeSerie.Period.Start isn't equal to aggregatedMeasureDataProcess.EndOfPeriod", nameof(aggregatedTimeSerie));
+        if (aggregatedMeasureDataProcess.SettlementVersion?.Name != aggregatedTimeSerie.SettlementVersion) throw new ArgumentException("aggregatedTimeSerie.SettlementVersion isn't equal to aggregatedMeasureDataProcess.SettlementVersion", nameof(aggregatedTimeSerie));
 
         return new Aggregation(
             MapPoints(aggregatedTimeSerie.Points),
@@ -117,7 +120,7 @@ public static class AggregationFactory
         var settlementVersionName = null as string;
         try
         {
-            settlementVersionName = SettlementVersion.FromCode(settlementVersionCode ?? string.Empty).Name;
+            settlementVersionName = SettlementVersion.FromName(settlementVersionCode ?? string.Empty).Name;
         }
         catch (InvalidCastException)
         {

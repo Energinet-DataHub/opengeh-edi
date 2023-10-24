@@ -61,14 +61,13 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
 
-        var expectedSettlementVersionName = SettlementVersion.FromCode(acceptedEvent.SettlementVersion).Name;
         outgoingMessage
             .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion, expectedSettlementVersionName)
+            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion, acceptedEvent.SettlementVersion)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId);
     }
@@ -87,14 +86,13 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
 
-        var expectedSettlementVersionName = SettlementVersion.FromCode(acceptedEvent.SettlementVersion).Name;
         outgoingMessage
             .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion, expectedSettlementVersionName);
+            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion, acceptedEvent.SettlementVersion);
     }
 
     protected override void Dispose(bool disposing)
@@ -141,7 +139,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             Period = period,
             TimeSeriesPoints = { point },
             TimeSeriesType = TimeSeriesType.Production,
-            SettlementVersion = aggregatedMeasureDataProcess.SettlementVersion?.Code,
+            SettlementVersion = aggregatedMeasureDataProcess.SettlementVersion?.Name,
         };
     }
 
@@ -178,7 +176,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
           SampleData.ReceiverNumber,
           receiverRole.Code,
           BusinessReason.BalanceFixing,
-          null,
+          MeteringPointType.Production.Code,
           null,
           SampleData.StartOfPeriod,
           SampleData.EndOfPeriod,
