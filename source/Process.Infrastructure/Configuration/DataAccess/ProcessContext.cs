@@ -31,13 +31,10 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess
 {
     public class ProcessContext : DbContext
     {
-        private readonly ISerializer _serializer;
-
         #nullable disable
-        public ProcessContext(DbContextOptions<ProcessContext> options, ISerializer serializer)
+        public ProcessContext(DbContextOptions<ProcessContext> options)
             : base(options)
         {
-            _serializer = serializer;
         }
 
         public ProcessContext()

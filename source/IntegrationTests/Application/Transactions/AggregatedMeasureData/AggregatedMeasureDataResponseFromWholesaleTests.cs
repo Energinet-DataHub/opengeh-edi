@@ -17,31 +17,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using NodaTime.Extensions;
 using Xunit;
 using Xunit.Categories;
-using GridAreaDetails = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.GridAreaDetails;
-using Period = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Period;
-using Point = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Point;
+using GridAreaDetails = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.GridAreaDetails;
+using Period = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Period;
+using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Point;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
 [IntegrationTest]
 public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
 {
-    private readonly B2BContext _b2BContext;
+    private readonly ProcessContext _processContext;
 
     public AggregatedMeasureDataResponseFromWholesaleTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _b2BContext = GetService<B2BContext>();
+        _processContext = GetService<ProcessContext>();
     }
 
     [Fact]
@@ -125,7 +125,7 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
-        _b2BContext.Dispose();
+        _processContext.Dispose();
     }
 
     private static RequestAggregatedMeasureDataMarketDocumentBuilder MessageBuilder()
@@ -173,7 +173,7 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
 
     private AggregatedMeasureDataProcess? GetProcess(string senderNumber)
     {
-        return _b2BContext.AggregatedMeasureDataProcesses
+        return _processContext.AggregatedMeasureDataProcesses
             .ToList()
             .FirstOrDefault(x => x.RequestedByActorId.Value == senderNumber);
     }

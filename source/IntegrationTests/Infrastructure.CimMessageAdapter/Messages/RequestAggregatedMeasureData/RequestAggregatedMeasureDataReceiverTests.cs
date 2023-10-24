@@ -23,22 +23,21 @@ using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration.Authentication;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Domain.Documents;
-using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Xunit;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
-[IntegrationTest]
-public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetime
+public class RequestAggregatedMeasureDataReceiverTests : ProcessTestBase, IAsyncLifetime
 {
     private readonly RequestAggregatedMeasureDataMarketMessageParser _requestAggregatedMeasureDataMarketMessageParser;
     private readonly ITransactionIdRepository _transactionIdRepository;
@@ -46,12 +45,12 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     private readonly ProcessTypeValidator _processTypeValidator;
     private readonly MessageTypeValidator _messageTypeValidator;
     private readonly CalculationResponsibleReceiverVerification _calculationResponsibleReceiverVerification;
-    private readonly B2BContext _b2BContext;
+    private readonly ProcessContext _processContext;
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
     private readonly IMarketActorAuthenticator _marketActorAuthenticator;
     private readonly BusinessTypeValidator _businessTypeValidator;
 
-    public RequestAggregatedMeasureDataReceiverTests(DatabaseFixture databaseFixture)
+    public RequestAggregatedMeasureDataReceiverTests(ProcessDatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _requestAggregatedMeasureDataMarketMessageParser = GetService<RequestAggregatedMeasureDataMarketMessageParser>();
@@ -60,7 +59,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         _processTypeValidator = GetService<ProcessTypeValidator>();
         _messageTypeValidator = GetService<MessageTypeValidator>();
         _calculationResponsibleReceiverVerification = GetService<CalculationResponsibleReceiverVerification>();
-        _b2BContext = GetService<B2BContext>();
+        _processContext = GetService<ProcessContext>();
         _aggregatedMeasureDataProcessRepository = GetService<IAggregatedMeasureDataProcessRepository>();
         _marketActorAuthenticator = new MarketActorAuthenticatorSpy(ActorNumber.Create("1234567890123"), "DDQ");
         _businessTypeValidator = GetService<BusinessTypeValidator>();
@@ -84,7 +83,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
     public Task DisposeAsync()
     {
-        _b2BContext.Dispose();
+        _processContext.Dispose();
         return Task.CompletedTask;
     }
 
@@ -425,13 +424,13 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var result = await CreateInitializeRequestAggregatedMeasureProcessesHandler()
             .Handle(new InitializeAggregatedMeasureDataProcessesCommand(messageParserResult.MarketMessage!), CancellationToken.None);
 
-        var process = _b2BContext.AggregatedMeasureDataProcesses.Local.FirstOrDefault();
+        var process = _processContext.AggregatedMeasureDataProcesses.Local.FirstOrDefault();
         Assert.True(result.Success);
         Assert.NotNull(process);
 
-        var document = messageParserResult.MarketMessage!;
-        AssertTransactionIdIsStored(messageParserResult.MarketMessage!.SenderNumber, messageParserResult.MarketMessage!.Series.First().Id);
-        AssertMessageIdIsStored(messageParserResult.MarketMessage!.SenderNumber, messageParserResult.MarketMessage!.MessageId);
+        var document = messageParserResult.MarketMessage!; //TODO NOT USED?
+        await AssertTransactionIdIsStored(messageParserResult.MarketMessage!.SenderNumber, messageParserResult.MarketMessage!.Series.First().Id);
+        await AssertMessageIdIsStored(messageParserResult.MarketMessage!.SenderNumber, messageParserResult.MarketMessage!.MessageId);
     }
 
     [Fact]
@@ -451,15 +450,15 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var result = await CreateInitializeRequestAggregatedMeasureProcessesHandler()
             .Handle(new InitializeAggregatedMeasureDataProcessesCommand(messageParserResult.MarketMessage!), CancellationToken.None);
 
-        var processes = _b2BContext.AggregatedMeasureDataProcesses.Local.ToList();
+        var processes = _processContext.AggregatedMeasureDataProcesses.Local.ToList();
         Assert.True(result.Success);
         Assert.NotNull(processes);
         Assert.Equal(messageParserResult.MarketMessage!.Series.Count, processes.Count);
 
         var document = messageParserResult.MarketMessage!;
-        AssertTransactionIdIsStored(messageParserResult.MarketMessage!.SenderNumber, document.Series.First().Id);
-        AssertTransactionIdIsStored(messageParserResult.MarketMessage!.SenderNumber, document.Series.Last().Id);
-        AssertMessageIdIsStored(messageParserResult.MarketMessage!.SenderNumber, messageParserResult.MarketMessage!.MessageId);
+        await AssertTransactionIdIsStored(messageParserResult.MarketMessage!.SenderNumber, document.Series.First().Id);
+        await AssertTransactionIdIsStored(messageParserResult.MarketMessage!.SenderNumber, document.Series.Last().Id);
+        await AssertMessageIdIsStored(messageParserResult.MarketMessage!.SenderNumber, messageParserResult.MarketMessage!.MessageId);
     }
 
     [Fact]
@@ -578,12 +577,12 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         return _requestAggregatedMeasureDataMarketMessageParser.ParseAsync(message, DocumentFormat.Xml, CancellationToken.None);
     }
 
-    private void AssertTransactionIdIsStored(string senderId, string transactionId)
+    private async Task AssertTransactionIdIsStored(string senderId, string transactionId)
     {
-        var transaction = _b2BContext.TransactionIds.Local
-            .FirstOrDefault(
-                transactionIdForSender => transactionIdForSender.TransactionId == transactionId
-                                          && transactionIdForSender.SenderId == senderId);
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+        var sql =
+            "SELECT * FROM dbo.TransactionRegistry WHERE TransactionId = @TransactionId AND SenderId = @SenderId";
+        var transaction = await connection.QueryFirstOrDefaultAsync(sql, new { TransactionId = transactionId, SenderId = senderId });
         Assert.NotNull(transaction);
     }
 
@@ -596,12 +595,16 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         Assert.Null(transaction);
     }
 
-    private void AssertMessageIdIsStored(string senderId, string messageId)
+    private async Task AssertMessageIdIsStored(string senderId, string messageId)
     {
-        var messages = _b2BContext.MessageIds.Local.Where(x => x.MessageId == messageId && x.SenderId == senderId)
-            .ToList();
-        Assert.NotNull(messages);
-        Assert.Single(messages);
+        // var messages = _processContext.MessageIds.Local.Where(x => x.MessageId == messageId && x.SenderId == senderId)
+        //     .ToList(); TODO: REMOVE IF WORKS
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+        var sql =
+            "SELECT * FROM dbo.MessageIds WHERE MessageId = @MessageId AND SenderId = @SenderId";
+        var transaction = await connection.QueryFirstOrDefaultAsync(sql, new { MessageId = messageId, SenderId = senderId });
+        Assert.NotNull(transaction);
+        Assert.Single(transaction);
     }
 
     private async Task AssertMessageIdIsNotStoredAsync(string senderId, string messageId)

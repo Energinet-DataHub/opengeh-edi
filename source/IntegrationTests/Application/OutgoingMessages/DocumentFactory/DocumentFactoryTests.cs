@@ -15,8 +15,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.DocumentFactory;

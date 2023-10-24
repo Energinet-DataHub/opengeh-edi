@@ -16,15 +16,15 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Domain.Documents;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.Domain.Transactions;
-using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.Edi.Responses;
 using Xunit;
 using Xunit.Categories;
@@ -35,12 +35,12 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.Aggreg
 [IntegrationTest]
 public class WhenARejectedResultIsAvailableTests : TestBase
 {
-    private readonly B2BContext _b2BContext;
+    private readonly ProcessContext _processContext;
 
     public WhenARejectedResultIsAvailableTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _b2BContext = GetService<B2BContext>();
+        _processContext = GetService<ProcessContext>();
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
-        _b2BContext.Dispose();
+        _processContext.Dispose();
     }
 
     private async Task<AssertOutgoingMessage> OutgoingMessageAsync(
@@ -111,8 +111,8 @@ public class WhenARejectedResultIsAvailableTests : TestBase
           null);
 
         process.WasSentToWholesale();
-        _b2BContext.AggregatedMeasureDataProcesses.Add(process);
-        _b2BContext.SaveChanges();
+        _processContext.AggregatedMeasureDataProcesses.Add(process);
+        _processContext.SaveChanges();
         return process;
     }
 }

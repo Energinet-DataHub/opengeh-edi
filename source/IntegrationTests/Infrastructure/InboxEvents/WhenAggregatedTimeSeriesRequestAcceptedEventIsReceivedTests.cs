@@ -20,8 +20,8 @@ using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.Aggregations;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
@@ -30,7 +30,7 @@ using Period = Energinet.DataHub.Edi.Responses.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 
-public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestBase
+public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : ProcessTestBase
 {
     private readonly string _eventType = nameof(AggregatedTimeSeriesRequestAccepted);
     private readonly Guid _referenceId = Guid.NewGuid();
@@ -39,7 +39,7 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
     private readonly AggregatedTimeSeriesRequestAcceptedEventMapper _aggregatedTimeSeriesRequestAcceptedEventMapper;
     private readonly AggregatedTimeSeriesRequestAccepted _aggregatedTimeSeriesRequestAcceptedResponse;
 
-    public WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests(DatabaseFixture databaseFixture)
+    public WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests(ProcessDatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _processor = GetService<InboxEventsProcessor>();

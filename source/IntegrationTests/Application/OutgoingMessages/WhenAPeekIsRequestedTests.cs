@@ -18,17 +18,17 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Dapper;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Domain.Documents;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Process.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using MediatR;
 using Xunit;
-using MessageCategory = Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing.MessageCategory;
-using PeekResult = Energinet.DataHub.EDI.Application.OutgoingMessages.PeekResult;
+using PeekResult = Energinet.DataHub.EDI.Process.Application.OutgoingMessages.PeekResult;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
@@ -40,7 +40,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         : base(databaseFixture)
     {
         _requestAggregatedMeasuredDataProcessInvoker =
-            new RequestAggregatedMeasuredDataProcessInvoker(GetService<IMediator>(), GetService<B2BContext>());
+            new RequestAggregatedMeasuredDataProcessInvoker(GetService<IMediator>(), GetService<ProcessContext>());
     }
 
     [Fact]

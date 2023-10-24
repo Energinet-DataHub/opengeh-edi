@@ -19,15 +19,15 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
+using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using Energinet.DataHub.Edi.Requests;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
@@ -38,7 +38,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages.Re
 [IntegrationTest]
 public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
 {
-    private readonly B2BContext _b2BContext;
+    private readonly ProcessContext _processContext;
     private readonly ServiceBusSenderSpy _senderSpy;
     private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
     private readonly InternalCommandMapper _mapper;
@@ -47,7 +47,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
     public InitializeAggregatedMeasureDataProcessesCommandTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _b2BContext = GetService<B2BContext>();
+        _processContext = GetService<ProcessContext>();
         _mapper = GetService<InternalCommandMapper>();
         _serializer = GetService<ISerializer>();
         _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IServiceBusSenderFactory>();
@@ -199,7 +199,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
-        _b2BContext.Dispose();
+        _processContext.Dispose();
         _senderSpy.Dispose();
         _serviceBusClientSenderFactory.Dispose();
     }
@@ -217,7 +217,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
 
     private InternalCommand LoadCommand(string internalCommandType)
     {
-        var queuedInternalCommand = _b2BContext.QueuedInternalCommands
+        var queuedInternalCommand = _processContext.QueuedInternalCommands
             .ToList()
             .First(x => x.Type == internalCommandType);
 
@@ -227,14 +227,14 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
 
     private AggregatedMeasureDataProcess? GetProcess(string senderNumber)
     {
-        return _b2BContext.AggregatedMeasureDataProcesses
+        return _processContext.AggregatedMeasureDataProcesses
             .ToList()
             .FirstOrDefault(x => x.RequestedByActorId.Value == senderNumber);
     }
 
     private IEnumerable<AggregatedMeasureDataProcess> GetProcesses(string senderNumber)
     {
-        return _b2BContext.AggregatedMeasureDataProcesses
+        return _processContext.AggregatedMeasureDataProcesses
             .ToList()
             .Where(x => x.RequestedByActorId.Value == senderNumber);
     }

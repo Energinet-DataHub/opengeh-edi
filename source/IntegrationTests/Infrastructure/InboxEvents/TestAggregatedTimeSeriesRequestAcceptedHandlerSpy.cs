@@ -17,9 +17,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
 using Energinet.DataHub.Edi.Responses;
 using MediatR;
 using NodaTime.Serialization.Protobuf;
@@ -106,8 +106,8 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
     {
         return resolution switch
         {
-            Resolution.Pt15M => Domain.Transactions.Aggregations.Resolution.QuarterHourly.Name,
-            Resolution.Pt1H => Domain.Transactions.Aggregations.Resolution.Hourly.Name,
+            Resolution.Pt15M => Process.Domain.Transactions.Aggregations.Resolution.QuarterHourly.Name,
+            Resolution.Pt1H => Process.Domain.Transactions.Aggregations.Resolution.Hourly.Name,
             Resolution.Unspecified => throw new InvalidOperationException("Could not map resolution type"),
             _ => throw new InvalidOperationException("Unknown resolution type"),
         };

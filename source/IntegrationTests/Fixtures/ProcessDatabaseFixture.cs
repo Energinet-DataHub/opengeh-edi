@@ -24,13 +24,13 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
 {
-    public class DatabaseFixture : IDisposable, IAsyncLifetime
+    public class ProcessDatabaseFixture : IDisposable, IAsyncLifetime
     {
         private static string _connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=B2BTransactions;Integrated Security=True;Connection Timeout=60";
-        private readonly B2BContext _b2bContext;
+        private readonly ProcessContext _processContext;
         private bool _disposed;
 
-        public DatabaseFixture()
+        public ProcessDatabaseFixture()
         {
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.local.json", optional: true)
@@ -46,11 +46,11 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
                 _connectionString = environmentVariableConnectionString;
             }
 
-            var optionsBuilder = new DbContextOptionsBuilder<B2BContext>();
-            optionsBuilder
+            var optionsBuilderProcess = new DbContextOptionsBuilder<ProcessContext>();
+            optionsBuilderProcess
                 .UseSqlServer(_connectionString, options => options.UseNodaTime());
 
-            _b2bContext = new B2BContext(optionsBuilder.Options);
+            _processContext = new ProcessContext(optionsBuilderProcess.Options);
         }
 
         public static string ConnectionString => _connectionString;
@@ -90,7 +90,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
                 $"DELETE FROM [dbo].[MessageRegistry]" +
                 $"DELETE FROM [dbo].[TransactionRegistry]";
 
-            _b2bContext.Database.ExecuteSqlRaw(cleanupStatement);
+            _processContext.Database.ExecuteSqlRaw(cleanupStatement);
         }
 
         public void Dispose()
@@ -107,7 +107,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
             }
 
             CleanupDatabase();
-            _b2bContext.Dispose();
+            _processContext.Dispose();
             _disposed = true;
         }
 
