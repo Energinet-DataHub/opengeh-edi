@@ -15,14 +15,11 @@
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.Edi.Requests;
 using NodaTime;
-using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Factories;
 
 public static class RequestAggregatedMeasureDataHttpFactory
 {
-    private static Instant _date;
-
     public static RequestAggregatedMeasureData Create(
         RequestAggregatedMeasureDataMarketRequest request,
         string actorNumber,
@@ -48,8 +45,8 @@ public static class RequestAggregatedMeasureDataHttpFactory
         var serie = new Serie
         {
             Id = Guid.NewGuid().ToString(),
-            StartDateAndOrTimeDateTime = SetTimeToMidnight(request.StartDate, dateTimeZone),
-            EndDateAndOrTimeDateTime = SetTimeToMidnight(request.EndDate, dateTimeZone),
+            StartDateAndOrTimeDateTime = InstantFormatFactory.SetInstantToMidnight(request.StartDate, dateTimeZone),
+            EndDateAndOrTimeDateTime = InstantFormatFactory.SetInstantToMidnight(request.EndDate, dateTimeZone),
         };
 
         if (request.GridArea != null)
@@ -77,16 +74,6 @@ public static class RequestAggregatedMeasureDataHttpFactory
         data.Series.Add(serie);
 
         return data;
-    }
-
-    private static string SetTimeToMidnight(string dateString, DateTimeZone dateTimeZone)
-    {
-        _date = InstantPattern.ExtendedIso.Parse(dateString).Value;
-        var zonedDateTime = new ZonedDateTime(_date, dateTimeZone);
-        var dateTimeZoneAtMidnight = zonedDateTime.Date
-            .At(LocalTime.Midnight)
-            .InZoneStrictly(dateTimeZone);
-        return dateTimeZoneAtMidnight.ToInstant().ToString();
     }
 
     private static string SetSettlementSeriesVersion(ProcessType processType)
