@@ -28,6 +28,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using NodaTime.Extensions;
 using Xunit;
 using Xunit.Categories;
+using ActorGrouping = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.ActorGrouping;
 using GridAreaDetails = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.GridAreaDetails;
 using Period = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Period;
 using Point = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Point;
@@ -46,7 +47,7 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
     }
 
     [Fact]
-    public async Task Aggregated_measure_data_response_was_accepted()
+    public async Task Aggregated_measure_data_response_message_was_received()
     {
         // Arrange
         var expectedOutgoingMessages = 1;
@@ -57,18 +58,18 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         var acceptedAggregation = CreateAcceptedAggregation();
 
         // Act
-        process.IsAccepted(acceptedAggregation);
+        process.AddResponseMessage(acceptedAggregation);
 
         // Assert
-        AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);
-        AssertOutgoingMessageCreated(process, expectedOutgoingMessages);
+        AssertProcessState(process, AggregatedMeasureDataProcess.State.Sent);
+        AssertPendingMessageCreated(process, expectedOutgoingMessages);
     }
 
     [Fact]
-    public async Task Aggregated_measure_data_process_accepted_will_only_be_processed_once()
+    public async Task Aggregated_measure_data_process_will_only_add_one_message_per_grid_area()
     {
         // Arrange
-        var expectedOutgoingMessages = 1;
+        var expectedPendingMessages = 1;
         var marketMessage = MessageBuilder().Build();
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
@@ -76,12 +77,12 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         var acceptedAggregation = CreateAcceptedAggregation();
 
         // Act
-        process.IsAccepted(acceptedAggregation);
-        process.IsAccepted(acceptedAggregation);
+        process.AddResponseMessage(acceptedAggregation);
+        process.AddResponseMessage(acceptedAggregation);
 
         // Assert
-        AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);
-        AssertOutgoingMessageCreated(process, expectedOutgoingMessages);
+        AssertProcessState(process, AggregatedMeasureDataProcess.State.Sent);
+        AssertPendingMessageCreated(process, expectedPendingMessages);
     }
 
     [Fact]
@@ -170,6 +171,13 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         var messages = typeof(AggregatedMeasureDataProcess).GetField("_messages", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(process) as IReadOnlyCollection<OutgoingMessage>;
         Assert.NotNull(messages);
         Assert.Equal(expectedOutgoingMessages, messages.Count);
+    }
+
+    private static void AssertPendingMessageCreated(AggregatedMeasureDataProcess process, int expectedOutgoingMessages)
+    {
+        var pendingMessages = typeof(AggregatedMeasureDataProcess).GetField("_pendingMessages", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(process) as Dictionary<string, Aggregation>;
+        Assert.NotNull(pendingMessages);
+        Assert.Equal(expectedOutgoingMessages, pendingMessages.Values.Count);
     }
 
     private AggregatedMeasureDataProcess? GetProcess(string senderNumber)

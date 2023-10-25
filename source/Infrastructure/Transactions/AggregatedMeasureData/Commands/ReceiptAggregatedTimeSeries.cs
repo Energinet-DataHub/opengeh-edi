@@ -13,14 +13,16 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 
 public class ReceiptAggregatedTimeSeries : InternalCommand
 {
-    public ReceiptAggregatedTimeSeries(Guid processId, ReadOnlyCollection<string> gridAreas)
+    [JsonConstructor]
+    public ReceiptAggregatedTimeSeries(Guid processId, IReadOnlyList<string> gridAreas)
     {
         ProcessId = processId;
         GridAreas = gridAreas;
@@ -28,5 +30,5 @@ public class ReceiptAggregatedTimeSeries : InternalCommand
 
     public Guid ProcessId { get; }
 
-    public ReadOnlyCollection<string> GridAreas { get; }
+    public IReadOnlyList<string> GridAreas { get; }
 }

@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.Collections;
 using NodaTime.Serialization.Protobuf;
+using ActorGrouping = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.ActorGrouping;
 using GridAreaDetails = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.GridAreaDetails;
 using Period = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Period;
 using Point = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Point;

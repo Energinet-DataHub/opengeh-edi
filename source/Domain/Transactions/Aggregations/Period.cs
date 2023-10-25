@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Globalization;
-using Energinet.DataHub.EDI.Domain.Documents;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.Domain.Transactions.Aggregations;

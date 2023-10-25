@@ -13,6 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Domain.Actors;
@@ -39,11 +42,11 @@ using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
 [IntegrationTest]
-public class WhenAnAcceptedResultIsAvailableTests : TestBase
+public class WhenAnResponseMessageIsAvailableTests : TestBase
 {
     private readonly B2BContext _b2BContext;
 
-    public WhenAnAcceptedResultIsAvailableTests(DatabaseFixture databaseFixture)
+    public WhenAnResponseMessageIsAvailableTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _b2BContext = GetService<B2BContext>();
@@ -55,9 +58,11 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         // Arrange
         var process = BuildProcess();
         var acceptedEvent = GetAcceptedEvent(process);
+        var receiptEvent = GetReceiptEvent(new List<AggregatedTimeSeriesRequestResponseMessage> { acceptedEvent });
 
         // Act
         await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestResponseMessage), acceptedEvent, process.ProcessId.Id);
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestReceipt), receiptEvent, process.ProcessId.Id);
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
@@ -102,6 +107,13 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         _b2BContext.Dispose();
     }
 
+    private static AggregatedTimeSeriesRequestReceipt GetReceiptEvent(List<AggregatedTimeSeriesRequestResponseMessage> responseMessages)
+    {
+        var response = new AggregatedTimeSeriesRequestReceipt();
+        response.GridAreas.AddRange(responseMessages.Select(response => response.GridArea));
+        return response;
+    }
+
     private static AggregatedTimeSeriesRequestResponseMessage GetAcceptedEvent(AggregatedMeasureDataProcess aggregatedMeasureDataProcess)
     {
         return CreateAggregation(aggregatedMeasureDataProcess);
@@ -142,6 +154,18 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             TimeSeriesType = TimeSeriesType.Production,
             SettlementVersion = SettlementVersion.FirstCorrection.Name,
         };
+    }
+
+    private static void AssertProcessState(AggregatedMeasureDataProcess process, AggregatedMeasureDataProcess.State state)
+    {
+        var processState = typeof(AggregatedMeasureDataProcess).GetField("_state", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(process);
+        Assert.Equal(state, processState);
+    }
+
+    private static void AssertNumberOfPendingMessages(AggregatedMeasureDataProcess process, int numberOfMessages)
+    {
+        var pendingMessages = typeof(AggregatedMeasureDataProcess).GetField("_pendingMessages", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(process);
+        Assert.Equal(numberOfMessages, pendingMessages!.GetType().GetProperty("Count")?.GetValue(pendingMessages));
     }
 
     private async Task AddInboxEvent(
@@ -190,5 +214,12 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         _b2BContext.AggregatedMeasureDataProcesses.Add(process);
         _b2BContext.SaveChanges();
         return process;
+    }
+
+    private AggregatedMeasureDataProcess? GetProcess(Guid processId)
+    {
+        return _b2BContext.AggregatedMeasureDataProcesses
+            .ToList()
+            .FirstOrDefault(x => x.ProcessId.Id == processId);
     }
 }
