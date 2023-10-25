@@ -34,15 +34,15 @@ public sealed class BusinessReason : EnumerationType
 
     public static BusinessReason FromName(string name)
     {
-        var businessReason = GetAll<BusinessReason>().FirstOrDefault(processType =>
-            processType.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{name} is not a valid process type name");
+        var businessReason = GetAll<BusinessReason>().FirstOrDefault(businessReason =>
+            businessReason.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{name} is not a valid process type name");
         return businessReason;
     }
 
     public static BusinessReason FromCode(string code)
     {
         var businessReason = GetAll<BusinessReason>().FirstOrDefault(processType =>
-            processType.Code.Equals(code, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{code} is not a valid process type code");
+            businessReason.Code.Equals(code, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{code} is not a valid process type code");
         return businessReason;
     }
 }
