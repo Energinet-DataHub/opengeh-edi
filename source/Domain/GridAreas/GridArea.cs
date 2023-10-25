@@ -21,12 +21,12 @@ public class GridArea
 {
     private readonly Guid _id;
 
-    public GridArea(string gridAreaCode, Instant validFrom, ActorNumber actorNumber)
+    public GridArea(string gridAreaCode, Instant validFrom, ActorNumber ownerActorNumber)
     {
         _id = Guid.NewGuid();
         GridAreaCode = gridAreaCode;
         ValidFrom = validFrom;
-        ActorNumber = actorNumber;
+        OwnerActorNumber = ownerActorNumber;
     }
 
 #pragma warning disable
@@ -36,5 +36,5 @@ public class GridArea
 
     public string GridAreaCode { get; }
     public Instant ValidFrom { get; }
-    public ActorNumber ActorNumber { get; }
+    public ActorNumber OwnerActorNumber { get; }
 }

@@ -14,7 +14,6 @@
 
 using System;
 using Energinet.DataHub.Core.Messaging.Communication;
-using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
 using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.Domain.Actors;
@@ -23,7 +22,7 @@ using NodaTime.Serialization.Protobuf;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 
-public class GridAreaOwnershipAssignedMapper : IIntegrationEventMapper
+public class GridAreaOwnershipAssignedEventMapper : IIntegrationEventMapper
 {
     public string EventTypeToHandle => GridAreaOwnershipAssigned.EventName;
 

@@ -70,14 +70,14 @@ public class WhenGridAreaOwnershipAssignedTests : TestBase
         await integrationEventHandler.HandleAsync(integrationEvent).ConfigureAwait(false);
     }
 
-    private async Task<IEnumerable<GridArea>> GetGridAreas(string gridAreaCode, string actorNumber)
+    private async Task<IEnumerable<GridArea>> GetGridAreas(string gridAreaCode, string gridAreaOwnerActorNumber)
     {
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
-        var sql = $"SELECT GridAreaCode, ActorNumber FROM [dbo].[GridArea] WHERE ActorNumber = '{actorNumber}' AND GridAreaCode = '{gridAreaCode}'";
+        var sql = $"SELECT GridAreaCode, GridAreaOwnerActorNumber FROM [dbo].[GridArea] WHERE GridAreaOwnerActorNumber = '{gridAreaOwnerActorNumber}' AND GridAreaCode = '{gridAreaCode}'";
         return await connection.QueryAsync<GridArea>(sql);
     }
 
 #pragma warning disable
-    public record GridArea(string GridAreaCode, string ActorNumber);
+    public record GridArea(string GridAreaCode, string GridAreaOwnerActorNumber);
 #pragma warning restore
 }

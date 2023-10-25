@@ -22,16 +22,16 @@ namespace Energinet.DataHub.EDI.Application.GridAreas;
 public class CreateGridAreaCommand : InternalCommand
 {
     [JsonConstructor]
-    public CreateGridAreaCommand(string gridAreaCode, Instant validFrom, ActorNumber actorNumber)
+    public CreateGridAreaCommand(string gridAreaCode, Instant validFrom, ActorNumber gridAreaOwnerActorNumber)
     {
         GridAreaCode = gridAreaCode;
         ValidFrom = validFrom;
-        ActorNumber = actorNumber;
+        GridAreaOwnerActorNumber = gridAreaOwnerActorNumber;
     }
 
     public string GridAreaCode { get; }
 
     public Instant ValidFrom { get; }
 
-    public ActorNumber ActorNumber { get; }
+    public ActorNumber GridAreaOwnerActorNumber { get; }
 }

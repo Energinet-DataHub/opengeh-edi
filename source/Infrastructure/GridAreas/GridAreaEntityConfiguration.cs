@@ -31,7 +31,7 @@ public class GridAreaEntityConfiguration : IEntityTypeConfiguration<GridArea>
         builder.Property<Guid>("_id").HasColumnName("Id");
         builder.Property(entity => entity.GridAreaCode);
         builder.Property(entity => entity.ValidFrom);
-        builder.Property(receiver => receiver.ActorNumber).HasColumnName("ActorNumber")
+        builder.Property(receiver => receiver.OwnerActorNumber).HasColumnName("ActorNumber")
             .HasConversion(toDbValue => toDbValue.Value, fromDbValue => ActorNumber.Create(fromDbValue));
     }
 }
