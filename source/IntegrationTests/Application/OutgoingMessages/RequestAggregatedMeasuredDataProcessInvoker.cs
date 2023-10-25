@@ -23,7 +23,7 @@ using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMea
 using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 using MediatR;
-using NodaTime.Extensions;
+using NodaTime.Text;
 using GridAreaDetails = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.GridAreaDetails;
 using Period = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.Period;
 using Point = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.Point;
@@ -47,7 +47,10 @@ public class RequestAggregatedMeasuredDataProcessInvoker
         await _mediator.Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
         var process = GetProcess(marketMessage.SenderNumber);
         process!.WasSentToWholesale();
+
+        // ReSharper disable once MethodHasAsyncOverload -- Test Event_registration_is_omitted_if_run_in_parallel fails if this is async
         _b2BContext.SaveChanges();
+
         var acceptedAggregation = CreateAggregatedTimeSerie();
         await _mediator.Send(new AcceptedAggregatedTimeSerie(process.ProcessId.Id, acceptedAggregation)).ConfigureAwait(false);
     }
@@ -61,7 +64,7 @@ public class RequestAggregatedMeasuredDataProcessInvoker
             MeteringPointType.Consumption.Name,
             MeasurementUnit.Kwh.Name,
             Resolution.Hourly.Name,
-            new Period(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant()),
+            new Period(InstantPattern.General.Parse("2022-06-17T22:00:00Z").Value, InstantPattern.General.Parse("2022-07-22T22:00:00Z").Value),
             new GridAreaDetails("805", "1234567891045"),
             SettlementVersion.FirstCorrection.Name);
     }

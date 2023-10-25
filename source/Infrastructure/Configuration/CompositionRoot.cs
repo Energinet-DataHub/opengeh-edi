@@ -253,14 +253,14 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
 
         private void AddActorServices()
         {
-            _services.AddTransient<IRequestHandler<CreateActorCommand, Unit>, CreateActorHandler>();
-            _services.AddTransient<IActorRegistry, ActorRegistry>();
+            _services.AddScoped<IRequestHandler<CreateActorCommand, Unit>, CreateActorHandler>();
+            _services.AddScoped<IActorRegistry, ActorRegistry>();
         }
 
         private void AddGridAreaServices()
         {
-            _services.AddTransient<IRequestHandler<CreateGridAreaCommand, Unit>, CreateGridAreaHandler>();
-            _services.AddTransient<IGridAreaRepository, GridAreaRepository>();
+            _services.AddScoped<IRequestHandler<GridAreaOwnershipAssignedCommand, Unit>, GridAreaOwnershipAssignedHandler>();
+            _services.AddScoped<IGridAreaRepository, GridAreaRepository>();
         }
 
         private void AddProcessing()

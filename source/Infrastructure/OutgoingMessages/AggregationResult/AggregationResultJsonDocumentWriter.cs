@@ -119,7 +119,7 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
 
             if (series.SettlementVersion is not null)
             {
-                writer.WriteObject("settlement_Series.version", new KeyValuePair<string, string>("value", CimCode.Of(SettlementVersion.From(series.SettlementVersion))));
+                writer.WriteObject("settlement_Series.version", new KeyValuePair<string, string>("value", CimCode.Of(SettlementVersion.FromName(series.SettlementVersion))));
             }
 
             writer.WritePropertyName("Period");

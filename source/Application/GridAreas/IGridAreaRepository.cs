@@ -27,7 +27,7 @@ public interface IGridAreaRepository
     /// <summary>
     /// Responsible for creating a grid area if it does not exist.
     /// </summary>
-    Task CreateIfNotExistAsync(
+    Task UpdateOwnershipAsync(
         string gridAreaCode,
         Instant validFrom,
         ActorNumber actorNumber,

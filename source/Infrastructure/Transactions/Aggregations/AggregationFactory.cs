@@ -50,6 +50,11 @@ public class AggregationFactory
         if (aggregatedMeasureDataProcess == null) throw new ArgumentNullException(nameof(aggregatedMeasureDataProcess));
         if (aggregatedTimeSerie == null) throw new ArgumentNullException(nameof(aggregatedTimeSerie));
 
+        if ((aggregatedMeasureDataProcess.MeteringPointType != null ? MeteringPointType.FromCode(aggregatedMeasureDataProcess.MeteringPointType).Name : null) != aggregatedTimeSerie.MeteringPointType) throw new ArgumentException("aggregatedTimeSerie.MeteringPointType isn't equal to aggregatedMeasureDataProcess.MeteringPointType", nameof(aggregatedTimeSerie));
+        if (aggregatedMeasureDataProcess.StartOfPeriod != aggregatedTimeSerie.Period.Start.ToString()) throw new ArgumentException("aggregatedTimeSerie.Period.Start isn't equal to aggregatedMeasureDataProcess.StartOfPeriod", nameof(aggregatedTimeSerie));
+        if (aggregatedMeasureDataProcess.EndOfPeriod != aggregatedTimeSerie.Period.End.ToString()) throw new ArgumentException("aggregatedTimeSerie.Period.Start isn't equal to aggregatedMeasureDataProcess.EndOfPeriod", nameof(aggregatedTimeSerie));
+        if (aggregatedMeasureDataProcess.SettlementVersion?.Name != aggregatedTimeSerie.SettlementVersion) throw new ArgumentException("aggregatedTimeSerie.SettlementVersion isn't equal to aggregatedMeasureDataProcess.SettlementVersion", nameof(aggregatedTimeSerie));
+
         return new Aggregation(
             MapPoints(aggregatedTimeSerie.Points),
             aggregatedTimeSerie.MeteringPointType,
@@ -57,7 +62,7 @@ public class AggregationFactory
             aggregatedTimeSerie.Resolution,
             MapPeriod(aggregatedTimeSerie.Period),
             MapSettlementMethod(aggregatedMeasureDataProcess),
-            MapBusinessReason(aggregatedMeasureDataProcess),
+            aggregatedMeasureDataProcess.BusinessReason.Name,
             MapActorGrouping(aggregatedMeasureDataProcess),
             MapGridAreaDetails(aggregatedTimeSerie.GridAreaDetails),
             aggregatedMeasureDataProcess.BusinessTransactionId.Id,
@@ -120,12 +125,12 @@ public class AggregationFactory
         return new ActorGrouping(null, null);
     }
 
-    private static string? MapSettlementVersion(string? settlementVersion)
+    private static string? MapSettlementVersion(string? settlementVersionCode)
     {
         var settlementVersionName = null as string;
         try
         {
-            settlementVersionName = SettlementVersion.From(settlementVersion ?? string.Empty).Name;
+            settlementVersionName = SettlementVersion.FromName(settlementVersionCode ?? string.Empty).Name;
         }
         catch (InvalidCastException)
         {
@@ -148,11 +153,6 @@ public class AggregationFactory
         }
 
         return settlementTypeName;
-    }
-
-    private static string MapBusinessReason(AggregatedMeasureDataProcess process)
-    {
-        return CimCode.To(process.BusinessReason).Name;
     }
 
     private static string MapProcessTypeFromCalculationResult(ProcessType processType)

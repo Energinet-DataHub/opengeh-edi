@@ -23,7 +23,7 @@ using NodaTime.Serialization.Protobuf;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 
-public class GridAreaOwnershipAssignedMapper : IIntegrationEventMapper
+public class GridAreaOwnershipAssignedEventMapper : IIntegrationEventMapper
 {
     public string EventTypeToHandle => GridAreaOwnershipAssigned.EventName;
 

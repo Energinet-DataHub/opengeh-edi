@@ -19,20 +19,20 @@ using MediatR;
 
 namespace Energinet.DataHub.EDI.Application.GridAreas;
 
-public class CreateGridAreaHandler : IRequestHandler<CreateGridAreaCommand, Unit>
+public class GridAreaOwnershipAssignedHandler : IRequestHandler<GridAreaOwnershipAssignedCommand, Unit>
 {
     private readonly IGridAreaRepository _gridAreaRepository;
 
-    public CreateGridAreaHandler(IGridAreaRepository gridAreaRepository)
+    public GridAreaOwnershipAssignedHandler(IGridAreaRepository gridAreaRepository)
     {
         _gridAreaRepository = gridAreaRepository;
     }
 
-    public async Task<Unit> Handle(CreateGridAreaCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(GridAreaOwnershipAssignedCommand request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
 
-        await _gridAreaRepository.CreateIfNotExistAsync(request.GridAreaCode, request.ValidFrom, request.ActorNumber, cancellationToken).ConfigureAwait(false);
+        await _gridAreaRepository.UpdateOwnershipAsync(request.GridAreaCode, request.ValidFrom, request.GridAreaOwnerActorNumber, cancellationToken).ConfigureAwait(false);
 
         return Unit.Value;
     }

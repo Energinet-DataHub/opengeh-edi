@@ -32,14 +32,17 @@ public class GridAreaRepository : IGridAreaRepository
         _dbContext = dbContext;
     }
 
-    public async Task CreateIfNotExistAsync(
+    public async Task UpdateOwnershipAsync(
         string gridAreaCode,
         Instant validFrom,
         ActorNumber actorNumber,
         CancellationToken cancellationToken)
     {
-        if (await GridAreaDoesNotExistsAsync(gridAreaCode, cancellationToken).ConfigureAwait(false))
+        var gridArea = await GetGridAreaAsync(gridAreaCode, cancellationToken).ConfigureAwait(false);
+        if (gridArea == null)
             await _dbContext.GridAreas.AddAsync(new GridArea(gridAreaCode, validFrom, actorNumber), cancellationToken).ConfigureAwait(false);
+        else
+            gridArea.UpdateOwnership(validFrom, actorNumber);
     }
 
     public async Task<ActorNumber> GetGridOperatorForAsync(string gridAreaCode, CancellationToken cancellationToken)
@@ -49,15 +52,15 @@ public class GridAreaRepository : IGridAreaRepository
                 gridArea => gridArea.GridAreaCode == gridAreaCode,
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);
-        return gridAreaByCode.ActorNumber;
+        return gridAreaByCode.GridAreaOwnerActorNumber;
     }
 
-    private async Task<bool> GridAreaDoesNotExistsAsync(
+    private async Task<GridArea?> GetGridAreaAsync(
         string gridAreaCode,
         CancellationToken cancellationToken)
     {
-        return !await _dbContext.GridAreas
-            .AnyAsync(
+        return await _dbContext.GridAreas
+            .FirstOrDefaultAsync(
                 gridArea => gridArea.GridAreaCode == gridAreaCode,
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);
