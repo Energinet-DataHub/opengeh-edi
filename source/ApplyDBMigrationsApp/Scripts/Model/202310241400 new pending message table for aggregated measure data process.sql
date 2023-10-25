@@ -1,5 +1,6 @@
 ﻿create table [dbo].[PendingMessagesForAggregatedMeasureDataProcess]
 (
+    Id uniqueidentifier not null,
     MeteringPointType nvarchar(50) not null,
     SettlementType nvarchar(50) null,
     SettlementVersion nvarchar(50) null,
@@ -17,6 +18,6 @@
     ReceiverRole nvarchar(50) null,
     Points nvarchar(max) null,
     ProcessId uniqueidentifier not null,
-    PRIMARY KEY (GridAreaCode),
+    PRIMARY KEY (Id),
     FOREIGN KEY (ProcessId) REFERENCES [dbo].[AggregatedMeasureDataProcesses] (ProcessId)
 )

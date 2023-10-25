@@ -42,31 +42,31 @@ using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
 [IntegrationTest]
-public class WhenAnResponseMessageIsAvailableTests : TestBase
+public class WhenAnReceiptIsAvailableTests : TestBase
 {
     private readonly B2BContext _b2BContext;
 
-    public WhenAnResponseMessageIsAvailableTests(DatabaseFixture databaseFixture)
+    public WhenAnReceiptIsAvailableTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _b2BContext = GetService<B2BContext>();
     }
 
     [Fact]
-    public async Task Aggregated_measure_data_response_is_accepted()
+    public async Task Receipt_with_one_matching_response_messages()
     {
         // Arrange
         var process = BuildProcess();
-        var acceptedEvent = GetAcceptedEvent(process);
-        var receiptEvent = GetReceiptEvent(new List<AggregatedTimeSeriesRequestResponseMessage> { acceptedEvent });
+        var responseMessageEvent = GetResponseMessageEvent(process);
+        var receiptEvent = GetReceiptEvent(new List<AggregatedTimeSeriesRequestResponseMessage> { responseMessageEvent });
 
         // Act
-        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestResponseMessage), acceptedEvent, process.ProcessId.Id);
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestResponseMessage), responseMessageEvent, process.ProcessId.Id);
         await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestReceipt), receiptEvent, process.ProcessId.Id);
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
-        var timeSerie = acceptedEvent;
+        var timeSerie = responseMessageEvent;
         outgoingMessage
             .HasBusinessReason(CimCode.To(process.BusinessReason).Name)
             .HasReceiverId(process.RequestedByActorId.Value)
@@ -79,19 +79,21 @@ public class WhenAnResponseMessageIsAvailableTests : TestBase
     }
 
     [Fact]
-    public async Task Received_2_accepted_events_for_same_aggregated_measure_data_process()
+    public async Task Received_2_receipt_events_for_same_aggregated_measure_data_process()
     {
         // Arrange
         var process = BuildProcess();
-        var acceptedEvent = GetAcceptedEvent(process);
+        var responseMessageEvent = GetResponseMessageEvent(process);
+        var receiptEvent = GetReceiptEvent(new List<AggregatedTimeSeriesRequestResponseMessage> { responseMessageEvent });
 
         // Act
-        await AddInboxEvent(process, acceptedEvent);
-        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestResponseMessage), acceptedEvent, process.ProcessId.Id);
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestResponseMessage), responseMessageEvent, process.ProcessId.Id);
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestReceipt), receiptEvent, process.ProcessId.Id);
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestReceipt), receiptEvent, process.ProcessId.Id);
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
-        var timeSerie = acceptedEvent;
+        var timeSerie = responseMessageEvent;
         outgoingMessage
             .HasBusinessReason(CimCode.To(process.BusinessReason).Name)
             .HasReceiverId(process.RequestedByActorId.Value)
@@ -99,6 +101,75 @@ public class WhenAnResponseMessageIsAvailableTests : TestBase
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion!, timeSerie.SettlementVersion);
+    }
+
+    [Fact]
+    public async Task Receipt_with_two_matching_response_messages()
+    {
+        // Arrange
+        var process = BuildProcess();
+        var responseMessageEvent = GetResponseMessageEvent(process);
+        var responseMessageEvent1 = GetResponseMessageEvent(process);
+        responseMessageEvent1.GridArea = "999";
+
+        var receiptEvent = GetReceiptEvent(new List<AggregatedTimeSeriesRequestResponseMessage> { responseMessageEvent, responseMessageEvent1 });
+
+        // Act
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestResponseMessage), responseMessageEvent, process.ProcessId.Id);
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestReceipt), receiptEvent, process.ProcessId.Id);
+
+        // Assert
+        var processFromDb = GetProcess(process.ProcessId.Id);
+        Assert.NotNull(processFromDb);
+        AssertProcessState(processFromDb, AggregatedMeasureDataProcess.State.Accepted);
+        AssertOutgoingMessageCreated(processFromDb, 2);
+    }
+
+    [Fact]
+    public async Task Received_receipt_events_but_to_many_response_messages()
+    {
+        // Arrange
+        var process = BuildProcess();
+        var responseMessageEvent = GetResponseMessageEvent(process);
+
+        var receiptEvent = GetReceiptEvent(new List<AggregatedTimeSeriesRequestResponseMessage> { responseMessageEvent });
+
+        // Act
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestResponseMessage), responseMessageEvent, process.ProcessId.Id);
+
+        var responseMessageEvent2 = responseMessageEvent;
+        responseMessageEvent2.GridArea = "999";
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestResponseMessage), responseMessageEvent2, process.ProcessId.Id);
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestReceipt), receiptEvent, process.ProcessId.Id);
+
+        // Assert
+        var processFromDb = GetProcess(process.ProcessId.Id);
+        Assert.NotNull(processFromDb);
+        AssertProcessState(processFromDb, AggregatedMeasureDataProcess.State.Sent);
+        AssertNumberOfPendingMessages(processFromDb, 0);
+        AssertOutgoingMessageCreated(processFromDb, 0);
+    }
+
+    [Fact]
+    public async Task Received_receipt_events_but_missing_response_messages()
+    {
+        // Arrange
+        var process = BuildProcess();
+        var responseMessageEvent = GetResponseMessageEvent(process);
+
+        var receiptEvent = GetReceiptEvent(new List<AggregatedTimeSeriesRequestResponseMessage> { responseMessageEvent });
+        receiptEvent.GridAreas.Add("999");
+
+        // Act
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestResponseMessage), responseMessageEvent, process.ProcessId.Id);
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestReceipt), receiptEvent, process.ProcessId.Id);
+
+        // Assert
+        var processFromDb = GetProcess(process.ProcessId.Id);
+        Assert.NotNull(processFromDb);
+        AssertProcessState(processFromDb, AggregatedMeasureDataProcess.State.Sent);
+        AssertNumberOfPendingMessages(processFromDb, 1);
+        AssertOutgoingMessageCreated(processFromDb, 0);
     }
 
     protected override void Dispose(bool disposing)
@@ -114,7 +185,7 @@ public class WhenAnResponseMessageIsAvailableTests : TestBase
         return response;
     }
 
-    private static AggregatedTimeSeriesRequestResponseMessage GetAcceptedEvent(AggregatedMeasureDataProcess aggregatedMeasureDataProcess)
+    private static AggregatedTimeSeriesRequestResponseMessage GetResponseMessageEvent(AggregatedMeasureDataProcess aggregatedMeasureDataProcess)
     {
         return CreateAggregation(aggregatedMeasureDataProcess);
     }
@@ -168,16 +239,11 @@ public class WhenAnResponseMessageIsAvailableTests : TestBase
         Assert.Equal(numberOfMessages, pendingMessages!.GetType().GetProperty("Count")?.GetValue(pendingMessages));
     }
 
-    private async Task AddInboxEvent(
-        AggregatedMeasureDataProcess process,
-        AggregatedTimeSeriesRequestResponseMessage acceptedEvent)
+    private static void AssertOutgoingMessageCreated(AggregatedMeasureDataProcess process, int expectedOutgoingMessages)
     {
-        await GetService<InboxEventReceiver>()
-            .ReceiveAsync(
-                Guid.NewGuid().ToString(),
-                nameof(AggregatedTimeSeriesRequestResponseMessage),
-                process.ProcessId.Id,
-                acceptedEvent.ToByteArray());
+        var messages = typeof(AggregatedMeasureDataProcess).GetField("_messages", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(process) as IReadOnlyCollection<OutgoingMessage>;
+        Assert.NotNull(messages);
+        Assert.Equal(expectedOutgoingMessages, messages.Count);
     }
 
     private async Task<AssertOutgoingMessage> OutgoingMessageAsync(

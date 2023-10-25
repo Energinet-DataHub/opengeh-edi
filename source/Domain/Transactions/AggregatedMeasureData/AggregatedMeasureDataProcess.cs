@@ -126,7 +126,11 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
 
             if (_state == State.Sent)
             {
-                _pendingMessages.Add(MapAggregationToPending(aggregation));
+                if (_pendingMessages.All(message =>
+                        message.GridAreaDetails.GridAreaCode != aggregation.GridAreaDetails.GridAreaCode))
+                {
+                    _pendingMessages.Add(MapAggregationToPending(aggregation));
+                }
             }
         }
 
@@ -150,9 +154,13 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
                 return;
             }
 
-            if (InvalidGridAreas(gridAreas))
+            if (gridAreas.Count != _pendingMessages.Count)
             {
-                //_pendingMessages = new();
+                if (HaveToClearPendingMessages(gridAreas))
+                {
+                    _pendingMessages.Clear();
+                }
+
                 _state = State.Initialized;
                 AddDomainEvent(new AggregatedMeasureProcessIsInitialized(ProcessId));
                 return;
@@ -193,19 +201,14 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
                 aggregation.SettlementVersion);
         }
 
-        private bool InvalidGridAreas(IReadOnlyList<string> gridAreas)
+        private bool HaveToClearPendingMessages(IReadOnlyList<string> gridAreas)
         {
-            if (gridAreas.Count != _pendingMessages.Count)
+            if (_pendingMessages.Count <= gridAreas.Count && _pendingMessages.All(message => gridAreas.Contains(message.GridAreaDetails.GridAreaCode)))
             {
-                return true;
+                return false;
             }
 
-            // if (!gridAreas.All(gridArea => _pendingMessages.ContainsKey(gridArea)))
-            // {
-            //     return true;
-            // }
-
-            return false;
+            return true;
         }
 
         private RejectedAggregationResultMessage CreateRejectedAggregationResultMessage(

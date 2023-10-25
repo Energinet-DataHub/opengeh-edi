@@ -175,9 +175,9 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
 
     private static void AssertPendingMessageCreated(AggregatedMeasureDataProcess process, int expectedOutgoingMessages)
     {
-        var pendingMessages = typeof(AggregatedMeasureDataProcess).GetField("_pendingMessages", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(process) as Dictionary<string, Aggregation>;
+        var pendingMessages = typeof(AggregatedMeasureDataProcess).GetField("_pendingMessages", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(process) as List<PendingAggregation>;
         Assert.NotNull(pendingMessages);
-        Assert.Equal(expectedOutgoingMessages, pendingMessages.Values.Count);
+        Assert.Equal(expectedOutgoingMessages, pendingMessages.Count);
     }
 
     private AggregatedMeasureDataProcess? GetProcess(string senderNumber)

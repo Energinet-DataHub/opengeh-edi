@@ -63,7 +63,8 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
         builder.OwnsMany<PendingAggregation>("_pendingMessages", navigationBuilder =>
         {
             navigationBuilder.ToTable("PendingMessagesForAggregatedMeasureDataProcess", "dbo");
-            navigationBuilder.HasKey(x => x.MeasureUnitType);
+            navigationBuilder.HasKey("Id");
+            navigationBuilder.Property("Id");
             navigationBuilder.Property(x => x.MeteringPointType);
             navigationBuilder.Property(x => x.SettlementType);
             navigationBuilder.Property(x => x.SettlementVersion);

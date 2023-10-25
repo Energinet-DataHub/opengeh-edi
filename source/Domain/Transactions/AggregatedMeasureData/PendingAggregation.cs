@@ -18,7 +18,6 @@
 // using APoint = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Point;
 
 using NodaTime;
-using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 
@@ -123,6 +122,7 @@ public class PendingAggregation
         End = end;
         GridAreaCode = gridAreaCode;
         GridAreaResponsibleId = gridAreaResponsibleId;
+        Id = Guid.NewGuid();
     }
 
 // #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -167,6 +167,8 @@ public class PendingAggregation
     private string GridAreaCode { get; }
 
     private string GridAreaResponsibleId { get; }
+
+    private Guid Id { get; }
 }
 
 // public record PendingAggregation(
