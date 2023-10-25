@@ -67,7 +67,7 @@ public class WhenGridAreaOwnershipAssignedTests : TestBase
     }
 
     [Fact]
-    public async Task New_grid_area_event_for_existing_grid_area_code_with_newer_valid_replace_existing_ownership()
+    public async Task New_grid_area_event_for_existing_grid_area_code_with_newer_valid_from_update_ownership()
     {
         var newerValidFrom = Timestamp.FromDateTime(DateTime.UtcNow.AddDays(1));
         var gridAreaOwnershipAssignedEvent01 = _gridAreaOwnershipAssignedEventBuilder
@@ -87,7 +87,7 @@ public class WhenGridAreaOwnershipAssignedTests : TestBase
     }
 
     [Fact]
-    public async Task New_grid_area_event_for_existing_grid_area_code_with_old_valid_from_does_not_store_second_grid_area()
+    public async Task New_grid_area_event_for_existing_grid_area_code_with_old_valid_from_does_not_update_ownership()
     {
         var olderValidFrom = Timestamp.FromDateTime(DateTime.UtcNow.AddDays(-1));
         var gridAreaOwnershipAssignedEvent01 = _gridAreaOwnershipAssignedEventBuilder
