@@ -52,7 +52,7 @@ public class WhenGridAreaOwnershipAssignedTests : TestBase
     }
 
     [Fact]
-    public async Task Multiple_grid_area_ownership_assigned_event_is_received_with_same_owner_is_stores()
+    public async Task Multiple_grid_area_ownership_assigned_event_is_received_with_same_owner_is_stored()
     {
         var gridAreaOwnershipAssignedEvent01 = _gridAreaOwnershipAssignedEventBuilder.Build();
         var gridAreaOwnershipAssignedEvent02 = _gridAreaOwnershipAssignedEventBuilder
