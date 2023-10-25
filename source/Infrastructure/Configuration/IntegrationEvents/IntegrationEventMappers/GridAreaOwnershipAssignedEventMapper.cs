@@ -33,6 +33,6 @@ public class GridAreaOwnershipAssignedEventMapper : IIntegrationEventMapper
 
         var gridAreaOwnershipAssignedEvent = (GridAreaOwnershipAssigned)integrationEvent.Message;
 
-        return new CreateGridAreaCommand(gridAreaOwnershipAssignedEvent.GridAreaCode, gridAreaOwnershipAssignedEvent.ValidFrom.ToInstant(), ActorNumber.Create(gridAreaOwnershipAssignedEvent.ActorNumber));
+        return new GridAreaOwnershipAssignedCommand(gridAreaOwnershipAssignedEvent.GridAreaCode, gridAreaOwnershipAssignedEvent.ValidFrom.ToInstant(), ActorNumber.Create(gridAreaOwnershipAssignedEvent.ActorNumber));
     }
 }

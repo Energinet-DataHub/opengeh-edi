@@ -259,7 +259,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
 
         private void AddGridAreaServices()
         {
-            _services.AddScoped<IRequestHandler<CreateGridAreaCommand, Unit>, CreateGridAreaHandler>();
+            _services.AddScoped<IRequestHandler<GridAreaOwnershipAssignedCommand, Unit>, GridAreaOwnershipAssignedHandler>();
             _services.AddScoped<IGridAreaRepository, GridAreaRepository>();
         }
 

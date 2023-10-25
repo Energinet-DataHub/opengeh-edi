@@ -42,7 +42,7 @@ internal static class InternalCommandProcessing
     {
         var mapper = new InternalCommandMapper();
         mapper.Add("CreateActor", typeof(CreateActorCommand));
-        mapper.Add("GridArea", typeof(CreateGridAreaCommand));
+        mapper.Add("GridArea", typeof(GridAreaOwnershipAssignedCommand));
         mapper.Add("Aggregations.ForwardAggregationResult", typeof(ForwardAggregationResult));
         mapper.Add("SendAggregatedMeasureRequestToWholesale", typeof(SendAggregatedMeasureRequestToWholesale));
         mapper.Add("AcceptedAggregatedTimeSerie", typeof(AcceptedAggregatedTimeSerie));

@@ -19,10 +19,10 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.Application.GridAreas;
 
-public class CreateGridAreaCommand : InternalCommand
+public class GridAreaOwnershipAssignedCommand : InternalCommand
 {
     [JsonConstructor]
-    public CreateGridAreaCommand(string gridAreaCode, Instant validFrom, ActorNumber gridAreaOwnerActorNumber)
+    public GridAreaOwnershipAssignedCommand(string gridAreaCode, Instant validFrom, ActorNumber gridAreaOwnerActorNumber)
     {
         GridAreaCode = gridAreaCode;
         ValidFrom = validFrom;
