@@ -50,7 +50,7 @@ public class WhenGridAreaOwnershipAssignedTests : TestBase
     }
 
     [Fact]
-    public async Task New_grid_area_is_received_with_existing_grid_area_code_does_not_store_second_grid_area()
+    public async Task New_grid_area_event_is_received_with_existing_grid_area_code_does_not_store_second_grid_area()
     {
         var gridAreaOwnershipAssignedEvent = GridAreaOwnershipAssignedEventBuilder.Build();
         await HavingReceivedAndHandledIntegrationEventAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnershipAssignedEvent);
