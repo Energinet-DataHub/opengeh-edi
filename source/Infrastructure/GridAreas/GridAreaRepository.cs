@@ -14,6 +14,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.GridAreas;
@@ -26,28 +27,33 @@ namespace Energinet.DataHub.EDI.Infrastructure.GridAreas;
 public class GridAreaRepository : IGridAreaRepository
 {
     private readonly B2BContext _dbContext;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-    public GridAreaRepository(B2BContext dbContext)
+    public GridAreaRepository(B2BContext dbContext, ISystemDateTimeProvider systemDateTimeProvider)
     {
         _dbContext = dbContext;
+        _systemDateTimeProvider = systemDateTimeProvider;
     }
 
-    public async Task CreateIfNotExistAsync(
+    public async Task UpdateOwnershipAsync(
         string gridAreaCode,
         Instant validFrom,
         ActorNumber actorNumber,
         CancellationToken cancellationToken)
     {
-        if (await GridAreaDoesNotExistsAsync(gridAreaCode, cancellationToken).ConfigureAwait(false))
+        var gridArea = await GetGridAreaAsync(gridAreaCode, cancellationToken).ConfigureAwait(false);
+        if (gridArea == null)
             await _dbContext.GridAreas.AddAsync(new GridArea(gridAreaCode, validFrom, actorNumber), cancellationToken).ConfigureAwait(false);
+        else
+            gridArea.UpdateOwnership(validFrom, actorNumber);
     }
 
-    private async Task<bool> GridAreaDoesNotExistsAsync(
+    private async Task<GridArea?> GetGridAreaAsync(
         string gridAreaCode,
         CancellationToken cancellationToken)
     {
-        return !await _dbContext.GridAreas
-            .AnyAsync(
+        return await _dbContext.GridAreas
+            .FirstOrDefaultAsync(
                 gridArea => gridArea.GridAreaCode == gridAreaCode,
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);

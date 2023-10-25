@@ -32,7 +32,7 @@ public class CreateGridAreaHandler : IRequestHandler<CreateGridAreaCommand, Unit
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
 
-        await _gridAreaRepository.CreateIfNotExistAsync(request.GridAreaCode, request.ValidFrom, request.GridAreaOwnerActorNumber, cancellationToken).ConfigureAwait(false);
+        await _gridAreaRepository.UpdateOwnershipAsync(request.GridAreaCode, request.ValidFrom, request.GridAreaOwnerActorNumber, cancellationToken).ConfigureAwait(false);
 
         return Unit.Value;
     }

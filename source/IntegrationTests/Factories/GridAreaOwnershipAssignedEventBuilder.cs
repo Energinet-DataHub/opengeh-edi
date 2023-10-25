@@ -19,19 +19,37 @@ using Google.Protobuf.WellKnownTypes;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
-internal static class GridAreaOwnershipAssignedEventBuilder
+internal sealed class GridAreaOwnershipAssignedEventBuilder
 {
-    private const string GridAreaCode = "543";
-    private static readonly string _actorNumber = ActorNumber.Create("1234567890123").Value;
-    private static readonly Timestamp _validFrom = Timestamp.FromDateTime(DateTime.UtcNow);
+    private string _gridAreaCode = "543";
+    private string _actorNumber = ActorNumber.Create("1234567890123").Value;
+    private Timestamp _validFrom = Timestamp.FromDateTime(DateTime.UtcNow);
 
-    internal static GridAreaOwnershipAssigned Build()
+    internal GridAreaOwnershipAssigned Build()
     {
         return new GridAreaOwnershipAssigned()
         {
-            GridAreaCode = GridAreaCode,
+            GridAreaCode = _gridAreaCode,
             ValidFrom = _validFrom,
             ActorNumber = _actorNumber,
         };
+    }
+
+    internal GridAreaOwnershipAssignedEventBuilder WithValidFrom(Timestamp newerValidFrom)
+    {
+        _validFrom = newerValidFrom;
+        return this;
+    }
+
+    internal GridAreaOwnershipAssignedEventBuilder WithOwnerShipActorNumber(string actorNumber)
+    {
+        _actorNumber = actorNumber;
+        return this;
+    }
+
+    internal GridAreaOwnershipAssignedEventBuilder WithGridAreaCode(string gridAreaCode)
+    {
+        _gridAreaCode = gridAreaCode;
+        return this;
     }
 }
