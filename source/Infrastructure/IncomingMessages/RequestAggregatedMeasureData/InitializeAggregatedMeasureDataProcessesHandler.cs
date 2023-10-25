@@ -60,7 +60,7 @@ public class InitializeAggregatedMeasureDataProcessesHandler
     private void CreateAggregatedMeasureDataProcess(
         RequestAggregatedMeasureDataMarketMessage marketMessage)
     {
-        var requestedByActorId = ActorNumber.Create(marketMessage.SenderNumber);
+        var actorSenderNumber = ActorNumber.Create(marketMessage.SenderNumber);
         var businessReason = CimCode.To(marketMessage.BusinessReason);
 
         foreach (var serie in marketMessage.Series)
@@ -73,7 +73,7 @@ public class InitializeAggregatedMeasureDataProcessesHandler
                 new AggregatedMeasureDataProcess(
                     ProcessId.New(),
                     BusinessTransactionId.Create(serie.Id),
-                    requestedByActorId,
+                    actorSenderNumber,
                     marketMessage.SenderRoleCode,
                     businessReason,
                     serie.MarketEvaluationPointType,

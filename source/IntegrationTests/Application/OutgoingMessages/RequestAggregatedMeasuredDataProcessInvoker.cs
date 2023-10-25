@@ -64,7 +64,7 @@ public class RequestAggregatedMeasuredDataProcessInvoker
             MeteringPointType.Consumption.Name,
             MeasurementUnit.Kwh.Name,
             Resolution.Hourly.Name,
-            new Period(InstantPattern.General.Parse("2022-06-17T22:00:00Z").GetValueOrThrow(), InstantPattern.General.Parse("2022-07-22T22:00:00Z").GetValueOrThrow()),
+            new Period(InstantPattern.General.Parse("2022-06-17T22:00:00Z").Value, InstantPattern.General.Parse("2022-07-22T22:00:00Z").Value),
             new GridAreaDetails("805", "1234567891045"),
             SettlementVersion.FirstCorrection.Name);
     }

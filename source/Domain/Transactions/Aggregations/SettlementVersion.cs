@@ -18,16 +18,18 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
 public class SettlementVersion : EnumerationType
 {
-    public static readonly SettlementVersion FirstCorrection = new(0, nameof(FirstCorrection), "D01");
-    public static readonly SettlementVersion SecondCorrection = new(0, nameof(SecondCorrection), "D02");
-    public static readonly SettlementVersion ThirdCorrection = new(0, nameof(ThirdCorrection), "D03");
-    public static readonly SettlementVersion FourthCorrection = new(0, nameof(FourthCorrection), "D04");
-    public static readonly SettlementVersion FifthCorrection = new(0, nameof(FifthCorrection), "D05");
-    public static readonly SettlementVersion SixthCorrection = new(0, nameof(SixthCorrection), "D06");
-    public static readonly SettlementVersion SeventhCorrection = new(0, nameof(SeventhCorrection), "D07");
-    public static readonly SettlementVersion EighthCorrection = new(0, nameof(EighthCorrection), "D08");
-    public static readonly SettlementVersion NinthCorrection = new(0, nameof(NinthCorrection), "D09");
-    public static readonly SettlementVersion TenthCorrection = new(0, nameof(TenthCorrection), "D10");
+    public static readonly SettlementVersion FirstCorrection = new(1, nameof(FirstCorrection), "D01");
+    public static readonly SettlementVersion SecondCorrection = new(2, nameof(SecondCorrection), "D02");
+    public static readonly SettlementVersion ThirdCorrection = new(3, nameof(ThirdCorrection), "D03");
+
+    // Below SettlementVersions are not used directly, but must be here for possible mapping
+    public static readonly SettlementVersion FourthCorrection = new(4, nameof(FourthCorrection), "D04");
+    public static readonly SettlementVersion FifthCorrection = new(5, nameof(FifthCorrection), "D05");
+    public static readonly SettlementVersion SixthCorrection = new(6, nameof(SixthCorrection), "D06");
+    public static readonly SettlementVersion SeventhCorrection = new(7, nameof(SeventhCorrection), "D07");
+    public static readonly SettlementVersion EighthCorrection = new(8, nameof(EighthCorrection), "D08");
+    public static readonly SettlementVersion NinthCorrection = new(9, nameof(NinthCorrection), "D09");
+    public static readonly SettlementVersion TenthCorrection = new(10, nameof(TenthCorrection), "D10");
 
     private SettlementVersion(int id, string name, string code)
         : base(id, name)
