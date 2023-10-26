@@ -56,7 +56,7 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
     public async Task Event_is_marked_as_processed_when_a_handler_has_handled_it_successfully()
     {
         _gridAreaBuilder
-            .WithGridAreaCode(GridArea)
+            .WithGridAreaCode(GridAreaCode)
             .Store(GetService<B2BContext>());
 
         await _processor.ProcessEventsAsync(CancellationToken.None);
