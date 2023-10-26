@@ -24,6 +24,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Newtonsoft.Json;
 using NodaTime;
+using ActorGrouping = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.ActorGrouping;
+using GridAreaDetails = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.GridAreaDetails;
+using Period = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.Period;
 using Point = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.Point;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData;
@@ -94,34 +97,34 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
                     fromDbValue =>
                         JsonConvert.DeserializeObject<IReadOnlyList<Point>>(fromDbValue) ?? new List<Point>());
 
-            navigationBuilder.Property<Instant>("Start").HasColumnName("StartPeriod");
-            navigationBuilder.Property<Instant>("End").HasColumnName("EndPeriod");
-            navigationBuilder.Property<string?>("EnergySupplierId");
-            navigationBuilder.Property<string?>("BalanceResponsibleId");
-            navigationBuilder.Property<string>("GridAreaCode");
-            navigationBuilder.Property<string>("GridAreaResponsibleId");
+            // navigationBuilder.Property<Instant>("Start").HasColumnName("StartPeriod");
+            // navigationBuilder.Property<Instant>("End").HasColumnName("EndPeriod");
+            // navigationBuilder.Property<string?>("EnergySupplierId");
+            // navigationBuilder.Property<string?>("BalanceResponsibleId");
+            // navigationBuilder.Property<string>("GridAreaCode");
+            // navigationBuilder.Property<string>("GridAreaResponsibleId");
             navigationBuilder.WithOwner().HasForeignKey("ProcessId");
 
-            // builder.OwnsOne<Period>(x => x.Period, period
-            //     =>
-            // {
-            //     period.Property(y => y.Start).HasColumnName("StartPeriod");
-            //     period.Property(y => y.End).HasColumnName("EndPeriod");
-            // });
-            //
-            // builder.OwnsOne<ActorGrouping>(x => x.ActorGrouping, actorGrouping
-            //     =>
-            // {
-            //     actorGrouping.Property(y => y.BalanceResponsibleNumber).HasColumnName("EnergySupplierId");
-            //     actorGrouping.Property(y => y.EnergySupplierNumber).HasColumnName("BalanceResponsibleId");
-            // });
-            //
-            // builder.OwnsOne<GridAreaDetails>(x => x.GridAreaDetails, gridDetails
-            //     =>
-            // {
-            //     gridDetails.Property(y => y.GridAreaCode).HasColumnName("GridAreCode");
-            //     gridDetails.Property(y => y.OperatorNumber).HasColumnName("GridAreaResponsibleId");
-            // });
+            navigationBuilder.OwnsOne<Period>(x => x.Period, period
+                =>
+            {
+                period.Property(y => y.Start).HasColumnName("StartPeriod");
+                period.Property(y => y.End).HasColumnName("EndPeriod");
+            });
+
+            navigationBuilder.OwnsOne<ActorGrouping>(x => x.ActorGrouping, actorGrouping
+                =>
+            {
+                actorGrouping.Property(y => y.BalanceResponsibleNumber).HasColumnName("EnergySupplierId");
+                actorGrouping.Property(y => y.EnergySupplierNumber).HasColumnName("BalanceResponsibleId");
+            });
+
+            navigationBuilder.OwnsOne<GridAreaDetails>(x => x.GridAreaDetails, gridDetails
+                =>
+            {
+                gridDetails.Property(y => y.GridAreaCode).HasColumnName("GridAreaCode");
+                gridDetails.Property(y => y.OperatorNumber).HasColumnName("GridAreaResponsibleId");
+            });
         });
 
         builder.HasMany<OutgoingMessage>("_messages")

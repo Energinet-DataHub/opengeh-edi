@@ -250,16 +250,13 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
                 aggregation.SettlementType,
                 aggregation.BusinessReason,
                 ProcessId,
-                aggregation.Period.Start,
-                aggregation.Period.End,
-                aggregation.GridAreaDetails.GridAreaCode,
-                aggregation.GridAreaDetails.OperatorNumber,
+                new Period(aggregation.Period.Start, aggregation.Period.End),
+                new GridAreaDetails(aggregation.GridAreaDetails.GridAreaCode, aggregation.GridAreaDetails.OperatorNumber),
+                new ActorGrouping(aggregation.ActorGrouping.EnergySupplierNumber, aggregation.ActorGrouping.BalanceResponsibleNumber),
                 aggregation.SettlementVersion,
                 aggregation.ReceiverRole,
                 aggregation.Receiver,
-                aggregation.OriginalTransactionIdReference,
-                aggregation.ActorGrouping.EnergySupplierNumber,
-                aggregation.ActorGrouping.BalanceResponsibleNumber);
+                aggregation.OriginalTransactionIdReference);
         }
     }
 }

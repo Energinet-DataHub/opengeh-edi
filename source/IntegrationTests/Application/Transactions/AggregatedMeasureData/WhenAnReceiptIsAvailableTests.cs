@@ -26,6 +26,8 @@ using Energinet.DataHub.EDI.Domain.Transactions;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
+using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.Edi.Responses;
@@ -173,6 +175,7 @@ public class WhenAnReceiptIsAvailableTests : TestBase
         AssertProcessState(processFromDb, AggregatedMeasureDataProcess.State.Initialized);
         AssertNumberOfPendingMessages(processFromDb, 1);
         AssertOutgoingMessageCreated(processFromDb, 0);
+        AssertSingleEnqueuedInternalCommand(nameof(SendAggregatedMeasureRequestToWholesale));
     }
 
     protected override void Dispose(bool disposing)
@@ -249,6 +252,15 @@ public class WhenAnReceiptIsAvailableTests : TestBase
             .Where(x => x.ProcessId == process.ProcessId);
         Assert.NotNull(outgoingMessages);
         Assert.Equal(expectedOutgoingMessages, outgoingMessages.Count());
+    }
+
+    private void AssertSingleEnqueuedInternalCommand(string typeOfCommand)
+    {
+        var internalCommands = _b2BContext.QueuedInternalCommands
+            .ToList()
+            .Where(x => x.Type == typeOfCommand);
+        Assert.NotNull(internalCommands);
+        Assert.Single(internalCommands);
     }
 
     private async Task<AssertOutgoingMessage> OutgoingMessageAsync(
