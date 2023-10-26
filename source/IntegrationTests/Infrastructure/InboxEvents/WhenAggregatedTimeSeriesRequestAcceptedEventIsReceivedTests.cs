@@ -34,7 +34,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 
 public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestBase
 {
-    private const string GridArea = "244";
+    private const string GridAreaCode = "244";
     private readonly string _eventType = nameof(AggregatedTimeSeriesRequestAccepted);
     private readonly Guid _referenceId = Guid.NewGuid();
     private readonly string _eventId = "1";
@@ -85,7 +85,7 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
         return new AggregatedTimeSeriesRequestAccepted()
         {
             SettlementVersion = "0",
-            GridArea = GridArea,
+            GridArea = GridAreaCode,
             QuantityUnit = QuantityUnit.Kwh,
             Period = period,
             TimeSeriesPoints = { point },
