@@ -26,7 +26,6 @@ using Energinet.DataHub.EDI.Domain.Transactions;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.Edi.Responses;
@@ -63,10 +62,10 @@ public class WhenAnReceiptIsAvailableTests : TestBase
         await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestReceipt), receiptEvent, process.ProcessId.Id);
 
         // Assert
-        var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
+        var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.Correction);
         var timeSerie = responseMessageEvent;
         outgoingMessage
-            .HasBusinessReason(CimCode.To(process.BusinessReason).Name)
+            .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
@@ -96,10 +95,10 @@ public class WhenAnReceiptIsAvailableTests : TestBase
         await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestReceipt), receiptEvent, process.ProcessId.Id);
 
         // Assert
-        var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
+        var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.Correction);
         var timeSerie = responseMessageEvent;
         outgoingMessage
-            .HasBusinessReason(CimCode.To(process.BusinessReason).Name)
+            .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
@@ -226,7 +225,7 @@ public class WhenAnReceiptIsAvailableTests : TestBase
             QuantityUnit = QuantityUnit.Kwh,
             Period = period,
             TimeSeriesPoints = { point },
-            TimeSeriesType = TimeSeriesType.Production,
+            TimeSeriesType = TimeSeriesType.NetExchangePerGa,
             SettlementVersion = SettlementVersion.FirstCorrection.Name,
         };
     }
@@ -272,15 +271,15 @@ public class WhenAnReceiptIsAvailableTests : TestBase
           BusinessTransactionId.Create(Guid.NewGuid().ToString()),
           SampleData.ReceiverNumber,
           receiverRole.Code,
-          CimCode.Of(BusinessReason.BalanceFixing),
-          null,
+          BusinessReason.Correction,
+          MeteringPointType.Exchange.Code,
           null,
           SampleData.StartOfPeriod,
           SampleData.EndOfPeriod,
           SampleData.GridAreaCode,
           receiverRole == MarketRole.EnergySupplier ? SampleData.ReceiverNumber.Value : null,
           receiverRole == MarketRole.BalanceResponsibleParty ? SampleData.ReceiverNumber.Value : null,
-          "D01");
+          SettlementVersion.FirstCorrection);
 
         process.WasSentToWholesale();
         _b2BContext.AggregatedMeasureDataProcesses.Add(process);

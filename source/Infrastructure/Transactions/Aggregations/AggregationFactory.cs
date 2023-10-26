@@ -20,7 +20,6 @@ using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Domain.Transactions.Exceptions;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.Collections;
 using NodaTime.Serialization.Protobuf;

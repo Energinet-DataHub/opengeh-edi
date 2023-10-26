@@ -132,43 +132,23 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
     <EmbeddedResource Include="Scripts\Model\202310241037 Create GridArea table.sql" />
     <EmbeddedResource Include="Scripts\Model\202310241037 Rename ActorNumber to GridAreaOwnerActorNumber in GridArea table.sql" />
-    <EmbeddedResource Include="Scripts\Model\202310241037 Create GridArea table.sql" />
-    <EmbeddedResource Include="Scripts\Model\202310241037 Rename ActorNumber to GridAreaOwnerActorNumber in GridArea table.sql" />
-    <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
-    <None Remove="Scripts\Model\202322051044 Add Document to ArchivedMessage.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
-    <None Remove="Scripts\Model\202227101336 Add ReadyMessages Table.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101336 Add BundledMessages Table.sql" />
-    <None Remove="Scripts\Model\202227101337 Alter AggregatedTimeSeriesTransactions table.sql" />
-    <None Remove="Scripts\Model\202227101352 Change Id from string to uniqueidentifier.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101353 Change Id from string to uniqueidentifier.sql" />
-    <None Remove="Scripts\Model\202304131240 Create ArchivedMessage table.sql" />
     <EmbeddedResource Include="Scripts\Model\202304131240 Create ArchivedMessage table.sql" />
-    <None Remove="Scripts\Model\202305311442 Recreate TransactionIds as TransactionRegistry.sql" />
     <EmbeddedResource Include="Scripts\Model\202305311442 Recreate TransactionIds as TransactionRegistry.sql" />
-    <None Remove="Scripts\Model\202307311506 Create ReceivedInboxEvents table.sql" />
     <EmbeddedResource Include="Scripts\Model\202307311506 Create ReceivedInboxEvents table.sql" />
-    <None Remove="Scripts\Model\202308011325 Add referenceId to ReceivedInboxEvents.sql" />
     <EmbeddedResource Include="Scripts\Model\202308011325 Add referenceId to ReceivedInboxEvents.sql" />
-    <None Remove="Scripts\Model\202309181435 Rename ProcessId to BusinessProcessId on MoveInTransactions.sql" />
     <EmbeddedResource Include="Scripts\Model\202309181435 Rename ProcessId to BusinessProcessId on MoveInTransactions.sql" />
-    <None Remove="Scripts\Model\202309181436 Rename TransactionId to ProcessId on MoveInTransactions.sql" />
     <EmbeddedResource Include="Scripts\Model\202309181436 Rename TransactionId to ProcessId on MoveInTransactions.sql" />
-    <None Remove="Scripts\Model\202309151307 Rename TransactionId to ProcessId on OutgoingMessage.sql" />
     <EmbeddedResource Include="Scripts\Model\202309151307 Rename TransactionId to ProcessId on OutgoingMessage.sql" />
     <EmbeddedResource Include="Scripts\Model\202309211415 ArchivedMessage MessageId is longer.sql" />
     <EmbeddedResource Include="Scripts\Model\202309271021 Remove ResponseData from AggregatedMeasureDataProcesses.sql" />
-<<<<<<< HEAD
-    <EmbeddedResource Include="Scripts\Model\202310241400 new pending message table for aggregated measure data process.sql" />
-=======
-    <EmbeddedResource Include="Scripts\Model\202310231618 Change SettlementVersion of AggregatedMeasuredDataProcess type to nvarchar.sql" />
->>>>>>> main
     <EmbeddedResource Include="Scripts\Model\202310231618 Change SettlementVersion of AggregatedMeasuredDataProcess type to nvarchar.sql" />
     <EmbeddedResource Include="Scripts\Model\202310241400 new pending message table for aggregated measure data process.sql" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Scripts\Model\202306010815 Recreate MessageIds as MessageRegistry.sql" />
     <EmbeddedResource Include="Scripts\Model\202306010815 Recreate MessageIds as MessageRegistry.sql" />
   </ItemGroup>
 
