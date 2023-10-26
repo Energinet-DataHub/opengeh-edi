@@ -1,6 +1,6 @@
 DECLARE @validFrom DATETIME2 = '2023-10-24 00:00:00.0000000';
 
-INSERT INTO dbo.GridArea (Id, GridAreaCode, ValidFrom, ActorNumber)
+INSERT INTO dbo.GridArea (Id, GridAreaCode, ValidFrom, GridAreaOwnerActorNumber)
 VALUES
     (NEWID(), '003', @validFrom, '5790002606892'),
     (NEWID(), '007', @validFrom, '5790002606892'),
