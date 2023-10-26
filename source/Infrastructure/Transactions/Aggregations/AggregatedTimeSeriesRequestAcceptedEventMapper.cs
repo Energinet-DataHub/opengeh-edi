@@ -38,18 +38,16 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         var aggregation =
             AggregatedTimeSeriesRequestAccepted.Parser.ParseJson(payload);
 
-        var aggregatiedTimeSerie = new AggregatedTimeSerie(
-                MapPoints(aggregation.TimeSeriesPoints),
-                MapMeteringPointType(aggregation),
-                MapUnitType(aggregation),
-                MapResolution(aggregation),
-                MapPeriod(aggregation),
-                MapGridAreaDetails(aggregation),
-                MapSettlementVersion(aggregation));
+        var aggregatedTimeSerie = new AggregatedTimeSerie(
+            MapPoints(aggregation.TimeSeriesPoints),
+            MapMeteringPointType(aggregation.TimeSeriesType),
+            MapUnitType(aggregation.QuantityUnit),
+            MapResolution(aggregation.Resolution),
+            MapGridAreaDetails(aggregation.GridArea));
 
         return Task.FromResult<INotification>(new AggregatedTimeSerieRequestWasAccepted(
             referenceId,
-            aggregatiedTimeSerie));
+            aggregatedTimeSerie));
     }
 
     public bool CanHandle(string eventType)
@@ -65,14 +63,9 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         return inboxEvent.ToString();
     }
 
-    private static string? MapSettlementVersion(AggregatedTimeSeriesRequestAccepted aggregation)
+    private static string MapMeteringPointType(TimeSeriesType timeSeriesType)
     {
-        return aggregation.SettlementVersion;
-    }
-
-    private static string MapMeteringPointType(AggregatedTimeSeriesRequestAccepted aggregation)
-    {
-        return aggregation.TimeSeriesType switch
+        return timeSeriesType switch
         {
             TimeSeriesType.Production => MeteringPointType.Production.Name,
             TimeSeriesType.FlexConsumption => MeteringPointType.Consumption.Name,
@@ -99,14 +92,9 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         return points.AsReadOnly();
     }
 
-    private static Domain.Transactions.AggregatedMeasureData.Period MapPeriod(AggregatedTimeSeriesRequestAccepted aggregation)
+    private static string MapResolution(Resolution resolution)
     {
-        return new Domain.Transactions.AggregatedMeasureData.Period(aggregation.Period.StartOfPeriod.ToInstant(), aggregation.Period.EndOfPeriod.ToInstant());
-    }
-
-    private static string MapResolution(AggregatedTimeSeriesRequestAccepted aggregation)
-    {
-        return aggregation.Period.Resolution switch
+        return resolution switch
         {
             Resolution.Pt15M => Domain.Transactions.Aggregations.Resolution.QuarterHourly.Name,
             Resolution.Pt1H => Domain.Transactions.Aggregations.Resolution.Hourly.Name,
@@ -115,9 +103,9 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         };
     }
 
-    private static string MapUnitType(AggregatedTimeSeriesRequestAccepted aggregation)
+    private static string MapUnitType(QuantityUnit quantityUnit)
     {
-        return aggregation.QuantityUnit switch
+        return quantityUnit switch
         {
             QuantityUnit.Kwh => MeasurementUnit.Kwh.Name,
             QuantityUnit.Unspecified => throw new InvalidOperationException("Could not map unit type"),
@@ -149,10 +137,10 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         return input.Units + (input.Nanos / nanoFactor);
     }
 
-    private static GridAreaDetails MapGridAreaDetails(AggregatedTimeSeriesRequestAccepted aggregation)
+    private static GridAreaDetails MapGridAreaDetails(string gridAreaCode)
     {
-        var gridOperatorNumber = GridAreaLookup.GetGridOperatorFor(aggregation.GridArea);
+        var gridOperatorNumber = GridAreaLookup.GetGridOperatorFor(gridAreaCode);
 
-        return new GridAreaDetails(aggregation.GridArea, gridOperatorNumber.Value);
+        return new GridAreaDetails(gridAreaCode, gridOperatorNumber.Value);
     }
 }

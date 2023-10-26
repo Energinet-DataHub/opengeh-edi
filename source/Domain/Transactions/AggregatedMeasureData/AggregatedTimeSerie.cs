@@ -22,9 +22,7 @@ public record AggregatedTimeSerie(
     string MeteringPointType,
     string UnitType,
     string Resolution,
-    Period Period,
-    GridAreaDetails GridAreaDetails,
-    string? SettlementVersion);
+    GridAreaDetails GridAreaDetails);
 
 [Serializable]
 public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
