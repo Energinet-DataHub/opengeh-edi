@@ -13,10 +13,10 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Domain.Documents;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
-using Energinet.DataHub.EDI.Domain.Transactions;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Domain.OutgoingMessages.Queueing;

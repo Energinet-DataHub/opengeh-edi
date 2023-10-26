@@ -45,3 +45,5 @@ public class ActorNumber : ValueObject
         return actorNumber.Length == 13;
     }
 }
+
+#pragma warning disable

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.Core.App.Common.Abstractions.Actors;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Domain.ArchivedMessages;
 using Energinet.DataHub.EDI.Domain.GridAreas;
 using Energinet.DataHub.EDI.Infrastructure.Actors;

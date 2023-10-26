@@ -12,20 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
-using Xunit;
+using System;
 
-namespace Energinet.DataHub.EDI.Tests.Domain.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Common.Actors;
 
-public class ResolutionTests
+public class Actor
 {
-    [Theory]
-    [InlineData("pt1h")]
-    [InlineData("hourly")]
-    public void Can_parse_from_name_or_code(string valueToParseFrom)
-    {
-        var resolution = Resolution.From(valueToParseFrom);
+    private readonly Guid _id;
 
-        Assert.Equal(Resolution.Hourly, resolution);
+    public Actor(ActorNumber actorNumber, string externalId)
+    {
+        _id = Guid.NewGuid();
+        ActorNumber = actorNumber;
+        ExternalId = externalId;
     }
+
+#pragma warning disable
+    private Actor()
+    {
+    }
+
+    public ActorNumber ActorNumber { get; set; }
+
+    public string ExternalId { get; set; }
 }

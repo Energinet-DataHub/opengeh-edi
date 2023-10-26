@@ -12,12 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Energinet.DataHub.EDI.Domain.Transactions;
-using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Tests.Factories;
+using NodaTime;
 using Xunit;
+using GridArea = Energinet.DataHub.EDI.Domain.GridAreas.GridArea;
 
 namespace Energinet.DataHub.EDI.Tests.Domain.Transactions.Aggregations;
 
@@ -42,7 +45,7 @@ public class AggregationResultMessageFactoryTests
     {
         var result = _aggregationResult
             .ForProduction()
-            .WithGridAreaDetails(GridArea.Create("870"), ActorNumber.Create("1234567890123"))
+            .WithGridAreaDetails(new GridArea("870", Instant.FromDateTimeUtc(DateTime.UtcNow), ActorNumber.Create("1234567890123")))
             .Build();
 
         var message = CreateMessage(result);

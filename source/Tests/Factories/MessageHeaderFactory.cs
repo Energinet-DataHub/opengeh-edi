@@ -14,16 +14,16 @@
 
 using System;
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.Tests.Factories;
 
 public static class MessageHeaderFactory
 {
-    public static MessageHeader Create(BusinessReason? businessReason = null, MarketRole? receiverRole = null, MarketRole? senderRole = null)
+    public static OutgoingMessageHeader Create(BusinessReason? businessReason = null, MarketRole? receiverRole = null, MarketRole? senderRole = null)
     {
-        return new MessageHeader(
+        return new OutgoingMessageHeader(
             businessReason is null ? BusinessReason.MoveIn.Name : businessReason.Name,
             "1234567890123",
             senderRole is null ? MarketRole.MeteringPointAdministrator.Name : senderRole.Name,

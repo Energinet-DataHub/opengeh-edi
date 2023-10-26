@@ -15,7 +15,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.Core.App.Common.Abstractions.Actors;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common.Actors;
