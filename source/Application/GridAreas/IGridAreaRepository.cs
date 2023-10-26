@@ -32,4 +32,9 @@ public interface IGridAreaRepository
         Instant validFrom,
         ActorNumber actorNumber,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Responsible for getting the grid operator for a given grid area.
+    /// </summary>
+    Task<ActorNumber> GetGridOwnerForAsync(string gridAreaCode, CancellationToken cancellationToken);
 }
