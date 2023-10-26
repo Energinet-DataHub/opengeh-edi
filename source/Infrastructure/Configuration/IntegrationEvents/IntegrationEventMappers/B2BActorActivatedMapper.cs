@@ -15,8 +15,8 @@
 using System;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.Application.Actors;
-using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
-using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
