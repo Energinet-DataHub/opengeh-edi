@@ -303,7 +303,7 @@ public class AggregationFactory
             _ => throw new InvalidOperationException("Unknown aggregation level"),
         };
 
-        var gridOperatorNumber = await _gridAreaRepository.GetGridOperatorForAsync(gridAreaCode, cancellationToken).ConfigureAwait(false);
+        var gridOperatorNumber = await _gridAreaRepository.GetGridOwnerForAsync(gridAreaCode, cancellationToken).ConfigureAwait(false);
 
         return new GridAreaDetails(gridAreaCode, gridOperatorNumber.Value);
     }

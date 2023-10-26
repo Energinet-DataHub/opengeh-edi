@@ -159,7 +159,7 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
 
     private async Task<GridAreaDetails> MapGridAreaDetailsAsync(string gridAreaCode, CancellationToken cancellationToken)
     {
-        var gridOperatorNumber = await _gridAreaRepository.GetGridOperatorForAsync(gridAreaCode, cancellationToken).ConfigureAwait(false);
+        var gridOperatorNumber = await _gridAreaRepository.GetGridOwnerForAsync(gridAreaCode, cancellationToken).ConfigureAwait(false);
 
         return new GridAreaDetails(gridAreaCode, gridOperatorNumber.Value);
     }

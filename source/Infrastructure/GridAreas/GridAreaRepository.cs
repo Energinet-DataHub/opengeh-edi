@@ -45,7 +45,7 @@ public class GridAreaRepository : IGridAreaRepository
             gridArea.UpdateOwnership(validFrom, actorNumber);
     }
 
-    public async Task<ActorNumber> GetGridOperatorForAsync(string gridAreaCode, CancellationToken cancellationToken)
+    public async Task<ActorNumber> GetGridOwnerForAsync(string gridAreaCode, CancellationToken cancellationToken)
     {
         var gridAreaByCode = await _dbContext.GridAreas
             .FirstAsync(
