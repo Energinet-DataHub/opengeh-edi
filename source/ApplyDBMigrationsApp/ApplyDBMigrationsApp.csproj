@@ -125,6 +125,13 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202225081511 Add grid operator id.sql" />
     <EmbeddedResource Include="Scripts\Model\202226081400 Make EnergySupplierNumber nullable.sql" />
     <EmbeddedResource Include="Scripts\Model\202310181233 Add SettlemenVersion to AggregatedMeasuredDataProcess.sql" />
+    <EmbeddedResource Include="Scripts\Model\202310191501 Add Constraint on Actor for IdentificationNumber and B2CId.sql" />
+    <EmbeddedResource Include="Scripts\Model\202310200957 Rename IdentificationNumber to ActorNumber on Actor.sql" />
+    <EmbeddedResource Include="Scripts\Model\202310200958 Rename B2CId to ExternalId on Actor.sql" />
+    <EmbeddedResource Include="Scripts\Model\202310200959 Actor ExternalId to nvarchar.sql" />
+    <EmbeddedResource Include="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
+    <EmbeddedResource Include="Scripts\Model\202310241037 Create GridArea table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202310241037 Rename ActorNumber to GridAreaOwnerActorNumber in GridArea table.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202322051044 Add Document to ArchivedMessage.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
@@ -149,6 +156,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202309151307 Rename TransactionId to ProcessId on OutgoingMessage.sql" />
     <EmbeddedResource Include="Scripts\Model\202309211415 ArchivedMessage MessageId is longer.sql" />
     <EmbeddedResource Include="Scripts\Model\202309271021 Remove ResponseData from AggregatedMeasureDataProcesses.sql" />
+    <EmbeddedResource Include="Scripts\Model\202310231618 Change SettlementVersion of AggregatedMeasuredDataProcess type to nvarchar.sql" />
   </ItemGroup>
 
   <ItemGroup>

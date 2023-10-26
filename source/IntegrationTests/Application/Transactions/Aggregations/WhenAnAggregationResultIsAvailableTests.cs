@@ -177,8 +177,9 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     [InlineData(ProcessType.BalanceFixing, nameof(BusinessReason.BalanceFixing), TimeSeriesType.NetExchangePerNeighboringGa)]
     [InlineData(ProcessType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.NetExchangePerGa)]
     [InlineData(ProcessType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.NetExchangePerNeighboringGa)]
-    public async Task Exchange_is_sent_to_the_grid_operator(ProcessType processType, string businessReason, TimeSeriesType timeSeriesType)
+    public async Task Exchange_is_sent_to_the_grid_operator(ProcessType processType, string businessReasonName, TimeSeriesType timeSeriesType)
     {
+        var businessReason = BusinessReason.FromName(businessReasonName);
         _eventBuilder
             .WithProcessType(processType)
             .WithResolution(Resolution.Quarter)
@@ -189,7 +190,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
 
         await HavingReceivedAndHandledIntegrationEventAsync(CalculationResultCompleted.EventName, _eventBuilder.Build());
 
-        var message = await OutgoingMessageAsync(MarketRole.MeteredDataResponsible, BusinessReason.From(businessReason));
+        var message = await OutgoingMessageAsync(MarketRole.MeteredDataResponsible, businessReason);
         message.HasReceiverId(SampleData.GridOperatorNumber)
             .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
@@ -201,8 +202,9 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     [Theory]
     [InlineData(ProcessType.BalanceFixing, nameof(BusinessReason.BalanceFixing), TimeSeriesType.TotalConsumption)]
     [InlineData(ProcessType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.TotalConsumption)]
-    public async Task Total_consumption_is_sent_to_the_grid_operator(ProcessType processType, string businessReason, TimeSeriesType timeSeriesType)
+    public async Task Total_consumption_is_sent_to_the_grid_operator(ProcessType processType, string businessReasonName, TimeSeriesType timeSeriesType)
     {
+        var businessReason = BusinessReason.FromName(businessReasonName);
         _eventBuilder
             .WithProcessType(processType)
             .WithResolution(Resolution.Quarter)
@@ -213,7 +215,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
 
         await HavingReceivedAndHandledIntegrationEventAsync(CalculationResultCompleted.EventName, _eventBuilder.Build());
 
-        var message = await OutgoingMessageAsync(MarketRole.MeteredDataResponsible, BusinessReason.From(businessReason));
+        var message = await OutgoingMessageAsync(MarketRole.MeteredDataResponsible, businessReason);
         message.HasReceiverId(SampleData.GridOperatorNumber)
             .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
@@ -222,11 +224,11 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, MeteringPointType.Consumption.Name);
     }
 
-    private async Task<AssertOutgoingMessage> OutgoingMessageAsync(MarketRole roleOfReceiver, BusinessReason completedAggregationType)
+    private async Task<AssertOutgoingMessage> OutgoingMessageAsync(MarketRole roleOfReceiver, BusinessReason businessReason)
     {
         return await AssertOutgoingMessage.OutgoingMessageAsync(
             DocumentType.NotifyAggregatedMeasureData.Name,
-            completedAggregationType.Name,
+            businessReason.Name,
             roleOfReceiver,
             GetService<IDatabaseConnectionFactory>());
     }

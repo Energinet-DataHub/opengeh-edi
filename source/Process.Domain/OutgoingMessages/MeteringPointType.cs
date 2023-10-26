@@ -20,18 +20,28 @@ namespace Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
 
 public class MeteringPointType : EnumerationType
 {
-    public static readonly MeteringPointType Consumption = new(0, nameof(Consumption));
-    public static readonly MeteringPointType Production = new(1, nameof(Production));
-    public static readonly MeteringPointType Exchange = new(2, nameof(Exchange));
+    public static readonly MeteringPointType Consumption = new(0, nameof(Consumption), "E17");
+    public static readonly MeteringPointType Production = new(1, nameof(Production), "E18");
+    public static readonly MeteringPointType Exchange = new(2, nameof(Exchange), "E20");
 
-    private MeteringPointType(int id, string name)
+    private MeteringPointType(int id, string name, string code)
         : base(id, name)
     {
+        Code = code;
     }
 
-    public static MeteringPointType From(string valueToParse)
+    public string Code { get; }
+
+    public static MeteringPointType From(string name)
     {
-        var meteringPointType = GetAll<MeteringPointType>().FirstOrDefault(type => type.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{valueToParse} is not a valid metering point type");
+        var meteringPointType = GetAll<MeteringPointType>().FirstOrDefault(type => type.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{name} is not a valid metering point type name");
+
+        return meteringPointType;
+    }
+
+    public static MeteringPointType FromCode(string code)
+    {
+        var meteringPointType = GetAll<MeteringPointType>().FirstOrDefault(type => type.Code.Equals(code, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{code} is not a valid metering point type code");
 
         return meteringPointType;
     }

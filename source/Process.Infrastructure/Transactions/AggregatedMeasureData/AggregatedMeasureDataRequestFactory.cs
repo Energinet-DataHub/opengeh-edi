@@ -121,7 +121,7 @@ public static class AggregatedMeasureDataRequestFactory
             MeteringPointType = process.MeteringPointType,
             RequestedByActorId = process.RequestedByActorId.Value,
             RequestedByActorRole = process.RequestedByActorRoleCode,
-            BusinessReason = process.BusinessReason,
+            BusinessReason = process.BusinessReason.Code,
         };
 
         if (process.SettlementMethod != null)
@@ -134,7 +134,7 @@ public static class AggregatedMeasureDataRequestFactory
             request.BalanceResponsibleId = process.BalanceResponsibleId;
 
         if (process.SettlementVersion != null)
-            request.SettlementSeriesVersion = process.SettlementVersion;
+            request.SettlementSeriesVersion = process.SettlementVersion.Code;
 
         if (process.MeteringGridAreaDomainId != null)
             request.GridAreaCode = process.MeteringGridAreaDomainId;

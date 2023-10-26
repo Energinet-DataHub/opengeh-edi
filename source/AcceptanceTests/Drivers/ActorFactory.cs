@@ -24,15 +24,15 @@ public static class ActorFactory
         using var command = new SqlCommand();
 
         command.CommandText = @"BEGIN
-                                   IF NOT EXISTS (SELECT * FROM [dbo].[Actor] WHERE IdentificationNumber = @IdentificationNumber)
+                                   IF NOT EXISTS (SELECT * FROM [dbo].[Actor] WHERE ActorNumber = @ActorNumber)
                                    BEGIN
-                                       INSERT INTO [dbo].[Actor] ([Id], [IdentificationNumber], [B2CId])
-                                       VALUES (@Id, @IdentificationNumber, @B2CId)
+                                       INSERT INTO [dbo].[Actor] ([Id], [ActorNumber], [ExternalId])
+                                       VALUES (@Id, @ActorNumber, @ExternalId)
                                    END
                                 END";
         command.Parameters.AddWithValue("@Id", "756768A4-64B4-4B66-A5ED-21BA3D64A59D");
-        command.Parameters.AddWithValue("@IdentificationNumber", "5790000610976");
-        command.Parameters.AddWithValue("@B2CId", b2CId);
+        command.Parameters.AddWithValue("@ActorNumber", "5790000610976");
+        command.Parameters.AddWithValue("@ExternalId", b2CId);
         command.Connection = connection;
 
         command.Connection.Open();

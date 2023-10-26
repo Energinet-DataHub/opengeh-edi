@@ -14,22 +14,20 @@
 
 using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Common.Actors;
 
 namespace Energinet.DataHub.EDI.Application.Actors;
 
 public class CreateActorCommand : InternalCommand
 {
     [JsonConstructor]
-    public CreateActorCommand(string actorId, string b2cId, string identificationNumber)
+    public CreateActorCommand(string externalId, ActorNumber actorNumber)
     {
-        ActorId = actorId;
-        IdentificationNumber = identificationNumber;
-        B2CId = b2cId;
+        ActorNumber = actorNumber;
+        ExternalId = externalId;
     }
 
-    public string B2CId { get; }
+    public string ExternalId { get; }
 
-    public string ActorId { get; }
-
-    public string IdentificationNumber { get; }
+    public ActorNumber ActorNumber { get; }
 }

@@ -77,8 +77,8 @@ public class RequestAggregatedMeasureDataReceiverTests : ProcessTestBase, IAsync
     {
 #pragma warning disable CA2007
 
-        await InvokeCommandAsync(new CreateActorCommand(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.SenderId));
-        await InvokeCommandAsync(new CreateActorCommand(Guid.NewGuid().ToString(), SampleData.SecondStsAssignedUserId, SampleData.SecondSenderId));
+        await InvokeCommandAsync(new CreateActorCommand(SampleData.StsAssignedUserId, ActorNumber.Create(SampleData.SenderId)));
+        await InvokeCommandAsync(new CreateActorCommand(SampleData.SecondStsAssignedUserId, ActorNumber.Create(SampleData.SecondSenderId)));
     }
 
     public Task DisposeAsync()

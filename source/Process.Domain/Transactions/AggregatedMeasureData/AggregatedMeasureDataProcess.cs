@@ -34,7 +34,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             BusinessTransactionId businessTransactionId,
             ActorNumber requestedByActorId,
             string requestedByActorRoleCode,
-            string businessReason,
+            BusinessReason businessReason,
             string? meteringPointType,
             string? settlementMethod,
             string startOfPeriod,
@@ -42,7 +42,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             string? meteringGridAreaDomainId,
             string? energySupplierId,
             string? balanceResponsibleId,
-            string? settlementVersion)
+            SettlementVersion? settlementVersion)
         {
             ProcessId = processId;
             BusinessTransactionId = businessTransactionId;
@@ -58,6 +58,9 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             RequestedByActorId = requestedByActorId;
             RequestedByActorRoleCode = requestedByActorRoleCode;
             AddDomainEvent(new AggregatedMeasureProcessIsInitialized(processId));
+
+            if (BusinessReason == BusinessReason.Correction && SettlementVersion == null)
+                SettlementVersion = SettlementVersion.FirstCorrection;
         }
 
         /// <summary>
@@ -87,7 +90,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
 
         public BusinessTransactionId BusinessTransactionId { get; }
 
-        public string BusinessReason { get; }
+        public BusinessReason BusinessReason { get; }
 
         /// <summary>
         /// Represent consumption types or production.
@@ -109,7 +112,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
 
         public string? BalanceResponsibleId { get; }
 
-        public string? SettlementVersion { get; }
+        public SettlementVersion? SettlementVersion { get; }
 
         public ActorNumber RequestedByActorId { get; set; }
 

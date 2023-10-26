@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration.Authentication;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.Actors;
 using Energinet.DataHub.EDI.Infrastructure.ArchivedMessages;
@@ -32,6 +33,7 @@ using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
+using Energinet.DataHub.EDI.Infrastructure.GridAreas;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
@@ -62,6 +64,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             services.AddLogging();
             AddActorServices();
             AddWholeSaleInBox();
+            AddGridAreaServices();
             IntegrationEventsConfiguration.Configure(services);
             InboxEventsConfiguration.Configure(services);
             ArchivedMessageConfiguration.Configure(services);
@@ -193,8 +196,14 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
 
         private void AddActorServices()
         {
-            _services.AddTransient<IRequestHandler<CreateActorCommand, Unit>, CreateActorHandler>();
-            _services.AddTransient<IActorRegistry, ActorRegistry>();
+            _services.AddScoped<IRequestHandler<CreateActorCommand, Unit>, CreateActorHandler>();
+            _services.AddScoped<IActorRegistry, ActorRegistry>();
+        }
+
+        private void AddGridAreaServices()
+        {
+            _services.AddScoped<IRequestHandler<GridAreaOwnershipAssignedCommand, Unit>, GridAreaOwnershipAssignedHandler>();
+            _services.AddScoped<IGridAreaRepository, GridAreaRepository>();
         }
 
         private void AddWholeSaleInBox()

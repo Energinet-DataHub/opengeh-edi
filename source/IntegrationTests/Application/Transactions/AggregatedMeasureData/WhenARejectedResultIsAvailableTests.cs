@@ -67,7 +67,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
         outgoingMessage
-            .HasBusinessReason(CimCode.To(process.BusinessReason).Name)
+            .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
@@ -100,7 +100,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
           BusinessTransactionId.Create(Guid.NewGuid().ToString()),
           SampleData.ReceiverNumber,
           SampleData.BalanceResponsibleParty.Code,
-          CimCode.Of(BusinessReason.BalanceFixing),
+          BusinessReason.BalanceFixing,
           null,
           null,
           SampleData.StartOfPeriod,

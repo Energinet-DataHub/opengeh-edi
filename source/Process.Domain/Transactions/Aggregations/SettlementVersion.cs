@@ -20,11 +20,20 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 
 public class SettlementVersion : EnumerationType
 {
-    public static readonly SettlementVersion FirstCorrection = new(0, nameof(FirstCorrection), "D01");
-    public static readonly SettlementVersion SecondCorrection = new(0, nameof(SecondCorrection), "D02");
-    public static readonly SettlementVersion ThirdCorrection = new(0, nameof(ThirdCorrection), "D03");
+    public static readonly SettlementVersion FirstCorrection = new(1, nameof(FirstCorrection), "D01");
+    public static readonly SettlementVersion SecondCorrection = new(2, nameof(SecondCorrection), "D02");
+    public static readonly SettlementVersion ThirdCorrection = new(3, nameof(ThirdCorrection), "D03");
 
-    public SettlementVersion(int id, string name, string code)
+    // Below SettlementVersions are not used directly, but must be here for possible mapping
+    public static readonly SettlementVersion FourthCorrection = new(4, nameof(FourthCorrection), "D04");
+    public static readonly SettlementVersion FifthCorrection = new(5, nameof(FifthCorrection), "D05");
+    public static readonly SettlementVersion SixthCorrection = new(6, nameof(SixthCorrection), "D06");
+    public static readonly SettlementVersion SeventhCorrection = new(7, nameof(SeventhCorrection), "D07");
+    public static readonly SettlementVersion EighthCorrection = new(8, nameof(EighthCorrection), "D08");
+    public static readonly SettlementVersion NinthCorrection = new(9, nameof(NinthCorrection), "D09");
+    public static readonly SettlementVersion TenthCorrection = new(10, nameof(TenthCorrection), "D10");
+
+    private SettlementVersion(int id, string name, string code)
         : base(id, name)
     {
         Code = code;
@@ -32,12 +41,20 @@ public class SettlementVersion : EnumerationType
 
     public string Code { get; }
 
-    public static SettlementVersion From(string valueToParse)
+    public static SettlementVersion FromName(string name)
     {
         var settlementVersion = GetAll<SettlementVersion>()
-            .FirstOrDefault(type => type.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase) ||
-                                    type.Code.Equals(valueToParse, StringComparison.OrdinalIgnoreCase)) ??
-                                    throw new InvalidCastException($"Could not parse {valueToParse} to settlement version");
+            .FirstOrDefault(type => type.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+            ?? throw new InvalidCastException($"Could not parse name {name} to settlement version");
+
+        return settlementVersion;
+    }
+
+    public static SettlementVersion FromCode(string code)
+    {
+        var settlementVersion = GetAll<SettlementVersion>()
+            .FirstOrDefault(type => type.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
+            ?? throw new InvalidCastException($"Could not parse code {code} to settlement version");
 
         return settlementVersion;
     }

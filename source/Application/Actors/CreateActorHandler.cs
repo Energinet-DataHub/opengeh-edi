@@ -21,18 +21,18 @@ namespace Energinet.DataHub.EDI.Application.Actors;
 
 public class CreateActorHandler : IRequestHandler<CreateActorCommand, Unit>
 {
-    private readonly IActorRegistry _actorRegistry;
+    private readonly IActorRepository _actorRepository;
 
-    public CreateActorHandler(IActorRegistry actorRegistry)
+    public CreateActorHandler(IActorRepository actorRepository)
     {
-        _actorRegistry = actorRegistry;
+        _actorRepository = actorRepository;
     }
 
     public async Task<Unit> Handle(CreateActorCommand request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
 
-        await _actorRegistry.TryStoreAsync(request, cancellationToken).ConfigureAwait(false);
+        await _actorRepository.CreateIfNotExistAsync(request.ActorNumber, request.ExternalId, cancellationToken).ConfigureAwait(false);
 
         return Unit.Value;
     }

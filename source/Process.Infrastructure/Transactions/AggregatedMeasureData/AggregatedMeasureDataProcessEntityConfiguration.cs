@@ -43,7 +43,10 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
         builder.Property(x => x.MeteringGridAreaDomainId);
         builder.Property(x => x.EnergySupplierId);
         builder.Property(x => x.BalanceResponsibleId);
-        builder.Property(x => x.BusinessReason);
+        builder.Property(x => x.BusinessReason)
+            .HasConversion(
+                value => value.Code,
+                dbValue => BusinessReason.FromCode(dbValue));
         builder.Property(x => x.RequestedByActorId)
             .HasConversion(
                 toDbValue => toDbValue.Value,
@@ -55,6 +58,11 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
                 toDbValue => toDbValue.ToString(),
                 fromDbValue => Enum.Parse<AggregatedMeasureDataProcess.State>(fromDbValue, true))
             .HasColumnName("State");
+
+        builder.Property(x => x.SettlementVersion)
+            .HasConversion(
+                value => value != null ? value.Code : null,
+                dbValue => !string.IsNullOrWhiteSpace(dbValue) ? SettlementVersion.FromCode(dbValue) : null);
 
         builder.HasMany<OutgoingMessage>("_messages")
             .WithOne()

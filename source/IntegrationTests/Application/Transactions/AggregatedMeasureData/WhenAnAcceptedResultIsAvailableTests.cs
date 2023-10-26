@@ -62,14 +62,14 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
-        var timeSerie = acceptedEvent;
+
         outgoingMessage
-            .HasBusinessReason(CimCode.To(process.BusinessReason).Name)
+            .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion, timeSerie.SettlementVersion)
+            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion, acceptedEvent.SettlementVersion)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId);
     }
@@ -87,14 +87,14 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
-        var timeSerie = acceptedEvent;
+
         outgoingMessage
-            .HasBusinessReason(CimCode.To(process.BusinessReason).Name)
+            .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion!, timeSerie.SettlementVersion);
+            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion, acceptedEvent.SettlementVersion);
     }
 
     protected override void Dispose(bool disposing)
@@ -141,7 +141,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             Period = period,
             TimeSeriesPoints = { point },
             TimeSeriesType = TimeSeriesType.Production,
-            SettlementVersion = SettlementVersion.FirstCorrection.Name,
+            SettlementVersion = aggregatedMeasureDataProcess.SettlementVersion?.Name,
         };
     }
 
@@ -177,15 +177,15 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
           BusinessTransactionId.Create(Guid.NewGuid().ToString()),
           SampleData.ReceiverNumber,
           receiverRole.Code,
-          CimCode.Of(BusinessReason.BalanceFixing),
-          null,
+          BusinessReason.BalanceFixing,
+          MeteringPointType.Production.Code,
           null,
           SampleData.StartOfPeriod,
           SampleData.EndOfPeriod,
           SampleData.GridAreaCode,
           receiverRole == MarketRole.EnergySupplier ? SampleData.ReceiverNumber.Value : null,
           receiverRole == MarketRole.BalanceResponsibleParty ? SampleData.ReceiverNumber.Value : null,
-          "D01");
+          SettlementVersion.FirstCorrection);
 
         process.WasSentToWholesale();
         _processContext.AggregatedMeasureDataProcesses.Add(process);

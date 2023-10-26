@@ -19,6 +19,7 @@ using Dapper;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Assertions;
@@ -103,15 +104,12 @@ public class AssertOutgoingMessage
         return this;
     }
 
-    public AssertOutgoingMessage HasBusinessReason(string businessReason)
+    public AssertOutgoingMessage HasBusinessReason(BusinessReason businessReason)
     {
-        Assert.Equal(businessReason, _message.BusinessReason);
-        return this;
-    }
+        ArgumentNullException.ThrowIfNull(businessReason);
 
-    public AssertMarketActivityRecord WithMarketActivityRecord()
-    {
-        return new AssertMarketActivityRecord(_message.MessageRecord);
+        Assert.Equal(businessReason.Name, _message.BusinessReason);
+        return this;
     }
 
     public AssertOutgoingMessage HasMessageRecordValue<TMessageRecord>(
