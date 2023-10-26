@@ -14,6 +14,7 @@
 
 using System.Xml.Schema;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.Xml;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
 
 namespace Energinet.DataHub.EDI.Infrastructure.DocumentValidation.Ebix;
 

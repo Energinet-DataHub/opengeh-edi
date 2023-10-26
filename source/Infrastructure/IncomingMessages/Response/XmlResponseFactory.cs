@@ -19,13 +19,14 @@ using System.Xml;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.Response
 {
     public class XmlResponseFactory : IResponseFactory
     {
 #pragma warning disable CA1822
-        public DocumentFormat HandledFormat => DocumentFormat.CimXml;
+        public DocumentFormat HandledFormat => DocumentFormat.Xml;
 #pragma warning restore CA1822
 
         public ResponseMessage From(Result result)

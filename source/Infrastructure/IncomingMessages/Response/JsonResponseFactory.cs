@@ -20,13 +20,14 @@ using System.Text.Json;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.Response;
 
 public class JsonResponseFactory : IResponseFactory
 {
 #pragma warning disable CA1822
-    public DocumentFormat HandledFormat => DocumentFormat.CimJson;
+    public DocumentFormat HandledFormat => DocumentFormat.Json;
 #pragma warning restore CA1822
 
     public ResponseMessage From(Result result)

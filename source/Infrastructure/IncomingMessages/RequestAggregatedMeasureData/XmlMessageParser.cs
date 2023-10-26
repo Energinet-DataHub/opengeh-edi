@@ -26,6 +26,7 @@ using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAgg
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.CimXml;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
@@ -42,7 +43,7 @@ public class XmlMessageParser : IMessageParser<RequestAggregatedMeasureDataMarke
     }
 
 #pragma warning disable CA1822
-    public DocumentFormat HandledFormat => DocumentFormat.CimXml;
+    public DocumentFormat HandledFormat => DocumentFormat.Xml;
 #pragma warning restore CA1822
 
     public async Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(Stream message, CancellationToken cancellationToken)
