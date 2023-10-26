@@ -15,6 +15,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
@@ -31,23 +34,13 @@ using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 
-public static class AggregationFactory
+public class AggregationFactory
 {
-    public static Aggregation Create(CalculationResultCompleted integrationEvent)
-    {
-        if (integrationEvent == null) throw new ArgumentNullException(nameof(integrationEvent));
+    private readonly IGridAreaRepository _gridAreaRepository;
 
-        return new Aggregation(
-            MapPoints(integrationEvent.TimeSeriesPoints),
-            MapMeteringPointTypeFromCalculationResult(integrationEvent.TimeSeriesType),
-            MapQuantityUnitFromCalculationResult(integrationEvent.QuantityUnit),
-            MapResolutionFromCalculationResult(integrationEvent.Resolution),
-            MapPeriod(integrationEvent),
-            MapSettlementType(integrationEvent.TimeSeriesType),
-            MapProcessTypeFromCalculationResult(integrationEvent.ProcessType),
-            MapActorGrouping(integrationEvent),
-            MapGridAreaDetails(integrationEvent),
-            SettlementVersion: MapSettlementVersion(integrationEvent.ProcessType));
+    public AggregationFactory(IGridAreaRepository gridAreaRepository)
+    {
+        _gridAreaRepository = gridAreaRepository;
     }
 
     public static Aggregation Create(
@@ -76,6 +69,23 @@ public static class AggregationFactory
             aggregatedMeasureDataProcess.RequestedByActorId.Value,
             MapReceiverRole(aggregatedMeasureDataProcess),
             MapSettlementVersion(aggregatedTimeSerie.SettlementVersion));
+    }
+
+    public async Task<Aggregation> CreateAsync(CalculationResultCompleted integrationEvent, CancellationToken cancellationToken)
+    {
+        if (integrationEvent == null) throw new ArgumentNullException(nameof(integrationEvent));
+
+        return new Aggregation(
+            MapPoints(integrationEvent.TimeSeriesPoints),
+            MapMeteringPointTypeFromCalculationResult(integrationEvent.TimeSeriesType),
+            MapQuantityUnitFromCalculationResult(integrationEvent.QuantityUnit),
+            MapResolutionFromCalculationResult(integrationEvent.Resolution),
+            MapPeriod(integrationEvent),
+            MapSettlementType(integrationEvent.TimeSeriesType),
+            MapProcessTypeFromCalculationResult(integrationEvent.ProcessType),
+            MapActorGrouping(integrationEvent),
+            await GetGridAreaDetailsAsync(integrationEvent, cancellationToken).ConfigureAwait(false),
+            SettlementVersion: MapSettlementVersion(integrationEvent.ProcessType));
     }
 
     private static GridAreaDetails MapGridAreaDetails(
@@ -281,7 +291,7 @@ public static class AggregationFactory
         return input.Units + (input.Nanos / nanoFactor);
     }
 
-    private static GridAreaDetails MapGridAreaDetails(CalculationResultCompleted integrationEvent)
+    private async Task<GridAreaDetails> GetGridAreaDetailsAsync(CalculationResultCompleted integrationEvent, CancellationToken cancellationToken)
     {
         var gridAreaCode = integrationEvent.AggregationLevelCase switch
         {
@@ -293,7 +303,7 @@ public static class AggregationFactory
             _ => throw new InvalidOperationException("Unknown aggregation level"),
         };
 
-        var gridOperatorNumber = GridAreaLookup.GetGridOperatorFor(gridAreaCode);
+        var gridOperatorNumber = await _gridAreaRepository.GetGridOwnerForAsync(gridAreaCode, cancellationToken).ConfigureAwait(false);
 
         return new GridAreaDetails(gridAreaCode, gridOperatorNumber.Value);
     }
