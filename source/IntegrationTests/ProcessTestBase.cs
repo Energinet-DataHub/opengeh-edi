@@ -47,7 +47,7 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests
 {
-    [Collection("IntegrationTest")]
+    [Collection("ProcessIntegrationTest")]
     public class ProcessTestBase : IDisposable
     {
         private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
@@ -178,7 +178,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 .AddRemoteBusinessService<DummyRequest, DummyReply>(
                     sp => new RemoteBusinessServiceRequestSenderSpy<DummyRequest>("Dummy"), "Dummy")
                 .AddDatabaseConnectionFactory(DatabaseFixture.ConnectionString)
-                //.AddDatabaseContext(DatabaseFixture.ConnectionString)
+                .AddDatabaseContext(DatabaseFixture.ConnectionString)
                 .AddSystemClock(new SystemDateTimeProviderStub())
                 .AddCorrelationContext(_ =>
                 {

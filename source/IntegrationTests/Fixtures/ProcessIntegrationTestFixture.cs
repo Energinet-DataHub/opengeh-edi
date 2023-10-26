@@ -14,13 +14,12 @@
 
 using Xunit;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
+namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+
+[CollectionDefinition("ProcessIntegrationTest")]
+public class ProcessIntegrationTestFixture : ICollectionFixture<ProcessDatabaseFixture>
 {
-    [CollectionDefinition("IntegrationTest")]
-    public class IntegrationTestFixture : ICollectionFixture<DatabaseFixture>
-    {
-        // This class has no code, and is never created. Its purpose is simply
-        // to be the place to apply [CollectionDefinition] and all the
-        // ICollectionFixture<> interfaces.
-    }
+    // This class has no code, and is never created. Its purpose is simply
+    // to be the place to apply [CollectionDefinition] and all the
+    // ICollectionFixture<> interfaces.
 }
