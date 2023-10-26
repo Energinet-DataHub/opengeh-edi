@@ -26,12 +26,10 @@ using Energinet.DataHub.EDI.Domain.Transactions;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.Edi.Responses;
-using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using NodaTime.Text;
 using Xunit;
@@ -76,6 +74,12 @@ public class WhenAnReceiptIsAvailableTests : TestBase
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion, timeSerie.SettlementVersion)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId);
+
+        // Assert
+        var processFromDb = GetProcess(process.ProcessId.Id);
+        Assert.NotNull(processFromDb);
+        AssertProcessState(processFromDb, AggregatedMeasureDataProcess.State.Accepted);
+        AssertNumberOfPendingMessages(processFromDb, 0);
     }
 
     [Fact]
@@ -116,17 +120,17 @@ public class WhenAnReceiptIsAvailableTests : TestBase
 
         // Act
         await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestResponseMessage), responseMessageEvent, process.ProcessId.Id);
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestResponseMessage), responseMessageEvent1, process.ProcessId.Id);
         await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestReceipt), receiptEvent, process.ProcessId.Id);
 
         // Assert
         var processFromDb = GetProcess(process.ProcessId.Id);
         Assert.NotNull(processFromDb);
-        AssertProcessState(processFromDb, AggregatedMeasureDataProcess.State.Accepted);
         AssertOutgoingMessageCreated(processFromDb, 2);
     }
 
     [Fact]
-    public async Task Received_receipt_events_but_to_many_response_messages()
+    public async Task Received_receipt_events_but_too_many_response_messages()
     {
         // Arrange
         var process = BuildProcess();
@@ -145,7 +149,7 @@ public class WhenAnReceiptIsAvailableTests : TestBase
         // Assert
         var processFromDb = GetProcess(process.ProcessId.Id);
         Assert.NotNull(processFromDb);
-        AssertProcessState(processFromDb, AggregatedMeasureDataProcess.State.Sent);
+        AssertProcessState(processFromDb, AggregatedMeasureDataProcess.State.Initialized);
         AssertNumberOfPendingMessages(processFromDb, 0);
         AssertOutgoingMessageCreated(processFromDb, 0);
     }
@@ -167,7 +171,7 @@ public class WhenAnReceiptIsAvailableTests : TestBase
         // Assert
         var processFromDb = GetProcess(process.ProcessId.Id);
         Assert.NotNull(processFromDb);
-        AssertProcessState(processFromDb, AggregatedMeasureDataProcess.State.Sent);
+        AssertProcessState(processFromDb, AggregatedMeasureDataProcess.State.Initialized);
         AssertNumberOfPendingMessages(processFromDb, 1);
         AssertOutgoingMessageCreated(processFromDb, 0);
     }
@@ -239,11 +243,13 @@ public class WhenAnReceiptIsAvailableTests : TestBase
         Assert.Equal(numberOfMessages, pendingMessages!.GetType().GetProperty("Count")?.GetValue(pendingMessages));
     }
 
-    private static void AssertOutgoingMessageCreated(AggregatedMeasureDataProcess process, int expectedOutgoingMessages)
+    private void AssertOutgoingMessageCreated(AggregatedMeasureDataProcess process, int expectedOutgoingMessages)
     {
-        var messages = typeof(AggregatedMeasureDataProcess).GetField("_messages", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(process) as IReadOnlyCollection<OutgoingMessage>;
-        Assert.NotNull(messages);
-        Assert.Equal(expectedOutgoingMessages, messages.Count);
+        var outgoingMessages = _b2BContext.OutgoingMessages
+            .ToList()
+            .Where(x => x.ProcessId == process.ProcessId);
+        Assert.NotNull(outgoingMessages);
+        Assert.Equal(expectedOutgoingMessages, outgoingMessages.Count());
     }
 
     private async Task<AssertOutgoingMessage> OutgoingMessageAsync(
@@ -284,6 +290,7 @@ public class WhenAnReceiptIsAvailableTests : TestBase
 
     private AggregatedMeasureDataProcess? GetProcess(Guid processId)
     {
+        _b2BContext.ChangeTracker.Clear();
         return _b2BContext.AggregatedMeasureDataProcesses
             .ToList()
             .FirstOrDefault(x => x.ProcessId.Id == processId);

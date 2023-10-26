@@ -171,6 +171,7 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
                 _messages.Add(AggregationResultMessageFactory.CreateMessage(MapPendingToAggregation(message), ProcessId));
             }
 
+            _pendingMessages.Clear();
             _state = State.Accepted;
         }
 
