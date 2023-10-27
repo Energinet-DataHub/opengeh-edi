@@ -28,7 +28,6 @@ using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Xunit;
-using Period = Energinet.DataHub.Edi.Responses.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 
@@ -75,21 +74,13 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
             Time = new Timestamp() { Seconds = 1, },
         };
 
-        var period = new Period()
-        {
-            StartOfPeriod = new Timestamp() { Seconds = 1, },
-            EndOfPeriod = new Timestamp() { Seconds = 2, },
-            Resolution = Resolution.Pt15M,
-        };
-
         return new AggregatedTimeSeriesRequestAccepted()
         {
-            SettlementVersion = "0",
             GridArea = GridAreaCode,
             QuantityUnit = QuantityUnit.Kwh,
-            Period = period,
             TimeSeriesPoints = { point },
             TimeSeriesType = TimeSeriesType.Production,
+            Resolution = Resolution.Pt15M,
         };
     }
 

@@ -23,10 +23,10 @@ using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Domain.Transactions.Exceptions;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.Collections;
 using NodaTime.Serialization.Protobuf;
+using NodaTime.Text;
 using GridAreaDetails = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.GridAreaDetails;
 using Period = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Period;
 using Point = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Point;
@@ -51,16 +51,13 @@ public class AggregationFactory
         if (aggregatedTimeSerie == null) throw new ArgumentNullException(nameof(aggregatedTimeSerie));
 
         if ((aggregatedMeasureDataProcess.MeteringPointType != null ? MeteringPointType.FromCode(aggregatedMeasureDataProcess.MeteringPointType).Name : null) != aggregatedTimeSerie.MeteringPointType) throw new ArgumentException("aggregatedTimeSerie.MeteringPointType isn't equal to aggregatedMeasureDataProcess.MeteringPointType", nameof(aggregatedTimeSerie));
-        if (aggregatedMeasureDataProcess.StartOfPeriod != aggregatedTimeSerie.Period.Start.ToString()) throw new ArgumentException("aggregatedTimeSerie.Period.Start isn't equal to aggregatedMeasureDataProcess.StartOfPeriod", nameof(aggregatedTimeSerie));
-        if (aggregatedMeasureDataProcess.EndOfPeriod != aggregatedTimeSerie.Period.End.ToString()) throw new ArgumentException("aggregatedTimeSerie.Period.Start isn't equal to aggregatedMeasureDataProcess.EndOfPeriod", nameof(aggregatedTimeSerie));
-        if (aggregatedMeasureDataProcess.SettlementVersion?.Name != aggregatedTimeSerie.SettlementVersion) throw new ArgumentException("aggregatedTimeSerie.SettlementVersion isn't equal to aggregatedMeasureDataProcess.SettlementVersion", nameof(aggregatedTimeSerie));
 
         return new Aggregation(
             MapPoints(aggregatedTimeSerie.Points),
             aggregatedTimeSerie.MeteringPointType,
             aggregatedTimeSerie.UnitType,
             aggregatedTimeSerie.Resolution,
-            MapPeriod(aggregatedTimeSerie.Period),
+            MapPeriod(aggregatedMeasureDataProcess.StartOfPeriod, aggregatedMeasureDataProcess.EndOfPeriod),
             MapSettlementMethod(aggregatedMeasureDataProcess),
             aggregatedMeasureDataProcess.BusinessReason.Name,
             MapActorGrouping(aggregatedMeasureDataProcess),
@@ -68,7 +65,7 @@ public class AggregationFactory
             aggregatedMeasureDataProcess.BusinessTransactionId.Id,
             aggregatedMeasureDataProcess.RequestedByActorId.Value,
             MapReceiverRole(aggregatedMeasureDataProcess),
-            MapSettlementVersion(aggregatedTimeSerie.SettlementVersion));
+            aggregatedMeasureDataProcess.SettlementVersion?.Name);
     }
 
     public async Task<Aggregation> CreateAsync(CalculationResultCompleted integrationEvent, CancellationToken cancellationToken)
@@ -88,15 +85,18 @@ public class AggregationFactory
             SettlementVersion: MapSettlementVersion(integrationEvent.ProcessType));
     }
 
+    private static Period MapPeriod(string startOfPeriod, string? endOfPeriod)
+    {
+        if (string.IsNullOrEmpty(endOfPeriod)) // Throw exception since our end period is nullable in our schema contract, but we validate for it in Wholesale
+            throw new ArgumentException("End of period shouldn't be able to be null, since validation in Wholesale rejects the request if it isn't set", nameof(endOfPeriod));
+
+        return new Period(InstantPattern.General.Parse(startOfPeriod).Value, InstantPattern.General.Parse(endOfPeriod).Value);
+    }
+
     private static GridAreaDetails MapGridAreaDetails(
         Domain.Transactions.AggregatedMeasureData.GridAreaDetails timeSerieGridAreaDetails)
     {
         return new GridAreaDetails(timeSerieGridAreaDetails.GridAreaCode, timeSerieGridAreaDetails.OperatorNumber);
-    }
-
-    private static Period MapPeriod(Domain.Transactions.AggregatedMeasureData.Period timeSeriePeriod)
-    {
-        return new Period(timeSeriePeriod.Start, timeSeriePeriod.End);
     }
 
     private static List<Point> MapPoints(IReadOnlyList<Domain.Transactions.AggregatedMeasureData.Point> points)
@@ -123,21 +123,6 @@ public class AggregationFactory
         }
 
         return new ActorGrouping(null, null);
-    }
-
-    private static string? MapSettlementVersion(string? settlementVersionCode)
-    {
-        var settlementVersionName = null as string;
-        try
-        {
-            settlementVersionName = SettlementVersion.FromName(settlementVersionCode ?? string.Empty).Name;
-        }
-        catch (InvalidCastException)
-        {
-            // Settlement version is set to null.
-        }
-
-        return settlementVersionName;
     }
 
     private static string? MapSettlementMethod(AggregatedMeasureDataProcess process)
