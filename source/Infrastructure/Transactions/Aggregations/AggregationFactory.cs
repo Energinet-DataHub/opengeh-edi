@@ -68,14 +68,6 @@ public class AggregationFactory
             aggregatedMeasureDataProcess.SettlementVersion?.Name);
     }
 
-    private static Period MapPeriod(string startOfPeriod, string? endOfPeriod)
-    {
-        if (string.IsNullOrEmpty(endOfPeriod)) // Throw exception since our end period is nullable in our schema contract, but we validate for it in Wholesale
-            throw new ArgumentException("End of period shouldn't be able to be null, since validation in Wholesale rejects the request if it isn't set", nameof(endOfPeriod));
-
-        return new Period(InstantPattern.General.Parse(startOfPeriod).Value, InstantPattern.General.Parse(endOfPeriod).Value);
-    }
-
     public async Task<Aggregation> CreateAsync(CalculationResultCompleted integrationEvent, CancellationToken cancellationToken)
     {
         if (integrationEvent == null) throw new ArgumentNullException(nameof(integrationEvent));
@@ -91,6 +83,14 @@ public class AggregationFactory
             MapActorGrouping(integrationEvent),
             await GetGridAreaDetailsAsync(integrationEvent, cancellationToken).ConfigureAwait(false),
             SettlementVersion: MapSettlementVersion(integrationEvent.ProcessType));
+    }
+
+    private static Period MapPeriod(string startOfPeriod, string? endOfPeriod)
+    {
+        if (string.IsNullOrEmpty(endOfPeriod)) // Throw exception since our end period is nullable in our schema contract, but we validate for it in Wholesale
+            throw new ArgumentException("End of period shouldn't be able to be null, since validation in Wholesale rejects the request if it isn't set", nameof(endOfPeriod));
+
+        return new Period(InstantPattern.General.Parse(startOfPeriod).Value, InstantPattern.General.Parse(endOfPeriod).Value);
     }
 
     private static GridAreaDetails MapGridAreaDetails(

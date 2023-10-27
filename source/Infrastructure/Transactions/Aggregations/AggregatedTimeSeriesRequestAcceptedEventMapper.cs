@@ -25,7 +25,6 @@ using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.No
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.Collections;
 using MediatR;
-using NodaTime.Serialization.Protobuf;
 using GridAreaDetails = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.GridAreaDetails;
 using Point = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.Point;
 using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
