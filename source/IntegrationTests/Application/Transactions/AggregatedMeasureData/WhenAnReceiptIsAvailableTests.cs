@@ -35,7 +35,6 @@ using Google.Protobuf.WellKnownTypes;
 using NodaTime.Text;
 using Xunit;
 using Xunit.Categories;
-using Period = Energinet.DataHub.Edi.Responses.Period;
 using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.AggregatedMeasureData;
@@ -76,7 +75,6 @@ public class WhenAnReceiptIsAvailableTests : TestBase
             .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion, timeSerie.SettlementVersion)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId);
 
@@ -111,8 +109,7 @@ public class WhenAnReceiptIsAvailableTests : TestBase
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
-            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion!, timeSerie.SettlementVersion);
+            .HasSenderId(DataHubDetails.IdentificationNumber.Value);
     }
 
     [Fact]
@@ -231,30 +228,13 @@ public class WhenAnReceiptIsAvailableTests : TestBase
             Time = new Timestamp() { Seconds = 1, },
         };
 
-        var period = new Period()
-        {
-            StartOfPeriod = new Timestamp()
-            {
-                Seconds = InstantPattern.General.Parse(aggregatedMeasureDataProcess.StartOfPeriod)
-                .GetValueOrThrow().ToUnixTimeSeconds(),
-            },
-            EndOfPeriod = new Timestamp()
-            {
-                Seconds = aggregatedMeasureDataProcess.EndOfPeriod is not null
-                ? InstantPattern.General.Parse(aggregatedMeasureDataProcess.EndOfPeriod).GetValueOrThrow().ToUnixTimeSeconds()
-                : 1,
-            },
-            Resolution = Resolution.Pt15M,
-        };
-
         return new AggregatedTimeSeriesRequestResponseMessage()
         {
             GridArea = aggregatedMeasureDataProcess.MeteringGridAreaDomainId,
             QuantityUnit = QuantityUnit.Kwh,
-            Period = period,
             TimeSeriesPoints = { point },
             TimeSeriesType = TimeSeriesType.NetExchangePerGa,
-            SettlementVersion = SettlementVersion.FirstCorrection.Name,
+            Resolution = Resolution.Pt15M,
         };
     }
 
