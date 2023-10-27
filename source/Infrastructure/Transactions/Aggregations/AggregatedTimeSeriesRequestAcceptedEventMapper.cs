@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
@@ -33,21 +34,30 @@ namespace Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 
 public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
 {
-    public Task<INotification> MapFromAsync(string payload, Guid referenceId, CancellationToken cancellationToken)
+    private readonly IGridAreaRepository _gridAreaRepository;
+
+    public AggregatedTimeSeriesRequestAcceptedEventMapper(IGridAreaRepository gridAreaRepository)
+    {
+        _gridAreaRepository = gridAreaRepository;
+    }
+
+    public async Task<INotification> MapFromAsync(string payload, Guid referenceId, CancellationToken cancellationToken)
     {
         var aggregation =
             AggregatedTimeSeriesRequestAccepted.Parser.ParseJson(payload);
 
         var aggregatedTimeSerie = new AggregatedTimeSerie(
-            MapPoints(aggregation.TimeSeriesPoints),
-            MapMeteringPointType(aggregation.TimeSeriesType),
-            MapUnitType(aggregation.QuantityUnit),
-            MapResolution(aggregation.Resolution),
-            MapGridAreaDetails(aggregation.GridArea));
+                MapPoints(aggregation.TimeSeriesPoints),
+                MapMeteringPointType(aggregation),
+                MapUnitType(aggregation),
+                MapResolution(aggregation),
+                MapPeriod(aggregation),
+                await MapGridAreaDetailsAsync(aggregation.GridArea, cancellationToken).ConfigureAwait(false),
+                MapSettlementVersion(aggregation));
 
-        return Task.FromResult<INotification>(new AggregatedTimeSerieRequestWasAccepted(
+        return new AggregatedTimeSerieRequestWasAccepted(
             referenceId,
-            aggregatedTimeSerie));
+            aggregatedTimeSerie);
     }
 
     public bool CanHandle(string eventType)
@@ -137,9 +147,9 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         return input.Units + (input.Nanos / nanoFactor);
     }
 
-    private static GridAreaDetails MapGridAreaDetails(string gridAreaCode)
+    private async Task<GridAreaDetails> MapGridAreaDetailsAsync(string gridAreaCode, CancellationToken cancellationToken)
     {
-        var gridOperatorNumber = GridAreaLookup.GetGridOperatorFor(gridAreaCode);
+        var gridOperatorNumber = await _gridAreaRepository.GetGridOwnerForAsync(gridAreaCode, cancellationToken).ConfigureAwait(false);
 
         return new GridAreaDetails(gridAreaCode, gridOperatorNumber.Value);
     }

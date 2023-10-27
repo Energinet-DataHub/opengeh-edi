@@ -25,6 +25,7 @@ using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
+using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf;
@@ -40,6 +41,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.Aggreg
 public class WhenAnAcceptedResultIsAvailableTests : TestBase
 {
     private readonly B2BContext _b2BContext;
+    private readonly GridAreaBuilder _gridAreaBuilder = new();
 
     public WhenAnAcceptedResultIsAvailableTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
@@ -51,6 +53,9 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     public async Task Aggregated_measure_data_response_is_accepted()
     {
         // Arrange
+        _gridAreaBuilder
+            .WithGridAreaCode(SampleData.GridAreaCode)
+            .Store(_b2BContext);
         var process = BuildProcess();
         var acceptedEvent = GetAcceptedEvent(process);
 
@@ -74,6 +79,9 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     public async Task Received_2_accepted_events_for_same_aggregated_measure_data_process()
     {
         // Arrange
+        _gridAreaBuilder
+            .WithGridAreaCode(SampleData.GridAreaCode)
+            .Store(_b2BContext);
         var process = BuildProcess();
         var acceptedEvent = GetAcceptedEvent(process);
 

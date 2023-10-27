@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
 using Energinet.DataHub.EDI.Application.Transactions.Aggregations;
@@ -23,16 +25,23 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.I
 
 public class CalculationResultCompletedMapper : IIntegrationEventMapper
 {
+    private readonly AggregationFactory _aggregationFactory;
+
+    public CalculationResultCompletedMapper(AggregationFactory aggregationFactory)
+    {
+        _aggregationFactory = aggregationFactory;
+    }
+
     public string EventTypeToHandle => CalculationResultCompleted.EventName;
 
-    public InternalCommand MapToCommand(IntegrationEvent integrationEvent)
+    public async Task<InternalCommand> MapToCommandAsync(IntegrationEvent integrationEvent)
     {
         if (integrationEvent == null)
             throw new ArgumentNullException(nameof(integrationEvent));
 
         var calculationResultCompletedIntegrationEvent = (CalculationResultCompleted)integrationEvent.Message;
 
-        var aggregation = AggregationFactory.Create(calculationResultCompletedIntegrationEvent);
+        var aggregation = await _aggregationFactory.CreateAsync(calculationResultCompletedIntegrationEvent, CancellationToken.None).ConfigureAwait(false);
         var forwardAggregationResult = new ForwardAggregationResult(aggregation);
 
         return forwardAggregationResult;

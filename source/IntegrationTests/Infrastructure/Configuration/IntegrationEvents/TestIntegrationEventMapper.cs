@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
@@ -25,10 +26,10 @@ public class TestIntegrationEventMapper : IIntegrationEventMapper
 
     public int MappedCount { get; private set; }
 
-    public InternalCommand MapToCommand(IntegrationEvent integrationEvent)
+    public Task<InternalCommand> MapToCommandAsync(IntegrationEvent integrationEvent)
     {
         MappedCount++;
 
-        return new TestCommand();
+        return Task.FromResult<InternalCommand>(new TestCommand());
     }
 }
