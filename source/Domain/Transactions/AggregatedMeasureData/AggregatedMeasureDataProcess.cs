@@ -14,7 +14,6 @@
 
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Common;
-using Energinet.DataHub.EDI.Domain.GridAreas;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
@@ -182,7 +181,7 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
                 }
 
                 _state = State.Initialized;
-                AddDomainEvent(new AggregatedMeasureProcessIsInitialized(ProcessId)); // Create new command with retry
+                AddDomainEvent(new AggregatedMeasureDataProcessRetryFetchingData(ProcessId));
                 return;
             }
 

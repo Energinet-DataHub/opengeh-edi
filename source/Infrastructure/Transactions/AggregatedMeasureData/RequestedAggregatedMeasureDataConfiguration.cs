@@ -36,6 +36,7 @@ internal static class RequestedAggregatedMeasureDataConfiguration
         services.AddTransient<IRequestHandler<RejectedAggregatedTimeSeries, Unit>, RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable>();
         services.AddTransient<IRequestHandler<ReceiptAggregatedTimeSeries, Unit>, AcceptProcessWhenReceiptAggregatedTimeSeriesIsAvailable>();
         services.AddTransient<INotificationHandler<AggregatedMeasureProcessIsInitialized>, NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized>();
+        services.AddTransient<INotificationHandler<AggregatedMeasureDataProcessRetryFetchingData>, RetryFetchingDataForAggregatedMeasureDataProcess>();
         services.AddTransient<IRequestHandler<InitializeAggregatedMeasureDataProcessesCommand, Result>, InitializeAggregatedMeasureDataProcessesHandler>();
         services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestResponse>, WhenAnAggregatedTimeSeriesRequestResponseMessageIsAvailable>();
         services.AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasRejected>, WhenAnRejectedAggregatedTimeSeriesRequestIsAvailable>();

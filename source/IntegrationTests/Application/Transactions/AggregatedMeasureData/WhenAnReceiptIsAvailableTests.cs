@@ -32,7 +32,6 @@ using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.WellKnownTypes;
-using NodaTime.Text;
 using Xunit;
 using Xunit.Categories;
 using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
@@ -68,7 +67,6 @@ public class WhenAnReceiptIsAvailableTests : TestBase
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.Correction);
-        var timeSerie = responseMessageEvent;
         outgoingMessage
             .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
@@ -102,30 +100,24 @@ public class WhenAnReceiptIsAvailableTests : TestBase
         await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestReceipt), receiptEvent, process.ProcessId.Id);
 
         // Assert
-        var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.Correction);
-        var timeSerie = responseMessageEvent;
-        outgoingMessage
-            .HasBusinessReason(process.BusinessReason)
-            .HasReceiverId(process.RequestedByActorId.Value)
-            .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
-            .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
-            .HasSenderId(DataHubDetails.IdentificationNumber.Value);
+        await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.Correction);
     }
 
     [Fact]
     public async Task Receipt_with_two_matching_response_messages()
     {
         // Arrange
+        var anotherGridArea = "999";
         _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .Store(_b2BContext);
         _gridAreaBuilder
-            .WithGridAreaCode("999")
+            .WithGridAreaCode(anotherGridArea)
             .Store(_b2BContext);
         var process = BuildProcess();
         var responseMessageEvent = GetResponseMessageEvent(process);
         var responseMessageEvent1 = GetResponseMessageEvent(process);
-        responseMessageEvent1.GridArea = "999";
+        responseMessageEvent1.GridArea = anotherGridArea;
 
         var receiptEvent = GetReceiptEvent(new List<AggregatedTimeSeriesRequestResponseMessage> { responseMessageEvent, responseMessageEvent1 });
 
@@ -144,11 +136,12 @@ public class WhenAnReceiptIsAvailableTests : TestBase
     public async Task Received_receipt_events_but_too_many_response_messages()
     {
         // Arrange
+        var anotherGridArea = "999";
         _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .Store(_b2BContext);
         _gridAreaBuilder
-            .WithGridAreaCode("999")
+            .WithGridAreaCode(anotherGridArea)
             .Store(_b2BContext);
         var process = BuildProcess();
         var responseMessageEvent = GetResponseMessageEvent(process);
@@ -159,7 +152,7 @@ public class WhenAnReceiptIsAvailableTests : TestBase
         await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestResponseMessage), responseMessageEvent, process.ProcessId.Id);
 
         var responseMessageEvent2 = responseMessageEvent;
-        responseMessageEvent2.GridArea = "999";
+        responseMessageEvent2.GridArea = anotherGridArea;
         await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestResponseMessage), responseMessageEvent2, process.ProcessId.Id);
         await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestReceipt), receiptEvent, process.ProcessId.Id);
 

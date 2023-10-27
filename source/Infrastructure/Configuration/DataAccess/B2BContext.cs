@@ -72,8 +72,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 
         public DbSet<GridArea> GridAreas { get; private set; }
 
-        public DbSet<PendingAggregation> PendingAggregationsForAggregatedMeasureDataProcesses { get; private set; }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));

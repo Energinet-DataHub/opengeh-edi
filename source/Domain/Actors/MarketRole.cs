@@ -51,7 +51,7 @@ public class MarketRole : EnumerationType
     public static MarketRole FromName(string name)
     {
         var matchingItem = GetAll<MarketRole>().FirstOrDefault(item => item.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-        return matchingItem ?? throw new InvalidOperationException($"'{name}' is not a valid code in {typeof(MarketRole)}");
+        return matchingItem ?? throw new InvalidOperationException($"'{name}' is not a valid name in {typeof(MarketRole)}");
     }
 
     public override string ToString()
