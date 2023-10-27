@@ -48,12 +48,10 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
 
         var aggregatedTimeSerie = new AggregatedTimeSerie(
                 MapPoints(aggregation.TimeSeriesPoints),
-                MapMeteringPointType(aggregation),
-                MapUnitType(aggregation),
-                MapResolution(aggregation),
-                MapPeriod(aggregation),
-                await MapGridAreaDetailsAsync(aggregation.GridArea, cancellationToken).ConfigureAwait(false),
-                MapSettlementVersion(aggregation));
+                MapMeteringPointType(aggregation.TimeSeriesType),
+                MapUnitType(aggregation.QuantityUnit),
+                MapResolution(aggregation.Resolution),
+                await MapGridAreaDetailsAsync(aggregation.GridArea, cancellationToken).ConfigureAwait(false));
 
         return new AggregatedTimeSerieRequestWasAccepted(
             referenceId,
