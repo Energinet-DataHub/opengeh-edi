@@ -96,7 +96,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202306090924 Change archived id type to nvarchar.sql" />
     <EmbeddedResource Include="Scripts\Model\202305161024 Add Process Type to ArchivedMassage.sql" />
     <EmbeddedResource Include="Scripts\Model\202305171026 Rename Process Type to BusinessReason.sql" />
-    <EmbeddedResource Include="Scripts\Model\202306271334 Create AggregatedMeasureDataProcesses Table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202306010815 Recreate MessageIds as MessageRegistry.sql" />
     <EmbeddedResource Include="Scripts\Model\202307061430 Create ActorMessageQueue Table.sql" />
     <EmbeddedResource Include="Scripts\Model\202307061435 Create Bundle Table.sql" />
     <EmbeddedResource Include="Scripts\Model\202307061440 Create MarketDocument Table.sql" />
@@ -146,11 +146,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202309271021 Remove ResponseData from AggregatedMeasureDataProcesses.sql" />
     <EmbeddedResource Include="Scripts\Model\202310231618 Change SettlementVersion of AggregatedMeasuredDataProcess type to nvarchar.sql" />
     <EmbeddedResource Include="Scripts\Model\202310241400 new pending message table for aggregated measure data process.sql" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Include="Scripts\Model\202310241414 Create static GridAreas.sql" />
-    <EmbeddedResource Include="Scripts\Model\202306010815 Recreate MessageIds as MessageRegistry.sql" />
   </ItemGroup>
 
 </Project>

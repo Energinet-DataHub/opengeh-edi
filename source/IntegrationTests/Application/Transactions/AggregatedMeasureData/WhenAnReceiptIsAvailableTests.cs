@@ -27,8 +27,8 @@ using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
+using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.WellKnownTypes;
@@ -44,6 +44,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.Aggreg
 public class WhenAnReceiptIsAvailableTests : TestBase
 {
     private readonly B2BContext _b2BContext;
+    private readonly GridAreaBuilder _gridAreaBuilder = new();
+
 
     public WhenAnReceiptIsAvailableTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
@@ -55,6 +57,9 @@ public class WhenAnReceiptIsAvailableTests : TestBase
     public async Task Receipt_with_one_matching_response_messages()
     {
         // Arrange
+        _gridAreaBuilder
+            .WithGridAreaCode(SampleData.GridAreaCode)
+            .Store(_b2BContext);
         var process = BuildProcess();
         var responseMessageEvent = GetResponseMessageEvent(process);
         var receiptEvent = GetReceiptEvent(new List<AggregatedTimeSeriesRequestResponseMessage> { responseMessageEvent });
@@ -87,6 +92,9 @@ public class WhenAnReceiptIsAvailableTests : TestBase
     public async Task Received_2_receipt_events_for_same_aggregated_measure_data_process()
     {
         // Arrange
+        _gridAreaBuilder
+            .WithGridAreaCode(SampleData.GridAreaCode)
+            .Store(_b2BContext);
         var process = BuildProcess();
         var responseMessageEvent = GetResponseMessageEvent(process);
         var receiptEvent = GetReceiptEvent(new List<AggregatedTimeSeriesRequestResponseMessage> { responseMessageEvent });
@@ -112,6 +120,12 @@ public class WhenAnReceiptIsAvailableTests : TestBase
     public async Task Receipt_with_two_matching_response_messages()
     {
         // Arrange
+        _gridAreaBuilder
+            .WithGridAreaCode(SampleData.GridAreaCode)
+            .Store(_b2BContext);
+        _gridAreaBuilder
+            .WithGridAreaCode("999")
+            .Store(_b2BContext);
         var process = BuildProcess();
         var responseMessageEvent = GetResponseMessageEvent(process);
         var responseMessageEvent1 = GetResponseMessageEvent(process);
@@ -134,6 +148,12 @@ public class WhenAnReceiptIsAvailableTests : TestBase
     public async Task Received_receipt_events_but_too_many_response_messages()
     {
         // Arrange
+        _gridAreaBuilder
+            .WithGridAreaCode(SampleData.GridAreaCode)
+            .Store(_b2BContext);
+        _gridAreaBuilder
+            .WithGridAreaCode("999")
+            .Store(_b2BContext);
         var process = BuildProcess();
         var responseMessageEvent = GetResponseMessageEvent(process);
 
@@ -159,6 +179,12 @@ public class WhenAnReceiptIsAvailableTests : TestBase
     public async Task Received_receipt_events_but_missing_response_messages()
     {
         // Arrange
+        _gridAreaBuilder
+            .WithGridAreaCode(SampleData.GridAreaCode)
+            .Store(_b2BContext);
+        _gridAreaBuilder
+            .WithGridAreaCode("999")
+            .Store(_b2BContext);
         var process = BuildProcess();
         var responseMessageEvent = GetResponseMessageEvent(process);
 

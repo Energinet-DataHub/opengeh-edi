@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.GridAreas;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
