@@ -241,7 +241,7 @@ public class WhenAnReceiptIsAvailableTests : TestBase
 
     private static void AssertNumberOfPendingMessages(AggregatedMeasureDataProcess process, int numberOfMessages)
     {
-        var pendingMessages = typeof(AggregatedMeasureDataProcess).GetField("_pendingMessages", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(process);
+        var pendingMessages = typeof(AggregatedMeasureDataProcess).GetField("_pendingAggregations", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(process);
         Assert.Equal(numberOfMessages, pendingMessages!.GetType().GetProperty("Count")?.GetValue(pendingMessages));
     }
 
@@ -293,6 +293,7 @@ public class WhenAnReceiptIsAvailableTests : TestBase
           receiverRole == MarketRole.BalanceResponsibleParty ? SampleData.ReceiverNumber.Value : null,
           SettlementVersion.FirstCorrection);
 
+        process.IsSendingToWholesale();
         process.WasSentToWholesale();
         _b2BContext.AggregatedMeasureDataProcesses.Add(process);
         _b2BContext.SaveChanges();

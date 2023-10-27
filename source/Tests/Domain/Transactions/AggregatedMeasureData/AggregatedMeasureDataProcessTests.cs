@@ -26,7 +26,7 @@ public class AggregatedMeasureDataProcessTests
     {
         var expectedStates = new List<string>()
         {
-            "Initialized", "Sent", "Accepted", "Rejected",
+            "Initialized", "Sending", "Sent", "Accepted", "Rejected",
         };
 
         var actualStates = Enum.GetNames(typeof(AggregatedMeasureDataProcess.State));

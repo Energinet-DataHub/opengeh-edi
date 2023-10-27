@@ -109,6 +109,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
           null,
           null);
 
+        process.IsSendingToWholesale();
         process.WasSentToWholesale();
         _b2BContext.AggregatedMeasureDataProcesses.Add(process);
         _b2BContext.SaveChanges();

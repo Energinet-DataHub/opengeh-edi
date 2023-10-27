@@ -73,50 +73,83 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
                 value => value != null ? value.Code : null,
                 dbValue => !string.IsNullOrWhiteSpace(dbValue) ? SettlementVersion.FromCode(dbValue) : null);
 
-        builder.OwnsMany<PendingAggregation>("_pendingMessages", navigationBuilder =>
+        builder.OwnsMany<PendingAggregation>("_pendingAggregations", navigationBuilder =>
         {
-            navigationBuilder.ToTable("PendingMessagesForAggregatedMeasureDataProcess", "dbo");
+            navigationBuilder.ToTable("PendingAggregations", "dbo");
             navigationBuilder.HasKey("Id");
+            navigationBuilder.WithOwner().HasForeignKey("ProcessId");
             navigationBuilder.Property("Id");
-            navigationBuilder.Property(x => x.MeteringPointType);
-            navigationBuilder.Property(x => x.SettlementType);
-            navigationBuilder.Property(x => x.SettlementVersion);
-            navigationBuilder.Property(x => x.BusinessReason);
-            navigationBuilder.Property(x => x.MeasureUnitType);
             navigationBuilder.Property(x => x.Resolution);
-            navigationBuilder.Property(x => x.OriginalTransactionIdReference);
-            navigationBuilder.Property(x => x.Receiver);
-            navigationBuilder.Property(x => x.ReceiverRole);
+            navigationBuilder.Property(x => x.MeteringPointType)
+                .HasConversion(
+                    toDbValue => toDbValue.Code,
+                    fromDbValue => MeteringPointType.FromCode(fromDbValue));
+
+            navigationBuilder.Property(x => x.SettlementType)
+                .HasConversion(
+                    toDbValue
+                        => toDbValue != null ? toDbValue.Code : null,
+                    fromDbValue
+                        => fromDbValue != null ? SettlementType.From(fromDbValue) : null);
+
+            navigationBuilder.Property(x => x.SettlementVersion)
+                .HasConversion(
+                    toDbValue
+                        => toDbValue != null ? toDbValue.Code : null,
+                    fromDbValue
+                        => fromDbValue != null ? SettlementVersion.FromCode(fromDbValue) : null);
+
+            navigationBuilder.Property(x => x.BusinessReason)
+                .HasConversion(
+                    toDbValue
+                        => toDbValue.Code,
+                    fromDbValue
+                        => BusinessReason.FromCode(fromDbValue));
+
+            navigationBuilder.Property(x => x.MeasurementUnit)
+                .HasConversion(
+                    toDbValue
+                        => toDbValue.Code,
+                    fromDbValue
+                        => MeasurementUnit.From(fromDbValue));
+
+            navigationBuilder.Property(x => x.BusinessTransactionId)
+                .HasConversion(
+                    toDbValue
+                        => toDbValue != null ? toDbValue.Id : null,
+                    fromDbValue
+                        => fromDbValue != null ? BusinessTransactionId.Create(fromDbValue) : null);
+
+            navigationBuilder.Property(x => x.ReceiverId)
+                .HasConversion(
+                    toDbValue
+                        => toDbValue != null ? toDbValue.Value : null,
+                    fromDbValue
+                        => fromDbValue != null ? ActorNumber.Create(fromDbValue) : null);
+
+            navigationBuilder.Property(x => x.ReceiverRole)
+                .HasConversion(
+                    toDbValue
+                        => toDbValue != null ? toDbValue.Code : null,
+                    fromDbValue
+                        => fromDbValue != null ? MarketRole.FromCode(fromDbValue) : null);
+
             navigationBuilder.Property(x => x.ProcessId)
                 .HasConversion(
                     toDbValue => toDbValue.Id,
                     fromDbValue => ProcessId.Create(fromDbValue));
+
             navigationBuilder.Property(x => x.Points)
                 .HasConversion(
                     toDbValue => JsonConvert.SerializeObject(toDbValue),
                     fromDbValue =>
                         JsonConvert.DeserializeObject<IReadOnlyList<Point>>(fromDbValue) ?? new List<Point>());
 
-            // navigationBuilder.Property<Instant>("Start").HasColumnName("StartPeriod");
-            // navigationBuilder.Property<Instant>("End").HasColumnName("EndPeriod");
-            // navigationBuilder.Property<string?>("EnergySupplierId");
-            // navigationBuilder.Property<string?>("BalanceResponsibleId");
-            // navigationBuilder.Property<string>("GridAreaCode");
-            // navigationBuilder.Property<string>("GridAreaResponsibleId");
-            navigationBuilder.WithOwner().HasForeignKey("ProcessId");
-
             navigationBuilder.OwnsOne<Period>(x => x.Period, period
                 =>
             {
-                period.Property(y => y.Start).HasColumnName("StartPeriod");
-                period.Property(y => y.End).HasColumnName("EndPeriod");
-            });
-
-            navigationBuilder.OwnsOne<ActorGrouping>(x => x.ActorGrouping, actorGrouping
-                =>
-            {
-                actorGrouping.Property(y => y.BalanceResponsibleNumber).HasColumnName("EnergySupplierId");
-                actorGrouping.Property(y => y.EnergySupplierNumber).HasColumnName("BalanceResponsibleId");
+                period.Property(y => y.Start).HasColumnName("PeriodStart");
+                period.Property(y => y.End).HasColumnName("PeriodEnd");
             });
 
             navigationBuilder.OwnsOne<GridAreaDetails>(x => x.GridAreaDetails, gridDetails

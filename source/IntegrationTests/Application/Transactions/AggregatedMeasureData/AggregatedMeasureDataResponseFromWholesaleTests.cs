@@ -53,7 +53,8 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         var marketMessage = MessageBuilder().Build();
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
-        process!.WasSentToWholesale();
+        process!.IsSendingToWholesale();
+        process.WasSentToWholesale();
         var acceptedAggregation = CreateAcceptedAggregation();
 
         // Act
@@ -72,7 +73,8 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         var marketMessage = MessageBuilder().Build();
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
-        process!.WasSentToWholesale();
+        process!.IsSendingToWholesale();
+        process.WasSentToWholesale();
         var acceptedAggregation = CreateAcceptedAggregation();
 
         // Act
@@ -92,7 +94,8 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         var marketMessage = MessageBuilder().Build();
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
-        process!.WasSentToWholesale();
+        process!.IsSendingToWholesale();
+        process.WasSentToWholesale();
         var rejectedRequest = CreateRejectRequest();
 
         // Act
@@ -111,7 +114,8 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         var marketMessage = MessageBuilder().Build();
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
-        process!.WasSentToWholesale();
+        process!.IsSendingToWholesale();
+        process.WasSentToWholesale();
         var rejectedRequest = CreateRejectRequest();
 
         // Act
@@ -174,7 +178,7 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
 
     private static void AssertPendingMessageCreated(AggregatedMeasureDataProcess process, int expectedOutgoingMessages)
     {
-        var pendingMessages = typeof(AggregatedMeasureDataProcess).GetField("_pendingMessages", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(process) as List<PendingAggregation>;
+        var pendingMessages = typeof(AggregatedMeasureDataProcess).GetField("_pendingAggregations", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(process) as List<PendingAggregation>;
         Assert.NotNull(pendingMessages);
         Assert.Equal(expectedOutgoingMessages, pendingMessages.Count);
     }

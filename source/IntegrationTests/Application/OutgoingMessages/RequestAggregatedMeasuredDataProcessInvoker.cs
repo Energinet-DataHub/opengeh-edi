@@ -48,6 +48,7 @@ public class RequestAggregatedMeasuredDataProcessInvoker
         var marketMessage = new RequestAggregatedMeasureDataMarketDocumentBuilder().Build();
         await _mediator.Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
         var process = GetProcess(marketMessage.SenderNumber);
+        process!.IsSendingToWholesale();
         process!.WasSentToWholesale();
 
         // ReSharper disable once MethodHasAsyncOverload -- Test Event_registration_is_omitted_if_run_in_parallel fails if this is async

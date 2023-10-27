@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.Exceptions;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
@@ -180,6 +181,24 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
     }
 
     [Fact]
+    public async Task Aggregated_measure_data_process_with_wrong_state_was_not_sent_to_wholesale()
+    {
+        // Arrange
+        var marketMessage =
+            MessageBuilder().
+                SetSenderRole(MarketRole.MeteredDataResponsible.Code).
+                SetEnergySupplierId(null).
+                SetBalanceResponsibleId(null).
+                Build();
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
+        SetProcessStateToSent(marketMessage.SenderNumber);
+        var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
+
+        // Act
+        await Assert.ThrowsAsync<InvalidProcessStateException>(() => InvokeCommandAsync(command));
+    }
+
+    [Fact]
     public async Task Aggregated_measure_data_process_without_settlement_method_was_sent_to_wholesale()
     {
         // Arrange
@@ -273,6 +292,14 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
 
         var commandMetaData = _mapper.GetByName(queuedInternalCommand.Type);
         return (InternalCommand)_serializer.Deserialize(queuedInternalCommand.Data, commandMetaData.CommandType);
+    }
+
+    private void SetProcessStateToSent(string senderNumber)
+    {
+        var process = GetProcess(senderNumber);
+        process!.IsSendingToWholesale();
+        process.WasSentToWholesale();
+        _b2BContext.SaveChanges();
     }
 
     private AggregatedMeasureDataProcess? GetProcess(string senderNumber)

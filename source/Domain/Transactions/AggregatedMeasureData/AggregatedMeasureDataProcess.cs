@@ -18,13 +18,14 @@ using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Domain.Transactions.Exceptions;
 
 namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
 {
     public class AggregatedMeasureDataProcess : Entity
     {
         private readonly List<OutgoingMessage> _messages = new();
-        private readonly List<PendingAggregation> _pendingMessages = new();
+        private readonly List<PendingAggregation> _pendingAggregations = new();
         private State _state = State.Initialized;
 
         public AggregatedMeasureDataProcess(
@@ -78,6 +79,7 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
         public enum State
         {
             Initialized,
+            Sending,
             Sent,
             Accepted,
             Rejected,
@@ -115,12 +117,26 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
 
         public string RequestedByActorRoleCode { get; }
 
+        public void IsSendingToWholesale()
+        {
+            if (_state != State.Initialized)
+            {
+                throw InvalidProcessStateException
+                    .InvalidState(_state.ToString(), nameof(IsSendingToWholesale));
+            }
+
+            _state = State.Sending;
+        }
+
         public void WasSentToWholesale()
         {
-            if (_state == State.Initialized)
+            if (_state != State.Sending)
             {
-                _state = State.Sent;
+                throw InvalidProcessStateException.
+                    InvalidState(_state.ToString(), nameof(WasSentToWholesale));
             }
+
+            _state = State.Sent;
         }
 
         public void AddResponseMessage(Aggregation aggregation)
@@ -129,10 +145,10 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
 
             if (_state == State.Sent)
             {
-                if (_pendingMessages.All(message =>
+                if (_pendingAggregations.All(message =>
                         message.GridAreaDetails.GridAreaCode != aggregation.GridAreaDetails.GridAreaCode))
                 {
-                    _pendingMessages.Add(MapAggregationToPending(aggregation));
+                    _pendingAggregations.Add(MapAggregationToPending(aggregation));
                 }
             }
         }
@@ -157,24 +173,24 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
                 return;
             }
 
-            if (gridAreas.Count != _pendingMessages.Count)
+            if (gridAreas.Count != _pendingAggregations.Count)
             {
                 if (HaveToClearPendingMessages(gridAreas))
                 {
-                    _pendingMessages.Clear();
+                    _pendingAggregations.Clear();
                 }
 
                 _state = State.Initialized;
-                AddDomainEvent(new AggregatedMeasureProcessIsInitialized(ProcessId));
+                AddDomainEvent(new AggregatedMeasureProcessIsInitialized(ProcessId)); // Create new command with retry
                 return;
             }
 
-            foreach (var message in _pendingMessages)
+            foreach (var message in _pendingAggregations)
             {
                 _messages.Add(AggregationResultMessageFactory.CreateMessage(MapPendingToAggregation(message), ProcessId));
             }
 
-            _pendingMessages.Clear();
+            _pendingAggregations.Clear();
             _state = State.Accepted;
         }
 
@@ -188,7 +204,7 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
                         point.Quality,
                         point.SampleTime)).ToList(),
                 aggregation.MeteringPointType,
-                aggregation.MeasureUnitType,
+                aggregation.MeasurementUnit,
                 aggregation.Resolution,
                 new Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Period(
                     aggregation.Period.Start,
@@ -197,17 +213,17 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
                 aggregation.BusinessReason,
                 new Energinet.DataHub.EDI.Domain.Transactions.Aggregations.ActorGrouping(
                     aggregation.ActorGrouping.EnergySupplierNumber, aggregation.ActorGrouping.BalanceResponsibleNumber),
-                new Energinet.DataHub.EDI.Domain.Transactions.Aggregations.GridAreaDetails(
+                new GridArea(
                     aggregation.GridAreaDetails.GridAreaCode, aggregation.GridAreaDetails.OperatorNumber),
-                aggregation.OriginalTransactionIdReference,
-                aggregation.Receiver,
+                aggregation.BusinessTransactionId,
+                aggregation.ReceiverId,
                 aggregation.ReceiverRole,
                 aggregation.SettlementVersion);
         }
 
         private bool HaveToClearPendingMessages(IReadOnlyList<string> gridAreas)
         {
-            if (_pendingMessages.Count <= gridAreas.Count && _pendingMessages.All(message => gridAreas.Contains(message.GridAreaDetails.GridAreaCode)))
+            if (_pendingAggregations.Count <= gridAreas.Count && _pendingAggregations.All(message => gridAreas.Contains(message.GridAreaDetails.GridAreaCode)))
             {
                 return false;
             }

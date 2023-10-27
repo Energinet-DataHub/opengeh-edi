@@ -12,40 +12,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+
 namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 
 public class PendingAggregation
 {
     public PendingAggregation(
         IReadOnlyList<Point> points,
-        string meteringPointType,
-        string measureUnitType,
+        MeteringPointType meteringPointType,
+        MeasurementUnit measurementUnit,
         string resolution,
-        string? settlementType,
-        string businessReason,
+        SettlementType? settlementType,
+        BusinessReason businessReason,
         ProcessId processId,
         Period period,
-        GridAreaDetails gridAreaDetails,
-        ActorGrouping actorGrouping,
-        string? settlementVersion = null,
-        string? receiverRole = null,
-        string? receiver = null,
-        string? originalTransactionIdReference = null)
+        GridArea gridArea,
+        ActorNumber? energySupplierId,
+        ActorNumber? balanceResponsibleId,
+        SettlementVersion? settlementVersion = null,
+        MarketRole? receiverRole = null,
+        ActorNumber? receiverId = null,
+        BusinessTransactionId? businessTransactionId = null)
     {
         Points = points;
         MeteringPointType = meteringPointType;
-        MeasureUnitType = measureUnitType;
+        MeasurementUnit = measurementUnit;
         Resolution = resolution;
         SettlementType = settlementType;
         BusinessReason = businessReason;
         ProcessId = processId;
         Period = period;
-        GridAreaDetails = gridAreaDetails;
-        ActorGrouping = actorGrouping;
+        GridArea = gridArea;
+        EnergySupplierId = energySupplierId;
+        BalanceResponsibleId = balanceResponsibleId;
         SettlementVersion = settlementVersion;
         ReceiverRole = receiverRole;
-        Receiver = receiver;
-        OriginalTransactionIdReference = originalTransactionIdReference;
+        ReceiverId = receiverId;
+        BusinessTransactionId = businessTransactionId;
     }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -54,33 +60,35 @@ public class PendingAggregation
 
     public IReadOnlyList<Point> Points { get;  }
 
-    public string MeteringPointType { get;  }
+    public MeteringPointType MeteringPointType { get;  }
 
-    public string MeasureUnitType { get;  }
+    public MeasurementUnit MeasurementUnit { get;  }
 
     public string Resolution { get;  }
 
     public Period Period { get; }
 
-    public string? SettlementType { get;  }
+    public SettlementType? SettlementType { get;  }
 
-    public string BusinessReason { get;  }
-
-    public ActorGrouping ActorGrouping { get; }
-
-    public GridAreaDetails GridAreaDetails { get; }
+    public BusinessReason BusinessReason { get;  }
 
     public ProcessId ProcessId { get;  }
 
-    public string? SettlementVersion { get;  }
+    public GridArea GridArea { get; }
 
-    public string? ReceiverRole { get;  }
+    public ActorNumber? BalanceResponsibleId { get; set; }
 
-    public string? Receiver { get;  }
+    public ActorNumber? EnergySupplierId { get; set; }
 
-    public string? OriginalTransactionIdReference { get;  }
+    public SettlementVersion? SettlementVersion { get;  }
+
+    public MarketRole? ReceiverRole { get;  }
+
+    public ActorNumber? ReceiverId { get;  }
+
+    public BusinessTransactionId? BusinessTransactionId { get;  }
 
     private Guid Id { get; }
 }
 
-public record ActorGrouping(string? EnergySupplierNumber, string? BalanceResponsibleNumber);
+public record ActorGrouping(string? EnergySupplierNumber, string? BalanceResponsibleNumber); // actorNumber.
