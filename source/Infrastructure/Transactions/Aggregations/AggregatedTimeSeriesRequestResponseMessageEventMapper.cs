@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
@@ -33,23 +34,30 @@ namespace Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 
 public class AggregatedTimeSeriesRequestResponseMessageEventMapper : IInboxEventMapper
 {
-    public Task<INotification> MapFromAsync(string payload, Guid referenceId, CancellationToken cancellationToken)
+    private readonly IGridAreaRepository _gridAreaRepository;
+
+    public AggregatedTimeSeriesRequestResponseMessageEventMapper(IGridAreaRepository gridAreaRepository)
+    {
+        _gridAreaRepository = gridAreaRepository;
+    }
+
+    public async Task<INotification> MapFromAsync(string payload, Guid referenceId, CancellationToken cancellationToken)
     {
         var aggregation =
             AggregatedTimeSeriesRequestResponseMessage.Parser.ParseJson(payload);
 
-        var aggregatiedTimeSerie = new AggregatedTimeSerie(
+        var aggregatedTimeSerie = new AggregatedTimeSerie(
                 MapPoints(aggregation.TimeSeriesPoints),
                 MapMeteringPointType(aggregation),
                 MapUnitType(aggregation),
                 MapResolution(aggregation),
                 MapPeriod(aggregation),
-                MapGridAreaDetails(aggregation),
+                await MapGridAreaDetailsAsync(aggregation.GridArea, cancellationToken).ConfigureAwait(false),
                 MapSettlementVersion(aggregation));
 
-        return Task.FromResult<INotification>(new AggregatedTimeSerieRequestResponse(
+        return new AggregatedTimeSerieRequestResponse(
             referenceId,
-            aggregatiedTimeSerie));
+            aggregatedTimeSerie);
     }
 
     public bool CanHandle(string eventType)
@@ -149,10 +157,10 @@ public class AggregatedTimeSeriesRequestResponseMessageEventMapper : IInboxEvent
         return input.Units + (input.Nanos / nanoFactor);
     }
 
-    private static GridAreaDetails MapGridAreaDetails(AggregatedTimeSeriesRequestResponseMessage aggregation)
+    private async Task<GridAreaDetails> MapGridAreaDetailsAsync(string gridAreaCode, CancellationToken cancellationToken)
     {
-        var gridOperatorNumber = GridAreaLookup.GetGridOperatorFor(aggregation.GridArea);
+        var gridOperatorNumber = await _gridAreaRepository.GetGridOwnerForAsync(gridAreaCode, cancellationToken).ConfigureAwait(false);
 
-        return new GridAreaDetails(aggregation.GridArea, gridOperatorNumber.Value);
+        return new GridAreaDetails(gridAreaCode, gridOperatorNumber.Value);
     }
 }

@@ -25,7 +25,7 @@ namespace Energinet.DataHub.EDI.Tests.Factories;
 public class AggregationResultBuilder
 {
     private MeteringPointType _meteringPointType = MeteringPointType.Consumption;
-    private GridArea _gridArea = GridArea.Create("870");
+    private string _gridAreaCode = "870";
     private ActorNumber _gridOperator = ActorNumber.Create("1234567890123");
     private SettlementType? _settlementType;
     private ActorGrouping _actorGrouping = new ActorGrouping(null, null);
@@ -43,12 +43,12 @@ public class AggregationResultBuilder
             _settlementType?.Name,
             BusinessReason.BalanceFixing.Name,
             _actorGrouping,
-            new GridAreaDetails(_gridArea.Code, _gridOperator.Value));
+            new GridAreaDetails(_gridAreaCode, _gridOperator.Value));
     }
 
-    public AggregationResultBuilder WithGridAreaDetails(GridArea gridArea, ActorNumber gridOperator)
+    public AggregationResultBuilder WithGridAreaDetails(string gridAreaCode, ActorNumber gridOperator)
     {
-        _gridArea = gridArea;
+        _gridAreaCode = gridAreaCode;
         _gridOperator = gridOperator;
         return this;
     }

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
@@ -25,13 +26,13 @@ public class B2BActorActivatedMapper : IIntegrationEventMapper
 {
     public string EventTypeToHandle => ActorActivated.EventName;
 
-    public InternalCommand MapToCommand(IntegrationEvent integrationEvent)
+    public Task<InternalCommand> MapToCommandAsync(IntegrationEvent integrationEvent)
     {
         if (integrationEvent == null)
             throw new ArgumentNullException(nameof(integrationEvent));
 
         var actorActivatedEvent = (ActorActivated)integrationEvent.Message;
 
-        return new CreateActorCommand(actorActivatedEvent.ExternalActorId, ActorNumber.Create(actorActivatedEvent.ActorNumber));
+        return Task.FromResult<InternalCommand>(new CreateActorCommand(actorActivatedEvent.ExternalActorId, ActorNumber.Create(actorActivatedEvent.ActorNumber)));
     }
 }

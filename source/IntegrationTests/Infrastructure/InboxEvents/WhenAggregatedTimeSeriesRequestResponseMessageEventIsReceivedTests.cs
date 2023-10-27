@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
+using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf;
@@ -32,12 +33,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 
 public class WhenAggregatedTimeSeriesRequestResponseMessageEventIsReceivedTests : TestBase
 {
+    private const string GridAreaCode = "244";
     private readonly string _eventType = nameof(AggregatedTimeSeriesRequestResponseMessage);
     private readonly Guid _referenceId = Guid.NewGuid();
     private readonly string _eventId = "1";
     private readonly InboxEventsProcessor _processor;
     private readonly AggregatedTimeSeriesRequestResponseMessageEventMapper _aggregatedTimeSeriesRequestResponseMessageEventMapper;
     private readonly AggregatedTimeSeriesRequestResponseMessage _aggregatedTimeSeriesRequestAcceptedResponse;
+    private readonly GridAreaBuilder _gridAreaBuilder = new();
 
     public WhenAggregatedTimeSeriesRequestResponseMessageEventIsReceivedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
@@ -51,6 +54,10 @@ public class WhenAggregatedTimeSeriesRequestResponseMessageEventIsReceivedTests 
     [Fact]
     public async Task Event_is_marked_as_processed_when_a_handler_has_handled_it_successfully()
     {
+        _gridAreaBuilder
+            .WithGridAreaCode(GridAreaCode)
+            .Store(GetService<B2BContext>());
+
         await _processor.ProcessEventsAsync(CancellationToken.None);
 
         TestAggregatedTimeSeriesRequestResponseMessageHandlerSpy.AssertExpectedNotifications(_aggregatedTimeSeriesRequestAcceptedResponse);
@@ -77,7 +84,7 @@ public class WhenAggregatedTimeSeriesRequestResponseMessageEventIsReceivedTests 
         return new AggregatedTimeSeriesRequestResponseMessage()
         {
             SettlementVersion = "0",
-            GridArea = "244",
+            GridArea = GridAreaCode,
             QuantityUnit = QuantityUnit.Kwh,
             Period = period,
             TimeSeriesPoints = { point },
