@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.Common;
+using Energinet.DataHub.EDI.Domain.GridAreas;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
@@ -203,22 +204,24 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
                         point.Quantity,
                         point.Quality,
                         point.SampleTime)).ToList(),
-                aggregation.MeteringPointType,
-                aggregation.MeasurementUnit,
+                aggregation.MeteringPointType.Name,
+                aggregation.MeasurementUnit.Code,
                 aggregation.Resolution,
                 new Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Period(
                     aggregation.Period.Start,
                     aggregation.Period.End),
-                aggregation.SettlementType,
-                aggregation.BusinessReason,
-                new Energinet.DataHub.EDI.Domain.Transactions.Aggregations.ActorGrouping(
-                    aggregation.ActorGrouping.EnergySupplierNumber, aggregation.ActorGrouping.BalanceResponsibleNumber),
-                new GridArea(
-                    aggregation.GridAreaDetails.GridAreaCode, aggregation.GridAreaDetails.OperatorNumber),
-                aggregation.BusinessTransactionId,
-                aggregation.ReceiverId,
-                aggregation.ReceiverRole,
-                aggregation.SettlementVersion);
+                aggregation.SettlementType?.Code,
+                aggregation.BusinessReason.Name,
+                new ActorGrouping(
+                    aggregation.EnergySupplierId?.Value,
+                    aggregation.BalanceResponsibleId?.Value),
+                new Energinet.DataHub.EDI.Domain.Transactions.Aggregations.GridAreaDetails(
+                    aggregation.GridAreaDetails.GridAreaCode,
+                    aggregation.GridAreaDetails.OperatorNumber),
+                aggregation.BusinessTransactionId?.Id,
+                aggregation.ReceiverId?.Value,
+                aggregation.ReceiverRole?.Name,
+                aggregation.SettlementVersion?.Name);
         }
 
         private bool HaveToClearPendingMessages(IReadOnlyList<string> gridAreas)
@@ -255,24 +258,27 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
         {
             return new(
                 aggregation.Points.Select(point =>
-                    new Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.Point(
+                    new Point(
                         point.Position,
                         point.Quantity,
                         point.Quality,
                         point.SampleTime)).ToList(),
-                aggregation.MeteringPointType,
-                aggregation.MeasureUnitType,
+                OutgoingMessages.MeteringPointType.From(aggregation.MeteringPointType),
+                MeasurementUnit.From(aggregation.MeasureUnitType),
                 aggregation.Resolution,
-                aggregation.SettlementType,
-                aggregation.BusinessReason,
+                aggregation.SettlementType != null ? SettlementType.From(aggregation.SettlementType) : null,
+                BusinessReason.FromName(aggregation.BusinessReason),
                 ProcessId,
                 new Period(aggregation.Period.Start, aggregation.Period.End),
-                new GridAreaDetails(aggregation.GridAreaDetails.GridAreaCode, aggregation.GridAreaDetails.OperatorNumber),
-                new ActorGrouping(aggregation.ActorGrouping.EnergySupplierNumber, aggregation.ActorGrouping.BalanceResponsibleNumber),
-                aggregation.SettlementVersion,
-                aggregation.ReceiverRole,
-                aggregation.Receiver,
-                aggregation.OriginalTransactionIdReference);
+                new GridAreaDetails(
+                    aggregation.GridAreaDetails.GridAreaCode,
+                    aggregation.GridAreaDetails.OperatorNumber),
+                aggregation.ActorGrouping.EnergySupplierNumber != null ? ActorNumber.Create(aggregation.ActorGrouping.EnergySupplierNumber) : null,
+                aggregation.ActorGrouping.BalanceResponsibleNumber != null ? ActorNumber.Create(aggregation.ActorGrouping.BalanceResponsibleNumber) : null,
+                aggregation.SettlementVersion != null ? SettlementVersion.FromName(aggregation.SettlementVersion) : null,
+                aggregation.ReceiverRole != null ? MarketRole.FromName(aggregation.ReceiverRole) : null,
+                aggregation.Receiver != null ? ActorNumber.Create(aggregation.Receiver) : null,
+                aggregation.OriginalTransactionIdReference != null ? BusinessTransactionId.Create(aggregation.OriginalTransactionIdReference) : null);
         }
     }
 }

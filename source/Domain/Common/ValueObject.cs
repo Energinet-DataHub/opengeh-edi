@@ -26,7 +26,7 @@ namespace Energinet.DataHub.EDI.Domain.Common
             return obj1?.Equals(obj2) ?? Equals(obj2, null);
         }
 
-        public static bool operator !=(ValueObject obj1, ValueObject obj2)
+        public static bool operator !=(ValueObject? obj1, ValueObject? obj2)
         {
             return !(obj1 == obj2);
         }

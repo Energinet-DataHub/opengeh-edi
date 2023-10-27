@@ -19,6 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.GridAreas;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
@@ -27,7 +28,6 @@ using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.Collections;
 using NodaTime.Serialization.Protobuf;
 using ActorGrouping = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.ActorGrouping;
-using GridAreaDetails = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.GridAreaDetails;
 using Period = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Period;
 using Point = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Point;
 using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
@@ -88,10 +88,10 @@ public class AggregationFactory
             SettlementVersion: MapSettlementVersion(integrationEvent.ProcessType));
     }
 
-    private static GridAreaDetails MapGridAreaDetails(
+    private static Energinet.DataHub.EDI.Domain.Transactions.Aggregations.GridAreaDetails MapGridAreaDetails(
         Domain.Transactions.AggregatedMeasureData.GridAreaDetails timeSerieGridAreaDetails)
     {
-        return new GridAreaDetails(timeSerieGridAreaDetails.GridAreaCode, timeSerieGridAreaDetails.OperatorNumber);
+        return new Energinet.DataHub.EDI.Domain.Transactions.Aggregations.GridAreaDetails(timeSerieGridAreaDetails.GridAreaCode, timeSerieGridAreaDetails.OperatorNumber);
     }
 
     private static Period MapPeriod(Domain.Transactions.AggregatedMeasureData.Period timeSeriePeriod)
@@ -127,32 +127,18 @@ public class AggregationFactory
 
     private static string? MapSettlementVersion(string? settlementVersionCode)
     {
-        var settlementVersionName = null as string;
-        try
-        {
-            settlementVersionName = SettlementVersion.FromName(settlementVersionCode ?? string.Empty).Name;
-        }
-        catch (InvalidCastException)
-        {
-            // Settlement version is set to null.
-        }
+        if (settlementVersionCode == null)
+            return null;
 
-        return settlementVersionName;
+        return SettlementVersion.FromName(settlementVersionCode).Name;
     }
 
     private static string? MapSettlementMethod(AggregatedMeasureDataProcess process)
     {
-        var settlementTypeName = null as string;
-        try
-        {
-            settlementTypeName = SettlementType.From(process.SettlementMethod ?? string.Empty).Name;
-        }
-        catch (InvalidCastException)
-        {
-            // Settlement type for Production is set to null.
-        }
+        if (process.SettlementMethod == null)
+            return null;
 
-        return settlementTypeName;
+        return SettlementType.From(process.SettlementMethod).Name;
     }
 
     private static string MapProcessTypeFromCalculationResult(ProcessType processType)
@@ -291,7 +277,7 @@ public class AggregationFactory
         return input.Units + (input.Nanos / nanoFactor);
     }
 
-    private async Task<GridAreaDetails> GetGridAreaDetailsAsync(CalculationResultCompleted integrationEvent, CancellationToken cancellationToken)
+    private async Task<Energinet.DataHub.EDI.Domain.Transactions.Aggregations.GridAreaDetails> GetGridAreaDetailsAsync(CalculationResultCompleted integrationEvent, CancellationToken cancellationToken)
     {
         var gridAreaCode = integrationEvent.AggregationLevelCase switch
         {
@@ -305,6 +291,6 @@ public class AggregationFactory
 
         var gridOperatorNumber = await _gridAreaRepository.GetGridOwnerForAsync(gridAreaCode, cancellationToken).ConfigureAwait(false);
 
-        return new GridAreaDetails(gridAreaCode, gridOperatorNumber.Value);
+        return new Energinet.DataHub.EDI.Domain.Transactions.Aggregations.GridAreaDetails(gridAreaCode, gridOperatorNumber.Value);
     }
 }

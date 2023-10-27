@@ -17,7 +17,7 @@
     ReceiverId nvarchar(16) null,
     ReceiverRole nvarchar(3) null,
     Points nvarchar(max) null,
-    ProcessId uniqueidentifier not null,
+    ProcessId uniqueidentifier null,
     PRIMARY KEY (Id),
     FOREIGN KEY (ProcessId) REFERENCES [dbo].[AggregatedMeasureDataProcesses] (ProcessId)
 )

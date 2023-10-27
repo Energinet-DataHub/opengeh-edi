@@ -46,7 +46,6 @@ public class WhenAnReceiptIsAvailableTests : TestBase
     private readonly B2BContext _b2BContext;
     private readonly GridAreaBuilder _gridAreaBuilder = new();
 
-
     public WhenAnReceiptIsAvailableTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {

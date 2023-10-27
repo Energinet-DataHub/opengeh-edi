@@ -30,7 +30,7 @@ public class PendingAggregation
         BusinessReason businessReason,
         ProcessId processId,
         Period period,
-        GridArea gridArea,
+        GridAreaDetails gridAreaDetails,
         ActorNumber? energySupplierId,
         ActorNumber? balanceResponsibleId,
         SettlementVersion? settlementVersion = null,
@@ -46,7 +46,7 @@ public class PendingAggregation
         BusinessReason = businessReason;
         ProcessId = processId;
         Period = period;
-        GridArea = gridArea;
+        GridAreaDetails = gridAreaDetails;
         EnergySupplierId = energySupplierId;
         BalanceResponsibleId = balanceResponsibleId;
         SettlementVersion = settlementVersion;
@@ -75,7 +75,7 @@ public class PendingAggregation
 
     public ProcessId ProcessId { get;  }
 
-    public GridArea GridArea { get; }
+    public GridAreaDetails GridAreaDetails { get; }
 
     public ActorNumber? BalanceResponsibleId { get; set; }
 
@@ -91,5 +91,3 @@ public class PendingAggregation
 
     private Guid Id { get; }
 }
-
-public record ActorGrouping(string? EnergySupplierNumber, string? BalanceResponsibleNumber); // actorNumber.

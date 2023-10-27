@@ -19,12 +19,9 @@ using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.Transactions;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Newtonsoft.Json;
-using NodaTime;
-using ActorGrouping = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.ActorGrouping;
 using GridAreaDetails = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.GridAreaDetails;
 using Period = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.Period;
 using Point = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.Point;
@@ -85,17 +82,21 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
                     toDbValue => toDbValue.Code,
                     fromDbValue => MeteringPointType.FromCode(fromDbValue));
 
-            navigationBuilder.Property(x => x.SettlementType)
+            navigationBuilder.Property<SettlementType?>(x => x.SettlementType)
                 .HasConversion(
                     toDbValue
+#pragma warning disable IDE0031
                         => toDbValue != null ? toDbValue.Code : null,
+#pragma warning restore IDE0031
                     fromDbValue
                         => fromDbValue != null ? SettlementType.From(fromDbValue) : null);
 
-            navigationBuilder.Property(x => x.SettlementVersion)
+            navigationBuilder.Property<SettlementVersion?>(x => x.SettlementVersion)
                 .HasConversion(
                     toDbValue
+#pragma warning disable IDE0031
                         => toDbValue != null ? toDbValue.Code : null,
+#pragma warning restore IDE0031
                     fromDbValue
                         => fromDbValue != null ? SettlementVersion.FromCode(fromDbValue) : null);
 
@@ -113,28 +114,36 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
                     fromDbValue
                         => MeasurementUnit.From(fromDbValue));
 
-            navigationBuilder.Property(x => x.BusinessTransactionId)
+            navigationBuilder.Property<BusinessTransactionId?>(x => x.BusinessTransactionId)
                 .HasConversion(
                     toDbValue
+#pragma warning disable IDE0031
                         => toDbValue != null ? toDbValue.Id : null,
+#pragma warning restore IDE0031
                     fromDbValue
                         => fromDbValue != null ? BusinessTransactionId.Create(fromDbValue) : null);
 
-            navigationBuilder.Property(x => x.ReceiverId)
+            navigationBuilder.Property<ActorNumber?>(x => x.ReceiverId)
                 .HasConversion(
                     toDbValue
+#pragma warning disable CS8604 // Possible null reference argument.
+#pragma warning disable IDE0031
                         => toDbValue != null ? toDbValue.Value : null,
+#pragma warning restore IDE0031
+#pragma warning restore CS8604 // Possible null reference argument.
                     fromDbValue
                         => fromDbValue != null ? ActorNumber.Create(fromDbValue) : null);
 
-            navigationBuilder.Property(x => x.ReceiverRole)
+            navigationBuilder.Property<MarketRole?>(x => x.ReceiverRole)
                 .HasConversion(
                     toDbValue
+#pragma warning disable IDE0031
                         => toDbValue != null ? toDbValue.Code : null,
+#pragma warning restore IDE0031
                     fromDbValue
                         => fromDbValue != null ? MarketRole.FromCode(fromDbValue) : null);
 
-            navigationBuilder.Property(x => x.ProcessId)
+            navigationBuilder.Property<ProcessId>(x => x.ProcessId)
                 .HasConversion(
                     toDbValue => toDbValue.Id,
                     fromDbValue => ProcessId.Create(fromDbValue));
@@ -144,6 +153,28 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
                     toDbValue => JsonConvert.SerializeObject(toDbValue),
                     fromDbValue =>
                         JsonConvert.DeserializeObject<IReadOnlyList<Point>>(fromDbValue) ?? new List<Point>());
+
+            navigationBuilder.Property<ActorNumber?>(x => x.EnergySupplierId)
+                .HasConversion(
+                    toDbValue
+#pragma warning disable CS8604 // Possible null reference argument.
+#pragma warning disable IDE0031
+                        => toDbValue != null ? toDbValue.Value : null,
+#pragma warning restore IDE0031
+#pragma warning restore CS8604 // Possible null reference argument.
+                    fromDbValue
+                        => fromDbValue != null ? ActorNumber.Create(fromDbValue) : null);
+
+            navigationBuilder.Property<ActorNumber?>(x => x.BalanceResponsibleId)
+                .HasConversion(
+                    toDbValue
+#pragma warning disable CS8604 // Possible null reference argument.
+#pragma warning disable IDE0031
+                        => toDbValue != null ? toDbValue.Value : null,
+#pragma warning restore IDE0031
+#pragma warning restore CS8604 // Possible null reference argument.
+                    fromDbValue
+                        => fromDbValue != null ? ActorNumber.Create(fromDbValue) : null);
 
             navigationBuilder.OwnsOne<Period>(x => x.Period, period
                 =>
@@ -156,7 +187,7 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
                 =>
             {
                 gridDetails.Property(y => y.GridAreaCode).HasColumnName("GridAreaCode");
-                gridDetails.Property(y => y.OperatorNumber).HasColumnName("GridAreaResponsibleId");
+                gridDetails.Property(y => y.OperatorNumber).HasColumnName("GridAreaOwnerId");
             });
         });
 
