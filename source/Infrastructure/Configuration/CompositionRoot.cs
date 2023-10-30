@@ -65,6 +65,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             AddActorServices();
             AddWholeSaleInBox();
             AddGridAreaServices();
+            _services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>));
             IntegrationEventsConfiguration.Configure(services);
             InboxEventsConfiguration.Configure(services);
             ArchivedMessageConfiguration.Configure(services);
