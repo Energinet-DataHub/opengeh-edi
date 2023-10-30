@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
@@ -26,6 +28,7 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.IntegrationEvents;
+using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.AggregationResult;
 using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common;
@@ -49,8 +52,8 @@ public static class ProcessConfiguration
 {
     public static void Configure(IServiceCollection services, string databaseConnectionString)
     {
-        services.AddDbContext<ProcessContext>(options =>
-            options.UseSqlServer(databaseConnectionString));
+        services.AddDbContext<DbContext, ProcessContext>(options =>
+            options.UseSqlServer(databaseConnectionString, y => y.UseNodaTime()));
 
         //EventsConfiguration
         services.AddTransient<IIntegrationEventMapper, CalculationResultCompletedMapper>();
@@ -73,7 +76,8 @@ public static class ProcessConfiguration
 
         //ProcessingConfiguration
         services.AddScoped<DomainEventsAccessor>();
-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>));
+        services.AddScoped<ProcessUnitOfWork>();
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(Processing.UnitOfWorkBehaviour<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RaiseDomainEventsBehaviour<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(EnqueueOutgoingMessagesBehaviour<,>));
 
@@ -96,5 +100,7 @@ public static class ProcessConfiguration
         services.AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasRejected>, WhenAnRejectedAggregatedTimeSeriesRequestIsAvailable>();
         services.AddScoped<WholesaleInbox>();
         services.AddScoped<IAggregatedMeasureDataProcessRepository, AggregatedMeasureDataProcessRepository>();
+
+        InternalCommandProcessing.Configure(services);
     }
 }
