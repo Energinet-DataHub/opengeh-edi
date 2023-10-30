@@ -37,7 +37,7 @@ using Xunit.Categories;
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages.RequestAggregatedMeasureData;
 
 [IntegrationTest]
-public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
+public class InitializeAggregatedMeasureDataProcessesCommandTests : ProcessTestBase
 {
     private readonly ProcessContext _processContext;
     private readonly ServiceBusSenderSpy _senderSpy;
@@ -45,7 +45,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
     private readonly InternalCommandMapper _mapper;
     private readonly ISerializer _serializer;
 
-    public InitializeAggregatedMeasureDataProcessesCommandTests(DatabaseFixture databaseFixture)
+    public InitializeAggregatedMeasureDataProcessesCommandTests(ProcessDatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _processContext = GetService<ProcessContext>();

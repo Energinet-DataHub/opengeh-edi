@@ -163,15 +163,15 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             _services.AddTransient<InboxEventsProcessor>();
             _services.AddTransient<AggregatedTimeSeriesRequestAcceptedEventMapper>();
             _services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>>(_ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy);
-            _services.AddTransient<INotificationHandler<IntegrationTests.Infrastructure.InboxEvents.TestNotification>>(
+            _services.AddTransient<INotificationHandler<TestNotification>>(
                 _ => InboxEventNotificationHandler);
 
             _services.AddTransient<IRequestHandler<TestCommand, Unit>, TestCommandHandler>();
             _services.AddTransient<IRequestHandler<TestCreateOutgoingMessageCommand, Unit>, TestCreateOutgoingCommandHandler>();
 
             _services.AddTransient<IIntegrationEventHandler, IntegrationEventHandler>();
-            _services.AddTransient<ProcessContext>();
             _services.AddTransient<B2BContext>();
+            ProcessConfiguration.Configure(_services, DatabaseFixture.ConnectionString);
 
             CompositionRoot.Initialize(_services)
                 .AddAuthentication()
@@ -189,7 +189,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 .AddMessagePublishing()
                 .AddMessageParserServices();
             _serviceProvider = _services.BuildServiceProvider();
-            ProcessConfiguration.Configure(_services, DatabaseFixture.ConnectionString);
         }
     }
 }

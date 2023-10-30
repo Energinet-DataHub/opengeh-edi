@@ -32,11 +32,11 @@ using PeekResult = Energinet.DataHub.EDI.Process.Application.OutgoingMessages.Pe
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
-public class WhenAPeekIsRequestedTests : TestBase
+public class WhenAPeekIsRequestedTests : ProcessTestBase
 {
     private readonly RequestAggregatedMeasuredDataProcessInvoker _requestAggregatedMeasuredDataProcessInvoker;
 
-    public WhenAPeekIsRequestedTests(DatabaseFixture databaseFixture)
+    public WhenAPeekIsRequestedTests(ProcessDatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _requestAggregatedMeasuredDataProcessInvoker =
