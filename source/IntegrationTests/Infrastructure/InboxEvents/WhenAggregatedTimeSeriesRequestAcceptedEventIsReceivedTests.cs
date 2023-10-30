@@ -18,26 +18,29 @@ using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
+using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Xunit;
-using Period = Energinet.DataHub.Edi.Responses.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 
 public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestBase
 {
+    private const string GridAreaCode = "244";
     private readonly string _eventType = nameof(AggregatedTimeSeriesRequestAccepted);
     private readonly Guid _referenceId = Guid.NewGuid();
     private readonly string _eventId = "1";
     private readonly InboxEventsProcessor _processor;
     private readonly AggregatedTimeSeriesRequestAcceptedEventMapper _aggregatedTimeSeriesRequestAcceptedEventMapper;
     private readonly AggregatedTimeSeriesRequestAccepted _aggregatedTimeSeriesRequestAcceptedResponse;
+    private readonly GridAreaBuilder _gridAreaBuilder = new();
 
     public WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
@@ -51,6 +54,10 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
     [Fact]
     public async Task Event_is_marked_as_processed_when_a_handler_has_handled_it_successfully()
     {
+        _gridAreaBuilder
+            .WithGridAreaCode(GridAreaCode)
+            .Store(GetService<B2BContext>());
+
         await _processor.ProcessEventsAsync(CancellationToken.None);
 
         TestAggregatedTimeSeriesRequestAcceptedHandlerSpy.AssertExpectedNotifications(_aggregatedTimeSeriesRequestAcceptedResponse);
@@ -67,21 +74,13 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
             Time = new Timestamp() { Seconds = 1, },
         };
 
-        var period = new Period()
-        {
-            StartOfPeriod = new Timestamp() { Seconds = 1, },
-            EndOfPeriod = new Timestamp() { Seconds = 2, },
-            Resolution = Resolution.Pt15M,
-        };
-
         return new AggregatedTimeSeriesRequestAccepted()
         {
-            SettlementVersion = "0",
-            GridArea = "244",
+            GridArea = GridAreaCode,
             QuantityUnit = QuantityUnit.Kwh,
-            Period = period,
             TimeSeriesPoints = { point },
             TimeSeriesType = TimeSeriesType.Production,
+            Resolution = Resolution.Pt15M,
         };
     }
 

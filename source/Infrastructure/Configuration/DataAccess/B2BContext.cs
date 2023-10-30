@@ -13,21 +13,22 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.ArchivedMessages;
+using Energinet.DataHub.EDI.Domain.GridAreas;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.Actors;
 using Energinet.DataHub.EDI.Infrastructure.ArchivedMessages;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Infrastructure.GridAreas;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
@@ -67,6 +68,10 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 
         public DbSet<MessageIdForSender> MessageIds { get; private set; }
 
+        public DbSet<Actor> Actors { get; private set; }
+
+        public DbSet<GridArea> GridAreas { get; private set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
@@ -80,6 +85,8 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
             modelBuilder.ApplyConfiguration(new ReceivedInboxEventEntityConfiguration());
             modelBuilder.ApplyConfiguration(new TransactionIdEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MessageIdEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new ActorEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new GridAreaEntityConfiguration());
         }
     }
 }

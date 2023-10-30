@@ -95,7 +95,7 @@ internal sealed class EdiDriver : IDisposable
             "NotifyAggregatedMeasureData_MarketDocument",
             out var marketDocument);
 
-        Assert.True(documentIsOfExpectedType, "\nAccepted message failed with wrong message type\n");
+        Assert.True(documentIsOfExpectedType, "\nAccepted message failed with wrong message type\n Document: " + jsonElement.ToString() + "\n");
         Assert.Equal("E31", marketDocument
             .GetProperty("type")
             .GetProperty("value")

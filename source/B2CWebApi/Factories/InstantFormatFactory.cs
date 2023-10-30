@@ -12,19 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Domain.Transactions;
+using NodaTime;
+using NodaTime.Text;
 
-public class GridArea
+namespace Energinet.DataHub.EDI.B2CWebApi.Factories;
+
+public static class InstantFormatFactory
 {
-    private GridArea(string code)
+    public static string SetInstantToMidnight(string dateString, DateTimeZone dateTimeZone)
     {
-        Code = code;
-    }
-
-    public string Code { get; }
-
-    public static GridArea Create(string code)
-    {
-        return new GridArea(code);
+        var instant = InstantPattern.ExtendedIso.Parse(dateString).Value;
+        var zonedDateTime = new ZonedDateTime(instant, dateTimeZone);
+        var dateTimeZoneAtMidnight = zonedDateTime.Date
+            .At(LocalTime.Midnight)
+            .InZoneStrictly(dateTimeZone);
+        return dateTimeZoneAtMidnight.ToInstant().ToString();
     }
 }

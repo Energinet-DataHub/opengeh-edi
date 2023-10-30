@@ -167,12 +167,12 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     [InlineData(nameof(DocumentFormat.Json), nameof(BusinessReason.BalanceFixing))]
     public async Task Business_reason_is_translated(string documentFormat, string processType)
     {
-        _timeSeries.WithBusinessReason(BusinessReason.From(processType));
+        _timeSeries.WithBusinessReason(BusinessReason.FromName(processType));
 
         var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
 
         AssertDocument(document, DocumentFormat.From(documentFormat))
-            .HasBusinessReason(BusinessReason.From(processType))
+            .HasBusinessReason(BusinessReason.FromName(processType))
             .SettlementVersionIsNotPresent();
     }
 
@@ -185,16 +185,16 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         _timeSeries
             .WithMessageId(SampleData.MessageId)
             .WithTransactionId(SampleData.TransactionId)
-            .WithBusinessReason(BusinessReason.From(processType))
-            .WithSettlementVersion(SettlementVersion.From(settlementVersion))
+            .WithBusinessReason(BusinessReason.FromName(processType))
+            .WithSettlementVersion(SettlementVersion.FromName(settlementVersion))
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
             .WithPoint(new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z"));
 
         var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
 
         await AssertDocument(document, DocumentFormat.From(documentFormat))
-            .HasBusinessReason(BusinessReason.From(processType))
-            .HasSettlementVersion(SettlementVersion.From(settlementVersion))
+            .HasBusinessReason(BusinessReason.FromName(processType))
+            .HasSettlementVersion(SettlementVersion.FromName(settlementVersion))
             .DocumentIsValidAsync();
     }
 

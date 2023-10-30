@@ -42,7 +42,7 @@ public class AggregationResultMessageFactoryTests
     {
         var result = _aggregationResult
             .ForProduction()
-            .WithGridAreaDetails(GridArea.Create("870"), ActorNumber.Create("1234567890123"))
+            .WithGridAreaDetails(gridAreaCode: "870", ActorNumber.Create("1234567890123"))
             .Build();
 
         var message = CreateMessage(result);
