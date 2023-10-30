@@ -21,6 +21,7 @@ using System.Text;
 using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Process.Domain.Documents;
+using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.AggregationResult;
 using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common.Xml;
 using MediatR;
 using Microsoft.Azure.Functions.Worker.Middleware;
@@ -44,8 +45,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
         public static IEnumerable<object[]> GetDocumentWriterRequirements()
         {
             var constructorDependencies = ReflectionHelper.FindAllConstructorDependenciesForType();
-
-            return ApplicationAssemblies.Infrastructure.GetTypes()
+            return typeof(AggregationResultXmlDocumentWriter).Assembly.GetTypes()
                 .Where(t => t.IsSubclassOf(typeof(DocumentWriter)))
                 .Select(t => new object[] { new Requirement(t.Name, constructorDependencies(t), t) });
         }
@@ -63,7 +63,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
         public static IEnumerable<object[]> GetDocumentWritersRequirements()
             => ResolveTypesThatImplementType(
                 typeof(IDocumentWriter),
-                new[] { ApplicationAssemblies.Application, ApplicationAssemblies.Infrastructure });
+                new[] { ApplicationAssemblies.Application, ApplicationAssemblies.Infrastructure, typeof(AggregationResultXmlDocumentWriter).Assembly });
 
         public static IEnumerable<object[]> GetFunctionRequirements()
         {

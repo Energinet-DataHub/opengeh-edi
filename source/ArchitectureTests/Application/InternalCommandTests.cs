@@ -27,8 +27,8 @@ public class InternalCommandTests
 {
     public static IEnumerable<object[]> GetInternalCommands()
     {
-        return ApplicationAssemblies.Application
-            .GetTypes()
+        var allTypes = ApplicationAssemblies.Application.GetTypes().Concat(ApplicationAssemblies.Infrastructure.GetTypes()).Concat(ApplicationAssemblies.Process.GetTypes());
+        return allTypes
             .Where(t => t.IsSubclassOf(typeof(InternalCommand)))
             .Select(t => new[] { t });
     }
