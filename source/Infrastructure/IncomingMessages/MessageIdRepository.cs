@@ -30,17 +30,11 @@ namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages
     public class MessageIdRepository : IMessageIdRepository
     {
         private readonly B2BContext _b2BContext;
-        private readonly IDatabaseConnectionFactory _connectionFactory;
-        private readonly ILogger _logger;
 
         public MessageIdRepository(
-            B2BContext b2BContext,
-            IDatabaseConnectionFactory connectionFactory,
-            ILogger<MessageIdRepository> logger)
+            B2BContext b2BContext)
         {
             _b2BContext = b2BContext;
-            _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
-            _logger = logger;
         }
 
         public async Task StoreAsync(string senderNumber, string messageId, CancellationToken cancellationToken)

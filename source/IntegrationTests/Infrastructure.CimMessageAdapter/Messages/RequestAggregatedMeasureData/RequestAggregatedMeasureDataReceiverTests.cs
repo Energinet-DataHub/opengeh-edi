@@ -22,10 +22,12 @@ using Dapper;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration.Authentication;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
@@ -414,17 +416,21 @@ public class RequestAggregatedMeasureDataReceiverTests : ProcessTestBase, IAsync
     {
         var knownReceiverId = "5790001330552";
         var knownReceiverRole = "DGL";
+        var knownSenderId = "5790001330551";
+        var knownSenderRole = MarketRole.EnergySupplier.Code;
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
             .WithReceiverRole(knownReceiverRole)
             .WithReceiverId(knownReceiverId)
+            .WithSenderId(knownSenderId)
+            .WithSenderRole(knownSenderRole)
             .Message();
 
         var messageParserResult = await ParseMessageAsync(message);
-        var result = await CreateInitializeRequestAggregatedMeasureProcessesHandler()
-            .Handle(new InitializeAggregatedMeasureDataProcessesCommand(messageParserResult.MarketMessage!), CancellationToken.None);
+        var marketMessage = CreateMarketMessageWithAuthentication(messageParserResult.MarketMessage!, knownSenderId, knownSenderRole);
+        var result = await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
 
-        var process = _processContext.AggregatedMeasureDataProcesses.Local.FirstOrDefault();
+        var process = _processContext.AggregatedMeasureDataProcesses.FirstOrDefault();
         Assert.True(result.Success);
         Assert.NotNull(process);
 
@@ -437,20 +443,24 @@ public class RequestAggregatedMeasureDataReceiverTests : ProcessTestBase, IAsync
     public async Task Multiple_activity_records_are_committed_as_processes()
     {
         var knownReceiverId = "5790001330552";
-        var knownReceiverRole = "DGL";
+        var knownReceiverRole = MarketRole.CalculationResponsibleRole.Code;
+        var knownSenderId = "5790001330551";
+        var knownSenderRole = MarketRole.EnergySupplier.Code;
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
             .DuplicateSeriesRecords()
             .WithSeriesTransactionId(Guid.NewGuid().ToString())
             .WithReceiverRole(knownReceiverRole)
             .WithReceiverId(knownReceiverId)
+            .WithSenderId(knownSenderId)
+            .WithSenderRole(knownSenderRole)
             .Message();
 
         var messageParserResult = await ParseMessageAsync(message);
-        var result = await CreateInitializeRequestAggregatedMeasureProcessesHandler()
-            .Handle(new InitializeAggregatedMeasureDataProcessesCommand(messageParserResult.MarketMessage!), CancellationToken.None);
+        var marketMessage = CreateMarketMessageWithAuthentication(messageParserResult.MarketMessage!, knownSenderId, knownSenderRole);
+        var result = await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
 
-        var processes = _processContext.AggregatedMeasureDataProcesses.Local.ToList();
+        var processes = _processContext.AggregatedMeasureDataProcesses.ToList();
         Assert.True(result.Success);
         Assert.NotNull(processes);
         Assert.Equal(messageParserResult.MarketMessage!.Series.Count, processes.Count);
@@ -554,6 +564,23 @@ public class RequestAggregatedMeasureDataReceiverTests : ProcessTestBase, IAsync
         Assert.Contains(result.Errors, error => error is NotSupportedBusinessType);
     }
 
+    private static RequestAggregatedMeasureDataMarketMessage CreateMarketMessageWithAuthentication(RequestAggregatedMeasureDataMarketMessage marketMessage, string knownSenderId, string knownSenderRole)
+    {
+        return new RequestAggregatedMeasureDataMarketMessage(
+            marketMessage.SenderNumber,
+            marketMessage.SenderRoleCode,
+            marketMessage.ReceiverNumber,
+            marketMessage.ReceiverRoleCode,
+            marketMessage.BusinessReason,
+            knownSenderId,
+            knownSenderRole,
+            marketMessage.MessageType,
+            marketMessage.MessageId,
+            marketMessage.CreatedAt,
+            marketMessage.BusinessType,
+            marketMessage.Series);
+    }
+
     private InitializeAggregatedMeasureDataProcessesHandler CreateInitializeRequestAggregatedMeasureProcessesHandler()
     {
         return new InitializeAggregatedMeasureDataProcessesHandler(CreateMessageReceiver(), _aggregatedMeasureDataProcessRepository);
@@ -597,14 +624,11 @@ public class RequestAggregatedMeasureDataReceiverTests : ProcessTestBase, IAsync
 
     private async Task AssertMessageIdIsStored(string senderId, string messageId)
     {
-        // var messages = _processContext.MessageIds.Local.Where(x => x.MessageId == messageId && x.SenderId == senderId)
-        //     .ToList(); TODO: REMOVE IF WORKS
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql =
-            "SELECT * FROM dbo.MessageIds WHERE MessageId = @MessageId AND SenderId = @SenderId";
-        var transaction = await connection.QueryFirstOrDefaultAsync(sql, new { MessageId = messageId, SenderId = senderId });
+            "SELECT [MessageId], [SenderId] FROM dbo.MessageRegistry WHERE MessageId = @MessageId AND SenderId = @SenderId";
+        var transaction = await connection.QueryFirstOrDefaultAsync<MessageIdForSender>(sql, new { MessageId = messageId, SenderId = senderId });
         Assert.NotNull(transaction);
-        Assert.Single(transaction);
     }
 
     private async Task AssertMessageIdIsNotStoredAsync(string senderId, string messageId)
