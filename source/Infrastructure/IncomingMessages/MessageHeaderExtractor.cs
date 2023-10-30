@@ -15,7 +15,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
-using Energinet.DataHub.EDI.Application.IncomingMessages;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 
@@ -36,6 +35,7 @@ internal static class MessageHeaderExtractor
         var receiverId = string.Empty;
         var receiverRole = string.Empty;
         var createdAt = string.Empty;
+        string? businessType = null;
         var ns = rootElement.DefaultNamespace;
 
         await reader.AdvanceToAsync(headerElementName, rootElement.DefaultNamespace).ConfigureAwait(false);
@@ -58,11 +58,13 @@ internal static class MessageHeaderExtractor
                 receiverRole = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             else if (reader.Is("createdDateTime", ns))
                 createdAt = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            else if (reader.Is("businessSector.type", ns))
+                businessType = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             else await reader.ReadAsync().ConfigureAwait(false);
 
             if (reader.Is(marketActivityRecordElementName, ns)) break;
         }
 
-        return new MessageHeader(messageId, messageType, processType, senderId, senderRole, receiverId, receiverRole, createdAt);
+        return new MessageHeader(messageId, messageType, processType, senderId, senderRole, receiverId, receiverRole, createdAt, businessType);
     }
 }

@@ -14,10 +14,10 @@
 
 using System.Text.Json.Serialization;
 using Energinet.DataHub.Core.App.WebApp.Authentication;
-using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Logging.LoggingMiddleware;
 using Energinet.DataHub.EDI.B2CWebApi.Clients;
+using Energinet.DataHub.EDI.B2CWebApi.Configuration;
 using Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Microsoft.OpenApi.Models;
@@ -67,9 +67,12 @@ public class Startup
 
         serviceCollection.AddOptions<JwtOptions>().Bind(Configuration);
         serviceCollection.AddOptions<EdiOptions>().Bind(Configuration);
+        serviceCollection.AddOptions<DateTimeOptions>().Bind(Configuration);
+
         serviceCollection.AddHttpLoggingScope(DomainName);
 
-        AddJwtTokenSecurity(serviceCollection);
+        serviceCollection.AddJwtTokenSecurity(Configuration);
+        serviceCollection.AddDateTimeConfiguration(Configuration);
         serviceCollection
             .AddHttpClient();
         var ediClientOptions = Configuration.Get<EdiOptions>()!;
@@ -107,16 +110,5 @@ public class Startup
             endpoints.MapLiveHealthChecks();
             endpoints.MapReadyHealthChecks();
         });
-    }
-
-    /// <summary>
-    /// Adds registrations of JwtTokenMiddleware and corresponding dependencies.
-    /// </summary>
-    private void AddJwtTokenSecurity(IServiceCollection serviceCollection)
-    {
-        var options = Configuration.Get<JwtOptions>()!;
-        serviceCollection.AddJwtBearerAuthentication(options.EXTERNAL_OPEN_ID_URL, options.INTERNAL_OPEN_ID_URL, options.BACKEND_BFF_APP_ID);
-        serviceCollection.AddUserAuthentication<FrontendUser, FrontendUserProvider>();
-        serviceCollection.AddPermissionAuthorization();
     }
 }

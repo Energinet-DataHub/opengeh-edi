@@ -21,7 +21,7 @@ public record RequestAggregatedMeasureDataMarketRequest(
     ProcessType ProcessType,
     MeteringPointType MeteringPointType,
     string StartDate,
-    string? EndDate,
+    string EndDate,
     string? GridArea,
     string? EnergySupplierId,
     string? BalanceResponsibleId);
@@ -40,5 +40,7 @@ public enum ProcessType
     PreliminaryAggregation,
     BalanceFixing,
     WholesaleFixing,
-    Correction,
+    FirstCorrection,
+    SecondCorrection,
+    ThirdCorrection,
 }

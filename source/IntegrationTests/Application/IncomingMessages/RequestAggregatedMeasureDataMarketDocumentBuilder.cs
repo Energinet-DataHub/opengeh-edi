@@ -32,11 +32,13 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
     private readonly string _endDateAndOrTimeDateTime = "2022-07-22T22:00:00Z";
     private readonly string _meteringGridAreaDomainId = "244";
     private readonly string _messageType = "E74";
-    private readonly BusinessReason _businesReason = BusinessReason.PreliminaryAggregation;
+    private readonly string _businessType = "23";
+    private readonly BusinessReason _businessReason = BusinessReason.PreliminaryAggregation;
     private readonly string _senderId = SampleData.NewEnergySupplierNumber;
     private readonly ActorNumber _receiverId = DataHubDetails.IdentificationNumber;
     private readonly MarketRole _receiverRole = MarketRole.CalculationResponsibleRole;
     private readonly string _createdAt = SystemClock.Instance.GetCurrentInstant().ToString();
+    private readonly string? _settlementVersions = "D01";
     private string _messageId = Guid.NewGuid().ToString();
     private string _serieId = Guid.NewGuid().ToString();
     private string _senderRole = MarketRole.EnergySupplier.Code;
@@ -105,19 +107,21 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
             _endDateAndOrTimeDateTime,
             _meteringGridAreaDomainId,
             _energySupplierMarketParticipantId,
-            _balanceResponsiblePartyMarketParticipantId);
+            _balanceResponsiblePartyMarketParticipantId,
+            _settlementVersions);
 
     private MessageHeader CreateHeader()
     {
         return new MessageHeader(
             _messageId,
             _messageType,
-            CimCode.Of(_businesReason),
+            CimCode.Of(_businessReason),
             _senderId,
             _senderRole,
             _receiverId.Value,
             _receiverRole.Code,
             _createdAt,
+            _businessType,
             _senderId,
             _senderRole);
     }

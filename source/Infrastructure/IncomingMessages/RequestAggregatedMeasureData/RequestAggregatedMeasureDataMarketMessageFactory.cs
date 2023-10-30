@@ -16,8 +16,6 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
-using Energinet.DataHub.EDI.Domain.Actors;
-using Energinet.DataHub.EDI.Domain.Documents;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
@@ -42,6 +40,7 @@ public static class RequestAggregatedMeasureDataMarketMessageFactory
             header.MessageType,
             header.MessageId,
             header.CreatedAt,
+            header.BusinessType,
             series);
     }
 
@@ -54,13 +53,14 @@ public static class RequestAggregatedMeasureDataMarketMessageFactory
         var series = requestAggregatedMeasureData.Series
             .Select(serie => new Serie(
                 serie.Id,
-                serie.MarketEvaluationPointType,
-                serie.MarketEvaluationSettlementMethod,
+                string.IsNullOrWhiteSpace(serie.MarketEvaluationPointType) ? null : serie.MarketEvaluationPointType,
+                string.IsNullOrWhiteSpace(serie.MarketEvaluationSettlementMethod) ? null : serie.MarketEvaluationSettlementMethod,
                 serie.StartDateAndOrTimeDateTime,
-                serie.EndDateAndOrTimeDateTime,
-                serie.MeteringGridAreaDomainId,
-                serie.EnergySupplierMarketParticipantId,
-                serie.BalanceResponsiblePartyMarketParticipantId)).ToList();
+                string.IsNullOrWhiteSpace(serie.EndDateAndOrTimeDateTime) ? null : serie.EndDateAndOrTimeDateTime,
+                string.IsNullOrWhiteSpace(serie.MeteringGridAreaDomainId) ? null : serie.MeteringGridAreaDomainId,
+                string.IsNullOrWhiteSpace(serie.EnergySupplierMarketParticipantId) ? null : serie.EnergySupplierMarketParticipantId,
+                string.IsNullOrWhiteSpace(serie.BalanceResponsiblePartyMarketParticipantId) ? null : serie.BalanceResponsiblePartyMarketParticipantId,
+                string.IsNullOrWhiteSpace(serie.SettlementSeriesVersion) ? null : serie.SettlementSeriesVersion)).ToList();
 
         return new RequestAggregatedMeasureDataMarketMessage(
             requestAggregatedMeasureData.SenderId,
@@ -73,6 +73,7 @@ public static class RequestAggregatedMeasureDataMarketMessageFactory
             requestAggregatedMeasureData.MessageType,
             requestAggregatedMeasureData.MessageId,
             createdAt.ToString(),
+            BusinessType: "23",
             series);
     }
 }

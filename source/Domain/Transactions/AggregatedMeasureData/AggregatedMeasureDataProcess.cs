@@ -18,7 +18,6 @@ using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
 {
@@ -32,14 +31,15 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
             BusinessTransactionId businessTransactionId,
             ActorNumber requestedByActorId,
             string requestedByActorRoleCode,
-            string businessReason,
+            BusinessReason businessReason,
             string? meteringPointType,
             string? settlementMethod,
             string startOfPeriod,
             string? endOfPeriod,
             string? meteringGridAreaDomainId,
             string? energySupplierId,
-            string? balanceResponsibleId)
+            string? balanceResponsibleId,
+            SettlementVersion? settlementVersion)
         {
             ProcessId = processId;
             BusinessTransactionId = businessTransactionId;
@@ -49,15 +49,15 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
             StartOfPeriod = startOfPeriod;
             EndOfPeriod = endOfPeriod;
             MeteringGridAreaDomainId = meteringGridAreaDomainId;
-            EnergySupplierId = string.IsNullOrWhiteSpace(energySupplierId)
-                ? null
-                : energySupplierId;
-            BalanceResponsibleId = string.IsNullOrWhiteSpace(balanceResponsibleId)
-                ? null
-                : balanceResponsibleId;
+            EnergySupplierId = energySupplierId;
+            BalanceResponsibleId = balanceResponsibleId;
+            SettlementVersion = settlementVersion;
             RequestedByActorId = requestedByActorId;
             RequestedByActorRoleCode = requestedByActorRoleCode;
             AddDomainEvent(new AggregatedMeasureProcessIsInitialized(processId));
+
+            if (BusinessReason == BusinessReason.Correction && SettlementVersion == null)
+                SettlementVersion = SettlementVersion.FirstCorrection;
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
 
         public BusinessTransactionId BusinessTransactionId { get; }
 
-        public string BusinessReason { get; }
+        public BusinessReason BusinessReason { get; }
 
         /// <summary>
         /// Represent consumption types or production.
@@ -108,6 +108,8 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
         public string? EnergySupplierId { get; }
 
         public string? BalanceResponsibleId { get; }
+
+        public SettlementVersion? SettlementVersion { get; }
 
         public ActorNumber RequestedByActorId { get; set; }
 

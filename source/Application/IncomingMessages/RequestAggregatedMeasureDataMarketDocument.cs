@@ -30,6 +30,7 @@ public record RequestAggregatedMeasureDataMarketMessage(
     string MessageType,
     string MessageId,
     string CreatedAt,
+    string? BusinessType,
     IReadOnlyCollection<Serie> Series);
 
 public record Serie(
@@ -40,4 +41,5 @@ public record Serie(
     string? EndDateAndOrTimeDateTime,
     string? MeteringGridAreaDomainId,
     string? EnergySupplierMarketParticipantId,
-    string? BalanceResponsiblePartyMarketParticipantId);
+    string? BalanceResponsiblePartyMarketParticipantId,
+    string? SettlementSeriesVersion);

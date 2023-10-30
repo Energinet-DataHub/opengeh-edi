@@ -18,9 +18,9 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
 public class SettlementVersion : EnumerationCodeType
 {
-    public static readonly SettlementVersion FirstCorrection = new(0, nameof(FirstCorrection), "D01");
-    public static readonly SettlementVersion SecondCorrection = new(0, nameof(SecondCorrection), "D02");
-    public static readonly SettlementVersion ThirdCorrection = new(0, nameof(ThirdCorrection), "D03");
+    public static readonly SettlementVersion FirstCorrection = new(1, nameof(FirstCorrection), "D01");
+    public static readonly SettlementVersion SecondCorrection = new(2, nameof(SecondCorrection), "D02");
+    public static readonly SettlementVersion ThirdCorrection = new(3, nameof(ThirdCorrection), "D03");
 
     public SettlementVersion(int id, string name, string code)
         : base(id, name, code)

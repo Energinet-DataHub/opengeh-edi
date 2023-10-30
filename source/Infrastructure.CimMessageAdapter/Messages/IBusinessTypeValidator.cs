@@ -12,19 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Domain.Transactions;
+using System.Threading;
+using System.Threading.Tasks;
 
-public class GridArea
+namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
+
+/// <summary>
+/// Validation for Business Type
+/// </summary>
+public interface IBusinessTypeValidator
 {
-    private GridArea(string code)
-    {
-        Code = code;
-    }
-
-    public string Code { get; }
-
-    public static GridArea Create(string code)
-    {
-        return new GridArea(code);
-    }
+    /// <summary>
+    /// Validates Business Type
+    /// </summary>
+    public Task<Result> ValidateAsync(string? businessType, CancellationToken cancellationToken);
 }

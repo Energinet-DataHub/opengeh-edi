@@ -17,12 +17,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Common;
 using Energinet.DataHub.EDI.Domain.Transactions;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using MediatR;
-using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
@@ -59,22 +61,30 @@ public class InitializeAggregatedMeasureDataProcessesHandler
     private void CreateAggregatedMeasureDataProcess(
         RequestAggregatedMeasureDataMarketMessage marketMessage)
     {
+        var actorSenderNumber = ActorNumber.Create(marketMessage.SenderNumber);
+        var businessReason = CimCode.To(marketMessage.BusinessReason);
+
         foreach (var serie in marketMessage.Series)
         {
+            var settlementVersion = !string.IsNullOrWhiteSpace(serie.SettlementSeriesVersion)
+                ? EnumerationCodeType.FromCode<SettlementVersion>(serie.SettlementSeriesVersion)
+                : null;
+
             _aggregatedMeasureDataProcessRepository.Add(
                 new AggregatedMeasureDataProcess(
                     ProcessId.New(),
                     BusinessTransactionId.Create(serie.Id),
-                    ActorNumber.Create(marketMessage.SenderNumber),
+                    actorSenderNumber,
                     marketMessage.SenderRoleCode,
-                    marketMessage.BusinessReason,
+                    businessReason,
                     serie.MarketEvaluationPointType,
                     serie.MarketEvaluationSettlementMethod,
                     serie.StartDateAndOrTimeDateTime,
                     serie.EndDateAndOrTimeDateTime,
                     serie.MeteringGridAreaDomainId,
                     serie.EnergySupplierMarketParticipantId,
-                    serie.BalanceResponsiblePartyMarketParticipantId));
+                    serie.BalanceResponsiblePartyMarketParticipantId,
+                    settlementVersion));
         }
     }
 }

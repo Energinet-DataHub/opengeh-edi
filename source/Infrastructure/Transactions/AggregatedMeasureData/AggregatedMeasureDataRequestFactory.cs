@@ -15,6 +15,7 @@
 using System;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.Edi.Requests;
 using Google.Protobuf;
 
@@ -102,11 +103,15 @@ public static class AggregatedMeasureDataRequestFactory
 
     private static Edi.Requests.Period MapPeriod(AggregatedMeasureDataProcess process)
     {
-        return new Edi.Requests.Period
+        var period = new Edi.Requests.Period
         {
             Start = process.StartOfPeriod,
-            End = process.EndOfPeriod,
         };
+
+        if (process.EndOfPeriod != null)
+            period.End = process.EndOfPeriod;
+
+        return period;
     }
 
     private static IMessage CreateAggregatedMeasureDataRequest(AggregatedMeasureDataProcess process)
@@ -115,13 +120,25 @@ public static class AggregatedMeasureDataRequestFactory
         {
             Period = MapPeriod(process),
             MeteringPointType = process.MeteringPointType,
-            SettlementMethod = process.SettlementMethod,
             RequestedByActorId = process.RequestedByActorId.Value,
             RequestedByActorRole = process.RequestedByActorRoleCode,
+            BusinessReason = process.BusinessReason.Code,
         };
+
+        if (process.SettlementMethod != null)
+            request.SettlementMethod = process.SettlementMethod;
 
         if (process.EnergySupplierId != null)
             request.EnergySupplierId = process.EnergySupplierId;
+
+        if (process.BalanceResponsibleId != null)
+            request.BalanceResponsibleId = process.BalanceResponsibleId;
+
+        if (process.SettlementVersion != null)
+            request.SettlementSeriesVersion = process.SettlementVersion.Code;
+
+        if (process.MeteringGridAreaDomainId != null)
+            request.GridAreaCode = process.MeteringGridAreaDomainId;
 
         MapGridArea(request, process);
         MapEnergySupplierPerGridArea(request, process);

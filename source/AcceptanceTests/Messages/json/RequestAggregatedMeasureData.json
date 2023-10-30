@@ -6,14 +6,14 @@
     },
     "createdDateTime": "2022-12-17T09:30:47Z",
     "process.processType": {
-      "value": "D05"
+      "value": "D04"
     },
     "receiver_MarketParticipant.mRID": {
       "codingScheme": "A10",
       "value": "5790001330552"
     },
     "receiver_MarketParticipant.marketRole.type": {
-      "value": "DGL"
+        "value": "DGL"
     },
     "sender_MarketParticipant.mRID": {
       "codingScheme": "A10",
@@ -33,14 +33,11 @@
           "value": "D01"
         },
         "marketEvaluationPoint.type": {
-          "value": "E18"
+          "value": "E17"
         },
         "meteringGridArea_Domain.mRID": {
           "codingScheme": "NDK",
           "value": "543"
-        },
-        "settlement_Series.version": {
-          "value": "D01"
         },
         "start_DateAndOrTime.dateTime": "2023-07-26T22:00:00Z"
       }
