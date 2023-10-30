@@ -30,27 +30,27 @@ using Period = Energinet.DataHub.Edi.Responses.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 
-public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestBase
+public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : ProcessTestBase
 {
     private readonly string _eventType = nameof(AggregatedTimeSeriesRequestAccepted);
     private readonly Guid _referenceId = Guid.NewGuid();
-    private readonly string _eventId = "1";
+    private readonly string _eventId = Guid.NewGuid().ToString();
     private readonly InboxEventsProcessor _processor;
     private readonly AggregatedTimeSeriesRequestAcceptedEventMapper _aggregatedTimeSeriesRequestAcceptedEventMapper;
     private readonly AggregatedTimeSeriesRequestAccepted _aggregatedTimeSeriesRequestAcceptedResponse;
 
-    public WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests(DatabaseFixture databaseFixture)
+    public WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests(ProcessDatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _processor = GetService<InboxEventsProcessor>();
         _aggregatedTimeSeriesRequestAcceptedEventMapper = GetService<AggregatedTimeSeriesRequestAcceptedEventMapper>();
         _aggregatedTimeSeriesRequestAcceptedResponse = CreateResponseFromWholeSale();
-        RegisterInboxEvent();
     }
 
     [Fact]
     public async Task Event_is_marked_as_processed_when_a_handler_has_handled_it_successfully()
     {
+        RegisterInboxEvent();
         await _processor.ProcessEventsAsync(CancellationToken.None);
 
         TestAggregatedTimeSeriesRequestAcceptedHandlerSpy.AssertExpectedNotifications(_aggregatedTimeSeriesRequestAcceptedResponse);
@@ -100,8 +100,8 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
     private async Task EventIsMarkedAsProcessedAsync(string eventId)
     {
         var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-        var isProcessed = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM dbo.ReceivedInboxEvents WHERE Id = @EventId AND ProcessedDate IS NOT NULL", new { EventId = eventId, });
-        Assert.True(isProcessed);
+        var isProcessed = await connection.QueryFirstOrDefaultAsync($"SELECT * FROM dbo.ReceivedInboxEvents WHERE Id = @EventId AND ProcessedDate IS NOT NULL", new { EventId = eventId, });
+        Assert.NotNull(isProcessed);
     }
 
     private string ToJson()

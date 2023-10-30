@@ -93,6 +93,7 @@ namespace Energinet.DataHub.EDI.Api
 
                     services.AddApplicationInsights();
                     services.ConfigureFunctionsApplicationInsights();
+
                     ProcessConfiguration.Configure(services, databaseConnectionString!);
 
                     CompositionRoot.Initialize(services)

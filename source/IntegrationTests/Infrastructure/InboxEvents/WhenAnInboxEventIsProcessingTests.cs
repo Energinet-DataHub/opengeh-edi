@@ -28,15 +28,15 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 
-public class WhenAnInboxEventIsProcessingTests : TestBase
+public class WhenAnInboxEventIsProcessingTests : ProcessTestBase
 {
     private readonly string _eventType = nameof(TestInboxEvent);
     private readonly Guid _referenceId = Guid.NewGuid();
-    private readonly string _eventId = "1";
+    private readonly string _eventId = Guid.NewGuid().ToString();
     private readonly InboxEventsProcessor _inboxProcessor;
     private readonly TestInboxEventMapper _testInboxEventMapper;
 
-    public WhenAnInboxEventIsProcessingTests(DatabaseFixture databaseFixture)
+    public WhenAnInboxEventIsProcessingTests(ProcessDatabaseFixture databaseFixture)
      : base(databaseFixture)
     {
         _testInboxEventMapper = new TestInboxEventMapper();
