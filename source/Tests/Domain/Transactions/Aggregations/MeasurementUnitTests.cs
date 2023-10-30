@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Domain.Transactions.Aggregations;
@@ -24,7 +25,7 @@ public class MeasurementUnitTests
     [InlineData("KWH")]
     public void Can_parse_from_name_or_code(string valueToParse)
     {
-        var measurementUnitType = MeasurementUnit.From(valueToParse);
+        var measurementUnitType = CimCode.Of<MeasurementUnit>(valueToParse);
 
         Assert.NotNull(measurementUnitType);
     }

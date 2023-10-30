@@ -16,22 +16,12 @@ using Energinet.DataHub.EDI.Domain.Common;
 
 namespace Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
-public class MeasurementUnit : EnumerationType
+public class MeasurementUnit : EnumerationCodeType
 {
     public static readonly MeasurementUnit Kwh = new(0, nameof(Kwh), "KWH");
 
     private MeasurementUnit(int id, string name, string code)
-        : base(id, name)
+        : base(id, name, code)
     {
-        Code = code;
-    }
-
-    public string Code { get; }
-
-    public static MeasurementUnit From(string value)
-    {
-        return GetAll<MeasurementUnit>().First(type =>
-            type.Code.Equals(value, StringComparison.OrdinalIgnoreCase) ||
-            type.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
     }
 }

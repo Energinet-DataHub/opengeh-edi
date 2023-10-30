@@ -14,6 +14,7 @@
 
 using System;
 using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Common;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
@@ -21,26 +22,21 @@ namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 
 public static class CimCode
 {
-    public static string Of(BusinessReason businessReason)
+    public static string Of<T>(string value)
+        where T : EnumerationCodeType
     {
-        ArgumentNullException.ThrowIfNull(businessReason);
+        ArgumentNullException.ThrowIfNull(value, nameof(value));
 
-        if (businessReason == BusinessReason.BalanceFixing)
-            return "D04";
+        var code = EnumerationType.FromName<T>(value);
+        return !string.IsNullOrWhiteSpace(code.Code) ? code.Code : throw NoCodeFoundFor(code.Name);
+    }
 
-        if (businessReason == BusinessReason.MoveIn)
-            return "E65";
+    public static string Of<T>(T value)
+        where T : EnumerationCodeType
+    {
+        ArgumentNullException.ThrowIfNull(value, nameof(value));
 
-        if (businessReason == BusinessReason.PreliminaryAggregation)
-            return "D03";
-
-        if (businessReason == BusinessReason.WholesaleFixing)
-            return "D05";
-
-        if (businessReason == BusinessReason.Correction)
-            return "D32";
-
-        throw NoCodeFoundFor(businessReason.Name);
+        return !string.IsNullOrWhiteSpace(value.Code) ? value.Code : throw NoCodeFoundFor(value.Name);
     }
 
     public static BusinessReason To(string businessReasonCode)
@@ -63,122 +59,6 @@ public static class CimCode
             return BusinessReason.Correction;
 
         throw NoBusinessReasonFoundFor(businessReasonCode);
-    }
-
-    public static string Of(SettlementVersion settlementVersion)
-    {
-        ArgumentNullException.ThrowIfNull(settlementVersion);
-
-        if (settlementVersion == SettlementVersion.FirstCorrection)
-            return "D01";
-
-        if (settlementVersion == SettlementVersion.SecondCorrection)
-            return "D02";
-
-        if (settlementVersion == SettlementVersion.ThirdCorrection)
-            return "D03";
-
-        throw NoCodeFoundFor(settlementVersion.Name);
-    }
-
-    public static string Of(MeteringPointType meteringPointType)
-    {
-        ArgumentNullException.ThrowIfNull(meteringPointType);
-
-        if (meteringPointType == MeteringPointType.Consumption)
-            return "E17";
-
-        if (meteringPointType == MeteringPointType.Production)
-            return "E18";
-
-        if (meteringPointType == MeteringPointType.Exchange)
-            return "E20";
-
-        throw NoCodeFoundFor(meteringPointType.Name);
-    }
-
-    public static string Of(MarketRole marketRole)
-    {
-        ArgumentNullException.ThrowIfNull(marketRole);
-
-        if (marketRole == MarketRole.EnergySupplier)
-            return "DDQ";
-        if (marketRole == MarketRole.GridOperator)
-            return "DDM";
-        if (marketRole == MarketRole.MeteredDataResponsible)
-            return "MDR";
-        if (marketRole == MarketRole.MeteringDataAdministrator)
-            return "DGL";
-        if (marketRole == MarketRole.MeteringPointAdministrator)
-            return "DDZ";
-        if (marketRole == MarketRole.BalanceResponsibleParty)
-            return "DDK";
-
-        throw NoCodeFoundFor(marketRole.Name);
-    }
-
-    public static string Of(SettlementType settlementType)
-    {
-        ArgumentNullException.ThrowIfNull(settlementType);
-
-        if (settlementType == SettlementType.Flex)
-            return "D01";
-        if (settlementType == SettlementType.NonProfiled)
-            return "E02";
-
-        throw NoCodeFoundFor(settlementType.Name);
-    }
-
-    public static string Of(MeasurementUnit measurementUnit)
-    {
-        ArgumentNullException.ThrowIfNull(measurementUnit);
-
-        if (measurementUnit == MeasurementUnit.Kwh)
-            return "KWH";
-
-        throw NoCodeFoundFor(measurementUnit.Name);
-    }
-
-    public static string Of(Resolution resolution)
-    {
-        ArgumentNullException.ThrowIfNull(resolution);
-
-        if (resolution == Resolution.QuarterHourly)
-            return "PT15M";
-        if (resolution == Resolution.Hourly)
-            return "PT1H";
-
-        throw NoCodeFoundFor(resolution.Name);
-    }
-
-    public static string Of(Quality quality)
-    {
-        ArgumentNullException.ThrowIfNull(quality);
-
-        if (quality == Quality.Estimated)
-            return "A03";
-        if (quality == Quality.Incomplete)
-            return "A05";
-        if (quality == Quality.Calculated)
-            return "A06";
-        if (quality == Quality.Measured)
-            return "A04";
-        if (quality == Quality.Missing)
-            return "A02";
-
-        throw NoCodeFoundFor(quality.Name);
-    }
-
-    public static string Of(ReasonCode reasonCode)
-    {
-        ArgumentNullException.ThrowIfNull(reasonCode);
-
-        if (reasonCode == ReasonCode.FullyAccepted)
-            return "A01";
-        if (reasonCode == ReasonCode.FullyRejected)
-            return "A02";
-
-        throw NoCodeFoundFor(reasonCode.Name);
     }
 
     public static string CodingSchemeOf(ActorNumber actorNumber)

@@ -206,7 +206,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     [InlineData(ProcessType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.NetExchangePerNeighboringGa)]
     public async Task Exchange_is_sent_to_the_grid_operator(ProcessType processType, string businessReasonName, TimeSeriesType timeSeriesType)
     {
-        var businessReason = BusinessReason.FromName(businessReasonName);
+        var businessReason = BusinessReason.From(businessReasonName);
         _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .WithActorNumber(SampleData.GridOperatorNumber)
@@ -236,7 +236,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     [InlineData(ProcessType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.TotalConsumption)]
     public async Task Total_consumption_is_sent_to_the_grid_operator(ProcessType processType, string businessReasonName, TimeSeriesType timeSeriesType)
     {
-        var businessReason = BusinessReason.FromName(businessReasonName);
+        var businessReason = BusinessReason.From(businessReasonName);
         _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .WithActorNumber(SampleData.GridOperatorNumber)

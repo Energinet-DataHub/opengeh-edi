@@ -55,10 +55,10 @@ public class AggregationResultXmlDocumentWriter : DocumentWriter
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, timeSeries.TransactionId.ToString()).ConfigureAwait(false);
             // TODO XJOHO: We are currently not receiving version from Wholesale - bug team-phoenix #78
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "version", null, "1").ConfigureAwait(false);
-            await WriteElementIfHasValueAsync("settlement_Series.version", timeSeries.SettlementVersion is null ? null : CimCode.Of(SettlementVersion.FromName(timeSeries.SettlementVersion)), writer).ConfigureAwait(false);
+            await WriteElementIfHasValueAsync("settlement_Series.version", timeSeries.SettlementVersion is null ? null : CimCode.Of<SettlementVersion>(timeSeries.SettlementVersion), writer).ConfigureAwait(false);
             await WriteElementIfHasValueAsync("originalTransactionIDReference_Series.mRID", timeSeries.OriginalTransactionIdReference, writer).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "marketEvaluationPoint.type", null, CimCode.Of(MeteringPointType.From(timeSeries.MeteringPointType))).ConfigureAwait(false);
-            await WriteElementIfHasValueAsync("marketEvaluationPoint.settlementMethod", timeSeries.SettlementType is null ? null : CimCode.Of(SettlementType.From(timeSeries.SettlementType)), writer).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "marketEvaluationPoint.type", null, CimCode.Of<MeteringPointType>(timeSeries.MeteringPointType)).ConfigureAwait(false);
+            await WriteElementIfHasValueAsync("marketEvaluationPoint.settlementMethod", timeSeries.SettlementType is null ? null : CimCode.Of<SettlementType>(timeSeries.SettlementType), writer).ConfigureAwait(false);
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "meteringGridArea_Domain.mRID", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "codingScheme", null, "NDK").ConfigureAwait(false);
             await writer.WriteStringAsync(timeSeries.GridAreaCode).ConfigureAwait(false);
@@ -82,10 +82,10 @@ public class AggregationResultXmlDocumentWriter : DocumentWriter
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, GeneralValues.ProductCode).ConfigureAwait(false);
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, CimCode.Of(MeasurementUnit.From(timeSeries.MeasureUnitType))).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, CimCode.Of<MeasurementUnit>(timeSeries.MeasureUnitType)).ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Period", null).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "resolution", null, CimCode.Of(Resolution.From(timeSeries.Resolution))).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "resolution", null, CimCode.Of<Resolution>(timeSeries.Resolution)).ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "timeInterval", null).ConfigureAwait(false);
 

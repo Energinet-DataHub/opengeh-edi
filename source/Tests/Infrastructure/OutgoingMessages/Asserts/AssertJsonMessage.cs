@@ -45,7 +45,7 @@ public static class AssertJsonMessage
         if (header == null) throw new ArgumentNullException(nameof(header));
         var root = document.RootElement.GetProperty(documentType);
         Assert.Equal(header.MessageId, root.GetProperty("mRID").ToString());
-        Assert.Equal(CimCode.Of(BusinessReason.FromName(header.BusinessReason)), root.GetProperty("process.processType").GetProperty("value").ToString());
+        Assert.Equal(CimCode.Of(EnumerationType.FromName<BusinessReason>(header.BusinessReason)), root.GetProperty("process.processType").GetProperty("value").ToString());
         Assert.Equal("23", root.GetProperty("businessSector.type").GetProperty("value").ToString());
         Assert.Equal(header.SenderId, root.GetProperty("sender_MarketParticipant.mRID").GetProperty("value").ToString());
         Assert.Equal(CimCode.Of(EnumerationType.FromName<MarketRole>(header.SenderRole)), root.GetProperty("sender_MarketParticipant.marketRole.type").GetProperty("value").ToString());

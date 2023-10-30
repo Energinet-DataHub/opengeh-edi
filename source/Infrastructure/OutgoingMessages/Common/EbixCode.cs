@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Common;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
@@ -21,138 +21,25 @@ namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 
 public static class EbixCode
 {
-    public static string Of(BusinessReason businessReason)
+    public static string Of<T>(string value)
+        where T : EnumerationCodeType
     {
-        ArgumentNullException.ThrowIfNull(businessReason);
+        ArgumentNullException.ThrowIfNull(value, nameof(value));
 
-        if (businessReason == BusinessReason.BalanceFixing)
-            return "D04";
-
-        if (businessReason == BusinessReason.MoveIn)
-            return "E65";
-
-        if (businessReason == BusinessReason.PreliminaryAggregation)
-            return "D03";
-
-        if (businessReason == BusinessReason.WholesaleFixing)
-            return "D05";
-
-        if (businessReason == BusinessReason.Correction)
-            return "D32";
-
-        throw NoCodeFoundFor(businessReason.Name);
+        var code = EnumerationType.FromName<T>(value);
+        return !string.IsNullOrWhiteSpace(code.Code) ? code.Code : throw NoCodeFoundFor(code.Name);
     }
 
     public static BusinessReason To(string businessReasonCode)
     {
         ArgumentNullException.ThrowIfNull(businessReasonCode);
 
-        if (businessReasonCode == "D04")
-            return BusinessReason.BalanceFixing;
-
-        if (businessReasonCode == "E65")
-            return BusinessReason.MoveIn;
-
-        if (businessReasonCode == "D03")
-            return BusinessReason.PreliminaryAggregation;
-
-        if (businessReasonCode == "D05")
-            return BusinessReason.WholesaleFixing;
-
-        if (businessReasonCode == "D32")
-            return BusinessReason.Correction;
-
-        throw NoBusinessReasonFoundFor(businessReasonCode);
-    }
-
-    public static string Of(SettlementVersion settlementVersion)
-    {
-        ArgumentNullException.ThrowIfNull(settlementVersion);
-
-        if (settlementVersion == SettlementVersion.FirstCorrection)
-            return "D01";
-
-        if (settlementVersion == SettlementVersion.SecondCorrection)
-            return "D02";
-
-        if (settlementVersion == SettlementVersion.ThirdCorrection)
-            return "D03";
-
-        throw NoCodeFoundFor(settlementVersion.Name);
-    }
-
-    public static string Of(MeteringPointType meteringPointType)
-    {
-        ArgumentNullException.ThrowIfNull(meteringPointType);
-
-        if (meteringPointType == MeteringPointType.Consumption)
-            return "E17";
-
-        if (meteringPointType == MeteringPointType.Production)
-            return "E18";
-
-        if (meteringPointType == MeteringPointType.Exchange)
-            return "E20";
-
-        throw NoCodeFoundFor(meteringPointType.Name);
-    }
-
-    public static string Of(MarketRole marketRole)
-    {
-        ArgumentNullException.ThrowIfNull(marketRole);
-
-        if (marketRole == MarketRole.EnergySupplier)
-            return "DDQ";
-        if (marketRole == MarketRole.GridOperator)
-            return "DDM";
-        if (marketRole == MarketRole.MeteredDataResponsible)
-            return "MDR";
-        if (marketRole == MarketRole.MeteringDataAdministrator)
-            return "DGL";
-        if (marketRole == MarketRole.MeteringPointAdministrator)
-            return "DDZ";
-        if (marketRole == MarketRole.BalanceResponsibleParty)
-            return "DDK";
-
-        throw NoCodeFoundFor(marketRole.Name);
-    }
-
-    public static string Of(SettlementType settlementType)
-    {
-        ArgumentNullException.ThrowIfNull(settlementType);
-
-        if (settlementType == SettlementType.Flex)
-            return "D01";
-        if (settlementType == SettlementType.NonProfiled)
-            return "E02";
-
-        throw NoCodeFoundFor(settlementType.Name);
-    }
-
-    public static string Of(MeasurementUnit measurementUnit)
-    {
-        ArgumentNullException.ThrowIfNull(measurementUnit);
-
-        if (measurementUnit == MeasurementUnit.Kwh)
-            return "KWH";
-
-        throw NoCodeFoundFor(measurementUnit.Name);
-    }
-
-    public static string Of(Resolution resolution)
-    {
-        ArgumentNullException.ThrowIfNull(resolution);
-
-        if (resolution == Resolution.QuarterHourly)
-            return "PT15M";
-        if (resolution == Resolution.Hourly)
-            return "PT1H";
-
-        throw NoCodeFoundFor(resolution.Name);
+        return BusinessReason.From(businessReasonCode);
     }
 
     public static string Of(Quality quality)
     {
+        // The codes for Ebix documents are different from those in CIM - thats why this functionlooks like it does
         ArgumentNullException.ThrowIfNull(quality);
 
         if (quality == Quality.Estimated)
@@ -161,12 +48,15 @@ public static class EbixCode
             return "D01";
         if (quality == Quality.Measured)
             return "E01";
+        if (quality == Quality.Adjusted)
+            return "36";
 
         throw NoCodeFoundFor(quality.Name);
     }
 
     public static string Of(ReasonCode reasonCode)
     {
+        // The codes for Ebix documents are different from those in CIM - thats why this functionlooks like it does
         ArgumentNullException.ThrowIfNull(reasonCode);
 
         if (reasonCode == ReasonCode.FullyAccepted)
@@ -180,10 +70,5 @@ public static class EbixCode
     private static Exception NoCodeFoundFor(string domainType)
     {
         return new InvalidOperationException($"No code has been defined for {domainType}");
-    }
-
-    private static Exception NoBusinessReasonFoundFor(string businessReasonCode)
-    {
-        return new InvalidOperationException($"No business reason has been defined for {businessReasonCode}");
     }
 }

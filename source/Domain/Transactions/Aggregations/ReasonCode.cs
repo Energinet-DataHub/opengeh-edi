@@ -16,24 +16,13 @@ using Energinet.DataHub.EDI.Domain.Common;
 
 namespace Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
-public class ReasonCode : EnumerationType
+public class ReasonCode : EnumerationCodeType
 {
     public static readonly ReasonCode FullyAccepted = new(0, nameof(FullyAccepted), "A01");
     public static readonly ReasonCode FullyRejected = new(1, nameof(FullyRejected), "A02");
 
     public ReasonCode(int id, string name, string code)
-        : base(id, name)
+        : base(id, name, code)
     {
-        Code = code;
-    }
-
-    public string Code { get; }
-
-    public static ReasonCode From(string valueToParseFrom)
-    {
-        return GetAll
-                <ReasonCode>()
-            .First(reasonCode => reasonCode.Name.Equals(valueToParseFrom, StringComparison.OrdinalIgnoreCase) ||
-                                 reasonCode.Code.Equals(valueToParseFrom, StringComparison.OrdinalIgnoreCase));
     }
 }

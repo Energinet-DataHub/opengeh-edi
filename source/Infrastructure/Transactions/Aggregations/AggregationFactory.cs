@@ -19,6 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Common;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
@@ -50,7 +51,7 @@ public class AggregationFactory
         if (aggregatedMeasureDataProcess == null) throw new ArgumentNullException(nameof(aggregatedMeasureDataProcess));
         if (aggregatedTimeSerie == null) throw new ArgumentNullException(nameof(aggregatedTimeSerie));
 
-        if ((aggregatedMeasureDataProcess.MeteringPointType != null ? MeteringPointType.FromCode(aggregatedMeasureDataProcess.MeteringPointType).Name : null) != aggregatedTimeSerie.MeteringPointType) throw new ArgumentException("aggregatedTimeSerie.MeteringPointType isn't equal to aggregatedMeasureDataProcess.MeteringPointType", nameof(aggregatedTimeSerie));
+        if ((aggregatedMeasureDataProcess.MeteringPointType != null ? EnumerationCodeType.FromCode<MeteringPointType>(aggregatedMeasureDataProcess.MeteringPointType).Name : null) != aggregatedTimeSerie.MeteringPointType) throw new ArgumentException("aggregatedTimeSerie.MeteringPointType isn't equal to aggregatedMeasureDataProcess.MeteringPointType", nameof(aggregatedTimeSerie));
 
         return new Aggregation(
             MapPoints(aggregatedTimeSerie.Points),
@@ -107,7 +108,7 @@ public class AggregationFactory
 
     private static string MapReceiverRole(AggregatedMeasureDataProcess process)
     {
-        return MarketRole.FromCode(process.RequestedByActorRoleCode).Name;
+        return MarketRole.FromCode<MarketRole>(process.RequestedByActorRoleCode).Name;
     }
 
     private static ActorGrouping MapActorGrouping(AggregatedMeasureDataProcess process)

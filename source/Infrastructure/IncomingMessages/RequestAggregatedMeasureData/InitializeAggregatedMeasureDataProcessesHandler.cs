@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Common;
 using Energinet.DataHub.EDI.Domain.Transactions;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
@@ -66,7 +67,7 @@ public class InitializeAggregatedMeasureDataProcessesHandler
         foreach (var serie in marketMessage.Series)
         {
             var settlementVersion = !string.IsNullOrWhiteSpace(serie.SettlementSeriesVersion)
-                ? SettlementVersion.FromCode(serie.SettlementSeriesVersion)
+                ? EnumerationCodeType.FromCode<SettlementVersion>(serie.SettlementSeriesVersion)
                 : null;
 
             _aggregatedMeasureDataProcessRepository.Add(

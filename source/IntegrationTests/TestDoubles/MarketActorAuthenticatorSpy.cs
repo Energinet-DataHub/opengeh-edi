@@ -25,7 +25,7 @@ public class MarketActorAuthenticatorSpy : IMarketActorAuthenticator
 {
     public MarketActorAuthenticatorSpy(ActorNumber senderNumber, string senderRole)
     {
-        CurrentIdentity = new Authenticated("not_need", senderNumber, new List<MarketRole> { MarketRole.FromCode(senderRole) });
+        CurrentIdentity = new Authenticated("not_need", senderNumber, new List<MarketRole> { MarketRole.FromCode<MarketRole>(senderRole) });
     }
 
     public MarketActorIdentity CurrentIdentity { get; }

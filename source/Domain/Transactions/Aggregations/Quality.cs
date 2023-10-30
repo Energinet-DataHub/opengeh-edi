@@ -16,21 +16,19 @@ using Energinet.DataHub.EDI.Domain.Common;
 
 namespace Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
-public class Quality : EnumerationType
+public class Quality : EnumerationCodeType
 {
-    public static readonly Quality Missing = new(0, nameof(Missing), "A02");
-    public static readonly Quality Estimated = new(1, nameof(Estimated), "A03");
-    public static readonly Quality Measured = new(2, nameof(Measured), "A04");
-    public static readonly Quality Incomplete = new(3, nameof(Incomplete), "A05");
-    public static readonly Quality Calculated = new(4, nameof(Calculated), "A06");
+    public static readonly Quality Adjusted = new(0, nameof(Adjusted), "A01");
+    public static readonly Quality Missing = new(1, nameof(Missing), "A02");
+    public static readonly Quality Estimated = new(2, nameof(Estimated), "A03");
+    public static readonly Quality Measured = new(3, nameof(Measured), "A04");
+    public static readonly Quality Incomplete = new(4, nameof(Incomplete), "A05");
+    public static readonly Quality Calculated = new(5, nameof(Calculated), "A06");
 
     public Quality(int id, string name, string code)
-        : base(id, name)
+        : base(id, name, code)
     {
-        Code = code;
     }
-
-    public string Code { get; }
 
     public static Quality From(string valueToParseFrom)
     {

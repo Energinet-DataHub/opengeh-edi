@@ -105,7 +105,7 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
             {
                 writer.WriteObject(
                     "marketEvaluationPoint.settlementMethod",
-                    new KeyValuePair<string, string>("value", CimCode.Of(SettlementType.From(series.SettlementType))));
+                    new KeyValuePair<string, string>("value", CimCode.Of(SettlementType.FromName<SettlementType>(series.SettlementType))));
             }
 
             if (series.OriginalTransactionIdReference is not null)
@@ -113,19 +113,19 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
                 writer.WriteProperty("originalTransactionIDReference_Series.mRID", series.OriginalTransactionIdReference);
             }
 
-            writer.WriteObject("marketEvaluationPoint.type", new KeyValuePair<string, string>("value", CimCode.Of(MeteringPointType.From(series.MeteringPointType))));
+            writer.WriteObject("marketEvaluationPoint.type", new KeyValuePair<string, string>("value", CimCode.Of(MeteringPointType.FromName<MeteringPointType>(series.MeteringPointType))));
             writer.WriteProperty("product", GeneralValues.ProductCode);
-            writer.WriteObject("quantity_Measure_Unit.name", new KeyValuePair<string, string>("value", CimCode.Of(MeasurementUnit.From(series.MeasureUnitType))));
+            writer.WriteObject("quantity_Measure_Unit.name", new KeyValuePair<string, string>("value", CimCode.Of(MeasurementUnit.FromName<MeasurementUnit>(series.MeasureUnitType))));
 
             if (series.SettlementVersion is not null)
             {
-                writer.WriteObject("settlement_Series.version", new KeyValuePair<string, string>("value", CimCode.Of(SettlementVersion.FromName(series.SettlementVersion))));
+                writer.WriteObject("settlement_Series.version", new KeyValuePair<string, string>("value", CimCode.Of(SettlementVersion.FromName<SettlementVersion>(series.SettlementVersion))));
             }
 
             writer.WritePropertyName("Period");
             writer.WriteStartObject();
 
-            writer.WriteProperty("resolution", CimCode.Of(Resolution.From(series.Resolution)));
+            writer.WriteProperty("resolution", CimCode.Of(Resolution.FromName<Resolution>(series.Resolution)));
 
             writer.WritePropertyName("timeInterval");
             writer.WriteStartObject();

@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Data;
 using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.Common;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.Transactions;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
@@ -48,7 +50,7 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
         builder.Property(x => x.BusinessReason)
             .HasConversion(
                 value => value.Code,
-                dbValue => BusinessReason.FromCode(dbValue));
+                dbValue => EnumerationCodeType.FromCode<BusinessReason>(dbValue));
         builder.Property(x => x.RequestedByActorId)
             .HasConversion(
                 toDbValue => toDbValue.Value,
@@ -64,7 +66,7 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
         builder.Property(x => x.SettlementVersion)
             .HasConversion(
                 value => value != null ? value.Code : null,
-                dbValue => !string.IsNullOrWhiteSpace(dbValue) ? SettlementVersion.FromCode(dbValue) : null);
+                dbValue => !string.IsNullOrWhiteSpace(dbValue) ? EnumerationCodeType.FromCode<SettlementVersion>(dbValue) : null);
 
         builder.HasMany<OutgoingMessage>("_messages")
             .WithOne()

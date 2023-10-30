@@ -45,7 +45,7 @@ internal static class XmlHeaderWriter
             .ConfigureAwait(false);
         await writer.WriteElementStringAsync(documentDetails.Prefix, "mRID", null, messageHeader.MessageId).ConfigureAwait(false);
         await writer.WriteElementStringAsync(documentDetails.Prefix, "type", null, documentDetails.TypeCode).ConfigureAwait(false);
-        await writer.WriteElementStringAsync(documentDetails.Prefix, "process.processType", null, CimCode.Of(BusinessReason.FromName(messageHeader.BusinessReason)))
+        await writer.WriteElementStringAsync(documentDetails.Prefix, "process.processType", null, CimCode.Of(EnumerationType.FromName<BusinessReason>(messageHeader.BusinessReason)))
             .ConfigureAwait(false);
         await writer.WriteElementStringAsync(documentDetails.Prefix, "businessSector.type", null, GeneralValues.SectorTypeCode).ConfigureAwait(false);
 

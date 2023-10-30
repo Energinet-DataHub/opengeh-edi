@@ -15,6 +15,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Domain.Common;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
@@ -167,12 +168,12 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     [InlineData(nameof(DocumentFormat.Json), nameof(BusinessReason.BalanceFixing))]
     public async Task Business_reason_is_translated(string documentFormat, string processType)
     {
-        _timeSeries.WithBusinessReason(BusinessReason.FromName(processType));
+        _timeSeries.WithBusinessReason(BusinessReason.From(processType));
 
         var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
 
         AssertDocument(document, DocumentFormat.From(documentFormat))
-            .HasBusinessReason(BusinessReason.FromName(processType))
+            .HasBusinessReason(BusinessReason.From(processType))
             .SettlementVersionIsNotPresent();
     }
 
@@ -185,16 +186,16 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         _timeSeries
             .WithMessageId(SampleData.MessageId)
             .WithTransactionId(SampleData.TransactionId)
-            .WithBusinessReason(BusinessReason.FromName(processType))
-            .WithSettlementVersion(SettlementVersion.FromName(settlementVersion))
+            .WithBusinessReason(BusinessReason.From(processType))
+            .WithSettlementVersion(SettlementVersion.FromName<SettlementVersion>(settlementVersion))
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
             .WithPoint(new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z"));
 
         var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
 
         await AssertDocument(document, DocumentFormat.From(documentFormat))
-            .HasBusinessReason(BusinessReason.FromName(processType))
-            .HasSettlementVersion(SettlementVersion.FromName(settlementVersion))
+            .HasBusinessReason(EnumerationCodeType.FromName<BusinessReason>(processType))
+            .HasSettlementVersion(SettlementVersion.FromName<SettlementVersion>(settlementVersion))
             .DocumentIsValidAsync();
     }
 

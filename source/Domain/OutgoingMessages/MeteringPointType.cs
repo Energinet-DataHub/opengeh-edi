@@ -16,31 +16,14 @@ using Energinet.DataHub.EDI.Domain.Common;
 
 namespace Energinet.DataHub.EDI.Domain.OutgoingMessages;
 
-public class MeteringPointType : EnumerationType
+public class MeteringPointType : EnumerationCodeType
 {
     public static readonly MeteringPointType Consumption = new(0, nameof(Consumption), "E17");
     public static readonly MeteringPointType Production = new(1, nameof(Production), "E18");
     public static readonly MeteringPointType Exchange = new(2, nameof(Exchange), "E20");
 
     private MeteringPointType(int id, string name, string code)
-        : base(id, name)
+        : base(id, name, code)
     {
-        Code = code;
-    }
-
-    public string Code { get; }
-
-    public static MeteringPointType From(string name)
-    {
-        var meteringPointType = GetAll<MeteringPointType>().FirstOrDefault(type => type.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{name} is not a valid metering point type name");
-
-        return meteringPointType;
-    }
-
-    public static MeteringPointType FromCode(string code)
-    {
-        var meteringPointType = GetAll<MeteringPointType>().FirstOrDefault(type => type.Code.Equals(code, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{code} is not a valid metering point type code");
-
-        return meteringPointType;
     }
 }

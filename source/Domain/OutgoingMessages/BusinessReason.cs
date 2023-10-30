@@ -16,10 +16,10 @@ using Energinet.DataHub.EDI.Domain.Common;
 
 namespace Energinet.DataHub.EDI.Domain.OutgoingMessages;
 
-public sealed class BusinessReason : EnumerationType
+public sealed class BusinessReason : EnumerationCodeType
 {
     // ReSharper disable InconsistentNaming
-    #pragma warning disable IDE1006
+#pragma warning disable IDE1006
     public static readonly BusinessReason MoveIn = new(0, nameof(MoveIn), "E65");
     public static readonly BusinessReason BalanceFixing = new(1, nameof(BalanceFixing), "D04");
     public static readonly BusinessReason PreliminaryAggregation = new(2, nameof(PreliminaryAggregation), "D03");
@@ -419,24 +419,14 @@ public sealed class BusinessReason : EnumerationType
     #pragma warning restore IDE1006
 
     private BusinessReason(int id, string name, string code)
-     : base(id, name)
+     : base(id, name, code)
     {
-        Code = code;
     }
 
-    public string Code { get; }
-
-    public static BusinessReason FromName(string name)
+    public static BusinessReason From(string valueToParse)
     {
-        var businessReason = GetAll<BusinessReason>().FirstOrDefault(br =>
-            br.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{name} is not a valid process type name");
-        return businessReason;
-    }
-
-    public static BusinessReason FromCode(string code)
-    {
-        var businessReason = GetAll<BusinessReason>().FirstOrDefault(br =>
-            br.Code.Equals(code, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{code} is not a valid process type code");
+        var businessReason = GetAll<BusinessReason>().FirstOrDefault(processType =>
+            processType.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{valueToParse} is not a valid process type");
         return businessReason;
     }
 }

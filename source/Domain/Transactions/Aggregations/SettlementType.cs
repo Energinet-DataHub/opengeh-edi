@@ -16,7 +16,7 @@ using Energinet.DataHub.EDI.Domain.Common;
 
 namespace Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 
-public class SettlementType : EnumerationType
+public class SettlementType : EnumerationCodeType
 {
     // Customer with more than ~100.000 kwH per year
     public static readonly SettlementType NonProfiled = new(0, nameof(NonProfiled), "E02");
@@ -25,12 +25,9 @@ public class SettlementType : EnumerationType
     public static readonly SettlementType Flex = new(1, nameof(Flex), "D01");
 
     private SettlementType(int id, string name, string code)
-        : base(id, name)
+        : base(id, name, code)
     {
-        Code = code;
     }
-
-    public string Code { get; }
 
     public static SettlementType From(string valueToParse)
     {
