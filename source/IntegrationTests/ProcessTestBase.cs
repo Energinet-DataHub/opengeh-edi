@@ -170,7 +170,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             _services.AddTransient<IRequestHandler<TestCreateOutgoingMessageCommand, Unit>, TestCreateOutgoingCommandHandler>();
 
             _services.AddTransient<IIntegrationEventHandler, IntegrationEventHandler>();
-            _services.AddTransient<B2BContext>();
             ProcessConfiguration.Configure(_services, DatabaseFixture.ConnectionString);
 
             CompositionRoot.Initialize(_services)

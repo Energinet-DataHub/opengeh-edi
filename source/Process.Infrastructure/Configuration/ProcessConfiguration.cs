@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
-using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
@@ -22,6 +20,7 @@ using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using Energinet.DataHub.EDI.Process.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Application.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Domain;
 using Energinet.DataHub.EDI.Process.Domain.Documents;
 using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
@@ -32,6 +31,7 @@ using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.AggregationResult;
 using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Dequeue;
 using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Processing;
@@ -76,7 +76,7 @@ public static class ProcessConfiguration
 
         //ProcessingConfiguration
         services.AddScoped<DomainEventsAccessor>();
-        services.AddScoped<ProcessUnitOfWork>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(Processing.UnitOfWorkBehaviour<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RaiseDomainEventsBehaviour<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(EnqueueOutgoingMessagesBehaviour<,>));
@@ -89,6 +89,9 @@ public static class ProcessConfiguration
         services.AddScoped<IActorMessageQueueRepository, ActorMessageQueueRepository>();
         services.AddScoped<IMarketDocumentRepository, MarketDocumentRepository>();
         services.AddTransient<IRequestHandler<PeekCommand, PeekResult>, PeekHandler>();
+
+        //DequeConfiguration
+        DequeueConfiguration.Configure(services);
 
         // RequestedAggregatedMeasureDataConfiguration
         services.AddTransient<IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>, SendAggregatedMeasuredDataToWholesale>();

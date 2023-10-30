@@ -13,15 +13,15 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Process.Domain;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 
-public class ProcessUnitOfWork : IUnitOfWork
+public class UnitOfWork : IUnitOfWork
 {
     private readonly ProcessContext _context;
 
-    public ProcessUnitOfWork(ProcessContext context)
+    public UnitOfWork(ProcessContext context)
     {
         _context = context;
     }

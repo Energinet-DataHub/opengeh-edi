@@ -18,22 +18,22 @@ using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using MediatR;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
+using IUnitOfWork = Energinet.DataHub.EDI.Process.Domain.IUnitOfWork;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Processing;
 
 public class UnitOfWorkBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : ICommand<TResponse>
 {
-    private readonly ProcessUnitOfWork _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
     private readonly ILogger<UnitOfWorkBehaviour<TRequest, TResponse>> _logger;
 
     public UnitOfWorkBehaviour(
-        ProcessUnitOfWork unitOfWork,
+        IUnitOfWork unitOfWork,
         IDatabaseConnectionFactory databaseConnectionFactory,
         ILogger<UnitOfWorkBehaviour<TRequest, TResponse>> logger)
     {

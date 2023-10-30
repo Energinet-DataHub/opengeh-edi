@@ -23,6 +23,7 @@ using Energinet.DataHub.EDI.Process.Domain.Documents;
 using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
 using MediatR;
 using NodaTime;
+using IUnitOfWork = Energinet.DataHub.EDI.Process.Domain.IUnitOfWork;
 
 namespace Energinet.DataHub.EDI.Process.Application.OutgoingMessages;
 

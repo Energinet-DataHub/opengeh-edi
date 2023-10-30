@@ -15,7 +15,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Exceptions;
@@ -26,22 +25,22 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMe
 
 public class AggregatedMeasureDataProcessRepository : IAggregatedMeasureDataProcessRepository
 {
-    private readonly ProcessContext _b2BContext;
+    private readonly ProcessContext _processContext;
 
-    public AggregatedMeasureDataProcessRepository(ProcessContext b2BContext)
+    public AggregatedMeasureDataProcessRepository(ProcessContext processContext)
     {
-        _b2BContext = b2BContext;
+        _processContext = processContext;
     }
 
     public void Add(AggregatedMeasureDataProcess process)
     {
-        _b2BContext.AggregatedMeasureDataProcesses.Add(process);
+        _processContext.AggregatedMeasureDataProcesses.Add(process);
     }
 
     public async Task<AggregatedMeasureDataProcess> GetAsync(ProcessId processId, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(processId);
-        return await _b2BContext
+        return await _processContext
                .AggregatedMeasureDataProcesses
                .FirstOrDefaultAsync(process => process.ProcessId == processId, cancellationToken)
                .ConfigureAwait(false)
