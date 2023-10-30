@@ -1,1 +1,1 @@
-﻿update Bundles set CreatedTS = GETUTCDATE();
+﻿update Bundles set Created = GETUTCDATE();

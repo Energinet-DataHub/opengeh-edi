@@ -48,8 +48,8 @@ public class ActorMessageQueue : Entity
         ArgumentNullException.ThrowIfNull(outgoingMessage);
         EnsureApplicable(outgoingMessage);
 
-        var currentBundle = CurrentBundleOf(BusinessReason.From(outgoingMessage.BusinessReason), outgoingMessage.DocumentType) ??
-                            CreateBundleOf(BusinessReason.From(outgoingMessage.BusinessReason), outgoingMessage.DocumentType, 
+        var currentBundle = CurrentBundleOf(BusinessReason.FromName(outgoingMessage.BusinessReason), outgoingMessage.DocumentType) ??
+                            CreateBundleOf(BusinessReason.FromName(outgoingMessage.BusinessReason), outgoingMessage.DocumentType,
                                 SetMaxNumberOfMessagesInABundle(maxNumberOfMessagesInABundle, outgoingMessage.DocumentType), timeStamp);
 
         currentBundle.Add(outgoingMessage);

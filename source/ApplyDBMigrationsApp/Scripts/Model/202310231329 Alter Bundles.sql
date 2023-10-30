@@ -1,1 +1,1 @@
-﻿ALTER table Bundles add CreatedTS datetime2(7) null;
+﻿ALTER table Bundles add Created datetime2(7) null;

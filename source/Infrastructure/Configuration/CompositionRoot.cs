@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration.Authentication;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Domain.Documents;
@@ -36,6 +37,7 @@ using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusine
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Processing;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
+using Energinet.DataHub.EDI.Infrastructure.GridAreas;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages;
@@ -77,6 +79,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             InternalCommandProcessing.Configure(_services);
             AddMessageGenerationServices();
             AddActorServices();
+            AddGridAreaServices();
             AddProcessing();
             AddWholeSaleInBox();
             DequeueConfiguration.Configure(services);
@@ -250,8 +253,14 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
 
         private void AddActorServices()
         {
-            _services.AddTransient<IRequestHandler<CreateActorCommand, Unit>, CreateActorHandler>();
-            _services.AddTransient<IActorRegistry, ActorRegistry>();
+            _services.AddScoped<IRequestHandler<CreateActorCommand, Unit>, CreateActorHandler>();
+            _services.AddScoped<IActorRegistry, ActorRegistry>();
+        }
+
+        private void AddGridAreaServices()
+        {
+            _services.AddScoped<IRequestHandler<GridAreaOwnershipAssignedCommand, Unit>, GridAreaOwnershipAssignedHandler>();
+            _services.AddScoped<IGridAreaRepository, GridAreaRepository>();
         }
 
         private void AddProcessing()

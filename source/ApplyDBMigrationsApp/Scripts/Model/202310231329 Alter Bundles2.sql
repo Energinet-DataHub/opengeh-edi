@@ -1,1 +1,1 @@
-﻿alter table Bundles alter column CreatedTS datetime2(7) not null;
+﻿alter table Bundles alter column Created datetime2(7) not null;

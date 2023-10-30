@@ -67,7 +67,7 @@ namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts
         internal static void AssertHeader(MessageHeader header, XDocument document)
         {
             Assert.NotEmpty(AssertEbixMessage.GetMessageHeaderValue(document, "mRID")!);
-            AssertHasHeaderValue(document, "process.processType", CimCode.Of(BusinessReason.From(header.BusinessReason)));
+            AssertHasHeaderValue(document, "process.processType", CimCode.Of(BusinessReason.FromName(header.BusinessReason)));
             AssertHasHeaderValue(document, "businessSector.type", "23");
             AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", header.SenderId);
             AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(header.SenderRole)));

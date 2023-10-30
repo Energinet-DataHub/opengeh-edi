@@ -28,7 +28,7 @@ public class CimCodeTests
     [InlineData(nameof(BusinessReason.MoveIn), "E65")]
     public void Translate_business_reason(string businessReason, string expectedCode)
     {
-        Assert.Equal(expectedCode, CimCode.Of(BusinessReason.From(businessReason)));
+        Assert.Equal(expectedCode, CimCode.Of(BusinessReason.FromName(businessReason)));
     }
 
     [Theory]

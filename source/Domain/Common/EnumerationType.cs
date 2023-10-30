@@ -38,7 +38,7 @@ namespace Energinet.DataHub.EDI.Domain.Common
             return left.Equals(right);
         }
 
-        public static bool operator !=(EnumerationType left, EnumerationType right)
+        public static bool operator !=(EnumerationType? left, EnumerationType? right)
         {
             return !(left == right);
         }
