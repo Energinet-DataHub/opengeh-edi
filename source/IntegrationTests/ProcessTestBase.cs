@@ -62,14 +62,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             databaseFixture.CleanupDatabase();
             _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
             TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
-            InboxEventNotificationHandler = new IntegrationTests.Infrastructure.InboxEvents.TestNotificationHandlerSpy();
+            InboxEventNotificationHandler = new TestNotificationHandlerSpy();
             BuildServices();
             _processContext = GetService<ProcessContext>();
         }
 
         protected TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
 
-        protected IntegrationTests.Infrastructure.InboxEvents.TestNotificationHandlerSpy InboxEventNotificationHandler { get; }
+        protected TestNotificationHandlerSpy InboxEventNotificationHandler { get; }
 
         public void Dispose()
         {
@@ -155,6 +155,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
             _services = new ServiceCollection();
 
+            ProcessConfiguration.Configure(_services, DatabaseFixture.ConnectionString);
             _services.AddSingleton(new WholesaleServiceBusClientConfiguration("Fake"));
             _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
             _services.AddSingleton(
@@ -170,7 +171,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             _services.AddTransient<IRequestHandler<TestCreateOutgoingMessageCommand, Unit>, TestCreateOutgoingCommandHandler>();
 
             _services.AddTransient<IIntegrationEventHandler, IntegrationEventHandler>();
-            ProcessConfiguration.Configure(_services, DatabaseFixture.ConnectionString);
 
             CompositionRoot.Initialize(_services)
                 .AddAuthentication()

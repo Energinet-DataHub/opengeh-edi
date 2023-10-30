@@ -26,11 +26,11 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
-public class WhenOutgoingMessagesAreCreatedTests : TestBase
+public class WhenOutgoingMessagesAreCreatedTests : ProcessTestBase
 {
     private readonly RequestAggregatedMeasuredDataProcessInvoker _requestAggregatedMeasuredDataProcessInvoker;
 
-    public WhenOutgoingMessagesAreCreatedTests(DatabaseFixture databaseFixture)
+    public WhenOutgoingMessagesAreCreatedTests(ProcessDatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _requestAggregatedMeasuredDataProcessInvoker =

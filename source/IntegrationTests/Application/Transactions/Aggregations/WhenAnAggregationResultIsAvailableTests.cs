@@ -31,11 +31,11 @@ using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.Aggregations;
 
-public class WhenAnAggregationResultIsAvailableTests : TestBase
+public class WhenAnAggregationResultIsAvailableTests : ProcessTestBase
 {
     private readonly CalculationResultCompletedEventBuilder _eventBuilder = new();
 
-    public WhenAnAggregationResultIsAvailableTests(DatabaseFixture databaseFixture)
+    public WhenAnAggregationResultIsAvailableTests(ProcessDatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
     }

@@ -35,11 +35,11 @@ using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Poi
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
 [IntegrationTest]
-public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
+public class AggregatedMeasureDataResponseFromWholesaleTests : ProcessTestBase
 {
     private readonly ProcessContext _processContext;
 
-    public AggregatedMeasureDataResponseFromWholesaleTests(DatabaseFixture databaseFixture)
+    public AggregatedMeasureDataResponseFromWholesaleTests(ProcessDatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _processContext = GetService<ProcessContext>();

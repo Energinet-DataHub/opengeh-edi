@@ -13,10 +13,11 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Application.Configuration.Commands;
 using Energinet.DataHub.EDI.Common;
+using IUnitOfWork = Energinet.DataHub.EDI.Process.Domain.IUnitOfWork;
 
-namespace Energinet.DataHub.EDI.Application.Configuration.Commands;
+namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 
 public class CommandSchedulerFacade
 {

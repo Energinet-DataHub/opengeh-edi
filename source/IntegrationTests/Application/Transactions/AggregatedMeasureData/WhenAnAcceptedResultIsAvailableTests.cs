@@ -40,11 +40,11 @@ using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
 [IntegrationTest]
-public class WhenAnAcceptedResultIsAvailableTests : TestBase
+public class WhenAnAcceptedResultIsAvailableTests : ProcessTestBase
 {
     private readonly ProcessContext _processContext;
 
-    public WhenAnAcceptedResultIsAvailableTests(DatabaseFixture databaseFixture)
+    public WhenAnAcceptedResultIsAvailableTests(ProcessDatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _processContext = GetService<ProcessContext>();
