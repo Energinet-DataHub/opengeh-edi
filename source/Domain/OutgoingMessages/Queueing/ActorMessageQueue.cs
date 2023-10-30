@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.Domain.Common;
 using Energinet.DataHub.EDI.Domain.Documents;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
 
@@ -42,7 +43,7 @@ public class ActorMessageQueue : Entity
         return new ActorMessageQueue(receiver);
     }
 
-    public void Enqueue(OutgoingMessage outgoingMessage, DateTime timeStamp, int? maxNumberOfMessagesInABundle = null)
+    public void Enqueue(OutgoingMessage outgoingMessage, Instant timeStamp, int? maxNumberOfMessagesInABundle = null)
     {
         ArgumentNullException.ThrowIfNull(outgoingMessage);
         EnsureApplicable(outgoingMessage);
@@ -100,7 +101,7 @@ public class ActorMessageQueue : Entity
             && bundle.BusinessReason == businessReason);
     }
 
-    private Bundle CreateBundleOf(BusinessReason businessReason, DocumentType messageType, int maxNumberOfMessagesInABundle, DateTime timeStamp)
+    private Bundle CreateBundleOf(BusinessReason businessReason, DocumentType messageType, int maxNumberOfMessagesInABundle, Instant timeStamp)
     {
         var bundle = new Bundle(BundleId.New(), businessReason, messageType, maxNumberOfMessagesInABundle, timeStamp);
         _bundles.Add(bundle);
@@ -110,8 +111,8 @@ public class ActorMessageQueue : Entity
     private Bundle? NextBundleToPeek(MessageCategory? category = null)
     {
         var nextBundleToPeek = category is not null ?
-            _bundles.Where(bundle => !bundle.IsDequeued && bundle.DocumentTypeInBundle.Category.Equals(category)).OrderBy(bundle => bundle.CreatedTS).FirstOrDefault() :
-            _bundles.Where(bundle => !bundle.IsDequeued).OrderBy(bundle => bundle.CreatedTS).FirstOrDefault();
+            _bundles.Where(bundle => !bundle.IsDequeued && bundle.DocumentTypeInBundle.Category.Equals(category)).OrderBy(bundle => bundle.Created).FirstOrDefault() :
+            _bundles.Where(bundle => !bundle.IsDequeued).OrderBy(bundle => bundle.Created).FirstOrDefault();
 
         nextBundleToPeek?.CloseBundle();
 

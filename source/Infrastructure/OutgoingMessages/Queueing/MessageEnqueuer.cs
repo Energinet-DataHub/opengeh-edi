@@ -45,6 +45,6 @@ public class MessageEnqueuer
             await _actorMessageQueueRepository.AddAsync(messageQueue).ConfigureAwait(false);
         }
 
-        messageQueue.Enqueue(message, _systemDateTimeProvider.Now().ToDateTimeUtc());
+        messageQueue.Enqueue(message, _systemDateTimeProvider.Now());
     }
 }
