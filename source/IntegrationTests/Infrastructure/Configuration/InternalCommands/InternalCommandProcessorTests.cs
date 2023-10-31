@@ -16,34 +16,31 @@ using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration.Commands;
-using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using Microsoft.Extensions.DependencyInjection;
-using NodaTime;
 using Xunit;
 using Xunit.Categories;
+using IUnitOfWork = Energinet.DataHub.EDI.Process.Domain.IUnitOfWork;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 
 [IntegrationTest]
-public class InternalCommandProcessorTests : TestBase
+public class InternalCommandProcessorTests : ProcessTestBase
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly InternalCommandProcessor _processor;
-    private readonly ISystemDateTimeProvider _timeProvider;
     private readonly ICommandScheduler _scheduler;
     private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public InternalCommandProcessorTests(DatabaseFixture databaseFixture)
+    public InternalCommandProcessorTests(ProcessDatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _unitOfWork = GetService<IUnitOfWork>();
         _processor = GetService<InternalCommandProcessor>();
-        _timeProvider = GetService<ISystemDateTimeProvider>();
         _scheduler = GetService<ICommandScheduler>();
         _connectionFactory = GetService<IDatabaseConnectionFactory>();
         var mapper = GetService<InternalCommandMapper>();

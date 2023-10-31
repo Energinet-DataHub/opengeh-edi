@@ -80,7 +80,7 @@ public class InboxEventsProcessor
                               "SET ProcessedDate = @Now " +
                               "WHERE Id = @Id";
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
-        await connection.ExecuteAsync(updateStatement, new
+        _ = await connection.ExecuteAsync(updateStatement, new
         {
             Id = @event.Id,
             Now = _dateTimeProvider.Now().ToDateTimeUtc(),
