@@ -61,13 +61,10 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             ArgumentNullException.ThrowIfNull(databaseFixture);
             databaseFixture.CleanupDatabase();
             _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
-            TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
             InboxEventNotificationHandler = new TestNotificationHandlerSpy();
             BuildServices();
             _processContext = GetService<ProcessContext>();
         }
-
-        protected TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
 
         protected TestNotificationHandlerSpy InboxEventNotificationHandler { get; }
 
@@ -162,8 +159,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
 
             _services.AddTransient<InboxEventsProcessor>();
-            _services.AddTransient<AggregatedTimeSeriesRequestAcceptedEventMapper>();
-            _services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>>(_ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy);
+            //_services.AddTransient<AggregatedTimeSeriesRequestAcceptedEventMapper>();
             _services.AddTransient<INotificationHandler<TestNotification>>(
                 _ => InboxEventNotificationHandler);
 

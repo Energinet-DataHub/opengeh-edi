@@ -35,7 +35,8 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
-using Google.Protobuf;
+using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
+using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.Aggregations;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -57,14 +58,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             databaseFixture.CleanupDatabase();
             _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
             TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
-            InboxEventNotificationHandler = new IntegrationTests.Infrastructure.InboxEvents.TestNotificationHandlerSpy();
+            InboxEventNotificationHandler = new TestNotificationHandlerSpy();
             BuildServices();
             _b2BContext = GetService<B2BContext>();
         }
 
         protected TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
 
-        protected IntegrationTests.Infrastructure.InboxEvents.TestNotificationHandlerSpy InboxEventNotificationHandler { get; }
+        protected TestNotificationHandlerSpy InboxEventNotificationHandler { get; }
 
         public void Dispose()
         {
@@ -102,18 +103,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return GetService<IMediator>().Send(query, CancellationToken.None);
         }
 
-        protected async Task HavingReceivedInboxEventAsync(string eventType, IMessage eventPayload, Guid processId)
-        {
-            await GetService<InboxEventReceiver>().
-                ReceiveAsync(
-                    Guid.NewGuid().ToString(),
-                    eventType,
-                    processId,
-                    eventPayload.ToByteArray())
-                .ConfigureAwait(false);
-            await ProcessReceivedInboxEventsAsync().ConfigureAwait(false);
-        }
-
         protected Task ProcessReceivedInboxEventsAsync()
         {
             return ProcessBackgroundTasksAsync();
@@ -145,9 +134,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
 
             _services.AddTransient<InboxEventsProcessor>();
-            // _services.AddTransient<AggregatedTimeSeriesRequestAcceptedEventMapper>();
-            // _services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>>(_ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy);
-            _services.AddTransient<INotificationHandler<IntegrationTests.Infrastructure.InboxEvents.TestNotification>>(
+            _services.AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestAcceptedEventMapper>();
+            _services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>>(_ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy);
+            _services.AddTransient<INotificationHandler<TestNotification>>(
                 _ => InboxEventNotificationHandler);
 
             _services.AddTransient<IRequestHandler<TestCommand, Unit>, TestCommandHandler>();

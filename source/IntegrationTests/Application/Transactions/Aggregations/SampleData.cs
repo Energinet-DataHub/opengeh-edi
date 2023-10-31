@@ -23,7 +23,7 @@ internal sealed class SampleData
 {
     internal static string NameOfBalanceFixingCompletedIntegrationEvent => "BalanceFixingCompleted";
 
-    internal static string GridOperatorNumber => "8200000007739";
+    internal static ActorNumber GridOperatorNumber => ActorNumber.Create("8200000007739");
 
     internal static string GridAreaCode => "805";
 

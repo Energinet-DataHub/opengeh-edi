@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
+using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.Process.Domain.Documents;
 using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
@@ -34,7 +35,6 @@ using Google.Protobuf.WellKnownTypes;
 using NodaTime.Text;
 using Xunit;
 using Xunit.Categories;
-using Period = Energinet.DataHub.Edi.Responses.Period;
 using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.AggregatedMeasureData;
@@ -42,6 +42,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.Aggreg
 [IntegrationTest]
 public class WhenAnAcceptedResultIsAvailableTests : ProcessTestBase
 {
+    private readonly GridAreaBuilder _gridAreaBuilder = new();
     private readonly ProcessContext _processContext;
 
     public WhenAnAcceptedResultIsAvailableTests(ProcessDatabaseFixture databaseFixture)
@@ -54,6 +55,9 @@ public class WhenAnAcceptedResultIsAvailableTests : ProcessTestBase
     public async Task Aggregated_measure_data_response_is_accepted()
     {
         // Arrange
+        _gridAreaBuilder
+            .WithGridAreaCode(SampleData.GridAreaCode)
+            .Store(GetService<B2BContext>());
         var process = BuildProcess();
         var acceptedEvent = GetAcceptedEvent(process);
 
@@ -69,7 +73,6 @@ public class WhenAnAcceptedResultIsAvailableTests : ProcessTestBase
             .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion, acceptedEvent.SettlementVersion)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId);
     }
@@ -78,6 +81,9 @@ public class WhenAnAcceptedResultIsAvailableTests : ProcessTestBase
     public async Task Received_2_accepted_events_for_same_aggregated_measure_data_process()
     {
         // Arrange
+        _gridAreaBuilder
+            .WithGridAreaCode(SampleData.GridAreaCode)
+            .Store(GetService<B2BContext>());
         var process = BuildProcess();
         var acceptedEvent = GetAcceptedEvent(process);
 
@@ -93,8 +99,7 @@ public class WhenAnAcceptedResultIsAvailableTests : ProcessTestBase
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
-            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion, acceptedEvent.SettlementVersion);
+            .HasSenderId(DataHubDetails.IdentificationNumber.Value);
     }
 
     protected override void Dispose(bool disposing)
@@ -118,30 +123,13 @@ public class WhenAnAcceptedResultIsAvailableTests : ProcessTestBase
             Time = new Timestamp() { Seconds = 1, },
         };
 
-        var period = new Period()
-        {
-            StartOfPeriod = new Timestamp()
-            {
-                Seconds = InstantPattern.General.Parse(aggregatedMeasureDataProcess.StartOfPeriod)
-                .GetValueOrThrow().ToUnixTimeSeconds(),
-            },
-            EndOfPeriod = new Timestamp()
-            {
-                Seconds = aggregatedMeasureDataProcess.EndOfPeriod is not null
-                ? InstantPattern.General.Parse(aggregatedMeasureDataProcess.EndOfPeriod).GetValueOrThrow().ToUnixTimeSeconds()
-                : 1,
-            },
-            Resolution = Resolution.Pt15M,
-        };
-
         return new AggregatedTimeSeriesRequestAccepted()
         {
             GridArea = aggregatedMeasureDataProcess.MeteringGridAreaDomainId,
             QuantityUnit = QuantityUnit.Kwh,
-            Period = period,
             TimeSeriesPoints = { point },
             TimeSeriesType = TimeSeriesType.Production,
-            SettlementVersion = aggregatedMeasureDataProcess.SettlementVersion?.Name,
+            Resolution = Resolution.Pt15M,
         };
     }
 

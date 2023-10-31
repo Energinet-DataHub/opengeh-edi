@@ -19,7 +19,7 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 /// </summary>
 public record RequestAggregatedMeasureDataMarketRequest(
     ProcessType ProcessType,
-    MeteringPointType MeteringPointType,
+    MeteringPointType? MeteringPointType,
     string StartDate,
     string EndDate,
     string? GridArea,

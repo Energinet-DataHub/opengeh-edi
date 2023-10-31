@@ -15,24 +15,60 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Exceptions;
-using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.Collections;
 using NodaTime.Serialization.Protobuf;
-using GridAreaDetails = Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.GridAreaDetails;
-using Period = Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.Period;
+using NodaTime.Text;
+using GridAreaDetails = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.GridAreaDetails;
+using Period = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Period;
+using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Point;
 using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.Aggregations;
 
-public static class AggregationFactory
+public class AggregationFactory
 {
-    public static Aggregation Create(CalculationResultCompleted integrationEvent)
+    private readonly IGridAreaRepository _gridAreaRepository;
+
+    public AggregationFactory(IGridAreaRepository gridAreaRepository)
+    {
+        _gridAreaRepository = gridAreaRepository;
+    }
+
+    public static Aggregation Create(
+        AggregatedMeasureDataProcess aggregatedMeasureDataProcess,
+        AggregatedTimeSerie aggregatedTimeSerie)
+    {
+        if (aggregatedMeasureDataProcess == null) throw new ArgumentNullException(nameof(aggregatedMeasureDataProcess));
+        if (aggregatedTimeSerie == null) throw new ArgumentNullException(nameof(aggregatedTimeSerie));
+
+        if ((aggregatedMeasureDataProcess.MeteringPointType != null ? MeteringPointType.FromCode(aggregatedMeasureDataProcess.MeteringPointType).Name : null) != aggregatedTimeSerie.MeteringPointType) throw new ArgumentException("aggregatedTimeSerie.MeteringPointType isn't equal to aggregatedMeasureDataProcess.MeteringPointType", nameof(aggregatedTimeSerie));
+
+        return new Aggregation(
+            MapPoints(aggregatedTimeSerie.Points),
+            aggregatedTimeSerie.MeteringPointType,
+            aggregatedTimeSerie.UnitType,
+            aggregatedTimeSerie.Resolution,
+            MapPeriod(aggregatedMeasureDataProcess.StartOfPeriod, aggregatedMeasureDataProcess.EndOfPeriod),
+            MapSettlementMethod(aggregatedMeasureDataProcess),
+            aggregatedMeasureDataProcess.BusinessReason.Name,
+            MapActorGrouping(aggregatedMeasureDataProcess),
+            MapGridAreaDetails(aggregatedTimeSerie.GridAreaDetails),
+            aggregatedMeasureDataProcess.BusinessTransactionId.Id,
+            aggregatedMeasureDataProcess.RequestedByActorId.Value,
+            MapReceiverRole(aggregatedMeasureDataProcess),
+            aggregatedMeasureDataProcess.SettlementVersion?.Name);
+    }
+
+    public async Task<Aggregation> CreateAsync(CalculationResultCompleted integrationEvent, CancellationToken cancellationToken)
     {
         if (integrationEvent == null) throw new ArgumentNullException(nameof(integrationEvent));
 
@@ -45,51 +81,26 @@ public static class AggregationFactory
             MapSettlementType(integrationEvent.TimeSeriesType),
             MapProcessTypeFromCalculationResult(integrationEvent.ProcessType),
             MapActorGrouping(integrationEvent),
-            MapGridAreaDetails(integrationEvent),
+            await GetGridAreaDetailsAsync(integrationEvent, cancellationToken).ConfigureAwait(false),
             SettlementVersion: MapSettlementVersion(integrationEvent.ProcessType));
     }
 
-    public static Aggregation Create(
-        AggregatedMeasureDataProcess aggregatedMeasureDataProcess,
-        AggregatedTimeSerie aggregatedTimeSerie)
+    private static Period MapPeriod(string startOfPeriod, string? endOfPeriod)
     {
-        if (aggregatedMeasureDataProcess == null) throw new ArgumentNullException(nameof(aggregatedMeasureDataProcess));
-        if (aggregatedTimeSerie == null) throw new ArgumentNullException(nameof(aggregatedTimeSerie));
+        if (string.IsNullOrEmpty(endOfPeriod)) // Throw exception since our end period is nullable in our schema contract, but we validate for it in Wholesale
+            throw new ArgumentException("End of period shouldn't be able to be null, since validation in Wholesale rejects the request if it isn't set", nameof(endOfPeriod));
 
-        if ((aggregatedMeasureDataProcess.MeteringPointType != null ? MeteringPointType.FromCode(aggregatedMeasureDataProcess.MeteringPointType).Name : null) != aggregatedTimeSerie.MeteringPointType) throw new ArgumentException("aggregatedTimeSerie.MeteringPointType isn't equal to aggregatedMeasureDataProcess.MeteringPointType", nameof(aggregatedTimeSerie));
-        if (aggregatedMeasureDataProcess.StartOfPeriod != aggregatedTimeSerie.Period.Start.ToString()) throw new ArgumentException("aggregatedTimeSerie.Period.Start isn't equal to aggregatedMeasureDataProcess.StartOfPeriod", nameof(aggregatedTimeSerie));
-        if (aggregatedMeasureDataProcess.EndOfPeriod != aggregatedTimeSerie.Period.End.ToString()) throw new ArgumentException("aggregatedTimeSerie.Period.Start isn't equal to aggregatedMeasureDataProcess.EndOfPeriod", nameof(aggregatedTimeSerie));
-        if (aggregatedMeasureDataProcess.SettlementVersion?.Name != aggregatedTimeSerie.SettlementVersion) throw new ArgumentException("aggregatedTimeSerie.SettlementVersion isn't equal to aggregatedMeasureDataProcess.SettlementVersion", nameof(aggregatedTimeSerie));
-
-        return new Aggregation(
-            MapPoints(aggregatedTimeSerie.Points),
-            aggregatedTimeSerie.MeteringPointType,
-            aggregatedTimeSerie.UnitType,
-            aggregatedTimeSerie.Resolution,
-            MapPeriod(aggregatedTimeSerie.Period),
-            MapSettlementMethod(aggregatedMeasureDataProcess),
-            aggregatedMeasureDataProcess.BusinessReason.Name,
-            MapActorGrouping(aggregatedMeasureDataProcess),
-            MapGridAreaDetails(aggregatedTimeSerie.GridAreaDetails),
-            aggregatedMeasureDataProcess.BusinessTransactionId.Id,
-            aggregatedMeasureDataProcess.RequestedByActorId.Value,
-            MapReceiverRole(aggregatedMeasureDataProcess),
-            MapSettlementVersion(aggregatedTimeSerie.SettlementVersion));
+        return new Period(InstantPattern.General.Parse(startOfPeriod).Value, InstantPattern.General.Parse(endOfPeriod).Value);
     }
 
-    private static Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.GridAreaDetails MapGridAreaDetails(GridAreaDetails timeSerieGridAreaDetails)
+    private static GridAreaDetails MapGridAreaDetails(Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.GridAreaDetails timeSerieGridAreaDetails)
     {
-        return new Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.GridAreaDetails(timeSerieGridAreaDetails.GridAreaCode, timeSerieGridAreaDetails.OperatorNumber);
+        return new GridAreaDetails(timeSerieGridAreaDetails.GridAreaCode, timeSerieGridAreaDetails.OperatorNumber);
     }
 
-    private static Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Period MapPeriod(Period timeSeriePeriod)
+    private static List<Point> MapPoints(IReadOnlyList<Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.Point> points)
     {
-        return new Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Period(timeSeriePeriod.Start, timeSeriePeriod.End);
-    }
-
-    private static List<Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Point> MapPoints(IReadOnlyList<Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.Point> points)
-    {
-        return points.Select(point => new Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Point(point.Position, point.Quantity, point.Quality, point.SampleTime))
+        return points.Select(point => new Point(point.Position, point.Quantity, point.Quality, point.SampleTime))
             .ToList();
     }
 
@@ -111,21 +122,6 @@ public static class AggregationFactory
         }
 
         return new ActorGrouping(null, null);
-    }
-
-    private static string? MapSettlementVersion(string? settlementVersionCode)
-    {
-        var settlementVersionName = null as string;
-        try
-        {
-            settlementVersionName = SettlementVersion.FromName(settlementVersionCode ?? string.Empty).Name;
-        }
-        catch (InvalidCastException)
-        {
-            // Settlement version is set to null.
-        }
-
-        return settlementVersionName;
     }
 
     private static string? MapSettlementMethod(AggregatedMeasureDataProcess process)
@@ -238,19 +234,19 @@ public static class AggregationFactory
         };
     }
 
-    private static Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Period MapPeriod(CalculationResultCompleted integrationEvent)
+    private static Period MapPeriod(CalculationResultCompleted integrationEvent)
     {
-        return new Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Period(integrationEvent.PeriodStartUtc.ToInstant(), integrationEvent.PeriodEndUtc.ToInstant());
+        return new Period(integrationEvent.PeriodStartUtc.ToInstant(), integrationEvent.PeriodEndUtc.ToInstant());
     }
 
-    private static IReadOnlyList<Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
+    private static IReadOnlyList<Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
     {
-        var points = new List<Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Point>();
+        var points = new List<Point>();
 
         var pointPosition = 1;
         foreach (var point in timeSeriesPoints)
         {
-            points.Add(new Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Point(pointPosition, Parse(point.Quantity), MapQualityFromCalculationResult(point.QuantityQuality), point.Time.ToString()));
+            points.Add(new Point(pointPosition, Parse(point.Quantity), MapQualityFromCalculationResult(point.QuantityQuality), point.Time.ToString()));
             pointPosition++;
         }
 
@@ -279,7 +275,7 @@ public static class AggregationFactory
         return input.Units + (input.Nanos / nanoFactor);
     }
 
-    private static Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.GridAreaDetails MapGridAreaDetails(CalculationResultCompleted integrationEvent)
+    private async Task<GridAreaDetails> GetGridAreaDetailsAsync(CalculationResultCompleted integrationEvent, CancellationToken cancellationToken)
     {
         var gridAreaCode = integrationEvent.AggregationLevelCase switch
         {
@@ -291,8 +287,8 @@ public static class AggregationFactory
             _ => throw new InvalidOperationException("Unknown aggregation level"),
         };
 
-        var gridOperatorNumber = GridAreaLookup.GetGridOperatorFor(gridAreaCode);
+        var gridOperatorNumber = await _gridAreaRepository.GetGridOwnerForAsync(gridAreaCode, cancellationToken).ConfigureAwait(false);
 
-        return new Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.GridAreaDetails(gridAreaCode, gridOperatorNumber.Value);
+        return new GridAreaDetails(gridAreaCode, gridOperatorNumber.Value);
     }
 }

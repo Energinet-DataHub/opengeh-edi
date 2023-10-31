@@ -83,6 +83,7 @@ public static class ProcessConfiguration
 
         //AggregationsConfiguration
         services.AddTransient<IRequestHandler<ForwardAggregationResult, Unit>, ForwardAggregationResultHandler>();
+        services.AddScoped<AggregationFactory>();
 
         //PeekConfiguration
         services.AddScoped<MessageEnqueuer>();

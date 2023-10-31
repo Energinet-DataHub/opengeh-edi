@@ -14,7 +14,6 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Domain.GridAreas;
@@ -27,12 +26,10 @@ namespace Energinet.DataHub.EDI.Infrastructure.GridAreas;
 public class GridAreaRepository : IGridAreaRepository
 {
     private readonly B2BContext _dbContext;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-    public GridAreaRepository(B2BContext dbContext, ISystemDateTimeProvider systemDateTimeProvider)
+    public GridAreaRepository(B2BContext dbContext)
     {
         _dbContext = dbContext;
-        _systemDateTimeProvider = systemDateTimeProvider;
     }
 
     public async Task UpdateOwnershipAsync(
@@ -46,6 +43,16 @@ public class GridAreaRepository : IGridAreaRepository
             await _dbContext.GridAreas.AddAsync(new GridArea(gridAreaCode, validFrom, actorNumber), cancellationToken).ConfigureAwait(false);
         else
             gridArea.UpdateOwnership(validFrom, actorNumber);
+    }
+
+    public async Task<ActorNumber> GetGridOwnerForAsync(string gridAreaCode, CancellationToken cancellationToken)
+    {
+        var gridAreaByCode = await _dbContext.GridAreas
+            .FirstAsync(
+                gridArea => gridArea.GridAreaCode == gridAreaCode,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+        return gridAreaByCode.GridAreaOwnerActorNumber;
     }
 
     private async Task<GridArea?> GetGridAreaAsync(
