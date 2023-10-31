@@ -57,6 +57,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
 
         public Task InitializeAsync()
         {
+            CreateSchema();
             CleanupDatabase();
             return Task.CompletedTask;
         }
