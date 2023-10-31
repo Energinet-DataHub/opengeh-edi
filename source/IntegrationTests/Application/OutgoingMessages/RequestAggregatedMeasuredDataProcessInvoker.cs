@@ -35,12 +35,12 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 public class RequestAggregatedMeasuredDataProcessInvoker
 {
     private readonly IMediator _mediator;
-    private readonly ProcessContext _b2BContext;
+    private readonly ProcessContext _processContext;
 
-    public RequestAggregatedMeasuredDataProcessInvoker(IMediator mediator, ProcessContext b2BContext)
+    public RequestAggregatedMeasuredDataProcessInvoker(IMediator mediator, ProcessContext processContext)
     {
         _mediator = mediator;
-        _b2BContext = b2BContext;
+        _processContext = processContext;
     }
 
     public async Task HasBeenAcceptedAsync()
@@ -51,7 +51,7 @@ public class RequestAggregatedMeasuredDataProcessInvoker
         process!.WasSentToWholesale();
 
         // ReSharper disable once MethodHasAsyncOverload -- Test Event_registration_is_omitted_if_run_in_parallel fails if this is async
-        _b2BContext.SaveChanges();
+        _processContext.SaveChanges();
 
         var acceptedAggregation = CreateAggregatedTimeSerie();
         await _mediator.Send(new AcceptedAggregatedTimeSerie(process.ProcessId.Id, acceptedAggregation)).ConfigureAwait(false);
@@ -71,7 +71,7 @@ public class RequestAggregatedMeasuredDataProcessInvoker
 
     private AggregatedMeasureDataProcess? GetProcess(string senderId)
     {
-        return _b2BContext.AggregatedMeasureDataProcesses
+        return _processContext.AggregatedMeasureDataProcesses
             .ToList()
             .FirstOrDefault(x => x.RequestedByActorId.Value == senderId);
     }

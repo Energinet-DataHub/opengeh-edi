@@ -14,7 +14,7 @@
 
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.EDI.Common
+namespace Energinet.DataHub.EDI.Process.Domain
 {
     public abstract class Entity
     {

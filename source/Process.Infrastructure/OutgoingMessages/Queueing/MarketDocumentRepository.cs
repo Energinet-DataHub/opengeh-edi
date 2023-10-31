@@ -22,20 +22,20 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Queueing
 
 public class MarketDocumentRepository : IMarketDocumentRepository
 {
-    private readonly ProcessContext _b2BContext;
+    private readonly ProcessContext _processContext;
 
-    public MarketDocumentRepository(ProcessContext b2BContext)
+    public MarketDocumentRepository(ProcessContext processContext)
     {
-        _b2BContext = b2BContext;
+        _processContext = processContext;
     }
 
     public async Task<MarketDocument?> GetAsync(BundleId bundleId)
     {
-        return await _b2BContext.MarketDocuments.FirstOrDefaultAsync(x => x.BundleId == bundleId).ConfigureAwait(false);
+        return await _processContext.MarketDocuments.FirstOrDefaultAsync(x => x.BundleId == bundleId).ConfigureAwait(false);
     }
 
     public async Task AddAsync(MarketDocument marketDocument)
     {
-        await _b2BContext.AddAsync(marketDocument).ConfigureAwait(false);
+        await _processContext.AddAsync(marketDocument).ConfigureAwait(false);
     }
 }

@@ -16,7 +16,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.Process.Domain.Documents;
 
 namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
@@ -24,7 +23,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 /// <summary>
 /// Parses CIM messages from a stream
 /// </summary>
-public interface IMessageParser<TMarketMessageType>
+public interface IMessageParser
 {
     /// <summary>
     /// The CIM format handled

@@ -434,9 +434,9 @@ public class RequestAggregatedMeasureDataReceiverTests : ProcessTestBase, IAsync
         Assert.True(result.Success);
         Assert.NotNull(process);
 
-        var document = messageParserResult.MarketMessage!; //TODO NOT USED?
-        await AssertTransactionIdIsStored(messageParserResult.MarketMessage!.SenderNumber, messageParserResult.MarketMessage!.Series.First().Id);
-        await AssertMessageIdIsStored(messageParserResult.MarketMessage!.SenderNumber, messageParserResult.MarketMessage!.MessageId);
+        var document = messageParserResult.MarketMessage!;
+        await AssertTransactionIdIsStored(document.SenderNumber, document.Series.First().Id);
+        await AssertMessageIdIsStored(document.SenderNumber, document.MessageId);
     }
 
     [Fact]

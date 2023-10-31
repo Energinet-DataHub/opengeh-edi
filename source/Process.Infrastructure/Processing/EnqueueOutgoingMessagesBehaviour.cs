@@ -29,12 +29,12 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.Processing;
 public class EnqueueOutgoingMessagesBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : ICommand<TResponse>
 {
-    private readonly ProcessContext _b2BContext;
+    private readonly ProcessContext _processContext;
     private readonly MessageEnqueuer _messageEnqueuer;
 
-    public EnqueueOutgoingMessagesBehaviour(ProcessContext b2BContext, MessageEnqueuer messageEnqueuer)
+    public EnqueueOutgoingMessagesBehaviour(ProcessContext processContext, MessageEnqueuer messageEnqueuer)
     {
-        _b2BContext = b2BContext;
+        _processContext = processContext;
         _messageEnqueuer = messageEnqueuer;
     }
 
@@ -43,7 +43,7 @@ public class EnqueueOutgoingMessagesBehaviour<TRequest, TResponse> : IPipelineBe
         ArgumentNullException.ThrowIfNull(next);
         var result = await next().ConfigureAwait(false);
 
-        var outgoingMessages = _b2BContext
+        var outgoingMessages = _processContext
             .ChangeTracker
             .Entries<OutgoingMessage>()
             .Where(entity => entity.State == EntityState.Added)

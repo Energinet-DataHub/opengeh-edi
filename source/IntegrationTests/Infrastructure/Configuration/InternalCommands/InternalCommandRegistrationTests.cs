@@ -35,7 +35,7 @@ public class InternalCommandRegistrationTests : ProcessTestBase
 
     public static IEnumerable<object[]> GetInternalCommands()
     {
-        var allTypes = ApplicationAssemblies.Application.GetTypes().Concat(ApplicationAssemblies.Infrastructure.GetTypes()).Concat(ApplicationAssemblies.Process.GetTypes());
+        var allTypes = ApplicationAssemblies.Application.GetTypes().Concat(ApplicationAssemblies.Infrastructure.GetTypes()).Concat(ApplicationAssemblies.ProcessApplication.GetTypes());
         return allTypes
             .Where(x => x.BaseType == typeof(InternalCommand))
             .Select(x => new[] { x });

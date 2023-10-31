@@ -18,16 +18,15 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Process.Domain.Documents;
 
 namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
 public class RequestAggregatedMeasureDataMarketMessageParser
 {
-    private readonly IEnumerable<IMessageParser<RequestAggregatedMeasureDataMarketMessage>> _parsers;
+    private readonly IEnumerable<IMessageParser> _parsers;
 
-    public RequestAggregatedMeasureDataMarketMessageParser(IEnumerable<IMessageParser<RequestAggregatedMeasureDataMarketMessage>> parsers)
+    public RequestAggregatedMeasureDataMarketMessageParser(IEnumerable<IMessageParser> parsers)
     {
         _parsers = parsers;
     }

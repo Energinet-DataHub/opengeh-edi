@@ -30,7 +30,7 @@ using Energinet.DataHub.EDI.Process.Domain.Documents;
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
 public class JsonMessageParser : JsonParserBase,
-    IMessageParser<RequestAggregatedMeasureDataMarketMessage>
+    IMessageParser
 {
     private const string SeriesElementName = "Series";
     private const string HeaderElementName = "RequestAggregatedMeasureData_MarketDocument";

@@ -25,11 +25,11 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Queueing
 
 public class ActorMessageQueueRepository : IActorMessageQueueRepository
 {
-    private readonly ProcessContext _b2BContext;
+    private readonly ProcessContext _processContext;
 
-    public ActorMessageQueueRepository(ProcessContext b2BContext)
+    public ActorMessageQueueRepository(ProcessContext processContext)
     {
-        _b2BContext = b2BContext;
+        _processContext = processContext;
     }
 
     public async Task<ActorMessageQueue?> ActorMessageQueueForAsync(ActorNumber actorNumber, MarketRole actorRole)
@@ -37,12 +37,12 @@ public class ActorMessageQueueRepository : IActorMessageQueueRepository
         ArgumentNullException.ThrowIfNull(actorNumber);
         ArgumentNullException.ThrowIfNull(actorRole);
 
-        var actorMessageQueue = await _b2BContext.ActorMessageQueues.FirstOrDefaultAsync(queue =>
+        var actorMessageQueue = await _processContext.ActorMessageQueues.FirstOrDefaultAsync(queue =>
             queue.Receiver.Number.Equals(actorNumber) && queue.Receiver.ActorRole.Equals(actorRole)).ConfigureAwait(false);
 
         if (actorMessageQueue is null)
         {
-            actorMessageQueue = _b2BContext.ActorMessageQueues.Local.FirstOrDefault(queue =>
+            actorMessageQueue = _processContext.ActorMessageQueues.Local.FirstOrDefault(queue =>
                 queue.Receiver.Number.Equals(actorNumber) && queue.Receiver.ActorRole.Equals(actorRole));
         }
 
@@ -51,6 +51,6 @@ public class ActorMessageQueueRepository : IActorMessageQueueRepository
 
     public async Task AddAsync(ActorMessageQueue actorMessageQueue)
     {
-        await _b2BContext.AddAsync(actorMessageQueue).ConfigureAwait(false);
+        await _processContext.AddAsync(actorMessageQueue).ConfigureAwait(false);
     }
 }

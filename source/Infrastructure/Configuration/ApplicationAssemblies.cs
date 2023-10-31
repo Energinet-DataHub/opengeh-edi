@@ -24,5 +24,5 @@ public static class ApplicationAssemblies
 
     public static Assembly Infrastructure => typeof(ApplicationAssemblies).Assembly;
 
-    public static Assembly Process => typeof(ForwardAggregationResult).Assembly;
+    public static Assembly ProcessApplication => typeof(ForwardAggregationResult).Assembly;
 }
