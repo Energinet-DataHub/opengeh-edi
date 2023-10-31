@@ -16,25 +16,25 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Domain.Actors;
-using Energinet.DataHub.EDI.Domain.Documents;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using MediatR;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
-public class WhenOutgoingMessagesAreCreatedTests : TestBase
+public class WhenOutgoingMessagesAreCreatedTests : ProcessTestBase
 {
     private readonly RequestAggregatedMeasuredDataProcessInvoker _requestAggregatedMeasuredDataProcessInvoker;
 
-    public WhenOutgoingMessagesAreCreatedTests(DatabaseFixture databaseFixture)
+    public WhenOutgoingMessagesAreCreatedTests(ProcessDatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _requestAggregatedMeasuredDataProcessInvoker =
-            new RequestAggregatedMeasuredDataProcessInvoker(GetService<IMediator>(), GetService<B2BContext>());
+            new RequestAggregatedMeasuredDataProcessInvoker(GetService<IMediator>(), GetService<ProcessContext>());
     }
 
     [Fact]

@@ -15,7 +15,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.GridAreas;
-using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Domain.GridAreas;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;

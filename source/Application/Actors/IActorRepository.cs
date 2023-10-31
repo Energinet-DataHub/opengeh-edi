@@ -15,7 +15,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Common.Actors;
 
 namespace Energinet.DataHub.EDI.Application.Actors;
 

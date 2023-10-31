@@ -15,30 +15,32 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using MediatR;
+using NodaTime.Extensions;
 using NodaTime.Text;
-using GridAreaDetails = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.GridAreaDetails;
-using Period = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.Period;
-using Point = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.Point;
+using GridAreaDetails = Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.GridAreaDetails;
+using Period = Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.Period;
+using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.Point;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
 public class RequestAggregatedMeasuredDataProcessInvoker
 {
     private readonly IMediator _mediator;
-    private readonly B2BContext _b2BContext;
+    private readonly ProcessContext _processContext;
 
-    public RequestAggregatedMeasuredDataProcessInvoker(IMediator mediator, B2BContext b2BContext)
+    public RequestAggregatedMeasuredDataProcessInvoker(IMediator mediator, ProcessContext processContext)
     {
         _mediator = mediator;
-        _b2BContext = b2BContext;
+        _processContext = processContext;
     }
 
     public async Task HasBeenAcceptedAsync()
@@ -49,7 +51,7 @@ public class RequestAggregatedMeasuredDataProcessInvoker
         process!.WasSentToWholesale();
 
         // ReSharper disable once MethodHasAsyncOverload -- Test Event_registration_is_omitted_if_run_in_parallel fails if this is async
-        _b2BContext.SaveChanges();
+        _processContext.SaveChanges();
 
         var acceptedAggregation = CreateAggregatedTimeSerie();
         await _mediator.Send(new AcceptedAggregatedTimeSerie(process.ProcessId.Id, acceptedAggregation)).ConfigureAwait(false);
@@ -69,7 +71,7 @@ public class RequestAggregatedMeasuredDataProcessInvoker
 
     private AggregatedMeasureDataProcess? GetProcess(string senderId)
     {
-        return _b2BContext.AggregatedMeasureDataProcesses
+        return _processContext.AggregatedMeasureDataProcesses
             .ToList()
             .FirstOrDefault(x => x.RequestedByActorId.Value == senderId);
     }

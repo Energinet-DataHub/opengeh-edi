@@ -17,27 +17,28 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Application.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.Actors;
-using Energinet.DataHub.EDI.Domain.Documents;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Energinet.DataHub.EDI.Domain.Transactions;
-using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Process.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Queueing;
 using NodaTime.Extensions;
 using Xunit;
-using Point = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Point;
+using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Point;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
-public class WhenEnqueueingTests : TestBase
+public class WhenEnqueueingTests : ProcessTestBase
 {
     private readonly MessageEnqueuer _messageEnqueuer;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
 
-    public WhenEnqueueingTests(DatabaseFixture databaseFixture)
+    public WhenEnqueueingTests(ProcessDatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _messageEnqueuer = GetService<MessageEnqueuer>();

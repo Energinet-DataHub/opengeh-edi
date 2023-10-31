@@ -16,13 +16,13 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
-using Energinet.DataHub.EDI.Domain.Actors;
-using Energinet.DataHub.EDI.Domain.Transactions;
-using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.Transactions;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
@@ -61,7 +61,7 @@ public class InitializeAggregatedMeasureDataProcessesHandler
         RequestAggregatedMeasureDataMarketMessage marketMessage)
     {
         var actorSenderNumber = ActorNumber.Create(marketMessage.SenderNumber);
-        var businessReason = CimCode.To(marketMessage.BusinessReason);
+        var businessReason = BusinessReason.FromCode(marketMessage.BusinessReason);
 
         foreach (var serie in marketMessage.Series)
         {

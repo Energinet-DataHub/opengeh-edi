@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Google.Protobuf.WellKnownTypes;
 

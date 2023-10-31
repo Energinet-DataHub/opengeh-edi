@@ -19,14 +19,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Xunit;
-using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
+using DocumentFormat = Energinet.DataHub.EDI.Process.Domain.Documents.DocumentFormat;
 
 namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
@@ -45,7 +44,7 @@ public class MessageParserTests
     public MessageParserTests()
     {
         _requestAggregatedMeasureDataMarketMessageParser = new RequestAggregatedMeasureDataMarketMessageParser(
-            new IMessageParser<RequestAggregatedMeasureDataMarketMessage>[]
+            new IMessageParser[]
             {
                 new XmlMessageParser(),
                 new JsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),

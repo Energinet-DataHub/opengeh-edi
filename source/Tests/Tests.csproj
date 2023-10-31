@@ -51,6 +51,7 @@ limitations under the License.
       <ProjectReference Include="..\B2CWebApi\B2CWebApi.csproj" />
       <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
       <ProjectReference Include="..\Application\Application.csproj" />
+      <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>

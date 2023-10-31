@@ -14,14 +14,14 @@
 
 using System;
 using System.Collections.Generic;
-using Energinet.DataHub.EDI.Domain.Actors;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using NodaTime;
 using NodaTime.Text;
-using Period = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Period;
-using Point = Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
+using Period = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Period;
+using Point = Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
 namespace Energinet.DataHub.EDI.Tests.Factories;
 
@@ -158,9 +158,9 @@ public class TimeSeriesBuilder
         return this;
     }
 
-    public MessageHeader BuildHeader()
+    public OutgoingMessageHeader BuildHeader()
     {
-        return new MessageHeader(
+        return new OutgoingMessageHeader(
             _businessReason.Name,
             _senderNumber,
             _senderRole.Name,
