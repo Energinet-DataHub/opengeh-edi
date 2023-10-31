@@ -80,6 +80,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
                 $"DELETE FROM [dbo].[MarketEvaluationPoints]" +
                 $"DELETE FROM [dbo].[Actor]" +
                 $"DELETE FROM [dbo].[ReceivedIntegrationEvents]" +
+                $"DELETE FROM [dbo].[PendingAggregations]" +
                 $"DELETE FROM [dbo].[AggregatedMeasureDataProcesses]" +
                 $"DELETE FROM [dbo].[ArchivedMessages]" +
                 $"DELETE FROM [dbo].[MarketDocuments]" +

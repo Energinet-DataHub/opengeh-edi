@@ -13,14 +13,18 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.Transactions;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Newtonsoft.Json;
+using GridAreaDetails = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.GridAreaDetails;
+using Period = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.Period;
+using Point = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.Point;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData;
 
@@ -65,6 +69,127 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
             .HasConversion(
                 value => value != null ? value.Code : null,
                 dbValue => !string.IsNullOrWhiteSpace(dbValue) ? SettlementVersion.FromCode(dbValue) : null);
+
+        builder.OwnsMany<PendingAggregation>("_pendingAggregations", navigationBuilder =>
+        {
+            navigationBuilder.ToTable("PendingAggregations", "dbo");
+            navigationBuilder.HasKey("Id");
+            navigationBuilder.WithOwner().HasForeignKey("ProcessId");
+            navigationBuilder.Property("Id");
+            navigationBuilder.Property(x => x.Resolution);
+            navigationBuilder.Property(x => x.MeteringPointType)
+                .HasConversion(
+                    toDbValue => toDbValue.Code,
+                    fromDbValue => MeteringPointType.FromCode(fromDbValue));
+
+            navigationBuilder.Property<SettlementType?>(x => x.SettlementType)
+                .HasConversion(
+                    toDbValue
+#pragma warning disable IDE0031
+                        => toDbValue != null ? toDbValue.Code : null,
+#pragma warning restore IDE0031
+                    fromDbValue
+                        => fromDbValue != null ? SettlementType.From(fromDbValue) : null);
+
+            navigationBuilder.Property<SettlementVersion?>(x => x.SettlementVersion)
+                .HasConversion(
+                    toDbValue
+#pragma warning disable IDE0031
+                        => toDbValue != null ? toDbValue.Code : null,
+#pragma warning restore IDE0031
+                    fromDbValue
+                        => fromDbValue != null ? SettlementVersion.FromCode(fromDbValue) : null);
+
+            navigationBuilder.Property(x => x.BusinessReason)
+                .HasConversion(
+                    toDbValue
+                        => toDbValue.Code,
+                    fromDbValue
+                        => BusinessReason.FromCode(fromDbValue));
+
+            navigationBuilder.Property(x => x.MeasurementUnit)
+                .HasConversion(
+                    toDbValue
+                        => toDbValue.Code,
+                    fromDbValue
+                        => MeasurementUnit.From(fromDbValue));
+
+            navigationBuilder.Property<BusinessTransactionId?>(x => x.BusinessTransactionId)
+                .HasConversion(
+                    toDbValue
+#pragma warning disable IDE0031
+                        => toDbValue != null ? toDbValue.Id : null,
+#pragma warning restore IDE0031
+                    fromDbValue
+                        => fromDbValue != null ? BusinessTransactionId.Create(fromDbValue) : null);
+
+            navigationBuilder.Property<ActorNumber?>(x => x.ReceiverId)
+                .HasConversion(
+                    toDbValue
+#pragma warning disable CS8604 // Possible null reference argument.
+#pragma warning disable IDE0031
+                        => toDbValue != null ? toDbValue.Value : null,
+#pragma warning restore IDE0031
+#pragma warning restore CS8604 // Possible null reference argument.
+                    fromDbValue
+                        => fromDbValue != null ? ActorNumber.Create(fromDbValue) : null);
+
+            navigationBuilder.Property<MarketRole?>(x => x.ReceiverRole)
+                .HasConversion(
+                    toDbValue
+#pragma warning disable IDE0031
+                        => toDbValue != null ? toDbValue.Code : null,
+#pragma warning restore IDE0031
+                    fromDbValue
+                        => fromDbValue != null ? MarketRole.FromCode(fromDbValue) : null);
+
+            navigationBuilder.Property<ProcessId>(x => x.ProcessId)
+                .HasConversion(
+                    toDbValue => toDbValue.Id,
+                    fromDbValue => ProcessId.Create(fromDbValue));
+
+            navigationBuilder.Property(x => x.Points)
+                .HasConversion(
+                    toDbValue => JsonConvert.SerializeObject(toDbValue),
+                    fromDbValue =>
+                        JsonConvert.DeserializeObject<IReadOnlyList<Point>>(fromDbValue) ?? new List<Point>());
+
+            navigationBuilder.Property<ActorNumber?>(x => x.EnergySupplierId)
+                .HasConversion(
+                    toDbValue
+#pragma warning disable CS8604 // Possible null reference argument.
+#pragma warning disable IDE0031
+                        => toDbValue != null ? toDbValue.Value : null,
+#pragma warning restore IDE0031
+#pragma warning restore CS8604 // Possible null reference argument.
+                    fromDbValue
+                        => fromDbValue != null ? ActorNumber.Create(fromDbValue) : null);
+
+            navigationBuilder.Property<ActorNumber?>(x => x.BalanceResponsibleId)
+                .HasConversion(
+                    toDbValue
+#pragma warning disable CS8604 // Possible null reference argument.
+#pragma warning disable IDE0031
+                        => toDbValue != null ? toDbValue.Value : null,
+#pragma warning restore IDE0031
+#pragma warning restore CS8604 // Possible null reference argument.
+                    fromDbValue
+                        => fromDbValue != null ? ActorNumber.Create(fromDbValue) : null);
+
+            navigationBuilder.OwnsOne<Period>(x => x.Period, period
+                =>
+            {
+                period.Property(y => y.Start).HasColumnName("PeriodStart");
+                period.Property(y => y.End).HasColumnName("PeriodEnd");
+            });
+
+            navigationBuilder.OwnsOne<GridAreaDetails>(x => x.GridAreaDetails, gridDetails
+                =>
+            {
+                gridDetails.Property(y => y.GridAreaCode).HasColumnName("GridAreaCode");
+                gridDetails.Property(y => y.OperatorNumber).HasColumnName("GridAreaOwnerId");
+            });
+        });
 
         builder.HasMany<OutgoingMessage>("_messages")
             .WithOne()

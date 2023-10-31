@@ -45,8 +45,9 @@ internal static class InternalCommandProcessing
         mapper.Add("GridAreaOwnershipAssigned", typeof(GridAreaOwnershipAssignedCommand));
         mapper.Add("Aggregations.ForwardAggregationResult", typeof(ForwardAggregationResult));
         mapper.Add("SendAggregatedMeasureRequestToWholesale", typeof(SendAggregatedMeasureRequestToWholesale));
-        mapper.Add("AcceptedAggregatedTimeSerie", typeof(AcceptedAggregatedTimeSerie));
+        mapper.Add("ResponseMessageAggregatedTimeSerie", typeof(ResponseMessageAggregatedTimeSerie));
         mapper.Add("RejectedAggregatedTimeSeries", typeof(RejectedAggregatedTimeSeries));
+        mapper.Add("ReceiptAggregatedTimeSeries", typeof(ReceiptAggregatedTimeSeries));
 
         return mapper;
     }

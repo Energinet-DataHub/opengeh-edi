@@ -18,12 +18,14 @@ using Energinet.DataHub.EDI.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Domain.Transactions.Exceptions;
 
 namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
 {
     public class AggregatedMeasureDataProcess : Entity
     {
         private readonly List<OutgoingMessage> _messages = new();
+        private readonly List<PendingAggregation> _pendingAggregations = new();
         private State _state = State.Initialized;
 
         public AggregatedMeasureDataProcess(
@@ -66,7 +68,6 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
         /// Thereafter assign the rest of the parameters via reflection.
         /// To avoid throwing domainEvents when EF loads entity from database
         /// </summary>
-        /// <param name="state"></param>
         /// <remarks> Dont use this! </remarks>
 #pragma warning disable CS8618
         private AggregatedMeasureDataProcess(State state)
@@ -78,6 +79,7 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
         public enum State
         {
             Initialized,
+            Sending,
             Sent,
             Accepted,
             Rejected,
@@ -115,22 +117,39 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
 
         public string RequestedByActorRoleCode { get; }
 
-        public void WasSentToWholesale()
+        public void IsSendingToWholesale()
         {
-            if (_state == State.Initialized)
+            if (_state != State.Initialized)
             {
-                _state = State.Sent;
+                throw InvalidProcessStateException
+                    .InvalidState(_state.ToString(), nameof(IsSendingToWholesale));
             }
+
+            _state = State.Sending;
         }
 
-        public void IsAccepted(Aggregation aggregation)
+        public void WasSentToWholesale()
+        {
+            if (_state != State.Sending)
+            {
+                throw InvalidProcessStateException.
+                    InvalidState(_state.ToString(), nameof(WasSentToWholesale));
+            }
+
+            _state = State.Sent;
+        }
+
+        public void AddResponseMessage(Aggregation aggregation)
         {
             if (aggregation == null) throw new ArgumentNullException(nameof(aggregation));
 
             if (_state == State.Sent)
             {
-                _messages.Add(AggregationResultMessageFactory.CreateMessage(aggregation, ProcessId));
-                _state = State.Accepted;
+                if (_pendingAggregations.All(message =>
+                        message.GridAreaDetails.GridAreaCode != aggregation.GridAreaDetails.GridAreaCode))
+                {
+                    _pendingAggregations.Add(MapAggregationToPending(aggregation));
+                }
             }
         }
 
@@ -144,6 +163,74 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
 
                 _state = State.Rejected;
             }
+        }
+
+        public void IsAccepted(IReadOnlyList<string> gridAreas)
+        {
+            if (gridAreas == null) throw new ArgumentNullException(nameof(gridAreas));
+            if (_state != State.Sent)
+            {
+                return;
+            }
+
+            if (gridAreas.Count != _pendingAggregations.Count)
+            {
+                if (HaveToClearPendingMessages(gridAreas))
+                {
+                    _pendingAggregations.Clear();
+                }
+
+                _state = State.Initialized;
+                AddDomainEvent(new AggregatedMeasureDataProcessRetryFetchingData(ProcessId));
+                return;
+            }
+
+            foreach (var message in _pendingAggregations)
+            {
+                _messages.Add(AggregationResultMessageFactory.CreateMessage(MapPendingToAggregation(message), ProcessId));
+            }
+
+            _pendingAggregations.Clear();
+            _state = State.Accepted;
+        }
+
+        private static Aggregation MapPendingToAggregation(PendingAggregation aggregation)
+        {
+            return new Aggregation(
+                aggregation.Points.Select(point =>
+                    new Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Point(
+                        point.Position,
+                        point.Quantity,
+                        point.Quality,
+                        point.SampleTime)).ToList(),
+                aggregation.MeteringPointType.Name,
+                aggregation.MeasurementUnit.Code,
+                aggregation.Resolution,
+                new Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Period(
+                    aggregation.Period.Start,
+                    aggregation.Period.End),
+                aggregation.SettlementType?.Code,
+                aggregation.BusinessReason.Name,
+                new ActorGrouping(
+                    aggregation.EnergySupplierId?.Value,
+                    aggregation.BalanceResponsibleId?.Value),
+                new Energinet.DataHub.EDI.Domain.Transactions.Aggregations.GridAreaDetails(
+                    aggregation.GridAreaDetails.GridAreaCode,
+                    aggregation.GridAreaDetails.OperatorNumber),
+                aggregation.BusinessTransactionId?.Id,
+                aggregation.ReceiverId?.Value,
+                aggregation.ReceiverRole?.Name,
+                aggregation.SettlementVersion?.Name);
+        }
+
+        private bool HaveToClearPendingMessages(IReadOnlyList<string> gridAreas)
+        {
+            if (_pendingAggregations.Count <= gridAreas.Count && _pendingAggregations.All(message => gridAreas.Contains(message.GridAreaDetails.GridAreaCode)))
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private RejectedAggregationResultMessage CreateRejectedAggregationResultMessage(
@@ -164,6 +251,33 @@ namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData
                 rejectedAggregatedMeasureDataRequest.BusinessReason.Name,
                 MarketRole.FromCode(RequestedByActorRoleCode),
                 rejectedTimeSerie);
+        }
+
+        private PendingAggregation MapAggregationToPending(Aggregation aggregation)
+        {
+            return new(
+                aggregation.Points.Select(point =>
+                    new Point(
+                        point.Position,
+                        point.Quantity,
+                        point.Quality,
+                        point.SampleTime)).ToList(),
+                OutgoingMessages.MeteringPointType.From(aggregation.MeteringPointType),
+                MeasurementUnit.From(aggregation.MeasureUnitType),
+                aggregation.Resolution,
+                aggregation.SettlementType != null ? SettlementType.From(aggregation.SettlementType) : null,
+                BusinessReason.FromName(aggregation.BusinessReason),
+                ProcessId,
+                new Period(aggregation.Period.Start, aggregation.Period.End),
+                new GridAreaDetails(
+                    aggregation.GridAreaDetails.GridAreaCode,
+                    aggregation.GridAreaDetails.OperatorNumber),
+                aggregation.ActorGrouping.EnergySupplierNumber != null ? ActorNumber.Create(aggregation.ActorGrouping.EnergySupplierNumber) : null,
+                aggregation.ActorGrouping.BalanceResponsibleNumber != null ? ActorNumber.Create(aggregation.ActorGrouping.BalanceResponsibleNumber) : null,
+                aggregation.SettlementVersion != null ? SettlementVersion.FromName(aggregation.SettlementVersion) : null,
+                aggregation.ReceiverRole != null ? MarketRole.FromName(aggregation.ReceiverRole) : null,
+                aggregation.Receiver != null ? ActorNumber.Create(aggregation.Receiver) : null,
+                aggregation.OriginalTransactionIdReference != null ? BusinessTransactionId.Create(aggregation.OriginalTransactionIdReference) : null);
         }
     }
 }

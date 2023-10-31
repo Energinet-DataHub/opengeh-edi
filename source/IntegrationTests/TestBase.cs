@@ -61,13 +61,13 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             databaseFixture.CleanupDatabase();
             _httpClientSpy = new HttpClientSpy();
             _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
-            TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
+            TestAggregatedTimeSeriesRequestResponseMessageHandlerSpy = new TestAggregatedTimeSeriesRequestResponseMessageHandlerSpy();
             InboxEventNotificationHandler = new IntegrationTests.Infrastructure.InboxEvents.TestNotificationHandlerSpy();
             BuildServices();
             _b2BContext = GetService<B2BContext>();
         }
 
-        protected TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
+        protected TestAggregatedTimeSeriesRequestResponseMessageHandlerSpy TestAggregatedTimeSeriesRequestResponseMessageHandlerSpy { get; }
 
         protected IntegrationTests.Infrastructure.InboxEvents.TestNotificationHandlerSpy InboxEventNotificationHandler { get; }
 
@@ -161,8 +161,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
 
             _services.AddTransient<InboxEventsProcessor>();
-            _services.AddTransient<AggregatedTimeSeriesRequestAcceptedEventMapper>();
-            _services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>>(_ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy);
+            _services.AddTransient<AggregatedTimeSeriesRequestResponseMessageEventMapper>();
+            _services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestResponse>>(_ => TestAggregatedTimeSeriesRequestResponseMessageHandlerSpy);
             _services.AddTransient<INotificationHandler<IntegrationTests.Infrastructure.InboxEvents.TestNotification>>(
                 _ => InboxEventNotificationHandler);
 

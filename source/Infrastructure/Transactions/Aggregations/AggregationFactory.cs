@@ -27,7 +27,7 @@ using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.Collections;
 using NodaTime.Serialization.Protobuf;
 using NodaTime.Text;
-using GridAreaDetails = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.GridAreaDetails;
+using ActorGrouping = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.ActorGrouping;
 using Period = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Period;
 using Point = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Point;
 using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
@@ -93,10 +93,10 @@ public class AggregationFactory
         return new Period(InstantPattern.General.Parse(startOfPeriod).Value, InstantPattern.General.Parse(endOfPeriod).Value);
     }
 
-    private static GridAreaDetails MapGridAreaDetails(
+    private static Energinet.DataHub.EDI.Domain.Transactions.Aggregations.GridAreaDetails MapGridAreaDetails(
         Domain.Transactions.AggregatedMeasureData.GridAreaDetails timeSerieGridAreaDetails)
     {
-        return new GridAreaDetails(timeSerieGridAreaDetails.GridAreaCode, timeSerieGridAreaDetails.OperatorNumber);
+        return new Energinet.DataHub.EDI.Domain.Transactions.Aggregations.GridAreaDetails(timeSerieGridAreaDetails.GridAreaCode, timeSerieGridAreaDetails.OperatorNumber);
     }
 
     private static List<Point> MapPoints(IReadOnlyList<Domain.Transactions.AggregatedMeasureData.Point> points)
@@ -127,17 +127,10 @@ public class AggregationFactory
 
     private static string? MapSettlementMethod(AggregatedMeasureDataProcess process)
     {
-        var settlementTypeName = null as string;
-        try
-        {
-            settlementTypeName = SettlementType.From(process.SettlementMethod ?? string.Empty).Name;
-        }
-        catch (InvalidCastException)
-        {
-            // Settlement type for Production is set to null.
-        }
+        if (process.SettlementMethod == null)
+            return null;
 
-        return settlementTypeName;
+        return SettlementType.From(process.SettlementMethod).Name;
     }
 
     private static string MapProcessTypeFromCalculationResult(ProcessType processType)
@@ -276,7 +269,7 @@ public class AggregationFactory
         return input.Units + (input.Nanos / nanoFactor);
     }
 
-    private async Task<GridAreaDetails> GetGridAreaDetailsAsync(CalculationResultCompleted integrationEvent, CancellationToken cancellationToken)
+    private async Task<Energinet.DataHub.EDI.Domain.Transactions.Aggregations.GridAreaDetails> GetGridAreaDetailsAsync(CalculationResultCompleted integrationEvent, CancellationToken cancellationToken)
     {
         var gridAreaCode = integrationEvent.AggregationLevelCase switch
         {
@@ -290,6 +283,6 @@ public class AggregationFactory
 
         var gridOperatorNumber = await _gridAreaRepository.GetGridOwnerForAsync(gridAreaCode, cancellationToken).ConfigureAwait(false);
 
-        return new GridAreaDetails(gridAreaCode, gridOperatorNumber.Value);
+        return new Energinet.DataHub.EDI.Domain.Transactions.Aggregations.GridAreaDetails(gridAreaCode, gridOperatorNumber.Value);
     }
 }

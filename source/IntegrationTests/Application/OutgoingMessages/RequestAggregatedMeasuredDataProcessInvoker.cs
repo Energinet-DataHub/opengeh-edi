@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
@@ -23,9 +24,7 @@ using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMea
 using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 using MediatR;
-using NodaTime.Text;
 using GridAreaDetails = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.GridAreaDetails;
-using Period = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.Period;
 using Point = Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.Point;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
@@ -46,13 +45,17 @@ public class RequestAggregatedMeasuredDataProcessInvoker
         var marketMessage = new RequestAggregatedMeasureDataMarketDocumentBuilder().Build();
         await _mediator.Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
         var process = GetProcess(marketMessage.SenderNumber);
+        process!.IsSendingToWholesale();
         process!.WasSentToWholesale();
 
         // ReSharper disable once MethodHasAsyncOverload -- Test Event_registration_is_omitted_if_run_in_parallel fails if this is async
         _b2BContext.SaveChanges();
 
         var acceptedAggregation = CreateAggregatedTimeSerie();
-        await _mediator.Send(new AcceptedAggregatedTimeSerie(process.ProcessId.Id, acceptedAggregation)).ConfigureAwait(false);
+        await _mediator.Send(new ResponseMessageAggregatedTimeSerie(process.ProcessId.Id, acceptedAggregation)).ConfigureAwait(false);
+        await _mediator.Send(new ReceiptAggregatedTimeSeries(
+            process.ProcessId.Id,
+            new ReadOnlyCollection<string>(new[] { acceptedAggregation.GridAreaDetails.GridAreaCode }))).ConfigureAwait(false);
     }
 
     private static AggregatedTimeSerie CreateAggregatedTimeSerie()

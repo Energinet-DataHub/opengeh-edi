@@ -15,7 +15,6 @@
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.Transactions;
 using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using NodaTime;
 using Period = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Period;

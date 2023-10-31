@@ -14,24 +14,21 @@
 
 using System;
 using System.Collections.Generic;
-using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
-using Xunit;
+using System.Text.Json.Serialization;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
 
-namespace Energinet.DataHub.EDI.Tests.Domain.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 
-public class AggregatedMeasureDataProcessTests
+public class ReceiptAggregatedTimeSeries : InternalCommand
 {
-    [Fact]
-    public void Ensure_we_do_not_break_states()
+    [JsonConstructor]
+    public ReceiptAggregatedTimeSeries(Guid processId, IReadOnlyList<string> gridAreas)
     {
-        var expectedStates = new List<string>()
-        {
-            "Initialized", "Sending", "Sent", "Accepted", "Rejected",
-        };
-
-        var actualStates = Enum.GetNames(typeof(AggregatedMeasureDataProcess.State));
-
-        Assert.Equal(expectedStates.Count, actualStates.Length);
-        Assert.Contains(actualStates, state => expectedStates.Contains(state));
+        ProcessId = processId;
+        GridAreas = gridAreas;
     }
+
+    public Guid ProcessId { get; }
+
+    public IReadOnlyList<string> GridAreas { get; }
 }

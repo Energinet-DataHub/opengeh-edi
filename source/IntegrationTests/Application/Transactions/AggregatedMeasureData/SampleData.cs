@@ -14,7 +14,6 @@
 
 using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.AggregatedMeasureData;
 

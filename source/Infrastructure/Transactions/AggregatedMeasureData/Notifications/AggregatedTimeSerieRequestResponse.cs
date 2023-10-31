@@ -13,25 +13,20 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
-using Xunit;
+using MediatR;
 
-namespace Energinet.DataHub.EDI.Tests.Domain.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
 
-public class AggregatedMeasureDataProcessTests
+public class AggregatedTimeSerieRequestResponse : INotification
 {
-    [Fact]
-    public void Ensure_we_do_not_break_states()
+    public AggregatedTimeSerieRequestResponse(Guid processId, AggregatedTimeSerie aggregatedTimeSerie)
     {
-        var expectedStates = new List<string>()
-        {
-            "Initialized", "Sending", "Sent", "Accepted", "Rejected",
-        };
-
-        var actualStates = Enum.GetNames(typeof(AggregatedMeasureDataProcess.State));
-
-        Assert.Equal(expectedStates.Count, actualStates.Length);
-        Assert.Contains(actualStates, state => expectedStates.Contains(state));
+        ProcessId = processId;
+        AggregatedTimeSerie = aggregatedTimeSerie;
     }
+
+    public Guid ProcessId { get; }
+
+    public AggregatedTimeSerie AggregatedTimeSerie { get; }
 }

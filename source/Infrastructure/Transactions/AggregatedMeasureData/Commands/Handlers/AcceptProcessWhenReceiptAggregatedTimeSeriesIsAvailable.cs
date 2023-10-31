@@ -17,41 +17,28 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Domain.Transactions;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
 
-public class SendAggregatedMeasuredDataToWholesale
-    : IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>
+public class AcceptProcessWhenReceiptAggregatedTimeSeriesIsAvailable : IRequestHandler<ReceiptAggregatedTimeSeries, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
-    private readonly WholesaleInbox _wholesaleInbox;
 
-    public SendAggregatedMeasuredDataToWholesale(
-        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository,
-        WholesaleInbox wholesaleInbox)
+    public AcceptProcessWhenReceiptAggregatedTimeSeriesIsAvailable(
+        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
-        _wholesaleInbox = wholesaleInbox;
     }
 
-    public async Task<Unit> Handle(
-        SendAggregatedMeasureRequestToWholesale request,
-        CancellationToken cancellationToken)
+    public async Task<Unit> Handle(ReceiptAggregatedTimeSeries request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         var process = await _aggregatedMeasureDataProcessRepository
             .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
-        process.IsSendingToWholesale();
-
-        await _wholesaleInbox.SendAsync(
-            process,
-            cancellationToken).ConfigureAwait(false);
-
-        process.WasSentToWholesale();
+        process.IsAccepted(request.GridAreas);
 
         return Unit.Value;
     }

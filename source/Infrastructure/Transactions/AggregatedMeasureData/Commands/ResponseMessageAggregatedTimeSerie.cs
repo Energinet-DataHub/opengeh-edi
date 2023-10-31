@@ -13,14 +13,16 @@
 // limitations under the License.
 
 using System;
+using System.Text.Json.Serialization;
+using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
 using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
-using MediatR;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
+namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 
-public class AggregatedTimeSerieRequestWasAccepted : INotification
+public class ResponseMessageAggregatedTimeSerie : InternalCommand
 {
-    public AggregatedTimeSerieRequestWasAccepted(Guid processId, AggregatedTimeSerie aggregatedTimeSerie)
+    [JsonConstructor]
+    public ResponseMessageAggregatedTimeSerie(Guid processId, AggregatedTimeSerie aggregatedTimeSerie)
     {
         ProcessId = processId;
         AggregatedTimeSerie = aggregatedTimeSerie;

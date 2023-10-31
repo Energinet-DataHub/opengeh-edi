@@ -12,23 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text.Json.Serialization;
-using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
-using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Domain.Common;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
+namespace Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 
-public class AcceptedAggregatedTimeSerie : InternalCommand
+public class AggregatedMeasureDataProcessRetryFetchingData : DomainEvent
 {
-    [JsonConstructor]
-    public AcceptedAggregatedTimeSerie(Guid processId, AggregatedTimeSerie aggregatedTimeSerie)
+    public AggregatedMeasureDataProcessRetryFetchingData(ProcessId processId)
     {
         ProcessId = processId;
-        AggregatedTimeSerie = aggregatedTimeSerie;
     }
 
-    public Guid ProcessId { get; }
-
-    public AggregatedTimeSerie AggregatedTimeSerie { get; }
+    public ProcessId ProcessId { get; }
 }

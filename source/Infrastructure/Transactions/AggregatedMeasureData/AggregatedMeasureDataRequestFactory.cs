@@ -40,67 +40,6 @@ public static class AggregatedMeasureDataRequestFactory
         return message;
     }
 
-    private static void MapGridArea(AggregatedTimeSeriesRequest request, AggregatedMeasureDataProcess process)
-    {
-        if (process.EnergySupplierId == null && process.BalanceResponsibleId == null)
-        {
-            if (string.IsNullOrWhiteSpace(process.MeteringGridAreaDomainId)) throw new InvalidOperationException("Missing grid area code for grid responsible");
-            request.AggregationPerGridarea = new AggregationPerGridArea()
-            {
-                GridAreaCode = process.MeteringGridAreaDomainId,
-                GridResponsibleId = process.RequestedByActorId.Value,
-            };
-        }
-    }
-
-    private static void MapEnergySupplierPerGridArea(
-        AggregatedTimeSeriesRequest request,
-        AggregatedMeasureDataProcess process)
-    {
-        if (process.EnergySupplierId != null && process.BalanceResponsibleId == null)
-        {
-            if (string.IsNullOrWhiteSpace(process.MeteringGridAreaDomainId)) throw new InvalidOperationException($"Missing grid area code for energy supplier: {process.EnergySupplierId}");
-            request.AggregationPerEnergysupplierPerGridarea = new AggregationPerEnergySupplierPerGridArea()
-            {
-                GridAreaCode = process.MeteringGridAreaDomainId,
-                EnergySupplierId = process.EnergySupplierId,
-            };
-        }
-    }
-
-    private static void MapEnergyPerBalancePerGridArea(
-        AggregatedTimeSeriesRequest request,
-        AggregatedMeasureDataProcess process)
-    {
-        if (process.EnergySupplierId != null && process.BalanceResponsibleId != null)
-        {
-            if (string.IsNullOrWhiteSpace(process.MeteringGridAreaDomainId)) throw new InvalidOperationException($"Missing grid area code for energy supplier: {process.EnergySupplierId} per balance responsible: {process.BalanceResponsibleId}");
-            request.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea =
-                new AggregationPerEnergySupplierPerBalanceResponsiblePartyPerGridArea()
-                {
-                    GridAreaCode = process.MeteringGridAreaDomainId,
-                    BalanceResponsiblePartyId = process.BalanceResponsibleId,
-                    EnergySupplierId = process.EnergySupplierId,
-                };
-        }
-    }
-
-    private static void MapBalanceResponsiblePerGridArea(
-        AggregatedTimeSeriesRequest request,
-        AggregatedMeasureDataProcess process)
-    {
-        if (process.EnergySupplierId == null && process.BalanceResponsibleId != null)
-        {
-            if (string.IsNullOrWhiteSpace(process.MeteringGridAreaDomainId)) throw new InvalidOperationException($"Missing grid area code for balance responsible: {process.BalanceResponsibleId}");
-            request.AggregationPerBalanceresponsiblepartyPerGridarea =
-                new AggregationPerBalanceResponsiblePartyPerGridArea()
-                {
-                    GridAreaCode = process.MeteringGridAreaDomainId,
-                    BalanceResponsiblePartyId = process.BalanceResponsibleId,
-                };
-        }
-    }
-
     private static Edi.Requests.Period MapPeriod(AggregatedMeasureDataProcess process)
     {
         var period = new Edi.Requests.Period
@@ -139,11 +78,6 @@ public static class AggregatedMeasureDataRequestFactory
 
         if (process.MeteringGridAreaDomainId != null)
             request.GridAreaCode = process.MeteringGridAreaDomainId;
-
-        MapGridArea(request, process);
-        MapEnergySupplierPerGridArea(request, process);
-        MapBalanceResponsiblePerGridArea(request, process);
-        MapEnergyPerBalancePerGridArea(request, process);
 
         return request;
     }

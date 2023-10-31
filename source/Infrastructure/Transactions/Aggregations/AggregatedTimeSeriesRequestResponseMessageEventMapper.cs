@@ -31,11 +31,11 @@ using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 
-public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
+public class AggregatedTimeSeriesRequestResponseMessageEventMapper : IInboxEventMapper
 {
     private readonly IGridAreaRepository _gridAreaRepository;
 
-    public AggregatedTimeSeriesRequestAcceptedEventMapper(IGridAreaRepository gridAreaRepository)
+    public AggregatedTimeSeriesRequestResponseMessageEventMapper(IGridAreaRepository gridAreaRepository)
     {
         _gridAreaRepository = gridAreaRepository;
     }
@@ -43,7 +43,7 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
     public async Task<INotification> MapFromAsync(string payload, Guid referenceId, CancellationToken cancellationToken)
     {
         var aggregation =
-            AggregatedTimeSeriesRequestAccepted.Parser.ParseJson(payload);
+            AggregatedTimeSeriesRequestResponseMessage.Parser.ParseJson(payload);
 
         var aggregatedTimeSerie = new AggregatedTimeSerie(
                 MapPoints(aggregation.TimeSeriesPoints),
@@ -52,7 +52,7 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
                 MapResolution(aggregation.Resolution),
                 await MapGridAreaDetailsAsync(aggregation.GridArea, cancellationToken).ConfigureAwait(false));
 
-        return new AggregatedTimeSerieRequestWasAccepted(
+        return new AggregatedTimeSerieRequestResponse(
             referenceId,
             aggregatedTimeSerie);
     }
@@ -60,12 +60,12 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
     public bool CanHandle(string eventType)
     {
         ArgumentNullException.ThrowIfNull(eventType);
-        return eventType.Equals(nameof(AggregatedTimeSeriesRequestAccepted), StringComparison.OrdinalIgnoreCase);
+        return eventType.Equals(nameof(AggregatedTimeSeriesRequestResponseMessage), StringComparison.OrdinalIgnoreCase);
     }
 
     public string ToJson(byte[] payload)
     {
-        var inboxEvent = AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(
+        var inboxEvent = AggregatedTimeSeriesRequestResponseMessage.Parser.ParseFrom(
             payload);
         return inboxEvent.ToString();
     }

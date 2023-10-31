@@ -28,18 +28,18 @@ using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 
-public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHandler<AggregatedTimeSerieRequestWasAccepted>
+public class TestAggregatedTimeSeriesRequestResponseMessageHandlerSpy : INotificationHandler<AggregatedTimeSerieRequestResponse>
 {
     private static readonly List<INotification> _actualNotifications = new();
 
-    public static void AssertExpectedNotifications(AggregatedTimeSeriesRequestAccepted aggregatedTimeSeriesRequestAccepted)
+    public static void AssertExpectedNotifications(AggregatedTimeSeriesRequestResponseMessage aggregatedTimeSeriesRequestAccepted)
     {
         if (aggregatedTimeSeriesRequestAccepted == null) throw new ArgumentNullException(nameof(aggregatedTimeSeriesRequestAccepted));
 
         Assert.NotNull(_actualNotifications);
         Assert.Single(_actualNotifications);
-        Assert.Contains(_actualNotifications, notification => notification is AggregatedTimeSerieRequestWasAccepted);
-        var actualNotification = _actualNotifications.Single() as AggregatedTimeSerieRequestWasAccepted;
+        Assert.Contains(_actualNotifications, notification => notification is AggregatedTimeSerieRequestResponse);
+        var actualNotification = _actualNotifications.Single() as AggregatedTimeSerieRequestResponse;
         var actualTimeSerie = actualNotification!.AggregatedTimeSerie;
         Assert.Equal(aggregatedTimeSeriesRequestAccepted.GridArea, actualTimeSerie.GridAreaDetails.GridAreaCode);
         Assert.Equal(MapUnitType(aggregatedTimeSeriesRequestAccepted), actualTimeSerie.UnitType);
@@ -53,7 +53,7 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
         }
     }
 
-    public Task Handle(AggregatedTimeSerieRequestWasAccepted notification, CancellationToken cancellationToken)
+    public Task Handle(AggregatedTimeSerieRequestResponse notification, CancellationToken cancellationToken)
     {
         _actualNotifications.Add(notification);
         return Task.CompletedTask;
@@ -83,7 +83,7 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
         return input.Units + (input.Nanos / nanoFactor);
     }
 
-    private static string MapMeteringPointType(AggregatedTimeSeriesRequestAccepted aggregation)
+    private static string MapMeteringPointType(AggregatedTimeSeriesRequestResponseMessage aggregation)
     {
         return aggregation.TimeSeriesType switch
         {
@@ -98,7 +98,7 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
         };
     }
 
-    private static string MapUnitType(AggregatedTimeSeriesRequestAccepted aggregation)
+    private static string MapUnitType(AggregatedTimeSeriesRequestResponseMessage aggregation)
     {
         return aggregation.QuantityUnit switch
         {

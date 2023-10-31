@@ -31,12 +31,16 @@ internal static class RequestedAggregatedMeasureDataConfiguration
     public static void Configure(IServiceCollection services)
     {
         services.AddTransient<IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>, SendAggregatedMeasuredDataToWholesale>();
-        services.AddTransient<IRequestHandler<AcceptedAggregatedTimeSerie, Unit>, AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable>();
+        services.AddTransient<IRequestHandler<ResponseMessageAggregatedTimeSerie, Unit>, AddMessageToProcessWhenResponseAggregatedTimeSeriesIsAvailable>();
         services.AddTransient<IRequestHandler<RejectedAggregatedTimeSeries, Unit>, RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable>();
+        services.AddTransient<IRequestHandler<RejectedAggregatedTimeSeries, Unit>, RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable>();
+        services.AddTransient<IRequestHandler<ReceiptAggregatedTimeSeries, Unit>, AcceptProcessWhenReceiptAggregatedTimeSeriesIsAvailable>();
         services.AddTransient<INotificationHandler<AggregatedMeasureProcessIsInitialized>, NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized>();
+        services.AddTransient<INotificationHandler<AggregatedMeasureDataProcessRetryFetchingData>, RetryFetchingDataForAggregatedMeasureDataProcess>();
         services.AddTransient<IRequestHandler<InitializeAggregatedMeasureDataProcessesCommand, Result>, InitializeAggregatedMeasureDataProcessesHandler>();
-        services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>, WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable>();
+        services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestResponse>, WhenAnAggregatedTimeSeriesRequestResponseMessageIsAvailable>();
         services.AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasRejected>, WhenAnRejectedAggregatedTimeSeriesRequestIsAvailable>();
+        services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestReceipt>, WhenAnAggregatedTimeSeriesRequestReceiptIsAvailable>();
         services.AddScoped<WholesaleInbox>();
         services.AddScoped<IAggregatedMeasureDataProcessRepository, AggregatedMeasureDataProcessRepository>();
     }
