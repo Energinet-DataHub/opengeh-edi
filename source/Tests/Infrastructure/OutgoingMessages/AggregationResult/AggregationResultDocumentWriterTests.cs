@@ -14,20 +14,16 @@
 
 using System.IO;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.AggregationResult;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.OutgoingMessages.AggregationResult;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Domain;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
-using Energinet.DataHub.EDI.Process.Application.OutgoingMessages.Common;
-using Energinet.DataHub.EDI.Process.Domain.Documents;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
-using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.AggregationResult;
-using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
-using Point = Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.AggregationResult;
 

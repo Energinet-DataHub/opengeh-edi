@@ -48,6 +48,8 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\ActorMessageQueue.Application\ActorMessageQueue.Application.csproj" />
+      <ProjectReference Include="..\ActorMessageQueue.Domain\ActorMessageQueue.Domain.csproj" />
       <ProjectReference Include="..\B2CWebApi\B2CWebApi.csproj" />
       <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
       <ProjectReference Include="..\Application\Application.csproj" />

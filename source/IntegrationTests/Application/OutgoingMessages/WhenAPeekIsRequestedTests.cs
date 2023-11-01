@@ -17,18 +17,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Dapper;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.Process.Application.OutgoingMessages;
-using Energinet.DataHub.EDI.Process.Domain.Documents;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using MediatR;
 using Xunit;
-using PeekResult = Energinet.DataHub.EDI.Process.Application.OutgoingMessages.PeekResult;
+using DocumentType = Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing.DocumentType;
+using MessageCategory = Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing.MessageCategory;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 

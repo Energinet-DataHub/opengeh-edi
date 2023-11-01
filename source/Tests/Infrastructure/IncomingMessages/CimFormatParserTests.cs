@@ -14,7 +14,6 @@
 
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
-using Energinet.DataHub.EDI.Process.Domain.Documents;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.IncomingMessages;

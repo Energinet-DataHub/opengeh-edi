@@ -15,10 +15,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Process.Application.OutgoingMessages;
-using Energinet.DataHub.EDI.Process.Domain.Documents;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using MediatR;
 
@@ -38,7 +38,7 @@ public class TestCreateOutgoingCommandHandler : IRequestHandler<TestCreateOutgoi
         if (request == null) throw new ArgumentNullException(nameof(request));
         for (int i = 0; i < request.NumberOfOutgoingMessages; i++)
         {
-            _outgoingMessageRepository.Add(new OutgoingMessage(DocumentType.NotifyAggregatedMeasureData, ActorNumber.Create("1234567891234"), ProcessId.New(), Process.Domain.OutgoingMessages.BusinessReason.BalanceFixing.Name, MarketRole.EnergySupplier, ActorNumber.Create("1234567891234"), MarketRole.MeteringDataAdministrator, "data"));
+            _outgoingMessageRepository.Add(new OutgoingMessage(DocumentType.NotifyAggregatedMeasureData, ActorNumber.Create("1234567891234"), ProcessId.New().Id, BusinessReason.BalanceFixing.Name, MarketRole.EnergySupplier, ActorNumber.Create("1234567891234"), MarketRole.MeteringDataAdministrator, "data"));
         }
 
         return Unit.Task;
