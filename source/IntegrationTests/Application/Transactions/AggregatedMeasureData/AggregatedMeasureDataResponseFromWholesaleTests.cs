@@ -17,6 +17,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Domain;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
@@ -29,7 +31,7 @@ using NodaTime.Extensions;
 using Xunit;
 using Xunit.Categories;
 using GridAreaDetails = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.GridAreaDetails;
-using Period = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Period;
+using Period = Energinet.DataHub.EDI.Common.Period;
 using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Point;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.AggregatedMeasureData;

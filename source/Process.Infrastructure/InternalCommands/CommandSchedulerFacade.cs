@@ -15,7 +15,7 @@
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.Configuration.Commands;
 using Energinet.DataHub.EDI.Common;
-using IUnitOfWork = Energinet.DataHub.EDI.Process.Domain.IUnitOfWork;
+using IUnitOfWork = Energinet.DataHub.EDI.Domain.IUnitOfWork;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 

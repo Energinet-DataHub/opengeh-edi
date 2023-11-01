@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -65,7 +65,7 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
                 value => value != null ? value.Code : null,
                 dbValue => !string.IsNullOrWhiteSpace(dbValue) ? SettlementVersion.FromCode(dbValue) : null);
 
-        builder.HasMany<OutgoingMessage>("_messages")
+        builder.HasMany<OutgoingMessageDto>("_messages")
             .WithOne()
             .HasForeignKey("ProcessId");
 

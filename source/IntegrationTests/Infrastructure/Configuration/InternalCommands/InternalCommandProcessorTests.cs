@@ -24,7 +24,7 @@ using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Categories;
-using IUnitOfWork = Energinet.DataHub.EDI.Process.Domain.IUnitOfWork;
+using IUnitOfWork = Energinet.DataHub.EDI.Domain.IUnitOfWork;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 

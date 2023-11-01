@@ -18,8 +18,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.GridAreas;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Exceptions;
@@ -28,7 +28,7 @@ using Google.Protobuf.Collections;
 using NodaTime.Serialization.Protobuf;
 using NodaTime.Text;
 using GridAreaDetails = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.GridAreaDetails;
-using Period = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Period;
+using Period = Energinet.DataHub.EDI.Common.Period;
 using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Point;
 using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
 
@@ -158,7 +158,7 @@ public class AggregationFactory
     {
         return resolution switch
         {
-            Resolution.Quarter => Domain.Transactions.Aggregations.Resolution.QuarterHourly.Name,
+            Resolution.Quarter => Common.Resolution.QuarterHourly.Name,
             Resolution.Unspecified => throw new InvalidOperationException("Could not map resolution type"),
             _ => throw new InvalidOperationException("Unknown resolution type"),
         };

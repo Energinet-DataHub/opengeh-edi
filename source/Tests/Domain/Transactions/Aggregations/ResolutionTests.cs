@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Domain;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using Xunit;
 

@@ -16,13 +16,12 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;

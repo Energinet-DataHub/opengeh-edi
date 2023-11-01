@@ -14,13 +14,15 @@
 
 using System;
 using System.Collections.Generic;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Domain;
 using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using NodaTime;
 using NodaTime.Text;
-using Period = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Period;
+using Period = Energinet.DataHub.EDI.Common.Period;
 using Point = Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
 namespace Energinet.DataHub.EDI.Tests.Factories;

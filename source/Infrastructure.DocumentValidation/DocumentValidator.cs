@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Process.Domain.Documents;
+using Energinet.DataHub.EDI.Common;
 
 namespace Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 

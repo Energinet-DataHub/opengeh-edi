@@ -14,6 +14,8 @@
 
 using System.IO;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Domain;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Energinet.DataHub.EDI.Process.Application.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Process.Domain.Documents;

@@ -14,8 +14,11 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Domain;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
@@ -28,7 +31,6 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;

@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Domain;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 

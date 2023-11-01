@@ -21,7 +21,7 @@ using Energinet.DataHub.EDI.Common;
 using MediatR;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
-using IUnitOfWork = Energinet.DataHub.EDI.Process.Domain.IUnitOfWork;
+using IUnitOfWork = Energinet.DataHub.EDI.Domain.IUnitOfWork;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Processing;
 

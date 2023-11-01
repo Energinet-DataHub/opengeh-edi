@@ -17,10 +17,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.GridAreas;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.Collections;
@@ -102,8 +101,8 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
     {
         return resolution switch
         {
-            Resolution.Pt15M => Domain.Transactions.Aggregations.Resolution.QuarterHourly.Name,
-            Resolution.Pt1H => Domain.Transactions.Aggregations.Resolution.Hourly.Name,
+            Resolution.Pt15M => Common.Resolution.QuarterHourly.Name,
+            Resolution.Pt1H => Common.Resolution.Hourly.Name,
             Resolution.Unspecified => throw new InvalidOperationException("Could not map resolution type"),
             _ => throw new InvalidOperationException("Unknown resolution type"),
         };

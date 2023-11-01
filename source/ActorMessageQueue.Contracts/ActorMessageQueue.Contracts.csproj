@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  
+  <PropertyGroup>
+    <AssemblyName>Energinet.DataHub.EDI.ActorMessageQueue.Contracts</AssemblyName>
+    <RootNamespace>Energinet.DataHub.EDI.ActorMessageQueue.Contracts</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup>
+      <TargetFramework>net7.0</TargetFramework>
+      <ImplicitUsings>enable</ImplicitUsings>
+      <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
+  </ItemGroup>
+
+</Project>

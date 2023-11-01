@@ -20,7 +20,6 @@ using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAgg
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common;
 using NodaTime;
 using MessageHeader = Energinet.DataHub.EDI.Common.MessageHeader;
 

@@ -1,0 +1,114 @@
+﻿// Copyright 2020 Energinet DataHub A/S
+//
+// Licensed under the Apache License, Version 2.0 (the "License2");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System.Text.Json;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common.Json;
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.Documents;
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages;
+
+namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.RejectRequestAggregatedMeasureData;
+
+public class RejectRequestAggregatedMeasureDataJsonDocumentWriter : IDocumentWriter
+{
+    private const string DocumentType = "RejectRequestAggregatedMeasureData_MarketDocument";
+    private const string TypeCode = "ERR";
+    private readonly IMessageRecordParser _parser;
+
+    public RejectRequestAggregatedMeasureDataJsonDocumentWriter(IMessageRecordParser parser)
+    {
+        _parser = parser;
+    }
+
+#pragma warning disable CA1822
+    public bool HandlesFormat(DocumentFormat format)
+#pragma warning restore CA1822
+    {
+        return format == DocumentFormat.Json;
+    }
+
+    public bool HandlesType(DocumentType documentType)
+    {
+        return documentType == Domain.OutgoingMessages.Queueing.DocumentType.RejectRequestAggregatedMeasureData;
+    }
+
+    public async Task<Stream> WriteAsync(OutgoingMessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
+    {
+        var stream = new MemoryStream();
+        var options = new JsonWriterOptions() { Indented = true };
+        using var writer = new Utf8JsonWriter(stream, options);
+
+        JsonHeaderWriter.Write(header, DocumentType, TypeCode, CimCode.Of(ReasonCode.FullyRejected), writer);
+        WriteSeries(marketActivityRecords, writer);
+        writer.WriteEndObject();
+        await writer.FlushAsync().ConfigureAwait(false);
+        stream.Position = 0;
+        return stream;
+    }
+
+    private void WriteSeries(IReadOnlyCollection<string> marketActivityRecords, Utf8JsonWriter writer)
+    {
+        if (marketActivityRecords == null) throw new ArgumentNullException(nameof(marketActivityRecords));
+        if (writer == null) throw new ArgumentNullException(nameof(writer));
+
+        writer.WritePropertyName("Series");
+        writer.WriteStartArray();
+
+        foreach (var series in ParseFrom(marketActivityRecords))
+        {
+            writer.WriteStartObject();
+
+            writer.WriteProperty("mRID", series.TransactionId.ToString());
+            writer.WriteProperty("originalTransactionIDReference_Series.mRID", series.OriginalTransactionIdReference);
+
+            writer.WritePropertyName("Reason");
+            writer.WriteStartArray();
+            foreach (var rejectReason in series.RejectReasons)
+            {
+                writer.WriteStartObject();
+
+                writer.WritePropertyName("code");
+                writer.WriteStartObject();
+                writer.WriteProperty("value", rejectReason.ErrorCode);
+                writer.WriteEndObject();
+
+                writer.WriteProperty("text", rejectReason.ErrorMessage);
+
+                writer.WriteEndObject();
+            }
+
+            writer.WriteEndArray();
+
+            writer.WriteEndObject();
+        }
+
+        writer.WriteEndArray();
+        writer.WriteEndObject();
+    }
+
+    private IReadOnlyCollection<RejectedTimeSerie> ParseFrom(IReadOnlyCollection<string> payloads)
+    {
+        if (payloads == null) throw new ArgumentNullException(nameof(payloads));
+        var timeSeries = new List<RejectedTimeSerie>();
+        foreach (var payload in payloads)
+        {
+            timeSeries.Add(_parser.From<RejectedTimeSerie>(payload));
+        }
+
+        return timeSeries;
+    }
+}

@@ -29,6 +29,7 @@ using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
+using Energinet.DataHub.EDI.Process.Application.Configuration;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Energinet.DataHub.Wholesale.Contracts.Events;

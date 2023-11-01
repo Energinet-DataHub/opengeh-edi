@@ -1,9 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyName>Energinet.DataHub.EDI.ActorMessageQueue.Domain</AssemblyName>
+    <RootNamespace>Energinet.DataHub.EDI.ActorMessageQueue.Domain</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup>
+      <TargetFramework>net7.0</TargetFramework>
+      <ImplicitUsings>enable</ImplicitUsings>
+      <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\Domain\Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.0.0" />
+  </ItemGroup>
 
 </Project>

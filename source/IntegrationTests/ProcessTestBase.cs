@@ -36,6 +36,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+using Energinet.DataHub.EDI.Process.Application.Configuration;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Notifications;

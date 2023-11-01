@@ -24,7 +24,6 @@ using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.RejectedRequestAggre
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.Edi.Responses;
 using Xunit;
 using Xunit.Categories;

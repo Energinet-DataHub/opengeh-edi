@@ -16,8 +16,11 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Domain;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
@@ -124,7 +127,7 @@ public class WhenAnAggregationResultIsAvailableTests : ProcessTestBase
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
             .HasMessageRecordValue<TimeSeries>(x => x.GridAreaCode, SampleData.GridAreaCode)
-            .HasMessageRecordValue<TimeSeries>(x => x.Resolution, Process.Domain.Transactions.Aggregations.Resolution.QuarterHourly.Name)
+            .HasMessageRecordValue<TimeSeries>(x => x.Resolution, Common.Resolution.QuarterHourly.Name)
             .HasMessageRecordValue<TimeSeries>(x => x.MeasureUnitType, MeasurementUnit.Kwh.Name)
             .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, MeteringPointType.Production.Name)
             .HasMessageRecordValue<TimeSeries>(x => x.Period.Start, SampleData.StartOfPeriod)

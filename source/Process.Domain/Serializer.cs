@@ -30,17 +30,17 @@ public class Serializer
 
     public TValue Deserialize<TValue>(string json)
     {
-        return System.Text.Json.JsonSerializer.Deserialize<TValue>(json, _options)!;
+        return JsonSerializer.Deserialize<TValue>(json, _options)!;
     }
 
     public object Deserialize(string json, Type returnType)
     {
-        return System.Text.Json.JsonSerializer.Deserialize(json, returnType, _options)!;
+        return JsonSerializer.Deserialize(json, returnType, _options)!;
     }
 
     public string Serialize<TValue>(TValue value)
     {
         if (value == null) throw new ArgumentNullException(nameof(value));
-        return System.Text.Json.JsonSerializer.Serialize<object>(value, _options);
+        return JsonSerializer.Serialize<object>(value, _options);
     }
 }

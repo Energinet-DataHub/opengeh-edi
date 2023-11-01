@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Domain;
 using Energinet.DataHub.EDI.Process.Domain;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;

@@ -17,7 +17,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Domain;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.Process.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Domain;
@@ -29,6 +31,7 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Queueing;
 using NodaTime.Extensions;
 using Xunit;
+using IUnitOfWork = Energinet.DataHub.EDI.Domain.IUnitOfWork;
 using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Point;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
