@@ -39,8 +39,6 @@ public class OutgoingMessageDto
 
     public Guid Id { get; }
 
-    public bool IsPublished { get; private set; }
-
     public ActorNumber ReceiverId { get; }
 
     public Guid ProcessId { get; }
@@ -54,6 +52,4 @@ public class OutgoingMessageDto
     public MarketRole SenderRole { get; }
 
     public string MessageRecord { get; }
-
-    public ReceiverDto Receiver => new(ReceiverId, ReceiverRole);
 }

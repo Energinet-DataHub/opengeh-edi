@@ -12,18 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using MediatR;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.Processing;
+namespace Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.Configuration.DataAccess;
 
 public class UnitOfWorkBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : ICommand<TResponse>

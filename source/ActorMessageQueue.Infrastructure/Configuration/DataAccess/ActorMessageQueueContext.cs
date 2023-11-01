@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.OutgoingMessages.Queueing;

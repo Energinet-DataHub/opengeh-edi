@@ -24,7 +24,6 @@ using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.Configuration.DataA
 using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.OutgoingMessages.AggregationResult;
 using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.OutgoingMessages.Queueing;
-using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Queueing;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
 using MediatR;
@@ -38,8 +37,10 @@ public static class ActorMessageQueueConfiguration
 {
     public static void Configure(IServiceCollection services, string databaseConnectionString)
     {
-        services.AddDbContext<DbContext, ActorMessageQueueContext>(options =>
+        services.AddDbContext<ActorMessageQueueContext>(options =>
             options.UseSqlServer(databaseConnectionString, y => y.UseNodaTime()));
+        services.AddScoped<UnitOfWork>();
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>));
 
         //AddMessageGenerationServices
         services.AddScoped<DocumentFactory>();
@@ -56,11 +57,7 @@ public static class ActorMessageQueueConfiguration
         services.AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>();
         //services.AddScoped<OutgoingMessageEnqueuer>();
 
-        //ProcessingConfiguration
-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>));
-
         //PeekConfiguration
-        services.AddScoped<EnqueueMessageHandler>();
         services.AddScoped<IActorMessageQueueRepository, ActorMessageQueueRepository>();
         services.AddScoped<IMarketDocumentRepository, MarketDocumentRepository>();
         services.AddTransient<IRequestHandler<PeekCommand, PeekResult>, PeekHandler>();

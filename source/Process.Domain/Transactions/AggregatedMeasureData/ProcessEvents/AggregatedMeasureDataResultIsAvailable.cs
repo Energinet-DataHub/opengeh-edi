@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
+using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
 
-/// <summary>
-/// Contains the login for enqueueing a message to the actor message queue
-/// </summary>
-public interface IMessageEnqueuer
+namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+
+public class AggregatedMeasureDataResultIsAvailable : DomainEvent
 {
-    /// <summary>
-    /// Responsible for Enqueue a message to the actor message queue
-    /// </summary>
-    Task EnqueueAsync(OutgoingMessageDto messageDto);
+    public AggregatedMeasureDataResultIsAvailable(OutgoingMessageDto message)
+    {
+        Message = message;
+    }
+
+    public OutgoingMessageDto Message { get; }
 }

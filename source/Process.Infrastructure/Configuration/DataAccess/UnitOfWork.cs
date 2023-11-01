@@ -18,7 +18,7 @@ using Energinet.DataHub.EDI.Process.Domain;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 
-public class UnitOfWork : IUnitOfWork
+public class UnitOfWork
 {
     private readonly ProcessContext _context;
 

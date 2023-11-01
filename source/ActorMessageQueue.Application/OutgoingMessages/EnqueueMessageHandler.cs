@@ -46,9 +46,16 @@ public class EnqueueMessageHandler : IRequestHandler<EnqueueMessageCommand>
         messageQueue.Enqueue(message);
     }
 
-    private OutgoingMessage MapOutgoingMessage(OutgoingMessageDto messageDto)
+    private static OutgoingMessage MapOutgoingMessage(OutgoingMessageDto messageDto)
     {
-        //TODO
-        throw new NotImplementedException();
+        return new OutgoingMessage(
+            DocumentType.NotifyAggregatedMeasureData,
+            messageDto.ReceiverId,
+            messageDto.ProcessId,
+            messageDto.BusinessReason,
+            messageDto.ReceiverRole,
+            messageDto.SenderId,
+            messageDto.SenderRole,
+            messageDto.MessageRecord);
     }
 }

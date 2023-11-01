@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Common;
-
 namespace Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.Configuration.DataAccess;
 
-public class UnitOfWork : IUnitOfWork
+public class UnitOfWork
 {
     private readonly ActorMessageQueueContext _context;
 

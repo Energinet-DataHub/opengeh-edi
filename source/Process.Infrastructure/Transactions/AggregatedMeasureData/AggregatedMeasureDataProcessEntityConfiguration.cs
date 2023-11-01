@@ -65,10 +65,6 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
                 value => value != null ? value.Code : null,
                 dbValue => !string.IsNullOrWhiteSpace(dbValue) ? SettlementVersion.FromCode(dbValue) : null);
 
-        builder.HasMany<OutgoingMessageDto>("_messages")
-            .WithOne()
-            .HasForeignKey("ProcessId");
-
         builder.Ignore(x => x.DomainEvents);
     }
 }
