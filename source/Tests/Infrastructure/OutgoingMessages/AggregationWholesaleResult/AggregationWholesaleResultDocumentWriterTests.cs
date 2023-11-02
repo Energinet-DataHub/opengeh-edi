@@ -14,18 +14,18 @@
 
 using System.IO;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AggregationResult;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Process.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.AggregationWholesaleResult;
+using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
-using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
-using Point = Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
+using Point = Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.AggregationWholesaleResult;
 
@@ -167,12 +167,12 @@ public class AggregationWholesaleResultDocumentWriterTests : IClassFixture<Docum
     [InlineData(nameof(DocumentFormat.Json), nameof(BusinessReason.BalanceFixing))]
     public async Task Business_reason_is_translated(string documentFormat, string processType)
     {
-        _timeSeries.WithBusinessReason(BusinessReason.From(processType));
+        _timeSeries.WithBusinessReason(BusinessReason.FromName(processType));
 
         var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
 
         AssertDocument(document, DocumentFormat.From(documentFormat))
-            .HasBusinessReason(BusinessReason.From(processType))
+            .HasBusinessReason(BusinessReason.FromName(processType))
             .SettlementVersionIsNotPresent();
     }
 
@@ -185,16 +185,16 @@ public class AggregationWholesaleResultDocumentWriterTests : IClassFixture<Docum
         _timeSeries
             .WithMessageId(SampleData.MessageId)
             .WithTransactionId(SampleData.TransactionId)
-            .WithBusinessReason(BusinessReason.From(processType))
-            .WithSettlementVersion(SettlementVersion.From(settlementVersion))
+            .WithBusinessReason(BusinessReason.FromName(processType))
+            .WithSettlementVersion(SettlementVersion.FromName(settlementVersion))
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
             .WithPoint(new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z"));
 
         var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
 
         await AssertDocument(document, DocumentFormat.From(documentFormat))
-            .HasBusinessReason(BusinessReason.From(processType))
-            .HasSettlementVersion(SettlementVersion.From(settlementVersion))
+            .HasBusinessReason(BusinessReason.FromName(processType))
+            .HasSettlementVersion(SettlementVersion.FromName(settlementVersion))
             .DocumentIsValidAsync();
     }
 

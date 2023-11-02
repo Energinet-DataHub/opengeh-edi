@@ -17,18 +17,17 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using System.Xml;
-using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
-using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Xml;
-using Energinet.DataHub.EDI.Domain.Actors;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Xml;
-using Microsoft.Azure.Amqp.Framing;
-using Point = Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
+using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Process.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Process.Application.OutgoingMessages.Common.Xml;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common.Xml;
+using Point = Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
-namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AggregationResult;
+namespace Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.AggregationWholesaleResult;
 
 public class AggregationWholesaleResultXmlDocumentWriter : DocumentWriter
 {
@@ -86,7 +85,7 @@ public class AggregationWholesaleResultXmlDocumentWriter : DocumentWriter
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, GeneralValues.ProductCode).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, CimCode.Of(MeasurementUnit.From(timeSeries.MeasureUnitType))).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "registration_DateAndOrTime.dateTime", null, "[NeedsMapping]").ConfigureAwait(false); // <-- NeedsMapping
-            await WriteElementIfHasValueAsync("settlement_Series.version", timeSeries.SettlementVersion is null ? null : CimCode.Of(SettlementVersion.From(timeSeries.SettlementVersion)), writer).ConfigureAwait(false);
+            await WriteElementIfHasValueAsync("settlement_Series.version", timeSeries.SettlementVersion is null ? null : CimCode.Of(SettlementVersion.FromName(timeSeries.SettlementVersion)), writer).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "version", null, "[NeedsMapping]").ConfigureAwait(false); // <-- NeedsMapping
 
             // Start Period

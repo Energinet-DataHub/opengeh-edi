@@ -18,16 +18,16 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
-using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
-using Energinet.DataHub.EDI.Application.OutgoingMessages.Common.Xml;
-using Energinet.DataHub.EDI.Domain.Documents;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Ebix;
+using Energinet.DataHub.EDI.Process.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Process.Application.OutgoingMessages.Common.Xml;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common.Ebix;
 
-namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AggregationResult;
+namespace Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.AggregationWholesaleResult;
 
 public class AggregationWholesaleResultEbixDocumentWriter : EbixDocumentWriter
 {
@@ -60,7 +60,7 @@ public class AggregationWholesaleResultEbixDocumentWriter : EbixDocumentWriter
         }
         else if (settlementVersions?.Count() == 1)
         {
-            return SettlementVersion.From(settlementVersions.First()!);
+            return SettlementVersion.FromName(settlementVersions.First()!);
         }
         else
         {

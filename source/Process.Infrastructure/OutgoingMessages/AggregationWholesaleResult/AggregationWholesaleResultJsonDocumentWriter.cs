@@ -17,17 +17,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
-using Energinet.DataHub.EDI.Domain.Actors;
-using Energinet.DataHub.EDI.Domain.Documents;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common.Json;
-using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
+using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Process.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common.Json;
 
-namespace Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AggregationResult;
+namespace Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.AggregationWholesaleResult;
 
 public class AggregationWholesaleResultJsonDocumentWriter : IDocumentWriter
 {
@@ -50,7 +50,7 @@ public class AggregationWholesaleResultJsonDocumentWriter : IDocumentWriter
         return documentType == Domain.Documents.DocumentType.NotifyAggregatedWholesaleData;
     }
 
-    public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
+    public async Task<Stream> WriteAsync(OutgoingMessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
     {
         var stream = new MemoryStream();
         var options = new JsonWriterOptions() { Indented = true };
@@ -119,7 +119,7 @@ public class AggregationWholesaleResultJsonDocumentWriter : IDocumentWriter
 
             if (series.SettlementVersion is not null)
             {
-                writer.WriteObject("settlement_Series.version", new KeyValuePair<string, string>("value", CimCode.Of(SettlementVersion.From(series.SettlementVersion))));
+                writer.WriteObject("settlement_Series.version", new KeyValuePair<string, string>("value", CimCode.Of(SettlementVersion.FromName(series.SettlementVersion))));
             }
 
             writer.WritePropertyName("Period");
