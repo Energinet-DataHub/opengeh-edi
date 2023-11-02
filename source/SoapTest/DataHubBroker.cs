@@ -81,6 +81,10 @@ namespace Kamstrup.DataHub.Integration.DataHub
             DataHubServiceClient.dequeueMessage(msgID);
         }
 
+        public void GetMessage(string msgID)
+        {
+            DataHubServiceClient.getMessage(msgID);
+        }
 #nullable enable
         /// <summary>
         /// Checks for waiting responses
@@ -119,6 +123,52 @@ namespace Kamstrup.DataHub.Integration.DataHub
                    = requestMessage;
 
                 var message = dataHubServiceClient.peekMessage();
+
+                if (message != null)
+                {
+                    var xmlDoc = new XmlDocument();
+                    var node = xmlDoc.ImportNode(message.Payload, true);
+                    xmlDoc.AppendChild(node);
+                    return xmlDoc;
+                }
+            }
+
+            return null;
+        }
+
+        public XmlDocument? GetMessage(string dataHubUrl, string token, string messageId)
+        {
+            if (string.IsNullOrWhiteSpace(dataHubUrl))
+            {
+                throw new ArgumentNullException(nameof(dataHubUrl));
+            }
+
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                throw new ArgumentNullException(nameof(token));
+            }
+
+            // Create a binding using Transport and a certificate.
+            var binding = new BasicHttpBinding();
+            binding.Security.Mode = BasicHttpSecurityMode.Transport;
+            //binding.Security.Transport.ClientCredentialType = HttpClientCredentialType.Certificate;
+            binding.MaxReceivedMessageSize = 52428800; // 50 MB
+
+            // Create an EndPointAddress.
+            var endpoint = new EndpointAddress(dataHubUrl);
+
+            // Create the client.
+            var dataHubServiceClient = new DataHubService.marketMessagingB2BServiceV01PortTypeClient(binding, endpoint);
+            dataHubServiceClient.Open();
+            using (new OperationContextScope(dataHubServiceClient.InnerChannel))
+            {
+                // Add a HTTP Header to an outgoing request
+                var requestMessage = new HttpRequestMessageProperty();
+                requestMessage.Headers["Bearer"] = token;
+                OperationContext.Current.OutgoingMessageProperties[HttpRequestMessageProperty.Name]
+                   = requestMessage;
+
+                var message = dataHubServiceClient.getMessage(messageId);
 
                 if (message != null)
                 {

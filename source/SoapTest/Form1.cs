@@ -42,5 +42,12 @@ namespace SoapTest
             var res = broker.PeekMessage(_configurationRoot["Values:TestUrl"] ?? string.Empty, _configurationRoot["Values:Bearer"] ?? string.Empty);
             txtResult.Text = res is not null ? res.ToString() : "Found nothing";
         }
+
+        private void BtnGetMessage_Click(object sender, EventArgs e)
+        {
+            var broker = new DataHubBroker();
+            var res = broker.GetMessage(_configurationRoot["Values:TestUrl"] ?? string.Empty, _configurationRoot["Values:Bearer"] ?? string.Empty, txtMessageId.Text);
+            txtResult.Text = res is not null ? res.ToString() : "Found nothing";
+        }
     }
 }
