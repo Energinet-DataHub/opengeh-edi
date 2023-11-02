@@ -18,12 +18,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
-using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
+using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.Collections;
 using MediatR;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 
 public class AggregatedTimeSeriesRequestRejectedMapper : IInboxEventMapper
 {

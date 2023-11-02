@@ -25,6 +25,7 @@ using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Queueing;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,7 +53,7 @@ public static class ActorMessageQueueConfiguration
         services.AddScoped<IMessageRecordParser, MessageRecordParser>();
 
         //MessageEnqueueingConfiguration
-        services.AddTransient<INotificationHandler<EnqueueMessageEvent>, EnqueueMessageHandler>();
+        services.AddTransient<IEnqueueMessage, EnqueueMessage>();
         services.AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>();
         //services.AddScoped<OutgoingMessageEnqueuer>();
 

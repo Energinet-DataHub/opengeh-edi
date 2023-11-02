@@ -15,25 +15,24 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.Configuration.Commands;
+using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
-using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using MediatR;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Notifications.Handlers;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers;
 
-public class NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized : INotificationHandler<AggregatedMeasureProcessIsInitialized>
+public class EnqueueMessageHandler : INotificationHandler<EnqueueMessageEvent>
 {
-    private readonly ICommandScheduler _commandScheduler;
+    private readonly IEnqueueMessage _enqueueMessage;
 
-    public NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized(ICommandScheduler commandScheduler)
+    public EnqueueMessageHandler(IEnqueueMessage enqueueMessage)
     {
-        _commandScheduler = commandScheduler;
+        _enqueueMessage = enqueueMessage ?? throw new ArgumentNullException(nameof(enqueueMessage));
     }
 
-    public async Task Handle(AggregatedMeasureProcessIsInitialized notification, CancellationToken cancellationToken)
+    public async Task Handle(EnqueueMessageEvent notification, CancellationToken cancellationToken)
     {
         if (notification == null) throw new ArgumentNullException(nameof(notification));
-        await _commandScheduler.EnqueueAsync(new SendAggregatedMeasureRequestToWholesale(notification.ProcessId.Id)).ConfigureAwait(false);
+        await _enqueueMessage.EnqueueAsync(notification.OutgoingMessageDto).ConfigureAwait(false);
     }
 }

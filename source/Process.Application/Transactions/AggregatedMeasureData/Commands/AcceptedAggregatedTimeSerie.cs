@@ -15,16 +15,20 @@
 using System;
 using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Commands;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
 
-public class SendAggregatedMeasureRequestToWholesale : InternalCommand
+public class AcceptedAggregatedTimeSerie : InternalCommand
 {
     [JsonConstructor]
-    public SendAggregatedMeasureRequestToWholesale(Guid processId)
+    public AcceptedAggregatedTimeSerie(Guid processId, AggregatedTimeSerie aggregatedTimeSerie)
     {
         ProcessId = processId;
+        AggregatedTimeSerie = aggregatedTimeSerie;
     }
 
     public Guid ProcessId { get; }
+
+    public AggregatedTimeSerie AggregatedTimeSerie { get; }
 }

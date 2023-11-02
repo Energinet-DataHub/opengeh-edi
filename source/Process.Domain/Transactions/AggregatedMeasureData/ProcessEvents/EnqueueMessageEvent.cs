@@ -12,21 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
-using MediatR;
+using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
+using Energinet.DataHub.EDI.Common;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
+namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 
-public class AggregatedTimeSerieRequestWasAccepted : INotification
+/// <summary>
+/// Event to raise when an OutGoingMessage should be enqueued
+/// </summary>
+public class EnqueueMessageEvent : DomainEvent
 {
-    public AggregatedTimeSerieRequestWasAccepted(Guid processId, AggregatedTimeSerie aggregatedTimeSerie)
+    public EnqueueMessageEvent(OutgoingMessageDto outgoingMessageDto)
     {
-        ProcessId = processId;
-        AggregatedTimeSerie = aggregatedTimeSerie;
+        OutgoingMessageDto = outgoingMessageDto;
     }
 
-    public Guid ProcessId { get; }
-
-    public AggregatedTimeSerie AggregatedTimeSerie { get; }
+    public OutgoingMessageDto OutgoingMessageDto { get; }
 }

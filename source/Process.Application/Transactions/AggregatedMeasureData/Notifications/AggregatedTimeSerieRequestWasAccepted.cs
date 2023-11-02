@@ -13,10 +13,20 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using MediatR;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
 
-public record AggregatedTimeSeriesRequestWasRejected(Guid ReferenceId, IReadOnlyList<RejectReason> RejectReasons) : INotification;
+public class AggregatedTimeSerieRequestWasAccepted : INotification
+{
+    public AggregatedTimeSerieRequestWasAccepted(Guid processId, AggregatedTimeSerie aggregatedTimeSerie)
+    {
+        ProcessId = processId;
+        AggregatedTimeSerie = aggregatedTimeSerie;
+    }
+
+    public Guid ProcessId { get; }
+
+    public AggregatedTimeSerie AggregatedTimeSerie { get; }
+}

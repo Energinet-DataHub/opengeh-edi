@@ -27,7 +27,6 @@ using Energinet.DataHub.EDI.Application.Configuration.Queries;
 using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
@@ -37,10 +36,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.Intern
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.Process.Application.Configuration;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
-using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.Aggregations;
 using Google.Protobuf;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;

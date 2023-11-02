@@ -13,37 +13,16 @@
 // limitations under the License.
 
 using System;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.ActorMessageQueue.Application.Configuration;
 using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
-using Energinet.DataHub.EDI.Application.Configuration;
-using Energinet.DataHub.EDI.Application.Configuration.Queries;
-using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
-using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
-using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
-using Energinet.DataHub.EDI.Process.Application.Configuration;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
-using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.Aggregations;
-using Google.Protobuf;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.ActorMessageQueue.Application.Configuration;
-using Energinet.DataHub.EDI.Domain;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
@@ -21,17 +20,16 @@ using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMea
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using Energinet.DataHub.EDI.Process.Application.IntegrationEvents;
 using Energinet.DataHub.EDI.Process.Application.InternalCommands;
+using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
+using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands.Handlers;
+using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
+using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.Processing;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Commands;
-using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
-using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
-using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Notifications.Handlers;
-using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.Aggregations;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -68,6 +66,7 @@ public static class ProcessConfiguration
         services.AddTransient<IRequestHandler<AcceptedAggregatedTimeSerie, Unit>, AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable>();
         services.AddTransient<IRequestHandler<RejectedAggregatedTimeSeries, Unit>, RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable>();
         services.AddTransient<INotificationHandler<AggregatedMeasureProcessIsInitialized>, NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized>();
+        services.AddTransient<INotificationHandler<EnqueueMessageEvent>, EnqueueMessageHandler>();
         services.AddTransient<IRequestHandler<InitializeAggregatedMeasureDataProcessesCommand, Result>, InitializeAggregatedMeasureDataProcessesHandler>();
         services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>, WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable>();
         services.AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasRejected>, WhenAnRejectedAggregatedTimeSeriesRequestIsAvailable>();

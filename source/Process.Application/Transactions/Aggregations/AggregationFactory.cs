@@ -32,7 +32,7 @@ using Period = Energinet.DataHub.EDI.Common.Period;
 using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Point;
 using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 
 public class AggregationFactory
 {

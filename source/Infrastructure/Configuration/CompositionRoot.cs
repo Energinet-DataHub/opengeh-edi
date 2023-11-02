@@ -87,7 +87,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
 
         public CompositionRoot AddDatabaseContext(string connectionString)
         {
-            _services.AddDbContext<B2BContext>(x =>
+            _services.AddDbContext<DbContext, B2BContext>(x =>
             {
                 x.UseSqlServer(connectionString, y => y.UseNodaTime());
             });

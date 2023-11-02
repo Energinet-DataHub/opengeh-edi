@@ -18,7 +18,7 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.Edi.Requests;
 using Google.Protobuf;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 
 public static class AggregatedMeasureDataRequestFactory
 {

@@ -17,31 +17,28 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.Aggregations;
 using MediatR;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands.Handlers;
 
-public class AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable : IRequestHandler<AcceptedAggregatedTimeSerie, Unit>
+public class RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable : IRequestHandler<RejectedAggregatedTimeSeries, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
 
-    public AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable(
+    public RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable(
         IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
     }
 
-    public async Task<Unit> Handle(AcceptedAggregatedTimeSerie request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(RejectedAggregatedTimeSeries request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         var process = await _aggregatedMeasureDataProcessRepository
             .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
-        var aggregation = AggregationFactory.Create(process, request.AggregatedTimeSerie);
-
-        process.IsAccepted(aggregation);
+        process.IsRejected(new RejectedAggregatedMeasureDataRequest(request.RejectReasons, process.BusinessReason));
 
         return Unit.Value;
     }

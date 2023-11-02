@@ -15,12 +15,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.Configuration.Commands;
+using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
-using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using MediatR;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Notifications.Handlers;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers;
 
 public class WhenAnRejectedAggregatedTimeSeriesRequestIsAvailable : INotificationHandler<AggregatedTimeSeriesRequestWasRejected>
 {

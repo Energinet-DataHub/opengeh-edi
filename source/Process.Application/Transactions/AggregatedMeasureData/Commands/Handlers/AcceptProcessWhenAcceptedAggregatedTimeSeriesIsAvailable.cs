@@ -15,38 +15,33 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Infrastructure.Wholesale;
+using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using MediatR;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands.Handlers;
 
-public class SendAggregatedMeasuredDataToWholesale : IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>
+public class AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable : IRequestHandler<AcceptedAggregatedTimeSerie, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
-    private readonly WholesaleInbox _wholesaleInbox;
 
-    public SendAggregatedMeasuredDataToWholesale(
-        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository,
-        WholesaleInbox wholesaleInbox)
+    public AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable(
+        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
-        _wholesaleInbox = wholesaleInbox;
     }
 
-    public async Task<Unit> Handle(
-        SendAggregatedMeasureRequestToWholesale request,
-        CancellationToken cancellationToken)
+    public async Task<Unit> Handle(AcceptedAggregatedTimeSerie request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         var process = await _aggregatedMeasureDataProcessRepository
             .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
-        var serviceBusMessage = AggregatedMeasureDataRequestFactory.CreateServiceBusMessage(process);
-        await _wholesaleInbox.SendAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
 
-        process.WasSentToWholesale();
+        var aggregation = AggregationFactory.Create(process, request.AggregatedTimeSerie);
+
+        process.IsAccepted(aggregation);
 
         return Unit.Value;
     }

@@ -12,19 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 
-namespace Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
 
-/// <summary>
-/// Event to raise when an OutGoingMessage should be enqueued
-/// </summary>
-public class EnqueueMessageEvent : DomainEvent
+public class RejectedAggregatedTimeSeries : InternalCommand
 {
-    public EnqueueMessageEvent(OutgoingMessageDto outgoingMessageDto)
+    [JsonConstructor]
+    public RejectedAggregatedTimeSeries(Guid processId, IReadOnlyList<RejectReason> rejectReasons)
     {
-        OutgoingMessageDto = outgoingMessageDto;
+        ProcessId = processId;
+        RejectReasons = rejectReasons;
     }
 
-    public OutgoingMessageDto OutgoingMessageDto { get; }
+    public Guid ProcessId { get; }
+
+    public IReadOnlyList<RejectReason> RejectReasons { get; }
 }

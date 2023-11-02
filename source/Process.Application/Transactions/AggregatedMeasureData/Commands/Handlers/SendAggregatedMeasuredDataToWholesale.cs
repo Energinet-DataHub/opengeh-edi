@@ -15,30 +15,38 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using MediatR;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Commands.Handlers;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands.Handlers;
 
-public class RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable : IRequestHandler<RejectedAggregatedTimeSeries, Unit>
+public class SendAggregatedMeasuredDataToWholesale : IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
+    private readonly WholesaleInbox _wholesaleInbox;
 
-    public RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable(
-        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
+    public SendAggregatedMeasuredDataToWholesale(
+        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository,
+        WholesaleInbox wholesaleInbox)
     {
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
+        _wholesaleInbox = wholesaleInbox;
     }
 
-    public async Task<Unit> Handle(RejectedAggregatedTimeSeries request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(
+        SendAggregatedMeasureRequestToWholesale request,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         var process = await _aggregatedMeasureDataProcessRepository
             .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
+        var serviceBusMessage = AggregatedMeasureDataRequestFactory.CreateServiceBusMessage(process);
+        await _wholesaleInbox.SendAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
 
-        process.IsRejected(new RejectedAggregatedMeasureDataRequest(request.RejectReasons, process.BusinessReason));
+        process.WasSentToWholesale();
 
         return Unit.Value;
     }

@@ -19,7 +19,6 @@ using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
-using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.Aggregations;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 
 namespace Energinet.DataHub.EDI.Process.Application.IntegrationEvents;
