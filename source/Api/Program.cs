@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication;
@@ -29,8 +28,8 @@ using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
-using Energinet.DataHub.EDI.Infrastructure.Transactions;
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.Reflection;
@@ -95,10 +94,10 @@ namespace Energinet.DataHub.EDI.Api
                     services.AddApplicationInsights();
                     services.ConfigureFunctionsApplicationInsights();
 
+                    ProcessConfiguration.Configure(services, databaseConnectionString!);
+
                     CompositionRoot.Initialize(services)
                         .AddMessageBus(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!)
-                        .AddPeekConfiguration()
-                        .AddAggregationsConfiguration()
                         .AddRemoteBusinessService<DummyRequest, DummyReply>("Dummy", "Dummy")
                         .AddBearerAuthentication(tokenValidationParameters)
                         .AddAuthentication(sp =>
@@ -128,8 +127,6 @@ namespace Energinet.DataHub.EDI.Api
                             runtime.REQUEST_RESPONSE_LOGGING_CONNECTION_STRING!,
                             runtime.REQUEST_RESPONSE_LOGGING_CONTAINER_NAME!)
                         .AddMessagePublishing()
-                        .AddHttpClientAdapter(sp => new HttpClientAdapter(sp.GetRequiredService<HttpClient>()))
-                        .AddAggregatedMeasureDataServices()
                         .AddMessageParserServices();
 
                     services.AddLiveHealthCheck();

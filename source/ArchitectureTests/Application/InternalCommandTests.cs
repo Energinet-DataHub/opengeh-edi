@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Xunit;
 
@@ -27,8 +27,8 @@ public class InternalCommandTests
 {
     public static IEnumerable<object[]> GetInternalCommands()
     {
-        return ApplicationAssemblies.Application
-            .GetTypes()
+        var allTypes = ApplicationAssemblies.Application.GetTypes().Concat(ApplicationAssemblies.Infrastructure.GetTypes()).Concat(ApplicationAssemblies.ProcessApplication.GetTypes());
+        return allTypes
             .Where(t => t.IsSubclassOf(typeof(InternalCommand)))
             .Select(t => new[] { t });
     }

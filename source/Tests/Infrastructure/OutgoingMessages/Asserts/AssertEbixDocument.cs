@@ -21,8 +21,10 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Xunit;
+using DocumentType = Energinet.DataHub.EDI.Infrastructure.DocumentValidation.DocumentType;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 

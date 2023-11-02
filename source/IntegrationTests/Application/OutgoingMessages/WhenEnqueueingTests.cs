@@ -16,32 +16,39 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
+using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Application.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.Actors;
-using Energinet.DataHub.EDI.Domain.Documents;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Energinet.DataHub.EDI.Domain.Transactions;
-using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+using Energinet.DataHub.EDI.Process.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Process.Domain.Transactions;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Queueing;
+using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using NodaTime.Extensions;
 using Xunit;
-using Point = Energinet.DataHub.EDI.Domain.Transactions.Aggregations.Point;
+using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Point;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
-public class WhenEnqueueingTests : TestBase
+public class WhenEnqueueingTests : ProcessTestBase
 {
     private readonly MessageEnqueuer _messageEnqueuer;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-    public WhenEnqueueingTests(DatabaseFixture databaseFixture)
+    public WhenEnqueueingTests(ProcessDatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _messageEnqueuer = GetService<MessageEnqueuer>();
         _outgoingMessageRepository = GetService<IOutgoingMessageRepository>();
+        _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
     }
 
     [Fact]
@@ -76,6 +83,27 @@ public class WhenEnqueueingTests : TestBase
         var result = await InvokeCommandAsync(command);
 
         Assert.NotNull(result.MessageId);
+    }
+
+    [Fact]
+    public async Task Can_peek_oldest_bundle()
+    {
+        var message = CreateOutgoingMessage();
+        await EnqueueMessage(message);
+        ((SystemDateTimeProviderStub)_systemDateTimeProvider).SetNow(_systemDateTimeProvider.Now().PlusSeconds(1));
+        var message2 = CreateOutgoingMessage();
+        await EnqueueMessage(message2);
+
+        var command = new PeekCommand(message.ReceiverId, message.DocumentType.Category, message.ReceiverRole, DocumentFormat.Ebix);
+
+        var result = await InvokeCommandAsync(command);
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+        var sql = "SELECT top 1 id FROM [dbo].[Bundles] order by created";
+        var id = await
+            connection
+                .QuerySingleOrDefaultAsync<Guid>(sql);
+
+        Assert.Equal(result.MessageId, id);
     }
 
     [Fact]

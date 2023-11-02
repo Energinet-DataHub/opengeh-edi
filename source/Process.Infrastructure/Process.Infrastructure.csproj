@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Energinet.DataHub.EDI.Process.Infrastructure</AssemblyName>
+    <RootNamespace>Energinet.DataHub.EDI.Process.Infrastructure</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+    <ProjectReference Include="..\Process.Application\Process.Application.csproj" />
+  </ItemGroup>
+
+
+
+  <ItemGroup>
+    <Folder Include="OutgoingMessages\Peek\" />
+  </ItemGroup>
+
+</Project>

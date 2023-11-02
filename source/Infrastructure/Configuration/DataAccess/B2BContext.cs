@@ -13,54 +13,31 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Domain.ArchivedMessages;
 using Energinet.DataHub.EDI.Domain.GridAreas;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
-using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.Actors;
 using Energinet.DataHub.EDI.Infrastructure.ArchivedMessages;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.GridAreas;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Queueing;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 {
     public class B2BContext : DbContext
     {
-        private readonly ISerializer _serializer;
-
         #nullable disable
-        public B2BContext(DbContextOptions<B2BContext> options, ISerializer serializer)
+        public B2BContext(DbContextOptions<B2BContext> options)
             : base(options)
         {
-            _serializer = serializer;
         }
 
         public B2BContext()
         {
         }
 
-        public DbSet<AggregatedMeasureDataProcess> AggregatedMeasureDataProcesses { get; private set; }
-
-        public DbSet<OutgoingMessage> OutgoingMessages { get; private set; }
-
-        public DbSet<QueuedInternalCommand> QueuedInternalCommands { get; private set; }
-
-        public DbSet<EnqueuedMessage> EnqueuedMessages { get; private set; }
-
         public DbSet<ArchivedMessage> ArchivedMessages { get; private set; }
-
-        public DbSet<ActorMessageQueue> ActorMessageQueues { get; private set; }
-
-        public DbSet<MarketDocument> MarketDocuments { get; private set; }
 
         public DbSet<ReceivedInboxEvent> ReceivedInboxEvents { get; private set; }
 
@@ -76,12 +53,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
 
-            modelBuilder.ApplyConfiguration(new AggregatedMeasureDataProcessEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new OutgoingMessageEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new QueuedInternalCommandEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ArchivedMessageEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new ActorMessageQueueEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new MarketDocumentEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ReceivedInboxEventEntityConfiguration());
             modelBuilder.ApplyConfiguration(new TransactionIdEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MessageIdEntityConfiguration());

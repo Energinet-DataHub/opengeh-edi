@@ -15,8 +15,8 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Energinet.DataHub.EDI.Domain.Transactions.Exceptions;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Exceptions;
+using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.Aggregations;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Xunit;
 

@@ -841,4 +841,8 @@
       </None>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Process.Domain\Process.Domain.csproj" />
+    </ItemGroup>
+
 </Project>

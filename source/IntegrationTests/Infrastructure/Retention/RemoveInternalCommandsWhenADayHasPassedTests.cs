@@ -18,25 +18,25 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Retention;
 
-public class RemoveInternalCommandsWhenADayHasPassedTests : TestBase
+public class RemoveInternalCommandsWhenADayHasPassedTests : ProcessTestBase
 {
-    private readonly B2BContext _b2BContext;
+    private readonly ProcessContext _processContext;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly InternalCommandsRetention _sut;
 
     public RemoveInternalCommandsWhenADayHasPassedTests(
-        DatabaseFixture databaseFixture)
+        ProcessDatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _b2BContext = GetService<B2BContext>();
+        _processContext = GetService<ProcessContext>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
         _sut = new InternalCommandsRetention(GetService<IDatabaseConnectionFactory>(), GetService<ILogger<InternalCommandsRetention>>());
     }
@@ -58,15 +58,15 @@ public class RemoveInternalCommandsWhenADayHasPassedTests : TestBase
 
     protected override void Dispose(bool disposing)
     {
-        _b2BContext.Dispose();
+        _processContext.Dispose();
         base.Dispose(disposing);
     }
 
     private void AssertProcessedInternalCommandIsRemoved(int amountOfNotProcessedInternalCommands)
     {
-        var proccessedInternalCommands = _b2BContext.QueuedInternalCommands
+        var proccessedInternalCommands = _processContext.QueuedInternalCommands
             .Where(command => command.ProcessedDate != null);
-        var notProccessedInternalCommands = _b2BContext.QueuedInternalCommands
+        var notProccessedInternalCommands = _processContext.QueuedInternalCommands
             .Where(command => command.ProcessedDate == null);
 
         Assert.Equal(amountOfNotProcessedInternalCommands, notProccessedInternalCommands.Count());
@@ -79,15 +79,15 @@ public class RemoveInternalCommandsWhenADayHasPassedTests : TestBase
         {
             var processedCommand = new QueuedInternalCommand(Guid.NewGuid(), string.Empty, string.Empty, _systemDateTimeProvider.Now());
             processedCommand.ProcessedDate = _systemDateTimeProvider.Now();
-            _b2BContext.QueuedInternalCommands.Add(processedCommand);
+            _processContext.QueuedInternalCommands.Add(processedCommand);
         }
 
         for (int i = 0; i < amountOfNotProcessedInternalCommands; i++)
         {
             var notProcessedCommand = new QueuedInternalCommand(Guid.NewGuid(), string.Empty, string.Empty, _systemDateTimeProvider.Now());
-            _b2BContext.QueuedInternalCommands.Add(notProcessedCommand);
+            _processContext.QueuedInternalCommands.Add(notProcessedCommand);
         }
 
-        await _b2BContext.SaveChangesAsync(CancellationToken.None);
+        await _processContext.SaveChangesAsync(CancellationToken.None);
     }
 }

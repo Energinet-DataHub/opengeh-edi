@@ -14,7 +14,6 @@
 
 using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -28,7 +27,5 @@ public static class InboxEventsConfiguration
         services.AddTransient<IDataRetention, ReceivedInboxEventsRetention>();
         services.AddTransient<InboxEventReceiver>();
         services.AddTransient<InboxEventsProcessor>();
-        services.AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestAcceptedEventMapper>();
-        services.AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestRejectedMapper>();
     }
 }

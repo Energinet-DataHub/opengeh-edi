@@ -20,6 +20,7 @@ limitations under the License.
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.16.1" />
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="MediatR" Version="12.1.1" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
@@ -51,6 +52,7 @@ limitations under the License.
 
     <ItemGroup>
       <ProjectReference Include="..\Domain\Domain.csproj" />
+      <ProjectReference Include="..\Process.Domain\Process.Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -71,5 +73,9 @@ limitations under the License.
       <None Remove="SchemaStore\Schemas\Xml\urn-ediel-org-structure-requestchangecustomercharacteristics-0-1.xsd" />
       <None Remove="SchemaStore\Schemas\Xml\urn-ediel-org-structure-requestchangeaccountingpointcharacteristics-0-1" />
       <None Remove="SchemaStore\Schemas\Xml\urn-ediel-org-measure-notifyaggregatedmeasuredata-0-1.xsd" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Configuration\Commands\Commands\" />
     </ItemGroup>
 </Project>
