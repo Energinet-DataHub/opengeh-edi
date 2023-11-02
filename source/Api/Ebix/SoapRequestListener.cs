@@ -17,11 +17,13 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
+using Energinet.DataHub.EDI.Application.ArchivedMessages;
 using Energinet.DataHub.EDI.Application.Configuration.Authentication;
 using Energinet.DataHub.EDI.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
+using Grpc.Net.Client.Balancer;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -115,6 +117,51 @@ namespace Energinet.DataHub.EDI.Api.Ebix
         //    string xmlContent)
         //{
         //    return request.CreateResponsem(HttpStatusCode.NoContent);
+        //}
+
+        [Function("SoapGetMessage")]
+        public async Task<HttpResponseData> GetMessageAsync(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "getmessage/{messageId}"),]
+            HttpRequestData request,
+            FunctionContext executionContext,
+            string messageId)
+        {
+            var result = await _mediator.Send(new GetArchivedMessageDocumentQuery(messageId)).ConfigureAwait(false);
+
+            var response = HttpResponseData.CreateResponse(request);
+            if (result is null)
+            {
+                response.StatusCode = HttpStatusCode.NoContent;
+                return response;
+            }
+
+            response.Body = result;
+            response.Headers.Add("content-type", "text/xml");
+            response.StatusCode = HttpStatusCode.OK;
+            return response;
+        }
+
+        // TODO - add functionality to receive a list of messageids sent to the requestor in the specified timeframe.
+        //[Function("SoapGetMessageIds")]
+        //public async Task<HttpResponseData> GetMessageIdsAsync(
+        //    [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "getmessageids"),]
+        //    HttpRequestData request,
+        //    FunctionContext executionContext)
+        //{
+        //    var xmlBody = request.Body;
+        //    //var result = await _mediator.Send(new GetArchivedMessageDocumentQuery(messageId)).ConfigureAwait(false);
+
+        //    var response = HttpResponseData.CreateResponse(request);
+        //    //if (result is null)
+        //    //{
+        //    //    response.StatusCode = HttpStatusCode.NoContent;
+        //    //    return response;
+        //    //}
+
+        //    //response.Body = result;
+        //    response.Headers.Add("content-type", "text/xml");
+        //    response.StatusCode = HttpStatusCode.OK;
+        //    return response;
         //}
     }
 }
