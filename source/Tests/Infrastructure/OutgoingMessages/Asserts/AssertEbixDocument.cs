@@ -34,14 +34,15 @@ public class AssertEbixDocument
     private readonly DocumentValidator? _documentValidator;
     private readonly XDocument _document;
     private readonly XmlNamespaceManager _xmlNamespaceManager;
+    private readonly XDocument _originalMessage;
 
     private AssertEbixDocument(Stream stream, string prefix)
     {
         _prefix = prefix;
         using var reader = XmlReader.Create(stream);
-        var msg = XDocument.Load(reader);
+        _originalMessage = XDocument.Load(reader);
 
-        var elm = msg.Root!.Descendants().Single(x => x.Name.LocalName == "Payload").Descendants().First();
+        var elm = _originalMessage.Root!.Descendants().Single(x => x.Name.LocalName == "Payload").Descendants().First();
         _document = XDocument.Parse(elm.ToString());
 
         _xmlNamespaceManager = new XmlNamespaceManager(reader.NameTable);
@@ -84,6 +85,10 @@ public class AssertEbixDocument
 
     public async Task<AssertEbixDocument> HasValidStructureAsync(DocumentType type, string version = "0.1")
     {
+        Assert.True(_originalMessage.Root!.Name == "MessageContainer");
+        Assert.NotNull(_originalMessage.Root!.Elements().Single(x => x.Name.LocalName == "MessageReference"));
+        Assert.NotNull(_originalMessage.Root!.Elements().Single(x => x.Name.LocalName == "DocumentType"));
+        Assert.NotNull(_originalMessage.Root!.Elements().Single(x => x.Name.LocalName == "MessageType"));
         var validationResult = await _documentValidator!.ValidateAsync(_stream, DocumentFormat.Ebix, type, CancellationToken.None, version).ConfigureAwait(false);
         Assert.True(validationResult.IsValid);
         return this;
