@@ -18,7 +18,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Domain.Actors;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Exceptions;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
@@ -31,17 +30,11 @@ namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages
     public class MessageIdRepository : IMessageIdRepository
     {
         private readonly B2BContext _b2BContext;
-        private readonly IDatabaseConnectionFactory _connectionFactory;
-        private readonly ILogger _logger;
 
         public MessageIdRepository(
-            B2BContext b2BContext,
-            IDatabaseConnectionFactory connectionFactory,
-            ILogger<MessageIdRepository> logger)
+            B2BContext b2BContext)
         {
             _b2BContext = b2BContext;
-            _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
-            _logger = logger;
         }
 
         public async Task StoreAsync(string senderNumber, string messageId, CancellationToken cancellationToken)

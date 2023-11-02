@@ -14,6 +14,7 @@
 
 using System.Xml.Schema;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.Xml;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
 
 namespace Energinet.DataHub.EDI.Infrastructure.DocumentValidation.CimXml;
 
@@ -26,7 +27,7 @@ public class CimXmlValidator : IValidator
         _schemaProvider = schemaProvider;
     }
 
-    public DocumentFormat HandledFormat => DocumentFormat.CimXml;
+    public DocumentFormat HandledFormat => DocumentFormat.Xml;
 
     public async Task<ValidationResult> ValidateAsync(
         Stream document, DocumentType type, string version, CancellationToken cancellationToken)

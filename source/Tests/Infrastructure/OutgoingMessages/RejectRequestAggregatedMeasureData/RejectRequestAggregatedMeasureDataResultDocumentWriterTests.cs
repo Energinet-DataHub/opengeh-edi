@@ -14,17 +14,15 @@
 
 using System.IO;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AggregationResult;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
+using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.AggregationResult;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
-using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 

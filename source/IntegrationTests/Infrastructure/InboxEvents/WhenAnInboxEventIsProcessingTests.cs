@@ -32,7 +32,7 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
 {
     private readonly string _eventType = nameof(TestInboxEvent);
     private readonly Guid _referenceId = Guid.NewGuid();
-    private readonly string _eventId = "1";
+    private readonly string _eventId = Guid.NewGuid().ToString();
     private readonly InboxEventsProcessor _inboxProcessor;
     private readonly TestInboxEventMapper _testInboxEventMapper;
 

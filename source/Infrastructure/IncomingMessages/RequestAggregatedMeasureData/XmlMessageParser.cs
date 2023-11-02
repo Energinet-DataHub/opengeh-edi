@@ -26,11 +26,11 @@ using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAgg
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.CimXml;
-using DocumentFormat = Energinet.DataHub.EDI.Domain.Documents.DocumentFormat;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 
-public class XmlMessageParser : IMessageParser<RequestAggregatedMeasureDataMarketMessage>
+public class XmlMessageParser : IMessageParser
 {
     private const string SeriesRecordElementName = "Series";
     private const string HeaderElementName = "RequestAggregatedMeasureData_MarketDocument";
@@ -42,7 +42,9 @@ public class XmlMessageParser : IMessageParser<RequestAggregatedMeasureDataMarke
         _schemaProvider = new CimXmlSchemaProvider();
     }
 
+#pragma warning disable CA1822
     public DocumentFormat HandledFormat => DocumentFormat.Xml;
+#pragma warning restore CA1822
 
     public async Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(Stream message, CancellationToken cancellationToken)
     {

@@ -56,6 +56,7 @@ public class Startup
 
             config.AddSecurityDefinition("Bearer", securitySchema);
             config.SupportNonNullableReferenceTypes();
+            config.UseAllOfToExtendReferenceSchemas();
             var securityRequirement = new OpenApiSecurityRequirement { { securitySchema, new[] { "Bearer" } }, };
 
             config.AddSecurityRequirement(securityRequirement);
