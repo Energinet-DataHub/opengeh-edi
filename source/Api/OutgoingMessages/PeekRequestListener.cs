@@ -17,6 +17,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.Application.Configuration.Authentication;

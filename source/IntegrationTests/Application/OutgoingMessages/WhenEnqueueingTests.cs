@@ -16,6 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;

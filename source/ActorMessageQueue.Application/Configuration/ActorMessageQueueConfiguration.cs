@@ -28,7 +28,7 @@ using Energinet.DataHub.EDI.Infrastructure.DataRetention;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PeekResult = Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.PeekResult;
+using PeekResult = Energinet.DataHub.EDI.ActorMessageQueue.Contracts.PeekResult;
 
 namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.Configuration;
 

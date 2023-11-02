@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
-using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Common.Actors;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages;
@@ -39,7 +38,6 @@ public class DequeueHandler : IRequestHandler<DequeueCommand, DequeCommandResult
 
         var bundleId = BundleId.Create(messageId);
         var actorQueue = await _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.MarketRole).ConfigureAwait(false);
-
         if (actorQueue == null)
         {
             return new DequeCommandResult(false);
@@ -50,7 +48,3 @@ public class DequeueHandler : IRequestHandler<DequeueCommand, DequeCommandResult
         return new DequeCommandResult(successful);
     }
 }
-
-public record DequeueCommand(string MessageId, MarketRole MarketRole, ActorNumber ActorNumber) : ICommand<DequeCommandResult>;
-
-public record DequeCommandResult(bool Success);

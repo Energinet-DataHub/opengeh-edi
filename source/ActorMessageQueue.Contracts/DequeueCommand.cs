@@ -1,4 +1,4 @@
-// Copyright 2020 Energinet DataHub A/S
+﻿// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,6 @@
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
 
-namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages;
+namespace Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
 
 public record DequeueCommand(string MessageId, MarketRole MarketRole, ActorNumber ActorNumber) : ICommand<DequeCommandResult>;

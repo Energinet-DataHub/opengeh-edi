@@ -12,15 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
-using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Domain;
 using Energinet.DataHub.EDI.Domain.ArchivedMessages;
 using MediatR;
 using NodaTime;
 using IUnitOfWork = Energinet.DataHub.EDI.Common.IUnitOfWork;
+using PeekResult = Energinet.DataHub.EDI.ActorMessageQueue.Contracts.PeekResult;
 
 namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages;
 
@@ -96,11 +95,7 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
         var actorMessageQueue = await
             _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.ActorRole).ConfigureAwait(false);
         var peekResult = actorMessageQueue?.Peek(request.MessageCategory);
-        if (peekResult != null)
+        if (peekResult is { })
             await _unitOfWork.CommitAsync().ConfigureAwait(false);
     }
 }
-
-public record PeekCommand(ActorNumber ActorNumber, MessageCategory MessageCategory, MarketRole ActorRole, DocumentFormat DocumentFormat) : ICommand<PeekResult>;
-
-public record PeekResult(Stream? Bundle, Guid? MessageId = default);
