@@ -16,6 +16,9 @@ using Energinet.DataHub.EDI.Common;
 
 namespace Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
 
+/// <summary>
+/// Event to raise when an OutGoingMessage should be enqueued
+/// </summary>
 public class EnqueueMessageEvent : DomainEvent
 {
     public EnqueueMessageEvent(OutgoingMessageDto outgoingMessageDto)

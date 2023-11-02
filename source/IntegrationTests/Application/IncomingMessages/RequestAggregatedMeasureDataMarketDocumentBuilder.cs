@@ -14,7 +14,8 @@
 
 using System;
 using System.Collections.Generic;
-using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments;
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;

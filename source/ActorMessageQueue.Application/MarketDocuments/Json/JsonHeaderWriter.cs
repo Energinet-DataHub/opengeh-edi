@@ -13,11 +13,12 @@
 // limitations under the License.
 
 using System.Text.Json;
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
 
-namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common.Json;
+namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.Json;
 
 internal static class JsonHeaderWriter
 {

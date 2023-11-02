@@ -14,17 +14,13 @@
 
 using System.Globalization;
 using System.Xml;
-using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common;
-using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common.Ebix;
-using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common.Xml;
-using Energinet.DataHub.EDI.ActorMessageQueue.Domain.Documents;
-using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.Ebix;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.Xml;
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Domain;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 
-namespace Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.OutgoingMessages.AggregationResult;
+namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.AggregationResult;
 
 public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
 {

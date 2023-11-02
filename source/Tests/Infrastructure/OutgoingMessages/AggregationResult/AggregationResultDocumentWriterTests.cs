@@ -14,9 +14,9 @@
 
 using System.IO;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.AggregationResult;
-using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common;
-using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.OutgoingMessages.AggregationResult;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.AggregationResult;
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;

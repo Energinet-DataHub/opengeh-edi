@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 
-namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common
+namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments
 {
     public class MessageRecordParser : IMessageRecordParser
     {

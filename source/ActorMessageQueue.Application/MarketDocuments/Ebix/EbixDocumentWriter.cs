@@ -14,13 +14,12 @@
 
 using System.Text;
 using System.Xml;
-using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common.Xml;
-using Energinet.DataHub.EDI.ActorMessageQueue.Domain.Documents;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.Xml;
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Common;
 
-namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common.Ebix;
+namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.Ebix;
 
 public abstract class EbixDocumentWriter : IDocumentWriter
 {

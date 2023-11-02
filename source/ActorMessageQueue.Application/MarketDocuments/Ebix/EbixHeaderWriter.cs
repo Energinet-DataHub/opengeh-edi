@@ -13,12 +13,13 @@
 // limitations under the License.
 
 using System.Xml;
-using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common.Xml;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.Xml;
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
 
-namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common.Ebix;
+namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.Ebix;
 
 internal static class EbixHeaderWriter
 {

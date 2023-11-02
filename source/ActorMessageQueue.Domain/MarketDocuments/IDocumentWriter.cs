@@ -13,10 +13,9 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Common;
 
-namespace Energinet.DataHub.EDI.ActorMessageQueue.Domain.Documents;
+namespace Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
 
 /// <summary>
 /// Writes outgoing messages

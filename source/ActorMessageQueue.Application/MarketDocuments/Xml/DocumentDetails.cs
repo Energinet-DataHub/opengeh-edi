@@ -12,12 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common;
+namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.Xml;
 
-public static class OutgoingMessageExtensions
+public class DocumentDetails
 {
-    public static string ToStringValue(this bool value)
+    public DocumentDetails(string type, string schemaLocation, string xmlNamespace, string prefix, string typeCode)
     {
-        return value ? "true" : "false";
+        Type = type;
+        SchemaLocation = schemaLocation;
+        XmlNamespace = xmlNamespace;
+        Prefix = prefix;
+        TypeCode = typeCode;
     }
+
+    public string Type { get; }
+
+    public string SchemaLocation { get; }
+
+    public string XmlNamespace { get; }
+
+    public string Prefix { get; }
+
+    public string TypeCode { get; }
 }

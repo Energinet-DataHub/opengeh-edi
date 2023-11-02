@@ -17,6 +17,9 @@ using Energinet.DataHub.EDI.Common.Actors;
 
 namespace Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
 
+/// <summary>
+/// Contract for an outgoing message
+/// </summary>
 public class OutgoingMessageDto
 {
     public OutgoingMessageDto(

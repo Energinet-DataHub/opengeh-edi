@@ -13,11 +13,12 @@
 // limitations under the License.
 
 using System.Xml;
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
 
-namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common.Xml;
+namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.Xml;
 
 internal static class XmlHeaderWriter
 {

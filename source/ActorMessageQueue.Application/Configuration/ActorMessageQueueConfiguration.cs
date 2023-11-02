@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.AggregationResult;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages;
-using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.AggregationResult;
-using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common;
-using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.RejectRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
-using Energinet.DataHub.EDI.ActorMessageQueue.Domain.Documents;
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.OutgoingMessages;
-using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.OutgoingMessages.AggregationResult;
 using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Queueing;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;

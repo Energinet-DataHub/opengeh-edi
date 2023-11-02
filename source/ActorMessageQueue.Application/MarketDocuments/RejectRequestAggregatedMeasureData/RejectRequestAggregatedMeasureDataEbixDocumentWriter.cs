@@ -13,14 +13,13 @@
 // limitations under the License.
 
 using System.Xml;
-using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common;
-using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common.Ebix;
-using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common.Xml;
-using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.Ebix;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.Xml;
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages;
 
-namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.RejectRequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
 
 public class RejectRequestAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
 {

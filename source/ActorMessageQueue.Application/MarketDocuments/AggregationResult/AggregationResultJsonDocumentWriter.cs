@@ -13,16 +13,14 @@
 // limitations under the License.
 
 using System.Text.Json;
-using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common;
-using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common.Json;
-using Energinet.DataHub.EDI.ActorMessageQueue.Domain.Documents;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.Json;
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 
-namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.AggregationResult;
+namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.AggregationResult;
 
 public class AggregationResultJsonDocumentWriter : IDocumentWriter
 {

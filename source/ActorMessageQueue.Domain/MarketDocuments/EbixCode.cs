@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
 
-namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common;
+namespace Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
 
-public static class CimCode
+public static class EbixCode
 {
     public static string Of(BusinessReason businessReason)
     {
@@ -155,15 +154,11 @@ public static class CimCode
         ArgumentNullException.ThrowIfNull(quality);
 
         if (quality == Quality.Estimated)
-            return "A03";
-        if (quality == Quality.Incomplete)
-            return "A05";
+            return "56";
         if (quality == Quality.Calculated)
-            return "A06";
+            return "D01";
         if (quality == Quality.Measured)
-            return "A04";
-        if (quality == Quality.Missing)
-            return "A02";
+            return "E01";
 
         throw NoCodeFoundFor(quality.Name);
     }
@@ -173,22 +168,11 @@ public static class CimCode
         ArgumentNullException.ThrowIfNull(reasonCode);
 
         if (reasonCode == ReasonCode.FullyAccepted)
-            return "A01";
+            return "39";
         if (reasonCode == ReasonCode.FullyRejected)
-            return "A02";
+            return "41";
 
         throw NoCodeFoundFor(reasonCode.Name);
-    }
-
-    public static string CodingSchemeOf(ActorNumber actorNumber)
-    {
-        ArgumentNullException.ThrowIfNull(actorNumber);
-        if (ActorNumber.IsGlnNumber(actorNumber.Value))
-            return "A10";
-        if (ActorNumber.IsEic(actorNumber.Value))
-            return "A01";
-
-        throw NoCodeFoundFor(actorNumber.Value);
     }
 
     private static Exception NoCodeFoundFor(string domainType)

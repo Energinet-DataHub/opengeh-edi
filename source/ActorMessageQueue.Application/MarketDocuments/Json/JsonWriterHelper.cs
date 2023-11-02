@@ -14,7 +14,7 @@
 
 using System.Text.Json;
 
-namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages.Common.Json;
+namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.Json;
 
 internal static class JsonWriterHelper
 {
