@@ -15,14 +15,14 @@
 using System;
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
-using Energinet.DataHub.EDI.Domain.Actors;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common;
 using NodaTime;
-using MessageHeader = Energinet.DataHub.EDI.Infrastructure.IncomingMessages.MessageHeader;
+using MessageHeader = Energinet.DataHub.EDI.Common.MessageHeader;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 
@@ -38,7 +38,7 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
     private readonly ActorNumber _receiverId = DataHubDetails.IdentificationNumber;
     private readonly MarketRole _receiverRole = MarketRole.CalculationResponsibleRole;
     private readonly string _createdAt = SystemClock.Instance.GetCurrentInstant().ToString();
-    private readonly string? _settlementVersions = "1";
+    private readonly string? _settlementVersions = "D01";
     private string _messageId = Guid.NewGuid().ToString();
     private string _serieId = Guid.NewGuid().ToString();
     private string _senderRole = MarketRole.EnergySupplier.Code;

@@ -17,17 +17,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
-using Energinet.DataHub.EDI.Domain.Actors;
-using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
+using Energinet.DataHub.EDI.Application.IncomingMessages;
+using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
+using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using Energinet.DataHub.Edi.Requests;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
@@ -36,18 +37,18 @@ using Xunit.Categories;
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages.RequestAggregatedMeasureData;
 
 [IntegrationTest]
-public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
+public class InitializeAggregatedMeasureDataProcessesCommandTests : ProcessTestBase
 {
-    private readonly B2BContext _b2BContext;
+    private readonly ProcessContext _processContext;
     private readonly ServiceBusSenderSpy _senderSpy;
     private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
     private readonly InternalCommandMapper _mapper;
     private readonly ISerializer _serializer;
 
-    public InitializeAggregatedMeasureDataProcessesCommandTests(DatabaseFixture databaseFixture)
+    public InitializeAggregatedMeasureDataProcessesCommandTests(ProcessDatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _b2BContext = GetService<B2BContext>();
+        _processContext = GetService<ProcessContext>();
         _mapper = GetService<InternalCommandMapper>();
         _serializer = GetService<ISerializer>();
         _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IServiceBusSenderFactory>();
@@ -56,7 +57,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
     }
 
     [Fact]
-    public async Task Aggregated_measure_data_process_is_created()
+    public async Task Aggregated_measure_data_process_is_created_and_has_correct_data()
     {
         // Arrange
         var marketMessage = MessageBuilder().Build();
@@ -68,6 +69,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         var process = GetProcess(marketMessage.SenderNumber);
         Assert.Equal(marketMessage.Series.First().Id, process!.BusinessTransactionId.Id);
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Initialized);
+        AssertProcessValues(process, marketMessage);
     }
 
     [Fact]
@@ -199,9 +201,57 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
-        _b2BContext.Dispose();
+        _processContext.Dispose();
         _senderSpy.Dispose();
         _serviceBusClientSenderFactory.Dispose();
+    }
+
+    private static void AssertProcessValues(AggregatedMeasureDataProcess process, RequestAggregatedMeasureDataMarketMessage marketMessage)
+    {
+        var marketMessageSerie = marketMessage.Series.Single();
+
+        Assert.NotEqual(Guid.Empty, process.ProcessId.Id);
+        Assert.Equal(marketMessageSerie.Id, process.BusinessTransactionId.Id);
+        Assert.Equal(marketMessage.SenderNumber, process.RequestedByActorId.Value);
+        Assert.Equal(marketMessage.SenderRoleCode, process.RequestedByActorRoleCode);
+        Assert.Equal(marketMessage.BusinessReason, process.BusinessReason.Code);
+        Assert.Equal(marketMessageSerie.MarketEvaluationPointType, process.MeteringPointType);
+        Assert.Equal(marketMessageSerie.MarketEvaluationSettlementMethod, process.SettlementMethod);
+        Assert.Equal(marketMessageSerie.StartDateAndOrTimeDateTime, process.StartOfPeriod);
+        Assert.Equal(marketMessageSerie.EndDateAndOrTimeDateTime, process.EndOfPeriod);
+        Assert.Equal(marketMessageSerie.MeteringGridAreaDomainId, process.MeteringGridAreaDomainId);
+        Assert.Equal(marketMessageSerie.EnergySupplierMarketParticipantId, process.EnergySupplierId);
+        Assert.Equal(marketMessageSerie.BalanceResponsiblePartyMarketParticipantId, process.BalanceResponsibleId);
+        Assert.Equal(marketMessageSerie.SettlementSeriesVersion, process.SettlementVersion?.Code);
+
+        // Assert makes sure we have tests for alle expected properties - this fails if we add another property to our process without testing it & adding it to the array below
+        var assertedProperties = new[]
+        {
+            nameof(process.ProcessId),
+            nameof(process.BusinessTransactionId),
+            nameof(process.RequestedByActorId),
+            nameof(process.RequestedByActorRoleCode),
+            nameof(process.BusinessReason),
+            nameof(process.MeteringPointType),
+            nameof(process.SettlementMethod),
+            nameof(process.StartOfPeriod),
+            nameof(process.EndOfPeriod),
+            nameof(process.MeteringGridAreaDomainId),
+            nameof(process.EnergySupplierId),
+            nameof(process.BalanceResponsibleId),
+            nameof(process.SettlementVersion),
+        };
+
+        var ignoredProperties = new[]
+        {
+            nameof(AggregatedMeasureDataProcess.DomainEvents),
+        };
+
+        foreach (var propertyInfo in process.GetType().GetProperties())
+        {
+            if (!ignoredProperties.Contains(propertyInfo.Name))
+                Assert.Contains(propertyInfo.Name, assertedProperties);
+        }
     }
 
     private static RequestAggregatedMeasureDataMarketDocumentBuilder MessageBuilder()
@@ -217,7 +267,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
 
     private InternalCommand LoadCommand(string internalCommandType)
     {
-        var queuedInternalCommand = _b2BContext.QueuedInternalCommands
+        var queuedInternalCommand = _processContext.QueuedInternalCommands
             .ToList()
             .First(x => x.Type == internalCommandType);
 
@@ -227,14 +277,14 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
 
     private AggregatedMeasureDataProcess? GetProcess(string senderNumber)
     {
-        return _b2BContext.AggregatedMeasureDataProcesses
+        return _processContext.AggregatedMeasureDataProcesses
             .ToList()
             .FirstOrDefault(x => x.RequestedByActorId.Value == senderNumber);
     }
 
     private IEnumerable<AggregatedMeasureDataProcess> GetProcesses(string senderNumber)
     {
-        return _b2BContext.AggregatedMeasureDataProcesses
+        return _processContext.AggregatedMeasureDataProcesses
             .ToList()
             .Where(x => x.RequestedByActorId.Value == senderNumber);
     }

@@ -61,11 +61,10 @@ limitations under the License.
       <ProjectReference Include="..\Infrastructure.DocumentValidation\Infrastructure.DocumentValidation.csproj" />
       <ProjectReference Include="..\Infrastructure.CimMessageAdapter\Infrastructure.CimMessageAdapter.csproj" />
       <ProjectReference Include="..\Application\Application.csproj" />
+      <ProjectReference Include="..\Process.Application\Process.Application.csproj" />
+      <ProjectReference Include="..\Process.Domain\Process.Domain.csproj" />
       <ProjectReference Include="..\RequestResponse\source\RequestResponse\RequestResponse.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="OutgoingMessages\Peek" />
-    </ItemGroup>
 
 </Project>

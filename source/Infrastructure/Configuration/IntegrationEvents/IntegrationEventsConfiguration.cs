@@ -27,8 +27,8 @@ public static class IntegrationEventsConfiguration
     {
         services.AddTransient<IDataRetention, ReceivedIntegrationEventsRetention>();
         services.AddTransient<IReceivedIntegrationEventRepository, ReceivedIntegrationEventRepository>();
-        services.AddTransient<IIntegrationEventMapper, CalculationResultCompletedMapper>();
         services.AddTransient<IIntegrationEventMapper, B2BActorActivatedMapper>();
+        services.AddTransient<IIntegrationEventMapper, GridAreaOwnershipAssignedEventMapper>();
 
         services.AddTransient<IReadOnlyDictionary<string, IIntegrationEventMapper>>(sp => sp.GetServices<IIntegrationEventMapper>().ToDictionary(m => m.EventTypeToHandle, m => m));
     }

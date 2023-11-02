@@ -13,7 +13,8 @@
 // limitations under the License.
 
 using System.Reflection;
-using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration;
 
@@ -22,4 +23,6 @@ public static class ApplicationAssemblies
     public static Assembly Application => typeof(InternalCommand).Assembly;
 
     public static Assembly Infrastructure => typeof(ApplicationAssemblies).Assembly;
+
+    public static Assembly ProcessApplication => typeof(ForwardAggregationResult).Assembly;
 }

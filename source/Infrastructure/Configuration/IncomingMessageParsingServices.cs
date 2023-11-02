@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
@@ -49,9 +48,9 @@ internal static class IncomingMessageParsingServices
     private static void RegisterRequestAggregatedMeasureDataHandling(IServiceCollection services)
     {
         services
-            .AddScoped<IMessageParser<RequestAggregatedMeasureDataMarketMessage>, IncomingMessages.RequestAggregatedMeasureData.XmlMessageParser>();
+            .AddScoped<IMessageParser, IncomingMessages.RequestAggregatedMeasureData.XmlMessageParser>();
         services
-            .AddScoped<IMessageParser<RequestAggregatedMeasureDataMarketMessage>, IncomingMessages.RequestAggregatedMeasureData.JsonMessageParser>();
+            .AddScoped<IMessageParser, IncomingMessages.RequestAggregatedMeasureData.JsonMessageParser>();
         services.AddScoped<RequestAggregatedMeasureDataMarketMessageParser>();
         services.AddTransient<RequestAggregatedMeasureDataValidator>();
         services.AddTransient<SenderAuthorizer>();

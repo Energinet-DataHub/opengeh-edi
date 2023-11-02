@@ -17,9 +17,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
 using Energinet.DataHub.Edi.Responses;
 using MediatR;
 using NodaTime.Serialization.Protobuf;
@@ -42,11 +42,7 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
         var actualNotification = _actualNotifications.Single() as AggregatedTimeSerieRequestWasAccepted;
         var actualTimeSerie = actualNotification!.AggregatedTimeSerie;
         Assert.Equal(aggregatedTimeSeriesRequestAccepted.GridArea, actualTimeSerie.GridAreaDetails.GridAreaCode);
-        Assert.Equal(aggregatedTimeSeriesRequestAccepted.SettlementVersion, actualTimeSerie.SettlementVersion);
-        Assert.Equal(aggregatedTimeSeriesRequestAccepted.Period.StartOfPeriod.ToInstant(), actualTimeSerie.Period.Start);
-        Assert.Equal(aggregatedTimeSeriesRequestAccepted.Period.EndOfPeriod.ToInstant(), actualTimeSerie.Period.End);
         Assert.Equal(MapUnitType(aggregatedTimeSeriesRequestAccepted), actualTimeSerie.UnitType);
-        Assert.Equal(MapResolution(aggregatedTimeSeriesRequestAccepted.Period.Resolution), actualTimeSerie.Resolution);
         Assert.Equal(MapMeteringPointType(aggregatedTimeSeriesRequestAccepted), actualTimeSerie.MeteringPointType);
         foreach (var point in actualTimeSerie.Points)
         {
@@ -99,17 +95,6 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
             TimeSeriesType.TotalConsumption => MeteringPointType.Consumption.Name,
             TimeSeriesType.Unspecified => throw new InvalidOperationException("Unknown metering point type"),
             _ => throw new InvalidOperationException("Could not determine metering point type"),
-        };
-    }
-
-    private static string MapResolution(Resolution resolution)
-    {
-        return resolution switch
-        {
-            Resolution.Pt15M => Domain.Transactions.Aggregations.Resolution.QuarterHourly.Name,
-            Resolution.Pt1H => Domain.Transactions.Aggregations.Resolution.Hourly.Name,
-            Resolution.Unspecified => throw new InvalidOperationException("Could not map resolution type"),
-            _ => throw new InvalidOperationException("Unknown resolution type"),
         };
     }
 

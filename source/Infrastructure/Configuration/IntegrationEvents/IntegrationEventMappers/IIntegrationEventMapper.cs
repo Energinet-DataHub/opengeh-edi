@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
-using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Common;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 
@@ -31,5 +31,5 @@ public interface IIntegrationEventMapper
     /// <summary>
     /// Process a single integration event
     /// </summary>
-    public InternalCommand MapToCommand(IntegrationEvent integrationEvent);
+    public Task<InternalCommand> MapToCommandAsync(IntegrationEvent integrationEvent);
 }

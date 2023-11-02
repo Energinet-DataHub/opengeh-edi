@@ -14,7 +14,6 @@
 
 using System;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,22 +22,21 @@ using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.Application.Configuration;
-using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
 using Energinet.DataHub.EDI.Application.Configuration.Queries;
 using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
-using Google.Protobuf;
+using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
+using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.Aggregations;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -49,7 +47,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
     public class TestBase : IDisposable
     {
         private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
-        private readonly HttpClientSpy _httpClientSpy;
         private readonly B2BContext _b2BContext;
         private ServiceCollection? _services;
         private IServiceProvider _serviceProvider = default!;
@@ -59,17 +56,16 @@ namespace Energinet.DataHub.EDI.IntegrationTests
         {
             ArgumentNullException.ThrowIfNull(databaseFixture);
             databaseFixture.CleanupDatabase();
-            _httpClientSpy = new HttpClientSpy();
             _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
             TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
-            InboxEventNotificationHandler = new IntegrationTests.Infrastructure.InboxEvents.TestNotificationHandlerSpy();
+            InboxEventNotificationHandler = new TestNotificationHandlerSpy();
             BuildServices();
             _b2BContext = GetService<B2BContext>();
         }
 
         protected TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
 
-        protected IntegrationTests.Infrastructure.InboxEvents.TestNotificationHandlerSpy InboxEventNotificationHandler { get; }
+        protected TestNotificationHandlerSpy InboxEventNotificationHandler { get; }
 
         public void Dispose()
         {
@@ -107,19 +103,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return GetService<IMediator>().Send(query, CancellationToken.None);
         }
 
-        protected async Task HavingReceivedInboxEventAsync(string eventType, IMessage eventPayload, Guid processId)
-        {
-            await GetService<InboxEventReceiver>().
-                ReceiveAsync(
-                    Guid.NewGuid().ToString(),
-                    eventType,
-                    processId,
-                    eventPayload.ToByteArray())
-                .ConfigureAwait(false);
-            await ProcessReceivedInboxEventsAsync().ConfigureAwait(false);
-            await ProcessInternalCommandsAsync().ConfigureAwait(false);
-        }
-
         protected Task ProcessReceivedInboxEventsAsync()
         {
             return ProcessBackgroundTasksAsync();
@@ -132,16 +115,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 .Append("SharedAccessKeyName=send;")
                 .Append(CultureInfo.InvariantCulture, $"SharedAccessKey={Guid.NewGuid():N}")
                 .ToString();
-        }
-
-        private async Task ProcessInternalCommandsAsync()
-        {
-            await ProcessBackgroundTasksAsync();
-
-            if (_b2BContext.QueuedInternalCommands.Any(command => command.ProcessedDate == null))
-            {
-                await ProcessInternalCommandsAsync();
-            }
         }
 
         private Task ProcessBackgroundTasksAsync()
@@ -161,9 +134,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
 
             _services.AddTransient<InboxEventsProcessor>();
-            _services.AddTransient<AggregatedTimeSeriesRequestAcceptedEventMapper>();
+            _services.AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestAcceptedEventMapper>();
             _services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>>(_ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy);
-            _services.AddTransient<INotificationHandler<IntegrationTests.Infrastructure.InboxEvents.TestNotification>>(
+            _services.AddTransient<INotificationHandler<TestNotification>>(
                 _ => InboxEventNotificationHandler);
 
             _services.AddTransient<IRequestHandler<TestCommand, Unit>, TestCommandHandler>();
@@ -173,8 +146,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
             CompositionRoot.Initialize(_services)
                 .AddAuthentication()
-                .AddAggregationsConfiguration()
-                .AddPeekConfiguration()
                 .AddRemoteBusinessService<DummyRequest, DummyReply>(
                     sp => new RemoteBusinessServiceRequestSenderSpy<DummyRequest>("Dummy"), "Dummy")
                 .AddDatabaseConnectionFactory(DatabaseFixture.ConnectionString)
@@ -187,8 +158,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                     return correlation;
                 })
                 .AddMessagePublishing()
-                .AddHttpClientAdapter(_ => _httpClientSpy)
-                .AddAggregatedMeasureDataServices()
                 .AddMessageParserServices();
             _serviceProvider = _services.BuildServiceProvider();
         }

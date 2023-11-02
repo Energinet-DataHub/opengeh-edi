@@ -14,19 +14,19 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Energinet.DataHub.EDI.Domain.Common;
-using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.DocumentFactory;
 
 public class DocumentFactoryTests
-    : TestBase
+    : ProcessTestBase
 {
     private readonly IEnumerable<IDocumentWriter> _documentWriters;
 
-    public DocumentFactoryTests(DatabaseFixture databaseFixture)
+    public DocumentFactoryTests(ProcessDatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _documentWriters = GetService<IEnumerable<IDocumentWriter>>();

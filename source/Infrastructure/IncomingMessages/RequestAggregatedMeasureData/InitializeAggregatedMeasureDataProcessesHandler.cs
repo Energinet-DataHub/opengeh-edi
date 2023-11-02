@@ -16,11 +16,13 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
-using Energinet.DataHub.EDI.Domain.Actors;
-using Energinet.DataHub.EDI.Domain.Transactions;
-using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.Transactions;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
@@ -58,15 +60,22 @@ public class InitializeAggregatedMeasureDataProcessesHandler
     private void CreateAggregatedMeasureDataProcess(
         RequestAggregatedMeasureDataMarketMessage marketMessage)
     {
+        var actorSenderNumber = ActorNumber.Create(marketMessage.SenderNumber);
+        var businessReason = BusinessReason.FromCode(marketMessage.BusinessReason);
+
         foreach (var serie in marketMessage.Series)
         {
+            var settlementVersion = !string.IsNullOrWhiteSpace(serie.SettlementSeriesVersion)
+                ? SettlementVersion.FromCode(serie.SettlementSeriesVersion)
+                : null;
+
             _aggregatedMeasureDataProcessRepository.Add(
                 new AggregatedMeasureDataProcess(
                     ProcessId.New(),
                     BusinessTransactionId.Create(serie.Id),
-                    ActorNumber.Create(marketMessage.SenderNumber),
+                    actorSenderNumber,
                     marketMessage.SenderRoleCode,
-                    marketMessage.BusinessReason,
+                    businessReason,
                     serie.MarketEvaluationPointType,
                     serie.MarketEvaluationSettlementMethod,
                     serie.StartDateAndOrTimeDateTime,
@@ -74,7 +83,7 @@ public class InitializeAggregatedMeasureDataProcessesHandler
                     serie.MeteringGridAreaDomainId,
                     serie.EnergySupplierMarketParticipantId,
                     serie.BalanceResponsiblePartyMarketParticipantId,
-                    serie.SettlementSeriesVersion));
+                    settlementVersion));
         }
     }
 }

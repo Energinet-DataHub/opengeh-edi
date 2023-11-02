@@ -14,7 +14,7 @@
 
 using System;
 using System.Collections.Generic;
-using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Domain.Transactions.AggregatedMeasureData;
