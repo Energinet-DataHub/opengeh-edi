@@ -13,13 +13,12 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.Common;
-using MediatR;
 
 namespace Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
 
-public class EnqueueMessageCommand : InternalCommand, IRequest
+public class EnqueueMessageEvent : DomainEvent
 {
-    public EnqueueMessageCommand(OutgoingMessageDto outgoingMessageDto)
+    public EnqueueMessageEvent(OutgoingMessageDto outgoingMessageDto)
     {
         OutgoingMessageDto = outgoingMessageDto;
     }

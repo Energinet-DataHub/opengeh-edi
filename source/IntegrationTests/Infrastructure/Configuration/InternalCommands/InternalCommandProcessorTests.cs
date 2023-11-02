@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.Application.Configuration.Commands;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -31,7 +32,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.In
 [IntegrationTest]
 public class InternalCommandProcessorTests : ProcessTestBase
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly UnitOfWork _unitOfWork;
     private readonly InternalCommandProcessor _processor;
     private readonly ICommandScheduler _scheduler;
     private readonly IDatabaseConnectionFactory _connectionFactory;
@@ -39,7 +40,7 @@ public class InternalCommandProcessorTests : ProcessTestBase
     public InternalCommandProcessorTests(ProcessDatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _unitOfWork = GetService<IUnitOfWork>();
+        _unitOfWork = GetService<UnitOfWork>();
         _processor = GetService<InternalCommandProcessor>();
         _scheduler = GetService<ICommandScheduler>();
         _connectionFactory = GetService<IDatabaseConnectionFactory>();
@@ -75,6 +76,7 @@ public class InternalCommandProcessorTests : ProcessTestBase
     [Fact]
     public async Task Processing_same_command_twice_should_result_in_one_outgoing_message()
     {
+        // if this is a real case, we can rollback nested processes.
         // Arrange
         var serviceScopeFactory = GetService<IServiceScopeFactory>();
         using var newScope = serviceScopeFactory.CreateScope();

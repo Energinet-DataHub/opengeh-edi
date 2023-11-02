@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using MediatR;
-using NodaTime;
+namespace Energinet.DataHub.EDI.Common;
 
-namespace Energinet.DataHub.EDI.Process.Domain
+public class MessageCategory : EnumerationType
 {
-    public class DomainEvent : INotification
-    {
-        public Guid Id { get; } = Guid.NewGuid();
+    public static readonly MessageCategory Aggregations = new(1, nameof(Aggregations));
 
-        public Instant OccurredOn { get; } = SystemClock.Instance.GetCurrentInstant();
+    // Message category can not be peeked
+    public static readonly MessageCategory None = new(2, nameof(None));
+
+    private MessageCategory(int id, string name)
+        : base(id, name)
+    {
     }
 }

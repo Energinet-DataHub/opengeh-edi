@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
 
 namespace Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
@@ -19,6 +20,7 @@ namespace Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
 public class OutgoingMessageDto
 {
     public OutgoingMessageDto(
+        DocumentType documentType,
         ActorNumber receiverId,
         Guid processId,
         string businessReason,
@@ -27,6 +29,7 @@ public class OutgoingMessageDto
         MarketRole senderRole,
         string messageRecord)
     {
+        DocumentType = documentType;
         ReceiverId = receiverId;
         ProcessId = processId;
         BusinessReason = businessReason;
@@ -36,6 +39,8 @@ public class OutgoingMessageDto
         MessageRecord = messageRecord;
         Id = Guid.NewGuid();
     }
+
+    public DocumentType DocumentType { get; set; }
 
     public Guid Id { get; }
 

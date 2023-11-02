@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Common;
-
-namespace Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
+namespace Energinet.DataHub.EDI.Common;
 
 public class DocumentType : EnumerationType
 {

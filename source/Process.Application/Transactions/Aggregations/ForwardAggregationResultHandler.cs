@@ -35,7 +35,7 @@ public class ForwardAggregationResultHandler : IRequestHandler<ForwardAggregatio
     {
         ArgumentNullException.ThrowIfNull(request);
         var message = AggregationResultMessageFactory.CreateMessage(request.Result, ProcessId.New());
-        await _mediator.Send(new EnqueueMessageCommand(message), cancellationToken).ConfigureAwait(false);
+        await _mediator.Publish(new EnqueueMessageEvent(message), cancellationToken).ConfigureAwait(false);
         return await Unit.Task.ConfigureAwait(false);
     }
 }

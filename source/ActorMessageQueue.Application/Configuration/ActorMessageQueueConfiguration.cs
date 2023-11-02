@@ -53,7 +53,7 @@ public static class ActorMessageQueueConfiguration
         services.AddScoped<IMessageRecordParser, MessageRecordParser>();
 
         //MessageEnqueueingConfiguration
-        services.AddTransient<IRequestHandler<EnqueueMessageCommand>, EnqueueMessageHandler>();
+        services.AddTransient<INotificationHandler<EnqueueMessageEvent>, EnqueueMessageHandler>();
         services.AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>();
         //services.AddScoped<OutgoingMessageEnqueuer>();
 

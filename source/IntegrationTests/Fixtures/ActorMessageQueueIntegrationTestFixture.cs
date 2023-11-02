@@ -12,16 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
+using Xunit;
 
-namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 
-public class AggregatedMeasureDataResultIsAvailable : DomainEvent
+[CollectionDefinition("ActorMessageQueueIntegrationTest")]
+public class ActorMessageQueueIntegrationTestFixture : ICollectionFixture<ActorMessageQueueDatabaseFixture>
 {
-    public AggregatedMeasureDataResultIsAvailable(OutgoingMessageDto message)
-    {
-        Message = message;
-    }
-
-    public OutgoingMessageDto Message { get; }
+    // This class has no code, and is never created. Its purpose is simply
+    // to be the place to apply [CollectionDefinition] and all the
+    // ICollectionFixture<> interfaces.
 }

@@ -45,6 +45,9 @@ public static class ProcessConfiguration
         services.AddDbContext<ProcessContext>(options =>
             options.UseSqlServer(databaseConnectionString, y => y.UseNodaTime()));
 
+        services.AddScoped<UnitOfWork>();
+        ActorMessageQueueConfiguration.Configure(services, databaseConnectionString);
+
         //EventsConfiguration
         //TODO: can we move them out and delete ref to Infrastructure?
         services.AddTransient<IIntegrationEventMapper, CalculationResultCompletedMapper>();
@@ -53,7 +56,6 @@ public static class ProcessConfiguration
 
         //ProcessingConfiguration
         services.AddScoped<DomainEventsAccessor>();
-        services.AddScoped<UnitOfWork>();
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RaiseDomainEventsBehaviour<,>));
 
@@ -66,7 +68,6 @@ public static class ProcessConfiguration
         services.AddTransient<IRequestHandler<AcceptedAggregatedTimeSerie, Unit>, AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable>();
         services.AddTransient<IRequestHandler<RejectedAggregatedTimeSeries, Unit>, RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable>();
         services.AddTransient<INotificationHandler<AggregatedMeasureProcessIsInitialized>, NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized>();
-        services.AddTransient<INotificationHandler<AggregatedMeasureDataResultIsAvailable>, ForwardAggregatedMeasureResult>();
         services.AddTransient<IRequestHandler<InitializeAggregatedMeasureDataProcessesCommand, Result>, InitializeAggregatedMeasureDataProcessesHandler>();
         services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>, WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable>();
         services.AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasRejected>, WhenAnRejectedAggregatedTimeSeriesRequestIsAvailable>();
@@ -74,7 +75,5 @@ public static class ProcessConfiguration
         services.AddScoped<IAggregatedMeasureDataProcessRepository, AggregatedMeasureDataProcessRepository>();
 
         InternalCommandConfiguration.Configure(services);
-
-        ActorMessageQueueConfiguration.Configure(services, databaseConnectionString);
     }
 }

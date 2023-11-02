@@ -44,7 +44,7 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
 
     public bool HandlesType(DocumentType documentType)
     {
-        return documentType == Domain.OutgoingMessages.Queueing.DocumentType.NotifyAggregatedMeasureData;
+        return documentType == EDI.Common.DocumentType.NotifyAggregatedMeasureData;
     }
 
     public async Task<Stream> WriteAsync(OutgoingMessageHeader header, IReadOnlyCollection<string> marketActivityRecords)

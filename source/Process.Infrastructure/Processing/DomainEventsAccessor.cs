@@ -47,4 +47,12 @@ public class DomainEventsAccessor
             .ToList()
             .ForEach(e => e.Entity.ClearDomainEvents());
     }
+
+    public void ClearAllDomainEvent(DomainEvent domainEvent)
+    {
+        _context.ChangeTracker
+            .Entries<Entity>()
+            .ToList()
+            .ForEach(e => e.Entity.ClearDomainEvent(domainEvent));
+    }
 }

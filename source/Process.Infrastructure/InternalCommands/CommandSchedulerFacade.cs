@@ -15,6 +15,7 @@
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.Configuration.Commands;
 using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using IUnitOfWork = Energinet.DataHub.EDI.Domain.IUnitOfWork;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
@@ -22,9 +23,9 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 public class CommandSchedulerFacade
 {
     private readonly ICommandScheduler _commandScheduler;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly UnitOfWork _unitOfWork;
 
-    public CommandSchedulerFacade(ICommandScheduler commandScheduler, IUnitOfWork unitOfWork)
+    public CommandSchedulerFacade(ICommandScheduler commandScheduler, UnitOfWork unitOfWork)
     {
         _commandScheduler = commandScheduler;
         _unitOfWork = unitOfWork;

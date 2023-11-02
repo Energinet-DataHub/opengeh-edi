@@ -23,7 +23,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
 public class RejectedAggregationResultMessage : OutgoingMessageDto
 {
     public RejectedAggregationResultMessage(ActorNumber receiverId, Guid processId, string businessReason, MarketRole receiverRole, RejectedTimeSerie series)
-        : base(receiverId, processId, businessReason, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringDataAdministrator, new Serializer().Serialize(series))
+        : base(DocumentType.RejectRequestAggregatedMeasureData, receiverId, processId, businessReason, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringDataAdministrator, new Serializer().Serialize(series))
     {
         Series = series;
     }

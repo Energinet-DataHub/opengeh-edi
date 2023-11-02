@@ -43,7 +43,7 @@ public class RejectRequestAggregatedMeasureDataJsonDocumentWriter : IDocumentWri
 
     public bool HandlesType(DocumentType documentType)
     {
-        return documentType == Domain.OutgoingMessages.Queueing.DocumentType.RejectRequestAggregatedMeasureData;
+        return documentType == EDI.Common.DocumentType.RejectRequestAggregatedMeasureData;
     }
 
     public async Task<Stream> WriteAsync(OutgoingMessageHeader header, IReadOnlyCollection<string> marketActivityRecords)

@@ -14,7 +14,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;

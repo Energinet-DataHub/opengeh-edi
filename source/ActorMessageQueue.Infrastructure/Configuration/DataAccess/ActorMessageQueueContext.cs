@@ -15,7 +15,6 @@
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.OutgoingMessages.Queueing;
-using Energinet.DataHub.EDI.Infrastructure.ArchivedMessages;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.Configuration.DataAccess
@@ -45,7 +44,6 @@ namespace Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.Configuration.D
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
 
             modelBuilder.ApplyConfiguration(new OutgoingMessageEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new ArchivedMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ActorMessageQueueEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MarketDocumentEntityConfiguration());
         }

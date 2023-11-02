@@ -14,6 +14,7 @@
 
 using System;
 using System.Linq;
+using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages;
@@ -130,7 +131,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
 
             if (_state == State.Sent)
             {
-                AddDomainEvent(new AggregatedMeasureDataResultIsAvailable(AggregationResultMessageFactory.CreateMessage(aggregation, ProcessId)));
+                AddDomainEvent(new EnqueueMessageEvent(AggregationResultMessageFactory.CreateMessage(aggregation, ProcessId)));
                 _state = State.Accepted;
             }
         }
@@ -141,7 +142,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
 
             if (_state == State.Sent)
             {
-                AddDomainEvent(new AggregatedMeasureDataResultIsAvailable(CreateRejectedAggregationResultMessage(rejectAggregatedMeasureDataRequest)));
+                AddDomainEvent(new EnqueueMessageEvent(CreateRejectedAggregationResultMessage(rejectAggregatedMeasureDataRequest)));
                 _state = State.Rejected;
             }
         }

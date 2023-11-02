@@ -13,25 +13,28 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages;
 
-public class EnqueueMessageHandler : IRequestHandler<EnqueueMessageCommand>
+public class EnqueueMessageHandler : INotificationHandler<EnqueueMessageEvent>
 {
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
+    private readonly IOutgoingMessageRepository _outgoingMessageRepository;
 
-    public EnqueueMessageHandler(IActorMessageQueueRepository actorMessageQueueRepository)
+    public EnqueueMessageHandler(IActorMessageQueueRepository actorMessageQueueRepository, IOutgoingMessageRepository outgoingMessageRepository)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
+        _outgoingMessageRepository = outgoingMessageRepository;
     }
 
-    public async Task Handle(EnqueueMessageCommand request, CancellationToken cancellationToken)
+    public async Task Handle(EnqueueMessageEvent notification, CancellationToken cancellationToken)
     {
-        if (request == null) throw new ArgumentNullException(nameof(request));
+        if (notification == null) throw new ArgumentNullException(nameof(notification));
 
-        var message = MapOutgoingMessage(request.OutgoingMessageDto);
+        var message = MapOutgoingMessage(notification.OutgoingMessageDto);
 
         var messageQueue = await _actorMessageQueueRepository.ActorMessageQueueForAsync(
             message.Receiver.Number,
@@ -44,12 +47,13 @@ public class EnqueueMessageHandler : IRequestHandler<EnqueueMessageCommand>
         }
 
         messageQueue.Enqueue(message);
+        _outgoingMessageRepository.Add(message);
     }
 
     private static OutgoingMessage MapOutgoingMessage(OutgoingMessageDto messageDto)
     {
         return new OutgoingMessage(
-            DocumentType.NotifyAggregatedMeasureData,
+            messageDto.DocumentType,
             messageDto.ReceiverId,
             messageDto.ProcessId,
             messageDto.BusinessReason,

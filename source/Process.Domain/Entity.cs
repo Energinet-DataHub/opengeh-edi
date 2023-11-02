@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using Energinet.DataHub.EDI.Common;
 
 namespace Energinet.DataHub.EDI.Process.Domain
 {
@@ -31,6 +32,14 @@ namespace Energinet.DataHub.EDI.Process.Domain
         public void ClearDomainEvents()
         {
             _domainEvents.Clear();
+        }
+
+        /// <summary>
+        /// Remove the domain event if exists.
+        /// </summary>
+        public void ClearDomainEvent(DomainEvent domainEvent)
+        {
+            _domainEvents.Remove(domainEvent);
         }
 
         /// <summary>

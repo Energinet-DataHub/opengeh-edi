@@ -22,30 +22,30 @@ using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
+using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using MediatR;
 using Xunit;
-using DocumentType = Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing.DocumentType;
-using MessageCategory = Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing.MessageCategory;
+using DocumentType = Energinet.DataHub.EDI.Common.DocumentType;
+using MessageCategory = Energinet.DataHub.EDI.Common.MessageCategory;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
-public class WhenAPeekIsRequestedTests : ProcessTestBase
+public class WhenAPeekIsRequestedTests : ActorMessageQueueTestBase
 {
-    private readonly RequestAggregatedMeasuredDataProcessInvoker _requestAggregatedMeasuredDataProcessInvoker;
+    private readonly EnqueueMessageEventBuilder _enqueueMessageEventBuilder;
 
-    public WhenAPeekIsRequestedTests(ProcessDatabaseFixture databaseFixture)
+    public WhenAPeekIsRequestedTests(ActorMessageQueueDatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _requestAggregatedMeasuredDataProcessInvoker =
-            new RequestAggregatedMeasuredDataProcessInvoker(GetService<IMediator>(), GetService<ProcessContext>());
+        _enqueueMessageEventBuilder = new EnqueueMessageEventBuilder();
     }
 
     [Fact]
     public async Task When_no_messages_are_available_return_empty_result()
     {
-        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync();
+        var command = _enqueueMessageEventBuilder.Build();
+        await InvokeDomainEventAsync(command);
 
         var result = await PeekMessage(MessageCategory.None);
 
@@ -56,7 +56,11 @@ public class WhenAPeekIsRequestedTests : ProcessTestBase
     [Fact]
     public async Task A_message_bundle_is_returned()
     {
-        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync();
+        var command = _enqueueMessageEventBuilder
+            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            .WithReceiverRole(MarketRole.EnergySupplier)
+            .Build();
+        await InvokeDomainEventAsync(command);
 
         var result = await PeekMessage(MessageCategory.Aggregations);
 
@@ -64,14 +68,18 @@ public class WhenAPeekIsRequestedTests : ProcessTestBase
 
         AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
             .IsDocumentType(DocumentType.NotifyAggregatedMeasureData)
-            .IsBusinessReason(BusinessReason.PreliminaryAggregation)
+            .IsBusinessReason(BusinessReason.BalanceFixing)
             .HasSerieRecordCount(1);
     }
 
     [Fact]
     public async Task Ensure_same_bundle_is_returned_if_not_dequeued()
     {
-        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync();
+        var command = _enqueueMessageEventBuilder
+            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            .WithReceiverRole(MarketRole.EnergySupplier)
+            .Build();
+        await InvokeDomainEventAsync(command);
 
         var firstPeekResult = await PeekMessage(MessageCategory.Aggregations);
         var secondPeekResult = await PeekMessage(MessageCategory.Aggregations);
@@ -84,7 +92,11 @@ public class WhenAPeekIsRequestedTests : ProcessTestBase
     [Fact]
     public async Task The_generated_document_is_archived()
     {
-        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync();
+        var command = _enqueueMessageEventBuilder
+            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            .WithReceiverRole(MarketRole.EnergySupplier)
+            .Build();
+        await InvokeDomainEventAsync(command);
 
         var result = await PeekMessage(MessageCategory.Aggregations);
 

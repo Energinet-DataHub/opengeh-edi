@@ -24,14 +24,14 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Outgoin
 
 public class AggregationResultMessage : OutgoingMessageDto
 {
-    private AggregationResultMessage(ActorNumber receiverId, Guid processId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
-        : base(receiverId, processId, businessReason, receiverRole, senderId, senderRole, messageRecord)
-    {
-        Series = new Serializer().Deserialize<TimeSeries>(messageRecord)!;
-    }
+    // private AggregationResultMessage(ActorNumber receiverId, Guid processId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+    //     : base(DocumentType.NotifyAggregatedMeasureData, receiverId, processId, businessReason, receiverRole, senderId, senderRole, messageRecord)
+    // {
+    //     Series = new Serializer().Deserialize<TimeSeries>(messageRecord)!;
+    // }
 
     private AggregationResultMessage(ActorNumber receiverId, Guid processId, string businessReason, MarketRole receiverRole, TimeSeries series)
-        : base(receiverId, processId, businessReason, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringDataAdministrator, new Serializer().Serialize(series))
+        : base(DocumentType.NotifyAggregatedMeasureData, receiverId, processId, businessReason, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringDataAdministrator, new Serializer().Serialize(series))
     {
         Series = series;
     }
