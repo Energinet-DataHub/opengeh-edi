@@ -15,6 +15,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
+using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
+using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
@@ -26,22 +28,24 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
 public class WhenOutgoingMessagesAreCreatedTests : ActorMessageQueueTestBase
 {
-    private readonly EnqueueMessageEventBuilder _enqueueMessageEventBuilder;
+    private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
+    private readonly IEnqueueMessage _enqueueMessage;
 
     public WhenOutgoingMessagesAreCreatedTests(ActorMessageQueueDatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _enqueueMessageEventBuilder = new EnqueueMessageEventBuilder();
+        _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
+        _enqueueMessage = GetService<IEnqueueMessage>();
     }
 
     [Fact]
     public async Task Outgoing_message_is_enqueued()
     {
-        var command = _enqueueMessageEventBuilder
+        var message = _outgoingMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
             .WithReceiverRole(MarketRole.EnergySupplier)
             .Build();
-        await InvokeDomainEventAsync(command);
+        await EnqueueMessage(message);
 
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = $"SELECT * FROM [dbo].[OutgoingMessages]";
@@ -57,5 +61,11 @@ public class WhenOutgoingMessagesAreCreatedTests : ActorMessageQueueTestBase
         Assert.Equal(result.SenderRole, MarketRole.MeteringDataAdministrator.Name);
         Assert.Equal(BusinessReason.BalanceFixing.Name, result.BusinessReason);
         Assert.NotNull(result.MessageRecord);
+    }
+
+    private async Task EnqueueMessage(OutgoingMessageDto message)
+    {
+        await _enqueueMessage.EnqueueAsync(message);
+        await GetService<UnitOfWork>().CommitAsync();
     }
 }

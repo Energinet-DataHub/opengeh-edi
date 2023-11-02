@@ -30,7 +30,7 @@ using Period = Energinet.DataHub.EDI.Common.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
-public class EnqueueMessageEventBuilder
+public class OutgoingMessageDtoBuilder
 {
     private static readonly Guid _processId = ProcessId.Create(Guid.NewGuid()).Id;
     private static readonly BusinessReason _businessReason = BusinessReason.BalanceFixing;
@@ -40,10 +40,10 @@ public class EnqueueMessageEventBuilder
     private static MarketRole _receiverRole = MarketRole.MeteringDataAdministrator;
 
 #pragma warning disable CA1822
-    public EnqueueMessageEvent Build()
+    public OutgoingMessageDto Build()
 #pragma warning restore CA1822
     {
-        var message = AggregationResultMessage.Create(
+        return AggregationResultMessage.Create(
             _receiverNumber,
             _receiverRole,
             _processId,
@@ -57,16 +57,15 @@ public class EnqueueMessageEventBuilder
             new Period(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant()),
             _points,
             _businessReason.Name);
-        return new EnqueueMessageEvent(message);
     }
 
-    public EnqueueMessageEventBuilder WithReceiverNumber(string receiverNumber)
+    public OutgoingMessageDtoBuilder WithReceiverNumber(string receiverNumber)
     {
         _receiverNumber = ActorNumber.Create(receiverNumber);
         return this;
     }
 
-    public EnqueueMessageEventBuilder WithReceiverRole(MarketRole marketRole)
+    public OutgoingMessageDtoBuilder WithReceiverRole(MarketRole marketRole)
     {
         _receiverRole = marketRole;
         return this;

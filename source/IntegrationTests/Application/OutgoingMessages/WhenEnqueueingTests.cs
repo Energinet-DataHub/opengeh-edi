@@ -15,8 +15,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
+using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
@@ -27,19 +27,21 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
 public class WhenEnqueueingTests : ActorMessageQueueTestBase
 {
-    private readonly EnqueueMessageEventBuilder _enqueueMessageEventBuilder;
+    private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
+    private readonly IEnqueueMessage _enqueueMessage;
 
     public WhenEnqueueingTests(ActorMessageQueueDatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _enqueueMessageEventBuilder = new EnqueueMessageEventBuilder();
+        _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
+        _enqueueMessage = GetService<IEnqueueMessage>();
     }
 
     [Fact]
     public async Task Outgoing_message_is_enqueued()
     {
-        var command = _enqueueMessageEventBuilder.Build();
-        await InvokeDomainEventAsync(command);
+        var message = _outgoingMessageDtoBuilder.Build();
+        await EnqueueMessage(message);
 
         // TODO: (LRN) Ensure we have a ActorQueue with a bundle with the expected OutgoingMessage.
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
@@ -49,11 +51,11 @@ public class WhenEnqueueingTests : ActorMessageQueueTestBase
                 .QuerySingleOrDefaultAsync(sql);
         Assert.NotNull(result);
         Assert.Equal(result.DocumentType, DocumentType.NotifyAggregatedMeasureData.Name);
-        Assert.Equal(result.ReceiverId, command.OutgoingMessageDto.ReceiverId.Value);
-        Assert.Equal(result.ReceiverRole, command.OutgoingMessageDto.ReceiverRole.Name);
-        Assert.Equal(result.SenderId, command.OutgoingMessageDto.SenderId.Value);
-        Assert.Equal(result.SenderRole, command.OutgoingMessageDto.SenderRole.Name);
-        Assert.Equal(result.BusinessReason, command.OutgoingMessageDto.BusinessReason);
+        Assert.Equal(result.ReceiverId, message.ReceiverId.Value);
+        Assert.Equal(result.ReceiverRole, message.ReceiverRole.Name);
+        Assert.Equal(result.SenderId, message.SenderId.Value);
+        Assert.Equal(result.SenderRole, message.SenderRole.Name);
+        Assert.Equal(result.BusinessReason, message.BusinessReason);
         Assert.NotNull(result.MessageRecord);
         Assert.NotNull(result.AssignedBundleId);
     }
@@ -61,12 +63,12 @@ public class WhenEnqueueingTests : ActorMessageQueueTestBase
     [Fact]
     public async Task Can_peek_message()
     {
-        var enqueueCommand = _enqueueMessageEventBuilder.Build();
-        await InvokeDomainEventAsync(enqueueCommand);
+        var message = _outgoingMessageDtoBuilder.Build();
+        await EnqueueMessage(message);
         var command = new PeekCommand(
-            enqueueCommand.OutgoingMessageDto.ReceiverId,
+            message.ReceiverId,
             MessageCategory.Aggregations,
-            enqueueCommand.OutgoingMessageDto.ReceiverRole,
+            message.ReceiverRole,
             DocumentFormat.Xml);
 
         var result = await InvokeCommandAsync(command);
@@ -77,21 +79,27 @@ public class WhenEnqueueingTests : ActorMessageQueueTestBase
     [Fact]
     public async Task Can_dequeue_bundle()
     {
-        var enqueueCommand = _enqueueMessageEventBuilder.Build();
-        await InvokeDomainEventAsync(enqueueCommand);
+        var message = _outgoingMessageDtoBuilder.Build();
+        await EnqueueMessage(message);
         var peekCommand = new PeekCommand(
-            enqueueCommand.OutgoingMessageDto.ReceiverId,
+            message.ReceiverId,
             MessageCategory.Aggregations,
-            enqueueCommand.OutgoingMessageDto.ReceiverRole,
+            message.ReceiverRole,
             DocumentFormat.Xml);
         var peekResult = await InvokeCommandAsync(peekCommand);
         var dequeueCommand = new DequeueCommand(
             peekResult.MessageId!.Value.ToString(),
-            enqueueCommand.OutgoingMessageDto.ReceiverRole,
-            enqueueCommand.OutgoingMessageDto.ReceiverId);
+            message.ReceiverRole,
+            message.ReceiverId);
 
         var result = await InvokeCommandAsync(dequeueCommand);
 
         Assert.True(result.Success);
+    }
+
+    private async Task EnqueueMessage(OutgoingMessageDto message)
+    {
+        await _enqueueMessage.EnqueueAsync(message);
+        await GetService<UnitOfWork>().CommitAsync();
     }
 }

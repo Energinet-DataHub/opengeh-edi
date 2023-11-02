@@ -19,6 +19,7 @@ using System.Xml.Linq;
 using Dapper;
 using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
+using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
@@ -34,19 +35,21 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
 public class WhenAPeekIsRequestedTests : ActorMessageQueueTestBase
 {
-    private readonly EnqueueMessageEventBuilder _enqueueMessageEventBuilder;
+    private readonly IEnqueueMessage _enqueueMessage;
+    private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
 
     public WhenAPeekIsRequestedTests(ActorMessageQueueDatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _enqueueMessageEventBuilder = new EnqueueMessageEventBuilder();
+        _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
+        _enqueueMessage = GetService<IEnqueueMessage>();
     }
 
     [Fact]
     public async Task When_no_messages_are_available_return_empty_result()
     {
-        var command = _enqueueMessageEventBuilder.Build();
-        await InvokeDomainEventAsync(command);
+        var message = _outgoingMessageDtoBuilder.Build();
+        await EnqueueMessage(message);
 
         var result = await PeekMessage(MessageCategory.None);
 
@@ -57,11 +60,11 @@ public class WhenAPeekIsRequestedTests : ActorMessageQueueTestBase
     [Fact]
     public async Task A_message_bundle_is_returned()
     {
-        var command = _enqueueMessageEventBuilder
+        var message = _outgoingMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
             .WithReceiverRole(MarketRole.EnergySupplier)
             .Build();
-        await InvokeDomainEventAsync(command);
+        await EnqueueMessage(message);
 
         var result = await PeekMessage(MessageCategory.Aggregations);
 
@@ -76,11 +79,11 @@ public class WhenAPeekIsRequestedTests : ActorMessageQueueTestBase
     [Fact]
     public async Task Ensure_same_bundle_is_returned_if_not_dequeued()
     {
-        var command = _enqueueMessageEventBuilder
+        var message = _outgoingMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
             .WithReceiverRole(MarketRole.EnergySupplier)
             .Build();
-        await InvokeDomainEventAsync(command);
+        await EnqueueMessage(message);
 
         var firstPeekResult = await PeekMessage(MessageCategory.Aggregations);
         var secondPeekResult = await PeekMessage(MessageCategory.Aggregations);
@@ -93,11 +96,11 @@ public class WhenAPeekIsRequestedTests : ActorMessageQueueTestBase
     [Fact]
     public async Task The_generated_document_is_archived()
     {
-        var command = _enqueueMessageEventBuilder
+        var message = _outgoingMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
             .WithReceiverRole(MarketRole.EnergySupplier)
             .Build();
-        await InvokeDomainEventAsync(command);
+        await EnqueueMessage(message);
 
         var result = await PeekMessage(MessageCategory.Aggregations);
 
@@ -126,5 +129,11 @@ public class WhenAPeekIsRequestedTests : ActorMessageQueueTestBase
             await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var found = await connection.ExecuteScalarAsync<bool>(sqlStatement);
         Assert.True(found);
+    }
+
+    private async Task EnqueueMessage(OutgoingMessageDto message)
+    {
+        await _enqueueMessage.EnqueueAsync(message);
+        await GetService<UnitOfWork>().CommitAsync();
     }
 }

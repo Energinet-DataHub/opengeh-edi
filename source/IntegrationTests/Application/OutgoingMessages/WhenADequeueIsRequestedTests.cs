@@ -16,25 +16,28 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
+using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
 public class WhenADequeueIsRequestedTests : ActorMessageQueueTestBase
 {
-    private readonly EnqueueMessageEventBuilder _enqueueMessageEventBuilder;
+    private readonly IEnqueueMessage _enqueueMessage;
+    private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
 
     public WhenADequeueIsRequestedTests(ActorMessageQueueDatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _enqueueMessageEventBuilder = new EnqueueMessageEventBuilder();
+        _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
+        _enqueueMessage = GetService<IEnqueueMessage>();
     }
 
     [Fact]
@@ -49,9 +52,11 @@ public class WhenADequeueIsRequestedTests : ActorMessageQueueTestBase
     public async Task Dequeue_unknown_message_id_is_unsuccessful_when_actor_has_a_queue()
     {
         var unknownMessageId = Guid.NewGuid().ToString();
-        // Created an Actor Queue with a bundle.
-        await InvokeDomainEventAsync(_enqueueMessageEventBuilder.Build());
-
+        var enqueueMessageEvent = _outgoingMessageDtoBuilder
+            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            .WithReceiverRole(MarketRole.EnergySupplier)
+            .Build();
+        await EnqueueMessage(enqueueMessageEvent);
         var dequeueResult = await InvokeCommandAsync(new DequeueCommand(unknownMessageId, MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)));
 
         Assert.False(dequeueResult.Success);
@@ -60,11 +65,11 @@ public class WhenADequeueIsRequestedTests : ActorMessageQueueTestBase
     [Fact]
     public async Task Dequeue_is_Successful()
     {
-        var enqueueMessageEvent = _enqueueMessageEventBuilder
+        var enqueueMessageEvent = _outgoingMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
             .WithReceiverRole(MarketRole.EnergySupplier)
             .Build();
-        await InvokeDomainEventAsync(enqueueMessageEvent);
+        await EnqueueMessage(enqueueMessageEvent);
         var peekResult = await InvokeCommandAsync(new PeekCommand(
             ActorNumber.Create(SampleData.NewEnergySupplierNumber),
             MessageCategory.Aggregations,
@@ -79,5 +84,11 @@ public class WhenADequeueIsRequestedTests : ActorMessageQueueTestBase
 
         Assert.True(dequeueResult.Success);
         Assert.True(found);
+    }
+
+    private async Task EnqueueMessage(OutgoingMessageDto message)
+    {
+        await _enqueueMessage.EnqueueAsync(message);
+        await GetService<UnitOfWork>().CommitAsync();
     }
 }
