@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Domain.Actors;
 
 namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 

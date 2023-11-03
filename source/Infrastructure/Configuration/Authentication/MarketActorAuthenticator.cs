@@ -20,7 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration.Authentication;
-using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Common.Actors;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication
 {
@@ -53,7 +53,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication
                 return;
             }
 
-            var actorNumber = await _actorRepository.GetActorNumberByB2CIdAsync(Guid.Parse(userIdFromSts), cancellationToken).ConfigureAwait(false);
+            var actorNumber = await _actorRepository.GetActorNumberByExternalIdAsync(userIdFromSts, cancellationToken).ConfigureAwait(false);
             if (actorNumber is null)
             {
                 ActorIsNotAuthorized();

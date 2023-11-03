@@ -15,7 +15,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Common.Actors;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 
@@ -24,7 +24,7 @@ public static class ClaimsMap
     private static readonly Dictionary<string, MarketRole> _rolesMap = new()
     {
         { "energysupplier", MarketRole.EnergySupplier },
-        { "gridoperator", MarketRole.GridOperator },
+        { "gridaccessprovider", MarketRole.GridOperator },
         { "metereddataresponsible", MarketRole.MeteredDataResponsible },
         { "balanceresponsibleparty", MarketRole.BalanceResponsibleParty },
     };

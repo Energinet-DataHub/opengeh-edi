@@ -19,7 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration.Authentication;
-using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Xunit;
@@ -115,7 +115,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
 
         private async Task CreateActorAsync()
         {
-            await InvokeCommandAsync(new CreateActorCommand(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.ActorNumber)).ConfigureAwait(false);
+            await InvokeCommandAsync(new CreateActorCommand(SampleData.StsAssignedUserId, ActorNumber.Create(SampleData.ActorNumber))).ConfigureAwait(false);
         }
     }
 }

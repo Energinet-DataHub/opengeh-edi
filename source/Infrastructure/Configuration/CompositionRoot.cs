@@ -20,9 +20,8 @@ using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration.Authentication;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Application.OutgoingMessages;
-using Energinet.DataHub.EDI.Application.OutgoingMessages.Common;
-using Energinet.DataHub.EDI.Domain.Documents;
+using Energinet.DataHub.EDI.Application.GridAreas;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.Actors;
 using Energinet.DataHub.EDI.Infrastructure.ArchivedMessages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
@@ -30,23 +29,13 @@ using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.FeatureFlag;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.InternalCommands;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.Processing;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
+using Energinet.DataHub.EDI.Infrastructure.GridAreas;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.AggregationResult;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Dequeue;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Peek;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.Transactions;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using MediatR;
 using MediatR.Registration;
@@ -69,17 +58,14 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             services.AddScoped<ITransactionIdRepository, TransactionIdRepository>();
             services.AddScoped<IMessageIdRepository, MessageIdRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>();
             services.AddScoped<IFeatureFlagProvider, FeatureFlagProviderProvider>();
 
             AddMediatR();
             services.AddLogging();
-            InternalCommandProcessing.Configure(_services);
-            AddMessageGenerationServices();
             AddActorServices();
-            AddProcessing();
             AddWholeSaleInBox();
-            DequeueConfiguration.Configure(services);
+            AddGridAreaServices();
+            _services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>));
             IntegrationEventsConfiguration.Configure(services);
             InboxEventsConfiguration.Configure(services);
             ArchivedMessageConfiguration.Configure(services);
@@ -96,18 +82,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
         {
             _services.AddSingleton<ServiceBusClient>(_ => new ServiceBusClient(connectionString));
             _services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactory>();
-            return this;
-        }
-
-        public CompositionRoot AddPeekConfiguration()
-        {
-            PeekConfiguration.Configure(_services);
-            return this;
-        }
-
-        public CompositionRoot AddAggregationsConfiguration()
-        {
-            AggregationsConfiguration.Configure(_services);
             return this;
         }
 
@@ -177,26 +151,12 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
         public CompositionRoot AddMessagePublishing()
         {
             _services.AddSingleton<IActorRepository, ActorRepository>();
-            _services.AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>();
-            _services.AddScoped<OutgoingMessageEnqueuer>();
-            return this;
-        }
-
-        public CompositionRoot AddAggregatedMeasureDataServices()
-        {
-            RequestedAggregatedMeasureDataConfiguration.Configure(_services);
             return this;
         }
 
         public CompositionRoot AddMessageParserServices()
         {
             IncomingMessageParsingServices.AddIncomingMessageParsingServices(_services);
-            return this;
-        }
-
-        public CompositionRoot AddHttpClientAdapter(Func<IServiceProvider, IHttpClientAdapter> action)
-        {
-            _services.AddSingleton(action);
             return this;
         }
 
@@ -229,19 +189,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
                     responseQueueName));
         }
 
-        private void AddMessageGenerationServices()
-        {
-            _services.AddScoped<DocumentFactory>();
-            _services.AddScoped<IDocumentWriter, AggregationResultXmlDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, AggregationResultJsonDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, AggregationResultEbixDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataXmlDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataJsonDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataEbixDocumentWriter>();
-
-            _services.AddScoped<IMessageRecordParser, MessageRecordParser>();
-        }
-
         private void AddMediatR()
         {
             var configuration = new MediatRServiceConfiguration();
@@ -250,16 +197,14 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
 
         private void AddActorServices()
         {
-            _services.AddTransient<IRequestHandler<CreateActorCommand, Unit>, CreateActorHandler>();
-            _services.AddTransient<IActorRegistry, ActorRegistry>();
+            _services.AddScoped<IRequestHandler<CreateActorCommand, Unit>, CreateActorHandler>();
+            _services.AddScoped<IActorRegistry, ActorRegistry>();
         }
 
-        private void AddProcessing()
+        private void AddGridAreaServices()
         {
-            _services.AddScoped<DomainEventsAccessor>();
-            _services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>));
-            _services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RaiseDomainEventsBehaviour<,>));
-            _services.AddTransient(typeof(IPipelineBehavior<,>), typeof(EnqueueOutgoingMessagesBehaviour<,>));
+            _services.AddScoped<IRequestHandler<GridAreaOwnershipAssignedCommand, Unit>, GridAreaOwnershipAssignedHandler>();
+            _services.AddScoped<IGridAreaRepository, GridAreaRepository>();
         }
 
         private void AddWholeSaleInBox()

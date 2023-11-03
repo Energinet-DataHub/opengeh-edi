@@ -15,7 +15,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Domain.Actors;
+using Energinet.DataHub.EDI.Common.Actors;
 
 namespace Energinet.DataHub.EDI.Application.Actors;
 
@@ -27,14 +27,10 @@ public interface IActorRepository
     /// <summary>
     /// Get actor number by id
     /// </summary>
-    /// <param name="actorId"></param>
-    /// <param name="cancellationToken"></param>
-    Task<string> GetActorNumberByIdAsync(Guid actorId, CancellationToken cancellationToken);
+    Task<ActorNumber?> GetActorNumberByExternalIdAsync(string externalId, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Get actor number by id
+    /// Creates a new actor
     /// </summary>
-    /// <param name="actorId"></param>
-    /// <param name="cancellationToken"></param>
-    Task<ActorNumber?> GetActorNumberByB2CIdAsync(Guid actorId, CancellationToken cancellationToken);
+    Task CreateIfNotExistAsync(ActorNumber actorNumber, string externalId, CancellationToken cancellationToken);
 }

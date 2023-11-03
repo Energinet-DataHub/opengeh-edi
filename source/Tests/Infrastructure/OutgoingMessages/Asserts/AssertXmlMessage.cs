@@ -19,11 +19,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using Energinet.DataHub.EDI.Domain.Actors;
-using Energinet.DataHub.EDI.Domain.Common;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.Xml;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts
@@ -67,7 +67,7 @@ namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts
         internal static void AssertHeader(MessageHeader header, XDocument document)
         {
             Assert.NotEmpty(AssertXmlMessage.GetMessageHeaderValue(document, "mRID")!);
-            AssertHasHeaderValue(document, "process.processType", CimCode.Of(BusinessReason.From(header.BusinessReason)));
+            AssertHasHeaderValue(document, "process.processType", CimCode.Of(BusinessReason.FromName(header.BusinessReason)));
             AssertHasHeaderValue(document, "businessSector.type", "23");
             AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", header.SenderId);
             AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(header.SenderRole)));

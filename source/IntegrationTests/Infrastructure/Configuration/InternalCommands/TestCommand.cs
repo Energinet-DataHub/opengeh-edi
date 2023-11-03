@@ -14,7 +14,7 @@
 
 using System;
 using System.Text.Json.Serialization;
-using Energinet.DataHub.EDI.Application.Configuration.Commands.Commands;
+using Energinet.DataHub.EDI.Common;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 

@@ -14,10 +14,10 @@
 
 using System;
 using System.Collections.Generic;
-using Energinet.DataHub.EDI.Domain.Documents;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.Response;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
 using Xunit;
 using Xunit.Categories;
 

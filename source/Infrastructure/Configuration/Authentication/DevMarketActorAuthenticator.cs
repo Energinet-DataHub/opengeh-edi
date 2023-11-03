@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Common.Actors;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 
@@ -45,7 +46,7 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
             var actor = await FindActorAsync(actorNumberClaim.Value, cancellationToken).ConfigureAwait(false);
             if (actor is null)
             {
-                actor = new Actor(Guid.NewGuid(), actorNumberClaim.Value);
+                actor = new Actor(Guid.NewGuid().ToString(), actorNumberClaim.Value);
                 await RegisterActorAsync(actor, cancellationToken).ConfigureAwait(false);
             }
 
@@ -60,7 +61,7 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
     private static ClaimsPrincipal ReplaceCurrent(ClaimsPrincipal currentClaimsPrincipal, Actor actor)
     {
         var claims = currentClaimsPrincipal.Claims.Where(claim => !claim.Type.Equals(ClaimsMap.UserId, StringComparison.OrdinalIgnoreCase)).ToList();
-        claims.Add(new Claim(ClaimsMap.UserId, actor.Id.ToString()));
+        claims.Add(new Claim(ClaimsMap.UserId, actor.ExternalId));
 
         var identity = new ClaimsIdentity(claims);
         return new ClaimsPrincipal(identity);
@@ -74,16 +75,16 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
 
         return await connection
             .QueryFirstOrDefaultAsync<Actor>(
-                "SELECT B2CId AS Id, IdentificationNumber AS Number FROM dbo.Actor WHERE IdentificationNumber = @ActorNumber",
+                "SELECT ActorNumber, ExternalId FROM dbo.Actor WHERE ActorNumber = @ActorNumber",
                 new { ActorNumber = actorNumber })
             .ConfigureAwait(false);
     }
 
     private Task RegisterActorAsync(Actor actor, CancellationToken cancellationToken)
     {
-        return _actorRegistry.TryStoreAsync(new CreateActorCommand(Guid.NewGuid().ToString(),  actor.Id.ToString(), actor.Number), cancellationToken);
+        return _actorRegistry.TryStoreAsync(new CreateActorCommand(actor.ExternalId, ActorNumber.Create(actor.ActorNumber)), cancellationToken);
     }
 
     #pragma warning disable
-    private record Actor(Guid Id, string Number);
+    private record Actor(string ActorNumber, string ExternalId);
 }

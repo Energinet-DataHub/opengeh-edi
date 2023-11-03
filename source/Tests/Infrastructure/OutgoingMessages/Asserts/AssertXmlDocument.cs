@@ -23,7 +23,9 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
 using Xunit;
+using DocumentType = Energinet.DataHub.EDI.Infrastructure.DocumentValidation.DocumentType;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 
@@ -97,7 +99,7 @@ public class AssertXmlDocument
 
     public async Task<AssertXmlDocument> HasValidStructureAsync(DocumentType type, string version = "0.1")
     {
-        var validationResult = await _documentValidator!.ValidateAsync(_stream, DocumentFormat.CimXml, type, CancellationToken.None, version).ConfigureAwait(false);
+        var validationResult = await _documentValidator!.ValidateAsync(_stream, DocumentFormat.Xml, type, CancellationToken.None, version).ConfigureAwait(false);
         Assert.True(validationResult.IsValid);
         return this;
     }

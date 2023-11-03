@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using MediatR;
 using Xunit;
@@ -46,24 +47,23 @@ public class CreateActorsTests : TestBase
         var actor = await GetActor();
 
         Assert.NotNull(actor);
-        Assert.Equal(SampleData.ActorId, actor.Id.ToString());
-        Assert.Equal(SampleData.IdentificationNumber, actor.IdentificationNumber);
-        Assert.Equal(SampleData.B2CId, actor.B2CId);
+        Assert.Equal(SampleData.ActorNumber, actor.ActorNumber);
+        Assert.Equal(SampleData.ExternalId, actor.ExternalId);
     }
 
     private static CreateActorCommand CreateCommand()
     {
-        return new CreateActorCommand(SampleData.ActorId, SampleData.B2CId.ToString(), SampleData.IdentificationNumber);
+        return new CreateActorCommand(SampleData.ExternalId, ActorNumber.Create(SampleData.ActorNumber));
     }
 
     private async Task<Actor> GetActor()
     {
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
-        var sql = $"SELECT Id, B2CId, IdentificationNUmber FROM [dbo].[Actor] WHERE Id = '{SampleData.ActorId}'";
+        var sql = $"SELECT Id, ActorNumber, ExternalId FROM [dbo].[Actor] WHERE ExternalId = '{SampleData.ExternalId}' AND ActorNumber = '{SampleData.ActorNumber}'";
         return await connection.QuerySingleOrDefaultAsync<Actor>(sql);
     }
 
 #pragma warning disable
-    public record Actor(Guid Id, Guid B2CId, string IdentificationNumber);
+    public record Actor(Guid Id, string ActorNumber, string ExternalId);
 #pragma warning restore
 }

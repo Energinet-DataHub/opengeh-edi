@@ -14,7 +14,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
+using Azure.Messaging.ServiceBus;
 
 namespace Energinet.DataHub.EDI.Application.Wholesale;
 
@@ -28,5 +28,5 @@ public interface IWholesaleInbox
     /// </summary>
     /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
-    Task SendAsync(AggregatedMeasureDataProcess request, CancellationToken cancellationToken);
+    Task SendAsync(ServiceBusMessage request, CancellationToken cancellationToken);
 }

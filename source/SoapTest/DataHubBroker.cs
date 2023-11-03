@@ -85,6 +85,7 @@ namespace Kamstrup.DataHub.Integration.DataHub
         {
             DataHubServiceClient.getMessage(msgID);
         }
+
 #nullable enable
         /// <summary>
         /// Checks for waiting responses

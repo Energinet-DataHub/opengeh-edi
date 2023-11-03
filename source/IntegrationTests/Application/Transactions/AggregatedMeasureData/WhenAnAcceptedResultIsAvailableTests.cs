@@ -15,44 +15,49 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Domain.Actors;
-using Energinet.DataHub.EDI.Domain.Documents;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Energinet.DataHub.EDI.Domain.Transactions;
-using Energinet.DataHub.EDI.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
-using Energinet.DataHub.EDI.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
+using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using NodaTime.Text;
 using Xunit;
 using Xunit.Categories;
-using Period = Energinet.DataHub.Edi.Responses.Period;
 using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
 [IntegrationTest]
-public class WhenAnAcceptedResultIsAvailableTests : TestBase
+public class WhenAnAcceptedResultIsAvailableTests : ProcessTestBase
 {
-    private readonly B2BContext _b2BContext;
+    private readonly GridAreaBuilder _gridAreaBuilder = new();
+    private readonly ProcessContext _processContext;
 
-    public WhenAnAcceptedResultIsAvailableTests(DatabaseFixture databaseFixture)
+    public WhenAnAcceptedResultIsAvailableTests(ProcessDatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _b2BContext = GetService<B2BContext>();
+        _processContext = GetService<ProcessContext>();
     }
 
     [Fact]
     public async Task Aggregated_measure_data_response_is_accepted()
     {
         // Arrange
+        _gridAreaBuilder
+            .WithGridAreaCode(SampleData.GridAreaCode)
+            .Store(GetService<B2BContext>());
         var process = BuildProcess();
         var acceptedEvent = GetAcceptedEvent(process);
 
@@ -61,14 +66,13 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
-        var timeSerie = acceptedEvent;
+
         outgoingMessage
-            .HasBusinessReason(CimCode.To(process.BusinessReason).Name)
+            .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion, timeSerie.SettlementVersion)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId);
     }
@@ -77,6 +81,9 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     public async Task Received_2_accepted_events_for_same_aggregated_measure_data_process()
     {
         // Arrange
+        _gridAreaBuilder
+            .WithGridAreaCode(SampleData.GridAreaCode)
+            .Store(GetService<B2BContext>());
         var process = BuildProcess();
         var acceptedEvent = GetAcceptedEvent(process);
 
@@ -86,20 +93,19 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
-        var timeSerie = acceptedEvent;
+
         outgoingMessage
-            .HasBusinessReason(CimCode.To(process.BusinessReason).Name)
+            .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
-            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.SettlementVersion!, timeSerie.SettlementVersion);
+            .HasSenderId(DataHubDetails.IdentificationNumber.Value);
     }
 
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
-        _b2BContext.Dispose();
+        _processContext.Dispose();
     }
 
     private static AggregatedTimeSeriesRequestAccepted GetAcceptedEvent(AggregatedMeasureDataProcess aggregatedMeasureDataProcess)
@@ -117,30 +123,13 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             Time = new Timestamp() { Seconds = 1, },
         };
 
-        var period = new Period()
-        {
-            StartOfPeriod = new Timestamp()
-            {
-                Seconds = InstantPattern.General.Parse(aggregatedMeasureDataProcess.StartOfPeriod)
-                .GetValueOrThrow().ToUnixTimeSeconds(),
-            },
-            EndOfPeriod = new Timestamp()
-            {
-                Seconds = aggregatedMeasureDataProcess.EndOfPeriod is not null
-                ? InstantPattern.General.Parse(aggregatedMeasureDataProcess.EndOfPeriod).GetValueOrThrow().ToUnixTimeSeconds()
-                : 1,
-            },
-            Resolution = Resolution.Pt15M,
-        };
-
         return new AggregatedTimeSeriesRequestAccepted()
         {
             GridArea = aggregatedMeasureDataProcess.MeteringGridAreaDomainId,
             QuantityUnit = QuantityUnit.Kwh,
-            Period = period,
             TimeSeriesPoints = { point },
             TimeSeriesType = TimeSeriesType.Production,
-            SettlementVersion = SettlementVersion.FirstCorrection.Name,
+            Resolution = Resolution.Pt15M,
         };
     }
 
@@ -176,19 +165,19 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
           BusinessTransactionId.Create(Guid.NewGuid().ToString()),
           SampleData.ReceiverNumber,
           receiverRole.Code,
-          CimCode.Of(BusinessReason.BalanceFixing),
-          null,
+          BusinessReason.BalanceFixing,
+          MeteringPointType.Production.Code,
           null,
           SampleData.StartOfPeriod,
           SampleData.EndOfPeriod,
           SampleData.GridAreaCode,
           receiverRole == MarketRole.EnergySupplier ? SampleData.ReceiverNumber.Value : null,
           receiverRole == MarketRole.BalanceResponsibleParty ? SampleData.ReceiverNumber.Value : null,
-          "D01");
+          SettlementVersion.FirstCorrection);
 
         process.WasSentToWholesale();
-        _b2BContext.AggregatedMeasureDataProcesses.Add(process);
-        _b2BContext.SaveChanges();
+        _processContext.AggregatedMeasureDataProcesses.Add(process);
+        _processContext.SaveChanges();
         return process;
     }
 }
