@@ -20,8 +20,8 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
@@ -37,7 +37,7 @@ using Xunit.Categories;
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages.RequestAggregatedMeasureData;
 
 [IntegrationTest]
-public class InitializeAggregatedMeasureDataProcessesCommandTests : ProcessTestBase
+public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
 {
     private readonly ProcessContext _processContext;
     private readonly ServiceBusSenderSpy _senderSpy;
@@ -45,7 +45,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : ProcessTestB
     private readonly InternalCommandMapper _mapper;
     private readonly ISerializer _serializer;
 
-    public InitializeAggregatedMeasureDataProcessesCommandTests(ProcessDatabaseFixture databaseFixture)
+    public InitializeAggregatedMeasureDataProcessesCommandTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _processContext = GetService<ProcessContext>();

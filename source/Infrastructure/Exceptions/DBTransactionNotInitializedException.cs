@@ -12,17 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
-using NodaTime;
+using System;
 
-namespace Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
+namespace Energinet.DataHub.EDI.Infrastructure.Exceptions;
 
-public class ADayHasPassed : INotification
+public class DBTransactionNotInitializedException : Exception
 {
-    public ADayHasPassed(Instant now)
+    public DBTransactionNotInitializedException()
     {
-        Now = now;
     }
 
-    public Instant Now { get; }
+    public DBTransactionNotInitializedException(string message)
+        : base(message)
+    {
+    }
+
+    public DBTransactionNotInitializedException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
 }

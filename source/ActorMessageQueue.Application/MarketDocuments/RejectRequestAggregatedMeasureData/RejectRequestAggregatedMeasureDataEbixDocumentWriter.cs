@@ -17,7 +17,6 @@ using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.Ebix;
 using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.Xml;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages;
 
 namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
 
@@ -47,7 +46,7 @@ public class RejectRequestAggregatedMeasureDataEbixDocumentWriter : EbixDocument
         ArgumentNullException.ThrowIfNull(marketActivityPayloads);
         ArgumentNullException.ThrowIfNull(writer);
 
-        foreach (var rejectedTimeSerie in ParseFrom<RejectedTimeSerie>(marketActivityPayloads))
+        foreach (var rejectedTimeSerie in ParseFrom<RejectedTimeSerieMarketActivityRecord>(marketActivityPayloads))
         {
             if (rejectedTimeSerie.RejectReasons.Count == 0)
                 throw new NotSupportedException("Unable to create reject message if no reason is supplied");

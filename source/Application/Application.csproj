@@ -24,8 +24,8 @@ limitations under the License.
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="MediatR" Version="12.1.1" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.13" />
     <PackageReference Include="NodaTime" Version="3.1.9" />
     <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.6.40">
       <PrivateAssets>all</PrivateAssets>
@@ -73,9 +73,5 @@ limitations under the License.
       <None Remove="SchemaStore\Schemas\Xml\urn-ediel-org-structure-requestchangecustomercharacteristics-0-1.xsd" />
       <None Remove="SchemaStore\Schemas\Xml\urn-ediel-org-structure-requestchangeaccountingpointcharacteristics-0-1" />
       <None Remove="SchemaStore\Schemas\Xml\urn-ediel-org-measure-notifyaggregatedmeasuredata-0-1.xsd" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Configuration\Commands\Commands\" />
     </ItemGroup>
 </Project>

@@ -20,9 +20,9 @@ using Dapper;
 using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
 using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Common.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -33,12 +33,12 @@ using MessageCategory = Energinet.DataHub.EDI.Common.MessageCategory;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
-public class WhenAPeekIsRequestedTests : ActorMessageQueueTestBase
+public class WhenAPeekIsRequestedTests : TestBase
 {
     private readonly IEnqueueMessage _enqueueMessage;
     private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
 
-    public WhenAPeekIsRequestedTests(ActorMessageQueueDatabaseFixture databaseFixture)
+    public WhenAPeekIsRequestedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
@@ -134,6 +134,6 @@ public class WhenAPeekIsRequestedTests : ActorMessageQueueTestBase
     private async Task EnqueueMessage(OutgoingMessageDto message)
     {
         await _enqueueMessage.EnqueueAsync(message);
-        await GetService<UnitOfWork>().CommitAsync();
+        await GetService<IUnitOfWork>().CommitAsync();
     }
 }

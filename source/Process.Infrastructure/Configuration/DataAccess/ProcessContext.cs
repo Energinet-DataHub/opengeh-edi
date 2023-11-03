@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.EDI.Infrastructure.ArchivedMessages;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
@@ -43,7 +42,6 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess
 
             modelBuilder.ApplyConfiguration(new AggregatedMeasureDataProcessEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QueuedInternalCommandEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new ArchivedMessageEntityConfiguration());
         }
     }
 }

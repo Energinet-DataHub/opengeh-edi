@@ -18,7 +18,6 @@ using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.Ebix;
 using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.Xml;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 
 namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.AggregationResult;
 
@@ -45,7 +44,7 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
 
     protected override SettlementVersion? ExtractSettlementVersion(IReadOnlyCollection<string> marketActivityPayloads)
     {
-        var payloads = ParseFrom<TimeSeries>(marketActivityPayloads);
+        var payloads = ParseFrom<TimeSeriesMarketActivityRecord>(marketActivityPayloads);
         var settlementVersions = payloads.Where(ts => ts.SettlementVersion is not null).Select(ts => ts.SettlementVersion)?.Distinct().ToList();
         if (settlementVersions?.Count > 1)
         {
@@ -66,7 +65,7 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
         ArgumentNullException.ThrowIfNull(marketActivityPayloads);
         ArgumentNullException.ThrowIfNull(writer);
 
-        foreach (var timeSeries in ParseFrom<TimeSeries>(marketActivityPayloads))
+        foreach (var timeSeries in ParseFrom<TimeSeriesMarketActivityRecord>(marketActivityPayloads))
         {
             // Begin PayloadEnergyTimeSeries
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "PayloadEnergyTimeSeries", null).ConfigureAwait(false);

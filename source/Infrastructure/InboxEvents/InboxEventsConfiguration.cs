@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
+using Energinet.DataHub.EDI.Common.DataRetention;
+using Energinet.DataHub.EDI.Common.TimeEvents;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;

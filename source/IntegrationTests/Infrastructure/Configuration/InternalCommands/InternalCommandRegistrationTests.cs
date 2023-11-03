@@ -24,11 +24,11 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 
-public class InternalCommandRegistrationTests : ProcessTestBase
+public class InternalCommandRegistrationTests : TestBase
 {
     private readonly InternalCommandMapper _mapper;
 
-    public InternalCommandRegistrationTests(ProcessDatabaseFixture databaseFixture)
+    public InternalCommandRegistrationTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _mapper = GetService<InternalCommandMapper>();

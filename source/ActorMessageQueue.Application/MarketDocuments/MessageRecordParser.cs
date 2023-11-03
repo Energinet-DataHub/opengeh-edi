@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Common.Serialization;
 
 namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments
 {

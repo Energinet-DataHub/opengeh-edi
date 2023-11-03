@@ -18,7 +18,6 @@ using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.Xml;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 
 namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.AggregationResult;
 
@@ -42,7 +41,7 @@ public class AggregationResultXmlDocumentWriter : DocumentWriter
         ArgumentNullException.ThrowIfNull(marketActivityPayloads);
         ArgumentNullException.ThrowIfNull(writer);
 
-        foreach (var timeSeries in ParseFrom<TimeSeries>(marketActivityPayloads))
+        foreach (var timeSeries in ParseFrom<TimeSeriesMarketActivityRecord>(marketActivityPayloads))
         {
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Series", null).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, timeSeries.TransactionId.ToString()).ConfigureAwait(false);

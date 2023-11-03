@@ -12,23 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Domain;
-using Energinet.DataHub.EDI.Process.Domain;
+using MediatR;
+using NodaTime;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
-
-public class UnitOfWork
+namespace Energinet.DataHub.EDI.Common.TimeEvents
 {
-    private readonly ProcessContext _context;
-
-    public UnitOfWork(ProcessContext context)
+    public class TenSecondsHasHasPassed : INotification
     {
-        _context = context;
-    }
+        public TenSecondsHasHasPassed(Instant now)
+        {
+            Now = now;
+        }
 
-    public Task CommitAsync()
-    {
-        return _context.SaveChangesAsync();
+        public Instant Now { get; }
     }
 }

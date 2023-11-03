@@ -12,22 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Data;
+using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Common;
 
-namespace Energinet.DataHub.EDI.Application.Configuration.Commands
+namespace Energinet.DataHub.EDI.Common.DataAccess
 {
     /// <summary>
-    /// Service for scheduling and enqueueing internal commands for later processing
+    /// Factory for creating database connections
     /// </summary>
-    public interface ICommandScheduler
+    public interface IDatabaseConnectionFactory
     {
         /// <summary>
-        /// Schedules or enqueues a command
+        /// Creates and open a connection
         /// </summary>
-        /// <param name="command"></param>
-        /// <typeparam name="TCommand"><see cref="InternalCommand"/></typeparam>
-        Task EnqueueAsync<TCommand>(TCommand command)
-            where TCommand : InternalCommand;
+        /// <remarks>Returned connection must be disposed</remarks>
+        /// <returns><see cref="IDbConnection"/></returns>
+        IDbConnection GetConnectionAndOpen();
+
+        /// <summary>
+        /// Creates and open a connection
+        /// </summary>
+        /// <remarks>Returned connection must be disposed</remarks>
+        /// <returns><see cref="IDbConnection"/></returns>
+        ValueTask<IDbConnection> GetConnectionAndOpenAsync(CancellationToken cancellationToken);
     }
 }

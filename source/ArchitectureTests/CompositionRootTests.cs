@@ -164,6 +164,9 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
             public override string? REQUEST_RESPONSE_LOGGING_CONNECTION_STRING =>
                 CreateFakeServiceBusConnectionString();
 
+            public override string? DB_CONNECTION_STRING =>
+                CreateConnectionString();
+
             public override bool IsRunningLocally()
             {
                 return true;
@@ -181,6 +184,12 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
                     .Append("SharedAccessKeyName=send;")
                     .Append(CultureInfo.InvariantCulture, $"SharedAccessKey={Guid.NewGuid():N}")
                     .ToString();
+            }
+
+            private static string CreateConnectionString()
+            {
+                return
+                    "Server=(LocalDB)\\\\MSSQLLocalDB;Database=B2BTransactions;User=User;Password=Password;TrustServerCertificate=true;Trusted_Connection=True;";
             }
         }
     }

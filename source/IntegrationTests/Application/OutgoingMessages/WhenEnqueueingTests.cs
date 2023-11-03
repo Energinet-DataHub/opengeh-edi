@@ -16,21 +16,20 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
-using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Common.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
-public class WhenEnqueueingTests : ActorMessageQueueTestBase
+public class WhenEnqueueingTests : TestBase
 {
     private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
     private readonly IEnqueueMessage _enqueueMessage;
 
-    public WhenEnqueueingTests(ActorMessageQueueDatabaseFixture databaseFixture)
+    public WhenEnqueueingTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
@@ -100,6 +99,6 @@ public class WhenEnqueueingTests : ActorMessageQueueTestBase
     private async Task EnqueueMessage(OutgoingMessageDto message)
     {
         await _enqueueMessage.EnqueueAsync(message);
-        await GetService<UnitOfWork>().CommitAsync();
+        await GetService<IUnitOfWork>().CommitAsync();
     }
 }

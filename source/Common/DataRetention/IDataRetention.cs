@@ -12,19 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace Energinet.DataHub.EDI.Application.Configuration
+namespace Energinet.DataHub.EDI.Common.DataRetention;
+
+/// <summary>
+/// Represent the contract for data retention for a single data source.
+/// A data source can be a database table.
+/// </summary>
+public interface IDataRetention
 {
     /// <summary>
-    /// System time provider
+    /// Responsible for cleaning the no longer needed data.
     /// </summary>
-    public interface ISystemDateTimeProvider
-    {
-        /// <summary>
-        /// Return current date and time
-        /// </summary>
-        /// <returns><see cref="Instant"/></returns>
-        Instant Now();
-    }
+    /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
+    Task CleanupAsync(CancellationToken cancellationToken);
 }

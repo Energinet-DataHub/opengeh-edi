@@ -12,18 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
-using NodaTime;
+namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
 
-namespace Energinet.DataHub.EDI.Application.Configuration.TimeEvents
-{
-    public class TenSecondsHasHasPassed : INotification
-    {
-        public TenSecondsHasHasPassed(Instant now)
-        {
-            Now = now;
-        }
+public record RejectedTimeSerieMarketActivityRecord(
+    Guid TransactionId,
+    IReadOnlyList<RejectReason> RejectReasons,
+    string OriginalTransactionIdReference);
 
-        public Instant Now { get; }
-    }
-}
+public record RejectReason(string ErrorCode, string ErrorMessage);

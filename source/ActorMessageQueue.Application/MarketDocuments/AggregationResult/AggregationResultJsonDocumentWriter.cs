@@ -18,7 +18,6 @@ using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 
 namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.AggregationResult;
 
@@ -166,13 +165,13 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
         writer.WriteEndObject();
     }
 
-    private IReadOnlyCollection<TimeSeries> ParseFrom(IReadOnlyCollection<string> payloads)
+    private IReadOnlyCollection<TimeSeriesMarketActivityRecord> ParseFrom(IReadOnlyCollection<string> payloads)
     {
         if (payloads == null) throw new ArgumentNullException(nameof(payloads));
-        var timeSeries = new List<TimeSeries>();
+        var timeSeries = new List<TimeSeriesMarketActivityRecord>();
         foreach (var payload in payloads)
         {
-            timeSeries.Add(_parser.From<TimeSeries>(payload));
+            timeSeries.Add(_parser.From<TimeSeriesMarketActivityRecord>(payload));
         }
 
         return timeSeries;

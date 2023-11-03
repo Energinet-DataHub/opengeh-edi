@@ -17,23 +17,21 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
-using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Common.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
-public class WhenADequeueIsRequestedTests : ActorMessageQueueTestBase
+public class WhenADequeueIsRequestedTests : TestBase
 {
     private readonly IEnqueueMessage _enqueueMessage;
     private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
 
-    public WhenADequeueIsRequestedTests(ActorMessageQueueDatabaseFixture databaseFixture)
+    public WhenADequeueIsRequestedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
@@ -89,6 +87,6 @@ public class WhenADequeueIsRequestedTests : ActorMessageQueueTestBase
     private async Task EnqueueMessage(OutgoingMessageDto message)
     {
         await _enqueueMessage.EnqueueAsync(message);
-        await GetService<UnitOfWork>().CommitAsync();
+        await GetService<IUnitOfWork>().CommitAsync();
     }
 }

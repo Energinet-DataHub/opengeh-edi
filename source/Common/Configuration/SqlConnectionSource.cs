@@ -12,14 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Xunit;
+using System;
+using Microsoft.Data.SqlClient;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+namespace Energinet.DataHub.EDI.Common.Configuration;
 
-[CollectionDefinition("ActorMessageQueueIntegrationTest")]
-public class ActorMessageQueueIntegrationTestFixture : ICollectionFixture<ActorMessageQueueDatabaseFixture>
+public sealed class SqlConnectionSource : IDisposable
 {
-    // This class has no code, and is never created. Its purpose is simply
-    // to be the place to apply [CollectionDefinition] and all the
-    // ICollectionFixture<> interfaces.
+    public SqlConnectionSource(string databaseConnectionString)
+    {
+        Connection = new SqlConnection(databaseConnectionString);
+    }
+
+    public SqlConnection Connection { get;  }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            Connection.Dispose();
+        }
+    }
 }

@@ -21,7 +21,6 @@ using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
-using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
@@ -40,11 +39,11 @@ using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Poi
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
 [IntegrationTest]
-public class AggregatedMeasureDataResponseFromWholesaleTests : ProcessTestBase
+public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
 {
     private readonly ProcessContext _processContext;
 
-    public AggregatedMeasureDataResponseFromWholesaleTests(ProcessDatabaseFixture databaseFixture)
+    public AggregatedMeasureDataResponseFromWholesaleTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _processContext = GetService<ProcessContext>();

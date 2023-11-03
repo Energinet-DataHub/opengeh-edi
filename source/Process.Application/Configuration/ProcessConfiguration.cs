@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.ActorMessageQueue.Application.Configuration;
+using Energinet.DataHub.EDI.Common.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
@@ -31,20 +32,17 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.Processing;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.Process.Application.Configuration;
 
 public static class ProcessConfiguration
 {
-    public static void Configure(IServiceCollection services, string databaseConnectionString)
+    public static void Configure(IServiceCollection services)
     {
-        services.AddDbContext<ProcessContext>(options =>
-            options.UseSqlServer(databaseConnectionString, y => y.UseNodaTime()));
+        services.AddScopedSqlDbContext<ProcessContext>();
 
-        services.AddScoped<UnitOfWork>();
-        ActorMessageQueueConfiguration.Configure(services, databaseConnectionString);
+        ActorMessageQueueConfiguration.Configure(services);
 
         //EventsConfiguration
         //TODO: can we move them out and delete ref to Infrastructure?

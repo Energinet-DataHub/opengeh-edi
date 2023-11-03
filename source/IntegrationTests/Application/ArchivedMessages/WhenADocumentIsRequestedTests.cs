@@ -15,11 +15,10 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Application.ArchivedMessages;
-using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.SearchMessages;
 using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Domain.ArchivedMessages;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Xunit;

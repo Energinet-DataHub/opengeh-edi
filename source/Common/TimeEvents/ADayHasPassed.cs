@@ -12,22 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.OutgoingMessages;
+using MediatR;
+using NodaTime;
 
-// public class OutgoingMessageEnqueuer
-// {
-//     private readonly ProcessContext _context;
-//
-//     public OutgoingMessageEnqueuer(ProcessContext context)
-//     {
-//         _context = context;
-//     }
-//
-//     public Task EnqueueAsync(EnqueuedMessage message)
-//     {
-//         ArgumentNullException.ThrowIfNull(message);
-//         return _context.EnqueuedMessages
-//             .AddAsync(message)
-//             .AsTask();
-//     }
-// }
+namespace Energinet.DataHub.EDI.Common.TimeEvents;
+
+public class ADayHasPassed : INotification
+{
+    public ADayHasPassed(Instant now)
+    {
+        Now = now;
+    }
+
+    public Instant Now { get; }
+}

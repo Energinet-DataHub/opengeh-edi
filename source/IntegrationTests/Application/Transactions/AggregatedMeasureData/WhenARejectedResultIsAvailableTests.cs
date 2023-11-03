@@ -15,9 +15,9 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
-using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Common.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
@@ -32,11 +32,11 @@ using RejectReason = Energinet.DataHub.Edi.Responses.RejectReason;
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
 [IntegrationTest]
-public class WhenARejectedResultIsAvailableTests : ProcessTestBase
+public class WhenARejectedResultIsAvailableTests : TestBase
 {
     private readonly ProcessContext _processContext;
 
-    public WhenARejectedResultIsAvailableTests(ProcessDatabaseFixture databaseFixture)
+    public WhenARejectedResultIsAvailableTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _processContext = GetService<ProcessContext>();

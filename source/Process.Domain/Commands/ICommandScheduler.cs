@@ -12,20 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Common;
 
-namespace Energinet.DataHub.EDI.Infrastructure.DataRetention;
-
-/// <summary>
-/// Represent the contract for data retention for a single data source.
-/// A data source can be a database table.
-/// </summary>
-public interface IDataRetention
+namespace Energinet.DataHub.EDI.Process.Application.InternalCommands
 {
     /// <summary>
-    /// Responsible for cleaning the no longer needed data.
+    /// Service for scheduling and enqueueing internal commands for later processing
     /// </summary>
-    /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-    Task CleanupAsync(CancellationToken cancellationToken);
+    public interface ICommandScheduler
+    {
+        /// <summary>
+        /// Schedules or enqueues a command
+        /// </summary>
+        /// <param name="command"></param>
+        /// <typeparam name="TCommand"><see cref="InternalCommand"/></typeparam>
+        Task EnqueueAsync<TCommand>(TCommand command)
+            where TCommand : InternalCommand;
+    }
 }

@@ -16,10 +16,10 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
+using Energinet.DataHub.EDI.Common.DataAccess;
+using Energinet.DataHub.EDI.Common.Serialization;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Assertions;

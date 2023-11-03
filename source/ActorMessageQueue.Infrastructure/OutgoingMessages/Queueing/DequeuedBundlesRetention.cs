@@ -15,8 +15,8 @@
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.DataRetention;
+using Energinet.DataHub.EDI.Common.DataAccess;
+using Energinet.DataHub.EDI.Common.DataRetention;
 using Microsoft.Data.SqlClient;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Queueing;

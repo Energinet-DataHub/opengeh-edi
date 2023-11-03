@@ -18,7 +18,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization
+namespace Energinet.DataHub.EDI.Common.Serialization
 {
     /// <summary>
     /// Contract serialization and deserialization of JSON.

@@ -16,7 +16,6 @@ using System.Xml;
 using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.Xml;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages;
 
 namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
 
@@ -46,7 +45,7 @@ public class RejectRequestAggregatedMeasureDataXmlDocumentWriter : DocumentWrite
         if (marketActivityPayloads == null) throw new ArgumentNullException(nameof(marketActivityPayloads));
         if (writer == null) throw new ArgumentNullException(nameof(writer));
 
-        foreach (var rejectedTimeSerie in ParseFrom<RejectedTimeSerie>(marketActivityPayloads))
+        foreach (var rejectedTimeSerie in ParseFrom<RejectedTimeSerieMarketActivityRecord>(marketActivityPayloads))
         {
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Series", null).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, rejectedTimeSerie.TransactionId.ToString())

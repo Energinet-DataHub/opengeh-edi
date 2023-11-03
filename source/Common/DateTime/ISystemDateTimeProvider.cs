@@ -12,14 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Xunit;
+using NodaTime;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-
-[CollectionDefinition("ProcessIntegrationTest")]
-public class ProcessIntegrationTestFixture : ICollectionFixture<ProcessDatabaseFixture>
+namespace Energinet.DataHub.EDI.Common.DateTime
 {
-    // This class has no code, and is never created. Its purpose is simply
-    // to be the place to apply [CollectionDefinition] and all the
-    // ICollectionFixture<> interfaces.
+    /// <summary>
+    /// System time provider
+    /// </summary>
+    public interface ISystemDateTimeProvider
+    {
+        /// <summary>
+        /// Return current date and time
+        /// </summary>
+        /// <returns><see cref="Instant"/></returns>
+        Instant Now();
+    }
 }

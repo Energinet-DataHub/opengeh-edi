@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.Application.Actors;
-using Energinet.DataHub.EDI.Application.Configuration.Commands;
-using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
 using Energinet.DataHub.EDI.Application.GridAreas;
+using Energinet.DataHub.EDI.Common.DataRetention;
+using Energinet.DataHub.EDI.Common.TimeEvents;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;

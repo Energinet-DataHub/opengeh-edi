@@ -21,10 +21,10 @@ using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration.Authentication;
-using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Common.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
@@ -38,7 +38,7 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
-public class RequestAggregatedMeasureDataReceiverTests : ProcessTestBase, IAsyncLifetime
+public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetime
 {
     private readonly RequestAggregatedMeasureDataMarketMessageParser _requestAggregatedMeasureDataMarketMessageParser;
     private readonly ITransactionIdRepository _transactionIdRepository;
@@ -51,7 +51,7 @@ public class RequestAggregatedMeasureDataReceiverTests : ProcessTestBase, IAsync
     private readonly IMarketActorAuthenticator _marketActorAuthenticator;
     private readonly BusinessTypeValidator _businessTypeValidator;
 
-    public RequestAggregatedMeasureDataReceiverTests(ProcessDatabaseFixture databaseFixture)
+    public RequestAggregatedMeasureDataReceiverTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _requestAggregatedMeasureDataMarketMessageParser = GetService<RequestAggregatedMeasureDataMarketMessageParser>();

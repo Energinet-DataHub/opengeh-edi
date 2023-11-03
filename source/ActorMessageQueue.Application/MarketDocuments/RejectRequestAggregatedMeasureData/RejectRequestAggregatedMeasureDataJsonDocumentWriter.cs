@@ -17,7 +17,6 @@ using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.Json;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages;
 
 namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
 
@@ -98,13 +97,13 @@ public class RejectRequestAggregatedMeasureDataJsonDocumentWriter : IDocumentWri
         writer.WriteEndObject();
     }
 
-    private IReadOnlyCollection<RejectedTimeSerie> ParseFrom(IReadOnlyCollection<string> payloads)
+    private IReadOnlyCollection<RejectedTimeSerieMarketActivityRecord> ParseFrom(IReadOnlyCollection<string> payloads)
     {
         if (payloads == null) throw new ArgumentNullException(nameof(payloads));
-        var timeSeries = new List<RejectedTimeSerie>();
+        var timeSeries = new List<RejectedTimeSerieMarketActivityRecord>();
         foreach (var payload in payloads)
         {
-            timeSeries.Add(_parser.From<RejectedTimeSerie>(payload));
+            timeSeries.Add(_parser.From<RejectedTimeSerieMarketActivityRecord>(payload));
         }
 
         return timeSeries;

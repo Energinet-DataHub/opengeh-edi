@@ -16,9 +16,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Common.DataAccess;
 using MediatR;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
@@ -28,12 +27,12 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.Processing;
 public class UnitOfWorkBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : ICommand<TResponse>
 {
-    private readonly UnitOfWork _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
     private readonly ILogger<UnitOfWorkBehaviour<TRequest, TResponse>> _logger;
 
     public UnitOfWorkBehaviour(
-        UnitOfWork unitOfWork,
+        IUnitOfWork unitOfWork,
         IDatabaseConnectionFactory databaseConnectionFactory,
         ILogger<UnitOfWorkBehaviour<TRequest, TResponse>> logger)
     {
@@ -49,23 +48,34 @@ public class UnitOfWorkBehaviour<TRequest, TResponse> : IPipelineBehavior<TReque
     {
         if (next == null) throw new ArgumentNullException(nameof(next));
 
-        var result = await next().ConfigureAwait(false);
+        await _unitOfWork.BeginTransactionAsync().ConfigureAwait(false);
 
-        if (await InternalCommandAlreadyMarkedAsProcessedAsync(request, cancellationToken).ConfigureAwait(false))
+        try
         {
-            var commandId = (request as InternalCommand)?.Id;
-            _logger.Log(
-                LogLevel.Information,
-                "Command (id: {CommandId}, type: {CommandType}) was processed. All changes will be discarded",
-                commandId,
-                request.GetType());
-        }
-        else
-        {
-            await _unitOfWork.CommitAsync().ConfigureAwait(false);
-        }
+            var result = await next().ConfigureAwait(false);
 
-        return result;
+            if (await InternalCommandAlreadyMarkedAsProcessedAsync(request, cancellationToken).ConfigureAwait(false))
+            {
+                var commandId = (request as InternalCommand)?.Id;
+                _logger.Log(
+                    LogLevel.Information,
+                    "Command (id: {CommandId}, type: {CommandType}) was processed. All changes will be discarded",
+                    commandId,
+                    request.GetType());
+            }
+            else
+            {
+                await _unitOfWork.CommitTransactionAsync().ConfigureAwait(false);
+            }
+
+            return result;
+        }
+        catch (Exception)
+        {
+            // TODO: is this even necessary if the scope is aborted with an exception? - if not, we can remove the try and catch as well.
+            await _unitOfWork.RollbackAsync().ConfigureAwait(false);
+            throw;
+        }
     }
 
     private async Task<bool> InternalCommandAlreadyMarkedAsProcessedAsync(

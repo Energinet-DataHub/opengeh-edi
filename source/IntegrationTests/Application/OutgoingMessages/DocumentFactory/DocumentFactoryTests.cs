@@ -23,11 +23,11 @@ using Xunit;
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.DocumentFactory;
 
 public class DocumentFactoryTests
-    : ProcessTestBase
+    : TestBase
 {
     private readonly IEnumerable<IDocumentWriter> _documentWriters;
 
-    public DocumentFactoryTests(ProcessDatabaseFixture databaseFixture)
+    public DocumentFactoryTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _documentWriters = GetService<IEnumerable<IDocumentWriter>>();

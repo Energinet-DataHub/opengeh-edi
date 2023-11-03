@@ -15,7 +15,7 @@
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Common.DataAccess;
 using Microsoft.Data.SqlClient;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess

@@ -23,11 +23,10 @@ using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Common.Configuration;
+using Energinet.DataHub.EDI.Common.DataRetention;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Queueing;
-using Energinet.DataHub.EDI.Infrastructure.DataRetention;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using PeekResult = Energinet.DataHub.EDI.ActorMessageQueue.Contracts.PeekResult;
 
@@ -35,12 +34,9 @@ namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.Configuration;
 
 public static class ActorMessageQueueConfiguration
 {
-    public static void Configure(IServiceCollection services, string databaseConnectionString)
+    public static void Configure(IServiceCollection services)
     {
-        services.AddDbContext<ActorMessageQueueContext>(options =>
-            options.UseSqlServer(databaseConnectionString, y => y.UseNodaTime()));
-        services.AddScoped<UnitOfWork>();
-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>));
+        services.AddScopedSqlDbContext<ActorMessageQueueContext>();
 
         //AddMessageGenerationServices
         services.AddScoped<DocumentFactory>();
@@ -55,7 +51,6 @@ public static class ActorMessageQueueConfiguration
         //MessageEnqueueingConfiguration
         services.AddTransient<IEnqueueMessage, EnqueueMessage>();
         services.AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>();
-        //services.AddScoped<OutgoingMessageEnqueuer>();
 
         //PeekConfiguration
         services.AddScoped<IActorMessageQueueRepository, ActorMessageQueueRepository>();
