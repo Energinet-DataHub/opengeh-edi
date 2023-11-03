@@ -15,16 +15,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Process.Domain.Documents;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
 
 #pragma warning disable CA1711 // Identifiers should not have incorrect suffix
+
 public class ActorMessageQueue : Entity
 {
     // Used for persistent actor message queue entity.
     private readonly Guid _id;
+
     private readonly List<Bundle> _bundles = new();
 
     private ActorMessageQueue(Receiver receiver)
@@ -35,7 +37,8 @@ public class ActorMessageQueue : Entity
 
     public Receiver Receiver { get; set; }
 
-    #pragma warning disable
+#pragma warning disable
+
     private ActorMessageQueue()
     {
     }
@@ -45,14 +48,14 @@ public class ActorMessageQueue : Entity
         return new ActorMessageQueue(receiver);
     }
 
-    public void Enqueue(OutgoingMessage outgoingMessage, int? maxNumberOfMessagesInABundle = null)
+    public void Enqueue(OutgoingMessage outgoingMessage, Instant timeStamp, int? maxNumberOfMessagesInABundle = null)
     {
         ArgumentNullException.ThrowIfNull(outgoingMessage);
         EnsureApplicable(outgoingMessage);
 
         var currentBundle = CurrentBundleOf(BusinessReason.FromName(outgoingMessage.BusinessReason), outgoingMessage.DocumentType) ??
                             CreateBundleOf(BusinessReason.FromName(outgoingMessage.BusinessReason), outgoingMessage.DocumentType,
-                                SetMaxNumberOfMessagesInABundle(maxNumberOfMessagesInABundle, outgoingMessage.DocumentType));
+                                SetMaxNumberOfMessagesInABundle(maxNumberOfMessagesInABundle, outgoingMessage.DocumentType), timeStamp);
 
         currentBundle.Add(outgoingMessage);
     }
@@ -103,9 +106,9 @@ public class ActorMessageQueue : Entity
             && bundle.BusinessReason == businessReason);
     }
 
-    private Bundle CreateBundleOf(BusinessReason businessReason, DocumentType messageType, int maxNumberOfMessagesInABundle)
+    private Bundle CreateBundleOf(BusinessReason businessReason, DocumentType messageType, int maxNumberOfMessagesInABundle, Instant created)
     {
-        var bundle = new Bundle(BundleId.New(), businessReason, messageType, maxNumberOfMessagesInABundle);
+        var bundle = new Bundle(BundleId.New(), businessReason, messageType, maxNumberOfMessagesInABundle, created);
         _bundles.Add(bundle);
         return bundle;
     }
@@ -113,8 +116,8 @@ public class ActorMessageQueue : Entity
     private Bundle? NextBundleToPeek(MessageCategory? category = null)
     {
         var nextBundleToPeek = category is not null ?
-            _bundles.FirstOrDefault(bundle => bundle.IsDequeued == false && bundle.DocumentTypeInBundle.Category.Equals(category)) :
-            _bundles.FirstOrDefault(bundle => bundle.IsDequeued == false);
+            _bundles.Where(bundle => !bundle.IsDequeued && bundle.DocumentTypeInBundle.Category.Equals(category)).OrderBy(bundle => bundle.Created).FirstOrDefault() :
+            _bundles.Where(bundle => !bundle.IsDequeued).OrderBy(bundle => bundle.Created).FirstOrDefault();
 
         nextBundleToPeek?.CloseBundle();
 

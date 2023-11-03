@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.Application.Configuration.Authentication;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 using Energinet.DataHub.EDI.Process.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.Process.Domain.Documents;
 using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
@@ -66,9 +67,16 @@ public class PeekRequestListener
             return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
         }
 
+        var msgCategory = MessageCategory.None;
+
+        if (desiredDocumentFormat != DocumentFormat.Ebix)
+        {
+            msgCategory = EnumerationType.FromName<MessageCategory>(messageCategory);
+        }
+
         var peekResult = await _mediator.Send(new PeekCommand(
                 _authenticator.CurrentIdentity.Number!,
-                EnumerationType.FromName<MessageCategory>(messageCategory),
+                msgCategory,
                 _authenticator.CurrentIdentity.Roles.First(),
                 desiredDocumentFormat)).ConfigureAwait(false);
 
