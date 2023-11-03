@@ -169,7 +169,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
           SampleData.GridAreaCode,
           receiverRole == MarketRole.EnergySupplier ? SampleData.ReceiverNumber.Value : null,
           receiverRole == MarketRole.BalanceResponsibleParty ? SampleData.ReceiverNumber.Value : null,
-          SettlementVersion.FirstCorrection);
+          null);
 
         process.WasSentToWholesale();
         _processContext.AggregatedMeasureDataProcesses.Add(process);

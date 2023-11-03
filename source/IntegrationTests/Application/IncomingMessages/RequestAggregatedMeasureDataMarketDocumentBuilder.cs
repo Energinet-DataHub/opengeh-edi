@@ -39,7 +39,7 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
     private readonly ActorNumber _receiverId = DataHubDetails.IdentificationNumber;
     private readonly MarketRole _receiverRole = MarketRole.CalculationResponsibleRole;
     private readonly string _createdAt = SystemClock.Instance.GetCurrentInstant().ToString();
-    private readonly string? _settlementVersions = "D01";
+    private string? _settlementVersion;
     private string _messageId = Guid.NewGuid().ToString();
     private string _serieId = Guid.NewGuid().ToString();
     private string _senderRole = MarketRole.EnergySupplier.Code;
@@ -63,6 +63,12 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
     public RequestAggregatedMeasureDataMarketDocumentBuilder SetSenderRole(string senderRole)
     {
         _senderRole = senderRole;
+        return this;
+    }
+
+    public RequestAggregatedMeasureDataMarketDocumentBuilder SetSettlementVersion(string? settlementVersion)
+    {
+        _settlementVersion = settlementVersion;
         return this;
     }
 
@@ -109,7 +115,7 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
             _meteringGridAreaDomainId,
             _energySupplierMarketParticipantId,
             _balanceResponsiblePartyMarketParticipantId,
-            _settlementVersions);
+            _settlementVersion);
 
     private MessageHeader CreateHeader()
     {
