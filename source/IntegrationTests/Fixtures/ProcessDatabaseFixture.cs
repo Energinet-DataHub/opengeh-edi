@@ -26,34 +26,41 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
 {
     public class ProcessDatabaseFixture : IDisposable, IAsyncLifetime
     {
-        private static string _connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=B2BTransactions;Integrated Security=True;Connection Timeout=60";
         private readonly ProcessContext _processContext;
         private bool _disposed;
 
         public ProcessDatabaseFixture()
         {
-            var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.local.json", optional: true)
-                .Build();
-
-            var connectionStringFromConfig = configuration.GetConnectionString("Default");
-            if (!string.IsNullOrEmpty(connectionStringFromConfig))
-                _connectionString = connectionStringFromConfig;
-
-            var environmentVariableConnectionString = Environment.GetEnvironmentVariable("B2B_MESSAGING_CONNECTION_STRING");
-            if (!string.IsNullOrWhiteSpace(environmentVariableConnectionString))
-            {
-                _connectionString = environmentVariableConnectionString;
-            }
-
             var optionsBuilderProcess = new DbContextOptionsBuilder<ProcessContext>();
             optionsBuilderProcess
-                .UseSqlServer(_connectionString, options => options.UseNodaTime());
+                .UseSqlServer(ConnectionString, options => options.UseNodaTime());
 
             _processContext = new ProcessContext(optionsBuilderProcess.Options);
         }
 
-        public static string ConnectionString => _connectionString;
+        private static string ConnectionString
+        {
+            get
+            {
+                var connectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;Initial Catalog=B2BTransactions;Integrated Security=True;Connection Timeout=60";
+
+                var configuration = new ConfigurationBuilder()
+                    .AddJsonFile("appsettings.local.json", optional: true)
+                    .Build();
+
+                var connectionStringFromConfig = configuration.GetConnectionString("Default");
+                if (!string.IsNullOrEmpty(connectionStringFromConfig))
+                    connectionString = connectionStringFromConfig;
+
+                var environmentVariableConnectionString = Environment.GetEnvironmentVariable("B2B_MESSAGING_CONNECTION_STRING");
+                if (!string.IsNullOrWhiteSpace(environmentVariableConnectionString))
+                {
+                    connectionString = environmentVariableConnectionString;
+                }
+
+                return connectionString;
+            }
+        }
 
         public Task InitializeAsync()
         {
