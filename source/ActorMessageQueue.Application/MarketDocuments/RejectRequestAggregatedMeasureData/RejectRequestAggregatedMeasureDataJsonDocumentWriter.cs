@@ -22,7 +22,7 @@ namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.Re
 
 public class RejectRequestAggregatedMeasureDataJsonDocumentWriter : IDocumentWriter
 {
-    private const string DocumentType = "RejectRequestAggregatedMeasureData_MarketDocument";
+    private const string DocumentTypeName = "RejectRequestAggregatedMeasureData_MarketDocument";
     private const string TypeCode = "ERR";
     private readonly IMessageRecordParser _parser;
 
@@ -40,7 +40,7 @@ public class RejectRequestAggregatedMeasureDataJsonDocumentWriter : IDocumentWri
 
     public bool HandlesType(DocumentType documentType)
     {
-        return documentType == EDI.Common.DocumentType.RejectRequestAggregatedMeasureData;
+        return documentType == DocumentType.RejectRequestAggregatedMeasureData;
     }
 
     public async Task<Stream> WriteAsync(OutgoingMessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
@@ -49,7 +49,7 @@ public class RejectRequestAggregatedMeasureDataJsonDocumentWriter : IDocumentWri
         var options = new JsonWriterOptions() { Indented = true };
         using var writer = new Utf8JsonWriter(stream, options);
 
-        JsonHeaderWriter.Write(header, DocumentType, TypeCode, CimCode.Of(ReasonCode.FullyRejected), writer);
+        JsonHeaderWriter.Write(header, DocumentTypeName, TypeCode, CimCode.Of(ReasonCode.FullyRejected), writer);
         WriteSeries(marketActivityRecords, writer);
         writer.WriteEndObject();
         await writer.FlushAsync().ConfigureAwait(false);

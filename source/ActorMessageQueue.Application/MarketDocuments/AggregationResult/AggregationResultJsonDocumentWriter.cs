@@ -23,7 +23,7 @@ namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.Ag
 
 public class AggregationResultJsonDocumentWriter : IDocumentWriter
 {
-    private const string DocumentType = "NotifyAggregatedMeasureData_MarketDocument";
+    private const string DocumentTypeName = "NotifyAggregatedMeasureData_MarketDocument";
     private const string TypeCode = "E31";
     private readonly IMessageRecordParser _parser;
 
@@ -41,7 +41,7 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
 
     public bool HandlesType(DocumentType documentType)
     {
-        return documentType == EDI.Common.DocumentType.NotifyAggregatedMeasureData;
+        return documentType == DocumentType.NotifyAggregatedMeasureData;
     }
 
     public async Task<Stream> WriteAsync(OutgoingMessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
@@ -50,7 +50,7 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
         var options = new JsonWriterOptions() { Indented = true };
         using var writer = new Utf8JsonWriter(stream, options);
 
-        JsonHeaderWriter.Write(header, DocumentType, TypeCode, null, writer);
+        JsonHeaderWriter.Write(header, DocumentTypeName, TypeCode, null, writer);
         WriteSeries(marketActivityRecords, writer);
         writer.WriteEndObject();
         await writer.FlushAsync().ConfigureAwait(false);

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.EDI.ActorMessageQueue.Application.Configuration;
 using Energinet.DataHub.EDI.Common.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
@@ -38,11 +39,12 @@ namespace Energinet.DataHub.EDI.Process.Application.Configuration;
 
 public static class ProcessConfiguration
 {
-    public static void Configure(IServiceCollection services)
+    public static void Configure(IServiceCollection services, Action<IServiceCollection> actorMessageQueueConfiguration)
     {
-        services.AddScopedSqlDbContext<ProcessContext>();
+        if (actorMessageQueueConfiguration == null) throw new ArgumentNullException(nameof(actorMessageQueueConfiguration));
 
-        ActorMessageQueueConfiguration.Configure(services);
+        services.AddScopedSqlDbContext<ProcessContext>();
+        actorMessageQueueConfiguration(services);
 
         //EventsConfiguration
         //TODO: can we move them out and delete ref to Infrastructure?
@@ -55,6 +57,9 @@ public static class ProcessConfiguration
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RaiseDomainEventsBehaviour<,>));
 
+        //EnqueueMessageConfiguration
+        services.AddTransient<INotificationHandler<EnqueueMessageEvent>, EnqueueMessageHandler>();
+
         //AggregationsConfiguration
         services.AddTransient<IRequestHandler<ForwardAggregationResult, Unit>, ForwardAggregationResultHandler>();
         services.AddScoped<AggregationFactory>();
@@ -64,7 +69,6 @@ public static class ProcessConfiguration
         services.AddTransient<IRequestHandler<AcceptedAggregatedTimeSerie, Unit>, AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable>();
         services.AddTransient<IRequestHandler<RejectedAggregatedTimeSeries, Unit>, RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable>();
         services.AddTransient<INotificationHandler<AggregatedMeasureProcessIsInitialized>, NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized>();
-        services.AddTransient<INotificationHandler<EnqueueMessageEvent>, EnqueueMessageHandler>();
         services.AddTransient<IRequestHandler<InitializeAggregatedMeasureDataProcessesCommand, Result>, InitializeAggregatedMeasureDataProcessesHandler>();
         services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>, WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable>();
         services.AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasRejected>, WhenAnRejectedAggregatedTimeSeriesRequestIsAvailable>();

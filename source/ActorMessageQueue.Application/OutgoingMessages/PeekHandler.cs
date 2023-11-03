@@ -97,7 +97,7 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
         var actorMessageQueue = await
             _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.ActorRole).ConfigureAwait(false);
         var peekResult = actorMessageQueue?.Peek(request.MessageCategory);
-        if (peekResult is { })
+        if (peekResult != null)
             await _actorMessageQueueContext.SaveChangesAsync().ConfigureAwait(false);
     }
 }

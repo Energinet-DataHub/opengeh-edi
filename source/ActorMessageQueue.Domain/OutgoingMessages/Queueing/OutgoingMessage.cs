@@ -14,7 +14,6 @@
 
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Domain;
 
 namespace Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing
 {

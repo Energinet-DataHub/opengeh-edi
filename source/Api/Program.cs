@@ -19,6 +19,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.Configuration;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.Bearer;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.MarketActors;
@@ -145,7 +146,7 @@ namespace Energinet.DataHub.EDI.Api
                     };
                     services.AddSubscriber<IntegrationEventHandler>(integrationEventDescriptors);
 
-                    ProcessConfiguration.Configure(services);
+                    ProcessConfiguration.Configure(services, ActorMessageQueueConfiguration.Configure);
                 })
                 .ConfigureLogging(logging =>
                 {

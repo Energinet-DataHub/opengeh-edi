@@ -21,7 +21,9 @@ public sealed class SqlConnectionSource : IDisposable
 {
     public SqlConnectionSource(string databaseConnectionString)
     {
-        Connection = new SqlConnection(databaseConnectionString);
+        var builder = new SqlConnectionStringBuilder(databaseConnectionString);
+        builder.Encrypt = true;
+        Connection = new SqlConnection(builder.ConnectionString);
     }
 
     public SqlConnection Connection { get;  }

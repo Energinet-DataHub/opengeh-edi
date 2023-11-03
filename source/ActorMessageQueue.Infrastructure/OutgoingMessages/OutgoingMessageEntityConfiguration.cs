@@ -60,12 +60,6 @@ namespace Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.OutgoingMessage
                 fromDbValue => fromDbValue == Guid.Empty ? null : BundleId.Create(fromDbValue));
 
             builder.Ignore(x => x.Receiver);
-
-            // builder
-            //     .HasDiscriminator<string>("Discriminator")
-            //     .HasValue<OutgoingMessage>(nameof(OutgoingMessage))
-            //     .HasValue<AggregationResultMessage>(DocumentType.NotifyAggregatedMeasureData.Name)
-            //     .IsComplete(false);
         }
     }
 }
