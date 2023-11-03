@@ -41,19 +41,25 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
 
     public async Task<INotification> MapFromAsync(string payload, Guid referenceId, CancellationToken cancellationToken)
     {
-        var aggregation =
+        var aggregations =
             AggregatedTimeSeriesRequestAccepted.Parser.ParseJson(payload);
 
-        var aggregatedTimeSerie = new AggregatedTimeSerie(
+        ArgumentNullException.ThrowIfNull(aggregations);
+
+        var aggregatedTimeSeries = new List<AggregatedTimeSerie>();
+        foreach (var aggregation in aggregations.Series)
+        {
+            aggregatedTimeSeries.Add(new AggregatedTimeSerie(
                 MapPoints(aggregation.TimeSeriesPoints),
                 MapMeteringPointType(aggregation.TimeSeriesType),
                 MapUnitType(aggregation.QuantityUnit),
                 MapResolution(aggregation.Resolution),
-                await MapGridAreaDetailsAsync(aggregation.GridArea, cancellationToken).ConfigureAwait(false));
+                await MapGridAreaDetailsAsync(aggregation.GridArea, cancellationToken).ConfigureAwait(false)));
+        }
 
         return new AggregatedTimeSerieRequestWasAccepted(
             referenceId,
-            aggregatedTimeSerie);
+            aggregatedTimeSeries);
     }
 
     public bool CanHandle(string eventType)

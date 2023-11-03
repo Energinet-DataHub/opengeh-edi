@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
@@ -54,7 +55,7 @@ public class RequestAggregatedMeasuredDataProcessInvoker
         _processContext.SaveChanges();
 
         var acceptedAggregation = CreateAggregatedTimeSerie();
-        await _mediator.Send(new AcceptedAggregatedTimeSerie(process.ProcessId.Id, acceptedAggregation)).ConfigureAwait(false);
+        await _mediator.Send(new AcceptedAggregatedTimeSerie(process.ProcessId.Id, new List<AggregatedTimeSerie> { acceptedAggregation })).ConfigureAwait(false);
     }
 
     private static AggregatedTimeSerie CreateAggregatedTimeSerie()

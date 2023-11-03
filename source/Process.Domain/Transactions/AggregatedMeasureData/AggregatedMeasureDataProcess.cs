@@ -126,13 +126,17 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             }
         }
 
-        public void IsAccepted(Aggregation aggregation)
+        public void IsAccepted(IReadOnlyList<Aggregation> aggregations)
         {
-            if (aggregation == null) throw new ArgumentNullException(nameof(aggregation));
+            if (aggregations == null) throw new ArgumentNullException(nameof(aggregations));
 
             if (_state == State.Sent)
             {
-                _messages.Add(AggregationResultMessageFactory.CreateMessage(aggregation, ProcessId));
+                foreach (var aggregation in aggregations)
+                {
+                    _messages.Add(AggregationResultMessageFactory.CreateMessage(aggregation, ProcessId));
+                }
+
                 _state = State.Accepted;
             }
         }

@@ -57,7 +57,26 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : ProcessTestBase
         var acceptedAggregation = CreateAcceptedAggregation();
 
         // Act
-        process.IsAccepted(acceptedAggregation);
+        process.IsAccepted(new List<Aggregation> { acceptedAggregation });
+
+        // Assert
+        AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);
+        AssertOutgoingMessageCreated(process, expectedOutgoingMessages);
+    }
+
+    [Fact]
+    public async Task Aggregated_measure_data_response_was_accepted_with_two_series()
+    {
+        // Arrange
+        var expectedOutgoingMessages = 2;
+        var marketMessage = MessageBuilder().Build();
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
+        var process = GetProcess(marketMessage.SenderNumber);
+        process!.WasSentToWholesale();
+        var acceptedAggregation = CreateAcceptedAggregation();
+
+        // Act
+        process.IsAccepted(new List<Aggregation> { acceptedAggregation, acceptedAggregation });
 
         // Assert
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);
@@ -76,8 +95,8 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : ProcessTestBase
         var acceptedAggregation = CreateAcceptedAggregation();
 
         // Act
-        process.IsAccepted(acceptedAggregation);
-        process.IsAccepted(acceptedAggregation);
+        process.IsAccepted(new List<Aggregation> { acceptedAggregation });
+        process.IsAccepted(new List<Aggregation> { acceptedAggregation });
 
         // Assert
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);

@@ -15,7 +15,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.Configuration.Commands;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using MediatR;
@@ -34,6 +33,6 @@ public class WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable : INotificatio
     public Task Handle(AggregatedTimeSerieRequestWasAccepted notification, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(notification);
-        return _commandSchedulerFacade.EnqueueAsync(new AcceptedAggregatedTimeSerie(notification.ProcessId, notification.AggregatedTimeSerie));
+        return _commandSchedulerFacade.EnqueueAsync(new AcceptedAggregatedTimeSerie(notification.ProcessId, notification.AggregatedTimeSeries));
     }
 }

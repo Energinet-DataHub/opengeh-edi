@@ -122,8 +122,7 @@ public class WhenAnAcceptedResultIsAvailableTests : ProcessTestBase
             QuantityQuality = QuantityQuality.Incomplete,
             Time = new Timestamp() { Seconds = 1, },
         };
-
-        return new AggregatedTimeSeriesRequestAccepted()
+        var serie = new Serie
         {
             GridArea = aggregatedMeasureDataProcess.MeteringGridAreaDomainId,
             QuantityUnit = QuantityUnit.Kwh,
@@ -131,6 +130,11 @@ public class WhenAnAcceptedResultIsAvailableTests : ProcessTestBase
             TimeSeriesType = TimeSeriesType.Production,
             Resolution = Resolution.Pt15M,
         };
+
+        var aggregatedTimeSerie = new AggregatedTimeSeriesRequestAccepted();
+        aggregatedTimeSerie.Series.Add(serie);
+
+        return aggregatedTimeSerie;
     }
 
     private async Task AddInboxEvent(
