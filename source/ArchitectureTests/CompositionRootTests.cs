@@ -189,7 +189,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
             private static string CreateConnectionString()
             {
                 return
-                    "Server=(LocalDB)\\\\MSSQLLocalDB;Database=B2BTransactions;User=User;Password=Password;TrustServerCertificate=true;Trusted_Connection=True;";
+                    "Server=(LocalDB)\\\\MSSQLLocalDB;Database=B2BTransactions;User=User;Password=Password;TrustServerCertificate=true;Encrypt=True;Trusted_Connection=True;";
             }
         }
     }
