@@ -16,10 +16,10 @@ namespace Energinet.DataHub.EDI.Common;
 
 public class MessageCategory : EnumerationType
 {
+    public static readonly MessageCategory None = new(0, nameof(None));
     public static readonly MessageCategory Aggregations = new(1, nameof(Aggregations));
 
     // Message category can not be peeked
-    public static readonly MessageCategory None = new(2, nameof(None));
 
     private MessageCategory(int id, string name)
         : base(id, name)

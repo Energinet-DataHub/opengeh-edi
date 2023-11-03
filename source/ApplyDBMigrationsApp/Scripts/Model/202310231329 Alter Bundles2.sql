@@ -1,0 +1,1 @@
+﻿alter table Bundles alter column Created datetime2(7) not null;

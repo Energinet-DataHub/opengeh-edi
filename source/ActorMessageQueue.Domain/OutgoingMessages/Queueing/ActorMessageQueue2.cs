@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.Common;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
 
@@ -41,14 +42,14 @@ public class ActorMessageQueue2
         return new ActorMessageQueue2(receiver);
     }
 
-    public void Enqueue(OutgoingMessage outgoingMessage, int? maxNumberOfMessagesInABundle = null)
+    public void Enqueue(OutgoingMessage outgoingMessage, Instant timeStamp, int? maxNumberOfMessagesInABundle = null)
     {
         ArgumentNullException.ThrowIfNull(outgoingMessage);
         EnsureApplicable(outgoingMessage);
 
         var currentBundle = CurrentBundleOf(BusinessReason.FromName(outgoingMessage.BusinessReason), outgoingMessage.DocumentType) ??
                             CreateBundleOf(BusinessReason.FromName(outgoingMessage.BusinessReason), outgoingMessage.DocumentType,
-                                SetMaxNumberOfMessagesInABundle(maxNumberOfMessagesInABundle, outgoingMessage.DocumentType));
+                                SetMaxNumberOfMessagesInABundle(maxNumberOfMessagesInABundle, outgoingMessage.DocumentType), timeStamp);
 
         currentBundle.Add(outgoingMessage);
     }
@@ -99,9 +100,9 @@ public class ActorMessageQueue2
             && bundle.BusinessReason == businessReason);
     }
 
-    private Bundle CreateBundleOf(BusinessReason businessReason, DocumentType messageType, int maxNumberOfMessagesInABundle)
+    private Bundle CreateBundleOf(BusinessReason businessReason, DocumentType messageType, int maxNumberOfMessagesInABundle, Instant created)
     {
-        var bundle = new Bundle(BundleId.New(), businessReason, messageType, maxNumberOfMessagesInABundle);
+        var bundle = new Bundle(BundleId.New(), businessReason, messageType, maxNumberOfMessagesInABundle, created);
         _bundles.Add(bundle);
         return bundle;
     }
@@ -109,8 +110,8 @@ public class ActorMessageQueue2
     private Bundle? NextBundleToPeek(MessageCategory? category = null)
     {
         var nextBundleToPeek = category is not null ?
-            _bundles.FirstOrDefault(bundle => bundle.IsDequeued == false && bundle.DocumentTypeInBundle.Category.Equals(category)) :
-            _bundles.FirstOrDefault(bundle => bundle.IsDequeued == false);
+            _bundles.Where(bundle => !bundle.IsDequeued && bundle.DocumentTypeInBundle.Category.Equals(category)).OrderBy(bundle => bundle.Created).FirstOrDefault() :
+            _bundles.Where(bundle => !bundle.IsDequeued).OrderBy(bundle => bundle.Created).FirstOrDefault();
 
         nextBundleToPeek?.CloseBundle();
 

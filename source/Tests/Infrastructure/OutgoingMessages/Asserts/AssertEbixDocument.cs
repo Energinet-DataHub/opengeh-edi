@@ -14,6 +14,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,15 +35,23 @@ public class AssertEbixDocument
     private readonly DocumentValidator? _documentValidator;
     private readonly XDocument _document;
     private readonly XmlNamespaceManager _xmlNamespaceManager;
+    private readonly XDocument _originalMessage;
 
     private AssertEbixDocument(Stream stream, string prefix)
     {
-        _stream = stream;
         _prefix = prefix;
         using var reader = XmlReader.Create(stream);
-        _document = XDocument.Load(reader);
+        _originalMessage = XDocument.Load(reader);
+
+        var elm = _originalMessage.Root!.Descendants().Single(x => x.Name.LocalName == "Payload").Descendants().First();
+        _document = XDocument.Parse(elm.ToString());
+
         _xmlNamespaceManager = new XmlNamespaceManager(reader.NameTable);
-        _xmlNamespaceManager.AddNamespace(prefix, _document.Root!.Name.NamespaceName);
+        _xmlNamespaceManager.AddNamespace(prefix, _document!.Root!.Name.NamespaceName);
+        stream = new MemoryStream();
+        _document.Save(stream);
+        stream.Position = 0;
+        _stream = stream;
     }
 
     private AssertEbixDocument(Stream stream, string prefix, DocumentValidator documentValidator)
@@ -77,6 +86,10 @@ public class AssertEbixDocument
 
     public async Task<AssertEbixDocument> HasValidStructureAsync(DocumentType type, string version = "0.1")
     {
+        Assert.True(_originalMessage.Root!.Name == "MessageContainer");
+        Assert.NotNull(_originalMessage.Root!.Elements().Single(x => x.Name.LocalName == "MessageReference"));
+        Assert.NotNull(_originalMessage.Root!.Elements().Single(x => x.Name.LocalName == "DocumentType"));
+        Assert.NotNull(_originalMessage.Root!.Elements().Single(x => x.Name.LocalName == "MessageType"));
         var validationResult = await _documentValidator!.ValidateAsync(_stream, DocumentFormat.Ebix, type, CancellationToken.None, version).ConfigureAwait(false);
         Assert.True(validationResult.IsValid);
         return this;

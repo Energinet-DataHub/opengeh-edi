@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.Common;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
 
@@ -22,16 +23,18 @@ public sealed class Bundle
     private int _messageCount;
 
 #pragma warning disable
+
     private Bundle()
     {
     }
 
-    internal Bundle(BundleId id, BusinessReason businessReason, DocumentType documentTypeInBundle, int maxNumberOfMessagesInABundle)
+    internal Bundle(BundleId id, BusinessReason businessReason, DocumentType documentTypeInBundle, int maxNumberOfMessagesInABundle, Instant created)
     {
         _maxNumberOfMessagesInABundle = maxNumberOfMessagesInABundle;
         Id = id;
         BusinessReason = businessReason;
         DocumentTypeInBundle = documentTypeInBundle;
+        Created = created;
     }
 
     internal DocumentType DocumentTypeInBundle { get; }
@@ -44,9 +47,12 @@ public sealed class Bundle
 
     public bool IsDequeued { get; private set; }
 
+    public Instant Created { get; private set; }
+
     internal void Add(OutgoingMessage outgoingMessage)
     {
-        if (IsClosed) return;
+        if (IsClosed)
+            return;
         outgoingMessage.AssignToBundle(Id);
         _messageCount++;
         CloseBundleIfFull();

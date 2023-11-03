@@ -16,10 +16,10 @@ using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Domain.ArchivedMessages;
 using MediatR;
 using NodaTime;
-using IUnitOfWork = Energinet.DataHub.EDI.Common.IUnitOfWork;
 using PeekResult = Energinet.DataHub.EDI.ActorMessageQueue.Contracts.PeekResult;
 
 namespace Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages;
@@ -58,7 +58,8 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
             _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.ActorRole).ConfigureAwait(false);
         if (actorMessageQueue is null)
             return new PeekResult(null);
-        var peekResult = actorMessageQueue.Peek(request.MessageCategory);
+
+        var peekResult = request.DocumentFormat == DocumentFormat.Ebix ? actorMessageQueue.Peek() : actorMessageQueue.Peek(request.MessageCategory);
 
         if (peekResult.BundleId == null)
             return new PeekResult(null);

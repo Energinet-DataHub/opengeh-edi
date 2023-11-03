@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
@@ -19,8 +20,11 @@ using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
 using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.DataAccess;
+using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
@@ -29,12 +33,14 @@ public class WhenEnqueueingTests : TestBase
 {
     private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
     private readonly IEnqueueMessage _enqueueMessage;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
     public WhenEnqueueingTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
         _enqueueMessage = GetService<IEnqueueMessage>();
+        _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
     }
 
     [Fact]
@@ -74,6 +80,27 @@ public class WhenEnqueueingTests : TestBase
         var result = await InvokeCommandAsync(command);
 
         Assert.NotNull(result.MessageId);
+    }
+
+    [Fact]
+    public async Task Can_peek_oldest_bundle()
+    {
+        var message = _outgoingMessageDtoBuilder.Build();
+        await EnqueueMessage(message);
+        ((SystemDateTimeProviderStub)_systemDateTimeProvider).SetNow(_systemDateTimeProvider.Now().PlusSeconds(1));
+        var message2 = _outgoingMessageDtoBuilder.Build();
+        await EnqueueMessage(message2);
+
+        var command = new PeekCommand(message.ReceiverId, message.DocumentType.Category, message.ReceiverRole, DocumentFormat.Ebix);
+
+        var result = await InvokeCommandAsync(command);
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+        var sql = "SELECT top 1 id FROM [dbo].[Bundles] order by created";
+        var id = await
+            connection
+                .QuerySingleOrDefaultAsync<Guid>(sql);
+
+        Assert.Equal(result.MessageId, id);
     }
 
     [Fact]

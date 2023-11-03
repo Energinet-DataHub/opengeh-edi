@@ -16,6 +16,7 @@ using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
+using NodaTime;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Domain.OutgoingMessages.Queueing;
@@ -28,7 +29,7 @@ public class ActorMessageQueueTests
         var actorMessageQueue = ActorMessageQueue2.CreateFor(Receiver.Create(ActorNumber.Create("1234567890123"), MarketRole.EnergySupplier));
         var outgoingMessage = CreateOutgoingMessage(Receiver.Create(ActorNumber.Create("1234567890124"), MarketRole.EnergySupplier), BusinessReason.BalanceFixing);
 
-        Assert.Throws<ReceiverMismatchException>(() => actorMessageQueue.Enqueue(outgoingMessage));
+        Assert.Throws<ReceiverMismatchException>(() => actorMessageQueue.Enqueue(outgoingMessage, SystemClock.Instance.GetCurrentInstant()));
     }
 
     [Fact]
@@ -38,7 +39,7 @@ public class ActorMessageQueueTests
         var actorMessageQueue = ActorMessageQueue2.CreateFor(receiver);
         var outgoingMessage = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
 
-        actorMessageQueue.Enqueue(outgoingMessage);
+        actorMessageQueue.Enqueue(outgoingMessage, SystemClock.Instance.GetCurrentInstant());
 
         Assert.NotNull(outgoingMessage.AssignedBundleId);
     }
@@ -59,7 +60,7 @@ public class ActorMessageQueueTests
         var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), MarketRole.EnergySupplier);
         var actorMessageQueue = ActorMessageQueue2.CreateFor(receiver);
         var outgoingMessage = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
-        actorMessageQueue.Enqueue(outgoingMessage);
+        actorMessageQueue.Enqueue(outgoingMessage, SystemClock.Instance.GetCurrentInstant());
 
         var result = actorMessageQueue.Peek();
 
@@ -72,7 +73,7 @@ public class ActorMessageQueueTests
         var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), MarketRole.EnergySupplier);
         var actorMessageQueue = ActorMessageQueue2.CreateFor(receiver);
         var outgoingMessage = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
-        actorMessageQueue.Enqueue(outgoingMessage);
+        actorMessageQueue.Enqueue(outgoingMessage, SystemClock.Instance.GetCurrentInstant());
 
         var result = actorMessageQueue.Peek();
 
@@ -85,8 +86,8 @@ public class ActorMessageQueueTests
     {
         var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), MarketRole.EnergySupplier);
         var actorMessageQueue = ActorMessageQueue2.CreateFor(receiver);
-        actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing), maxNumberOfMessagesInABundle: 1);
-        actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing), maxNumberOfMessagesInABundle: 1);
+        actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing), SystemClock.Instance.GetCurrentInstant(), maxNumberOfMessagesInABundle: 1);
+        actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing), SystemClock.Instance.GetCurrentInstant(), maxNumberOfMessagesInABundle: 1);
 
         var firstBundle = actorMessageQueue.Peek();
         actorMessageQueue.Dequeue(firstBundle.BundleId!);
@@ -102,8 +103,8 @@ public class ActorMessageQueueTests
     {
         var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), MarketRole.EnergySupplier);
         var actorMessageQueue = ActorMessageQueue2.CreateFor(receiver);
-        actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.MoveIn, DocumentType.NotifyAggregatedMeasureData), maxNumberOfMessagesInABundle: 2);
-        actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing, DocumentType.RejectRequestAggregatedMeasureData), maxNumberOfMessagesInABundle: 2);
+        actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.MoveIn, DocumentType.NotifyAggregatedMeasureData), SystemClock.Instance.GetCurrentInstant(), maxNumberOfMessagesInABundle: 2);
+        actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing, DocumentType.RejectRequestAggregatedMeasureData), SystemClock.Instance.GetCurrentInstant(), maxNumberOfMessagesInABundle: 2);
 
         var firstPeekResult = actorMessageQueue.Peek(MessageCategory.Aggregations);
         actorMessageQueue.Dequeue(firstPeekResult.BundleId!);
@@ -122,8 +123,8 @@ public class ActorMessageQueueTests
         var actorMessageQueue = ActorMessageQueue2.CreateFor(receiver);
         var messageAssignedToFirstBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
         var messageAssignedToSecondBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
-        actorMessageQueue.Enqueue(messageAssignedToFirstBundle, 1);
-        actorMessageQueue.Enqueue(messageAssignedToSecondBundle, 1);
+        actorMessageQueue.Enqueue(messageAssignedToFirstBundle, SystemClock.Instance.GetCurrentInstant(), 1);
+        actorMessageQueue.Enqueue(messageAssignedToSecondBundle, SystemClock.Instance.GetCurrentInstant(), 1);
 
         var result = actorMessageQueue.Peek();
 
@@ -137,10 +138,10 @@ public class ActorMessageQueueTests
         var actorMessageQueue = ActorMessageQueue2.CreateFor(receiver);
         var messageAssignedToFirstBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
         var messageAssignedToSecondBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
-        actorMessageQueue.Enqueue(messageAssignedToFirstBundle, 1);
+        actorMessageQueue.Enqueue(messageAssignedToFirstBundle, SystemClock.Instance.GetCurrentInstant(), 1);
 
         actorMessageQueue.Peek();
-        actorMessageQueue.Enqueue(messageAssignedToSecondBundle, 1);
+        actorMessageQueue.Enqueue(messageAssignedToSecondBundle, SystemClock.Instance.GetCurrentInstant(), 1);
 
         Assert.NotEqual(messageAssignedToFirstBundle.AssignedBundleId, messageAssignedToSecondBundle.AssignedBundleId);
     }
@@ -152,10 +153,10 @@ public class ActorMessageQueueTests
         var actorMessageQueue = ActorMessageQueue2.CreateFor(receiver);
 
         var messageAssignedToFirstBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing, DocumentType.NotifyAggregatedMeasureData);
-        actorMessageQueue.Enqueue(messageAssignedToFirstBundle);
+        actorMessageQueue.Enqueue(messageAssignedToFirstBundle, SystemClock.Instance.GetCurrentInstant());
 
         var messageAssignedToSecondBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
-        actorMessageQueue.Enqueue(messageAssignedToSecondBundle);
+        actorMessageQueue.Enqueue(messageAssignedToSecondBundle, SystemClock.Instance.GetCurrentInstant());
 
         Assert.NotEqual(messageAssignedToFirstBundle!.AssignedBundleId, messageAssignedToSecondBundle.AssignedBundleId);
     }

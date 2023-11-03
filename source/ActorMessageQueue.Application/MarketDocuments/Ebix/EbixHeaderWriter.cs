@@ -30,10 +30,14 @@ internal static class EbixHeaderWriter
         if (documentDetails == null) throw new ArgumentNullException(nameof(documentDetails));
 
         await writer.WriteStartDocumentAsync().ConfigureAwait(false);
-        await writer.WriteStartElementAsync(
-            documentDetails.Prefix,
-            documentDetails.Type,
-            documentDetails.XmlNamespace).ConfigureAwait(false);
+
+        // Write Messageconatiner
+        await writer.WriteStartElementAsync(null, "MessageContainer", null).ConfigureAwait(false);
+        await writer.WriteElementStringAsync(null, "MessageReference", "urn:www:datahub:dk:b2b:v01", $"ENDK_{Guid.NewGuid():N}").ConfigureAwait(false);
+        await writer.WriteElementStringAsync(null, "DocumentType", "urn:www:datahub:dk:b2b:v01", $"{documentDetails.Type.Replace("DK_", string.Empty, StringComparison.InvariantCultureIgnoreCase)}").ConfigureAwait(false);
+        await writer.WriteElementStringAsync(null, "MessageType", "urn:www:datahub:dk:b2b:v01", "XML").ConfigureAwait(false);
+        await writer.WriteStartElementAsync(null, "Payload", "urn:www:datahub:dk:b2b:v01").ConfigureAwait(false);
+        await writer.WriteStartElementAsync(documentDetails.Prefix, documentDetails.Type, documentDetails.XmlNamespace).ConfigureAwait(false);
 
         // Begin HeaderEnergyDocument
         await writer.WriteStartElementAsync(documentDetails.Prefix, "HeaderEnergyDocument", null).ConfigureAwait(false);

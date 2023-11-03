@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.OutgoingMessages.Queueing;
 
@@ -50,6 +51,7 @@ public class ActorMessageQueueEntityConfiguration : IEntityTypeConfiguration<Ene
                 .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<BusinessReason>(fromDbValue));
             navigationBuilder.Property<int>("_messageCount").HasColumnName("MessageCount");
             navigationBuilder.Property<int>("_maxNumberOfMessagesInABundle").HasColumnName("MaxMessageCount");
+            navigationBuilder.Property<Instant>("Created").HasColumnName("Created");
             navigationBuilder.WithOwner().HasForeignKey("ActorMessageQueueId");
         });
     }

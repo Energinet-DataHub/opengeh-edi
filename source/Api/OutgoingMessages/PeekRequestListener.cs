@@ -68,9 +68,16 @@ public class PeekRequestListener
             return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
         }
 
+        var msgCategory = MessageCategory.None;
+
+        if (desiredDocumentFormat != DocumentFormat.Ebix)
+        {
+            msgCategory = EnumerationType.FromName<MessageCategory>(messageCategory);
+        }
+
         var peekResult = await _mediator.Send(new PeekCommand(
                 _authenticator.CurrentIdentity.Number!,
-                EnumerationType.FromName<MessageCategory>(messageCategory),
+                msgCategory,
                 _authenticator.CurrentIdentity.Roles.First(),
                 desiredDocumentFormat)).ConfigureAwait(false);
 
