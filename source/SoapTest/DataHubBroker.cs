@@ -15,12 +15,10 @@
 using System;
 using System.Configuration;
 using System.Diagnostics;
-using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Xml;
-using Energinet.DataHub.B2B.RSM.Extensions;
-using Energinet.DataHub.B2B.RSM.RSM011.V3.Notify;
+using SoapTest.RSM.Extensions;
 
 namespace Kamstrup.DataHub.Integration.DataHub
 {
@@ -87,6 +85,7 @@ namespace Kamstrup.DataHub.Integration.DataHub
         }
 
 #nullable enable
+
         /// <summary>
         /// Checks for waiting responses
         /// </summary>
@@ -182,6 +181,7 @@ namespace Kamstrup.DataHub.Integration.DataHub
 
             return null;
         }
+
 #nullable disable
 
         public RsmSynchronousMessage SendMessage(XmlDocument document, string messageId, string documentType)
