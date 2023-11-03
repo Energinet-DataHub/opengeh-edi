@@ -58,9 +58,6 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             RequestedByActorId = requestedByActorId;
             RequestedByActorRoleCode = requestedByActorRoleCode;
             AddDomainEvent(new AggregatedMeasureProcessIsInitialized(processId));
-
-            if (BusinessReason == BusinessReason.Correction && SettlementVersion == null)
-                SettlementVersion = SettlementVersion.FirstCorrection;
         }
 
         /// <summary>
