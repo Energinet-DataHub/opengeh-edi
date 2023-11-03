@@ -35,10 +35,5 @@ namespace Energinet.DataHub.EDI.Common
         /// Commits all changes made to the database in the current transaction asynchronously.
         /// </summary>
         Task CommitTransactionAsync();
-
-        /// <summary>
-        /// Commits with individual transaction scope.
-        /// </summary>
-        Task CommitAsync();
     }
 }

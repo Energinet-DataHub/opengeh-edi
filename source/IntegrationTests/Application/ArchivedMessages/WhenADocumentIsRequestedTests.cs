@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.Application.SearchMessages;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Domain.ArchivedMessages;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Xunit;
 
@@ -101,6 +102,6 @@ public class WhenADocumentIsRequestedTests : TestBase
     private async Task ArchiveMessage(ArchivedMessage archivedMessage)
     {
         _archivedMessageRepository.Add(archivedMessage);
-        await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
+        await GetService<B2BContext>().SaveChangesAsync().ConfigureAwait(false);
     }
 }

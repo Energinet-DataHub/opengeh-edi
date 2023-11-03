@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.Common.TimeEvents;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;

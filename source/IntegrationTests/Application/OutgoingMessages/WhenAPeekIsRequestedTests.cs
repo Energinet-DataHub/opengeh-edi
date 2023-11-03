@@ -134,6 +134,6 @@ public class WhenAPeekIsRequestedTests : TestBase
     private async Task EnqueueMessage(OutgoingMessageDto message)
     {
         await _enqueueMessage.EnqueueAsync(message);
-        await GetService<IUnitOfWork>().CommitAsync();
+        await GetService<ActorMessageQueueContext>().SaveChangesAsync();
     }
 }

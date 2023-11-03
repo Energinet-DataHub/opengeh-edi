@@ -59,12 +59,5 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 
             await _dbContextTransaction.RollbackAsync().ConfigureAwait(false);
         }
-
-        public async Task CommitAsync()
-        {
-            await _b2BContext.SaveChangesAsync().ConfigureAwait(false);
-            await _processContext.SaveChangesAsync().ConfigureAwait(false);
-            await _actorMessageQueueContext.SaveChangesAsync().ConfigureAwait(false);
-        }
     }
 }

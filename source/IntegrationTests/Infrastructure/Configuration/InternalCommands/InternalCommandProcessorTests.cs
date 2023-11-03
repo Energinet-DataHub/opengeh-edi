@@ -19,7 +19,8 @@ using Dapper;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.Process.Application.InternalCommands;
+using Energinet.DataHub.EDI.Process.Domain.Commands;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -30,7 +31,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.In
 [IntegrationTest]
 public class InternalCommandProcessorTests : TestBase
 {
-    private readonly IUnitOfWork _unitOfWork;
     private readonly InternalCommandProcessor _processor;
     private readonly ICommandScheduler _scheduler;
     private readonly IDatabaseConnectionFactory _connectionFactory;
@@ -39,7 +39,6 @@ public class InternalCommandProcessorTests : TestBase
         : base(databaseFixture)
     {
         _processor = GetService<InternalCommandProcessor>();
-        _unitOfWork = GetService<IUnitOfWork>();
         _scheduler = GetService<ICommandScheduler>();
         _connectionFactory = GetService<IDatabaseConnectionFactory>();
         var mapper = GetService<InternalCommandMapper>();
@@ -151,6 +150,6 @@ public class InternalCommandProcessorTests : TestBase
     private async Task Schedule(InternalCommand command)
     {
         await _scheduler.EnqueueAsync(command);
-        await _unitOfWork.CommitAsync();
+        await GetService<ProcessContext>().SaveChangesAsync();
     }
 }

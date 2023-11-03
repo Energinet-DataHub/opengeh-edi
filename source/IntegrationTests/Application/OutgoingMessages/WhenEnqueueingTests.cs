@@ -16,6 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
+using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
@@ -99,6 +100,6 @@ public class WhenEnqueueingTests : TestBase
     private async Task EnqueueMessage(OutgoingMessageDto message)
     {
         await _enqueueMessage.EnqueueAsync(message);
-        await GetService<IUnitOfWork>().CommitAsync();
+        await GetService<ActorMessageQueueContext>().SaveChangesAsync();
     }
 }

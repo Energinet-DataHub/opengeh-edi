@@ -30,7 +30,7 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
     private readonly IMarketDocumentRepository _marketDocumentRepository;
     private readonly DocumentFactory _documentFactory;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly ActorMessageQueueContext _actorMessageQueueContext;
     private readonly IArchivedMessageRepository _archivedMessageRepository;
 
     public PeekHandler(
@@ -38,14 +38,14 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
         IMarketDocumentRepository marketDocumentRepository,
         DocumentFactory documentFactory,
         IOutgoingMessageRepository outgoingMessageRepository,
-        IUnitOfWork unitOfWork,
+        ActorMessageQueueContext actorMessageQueueContext,
         IArchivedMessageRepository archivedMessageRepository)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _marketDocumentRepository = marketDocumentRepository;
         _documentFactory = documentFactory;
         _outgoingMessageRepository = outgoingMessageRepository;
-        _unitOfWork = unitOfWork;
+        _actorMessageQueueContext = actorMessageQueueContext;
         _archivedMessageRepository = archivedMessageRepository;
     }
 
@@ -97,6 +97,6 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
             _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.ActorRole).ConfigureAwait(false);
         var peekResult = actorMessageQueue?.Peek(request.MessageCategory);
         if (peekResult is { })
-            await _unitOfWork.CommitAsync().ConfigureAwait(false);
+            await _actorMessageQueueContext.SaveChangesAsync().ConfigureAwait(false);
     }
 }

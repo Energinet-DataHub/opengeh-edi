@@ -15,7 +15,7 @@
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Common;
 
-namespace Energinet.DataHub.EDI.Process.Application.InternalCommands
+namespace Energinet.DataHub.EDI.Process.Domain.Commands
 {
     /// <summary>
     /// Service for scheduling and enqueueing internal commands for later processing

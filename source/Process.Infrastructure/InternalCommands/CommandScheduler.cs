@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.Serialization;
-using Energinet.DataHub.EDI.Process.Application.InternalCommands;
+using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands

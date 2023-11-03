@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Process.Application.InternalCommands;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
+using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using MediatR;
 
