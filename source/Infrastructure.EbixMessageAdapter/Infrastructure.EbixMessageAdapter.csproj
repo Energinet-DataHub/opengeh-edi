@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net7.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter</AssemblyName>
+    <RootNamespace>Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter</RootNamespace>
+  </PropertyGroup>
+
+</Project>
