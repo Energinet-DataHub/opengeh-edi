@@ -15,9 +15,9 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.RSM.Extensions;
+using SoapTest.RSM.Extensions;
 
-namespace Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.RSM.RSM023.V3.Response
+namespace SoapTest.RSM.RSM023.V3.Response
 {
     public partial class DK_ResponseMasterDataMeteringPointType : RsmDocument
     {
@@ -26,10 +26,9 @@ namespace Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.RSM.RSM023.V3.
             get { return PayloadMasterDataMPEvent.Length; }
         }
 
+#nullable enable
         public static DK_ResponseMasterDataMeteringPointType? BuildPayload(RsmDocument emptyResponse, Collection<Tuple<string, string>> args)
         {
-            ArgumentNullException.ThrowIfNull(args, nameof(args));
-
             var header = new EnergyDocument
             {
                 Identification = args[5].Item2,
@@ -62,6 +61,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.RSM.RSM023.V3.
 
             return returnResponse;
         }
+#nullable disable
 
         public override void AddPayload(object payload)
         {

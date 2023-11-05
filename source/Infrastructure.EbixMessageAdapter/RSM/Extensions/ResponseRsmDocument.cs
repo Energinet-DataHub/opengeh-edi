@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.RSM.Extensions
+namespace SoapTest.RSM.Extensions
 {
     public abstract class ResponseRsmDocument : RsmDocument
     {

@@ -14,11 +14,11 @@
 
 using System;
 using System.Collections.ObjectModel;
-using Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.Classes;
-using Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.Interfaces;
-using Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.Utilities;
+using SoapTest.Classes;
+using SoapTest.Interfaces;
+using SoapTest.Utilities;
 
-namespace Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.RSM.Extensions
+namespace SoapTest.RSM.Extensions
 {
     public abstract class RsmDocument : IRsmDocument
     {
@@ -29,8 +29,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.RSM.Extensions
 
         public static void AddRsmInformation(DataHubDto dto, dynamic payload)
         {
-            ArgumentNullException.ThrowIfNull(dto, nameof(dto));
-
             dto.RespPayloadId = payload.Identification;
             if (payload.GetType().GetProperty("OriginalBusinessDocument") != null)
                 dto.ReqPayloadId = payload.OriginalBusinessDocument;

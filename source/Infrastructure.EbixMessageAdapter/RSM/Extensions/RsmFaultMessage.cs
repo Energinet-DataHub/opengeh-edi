@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.RSM.Extensions
+namespace SoapTest.RSM.Extensions
 {
     /// <summary>
     /// Class containing fault information from DataHub after synchronous validation

@@ -15,9 +15,9 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.RSM.Extensions;
+using SoapTest.RSM.Extensions;
 
-namespace Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.RSM.RSM020.V3.Confirm
+namespace SoapTest.RSM.RSM020.V3.Confirm
 {
     public partial class DK_ConfirmServicesType : RsmDocument
     {

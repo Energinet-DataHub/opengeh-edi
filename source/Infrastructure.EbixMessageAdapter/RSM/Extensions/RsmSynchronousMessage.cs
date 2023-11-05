@@ -17,7 +17,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Xml.Serialization;
 
-namespace Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.RSM.Extensions
+namespace SoapTest.RSM.Extensions
 {
     public abstract class RsmSynchronousMessage : RsmDocument
     {

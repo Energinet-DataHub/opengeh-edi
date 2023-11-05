@@ -15,9 +15,9 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.RSM.Extensions;
+using SoapTest.RSM.Extensions;
 
-namespace Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.RSM.RSM029.V3.Response
+namespace SoapTest.RSM.RSM029.V3.Response
 {
     public partial class DK_ResponseMasterDataConsumerType : RsmDocument
     {
@@ -29,7 +29,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.RSM.RSM029.V3.
 #nullable enable
         public static DK_ResponseMasterDataConsumerType? BuildPayload(RsmDocument emptyResponse, Collection<Tuple<string, string>> args)
         {
-            ArgumentNullException.ThrowIfNull(args, nameof(args));
             // var doc = emptyResponse.ConvertToXmlDocument();
             var header = new EnergyDocument
             {

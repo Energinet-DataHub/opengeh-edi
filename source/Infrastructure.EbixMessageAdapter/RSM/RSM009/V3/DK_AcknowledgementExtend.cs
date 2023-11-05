@@ -15,9 +15,9 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.RSM.Extensions;
+using SoapTest.RSM.Extensions;
 
-namespace Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.RSM.RSM009.V3.Response
+namespace SoapTest.RSM.RSM009.V3.Response
 {
     public partial class DK_AcknowledgementType : RsmDocument
     {

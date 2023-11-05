@@ -15,9 +15,9 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.RSM.Extensions;
+using SoapTest.RSM.Extensions;
 
-namespace Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.RSM.RSM022.V3.Notify
+namespace SoapTest.RSM.RSM022.V3.Notify
 {
     public partial class DK_NotifyMasterDataMeteringPointType : RsmDocument
     {

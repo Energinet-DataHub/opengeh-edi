@@ -15,9 +15,9 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.RSM.Extensions;
+using SoapTest.RSM.Extensions;
 
-namespace Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.RSM.RSM030.V3.Reject
+namespace SoapTest.RSM.RSM030.V3.Reject
 {
     public partial class DK_RejectUpdateMasterDataChargeType : ResponseRsmDocument
     {

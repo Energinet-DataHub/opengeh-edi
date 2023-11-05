@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.RSM.Extensions
+namespace SoapTest.RSM.Extensions
 {
     /// <summary>
     /// Class containing confirmation information from DataHub after synchronous validation
@@ -35,7 +35,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.EbixMessageAdapter.RSM.Extensions
         /// <summary>
         /// B2B_003 error from DataHub - the DataHub allready have received the data and do not wants it again
         /// </summary>
-        public bool B2B003 { get; set; }
+        public bool B2B_003 { get; set; }
 
         public override string GetDocumentType()
         {
