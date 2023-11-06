@@ -15,32 +15,34 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Process.Application.OutgoingMessages;
-using Energinet.DataHub.EDI.Process.Domain.Documents;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 
 public class TestCreateOutgoingCommandHandler : IRequestHandler<TestCreateOutgoingMessageCommand, Unit>
 {
-    private readonly IOutgoingMessageRepository _outgoingMessageRepository;
+    private readonly IMediator _mediator;
 
-    public TestCreateOutgoingCommandHandler(IOutgoingMessageRepository outgoingMessageRepository)
+    public TestCreateOutgoingCommandHandler(IMediator mediator)
     {
-        _outgoingMessageRepository = outgoingMessageRepository;
+        _mediator = mediator;
     }
 
-    public Task<Unit> Handle(TestCreateOutgoingMessageCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(TestCreateOutgoingMessageCommand request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
         for (int i = 0; i < request.NumberOfOutgoingMessages; i++)
         {
-            _outgoingMessageRepository.Add(new OutgoingMessage(DocumentType.NotifyAggregatedMeasureData, ActorNumber.Create("1234567891234"), ProcessId.New(), Process.Domain.OutgoingMessages.BusinessReason.BalanceFixing.Name, MarketRole.EnergySupplier, ActorNumber.Create("1234567891234"), MarketRole.MeteringDataAdministrator, "data"));
+            var message = new OutgoingMessageDto(DocumentType.NotifyAggregatedMeasureData, ActorNumber.Create("1234567891234"), ProcessId.New().Id, BusinessReason.BalanceFixing.Name, MarketRole.EnergySupplier, ActorNumber.Create("1234567891234"), MarketRole.MeteringDataAdministrator, "data");
+
+            await _mediator.Publish(new EnqueueMessageEvent(message), cancellationToken).ConfigureAwait(false);
         }
 
-        return Unit.Task;
+        return await Unit.Task;
     }
 }

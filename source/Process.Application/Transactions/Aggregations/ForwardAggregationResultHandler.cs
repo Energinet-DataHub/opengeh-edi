@@ -15,27 +15,28 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Process.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 
 public class ForwardAggregationResultHandler : IRequestHandler<ForwardAggregationResult, Unit>
 {
-    private readonly IOutgoingMessageRepository _outgoingMessageRepository;
+    private readonly IMediator _mediator;
 
-    public ForwardAggregationResultHandler(IOutgoingMessageRepository outgoingMessageRepository)
+    public ForwardAggregationResultHandler(IMediator mediator)
     {
-        _outgoingMessageRepository = outgoingMessageRepository;
+        _mediator = mediator;
     }
 
-    public Task<Unit> Handle(ForwardAggregationResult request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(ForwardAggregationResult request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
         var message = AggregationResultMessageFactory.CreateMessage(request.Result, ProcessId.New());
-        _outgoingMessageRepository.Add(message);
-        return Unit.Task;
+        await _mediator.Publish(new EnqueueMessageEvent(message), cancellationToken).ConfigureAwait(false);
+        return await Unit.Task.ConfigureAwait(false);
     }
 }

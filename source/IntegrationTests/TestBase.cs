@@ -14,17 +14,21 @@
 
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.Configuration;
 using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration.Queries;
-using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
 using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Common.DateTime;
+using Energinet.DataHub.EDI.Common.TimeEvents;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
@@ -35,8 +39,11 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
-using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Notifications;
-using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Application.Configuration;
+using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
+using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using Google.Protobuf;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -48,6 +55,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
     {
         private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
         private readonly B2BContext _b2BContext;
+        private readonly ProcessContext _processContext;
         private ServiceCollection? _services;
         private IServiceProvider _serviceProvider = default!;
         private bool _disposed;
@@ -61,6 +69,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             InboxEventNotificationHandler = new TestNotificationHandlerSpy();
             BuildServices();
             _b2BContext = GetService<B2BContext>();
+            _processContext = GetService<ProcessContext>();
         }
 
         protected TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
@@ -87,6 +96,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             }
 
             _b2BContext.Dispose();
+            _processContext.Dispose();
             _serviceBusSenderFactoryStub.Dispose();
             ((ServiceProvider)_serviceProvider!).Dispose();
             _disposed = true;
@@ -103,6 +113,19 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return GetService<IMediator>().Send(query, CancellationToken.None);
         }
 
+        protected async Task HavingReceivedInboxEventAsync(string eventType, IMessage eventPayload, Guid processId)
+        {
+            await GetService<InboxEventReceiver>().
+                ReceiveAsync(
+                    Guid.NewGuid().ToString(),
+                    eventType,
+                    processId,
+                    eventPayload.ToByteArray())
+                .ConfigureAwait(false);
+            await ProcessReceivedInboxEventsAsync().ConfigureAwait(false);
+            await ProcessInternalCommandsAsync().ConfigureAwait(false);
+        }
+
         protected Task ProcessReceivedInboxEventsAsync()
         {
             return ProcessBackgroundTasksAsync();
@@ -115,6 +138,16 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 .Append("SharedAccessKeyName=send;")
                 .Append(CultureInfo.InvariantCulture, $"SharedAccessKey={Guid.NewGuid():N}")
                 .ToString();
+        }
+
+        private async Task ProcessInternalCommandsAsync()
+        {
+            await ProcessBackgroundTasksAsync();
+
+            if (_processContext.QueuedInternalCommands.Any(command => command.ProcessedDate == null))
+            {
+                await ProcessInternalCommandsAsync();
+            }
         }
 
         private Task ProcessBackgroundTasksAsync()
@@ -159,6 +192,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 })
                 .AddMessagePublishing()
                 .AddMessageParserServices();
+
+            ProcessConfiguration.Configure(_services,  ActorMessageQueueConfiguration.Configure);
             _serviceProvider = _services.BuildServiceProvider();
         }
     }

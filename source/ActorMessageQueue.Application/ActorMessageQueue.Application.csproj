@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Energinet.DataHub.EDI.ActorMessageQueue.Application</AssemblyName>
+    <RootNamespace>Energinet.DataHub.EDI.ActorMessageQueue.Application</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup>
+      <TargetFramework>net7.0</TargetFramework>
+      <ImplicitUsings>enable</ImplicitUsings>
+      <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="12.1.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+    <PackageReference Include="SimplerSoftware.EntityFrameworkCore.SqlServer.NodaTime" Version="7.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ActorMessageQueue.Contracts\ActorMessageQueue.Contracts.csproj" />
+    <ProjectReference Include="..\ActorMessageQueue.Domain\ActorMessageQueue.Domain.csproj" />
+    <ProjectReference Include="..\ActorMessageQueue.Infrastructure\ActorMessageQueue.Infrastructure.csproj" />
+    <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\Domain\Domain.csproj" />
+  </ItemGroup>
+</Project>

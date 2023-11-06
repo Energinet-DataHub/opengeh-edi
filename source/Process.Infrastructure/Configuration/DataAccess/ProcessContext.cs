@@ -13,17 +13,8 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.EDI.Domain.ArchivedMessages;
-using Energinet.DataHub.EDI.Infrastructure.ArchivedMessages;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
-using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
-using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
-using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages;
-using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
 using Microsoft.EntityFrameworkCore;
 
@@ -43,26 +34,14 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess
 
         public DbSet<AggregatedMeasureDataProcess> AggregatedMeasureDataProcesses { get; private set; }
 
-        public DbSet<OutgoingMessage> OutgoingMessages { get; private set; }
-
         public DbSet<QueuedInternalCommand> QueuedInternalCommands { get; private set; }
-
-        public DbSet<EnqueuedMessage> EnqueuedMessages { get; private set; }
-
-        public DbSet<ActorMessageQueue> ActorMessageQueues { get; private set; }
-
-        public DbSet<MarketDocument> MarketDocuments { get; private set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
 
             modelBuilder.ApplyConfiguration(new AggregatedMeasureDataProcessEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new OutgoingMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QueuedInternalCommandEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new ArchivedMessageEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new ActorMessageQueueEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new MarketDocumentEntityConfiguration());
         }
     }
 }

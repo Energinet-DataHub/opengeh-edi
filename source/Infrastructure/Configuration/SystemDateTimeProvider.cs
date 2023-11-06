@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Common.DateTime;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration

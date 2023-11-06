@@ -17,36 +17,39 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Dapper;
-using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
+using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Common.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
+using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.Process.Application.OutgoingMessages;
-using Energinet.DataHub.EDI.Process.Domain.Documents;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using MediatR;
 using Xunit;
-using PeekResult = Energinet.DataHub.EDI.Process.Application.OutgoingMessages.PeekResult;
+using DocumentType = Energinet.DataHub.EDI.Common.DocumentType;
+using MessageCategory = Energinet.DataHub.EDI.Common.MessageCategory;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
-public class WhenAPeekIsRequestedTests : ProcessTestBase
+public class WhenAPeekIsRequestedTests : TestBase
 {
-    private readonly RequestAggregatedMeasuredDataProcessInvoker _requestAggregatedMeasuredDataProcessInvoker;
+    private readonly IEnqueueMessage _enqueueMessage;
+    private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
 
-    public WhenAPeekIsRequestedTests(ProcessDatabaseFixture databaseFixture)
+    public WhenAPeekIsRequestedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _requestAggregatedMeasuredDataProcessInvoker =
-            new RequestAggregatedMeasuredDataProcessInvoker(GetService<IMediator>(), GetService<ProcessContext>());
+        _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
+        _enqueueMessage = GetService<IEnqueueMessage>();
     }
 
     [Fact]
     public async Task When_no_messages_are_available_return_empty_result()
     {
-        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync();
+        var message = _outgoingMessageDtoBuilder.Build();
+        await EnqueueMessage(message);
 
         var result = await PeekMessage(MessageCategory.None);
 
@@ -57,7 +60,11 @@ public class WhenAPeekIsRequestedTests : ProcessTestBase
     [Fact]
     public async Task A_message_bundle_is_returned()
     {
-        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync();
+        var message = _outgoingMessageDtoBuilder
+            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            .WithReceiverRole(MarketRole.EnergySupplier)
+            .Build();
+        await EnqueueMessage(message);
 
         var result = await PeekMessage(MessageCategory.Aggregations);
 
@@ -65,14 +72,18 @@ public class WhenAPeekIsRequestedTests : ProcessTestBase
 
         AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
             .IsDocumentType(DocumentType.NotifyAggregatedMeasureData)
-            .IsBusinessReason(BusinessReason.PreliminaryAggregation)
+            .IsBusinessReason(BusinessReason.BalanceFixing)
             .HasSerieRecordCount(1);
     }
 
     [Fact]
     public async Task Ensure_same_bundle_is_returned_if_not_dequeued()
     {
-        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync();
+        var message = _outgoingMessageDtoBuilder
+            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            .WithReceiverRole(MarketRole.EnergySupplier)
+            .Build();
+        await EnqueueMessage(message);
 
         var firstPeekResult = await PeekMessage(MessageCategory.Aggregations);
         var secondPeekResult = await PeekMessage(MessageCategory.Aggregations);
@@ -85,7 +96,11 @@ public class WhenAPeekIsRequestedTests : ProcessTestBase
     [Fact]
     public async Task The_generated_document_is_archived()
     {
-        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync();
+        var message = _outgoingMessageDtoBuilder
+            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            .WithReceiverRole(MarketRole.EnergySupplier)
+            .Build();
+        await EnqueueMessage(message);
 
         var result = await PeekMessage(MessageCategory.Aggregations);
 
@@ -114,5 +129,11 @@ public class WhenAPeekIsRequestedTests : ProcessTestBase
             await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var found = await connection.ExecuteScalarAsync<bool>(sqlStatement);
         Assert.True(found);
+    }
+
+    private async Task EnqueueMessage(OutgoingMessageDto message)
+    {
+        await _enqueueMessage.EnqueueAsync(message);
+        await GetService<ActorMessageQueueContext>().SaveChangesAsync();
     }
 }

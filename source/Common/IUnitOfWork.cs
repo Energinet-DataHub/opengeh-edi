@@ -22,8 +22,18 @@ namespace Energinet.DataHub.EDI.Common
     public interface IUnitOfWork
     {
         /// <summary>
-        /// Commits current transaction
+        /// Asynchronously starts a new transaction.
         /// </summary>
-        Task CommitAsync();
+        Task BeginTransactionAsync();
+
+        /// <summary>
+        /// Discards all changes made to the database in the current transaction asynchronously.
+        /// </summary>
+        Task RollbackAsync();
+
+        /// <summary>
+        /// Commits all changes made to the database in the current transaction asynchronously.
+        /// </summary>
+        Task CommitTransactionAsync();
     }
 }

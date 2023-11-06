@@ -19,16 +19,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.Configuration;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.Bearer;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.MarketActors;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.Application.Actors;
-using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Common.Configuration;
+using Energinet.DataHub.EDI.Common.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
+using Energinet.DataHub.EDI.Process.Application.Configuration;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Energinet.DataHub.Wholesale.Contracts.Events;
@@ -94,8 +97,6 @@ namespace Energinet.DataHub.EDI.Api
                     services.AddApplicationInsights();
                     services.ConfigureFunctionsApplicationInsights();
 
-                    ProcessConfiguration.Configure(services, databaseConnectionString!);
-
                     CompositionRoot.Initialize(services)
                         .AddMessageBus(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!)
                         .AddRemoteBusinessService<DummyRequest, DummyReply>("Dummy", "Dummy")
@@ -144,6 +145,8 @@ namespace Energinet.DataHub.EDI.Api
                         GridAreaOwnershipAssigned.Descriptor,
                     };
                     services.AddSubscriber<IntegrationEventHandler>(integrationEventDescriptors);
+
+                    ProcessConfiguration.Configure(services, ActorMessageQueueConfiguration.Configure);
                 })
                 .ConfigureLogging(logging =>
                 {

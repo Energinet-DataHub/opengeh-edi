@@ -14,25 +14,21 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Common.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.Process.Domain.Documents;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
-using NodaTime.Text;
 using Xunit;
 using Xunit.Categories;
 using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
@@ -40,12 +36,12 @@ using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
 [IntegrationTest]
-public class WhenAnAcceptedResultIsAvailableTests : ProcessTestBase
+public class WhenAnAcceptedResultIsAvailableTests : TestBase
 {
     private readonly GridAreaBuilder _gridAreaBuilder = new();
     private readonly ProcessContext _processContext;
 
-    public WhenAnAcceptedResultIsAvailableTests(ProcessDatabaseFixture databaseFixture)
+    public WhenAnAcceptedResultIsAvailableTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _processContext = GetService<ProcessContext>();

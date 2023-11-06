@@ -15,8 +15,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Domain;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
-using Energinet.DataHub.EDI.Process.Domain.Documents;
 
 namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
 

@@ -17,10 +17,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments;
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Process.Domain.Documents;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Assertions

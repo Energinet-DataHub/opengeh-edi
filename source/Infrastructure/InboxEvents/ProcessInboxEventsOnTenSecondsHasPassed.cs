@@ -14,7 +14,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
+using Energinet.DataHub.EDI.Common.TimeEvents;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Infrastructure.InboxEvents;

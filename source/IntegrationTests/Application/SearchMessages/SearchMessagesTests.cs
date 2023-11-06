@@ -17,13 +17,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.SearchMessages;
 using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Domain.ArchivedMessages;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.Process.Domain.Documents;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
 using NodaTime;
 using Xunit;
 
@@ -221,6 +220,6 @@ public class SearchMessagesTests : TestBase
     private async Task ArchiveMessage(ArchivedMessage archivedMessage)
     {
         _archivedMessageRepository.Add(archivedMessage);
-        await GetService<IUnitOfWork>().CommitAsync();
+        await GetService<B2BContext>().SaveChangesAsync();
     }
 }

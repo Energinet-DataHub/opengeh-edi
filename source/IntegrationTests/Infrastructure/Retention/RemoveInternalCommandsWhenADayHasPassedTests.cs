@@ -17,7 +17,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.Configuration;
-using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Common.DataAccess;
+using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
@@ -26,14 +27,14 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Retention;
 
-public class RemoveInternalCommandsWhenADayHasPassedTests : ProcessTestBase
+public class RemoveInternalCommandsWhenADayHasPassedTests : TestBase
 {
     private readonly ProcessContext _processContext;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly InternalCommandsRetention _sut;
 
     public RemoveInternalCommandsWhenADayHasPassedTests(
-        ProcessDatabaseFixture databaseFixture)
+        DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _processContext = GetService<ProcessContext>();

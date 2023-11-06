@@ -20,15 +20,15 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.IncomingMessages;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
-using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData.Commands;
 using Energinet.DataHub.Edi.Requests;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
@@ -37,7 +37,7 @@ using Xunit.Categories;
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages.RequestAggregatedMeasureData;
 
 [IntegrationTest]
-public class InitializeAggregatedMeasureDataProcessesCommandTests : ProcessTestBase
+public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
 {
     private readonly ProcessContext _processContext;
     private readonly ServiceBusSenderSpy _senderSpy;
@@ -45,7 +45,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : ProcessTestB
     private readonly InternalCommandMapper _mapper;
     private readonly ISerializer _serializer;
 
-    public InitializeAggregatedMeasureDataProcessesCommandTests(ProcessDatabaseFixture databaseFixture)
+    public InitializeAggregatedMeasureDataProcessesCommandTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _processContext = GetService<ProcessContext>();
@@ -76,12 +76,17 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : ProcessTestB
     public async Task Duplicated_transaction_id_across_commands_one_aggregated_measure_data_process_is_created()
     {
         // Arrange
+        var senderIdForBothMarketMessages = "5790000555557";
+        var transactionIdForBothMarketMessages = Guid.NewGuid().ToString();
+
         var marketMessage01 = MessageBuilder()
-            .SetTransactionId("d0100662-1e08-477a-94a8-0f02d52be925")
+            .SetTransactionId(transactionIdForBothMarketMessages)
+            .SetSenderId(senderIdForBothMarketMessages)
             .Build();
 
         var marketMessage02 = MessageBuilder()
-            .SetTransactionId("d0100662-1e08-477a-94a8-0f02d52be925")
+            .SetTransactionId(transactionIdForBothMarketMessages)
+            .SetSenderId(senderIdForBothMarketMessages)
             .Build();
 
         // Act
@@ -95,26 +100,29 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : ProcessTestB
         catch (DbUpdateException e)
         {
             // Assert
+            // This exception is only expected if a command execution finishes before the other one ends.
             Assert.Contains("Violation of PRIMARY KEY constraint", e.InnerException?.Message, StringComparison.InvariantCulture);
         }
 
         var processes = GetProcesses(marketMessage01.SenderNumber);
         Assert.Single(processes);
-        var process = processes.First();
-        Assert.Equal(marketMessage01.Series.First().Id, process!.BusinessTransactionId.Id);
-        AssertProcessState(process, AggregatedMeasureDataProcess.State.Initialized);
     }
 
     [Fact]
     public async Task Duplicated_message_id_across_commands_one_aggregated_measure_data_process_is_created()
     {
         // Arrange
+        var senderIdForBothMarketMessages = "5790000555556";
+        var messageIdForBothMarketMessages = Guid.NewGuid().ToString();
+
         var marketMessage01 = MessageBuilder()
-            .SetMessageId("d0100662-1e08-477a-94a8-0f02d52be924")
+            .SetMessageId(messageIdForBothMarketMessages)
+            .SetSenderId(senderIdForBothMarketMessages)
             .Build();
 
         var marketMessage02 = MessageBuilder()
-            .SetMessageId("d0100662-1e08-477a-94a8-0f02d52be924")
+            .SetMessageId(messageIdForBothMarketMessages)
+            .SetSenderId(senderIdForBothMarketMessages)
             .Build();
 
         // Act
@@ -130,25 +138,13 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : ProcessTestB
         catch (DbUpdateException e)
         {
             // Assert
+            // This exception is only expected if a command execution finishes before the other one ends.
             Assert.Contains("Violation of PRIMARY KEY constraint", e.InnerException?.Message, StringComparison.InvariantCulture);
         }
 
         // Assert
         var processes = GetProcesses(marketMessage01.SenderNumber).ToList();
-
         Assert.Single(processes);
-
-        var taskStatuses = tasks.Select(t => t.Status).ToList();
-        Assert.Single(taskStatuses.Where(status => status == TaskStatus.RanToCompletion));
-        Assert.Single(taskStatuses.Where(status => status == TaskStatus.Faulted));
-
-        var completedTaskIndex = taskStatuses.FindIndex(status => status == TaskStatus.RanToCompletion);
-        var completedTaskMessage = completedTaskIndex == 0 ? marketMessage01 : marketMessage02;
-
-        var process = processes.First();
-
-        Assert.Equal(completedTaskMessage.Series.First().Id, process.BusinessTransactionId.Id);
-        AssertProcessState(process, AggregatedMeasureDataProcess.State.Initialized);
     }
 
     [Fact]

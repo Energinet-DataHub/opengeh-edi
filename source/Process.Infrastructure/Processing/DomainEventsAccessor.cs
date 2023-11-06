@@ -15,7 +15,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Domain;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 
@@ -46,5 +45,13 @@ public class DomainEventsAccessor
             .Entries<Entity>()
             .ToList()
             .ForEach(e => e.Entity.ClearDomainEvents());
+    }
+
+    public void ClearAllDomainEvent(DomainEvent domainEvent)
+    {
+        _context.ChangeTracker
+            .Entries<Entity>()
+            .ToList()
+            .ForEach(e => e.Entity.ClearDomainEvent(domainEvent));
     }
 }
