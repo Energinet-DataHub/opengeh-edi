@@ -58,12 +58,16 @@ limitations under the License.
   </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\ActorMessageQueue.Infrastructure\ActorMessageQueue.Infrastructure.csproj" />
       <ProjectReference Include="..\Infrastructure.DocumentValidation\Infrastructure.DocumentValidation.csproj" />
       <ProjectReference Include="..\Infrastructure.CimMessageAdapter\Infrastructure.CimMessageAdapter.csproj" />
       <ProjectReference Include="..\Application\Application.csproj" />
-      <ProjectReference Include="..\Process.Application\Process.Application.csproj" />
-      <ProjectReference Include="..\Process.Domain\Process.Domain.csproj" />
+      <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj" />
       <ProjectReference Include="..\RequestResponse\source\RequestResponse\RequestResponse.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Configuration\Queueing\" />
     </ItemGroup>
 
 

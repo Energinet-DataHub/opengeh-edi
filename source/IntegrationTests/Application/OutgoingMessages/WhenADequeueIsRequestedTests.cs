@@ -16,27 +16,27 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
+using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Common.DataAccess;
+using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.Process.Application.OutgoingMessages;
-using Energinet.DataHub.EDI.Process.Domain.Documents;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
-using MediatR;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
-public class WhenADequeueIsRequestedTests : ProcessTestBase
+public class WhenADequeueIsRequestedTests : TestBase
 {
-    private readonly RequestAggregatedMeasuredDataProcessInvoker _requestAggregatedMeasuredDataProcessInvoker;
+    private readonly IEnqueueMessage _enqueueMessage;
+    private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
 
-    public WhenADequeueIsRequestedTests(ProcessDatabaseFixture databaseFixture)
+    public WhenADequeueIsRequestedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _requestAggregatedMeasuredDataProcessInvoker =
-            new RequestAggregatedMeasuredDataProcessInvoker(GetService<IMediator>(), GetService<ProcessContext>());
+        _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
+        _enqueueMessage = GetService<IEnqueueMessage>();
     }
 
     [Fact]
@@ -51,9 +51,11 @@ public class WhenADequeueIsRequestedTests : ProcessTestBase
     public async Task Dequeue_unknown_message_id_is_unsuccessful_when_actor_has_a_queue()
     {
         var unknownMessageId = Guid.NewGuid().ToString();
-        // Created an Actor Queue with a bundle.
-        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync();
-
+        var enqueueMessageEvent = _outgoingMessageDtoBuilder
+            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            .WithReceiverRole(MarketRole.EnergySupplier)
+            .Build();
+        await EnqueueMessage(enqueueMessageEvent);
         var dequeueResult = await InvokeCommandAsync(new DequeueCommand(unknownMessageId, MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)));
 
         Assert.False(dequeueResult.Success);
@@ -62,7 +64,11 @@ public class WhenADequeueIsRequestedTests : ProcessTestBase
     [Fact]
     public async Task Dequeue_is_Successful()
     {
-        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync();
+        var enqueueMessageEvent = _outgoingMessageDtoBuilder
+            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            .WithReceiverRole(MarketRole.EnergySupplier)
+            .Build();
+        await EnqueueMessage(enqueueMessageEvent);
         var peekResult = await InvokeCommandAsync(new PeekCommand(
             ActorNumber.Create(SampleData.NewEnergySupplierNumber),
             MessageCategory.Aggregations,
@@ -77,5 +83,11 @@ public class WhenADequeueIsRequestedTests : ProcessTestBase
 
         Assert.True(dequeueResult.Success);
         Assert.True(found);
+    }
+
+    private async Task EnqueueMessage(OutgoingMessageDto message)
+    {
+        await _enqueueMessage.EnqueueAsync(message);
+        await GetService<ActorMessageQueueContext>().SaveChangesAsync();
     }
 }

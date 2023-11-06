@@ -14,11 +14,12 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments;
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using NodaTime;
+using DocumentType = Energinet.DataHub.EDI.Infrastructure.DocumentValidation.DocumentType;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 

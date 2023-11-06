@@ -18,11 +18,11 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.AggregationResult;
+using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.Xml;
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
-using Energinet.DataHub.EDI.Process.Domain.Documents;
-using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.AggregationResult;
-using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Common.Xml;
 using MediatR;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.DependencyInjection;
@@ -164,6 +164,9 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
             public override string? REQUEST_RESPONSE_LOGGING_CONNECTION_STRING =>
                 CreateFakeServiceBusConnectionString();
 
+            public override string? DB_CONNECTION_STRING =>
+                CreateConnectionString();
+
             public override bool IsRunningLocally()
             {
                 return true;
@@ -181,6 +184,12 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
                     .Append("SharedAccessKeyName=send;")
                     .Append(CultureInfo.InvariantCulture, $"SharedAccessKey={Guid.NewGuid():N}")
                     .ToString();
+            }
+
+            private static string CreateConnectionString()
+            {
+                return
+                    "Server=(LocalDB)\\\\MSSQLLocalDB;Database=B2BTransactions;User=User;Password=Password;TrustServerCertificate=true;Encrypt=True;Trusted_Connection=True;";
             }
         }
     }

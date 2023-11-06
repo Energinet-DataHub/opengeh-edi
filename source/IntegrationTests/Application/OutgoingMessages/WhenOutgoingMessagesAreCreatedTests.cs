@@ -15,32 +15,37 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
+using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Common.DataAccess;
+using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.Process.Domain.Documents;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
-using MediatR;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
-public class WhenOutgoingMessagesAreCreatedTests : ProcessTestBase
+public class WhenOutgoingMessagesAreCreatedTests : TestBase
 {
-    private readonly RequestAggregatedMeasuredDataProcessInvoker _requestAggregatedMeasuredDataProcessInvoker;
+    private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
+    private readonly IEnqueueMessage _enqueueMessage;
 
-    public WhenOutgoingMessagesAreCreatedTests(ProcessDatabaseFixture databaseFixture)
+    public WhenOutgoingMessagesAreCreatedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _requestAggregatedMeasuredDataProcessInvoker =
-            new RequestAggregatedMeasuredDataProcessInvoker(GetService<IMediator>(), GetService<ProcessContext>());
+        _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
+        _enqueueMessage = GetService<IEnqueueMessage>();
     }
 
     [Fact]
     public async Task Outgoing_message_is_enqueued()
     {
-        await _requestAggregatedMeasuredDataProcessInvoker.HasBeenAcceptedAsync();
+        var message = _outgoingMessageDtoBuilder
+            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            .WithReceiverRole(MarketRole.EnergySupplier)
+            .Build();
+        await EnqueueMessage(message);
 
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = $"SELECT * FROM [dbo].[OutgoingMessages]";
@@ -54,7 +59,13 @@ public class WhenOutgoingMessagesAreCreatedTests : ProcessTestBase
         Assert.Equal(result.ReceiverRole, MarketRole.EnergySupplier.Name);
         Assert.Equal(result.SenderId, DataHubDetails.IdentificationNumber.Value);
         Assert.Equal(result.SenderRole, MarketRole.MeteringDataAdministrator.Name);
-        Assert.Equal(BusinessReason.PreliminaryAggregation.Name, result.BusinessReason);
+        Assert.Equal(BusinessReason.BalanceFixing.Name, result.BusinessReason);
         Assert.NotNull(result.MessageRecord);
+    }
+
+    private async Task EnqueueMessage(OutgoingMessageDto message)
+    {
+        await _enqueueMessage.EnqueueAsync(message);
+        await GetService<ActorMessageQueueContext>().SaveChangesAsync();
     }
 }
