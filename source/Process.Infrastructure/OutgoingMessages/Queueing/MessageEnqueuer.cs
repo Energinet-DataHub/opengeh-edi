@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
 
@@ -22,10 +23,12 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Queueing
 public class MessageEnqueuer
 {
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-    public MessageEnqueuer(IActorMessageQueueRepository actorMessageQueueRepository)
+    public MessageEnqueuer(IActorMessageQueueRepository actorMessageQueueRepository, ISystemDateTimeProvider systemDateTimeProvider)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
+        _systemDateTimeProvider = systemDateTimeProvider;
     }
 
     public async Task EnqueueAsync(OutgoingMessage message)
@@ -42,6 +45,6 @@ public class MessageEnqueuer
             await _actorMessageQueueRepository.AddAsync(messageQueue).ConfigureAwait(false);
         }
 
-        messageQueue.Enqueue(message);
+        messageQueue.Enqueue(message, _systemDateTimeProvider.Now());
     }
 }
