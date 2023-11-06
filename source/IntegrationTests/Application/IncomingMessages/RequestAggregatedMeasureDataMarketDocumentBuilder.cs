@@ -35,10 +35,10 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
     private readonly string _messageType = "E74";
     private readonly string _businessType = "23";
     private readonly BusinessReason _businessReason = BusinessReason.PreliminaryAggregation;
-    private readonly string _senderId = SampleData.NewEnergySupplierNumber;
     private readonly ActorNumber _receiverId = DataHubDetails.IdentificationNumber;
     private readonly MarketRole _receiverRole = MarketRole.CalculationResponsibleRole;
     private readonly string _createdAt = SystemClock.Instance.GetCurrentInstant().ToString();
+    private string _senderId = SampleData.NewEnergySupplierNumber;
     private string? _settlementVersion;
     private string _messageId = Guid.NewGuid().ToString();
     private string _serieId = Guid.NewGuid().ToString();
@@ -93,6 +93,12 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
     public RequestAggregatedMeasureDataMarketDocumentBuilder SetTransactionId(string transactionId)
     {
         _serieId = transactionId;
+        return this;
+    }
+
+    public RequestAggregatedMeasureDataMarketDocumentBuilder SetSenderId(string s)
+    {
+        _senderId = s;
         return this;
     }
 
