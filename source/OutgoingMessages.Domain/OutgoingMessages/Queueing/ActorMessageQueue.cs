@@ -21,13 +21,13 @@ using NodaTime;
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 
 #pragma warning disable CA1711 // Identifiers should not have incorrect suffix
-public class ActorMessageQueue2
+public class ActorMessageQueue
 {
     // Used for persistent actor message queue entity.
     private readonly Guid _id;
     private readonly List<Bundle> _bundles = new();
 
-    private ActorMessageQueue2(Receiver receiver)
+    private ActorMessageQueue(Receiver receiver)
     {
         Receiver = receiver;
         _id = Guid.NewGuid();
@@ -36,13 +36,13 @@ public class ActorMessageQueue2
     public Receiver Receiver { get; set; }
 
     #pragma warning disable
-    private ActorMessageQueue2()
+    private ActorMessageQueue()
     {
     }
 
-    public static ActorMessageQueue2 CreateFor(Receiver receiver)
+    public static ActorMessageQueue CreateFor(Receiver receiver)
     {
-        return new ActorMessageQueue2(receiver);
+        return new ActorMessageQueue(receiver);
     }
 
     public void Enqueue(OutgoingMessage outgoingMessage, Instant timeStamp, int? maxNumberOfMessagesInABundle = null)

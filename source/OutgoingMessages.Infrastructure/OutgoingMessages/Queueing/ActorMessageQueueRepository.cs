@@ -31,7 +31,7 @@ public class ActorMessageQueueRepository : IActorMessageQueueRepository
         _actorMessageQueueContext = actorMessageQueueContext;
     }
 
-    public async Task<ActorMessageQueue2?> ActorMessageQueueForAsync(ActorNumber actorNumber, MarketRole actorRole)
+    public async Task<ActorMessageQueue?> ActorMessageQueueForAsync(ActorNumber actorNumber, MarketRole actorRole)
     {
         ArgumentNullException.ThrowIfNull(actorNumber);
         ArgumentNullException.ThrowIfNull(actorRole);
@@ -48,8 +48,8 @@ public class ActorMessageQueueRepository : IActorMessageQueueRepository
         return actorMessageQueue;
     }
 
-    public async Task AddAsync(ActorMessageQueue2 actorMessageQueue2)
+    public async Task AddAsync(ActorMessageQueue actorMessageQueue)
     {
-        await _actorMessageQueueContext.ActorMessageQueues.AddAsync(actorMessageQueue2).ConfigureAwait(false);
+        await _actorMessageQueueContext.ActorMessageQueues.AddAsync(actorMessageQueue).ConfigureAwait(false);
     }
 }

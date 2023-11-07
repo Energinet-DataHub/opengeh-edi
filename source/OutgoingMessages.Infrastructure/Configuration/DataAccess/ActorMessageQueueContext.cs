@@ -34,7 +34,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.Da
 
         public DbSet<OutgoingMessage> OutgoingMessages { get; private set; }
 
-        public DbSet<ActorMessageQueue2> ActorMessageQueues { get; private set; }
+        public DbSet<ActorMessageQueue> ActorMessageQueues { get; private set; }
 
         public DbSet<MarketDocument> MarketDocuments { get; private set; }
 

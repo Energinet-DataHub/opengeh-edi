@@ -49,7 +49,7 @@ public class EnqueueMessage : IEnqueueMessage
 
         if (messageQueue == null)
         {
-            messageQueue = ActorMessageQueue2.CreateFor(message.Receiver);
+            messageQueue = ActorMessageQueue.CreateFor(message.Receiver);
             await _actorMessageQueueRepository.AddAsync(messageQueue).ConfigureAwait(false);
         }
 

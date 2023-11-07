@@ -22,9 +22,9 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages.Queueing;
 
-public class ActorMessageQueueEntityConfiguration : IEntityTypeConfiguration<ActorMessageQueue2>
+public class ActorMessageQueueEntityConfiguration : IEntityTypeConfiguration<ActorMessageQueue>
 {
-    public void Configure(EntityTypeBuilder<ActorMessageQueue2> builder)
+    public void Configure(EntityTypeBuilder<ActorMessageQueue> builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
         builder.ToTable("ActorMessageQueues", "dbo");
