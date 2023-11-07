@@ -19,12 +19,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments;
-using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
-using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.Xml;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts

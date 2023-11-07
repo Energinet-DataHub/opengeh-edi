@@ -19,8 +19,6 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
-using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;

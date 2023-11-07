@@ -14,11 +14,11 @@
 
 using System.IO;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments;
-using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Serialization;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;

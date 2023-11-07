@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.ActorMessageQueue.Application.MarketDocuments;
-using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages;
