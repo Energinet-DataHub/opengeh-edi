@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.Tests.Factories;

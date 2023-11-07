@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.Exceptions;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
