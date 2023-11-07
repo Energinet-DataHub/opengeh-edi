@@ -14,10 +14,9 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Energinet.DataHub.EDI.ActorMessageQueue.Domain.MarketDocuments;
-using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.DocumentFactory;

@@ -45,15 +45,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Process.Infrastructure", "P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{DF63DDD2-C1CD-4EC7-9C4F-757481DD241F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ActorMessageQueue", "ActorMessageQueue", "{8F3318C8-73AD-49B7-BE96-0F76E2A0B472}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OutgoingMessages", "OutgoingMessages", "{8F3318C8-73AD-49B7-BE96-0F76E2A0B472}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActorMessageQueue.Application", "ActorMessageQueue.Application\ActorMessageQueue.Application.csproj", "{306A3D36-30A1-4BDA-BA18-A7AAEA2DC2ED}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutgoingMessages.Application", "OutgoingMessages.Application\OutgoingMessages.Application.csproj", "{306A3D36-30A1-4BDA-BA18-A7AAEA2DC2ED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActorMessageQueue.Domain", "ActorMessageQueue.Domain\ActorMessageQueue.Domain.csproj", "{AC4E69EC-D6F8-4229-9EAD-EA67979D0F3E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutgoingMessages.Domain", "OutgoingMessages.Domain\OutgoingMessages.Domain.csproj", "{AC4E69EC-D6F8-4229-9EAD-EA67979D0F3E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActorMessageQueue.Infrastructure", "ActorMessageQueue.Infrastructure\ActorMessageQueue.Infrastructure.csproj", "{CC07DBD6-D7E6-4D1B-A784-757B547D16F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutgoingMessages.Infrastructure", "OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj", "{CC07DBD6-D7E6-4D1B-A784-757B547D16F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActorMessageQueue.Contracts", "ActorMessageQueue.Contracts\ActorMessageQueue.Contracts.csproj", "{B94C8B3F-A3A3-4666-B0FD-1FF2BCED7613}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutgoingMessages.Contracts", "OutgoingMessages.Contracts\OutgoingMessages.Contracts.csproj", "{B94C8B3F-A3A3-4666-B0FD-1FF2BCED7613}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
