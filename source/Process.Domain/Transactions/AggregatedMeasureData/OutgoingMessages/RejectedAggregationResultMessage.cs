@@ -14,9 +14,9 @@
 
 using System;
 using System.Collections.Generic;
-using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.OutgoingMessages.Contracts;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages;
 
