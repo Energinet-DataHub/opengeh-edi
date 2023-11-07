@@ -45,8 +45,8 @@ public static class RequestAggregatedMeasureDataHttpFactory
         var serie = new Serie
         {
             Id = Guid.NewGuid().ToString(),
-            StartDateAndOrTimeDateTime = InstantFormatFactory.SetInstantToMidnight(request.StartDate, dateTimeZone),
-            EndDateAndOrTimeDateTime = InstantFormatFactory.SetInstantToMidnight(request.EndDate, dateTimeZone),
+            StartDateAndOrTimeDateTime = InstantFormatFactory.SetInstantToMidnightSameDay(request.StartDate, dateTimeZone).ToString(),
+            EndDateAndOrTimeDateTime = InstantFormatFactory.SetInstantToMidnightSameDay(request.EndDate, dateTimeZone).ToString(),
         };
 
         if (request.GridArea != null)

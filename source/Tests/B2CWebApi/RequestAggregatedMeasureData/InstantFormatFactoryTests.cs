@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
+using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using NodaTime;
 using NodaTime.Text;
 using Xunit;
@@ -30,10 +31,22 @@ public class InstantFormatFactoryTests
     [InlineData("2022-06-23T21:00:00Z")]
     public void Can_set_instant_to_midnight(string instantString)
     {
-        var instantAtMidget = InstantFormatFactory.SetInstantToMidnight(instantString, _dateTimeZone);
-        var parseResult = InstantPattern.General.Parse(instantAtMidget);
+        var instantAtMidget = InstantFormatFactory.SetInstantToMidnightSameDay(instantString, _dateTimeZone);
 
-        var zonedDateTime = new ZonedDateTime(parseResult.Value, _dateTimeZone);
+        var zonedDateTime = new ZonedDateTime(instantAtMidget, _dateTimeZone);
         Assert.True(zonedDateTime.TimeOfDay == LocalTime.Midnight);
+    }
+
+    [Theory]
+    [InlineData("2023-10-02T22:00:00.000Z")]
+    [InlineData("2022-06-23T22:00:00Z")]
+    [InlineData("2023-10-07T21:59:59.999Z")]
+    [InlineData("2022-06-23T21:00:00Z")]
+    public void Converts_to_same_day(string instantString)
+    {
+        var instantAtMidget = InstantFormatFactory.SetInstantToMidnightSameDay(instantString, _dateTimeZone);
+
+        var inputInstant = InstantPattern.ExtendedIso.Parse(instantString).GetValueOrThrow();
+        Assert.True(instantAtMidget.Day() == inputInstant.Day(), $"The inputData was: {inputInstant} and the output was: {instantAtMidget}");
     }
 }
