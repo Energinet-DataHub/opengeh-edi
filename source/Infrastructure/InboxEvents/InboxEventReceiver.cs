@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 
 namespace Energinet.DataHub.EDI.Infrastructure.InboxEvents;

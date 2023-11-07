@@ -19,9 +19,12 @@ using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration.Authentication;
-using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Common.Configuration;
+using Energinet.DataHub.EDI.Common.DataAccess;
+using Energinet.DataHub.EDI.Common.DateTime;
+using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.Actors;
 using Energinet.DataHub.EDI.Infrastructure.ArchivedMessages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
@@ -31,7 +34,6 @@ using Energinet.DataHub.EDI.Infrastructure.Configuration.FeatureFlag;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
 using Energinet.DataHub.EDI.Infrastructure.GridAreas;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
@@ -65,7 +67,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             AddActorServices();
             AddWholeSaleInBox();
             AddGridAreaServices();
-            _services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>));
             IntegrationEventsConfiguration.Configure(services);
             InboxEventsConfiguration.Configure(services);
             ArchivedMessageConfiguration.Configure(services);
@@ -85,12 +86,10 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddDatabaseContext(string connectionString)
+        public CompositionRoot AddDatabaseContext(string databaseConnectionString)
         {
-            _services.AddDbContext<B2BContext>(x =>
-            {
-                x.UseSqlServer(connectionString, y => y.UseNodaTime());
-            });
+            _services.AddScoped<SqlConnectionSource>(sp => new SqlConnectionSource(databaseConnectionString!));
+            _services.AddScopedSqlDbContext<B2BContext>();
             return this;
         }
 

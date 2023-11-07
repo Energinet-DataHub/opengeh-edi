@@ -39,6 +39,7 @@ public class RaiseDomainEventsBehaviour<TRequest, TResponse> : IPipelineBehavior
         var domainEvents = _domainEventsAccessor.GetAllDomainEvents();
         foreach (var domainEvent in domainEvents)
         {
+            _domainEventsAccessor.ClearAllDomainEvent(domainEvent);
             await _mediator.Publish(domainEvent, cancellationToken).ConfigureAwait(false);
         }
 

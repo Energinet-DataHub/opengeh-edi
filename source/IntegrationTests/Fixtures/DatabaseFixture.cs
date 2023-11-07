@@ -16,8 +16,6 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.Serialization;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Xunit;
@@ -78,7 +76,22 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
         public void CleanupDatabase()
         {
             var cleanupStatement =
+                $"DELETE FROM [dbo].[MoveInTransactions] " +
+                $"DELETE FROM [dbo].[UpdateCustomerMasterDataTransactions] " +
+                $"DELETE FROM [dbo].[MessageRegistry] " +
+                $"DELETE FROM [dbo].[TransactionRegistry]" +
+                $"DELETE FROM [dbo].[OutgoingMessages] " +
+                $"DELETE FROM [dbo].[ReasonTranslations] " +
+                $"DELETE FROM [dbo].[QueuedInternalCommands] " +
+                $"DELETE FROM [dbo].[MarketEvaluationPoints]" +
+                $"DELETE FROM [dbo].[Actor]" +
+                $"DELETE FROM [dbo].[ReceivedIntegrationEvents]" +
+                $"DELETE FROM [dbo].[AggregatedMeasureDataProcesses]" +
                 $"DELETE FROM [dbo].[ArchivedMessages]" +
+                $"DELETE FROM [dbo].[MarketDocuments]" +
+                $"DELETE FROM [dbo].[Bundles]" +
+                $"DELETE FROM [dbo].[ActorMessageQueues]" +
+                $"DELETE FROM [dbo].[ReceivedInboxEvents]" +
                 $"DELETE FROM [dbo].[MessageRegistry]" +
                 $"DELETE FROM [dbo].[TransactionRegistry]" +
                 $"DELETE FROM [dbo].[Actor]" +

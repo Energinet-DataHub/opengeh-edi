@@ -17,7 +17,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Common.DataAccess;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Application.SearchMessages;

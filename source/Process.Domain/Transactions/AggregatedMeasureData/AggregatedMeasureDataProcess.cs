@@ -17,16 +17,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData
 {
     public class AggregatedMeasureDataProcess : Entity
     {
-        private readonly List<OutgoingMessage> _messages = new();
         private State _state = State.Initialized;
 
         public AggregatedMeasureDataProcess(
@@ -131,7 +130,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             {
                 foreach (var aggregation in aggregations)
                 {
-                    _messages.Add(AggregationResultMessageFactory.CreateMessage(aggregation, ProcessId));
+                    AddDomainEvent(new EnqueueMessageEvent(AggregationResultMessageFactory.CreateMessage(aggregation, ProcessId)));
                 }
 
                 _state = State.Accepted;
@@ -144,8 +143,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
 
             if (_state == State.Sent)
             {
-                _messages.Add(CreateRejectedAggregationResultMessage(rejectAggregatedMeasureDataRequest));
-
+                AddDomainEvent(new EnqueueMessageEvent(CreateRejectedAggregationResultMessage(rejectAggregatedMeasureDataRequest)));
                 _state = State.Rejected;
             }
         }
@@ -156,7 +154,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             var rejectedTimeSerie = new RejectedTimeSerie(
                 ProcessId.Id,
                 rejectedAggregatedMeasureDataRequest.RejectReasons.Select(reason =>
-                        new Domain.OutgoingMessages.RejectedRequestAggregatedMeasureData.RejectReason(
+                        new Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages.RejectReason(
                             reason.ErrorCode,
                             reason.ErrorMessage))
                     .ToList(),
@@ -164,7 +162,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
 
             return new RejectedAggregationResultMessage(
                 RequestedByActorId,
-                ProcessId,
+                ProcessId.Id,
                 rejectedAggregatedMeasureDataRequest.BusinessReason.Name,
                 MarketRole.FromCode(RequestedByActorRoleCode),
                 rejectedTimeSerie);

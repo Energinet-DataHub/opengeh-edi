@@ -13,26 +13,26 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.Configuration.Commands;
 using Energinet.DataHub.EDI.Common;
-using IUnitOfWork = Energinet.DataHub.EDI.Process.Domain.IUnitOfWork;
+using Energinet.DataHub.EDI.Process.Domain.Commands;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 
 public class CommandSchedulerFacade
 {
     private readonly ICommandScheduler _commandScheduler;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly ProcessContext _processContext;
 
-    public CommandSchedulerFacade(ICommandScheduler commandScheduler, IUnitOfWork unitOfWork)
+    public CommandSchedulerFacade(ICommandScheduler commandScheduler, ProcessContext processContext)
     {
         _commandScheduler = commandScheduler;
-        _unitOfWork = unitOfWork;
+        _processContext = processContext;
     }
 
     public async Task EnqueueAsync(InternalCommand command)
     {
         await _commandScheduler.EnqueueAsync(command).ConfigureAwait(false);
-        await _unitOfWork.CommitAsync().ConfigureAwait(false);
+        await _processContext.SaveChangesAsync().ConfigureAwait(false);
     }
 }

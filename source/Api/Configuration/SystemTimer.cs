@@ -14,7 +14,8 @@
 
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.Configuration;
-using Energinet.DataHub.EDI.Application.Configuration.TimeEvents;
+using Energinet.DataHub.EDI.Common.DateTime;
+using Energinet.DataHub.EDI.Common.TimeEvents;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 

@@ -16,30 +16,34 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Dapper;
+using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
+using Energinet.DataHub.EDI.ActorMessageQueue.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using NodaTime.Extensions;
 using Xunit;
 using Xunit.Categories;
 using GridAreaDetails = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.GridAreaDetails;
-using Period = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Period;
+using Period = Energinet.DataHub.EDI.Common.Period;
 using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Point;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
 [IntegrationTest]
-public class AggregatedMeasureDataResponseFromWholesaleTests : ProcessTestBase
+public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
 {
     private readonly ProcessContext _processContext;
 
-    public AggregatedMeasureDataResponseFromWholesaleTests(ProcessDatabaseFixture databaseFixture)
+    public AggregatedMeasureDataResponseFromWholesaleTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _processContext = GetService<ProcessContext>();
@@ -49,7 +53,6 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : ProcessTestBase
     public async Task Aggregated_measure_data_response_was_accepted()
     {
         // Arrange
-        var expectedOutgoingMessages = 1;
         var marketMessage = MessageBuilder().Build();
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
@@ -80,14 +83,13 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : ProcessTestBase
 
         // Assert
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);
-        AssertOutgoingMessageCreated(process, expectedOutgoingMessages);
+        Assert.Contains(process.DomainEvents, x => x is EnqueueMessageEvent);
     }
 
     [Fact]
     public async Task Aggregated_measure_data_process_accepted_will_only_be_processed_once()
     {
         // Arrange
-        var expectedOutgoingMessages = 1;
         var marketMessage = MessageBuilder().Build();
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
@@ -100,14 +102,13 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : ProcessTestBase
 
         // Assert
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);
-        AssertOutgoingMessageCreated(process, expectedOutgoingMessages);
+        Assert.Contains(process.DomainEvents, x => x is EnqueueMessageEvent);
     }
 
     [Fact]
     public async Task Aggregated_measure_data_response_was_rejected()
     {
         // Arrange
-        var expectedOutgoingMessage = 1;
         var marketMessage = MessageBuilder().Build();
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
@@ -119,14 +120,13 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : ProcessTestBase
 
         // Assert
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Rejected);
-        AssertOutgoingMessageCreated(process, expectedOutgoingMessage);
+        Assert.Contains(process.DomainEvents, x => x is EnqueueMessageEvent);
     }
 
     [Fact]
     public async Task Aggregated_measure_data_process_rejected_will_only_be_processed_once()
     {
         // Arrange
-        var expectedOutgoingMessage = 1;
         var marketMessage = MessageBuilder().Build();
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
@@ -139,7 +139,7 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : ProcessTestBase
 
         // Assert
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Rejected);
-        AssertOutgoingMessageCreated(process, expectedOutgoingMessage);
+        Assert.Contains(process.DomainEvents, x => x is EnqueueMessageEvent);
     }
 
     protected override void Dispose(bool disposing)
@@ -182,13 +182,6 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : ProcessTestBase
     {
         var processState = typeof(AggregatedMeasureDataProcess).GetField("_state", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(process);
         Assert.Equal(state, processState);
-    }
-
-    private static void AssertOutgoingMessageCreated(AggregatedMeasureDataProcess process, int expectedOutgoingMessages)
-    {
-        var messages = typeof(AggregatedMeasureDataProcess).GetField("_messages", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(process) as IReadOnlyCollection<OutgoingMessage>;
-        Assert.NotNull(messages);
-        Assert.Equal(expectedOutgoingMessages, messages.Count);
     }
 
     private AggregatedMeasureDataProcess? GetProcess(string senderNumber)

@@ -16,46 +16,39 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.Application.Configuration;
-using Energinet.DataHub.EDI.Application.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.ActorMessageQueue.Contracts;
+using Energinet.DataHub.EDI.ActorMessageQueue.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Common.DataAccess;
+using Energinet.DataHub.EDI.Common.DateTime;
+using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
-using Energinet.DataHub.EDI.Process.Application.OutgoingMessages;
-using Energinet.DataHub.EDI.Process.Domain;
-using Energinet.DataHub.EDI.Process.Domain.Documents;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Energinet.DataHub.EDI.Process.Domain.OutgoingMessages.Queueing;
-using Energinet.DataHub.EDI.Process.Domain.Transactions;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
-using Energinet.DataHub.EDI.Process.Infrastructure.OutgoingMessages.Queueing;
 using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
-using NodaTime.Extensions;
 using Xunit;
-using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Point;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
-public class WhenEnqueueingTests : ProcessTestBase
+public class WhenEnqueueingTests : TestBase
 {
-    private readonly MessageEnqueuer _messageEnqueuer;
-    private readonly IOutgoingMessageRepository _outgoingMessageRepository;
+    private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
+    private readonly IEnqueueMessage _enqueueMessage;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-    public WhenEnqueueingTests(ProcessDatabaseFixture databaseFixture)
+    public WhenEnqueueingTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _messageEnqueuer = GetService<MessageEnqueuer>();
-        _outgoingMessageRepository = GetService<IOutgoingMessageRepository>();
+        _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
+        _enqueueMessage = GetService<IEnqueueMessage>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
     }
 
     [Fact]
     public async Task Outgoing_message_is_enqueued()
     {
-        var message = CreateOutgoingMessage();
+        var message = _outgoingMessageDtoBuilder.Build();
         await EnqueueMessage(message);
+
         // TODO: (LRN) Ensure we have a ActorQueue with a bundle with the expected OutgoingMessage.
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = "SELECT * FROM [dbo].[OutgoingMessages]";
@@ -63,7 +56,7 @@ public class WhenEnqueueingTests : ProcessTestBase
             connection
                 .QuerySingleOrDefaultAsync(sql);
         Assert.NotNull(result);
-        Assert.Equal(result.DocumentType, message.DocumentType.Name);
+        Assert.Equal(result.DocumentType, DocumentType.NotifyAggregatedMeasureData.Name);
         Assert.Equal(result.ReceiverId, message.ReceiverId.Value);
         Assert.Equal(result.ReceiverRole, message.ReceiverRole.Name);
         Assert.Equal(result.SenderId, message.SenderId.Value);
@@ -76,9 +69,13 @@ public class WhenEnqueueingTests : ProcessTestBase
     [Fact]
     public async Task Can_peek_message()
     {
-        var message = CreateOutgoingMessage();
+        var message = _outgoingMessageDtoBuilder.Build();
         await EnqueueMessage(message);
-        var command = new PeekCommand(message.ReceiverId, message.DocumentType.Category, message.ReceiverRole, DocumentFormat.Xml);
+        var command = new PeekCommand(
+            message.ReceiverId,
+            MessageCategory.Aggregations,
+            message.ReceiverRole,
+            DocumentFormat.Xml);
 
         var result = await InvokeCommandAsync(command);
 
@@ -88,10 +85,10 @@ public class WhenEnqueueingTests : ProcessTestBase
     [Fact]
     public async Task Can_peek_oldest_bundle()
     {
-        var message = CreateOutgoingMessage();
+        var message = _outgoingMessageDtoBuilder.Build();
         await EnqueueMessage(message);
         ((SystemDateTimeProviderStub)_systemDateTimeProvider).SetNow(_systemDateTimeProvider.Now().PlusSeconds(1));
-        var message2 = CreateOutgoingMessage();
+        var message2 = _outgoingMessageDtoBuilder.Build();
         await EnqueueMessage(message2);
 
         var command = new PeekCommand(message.ReceiverId, message.DocumentType.Category, message.ReceiverRole, DocumentFormat.Ebix);
@@ -109,43 +106,27 @@ public class WhenEnqueueingTests : ProcessTestBase
     [Fact]
     public async Task Can_dequeue_bundle()
     {
-        var message = CreateOutgoingMessage();
+        var message = _outgoingMessageDtoBuilder.Build();
         await EnqueueMessage(message);
-        var peekCommand = new PeekCommand(message.ReceiverId, message.DocumentType.Category, message.ReceiverRole, DocumentFormat.Xml);
+        var peekCommand = new PeekCommand(
+            message.ReceiverId,
+            MessageCategory.Aggregations,
+            message.ReceiverRole,
+            DocumentFormat.Xml);
         var peekResult = await InvokeCommandAsync(peekCommand);
-        var dequeueCommand = new DequeueCommand(peekResult.MessageId!.Value.ToString(), message.ReceiverRole, message.ReceiverId);
+        var dequeueCommand = new DequeueCommand(
+            peekResult.MessageId!.Value.ToString(),
+            message.ReceiverRole,
+            message.ReceiverId);
 
         var result = await InvokeCommandAsync(dequeueCommand);
 
         Assert.True(result.Success);
     }
 
-    private static OutgoingMessage CreateOutgoingMessage()
+    private async Task EnqueueMessage(OutgoingMessageDto message)
     {
-        var p = new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z"); //TODO tilføj point
-        var points = Array.Empty<Point>();
-        var message = AggregationResultMessage.Create(
-            ActorNumber.Create("1234567891912"),
-            MarketRole.MeteringDataAdministrator,
-            ProcessId.Create(Guid.NewGuid()),
-            new Aggregation(
-                points,
-                MeteringPointType.Consumption.Name,
-                MeasurementUnit.Kwh.Name,
-                Resolution.Hourly.Name,
-                new Period(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant()),
-                SettlementType.NonProfiled.Name,
-                BusinessReason.BalanceFixing.Name,
-                new ActorGrouping("1234567891911", null),
-                new GridAreaDetails("805", "1234567891045")));
-        return message;
-    }
-
-    private async Task EnqueueMessage(OutgoingMessage message)
-    {
-        _outgoingMessageRepository.Add(message);
-        await _messageEnqueuer.EnqueueAsync(message);
-        var unitOfWork = GetService<IUnitOfWork>();
-        await unitOfWork.CommitAsync();
+        await _enqueueMessage.EnqueueAsync(message);
+        await GetService<ActorMessageQueueContext>().SaveChangesAsync();
     }
 }

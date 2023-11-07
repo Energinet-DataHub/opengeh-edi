@@ -18,16 +18,17 @@ using System.Linq;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 
-public class InternalCommandRegistrationTests : ProcessTestBase
+public class InternalCommandRegistrationTests : TestBase
 {
     private readonly InternalCommandMapper _mapper;
 
-    public InternalCommandRegistrationTests(ProcessDatabaseFixture databaseFixture)
+    public InternalCommandRegistrationTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _mapper = GetService<InternalCommandMapper>();
@@ -35,7 +36,7 @@ public class InternalCommandRegistrationTests : ProcessTestBase
 
     public static IEnumerable<object[]> GetInternalCommands()
     {
-        var allTypes = ApplicationAssemblies.Application.GetTypes().Concat(ApplicationAssemblies.Infrastructure.GetTypes()).Concat(ApplicationAssemblies.ProcessApplication.GetTypes());
+        var allTypes = ApplicationAssemblies.Application.GetTypes().Concat(ApplicationAssemblies.Infrastructure.GetTypes()).Concat(typeof(ForwardAggregationResult).Assembly.GetTypes());
         return allTypes
             .Where(x => x.BaseType == typeof(InternalCommand))
             .Select(x => new[] { x });
