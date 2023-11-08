@@ -75,7 +75,7 @@ public class RequestAggregatedMeasureDataFactoryTests
         var request = new RequestAggregatedMeasureDataMarketRequest(
             ProcessType: ProcessType.BalanceFixing,
             MeteringPointType: MeteringPointType.Production,
-            StartDate: $"2023-10-1022:00:00.000Z",
+            StartDate: $"2023-10-10T22:00:00.000Z",
             EndDate: $"2023-10-{endDay}T21:59:59.{endDataMilliseconds}Z",
             GridArea: "803",
             EnergySupplierId: "579000000003042",
