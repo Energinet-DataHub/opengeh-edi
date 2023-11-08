@@ -28,7 +28,7 @@ public class RequestAggregatedMeasureDataFactoryTests
     private readonly DateTimeZone _dateTimeZone = DateTimeZoneProviders.Tzdb["Europe/Copenhagen"];
 
     [Fact]
-    public void Can_create_RequestAggregatedMeasureData()
+    public void Can_create_RequestAggregatedMeasureData_with_correct_data()
     {
         var senderId = "9876543210987";
         var startDay = 10;
