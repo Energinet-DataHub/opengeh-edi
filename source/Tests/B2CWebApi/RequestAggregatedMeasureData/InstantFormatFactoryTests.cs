@@ -29,6 +29,7 @@ public class InstantFormatFactoryTests
     [InlineData("2023-10-07T21:59:59.999Z")]
     [InlineData("2022-06-23T22:00:00Z")]
     [InlineData("2022-06-23T21:00:00Z")]
+    [InlineData("2022-01-23T23:00:00Z")]
     public void Can_set_instant_to_midnight(string instantString)
     {
         var instantAtMidget = InstantFormatFactory.SetInstantToMidnightSameDay(instantString, _dateTimeZone);
@@ -42,6 +43,7 @@ public class InstantFormatFactoryTests
     [InlineData("2022-06-23T22:00:00Z")]
     [InlineData("2023-10-07T21:59:59.999Z")]
     [InlineData("2022-06-23T21:00:00Z")]
+    [InlineData("2022-01-23T23:00:00Z")]
     public void Converts_to_same_day(string instantString)
     {
         var instantAtMidget = InstantFormatFactory.SetInstantToMidnightSameDay(instantString, _dateTimeZone);
