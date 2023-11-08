@@ -32,9 +32,9 @@ public class InstantFormatFactoryTests
     [InlineData("2022-01-23T23:00:00Z")]
     public void Can_set_instant_to_midnight(string instantString)
     {
-        var instantAtMidget = InstantFormatFactory.SetInstantToMidnight(instantString, _dateTimeZone);
+        var instantAtMidnight = InstantFormatFactory.SetInstantToMidnight(instantString, _dateTimeZone);
 
-        var zonedDateTime = new ZonedDateTime(instantAtMidget, _dateTimeZone);
+        var zonedDateTime = new ZonedDateTime(instantAtMidnight, _dateTimeZone);
         Assert.True(zonedDateTime.TimeOfDay == LocalTime.Midnight);
     }
 
@@ -44,10 +44,10 @@ public class InstantFormatFactoryTests
     [InlineData("2022-01-23T23:00:00Z")]
     public void Converts_to_same_day(string instantString)
     {
-        var instantAtMidget = InstantFormatFactory.SetInstantToMidnight(instantString, _dateTimeZone);
+        var instantAtMidnight = InstantFormatFactory.SetInstantToMidnight(instantString, _dateTimeZone);
 
         var inputInstant = InstantPattern.ExtendedIso.Parse(instantString).GetValueOrThrow();
-        Assert.True(instantAtMidget.Day() == inputInstant.Day(), $"The inputData was: {inputInstant} and the output was: {instantAtMidget}");
+        Assert.True(instantAtMidnight.Day() == inputInstant.Day(), $"The inputData was: {inputInstant} and the output was: {instantAtMidnight}");
     }
 
     [Theory]
@@ -60,9 +60,9 @@ public class InstantFormatFactoryTests
     [InlineData("2022-06-22T22:00:00Z", 3600000)] // adding an hour
     public void Converts_to_next_day(string instantString, int milliseconds)
     {
-        var instantAtMidget = InstantFormatFactory.SetInstantToMidnight(instantString, _dateTimeZone, Duration.FromMilliseconds(milliseconds));
+        var instantAtMidnight = InstantFormatFactory.SetInstantToMidnight(instantString, _dateTimeZone, Duration.FromMilliseconds(milliseconds));
 
         var inputInstant = InstantPattern.ExtendedIso.Parse(instantString).GetValueOrThrow();
-        Assert.True(instantAtMidget.Day() == inputInstant.Day(), $"The inputData was: {inputInstant} and the output was: {instantAtMidget}");
+        Assert.True(instantAtMidnight.Day() == inputInstant.Day(), $"The inputData was: {inputInstant} and the output was: {instantAtMidnight}");
     }
 }
