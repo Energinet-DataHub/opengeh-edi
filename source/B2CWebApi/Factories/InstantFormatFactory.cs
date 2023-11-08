@@ -19,16 +19,18 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Factories;
 
 public static class InstantFormatFactory
 {
-    public static Instant SetInstantToMidnightSameDay(string dateString, DateTimeZone dateTimeZone)
+    public static Instant SetInstantToMidnight(string dateString, DateTimeZone dateTimeZone, Duration? addDuration = null)
     {
         var instant = InstantPattern.ExtendedIso.Parse(dateString).Value;
+
+        if (addDuration is not null)
+        {
+            instant = instant.Plus(addDuration!.Value);
+        }
+
         var zonedDateTime = new ZonedDateTime(instant, dateTimeZone);
         var dateTimeZoneAtMidnight = zonedDateTime.Date
             .At(LocalTime.Midnight);
-        if (zonedDateTime.Hour >= 22)
-        {
-            dateTimeZoneAtMidnight = dateTimeZoneAtMidnight.PlusDays(1);
-        }
 
         return dateTimeZoneAtMidnight
             .InZoneStrictly(dateTimeZone)
