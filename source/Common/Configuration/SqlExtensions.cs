@@ -21,21 +21,13 @@ namespace Energinet.DataHub.EDI.Common.Configuration;
 public static class SqlExtensions
 {
     public static void AddScopedSqlDbContext<TDbContext>(
-        this IServiceCollection services,
-        Action<DbContextOptionsBuilder<TDbContext>>? optionsAction = null)
+        this IServiceCollection services)
         where TDbContext : DbContext
     {
-        services.AddScoped<DbContextOptions<TDbContext>>(serviceProvider =>
+        services.AddDbContext<TDbContext>((sp, o) =>
         {
-            var builder = new DbContextOptionsBuilder<TDbContext>();
-            var source = serviceProvider.GetRequiredService<SqlConnectionSource>();
-            builder.UseSqlServer(source.Connection, y => y.UseNodaTime());
-            optionsAction?.Invoke(builder);
-
-            return builder
-                .Options;
+            var source = sp.GetRequiredService<SqlConnectionSource>();
+            o.UseSqlServer(source.Connection, y => y.UseNodaTime());
         });
-
-        services.AddScoped<TDbContext>();
     }
 }
