@@ -19,11 +19,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
-using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration.Queries;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.DateTime;
@@ -193,7 +191,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 .AddMessagePublishing()
                 .AddMessageParserServices();
 
-            ProcessConfiguration.Configure(_services,  ActorMessageQueueConfiguration.Configure);
+            ActorMessageQueueConfiguration.Configure(_services);
+            ProcessConfiguration.Configure(_services);
             _serviceProvider = _services.BuildServiceProvider();
         }
     }

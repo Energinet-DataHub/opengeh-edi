@@ -27,7 +27,7 @@ using PeekResult = Energinet.DataHub.EDI.OutgoingMessages.Contracts.PeekResult;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
 
-public class PeekHandler : IRequestHandler<PeekCommand, Contracts.PeekResult>
+public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
 {
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
     private readonly IMarketDocumentRepository _marketDocumentRepository;

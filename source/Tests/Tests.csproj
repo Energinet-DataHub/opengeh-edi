@@ -94,8 +94,6 @@ limitations under the License.
 
     <ItemGroup>
       <Folder Include="Domain\OutgoingMessages\Queueing\" />
-      <ProjectReference Include="..\ActorMessageQueue.Application\ActorMessageQueue.Application.csproj" />
-      <ProjectReference Include="..\ActorMessageQueue.Domain\ActorMessageQueue.Domain.csproj" />
       <ProjectReference Include="..\Process.Application\Process.Application.csproj" />
     </ItemGroup>
 
