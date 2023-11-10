@@ -24,7 +24,6 @@ using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.Bearer;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.MarketActors;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.Application.Actors;
-using Energinet.DataHub.EDI.Common.Configuration;
 using Energinet.DataHub.EDI.Common.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
@@ -32,7 +31,6 @@ using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusine
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Configuration;
 using Energinet.DataHub.EDI.Process.Application.Configuration;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.Reflection;
@@ -146,7 +144,8 @@ namespace Energinet.DataHub.EDI.Api
                     };
                     services.AddSubscriber<IntegrationEventHandler>(integrationEventDescriptors);
 
-                    ProcessConfiguration.Configure(services, ActorMessageQueueConfiguration.Configure);
+                    ActorMessageQueueConfiguration.Configure(services);
+                    ProcessConfiguration.Configure(services);
                 })
                 .ConfigureLogging(logging =>
                 {

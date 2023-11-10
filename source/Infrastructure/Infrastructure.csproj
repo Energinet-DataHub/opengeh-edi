@@ -66,9 +66,6 @@ limitations under the License.
       <ProjectReference Include="..\RequestResponse\source\RequestResponse\RequestResponse.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Configuration\Queueing\" />
-    </ItemGroup>
 
 
 </Project>

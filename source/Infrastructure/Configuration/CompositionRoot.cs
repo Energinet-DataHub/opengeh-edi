@@ -41,7 +41,6 @@ using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using MediatR;
 using MediatR.Registration;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -149,7 +148,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
 
         public CompositionRoot AddMessagePublishing()
         {
-            _services.AddSingleton<IActorRepository, ActorRepository>();
+            _services.AddScoped<IActorRepository, ActorRepository>();
             return this;
         }
 

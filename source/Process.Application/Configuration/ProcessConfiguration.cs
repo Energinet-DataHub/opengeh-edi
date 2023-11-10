@@ -38,12 +38,9 @@ namespace Energinet.DataHub.EDI.Process.Application.Configuration;
 
 public static class ProcessConfiguration
 {
-    public static void Configure(IServiceCollection services, Action<IServiceCollection> actorMessageQueueConfiguration)
+    public static void Configure(IServiceCollection services)
     {
-        if (actorMessageQueueConfiguration == null) throw new ArgumentNullException(nameof(actorMessageQueueConfiguration));
-
         services.AddScopedSqlDbContext<ProcessContext>();
-        actorMessageQueueConfiguration(services);
 
         //EventsConfiguration
         //TODO: can we move them out and delete ref to Infrastructure?

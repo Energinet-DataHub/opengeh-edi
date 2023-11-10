@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OutgoingMessages.Contracts\OutgoingMessages.Contracts.csproj" />
-    <ProjectReference Include="..\ActorMessageQueue.Domain\ActorMessageQueue.Domain.csproj" />
     <ProjectReference Include="..\OutgoingMessages.Domain\OutgoingMessages.Domain.csproj" />
     <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
     <ProjectReference Include="..\Common\Common.csproj" />
