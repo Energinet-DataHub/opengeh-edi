@@ -22,7 +22,7 @@ using IncomingMessages.Infrastructure.Messages;
 using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 using IncomingMessages.Infrastructure.ValidationErrors;
 
-namespace IncomingMessages.Infrastructure.RequestAggregatedMeasureData;
+namespace IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 
 public class XmlMessageParser : IMessageParser
 {

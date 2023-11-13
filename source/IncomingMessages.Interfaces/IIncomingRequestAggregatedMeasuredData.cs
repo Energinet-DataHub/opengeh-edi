@@ -22,5 +22,5 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 #pragma warning disable SA1600
 public interface IIncomingRequestAggregatedMeasuredData
 {
-    Task<ResponseMessage> ParseAsync(Stream message, DocumentFormat documentFormat, CancellationToken cancellationToken);
+    Task<ResponseMessage> ParseAsync(Stream message, DocumentFormat documentFormat, CancellationToken cancellationToken, DocumentFormat responseFormat = null!);
 }

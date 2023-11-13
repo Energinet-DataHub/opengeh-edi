@@ -17,7 +17,7 @@ using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using NodaTime;
 
-namespace IncomingMessages.Infrastructure.RequestAggregatedMeasureData;
+namespace IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 
 public static class RequestAggregatedMeasureDataMarketMessageFactory
 {

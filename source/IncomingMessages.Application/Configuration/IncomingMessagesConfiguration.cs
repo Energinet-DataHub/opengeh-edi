@@ -17,7 +17,7 @@ using IncomingMessages.Infrastructure;
 using IncomingMessages.Infrastructure.Configuration.DataAccess;
 using IncomingMessages.Infrastructure.Messages;
 using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
-using IncomingMessages.Infrastructure.RequestAggregatedMeasureData;
+using IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 using IncomingMessages.Infrastructure.Response;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -30,10 +30,9 @@ public static class IncomingMessagesConfiguration
         services.AddScopedSqlDbContext<IncomingMessagesContext>();
         services.AddScoped<ITransactionIdRepository, TransactionIdRepository>();
         services.AddScoped<IMessageIdRepository, MessageIdRepository>();
-        services
-            .AddScoped<IMessageParser, XmlMessageParser>();
-        services
-            .AddScoped<IMessageParser, JsonMessageParser>();
+        services.AddScoped<IMessageParser, XmlMessageParser>();
+        services.AddScoped<IMessageParser, JsonMessageParser>();
+        services.AddScoped<IMessageParser, ProtoMessageParser>();
         services.AddScoped<RequestAggregatedMeasureDataMarketMessageParser>();
         services.AddTransient<SenderAuthorizer>();
         services.AddScoped<ProcessTypeValidator>();

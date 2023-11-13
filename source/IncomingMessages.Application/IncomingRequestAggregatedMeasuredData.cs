@@ -60,7 +60,7 @@ public class IncomingRequestAggregatedMeasuredData : IIncomingRequestAggregatedM
         _b2BContext = b2BContext;
     }
 
-    public async Task<ResponseMessage> ParseAsync(Stream message, DocumentFormat documentFormat, CancellationToken cancellationToken)
+    public async Task<ResponseMessage> ParseAsync(Stream message, DocumentFormat documentFormat, CancellationToken cancellationToken, DocumentFormat responseFormat = null!)
     {
         var requestAggregatedMeasureDataMarketMessageParserResult = await _requestAggregatedMeasureDataMarketMessageParser.ParseAsync(message, documentFormat, cancellationToken).ConfigureAwait(false);
 
@@ -69,7 +69,7 @@ public class IncomingRequestAggregatedMeasuredData : IIncomingRequestAggregatedM
         if (requestAggregatedMeasureDataMarketMessageParserResult.Errors.Any())
         {
             var res = Result.Failure(requestAggregatedMeasureDataMarketMessageParserResult.Errors.ToArray());
-            return _responseFactory.From(res, documentFormat);
+            return _responseFactory.From(res, responseFormat ?? documentFormat);
         }
 
         var validate = await _aggregatedMeasureDataMarketMessageValidator
