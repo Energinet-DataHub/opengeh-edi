@@ -14,7 +14,7 @@
 
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.EDI.Application.IncomingMessages;
+namespace Energinet.DataHub.EDI.Process.Interfaces;
 
 /// <summary>
 /// Responsible for carrying the market message data from the incoming message before any data validation.
