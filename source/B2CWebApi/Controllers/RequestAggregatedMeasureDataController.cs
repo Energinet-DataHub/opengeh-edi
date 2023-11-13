@@ -46,7 +46,7 @@ public class RequestAggregatedMeasureDataController : ControllerBase
     public async Task<ActionResult> RequestAsync(RequestAggregatedMeasureDataMarketRequest request, CancellationToken cancellationToken)
     {
         var currentUser = _userContext.CurrentUser;
-        var token = GetToken(currentUser);
+        var token = GetToken(currentUser);//TODO: LRN Slet B2C endpoint på API og Kald IncommingMessage modulet herfra
 
         var validationMessage = await _requestAggregatedMeasureDataHttpClient.RequestAsync(
             RequestAggregatedMeasureDataHttpFactory.Create(request, currentUser.ActorNumber, currentUser.Role, _dateTimeZone),
