@@ -46,7 +46,6 @@ public class RequestAggregatedMeasureMessageReceiver
     private readonly B2BContext _dbContext;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IIncomingRequestAggregatedMeasuredData _incomingRequestAggregatedMeasuredData;
-    private readonly ResponseFactory _responseFactory;
     private readonly ICorrelationContext _correlationContext;
     private readonly IMediator _mediator;
 
@@ -56,7 +55,6 @@ public class RequestAggregatedMeasureMessageReceiver
         B2BContext dbContext,
         ISystemDateTimeProvider systemDateTimeProvider,
         IIncomingRequestAggregatedMeasuredData incomingRequestAggregatedMeasuredData,
-        ResponseFactory responseFactory,
         ICorrelationContext correlationContext,
         IMediator mediator)
         {
@@ -65,7 +63,6 @@ public class RequestAggregatedMeasureMessageReceiver
         _dbContext = dbContext;
         _systemDateTimeProvider = systemDateTimeProvider;
         _incomingRequestAggregatedMeasuredData = incomingRequestAggregatedMeasuredData;
-        _responseFactory = responseFactory;
         _correlationContext = correlationContext;
         _mediator = mediator;
         }
@@ -91,13 +88,13 @@ public class RequestAggregatedMeasureMessageReceiver
 
         var messageParserResult = await _incomingRequestAggregatedMeasuredData
             .ParseAsync(request.Body, cimFormat, cancellationToken).ConfigureAwait(false);
-        if (messageParserResult.Any())
+        if (messageParserResult.IsErrorResponse)
         {
             var httpErrorStatusCode = HttpStatusCode.BadRequest;
-            return CreateResponse(request, httpErrorStatusCode, _responseFactory.From(messageParserResult, cimFormat));
+            return CreateResponse(request, httpErrorStatusCode, messageParserResult);
         }
 
-        await SaveArchivedMessageAsync(marketMessage, request.Body, cancellationToken).ConfigureAwait(false);
+        await SaveArchivedMessageAsync(marketMessage, request.Body, cancellationToken).ConfigureAwait(false); //TODO: Kommet hertil wuhuuu
 
         var result = await _mediator
             .Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage), cancellationToken).ConfigureAwait(false);

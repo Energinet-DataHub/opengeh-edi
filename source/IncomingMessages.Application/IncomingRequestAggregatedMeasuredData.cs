@@ -22,7 +22,9 @@ using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using IncomingMessages.Infrastructure;
+using IncomingMessages.Infrastructure.Messages;
 using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
+using IncomingMessages.Infrastructure.Response;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application;
 
@@ -31,27 +33,37 @@ public class IncomingRequestAggregatedMeasuredData : IIncomingRequestAggregatedM
     private readonly IRequestAggregatedMeasureDataMarketMessageParser _requestAggregatedMeasureDataMarketMessageParser;
     private readonly IncomingRequestAggregatedMeasuredDataSender _incomingRequestAggregatedMeasuredDataSender;
     private readonly ISerializer _serializer;
+    private readonly RequestAggregatedMeasureDataMarketMessageValidator _aggregatedMeasureDataMarketMessageValidator;
+    private readonly ResponseFactory _responseFactory;
 
     public IncomingRequestAggregatedMeasuredData(
         IRequestAggregatedMeasureDataMarketMessageParser requestAggregatedMeasureDataMarketMessageParser,
         IncomingRequestAggregatedMeasuredDataSender incomingRequestAggregatedMeasuredDataSender,
-        ISerializer serializer)
+        ISerializer serializer,
+        RequestAggregatedMeasureDataMarketMessageValidator aggregatedMeasureDataMarketMessageValidator,
+        ResponseFactory responseFactory)
     {
         _requestAggregatedMeasureDataMarketMessageParser = requestAggregatedMeasureDataMarketMessageParser;
         _incomingRequestAggregatedMeasuredDataSender = incomingRequestAggregatedMeasuredDataSender;
         _serializer = serializer;
+        _aggregatedMeasureDataMarketMessageValidator = aggregatedMeasureDataMarketMessageValidator;
+        _responseFactory = responseFactory;
     }
 
-    public async Task<IReadOnlyCollection<ValidationErrorDto>> ParseAsync(Stream message, DocumentFormat documentFormat, CancellationToken cancellationToken)
+    public async Task<ResponseMessage> ParseAsync(Stream message, DocumentFormat documentFormat, CancellationToken cancellationToken)
     {
         var requestAggregatedMeasureDataMarketMessageParserResult = await _requestAggregatedMeasureDataMarketMessageParser.ParseAsync(message, documentFormat, cancellationToken).ConfigureAwait(false);
         // save archived message
 
         if (requestAggregatedMeasureDataMarketMessageParserResult.Errors.Any())
         {
-            return requestAggregatedMeasureDataMarketMessageParserResult.Errors
-                .Select(x => new ValidationErrorDto(x.Message, x.Code, x.Target)).ToList();
+            var res = Result.Failure(requestAggregatedMeasureDataMarketMessageParserResult.Errors.ToArray());
+            return _responseFactory.From(res, documentFormat);
         }
+
+        var validate = await _aggregatedMeasureDataMarketMessageValidator
+            .ValidateAsync(requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!, cancellationToken)
+            .ConfigureAwait(false);
 
         var serviceBusMessage =
             new ServiceBusMessage(
@@ -63,6 +75,6 @@ public class IncomingRequestAggregatedMeasuredData : IIncomingRequestAggregatedM
         await _incomingRequestAggregatedMeasuredDataSender.SendAsync(serviceBusMessage, cancellationToken)
             .ConfigureAwait(false);
 
-        return new List<ValidationErrorDto>();
+        return new ResponseMessage();
     }
 }

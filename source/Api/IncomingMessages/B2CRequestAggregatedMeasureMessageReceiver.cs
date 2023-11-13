@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Domain;
 using Energinet.DataHub.EDI.Domain.ArchivedMessages;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.Edi.Requests;

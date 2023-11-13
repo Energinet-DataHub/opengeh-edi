@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,5 +22,5 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 #pragma warning disable SA1600
 public interface IIncomingRequestAggregatedMeasuredData
 {
-    Task<IReadOnlyCollection<ValidationErrorDto>> ParseAsync(Stream message, DocumentFormat documentFormat, CancellationToken cancellationToken);
+    Task<ResponseMessage> ParseAsync(Stream message, DocumentFormat documentFormat, CancellationToken cancellationToken);
 }
