@@ -37,8 +37,8 @@ using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusine
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
 using Energinet.DataHub.EDI.Infrastructure.GridAreas;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
-using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
+using IncomingMessages.Infrastructure;
 using MediatR;
 using MediatR.Registration;
 using Microsoft.Extensions.DependencyInjection;

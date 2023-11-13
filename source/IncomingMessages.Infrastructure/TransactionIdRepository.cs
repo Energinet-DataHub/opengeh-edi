@@ -12,24 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
+using IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages
+namespace IncomingMessages.Infrastructure
 {
     public class TransactionIdRepository : ITransactionIdRepository
     {
-        private readonly B2BContext _b2BContext;
+        private readonly IncomingMessagesContext _incomingMessagesContext;
 
-        public TransactionIdRepository(B2BContext b2BContext)
+        public TransactionIdRepository(IncomingMessagesContext incomingMessagesContext)
         {
-            _b2BContext = b2BContext;
+            _incomingMessagesContext = incomingMessagesContext;
         }
 
         public async Task<bool> TransactionIdExistsAsync(
@@ -52,19 +48,19 @@ namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages
 
             foreach (var transactionId in transactionIds)
             {
-               await _b2BContext.TransactionIds.AddAsync(new TransactionIdForSender(transactionId, senderId), cancellationToken).ConfigureAwait(false);
+               await _incomingMessagesContext.TransactionIdForSenders.AddAsync(new TransactionIdForSender(transactionId, senderId), cancellationToken).ConfigureAwait(false);
             }
         }
 
         private TransactionIdForSender? GetTransactionFromInMemoryCollection(string senderId, string transactionId)
         {
-            return _b2BContext.TransactionIds.Local
+            return _incomingMessagesContext.TransactionIdForSenders.Local
                 .FirstOrDefault(x => x.TransactionId == transactionId && x.SenderId == senderId);
         }
 
         private async Task<TransactionIdForSender?> GetTransactionFromDbAsync(string senderId, string transactionId, CancellationToken cancellationToken)
         {
-            return await _b2BContext.TransactionIds
+            return await _incomingMessagesContext.TransactionIdForSenders
                 .FirstOrDefaultAsync(
                     transactionIdForSender => transactionIdForSender.TransactionId == transactionId
                          && transactionIdForSender.SenderId == senderId,

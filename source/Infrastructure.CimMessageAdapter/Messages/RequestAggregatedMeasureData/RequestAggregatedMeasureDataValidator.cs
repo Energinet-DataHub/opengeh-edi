@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using IncomingMessages.Infrastructure;
+
 namespace Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
 public class RequestAggregatedMeasureDataValidator : RequestAggregatedMeasureDataMarketMessageValidator

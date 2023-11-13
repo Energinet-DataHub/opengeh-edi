@@ -12,26 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Dapper;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.Exceptions;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
-using Microsoft.Data.SqlClient;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
+using IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages
+namespace IncomingMessages.Infrastructure
 {
     public class MessageIdRepository : IMessageIdRepository
     {
-        private readonly B2BContext _b2BContext;
+        private readonly IncomingMessagesContext _b2BContext;
 
         public MessageIdRepository(
-            B2BContext b2BContext)
+            IncomingMessagesContext b2BContext)
         {
             _b2BContext = b2BContext;
         }
@@ -40,7 +33,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages
         {
             if (senderNumber == null) throw new ArgumentNullException(nameof(senderNumber));
 
-            await _b2BContext.MessageIds.AddAsync(
+            await _b2BContext.MessageIdForSenders.AddAsync(
                     new MessageIdForSender(messageId, senderNumber), cancellationToken)
                 .ConfigureAwait(false);
         }
@@ -60,7 +53,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages
 
         private MessageIdForSender? GetMessageFromInMemoryCollection(string senderNumber, string messageId)
         {
-            return _b2BContext.MessageIds.Local
+            return _b2BContext.MessageIdForSenders.Local
                 .FirstOrDefault(x => x.MessageId == messageId && x.SenderId == senderNumber);
         }
 
@@ -69,7 +62,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages
             string messageId,
             CancellationToken cancellationToken)
         {
-            return await _b2BContext.MessageIds
+            return await _b2BContext.MessageIdForSenders
                 .FirstOrDefaultAsync(
                     messageIdForSender => messageIdForSender.MessageId == messageId
                                               && messageIdForSender.SenderId == senderId,

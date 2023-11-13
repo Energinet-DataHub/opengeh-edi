@@ -58,6 +58,7 @@ limitations under the License.
   </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\Infrastructure.DocumentValidation\Infrastructure.DocumentValidation.csproj" />
       <ProjectReference Include="..\Infrastructure.CimMessageAdapter\Infrastructure.CimMessageAdapter.csproj" />
@@ -68,5 +69,9 @@ limitations under the License.
     </ItemGroup>
 
 
+
+    <ItemGroup>
+      <Folder Include="IncomingMessages\" />
+    </ItemGroup>
 
 </Project>
