@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
-using System.Threading.Tasks;
 using System.Xml;
 using Energinet.DataHub.EDI.Common;
 
-namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
+namespace IncomingMessages.Infrastructure;
 
 internal static class MessageHeaderExtractor
 {

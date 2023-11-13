@@ -61,7 +61,6 @@ limitations under the License.
       <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\Infrastructure.DocumentValidation\Infrastructure.DocumentValidation.csproj" />
-      <ProjectReference Include="..\Infrastructure.CimMessageAdapter\Infrastructure.CimMessageAdapter.csproj" />
       <ProjectReference Include="..\Application\Application.csproj" />
       <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj" />
       <ProjectReference Include="..\Process.Interfaces\Process.Interfaces.csproj" />

@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.CimXml;
-using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.Response;
+using IncomingMessages.Infrastructure.Messages;
+using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
+using IncomingMessages.Infrastructure.RequestAggregatedMeasureData;
+using IncomingMessages.Infrastructure.Response;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration;
@@ -48,9 +48,9 @@ internal static class IncomingMessageParsingServices
     private static void RegisterRequestAggregatedMeasureDataHandling(IServiceCollection services)
     {
         services
-            .AddScoped<IMessageParser, IncomingMessages.RequestAggregatedMeasureData.XmlMessageParser>();
+            .AddScoped<IMessageParser, XmlMessageParser>();
         services
-            .AddScoped<IMessageParser, IncomingMessages.RequestAggregatedMeasureData.JsonMessageParser>();
+            .AddScoped<IMessageParser, JsonMessageParser>();
         services.AddScoped<RequestAggregatedMeasureDataMarketMessageParser>();
         services.AddTransient<RequestAggregatedMeasureDataValidator>();
         services.AddTransient<SenderAuthorizer>();

@@ -48,4 +48,8 @@ limitations under the License.
       <Compile Remove="JsonMessageConverter.cs" />
       <Compile Remove="Messages\MktActivityRecord.cs" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Response\" />
+    </ItemGroup>
 </Project>

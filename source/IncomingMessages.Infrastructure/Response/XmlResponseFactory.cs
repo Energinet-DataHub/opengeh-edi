@@ -12,15 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
 using System.Text;
 using System.Xml;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
+using IncomingMessages.Infrastructure.Messages;
 
-namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.Response
+namespace IncomingMessages.Infrastructure.Response
 {
     public class XmlResponseFactory : IResponseFactory
     {

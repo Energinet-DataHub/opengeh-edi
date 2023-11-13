@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
+namespace IncomingMessages.Infrastructure;
 
 public class MessageIdEntityConfiguration : IEntityTypeConfiguration<MessageIdForSender>
 {

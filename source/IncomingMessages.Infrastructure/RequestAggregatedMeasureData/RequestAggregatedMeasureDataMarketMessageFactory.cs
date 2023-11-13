@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
+namespace IncomingMessages.Infrastructure.RequestAggregatedMeasureData;
 
 public static class RequestAggregatedMeasureDataMarketMessageFactory
 {
@@ -46,7 +44,7 @@ public static class RequestAggregatedMeasureDataMarketMessageFactory
     }
 
     public static RequestAggregatedMeasureDataMarketMessage Create(
-        Edi.Requests.RequestAggregatedMeasureData requestAggregatedMeasureData,
+        Energinet.DataHub.Edi.Requests.RequestAggregatedMeasureData requestAggregatedMeasureData,
         Instant createdAt)
     {
         if (requestAggregatedMeasureData == null) throw new ArgumentNullException(nameof(requestAggregatedMeasureData));

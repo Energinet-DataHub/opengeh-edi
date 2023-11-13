@@ -7,7 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Application\Application.csproj" />
       <ProjectReference Include="..\Common\Common.csproj" />
+      <ProjectReference Include="..\Infrastructure.DocumentValidation\Infrastructure.DocumentValidation.csproj" />
+      <ProjectReference Include="..\Process.Interfaces\Process.Interfaces.csproj" />
+      <ProjectReference Include="..\RequestResponse\source\RequestResponse\RequestResponse.csproj" />
     </ItemGroup>
 
 </Project>
