@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Process.Interfaces;
-using MediatR;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 
-public class InitializeAggregatedMeasureDataProcessesCommand : ICommand<Unit>
+#pragma warning disable SA1600
+public interface IIncomingRequestAggregatedMeasuredData
 {
-    public InitializeAggregatedMeasureDataProcessesCommand(RequestAggregatedMeasureDataMarketMessage marketMessage)
-    {
-        MarketMessage = marketMessage;
-    }
-
-    public RequestAggregatedMeasureDataMarketMessage MarketMessage { get; }
+    Task<IReadOnlyCollection<ValidationErrorDto>> ParseAsync(Stream message, DocumentFormat documentFormat, CancellationToken cancellationToken);
 }

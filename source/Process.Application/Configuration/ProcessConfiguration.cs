@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Energinet.DataHub.EDI.Common.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
@@ -30,7 +29,6 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.Pr
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.Processing;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
-using IncomingMessages.Infrastructure.Messages;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -65,7 +63,7 @@ public static class ProcessConfiguration
         services.AddTransient<IRequestHandler<AcceptedAggregatedTimeSerie, Unit>, AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable>();
         services.AddTransient<IRequestHandler<RejectedAggregatedTimeSeries, Unit>, RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable>();
         services.AddTransient<INotificationHandler<AggregatedMeasureProcessIsInitialized>, NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized>();
-        services.AddTransient<IRequestHandler<InitializeAggregatedMeasureDataProcessesCommand, Result>, InitializeAggregatedMeasureDataProcessesHandler>();
+        services.AddTransient<IRequestHandler<InitializeAggregatedMeasureDataProcessesCommand, Unit>, InitializeAggregatedMeasureDataProcessesHandler>();
         services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>, WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable>();
         services.AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasRejected>, WhenAnRejectedAggregatedTimeSeriesRequestIsAvailable>();
         services.AddScoped<WholesaleInbox>();

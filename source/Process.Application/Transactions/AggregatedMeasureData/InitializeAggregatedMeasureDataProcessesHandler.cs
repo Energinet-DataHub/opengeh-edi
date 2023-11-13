@@ -20,13 +20,11 @@ using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Interfaces;
-using IncomingMessages.Infrastructure.Messages;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 
-public class InitializeAggregatedMeasureDataProcessesHandler
-    : IRequestHandler<InitializeAggregatedMeasureDataProcessesCommand, Result>
+public class InitializeAggregatedMeasureDataProcessesHandler : IRequestHandler<InitializeAggregatedMeasureDataProcessesCommand, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
 
@@ -36,7 +34,7 @@ public class InitializeAggregatedMeasureDataProcessesHandler
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
     }
 
-    public async Task<Result> Handle(
+    public async Task<Unit> Handle(
         InitializeAggregatedMeasureDataProcessesCommand request,
         CancellationToken cancellationToken)
     {
@@ -45,7 +43,7 @@ public class InitializeAggregatedMeasureDataProcessesHandler
 
         CreateAggregatedMeasureDataProcess(request.MarketMessage);
 
-        return Result.Succeeded(); //TODO: LRN Should not return a result any longer
+        return Unit.Value;
     }
 
     private void CreateAggregatedMeasureDataProcess(

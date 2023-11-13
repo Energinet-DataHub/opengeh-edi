@@ -37,7 +37,6 @@ using Energinet.DataHub.EDI.Infrastructure.DataRetention;
 using Energinet.DataHub.EDI.Infrastructure.GridAreas;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
-using IncomingMessages.Infrastructure;
 using MediatR;
 using MediatR.Registration;
 using Microsoft.Extensions.DependencyInjection;
@@ -55,8 +54,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             _services = services;
             services.AddSingleton<HttpClient>();
             services.AddSingleton<ISerializer, Serializer>();
-            services.AddScoped<ITransactionIdRepository, TransactionIdRepository>();
-            services.AddScoped<IMessageIdRepository, MessageIdRepository>();
+
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IFeatureFlagProvider, FeatureFlagProviderProvider>();
 

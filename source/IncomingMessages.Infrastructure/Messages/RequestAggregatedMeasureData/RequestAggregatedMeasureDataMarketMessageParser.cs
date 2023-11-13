@@ -16,7 +16,7 @@ using Energinet.DataHub.EDI.Common;
 
 namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 
-public class RequestAggregatedMeasureDataMarketMessageParser
+public class RequestAggregatedMeasureDataMarketMessageParser : IRequestAggregatedMeasureDataMarketMessageParser
 {
     private readonly IEnumerable<IMessageParser> _parsers;
 

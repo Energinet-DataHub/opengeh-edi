@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Domain.ArchivedMessages;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Interfaces;
@@ -44,7 +45,7 @@ public class RequestAggregatedMeasureMessageReceiver
     private readonly IArchivedMessageRepository _messageArchive;
     private readonly B2BContext _dbContext;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-    private readonly RequestAggregatedMeasureDataMarketMessageParser _requestAggregatedMeasureDataMarketMessageParser;
+    private readonly IIncomingRequestAggregatedMeasuredData _incomingRequestAggregatedMeasuredData;
     private readonly ResponseFactory _responseFactory;
     private readonly ICorrelationContext _correlationContext;
     private readonly IMediator _mediator;
@@ -54,7 +55,7 @@ public class RequestAggregatedMeasureMessageReceiver
         IArchivedMessageRepository messageArchive,
         B2BContext dbContext,
         ISystemDateTimeProvider systemDateTimeProvider,
-        RequestAggregatedMeasureDataMarketMessageParser requestAggregatedMeasureDataMarketMessageParser,
+        IIncomingRequestAggregatedMeasuredData incomingRequestAggregatedMeasuredData,
         ResponseFactory responseFactory,
         ICorrelationContext correlationContext,
         IMediator mediator)
@@ -63,7 +64,7 @@ public class RequestAggregatedMeasureMessageReceiver
         _messageArchive = messageArchive;
         _dbContext = dbContext;
         _systemDateTimeProvider = systemDateTimeProvider;
-        _requestAggregatedMeasureDataMarketMessageParser = requestAggregatedMeasureDataMarketMessageParser;
+        _incomingRequestAggregatedMeasuredData = incomingRequestAggregatedMeasuredData;
         _responseFactory = responseFactory;
         _correlationContext = correlationContext;
         _mediator = mediator;
@@ -88,14 +89,12 @@ public class RequestAggregatedMeasureMessageReceiver
             return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
         }
 
-        var messageParserResult = await _requestAggregatedMeasureDataMarketMessageParser
+        var messageParserResult = await _incomingRequestAggregatedMeasuredData
             .ParseAsync(request.Body, cimFormat, cancellationToken).ConfigureAwait(false);
-        var marketMessage = messageParserResult.MarketMessage;
-        if (marketMessage is null || messageParserResult.Errors.Any())
+        if (messageParserResult.Any())
         {
-            var errorResult = Result.Failure(messageParserResult.Errors.ToArray());
             var httpErrorStatusCode = HttpStatusCode.BadRequest;
-            return CreateResponse(request, httpErrorStatusCode, _responseFactory.From(errorResult, cimFormat));
+            return CreateResponse(request, httpErrorStatusCode, _responseFactory.From(messageParserResult, cimFormat));
         }
 
         await SaveArchivedMessageAsync(marketMessage, request.Body, cancellationToken).ConfigureAwait(false);

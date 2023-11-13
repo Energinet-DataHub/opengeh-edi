@@ -14,10 +14,6 @@
 
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.CimXml;
-using IncomingMessages.Infrastructure.Messages;
-using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
-using IncomingMessages.Infrastructure.RequestAggregatedMeasureData;
-using IncomingMessages.Infrastructure.Response;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration;
@@ -26,16 +22,7 @@ internal static class IncomingMessageParsingServices
 {
     internal static void AddIncomingMessageParsingServices(IServiceCollection services)
     {
-        RegisterB2BResponseServices(services);
         RegisterSchemaProviders(services);
-        RegisterRequestAggregatedMeasureDataHandling(services);
-    }
-
-    private static void RegisterB2BResponseServices(IServiceCollection services)
-    {
-        services.AddSingleton<IResponseFactory, JsonResponseFactory>();
-        services.AddSingleton<IResponseFactory, XmlResponseFactory>();
-        services.AddSingleton<ResponseFactory>();
     }
 
     private static void RegisterSchemaProviders(IServiceCollection services)
@@ -43,19 +30,5 @@ internal static class IncomingMessageParsingServices
         services.AddSingleton<CimJsonSchemas>();
         services.AddSingleton<CimXmlSchemaProvider>();
         services.AddSingleton<JsonSchemaProvider>();
-    }
-
-    private static void RegisterRequestAggregatedMeasureDataHandling(IServiceCollection services)
-    {
-        services
-            .AddScoped<IMessageParser, XmlMessageParser>();
-        services
-            .AddScoped<IMessageParser, JsonMessageParser>();
-        services.AddScoped<RequestAggregatedMeasureDataMarketMessageParser>();
-        services.AddTransient<SenderAuthorizer>();
-        services.AddScoped<ProcessTypeValidator>();
-        services.AddScoped<MessageTypeValidator>();
-        services.AddScoped<BusinessTypeValidator>();
-        services.AddScoped<CalculationResponsibleReceiverVerification>();
     }
 }

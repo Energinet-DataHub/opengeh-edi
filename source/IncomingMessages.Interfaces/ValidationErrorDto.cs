@@ -12,18 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Process.Interfaces;
-using MediatR;
+namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
-
-public class InitializeAggregatedMeasureDataProcessesCommand : ICommand<Unit>
-{
-    public InitializeAggregatedMeasureDataProcessesCommand(RequestAggregatedMeasureDataMarketMessage marketMessage)
-    {
-        MarketMessage = marketMessage;
-    }
-
-    public RequestAggregatedMeasureDataMarketMessage MarketMessage { get; }
-}
+public record ValidationErrorDto(string Message, string Code, string? Target = null);

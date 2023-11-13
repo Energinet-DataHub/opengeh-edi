@@ -25,6 +25,7 @@ using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.MarketAc
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Common.DataAccess;
+using Energinet.DataHub.EDI.IncomingMessages.Application.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
@@ -146,6 +147,7 @@ namespace Energinet.DataHub.EDI.Api
 
                     ActorMessageQueueConfiguration.Configure(services);
                     ProcessConfiguration.Configure(services);
+                    IncomingMessagesConfiguration.Configure(services);
                 })
                 .ConfigureLogging(logging =>
                 {

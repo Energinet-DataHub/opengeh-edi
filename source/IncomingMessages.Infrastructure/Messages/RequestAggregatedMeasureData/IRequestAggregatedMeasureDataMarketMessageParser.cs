@@ -13,17 +13,12 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Process.Interfaces;
-using MediatR;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
+namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 
-public class InitializeAggregatedMeasureDataProcessesCommand : ICommand<Unit>
+#pragma warning disable SA1600
+public interface IRequestAggregatedMeasureDataMarketMessageParser
 {
-    public InitializeAggregatedMeasureDataProcessesCommand(RequestAggregatedMeasureDataMarketMessage marketMessage)
-    {
-        MarketMessage = marketMessage;
-    }
-
-    public RequestAggregatedMeasureDataMarketMessage MarketMessage { get; }
+    Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(
+        Stream message, DocumentFormat documentFormat, CancellationToken cancellationToken);
 }

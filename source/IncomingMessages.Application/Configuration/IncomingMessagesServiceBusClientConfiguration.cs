@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Process.Interfaces;
-using MediatR;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.Configuration;
 
-public class InitializeAggregatedMeasureDataProcessesCommand : ICommand<Unit>
+public class IncomingMessagesServiceBusClientConfiguration : IServiceBusClientConfiguration
 {
-    public InitializeAggregatedMeasureDataProcessesCommand(RequestAggregatedMeasureDataMarketMessage marketMessage)
+    public IncomingMessagesServiceBusClientConfiguration(string queueName)
     {
-        MarketMessage = marketMessage;
+        QueueName = queueName;
     }
 
-    public RequestAggregatedMeasureDataMarketMessage MarketMessage { get; }
+    public string QueueName { get; }
 }
