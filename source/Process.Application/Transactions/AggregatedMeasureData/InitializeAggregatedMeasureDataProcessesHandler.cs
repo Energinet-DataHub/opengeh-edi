@@ -21,7 +21,6 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using IncomingMessages.Infrastructure.Messages;
-using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
@@ -29,14 +28,11 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasu
 public class InitializeAggregatedMeasureDataProcessesHandler
     : IRequestHandler<InitializeAggregatedMeasureDataProcessesCommand, Result>
 {
-    private readonly RequestAggregatedMeasureDataValidator _messageValidator;
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
 
     public InitializeAggregatedMeasureDataProcessesHandler(
-        RequestAggregatedMeasureDataValidator messageValidator,
         IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
-        _messageValidator = messageValidator;
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
     }
 
@@ -47,13 +43,9 @@ public class InitializeAggregatedMeasureDataProcessesHandler
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(request.MarketMessage);
 
-        var result = await _messageValidator.ValidateAsync(request.MarketMessage, cancellationToken)
-            .ConfigureAwait(false);
+        CreateAggregatedMeasureDataProcess(request.MarketMessage);
 
-        if (result.Errors.Count == 0)
-            CreateAggregatedMeasureDataProcess(request.MarketMessage);
-
-        return result;
+        return Result.Succeeded(); //TODO: LRN Should not return a result any longer
     }
 
     private void CreateAggregatedMeasureDataProcess(
