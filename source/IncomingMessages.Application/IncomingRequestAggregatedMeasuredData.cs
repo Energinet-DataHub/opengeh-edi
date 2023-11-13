@@ -72,21 +72,27 @@ public class IncomingRequestAggregatedMeasuredData : IIncomingRequestAggregatedM
             return _responseFactory.From(res, responseFormat ?? documentFormat);
         }
 
-        var validate = await _aggregatedMeasureDataMarketMessageValidator
+        // Note that the current implementation could save the messageId and transactionId, then fail to send the service bus message.
+        var result = await _aggregatedMeasureDataMarketMessageValidator
             .ValidateAsync(requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!, cancellationToken)
             .ConfigureAwait(false);
 
-        var serviceBusMessage =
-            new ServiceBusMessage(
-                _serializer.Serialize(requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage))
-            {
-                Subject = requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!.ToString(), //TODO: LRN subject pattern`?
-            };
+        if (result.Success)
+        {
+            var serviceBusMessage =
+                new ServiceBusMessage(
+                    _serializer.Serialize(requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage))
+                {
+                    Subject = requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!.ToString(), //TODO: LRN subject pattern`?
+                };
 
-        await _incomingRequestAggregatedMeasuredDataSender.SendAsync(serviceBusMessage, cancellationToken)
-            .ConfigureAwait(false);
+            await _incomingRequestAggregatedMeasuredDataSender.SendAsync(serviceBusMessage, cancellationToken)
+                .ConfigureAwait(false);
 
-        return new ResponseMessage();
+            return new ResponseMessage();
+        }
+
+        return _responseFactory.From(result, responseFormat ?? documentFormat);
     }
 
     private async Task SaveArchivedMessageAsync(RequestAggregatedMeasureDataMarketMessage marketMessage, Stream document, CancellationToken hostCancellationToken)
