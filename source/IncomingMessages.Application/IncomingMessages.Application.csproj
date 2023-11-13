@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Energinet.DataHub.EDI.IncomingMessages.Application</AssemblyName>
+    <RootNamespace>Energinet.DataHub.EDI.IncomingMessages.Application</RootNamespace>
+  </PropertyGroup>
+</Project>
