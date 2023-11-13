@@ -42,29 +42,17 @@ namespace Energinet.DataHub.EDI.Api.IncomingMessages;
 public class RequestAggregatedMeasureMessageReceiver
 {
     private readonly ILogger<RequestAggregatedMeasureMessageReceiver> _logger;
-    private readonly IArchivedMessageRepository _messageArchive;
-    private readonly B2BContext _dbContext;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IIncomingRequestAggregatedMeasuredData _incomingRequestAggregatedMeasuredData;
     private readonly ICorrelationContext _correlationContext;
-    private readonly IMediator _mediator;
 
     public RequestAggregatedMeasureMessageReceiver(
         ILogger<RequestAggregatedMeasureMessageReceiver> logger,
-        IArchivedMessageRepository messageArchive,
-        B2BContext dbContext,
-        ISystemDateTimeProvider systemDateTimeProvider,
         IIncomingRequestAggregatedMeasuredData incomingRequestAggregatedMeasuredData,
-        ICorrelationContext correlationContext,
-        IMediator mediator)
+        ICorrelationContext correlationContext)
         {
         _logger = logger;
-        _messageArchive = messageArchive;
-        _dbContext = dbContext;
-        _systemDateTimeProvider = systemDateTimeProvider;
         _incomingRequestAggregatedMeasuredData = incomingRequestAggregatedMeasuredData;
         _correlationContext = correlationContext;
-        _mediator = mediator;
         }
 
     [Function(nameof(RequestAggregatedMeasureMessageReceiver))]
@@ -86,35 +74,19 @@ public class RequestAggregatedMeasureMessageReceiver
             return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
         }
 
-        var messageParserResult = await _incomingRequestAggregatedMeasuredData
+        var responseMessage = await _incomingRequestAggregatedMeasuredData
             .ParseAsync(request.Body, cimFormat, cancellationToken).ConfigureAwait(false);
-        if (messageParserResult.IsErrorResponse)
+        if (responseMessage.IsErrorResponse)
         {
             var httpErrorStatusCode = HttpStatusCode.BadRequest;
-            return CreateResponse(request, httpErrorStatusCode, messageParserResult);
+            return CreateResponse(request, httpErrorStatusCode, responseMessage);
         }
 
-        await SaveArchivedMessageAsync(marketMessage, request.Body, cancellationToken).ConfigureAwait(false); //TODO: Kommet hertil wuhuuu
+        // var result = await _mediator
+        //     .Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage), cancellationToken).ConfigureAwait(false);
 
-        var result = await _mediator
-            .Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage), cancellationToken).ConfigureAwait(false);
-
-        var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
-        return CreateResponse(request, httpStatusCode, _responseFactory.From(result, cimFormat));
-    }
-
-    private async Task SaveArchivedMessageAsync(RequestAggregatedMeasureDataMarketMessage marketMessage, Stream document, CancellationToken hostCancellationToken)
-    {
-        _messageArchive.Add(new ArchivedMessage(
-            Guid.NewGuid().ToString(),
-            marketMessage.MessageId,
-            IncomingDocumentType.RequestAggregatedMeasureData.Name,
-            marketMessage.SenderNumber,
-            marketMessage.ReceiverNumber,
-            _systemDateTimeProvider.Now(),
-            marketMessage.BusinessReason,
-            document));
-        await _dbContext.SaveChangesAsync(hostCancellationToken).ConfigureAwait(false);
+        var httpStatusCode = !responseMessage.IsErrorResponse ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
+        return CreateResponse(request, httpStatusCode, responseMessage);
     }
 
     private HttpResponseData CreateResponse(

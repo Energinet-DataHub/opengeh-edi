@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -20,11 +20,15 @@ using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Serialization;
+using Energinet.DataHub.EDI.Domain.ArchivedMessages;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Process.Interfaces;
 using IncomingMessages.Infrastructure;
 using IncomingMessages.Infrastructure.Messages;
 using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 using IncomingMessages.Infrastructure.Response;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application;
 
@@ -35,25 +39,32 @@ public class IncomingRequestAggregatedMeasuredData : IIncomingRequestAggregatedM
     private readonly ISerializer _serializer;
     private readonly RequestAggregatedMeasureDataMarketMessageValidator _aggregatedMeasureDataMarketMessageValidator;
     private readonly ResponseFactory _responseFactory;
+    private readonly IArchivedMessageRepository _archivedMessageRepository;
+    private readonly B2BContext _b2BContext;
 
     public IncomingRequestAggregatedMeasuredData(
         IRequestAggregatedMeasureDataMarketMessageParser requestAggregatedMeasureDataMarketMessageParser,
         IncomingRequestAggregatedMeasuredDataSender incomingRequestAggregatedMeasuredDataSender,
         ISerializer serializer,
         RequestAggregatedMeasureDataMarketMessageValidator aggregatedMeasureDataMarketMessageValidator,
-        ResponseFactory responseFactory)
+        ResponseFactory responseFactory,
+        IArchivedMessageRepository archivedMessageRepository,
+        B2BContext b2BContext)
     {
         _requestAggregatedMeasureDataMarketMessageParser = requestAggregatedMeasureDataMarketMessageParser;
         _incomingRequestAggregatedMeasuredDataSender = incomingRequestAggregatedMeasuredDataSender;
         _serializer = serializer;
         _aggregatedMeasureDataMarketMessageValidator = aggregatedMeasureDataMarketMessageValidator;
         _responseFactory = responseFactory;
+        _archivedMessageRepository = archivedMessageRepository;
+        _b2BContext = b2BContext;
     }
 
     public async Task<ResponseMessage> ParseAsync(Stream message, DocumentFormat documentFormat, CancellationToken cancellationToken)
     {
         var requestAggregatedMeasureDataMarketMessageParserResult = await _requestAggregatedMeasureDataMarketMessageParser.ParseAsync(message, documentFormat, cancellationToken).ConfigureAwait(false);
-        // save archived message
+
+        SaveArchivedMessageAsync(requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!, message, cancellationToken).ConfigureAwait(false);
 
         if (requestAggregatedMeasureDataMarketMessageParserResult.Errors.Any())
         {
@@ -76,5 +87,20 @@ public class IncomingRequestAggregatedMeasuredData : IIncomingRequestAggregatedM
             .ConfigureAwait(false);
 
         return new ResponseMessage();
+    }
+
+    private async Task SaveArchivedMessageAsync(RequestAggregatedMeasureDataMarketMessage marketMessage, Stream document, CancellationToken hostCancellationToken)
+    {
+        _archivedMessageRepository.Add(new ArchivedMessage(
+            Guid.NewGuid().ToString(),
+            marketMessage.MessageId,
+            IncomingDocumentType.RequestAggregatedMeasureData.Name,
+            marketMessage.SenderNumber,
+            marketMessage.ReceiverNumber,
+            SystemClock.Instance.GetCurrentInstant(),
+            marketMessage.BusinessReason,
+            document));
+
+        await _b2BContext.SaveChangesAsync(hostCancellationToken).ConfigureAwait(false);
     }
 }
