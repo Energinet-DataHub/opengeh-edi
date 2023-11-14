@@ -18,7 +18,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Common.DataAccess;
 using Energinet.DataHub.EDI.Common.DateTime;
 using MediatR;
