@@ -27,10 +27,10 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 
 public class AggregatedTimeSeriesRequestRejectedMapper : IInboxEventMapper
 {
-    public Task<INotification> MapFromAsync(string payload, Guid referenceId, CancellationToken cancellationToken)
+    public Task<INotification> MapFromAsync(byte[] payload, Guid referenceId, CancellationToken cancellationToken)
     {
         var inboxEvent =
-            AggregatedTimeSeriesRequestRejected.Parser.ParseJson(payload);
+            AggregatedTimeSeriesRequestRejected.Parser.ParseFrom(payload);
         return Task.FromResult<INotification>(
             new AggregatedTimeSeriesRequestWasRejected(
                 referenceId,
@@ -41,13 +41,6 @@ public class AggregatedTimeSeriesRequestRejectedMapper : IInboxEventMapper
     {
         ArgumentNullException.ThrowIfNull(eventType);
         return eventType.Equals(nameof(AggregatedTimeSeriesRequestRejected), StringComparison.OrdinalIgnoreCase);
-    }
-
-    public string ToJson(byte[] payload)
-    {
-        var inboxEvent = AggregatedTimeSeriesRequestRejected.Parser.ParseFrom(
-            payload);
-        return inboxEvent.ToString();
     }
 
     private static IReadOnlyList<Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.RejectReason> MapRejectReasons(RepeatedField<RejectReason> rejectReasons)
