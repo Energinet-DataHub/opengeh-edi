@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using System.Text.Json;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
@@ -24,22 +24,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 public class TestInboxEventMapper : IInboxEventMapper
 {
     #pragma warning disable // Method cannot be static since inherited from the interface
-    public Task<INotification> MapFromAsync(string payload, Guid referenceId, CancellationToken cancellationToken)
+    public Task<INotification> MapFromAsync(byte[] payload, Guid referenceId, CancellationToken cancellationToken)
     {
-        var inboxEvents = JsonSerializer.Deserialize<TestInboxEvent>(payload);
-
-        return Task.FromResult(new TestNotification(inboxEvents.EventProperty) as INotification);
+        return Task.FromResult(new TestNotification(Encoding.ASCII.GetString(payload)) as INotification);
     }
 
     public bool CanHandle(string eventType)
     {
         ArgumentNullException.ThrowIfNull(eventType);
         return eventType.Equals(nameof(TestInboxEvent), StringComparison.OrdinalIgnoreCase);
-    }
-
-    public string ToJson(byte[] payload)
-    {
-        var integrationEvent = JsonSerializer.Deserialize<TestInboxEvent>(payload);
-        return JsonSerializer.Serialize(integrationEvent);
     }
 }

@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 
@@ -61,13 +60,7 @@ public class InboxEventReceiver
 
     private async Task RegisterAsync(string eventId, string eventType, Guid referenceId, byte[] eventPayload)
     {
-        _context.ReceivedInboxEvents.Add(new ReceivedInboxEvent(eventId, eventType, referenceId, ToJson(eventType, eventPayload), _dateTimeProvider.Now()));
+        _context.ReceivedInboxEvents.Add(new ReceivedInboxEvent(eventId, eventType, referenceId, eventPayload, _dateTimeProvider.Now()));
         await _context.SaveChangesAsync().ConfigureAwait(false);
-    }
-
-    private string ToJson(string eventType, byte[] eventPayload)
-    {
-        var mapper = _mappers.First(mapper => mapper.CanHandle(eventType));
-        return mapper.ToJson(eventPayload);
     }
 }

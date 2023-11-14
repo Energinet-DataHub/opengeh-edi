@@ -16,15 +16,12 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.Application.Configuration;
-using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.Common.DataAccess;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
@@ -90,7 +87,7 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
             _eventId,
             _eventType,
             _referenceId,
-            ToJson(),
+            _aggregatedTimeSeriesRequestAcceptedResponse.ToByteArray(),
             GetService<ISystemDateTimeProvider>().Now()));
         context.SaveChanges();
     }
@@ -100,10 +97,5 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
         var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var isProcessed = await connection.QueryFirstOrDefaultAsync($"SELECT * FROM dbo.ReceivedInboxEvents WHERE Id = @EventId AND ProcessedDate IS NOT NULL", new { EventId = eventId, });
         Assert.NotNull(isProcessed);
-    }
-
-    private string ToJson()
-    {
-        return new AggregatedTimeSeriesRequestAcceptedEventMapper(GetService<IGridAreaRepository>()).ToJson(_aggregatedTimeSeriesRequestAcceptedResponse.ToByteArray());
     }
 }
