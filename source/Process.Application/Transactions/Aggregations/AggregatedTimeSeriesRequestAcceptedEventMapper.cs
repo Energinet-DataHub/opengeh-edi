@@ -42,7 +42,7 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
     public async Task<INotification> MapFromAsync(byte[] payload, Guid referenceId, CancellationToken cancellationToken)
     {
         var aggregation =
-            AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(payload.ToArray());
+            AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(payload);
 
         var aggregatedTimeSerie = new AggregatedTimeSerie(
                 MapPoints(aggregation.TimeSeriesPoints),
