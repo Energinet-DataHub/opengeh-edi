@@ -25,6 +25,7 @@ using Microsoft.Azure.Functions.Worker.Http;
 
 namespace Energinet.DataHub.EDI.Api.IncomingMessages;
 
+//TODO: Remove this endpoint and refactor the RequestAggregatedMeasureDataController
 public class B2CRequestAggregatedMeasureMessageReceiver
 {
     private readonly IIncomingRequestAggregatedMeasuredData _incomingRequestAggregatedMeasuredData;
