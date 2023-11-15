@@ -48,14 +48,6 @@ public sealed class ApiManagementDriver : IDisposable
         _httpClient.Dispose();
     }
 
-    public async Task ConfirmEbixResultIsAvailableFor(string token)
-    {
-        //var token = await GetAzureAdToken();
-        var responseString = await PeekEbixDocumentWithTimeoutAsync(token);
-
-        Assert.NotEmpty(responseString);
-    }
-
     public async Task<string> GetAzureAdToken(string clientId, string clientSecret)
     {
         //var tenantId = "4a7411ea-ac71-4b63-9647-b8bd4c5a20e0";
@@ -87,7 +79,7 @@ public sealed class ApiManagementDriver : IDisposable
         return accessToken;
     }
 
-    private async Task<string> PeekEbixDocumentWithTimeoutAsync(string token)
+    public async Task<string> PeekEbixDocumentWithTimeoutAsync(string token)
     {
         var stopWatch = Stopwatch.StartNew();
         while (stopWatch.ElapsedMilliseconds < 60000)

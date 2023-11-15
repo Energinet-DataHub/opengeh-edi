@@ -46,6 +46,12 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : TestRunner
         //await _wholesale.PublishAggregationResultAsync("543");
         await _edi.RequestAggregatedMeasureDataAsync(actorNumberForClientId, new[] { actorRoleForClientId }, false, token);
 
-        await _apiManagement.ConfirmEbixResultIsAvailableFor(token);
+        var responseString = await _apiManagement.PeekEbixDocumentWithTimeoutAsync(token);
+
+        Assert.Multiple(
+            () => Assert.NotEmpty(responseString),
+            () => Assert.Contains("envelope", responseString, StringComparison.OrdinalIgnoreCase),
+            () => Assert.DoesNotContain("RejectRequestMeteredDataAggregated", responseString, StringComparison.OrdinalIgnoreCase),
+            () => Assert.Contains("NotifyAggregatedMeasureData", responseString, StringComparison.OrdinalIgnoreCase));
     }
 }
