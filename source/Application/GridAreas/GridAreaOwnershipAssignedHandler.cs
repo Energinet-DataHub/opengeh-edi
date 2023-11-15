@@ -32,7 +32,12 @@ public class GridAreaOwnershipAssignedHandler : IRequestHandler<GridAreaOwnershi
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
 
-        await _gridAreaRepository.UpdateOwnershipAsync(request.GridAreaCode, request.ValidFrom, request.GridAreaOwnerActorNumber, request.SequenceNumber, cancellationToken).ConfigureAwait(false);
+        await _gridAreaRepository.UpdateOwnershipAsync(
+            request.GridAreaCode,
+            request.ValidFrom,
+            request.GridAreaOwnerActorNumber,
+            request.SequenceNumber,
+            cancellationToken).ConfigureAwait(false);
 
         return Unit.Value;
     }
