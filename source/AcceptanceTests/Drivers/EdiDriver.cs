@@ -39,10 +39,10 @@ internal sealed class EdiDriver : IDisposable
         _httpClient.Dispose();
     }
 
-    public async Task<Stream> RequestAggregatedMeasureDataAsync(string actorNumber, string[] marketRoles, bool badRequest = false)
+    public async Task<Stream> RequestAggregatedMeasureDataAsync(string actorNumber, string[] marketRoles, bool badRequest = false, string? overrideToken = null)
     {
-        var token = TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
-        var response = await RequestAggregatedMeasureDataAsync(token, badRequest).ConfigureAwait(false);
+        var token = overrideToken ?? TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
+        var response = await RequestAggregatedMeasureDataAsync(actorNumber, token, badRequest).ConfigureAwait(false);
 
         var document = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
         return document;
@@ -74,9 +74,10 @@ internal sealed class EdiDriver : IDisposable
         throw new TimeoutException("Unable to retrieve peek result within time limit");
     }
 
-    public async Task EmptyQueueAsync(string actorNumber, string[] marketRoles)
+    public async Task EmptyQueueAsync(string actorNumber, string[] marketRoles, string? tokenOverride = null)
     {
-        var token = TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
+        var token = tokenOverride ?? TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
+
         var peekResponse = await PeekAsync(token)
                 .ConfigureAwait(false);
         if (peekResponse.StatusCode == HttpStatusCode.OK)
@@ -123,11 +124,13 @@ internal sealed class EdiDriver : IDisposable
         return peekResponse.Headers.GetValues("MessageId").First();
     }
 
-    private static string GetContent(bool badRequest = false)
+    private static string GetContent(string actorNumber, bool badRequest = false)
     {
         var jsonContent = badRequest
             ? File.ReadAllText("Messages/json/RequestAggregatedMeasureDataWithBadPeriod.json")
-            : File.ReadAllText("Messages/json/RequestAggregatedMeasureData.json");
+            : actorNumber.Equals("5790000392551", StringComparison.OrdinalIgnoreCase)
+                ? File.ReadAllText("Messages/json/RequestAggregatedMeasureDataApiManagement.json")
+                : File.ReadAllText("Messages/json/RequestAggregatedMeasureData.json");
 
         jsonContent = jsonContent.Replace("{MessageId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
         jsonContent = jsonContent.Replace("{TransactionId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
@@ -135,11 +138,11 @@ internal sealed class EdiDriver : IDisposable
         return jsonContent;
     }
 
-    private async Task<HttpResponseMessage> RequestAggregatedMeasureDataAsync(string token, bool badRequest = false)
+    private async Task<HttpResponseMessage> RequestAggregatedMeasureDataAsync(string actorNumber, string token, bool badRequest = false)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, "api/RequestAggregatedMeasureMessageReceiver");
         request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
-        request.Content = new StringContent(GetContent(badRequest), Encoding.UTF8, "application/json");
+        request.Content = new StringContent(GetContent(actorNumber, badRequest), Encoding.UTF8, "application/json");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
         var aggregatedMeasureDataResponse = await _httpClient.SendAsync(request).ConfigureAwait(false);

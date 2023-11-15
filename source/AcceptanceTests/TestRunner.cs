@@ -39,12 +39,28 @@ public class TestRunner : IAsyncDisposable
         var sqlDatabaseName = "mssqldb-edi-edi-u-001";
 
         var dbConnectionString = $"Server={sqlServer};Initial Catalog={sqlDatabaseName};User Id={sqlUserName};Password={sqlUserPassword};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
-        ActorFactory.InsertActor(dbConnectionString, AzpToken);
+        // ActorFactory.InsertActor(dbConnectionString, AzpToken);
+
+        //AzureEntraTenantId = root.GetValue<string>("AZURE_ENTRA_TENANT_ID")!;
+        AzureEntraTenantId = "4a7411ea-ac71-4b63-9647-b8bd4c5a20e0";
+        //AzureEntraBackendAppId = root.GetValue<string>("AZURE_ENTRA_BACKEND_APP_ID")!;
+        AzureEntraBackendAppId = "fe8b720c-fda4-4aaa-9c6d-c0d2ed6584fe";
+        //AzureEntraClientId = root.GetValue<string>("AZURE_ENTRA_CLIENT_ID")!;
+        AzureEntraClientId = "D8E67800-B7EF-4025-90BB-FE06E1639117";
+        AzureEntraClientSecret = root.GetValue<string>("AZURE_ENTRA_CLIENT_SECRET")!;
     }
 
     internal IntegrationEventPublisher EventPublisher { get; }
 
     internal string AzpToken { get; }
+
+    internal string AzureEntraClientId { get; }
+
+    internal string AzureEntraClientSecret { get; }
+
+    internal string AzureEntraTenantId { get; }
+
+    internal string AzureEntraBackendAppId { get; }
 
     public async ValueTask DisposeAsync()
     {

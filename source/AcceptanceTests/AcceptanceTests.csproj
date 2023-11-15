@@ -9,6 +9,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Remove="Messages\json\RequestAggregatedMeasureDataApiManagement.json" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.16.1" />
         <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="4.3.5" />
         <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="4.0.0" />
@@ -55,6 +59,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureDataApiManagement.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
       <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureDataWithBadPeriod.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
