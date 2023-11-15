@@ -21,12 +21,13 @@ public class GridArea
 {
     private readonly Guid _id;
 
-    public GridArea(string gridAreaCode, Instant validFrom, ActorNumber gridAreaOwnerActorNumber)
+    public GridArea(string gridAreaCode, Instant validFrom, ActorNumber gridAreaOwnerActorNumber, int sequenceNumber)
     {
         _id = Guid.NewGuid();
         GridAreaCode = gridAreaCode;
         ValidFrom = validFrom;
         GridAreaOwnerActorNumber = gridAreaOwnerActorNumber;
+        SequenceNumber = sequenceNumber;
     }
 
 #pragma warning disable
@@ -38,9 +39,12 @@ public class GridArea
     public Instant ValidFrom { get; private set; }
     public ActorNumber GridAreaOwnerActorNumber { get; private set; }
 
-    public void UpdateOwnership(Instant validFrom, ActorNumber actorNumber)
+    public int SequenceNumber { get; private set; }
+
+    public void UpdateOwnership(Instant validFrom, ActorNumber actorNumber, int sequenceNumber)
     {
         if(ValidFrom > validFrom) return;
+        if(ValidFrom == validFrom && SequenceNumber > sequenceNumber) return;
 
         ValidFrom = validFrom;
         GridAreaOwnerActorNumber = actorNumber;

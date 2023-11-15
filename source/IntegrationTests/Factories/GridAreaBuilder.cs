@@ -50,6 +50,6 @@ public class GridAreaBuilder
 
     private static GridArea Build()
     {
-        return new GridArea(_gridArea, _fromDateTimeUtc, _actorNumber);
+        return new GridArea(_gridArea, _fromDateTimeUtc, _actorNumber, 1);
     }
 }

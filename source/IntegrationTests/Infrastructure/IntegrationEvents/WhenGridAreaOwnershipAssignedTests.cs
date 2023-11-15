@@ -54,7 +54,9 @@ public class WhenGridAreaOwnershipAssignedTests : TestBase
     [Fact]
     public async Task Multiple_grid_area_ownership_assigned_event_is_received_with_same_owner_is_stored()
     {
-        var gridAreaOwnershipAssignedEvent01 = _gridAreaOwnershipAssignedEventBuilder.Build();
+        var gridAreaOwnershipAssignedEvent01 = _gridAreaOwnershipAssignedEventBuilder
+            .WithGridAreaCode("543")
+            .Build();
         var gridAreaOwnershipAssignedEvent02 = _gridAreaOwnershipAssignedEventBuilder
             .WithGridAreaCode("804")
             .Build();
@@ -104,6 +106,56 @@ public class WhenGridAreaOwnershipAssignedTests : TestBase
         var gridArea = gridAreas.Single();
         Assert.Equal(gridArea.GridAreaCode, gridAreaOwnershipAssignedEvent01.GridAreaCode);
         Assert.Equal(gridArea.GridAreaOwnerActorNumber, gridAreaOwnershipAssignedEvent01.ActorNumber);
+    }
+
+    [Fact]
+    public async Task Multiple_grid_area_ownership_events_with_same_valid_from_highest_sequence_number_is_stored()
+    {
+        const string newGridAreaOwner = "9876543210987";
+        var validFrom = Timestamp.FromDateTime(DateTime.UtcNow);
+        var gridAreaOwnershipAssignedEvent01 = _gridAreaOwnershipAssignedEventBuilder
+            .WithValidFrom(validFrom)
+            .WithSequenceNumber(1)
+            .Build();
+        var gridAreaOwnershipAssignedEvent02 = _gridAreaOwnershipAssignedEventBuilder
+            .WithOwnerShipActorNumber(newGridAreaOwner)
+            .WithValidFrom(validFrom)
+            .WithSequenceNumber(2)
+            .Build();
+
+        await HavingReceivedAndHandledIntegrationEventAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnershipAssignedEvent01);
+
+        await HavingReceivedAndHandledIntegrationEventAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnershipAssignedEvent02);
+
+        var gridAreas = await GetGridAreas();
+        var gridArea = gridAreas.Single();
+        Assert.Equal(newGridAreaOwner, gridArea.GridAreaOwnerActorNumber);
+    }
+
+    [Fact]
+    public async Task Multiple_grid_area_ownership_events_with_same_valid_from_highest_sequence_number_is_stored_received_reverse_order()
+    {
+        const string gridAreaOwner1 = "9876543210987";
+        const string gridAreaOwner2 = "1234567890123";
+        var validFrom = Timestamp.FromDateTime(DateTime.UtcNow);
+        var gridAreaOwnershipAssignedEvent01 = _gridAreaOwnershipAssignedEventBuilder
+            .WithOwnerShipActorNumber(gridAreaOwner2)
+            .WithValidFrom(validFrom)
+            .WithSequenceNumber(2)
+            .Build();
+        var gridAreaOwnershipAssignedEvent02 = _gridAreaOwnershipAssignedEventBuilder
+            .WithOwnerShipActorNumber(gridAreaOwner1)
+            .WithValidFrom(validFrom)
+            .WithSequenceNumber(1)
+            .Build();
+
+        await HavingReceivedAndHandledIntegrationEventAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnershipAssignedEvent01);
+
+        await HavingReceivedAndHandledIntegrationEventAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnershipAssignedEvent02);
+
+        var gridAreas = await GetGridAreas();
+        var gridArea = gridAreas.Single();
+        Assert.Equal(gridAreaOwner2, gridArea.GridAreaOwnerActorNumber);
     }
 
     private async Task HavingReceivedAndHandledIntegrationEventAsync(string eventType, GridAreaOwnershipAssigned gridAreaOwnershipAssigned)

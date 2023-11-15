@@ -36,13 +36,14 @@ public class GridAreaRepository : IGridAreaRepository
         string gridAreaCode,
         Instant validFrom,
         ActorNumber actorNumber,
+        int sequenceNumber,
         CancellationToken cancellationToken)
     {
         var gridArea = await GetGridAreaAsync(gridAreaCode, cancellationToken).ConfigureAwait(false);
         if (gridArea == null)
-            await _dbContext.GridAreas.AddAsync(new GridArea(gridAreaCode, validFrom, actorNumber), cancellationToken).ConfigureAwait(false);
+            await _dbContext.GridAreas.AddAsync(new GridArea(gridAreaCode, validFrom, actorNumber, sequenceNumber), cancellationToken).ConfigureAwait(false);
         else
-            gridArea.UpdateOwnership(validFrom, actorNumber);
+            gridArea.UpdateOwnership(validFrom, actorNumber, sequenceNumber);
     }
 
     public async Task<ActorNumber> GetGridOwnerForAsync(string gridAreaCode, CancellationToken cancellationToken)

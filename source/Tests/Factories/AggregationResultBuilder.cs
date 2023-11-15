@@ -26,7 +26,7 @@ namespace Energinet.DataHub.EDI.Tests.Factories;
 public class AggregationResultBuilder
 {
     private MeteringPointType _meteringPointType = MeteringPointType.Consumption;
-    private GridArea _gridArea = new("870", Instant.FromDateTimeUtc(DateTime.UtcNow), ActorNumber.Create("1234567890123"));
+    private GridArea _gridArea = new("870", Instant.FromDateTimeUtc(DateTime.UtcNow), ActorNumber.Create("1234567890123"), 1);
     private SettlementType? _settlementType;
     private ActorGrouping _actorGrouping = new ActorGrouping(null, null);
 

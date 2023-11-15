@@ -31,6 +31,7 @@ public interface IGridAreaRepository
         string gridAreaCode,
         Instant validFrom,
         ActorNumber actorNumber,
+        int sequenceNumber,
         CancellationToken cancellationToken);
 
     /// <summary>
