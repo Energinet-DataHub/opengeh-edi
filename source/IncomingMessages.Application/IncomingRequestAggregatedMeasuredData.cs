@@ -64,7 +64,7 @@ public class IncomingRequestAggregatedMeasuredData : IIncomingRequestAggregatedM
     {
         var requestAggregatedMeasureDataMarketMessageParserResult = await _requestAggregatedMeasureDataMarketMessageParser.ParseAsync(message, documentFormat, cancellationToken).ConfigureAwait(false);
 
-        SaveArchivedMessageAsync(requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!, message, cancellationToken).ConfigureAwait(false);
+        await SaveArchivedMessageAsync(requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!, message, cancellationToken).ConfigureAwait(false);
 
         if (requestAggregatedMeasureDataMarketMessageParserResult.Errors.Any())
         {

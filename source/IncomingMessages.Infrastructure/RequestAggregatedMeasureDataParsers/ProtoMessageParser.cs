@@ -31,10 +31,15 @@ public class ProtoMessageParser : JsonParserBase, IMessageParser
 
     public DocumentFormat HandledFormat => DocumentFormat.Proto;
 
-    public async Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(Stream message, CancellationToken cancellationToken)
+    public Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(
+        Stream message,
+        CancellationToken cancellationToken)
     {
         var requestAggregatedMeasureData = RequestAggregatedMeasureData.Parser.ParseFrom(message);
-        var marketMessage = RequestAggregatedMeasureDataMarketMessageFactory.Create(requestAggregatedMeasureData, SystemClock.Instance.GetCurrentInstant());
-        return new RequestAggregatedMeasureDataMarketMessageParserResult(marketMessage);
+        var marketMessage = RequestAggregatedMeasureDataMarketMessageFactory.Create(
+            requestAggregatedMeasureData,
+            SystemClock.Instance.GetCurrentInstant());
+        var mes = new RequestAggregatedMeasureDataMarketMessageParserResult(marketMessage);
+        return Task.FromResult(mes);
     }
 }

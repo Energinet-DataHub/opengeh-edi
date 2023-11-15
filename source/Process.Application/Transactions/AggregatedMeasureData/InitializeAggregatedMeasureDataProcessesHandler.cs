@@ -34,7 +34,7 @@ public class InitializeAggregatedMeasureDataProcessesHandler : IRequestHandler<I
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
     }
 
-    public async Task<Unit> Handle(
+    public Task<Unit> Handle(
         InitializeAggregatedMeasureDataProcessesCommand request,
         CancellationToken cancellationToken)
     {
@@ -43,7 +43,7 @@ public class InitializeAggregatedMeasureDataProcessesHandler : IRequestHandler<I
 
         CreateAggregatedMeasureDataProcess(request.MarketMessage);
 
-        return Unit.Value;
+        return Task.FromResult(Unit.Value);
     }
 
     private void CreateAggregatedMeasureDataProcess(
