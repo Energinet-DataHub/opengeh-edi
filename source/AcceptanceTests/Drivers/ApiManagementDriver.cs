@@ -29,9 +29,11 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 public sealed class ApiManagementDriver : IDisposable
 {
+    internal const string ApiManagementUrl = "https://apim-shared-sharedres-u-001.azure-api.net/";
+
     private readonly HttpClient _httpClient = new()
     {
-        BaseAddress = new Uri("https://apim-shared-sharedres-u-001.azure-api.net/"),
+        BaseAddress = new Uri(ApiManagementUrl),
     };
 
     private readonly string _tenantId;

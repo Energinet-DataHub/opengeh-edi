@@ -11,7 +11,7 @@
     <ItemGroup>
       <None Remove="Messages\json\RequestAggregatedMeasureDataBalanceResponsible.json" />
       <None Remove="Messages\json\RequestAggregatedMeasureDataBalanceResponsibleWithBadPeriod.json" />
-      <None Remove="Messages\json\RequestAggregatedMeasureDataBalanceResponsibleWithMismatchingHeader.json" />
+      <None Remove="Messages\json\RequestAggregatedMeasureDataBalanceResponsibleWithInvalidSchema.json" />
     </ItemGroup>
 
     <ItemGroup>
@@ -23,6 +23,8 @@
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.2" />
         <PackageReference Include="NodaTime" Version="3.1.9" />
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.30.1" />
+        <PackageReference Include="System.ServiceModel.Http" Version="6.2.0" />
+        <PackageReference Include="System.ServiceModel.Primitives" Version="6.2.0" />
         <PackageReference Include="xunit" Version="2.5.1" />
         <PackageReference Include="xunit.categories" Version="2.0.8" />
         <PackageReference Include="xunit.extensibility.core" Version="2.5.1" />
@@ -61,9 +63,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureDataBalanceResponsibleWithMismatchingHeader.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
       <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureDataBalanceResponsibleWithBadPeriod.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>

@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 
 public class TestRunner : IAsyncDisposable
 {
-    internal const string BalanceResponsibleActorNumber = "5790000392551";
+    internal const string BalanceResponsibleActorNumber = "5790000392551"; // Svarer til "Test til Phoenix" aktøren i UI'en. Aktørnummer i UI og her stemmer ikke overens (måske vores database har dårlig data?).
     internal const string BalanceResponsibleActorRole = "balanceresponsibleparty";
 
     protected TestRunner()

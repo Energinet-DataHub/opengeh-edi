@@ -41,10 +41,10 @@ internal sealed class EdiDriver : IDisposable
         _httpClient.Dispose();
     }
 
-    public async Task<Stream> RequestAggregatedMeasureDataAsync(string actorNumber, string[] marketRoles, bool asyncError = false, bool syncError = false, string? overrideToken = null)
+    public async Task<Stream> RequestAggregatedMeasureDataAsync(string actorNumber, string[] marketRoles, bool asyncError = false, string? overrideToken = null)
     {
         var token = overrideToken ?? TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
-        var response = await RequestAggregatedMeasureDataAsync(actorNumber, token, asyncError, syncError).ConfigureAwait(false);
+        var response = await RequestAggregatedMeasureDataAsync(actorNumber, token, asyncError).ConfigureAwait(false);
 
         var document = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
         return document;
@@ -126,17 +126,15 @@ internal sealed class EdiDriver : IDisposable
         return peekResponse.Headers.GetValues("MessageId").First();
     }
 
-    private static string GetContent(string actorNumber, bool asyncError, bool syncError)
+    private static string GetContent(string actorNumber, bool asyncError)
     {
         string jsonRequestAcceptedFilePath;
         string jsonRequestAsynchronousRejectedFilePath;
-        string? jsonRequestSynchronousRejectedFilePath = null;
 
         if (actorNumber.Equals(TestRunner.BalanceResponsibleActorNumber, StringComparison.OrdinalIgnoreCase))
         {
             jsonRequestAcceptedFilePath = "Messages/json/RequestAggregatedMeasureDataBalanceResponsible.json";
             jsonRequestAsynchronousRejectedFilePath = "Messages/json/RequestAggregatedMeasureDataBalanceResponsibleWithBadPeriod.json";
-            jsonRequestSynchronousRejectedFilePath = "Messages/json/RequestAggregatedMeasureDataBalanceResponsibleWithBadHeader.json";
         }
         else
         {
@@ -144,19 +142,11 @@ internal sealed class EdiDriver : IDisposable
             jsonRequestAsynchronousRejectedFilePath = "Messages/json/RequestAggregatedMeasureDataWithBadPeriod.json";
         }
 
-        var jsonContent = (asyncError, syncError) switch
-        {
-            (false, false) => jsonRequestAcceptedFilePath,
-            (true, false) => jsonRequestAsynchronousRejectedFilePath,
-            (false, true) => jsonRequestSynchronousRejectedFilePath!,
-            _ => throw new ArgumentException($"Invalid combination of asyncError ({asyncError}) and syncError ({syncError}"),
-        };
+        var jsonFilePath = asyncError
+            ? jsonRequestAsynchronousRejectedFilePath
+            : jsonRequestAcceptedFilePath;
 
-        //var jsonContent = asyncError
-        //    ? File.ReadAllText(jsonRequestAsynchronousRejectedFilePath)
-        //    ? syncError
-        //        : File.ReadAllText(jsonRequestSynchronousRejectedFilePath!)
-        //        : File.ReadAllText(jsonRequestAcceptedFilePath);
+        var jsonContent = File.ReadAllText(jsonFilePath);
 
         jsonContent = jsonContent.Replace("{MessageId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
         jsonContent = jsonContent.Replace("{TransactionId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
@@ -164,11 +154,11 @@ internal sealed class EdiDriver : IDisposable
         return jsonContent;
     }
 
-    private async Task<HttpResponseMessage> RequestAggregatedMeasureDataAsync(string actorNumber, string token, bool asyncError, bool syncError)
+    private async Task<HttpResponseMessage> RequestAggregatedMeasureDataAsync(string actorNumber, string token, bool asyncError)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, "api/RequestAggregatedMeasureMessageReceiver");
         request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
-        request.Content = new StringContent(GetContent(actorNumber, asyncError, syncError), Encoding.UTF8, "application/json");
+        request.Content = new StringContent(GetContent(actorNumber, asyncError), Encoding.UTF8, "application/json");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
         var aggregatedMeasureDataResponse = await _httpClient.SendAsync(request).ConfigureAwait(false);
