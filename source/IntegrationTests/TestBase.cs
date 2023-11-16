@@ -165,7 +165,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
 
             _services.AddTransient<InboxEventsProcessor>();
-            _services.AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestAcceptedEventMapper>();
             _services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>>(_ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy);
             _services.AddTransient<INotificationHandler<TestNotification>>(
                 _ => InboxEventNotificationHandler);
