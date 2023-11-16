@@ -14,7 +14,7 @@
 
 using System;
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Domain.GridAreas;
+using Energinet.DataHub.EDI.Domain.GridAreaOwners;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using NodaTime;
 
@@ -32,7 +32,7 @@ public class GridAreaBuilder
     {
         if (b2BContext == null) throw new ArgumentNullException(nameof(b2BContext));
         var gridArea = Build();
-        b2BContext.GridAreas.Add(gridArea);
+        b2BContext.GridAreaOwners.Add(gridArea);
         b2BContext.SaveChanges();
     }
 
@@ -48,8 +48,8 @@ public class GridAreaBuilder
         return this;
     }
 
-    private static GridArea Build()
+    private static GridAreaOwner Build()
     {
-        return new GridArea(_gridArea, _fromDateTimeUtc, _actorNumber, 1);
+        return new GridAreaOwner(_gridArea, _fromDateTimeUtc, _actorNumber, 1);
     }
 }

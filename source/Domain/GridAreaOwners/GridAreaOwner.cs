@@ -15,13 +15,13 @@
 using Energinet.DataHub.EDI.Common.Actors;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.Domain.GridAreas;
+namespace Energinet.DataHub.EDI.Domain.GridAreaOwners;
 
-public class GridArea
+public class GridAreaOwner
 {
     private readonly Guid _id;
 
-    public GridArea(string gridAreaCode, Instant validFrom, ActorNumber gridAreaOwnerActorNumber, int sequenceNumber)
+    public GridAreaOwner(string gridAreaCode, Instant validFrom, ActorNumber gridAreaOwnerActorNumber, int sequenceNumber)
     {
         _id = Guid.NewGuid();
         GridAreaCode = gridAreaCode;
@@ -31,22 +31,12 @@ public class GridArea
     }
 
 #pragma warning disable
-    private GridArea()
+    private GridAreaOwner()
     {
     }
 
     public string GridAreaCode { get; }
     public Instant ValidFrom { get; private set; }
     public ActorNumber GridAreaOwnerActorNumber { get; private set; }
-
     public int SequenceNumber { get; private set; }
-
-    public void UpdateOwnership(Instant validFrom, ActorNumber actorNumber, int sequenceNumber)
-    {
-        if(ValidFrom > validFrom) return;
-        if(ValidFrom == validFrom && SequenceNumber > sequenceNumber) return;
-
-        ValidFrom = validFrom;
-        GridAreaOwnerActorNumber = actorNumber;
-    }
 }

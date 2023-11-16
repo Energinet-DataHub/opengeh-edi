@@ -14,19 +14,19 @@
 
 using System;
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Domain.GridAreas;
+using Energinet.DataHub.EDI.Domain.GridAreaOwners;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energinet.DataHub.EDI.Infrastructure.GridAreas;
 
-public class GridAreaEntityConfiguration : IEntityTypeConfiguration<GridArea>
+public class GridAreaOwnerEntityConfiguration : IEntityTypeConfiguration<GridAreaOwner>
 {
-    public void Configure(EntityTypeBuilder<GridArea> builder)
+    public void Configure(EntityTypeBuilder<GridAreaOwner> builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        builder.ToTable("GridArea", "dbo");
+        builder.ToTable("GridAreaOwner", "dbo");
         builder.HasKey("_id");
         builder.Property<Guid>("_id").HasColumnName("Id");
         builder.Property(entity => entity.GridAreaCode);

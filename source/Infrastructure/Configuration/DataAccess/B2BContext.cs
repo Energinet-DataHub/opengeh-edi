@@ -15,7 +15,7 @@
 using System;
 using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Domain.ArchivedMessages;
-using Energinet.DataHub.EDI.Domain.GridAreas;
+using Energinet.DataHub.EDI.Domain.GridAreaOwners;
 using Energinet.DataHub.EDI.Infrastructure.Actors;
 using Energinet.DataHub.EDI.Infrastructure.ArchivedMessages;
 using Energinet.DataHub.EDI.Infrastructure.GridAreas;
@@ -47,7 +47,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 
         public DbSet<Actor> Actors { get; private set; }
 
-        public DbSet<GridArea> GridAreas { get; private set; }
+        public DbSet<GridAreaOwner> GridAreaOwners { get; private set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -58,7 +58,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
             modelBuilder.ApplyConfiguration(new TransactionIdEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MessageIdEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ActorEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new GridAreaEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new GridAreaOwnerEntityConfiguration());
         }
     }
 }

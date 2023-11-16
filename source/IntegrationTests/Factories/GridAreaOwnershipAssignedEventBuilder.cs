@@ -23,7 +23,7 @@ internal sealed class GridAreaOwnershipAssignedEventBuilder
 {
     private string _gridAreaCode = "543";
     private string _actorNumber = ActorNumber.Create("1234567890123").Value;
-    private Timestamp _validFrom = Timestamp.FromDateTime(DateTime.UtcNow);
+    private Timestamp _validFrom = Timestamp.FromDateTime(DateTime.UtcNow.AddMinutes(-1));
     private int _sequenceNumber = 1;
 
     internal GridAreaOwnershipAssigned Build()
