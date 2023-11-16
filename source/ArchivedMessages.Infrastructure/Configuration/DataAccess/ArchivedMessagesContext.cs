@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.EDI.ArchivedMessages.Application;
+using ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Infrastructure.ArchivedMessages;
 using Microsoft.EntityFrameworkCore;
 

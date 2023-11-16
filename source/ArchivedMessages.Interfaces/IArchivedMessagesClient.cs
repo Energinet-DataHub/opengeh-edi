@@ -12,30 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using ArchivedMessages.Interfaces;
-
-namespace Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
+namespace ArchivedMessages.Interfaces;
 
 /// <summary>
-/// Responsible for archiving messages.
+/// Client for interacting with the archived messages service
 /// </summary>
-public interface IArchivedMessageRepository
+public interface IArchivedMessagesClient
 {
     /// <summary>
-    /// Archiving a message.
+    /// Create a new archived message directly in the database
     /// </summary>
     /// <param name="message"></param>
     /// <param name="cancellationToken"></param>
-    Task AddAsync(ArchivedMessage message, CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Get document.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>Stream</returns>
-    Task<Stream?> GetAsync(string id, CancellationToken cancellationToken);
+    Task CreateAsync(ArchivedMessage message, CancellationToken cancellationToken);
 }

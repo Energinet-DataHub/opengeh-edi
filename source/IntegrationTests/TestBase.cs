@@ -23,6 +23,7 @@ using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.Application.Configuration.Queries;
+using Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.TimeEvents;
@@ -193,6 +194,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
             ActorMessageQueueConfiguration.Configure(_services);
             ProcessConfiguration.Configure(_services);
+            ArchivedMessageConfiguration.Configure(_services);
             _serviceProvider = _services.BuildServiceProvider();
         }
     }

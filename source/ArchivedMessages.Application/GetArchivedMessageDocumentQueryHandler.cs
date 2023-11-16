@@ -17,6 +17,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Application;

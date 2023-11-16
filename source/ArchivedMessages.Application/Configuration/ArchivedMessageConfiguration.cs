@@ -14,8 +14,12 @@
 
 using System.IO;
 using ArchivedMessages.Interfaces;
+using Dapper;
+using Dapper.NodaTime;
 using Energinet.DataHub.EDI.Application.SearchMessages;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
+using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Common.Configuration;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -25,9 +29,10 @@ public static class ArchivedMessageConfiguration
 {
     public static void Configure(IServiceCollection services)
     {
+        services.AddScopedSqlDbContext<ArchivedMessagesContext>();
         services.AddTransient<IRequestHandler<GetMessagesQuery, MessageSearchResult>, GetMessageQueryHandler>();
         services.AddScoped<IArchivedMessageRepository, ArchivedMessageRepository>();
-
+        services.AddScoped<IArchivedMessagesClient, ArchivedMessagesClient>();
         services.AddTransient<IRequestHandler<GetArchivedMessageDocumentQuery, Stream?>, GetArchivedMessageDocumentQueryHandler>();
     }
 }

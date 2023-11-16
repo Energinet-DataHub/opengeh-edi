@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IO;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Application;
+namespace ArchivedMessages.Interfaces;
 
 public record ArchivedMessage(
     string Id,

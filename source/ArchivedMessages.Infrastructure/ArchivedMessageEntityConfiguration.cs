@@ -14,7 +14,7 @@
 
 using System;
 using System.IO;
-using Energinet.DataHub.EDI.ArchivedMessages.Application;
+using ArchivedMessages.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

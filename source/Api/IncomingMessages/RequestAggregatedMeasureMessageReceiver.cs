@@ -19,6 +19,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.ArchivedMessages.Application;
@@ -27,7 +28,6 @@ using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Interfaces;
@@ -41,8 +41,7 @@ namespace Energinet.DataHub.EDI.Api.IncomingMessages;
 public class RequestAggregatedMeasureMessageReceiver
 {
     private readonly ILogger<RequestAggregatedMeasureMessageReceiver> _logger;
-    private readonly IArchivedMessageRepository _messageArchive;
-    private readonly B2BContext _dbContext;
+    private readonly IArchivedMessagesClient _archivedMessagesClient;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly RequestAggregatedMeasureDataMarketMessageParser _requestAggregatedMeasureDataMarketMessageParser;
     private readonly ResponseFactory _responseFactory;
@@ -51,8 +50,7 @@ public class RequestAggregatedMeasureMessageReceiver
 
     public RequestAggregatedMeasureMessageReceiver(
         ILogger<RequestAggregatedMeasureMessageReceiver> logger,
-        IArchivedMessageRepository messageArchive,
-        B2BContext dbContext,
+        IArchivedMessagesClient archivedMessagesClient,
         ISystemDateTimeProvider systemDateTimeProvider,
         RequestAggregatedMeasureDataMarketMessageParser requestAggregatedMeasureDataMarketMessageParser,
         ResponseFactory responseFactory,
@@ -60,8 +58,7 @@ public class RequestAggregatedMeasureMessageReceiver
         IMediator mediator)
         {
         _logger = logger;
-        _messageArchive = messageArchive;
-        _dbContext = dbContext;
+        _archivedMessagesClient = archivedMessagesClient;
         _systemDateTimeProvider = systemDateTimeProvider;
         _requestAggregatedMeasureDataMarketMessageParser = requestAggregatedMeasureDataMarketMessageParser;
         _responseFactory = responseFactory;
@@ -107,9 +104,10 @@ public class RequestAggregatedMeasureMessageReceiver
         return CreateResponse(request, httpStatusCode, _responseFactory.From(result, cimFormat));
     }
 
-    private async Task SaveArchivedMessageAsync(RequestAggregatedMeasureDataMarketMessage marketMessage, Stream document, CancellationToken hostCancellationToken)
+    private async Task SaveArchivedMessageAsync(RequestAggregatedMeasureDataMarketMessage marketMessage, Stream document, CancellationToken cancellationToken)
     {
-        _messageArchive.Add(new ArchivedMessage(
+        await _archivedMessagesClient.CreateAsync(
+            new ArchivedMessage(
             Guid.NewGuid().ToString(),
             marketMessage.MessageId,
             IncomingDocumentType.RequestAggregatedMeasureData.Name,
@@ -117,8 +115,8 @@ public class RequestAggregatedMeasureMessageReceiver
             marketMessage.ReceiverNumber,
             _systemDateTimeProvider.Now(),
             marketMessage.BusinessReason,
-            document));
-        await _dbContext.SaveChangesAsync(hostCancellationToken).ConfigureAwait(false);
+            document),
+            cancellationToken).ConfigureAwait(false);
     }
 
     private HttpResponseData CreateResponse(

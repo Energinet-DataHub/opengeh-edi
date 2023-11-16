@@ -15,6 +15,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.OutgoingMessages.Contracts;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
@@ -33,20 +34,22 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
     private readonly DocumentFactory _documentFactory;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly ActorMessageQueueContext _actorMessageQueueContext;
-    //private readonly IArchivedMessageRepository _archivedMessageRepository;
+    private readonly IArchivedMessagesClient _archivedMessageClient;
 
     public PeekHandler(
         IActorMessageQueueRepository actorMessageQueueRepository,
         IMarketDocumentRepository marketDocumentRepository,
         DocumentFactory documentFactory,
         IOutgoingMessageRepository outgoingMessageRepository,
-        ActorMessageQueueContext actorMessageQueueContext)
+        ActorMessageQueueContext actorMessageQueueContext,
+        IArchivedMessagesClient archivedMessageClient)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _marketDocumentRepository = marketDocumentRepository;
         _documentFactory = documentFactory;
         _outgoingMessageRepository = outgoingMessageRepository;
         _actorMessageQueueContext = actorMessageQueueContext;
+        _archivedMessageClient = archivedMessageClient;
     }
 
     public async Task<PeekResult> Handle(PeekCommand request, CancellationToken cancellationToken)
@@ -76,15 +79,17 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
             document = new MarketDocument(result, peekResult.BundleId);
             await _marketDocumentRepository.AddAsync(document).ConfigureAwait(false);
 
-            // _archivedMessageRepository.Add(new ArchivedMessage(
-            //     peekResult.BundleId.Id.ToString(),
-            //     peekResult.BundleId.Id.ToString(),
-            //     outgoingMessageBundle.DocumentType.ToString(),
-            //     outgoingMessageBundle.SenderId.Value,
-            //     outgoingMessageBundle.Receiver.Number.Value,
-            //     timestamp,
-            //     outgoingMessageBundle.BusinessReason,
-            //     result));
+            await _archivedMessageClient.CreateAsync(
+                new ArchivedMessage(
+                peekResult.BundleId.Id.ToString(),
+                peekResult.BundleId.Id.ToString(),
+                outgoingMessageBundle.DocumentType.ToString(),
+                outgoingMessageBundle.SenderId.Value,
+                outgoingMessageBundle.Receiver.Number.Value,
+                timestamp,
+                outgoingMessageBundle.BusinessReason,
+                result),
+                cancellationToken).ConfigureAwait(false);
         }
 
         return new PeekResult(document.Payload, document.BundleId.Id);

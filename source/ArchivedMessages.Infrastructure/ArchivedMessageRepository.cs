@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.ArchivedMessages.Application;
-using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Configuration.DataAccess;
+using ArchivedMessages.Interfaces;
+using Dapper;
 using Energinet.DataHub.EDI.Common.DataAccess;
 using Microsoft.Data.SqlClient;
 
@@ -26,18 +27,42 @@ namespace Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 
 public class ArchivedMessageRepository : IArchivedMessageRepository
 {
-    private readonly ArchivedMessagesContext _dbContext;
     private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public ArchivedMessageRepository(ArchivedMessagesContext dbContext, IDatabaseConnectionFactory connectionFactory)
+    public ArchivedMessageRepository(IDatabaseConnectionFactory connectionFactory)
     {
-        _dbContext = dbContext;
         _connectionFactory = connectionFactory;
     }
 
-    public void Add(ArchivedMessage message)
+    public async Task AddAsync(ArchivedMessage message, CancellationToken cancellationToken)
     {
-        _dbContext.ArchivedMessages.Add(message);
+        ArgumentNullException.ThrowIfNull(message);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
+
+        byte[] documentBytes;
+        using (var memoryStream = new MemoryStream())
+        {
+            await message.Document.CopyToAsync(memoryStream, cancellationToken).ConfigureAwait(false);
+            documentBytes = memoryStream.ToArray();
+        }
+
+        var parameters = new
+        {
+            message.Id,
+            message.DocumentType,
+            message.ReceiverNumber,
+            message.SenderNumber,
+            message.CreatedAt,
+            message.BusinessReason,
+            Document = documentBytes,
+            message.MessageId,
+        };
+        var sql = @"INSERT INTO [dbo].[ArchivedMessages]
+                       ([Id], [DocumentType], [ReceiverNumber], [SenderNumber], [CreatedAt], [BusinessReason], [Document], [MessageId])
+                       VALUES
+                       (@Id, @DocumentType, @ReceiverNumber, @SenderNumber, @CreatedAt, @BusinessReason, @Document, @MessageId)";
+
+        await connection.ExecuteAsync(sql, parameters).ConfigureAwait(false);
     }
 
     public async Task<Stream?> GetAsync(string id, CancellationToken cancellationToken)
@@ -45,7 +70,7 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         using var command = CreateCommand(
             $"SELECT Document FROM dbo.[ArchivedMessages] WHERE Id = @Id",
-            new List<KeyValuePair<string, object>>
+            new List<KeyValuePair<string, object?>>
             {
                 new("@Id", id),
             },
@@ -62,7 +87,7 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
     }
 
     private static SqlCommand CreateCommand(
-        string sqlStatement, List<KeyValuePair<string, object>> parameters, IDbConnection connection)
+        string sqlStatement, List<KeyValuePair<string, object?>> parameters, IDbConnection connection)
     {
         var command = connection.CreateCommand();
 
