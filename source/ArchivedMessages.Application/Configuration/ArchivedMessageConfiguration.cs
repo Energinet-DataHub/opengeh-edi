@@ -15,11 +15,11 @@
 using System.IO;
 using ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Application.SearchMessages;
-using Energinet.DataHub.EDI.ArchivedMessages.Application;
+using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
 
 public static class ArchivedMessageConfiguration
 {
