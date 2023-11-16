@@ -26,6 +26,7 @@ using Energinet.DataHub.EDI.Application.Configuration.Queries;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.TimeEvents;
+using Energinet.DataHub.EDI.IncomingMessages.Application.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
@@ -42,6 +43,8 @@ using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureDa
 using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Google.Protobuf;
+using IncomingMessages.Infrastructure;
+using IncomingMessages.Infrastructure.Configuration.DataAccess;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -54,6 +57,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
         private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
         private readonly B2BContext _b2BContext;
         private readonly ProcessContext _processContext;
+        private readonly IncomingMessagesContext _incomingMessagesContext;
         private ServiceCollection? _services;
         private IServiceProvider _serviceProvider = default!;
         private bool _disposed;
@@ -68,6 +72,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             BuildServices();
             _b2BContext = GetService<B2BContext>();
             _processContext = GetService<ProcessContext>();
+            _incomingMessagesContext = GetService<IncomingMessagesContext>();
         }
 
         protected TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
@@ -95,6 +100,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
             _b2BContext.Dispose();
             _processContext.Dispose();
+            _incomingMessagesContext.Dispose();
             _serviceBusSenderFactoryStub.Dispose();
             ((ServiceProvider)_serviceProvider!).Dispose();
             _disposed = true;
@@ -160,6 +166,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             _services = new ServiceCollection();
 
             _services.AddSingleton(new WholesaleServiceBusClientConfiguration("Fake"));
+            _services.AddSingleton(new IncomingMessagesServiceBusClientConfiguration("Fake"));
+
             _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
             _services.AddSingleton(
                 _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
@@ -193,6 +201,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
             ActorMessageQueueConfiguration.Configure(_services);
             ProcessConfiguration.Configure(_services);
+            IncomingMessagesConfiguration.Configure(_services);
             _serviceProvider = _services.BuildServiceProvider();
         }
     }

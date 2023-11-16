@@ -34,19 +34,19 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application;
 
 public class IncomingRequestAggregatedMeasuredData : IIncomingRequestAggregatedMeasuredData
 {
-    private readonly IRequestAggregatedMeasureDataMarketMessageParser _requestAggregatedMeasureDataMarketMessageParser;
+    private readonly RequestAggregatedMeasureDataMarketMessageParser _requestAggregatedMeasureDataMarketMessageParser;
     private readonly IncomingRequestAggregatedMeasuredDataSender _incomingRequestAggregatedMeasuredDataSender;
     private readonly ISerializer _serializer;
-    private readonly RequestAggregatedMeasureDataMarketMessageValidator _aggregatedMeasureDataMarketMessageValidator;
+    private readonly RequestAggregatedMeasureDataValidator _aggregatedMeasureDataMarketMessageValidator;
     private readonly ResponseFactory _responseFactory;
     private readonly IArchivedMessageRepository _archivedMessageRepository;
     private readonly B2BContext _b2BContext;
 
     public IncomingRequestAggregatedMeasuredData(
-        IRequestAggregatedMeasureDataMarketMessageParser requestAggregatedMeasureDataMarketMessageParser,
+        RequestAggregatedMeasureDataMarketMessageParser requestAggregatedMeasureDataMarketMessageParser,
         IncomingRequestAggregatedMeasuredDataSender incomingRequestAggregatedMeasuredDataSender,
         ISerializer serializer,
-        RequestAggregatedMeasureDataMarketMessageValidator aggregatedMeasureDataMarketMessageValidator,
+        RequestAggregatedMeasureDataValidator aggregatedMeasureDataMarketMessageValidator,
         ResponseFactory responseFactory,
         IArchivedMessageRepository archivedMessageRepository,
         B2BContext b2BContext)

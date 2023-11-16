@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Application.Configuration;
+namespace IncomingMessages.Infrastructure;
 
 public class IncomingMessagesServiceBusClientConfiguration : IServiceBusClientConfiguration
 {

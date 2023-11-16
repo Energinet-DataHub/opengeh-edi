@@ -35,10 +35,12 @@ using Energinet.DataHub.EDI.Process.Application.Configuration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.Reflection;
+using IncomingMessages.Infrastructure;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
@@ -92,6 +94,8 @@ namespace Energinet.DataHub.EDI.Api
 
                     services.AddSingleton(new WholesaleServiceBusClientConfiguration(
                         runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!));
+                    services.AddSingleton(new IncomingMessagesServiceBusClientConfiguration(
+                        runtime.INCOMING_MESSAGES_QUEUE_NAME!));
 
                     services.AddApplicationInsights();
                     services.ConfigureFunctionsApplicationInsights();

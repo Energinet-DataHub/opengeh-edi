@@ -22,10 +22,10 @@ using NodaTime;
 
 namespace IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 
-public class ProtoMessageParser : JsonParserBase, IMessageParser
+public class ProtoMessageParser : IMessageParser
 {
-    public ProtoMessageParser(ISchemaProvider schemaProvider)
-        : base(schemaProvider)
+    public ProtoMessageParser()
+        : base()
     {
     }
 

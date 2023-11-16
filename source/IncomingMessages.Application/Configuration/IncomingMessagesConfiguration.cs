@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.Common.Configuration;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using IncomingMessages.Infrastructure;
 using IncomingMessages.Infrastructure.Configuration.DataAccess;
 using IncomingMessages.Infrastructure.Messages;
@@ -28,6 +29,7 @@ public static class IncomingMessagesConfiguration
     public static void Configure(IServiceCollection services)
     {
         services.AddScopedSqlDbContext<IncomingMessagesContext>();
+        services.AddScoped<IIncomingRequestAggregatedMeasuredData, IncomingRequestAggregatedMeasuredData>();
         services.AddScoped<ITransactionIdRepository, TransactionIdRepository>();
         services.AddScoped<IMessageIdRepository, MessageIdRepository>();
         services.AddScoped<IMessageParser, XmlMessageParser>();
@@ -35,6 +37,8 @@ public static class IncomingMessagesConfiguration
         services.AddScoped<IMessageParser, ProtoMessageParser>();
         services.AddScoped<RequestAggregatedMeasureDataMarketMessageParser>();
         services.AddTransient<SenderAuthorizer>();
+        services.AddTransient<IncomingRequestAggregatedMeasuredDataSender>();
+        services.AddTransient<RequestAggregatedMeasureDataValidator>();
         services.AddScoped<ProcessTypeValidator>();
         services.AddScoped<MessageTypeValidator>();
         services.AddScoped<BusinessTypeValidator>();

@@ -23,11 +23,12 @@ public class IncomingRequestAggregatedMeasuredDataSender
 
     public IncomingRequestAggregatedMeasuredDataSender(
         IServiceBusSenderFactory serviceBusSenderFactory,
-        string incomingMessagesQueueName)
+        IncomingMessagesServiceBusClientConfiguration incomingMessagesServiceBusClientConfiguration)
     {
         if (serviceBusSenderFactory == null) throw new ArgumentNullException(nameof(serviceBusSenderFactory));
+        if (incomingMessagesServiceBusClientConfiguration == null) throw new ArgumentNullException(nameof(incomingMessagesServiceBusClientConfiguration));
 
-        _senderCreator = serviceBusSenderFactory.GetSender(incomingMessagesQueueName);
+        _senderCreator = serviceBusSenderFactory.GetSender(incomingMessagesServiceBusClientConfiguration.QueueName);
     }
 
     public async Task SendAsync(

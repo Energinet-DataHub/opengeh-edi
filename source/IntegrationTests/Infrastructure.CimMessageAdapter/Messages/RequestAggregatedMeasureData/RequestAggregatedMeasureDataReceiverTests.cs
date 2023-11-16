@@ -47,7 +47,6 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     private readonly MessageTypeValidator _messageTypeValidator;
     private readonly CalculationResponsibleReceiverVerification _calculationResponsibleReceiverVerification;
     private readonly ProcessContext _processContext;
-    private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
     private readonly IMarketActorAuthenticator _marketActorAuthenticator;
     private readonly BusinessTypeValidator _businessTypeValidator;
 
@@ -61,7 +60,6 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         _messageTypeValidator = GetService<MessageTypeValidator>();
         _calculationResponsibleReceiverVerification = GetService<CalculationResponsibleReceiverVerification>();
         _processContext = GetService<ProcessContext>();
-        _aggregatedMeasureDataProcessRepository = GetService<IAggregatedMeasureDataProcessRepository>();
         _marketActorAuthenticator = new MarketActorAuthenticatorSpy(ActorNumber.Create("1234567890123"), "DDQ");
         _businessTypeValidator = GetService<BusinessTypeValidator>();
     }
