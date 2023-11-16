@@ -78,17 +78,19 @@ public class SearchMessagesTests : TestBase
         //Arrange
         var messageId = Guid.NewGuid().ToString();
         await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z"), messageId: messageId));
-        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z")));
+        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:01Z")));
 
         //Act
         var result = await _archivedMessagesClient.SearchAsync(
-            new GetMessagesQuery(new MessageCreationPeriod(
+            new GetMessagesQuery(
+                new MessageCreationPeriod(
                 CreatedAt("2023-05-01T22:00:00Z"),
-                CreatedAt("2023-05-02T22:00:00Z"))),
+                CreatedAt("2023-05-02T22:00:01Z"))),
             CancellationToken.None);
 
         //Assert
-        //Assert.Single(result.Messages); //TODO: LRN how come this test expected only one message when two were created on the same date?
+        //Assert.Single(result.Messages); //TODO: LRN how come this test expected only one message when two were created on the same time?
+        Assert.Equal(2, result.Messages.Count);
         Assert.Equal(messageId, result.Messages[0].MessageId);
     }
 

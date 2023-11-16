@@ -97,7 +97,7 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
                     input.SqlStatement,
                     input.Parameters)
                 .ConfigureAwait(false);
-        return new MessageSearchResult(archivedMessages.ToList().AsReadOnly());
+        return new MessageSearchResult(archivedMessages.OrderBy(x => x.CreatedAt).ToList().AsReadOnly());
     }
 
     private static SqlCommand CreateCommand(
