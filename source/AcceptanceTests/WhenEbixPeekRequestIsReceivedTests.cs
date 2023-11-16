@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
-using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests;
@@ -35,23 +34,78 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : TestRunner
     }
 
     [Fact]
-    public async Task Actor_can_peek_in_ebix_format()
+    public async Task Actor_can_peek_calculation_result_in_ebix_format()
     {
-        var actorNumberForClientId = "5790000392551";
-        var actorRoleForClientId = "metereddataresponsible";
-
         var token = await _apiManagement.GetAzureAdToken(AzureEntraClientId, AzureEntraClientSecret);
 
-        await _edi.EmptyQueueAsync(actorNumberForClientId, new[] { actorRoleForClientId }, token);
-        //await _wholesale.PublishAggregationResultAsync("543");
-        await _edi.RequestAggregatedMeasureDataAsync(actorNumberForClientId, new[] { actorRoleForClientId }, false, token);
+        await _edi.EmptyQueueAsync(TestRunner.BalanceResponsibleActorNumber, new[] { TestRunner.BalanceResponsibleActorRole }, token);
+        await _wholesale.PublishAggregationResultAsync("543", TestRunner.BalanceResponsibleActorNumber);
 
-        var responseString = await _apiManagement.PeekEbixDocumentWithTimeoutAsync(token);
+        var actualResponseString = await _apiManagement.PeekEbixDocumentWithTimeoutAsync(token);
 
         Assert.Multiple(
-            () => Assert.NotEmpty(responseString),
-            () => Assert.Contains("envelope", responseString, StringComparison.OrdinalIgnoreCase),
-            () => Assert.DoesNotContain("RejectRequestMeteredDataAggregated", responseString, StringComparison.OrdinalIgnoreCase),
-            () => Assert.Contains("NotifyAggregatedMeasureData", responseString, StringComparison.OrdinalIgnoreCase));
+            () => Assert.NotEmpty(actualResponseString),
+            () => Assert.Contains("<soap-env:Envelope", actualResponseString, StringComparison.OrdinalIgnoreCase),
+            () => Assert.Contains(
+                "<DocumentType xmlns=\"urn:www:datahub:dk:b2b:v01\">AggregatedMeteredDataTimeSeries</DocumentType>",
+                actualResponseString,
+                StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public async Task Actor_can_peek_accepted_request_in_ebix_format()
+    {
+        var token = await _apiManagement.GetAzureAdToken(AzureEntraClientId, AzureEntraClientSecret);
+
+        await _edi.EmptyQueueAsync(TestRunner.BalanceResponsibleActorNumber, new[] { TestRunner.BalanceResponsibleActorRole }, token);
+        await _edi.RequestAggregatedMeasureDataAsync(TestRunner.BalanceResponsibleActorNumber, new[] { TestRunner.BalanceResponsibleActorRole }, overrideToken: token);
+
+        var actualResponseString = await _apiManagement.PeekEbixDocumentWithTimeoutAsync(token);
+
+        Assert.Multiple(
+            () => Assert.NotEmpty(actualResponseString),
+            () => Assert.Contains("<soap-env:Envelope", actualResponseString, StringComparison.OrdinalIgnoreCase),
+            () => Assert.Contains(
+                "<DocumentType xmlns=\"urn:www:datahub:dk:b2b:v01\">AcceptRequestMeteredDataAggregated</DocumentType>",
+                actualResponseString,
+                StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public async Task Actor_can_peek_synchronous_rejected_request_in_ebix_format()
+    {
+        var token = await _apiManagement.GetAzureAdToken(AzureEntraClientId, AzureEntraClientSecret);
+
+        await _edi.EmptyQueueAsync(TestRunner.BalanceResponsibleActorNumber, new[] { TestRunner.BalanceResponsibleActorRole }, token);
+        await _edi.RequestAggregatedMeasureDataAsync(TestRunner.BalanceResponsibleActorNumber, new[] { TestRunner.BalanceResponsibleActorRole }, overrideToken: token, syncError: true);
+
+        var actualResponseString = await _apiManagement.PeekEbixDocumentWithTimeoutAsync(token);
+
+        Assert.Multiple(
+            () => Assert.NotEmpty(actualResponseString),
+            () => Assert.Contains("<soap-env:Envelope", actualResponseString, StringComparison.OrdinalIgnoreCase),
+            () => Assert.Contains(
+                "<DocumentType xmlns=\"urn:www:datahub:dk:b2b:v01\">RejectRequestMeteredDataAggregated</DocumentType>",
+                actualResponseString,
+                StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public async Task Actor_can_peek_asynchronous_rejected_request_in_ebix_format()
+    {
+        var token = await _apiManagement.GetAzureAdToken(AzureEntraClientId, AzureEntraClientSecret);
+
+        await _edi.EmptyQueueAsync(TestRunner.BalanceResponsibleActorNumber, new[] { TestRunner.BalanceResponsibleActorRole }, token);
+        await _edi.RequestAggregatedMeasureDataAsync(TestRunner.BalanceResponsibleActorNumber, new[] { TestRunner.BalanceResponsibleActorRole }, overrideToken: token, asyncError: true);
+
+        var actualResponseString = await _apiManagement.PeekEbixDocumentWithTimeoutAsync(token);
+
+        Assert.Multiple(
+            () => Assert.NotEmpty(actualResponseString),
+            () => Assert.Contains("<soap-env:Envelope", actualResponseString, StringComparison.OrdinalIgnoreCase),
+            () => Assert.Contains(
+                "<DocumentType xmlns=\"urn:www:datahub:dk:b2b:v01\">RejectRequestMeteredDataAggregated</DocumentType>",
+                actualResponseString,
+                StringComparison.OrdinalIgnoreCase));
     }
 }

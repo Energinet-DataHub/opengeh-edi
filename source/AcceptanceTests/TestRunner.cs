@@ -20,6 +20,9 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 
 public class TestRunner : IAsyncDisposable
 {
+    internal const string BalanceResponsibleActorNumber = "5790000392551";
+    internal const string BalanceResponsibleActorRole = "balanceresponsibleparty";
+
     protected TestRunner()
     {
         var root = new ConfigurationBuilder()
@@ -41,11 +44,8 @@ public class TestRunner : IAsyncDisposable
         var dbConnectionString = $"Server={sqlServer};Initial Catalog={sqlDatabaseName};User Id={sqlUserName};Password={sqlUserPassword};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
         // ActorFactory.InsertActor(dbConnectionString, AzpToken);
 
-        //AzureEntraTenantId = root.GetValue<string>("AZURE_ENTRA_TENANT_ID")!;
         AzureEntraTenantId = "4a7411ea-ac71-4b63-9647-b8bd4c5a20e0";
-        //AzureEntraBackendAppId = root.GetValue<string>("AZURE_ENTRA_BACKEND_APP_ID")!;
         AzureEntraBackendAppId = "fe8b720c-fda4-4aaa-9c6d-c0d2ed6584fe";
-        //AzureEntraClientId = root.GetValue<string>("AZURE_ENTRA_CLIENT_ID")!;
         AzureEntraClientId = "D8E67800-B7EF-4025-90BB-FE06E1639117";
         AzureEntraClientSecret = root.GetValue<string>("AZURE_ENTRA_CLIENT_SECRET")!;
     }

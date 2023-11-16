@@ -120,7 +120,7 @@ public class InboxEventsProcessor
 
     private IInboxEventMapper MapperFor(string eventType)
     {
-        var mapper = _mappers.FirstOrDefault(mapper => mapper.CanHandle(eventType))
+        var mapper = _mappers.SingleOrDefault(mapper => mapper.CanHandle(eventType))
                      ?? throw new UnsupportedInboxEventTypeException($"No InboxEventMapper for {eventType} eventType was found.");
         return mapper;
     }

@@ -82,7 +82,8 @@ public sealed class ApiManagementDriver : IDisposable
     public async Task<string> PeekEbixDocumentWithTimeoutAsync(string token)
     {
         var stopWatch = Stopwatch.StartNew();
-        while (stopWatch.ElapsedMilliseconds < 60000)
+        var timeBeforeTimeout = new TimeSpan(0, 1, 0);
+        while (stopWatch.ElapsedMilliseconds < timeBeforeTimeout.TotalMilliseconds)
         {
             var peekResponse = await PeekEbixAsync(token)
                 .ConfigureAwait(false);

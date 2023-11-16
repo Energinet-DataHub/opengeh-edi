@@ -39,6 +39,10 @@
         "meteringGridArea_Domain.mRID": {
           "codingScheme": "NDK",
           "value": "543"
+        },
+        "balanceResponsibleParty_MarketParticipant.mRID": {
+          "codingScheme": "A10",
+          "value": "9999999999999"
         }
       }
     ]

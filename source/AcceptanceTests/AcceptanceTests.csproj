@@ -9,7 +9,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Remove="Messages\json\RequestAggregatedMeasureDataApiManagement.json" />
+      <None Remove="Messages\json\RequestAggregatedMeasureDataBalanceResponsible.json" />
+      <None Remove="Messages\json\RequestAggregatedMeasureDataBalanceResponsibleWithBadPeriod.json" />
+      <None Remove="Messages\json\RequestAggregatedMeasureDataBalanceResponsibleWithMismatchingHeader.json" />
     </ItemGroup>
 
     <ItemGroup>
@@ -59,7 +61,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureDataApiManagement.json">
+      <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureDataBalanceResponsibleWithMismatchingHeader.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureDataBalanceResponsibleWithBadPeriod.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureDataBalanceResponsible.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureDataWithBadPeriod.json">
