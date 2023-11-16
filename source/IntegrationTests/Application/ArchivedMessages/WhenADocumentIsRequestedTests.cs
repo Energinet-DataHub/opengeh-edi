@@ -16,8 +16,8 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Application.SearchMessages;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -46,7 +46,7 @@ public class WhenADocumentIsRequestedTests : TestBase
         await ArchiveMessage(CreateArchivedMessage(id));
         await ArchiveMessage(CreateArchivedMessage());
 
-        var result = await QueryAsync(new GetArchivedMessageDocumentQuery(id));
+        var result = await _archivedMessagesClient.GetAsync(id, CancellationToken.None);
 
         Assert.NotNull(result);
     }

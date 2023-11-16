@@ -16,9 +16,7 @@ using System;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using ArchivedMessages.Interfaces;
-using Energinet.DataHub.EDI.ArchivedMessages.Application;
-using MediatR;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 
@@ -26,11 +24,11 @@ namespace Energinet.DataHub.EDI.Api.ArchivedMessages
 {
     public partial class ArchivedMessageGetDocumentListener
     {
-        private readonly IMediator _mediator;
+        private readonly IArchivedMessagesClient _archivedMessagesClient;
 
-        public ArchivedMessageGetDocumentListener(IMediator mediator)
+        public ArchivedMessageGetDocumentListener(IArchivedMessagesClient archivedMessagesClient)
         {
-            _mediator = mediator;
+            _archivedMessagesClient = archivedMessagesClient;
         }
 
         [Function("ArchivedMessages_GetDocument")]
@@ -50,9 +48,7 @@ namespace Energinet.DataHub.EDI.Api.ArchivedMessages
 
             var cancellationToken = cancellationTokenSource.Token;
 
-            var query = new GetArchivedMessageDocumentQuery(id);
-
-            var result = await _mediator.Send(query, cancellationToken).ConfigureAwait(false);
+            var result = await _archivedMessagesClient.GetAsync(id, cancellationToken).ConfigureAwait(false);
 
             var response = HttpResponseData.CreateResponse(request);
             if (result is null)

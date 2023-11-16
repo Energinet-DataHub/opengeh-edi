@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Application;
 
@@ -30,6 +32,13 @@ public class ArchivedMessagesClient : IArchivedMessagesClient
 
     public async Task CreateAsync(ArchivedMessage message, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(message);
         await _archivedMessageRepository.AddAsync(message, cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task<Stream?> GetAsync(string messageId, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(messageId);
+        return await _archivedMessageRepository.GetAsync(messageId, cancellationToken).ConfigureAwait(false);
     }
 }

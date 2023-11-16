@@ -107,11 +107,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return GetService<IMediator>().Send(command);
         }
 
-        protected Task<TResult> QueryAsync<TResult>(IQuery<TResult> query)
-        {
-            return GetService<IMediator>().Send(query, CancellationToken.None);
-        }
-
         protected async Task HavingReceivedInboxEventAsync(string eventType, IMessage eventPayload, Guid processId)
         {
             await GetService<InboxEventReceiver>().

@@ -18,8 +18,8 @@ using System.Data;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using ArchivedMessages.Interfaces;
 using Dapper;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Common.DataAccess;
 using Microsoft.Data.SqlClient;
 

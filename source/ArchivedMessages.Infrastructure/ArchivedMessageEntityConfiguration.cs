@@ -14,11 +14,11 @@
 
 using System;
 using System.IO;
-using ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.EDI.Infrastructure.ArchivedMessages;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 
 public class ArchivedMessageEntityConfiguration : IEntityTypeConfiguration<ArchivedMessage>
 {

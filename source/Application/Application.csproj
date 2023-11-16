@@ -74,8 +74,4 @@ limitations under the License.
       <None Remove="SchemaStore\Schemas\Xml\urn-ediel-org-structure-requestchangeaccountingpointcharacteristics-0-1" />
       <None Remove="SchemaStore\Schemas\Xml\urn-ediel-org-measure-notifyaggregatedmeasuredata-0-1.xsd" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="ArchivedMessages\" />
-    </ItemGroup>
 </Project>
