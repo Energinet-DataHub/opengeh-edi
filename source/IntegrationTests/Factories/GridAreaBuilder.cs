@@ -16,13 +16,14 @@ using System;
 using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Domain.GridAreaOwners;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
 public class GridAreaBuilder
 {
-    private static readonly Instant _fromDateTimeUtc = Instant.FromDateTimeUtc(DateTime.UtcNow);
+    private static readonly Instant _fromDateTimeUtc = Instant.FromDateTimeUtc(DateTime.UtcNow).PlusMinutes(-1);
     private static string _gridArea = "543";
     private static ActorNumber _actorNumber = ActorNumber.Create("5148796574821");
 
