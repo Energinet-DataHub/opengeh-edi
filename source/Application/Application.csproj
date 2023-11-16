@@ -76,6 +76,6 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="IncomingMessages\" />
+      <Folder Include="ArchivedMessages\" />
     </ItemGroup>
 </Project>

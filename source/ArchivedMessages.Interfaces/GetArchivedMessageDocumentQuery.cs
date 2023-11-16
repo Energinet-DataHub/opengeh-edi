@@ -12,16 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
+using Energinet.DataHub.EDI.Application.Configuration.Queries;
 
-namespace Energinet.DataHub.EDI.Domain.ArchivedMessages;
+namespace ArchivedMessages.Interfaces;
 
-public record ArchivedMessage(
-    string Id,
-    string? MessageId,
-    string DocumentType,
-    string? SenderNumber,
-    string? ReceiverNumber,
-    Instant CreatedAt,
-    string? BusinessReason,
-    Stream Document);
+public record GetArchivedMessageDocumentQuery(string Id) : IQuery<Stream?>;

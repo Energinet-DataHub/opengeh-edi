@@ -17,19 +17,19 @@ using System.Data;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.ArchivedMessages.Application;
+using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Common.DataAccess;
-using Energinet.DataHub.EDI.Domain.ArchivedMessages;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Microsoft.Data.SqlClient;
 
-namespace Energinet.DataHub.EDI.Infrastructure.ArchivedMessages;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 
 public class ArchivedMessageRepository : IArchivedMessageRepository
 {
-    private readonly B2BContext _dbContext;
+    private readonly ArchivedMessagesContext _dbContext;
     private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public ArchivedMessageRepository(B2BContext dbContext, IDatabaseConnectionFactory connectionFactory)
+    public ArchivedMessageRepository(ArchivedMessagesContext dbContext, IDatabaseConnectionFactory connectionFactory)
     {
         _dbContext = dbContext;
         _connectionFactory = connectionFactory;
