@@ -18,9 +18,8 @@ using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.SearchMessages;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Common.Serialization;
-using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using NodaTime;
@@ -29,13 +28,13 @@ namespace Energinet.DataHub.EDI.Api.ArchivedMessages;
 
 public class ArchivedMessageSearchListener
 {
-    private readonly IMediator _mediator;
     private readonly ISerializer _serializer;
+    private readonly IArchivedMessagesClient _archivedMessagesClient;
 
-    public ArchivedMessageSearchListener(IMediator mediator, ISerializer serializer)
+    public ArchivedMessageSearchListener(ISerializer serializer, IArchivedMessagesClient archivedMessagesClient)
     {
-        _mediator = mediator;
         _serializer = serializer;
+        _archivedMessagesClient = archivedMessagesClient;
     }
 
     [Function("ArchivedMessages_Search")]
@@ -66,7 +65,7 @@ public class ArchivedMessageSearchListener
         var query = new GetMessagesQuery
         {
             CreationPeriod = searchCriteria?.CreatedDuringPeriod is not null
-                ? new Application.SearchMessages.MessageCreationPeriod(
+                ? new EDI.ArchivedMessages.Interfaces.MessageCreationPeriod(
                     searchCriteria.CreatedDuringPeriod.Start,
                     searchCriteria.CreatedDuringPeriod.End)
                 : null,
@@ -76,8 +75,7 @@ public class ArchivedMessageSearchListener
             DocumentTypes = searchCriteria?.DocumentTypes,
             BusinessReasons = searchCriteria?.BusinessReasons,
         };
-
-        var result = await _mediator.Send(query, cancellationToken).ConfigureAwait(false);
+        var result = await _archivedMessagesClient.SearchAsync(query, cancellationToken).ConfigureAwait(false);
 
         return await SearchResultResponseAsync(request, result, cancellationToken).ConfigureAwait(false);
     }

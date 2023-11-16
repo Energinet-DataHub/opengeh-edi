@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
@@ -84,6 +85,19 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
         }
 
         return reader.GetStream(0);
+    }
+
+    public async Task<MessageSearchResult> SearchAsync(GetMessagesQuery queryInput, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(queryInput);
+        var input = new QueryBuilder().BuildFrom(queryInput);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
+        var archivedMessages =
+            await connection.QueryAsync<MessageInfo>(
+                    input.SqlStatement,
+                    input.Parameters)
+                .ConfigureAwait(false);
+        return new MessageSearchResult(archivedMessages.ToList().AsReadOnly());
     }
 
     private static SqlCommand CreateCommand(

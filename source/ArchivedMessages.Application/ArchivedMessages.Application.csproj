@@ -13,4 +13,7 @@
     <ProjectReference Include="..\ArchivedMessages.Infrastructure\ArchivedMessages.Infrastructure.csproj" />
     <ProjectReference Include="..\ArchivedMessages.Interfaces\ArchivedMessages.Interfaces.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="SearchMessages\" />
+  </ItemGroup>
 </Project>

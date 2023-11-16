@@ -38,4 +38,12 @@ public interface IArchivedMessageRepository
     /// <param name="cancellationToken"></param>
     /// <returns>Stream</returns>
     Task<Stream?> GetAsync(string id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Search for messages in the database
+    /// </summary>
+    /// <param name="queryInput"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
+    Task<MessageSearchResult> SearchAsync(GetMessagesQuery queryInput, CancellationToken cancellationToken);
 }

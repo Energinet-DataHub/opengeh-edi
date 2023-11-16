@@ -41,4 +41,10 @@ public class ArchivedMessagesClient : IArchivedMessagesClient
         ArgumentNullException.ThrowIfNull(messageId);
         return await _archivedMessageRepository.GetAsync(messageId, cancellationToken).ConfigureAwait(false);
     }
+
+    public Task<MessageSearchResult> SearchAsync(GetMessagesQuery queryInput, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(queryInput);
+        return _archivedMessageRepository.SearchAsync(queryInput, cancellationToken);
+    }
 }

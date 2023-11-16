@@ -16,7 +16,6 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.SearchMessages;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.DateTime;
@@ -79,7 +78,7 @@ public class WhenADocumentIsRequestedTests : TestBase
             Assert.Fail("We should be able to save multiple messages with the same message id");
         }
 
-        var result = await QueryAsync(new GetMessagesQuery());
+        var result = await _archivedMessagesClient.SearchAsync(new GetMessagesQuery(), CancellationToken.None);
 
         Assert.Equal(2, result.Messages.Count);
         Assert.Equal(messageId, result.Messages[0].MessageId);
