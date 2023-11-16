@@ -19,8 +19,6 @@ using System.Text;
 using System.Text.Json;
 using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
 using Energinet.DataHub.EDI.AcceptanceTests.Factories;
-using Energinet.DataHub.Edi.Responses;
-using Google.Protobuf.WellKnownTypes;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 

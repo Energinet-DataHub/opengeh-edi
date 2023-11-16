@@ -42,7 +42,7 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : TestRunner
     [Fact]
     public async Task Actor_can_peek_calculation_result_in_ebix_format()
     {
-        var token = await _apiManagement.GetAzureAdToken(AzureEntraClientId, AzureEntraClientSecret);
+        var token = await _apiManagement.GetAzureAdTokenAsync(AzureEntraClientId, AzureEntraClientSecret);
 
         await _edi.EmptyQueueAsync(TestRunner.BalanceResponsibleActorNumber, new[] { TestRunner.BalanceResponsibleActorRole }, token);
         await _wholesale.PublishAggregationResultAsync("543", TestRunner.BalanceResponsibleActorNumber);
@@ -57,7 +57,7 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : TestRunner
     [Fact]
     public async Task Actor_can_peek_accepted_request_in_ebix_format()
     {
-        var token = await _apiManagement.GetAzureAdToken(AzureEntraClientId, AzureEntraClientSecret);
+        var token = await _apiManagement.GetAzureAdTokenAsync(AzureEntraClientId, AzureEntraClientSecret);
 
         await _edi.EmptyQueueAsync(TestRunner.BalanceResponsibleActorNumber, new[] { TestRunner.BalanceResponsibleActorRole }, token);
         await _edi.RequestAggregatedMeasureDataAsync(TestRunner.BalanceResponsibleActorNumber, new[] { TestRunner.BalanceResponsibleActorRole }, overrideToken: token);
@@ -72,7 +72,7 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : TestRunner
     [Fact]
     public async Task Actor_can_peek_rejected_request_in_ebix_format()
     {
-        var token = await _apiManagement.GetAzureAdToken(AzureEntraClientId, AzureEntraClientSecret);
+        var token = await _apiManagement.GetAzureAdTokenAsync(AzureEntraClientId, AzureEntraClientSecret);
 
         await _edi.EmptyQueueAsync(TestRunner.BalanceResponsibleActorNumber, new[] { TestRunner.BalanceResponsibleActorRole }, token);
         await _edi.RequestAggregatedMeasureDataAsync(TestRunner.BalanceResponsibleActorNumber, new[] { TestRunner.BalanceResponsibleActorRole }, overrideToken: token, asyncError: true);

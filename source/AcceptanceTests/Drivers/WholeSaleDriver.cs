@@ -29,9 +29,9 @@ internal sealed class WholeSaleDriver
 
     internal Task PublishAggregationResultAsync(string gridAreaCode, string? balanceResponsibleId = null)
     {
-        var aggregation = string.IsNullOrEmpty(balanceResponsibleId)
-            ? CreateAggregationResultAvailableEventFor(gridAreaCode)
-            : CreateAggregationResultAvailableEventForBalanceResponsible(gridAreaCode, balanceResponsibleId);
+        var aggregation = !string.IsNullOrEmpty(balanceResponsibleId)
+            ? CreateAggregationResultAvailableEventForBalanceResponsible(gridAreaCode, balanceResponsibleId)
+            : CreateAggregationResultAvailableEventFor(gridAreaCode);
 
         return _integrationEventPublisher.PublishAsync(
             "CalculationResultCompleted",

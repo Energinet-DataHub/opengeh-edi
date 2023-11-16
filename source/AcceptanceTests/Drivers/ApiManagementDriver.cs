@@ -25,8 +25,6 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 
-#pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
-
 public sealed class ApiManagementDriver : IDisposable
 {
     internal const string ApiManagementUrl = "https://apim-shared-sharedres-u-001.azure-api.net/";
@@ -50,7 +48,7 @@ public sealed class ApiManagementDriver : IDisposable
         _httpClient.Dispose();
     }
 
-    public async Task<string> GetAzureAdToken(string clientId, string clientSecret)
+    public async Task<string> GetAzureAdTokenAsync(string clientId, string clientSecret)
     {
         //var tenantId = "4a7411ea-ac71-4b63-9647-b8bd4c5a20e0";
         //var backendAppId = "fe8b720c-fda4-4aaa-9c6d-c0d2ed6584fe";
