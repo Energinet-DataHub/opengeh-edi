@@ -59,7 +59,7 @@ public class WhenADocumentIsRequestedTests : TestBase
         var id = Guid.NewGuid().ToString();
         await ArchiveMessage(CreateArchivedMessage(id));
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => ArchiveMessage(CreateArchivedMessage(id)));
+        await Assert.ThrowsAsync<SqlException>(() => ArchiveMessage(CreateArchivedMessage(id)));
     }
 
     [Fact]
