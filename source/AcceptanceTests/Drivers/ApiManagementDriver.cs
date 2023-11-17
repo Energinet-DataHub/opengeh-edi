@@ -78,44 +78,4 @@ public sealed class ApiManagementDriver : IDisposable
 
         return accessToken;
     }
-
-    public async Task<string> PeekEbixDocumentWithTimeoutAsync(string token)
-    {
-        var stopWatch = Stopwatch.StartNew();
-        var timeBeforeTimeout = new TimeSpan(0, 1, 0);
-        while (stopWatch.ElapsedMilliseconds < timeBeforeTimeout.TotalMilliseconds)
-        {
-            var peekResponse = await PeekEbixAsync(token)
-                .ConfigureAwait(false);
-            if (peekResponse.StatusCode == HttpStatusCode.OK)
-            {
-                var document = await peekResponse.Content.ReadAsStringAsync();
-                //await DequeueAsync(token, GetMessageId(peekResponse)).ConfigureAwait(false);
-                return document;
-            }
-
-            if (peekResponse.StatusCode != HttpStatusCode.NoContent)
-            {
-                throw new UnexpectedPeekResponseException($"Unexpected Peek response: {peekResponse.StatusCode}");
-            }
-
-            await Task.Delay(500).ConfigureAwait(false);
-        }
-
-        throw new TimeoutException("Unable to retrieve peek result within time limit");
-    }
-
-    private async Task<HttpResponseMessage> PeekEbixAsync(string token)
-    {
-        using var request = new HttpRequestMessage(HttpMethod.Post, new Uri("ebix?soapAction=peekMessage", UriKind.Relative));
-        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
-        request.Content = new StringContent(string.Empty, System.Text.Encoding.UTF8, "application/ebix");
-        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/ebix");
-
-        var peekResponse = await _httpClient.SendAsync(request);
-
-        peekResponse.EnsureSuccessStatusCode();
-
-        return peekResponse;
-    }
 }
