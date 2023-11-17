@@ -48,8 +48,6 @@ public class UnitOfWorkBehaviour<TRequest, TResponse> : IPipelineBehavior<TReque
     {
         if (next == null) throw new ArgumentNullException(nameof(next));
 
-        await _unitOfWork.BeginTransactionAsync().ConfigureAwait(false);
-
         try
         {
             var result = await next().ConfigureAwait(false);

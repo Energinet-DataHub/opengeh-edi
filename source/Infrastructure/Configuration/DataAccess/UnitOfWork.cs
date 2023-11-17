@@ -45,6 +45,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 
         public async Task CommitTransactionAsync()
         {
+            await BeginTransactionAsync().ConfigureAwait(false);
             if (_dbContextTransaction == null) throw new DBTransactionNotInitializedException();
 
             await _b2BContext.SaveChangesAsync().ConfigureAwait(false);
