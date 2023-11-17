@@ -18,7 +18,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.DateTime;
@@ -32,14 +31,12 @@ public class SearchMessagesTests : TestBase
 {
     private readonly IArchivedMessagesClient _archivedMessagesClient;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-    private readonly ArchivedMessagesContext _archivedMessageContext;
 
     public SearchMessagesTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _archivedMessagesClient = GetService<IArchivedMessagesClient>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
-        _archivedMessageContext = GetService<ArchivedMessagesContext>();
     }
 
     [Fact]
@@ -202,12 +199,6 @@ public class SearchMessagesTests : TestBase
             message => message.BusinessReason!.Equals(balanceFixing.Name, StringComparison.OrdinalIgnoreCase));
     }
 
-    protected override void Dispose(bool disposing)
-    {
-        _archivedMessageContext.Dispose();
-        base.Dispose(disposing);
-    }
-
     private static Instant CreatedAt(string date)
     {
         return NodaTime.Text.InstantPattern.General.Parse(date).Value;
@@ -236,6 +227,5 @@ public class SearchMessagesTests : TestBase
     private async Task ArchiveMessage(ArchivedMessage archivedMessage)
     {
         await _archivedMessagesClient.CreateAsync(archivedMessage, CancellationToken.None);
-        await _archivedMessageContext.SaveChangesAsync();
     }
 }

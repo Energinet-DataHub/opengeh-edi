@@ -20,7 +20,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Common.DataAccess;
 using Microsoft.Data.SqlClient;
@@ -30,12 +29,10 @@ namespace Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 public class ArchivedMessageRepository : IArchivedMessageRepository
 {
     private readonly IDatabaseConnectionFactory _connectionFactory;
-    private readonly ArchivedMessagesContext _archivedMessagesContext;
 
-    public ArchivedMessageRepository(IDatabaseConnectionFactory connectionFactory, ArchivedMessagesContext archivedMessagesContext)
+    public ArchivedMessageRepository(IDatabaseConnectionFactory connectionFactory)
     {
         _connectionFactory = connectionFactory;
-        _archivedMessagesContext = archivedMessagesContext;
     }
 
     public async Task AddAsync(ArchivedMessage message, CancellationToken cancellationToken)
@@ -48,6 +45,7 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
         {
             await message.Document.CopyToAsync(memoryStream, cancellationToken).ConfigureAwait(false);
             documentBytes = memoryStream.ToArray();
+            message.Document.Position = 0;
         }
 
         string sql = @"INSERT INTO [dbo].[ArchivedMessages]
@@ -69,11 +67,6 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
         };
 
         await connection.ExecuteAsync(sql, parameters).ConfigureAwait(false);
-    }
-
-    public async Task AddEfAsync(ArchivedMessage message, CancellationToken cancellationToken)
-    {
-       await _archivedMessagesContext.ArchivedMessages.AddAsync(message, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<Stream?> GetAsync(string id, CancellationToken cancellationToken)

@@ -68,7 +68,11 @@ public class WhenAPeekIsRequestedTests : TestBase
         await EnqueueMessage(message);
 
         var result = await PeekMessage(MessageCategory.Aggregations);
-        Assert.NotNull(result);
+
+        AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
+            .IsDocumentType(DocumentType.NotifyAggregatedMeasureData)
+            .IsBusinessReason(BusinessReason.BalanceFixing)
+            .HasSerieRecordCount(1);
     }
 
     [Fact]
