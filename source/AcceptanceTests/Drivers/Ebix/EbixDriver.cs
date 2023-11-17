@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Diagnostics;
+using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
@@ -60,14 +61,9 @@ internal sealed class EbixDriver : IDisposable
         using var operationScope = new OperationContextScope(_ebixServiceClient.InnerChannel);
 
         // Add a HTTP Header to an outgoing request
-        var requestMessage = new HttpRequestMessageProperty
-        {
-            Headers =
-            {
-                ["Authorization"] = $"bearer {token}",
-                ["Content-Type"] = "text/xml",
-            },
-        };
+        var requestMessage = new HttpRequestMessageProperty();
+        requestMessage.Headers.Add(HttpRequestHeader.Authorization, $"bearer {token}");
+        requestMessage.Headers.Add(HttpRequestHeader.ContentType, "text/xml");
 
         OperationContext.Current.OutgoingMessageProperties[HttpRequestMessageProperty.Name] = requestMessage;
 
@@ -91,16 +87,6 @@ internal sealed class EbixDriver : IDisposable
         }
 
         throw new TimeoutException("Unable to retrieve peek result within time limit", lastException);
-        // if (message == null)
-        //     return null;
-        //
-        // if (message != null)
-        // {
-        //     var xmlDoc = new XmlDocument();
-        //     var node = xmlDoc.ImportNode(message.Payload, true);
-        //     xmlDoc.AppendChild(node);
-        //     return xmlDoc;
-        // }
     }
 
     public void Dispose()
