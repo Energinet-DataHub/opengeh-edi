@@ -9,7 +9,6 @@
     <PackageReference Include="NodaTime" Version="3.1.9" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Application\Application.csproj" />
     <ProjectReference Include="..\ArchivedMessages.Infrastructure\ArchivedMessages.Infrastructure.csproj" />
     <ProjectReference Include="..\ArchivedMessages.Interfaces\ArchivedMessages.Interfaces.csproj" />
   </ItemGroup>
