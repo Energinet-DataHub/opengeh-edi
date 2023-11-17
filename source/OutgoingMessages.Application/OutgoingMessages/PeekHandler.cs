@@ -15,6 +15,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.OutgoingMessages.Contracts;
@@ -35,6 +36,7 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly ActorMessageQueueContext _actorMessageQueueContext;
     private readonly IArchivedMessagesClient _archivedMessageClient;
+    private readonly ArchivedMessagesContext _archivedMessageContext;
 
     public PeekHandler(
         IActorMessageQueueRepository actorMessageQueueRepository,
@@ -42,7 +44,8 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
         DocumentFactory documentFactory,
         IOutgoingMessageRepository outgoingMessageRepository,
         ActorMessageQueueContext actorMessageQueueContext,
-        IArchivedMessagesClient archivedMessageClient)
+        IArchivedMessagesClient archivedMessageClient,
+        ArchivedMessagesContext archivedMessageContext)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _marketDocumentRepository = marketDocumentRepository;
@@ -50,6 +53,7 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
         _outgoingMessageRepository = outgoingMessageRepository;
         _actorMessageQueueContext = actorMessageQueueContext;
         _archivedMessageClient = archivedMessageClient;
+        _archivedMessageContext = archivedMessageContext;
     }
 
     public async Task<PeekResult> Handle(PeekCommand request, CancellationToken cancellationToken)
@@ -90,6 +94,7 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
                 outgoingMessageBundle.BusinessReason,
                 result),
                 cancellationToken).ConfigureAwait(false);
+            //await _archivedMessageContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
 
         return new PeekResult(document.Payload, document.BundleId.Id);

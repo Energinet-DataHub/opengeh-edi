@@ -16,6 +16,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.DateTime;
@@ -29,12 +30,14 @@ public class WhenADocumentIsRequestedTests : TestBase
 {
     private readonly IArchivedMessagesClient _archivedMessagesClient;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly ArchivedMessagesContext _archivedMessageContext;
 
     public WhenADocumentIsRequestedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _archivedMessagesClient = GetService<IArchivedMessagesClient>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
+        _archivedMessageContext = GetService<ArchivedMessagesContext>();
     }
 
     [Fact]
@@ -56,7 +59,7 @@ public class WhenADocumentIsRequestedTests : TestBase
         var id = Guid.NewGuid().ToString();
         await ArchiveMessage(CreateArchivedMessage(id));
 
-        await Assert.ThrowsAsync<SqlException>(() => ArchiveMessage(CreateArchivedMessage(id)));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => ArchiveMessage(CreateArchivedMessage(id)));
     }
 
     [Fact]
@@ -85,6 +88,12 @@ public class WhenADocumentIsRequestedTests : TestBase
         Assert.Equal(messageId, result.Messages[1].MessageId);
     }
 
+    protected override void Dispose(bool disposing)
+    {
+        _archivedMessageContext.Dispose();
+        base.Dispose(disposing);
+    }
+
     private ArchivedMessage CreateArchivedMessage(string? id = null, string? messageId = null)
     {
         return new ArchivedMessage(
@@ -101,5 +110,6 @@ public class WhenADocumentIsRequestedTests : TestBase
     private async Task ArchiveMessage(ArchivedMessage archivedMessage)
     {
         await _archivedMessagesClient.CreateAsync(archivedMessage, CancellationToken.None);
+        await _archivedMessageContext.SaveChangesAsync();
     }
 }

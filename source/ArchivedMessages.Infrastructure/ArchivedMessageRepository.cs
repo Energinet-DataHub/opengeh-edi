@@ -20,6 +20,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
+using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Common.DataAccess;
 using Microsoft.Data.SqlClient;
@@ -29,17 +30,19 @@ namespace Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 public class ArchivedMessageRepository : IArchivedMessageRepository
 {
     private readonly IDatabaseConnectionFactory _connectionFactory;
+    private readonly ArchivedMessagesContext _archivedMessagesContext;
 
-    public ArchivedMessageRepository(IDatabaseConnectionFactory connectionFactory)
+    public ArchivedMessageRepository(IDatabaseConnectionFactory connectionFactory, ArchivedMessagesContext archivedMessagesContext)
     {
         _connectionFactory = connectionFactory;
+        _archivedMessagesContext = archivedMessagesContext;
     }
 
     public async Task AddAsync(ArchivedMessage message, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(message);
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
-
+        // Read the content of the stream into a byte array
         byte[] documentBytes;
         using (var memoryStream = new MemoryStream())
         {
@@ -47,6 +50,12 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
             documentBytes = memoryStream.ToArray();
         }
 
+        string sql = @"INSERT INTO [dbo].[ArchivedMessages]
+                       ([Id], [DocumentType], [ReceiverNumber], [SenderNumber], [CreatedAt], [BusinessReason], [Document], [MessageId])
+                       VALUES
+                       (@Id, @DocumentType, @ReceiverNumber, @SenderNumber, @CreatedAt, @BusinessReason, @Document, @MessageId)";
+
+        // Create a new object with the stream replaced by the byte array
         var parameters = new
         {
             message.Id,
@@ -58,12 +67,13 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
             Document = documentBytes,
             message.MessageId,
         };
-        var sql = @"INSERT INTO [dbo].[ArchivedMessages]
-                       ([Id], [DocumentType], [ReceiverNumber], [SenderNumber], [CreatedAt], [BusinessReason], [Document], [MessageId])
-                       VALUES
-                       (@Id, @DocumentType, @ReceiverNumber, @SenderNumber, @CreatedAt, @BusinessReason, @Document, @MessageId)";
 
         await connection.ExecuteAsync(sql, parameters).ConfigureAwait(false);
+    }
+
+    public async Task AddEfAsync(ArchivedMessage message, CancellationToken cancellationToken)
+    {
+       await _archivedMessagesContext.ArchivedMessages.AddAsync(message, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<Stream?> GetAsync(string id, CancellationToken cancellationToken)
