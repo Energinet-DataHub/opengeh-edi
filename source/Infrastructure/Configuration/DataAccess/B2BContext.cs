@@ -14,10 +14,8 @@
 
 using System;
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Domain.ArchivedMessages;
-using Energinet.DataHub.EDI.Domain.GridAreas;
+using Energinet.DataHub.EDI.Domain.GridAreaOwners;
 using Energinet.DataHub.EDI.Infrastructure.Actors;
-using Energinet.DataHub.EDI.Infrastructure.ArchivedMessages;
 using Energinet.DataHub.EDI.Infrastructure.GridAreas;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
@@ -37,8 +35,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
         {
         }
 
-        public DbSet<ArchivedMessage> ArchivedMessages { get; private set; }
-
         public DbSet<ReceivedInboxEvent> ReceivedInboxEvents { get; private set; }
 
         public DbSet<TransactionIdForSender> TransactionIds { get; private set; }
@@ -47,18 +43,17 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 
         public DbSet<Actor> Actors { get; private set; }
 
-        public DbSet<GridArea> GridAreas { get; private set; }
+        public DbSet<GridAreaOwner> GridAreaOwners { get; private set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
 
-            modelBuilder.ApplyConfiguration(new ArchivedMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ReceivedInboxEventEntityConfiguration());
             modelBuilder.ApplyConfiguration(new TransactionIdEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MessageIdEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ActorEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new GridAreaEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new GridAreaOwnerEntityConfiguration());
         }
     }
 }

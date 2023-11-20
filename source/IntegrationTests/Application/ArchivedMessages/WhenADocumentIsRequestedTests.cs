@@ -14,27 +14,26 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.ArchivedMessages;
-using Energinet.DataHub.EDI.Application.SearchMessages;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.DateTime;
-using Energinet.DataHub.EDI.Domain.ArchivedMessages;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Microsoft.Data.SqlClient;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.ArchivedMessages;
 
 public class WhenADocumentIsRequestedTests : TestBase
 {
-    private readonly IArchivedMessageRepository _archivedMessageRepository;
+    private readonly IArchivedMessagesClient _archivedMessagesClient;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
     public WhenADocumentIsRequestedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _archivedMessageRepository = GetService<IArchivedMessageRepository>();
+        _archivedMessagesClient = GetService<IArchivedMessagesClient>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
     }
 
@@ -46,7 +45,7 @@ public class WhenADocumentIsRequestedTests : TestBase
         await ArchiveMessage(CreateArchivedMessage(id));
         await ArchiveMessage(CreateArchivedMessage());
 
-        var result = await QueryAsync(new GetArchivedMessageDocumentQuery(id));
+        var result = await _archivedMessagesClient.GetAsync(id, CancellationToken.None);
 
         Assert.NotNull(result);
     }
@@ -57,7 +56,7 @@ public class WhenADocumentIsRequestedTests : TestBase
         var id = Guid.NewGuid().ToString();
         await ArchiveMessage(CreateArchivedMessage(id));
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => ArchiveMessage(CreateArchivedMessage(id)));
+        await Assert.ThrowsAsync<SqlException>(() => ArchiveMessage(CreateArchivedMessage(id)));
     }
 
     [Fact]
@@ -79,7 +78,7 @@ public class WhenADocumentIsRequestedTests : TestBase
             Assert.Fail("We should be able to save multiple messages with the same message id");
         }
 
-        var result = await QueryAsync(new GetMessagesQuery());
+        var result = await _archivedMessagesClient.SearchAsync(new GetMessagesQuery(), CancellationToken.None);
 
         Assert.Equal(2, result.Messages.Count);
         Assert.Equal(messageId, result.Messages[0].MessageId);
@@ -101,7 +100,6 @@ public class WhenADocumentIsRequestedTests : TestBase
 
     private async Task ArchiveMessage(ArchivedMessage archivedMessage)
     {
-        _archivedMessageRepository.Add(archivedMessage);
-        await GetService<B2BContext>().SaveChangesAsync().ConfigureAwait(false);
+        await _archivedMessagesClient.CreateAsync(archivedMessage, CancellationToken.None);
     }
 }
