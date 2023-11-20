@@ -22,7 +22,7 @@ public static class ArchivedMessageConfiguration
 {
     public static void Configure(IServiceCollection services)
     {
-        services.AddScoped<IArchivedMessageRepository, ArchivedMessageRepository>();
-        services.AddScoped<IArchivedMessagesClient, ArchivedMessagesClient>();
+        services.AddTransient<IArchivedMessageRepository, ArchivedMessageRepository>();
+        services.AddTransient<IArchivedMessagesClient, ArchivedMessagesClient>();
     }
 }
