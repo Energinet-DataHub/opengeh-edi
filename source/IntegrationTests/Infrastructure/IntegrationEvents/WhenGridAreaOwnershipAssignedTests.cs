@@ -20,7 +20,11 @@ using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Common.DataAccess;
+using Energinet.DataHub.EDI.Common.DateTime;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Infrastructure.GridAreas;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
@@ -41,7 +45,7 @@ public class WhenGridAreaOwnershipAssignedTests : TestBase
     }
 
     [Fact]
-    public async Task New_grid_area_event_is_received_stores_grid_area()
+    public async Task New_grid_area_ownership_assigned_event_is_received_stores_grid_area_owner()
     {
         var gridAreaOwnershipAssignedEvent = _gridAreaOwnershipAssignedEventBuilder.Build();
 
@@ -54,7 +58,9 @@ public class WhenGridAreaOwnershipAssignedTests : TestBase
     [Fact]
     public async Task Multiple_grid_area_ownership_assigned_event_is_received_with_same_owner_is_stored()
     {
-        var gridAreaOwnershipAssignedEvent01 = _gridAreaOwnershipAssignedEventBuilder.Build();
+        var gridAreaOwnershipAssignedEvent01 = _gridAreaOwnershipAssignedEventBuilder
+            .WithGridAreaCode("543")
+            .Build();
         var gridAreaOwnershipAssignedEvent02 = _gridAreaOwnershipAssignedEventBuilder
             .WithGridAreaCode("804")
             .Build();
@@ -67,43 +73,95 @@ public class WhenGridAreaOwnershipAssignedTests : TestBase
     }
 
     [Fact]
-    public async Task New_grid_area_event_for_existing_grid_area_code_with_newer_valid_from_update_ownership()
+    public async Task New_grid_area_event_for_existing_grid_area_code_with_valid_from_in_future_does_not_update_owner()
     {
-        var newerValidFrom = Timestamp.FromDateTime(DateTime.UtcNow.AddDays(1));
+        var futureValidFrom = Timestamp.FromDateTime(DateTime.UtcNow.AddDays(1));
+        const string owner = "1234567890123";
         var gridAreaOwnershipAssignedEvent01 = _gridAreaOwnershipAssignedEventBuilder
+            .WithOwnerShipActorNumber(owner)
+            .WithSequenceNumber(1)
             .Build();
         var gridAreaOwnershipAssignedEvent02 = _gridAreaOwnershipAssignedEventBuilder
             .WithOwnerShipActorNumber("9876543210987")
-            .WithValidFrom(newerValidFrom)
+            .WithValidFrom(futureValidFrom)
+            .WithSequenceNumber(2)
             .Build();
-        await HavingReceivedAndHandledIntegrationEventAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnershipAssignedEvent01);
 
+        await HavingReceivedAndHandledIntegrationEventAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnershipAssignedEvent01);
         await HavingReceivedAndHandledIntegrationEventAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnershipAssignedEvent02);
 
         var gridAreas = await GetGridAreas();
-        var gridArea = gridAreas.Single();
-        Assert.Equal(gridArea.GridAreaCode, gridAreaOwnershipAssignedEvent02.GridAreaCode);
-        Assert.Equal(gridArea.GridAreaOwnerActorNumber, gridAreaOwnershipAssignedEvent02.ActorNumber);
+        Assert.True(2 == gridAreas.Count());
+        var actorNumber = await GetOwner(gridAreaOwnershipAssignedEvent01.GridAreaCode);
+        Assert.Equal(owner, actorNumber.Value);
     }
 
     [Fact]
-    public async Task New_grid_area_event_for_existing_grid_area_code_with_old_valid_from_does_not_update_ownership()
+    public async Task New_grid_area_event_for_existing_grid_area_code_with_valid_from_in_past_and_higher_sequence_number_updates_owner()
     {
         var olderValidFrom = Timestamp.FromDateTime(DateTime.UtcNow.AddDays(-1));
+        const string owner = "1234567890123";
         var gridAreaOwnershipAssignedEvent01 = _gridAreaOwnershipAssignedEventBuilder
+            .WithOwnerShipActorNumber("9876543210987")
+            .WithSequenceNumber(1)
             .Build();
         var gridAreaOwnershipAssignedEvent02 = _gridAreaOwnershipAssignedEventBuilder
+            .WithSequenceNumber(2)
             .WithValidFrom(olderValidFrom)
-            .WithOwnerShipActorNumber("9876543210987")
+            .WithOwnerShipActorNumber(owner)
             .Build();
-        await HavingReceivedAndHandledIntegrationEventAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnershipAssignedEvent01);
 
+        await HavingReceivedAndHandledIntegrationEventAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnershipAssignedEvent01);
         await HavingReceivedAndHandledIntegrationEventAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnershipAssignedEvent02);
 
-        var gridAreas = await GetGridAreas();
-        var gridArea = gridAreas.Single();
-        Assert.Equal(gridArea.GridAreaCode, gridAreaOwnershipAssignedEvent01.GridAreaCode);
-        Assert.Equal(gridArea.GridAreaOwnerActorNumber, gridAreaOwnershipAssignedEvent01.ActorNumber);
+        var actorNumber = await GetOwner(gridAreaOwnershipAssignedEvent01.GridAreaCode);
+        Assert.Equal(owner, actorNumber.Value);
+    }
+
+    [Fact]
+    public async Task Multiple_grid_area_ownership_events_with_same_valid_from_highest_sequence_number_is_owner()
+    {
+        const string owner = "9876543210987";
+        var validFrom = Timestamp.FromDateTime(DateTime.UtcNow.AddMinutes(-4));
+        var gridAreaOwnershipAssignedEvent01 = _gridAreaOwnershipAssignedEventBuilder
+            .WithValidFrom(validFrom)
+            .WithSequenceNumber(1)
+            .Build();
+        var gridAreaOwnershipAssignedEvent02 = _gridAreaOwnershipAssignedEventBuilder
+            .WithOwnerShipActorNumber(owner)
+            .WithValidFrom(validFrom)
+            .WithSequenceNumber(2)
+            .Build();
+
+        await HavingReceivedAndHandledIntegrationEventAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnershipAssignedEvent01);
+        await HavingReceivedAndHandledIntegrationEventAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnershipAssignedEvent02);
+
+        var actorNumber = await GetOwner(gridAreaOwnershipAssignedEvent01.GridAreaCode);
+        Assert.Equal(owner, actorNumber.Value);
+    }
+
+    [Fact]
+    public async Task Multiple_grid_area_ownership_events_with_same_valid_from_highest_sequence_number_is_owner_reversed_order()
+    {
+        const string gridAreaOwner1 = "9876543210987";
+        const string owner = "1234567890123";
+        var validFrom = Timestamp.FromDateTime(DateTime.UtcNow.AddMinutes(-4));
+        var gridAreaOwnershipAssignedEvent01 = _gridAreaOwnershipAssignedEventBuilder
+            .WithOwnerShipActorNumber(owner)
+            .WithValidFrom(validFrom)
+            .WithSequenceNumber(2)
+            .Build();
+        var gridAreaOwnershipAssignedEvent02 = _gridAreaOwnershipAssignedEventBuilder
+            .WithOwnerShipActorNumber(gridAreaOwner1)
+            .WithValidFrom(validFrom)
+            .WithSequenceNumber(1)
+            .Build();
+
+        await HavingReceivedAndHandledIntegrationEventAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnershipAssignedEvent01);
+        await HavingReceivedAndHandledIntegrationEventAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnershipAssignedEvent02);
+
+        var actorNumber = await GetOwner(gridAreaOwnershipAssignedEvent01.GridAreaCode);
+        Assert.Equal(owner, actorNumber.Value);
     }
 
     private async Task HavingReceivedAndHandledIntegrationEventAsync(string eventType, GridAreaOwnershipAssigned gridAreaOwnershipAssigned)
@@ -118,8 +176,16 @@ public class WhenGridAreaOwnershipAssignedTests : TestBase
     private async Task<IEnumerable<GridArea>> GetGridAreas()
     {
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
-        var sql = $"SELECT GridAreaCode, GridAreaOwnerActorNumber FROM [dbo].[GridArea]";
+        var sql = $"SELECT GridAreaCode, GridAreaOwnerActorNumber FROM [dbo].[GridAreaOwner]";
         return await connection.QueryAsync<GridArea>(sql);
+    }
+
+    private async Task<ActorNumber> GetOwner(string gridAreaCode)
+    {
+        var context = GetService<B2BContext>();
+        var systemTime = GetService<ISystemDateTimeProvider>();
+        var gridAreaRepository = new GridAreaRepository(context, systemTime);
+        return await gridAreaRepository.GetGridOwnerForAsync(gridAreaCode, CancellationToken.None).ConfigureAwait(false);
     }
 
 #pragma warning disable

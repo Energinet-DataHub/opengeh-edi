@@ -16,13 +16,9 @@ using System;
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Domain.GridAreas;
-using Energinet.DataHub.EDI.IntegrationTests.Assertions;
+using Energinet.DataHub.EDI.Domain.GridAreaOwners;
 using Energinet.DataHub.EDI.OutgoingMessages.Contracts;
-using Energinet.DataHub.EDI.Process.Domain;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using NodaTime;
 using NodaTime.Extensions;
@@ -34,7 +30,7 @@ public class OutgoingMessageDtoBuilder
 {
     private static readonly Guid _processId = ProcessId.Create(Guid.NewGuid()).Id;
     private static readonly BusinessReason _businessReason = BusinessReason.BalanceFixing;
-    private static readonly GridArea _gridAreaDetails = new("805", Instant.FromDateTimeUtc(DateTime.UtcNow), ActorNumber.Create("1234567891045"));
+    private static readonly GridAreaOwner _gridAreaOwnerDetails = new("805", Instant.FromDateTimeUtc(DateTime.UtcNow), ActorNumber.Create("1234567891045"), 1);
     private static readonly IReadOnlyList<Process.Domain.Transactions.Aggregations.OutgoingMessage.Point> _points = new List<Process.Domain.Transactions.Aggregations.OutgoingMessage.Point>();
     private static ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
     private static MarketRole _receiverRole = MarketRole.MeteringDataAdministrator;
@@ -47,7 +43,7 @@ public class OutgoingMessageDtoBuilder
             _receiverNumber,
             _receiverRole,
             _processId,
-            _gridAreaDetails.GridAreaCode,
+            _gridAreaOwnerDetails.GridAreaCode,
             MeteringPointType.Consumption.Name,
             SettlementType.NonProfiled.Name,
             MeasurementUnit.Kwh.Name,

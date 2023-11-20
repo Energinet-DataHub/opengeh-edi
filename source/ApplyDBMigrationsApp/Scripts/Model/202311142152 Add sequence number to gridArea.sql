@@ -1,0 +1,1 @@
+ALTER TABLE [dbo].[GridArea] ADD [SequenceNumber] TINYINT NOT NULL DEFAULT 0;

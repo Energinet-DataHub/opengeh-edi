@@ -22,11 +22,12 @@ namespace Energinet.DataHub.EDI.Application.GridAreas;
 public class GridAreaOwnershipAssignedCommand : InternalCommand
 {
     [JsonConstructor]
-    public GridAreaOwnershipAssignedCommand(string gridAreaCode, Instant validFrom, ActorNumber gridAreaOwnerActorNumber)
+    public GridAreaOwnershipAssignedCommand(string gridAreaCode, Instant validFrom, ActorNumber gridAreaOwnerActorNumber, int sequenceNumber)
     {
         GridAreaCode = gridAreaCode;
         ValidFrom = validFrom;
         GridAreaOwnerActorNumber = gridAreaOwnerActorNumber;
+        SequenceNumber = sequenceNumber;
     }
 
     public string GridAreaCode { get; }
@@ -34,4 +35,6 @@ public class GridAreaOwnershipAssignedCommand : InternalCommand
     public Instant ValidFrom { get; }
 
     public ActorNumber GridAreaOwnerActorNumber { get; }
+
+    public int SequenceNumber { get; }
 }

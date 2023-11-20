@@ -44,6 +44,11 @@ message GridAreaOwnershipAssigned {
    * A timestamp from when the ownership is valid.
    */
   google.protobuf.Timestamp valid_from = 4;
+
+  /*
+   * The sequence number of the event. Used to distinguish between events with identical valid_from timestamps.
+   */
+  int32 sequence_number = 5;
 }
 
 enum EicFunction {
@@ -53,4 +58,16 @@ enum EicFunction {
    */
   EIC_FUNCTION_UNSPECIFIED = 0;
   EIC_FUNCTION_GRID_ACCESS_PROVIDER = 1;
+  EIC_FUNCTION_BALANCE_RESPONSIBLE_PARTY = 2;
+  EIC_FUNCTION_BILLING_AGENT = 3;
+  EIC_FUNCTION_ENERGY_SUPPLIER = 4;
+  EIC_FUNCTION_IMBALANCE_SETTLEMENT_RESPONSIBLE = 5;
+  EIC_FUNCTION_METERED_DATA_ADMINISTRATOR = 6;
+  EIC_FUNCTION_METERED_DATA_RESPONSIBLE = 7;
+  EIC_FUNCTION_METERING_POINT_ADMINISTRATOR = 8;
+  EIC_FUNCTION_SYSTEM_OPERATOR = 9;
+  EIC_FUNCTION_DANISH_ENERGY_AGENCY = 10;
+  EIC_FUNCTION_DATAHUB_ADMINISTRATOR = 11;
+  EIC_FUNCTION_INDEPENDENT_AGGREGATOR = 12;
+  EIC_FUNCTION_SERIAL_ENERGY_TRADER = 13;
 }

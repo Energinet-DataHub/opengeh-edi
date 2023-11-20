@@ -95,7 +95,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
                 $"DELETE FROM [dbo].[MessageRegistry]" +
                 $"DELETE FROM [dbo].[TransactionRegistry]" +
                 $"DELETE FROM [dbo].[Actor]" +
-                $"DELETE FROM [dbo].[GridArea]";
+                $"DELETE FROM [dbo].[GridAreaOwner]";
 
             _b2bContext.Database.ExecuteSqlRaw(cleanupStatement);
         }
