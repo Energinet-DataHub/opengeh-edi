@@ -15,8 +15,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Dapper;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
-namespace Energinet.DataHub.EDI.Application.SearchMessages;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 
 internal sealed class QueryBuilder
 {

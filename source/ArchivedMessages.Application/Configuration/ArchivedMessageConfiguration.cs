@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using Energinet.DataHub.EDI.Application.Configuration.Queries;
-using NodaTime;
+using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.Application.SearchMessages;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
 
-public sealed record GetMessagesQuery(
-    MessageCreationPeriod? CreationPeriod = null,
-    string? MessageId = null,
-    string? SenderNumber = null,
-    string? ReceiverNumber = null,
-    IReadOnlyList<string>? DocumentTypes = null,
-    IReadOnlyList<string>? BusinessReasons = null) : IQuery<MessageSearchResult>;
-
-public record MessageCreationPeriod(Instant DateToSearchFrom, Instant DateToSearchTo);
+public static class ArchivedMessageConfiguration
+{
+    public static void Configure(IServiceCollection services)
+    {
+        services.AddTransient<IArchivedMessageRepository, ArchivedMessageRepository>();
+        services.AddTransient<IArchivedMessagesClient, ArchivedMessagesClient>();
+    }
+}
