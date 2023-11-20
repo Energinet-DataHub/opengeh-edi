@@ -59,6 +59,11 @@ limitations under the License.
 
     <ItemGroup>
       <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
+      <ProjectReference Include="..\ArchivedMessages.Application\ArchivedMessages.Application.csproj" />
+      <ProjectReference Include="..\ArchivedMessages.Infrastructure\ArchivedMessages.Infrastructure.csproj" />
+      <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
+      <ProjectReference Include="..\ArchivedMessages.Application\ArchivedMessages.Application.csproj" />
+      <ProjectReference Include="..\ArchivedMessages.Infrastructure\ArchivedMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\Infrastructure.DocumentValidation\Infrastructure.DocumentValidation.csproj" />
       <ProjectReference Include="..\Application\Application.csproj" />
@@ -67,10 +72,5 @@ limitations under the License.
       <ProjectReference Include="..\RequestResponse\source\RequestResponse\RequestResponse.csproj" />
     </ItemGroup>
 
-
-
-    <ItemGroup>
-      <Folder Include="IncomingMessages\" />
-    </ItemGroup>
 
 </Project>

@@ -19,7 +19,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 
 public class ReceivedInboxEvent
 {
-    public ReceivedInboxEvent(string id, string eventType, Guid referenceId, string eventPayload, Instant occurredOn)
+    public ReceivedInboxEvent(string id, string eventType, Guid referenceId, byte[] eventPayload, Instant occurredOn)
     {
         Id = id;
         OccurredOn = occurredOn;
@@ -41,5 +41,7 @@ public class ReceivedInboxEvent
 
     public Guid ReferenceId { get; }
 
-    public string EventPayload { get; }
+#pragma warning disable CA1819
+    public byte[] EventPayload { get; }
+#pragma warning restore CA1819
 }

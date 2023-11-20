@@ -13,13 +13,21 @@
 // limitations under the License.
 
 using System;
+using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
+using Energinet.DataHub.EDI.ArchivedMessages.Application;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+using Energinet.DataHub.EDI.Common.DateTime;
+using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
+using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.Edi.Requests;
+using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 
@@ -62,5 +70,20 @@ public class B2CRequestAggregatedMeasureMessageReceiver
         var response = request.CreateResponse(statusCode);
         response.WriteString(responseMessage.MessageBody, Encoding.UTF8);
         return response;
+    }
+
+    private async Task SaveArchivedMessageAsync(RequestAggregatedMeasureData requestAggregatedMeasureData, Stream document,  CancellationToken cancellationToken)
+    {
+        await _archivedMessagesClient.CreateAsync(
+            new ArchivedMessage(
+            Guid.NewGuid().ToString(),
+            requestAggregatedMeasureData.MessageId,
+            IncomingDocumentType.RequestAggregatedMeasureData.Name,
+            requestAggregatedMeasureData.SenderId,
+            requestAggregatedMeasureData.ReceiverId,
+            _systemDateTimeProvider.Now(),
+            requestAggregatedMeasureData.BusinessReason,
+            document),
+            cancellationToken).ConfigureAwait(false);
     }
 }

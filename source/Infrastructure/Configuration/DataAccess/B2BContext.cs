@@ -14,10 +14,8 @@
 
 using System;
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Domain.ArchivedMessages;
 using Energinet.DataHub.EDI.Domain.GridAreas;
 using Energinet.DataHub.EDI.Infrastructure.Actors;
-using Energinet.DataHub.EDI.Infrastructure.ArchivedMessages;
 using Energinet.DataHub.EDI.Infrastructure.GridAreas;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Microsoft.EntityFrameworkCore;
@@ -36,8 +34,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
         {
         }
 
-        public DbSet<ArchivedMessage> ArchivedMessages { get; private set; }
-
         public DbSet<ReceivedInboxEvent> ReceivedInboxEvents { get; private set; }
 
         public DbSet<Actor> Actors { get; private set; }
@@ -48,7 +44,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
 
-            modelBuilder.ApplyConfiguration(new ArchivedMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ReceivedInboxEventEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ActorEntityConfiguration());
             modelBuilder.ApplyConfiguration(new GridAreaEntityConfiguration());

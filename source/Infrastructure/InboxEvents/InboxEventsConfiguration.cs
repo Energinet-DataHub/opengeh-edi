@@ -14,7 +14,6 @@
 
 using Energinet.DataHub.EDI.Common.DataRetention;
 using Energinet.DataHub.EDI.Common.TimeEvents;
-using Energinet.DataHub.EDI.Infrastructure.DataRetention;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 

@@ -14,25 +14,18 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.DateTime;
-using Energinet.DataHub.EDI.Domain.ArchivedMessages;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using IncomingMessages.Infrastructure;
-using IncomingMessages.Infrastructure.Messages;
-using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
-using IncomingMessages.Infrastructure.Response;
-using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
@@ -43,15 +36,18 @@ public class RequestAggregatedMeasureMessageReceiver
 {
     private readonly ILogger<RequestAggregatedMeasureMessageReceiver> _logger;
     private readonly IIncomingRequestAggregatedMeasuredData _incomingRequestAggregatedMeasuredData;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly ICorrelationContext _correlationContext;
 
     public RequestAggregatedMeasureMessageReceiver(
         ILogger<RequestAggregatedMeasureMessageReceiver> logger,
         IIncomingRequestAggregatedMeasuredData incomingRequestAggregatedMeasuredData,
+        ISystemDateTimeProvider systemDateTimeProvider,
         ICorrelationContext correlationContext)
         {
         _logger = logger;
         _incomingRequestAggregatedMeasuredData = incomingRequestAggregatedMeasuredData;
+        _systemDateTimeProvider = systemDateTimeProvider;
         _correlationContext = correlationContext;
         }
 

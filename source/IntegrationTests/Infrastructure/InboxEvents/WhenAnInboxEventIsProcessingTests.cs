@@ -13,11 +13,10 @@
 // limitations under the License.
 
 using System;
-using System.Text.Json;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Common.DataAccess;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
@@ -110,13 +109,8 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
             _eventId,
             _eventType,
             _referenceId,
-            ToJson(),
+            Encoding.ASCII.GetBytes("Event1"),
             GetService<ISystemDateTimeProvider>().Now()));
         context.SaveChanges();
-    }
-
-    private string ToJson()
-    {
-        return _testInboxEventMapper.ToJson(JsonSerializer.SerializeToUtf8Bytes(new TestInboxEvent("Event1")));
     }
 }
