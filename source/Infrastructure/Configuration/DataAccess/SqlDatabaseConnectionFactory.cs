@@ -44,13 +44,5 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 
             return connection;
         }
-
-        public async ValueTask<IDbConnection> GetConnectionAndOpenAsync()
-        {
-            var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync().ConfigureAwait(false);
-
-            return connection;
-        }
     }
 }

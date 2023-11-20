@@ -20,13 +20,14 @@ using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration.Authentication;
 using Energinet.DataHub.EDI.Application.GridAreas;
+using Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
+using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Configuration;
 using Energinet.DataHub.EDI.Common.DataAccess;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.Actors;
-using Energinet.DataHub.EDI.Infrastructure.ArchivedMessages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
@@ -41,7 +42,6 @@ using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using MediatR;
 using MediatR.Registration;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -149,7 +149,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
 
         public CompositionRoot AddMessagePublishing()
         {
-            _services.AddSingleton<IActorRepository, ActorRepository>();
+            _services.AddScoped<IActorRepository, ActorRepository>();
             return this;
         }
 

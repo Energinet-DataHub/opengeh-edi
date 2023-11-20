@@ -38,10 +38,10 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         _gridAreaRepository = gridAreaRepository;
     }
 
-    public async Task<INotification> MapFromAsync(string payload, Guid referenceId, CancellationToken cancellationToken)
+    public async Task<INotification> MapFromAsync(byte[] payload, Guid referenceId, CancellationToken cancellationToken)
     {
         var aggregations =
-            AggregatedTimeSeriesRequestAccepted.Parser.ParseJson(payload);
+            AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(payload);
 
         ArgumentNullException.ThrowIfNull(aggregations);
 
@@ -65,13 +65,6 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
     {
         ArgumentNullException.ThrowIfNull(eventType);
         return eventType.Equals(nameof(AggregatedTimeSeriesRequestAccepted), StringComparison.OrdinalIgnoreCase);
-    }
-
-    public string ToJson(byte[] payload)
-    {
-        var inboxEvent = AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(
-            payload);
-        return inboxEvent.ToString();
     }
 
     private static string MapMeteringPointType(TimeSeriesType timeSeriesType)

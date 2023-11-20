@@ -59,7 +59,7 @@ jobs:
       - name: Repository Dispatch
         uses: peter-evans/repository-dispatch@v2
         with:
-          token: ${{ secrets.pat_token }}
+          token: ${{ secrets.internal_github_pat }}
           repository: ${{ vars.environment_repository_path }}
           event-type: edi-deployment-request-domain
           client-payload: '{"domain_pr": "${{ steps.find_pull_request.outputs.pull_request_number }}"}' # yamllint disable-line rule:quoted-strings

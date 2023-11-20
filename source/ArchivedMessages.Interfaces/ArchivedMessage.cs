@@ -13,8 +13,16 @@
 // limitations under the License.
 
 using System.IO;
-using Energinet.DataHub.EDI.Application.Configuration.Queries;
+using NodaTime;
 
-namespace Energinet.DataHub.EDI.Application.ArchivedMessages;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
-public record GetArchivedMessageDocumentQuery(string Id) : IQuery<Stream?>;
+public record ArchivedMessage(
+    string Id,
+    string? MessageId,
+    string DocumentType,
+    string? SenderNumber,
+    string? ReceiverNumber,
+    Instant CreatedAt,
+    string? BusinessReason,
+    Stream Document);
