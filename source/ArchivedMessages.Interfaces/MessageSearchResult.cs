@@ -12,24 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Domain.ArchivedMessages;
+using System.Collections.ObjectModel;
 
-/// <summary>
-/// Responsible for archiving messages.
-/// </summary>
-public interface IArchivedMessageRepository
-{
-    /// <summary>
-    /// Archiving a message.
-    /// </summary>
-    /// <param name="message"></param>
-    void Add(ArchivedMessage message);
+namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
-    /// <summary>
-    /// Get document.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>Stream</returns>
-    Task<Stream?> GetAsync(string id, CancellationToken cancellationToken);
-}
+public record MessageSearchResult(ReadOnlyCollection<MessageInfo> Messages);
