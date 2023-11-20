@@ -39,7 +39,7 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
     }
 
     [Fact]
-    public async Task Clean_up_grid_area_owners_succeed()
+    public async Task Clean_up_grid_area_owners__has_single_owner()
     {
         // Arrange
         var actorNumberOfExpectedOwner = ActorNumber.Create("9876543210987");
@@ -61,7 +61,7 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
     }
 
     [Fact]
-    public async Task Clean_up_grid_area_owners_does_not_delete_non_expired_grid_owners()
+    public async Task Clean_up_grid_area_owners__does_not_delete_non_expired_grid_owners()
     {
         // Arrange
         var actorNumberOfExpectedOwner = ActorNumber.Create("9876543210987");
@@ -82,7 +82,7 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
     }
 
     [Fact]
-    public async Task Clean_up_grid_area_owners_with_multiple_owners_succeed()
+    public async Task Clean_up_grid_area_owners_with_multiple_owners__all_grid_areas_has_owner()
     {
         // Arrange
         var gridAreaCode1 = "301";
