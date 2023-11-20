@@ -48,32 +48,23 @@ public class UnitOfWorkBehaviour<TRequest, TResponse> : IPipelineBehavior<TReque
     {
         if (next == null) throw new ArgumentNullException(nameof(next));
 
-        try
-        {
-            var result = await next().ConfigureAwait(false);
+        var result = await next().ConfigureAwait(false);
 
-            if (await InternalCommandAlreadyMarkedAsProcessedAsync(request, cancellationToken).ConfigureAwait(false))
-            {
-                var commandId = (request as InternalCommand)?.Id;
-                _logger.Log(
-                    LogLevel.Information,
-                    "Command (id: {CommandId}, type: {CommandType}) was processed. All changes will be discarded",
-                    commandId,
-                    request.GetType());
-            }
-            else
-            {
-                await _unitOfWork.CommitTransactionAsync().ConfigureAwait(false);
-            }
-
-            return result;
-        }
-        catch (Exception)
+        if (await InternalCommandAlreadyMarkedAsProcessedAsync(request, cancellationToken).ConfigureAwait(false))
         {
-            // TODO: is this even necessary if the scope is aborted with an exception? - if not, we can remove the try and catch as well.
-            await _unitOfWork.RollbackAsync().ConfigureAwait(false);
-            throw;
+            var commandId = (request as InternalCommand)?.Id;
+            _logger.Log(
+                LogLevel.Information,
+                "Command (id: {CommandId}, type: {CommandType}) was processed. All changes will be discarded",
+                commandId,
+                request.GetType());
         }
+        else
+        {
+            await _unitOfWork.CommitTransactionAsync().ConfigureAwait(false);
+        }
+
+        return result;
     }
 
     private async Task<bool> InternalCommandAlreadyMarkedAsProcessedAsync(
