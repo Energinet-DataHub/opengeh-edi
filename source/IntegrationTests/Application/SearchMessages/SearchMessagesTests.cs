@@ -85,12 +85,12 @@ public class SearchMessagesTests : TestBase
             new GetMessagesQuery(
                 new MessageCreationPeriod(
                 CreatedAt("2023-05-01T22:00:00Z"),
-                CreatedAt("2023-05-02T22:00:01Z"))),
+                CreatedAt("2023-05-02T22:00:01Z")),
+                messageId),
             CancellationToken.None);
 
         //Assert
-        //Assert.Single(result.Messages); //TODO: LRN how come this test expected only one message when two were created on the same time?
-        Assert.Equal(2, result.Messages.Count);
+        Assert.Single(result.Messages);
         Assert.Equal(messageId, result.Messages[0].MessageId);
     }
 
