@@ -36,13 +36,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
             _actorMessageQueueContext = actorMessageQueueContext;
         }
 
-        public async Task BeginTransactionAsync()
-        {
-            _dbContextTransaction = await _processContext.Database.BeginTransactionAsync().ConfigureAwait(false);
-            await _b2BContext.Database.UseTransactionAsync(_dbContextTransaction.GetDbTransaction()).ConfigureAwait(false);
-            await _actorMessageQueueContext.Database.UseTransactionAsync(_dbContextTransaction.GetDbTransaction()).ConfigureAwait(false);
-        }
-
         public async Task CommitTransactionAsync()
         {
             await BeginTransactionAsync().ConfigureAwait(false);
@@ -59,6 +52,13 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
             if (_dbContextTransaction == null) throw new DBTransactionNotInitializedException();
 
             await _dbContextTransaction.RollbackAsync().ConfigureAwait(false);
+        }
+
+        private async Task BeginTransactionAsync()
+        {
+            _dbContextTransaction = await _processContext.Database.BeginTransactionAsync().ConfigureAwait(false);
+            await _b2BContext.Database.UseTransactionAsync(_dbContextTransaction.GetDbTransaction()).ConfigureAwait(false);
+            await _actorMessageQueueContext.Database.UseTransactionAsync(_dbContextTransaction.GetDbTransaction()).ConfigureAwait(false);
         }
     }
 }
