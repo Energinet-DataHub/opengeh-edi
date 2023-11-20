@@ -18,11 +18,11 @@ using Google.Protobuf.WellKnownTypes;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
-internal sealed class WholeSaleDriver
+internal sealed class WholesaleDriver
 {
     private readonly IntegrationEventPublisher _integrationEventPublisher;
 
-    internal WholeSaleDriver(IntegrationEventPublisher integrationEventPublisher)
+    internal WholesaleDriver(IntegrationEventPublisher integrationEventPublisher)
     {
         _integrationEventPublisher = integrationEventPublisher;
     }

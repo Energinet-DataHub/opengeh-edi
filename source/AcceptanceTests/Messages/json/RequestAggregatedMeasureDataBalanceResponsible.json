@@ -29,7 +29,7 @@
       {
         "mRID": "{TransactionId}",
         "start_DateAndOrTime.dateTime": "2023-07-26T22:00:00Z",
-        "end_DateAndOrTime.dateTime": "2023-07-27T22:00:00Z",
+        "end_DateAndOrTime.dateTime": "2023-08-24T22:00:00Z",
         "marketEvaluationPoint.settlementMethod": {
           "value": "D01"
         },

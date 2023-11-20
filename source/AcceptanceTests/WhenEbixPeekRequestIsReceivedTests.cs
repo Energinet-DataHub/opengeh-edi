@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
+using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests;
@@ -23,64 +24,25 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 [IntegrationTest]
 public sealed class WhenEbixPeekRequestIsReceivedTests : TestRunner
 {
-    private readonly ApiManagementDriver _apiManagement;
-    private readonly EdiDriver _edi;
-    private readonly WholeSaleDriver _wholesale;
-    private readonly EbixDriver _ebixDriver;
+    private readonly EbixRequestDsl _ebix;
 
     public WhenEbixPeekRequestIsReceivedTests()
     {
-        _edi = new EdiDriver(AzpToken);
-        _wholesale = new WholeSaleDriver(EventPublisher);
-        _apiManagement = new ApiManagementDriver(AzureEntraTenantId, AzureEntraBackendAppId);
-
-        var apiManagementBaseUri = new Uri(ApiManagementDriver.ApiManagementUrl);
-
-        _ebixDriver = new EbixDriver(new Uri(apiManagementBaseUri, "/ebix"));
+        _ebix = new EbixRequestDsl(
+            new AzureAuthenticationDriver(AzureEntraTenantId, AzureEntraBackendAppId),
+            new EdiDriver(AzpToken),
+            new WholesaleDriver(EventPublisher),
+            new EbixDriver(new Uri(ApiManagementUri, "/ebix")));
     }
 
     [Fact]
     public async Task Actor_can_peek_calculation_result_in_ebix_format()
     {
-        var token = await _apiManagement.GetAzureAdTokenAsync(AzureEntraClientId, AzureEntraClientSecret);
+        var token = await _ebix.LoginAsActor(AzureEntraClientId, AzureEntraClientSecret);
 
-        await _edi.EmptyQueueAsync(TestRunner.BalanceResponsibleActorNumber, new[] { TestRunner.BalanceResponsibleActorRole }, token);
-        await _wholesale.PublishAggregationResultAsync("543", TestRunner.BalanceResponsibleActorNumber);
+        await _ebix.EmptyQueueForActor(BalanceResponsibleActorNumber, BalanceResponsibleActorRole, token);
+        await _ebix.PublishAggregationResultFor("543", BalanceResponsibleActorNumber);
 
-        var actualResponse = await _ebixDriver.PeekMessageWithTimeoutAsync(token);
-
-        Assert.Multiple(
-            () => Assert.NotNull(actualResponse?.MessageContainer?.Payload),
-            () => Assert.Equal("AggregatedMeteredDataTimeSeries", actualResponse!.MessageContainer.DocumentType));
-    }
-
-    [Fact]
-    public async Task Actor_can_peek_accepted_request_in_ebix_format()
-    {
-        var token = await _apiManagement.GetAzureAdTokenAsync(AzureEntraClientId, AzureEntraClientSecret);
-
-        await _edi.EmptyQueueAsync(TestRunner.BalanceResponsibleActorNumber, new[] { TestRunner.BalanceResponsibleActorRole }, token);
-        await _edi.RequestAggregatedMeasureDataAsync(TestRunner.BalanceResponsibleActorNumber, new[] { TestRunner.BalanceResponsibleActorRole }, overrideToken: token);
-
-        var actualResponse = await _ebixDriver.PeekMessageWithTimeoutAsync(token);
-
-        Assert.Multiple(
-            () => Assert.NotNull(actualResponse?.MessageContainer?.Payload),
-            () => Assert.Equal("AcceptRequestMeteredDataAggregated", actualResponse!.MessageContainer.DocumentType));
-    }
-
-    [Fact]
-    public async Task Actor_can_peek_rejected_request_in_ebix_format()
-    {
-        var token = await _apiManagement.GetAzureAdTokenAsync(AzureEntraClientId, AzureEntraClientSecret);
-
-        await _edi.EmptyQueueAsync(TestRunner.BalanceResponsibleActorNumber, new[] { TestRunner.BalanceResponsibleActorRole }, token);
-        await _edi.RequestAggregatedMeasureDataAsync(TestRunner.BalanceResponsibleActorNumber, new[] { TestRunner.BalanceResponsibleActorRole }, overrideToken: token, asyncError: true);
-
-        var actualResponse = await _ebixDriver.PeekMessageWithTimeoutAsync(token);
-
-        Assert.Multiple(
-            () => Assert.NotNull(actualResponse?.MessageContainer?.Payload),
-            () => Assert.Equal("RejectRequestMeteredDataAggregated", actualResponse!.MessageContainer.DocumentType));
+        await _ebix.ConfirmPeekIsCorrectEbixFormatAndDocumentType(token);
     }
 }

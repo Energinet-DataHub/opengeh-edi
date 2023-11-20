@@ -29,7 +29,7 @@ public sealed class WhenAggregationResultIsPublishedTests : TestRunner
     {
         _aggregations = new AggregationResultDsl(
             new EdiDriver(AzpToken),
-            new WholeSaleDriver(EventPublisher));
+            new WholesaleDriver(EventPublisher));
     }
 
     [Fact]
