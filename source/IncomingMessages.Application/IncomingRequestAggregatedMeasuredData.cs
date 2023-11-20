@@ -17,12 +17,10 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Serialization;
-using Energinet.DataHub.EDI.Domain.ArchivedMessages;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using IncomingMessages.Infrastructure;
 using IncomingMessages.Infrastructure.Messages;
@@ -39,8 +37,7 @@ public class IncomingRequestAggregatedMeasuredData : IIncomingRequestAggregatedM
     private readonly ISerializer _serializer;
     private readonly RequestAggregatedMeasureDataValidator _aggregatedMeasureDataMarketMessageValidator;
     private readonly ResponseFactory _responseFactory;
-    private readonly IArchivedMessageRepository _archivedMessageRepository;
-    private readonly B2BContext _b2BContext;
+    private readonly IArchivedMessagesClient _archivedMessagesClient;
 
     public IncomingRequestAggregatedMeasuredData(
         RequestAggregatedMeasureDataMarketMessageParser requestAggregatedMeasureDataMarketMessageParser,
@@ -48,16 +45,14 @@ public class IncomingRequestAggregatedMeasuredData : IIncomingRequestAggregatedM
         ISerializer serializer,
         RequestAggregatedMeasureDataValidator aggregatedMeasureDataMarketMessageValidator,
         ResponseFactory responseFactory,
-        IArchivedMessageRepository archivedMessageRepository,
-        B2BContext b2BContext)
+        IArchivedMessagesClient archivedMessagesClient)
     {
         _requestAggregatedMeasureDataMarketMessageParser = requestAggregatedMeasureDataMarketMessageParser;
         _incomingRequestAggregatedMeasuredDataSender = incomingRequestAggregatedMeasuredDataSender;
         _serializer = serializer;
         _aggregatedMeasureDataMarketMessageValidator = aggregatedMeasureDataMarketMessageValidator;
         _responseFactory = responseFactory;
-        _archivedMessageRepository = archivedMessageRepository;
-        _b2BContext = b2BContext;
+        _archivedMessagesClient = archivedMessagesClient;
     }
 
     public async Task<ResponseMessage> ParseAsync(Stream message, DocumentFormat documentFormat, CancellationToken cancellationToken, DocumentFormat responseFormat = null!)
@@ -97,7 +92,8 @@ public class IncomingRequestAggregatedMeasuredData : IIncomingRequestAggregatedM
 
     private async Task SaveArchivedMessageAsync(RequestAggregatedMeasureDataMarketMessage marketMessage, Stream document, CancellationToken hostCancellationToken)
     {
-        _archivedMessageRepository.Add(new ArchivedMessage(
+        _archivedMessagesClient.CreateAsync(
+            new ArchivedMessage(
             Guid.NewGuid().ToString(),
             marketMessage.MessageId,
             IncomingDocumentType.RequestAggregatedMeasureData.Name,
@@ -105,8 +101,7 @@ public class IncomingRequestAggregatedMeasuredData : IIncomingRequestAggregatedM
             marketMessage.ReceiverNumber,
             SystemClock.Instance.GetCurrentInstant(),
             marketMessage.BusinessReason,
-            document));
-
-        await _b2BContext.SaveChangesAsync(hostCancellationToken).ConfigureAwait(false);
+            document),
+            hostCancellationToken).ConfigureAwait(false);
     }
 }

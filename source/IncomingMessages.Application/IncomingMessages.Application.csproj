@@ -4,6 +4,7 @@
     <RootNamespace>Energinet.DataHub.EDI.IncomingMessages.Application</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ArchivedMessages.Interfaces\ArchivedMessages.Interfaces.csproj" />
     <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
     <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj" />
   </ItemGroup>
