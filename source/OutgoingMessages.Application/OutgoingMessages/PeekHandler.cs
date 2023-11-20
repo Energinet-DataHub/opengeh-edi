@@ -15,8 +15,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Domain.ArchivedMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Contracts;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
@@ -34,7 +34,7 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
     private readonly DocumentFactory _documentFactory;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly ActorMessageQueueContext _actorMessageQueueContext;
-    private readonly IArchivedMessageRepository _archivedMessageRepository;
+    private readonly IArchivedMessagesClient _archivedMessageClient;
 
     public PeekHandler(
         IActorMessageQueueRepository actorMessageQueueRepository,
@@ -42,14 +42,14 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
         DocumentFactory documentFactory,
         IOutgoingMessageRepository outgoingMessageRepository,
         ActorMessageQueueContext actorMessageQueueContext,
-        IArchivedMessageRepository archivedMessageRepository)
+        IArchivedMessagesClient archivedMessageClient)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _marketDocumentRepository = marketDocumentRepository;
         _documentFactory = documentFactory;
         _outgoingMessageRepository = outgoingMessageRepository;
         _actorMessageQueueContext = actorMessageQueueContext;
-        _archivedMessageRepository = archivedMessageRepository;
+        _archivedMessageClient = archivedMessageClient;
     }
 
     public async Task<PeekResult> Handle(PeekCommand request, CancellationToken cancellationToken)
@@ -79,7 +79,8 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
             document = new MarketDocument(result, peekResult.BundleId);
             await _marketDocumentRepository.AddAsync(document).ConfigureAwait(false);
 
-            _archivedMessageRepository.Add(new ArchivedMessage(
+            await _archivedMessageClient.CreateAsync(
+                new ArchivedMessage(
                 peekResult.BundleId.Id.ToString(),
                 peekResult.BundleId.Id.ToString(),
                 outgoingMessageBundle.DocumentType.ToString(),
@@ -87,7 +88,8 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
                 outgoingMessageBundle.Receiver.Number.Value,
                 timestamp,
                 outgoingMessageBundle.BusinessReason,
-                result));
+                result),
+                cancellationToken).ConfigureAwait(false);
         }
 
         return new PeekResult(document.Payload, document.BundleId.Id);

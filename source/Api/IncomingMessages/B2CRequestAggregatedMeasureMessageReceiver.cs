@@ -19,13 +19,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
-using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.ArchivedMessages.Application;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.DateTime;
-using Energinet.DataHub.EDI.Domain;
-using Energinet.DataHub.EDI.Domain.ArchivedMessages;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.Edi.Requests;
 using MediatR;
@@ -36,21 +34,18 @@ namespace Energinet.DataHub.EDI.Api.IncomingMessages;
 
 public class B2CRequestAggregatedMeasureMessageReceiver
 {
-    private readonly IArchivedMessageRepository _messageArchive;
-    private readonly B2BContext _dbContext;
+    private readonly IArchivedMessagesClient _archivedMessagesClient;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly ResponseFactory _responseFactory;
     private readonly IMediator _mediator;
 
     public B2CRequestAggregatedMeasureMessageReceiver(
-        IArchivedMessageRepository messageArchive,
-        B2BContext dbContext,
+        IArchivedMessagesClient archivedMessagesClient,
         ISystemDateTimeProvider systemDateTimeProvider,
         ResponseFactory responseFactory,
         IMediator mediator)
         {
-        _messageArchive = messageArchive;
-        _dbContext = dbContext;
+        _archivedMessagesClient = archivedMessagesClient;
         _systemDateTimeProvider = systemDateTimeProvider;
         _responseFactory = responseFactory;
         _mediator = mediator;
@@ -85,9 +80,10 @@ public class B2CRequestAggregatedMeasureMessageReceiver
         return response;
     }
 
-    private async Task SaveArchivedMessageAsync(RequestAggregatedMeasureData requestAggregatedMeasureData, Stream document,  CancellationToken hostCancellationToken)
+    private async Task SaveArchivedMessageAsync(RequestAggregatedMeasureData requestAggregatedMeasureData, Stream document,  CancellationToken cancellationToken)
     {
-        _messageArchive.Add(new ArchivedMessage(
+        await _archivedMessagesClient.CreateAsync(
+            new ArchivedMessage(
             Guid.NewGuid().ToString(),
             requestAggregatedMeasureData.MessageId,
             IncomingDocumentType.RequestAggregatedMeasureData.Name,
@@ -95,7 +91,7 @@ public class B2CRequestAggregatedMeasureMessageReceiver
             requestAggregatedMeasureData.ReceiverId,
             _systemDateTimeProvider.Now(),
             requestAggregatedMeasureData.BusinessReason,
-            document));
-        await _dbContext.SaveChangesAsync(hostCancellationToken).ConfigureAwait(false);
+            document),
+            cancellationToken).ConfigureAwait(false);
     }
 }
