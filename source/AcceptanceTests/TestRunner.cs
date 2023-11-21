@@ -22,6 +22,9 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 
 public class TestRunner : IAsyncDisposable
 {
+    internal const string BalanceResponsibleActorNumber = "5790000392551"; // Corresponds to the "Test til Phoenix" actor in the UI. Actor numbers in the UI doesn't equal the actor numbers we have in our database (our database has bad data).
+    internal const string BalanceResponsibleActorRole = "balanceresponsibleparty";
+
     protected TestRunner()
     {
         var root = new ConfigurationBuilder()
@@ -41,6 +44,12 @@ public class TestRunner : IAsyncDisposable
 
         var actorActivated = ActorFactory.CreateActorActivated("5790000610976", AzpToken);
         _ = Task.Run(async () => await EventPublisher.PublishAsync(ActorActivated.EventName, actorActivated.ToByteArray()).ConfigureAwait(false));
+
+        ApiManagementUri = new Uri(root.GetValue<string>("API_MANAGEMENT_URL") ?? "https://apim-shared-sharedres-u-001.azure-api.net/");
+        AzureEntraTenantId = root.GetValue<string>("AZURE_ENTRA_TENANT_ID") ?? "4a7411ea-ac71-4b63-9647-b8bd4c5a20e0";
+        AzureEntraBackendAppId = root.GetValue<string>("AZURE_ENTRA_BACKEND_APP_ID") ?? "fe8b720c-fda4-4aaa-9c6d-c0d2ed6584fe";
+        AzureEntraClientId = root.GetValue<string>("AZURE_ENTRA_CLIENT_ID") ?? "D8E67800-B7EF-4025-90BB-FE06E1639117";
+        AzureEntraClientSecret = root.GetValue<string>("AZURE_ENTRA_CLIENT_SECRET") ?? throw new InvalidOperationException("AZURE_ENTRA_CLIENT_SECRET is not set in configuration");
     }
 
     internal IntegrationEventPublisher EventPublisher { get; }
@@ -48,6 +57,16 @@ public class TestRunner : IAsyncDisposable
     internal string ConnectionString { get; }
 
     internal string AzpToken { get; }
+
+    internal Uri ApiManagementUri { get; }
+
+    internal string AzureEntraClientId { get; }
+
+    internal string AzureEntraClientSecret { get; }
+
+    internal string AzureEntraTenantId { get; }
+
+    internal string AzureEntraBackendAppId { get; }
 
     public async ValueTask DisposeAsync()
     {

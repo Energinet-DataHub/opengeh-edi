@@ -18,7 +18,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.Common.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Common.DateTime;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -120,7 +120,7 @@ public class InboxEventsProcessor
 
     private IInboxEventMapper MapperFor(string eventType)
     {
-        var mapper = _mappers.FirstOrDefault(mapper => mapper.CanHandle(eventType))
+        var mapper = _mappers.SingleOrDefault(mapper => mapper.CanHandle(eventType))
                      ?? throw new UnsupportedInboxEventTypeException($"No InboxEventMapper for {eventType} eventType was found.");
         return mapper;
     }

@@ -18,20 +18,24 @@ using Google.Protobuf.WellKnownTypes;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
-internal sealed class WholeSaleDriver
+internal sealed class WholesaleDriver
 {
     private readonly IntegrationEventPublisher _integrationEventPublisher;
 
-    internal WholeSaleDriver(IntegrationEventPublisher integrationEventPublisher)
+    internal WholesaleDriver(IntegrationEventPublisher integrationEventPublisher)
     {
         _integrationEventPublisher = integrationEventPublisher;
     }
 
-    internal Task PublishAggregationResultAsync(string gridAreaCode)
+    internal Task PublishAggregationResultAsync(string gridAreaCode, string? balanceResponsibleId = null)
     {
+        var aggregation = !string.IsNullOrEmpty(balanceResponsibleId)
+            ? CreateAggregationResultAvailableEventForBalanceResponsible(gridAreaCode, balanceResponsibleId)
+            : CreateAggregationResultAvailableEventFor(gridAreaCode);
+
         return _integrationEventPublisher.PublishAsync(
             "CalculationResultCompleted",
-            CreateAggregationResultAvailableEventFor(gridAreaCode).ToByteArray());
+            aggregation.ToByteArray());
     }
 
     private static CalculationResultCompleted CreateAggregationResultAvailableEventFor(string gridAreaCode)
@@ -46,6 +50,27 @@ internal sealed class WholeSaleDriver
             AggregationPerGridarea = new AggregationPerGridArea()
             {
                 GridAreaCode = gridAreaCode,
+            },
+            PeriodEndUtc = DateTime.UtcNow.ToTimestamp(),
+            PeriodStartUtc = DateTime.UtcNow.ToTimestamp(),
+            TimeSeriesPoints = { new TimeSeriesPoint { Time = new Timestamp { Seconds = 100000 }, Quantity = new DecimalValue { Units = 123, Nanos = 1200000 }, QuantityQuality = QuantityQuality.Measured } },
+        };
+        return processCompletedEvent;
+    }
+
+    private static CalculationResultCompleted CreateAggregationResultAvailableEventForBalanceResponsible(string gridAreaCode, string actorNumber)
+    {
+        var processCompletedEvent = new CalculationResultCompleted()
+        {
+            Resolution = Resolution.Quarter,
+            QuantityUnit = QuantityUnit.Kwh,
+            ProcessType = ProcessType.BalanceFixing,
+            TimeSeriesType = TimeSeriesType.Production,
+            BatchId = Guid.NewGuid().ToString(),
+            AggregationPerBalanceresponsiblepartyPerGridarea = new AggregationPerBalanceResponsiblePartyPerGridArea
+            {
+                GridAreaCode = gridAreaCode,
+                BalanceResponsiblePartyGlnOrEic = actorNumber,
             },
             PeriodEndUtc = DateTime.UtcNow.ToTimestamp(),
             PeriodStartUtc = DateTime.UtcNow.ToTimestamp(),

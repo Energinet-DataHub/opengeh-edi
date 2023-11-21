@@ -18,21 +18,20 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
 internal sealed class AggregationResultDsl
 {
-    private readonly WholeSaleDriver _wholeSale;
+    private readonly WholesaleDriver _wholesale;
     private readonly EdiDriver _edi;
 
-#pragma warning disable CA1822
     #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
 
-    internal AggregationResultDsl(EdiDriver ediDriver, WholeSaleDriver wholeSaleDriver)
+    internal AggregationResultDsl(EdiDriver ediDriver, WholesaleDriver wholesaleDriver)
     {
         _edi = ediDriver;
-        _wholeSale = wholeSaleDriver;
+        _wholesale = wholesaleDriver;
     }
 
     internal Task PublishResultFor(string gridAreaCode)
     {
-        return _wholeSale.PublishAggregationResultAsync(gridAreaCode);
+        return _wholesale.PublishAggregationResultAsync(gridAreaCode);
     }
 
     internal Task ConfirmResultIsAvailableFor(string actorNumber, string actorRole)
