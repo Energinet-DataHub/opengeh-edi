@@ -29,6 +29,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Google.Protobuf.WellKnownTypes;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.IntegrationEvents;
@@ -182,8 +183,10 @@ public class WhenGridAreaOwnershipAssignedTests : TestBase
 
     private async Task<ActorNumber> GetOwner(string gridAreaCode)
     {
-        var context = GetService<B2BContext>();
-        var systemTime = GetService<ISystemDateTimeProvider>();
+        var serviceScopeFactory = GetService<IServiceScopeFactory>();
+        using var newScope = serviceScopeFactory.CreateScope();
+        var context = newScope.ServiceProvider.GetRequiredService<B2BContext>();
+        var systemTime = newScope.ServiceProvider.GetRequiredService<ISystemDateTimeProvider>();
         var gridAreaRepository = new GridAreaRepository(context, systemTime);
         return await gridAreaRepository.GetGridOwnerForAsync(gridAreaCode, CancellationToken.None).ConfigureAwait(false);
     }
