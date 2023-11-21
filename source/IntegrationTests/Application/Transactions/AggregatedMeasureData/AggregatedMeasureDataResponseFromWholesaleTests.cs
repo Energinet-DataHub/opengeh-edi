@@ -80,6 +80,9 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         // Assert
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);
         Assert.Contains(process.DomainEvents, x => x is EnqueueMessageEvent);
+        Assert.All(process.DomainEvents, x
+            => Assert.Equal(typeof(EnqueueMessageEvent), x.GetType()));
+        Assert.Equal(2, process.DomainEvents.Count);
     }
 
     [Fact]
