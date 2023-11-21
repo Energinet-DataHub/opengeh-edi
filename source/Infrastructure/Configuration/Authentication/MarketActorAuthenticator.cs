@@ -21,16 +21,19 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration.Authentication;
 using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Domain.Authentication;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication
 {
     public class MarketActorAuthenticator : IMarketActorAuthenticator
     {
         private readonly IActorRepository _actorRepository;
+        private readonly AuthenticatedActor _authenticatedActor;
 
-        public MarketActorAuthenticator(IActorRepository actorRepository)
+        public MarketActorAuthenticator(IActorRepository actorRepository, AuthenticatedActor authenticatedActor)
         {
             _actorRepository = actorRepository;
+            _authenticatedActor = authenticatedActor;
         }
 
         public MarketActorIdentity CurrentIdentity { get; private set; } = new NotAuthenticated();
@@ -68,6 +71,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication
             }
 
             CurrentIdentity = new Authenticated(userIdFromSts, actorNumber, roles);
+            _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, roles: roles));
         }
 
         // TODO: Temporarly hack for authorizing users originating from portal. Remove when JWT is updated

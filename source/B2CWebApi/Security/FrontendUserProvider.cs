@@ -15,11 +15,21 @@
 using System.Security.Claims;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.EDI.B2CWebApi.Exceptions;
+using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Domain.Authentication;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Security;
 
 public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
 {
+    private readonly AuthenticatedActor _authenticatedActor;
+
+    public FrontendUserProvider(AuthenticatedActor authenticatedActor)
+    {
+        _authenticatedActor = authenticatedActor;
+    }
+
     public Task<FrontendUser?> ProvideUserAsync(
         Guid userId,
         Guid actorId,
@@ -59,6 +69,7 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
         if (azp is null)
             throw new MissingAzpException();
 
+        _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create(actorNumber), roles: new[] { EnumerationType.FromName<MarketRole>(role) }));
         return Task.FromResult<FrontendUser?>(new FrontendUser(
             userId,
             actorId,

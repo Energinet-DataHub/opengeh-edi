@@ -26,6 +26,7 @@ using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
+using Energinet.DataHub.EDI.Domain.Authentication;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
@@ -106,10 +107,13 @@ namespace Energinet.DataHub.EDI.Api
                                 return new DevMarketActorAuthenticator(
                                     sp.GetRequiredService<IActorRepository>(),
                                     sp.GetRequiredService<IActorRegistry>(),
-                                    sp.GetRequiredService<IDatabaseConnectionFactory>());
+                                    sp.GetRequiredService<IDatabaseConnectionFactory>(),
+                                    sp.GetRequiredService<AuthenticatedActor>());
                             }
 
-                            return new MarketActorAuthenticator(sp.GetRequiredService<IActorRepository>());
+                            return new MarketActorAuthenticator(
+                                sp.GetRequiredService<IActorRepository>(),
+                                sp.GetRequiredService<AuthenticatedActor>());
                         })
                         .AddDatabaseConnectionFactory(databaseConnectionString!)
                         .AddSystemClock(new SystemDateTimeProvider())

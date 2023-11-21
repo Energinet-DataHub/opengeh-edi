@@ -16,13 +16,21 @@ using System.Collections.Generic;
 using System.Linq;
 using Dapper;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Domain.Authentication;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 
 internal sealed class QueryBuilder
 {
+    private readonly ActorIdentity _actorIdentity;
     private readonly DynamicParameters _queryParameters = new();
     private readonly List<string> _statement = new();
+
+    public QueryBuilder(ActorIdentity actorIdentity)
+    {
+        _actorIdentity = actorIdentity;
+    }
 
     public QueryInput BuildFrom(GetMessagesQuery request)
     {
@@ -67,6 +75,13 @@ internal sealed class QueryBuilder
             AddFilter(
                 "BusinessReason in @BusinessReason",
                 new KeyValuePair<string, object>("BusinessReason", request.BusinessReasons));
+        }
+
+        if (!_actorIdentity.HasRole(MarketRole.CalculationResponsibleRole) && !_actorIdentity.HasRole(MarketRole.MasterDataResponsibleRole))
+        {
+            AddFilter(
+                "(ReceiverNumber=@Requester OR SenderNumber=@Requester)",
+                new KeyValuePair<string, object>("Requester", _actorIdentity.ActorNumber.Value));
         }
 
         return new QueryInput(BuildStatement(), _queryParameters);

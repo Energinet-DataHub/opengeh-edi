@@ -20,7 +20,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Common.DateTime;
+using Energinet.DataHub.EDI.Domain.Authentication;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using NodaTime;
 using Xunit;
@@ -35,6 +37,8 @@ public class SearchMessagesTests : TestBase
     public SearchMessagesTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), new[] { MarketRole.CalculationResponsibleRole }));
         _archivedMessagesClient = GetService<IArchivedMessagesClient>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
     }
@@ -197,6 +201,50 @@ public class SearchMessagesTests : TestBase
         Assert.Contains(
             result.Messages,
             message => message.BusinessReason!.Equals(balanceFixing.Name, StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Theory]
+    [InlineData("EnergySupplier")]
+    [InlineData("GridOperator")]
+    [InlineData("MeteringPointAdministrator")]
+    [InlineData("MeteringDataAdministrator")]
+    [InlineData("MeteredDataResponsible")]
+    [InlineData("BalanceResponsibleParty")]
+    public async Task Requester_can_only_fetch_own_messages(string marketRoleName)
+    {
+        var actorNumber = ActorNumber.Create("1234512345888");
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, new[] { EnumerationType.FromName<MarketRole>(marketRoleName) }));
+
+        var archivedMessageOwnMessage = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: actorNumber.Value);
+        var archivedMessage = CreateArchivedMessage(_systemDateTimeProvider.Now());
+        await ArchiveMessage(archivedMessageOwnMessage);
+        await ArchiveMessage(archivedMessage);
+
+        var result = await _archivedMessagesClient.SearchAsync(new GetMessagesQuery(), CancellationToken.None);
+
+        var messageInfo = result.Messages.SingleOrDefault();
+        Assert.NotNull(messageInfo);
+        Assert.True(messageInfo.SenderNumber == actorNumber.Value || messageInfo.ReceiverNumber == actorNumber.Value);
+    }
+
+    [Theory]
+    [InlineData("CalculationResponsibleRole")]
+    [InlineData("MasterDataResponsibleRole")]
+    public async Task Market_roll_can_fetch_all_messages(string marketRoleName)
+    {
+        var actorNumber = ActorNumber.Create("1234512345888");
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, new[] { EnumerationType.FromName<MarketRole>(marketRoleName) }));
+
+        var archivedMessageOwnMessage = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: actorNumber.Value);
+        var archivedMessage = CreateArchivedMessage(_systemDateTimeProvider.Now());
+        await ArchiveMessage(archivedMessageOwnMessage);
+        await ArchiveMessage(archivedMessage);
+
+        var result = await _archivedMessagesClient.SearchAsync(new GetMessagesQuery(), CancellationToken.None);
+
+        Assert.Equal(2, result.Messages.Count);
     }
 
     private static Instant CreatedAt(string date)

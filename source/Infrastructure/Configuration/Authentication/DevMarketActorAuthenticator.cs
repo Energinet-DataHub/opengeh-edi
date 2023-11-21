@@ -21,6 +21,7 @@ using Dapper;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Domain.Authentication;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 
@@ -29,8 +30,12 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
     private readonly IActorRegistry _actorRegistry;
     private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public DevMarketActorAuthenticator(IActorRepository actorRepository, IActorRegistry actorRegistry, IDatabaseConnectionFactory connectionFactory)
-        : base(actorRepository)
+    public DevMarketActorAuthenticator(
+        IActorRepository actorRepository,
+        IActorRegistry actorRegistry,
+        IDatabaseConnectionFactory connectionFactory,
+        AuthenticatedActor authenticatedActor)
+        : base(actorRepository, authenticatedActor)
     {
         _actorRegistry = actorRegistry;
         _connectionFactory = connectionFactory;

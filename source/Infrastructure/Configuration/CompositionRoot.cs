@@ -29,6 +29,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusin
 using Energinet.DataHub.EDI.Common.DataRetention;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.Serialization;
+using Energinet.DataHub.EDI.Domain.Authentication;
 using Energinet.DataHub.EDI.Infrastructure.Actors;
 using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
@@ -64,6 +65,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
 
             AddMediatR();
             services.AddLogging();
+            AddAuthenticatedActor();
             AddActorServices();
             AddWholeSaleInBox();
             AddGridAreaServices();
@@ -192,6 +194,11 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
         {
             var configuration = new MediatRServiceConfiguration();
             ServiceRegistrar.AddRequiredServices(_services, configuration);
+        }
+
+        private void AddAuthenticatedActor()
+        {
+            _services.AddScoped<AuthenticatedActor>();
         }
 
         private void AddActorServices()

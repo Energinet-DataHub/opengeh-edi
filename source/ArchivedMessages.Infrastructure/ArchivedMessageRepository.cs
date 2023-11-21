@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.Domain.Authentication;
 using Microsoft.Data.SqlClient;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
@@ -29,10 +30,14 @@ namespace Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 public class ArchivedMessageRepository : IArchivedMessageRepository
 {
     private readonly IDatabaseConnectionFactory _connectionFactory;
+    private readonly AuthenticatedActor _authenticatedActor;
 
-    public ArchivedMessageRepository(IDatabaseConnectionFactory connectionFactory)
+    public ArchivedMessageRepository(
+        IDatabaseConnectionFactory connectionFactory,
+        AuthenticatedActor authenticatedActor)
     {
         _connectionFactory = connectionFactory;
+        _authenticatedActor = authenticatedActor;
     }
 
     public async Task AddAsync(ArchivedMessage message, CancellationToken cancellationToken)
@@ -93,7 +98,7 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
     public async Task<MessageSearchResult> SearchAsync(GetMessagesQuery queryInput, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(queryInput);
-        var input = new QueryBuilder().BuildFrom(queryInput);
+        var input = new QueryBuilder(_authenticatedActor.CurrentActorIdentity).BuildFrom(queryInput);
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         var archivedMessages =
             await connection.QueryAsync<MessageInfo>(
