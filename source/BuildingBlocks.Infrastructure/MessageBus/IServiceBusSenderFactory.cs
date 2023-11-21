@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus
 {
     /// <summary>
     /// Factory for Azure Service Bus client sender adapters

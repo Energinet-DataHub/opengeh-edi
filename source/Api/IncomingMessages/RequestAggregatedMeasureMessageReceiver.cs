@@ -56,7 +56,7 @@ public class RequestAggregatedMeasureMessageReceiver
         ResponseFactory responseFactory,
         ICorrelationContext correlationContext,
         IMediator mediator)
-        {
+    {
         _logger = logger;
         _archivedMessagesClient = archivedMessagesClient;
         _systemDateTimeProvider = systemDateTimeProvider;
@@ -64,7 +64,7 @@ public class RequestAggregatedMeasureMessageReceiver
         _responseFactory = responseFactory;
         _correlationContext = correlationContext;
         _mediator = mediator;
-        }
+    }
 
     [Function(nameof(RequestAggregatedMeasureMessageReceiver))]
     public async Task<HttpResponseData> RunAsync(
