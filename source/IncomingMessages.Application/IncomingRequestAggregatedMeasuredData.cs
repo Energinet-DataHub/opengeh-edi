@@ -17,6 +17,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Serialization;
@@ -92,7 +93,7 @@ public class IncomingRequestAggregatedMeasuredData : IIncomingRequestAggregatedM
 
     private async Task SaveArchivedMessageAsync(RequestAggregatedMeasureDataMarketMessage marketMessage, Stream document, CancellationToken hostCancellationToken)
     {
-        _archivedMessagesClient.CreateAsync(
+       await _archivedMessagesClient.CreateAsync(
             new ArchivedMessage(
             Guid.NewGuid().ToString(),
             marketMessage.MessageId,

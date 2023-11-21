@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.EDI.Common.Actors;
 
-namespace Energinet.DataHub.EDI.Application.Configuration.Authentication
+namespace Energinet.DataHub.EDI.Common
 {
     public abstract class MarketActorIdentity
     {

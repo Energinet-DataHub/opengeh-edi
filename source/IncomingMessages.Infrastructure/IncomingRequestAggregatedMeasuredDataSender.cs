@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 
 namespace IncomingMessages.Infrastructure;
 

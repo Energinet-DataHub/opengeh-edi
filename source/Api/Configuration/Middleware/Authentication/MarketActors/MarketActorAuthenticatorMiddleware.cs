@@ -15,6 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.Configuration.Authentication;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Microsoft.Azure.Functions.Worker;
