@@ -30,7 +30,11 @@ public class TestRunner : IAsyncDisposable
             .Build();
         var secretsConfiguration = BuildSecretsConfiguration(root);
 
-        ConnectionString = secretsConfiguration.GetValue<string>("EDI_DATABASE_CONNECTION_STRING")!;
+        var sqlServer = secretsConfiguration.GetValue<string>("mssql-data-url")!;
+        // Connection string with read only access to the database.
+        var dbConnectionString = $"Server={sqlServer};Initial Catalog=mssqldb-edi-edi-u-001;Authentication=Active Directory Default;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+        ConnectionString = dbConnectionString;
+
         var serviceBusConnectionString = secretsConfiguration.GetValue<string>("sb-domain-relay-manage-connection-string")!;
         var topicName = secretsConfiguration.GetValue<string>("sbt-shres-integrationevent-received-name")!;
         EventPublisher = new IntegrationEventPublisher(serviceBusConnectionString, topicName);

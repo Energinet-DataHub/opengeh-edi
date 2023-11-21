@@ -31,7 +31,7 @@ public sealed class WhenActorActivatedIsPublishedTests : TestRunner
     }
 
     [Fact]
-    public async Task Actor_can_peek_and_dequeue_aggregation_result()
+    public async Task Actor_is_created()
     {
         var b2CId = Guid.NewGuid().ToString();
         await _actorDsl.PublishResultForAsync(actorNumber: "5790000610977", b2CId: b2CId);
