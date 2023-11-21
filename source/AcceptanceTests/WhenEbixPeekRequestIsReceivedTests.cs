@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 using Xunit.Categories;
 
@@ -21,25 +22,27 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 
 [IntegrationTest]
-public sealed class WhenAggregationResultIsPublishedTests : TestRunner
+public sealed class WhenEbixPeekRequestIsReceivedTests : TestRunner
 {
-    private readonly AggregationResultDsl _aggregations;
+    private readonly EbixRequestDsl _ebix;
 
-    public WhenAggregationResultIsPublishedTests()
+    public WhenEbixPeekRequestIsReceivedTests()
     {
-        _aggregations = new AggregationResultDsl(
+        _ebix = new EbixRequestDsl(
+            new AzureAuthenticationDriver(AzureEntraTenantId, AzureEntraBackendAppId),
             new EdiDriver(AzpToken),
-            new WholesaleDriver(EventPublisher));
+            new WholesaleDriver(EventPublisher),
+            new EbixDriver(new Uri(ApiManagementUri, "/ebix")));
     }
 
     [Fact]
-    public async Task Actor_can_peek_and_dequeue_aggregation_result()
+    public async Task Actor_can_peek_calculation_result_in_ebix_format()
     {
-        await _aggregations.EmptyQueueForActor(actorNumber: "5790000610976", actorRole: "metereddataresponsible");
+        var token = await _ebix.LoginAsActor(AzureEntraClientId, AzureEntraClientSecret);
 
-        await _aggregations.PublishResultFor(gridAreaCode: "543");
+        await _ebix.EmptyQueueForActor(BalanceResponsibleActorNumber, BalanceResponsibleActorRole, token);
+        await _ebix.PublishAggregationResultFor("543", BalanceResponsibleActorNumber);
 
-        await _aggregations
-            .ConfirmResultIsAvailableFor(actorNumber: "5790000610976", actorRole: "metereddataresponsible");
+        await _ebix.ConfirmPeekIsCorrectEbixFormatAndDocumentType(token);
     }
 }

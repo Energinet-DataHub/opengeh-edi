@@ -13,18 +13,13 @@
 // limitations under the License.
 
 using System;
-using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.Application.Configuration;
-using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
-using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
-using Energinet.DataHub.EDI.Process.Interfaces;
 using IncomingMessages.Infrastructure;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
