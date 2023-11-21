@@ -36,18 +36,15 @@ public class RequestAggregatedMeasureMessageReceiver
 {
     private readonly ILogger<RequestAggregatedMeasureMessageReceiver> _logger;
     private readonly IIncomingRequestAggregatedMeasuredData _incomingRequestAggregatedMeasuredData;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly ICorrelationContext _correlationContext;
 
     public RequestAggregatedMeasureMessageReceiver(
         ILogger<RequestAggregatedMeasureMessageReceiver> logger,
         IIncomingRequestAggregatedMeasuredData incomingRequestAggregatedMeasuredData,
-        ISystemDateTimeProvider systemDateTimeProvider,
         ICorrelationContext correlationContext)
         {
         _logger = logger;
         _incomingRequestAggregatedMeasuredData = incomingRequestAggregatedMeasuredData;
-        _systemDateTimeProvider = systemDateTimeProvider;
         _correlationContext = correlationContext;
         }
 
@@ -77,9 +74,6 @@ public class RequestAggregatedMeasureMessageReceiver
             var httpErrorStatusCode = HttpStatusCode.BadRequest;
             return CreateResponse(request, httpErrorStatusCode, responseMessage);
         }
-
-        // var result = await _mediator
-        //     .Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage), cancellationToken).ConfigureAwait(false);
 
         var httpStatusCode = !responseMessage.IsErrorResponse ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
         return CreateResponse(request, httpStatusCode, responseMessage);

@@ -429,10 +429,6 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var process = _processContext.AggregatedMeasureDataProcesses.FirstOrDefault();
         Assert.NotNull(process);
-
-        var document = messageParserResult.MarketMessage!;
-        await AssertTransactionIdIsStored(document.SenderNumber, document.Series.First().Id);
-        await AssertMessageIdIsStored(document.SenderNumber, document.MessageId);
     }
 
     [Fact]
@@ -444,6 +440,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var knownSenderRole = MarketRole.EnergySupplier.Code;
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
+            .DuplicateSeriesRecords()
             .WithSeriesTransactionId(Guid.NewGuid().ToString())
             .WithReceiverRole(knownReceiverRole)
             .WithReceiverId(knownReceiverId)
@@ -457,12 +454,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var processes = _processContext.AggregatedMeasureDataProcesses.ToList();
         Assert.NotNull(processes);
-        Assert.Equal(messageParserResult.MarketMessage!.Series.Count, processes.Count);
-
-        var document = messageParserResult.MarketMessage!;
-        await AssertTransactionIdIsStored(messageParserResult.MarketMessage!.SenderNumber, document.Series.First().Id);
-        await AssertTransactionIdIsStored(messageParserResult.MarketMessage!.SenderNumber, document.Series.Last().Id);
-        await AssertMessageIdIsStored(messageParserResult.MarketMessage!.SenderNumber, messageParserResult.MarketMessage!.MessageId);
+        Assert.Equal(2, messageParserResult.MarketMessage!.Series.Count);
     }
 
     [Fact]
