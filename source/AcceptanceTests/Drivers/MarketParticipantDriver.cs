@@ -20,12 +20,10 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 internal sealed class MarketParticipantDriver
 {
     private readonly IntegrationEventPublisher _integrationEventPublisher;
-    private readonly string _connectionString;
 
-    public MarketParticipantDriver(IntegrationEventPublisher integrationEventPublisher, string connectionString)
+    public MarketParticipantDriver(IntegrationEventPublisher integrationEventPublisher)
     {
         _integrationEventPublisher = integrationEventPublisher;
-        _connectionString = connectionString;
     }
 
     public async Task PublishActorActivatedAsync(string actorNumber, string b2CId)
@@ -33,20 +31,5 @@ internal sealed class MarketParticipantDriver
         await _integrationEventPublisher.PublishAsync(
             "ActorActivated",
             ActorFactory.CreateActorActivated(actorNumber, b2CId).ToByteArray()).ConfigureAwait(false);
-    }
-
-    public async Task ActorActivatedExistsAsync(string actorNumber, string azpToken)
-    {
-        using var connection = new SqlConnection(_connectionString);
-        using var command = new SqlCommand();
-
-        command.CommandText = "SELECT COUNT(*) FROM [Actor] WHERE ActorNumber = @ActorNumber AND ExternalId = @ExternalId";
-        command.Parameters.AddWithValue("@ActorNumber", actorNumber);
-        command.Parameters.AddWithValue("@ExternalId", azpToken);
-        command.Connection = connection;
-
-        await command.Connection.OpenAsync().ConfigureAwait(false);
-        var exist = await command.ExecuteScalarAsync().ConfigureAwait(false);
-        Assert.NotNull(exist);
     }
 }

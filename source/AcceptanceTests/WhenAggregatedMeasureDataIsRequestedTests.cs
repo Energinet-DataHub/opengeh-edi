@@ -29,7 +29,7 @@ public sealed class WhenAggregatedMeasureDataIsRequestedTests : TestRunner
 
     public WhenAggregatedMeasureDataIsRequestedTests()
     {
-        _aggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(AzpToken));
+        _aggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(AzpToken, ConnectionString));
     }
 
     [Fact]

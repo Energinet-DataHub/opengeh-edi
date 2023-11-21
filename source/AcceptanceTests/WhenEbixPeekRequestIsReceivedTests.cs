@@ -30,7 +30,7 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : TestRunner
     {
         _ebix = new EbixRequestDsl(
             new AzureAuthenticationDriver(AzureEntraTenantId, AzureEntraBackendAppId),
-            new EdiDriver(AzpToken),
+            new EdiDriver(AzpToken, ConnectionString),
             new WholesaleDriver(EventPublisher),
             new EbixDriver(new Uri(ApiManagementUri, "/ebix")));
     }

@@ -27,7 +27,7 @@ public sealed class WhenActorActivatedIsPublishedTests : TestRunner
 
     public WhenActorActivatedIsPublishedTests()
     {
-        _actorDsl = new ActorDsl(new MarketParticipantDriver(EventPublisher, ConnectionString));
+        _actorDsl = new ActorDsl(new MarketParticipantDriver(EventPublisher), new EdiDriver(AzpToken, ConnectionString));
     }
 
     [Fact]
