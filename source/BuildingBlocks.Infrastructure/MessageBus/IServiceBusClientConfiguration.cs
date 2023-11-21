@@ -12,18 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 
-namespace Energinet.DataHub.EDI.Common
+/// <summary>
+/// Interface for configurations
+/// </summary>
+public interface IServiceBusClientConfiguration
 {
     /// <summary>
-    /// Unit of work
+    /// Queue name for service
     /// </summary>
-    public interface IUnitOfWork
-    {
-        /// <summary>
-        /// Commits all changes made to the database in the current transaction asynchronously.
-        /// </summary>
-        Task CommitTransactionAsync();
-    }
+    string QueueName { get; }
 }
