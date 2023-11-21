@@ -16,7 +16,7 @@ using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Energinet.DataHub.EDI.Common.DataAccess
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess
 {
     /// <summary>
     /// Factory for creating database connections
