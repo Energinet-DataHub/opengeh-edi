@@ -83,7 +83,7 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
         return input.Units + (input.Nanos / nanoFactor);
     }
 
-    private static string MapMeteringPointType(Serie aggregation)
+    private static string MapMeteringPointType(Series aggregation)
     {
         return aggregation.TimeSeriesType switch
         {
@@ -98,7 +98,7 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
         };
     }
 
-    private static string MapUnitType(Serie aggregation)
+    private static string MapUnitType(Series aggregation)
     {
         return aggregation.QuantityUnit switch
         {

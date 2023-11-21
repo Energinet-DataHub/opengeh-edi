@@ -69,7 +69,7 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
             QuantityQuality = QuantityQuality.Incomplete,
             Time = new Timestamp() { Seconds = 1, },
         };
-        var serie = new Serie()
+        var series = new Series()
         {
             GridArea = GridAreaCode,
             QuantityUnit = QuantityUnit.Kwh,
@@ -79,7 +79,7 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
         };
 
         var timeSerie = new AggregatedTimeSeriesRequestAccepted();
-        timeSerie.Series.Add(serie);
+        timeSerie.Series.Add(series);
         return timeSerie;
     }
 
