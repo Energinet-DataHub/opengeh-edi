@@ -77,7 +77,7 @@ internal sealed class QueryBuilder
                 new KeyValuePair<string, object>("BusinessReason", request.BusinessReasons));
         }
 
-        if (!_actorIdentity.HasRole(MarketRole.CalculationResponsibleRole) && !_actorIdentity.HasRole(MarketRole.MasterDataResponsibleRole))
+        if (!_actorIdentity.HasRole(MarketRole.DataHubAdministrator))
         {
             AddFilter(
                 "(ReceiverNumber=@Requester OR SenderNumber=@Requester)",

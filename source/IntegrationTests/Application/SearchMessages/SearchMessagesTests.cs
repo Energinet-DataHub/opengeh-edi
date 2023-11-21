@@ -38,7 +38,7 @@ public class SearchMessagesTests : TestBase
         : base(databaseFixture)
     {
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), new[] { MarketRole.CalculationResponsibleRole }));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), new[] { MarketRole.DataHubAdministrator }));
         _archivedMessagesClient = GetService<IArchivedMessagesClient>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
     }
@@ -210,6 +210,8 @@ public class SearchMessagesTests : TestBase
     [InlineData("MeteringDataAdministrator")]
     [InlineData("MeteredDataResponsible")]
     [InlineData("BalanceResponsibleParty")]
+    [InlineData("CalculationResponsibleRole")]
+    [InlineData("MasterDataResponsibleRole")]
     public async Task Requester_can_only_fetch_own_messages(string marketRoleName)
     {
         var actorNumber = ActorNumber.Create("1234512345888");
@@ -229,8 +231,7 @@ public class SearchMessagesTests : TestBase
     }
 
     [Theory]
-    [InlineData("CalculationResponsibleRole")]
-    [InlineData("MasterDataResponsibleRole")]
+    [InlineData("DataHubAdministrator")]
     public async Task Market_roll_can_fetch_all_messages(string marketRoleName)
     {
         var actorNumber = ActorNumber.Create("1234512345888");
