@@ -12,25 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
-
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 
 /// <summary>
-/// Azure Service Bus Client sender adapter
+/// Interface for configurations
 /// </summary>
-public interface IRemoteBusinessServiceRequestSenderAdapter<TRequest> : IAsyncDisposable, IDisposable
+public interface IServiceBusClientConfiguration
 {
     /// <summary>
-    /// Topic name
+    /// Queue name for service
     /// </summary>
     string QueueName { get; }
-
-    /// <summary>
-    /// Send integration event to topic
-    /// </summary>
-    /// <param name="message"></param>
-    Task SendAsync(ServiceBusMessage message);
 }

@@ -15,13 +15,13 @@
 using System;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Domain.GridAreaOwners;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using Energinet.DataHub.EDI.Tests.Factories;
 using NodaTime;
 using Xunit;
-using GridArea = Energinet.DataHub.EDI.Domain.GridAreas.GridArea;
 
 namespace Energinet.DataHub.EDI.Tests.Domain.Transactions.Aggregations;
 
@@ -46,7 +46,7 @@ public class AggregationResultMessageFactoryTests
     {
         var result = _aggregationResult
             .ForProduction()
-            .WithGridAreaDetails(new GridArea("870", Instant.FromDateTimeUtc(DateTime.UtcNow), ActorNumber.Create("1234567890123")))
+            .WithGridAreaDetails(new GridAreaOwner("870", Instant.FromDateTimeUtc(DateTime.UtcNow), ActorNumber.Create("1234567890123"), 1))
             .Build();
 
         var message = CreateMessage(result);

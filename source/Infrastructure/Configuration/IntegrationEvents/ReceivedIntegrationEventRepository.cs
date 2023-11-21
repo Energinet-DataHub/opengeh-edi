@@ -13,16 +13,12 @@
 // limitations under the License.
 
 using System;
-using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.Application.Configuration;
-using Energinet.DataHub.EDI.Common.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Common.DateTime;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Microsoft.Data.SqlClient;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 

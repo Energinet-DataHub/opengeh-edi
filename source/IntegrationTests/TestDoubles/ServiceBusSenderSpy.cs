@@ -17,7 +17,7 @@ using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles
 {

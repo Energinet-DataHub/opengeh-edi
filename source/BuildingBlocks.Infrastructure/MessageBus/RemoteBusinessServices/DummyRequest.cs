@@ -12,22 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
 
-namespace Energinet.DataHub.EDI.Common.Configuration;
+public record DummyRequest;
 
-public static class SqlExtensions
-{
-    public static void AddScopedSqlDbContext<TDbContext>(
-        this IServiceCollection services)
-        where TDbContext : DbContext
-    {
-        services.AddDbContext<TDbContext>((sp, o) =>
-        {
-            var source = sp.GetRequiredService<SqlConnectionSource>();
-            o.UseSqlServer(source.Connection, y => y.UseNodaTime());
-        });
-    }
-}
+public record DummyReply;

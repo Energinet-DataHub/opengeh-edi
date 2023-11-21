@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.Application.Wholesale;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Wholesale;

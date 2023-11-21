@@ -14,23 +14,13 @@
 
 using System.Threading.Tasks;
 
-namespace Energinet.DataHub.EDI.Common
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure
 {
     /// <summary>
     /// Unit of work
     /// </summary>
     public interface IUnitOfWork
     {
-        /// <summary>
-        /// Asynchronously starts a new transaction.
-        /// </summary>
-        Task BeginTransactionAsync();
-
-        /// <summary>
-        /// Discards all changes made to the database in the current transaction asynchronously.
-        /// </summary>
-        Task RollbackAsync();
-
         /// <summary>
         /// Commits all changes made to the database in the current transaction asynchronously.
         /// </summary>

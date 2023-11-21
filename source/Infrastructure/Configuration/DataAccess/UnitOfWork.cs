@@ -13,8 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Infrastructure.Exceptions;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using IncomingMessages.Infrastructure.Configuration.DataAccess;
@@ -29,7 +28,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
         private readonly ProcessContext _processContext;
         private readonly ActorMessageQueueContext _actorMessageQueueContext;
         private readonly IncomingMessagesContext _incomingMessagesContext;
-        private IDbContextTransaction? _dbContextTransaction;
 
         public UnitOfWork(B2BContext b2BContext, ProcessContext processContext, ActorMessageQueueContext actorMessageQueueContext, IncomingMessagesContext incomingMessagesContext)
         {
@@ -39,30 +37,23 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
             _incomingMessagesContext = incomingMessagesContext;
         }
 
-        public async Task BeginTransactionAsync()
-        {
-            _dbContextTransaction = await _processContext.Database.BeginTransactionAsync().ConfigureAwait(false);
-            await _b2BContext.Database.UseTransactionAsync(_dbContextTransaction.GetDbTransaction()).ConfigureAwait(false);
-            await _actorMessageQueueContext.Database.UseTransactionAsync(_dbContextTransaction.GetDbTransaction()).ConfigureAwait(false);
-            await _incomingMessagesContext.Database.UseTransactionAsync(_dbContextTransaction.GetDbTransaction()).ConfigureAwait(false);
-        }
-
         public async Task CommitTransactionAsync()
         {
-            if (_dbContextTransaction == null) throw new DBTransactionNotInitializedException();
-
+            using var transaction = await BeginTransactionAsync().ConfigureAwait(false);
             await _b2BContext.SaveChangesAsync().ConfigureAwait(false);
             await _processContext.SaveChangesAsync().ConfigureAwait(false);
             await _actorMessageQueueContext.SaveChangesAsync().ConfigureAwait(false);
             await _incomingMessagesContext.SaveChangesAsync().ConfigureAwait(false);
-            await _dbContextTransaction.CommitAsync().ConfigureAwait(false);
+            await transaction.CommitAsync().ConfigureAwait(false);
         }
 
-        public async Task RollbackAsync()
+        private async Task<IDbContextTransaction> BeginTransactionAsync()
         {
-            if (_dbContextTransaction == null) throw new DBTransactionNotInitializedException();
-
-            await _dbContextTransaction.RollbackAsync().ConfigureAwait(false);
+            var dbContextTransaction = await _processContext.Database.BeginTransactionAsync().ConfigureAwait(false);
+            await _b2BContext.Database.UseTransactionAsync(dbContextTransaction.GetDbTransaction()).ConfigureAwait(false);
+            await _actorMessageQueueContext.Database.UseTransactionAsync(dbContextTransaction.GetDbTransaction()).ConfigureAwait(false);
+            await _incomingMessagesContext.Database.UseTransactionAsync(dbContextTransaction.GetDbTransaction()).ConfigureAwait(false);
+            return dbContextTransaction;
         }
     }
 }

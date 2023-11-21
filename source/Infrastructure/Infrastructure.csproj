@@ -24,7 +24,6 @@ limitations under the License.
     <PackageReference Include="AspNetCore.HealthChecks.AzureServiceBus" Version="7.0.0" />
     <PackageReference Include="AspNetCore.HealthChecks.AzureStorage" Version="7.0.0" />
     <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="6.0.2" />
-    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.16.1" />
     <PackageReference Include="Dapper-NodaTime" Version="0.1.0" />
     <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="8.1.0" />
     <PackageReference Include="Energinet.DataHub.Core.Logging" Version="2.2.8" />
@@ -64,6 +63,7 @@ limitations under the License.
       <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\ArchivedMessages.Application\ArchivedMessages.Application.csproj" />
       <ProjectReference Include="..\ArchivedMessages.Infrastructure\ArchivedMessages.Infrastructure.csproj" />
+      <ProjectReference Include="..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\Infrastructure.DocumentValidation\Infrastructure.DocumentValidation.csproj" />
       <ProjectReference Include="..\Application\Application.csproj" />
