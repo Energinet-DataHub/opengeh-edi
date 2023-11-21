@@ -35,7 +35,6 @@ public class IncomingRequestAggregatedMeasuredData : IIncomingRequestAggregatedM
 {
     private readonly RequestAggregatedMeasureDataMarketMessageParser _requestAggregatedMeasureDataMarketMessageParser;
     private readonly IncomingRequestAggregatedMeasuredDataSender _incomingRequestAggregatedMeasuredDataSender;
-    private readonly ISerializer _serializer;
     private readonly RequestAggregatedMeasureDataValidator _aggregatedMeasureDataMarketMessageValidator;
     private readonly ResponseFactory _responseFactory;
     private readonly IArchivedMessagesClient _archivedMessagesClient;
@@ -43,14 +42,12 @@ public class IncomingRequestAggregatedMeasuredData : IIncomingRequestAggregatedM
     public IncomingRequestAggregatedMeasuredData(
         RequestAggregatedMeasureDataMarketMessageParser requestAggregatedMeasureDataMarketMessageParser,
         IncomingRequestAggregatedMeasuredDataSender incomingRequestAggregatedMeasuredDataSender,
-        ISerializer serializer,
         RequestAggregatedMeasureDataValidator aggregatedMeasureDataMarketMessageValidator,
         ResponseFactory responseFactory,
         IArchivedMessagesClient archivedMessagesClient)
     {
         _requestAggregatedMeasureDataMarketMessageParser = requestAggregatedMeasureDataMarketMessageParser;
         _incomingRequestAggregatedMeasuredDataSender = incomingRequestAggregatedMeasuredDataSender;
-        _serializer = serializer;
         _aggregatedMeasureDataMarketMessageValidator = aggregatedMeasureDataMarketMessageValidator;
         _responseFactory = responseFactory;
         _archivedMessagesClient = archivedMessagesClient;
@@ -75,14 +72,9 @@ public class IncomingRequestAggregatedMeasuredData : IIncomingRequestAggregatedM
 
         if (result.Success)
         {
-            var serviceBusMessage =
-                new ServiceBusMessage(
-                    _serializer.Serialize(requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage))
-                {
-                    Subject = requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!.ToString(), //TODO: LRN subject pattern`?
-                };
-
-            await _incomingRequestAggregatedMeasuredDataSender.SendAsync(serviceBusMessage, cancellationToken)
+            await _incomingRequestAggregatedMeasuredDataSender.SendAsync(
+                    requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!,
+                    cancellationToken)
                 .ConfigureAwait(false);
 
             return new ResponseMessage();

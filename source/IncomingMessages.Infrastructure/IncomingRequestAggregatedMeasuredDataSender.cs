@@ -14,27 +14,40 @@
 
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
+using Energinet.DataHub.EDI.Common.Serialization;
+using Energinet.DataHub.EDI.Process.Interfaces;
 
 namespace IncomingMessages.Infrastructure;
 
 public class IncomingRequestAggregatedMeasuredDataSender
 {
+    private readonly ISerializer _serializer;
     private readonly IServiceBusSenderAdapter _senderCreator;
 
     public IncomingRequestAggregatedMeasuredDataSender(
         IServiceBusSenderFactory serviceBusSenderFactory,
-        IncomingMessagesServiceBusClientConfiguration incomingMessagesServiceBusClientConfiguration)
+        IncomingMessagesServiceBusClientConfiguration incomingMessagesServiceBusClientConfiguration,
+        ISerializer serializer)
     {
         if (serviceBusSenderFactory == null) throw new ArgumentNullException(nameof(serviceBusSenderFactory));
         if (incomingMessagesServiceBusClientConfiguration == null) throw new ArgumentNullException(nameof(incomingMessagesServiceBusClientConfiguration));
+        _serializer = serializer;
 
         _senderCreator = serviceBusSenderFactory.GetSender(incomingMessagesServiceBusClientConfiguration.QueueName);
     }
 
     public async Task SendAsync(
-        ServiceBusMessage request,
+        RequestAggregatedMeasureDataMarketMessage request,
         CancellationToken cancellationToken)
     {
-        await _senderCreator.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        ArgumentNullException.ThrowIfNull(request, nameof(request));
+        var serviceBusMessage =
+            new ServiceBusMessage(
+                _serializer.Serialize(request))
+            {
+                Subject = request.MessageType,
+            };
+
+        await _senderCreator.SendAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
     }
 }
