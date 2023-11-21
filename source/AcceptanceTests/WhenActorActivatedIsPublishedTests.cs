@@ -34,8 +34,8 @@ public sealed class WhenActorActivatedIsPublishedTests : TestRunner
     public async Task Actor_is_created()
     {
         var b2CId = Guid.NewGuid().ToString();
-        await _actorDsl.PublishResultForAsync(actorNumber: "5790000610977", b2CId: b2CId);
+        await _actorDsl.PublishResultForAsync(actorNumber: "8880000610888", b2CId: b2CId);
 
-        await _actorDsl.ConfirmActorIsAvailableAsync(actorNumber: "5790000610977", b2CId: b2CId);
+        await _actorDsl.ConfirmActorIsAvailableAsync(actorNumber: "8880000610888", b2CId: b2CId);
     }
 }

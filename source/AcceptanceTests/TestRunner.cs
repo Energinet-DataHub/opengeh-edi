@@ -34,7 +34,7 @@ public class TestRunner : IAsyncDisposable
         var secretsConfiguration = BuildSecretsConfiguration(root);
 
         var sqlServer = secretsConfiguration.GetValue<string>("mssql-data-url")!;
-        var dbConnectionString = $"Server={sqlServer};Initial Catalog=mssqldb-edi-edi-u-001;Authentication=Active Directory Default;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+        var dbConnectionString = $"Server={sqlServer};Authentication=Active Directory Default;Database=mssqldb-edi-edi-u-001;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
         ConnectionString = dbConnectionString;
 
         var serviceBusConnectionString = secretsConfiguration.GetValue<string>("sb-domain-relay-manage-connection-string")!;

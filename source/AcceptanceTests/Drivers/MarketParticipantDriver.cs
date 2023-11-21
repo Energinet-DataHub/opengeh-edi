@@ -40,7 +40,7 @@ internal sealed class MarketParticipantDriver
         using var connection = new SqlConnection(_connectionString);
         using var command = new SqlCommand();
 
-        command.CommandText = "SELECT COUNT(*) FROM [Table] WHERE ActorNumber = @ActorNumber AND ExternalId = @ExternalId";
+        command.CommandText = "SELECT COUNT(*) FROM [Actor] WHERE ActorNumber = @ActorNumber AND ExternalId = @ExternalId";
         command.Parameters.AddWithValue("@ActorNumber", actorNumber);
         command.Parameters.AddWithValue("@ExternalId", azpToken);
         command.Connection = connection;
