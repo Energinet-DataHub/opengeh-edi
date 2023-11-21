@@ -39,7 +39,7 @@ internal sealed class AggregatedMeasureDataRequestDsl
 
     internal Task RejectedAggregatedMeasureDataFor(string actorNumber, string actorRole)
     {
-        return _edi.RequestAggregatedMeasureDataAsync(actorNumber, new[] { actorRole }, true);
+        return _edi.RequestAggregatedMeasureDataAsync(actorNumber, new[] { actorRole }, asyncError: true);
     }
 
     internal Task ConfirmRejectedResultIsAvailableFor(string actorNumber, string actorRole)
