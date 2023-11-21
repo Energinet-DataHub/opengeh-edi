@@ -12,30 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Data.SqlClient;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
+using Google.Protobuf.WellKnownTypes;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 public static class ActorFactory
 {
-    public static void InsertActor(string connectionString, string b2CId)
-    {
-        using var connection = new SqlConnection(connectionString);
-        using var command = new SqlCommand();
-
-        command.CommandText = @"BEGIN
-                                   IF NOT EXISTS (SELECT * FROM [dbo].[Actor] WHERE ActorNumber = @ActorNumber)
-                                   BEGIN
-                                       INSERT INTO [dbo].[Actor] ([Id], [ActorNumber], [ExternalId])
-                                       VALUES (@Id, @ActorNumber, @ExternalId)
-                                   END
-                                END";
-        command.Parameters.AddWithValue("@Id", "756768A4-64B4-4B66-A5ED-21BA3D64A59D");
-        command.Parameters.AddWithValue("@ActorNumber", "5790000610976");
-        command.Parameters.AddWithValue("@ExternalId", b2CId);
-        command.Connection = connection;
-
-        command.Connection.Open();
-        command.ExecuteNonQuery();
-    }
+    public static ActorActivated CreateActorActivated(string actorNumber, string b2CId) =>
+        new()
+        {
+            ActorNumber = actorNumber,
+            ExternalActorId = b2CId,
+            ActorNumberType = ActorNumberType.Gln,
+            ValidFrom = Timestamp.FromDateTime(DateTime.UtcNow),
+        };
 }
