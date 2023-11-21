@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.Common.Configuration;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 
 public static class SqlExtensions
 {
