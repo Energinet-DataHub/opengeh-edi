@@ -23,7 +23,8 @@ internal sealed class GridAreaOwnershipAssignedEventBuilder
 {
     private string _gridAreaCode = "543";
     private string _actorNumber = ActorNumber.Create("1234567890123").Value;
-    private Timestamp _validFrom = Timestamp.FromDateTime(DateTime.UtcNow);
+    private Timestamp _validFrom = Timestamp.FromDateTime(DateTime.UtcNow.AddMinutes(-1));
+    private int _sequenceNumber = 1;
 
     internal GridAreaOwnershipAssigned Build()
     {
@@ -32,6 +33,7 @@ internal sealed class GridAreaOwnershipAssignedEventBuilder
             GridAreaCode = _gridAreaCode,
             ValidFrom = _validFrom,
             ActorNumber = _actorNumber,
+            SequenceNumber = _sequenceNumber,
         };
     }
 
@@ -50,6 +52,12 @@ internal sealed class GridAreaOwnershipAssignedEventBuilder
     internal GridAreaOwnershipAssignedEventBuilder WithGridAreaCode(string gridAreaCode)
     {
         _gridAreaCode = gridAreaCode;
+        return this;
+    }
+
+    internal GridAreaOwnershipAssignedEventBuilder WithSequenceNumber(int sequenceNumber)
+    {
+        _sequenceNumber = sequenceNumber;
         return this;
     }
 }

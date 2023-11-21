@@ -34,6 +34,11 @@ public class GridAreaOwnershipAssignedMapper : IIntegrationEventMapper
 
         var gridAreaOwnershipAssignedEvent = (GridAreaOwnershipAssigned)integrationEvent.Message;
 
-        return Task.FromResult<InternalCommand>(new GridAreaOwnershipAssignedCommand(gridAreaOwnershipAssignedEvent.GridAreaCode, gridAreaOwnershipAssignedEvent.ValidFrom.ToInstant(), ActorNumber.Create(gridAreaOwnershipAssignedEvent.ActorNumber)));
+        return Task.FromResult<InternalCommand>(
+            new GridAreaOwnershipAssignedCommand(
+                gridAreaOwnershipAssignedEvent.GridAreaCode,
+                gridAreaOwnershipAssignedEvent.ValidFrom.ToInstant(),
+                ActorNumber.Create(gridAreaOwnershipAssignedEvent.ActorNumber),
+                gridAreaOwnershipAssignedEvent.SequenceNumber));
     }
 }
