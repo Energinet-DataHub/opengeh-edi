@@ -15,7 +15,7 @@
 using System;
 using Microsoft.Data.SqlClient;
 
-namespace Energinet.DataHub.EDI.Common.Configuration;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 
 public sealed class SqlConnectionSource : IDisposable
 {

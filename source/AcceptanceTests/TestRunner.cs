@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.Core.FunctionApp.TestCommon;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Microsoft.Extensions.Configuration;
@@ -20,6 +21,9 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 
 public class TestRunner : IAsyncDisposable
 {
+    internal const string BalanceResponsibleActorNumber = "5790000392551"; // Corresponds to the "Test til Phoenix" actor in the UI. Actor numbers in the UI doesn't equal the actor numbers we have in our database (our database has bad data).
+    internal const string BalanceResponsibleActorRole = "balanceresponsibleparty";
+
     protected TestRunner()
     {
         var root = new ConfigurationBuilder()
@@ -33,6 +37,7 @@ public class TestRunner : IAsyncDisposable
         EventPublisher = new IntegrationEventPublisher(connectionString, topicName);
         AzpToken = root.GetValue<string>("AZP_TOKEN")!;
 
+        /* EDK: The following no longer works since Azure databases doesn't accept username/password authentication
         var sqlServer = secretsConfiguration.GetValue<string>("mssql-data-url")!;
         var sqlUserName = secretsConfiguration.GetValue<string>("mssql-data-admin-user-name")!;
         var sqlUserPassword = secretsConfiguration.GetValue<string>("mssql-data-admin-user-password")!;
@@ -40,11 +45,28 @@ public class TestRunner : IAsyncDisposable
 
         var dbConnectionString = $"Server={sqlServer};Initial Catalog={sqlDatabaseName};User Id={sqlUserName};Password={sqlUserPassword};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
         ActorFactory.InsertActor(dbConnectionString, AzpToken);
+        */
+
+        ApiManagementUri = new Uri(root.GetValue<string>("API_MANAGEMENT_URL") ?? "https://apim-shared-sharedres-u-001.azure-api.net/");
+        AzureEntraTenantId = root.GetValue<string>("AZURE_ENTRA_TENANT_ID") ?? "4a7411ea-ac71-4b63-9647-b8bd4c5a20e0";
+        AzureEntraBackendAppId = root.GetValue<string>("AZURE_ENTRA_BACKEND_APP_ID") ?? "fe8b720c-fda4-4aaa-9c6d-c0d2ed6584fe";
+        AzureEntraClientId = root.GetValue<string>("AZURE_ENTRA_CLIENT_ID") ?? "D8E67800-B7EF-4025-90BB-FE06E1639117";
+        AzureEntraClientSecret = root.GetValue<string>("AZURE_ENTRA_CLIENT_SECRET") ?? throw new InvalidOperationException("AZURE_ENTRA_CLIENT_SECRET is not set in configuration");
     }
 
     internal IntegrationEventPublisher EventPublisher { get; }
 
+    internal Uri ApiManagementUri { get; }
+
     internal string AzpToken { get; }
+
+    internal string AzureEntraClientId { get; }
+
+    internal string AzureEntraClientSecret { get; }
+
+    internal string AzureEntraTenantId { get; }
+
+    internal string AzureEntraBackendAppId { get; }
 
     public async ValueTask DisposeAsync()
     {

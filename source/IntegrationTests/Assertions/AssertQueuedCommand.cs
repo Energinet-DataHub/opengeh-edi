@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Dapper;
-using Energinet.DataHub.EDI.Common.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using Xunit;

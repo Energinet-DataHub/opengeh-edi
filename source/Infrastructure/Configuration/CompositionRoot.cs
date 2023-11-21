@@ -21,10 +21,12 @@ using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration.Authentication;
 using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
-using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
-using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Common.Configuration;
-using Energinet.DataHub.EDI.Common.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
+using Energinet.DataHub.EDI.Common.DataRetention;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.Actors;
@@ -33,8 +35,6 @@ using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.FeatureFlag;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
 using Energinet.DataHub.EDI.Infrastructure.GridAreas;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
@@ -204,6 +204,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
         {
             _services.AddScoped<IRequestHandler<GridAreaOwnershipAssignedCommand, Unit>, GridAreaOwnershipAssignedHandler>();
             _services.AddScoped<IGridAreaRepository, GridAreaRepository>();
+            _services.AddTransient<IDataRetention, GridAreaOwnerRetention>();
         }
 
         private void AddWholeSaleInBox()

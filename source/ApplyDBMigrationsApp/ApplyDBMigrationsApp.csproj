@@ -137,6 +137,9 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202310231329 Alter Bundles1.sql" />
     <EmbeddedResource Include="Scripts\Model\202310231329 Alter Bundles.sql" />
     <EmbeddedResource Include="Scripts\Model\202311140927 Make EventPayload to varbinary for inboxEvents.sql" />
+    <EmbeddedResource Include="Scripts\Model\202311142152 Add sequence number to gridArea.sql" />
+    <EmbeddedResource Include="Scripts\Model\202311151110 Remane of gridArea table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202311211120 Alter SequenceNumber to int of gridArea table.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
     <None Remove="Scripts\Model\202310231329 Alter Bundles1.sql" />

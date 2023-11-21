@@ -12,8 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
+using System.Threading.Tasks;
 
-public record DummyRequest;
-
-public record DummyReply;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure
+{
+    /// <summary>
+    /// Unit of work
+    /// </summary>
+    public interface IUnitOfWork
+    {
+        /// <summary>
+        /// Commits all changes made to the database in the current transaction asynchronously.
+        /// </summary>
+        Task CommitTransactionAsync();
+    }
+}

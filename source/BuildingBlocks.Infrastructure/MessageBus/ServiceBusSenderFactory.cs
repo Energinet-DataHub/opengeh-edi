@@ -17,7 +17,7 @@ using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus
 {
     public sealed class ServiceBusSenderFactory : IServiceBusSenderFactory
     {
