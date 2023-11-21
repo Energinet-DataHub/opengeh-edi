@@ -17,7 +17,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
 
 public class RemoteBusinessService<TRequest, TReply>
     where TRequest : class

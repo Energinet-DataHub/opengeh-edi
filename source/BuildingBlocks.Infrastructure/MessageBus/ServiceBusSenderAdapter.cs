@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus
 {
     public sealed class ServiceBusSenderAdapter : IServiceBusSenderAdapter
     {

@@ -12,28 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+using System;
 
-namespace Energinet.DataHub.EDI.Common
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus
 {
     /// <summary>
-    /// Unit of work
+    /// Factory for Azure Service Bus client sender adapters
     /// </summary>
-    public interface IUnitOfWork
+    public interface IServiceBusSenderFactory : IAsyncDisposable, IDisposable
     {
         /// <summary>
-        /// Asynchronously starts a new transaction.
+        /// Get sender for specified topic
         /// </summary>
-        Task BeginTransactionAsync();
-
-        /// <summary>
-        /// Discards all changes made to the database in the current transaction asynchronously.
-        /// </summary>
-        Task RollbackAsync();
-
-        /// <summary>
-        /// Commits all changes made to the database in the current transaction asynchronously.
-        /// </summary>
-        Task CommitTransactionAsync();
+        /// <param name="topicName">Topic name</param>
+        /// <returns><see cref="IServiceBusSenderAdapter"/></returns>
+        IServiceBusSenderAdapter GetSender(string topicName);
     }
 }

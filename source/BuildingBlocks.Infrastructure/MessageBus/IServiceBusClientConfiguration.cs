@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 
 /// <summary>
 /// Interface for configurations

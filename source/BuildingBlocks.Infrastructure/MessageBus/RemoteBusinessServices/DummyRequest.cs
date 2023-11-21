@@ -12,20 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus
-{
-    /// <summary>
-    /// Factory for Azure Service Bus client sender adapters
-    /// </summary>
-    public interface IServiceBusSenderFactory : IAsyncDisposable, IDisposable
-    {
-        /// <summary>
-        /// Get sender for specified topic
-        /// </summary>
-        /// <param name="topicName">Topic name</param>
-        /// <returns><see cref="IServiceBusSenderAdapter"/></returns>
-        IServiceBusSenderAdapter GetSender(string topicName);
-    }
-}
+public record DummyRequest;
+
+public record DummyReply;

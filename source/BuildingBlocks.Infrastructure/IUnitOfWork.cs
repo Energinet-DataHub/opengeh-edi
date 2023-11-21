@@ -12,25 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
-
-/// <summary>
-/// Azure Service Bus Client sender adapter
-/// </summary>
-public interface IRemoteBusinessServiceRequestSenderAdapter<TRequest> : IAsyncDisposable, IDisposable
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure
 {
     /// <summary>
-    /// Topic name
+    /// Unit of work
     /// </summary>
-    string QueueName { get; }
+    public interface IUnitOfWork
+    {
+        /// <summary>
+        /// Asynchronously starts a new transaction.
+        /// </summary>
+        Task BeginTransactionAsync();
 
-    /// <summary>
-    /// Send integration event to topic
-    /// </summary>
-    /// <param name="message"></param>
-    Task SendAsync(ServiceBusMessage message);
+        /// <summary>
+        /// Discards all changes made to the database in the current transaction asynchronously.
+        /// </summary>
+        Task RollbackAsync();
+
+        /// <summary>
+        /// Commits all changes made to the database in the current transaction asynchronously.
+        /// </summary>
+        Task CommitTransactionAsync();
+    }
 }
