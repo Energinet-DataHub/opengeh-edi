@@ -15,7 +15,7 @@
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Common.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Common.DataRetention;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;

@@ -12,15 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.MessageBus;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
-/// <summary>
-/// Interface for configurations
-/// </summary>
-public interface IServiceBusClientConfiguration
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
+
+public static class SqlExtensions
 {
-    /// <summary>
-    /// Queue name for service
-    /// </summary>
-    string QueueName { get; }
+    public static void AddScopedSqlDbContext<TDbContext>(
+        this IServiceCollection services)
+        where TDbContext : DbContext
+    {
+        services.AddDbContext<TDbContext>((sp, o) =>
+        {
+            var source = sp.GetRequiredService<SqlConnectionSource>();
+            o.UseSqlServer(source.Connection, y => y.UseNodaTime());
+        });
+    }
 }
