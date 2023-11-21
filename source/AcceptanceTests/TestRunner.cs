@@ -31,7 +31,6 @@ public class TestRunner : IAsyncDisposable
         var secretsConfiguration = BuildSecretsConfiguration(root);
 
         var sqlServer = secretsConfiguration.GetValue<string>("mssql-data-url")!;
-        // Connection string with read only access to the database.
         var dbConnectionString = $"Server={sqlServer};Initial Catalog=mssqldb-edi-edi-u-001;Authentication=Active Directory Default;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
         ConnectionString = dbConnectionString;
 
