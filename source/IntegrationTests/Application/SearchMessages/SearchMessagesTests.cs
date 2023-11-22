@@ -206,7 +206,7 @@ public class SearchMessagesTests : TestBase
     {
         var actorNumber = ActorNumber.Create("1234512345888");
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, new[] { MarketRole.EnergySupplier }, restrictions: new[] { Restriction.OwnData }));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, restrictions: new[] { Restriction.Owned }));
 
         var archivedMessageOwnMessage = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: actorNumber.Value);
         var archivedMessage = CreateArchivedMessage(_systemDateTimeProvider.Now());
@@ -221,11 +221,11 @@ public class SearchMessagesTests : TestBase
     }
 
     [Fact]
-    public async Task No_data_restriction_can_fetch_all_messages()
+    public async Task None_data_restriction_can_fetch_all_messages()
     {
         var actorNumber = ActorNumber.Create("1234512345888");
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, new[] { MarketRole.EnergySupplier }, restrictions: new[] { Restriction.None }));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, restrictions: new[] { Restriction.None }));
 
         var archivedMessageOwnMessage = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: actorNumber.Value);
         var archivedMessage = CreateArchivedMessage(_systemDateTimeProvider.Now());

@@ -71,7 +71,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication
             }
 
             CurrentIdentity = new Authenticated(userIdFromSts, actorNumber, roles);
-            _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, roles: roles, new[] { Restriction.OwnData }));
+            _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, new[] { Restriction.Owned }, marketRoles: roles));
         }
 
         // TODO: Temporarly hack for authorizing users originating from portal. Remove when JWT is updated

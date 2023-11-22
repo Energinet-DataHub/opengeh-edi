@@ -19,7 +19,11 @@ namespace Energinet.DataHub.EDI.Domain.Authentication;
 public class Restriction : EnumerationType
 {
     public static readonly Restriction None = new(0, "None");
-    public static readonly Restriction OwnData = new(1, "OwnData");
+
+    /// <summary>
+    /// Allow to see that that the actor owns.
+    /// </summary>
+    public static readonly Restriction Owned = new(1, "OwnData");
 
     private Restriction(int id, string name)
         : base(id, name)

@@ -78,7 +78,7 @@ internal sealed class QueryBuilder
                 new KeyValuePair<string, object>("BusinessReason", request.BusinessReasons));
         }
 
-        if (_actorIdentity.HasRestriction(Restriction.OwnData))
+        if (_actorIdentity.HasRestriction(Restriction.Owned))
         {
             AddFilter(
                 "(ReceiverNumber=@Requester OR SenderNumber=@Requester)",

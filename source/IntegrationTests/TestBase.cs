@@ -73,7 +73,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             _processContext = GetService<ProcessContext>();
 
             var authenticatedActor = GetService<AuthenticatedActor>();
-            authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), new[] { MarketRole.DataHubAdministrator }, restrictions: new[] { Restriction.None }));
+            authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restrictions: new[] { Restriction.None }));
         }
 
         protected TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }

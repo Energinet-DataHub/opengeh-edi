@@ -20,24 +20,24 @@ public class ActorIdentity
 {
     public ActorIdentity(
         ActorNumber actorNumber,
-        IEnumerable<MarketRole> roles,
-        IEnumerable<Restriction> restrictions)
+        IEnumerable<Restriction> restrictions,
+        IEnumerable<MarketRole>? marketRoles = null)
     {
         ActorNumber = actorNumber;
-        Roles = roles;
         Restrictions = restrictions;
+        MarketRoles = marketRoles;
     }
 
     public ActorNumber ActorNumber { get; }
 
     public IEnumerable<Restriction> Restrictions { get; set; }
 
-    private IEnumerable<MarketRole> Roles { get; set; }
+    private IEnumerable<MarketRole>? MarketRoles { get; set; }
 
     public bool HasRole(MarketRole role)
     {
-        return Roles.Any(marketRole => marketRole.Name.Equals(role.Name, StringComparison.OrdinalIgnoreCase) &&
-                                       marketRole.Code.Equals(role.Code, StringComparison.OrdinalIgnoreCase));
+        return MarketRoles != null && MarketRoles.Any(marketRole => marketRole.Name.Equals(role.Name, StringComparison.OrdinalIgnoreCase) &&
+                                                                    marketRole.Code.Equals(role.Code, StringComparison.OrdinalIgnoreCase));
     }
 
     public bool HasRestriction(Restriction suspect)
