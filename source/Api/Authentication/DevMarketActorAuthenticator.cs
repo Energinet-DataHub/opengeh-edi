@@ -52,7 +52,7 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
             var actor = await FindActorAsync(actorNumberClaim.Value, cancellationToken).ConfigureAwait(false);
             if (actor is null)
             {
-                actor = new Actor(Guid.NewGuid().ToString(), actorNumberClaim.Value);
+                actor = new Actor(actorNumberClaim.Value, Guid.NewGuid().ToString());
                 await RegisterActorAsync(actor, cancellationToken).ConfigureAwait(false);
             }
 
