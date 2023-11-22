@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.B2CWebApi.Clients;
 using Energinet.DataHub.EDI.B2CWebApi.Configuration;
 using Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Microsoft.OpenApi.Models;
 
 namespace Energinet.DataHub.EDI.B2CWebApi;
@@ -71,7 +72,7 @@ public class Startup
         serviceCollection.AddOptions<DateTimeOptions>().Bind(Configuration);
 
         serviceCollection.AddHttpLoggingScope(DomainName);
-
+        serviceCollection.AddScoped<AuthenticatedActor>();
         serviceCollection.AddJwtTokenSecurity(Configuration);
         serviceCollection.AddDateTimeConfiguration(Configuration);
         serviceCollection
