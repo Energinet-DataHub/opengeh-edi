@@ -92,6 +92,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
             .SetSenderId(senderIdForBothMarketMessages)
             .Build();
 
+        // new scope to simulate a race condition.
         var sessionProvider = GetService<IServiceProvider>();
         using var secondScope = sessionProvider.CreateScope();
         var mediatorInSecondScope = secondScope.ServiceProvider.GetService<IMediator>();
@@ -134,6 +135,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
             .SetSenderId(senderIdForBothMarketMessages)
             .Build();
 
+        // new scope to simulate a race condition.
         var sessionProvider = GetService<IServiceProvider>();
         using var secondScope = sessionProvider.CreateScope();
         var mediatorInSecondScope = secondScope.ServiceProvider.GetService<IMediator>();
