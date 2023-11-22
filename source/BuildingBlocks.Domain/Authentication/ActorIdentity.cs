@@ -14,23 +14,23 @@
 
 using Energinet.DataHub.EDI.Common.Actors;
 
-namespace Energinet.DataHub.EDI.Domain.Authentication;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 
 public class ActorIdentity
 {
     public ActorIdentity(
         ActorNumber actorNumber,
-        IEnumerable<Restriction> restrictions,
+        Restriction restriction,
         IEnumerable<MarketRole>? marketRoles = null)
     {
         ActorNumber = actorNumber;
-        Restrictions = restrictions;
+        Restriction = restriction;
         MarketRoles = marketRoles;
     }
 
     public ActorNumber ActorNumber { get; }
 
-    public IEnumerable<Restriction> Restrictions { get; set; }
+    public Restriction Restriction { get; set; }
 
     private IEnumerable<MarketRole>? MarketRoles { get; set; }
 
@@ -42,6 +42,6 @@ public class ActorIdentity
 
     public bool HasRestriction(Restriction suspect)
     {
-        return Restrictions.Any(restriction => restriction.Name.Equals(suspect.Name, StringComparison.OrdinalIgnoreCase));
+        return suspect != null && Restriction.Name.Equals(suspect.Name, StringComparison.OrdinalIgnoreCase);
     }
 }

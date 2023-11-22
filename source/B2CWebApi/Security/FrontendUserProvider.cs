@@ -15,9 +15,8 @@
 using System.Security.Claims;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.EDI.B2CWebApi.Exceptions;
-using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Domain.Authentication;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Security;
 
@@ -85,13 +84,13 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
         {
             _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
                 actorNumber,
-                restrictions: new[] { Restriction.None }));
+                restriction: Restriction.None));
         }
         else
         {
             _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
                 actorNumber,
-                restrictions: new[] { Restriction.Owned }));
+                restriction: Restriction.Owned));
         }
     }
 }

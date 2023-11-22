@@ -21,8 +21,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.Domain.Authentication;
 using Microsoft.Data.SqlClient;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;

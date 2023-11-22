@@ -12,21 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Common;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Exceptions;
 
-namespace Energinet.DataHub.EDI.Domain.Authentication;
-
-public class Restriction : EnumerationType
+public class InvalidRestrictionException : Exception
 {
-    public static readonly Restriction None = new(0, "None");
+    public InvalidRestrictionException()
+    {
+    }
 
-    /// <summary>
-    /// Allow to see that that the actor owns.
-    /// </summary>
-    public static readonly Restriction Owned = new(1, "OwnData");
+    public InvalidRestrictionException(string message)
+        : base(message)
+    {
+    }
 
-    private Restriction(int id, string name)
-        : base(id, name)
+    public InvalidRestrictionException(string message, Exception innerException)
+        : base(message, innerException)
     {
     }
 }

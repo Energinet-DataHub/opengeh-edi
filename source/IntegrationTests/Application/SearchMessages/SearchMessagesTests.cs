@@ -19,10 +19,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Common.DateTime;
-using Energinet.DataHub.EDI.Domain.Authentication;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using NodaTime;
 using Xunit;
@@ -202,33 +202,37 @@ public class SearchMessagesTests : TestBase
     }
 
     [Fact]
-    public async Task Own_data_restriction_Requester_can_only_fetch_own_messages()
+    public async Task Actor_identity_with_owned_restriction_can_only_fetch_own_messages()
     {
-        var actorNumber = ActorNumber.Create("1234512345888");
+        var ownActorNumber = ActorNumber.Create("1234512345888");
+        var someoneElseActorNumber = ActorNumber.Create("1234512345888");
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, restrictions: new[] { Restriction.Owned }));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ownActorNumber, restriction: Restriction.Owned));
 
-        var archivedMessageOwnMessage = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: actorNumber.Value);
-        var archivedMessage = CreateArchivedMessage(_systemDateTimeProvider.Now());
-        await ArchiveMessage(archivedMessageOwnMessage);
+        var archivedMessageOwnMessageAsReceiver = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: ownActorNumber.Value);
+        var archivedMessageOwnMessageAsSender = CreateArchivedMessage(_systemDateTimeProvider.Now(), senderNumber: ownActorNumber.Value);
+        var archivedMessage = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: someoneElseActorNumber.Value);
+        await ArchiveMessage(archivedMessageOwnMessageAsReceiver);
+        await ArchiveMessage(archivedMessageOwnMessageAsSender);
         await ArchiveMessage(archivedMessage);
 
         var result = await _archivedMessagesClient.SearchAsync(new GetMessagesQuery(), CancellationToken.None);
 
-        var messageInfo = result.Messages.SingleOrDefault();
-        Assert.NotNull(messageInfo);
-        Assert.True(messageInfo.SenderNumber == actorNumber.Value || messageInfo.ReceiverNumber == actorNumber.Value);
+        Assert.Equal(2, result.Messages.Count);
+        Assert.True(result.Messages.First().SenderNumber == ownActorNumber.Value || result.Messages.First().ReceiverNumber == ownActorNumber.Value);
+        Assert.True(result.Messages.Last().SenderNumber == ownActorNumber.Value || result.Messages.Last().ReceiverNumber == ownActorNumber.Value);
     }
 
     [Fact]
-    public async Task None_data_restriction_can_fetch_all_messages()
+    public async Task Actor_identity_with_none_restriction_can_fetch_all_messages()
     {
-        var actorNumber = ActorNumber.Create("1234512345888");
+        var ownActorNumber = ActorNumber.Create("1234512345888");
+        var someoneElseActorNumber = ActorNumber.Create("1234512345888");
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, restrictions: new[] { Restriction.None }));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ownActorNumber, restriction: Restriction.None));
 
-        var archivedMessageOwnMessage = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: actorNumber.Value);
-        var archivedMessage = CreateArchivedMessage(_systemDateTimeProvider.Now());
+        var archivedMessageOwnMessage = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: ownActorNumber.Value);
+        var archivedMessage = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: someoneElseActorNumber.Value);
         await ArchiveMessage(archivedMessageOwnMessage);
         await ArchiveMessage(archivedMessage);
 
