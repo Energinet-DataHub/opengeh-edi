@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
@@ -22,13 +23,13 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasu
 public class AcceptedAggregatedTimeSerie : InternalCommand
 {
     [JsonConstructor]
-    public AcceptedAggregatedTimeSerie(Guid processId, AggregatedTimeSerie aggregatedTimeSerie)
+    public AcceptedAggregatedTimeSerie(Guid processId, IReadOnlyList<AggregatedTimeSerie> aggregatedTimeSeries)
     {
         ProcessId = processId;
-        AggregatedTimeSerie = aggregatedTimeSerie;
+        AggregatedTimeSeries = aggregatedTimeSeries;
     }
 
     public Guid ProcessId { get; }
 
-    public AggregatedTimeSerie AggregatedTimeSerie { get; }
+    public IReadOnlyList<AggregatedTimeSerie> AggregatedTimeSeries { get; }
 }
