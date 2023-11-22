@@ -18,7 +18,6 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration;
-using Energinet.DataHub.EDI.Application.Configuration.Authentication;
 using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
@@ -106,20 +105,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
         {
             _services.AddScoped<CurrentClaimsPrincipal>();
             _services.AddScoped(sp => new JwtTokenParser(tokenValidationParameters));
-            return this;
-        }
-
-        public CompositionRoot AddAuthentication(Func<IServiceProvider, IMarketActorAuthenticator>? authenticatorBuilder = null)
-        {
-            if (authenticatorBuilder is null)
-            {
-                _services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
-            }
-            else
-            {
-                _services.AddScoped(authenticatorBuilder);
-            }
-
             return this;
         }
 

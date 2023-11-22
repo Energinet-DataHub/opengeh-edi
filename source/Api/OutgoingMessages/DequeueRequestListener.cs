@@ -15,7 +15,6 @@
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.Configuration.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.OutgoingMessages.Contracts;
 using MediatR;

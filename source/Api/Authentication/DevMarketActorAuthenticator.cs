@@ -22,8 +22,9 @@ using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
+namespace Energinet.DataHub.EDI.Api.Authentication;
 
 public class DevMarketActorAuthenticator : MarketActorAuthenticator
 {

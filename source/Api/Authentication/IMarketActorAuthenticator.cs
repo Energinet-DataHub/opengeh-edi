@@ -16,7 +16,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Energinet.DataHub.EDI.Application.Configuration.Authentication
+namespace Energinet.DataHub.EDI.Api.Authentication
 {
     /// <summary>
     /// Service for authenticating an market actor
