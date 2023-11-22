@@ -19,17 +19,20 @@ using System.Text;
 using System.Text.Json;
 using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
 using Energinet.DataHub.EDI.AcceptanceTests.Factories;
+using Microsoft.Data.SqlClient;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 internal sealed class EdiDriver : IDisposable
 {
     private readonly string _azpToken;
+    private readonly string _connectionString;
     private readonly HttpClient _httpClient;
 
-    public EdiDriver(string azpToken)
+    public EdiDriver(string azpToken, string connectionString)
     {
         _azpToken = azpToken;
+        _connectionString = connectionString;
         _httpClient = new HttpClient();
         _httpClient.BaseAddress = new Uri("https://func-api-edi-u-001.azurewebsites.net/");
     }
@@ -117,6 +120,21 @@ internal sealed class EdiDriver : IDisposable
             .GetProperty("type")
             .GetProperty("value")
             .GetString());
+    }
+
+    public async Task ActorExistsAsync(string actorNumber, string azpToken)
+    {
+        using var connection = new SqlConnection(_connectionString);
+        using var command = new SqlCommand();
+
+        command.CommandText = "SELECT COUNT(*) FROM [Actor] WHERE ActorNumber = @ActorNumber AND ExternalId = @ExternalId";
+        command.Parameters.AddWithValue("@ActorNumber", actorNumber);
+        command.Parameters.AddWithValue("@ExternalId", azpToken);
+        command.Connection = connection;
+
+        await command.Connection.OpenAsync().ConfigureAwait(false);
+        var exist = await command.ExecuteScalarAsync().ConfigureAwait(false);
+        Assert.NotNull(exist);
     }
 
     private static string GetMessageId(HttpResponseMessage peekResponse)
