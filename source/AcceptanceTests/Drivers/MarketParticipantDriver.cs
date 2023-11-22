@@ -12,19 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
-using Google.Protobuf.WellKnownTypes;
+using Google.Protobuf;
+using Microsoft.Data.SqlClient;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
-public static class ActorFactory
+internal sealed class MarketParticipantDriver
 {
-    public static ActorActivated CreateActorActivated(string actorNumber, string b2CId) =>
-        new()
-        {
-            ActorNumber = actorNumber,
-            ExternalActorId = b2CId,
-            ActorNumberType = ActorNumberType.Gln,
-            ValidFrom = Timestamp.FromDateTime(DateTime.UtcNow),
-        };
+    private readonly IntegrationEventPublisher _integrationEventPublisher;
+
+    public MarketParticipantDriver(IntegrationEventPublisher integrationEventPublisher)
+    {
+        _integrationEventPublisher = integrationEventPublisher;
+    }
+
+    public async Task PublishActorActivatedAsync(string actorNumber, string b2CId)
+    {
+        await _integrationEventPublisher.PublishAsync(
+            "ActorActivated",
+            ActorFactory.CreateActorActivated(actorNumber, b2CId).ToByteArray()).ConfigureAwait(false);
+    }
 }

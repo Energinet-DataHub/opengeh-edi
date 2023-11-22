@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.Core.FunctionApp.TestCommon;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
+using Google.Protobuf;
 using Microsoft.Extensions.Configuration;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests;
@@ -32,20 +33,17 @@ public class TestRunner : IAsyncDisposable
             .Build();
         var secretsConfiguration = BuildSecretsConfiguration(root);
 
-        var connectionString = secretsConfiguration.GetValue<string>("sb-domain-relay-manage-connection-string")!;
+        var sqlServer = secretsConfiguration.GetValue<string>("mssql-data-url")!;
+        var dbConnectionString = $"Server={sqlServer};Authentication=Active Directory Default;Database=mssqldb-edi-edi-u-001;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+        ConnectionString = dbConnectionString;
+
+        var serviceBusConnectionString = secretsConfiguration.GetValue<string>("sb-domain-relay-manage-connection-string")!;
         var topicName = secretsConfiguration.GetValue<string>("sbt-shres-integrationevent-received-name")!;
-        EventPublisher = new IntegrationEventPublisher(connectionString, topicName);
+        EventPublisher = new IntegrationEventPublisher(serviceBusConnectionString, topicName);
         AzpToken = root.GetValue<string>("AZP_TOKEN")!;
 
-        /* EDK: The following no longer works since Azure databases doesn't accept username/password authentication
-        var sqlServer = secretsConfiguration.GetValue<string>("mssql-data-url")!;
-        var sqlUserName = secretsConfiguration.GetValue<string>("mssql-data-admin-user-name")!;
-        var sqlUserPassword = secretsConfiguration.GetValue<string>("mssql-data-admin-user-password")!;
-        var sqlDatabaseName = "mssqldb-edi-edi-u-001";
-
-        var dbConnectionString = $"Server={sqlServer};Initial Catalog={sqlDatabaseName};User Id={sqlUserName};Password={sqlUserPassword};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
-        ActorFactory.InsertActor(dbConnectionString, AzpToken);
-        */
+        var actorActivated = ActorFactory.CreateActorActivated("5790000610976", AzpToken);
+        _ = Task.Run(async () => await EventPublisher.PublishAsync(ActorActivated.EventName, actorActivated.ToByteArray()).ConfigureAwait(false));
 
         ApiManagementUri = new Uri(root.GetValue<string>("API_MANAGEMENT_URL") ?? "https://apim-shared-sharedres-u-001.azure-api.net/");
         AzureEntraTenantId = root.GetValue<string>("AZURE_ENTRA_TENANT_ID") ?? "4a7411ea-ac71-4b63-9647-b8bd4c5a20e0";
@@ -56,9 +54,11 @@ public class TestRunner : IAsyncDisposable
 
     internal IntegrationEventPublisher EventPublisher { get; }
 
-    internal Uri ApiManagementUri { get; }
+    internal string ConnectionString { get; }
 
     internal string AzpToken { get; }
+
+    internal Uri ApiManagementUri { get; }
 
     internal string AzureEntraClientId { get; }
 
