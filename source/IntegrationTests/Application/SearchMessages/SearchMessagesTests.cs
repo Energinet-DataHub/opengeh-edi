@@ -19,7 +19,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using NodaTime;
@@ -197,6 +199,46 @@ public class SearchMessagesTests : TestBase
         Assert.Contains(
             result.Messages,
             message => message.BusinessReason!.Equals(balanceFixing.Name, StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public async Task Actor_identity_with_owned_restriction_can_only_fetch_own_messages()
+    {
+        var ownActorNumber = ActorNumber.Create("1234512345888");
+        var someoneElseActorNumber = ActorNumber.Create("1234512345777");
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ownActorNumber, restriction: Restriction.Owned));
+
+        var archivedMessageOwnMessageAsReceiver = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: ownActorNumber.Value, senderNumber: someoneElseActorNumber.Value);
+        var archivedMessageOwnMessageAsSender = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: someoneElseActorNumber.Value, senderNumber: ownActorNumber.Value);
+        var archivedMessage = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: someoneElseActorNumber.Value, senderNumber: someoneElseActorNumber.Value);
+        await ArchiveMessage(archivedMessageOwnMessageAsReceiver);
+        await ArchiveMessage(archivedMessageOwnMessageAsSender);
+        await ArchiveMessage(archivedMessage);
+
+        var result = await _archivedMessagesClient.SearchAsync(new GetMessagesQuery(), CancellationToken.None);
+
+        Assert.Equal(2, result.Messages.Count);
+        Assert.True(result.Messages.First().SenderNumber == ownActorNumber.Value || result.Messages.First().ReceiverNumber == ownActorNumber.Value);
+        Assert.True(result.Messages.Last().SenderNumber == ownActorNumber.Value || result.Messages.Last().ReceiverNumber == ownActorNumber.Value);
+    }
+
+    [Fact]
+    public async Task Actor_identity_with_none_restriction_can_fetch_all_messages()
+    {
+        var ownActorNumber = ActorNumber.Create("1234512345888");
+        var someoneElseActorNumber = ActorNumber.Create("1234512345777");
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ownActorNumber, restriction: Restriction.None));
+
+        var archivedMessageOwnMessageAsSender = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: someoneElseActorNumber.Value, senderNumber: ownActorNumber.Value);
+        var archivedMessage = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: someoneElseActorNumber.Value, senderNumber: someoneElseActorNumber.Value);
+        await ArchiveMessage(archivedMessageOwnMessageAsSender);
+        await ArchiveMessage(archivedMessage);
+
+        var result = await _archivedMessagesClient.SearchAsync(new GetMessagesQuery(), CancellationToken.None);
+
+        Assert.Equal(2, result.Messages.Count);
     }
 
     private static Instant CreatedAt(string date)

@@ -12,16 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using Energinet.DataHub.EDI.Common.Actors;
+using System;
 
-namespace Energinet.DataHub.EDI.Application.Configuration.Authentication
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Exceptions;
+
+public class InvalidRestrictionException : Exception
 {
-    public class Authenticated : MarketActorIdentity
+    public InvalidRestrictionException()
     {
-        public Authenticated(string id, ActorNumber? number, IEnumerable<MarketRole> roles)
-            : base(id, number, roles)
-        {
-        }
+    }
+
+    public InvalidRestrictionException(string message)
+        : base(message)
+    {
+    }
+
+    public InvalidRestrictionException(string message, Exception innerException)
+        : base(message, innerException)
+    {
     }
 }
