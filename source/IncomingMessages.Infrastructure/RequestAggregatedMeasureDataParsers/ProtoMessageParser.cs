@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 using Energinet.DataHub.Edi.Requests;
 using IncomingMessages.Infrastructure.BaseParsers;
@@ -24,9 +25,11 @@ namespace IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 
 public class ProtoMessageParser : IMessageParser
 {
-    public ProtoMessageParser()
-        : base()
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+
+    public ProtoMessageParser(ISystemDateTimeProvider systemDateTimeProvider)
     {
+        _systemDateTimeProvider = systemDateTimeProvider;
     }
 
     public DocumentFormat HandledFormat => DocumentFormat.Proto;
@@ -38,7 +41,7 @@ public class ProtoMessageParser : IMessageParser
         var requestAggregatedMeasureData = RequestAggregatedMeasureData.Parser.ParseFrom(message);
         var marketMessage = RequestAggregatedMeasureDataMarketMessageFactory.Create(
             requestAggregatedMeasureData,
-            SystemClock.Instance.GetCurrentInstant());
+            _systemDateTimeProvider.Now());
         var mes = new RequestAggregatedMeasureDataMarketMessageParserResult(marketMessage);
         return Task.FromResult(mes);
     }
