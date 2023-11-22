@@ -69,8 +69,7 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
             QuantityQuality = QuantityQuality.Incomplete,
             Time = new Timestamp() { Seconds = 1, },
         };
-
-        return new AggregatedTimeSeriesRequestAccepted()
+        var series = new Series()
         {
             GridArea = GridAreaCode,
             QuantityUnit = QuantityUnit.Kwh,
@@ -78,6 +77,10 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
             TimeSeriesType = TimeSeriesType.Production,
             Resolution = Resolution.Pt15M,
         };
+
+        var timeSerie = new AggregatedTimeSeriesRequestAccepted();
+        timeSerie.Series.Add(series);
+        return timeSerie;
     }
 
     private void RegisterInboxEvent()
