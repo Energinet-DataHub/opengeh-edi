@@ -12,17 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Common.Actors;
 
-namespace Energinet.DataHub.EDI.Application.Configuration.Authentication
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+
+public class Restriction : EnumerationType
 {
-    public class Authenticated : MarketActorIdentity
+    /// <summary>
+    /// No restrictions can see all data.
+    /// </summary>
+    public static readonly Restriction None = new(0, nameof(None));
+
+    /// <summary>
+    /// Restricted to only see own data.
+    /// </summary>
+    public static readonly Restriction Owned = new(1, nameof(Owned));
+
+    private Restriction(int id, string name)
+        : base(id, name)
     {
-        public Authenticated(string id, ActorNumber? number, IEnumerable<MarketRole> roles)
-            : base(id, number, roles)
-        {
-        }
     }
 }

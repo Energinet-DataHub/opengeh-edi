@@ -13,16 +13,22 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Common.Actors;
 
-namespace Energinet.DataHub.EDI.Application.Configuration.Authentication
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Exceptions;
+
+public class InvalidRestrictionException : Exception
 {
-    public class NotAuthenticated : MarketActorIdentity
+    public InvalidRestrictionException()
     {
-        public NotAuthenticated()
-            : base("NotSet", ActorNumber.Create("0000000000000"), Array.Empty<MarketRole>())
-        {
-        }
+    }
+
+    public InvalidRestrictionException(string message)
+        : base(message)
+    {
+    }
+
+    public InvalidRestrictionException(string message, Exception innerException)
+        : base(message, innerException)
+    {
     }
 }

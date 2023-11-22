@@ -16,7 +16,11 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
+<<<<<<<< HEAD:source/Common/IMarketActorAuthenticator.cs
 namespace Energinet.DataHub.EDI.Common
+========
+namespace Energinet.DataHub.EDI.Api.Authentication
+>>>>>>>> main:source/Api/Authentication/IMarketActorAuthenticator.cs
 {
     /// <summary>
     /// Service for authenticating an market actor
@@ -24,15 +28,10 @@ namespace Energinet.DataHub.EDI.Common
     public interface IMarketActorAuthenticator
     {
         /// <summary>
-        /// Current identity
-        /// </summary>
-        MarketActorIdentity CurrentIdentity { get; }
-
-        /// <summary>
         /// Authenticates a claims principal
         /// </summary>
         /// <param name="claimsPrincipal"></param>
         /// <param name="cancellationToken"></param>
-        Task AuthenticateAsync(ClaimsPrincipal claimsPrincipal, CancellationToken cancellationToken);
+        Task<bool> AuthenticateAsync(ClaimsPrincipal claimsPrincipal, CancellationToken cancellationToken);
     }
 }

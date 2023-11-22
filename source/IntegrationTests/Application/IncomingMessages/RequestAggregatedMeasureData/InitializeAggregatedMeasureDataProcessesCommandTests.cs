@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
@@ -30,7 +31,9 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Requests;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Categories;
 
@@ -89,9 +92,16 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
             .SetSenderId(senderIdForBothMarketMessages)
             .Build();
 
+        // new scope to simulate a race condition.
+        var sessionProvider = GetService<IServiceProvider>();
+        using var secondScope = sessionProvider.CreateScope();
+        var mediatorInSecondScope = secondScope.ServiceProvider.GetService<IMediator>();
+        var authenticatedActorInSecondScope = secondScope.ServiceProvider.GetService<AuthenticatedActor>();
+        authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None));
+
         // Act
         var task01 = InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage01));
-        var task02 = InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage02));
+        var task02 = mediatorInSecondScope!.Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage02));
 
         try
         {
@@ -125,9 +135,16 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
             .SetSenderId(senderIdForBothMarketMessages)
             .Build();
 
+        // new scope to simulate a race condition.
+        var sessionProvider = GetService<IServiceProvider>();
+        using var secondScope = sessionProvider.CreateScope();
+        var mediatorInSecondScope = secondScope.ServiceProvider.GetService<IMediator>();
+        var authenticatedActorInSecondScope = secondScope.ServiceProvider.GetService<AuthenticatedActor>();
+        authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None));
+
         // Act
         var task01 = InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage01));
-        var task02 = InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage02));
+        var task02 = mediatorInSecondScope!.Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage02));
 
         var tasks = new[] { task01, task02 };
 

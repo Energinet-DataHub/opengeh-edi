@@ -38,8 +38,7 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Application\Application.csproj" />
-      <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
+      <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
       <ProjectReference Include="..\Infrastructure.DocumentValidation\Infrastructure.DocumentValidation.csproj" />
       <ProjectReference Include="..\Process.Interfaces\Process.Interfaces.csproj" />
     </ItemGroup>
@@ -47,9 +46,5 @@ limitations under the License.
     <ItemGroup>
       <Compile Remove="JsonMessageConverter.cs" />
       <Compile Remove="Messages\MktActivityRecord.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Response\" />
     </ItemGroup>
 </Project>
