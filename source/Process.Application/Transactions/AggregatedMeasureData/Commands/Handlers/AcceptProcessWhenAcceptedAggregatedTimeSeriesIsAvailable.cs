@@ -13,11 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands.Handlers;
@@ -39,9 +41,13 @@ public class AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable : IRequest
         var process = await _aggregatedMeasureDataProcessRepository
             .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
-        var aggregation = AggregationFactory.Create(process, request.AggregatedTimeSerie);
+        var aggregations = new List<Aggregation>();
+        foreach (var aggregatedTimeSerie in request.AggregatedTimeSeries)
+        {
+            aggregations.Add(AggregationFactory.Create(process, aggregatedTimeSerie));
+        }
 
-        process.IsAccepted(aggregation);
+        process.IsAccepted(aggregations);
 
         return Unit.Value;
     }
