@@ -72,7 +72,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             _processContext = GetService<ProcessContext>();
 
             var authenticatedActor = GetService<AuthenticatedActor>();
-            authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None, Array.Empty<MarketRole>()));
+            authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None));
         }
 
         protected TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
@@ -107,7 +107,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
         protected Task<TResult> InvokeCommandAsync<TResult>(ICommand<TResult> command)
         {
-            //BuildServices();
             return GetService<IMediator>().Send(command);
         }
 

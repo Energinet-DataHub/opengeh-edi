@@ -88,7 +88,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
             {
                 new(ClaimsMap.UserId, SampleData.StsAssignedUserId),
                 ClaimsMap.RoleFrom(MarketRole.EnergySupplier),
-                ClaimsMap.RoleFrom(MarketRole.GridOperator),
             };
             var claimsPrincipal = CreateIdentity(claims);
 
@@ -96,7 +95,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
 
             Assert.True(authenticated);
             Assert.Equal(_authenticatedActor.CurrentActorIdentity.ActorNumber.Value, SampleData.ActorNumber);
-            Assert.True(_authenticatedActor.CurrentActorIdentity.HasRole(MarketRole.GridOperator));
             Assert.True(_authenticatedActor.CurrentActorIdentity.HasRole(MarketRole.EnergySupplier));
         }
 

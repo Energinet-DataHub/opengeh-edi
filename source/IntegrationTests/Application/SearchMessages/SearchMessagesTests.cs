@@ -207,7 +207,7 @@ public class SearchMessagesTests : TestBase
         var ownActorNumber = ActorNumber.Create("1234512345888");
         var someoneElseActorNumber = ActorNumber.Create("1234512345777");
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ownActorNumber, restriction: Restriction.Owned, Array.Empty<MarketRole>()));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ownActorNumber, restriction: Restriction.Owned));
 
         var archivedMessageOwnMessageAsReceiver = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: ownActorNumber.Value, senderNumber: someoneElseActorNumber.Value);
         var archivedMessageOwnMessageAsSender = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: someoneElseActorNumber.Value, senderNumber: ownActorNumber.Value);
@@ -229,7 +229,7 @@ public class SearchMessagesTests : TestBase
         var ownActorNumber = ActorNumber.Create("1234512345888");
         var someoneElseActorNumber = ActorNumber.Create("1234512345777");
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ownActorNumber, restriction: Restriction.None, Array.Empty<MarketRole>()));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ownActorNumber, restriction: Restriction.None));
 
         var archivedMessageOwnMessageAsSender = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: someoneElseActorNumber.Value, senderNumber: ownActorNumber.Value);
         var archivedMessage = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: someoneElseActorNumber.Value, senderNumber: someoneElseActorNumber.Value);

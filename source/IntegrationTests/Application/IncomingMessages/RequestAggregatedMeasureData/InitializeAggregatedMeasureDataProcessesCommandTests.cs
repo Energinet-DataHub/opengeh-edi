@@ -96,7 +96,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         using var secondScope = sessionProvider.CreateScope();
         var mediatorInSecondScope = secondScope.ServiceProvider.GetService<IMediator>();
         var authenticatedActorInSecondScope = secondScope.ServiceProvider.GetService<AuthenticatedActor>();
-        authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None, Array.Empty<MarketRole>()));
+        authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None));
 
         // Act
         var task01 = InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage01));
@@ -138,7 +138,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         using var secondScope = sessionProvider.CreateScope();
         var mediatorInSecondScope = secondScope.ServiceProvider.GetService<IMediator>();
         var authenticatedActorInSecondScope = secondScope.ServiceProvider.GetService<AuthenticatedActor>();
-        authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None, Array.Empty<MarketRole>()));
+        authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None));
 
         // Act
         var task01 = InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage01));

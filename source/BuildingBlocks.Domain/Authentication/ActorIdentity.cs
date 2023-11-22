@@ -24,23 +24,22 @@ public class ActorIdentity
     public ActorIdentity(
         ActorNumber actorNumber,
         Restriction restriction,
-        IEnumerable<MarketRole> marketRoles)
+        MarketRole? marketRole = null)
     {
         ActorNumber = actorNumber;
         Restriction = restriction;
-        MarketRoles = marketRoles;
+        MarketRole = marketRole;
     }
 
     public ActorNumber ActorNumber { get; }
 
     public Restriction Restriction { get; set; }
 
-    public IEnumerable<MarketRole> MarketRoles { get; set; }
+    public MarketRole? MarketRole { get; set; }
 
     public bool HasRole(MarketRole role)
     {
-        return MarketRoles != null && MarketRoles.Any(marketRole => marketRole.Name.Equals(role.Name, StringComparison.OrdinalIgnoreCase) &&
-                                                                    marketRole.Code.Equals(role.Code, StringComparison.OrdinalIgnoreCase));
+        return MarketRole != null && role != null && MarketRole.Name.Equals(role.Name, StringComparison.OrdinalIgnoreCase) && MarketRole.Code.Equals(role.Code, StringComparison.OrdinalIgnoreCase);
     }
 
     public bool HasRestriction(Restriction suspect)

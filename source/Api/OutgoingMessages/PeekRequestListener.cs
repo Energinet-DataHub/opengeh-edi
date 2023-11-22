@@ -76,7 +76,7 @@ public class PeekRequestListener
         var peekResult = await _mediator.Send(new PeekCommand(
             _authenticatedActor.CurrentActorIdentity.ActorNumber,
             msgCategory,
-            _authenticatedActor.CurrentActorIdentity.MarketRoles.First(),
+            _authenticatedActor.CurrentActorIdentity.MarketRole!,
             desiredDocumentFormat)).ConfigureAwait(false);
 
         var response = HttpResponseData.CreateResponse(request);

@@ -48,7 +48,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         _processContext = GetService<ProcessContext>();
 
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234567890123"), restriction: Restriction.None, new[] { MarketRole.FromCode("DDQ") }));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234567890123"), restriction: Restriction.None,  MarketRole.FromCode("DDQ")));
 
         _requestAggregatedMeasureDataValidator = GetService<RequestAggregatedMeasureDataValidator>();
     }

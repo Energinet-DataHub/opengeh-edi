@@ -43,7 +43,7 @@ namespace Energinet.DataHub.EDI.Api.Authentication
             // TODO: Temporarly hack for authorizing users originating from portal. Remove when JWT is updated
             if (UserOriginatesFromPortal(claimsPrincipal))
             {
-                _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.Owned, marketRoles: new List<MarketRole>()));
+                _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.Owned));
                 return true;
             }
 
@@ -59,13 +59,13 @@ namespace Energinet.DataHub.EDI.Api.Authentication
                 return false;
             }
 
-            var roles = ParseRoles(claimsPrincipal);
-            if (roles.Count == 0)
+            var marketRole = ParseRole(claimsPrincipal);
+            if (marketRole is null)
             {
                 return false;
             }
 
-            _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, marketRoles: roles));
+            _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, marketRole: marketRole));
             return true;
         }
 
@@ -81,23 +81,19 @@ namespace Energinet.DataHub.EDI.Api.Authentication
                 .Value;
         }
 
-        private static IReadOnlyList<MarketRole> ParseRoles(ClaimsPrincipal claimsPrincipal)
+        private static MarketRole? ParseRole(ClaimsPrincipal claimsPrincipal)
         {
             var roleClaims = claimsPrincipal.FindAll(claim =>
                     claim.Type.Equals(ClaimTypes.Role, StringComparison.OrdinalIgnoreCase))
-                .Select(claim => claim.Value);
+                .Select(claim => claim.Value)
+                .ToList();
 
-            var roles = new List<MarketRole>();
-            foreach (var roleClaim in roleClaims)
+            if (!roleClaims.Any() || roleClaims.Count > 1)
             {
-                var marketRole = ClaimsMap.RoleFrom(roleClaim);
-                if (marketRole is not null)
-                {
-                    roles.Add(marketRole);
-                }
+                return null;
             }
 
-            return roles;
+            return ClaimsMap.RoleFrom(roleClaims.First());
         }
     }
 }

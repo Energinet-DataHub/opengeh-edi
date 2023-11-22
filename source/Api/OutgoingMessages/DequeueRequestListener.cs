@@ -41,7 +41,7 @@ public class DequeueRequestListener
         FunctionContext executionContext,
         string messageId)
     {
-        var result = await _mediator.Send(new DequeueCommand(messageId, _authenticatedActor.CurrentActorIdentity!.MarketRoles.First(), _authenticatedActor.CurrentActorIdentity.ActorNumber!)).ConfigureAwait(false);
+        var result = await _mediator.Send(new DequeueCommand(messageId, _authenticatedActor.CurrentActorIdentity.MarketRole!, _authenticatedActor.CurrentActorIdentity.ActorNumber!)).ConfigureAwait(false);
         return result.Success
             ? request.CreateResponse(HttpStatusCode.OK)
             : request.CreateResponse(HttpStatusCode.BadRequest);

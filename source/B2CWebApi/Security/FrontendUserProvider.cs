@@ -84,15 +84,13 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
         {
             _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
                 actorNumber,
-                restriction: Restriction.None,
-                marketRoles: Array.Empty<MarketRole>()));
+                restriction: Restriction.None));
         }
         else
         {
             _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
                 actorNumber,
-                restriction: Restriction.Owned,
-                marketRoles: Array.Empty<MarketRole>()));
+                restriction: Restriction.Owned));
         }
     }
 }
