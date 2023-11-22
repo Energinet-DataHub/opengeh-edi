@@ -21,11 +21,11 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 
 [IntegrationTest]
-public sealed class WhenActorActivatedIsPublishedTests : TestRunner
+public sealed class WhenNewB2BActorIsCreatedTests : TestRunner
 {
     private readonly ActorDsl _actorDsl;
 
-    public WhenActorActivatedIsPublishedTests()
+    public WhenNewB2BActorIsCreatedTests()
     {
         _actorDsl = new ActorDsl(new MarketParticipantDriver(EventPublisher), new EdiDriver(AzpToken, ConnectionString));
     }
