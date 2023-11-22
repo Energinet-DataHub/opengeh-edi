@@ -33,17 +33,20 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
     {
         if (aggregatedTimeSeriesRequestAccepted == null) throw new ArgumentNullException(nameof(aggregatedTimeSeriesRequestAccepted));
 
+        var firstSerie = aggregatedTimeSeriesRequestAccepted.Series.FirstOrDefault();
+        Assert.NotNull(firstSerie);
         Assert.NotNull(_actualNotifications);
         Assert.Single(_actualNotifications);
         Assert.Contains(_actualNotifications, notification => notification is AggregatedTimeSerieRequestWasAccepted);
         var actualNotification = _actualNotifications.Single() as AggregatedTimeSerieRequestWasAccepted;
-        var actualTimeSerie = actualNotification!.AggregatedTimeSerie;
-        Assert.Equal(aggregatedTimeSeriesRequestAccepted.GridArea, actualTimeSerie.GridAreaDetails.GridAreaCode);
-        Assert.Equal(MapUnitType(aggregatedTimeSeriesRequestAccepted), actualTimeSerie.UnitType);
-        Assert.Equal(MapMeteringPointType(aggregatedTimeSeriesRequestAccepted), actualTimeSerie.MeteringPointType);
+        var actualTimeSerie = actualNotification!.AggregatedTimeSeries[0];
+        Assert.NotNull(actualTimeSerie);
+        Assert.Equal(firstSerie.GridArea, actualTimeSerie.GridAreaDetails.GridAreaCode);
+        Assert.Equal(MapUnitType(firstSerie), actualTimeSerie.UnitType);
+        Assert.Equal(MapMeteringPointType(firstSerie), actualTimeSerie.MeteringPointType);
         foreach (var point in actualTimeSerie.Points)
         {
-            Assert.Contains(aggregatedTimeSeriesRequestAccepted.TimeSeriesPoints, exceptedPoint =>
+            Assert.Contains(firstSerie.TimeSeriesPoints, exceptedPoint =>
                 exceptedPoint.Time.ToString() == point.SampleTime &&
                 MapQuality(exceptedPoint.QuantityQuality) == point.Quality &&
                 Parse(exceptedPoint.Quantity) == point.Quantity);
@@ -80,7 +83,7 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
         return input.Units + (input.Nanos / nanoFactor);
     }
 
-    private static string MapMeteringPointType(AggregatedTimeSeriesRequestAccepted aggregation)
+    private static string MapMeteringPointType(Series aggregation)
     {
         return aggregation.TimeSeriesType switch
         {
@@ -95,7 +98,7 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
         };
     }
 
-    private static string MapUnitType(AggregatedTimeSeriesRequestAccepted aggregation)
+    private static string MapUnitType(Series aggregation)
     {
         return aggregation.QuantityUnit switch
         {
