@@ -37,8 +37,6 @@ public class SearchMessagesTests : TestBase
     public SearchMessagesTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), new[] { MarketRole.DataHubAdministrator }));
         _archivedMessagesClient = GetService<IArchivedMessagesClient>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
     }
@@ -203,20 +201,12 @@ public class SearchMessagesTests : TestBase
             message => message.BusinessReason!.Equals(balanceFixing.Name, StringComparison.OrdinalIgnoreCase));
     }
 
-    [Theory]
-    [InlineData("EnergySupplier")]
-    [InlineData("GridOperator")]
-    [InlineData("MeteringPointAdministrator")]
-    [InlineData("MeteringDataAdministrator")]
-    [InlineData("MeteredDataResponsible")]
-    [InlineData("BalanceResponsibleParty")]
-    [InlineData("CalculationResponsibleRole")]
-    [InlineData("MasterDataResponsibleRole")]
-    public async Task Requester_can_only_fetch_own_messages(string marketRoleName)
+    [Fact]
+    public async Task Own_data_restriction_Requester_can_only_fetch_own_messages()
     {
         var actorNumber = ActorNumber.Create("1234512345888");
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, new[] { EnumerationType.FromName<MarketRole>(marketRoleName) }));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, new[] { MarketRole.EnergySupplier }, restrictions: new[] { Restriction.OwnData }));
 
         var archivedMessageOwnMessage = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: actorNumber.Value);
         var archivedMessage = CreateArchivedMessage(_systemDateTimeProvider.Now());
@@ -230,13 +220,12 @@ public class SearchMessagesTests : TestBase
         Assert.True(messageInfo.SenderNumber == actorNumber.Value || messageInfo.ReceiverNumber == actorNumber.Value);
     }
 
-    [Theory]
-    [InlineData("DataHubAdministrator")]
-    public async Task Market_roll_can_fetch_all_messages(string marketRoleName)
+    [Fact]
+    public async Task No_data_restriction_can_fetch_all_messages()
     {
         var actorNumber = ActorNumber.Create("1234512345888");
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, new[] { EnumerationType.FromName<MarketRole>(marketRoleName) }));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, new[] { MarketRole.EnergySupplier }, restrictions: new[] { Restriction.None }));
 
         var archivedMessageOwnMessage = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: actorNumber.Value);
         var archivedMessage = CreateArchivedMessage(_systemDateTimeProvider.Now());

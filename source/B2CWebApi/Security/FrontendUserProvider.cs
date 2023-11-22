@@ -69,7 +69,7 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
         if (azp is null)
             throw new MissingAzpException();
 
-        _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create(actorNumber), roles: new[] { EnumerationType.FromName<MarketRole>(role) }));
+        SetAuthenticatedActor(ActorNumber.Create(actorNumber), accessAllData: isFas);
         return Task.FromResult<FrontendUser?>(new FrontendUser(
             userId,
             actorId,
@@ -77,5 +77,23 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
             actorNumber,
             role,
             azp));
+    }
+
+    private void SetAuthenticatedActor(ActorNumber actorNumber, bool accessAllData)
+    {
+        if (accessAllData)
+        {
+            _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
+                actorNumber,
+                roles: new[] { MarketRole.FrontendEndUser },
+                restrictions: new[] { Restriction.None }));
+        }
+        else
+        {
+            _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
+                actorNumber,
+                roles: new[] { MarketRole.FrontendEndUser },
+                restrictions: new[] { Restriction.OwnData }));
+        }
     }
 }

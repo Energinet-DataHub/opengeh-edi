@@ -18,6 +18,7 @@ using Dapper;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Domain.Authentication;
+using Energinet.DataHub.EDI.Domain.Exceptions;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 
@@ -77,11 +78,15 @@ internal sealed class QueryBuilder
                 new KeyValuePair<string, object>("BusinessReason", request.BusinessReasons));
         }
 
-        if (!_actorIdentity.HasRole(MarketRole.DataHubAdministrator))
+        if (_actorIdentity.HasRestriction(Restriction.OwnData))
         {
             AddFilter(
                 "(ReceiverNumber=@Requester OR SenderNumber=@Requester)",
                 new KeyValuePair<string, object>("Requester", _actorIdentity.ActorNumber.Value));
+        }
+        else if (!_actorIdentity.HasRestriction(Restriction.None))
+        {
+            throw new InvalidRestrictionException($"Invalid restriction for fetching archived messages. Must be either OwnData or None. ActorNumber: {_actorIdentity.ActorNumber.Value}; Restrictions: {_actorIdentity.Restrictions.Select(x => x.Name).Aggregate((x, y) => x + ", " + y)}");
         }
 
         return new QueryInput(BuildStatement(), _queryParameters);

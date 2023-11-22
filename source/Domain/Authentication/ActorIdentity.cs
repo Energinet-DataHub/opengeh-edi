@@ -18,19 +18,30 @@ namespace Energinet.DataHub.EDI.Domain.Authentication;
 
 public class ActorIdentity
 {
-    public ActorIdentity(ActorNumber actorNumber, IEnumerable<MarketRole> roles)
+    public ActorIdentity(
+        ActorNumber actorNumber,
+        IEnumerable<MarketRole> roles,
+        IEnumerable<Restriction> restrictions)
     {
         ActorNumber = actorNumber;
         Roles = roles;
+        Restrictions = restrictions;
     }
 
     public ActorNumber ActorNumber { get; }
 
-    public IEnumerable<MarketRole> Roles { get; set; }
+    public IEnumerable<Restriction> Restrictions { get; set; }
+
+    private IEnumerable<MarketRole> Roles { get; set; }
 
     public bool HasRole(MarketRole role)
     {
         return Roles.Any(marketRole => marketRole.Name.Equals(role.Name, StringComparison.OrdinalIgnoreCase) &&
                                        marketRole.Code.Equals(role.Code, StringComparison.OrdinalIgnoreCase));
+    }
+
+    public bool HasRestriction(Restriction suspect)
+    {
+        return Restrictions.Any(restriction => restriction.Name.Equals(suspect.Name, StringComparison.OrdinalIgnoreCase));
     }
 }

@@ -18,9 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Common.DateTime;
-using Energinet.DataHub.EDI.Domain.Authentication;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Microsoft.Data.SqlClient;
 using Xunit;
@@ -35,8 +33,6 @@ public class WhenADocumentIsRequestedTests : TestBase
     public WhenADocumentIsRequestedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), new[] { MarketRole.DataHubAdministrator }));
         _archivedMessagesClient = GetService<IArchivedMessagesClient>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
     }

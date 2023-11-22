@@ -36,6 +36,7 @@ public class MarketRole : EnumerationType
     public static readonly MarketRole MasterDataResponsibleRole = new(6, "MasterDataResponsibleRole", "DDZ");
 
     public static readonly MarketRole DataHubAdministrator = new(7, "DataHubAdministrator", string.Empty);
+    public static readonly MarketRole FrontendEndUser = new(7, "FrontendEndUser", string.Empty);
 
     private MarketRole(int id, string name, string code)
         : base(id, name)

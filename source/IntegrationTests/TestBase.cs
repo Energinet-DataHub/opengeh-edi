@@ -27,8 +27,10 @@ using Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.TimeEvents;
+using Energinet.DataHub.EDI.Domain.Authentication;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
@@ -69,6 +71,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             BuildServices();
             _b2BContext = GetService<B2BContext>();
             _processContext = GetService<ProcessContext>();
+
+            var authenticatedActor = GetService<AuthenticatedActor>();
+            authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), new[] { MarketRole.DataHubAdministrator }, restrictions: new[] { Restriction.None }));
         }
 
         protected TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
