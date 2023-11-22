@@ -19,24 +19,30 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.Application.Actors;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
+namespace Energinet.DataHub.EDI.Api.Authentication;
 
 public class DevMarketActorAuthenticator : MarketActorAuthenticator
 {
     private readonly IActorRegistry _actorRegistry;
     private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public DevMarketActorAuthenticator(IActorRepository actorRepository, IActorRegistry actorRegistry, IDatabaseConnectionFactory connectionFactory)
-        : base(actorRepository)
+    public DevMarketActorAuthenticator(
+        IActorRepository actorRepository,
+        IActorRegistry actorRegistry,
+        IDatabaseConnectionFactory connectionFactory,
+        AuthenticatedActor authenticatedActor)
+        : base(actorRepository, authenticatedActor)
     {
         _actorRegistry = actorRegistry;
         _connectionFactory = connectionFactory;
     }
 
-    public override async Task AuthenticateAsync(ClaimsPrincipal claimsPrincipal, CancellationToken cancellationToken)
+    public override async Task<bool> AuthenticateAsync(ClaimsPrincipal claimsPrincipal, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(claimsPrincipal);
 
@@ -46,16 +52,14 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
             var actor = await FindActorAsync(actorNumberClaim.Value, cancellationToken).ConfigureAwait(false);
             if (actor is null)
             {
-                actor = new Actor(Guid.NewGuid().ToString(), actorNumberClaim.Value);
+                actor = new Actor(actorNumberClaim.Value, Guid.NewGuid().ToString());
                 await RegisterActorAsync(actor, cancellationToken).ConfigureAwait(false);
             }
 
-            await base.AuthenticateAsync(ReplaceCurrent(claimsPrincipal, actor), cancellationToken).ConfigureAwait(false);
+            return await base.AuthenticateAsync(ReplaceCurrent(claimsPrincipal, actor), cancellationToken).ConfigureAwait(false);
         }
-        else
-        {
-            await base.AuthenticateAsync(claimsPrincipal, cancellationToken).ConfigureAwait(false);
-        }
+
+        return await base.AuthenticateAsync(claimsPrincipal, cancellationToken).ConfigureAwait(false);
     }
 
     private static ClaimsPrincipal ReplaceCurrent(ClaimsPrincipal currentClaimsPrincipal, Actor actor)
