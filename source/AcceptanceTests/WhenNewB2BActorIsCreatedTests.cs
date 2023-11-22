@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
-using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 using Xunit.Categories;
 
@@ -22,27 +21,21 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 
 [IntegrationTest]
-public sealed class WhenEbixPeekRequestIsReceivedTests : TestRunner
+public sealed class WhenNewB2BActorIsCreatedTests : TestRunner
 {
-    private readonly EbixRequestDsl _ebix;
+    private readonly ActorDsl _actorDsl;
 
-    public WhenEbixPeekRequestIsReceivedTests()
+    public WhenNewB2BActorIsCreatedTests()
     {
-        _ebix = new EbixRequestDsl(
-            new AzureAuthenticationDriver(AzureEntraTenantId, AzureEntraBackendAppId),
-            new EdiDriver(AzpToken, ConnectionString),
-            new WholesaleDriver(EventPublisher),
-            new EbixDriver(new Uri(ApiManagementUri, "/ebix")));
+        _actorDsl = new ActorDsl(new MarketParticipantDriver(EventPublisher), new EdiDriver(AzpToken, ConnectionString));
     }
 
     [Fact]
-    public async Task Actor_can_peek_calculation_result_in_ebix_format()
+    public async Task Actor_is_created()
     {
-        var token = await _ebix.LoginAsActor(AzureEntraClientId, AzureEntraClientSecret);
+        var b2CId = Guid.NewGuid().ToString();
+        await _actorDsl.PublishResultForAsync(actorNumber: "8880000610888", b2CId: b2CId);
 
-        await _ebix.EmptyQueueForActor(BalanceResponsibleActorNumber, BalanceResponsibleActorRole, token);
-        await _ebix.PublishAggregationResultFor("543", BalanceResponsibleActorNumber);
-
-        await _ebix.ConfirmPeekIsCorrectEbixFormatAndDocumentType(token);
+        await _actorDsl.ConfirmActorIsAvailableAsync(actorNumber: "8880000610888", b2CId: b2CId);
     }
 }
