@@ -19,7 +19,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 public class Restriction : EnumerationType
 {
     /// <summary>
-    /// No restrictions.
+    /// No restrictions can see all data.
     /// </summary>
     public static readonly Restriction None = new(0, nameof(None));
 
