@@ -29,7 +29,7 @@ public static class IncomingMessagesConfiguration
     public static void Configure(IServiceCollection services)
     {
         services.AddScopedSqlDbContext<IncomingMessagesContext>();
-        services.AddScoped<IIncomingRequestAggregatedMeasuredData, IncomingRequestAggregatedMeasuredData>();
+        services.AddScoped<IIncomingRequestAggregatedMeasuredParser, IncomingRequestAggregatedMeasuredParser>();
         services.AddScoped<ITransactionIdRepository, TransactionIdRepository>();
         services.AddScoped<IMessageIdRepository, MessageIdRepository>();
         services.AddScoped<IMessageParser, XmlMessageParser>();

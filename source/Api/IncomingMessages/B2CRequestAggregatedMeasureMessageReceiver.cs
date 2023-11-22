@@ -31,11 +31,11 @@ namespace Energinet.DataHub.EDI.Api.IncomingMessages;
 //TODO: Remove this endpoint and refactor the RequestAggregatedMeasureDataController
 public class B2CRequestAggregatedMeasureMessageReceiver
 {
-    private readonly IIncomingRequestAggregatedMeasuredData _incomingRequestAggregatedMeasuredData;
+    private readonly IIncomingRequestAggregatedMeasuredParser _incomingRequestAggregatedMeasuredParser;
 
-    public B2CRequestAggregatedMeasureMessageReceiver(IIncomingRequestAggregatedMeasuredData incomingRequestAggregatedMeasuredData)
+    public B2CRequestAggregatedMeasureMessageReceiver(IIncomingRequestAggregatedMeasuredParser incomingRequestAggregatedMeasuredParser)
         {
-        _incomingRequestAggregatedMeasuredData = incomingRequestAggregatedMeasuredData;
+        _incomingRequestAggregatedMeasuredParser = incomingRequestAggregatedMeasuredParser;
         }
 
     [Function(nameof(B2CRequestAggregatedMeasureMessageReceiver))]
@@ -48,7 +48,7 @@ public class B2CRequestAggregatedMeasureMessageReceiver
 
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);
 
-        var responseMessage = await _incomingRequestAggregatedMeasuredData.ParseAsync(
+        var responseMessage = await _incomingRequestAggregatedMeasuredParser.ParseAsync(
             request.Body,
             DocumentFormat.Proto,
             cancellationToken,

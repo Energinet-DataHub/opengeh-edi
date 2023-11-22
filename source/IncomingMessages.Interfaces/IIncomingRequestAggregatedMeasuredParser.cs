@@ -20,7 +20,7 @@ using Energinet.DataHub.EDI.Common;
 namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 
 #pragma warning disable SA1600
-public interface IIncomingRequestAggregatedMeasuredData
+public interface IIncomingRequestAggregatedMeasuredParser
 {
     Task<ResponseMessage> ParseAsync(Stream message, DocumentFormat documentFormat, CancellationToken cancellationToken, DocumentFormat responseFormat = null!);
 }

@@ -16,6 +16,7 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
+using Energinet.DataHub.EDI.Api.EventListeners;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Interfaces;
@@ -23,22 +24,22 @@ using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.EDI.Api.EventListeners;
+namespace Energinet.DataHub.EDI.Api.IncomingMessages;
 
 public class IncomingMessagesListener
 {
-    private readonly ILogger<IntegrationEventListener> _logger;
+    private readonly ILogger<IncomingMessagesListener> _logger;
     private readonly IMediator _mediator;
     private readonly ISerializer _serializer;
 
-    public IncomingMessagesListener(ILogger<IntegrationEventListener> logger, IMediator mediator, ISerializer serializer)
+    public IncomingMessagesListener(ILogger<IncomingMessagesListener> logger, IMediator mediator, ISerializer serializer)
     {
         _logger = logger;
         _mediator = mediator;
         _serializer = serializer;
     }
 
-    [Function(nameof(IntegrationEventListener))]
+    [Function(nameof(IncomingMessagesListener))]
     public async Task RunAsync(
         [ServiceBusTrigger(
             "%INCOMING_MESSAGES_QUEUE_NAME%",

@@ -45,7 +45,7 @@ public class IncomingRequestAggregatedMeasuredDataSender
             new ServiceBusMessage(
                 _serializer.Serialize(request))
             {
-                Subject = request.MessageType,
+                Subject = nameof(RequestAggregatedMeasureDataMarketMessage),
             };
 
         await _senderCreator.SendAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);

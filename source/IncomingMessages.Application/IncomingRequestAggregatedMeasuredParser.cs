@@ -29,7 +29,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application;
 
-public class IncomingRequestAggregatedMeasuredData : IIncomingRequestAggregatedMeasuredData
+public class IncomingRequestAggregatedMeasuredParser : IIncomingRequestAggregatedMeasuredParser
 {
     private readonly RequestAggregatedMeasureDataMarketMessageParser _requestAggregatedMeasureDataMarketMessageParser;
     private readonly IncomingRequestAggregatedMeasuredDataSender _incomingRequestAggregatedMeasuredDataSender;
@@ -37,7 +37,7 @@ public class IncomingRequestAggregatedMeasuredData : IIncomingRequestAggregatedM
     private readonly ResponseFactory _responseFactory;
     private readonly IArchivedMessagesClient _archivedMessagesClient;
 
-    public IncomingRequestAggregatedMeasuredData(
+    public IncomingRequestAggregatedMeasuredParser(
         RequestAggregatedMeasureDataMarketMessageParser requestAggregatedMeasureDataMarketMessageParser,
         IncomingRequestAggregatedMeasuredDataSender incomingRequestAggregatedMeasuredDataSender,
         RequestAggregatedMeasureDataValidator aggregatedMeasureDataMarketMessageValidator,
