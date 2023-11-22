@@ -18,6 +18,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.Application.Configuration.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Domain;
 using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
@@ -31,16 +32,16 @@ namespace Energinet.DataHub.EDI.Api.OutgoingMessages;
 
 public class PeekRequestListener
 {
-    private readonly IMarketActorAuthenticator _authenticator;
+    private readonly AuthenticatedActor _authenticatedActor;
     private readonly ILogger<PeekRequestListener> _logger;
     private readonly IMediator _mediator;
 
     public PeekRequestListener(
-        IMarketActorAuthenticator authenticator,
+        AuthenticatedActor authenticatedActor,
         ILogger<PeekRequestListener> logger,
         IMediator mediator)
     {
-        _authenticator = authenticator;
+        _authenticatedActor = authenticatedActor;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _mediator = mediator;
     }
@@ -74,10 +75,10 @@ public class PeekRequestListener
         }
 
         var peekResult = await _mediator.Send(new PeekCommand(
-                _authenticator.CurrentIdentity.Number!,
-                msgCategory,
-                _authenticator.CurrentIdentity.Roles.First(),
-                desiredDocumentFormat)).ConfigureAwait(false);
+            _authenticatedActor.CurrentActorIdentity.ActorNumber,
+            msgCategory,
+            _authenticatedActor.CurrentActorIdentity.MarketRoles.First(),
+            desiredDocumentFormat)).ConfigureAwait(false);
 
         var response = HttpResponseData.CreateResponse(request);
         if (peekResult.MessageId is null)

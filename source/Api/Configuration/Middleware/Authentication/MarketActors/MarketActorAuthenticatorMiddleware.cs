@@ -15,6 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.Configuration.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Microsoft.Azure.Functions.Worker;
@@ -37,6 +38,7 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.Mark
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (next == null) throw new ArgumentNullException(nameof(next));
             var marketActorAuthenticator = context.GetService<IMarketActorAuthenticator>();
+            var authenticatedActor = context.GetService<AuthenticatedActor>();
             var currentClaimsPrincipal = context.GetService<CurrentClaimsPrincipal>();
 
             if (!context.IsRequestFromUser())
@@ -61,8 +63,8 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.Mark
                 return;
             }
 
-            await marketActorAuthenticator.AuthenticateAsync(currentClaimsPrincipal.ClaimsPrincipal!, context.CancellationToken).ConfigureAwait(false);
-            if (marketActorAuthenticator.CurrentIdentity is NotAuthenticated)
+            var authenticated = await marketActorAuthenticator.AuthenticateAsync(currentClaimsPrincipal.ClaimsPrincipal!, context.CancellationToken).ConfigureAwait(false);
+            if (!authenticated)
             {
                 _logger.LogError("Could not authenticate market actor identity. This is due to the current claims identity does hold the required claims.");
                 context.RespondWithUnauthorized(httpRequestData);
@@ -70,14 +72,14 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.Mark
             }
 
             var serializer = context.GetService<ISerializer>();
-            WriteAuthenticatedIdentityToLog(marketActorAuthenticator, serializer);
+            WriteAuthenticatedIdentityToLog(authenticatedActor.CurrentActorIdentity, serializer);
             await next(context).ConfigureAwait(false);
         }
 
-        private void WriteAuthenticatedIdentityToLog(IMarketActorAuthenticator marketActorAuthenticator, ISerializer serializer)
+        private void WriteAuthenticatedIdentityToLog(ActorIdentity? actorIdentity, ISerializer serializer)
         {
             _logger.LogInformation("Successfully authenticated market actor identity.");
-            _logger.LogInformation(serializer.Serialize(marketActorAuthenticator.CurrentIdentity));
+            _logger.LogInformation(serializer.Serialize(actorIdentity));
         }
     }
 }

@@ -24,15 +24,10 @@ namespace Energinet.DataHub.EDI.Application.Configuration.Authentication
     public interface IMarketActorAuthenticator
     {
         /// <summary>
-        /// Current identity
-        /// </summary>
-        MarketActorIdentity CurrentIdentity { get; }
-
-        /// <summary>
         /// Authenticates a claims principal
         /// </summary>
         /// <param name="claimsPrincipal"></param>
         /// <param name="cancellationToken"></param>
-        Task AuthenticateAsync(ClaimsPrincipal claimsPrincipal, CancellationToken cancellationToken);
+        Task<bool> AuthenticateAsync(ClaimsPrincipal claimsPrincipal, CancellationToken cancellationToken);
     }
 }

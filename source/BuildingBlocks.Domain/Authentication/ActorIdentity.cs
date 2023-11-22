@@ -24,7 +24,7 @@ public class ActorIdentity
     public ActorIdentity(
         ActorNumber actorNumber,
         Restriction restriction,
-        IEnumerable<MarketRole>? marketRoles = null)
+        IEnumerable<MarketRole> marketRoles)
     {
         ActorNumber = actorNumber;
         Restriction = restriction;
@@ -35,7 +35,7 @@ public class ActorIdentity
 
     public Restriction Restriction { get; set; }
 
-    private IEnumerable<MarketRole>? MarketRoles { get; set; }
+    public IEnumerable<MarketRole> MarketRoles { get; set; }
 
     public bool HasRole(MarketRole role)
     {

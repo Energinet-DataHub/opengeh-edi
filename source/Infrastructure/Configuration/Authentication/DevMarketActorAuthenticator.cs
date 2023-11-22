@@ -41,7 +41,7 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
         _connectionFactory = connectionFactory;
     }
 
-    public override async Task AuthenticateAsync(ClaimsPrincipal claimsPrincipal, CancellationToken cancellationToken)
+    public override async Task<bool> AuthenticateAsync(ClaimsPrincipal claimsPrincipal, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(claimsPrincipal);
 
@@ -55,12 +55,10 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
                 await RegisterActorAsync(actor, cancellationToken).ConfigureAwait(false);
             }
 
-            await base.AuthenticateAsync(ReplaceCurrent(claimsPrincipal, actor), cancellationToken).ConfigureAwait(false);
+            return await base.AuthenticateAsync(ReplaceCurrent(claimsPrincipal, actor), cancellationToken).ConfigureAwait(false);
         }
-        else
-        {
-            await base.AuthenticateAsync(claimsPrincipal, cancellationToken).ConfigureAwait(false);
-        }
+
+        return await base.AuthenticateAsync(claimsPrincipal, cancellationToken).ConfigureAwait(false);
     }
 
     private static ClaimsPrincipal ReplaceCurrent(ClaimsPrincipal currentClaimsPrincipal, Actor actor)

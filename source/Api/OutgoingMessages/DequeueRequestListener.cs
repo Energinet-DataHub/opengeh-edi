@@ -16,6 +16,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.Configuration.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.OutgoingMessages.Contracts;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
@@ -26,12 +27,12 @@ namespace Energinet.DataHub.EDI.Api.OutgoingMessages;
 public class DequeueRequestListener
 {
     private readonly IMediator _mediator;
-    private readonly IMarketActorAuthenticator _authenticator;
+    private readonly AuthenticatedActor _authenticatedActor;
 
-    public DequeueRequestListener(IMediator mediator, IMarketActorAuthenticator authenticator)
+    public DequeueRequestListener(IMediator mediator, AuthenticatedActor authenticatedActor)
     {
         _mediator = mediator;
-        _authenticator = authenticator;
+        _authenticatedActor = authenticatedActor;
     }
 
     [Function("DequeueRequestListener")]
@@ -41,7 +42,7 @@ public class DequeueRequestListener
         FunctionContext executionContext,
         string messageId)
     {
-        var result = await _mediator.Send(new DequeueCommand(messageId, _authenticator.CurrentIdentity.Roles.First(), _authenticator.CurrentIdentity.Number!)).ConfigureAwait(false);
+        var result = await _mediator.Send(new DequeueCommand(messageId, _authenticatedActor.CurrentActorIdentity!.MarketRoles.First(), _authenticatedActor.CurrentActorIdentity.ActorNumber!)).ConfigureAwait(false);
         return result.Success
             ? request.CreateResponse(HttpStatusCode.OK)
             : request.CreateResponse(HttpStatusCode.BadRequest);

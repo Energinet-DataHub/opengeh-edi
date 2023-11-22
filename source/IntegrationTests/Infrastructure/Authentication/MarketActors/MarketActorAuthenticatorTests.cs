@@ -19,6 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -31,17 +32,22 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
     public class MarketActorAuthenticatorTests : TestBase
     {
         private readonly IMarketActorAuthenticator _authenticator;
+        private readonly AuthenticatedActor _authenticatedActor;
 
         public MarketActorAuthenticatorTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             _authenticator = GetService<IMarketActorAuthenticator>();
+            _authenticatedActor = GetService<AuthenticatedActor>();
+
+            var authenticatedActor = GetService<AuthenticatedActor>();
+            authenticatedActor.SetAuthenticatedActor(null!);
         }
 
         [Fact]
         public void Current_user_is_not_authenticated()
         {
-            Assert.IsType<NotAuthenticated>(_authenticator.CurrentIdentity);
+            Assert.Throws<InvalidOperationException>(() => _authenticatedActor.CurrentActorIdentity);
         }
 
         [Fact]
@@ -54,9 +60,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
             };
             var claimsPrincipal = CreateIdentity(claims);
 
-            await _authenticator.AuthenticateAsync(claimsPrincipal, CancellationToken.None);
+            var authenticated = await _authenticator.AuthenticateAsync(claimsPrincipal, CancellationToken.None);
 
-            Assert.IsType<NotAuthenticated>(_authenticator.CurrentIdentity);
+            Assert.False(authenticated);
         }
 
         [Fact]
@@ -69,9 +75,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
             };
             var claimsPrincipal = CreateIdentity(claims);
 
-            await _authenticator.AuthenticateAsync(claimsPrincipal, CancellationToken.None);
+            var authenticated = await _authenticator.AuthenticateAsync(claimsPrincipal, CancellationToken.None);
 
-            Assert.IsType<NotAuthenticated>(_authenticator.CurrentIdentity);
+            Assert.False(authenticated);
         }
 
         [Fact]
@@ -86,18 +92,12 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
             };
             var claimsPrincipal = CreateIdentity(claims);
 
-            await _authenticator.AuthenticateAsync(claimsPrincipal, CancellationToken.None);
+            var authenticated = await _authenticator.AuthenticateAsync(claimsPrincipal, CancellationToken.None);
 
-            Assert.IsType<Authenticated>(_authenticator.CurrentIdentity);
-            Assert.Equal(GetClaimValue(claimsPrincipal, ClaimsMap.UserId), _authenticator.CurrentIdentity.Id);
-            Assert.Equal(_authenticator.CurrentIdentity.Number?.Value, SampleData.ActorNumber);
-            Assert.True(_authenticator.CurrentIdentity.HasRole(MarketRole.GridOperator.Name));
-            Assert.True(_authenticator.CurrentIdentity.HasRole(MarketRole.EnergySupplier.Name));
-        }
-
-        private static string? GetClaimValue(ClaimsPrincipal claimsPrincipal, string claimName)
-        {
-            return claimsPrincipal.FindFirst(claim => claim.Type.Equals(claimName, StringComparison.OrdinalIgnoreCase))?.Value;
+            Assert.True(authenticated);
+            Assert.Equal(_authenticatedActor.CurrentActorIdentity.ActorNumber.Value, SampleData.ActorNumber);
+            Assert.True(_authenticatedActor.CurrentActorIdentity.HasRole(MarketRole.GridOperator));
+            Assert.True(_authenticatedActor.CurrentActorIdentity.HasRole(MarketRole.EnergySupplier));
         }
 
         private static ClaimsPrincipal CreateIdentity(List<Claim>? claims = null)
