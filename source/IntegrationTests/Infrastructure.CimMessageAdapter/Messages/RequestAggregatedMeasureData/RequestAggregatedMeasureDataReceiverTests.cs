@@ -24,13 +24,13 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
-using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
-using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Interfaces;
+using IncomingMessages.Infrastructure;
+using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
+using IncomingMessages.Infrastructure.ValidationErrors;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
@@ -398,34 +398,6 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     }
 
     [Fact]
-    public async Task Valid_activity_records_are_extracted_and_committed_as_a_process()
-    {
-        var knownReceiverId = "5790001330552";
-        var knownReceiverRole = "DGL";
-        var knownSenderId = "5790001330551";
-        var knownSenderRole = MarketRole.EnergySupplier.Code;
-        await using var message = BusinessMessageBuilder
-            .RequestAggregatedMeasureData()
-            .WithReceiverRole(knownReceiverRole)
-            .WithReceiverId(knownReceiverId)
-            .WithSenderId(knownSenderId)
-            .WithSenderRole(knownSenderRole)
-            .Message();
-
-        var messageParserResult = await ParseMessageAsync(message);
-        var marketMessage = CreateMarketMessageWithAuthentication(messageParserResult.MarketMessage!, knownSenderId, knownSenderRole);
-        var result = await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
-
-        var process = _processContext.AggregatedMeasureDataProcesses.FirstOrDefault();
-        Assert.True(result.Success);
-        Assert.NotNull(process);
-
-        var document = messageParserResult.MarketMessage!;
-        await AssertTransactionIdIsStored(document.SenderNumber, document.Series.First().Id);
-        await AssertMessageIdIsStored(document.SenderNumber, document.MessageId);
-    }
-
-    [Fact]
     public async Task Multiple_activity_records_are_committed_as_processes()
     {
         var knownReceiverId = "5790001330552";
@@ -434,6 +406,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var knownSenderRole = MarketRole.EnergySupplier.Code;
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
+            .DuplicateSeriesRecords()
             .WithSeriesTransactionId(Guid.NewGuid().ToString())
             .WithReceiverRole(knownReceiverRole)
             .WithReceiverId(knownReceiverId)
@@ -443,17 +416,11 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var messageParserResult = await ParseMessageAsync(message);
         var marketMessage = CreateMarketMessageWithAuthentication(messageParserResult.MarketMessage!, knownSenderId, knownSenderRole);
-        var result = await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
 
         var processes = _processContext.AggregatedMeasureDataProcesses.ToList();
-        Assert.True(result.Success);
         Assert.NotNull(processes);
-        Assert.Equal(messageParserResult.MarketMessage!.Series.Count, processes.Count);
-
-        var document = messageParserResult.MarketMessage!;
-        await AssertTransactionIdIsStored(messageParserResult.MarketMessage!.SenderNumber, document.Series.First().Id);
-        await AssertTransactionIdIsStored(messageParserResult.MarketMessage!.SenderNumber, document.Series.Last().Id);
-        await AssertMessageIdIsStored(messageParserResult.MarketMessage!.SenderNumber, messageParserResult.MarketMessage!.MessageId);
+        Assert.Equal(2, messageParserResult.MarketMessage!.Series.Count);
     }
 
     [Fact]

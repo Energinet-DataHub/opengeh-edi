@@ -12,15 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
@@ -43,14 +48,58 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
     [Fact]
     public async Task Incoming_message_is_received()
     {
-      var respons = await _incomingMessagesRequest.ParseAsync(
-            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
-            DocumentFormat.Json,
-            CancellationToken.None);
+      // Assert
+      var authenticatedActor = GetService<AuthenticatedActor>();
+      authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("5799999933318"), Restriction.Owned, MarketRole.BalanceResponsibleParty));
+
+      // Act
+      await _incomingMessagesRequest.ParseAsync(
+          ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
+          DocumentFormat.Json,
+          CancellationToken.None);
 
       // Assert
       var message = _senderSpy.Message;
       Assert.NotNull(message);
+    }
+
+    [Fact]
+    public async Task Only_one_request_pr_transactionId_and_messageId_is_accepted()
+    {
+        // Arrange
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("5799999933318"), Restriction.Owned, MarketRole.BalanceResponsibleParty));
+
+        // Act
+        // new scope to simulate a race condition.
+        var sessionProvider = GetService<IServiceProvider>();
+        using var secondScope = sessionProvider.CreateScope();
+        var authenticatedActorInSecondScope = secondScope.ServiceProvider.GetService<AuthenticatedActor>();
+        var secondParser = secondScope.ServiceProvider.GetRequiredService<IIncomingRequestAggregatedMeasuredParser>();
+        var task01 = _incomingMessagesRequest.ParseAsync(
+            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
+            DocumentFormat.Json,
+            CancellationToken.None);
+        var task02 = secondParser.ParseAsync(
+            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
+            DocumentFormat.Json,
+            CancellationToken.None);
+        authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("5799999933318"), restriction: Restriction.None));
+
+        try
+        {
+            await Task.WhenAll(task01, task02);
+        }
+        catch (DbUpdateException e)
+        {
+            // Assert
+            // This exception is only expected if a command execution finishes before the other one ends.
+            Assert.Contains("Violation of PRIMARY KEY constraint", e.InnerException?.Message, StringComparison.InvariantCulture);
+        }
+
+        // Assert
+        var message = _senderSpy.Message;
+        Assert.NotNull(message);
     }
 
     protected override void Dispose(bool disposing)

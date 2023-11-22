@@ -16,11 +16,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
-<<<<<<<< HEAD:source/Common/IMarketActorAuthenticator.cs
-namespace Energinet.DataHub.EDI.Common
-========
 namespace Energinet.DataHub.EDI.Api.Authentication
->>>>>>>> main:source/Api/Authentication/IMarketActorAuthenticator.cs
 {
     /// <summary>
     /// Service for authenticating an market actor
