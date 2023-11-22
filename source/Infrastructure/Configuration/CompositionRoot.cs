@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.Configuration.Authentication;
 using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
@@ -64,6 +65,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
 
             AddMediatR();
             services.AddLogging();
+            AddAuthenticatedActor();
             AddActorServices();
             AddWholeSaleInBox();
             AddGridAreaServices();
@@ -192,6 +194,11 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
         {
             var configuration = new MediatRServiceConfiguration();
             ServiceRegistrar.AddRequiredServices(_services, configuration);
+        }
+
+        private void AddAuthenticatedActor()
+        {
+            _services.AddScoped<AuthenticatedActor>();
         }
 
         private void AddActorServices()

@@ -15,11 +15,20 @@
 using System.Security.Claims;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.EDI.B2CWebApi.Exceptions;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.Common.Actors;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Security;
 
 public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
 {
+    private readonly AuthenticatedActor _authenticatedActor;
+
+    public FrontendUserProvider(AuthenticatedActor authenticatedActor)
+    {
+        _authenticatedActor = authenticatedActor;
+    }
+
     public Task<FrontendUser?> ProvideUserAsync(
         Guid userId,
         Guid actorId,
@@ -59,6 +68,7 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
         if (azp is null)
             throw new MissingAzpException();
 
+        SetAuthenticatedActor(ActorNumber.Create(actorNumber), accessAllData: isFas);
         return Task.FromResult<FrontendUser?>(new FrontendUser(
             userId,
             actorId,
@@ -66,5 +76,21 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
             actorNumber,
             role,
             azp));
+    }
+
+    private void SetAuthenticatedActor(ActorNumber actorNumber, bool accessAllData)
+    {
+        if (accessAllData)
+        {
+            _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
+                actorNumber,
+                restriction: Restriction.None));
+        }
+        else
+        {
+            _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
+                actorNumber,
+                restriction: Restriction.Owned));
+        }
     }
 }
