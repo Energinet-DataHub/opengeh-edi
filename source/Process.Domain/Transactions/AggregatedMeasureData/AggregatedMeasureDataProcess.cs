@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Actors;
@@ -121,13 +122,17 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             }
         }
 
-        public void IsAccepted(Aggregation aggregation)
+        public void IsAccepted(IReadOnlyList<Aggregation> aggregations)
         {
-            if (aggregation == null) throw new ArgumentNullException(nameof(aggregation));
+            if (aggregations == null) throw new ArgumentNullException(nameof(aggregations));
 
             if (_state == State.Sent)
             {
-                AddDomainEvent(new EnqueueMessageEvent(AggregationResultMessageFactory.CreateMessage(aggregation, ProcessId)));
+                foreach (var aggregation in aggregations)
+                {
+                    AddDomainEvent(new EnqueueMessageEvent(AggregationResultMessageFactory.CreateMessage(aggregation, ProcessId)));
+                }
+
                 _state = State.Accepted;
             }
         }
