@@ -20,6 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 using Energinet.DataHub.Edi.Requests;
 using FluentAssertions.Execution;
@@ -51,7 +52,7 @@ public class MessageParserTests
             {
                 new XmlMessageParser(),
                 new JsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
-                new ProtoMessageParser(),
+                new ProtoMessageParser(new SystemDateTimeProvider()),
             });
     }
 

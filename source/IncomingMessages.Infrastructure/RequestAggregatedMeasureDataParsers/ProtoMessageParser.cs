@@ -28,6 +28,7 @@ public class ProtoMessageParser : IMessageParser
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
     public ProtoMessageParser(ISystemDateTimeProvider systemDateTimeProvider)
+        : base()
     {
         _systemDateTimeProvider = systemDateTimeProvider;
     }

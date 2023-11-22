@@ -420,7 +420,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         var processes = _processContext.AggregatedMeasureDataProcesses.ToList();
         Assert.NotNull(processes);
-        Assert.Equal(2, messageParserResult.MarketMessage!.Series.Count);
+        Assert.Equal(2, processes.Count);
     }
 
     [Fact]
