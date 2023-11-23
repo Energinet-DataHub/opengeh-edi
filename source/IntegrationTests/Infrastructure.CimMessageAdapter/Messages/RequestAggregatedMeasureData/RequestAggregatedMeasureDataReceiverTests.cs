@@ -535,7 +535,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
     private Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseMessageAsync(Stream message)
     {
-        return _marketMessageParser.ParseAsync(message, DocumentFormat.Xml, DocumentType.NotifyAggregatedMeasureData, CancellationToken.None);
+        return _marketMessageParser.ParseAsync(message, DocumentFormat.Xml, IncomingDocumentType.RequestAggregatedMeasureData, CancellationToken.None);
     }
 
     private async Task AssertTransactionIdIsStored(string senderId, string transactionId)

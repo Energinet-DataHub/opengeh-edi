@@ -56,7 +56,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
       await _incomingMessagesRequest.ParseAsync(
           ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
           DocumentFormat.Json,
-          DocumentType.NotifyAggregatedMeasureData,
+          IncomingDocumentType.RequestAggregatedMeasureData,
           CancellationToken.None);
 
       // Assert
@@ -80,12 +80,12 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var task01 = _incomingMessagesRequest.ParseAsync(
             ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
             DocumentFormat.Json,
-            DocumentType.NotifyAggregatedMeasureData,
+            IncomingDocumentType.RequestAggregatedMeasureData,
             CancellationToken.None);
         var task02 = secondParser.ParseAsync(
             ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
             DocumentFormat.Json,
-            DocumentType.NotifyAggregatedMeasureData,
+            IncomingDocumentType.RequestAggregatedMeasureData,
             CancellationToken.None);
         authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("5799999933318"), restriction: Restriction.None));
 

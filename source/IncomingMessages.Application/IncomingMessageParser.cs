@@ -54,7 +54,7 @@ public class IncomingMessageParser : IIncomingMessageParser
     public async Task<ResponseMessage> ParseAsync(
         Stream message,
         DocumentFormat documentFormat,
-        DocumentType documentType,
+        IncomingDocumentType documentType,
         CancellationToken cancellationToken,
         DocumentFormat responseFormat = null!)
     {

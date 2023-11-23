@@ -33,7 +33,7 @@ public class ProtoMessageParser : IMessageParser
 
     public DocumentFormat HandledFormat => DocumentFormat.Proto;
 
-    public DocumentType DocumentType => DocumentType.NotifyAggregatedMeasureData;
+    public IncomingDocumentType DocumentType => IncomingDocumentType.RequestAggregatedMeasureData;
 
     public Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(
         Stream message,

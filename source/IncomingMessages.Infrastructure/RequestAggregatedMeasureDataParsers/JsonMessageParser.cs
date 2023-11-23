@@ -36,11 +36,9 @@ public class JsonMessageParser : JsonParserBase,
     {
     }
 
-#pragma warning disable CA1822
     public DocumentFormat HandledFormat => DocumentFormat.Json;
 
-    public DocumentType DocumentType => DocumentType.NotifyAggregatedMeasureData;
-#pragma warning restore CA1822
+    public IncomingDocumentType DocumentType => IncomingDocumentType.RequestAggregatedMeasureData;
 
     public async Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(
         Stream message,

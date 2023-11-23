@@ -37,11 +37,9 @@ public class XmlMessageParser : IMessageParser
         _schemaProvider = new CimXmlSchemaProvider();
     }
 
-#pragma warning disable CA1822
     public DocumentFormat HandledFormat => DocumentFormat.Xml;
 
-    public DocumentType DocumentType => DocumentType.NotifyAggregatedMeasureData;
-#pragma warning restore CA1822
+    public IncomingDocumentType DocumentType => IncomingDocumentType.RequestAggregatedMeasureData;
 
     public async Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(Stream message, CancellationToken cancellationToken)
     {

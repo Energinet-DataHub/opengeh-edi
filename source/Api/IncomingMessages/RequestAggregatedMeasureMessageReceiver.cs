@@ -64,7 +64,12 @@ public class RequestAggregatedMeasureMessageReceiver
         }
 
         var responseMessage = await _incomingMessageParser
-            .ParseAsync(request.Body, cimFormat, DocumentType.NotifyAggregatedMeasureData, cancellationToken).ConfigureAwait(false);
+            .ParseAsync(
+                request.Body,
+                cimFormat,
+                IncomingDocumentType.RequestAggregatedMeasureData,
+                cancellationToken).ConfigureAwait(false);
+
         if (responseMessage.IsErrorResponse)
         {
             var httpErrorStatusCode = HttpStatusCode.BadRequest;

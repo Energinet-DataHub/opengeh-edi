@@ -51,7 +51,7 @@ public class B2CRequestAggregatedMeasureMessageReceiver
         var responseMessage = await _incomingMessageParser.ParseAsync(
             request.Body,
             DocumentFormat.Proto,
-            DocumentType.NotifyAggregatedMeasureData,
+            IncomingDocumentType.RequestAggregatedMeasureData,
             cancellationToken,
             DocumentFormat.Json)
             .ConfigureAwait(false);

@@ -30,7 +30,7 @@ public interface IMessageParser
     /// <summary>
     /// The CIM document type handled
     /// </summary>
-    DocumentType DocumentType { get; }
+    IncomingDocumentType DocumentType { get; }
 
     /// <summary>
     /// Parse from stream
