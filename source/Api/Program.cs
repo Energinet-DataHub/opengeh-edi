@@ -113,7 +113,7 @@ namespace Energinet.DataHub.EDI.Api
                             sp.GetRequiredService<AuthenticatedActor>());
                     });
 
-                    CompositionRoot.Initialize(services)
+                    CompositionRoot.Initialize(services, databaseConnectionString!)
                         .AddMessageBus(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!)
                         .AddRemoteBusinessService<DummyRequest, DummyReply>("Dummy", "Dummy")
                         .AddBearerAuthentication(tokenValidationParameters)

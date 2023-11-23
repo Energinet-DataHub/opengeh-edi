@@ -19,4 +19,6 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
 public class EdiOptions
 {
     public string EDI_BASE_URL { get; set; } = string.Empty;
+
+    public string EDI_DATABASE_CONNECTION_STRING { get; set; } = string.Empty;
 }

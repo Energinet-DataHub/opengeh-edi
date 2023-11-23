@@ -52,7 +52,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
     {
         private readonly IServiceCollection _services;
 
-        private CompositionRoot(IServiceCollection services)
+        private CompositionRoot(IServiceCollection services, string connectionString)
         {
             _services = services;
             services.AddSingleton<HttpClient>();
@@ -70,14 +70,14 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             AddGridAreaServices();
             IntegrationEventsConfiguration.Configure(services);
             InboxEventsConfiguration.Configure(services);
-            ArchivedMessageConfiguration.Configure(services);
+            ArchivedMessageConfiguration.Configure(services, connectionString);
             QueryHandlingConfiguration.Configure(services);
             DataRetentionConfiguration.Configure(services);
         }
 
-        public static CompositionRoot Initialize(IServiceCollection services)
+        public static CompositionRoot Initialize(IServiceCollection services, string connectionString)
         {
-            return new CompositionRoot(services);
+            return new CompositionRoot(services, connectionString);
         }
 
         public CompositionRoot AddMessageBus(string connectionString)
