@@ -424,28 +424,6 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     }
 
     [Fact]
-    public async Task Transaction_and_message_ids_are_not_saved_when_receiving_a_faulted_request()
-    {
-        await using var message = BusinessMessageBuilder
-            .RequestAggregatedMeasureData()
-            .WithReceiverId("5790001330552") // This is not MDR
-            .WithReceiverRole("MDR")
-            .Message();
-
-        var messageParserResult = await ParseMessageAsync(message);
-
-        // Act
-        var result = await _requestAggregatedMeasureDataValidator.ValidateAsync(messageParserResult.MarketMessage!, CancellationToken.None);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.False(result.Success);
-
-        await AssertTransactionIdIsNotStoredAsync(messageParserResult.MarketMessage!.SenderNumber, messageParserResult.MarketMessage!.Series.First().Id);
-        await AssertMessageIdIsNotStoredAsync(messageParserResult.MarketMessage!.SenderNumber, messageParserResult.MarketMessage!.MessageId);
-    }
-
-    [Fact]
     public async Task Transaction_id_must_not_be_less_than_36_characters()
     {
         await using var message = BusinessMessageBuilder
@@ -536,41 +514,5 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     private Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseMessageAsync(Stream message)
     {
         return _marketMessageParser.ParseAsync(message, DocumentFormat.Xml, IncomingDocumentType.RequestAggregatedMeasureData, CancellationToken.None);
-    }
-
-    private async Task AssertTransactionIdIsStored(string senderId, string transactionId)
-    {
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-        var sql =
-            "SELECT * FROM dbo.TransactionRegistry WHERE TransactionId = @TransactionId AND SenderId = @SenderId";
-        var transaction = await connection.QueryFirstOrDefaultAsync(sql, new { TransactionId = transactionId, SenderId = senderId });
-        Assert.NotNull(transaction);
-    }
-
-    private async Task AssertTransactionIdIsNotStoredAsync(string senderId, string transactionId)
-    {
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-        var sql =
-            "SELECT * FROM dbo.TransactionRegistry WHERE TransactionId = @TransactionId AND SenderId = @SenderId";
-        var transaction = await connection.QueryFirstOrDefaultAsync(sql, new { TransactionId = transactionId, SenderId = senderId });
-        Assert.Null(transaction);
-    }
-
-    private async Task AssertMessageIdIsStored(string senderId, string messageId)
-    {
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-        var sql =
-            "SELECT [MessageId], [SenderId] FROM dbo.MessageRegistry WHERE MessageId = @MessageId AND SenderId = @SenderId";
-        var transaction = await connection.QueryFirstOrDefaultAsync<MessageIdForSender>(sql, new { MessageId = messageId, SenderId = senderId });
-        Assert.NotNull(transaction);
-    }
-
-    private async Task AssertMessageIdIsNotStoredAsync(string senderId, string messageId)
-    {
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-        var sql =
-            "SELECT * FROM dbo.MessageRegistry WHERE MessageId = @MessageId AND SenderId = @SenderId";
-        var message = await connection.QueryFirstOrDefaultAsync(sql, new { MessageId = messageId, SenderId = senderId });
-        Assert.Null(message);
     }
 }

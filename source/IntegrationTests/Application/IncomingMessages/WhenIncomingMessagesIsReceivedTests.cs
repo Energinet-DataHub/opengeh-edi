@@ -14,6 +14,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,6 +25,7 @@ using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+using IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -35,6 +37,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
     private readonly IIncomingMessageParser _incomingMessagesRequest;
     private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
     private readonly ServiceBusSenderSpy _senderSpy;
+    private readonly IncomingMessagesContext _incomingMessageContext;
 
     public WhenIncomingMessagesIsReceivedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
@@ -43,6 +46,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         _senderSpy = new ServiceBusSenderSpy("Fake");
         _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
         _incomingMessagesRequest = GetService<IIncomingMessageParser>();
+        _incomingMessageContext = GetService<IncomingMessagesContext>();
     }
 
     [Fact]
@@ -105,10 +109,32 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         Assert.NotNull(message);
     }
 
+    [Fact]
+    public async Task Transaction_and_message_ids_are_not_saved_when_receiving_a_faulted_request()
+    {
+        // Assert
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("5799999933318"), Restriction.Owned, MarketRole.BalanceResponsibleParty));
+
+        // Act
+        await _incomingMessagesRequest.ParseAsync(
+            ReadJsonFile("Application\\IncomingMessages\\FailSchemeValidationAggregatedMeasureData.json"),
+            DocumentFormat.Json,
+            IncomingDocumentType.RequestAggregatedMeasureData,
+            CancellationToken.None);
+
+        // Assert
+        var message = _senderSpy.Message;
+        Assert.Null(message);
+        Assert.Empty(_incomingMessageContext.MessageIdForSenders.ToList());
+        Assert.Empty(_incomingMessageContext.TransactionIdForSenders.ToList());
+    }
+
     protected override void Dispose(bool disposing)
     {
         _senderSpy.Dispose();
         _serviceBusClientSenderFactory.Dispose();
+        _incomingMessageContext.Dispose();
         base.Dispose(disposing);
     }
 

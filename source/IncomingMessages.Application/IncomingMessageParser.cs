@@ -61,23 +61,23 @@ public class IncomingMessageParser : IIncomingMessageParser
         var requestAggregatedMeasureDataMarketMessageParserResult =
             await _marketMessageParser.ParseAsync(message, documentFormat, documentType, cancellationToken).ConfigureAwait(false);
 
-        await _archivedMessagesClient.CreateAsync(
-            new ArchivedMessage(
-            Guid.NewGuid().ToString(),
-            requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!.MessageId,
-            IncomingDocumentType.RequestAggregatedMeasureData.Name,
-            requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!.SenderNumber,
-            requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!.ReceiverNumber,
-            SystemClock.Instance.GetCurrentInstant(),
-            requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!.BusinessReason,
-            message),
-            cancellationToken).ConfigureAwait(false);
-
         if (requestAggregatedMeasureDataMarketMessageParserResult.Errors.Any())
         {
             var res = Result.Failure(requestAggregatedMeasureDataMarketMessageParserResult.Errors.ToArray());
             return _responseFactory.From(res, responseFormat ?? documentFormat);
         }
+
+        await _archivedMessagesClient.CreateAsync(
+            new ArchivedMessage(
+                Guid.NewGuid().ToString(),
+                requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!.MessageId,
+                IncomingDocumentType.RequestAggregatedMeasureData.Name,
+                requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!.SenderNumber,
+                requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!.ReceiverNumber,
+                SystemClock.Instance.GetCurrentInstant(),
+                requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!.BusinessReason,
+                message),
+            cancellationToken).ConfigureAwait(false);
 
         // Note that the current implementation could save the messageId and transactionId, then fail to send the service bus message.
         var result = await _aggregatedMeasureDataMarketMessageValidator
