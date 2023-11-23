@@ -14,12 +14,10 @@
 
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.DateTime;
-using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 using Energinet.DataHub.Edi.Requests;
-using IncomingMessages.Infrastructure.BaseParsers;
 using IncomingMessages.Infrastructure.Messages;
 using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
-using NodaTime;
+using DocumentType = Energinet.DataHub.EDI.Common.DocumentType;
 
 namespace IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 
@@ -34,6 +32,8 @@ public class ProtoMessageParser : IMessageParser
     }
 
     public DocumentFormat HandledFormat => DocumentFormat.Proto;
+
+    public DocumentType DocumentType => DocumentType.NotifyAggregatedMeasureData;
 
     public Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(
         Stream message,

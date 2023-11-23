@@ -19,6 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.Application.Configuration;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using IncomingMessages.Infrastructure;
 using Microsoft.Azure.Functions.Worker;
@@ -30,16 +31,16 @@ namespace Energinet.DataHub.EDI.Api.IncomingMessages;
 public class RequestAggregatedMeasureMessageReceiver
 {
     private readonly ILogger<RequestAggregatedMeasureMessageReceiver> _logger;
-    private readonly IIncomingRequestAggregatedMeasuredParser _incomingRequestAggregatedMeasuredParser;
+    private readonly IIncomingMessageParser _incomingMessageParser;
     private readonly ICorrelationContext _correlationContext;
 
     public RequestAggregatedMeasureMessageReceiver(
         ILogger<RequestAggregatedMeasureMessageReceiver> logger,
-        IIncomingRequestAggregatedMeasuredParser incomingRequestAggregatedMeasuredParser,
+        IIncomingMessageParser incomingMessageParser,
         ICorrelationContext correlationContext)
         {
         _logger = logger;
-        _incomingRequestAggregatedMeasuredParser = incomingRequestAggregatedMeasuredParser;
+        _incomingMessageParser = incomingMessageParser;
         _correlationContext = correlationContext;
         }
 
@@ -62,8 +63,8 @@ public class RequestAggregatedMeasureMessageReceiver
             return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
         }
 
-        var responseMessage = await _incomingRequestAggregatedMeasuredParser
-            .ParseAsync(request.Body, cimFormat, cancellationToken).ConfigureAwait(false);
+        var responseMessage = await _incomingMessageParser
+            .ParseAsync(request.Body, cimFormat, DocumentType.NotifyAggregatedMeasureData, cancellationToken).ConfigureAwait(false);
         if (responseMessage.IsErrorResponse)
         {
             var httpErrorStatusCode = HttpStatusCode.BadRequest;

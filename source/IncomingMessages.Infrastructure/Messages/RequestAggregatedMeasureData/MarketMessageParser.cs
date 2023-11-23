@@ -16,19 +16,20 @@ using Energinet.DataHub.EDI.Common;
 
 namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 
-public class RequestAggregatedMeasureDataMarketMessageParser
+public class MarketMessageParser
 {
     private readonly IEnumerable<IMessageParser> _parsers;
 
-    public RequestAggregatedMeasureDataMarketMessageParser(IEnumerable<IMessageParser> parsers)
+    public MarketMessageParser(IEnumerable<IMessageParser> parsers)
     {
         _parsers = parsers;
     }
 
     public Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(
-        Stream message, DocumentFormat documentFormat, CancellationToken cancellationToken)
+        Stream message, DocumentFormat documentFormat, DocumentType documentType, CancellationToken cancellationToken)
     {
-        var parser = _parsers.FirstOrDefault(parser => parser.HandledFormat.Equals(documentFormat));
+        var parser = _parsers.FirstOrDefault(parser =>
+            parser.HandledFormat.Equals(documentFormat) && parser.DocumentType.Equals(documentType));
         if (parser is null)
             throw new InvalidOperationException($"No message parser found for message format '{documentFormat}'");
         return parser.ParseAsync(message, cancellationToken);

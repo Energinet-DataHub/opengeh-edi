@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.Process.Interfaces;
 using IncomingMessages.Infrastructure.Messages;
 using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 using IncomingMessages.Infrastructure.ValidationErrors;
+using DocumentType = Energinet.DataHub.EDI.Common.DocumentType;
 
 namespace IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 
@@ -38,6 +39,8 @@ public class XmlMessageParser : IMessageParser
 
 #pragma warning disable CA1822
     public DocumentFormat HandledFormat => DocumentFormat.Xml;
+
+    public DocumentType DocumentType => DocumentType.NotifyAggregatedMeasureData;
 #pragma warning restore CA1822
 
     public async Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(Stream message, CancellationToken cancellationToken)

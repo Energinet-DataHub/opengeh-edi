@@ -29,33 +29,49 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application;
 
-public class IncomingRequestAggregatedMeasuredParser : IIncomingRequestAggregatedMeasuredParser
+public class IncomingMessageParser : IIncomingMessageParser
 {
-    private readonly RequestAggregatedMeasureDataMarketMessageParser _requestAggregatedMeasureDataMarketMessageParser;
+    private readonly MarketMessageParser _marketMessageParser;
     private readonly IncomingRequestAggregatedMeasuredDataSender _incomingRequestAggregatedMeasuredDataSender;
     private readonly RequestAggregatedMeasureDataValidator _aggregatedMeasureDataMarketMessageValidator;
     private readonly ResponseFactory _responseFactory;
     private readonly IArchivedMessagesClient _archivedMessagesClient;
 
-    public IncomingRequestAggregatedMeasuredParser(
-        RequestAggregatedMeasureDataMarketMessageParser requestAggregatedMeasureDataMarketMessageParser,
+    public IncomingMessageParser(
+        MarketMessageParser marketMessageParser,
         IncomingRequestAggregatedMeasuredDataSender incomingRequestAggregatedMeasuredDataSender,
         RequestAggregatedMeasureDataValidator aggregatedMeasureDataMarketMessageValidator,
         ResponseFactory responseFactory,
         IArchivedMessagesClient archivedMessagesClient)
     {
-        _requestAggregatedMeasureDataMarketMessageParser = requestAggregatedMeasureDataMarketMessageParser;
+        _marketMessageParser = marketMessageParser;
         _incomingRequestAggregatedMeasuredDataSender = incomingRequestAggregatedMeasuredDataSender;
         _aggregatedMeasureDataMarketMessageValidator = aggregatedMeasureDataMarketMessageValidator;
         _responseFactory = responseFactory;
         _archivedMessagesClient = archivedMessagesClient;
     }
 
-    public async Task<ResponseMessage> ParseAsync(Stream message, DocumentFormat documentFormat, CancellationToken cancellationToken, DocumentFormat responseFormat = null!)
+    public async Task<ResponseMessage> ParseAsync(
+        Stream message,
+        DocumentFormat documentFormat,
+        DocumentType documentType,
+        CancellationToken cancellationToken,
+        DocumentFormat responseFormat = null!)
     {
-        var requestAggregatedMeasureDataMarketMessageParserResult = await _requestAggregatedMeasureDataMarketMessageParser.ParseAsync(message, documentFormat, cancellationToken).ConfigureAwait(false);
+        var requestAggregatedMeasureDataMarketMessageParserResult =
+            await _marketMessageParser.ParseAsync(message, documentFormat, documentType, cancellationToken).ConfigureAwait(false);
 
-        await SaveArchivedMessageAsync(requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!, message, cancellationToken).ConfigureAwait(false);
+        await _archivedMessagesClient.CreateAsync(
+            new ArchivedMessage(
+            Guid.NewGuid().ToString(),
+            requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!.MessageId,
+            IncomingDocumentType.RequestAggregatedMeasureData.Name,
+            requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!.SenderNumber,
+            requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!.ReceiverNumber,
+            SystemClock.Instance.GetCurrentInstant(),
+            requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!.BusinessReason,
+            message),
+            cancellationToken).ConfigureAwait(false);
 
         if (requestAggregatedMeasureDataMarketMessageParserResult.Errors.Any())
         {
@@ -79,20 +95,5 @@ public class IncomingRequestAggregatedMeasuredParser : IIncomingRequestAggregate
         }
 
         return _responseFactory.From(result, responseFormat ?? documentFormat);
-    }
-
-    private async Task SaveArchivedMessageAsync(RequestAggregatedMeasureDataMarketMessage marketMessage, Stream document, CancellationToken hostCancellationToken)
-    {
-       await _archivedMessagesClient.CreateAsync(
-            new ArchivedMessage(
-            Guid.NewGuid().ToString(),
-            marketMessage.MessageId,
-            IncomingDocumentType.RequestAggregatedMeasureData.Name,
-            marketMessage.SenderNumber,
-            marketMessage.ReceiverNumber,
-            SystemClock.Instance.GetCurrentInstant(),
-            marketMessage.BusinessReason,
-            document),
-            hostCancellationToken).ConfigureAwait(false);
     }
 }

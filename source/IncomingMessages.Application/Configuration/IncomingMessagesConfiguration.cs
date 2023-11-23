@@ -29,13 +29,13 @@ public static class IncomingMessagesConfiguration
     public static void Configure(IServiceCollection services)
     {
         services.AddScopedSqlDbContext<IncomingMessagesContext>();
-        services.AddScoped<IIncomingRequestAggregatedMeasuredParser, IncomingRequestAggregatedMeasuredParser>();
+        services.AddScoped<IIncomingMessageParser, IncomingMessageParser>();
         services.AddScoped<ITransactionIdRepository, TransactionIdRepository>();
         services.AddScoped<IMessageIdRepository, MessageIdRepository>();
         services.AddScoped<IMessageParser, XmlMessageParser>();
         services.AddScoped<IMessageParser, JsonMessageParser>();
         services.AddScoped<IMessageParser, ProtoMessageParser>();
-        services.AddScoped<RequestAggregatedMeasureDataMarketMessageParser>();
+        services.AddScoped<MarketMessageParser>();
         services.AddTransient<SenderAuthorizer>();
         services.AddTransient<IncomingRequestAggregatedMeasuredDataSender>();
         services.AddTransient<RequestAggregatedMeasureDataValidator>();

@@ -30,6 +30,7 @@ using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 using IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 using IncomingMessages.Infrastructure.ValidationErrors;
 using Xunit;
+using DocumentType = Energinet.DataHub.EDI.Common.DocumentType;
 
 namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
@@ -43,11 +44,11 @@ public class MessageParserTests
     private static readonly string SubPath =
         $"{Path.DirectorySeparatorChar}aggregatedmeasure{Path.DirectorySeparatorChar}";
 
-    private readonly RequestAggregatedMeasureDataMarketMessageParser _requestAggregatedMeasureDataMarketMessageParser;
+    private readonly MarketMessageParser _marketMessageParser;
 
     public MessageParserTests()
     {
-        _requestAggregatedMeasureDataMarketMessageParser = new RequestAggregatedMeasureDataMarketMessageParser(
+        _marketMessageParser = new MarketMessageParser(
             new IMessageParser[]
             {
                 new XmlMessageParser(),
@@ -81,7 +82,7 @@ public class MessageParserTests
     [MemberData(nameof(CreateMessagesWithSingleAndMultipleTransactions))]
     public async Task Successfully_parsed(DocumentFormat format, Stream message)
     {
-        var result = await _requestAggregatedMeasureDataMarketMessageParser.ParseAsync(message, format, CancellationToken.None);
+        var result = await _marketMessageParser.ParseAsync(message, format, DocumentType.NotifyAggregatedMeasureData, CancellationToken.None);
         using var assertionScope = new AssertionScope();
         Assert.True(result.Success);
         var marketMessage = result!.MarketMessage!;
@@ -114,7 +115,7 @@ public class MessageParserTests
     [MemberData(nameof(CreateBadMessages))]
     public async Task Messages_with_errors(DocumentFormat format, Stream message, string expectedError)
     {
-        var result = await _requestAggregatedMeasureDataMarketMessageParser.ParseAsync(message, format, CancellationToken.None);
+        var result = await _marketMessageParser.ParseAsync(message, format, DocumentType.NotifyAggregatedMeasureData, CancellationToken.None);
 
         Assert.True(result.Errors.Count > 0);
         Assert.True(result.Success == false);

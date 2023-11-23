@@ -37,14 +37,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapte
 
 public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetime
 {
-    private readonly RequestAggregatedMeasureDataMarketMessageParser _requestAggregatedMeasureDataMarketMessageParser;
+    private readonly MarketMessageParser _marketMessageParser;
     private readonly ProcessContext _processContext;
     private readonly RequestAggregatedMeasureDataValidator _requestAggregatedMeasureDataValidator;
 
     public RequestAggregatedMeasureDataReceiverTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _requestAggregatedMeasureDataMarketMessageParser = GetService<RequestAggregatedMeasureDataMarketMessageParser>();
+        _marketMessageParser = GetService<MarketMessageParser>();
         _processContext = GetService<ProcessContext>();
 
         var authenticatedActor = GetService<AuthenticatedActor>();
@@ -535,7 +535,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
     private Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseMessageAsync(Stream message)
     {
-        return _requestAggregatedMeasureDataMarketMessageParser.ParseAsync(message, DocumentFormat.Xml, CancellationToken.None);
+        return _marketMessageParser.ParseAsync(message, DocumentFormat.Xml, DocumentType.NotifyAggregatedMeasureData, CancellationToken.None);
     }
 
     private async Task AssertTransactionIdIsStored(string senderId, string transactionId)

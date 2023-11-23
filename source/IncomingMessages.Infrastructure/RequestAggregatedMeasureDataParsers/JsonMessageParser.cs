@@ -20,6 +20,7 @@ using IncomingMessages.Infrastructure.BaseParsers;
 using IncomingMessages.Infrastructure.Messages;
 using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 using IncomingMessages.Infrastructure.ValidationErrors;
+using DocumentType = Energinet.DataHub.EDI.Common.DocumentType;
 
 namespace IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 
@@ -37,6 +38,8 @@ public class JsonMessageParser : JsonParserBase,
 
 #pragma warning disable CA1822
     public DocumentFormat HandledFormat => DocumentFormat.Json;
+
+    public DocumentType DocumentType => DocumentType.NotifyAggregatedMeasureData;
 #pragma warning restore CA1822
 
     public async Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(

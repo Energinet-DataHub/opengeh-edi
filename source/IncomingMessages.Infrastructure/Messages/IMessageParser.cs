@@ -28,6 +28,11 @@ public interface IMessageParser
     DocumentFormat HandledFormat { get; }
 
     /// <summary>
+    /// The CIM document type handled
+    /// </summary>
+    DocumentType DocumentType { get; }
+
+    /// <summary>
     /// Parse from stream
     /// </summary>
     Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(

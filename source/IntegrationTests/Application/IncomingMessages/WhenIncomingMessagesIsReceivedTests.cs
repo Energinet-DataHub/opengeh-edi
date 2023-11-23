@@ -32,7 +32,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 
 public class WhenIncomingMessagesIsReceivedTests : TestBase
 {
-    private readonly IIncomingRequestAggregatedMeasuredParser _incomingMessagesRequest;
+    private readonly IIncomingMessageParser _incomingMessagesRequest;
     private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
     private readonly ServiceBusSenderSpy _senderSpy;
 
@@ -42,7 +42,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IServiceBusSenderFactory>();
         _senderSpy = new ServiceBusSenderSpy("Fake");
         _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
-        _incomingMessagesRequest = GetService<IIncomingRequestAggregatedMeasuredParser>();
+        _incomingMessagesRequest = GetService<IIncomingMessageParser>();
     }
 
     [Fact]
@@ -56,6 +56,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
       await _incomingMessagesRequest.ParseAsync(
           ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
           DocumentFormat.Json,
+          DocumentType.NotifyAggregatedMeasureData,
           CancellationToken.None);
 
       // Assert
@@ -75,14 +76,16 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var sessionProvider = GetService<IServiceProvider>();
         using var secondScope = sessionProvider.CreateScope();
         var authenticatedActorInSecondScope = secondScope.ServiceProvider.GetService<AuthenticatedActor>();
-        var secondParser = secondScope.ServiceProvider.GetRequiredService<IIncomingRequestAggregatedMeasuredParser>();
+        var secondParser = secondScope.ServiceProvider.GetRequiredService<IIncomingMessageParser>();
         var task01 = _incomingMessagesRequest.ParseAsync(
             ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
             DocumentFormat.Json,
+            DocumentType.NotifyAggregatedMeasureData,
             CancellationToken.None);
         var task02 = secondParser.ParseAsync(
             ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
             DocumentFormat.Json,
+            DocumentType.NotifyAggregatedMeasureData,
             CancellationToken.None);
         authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("5799999933318"), restriction: Restriction.None));
 
