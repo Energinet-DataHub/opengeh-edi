@@ -842,7 +842,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Process.Domain\Process.Domain.csproj" />
+      <ProjectReference Include="..\Common\Common.csproj" />
     </ItemGroup>
 
 </Project>

@@ -22,7 +22,9 @@ using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Xml;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
+using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using MediatR;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.DependencyInjection;
@@ -53,7 +55,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
         public static IEnumerable<object[]> GetRequestHandlerRequirements()
             => ResolveTypes(
                 typeof(IRequestHandler<,>),
-                new[] { ApplicationAssemblies.Application, ApplicationAssemblies.Infrastructure });
+                new[] { typeof(InitializeAggregatedMeasureDataProcessesHandler).Assembly, typeof(PeekHandler).Assembly });
 
         public static IEnumerable<object[]> GetNotificationsHandlerRequirements()
             => ResolveTypes(
