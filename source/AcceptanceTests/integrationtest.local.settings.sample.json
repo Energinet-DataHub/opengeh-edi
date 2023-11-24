@@ -1,6 +1,5 @@
 ﻿{
   "AZP_TOKEN": "<acceptance test azp token using for auth token>",
   "SHARED_KEYVAULT_NAME": "<key vault name>",
-  "EDI_DATABASE_CONNECTION_STRING": "<connection string for edi db>",
   "AZURE_ENTRA_CLIENT_SECRET": "<azure entra client secret for api management login>"
 }
