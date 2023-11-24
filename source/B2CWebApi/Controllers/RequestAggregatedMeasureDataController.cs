@@ -13,10 +13,12 @@
 // limitations under the License.
 
 using Energinet.DataHub.Core.App.Common;
-using Energinet.DataHub.EDI.B2CWebApi.Clients;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+using Google.Protobuf;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NodaTime;
@@ -27,18 +29,18 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 [Route("[controller]")]
 public class RequestAggregatedMeasureDataController : ControllerBase
 {
-    private readonly RequestAggregatedMeasureDataHttpClient _requestAggregatedMeasureDataHttpClient;
     private readonly UserContext<FrontendUser> _userContext;
     private readonly DateTimeZone _dateTimeZone;
+    private readonly IIncomingMessageParser _incomingMessageParser;
 
     public RequestAggregatedMeasureDataController(
-        RequestAggregatedMeasureDataHttpClient requestAggregatedMeasureDataHttpClient,
         UserContext<FrontendUser> userContext,
-        DateTimeZone dateTimeZone)
+        DateTimeZone dateTimeZone,
+        IIncomingMessageParser incomingMessageParser)
     {
-        _requestAggregatedMeasureDataHttpClient = requestAggregatedMeasureDataHttpClient;
         _userContext = userContext;
         _dateTimeZone = dateTimeZone;
+        _incomingMessageParser = incomingMessageParser;
     }
 
     [HttpPost]
@@ -46,26 +48,36 @@ public class RequestAggregatedMeasureDataController : ControllerBase
     public async Task<ActionResult> RequestAsync(RequestAggregatedMeasureDataMarketRequest request, CancellationToken cancellationToken)
     {
         var currentUser = _userContext.CurrentUser;
-        var token = GetToken(currentUser);
 
-        var validationMessage = await _requestAggregatedMeasureDataHttpClient.RequestAsync(
-            RequestAggregatedMeasureDataHttpFactory.Create(request, currentUser.ActorNumber, currentUser.Role, _dateTimeZone),
-            token,
-            cancellationToken).ConfigureAwait(false);
+        var message =
+            RequestAggregatedMeasureDataHttpFactory.Create(
+                request,
+                currentUser.ActorNumber,
+                currentUser.Role,
+                _dateTimeZone);
 
-        if (string.IsNullOrWhiteSpace(validationMessage))
-            return Ok();
+        var responseMessage = await _incomingMessageParser.ParseAsync(
+                GenerateStreamFromString(message.ToByteArray()),
+                DocumentFormat.Proto,
+                IncomingDocumentType.RequestAggregatedMeasureData,
+                cancellationToken,
+                DocumentFormat.Json)
+            .ConfigureAwait(false);
 
-        return BadRequest(validationMessage);
+        if (responseMessage.IsErrorResponse)
+        {
+            return BadRequest();
+        }
+
+        return Ok(responseMessage.MessageBody);
     }
 
-    private static string GetToken(FrontendUser currentUser)
+    private static Stream GenerateStreamFromString(byte[] dataToStream)
     {
-        return TokenBuilder.BuildToken(
-            currentUser.ActorNumber,
-#pragma warning disable CA1308
-            currentUser.Role.ToLowerInvariant(),
-#pragma warning restore CA1308
-            currentUser.Azp);
+        if (dataToStream == null) throw new ArgumentNullException(nameof(dataToStream));
+        var stream = new MemoryStream();
+        stream.Write(dataToStream, 0, dataToStream.Length);
+        stream.Position = 0;
+        return stream;
     }
 }

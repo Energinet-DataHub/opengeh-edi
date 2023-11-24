@@ -18,7 +18,5 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1056", Justification = "Nuget expects a string")]
 public class EdiOptions
 {
-    public string EDI_BASE_URL { get; set; } = string.Empty;
-
     public string EDI_DATABASE_CONNECTION_STRING { get; set; } = string.Empty;
 }

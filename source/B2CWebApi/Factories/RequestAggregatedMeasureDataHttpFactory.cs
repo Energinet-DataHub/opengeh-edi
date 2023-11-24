@@ -36,8 +36,6 @@ public static class RequestAggregatedMeasureDataHttpFactory
             SenderRoleCode = senderRoleCode,
             ReceiverId = "5790001330552",
             ReceiverRoleCode = MarketRole.CalculationResponsibleRole.Code,
-            AuthenticatedUser = actorNumber,
-            AuthenticatedUserRoleCode = senderRoleCode,
             BusinessReason = MapToBusinessReasonCode(request.ProcessType),
             MessageType = "E74",
         };

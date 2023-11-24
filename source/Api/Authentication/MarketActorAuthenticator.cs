@@ -40,13 +40,6 @@ namespace Energinet.DataHub.EDI.Api.Authentication
         {
             if (claimsPrincipal == null) throw new ArgumentNullException(nameof(claimsPrincipal));
 
-            // TODO: Temporarly hack for authorizing users originating from portal. Remove when JWT is updated
-            if (UserOriginatesFromPortal(claimsPrincipal))
-            {
-                _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.Owned));
-                return true;
-            }
-
             var userIdFromSts = GetClaimValueFrom(claimsPrincipal, ClaimsMap.UserId);
             if (string.IsNullOrWhiteSpace(userIdFromSts))
             {
@@ -67,12 +60,6 @@ namespace Energinet.DataHub.EDI.Api.Authentication
 
             _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, marketRole: marketRole));
             return true;
-        }
-
-        // TODO: Temporarly hack for authorizing users originating from portal. Remove when JWT is updated
-        private static bool UserOriginatesFromPortal(ClaimsPrincipal claimsPrincipal)
-        {
-            return claimsPrincipal.FindFirst(claim => claim.Type.Equals("token", StringComparison.OrdinalIgnoreCase)) is not null;
         }
 
         private static string? GetClaimValueFrom(ClaimsPrincipal claimsPrincipal, string claimName)

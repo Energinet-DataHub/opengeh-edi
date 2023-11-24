@@ -17,12 +17,12 @@ using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Logging.LoggingMiddleware;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
-using Energinet.DataHub.EDI.B2CWebApi.Clients;
 using Energinet.DataHub.EDI.B2CWebApi.Configuration;
 using Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.Common.Serialization;
+using Energinet.DataHub.EDI.IncomingMessages.Application.Configuration;
 using Microsoft.OpenApi.Models;
 
 namespace Energinet.DataHub.EDI.B2CWebApi;
@@ -79,13 +79,12 @@ public class Startup
 
         var ediClientOptions = Configuration.Get<EdiOptions>()!;
         ArchivedMessageConfiguration.Configure(serviceCollection, ediClientOptions.EDI_DATABASE_CONNECTION_STRING);
+        IncomingMessagesConfiguration.Configure(serviceCollection);
 
         serviceCollection.AddJwtTokenSecurity(Configuration);
         serviceCollection.AddDateTimeConfiguration(Configuration);
         serviceCollection
             .AddHttpClient();
-        serviceCollection.AddScoped(provider => new RequestAggregatedMeasureDataHttpClient(
-            provider.GetRequiredService<IHttpClientFactory>(), new Uri(ediClientOptions.EDI_BASE_URL)));
     }
 
     public void Configure(IApplicationBuilder app)
