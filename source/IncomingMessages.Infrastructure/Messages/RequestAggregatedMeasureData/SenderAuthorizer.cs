@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
-using Energinet.DataHub.EDI.Common.Actors;
 using IncomingMessages.Infrastructure.ValidationErrors;
 
 namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData

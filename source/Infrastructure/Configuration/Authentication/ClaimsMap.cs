@@ -15,7 +15,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 

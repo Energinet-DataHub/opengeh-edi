@@ -12,16 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
-
-namespace Energinet.DataHub.EDI.Common
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors
 {
-    #pragma warning disable CA1040
-    /// <summary>
-    /// CQRS command object
-    /// </summary>
-    public interface ICommand<out TResponse> : IRequest<TResponse>
+    public static class DataHubDetails
     {
+        public static ActorNumber IdentificationNumber => ActorNumber.Create("5790001330552");
     }
-#pragma warning restore
 }

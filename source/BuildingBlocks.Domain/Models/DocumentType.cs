@@ -12,25 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
-
-public class Restriction : EnumerationType
+public class DocumentType : EnumerationType
 {
-    /// <summary>
-    /// No restrictions can see all data.
-    /// </summary>
-    public static readonly Restriction None = new(0, nameof(None));
+    public static readonly DocumentType NotifyAggregatedMeasureData = new(7, nameof(NotifyAggregatedMeasureData), MessageCategory.Aggregations);
+    public static readonly DocumentType RejectRequestAggregatedMeasureData = new(8, nameof(RejectRequestAggregatedMeasureData), MessageCategory.Aggregations);
 
-    /// <summary>
-    /// Restricted to only see own data.
-    /// </summary>
-    public static readonly Restriction Owned = new(1, nameof(Owned));
-
-    private Restriction(int id, string name)
+    protected DocumentType(int id, string name, MessageCategory category)
         : base(id, name)
     {
+        Category = category;
+    }
+
+    public MessageCategory Category { get; }
+
+    public override string ToString()
+    {
+        return Name;
     }
 }

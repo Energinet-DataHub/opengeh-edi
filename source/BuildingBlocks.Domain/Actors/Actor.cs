@@ -12,18 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
-using NodaTime;
+using System;
 
-namespace Energinet.DataHub.EDI.Common.TimeEvents
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+
+public class Actor
 {
-    public class TenSecondsHasHasPassed : INotification
-    {
-        public TenSecondsHasHasPassed(Instant now)
-        {
-            Now = now;
-        }
+    private readonly Guid _id;
 
-        public Instant Now { get; }
+    public Actor(ActorNumber actorNumber, string externalId)
+    {
+        _id = Guid.NewGuid();
+        ActorNumber = actorNumber;
+        ExternalId = externalId;
     }
+
+#pragma warning disable
+    private Actor()
+    {
+    }
+
+    public ActorNumber ActorNumber { get; set; }
+
+    public string ExternalId { get; set; }
 }
