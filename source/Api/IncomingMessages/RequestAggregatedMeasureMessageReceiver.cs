@@ -13,26 +13,15 @@
 // limitations under the License.
 
 using System;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.Application.Configuration;
-using Energinet.DataHub.EDI.ArchivedMessages.Application;
-using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Common.DateTime;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
-using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
-using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.Process.Interfaces;
-using MediatR;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+using IncomingMessages.Infrastructure;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
@@ -42,30 +31,18 @@ namespace Energinet.DataHub.EDI.Api.IncomingMessages;
 public class RequestAggregatedMeasureMessageReceiver
 {
     private readonly ILogger<RequestAggregatedMeasureMessageReceiver> _logger;
-    private readonly IArchivedMessagesClient _archivedMessagesClient;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-    private readonly RequestAggregatedMeasureDataMarketMessageParser _requestAggregatedMeasureDataMarketMessageParser;
-    private readonly ResponseFactory _responseFactory;
+    private readonly IIncomingMessageParser _incomingMessageParser;
     private readonly ICorrelationContext _correlationContext;
-    private readonly IMediator _mediator;
 
     public RequestAggregatedMeasureMessageReceiver(
         ILogger<RequestAggregatedMeasureMessageReceiver> logger,
-        IArchivedMessagesClient archivedMessagesClient,
-        ISystemDateTimeProvider systemDateTimeProvider,
-        RequestAggregatedMeasureDataMarketMessageParser requestAggregatedMeasureDataMarketMessageParser,
-        ResponseFactory responseFactory,
-        ICorrelationContext correlationContext,
-        IMediator mediator)
-    {
+        IIncomingMessageParser incomingMessageParser,
+        ICorrelationContext correlationContext)
+        {
         _logger = logger;
-        _archivedMessagesClient = archivedMessagesClient;
-        _systemDateTimeProvider = systemDateTimeProvider;
-        _requestAggregatedMeasureDataMarketMessageParser = requestAggregatedMeasureDataMarketMessageParser;
-        _responseFactory = responseFactory;
+        _incomingMessageParser = incomingMessageParser;
         _correlationContext = correlationContext;
-        _mediator = mediator;
-    }
+        }
 
     [Function(nameof(RequestAggregatedMeasureMessageReceiver))]
     public async Task<HttpResponseData> RunAsync(
@@ -86,38 +63,21 @@ public class RequestAggregatedMeasureMessageReceiver
             return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
         }
 
-        var messageParserResult = await _requestAggregatedMeasureDataMarketMessageParser
-            .ParseAsync(request.Body, cimFormat, cancellationToken).ConfigureAwait(false);
-        var marketMessage = messageParserResult.MarketMessage;
-        if (marketMessage is null || messageParserResult.Errors.Any())
+        var responseMessage = await _incomingMessageParser
+            .ParseAsync(
+                request.Body,
+                cimFormat,
+                IncomingDocumentType.RequestAggregatedMeasureData,
+                cancellationToken).ConfigureAwait(false);
+
+        if (responseMessage.IsErrorResponse)
         {
-            var errorResult = Result.Failure(messageParserResult.Errors.ToArray());
             var httpErrorStatusCode = HttpStatusCode.BadRequest;
-            return CreateResponse(request, httpErrorStatusCode, _responseFactory.From(errorResult, cimFormat));
+            return CreateResponse(request, httpErrorStatusCode, responseMessage);
         }
 
-        await SaveArchivedMessageAsync(marketMessage, request.Body, cancellationToken).ConfigureAwait(false);
-
-        var result = await _mediator
-            .Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage), cancellationToken).ConfigureAwait(false);
-
-        var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
-        return CreateResponse(request, httpStatusCode, _responseFactory.From(result, cimFormat));
-    }
-
-    private async Task SaveArchivedMessageAsync(RequestAggregatedMeasureDataMarketMessage marketMessage, Stream document, CancellationToken cancellationToken)
-    {
-        await _archivedMessagesClient.CreateAsync(
-            new ArchivedMessage(
-            Guid.NewGuid().ToString(),
-            marketMessage.MessageId,
-            IncomingDocumentType.RequestAggregatedMeasureData.Name,
-            marketMessage.SenderNumber,
-            marketMessage.ReceiverNumber,
-            _systemDateTimeProvider.Now(),
-            marketMessage.BusinessReason,
-            document),
-            cancellationToken).ConfigureAwait(false);
+        var httpStatusCode = !responseMessage.IsErrorResponse ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
+        return CreateResponse(request, httpStatusCode, responseMessage);
     }
 
     private HttpResponseData CreateResponse(

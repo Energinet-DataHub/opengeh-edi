@@ -28,18 +28,25 @@ namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles
             TopicName = topicName;
         }
 
+        public bool ShouldFail { get; set; }
+
         public string TopicName { get; }
 
         public ServiceBusMessage? Message { get; private set; }
 
         public Task SendAsync(ServiceBusMessage message, CancellationToken cancellationToken)
         {
+            if (ShouldFail)
+                throw new ServiceBusException();
             Message = message;
             return Task.CompletedTask;
         }
 
         public Task SendAsync(ReadOnlyCollection<ServiceBusMessage> messages, CancellationToken cancellationToken)
         {
+            if (ShouldFail)
+                throw new ServiceBusException();
+
             return Task.CompletedTask;
         }
 

@@ -19,37 +19,24 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
-using Energinet.DataHub.EDI.ArchivedMessages.Application;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Common.DateTime;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
-using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.Edi.Requests;
-using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 
 namespace Energinet.DataHub.EDI.Api.IncomingMessages;
 
+//TODO: Remove this endpoint and refactor the RequestAggregatedMeasureDataController
 public class B2CRequestAggregatedMeasureMessageReceiver
 {
-    private readonly IArchivedMessagesClient _archivedMessagesClient;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-    private readonly ResponseFactory _responseFactory;
-    private readonly IMediator _mediator;
+    private readonly IIncomingMessageParser _incomingMessageParser;
 
-    public B2CRequestAggregatedMeasureMessageReceiver(
-        IArchivedMessagesClient archivedMessagesClient,
-        ISystemDateTimeProvider systemDateTimeProvider,
-        ResponseFactory responseFactory,
-        IMediator mediator)
+    public B2CRequestAggregatedMeasureMessageReceiver(IIncomingMessageParser incomingMessageParser)
         {
-        _archivedMessagesClient = archivedMessagesClient;
-        _systemDateTimeProvider = systemDateTimeProvider;
-        _responseFactory = responseFactory;
-        _mediator = mediator;
+        _incomingMessageParser = incomingMessageParser;
         }
 
     [Function(nameof(B2CRequestAggregatedMeasureMessageReceiver))]
@@ -62,15 +49,16 @@ public class B2CRequestAggregatedMeasureMessageReceiver
 
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);
 
-        var requestAggregatedMeasureData = RequestAggregatedMeasureData.Parser.ParseFrom(request.Body);
-        await SaveArchivedMessageAsync(requestAggregatedMeasureData, request.Body, cancellationToken).ConfigureAwait(false);
-        var marketMessage = RequestAggregatedMeasureDataMarketMessageFactory.Create(requestAggregatedMeasureData, _systemDateTimeProvider.Now());
+        var responseMessage = await _incomingMessageParser.ParseAsync(
+            request.Body,
+            DocumentFormat.Proto,
+            IncomingDocumentType.RequestAggregatedMeasureData,
+            cancellationToken,
+            DocumentFormat.Json)
+            .ConfigureAwait(false);
 
-        var result = await _mediator
-            .Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage), cancellationToken).ConfigureAwait(false);
-
-        var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
-        return CreateResponse(request, httpStatusCode, _responseFactory.From(result, DocumentFormat.Json));
+        var httpStatusCode = !responseMessage.IsErrorResponse ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
+        return CreateResponse(request, httpStatusCode, responseMessage);
     }
 
     private static HttpResponseData CreateResponse(
@@ -79,20 +67,5 @@ public class B2CRequestAggregatedMeasureMessageReceiver
         var response = request.CreateResponse(statusCode);
         response.WriteString(responseMessage.MessageBody, Encoding.UTF8);
         return response;
-    }
-
-    private async Task SaveArchivedMessageAsync(RequestAggregatedMeasureData requestAggregatedMeasureData, Stream document,  CancellationToken cancellationToken)
-    {
-        await _archivedMessagesClient.CreateAsync(
-            new ArchivedMessage(
-            Guid.NewGuid().ToString(),
-            requestAggregatedMeasureData.MessageId,
-            IncomingDocumentType.RequestAggregatedMeasureData.Name,
-            requestAggregatedMeasureData.SenderId,
-            requestAggregatedMeasureData.ReceiverId,
-            _systemDateTimeProvider.Now(),
-            requestAggregatedMeasureData.BusinessReason,
-            document),
-            cancellationToken).ConfigureAwait(false);
     }
 }
