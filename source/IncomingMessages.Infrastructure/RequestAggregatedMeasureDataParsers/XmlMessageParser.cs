@@ -170,7 +170,7 @@ public class XmlMessageParser : IMessageParser
         string? marketEvaluationSettlementMethod = null;
         var startDateAndOrTimeDateTime = string.Empty;
         var endDateAndOrTimeDateTime = string.Empty;
-        var meteringGridAreaDomainId = string.Empty;
+        string? meteringGridAreaDomainId = null;
         string? energySupplierMarketParticipantId = null;
         string? balanceResponsiblePartyMarketParticipantId = null;
         string? settlementSeriesVersion = null;
