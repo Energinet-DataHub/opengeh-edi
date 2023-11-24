@@ -20,7 +20,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 using Energinet.DataHub.Edi.Requests;
@@ -31,7 +30,6 @@ using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 using IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 using IncomingMessages.Infrastructure.ValidationErrors;
 using Xunit;
-using DocumentType = Energinet.DataHub.EDI.Common.DocumentType;
 
 namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
