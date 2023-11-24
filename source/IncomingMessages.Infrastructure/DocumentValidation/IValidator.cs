@@ -13,9 +13,8 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
 
-namespace Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+namespace IncomingMessages.Infrastructure.DocumentValidation;
 
 /// <summary>
 /// Validates a document
