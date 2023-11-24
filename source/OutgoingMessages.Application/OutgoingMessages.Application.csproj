@@ -17,7 +17,6 @@
     <ProjectReference Include="..\OutgoingMessages.Contracts\OutgoingMessages.Contracts.csproj" />
     <ProjectReference Include="..\OutgoingMessages.Domain\OutgoingMessages.Domain.csproj" />
     <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
-    <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 </Project>
