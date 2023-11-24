@@ -12,14 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Common;
+using System;
+using MediatR;
+using NodaTime;
 
-public class IncomingDocumentType : EnumerationType
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain
 {
-    public static readonly IncomingDocumentType RequestAggregatedMeasureData = new(0, nameof(RequestAggregatedMeasureData));
-
-    public IncomingDocumentType(int id, string name)
-        : base(id, name)
+    public class DomainEvent : INotification
     {
+        public Guid Id { get; } = Guid.NewGuid();
+
+        public Instant OccurredOn { get; } = SystemClock.Instance.GetCurrentInstant();
     }
 }

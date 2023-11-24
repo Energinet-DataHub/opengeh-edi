@@ -15,23 +15,24 @@
 using System;
 using System.Linq;
 
-namespace Energinet.DataHub.EDI.Common;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public class DocumentFormat : EnumerationType
+public class MeasurementUnit : EnumerationType
 {
-    public static readonly DocumentFormat Xml = new(0, nameof(Xml));
-    public static readonly DocumentFormat Json = new(1, nameof(Json));
-    public static readonly DocumentFormat Ebix = new(2, nameof(Ebix));
-    public static readonly DocumentFormat Proto = new(3, nameof(Proto));
+    public static readonly MeasurementUnit Kwh = new(0, nameof(Kwh), "KWH");
 
-    private DocumentFormat(int id, string name)
+    private MeasurementUnit(int id, string name, string code)
         : base(id, name)
     {
+        Code = code;
     }
 
-    public static DocumentFormat From(string valueToParse)
+    public string Code { get; }
+
+    public static MeasurementUnit From(string value)
     {
-        return GetAll<DocumentFormat>()
-            .First(format => format.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase));
+        return GetAll<MeasurementUnit>().First(type =>
+            type.Code.Equals(value, StringComparison.OrdinalIgnoreCase) ||
+            type.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
     }
 }

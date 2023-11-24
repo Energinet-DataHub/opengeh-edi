@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Energinet.DataHub.EDI.Common.Actors;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 
 public class ActorNumber : ValueObject
 {

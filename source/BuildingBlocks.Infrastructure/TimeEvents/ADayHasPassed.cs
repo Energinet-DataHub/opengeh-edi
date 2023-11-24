@@ -12,28 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using MediatR;
+using NodaTime;
 
-namespace Energinet.DataHub.EDI.Common.Actors;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 
-public class InvalidActorNumberException : Exception
+public class ADayHasPassed : INotification
 {
-    private InvalidActorNumberException(string message)
-        : base(message)
+    public ADayHasPassed(Instant now)
     {
+        Now = now;
     }
 
-    private InvalidActorNumberException()
-    {
-    }
-
-    private InvalidActorNumberException(string message, Exception innerException)
-        : base(message, innerException)
-    {
-    }
-
-    public static InvalidActorNumberException Create(string invalidActorNumber)
-    {
-        return new InvalidActorNumberException($"{invalidActorNumber} is not a valid actor number");
-    }
+    public Instant Now { get; }
 }

@@ -15,7 +15,7 @@
 using System;
 using System.Linq;
 
-namespace Energinet.DataHub.EDI.Common;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public sealed class BusinessReason : EnumerationType
 {

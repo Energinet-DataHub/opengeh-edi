@@ -18,6 +18,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Domain;
 using Energinet.DataHub.EDI.OutgoingMessages.Contracts;

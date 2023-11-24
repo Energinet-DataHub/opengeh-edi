@@ -15,7 +15,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Common.TimeEvents;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands

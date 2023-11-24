@@ -12,23 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Common;
+using System;
 
-public class DocumentType : EnumerationType
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+
+public class InvalidActorNumberException : Exception
 {
-    public static readonly DocumentType NotifyAggregatedMeasureData = new(7, nameof(NotifyAggregatedMeasureData), MessageCategory.Aggregations);
-    public static readonly DocumentType RejectRequestAggregatedMeasureData = new(8, nameof(RejectRequestAggregatedMeasureData), MessageCategory.Aggregations);
-
-    protected DocumentType(int id, string name, MessageCategory category)
-        : base(id, name)
+    private InvalidActorNumberException(string message)
+        : base(message)
     {
-        Category = category;
     }
 
-    public MessageCategory Category { get; }
-
-    public override string ToString()
+    private InvalidActorNumberException()
     {
-        return Name;
+    }
+
+    private InvalidActorNumberException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+
+    public static InvalidActorNumberException Create(string invalidActorNumber)
+    {
+        return new InvalidActorNumberException($"{invalidActorNumber} is not a valid actor number");
     }
 }
