@@ -16,13 +16,21 @@ using System.Collections.Generic;
 using System.Linq;
 using Dapper;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Exceptions;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 
 internal sealed class QueryBuilder
 {
+    private readonly ActorIdentity _actorIdentity;
     private readonly DynamicParameters _queryParameters = new();
     private readonly List<string> _statement = new();
+
+    public QueryBuilder(ActorIdentity actorIdentity)
+    {
+        _actorIdentity = actorIdentity;
+    }
 
     public QueryInput BuildFrom(GetMessagesQuery request)
     {
@@ -67,6 +75,17 @@ internal sealed class QueryBuilder
             AddFilter(
                 "BusinessReason in @BusinessReason",
                 new KeyValuePair<string, object>("BusinessReason", request.BusinessReasons));
+        }
+
+        if (_actorIdentity.HasRestriction(Restriction.Owned))
+        {
+            AddFilter(
+                "(ReceiverNumber=@Requester OR SenderNumber=@Requester)",
+                new KeyValuePair<string, object>("Requester", _actorIdentity.ActorNumber.Value));
+        }
+        else if (!_actorIdentity.HasRestriction(Restriction.None))
+        {
+            throw new InvalidRestrictionException($"Invalid restriction for fetching archived messages. Must be either {nameof(Restriction.Owned)} or {nameof(Restriction.None)}. ActorNumber: {_actorIdentity.ActorNumber.Value}; Restriction: {_actorIdentity.Restriction.Name}");
         }
 
         return new QueryInput(BuildStatement(), _queryParameters);

@@ -19,11 +19,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.EDI.Api.Authentication;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.Bearer;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.MarketActors;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.Application.Actors;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
@@ -95,22 +97,26 @@ namespace Energinet.DataHub.EDI.Api
                     services.AddApplicationInsights();
                     services.ConfigureFunctionsApplicationInsights();
 
+                    services.AddAuthentication(sp =>
+                    {
+                        if (runtime.IsRunningLocally() || runtime.ALLOW_TEST_TOKENS)
+                        {
+                            return new DevMarketActorAuthenticator(
+                                sp.GetRequiredService<IActorRepository>(),
+                                sp.GetRequiredService<IActorRegistry>(),
+                                sp.GetRequiredService<IDatabaseConnectionFactory>(),
+                                sp.GetRequiredService<AuthenticatedActor>());
+                        }
+
+                        return new MarketActorAuthenticator(
+                            sp.GetRequiredService<IActorRepository>(),
+                            sp.GetRequiredService<AuthenticatedActor>());
+                    });
+
                     CompositionRoot.Initialize(services)
                         .AddMessageBus(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!)
                         .AddRemoteBusinessService<DummyRequest, DummyReply>("Dummy", "Dummy")
                         .AddBearerAuthentication(tokenValidationParameters)
-                        .AddAuthentication(sp =>
-                        {
-                            if (runtime.IsRunningLocally() || runtime.ALLOW_TEST_TOKENS)
-                            {
-                                return new DevMarketActorAuthenticator(
-                                    sp.GetRequiredService<IActorRepository>(),
-                                    sp.GetRequiredService<IActorRegistry>(),
-                                    sp.GetRequiredService<IDatabaseConnectionFactory>());
-                            }
-
-                            return new MarketActorAuthenticator(sp.GetRequiredService<IActorRepository>());
-                        })
                         .AddDatabaseConnectionFactory(databaseConnectionString!)
                         .AddSystemClock(new SystemDateTimeProvider())
                         .AddDatabaseContext(databaseConnectionString!)
@@ -160,6 +166,18 @@ namespace Energinet.DataHub.EDI.Api
                     });
                 })
                 .Build();
+        }
+
+        public static void AddAuthentication(this IServiceCollection services, Func<IServiceProvider, IMarketActorAuthenticator>? authenticatorBuilder = null)
+        {
+            if (authenticatorBuilder is null)
+            {
+                services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
+            }
+            else
+            {
+                services.AddScoped(authenticatorBuilder);
+            }
         }
 
         private static void ConfigureAuthenticationMiddleware(IFunctionsWorkerApplicationBuilder worker)

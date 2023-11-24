@@ -16,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
       <ProjectReference Include="..\RequestResponse\source\RequestResponse\RequestResponse.csproj" />
     </ItemGroup>
 
