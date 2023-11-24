@@ -19,9 +19,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Dapper;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -29,8 +30,8 @@ using Energinet.DataHub.EDI.OutgoingMessages.Contracts;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using MediatR;
 using Xunit;
-using DocumentType = Energinet.DataHub.EDI.Common.DocumentType;
-using MessageCategory = Energinet.DataHub.EDI.Common.MessageCategory;
+using DocumentType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.DocumentType;
+using MessageCategory = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MessageCategory;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 

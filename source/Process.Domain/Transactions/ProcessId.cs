@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions;
 

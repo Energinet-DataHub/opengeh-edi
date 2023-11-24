@@ -12,27 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.Common;
-
-public class MeasurementUnit : EnumerationType
+public class MessageCategory : EnumerationType
 {
-    public static readonly MeasurementUnit Kwh = new(0, nameof(Kwh), "KWH");
+    public static readonly MessageCategory None = new(0, nameof(None));
+    public static readonly MessageCategory Aggregations = new(1, nameof(Aggregations));
 
-    private MeasurementUnit(int id, string name, string code)
+    // Message category can not be peeked
+
+    private MessageCategory(int id, string name)
         : base(id, name)
     {
-        Code = code;
-    }
-
-    public string Code { get; }
-
-    public static MeasurementUnit From(string value)
-    {
-        return GetAll<MeasurementUnit>().First(type =>
-            type.Code.Equals(value, StringComparison.OrdinalIgnoreCase) ||
-            type.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
     }
 }

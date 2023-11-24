@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Common.Actors;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.Common
+public class IncomingDocumentType : EnumerationType
 {
-    public static class DataHubDetails
+    public static readonly IncomingDocumentType RequestAggregatedMeasureData = new(0, nameof(RequestAggregatedMeasureData));
+
+    public IncomingDocumentType(int id, string name)
+        : base(id, name)
     {
-        public static ActorNumber IdentificationNumber => ActorNumber.Create("5790001330552");
     }
 }

@@ -12,24 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using MediatR;
+using NodaTime;
 
-namespace Energinet.DataHub.EDI.Common
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents
 {
-    [Serializable]
-    public abstract class InternalCommand : ICommand<Unit>
+    public class TenSecondsHasHasPassed : INotification
     {
-        protected InternalCommand()
+        public TenSecondsHasHasPassed(Instant now)
         {
-            Id = Guid.NewGuid();
+            Now = now;
         }
 
-        protected InternalCommand(Guid id)
-        {
-            Id = id;
-        }
-
-        public Guid Id { get; }
+        public Instant Now { get; }
     }
 }

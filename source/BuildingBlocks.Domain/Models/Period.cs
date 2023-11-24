@@ -15,7 +15,7 @@
 using System.Globalization;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.Common;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public record Period(Instant Start, Instant End)
 {

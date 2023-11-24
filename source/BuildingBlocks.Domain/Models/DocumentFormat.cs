@@ -15,25 +15,23 @@
 using System;
 using System.Linq;
 
-namespace Energinet.DataHub.EDI.Common;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public class Resolution : EnumerationType
+public class DocumentFormat : EnumerationType
 {
-    public static readonly Resolution Hourly = new(0, nameof(Hourly), "PT1H");
-    public static readonly Resolution QuarterHourly = new(1, nameof(QuarterHourly), "XXXX");
+    public static readonly DocumentFormat Xml = new(0, nameof(Xml));
+    public static readonly DocumentFormat Json = new(1, nameof(Json));
+    public static readonly DocumentFormat Ebix = new(2, nameof(Ebix));
+    public static readonly DocumentFormat Proto = new(3, nameof(Proto));
 
-    private Resolution(int id, string name, string code)
+    private DocumentFormat(int id, string name)
         : base(id, name)
     {
-        Code = code;
     }
 
-    public string Code { get; }
-
-    public static Resolution From(string value)
+    public static DocumentFormat From(string valueToParse)
     {
-        return GetAll<Resolution>().First(resolution =>
-            resolution.Code.Equals(value, StringComparison.OrdinalIgnoreCase) ||
-            resolution.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
+        return GetAll<DocumentFormat>()
+            .First(format => format.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase));
     }
 }

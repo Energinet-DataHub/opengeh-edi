@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using NodaTime;
 using NodaTime.Text;
 

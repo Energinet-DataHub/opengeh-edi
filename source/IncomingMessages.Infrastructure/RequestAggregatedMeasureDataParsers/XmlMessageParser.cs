@@ -14,14 +14,13 @@
 
 using System.Xml;
 using System.Xml.Schema;
-using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.CimXml;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using IncomingMessages.Infrastructure.Messages;
 using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 using IncomingMessages.Infrastructure.ValidationErrors;
-using DocumentType = Energinet.DataHub.EDI.Common.DocumentType;
 
 namespace IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 
