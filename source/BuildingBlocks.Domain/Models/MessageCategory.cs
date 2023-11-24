@@ -12,12 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Common.Actors;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.Common
+public class MessageCategory : EnumerationType
 {
-    public static class DataHubDetails
+    public static readonly MessageCategory None = new(0, nameof(None));
+    public static readonly MessageCategory Aggregations = new(1, nameof(Aggregations));
+
+    // Message category can not be peeked
+
+    private MessageCategory(int id, string name)
+        : base(id, name)
     {
-        public static ActorNumber IdentificationNumber => ActorNumber.Create("5790001330552");
     }
 }

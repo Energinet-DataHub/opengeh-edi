@@ -12,27 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
+using MediatR;
 
-namespace Energinet.DataHub.EDI.Common;
-
-public class MeasurementUnit : EnumerationType
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models
 {
-    public static readonly MeasurementUnit Kwh = new(0, nameof(Kwh), "KWH");
-
-    private MeasurementUnit(int id, string name, string code)
-        : base(id, name)
+    #pragma warning disable CA1040
+    /// <summary>
+    /// CQRS command object
+    /// </summary>
+    public interface ICommand<out TResponse> : IRequest<TResponse>
     {
-        Code = code;
     }
-
-    public string Code { get; }
-
-    public static MeasurementUnit From(string value)
-    {
-        return GetAll<MeasurementUnit>().First(type =>
-            type.Code.Equals(value, StringComparison.OrdinalIgnoreCase) ||
-            type.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
-    }
+#pragma warning restore
 }

@@ -13,15 +13,24 @@
 // limitations under the License.
 
 using System;
-using MediatR;
-using NodaTime;
+using System.Linq;
 
-namespace Energinet.DataHub.EDI.Common
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+
+public class DocumentFormat : EnumerationType
 {
-    public class DomainEvent : INotification
-    {
-        public Guid Id { get; } = Guid.NewGuid();
+    public static readonly DocumentFormat Xml = new(0, nameof(Xml));
+    public static readonly DocumentFormat Json = new(1, nameof(Json));
+    public static readonly DocumentFormat Ebix = new(2, nameof(Ebix));
 
-        public Instant OccurredOn { get; } = SystemClock.Instance.GetCurrentInstant();
+    private DocumentFormat(int id, string name)
+        : base(id, name)
+    {
+    }
+
+    public static DocumentFormat From(string valueToParse)
+    {
+        return GetAll<DocumentFormat>()
+            .First(format => format.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase));
     }
 }

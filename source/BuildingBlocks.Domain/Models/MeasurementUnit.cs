@@ -15,14 +15,13 @@
 using System;
 using System.Linq;
 
-namespace Energinet.DataHub.EDI.Common;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public class Resolution : EnumerationType
+public class MeasurementUnit : EnumerationType
 {
-    public static readonly Resolution Hourly = new(0, nameof(Hourly), "PT1H");
-    public static readonly Resolution QuarterHourly = new(1, nameof(QuarterHourly), "XXXX");
+    public static readonly MeasurementUnit Kwh = new(0, nameof(Kwh), "KWH");
 
-    private Resolution(int id, string name, string code)
+    private MeasurementUnit(int id, string name, string code)
         : base(id, name)
     {
         Code = code;
@@ -30,10 +29,10 @@ public class Resolution : EnumerationType
 
     public string Code { get; }
 
-    public static Resolution From(string value)
+    public static MeasurementUnit From(string value)
     {
-        return GetAll<Resolution>().First(resolution =>
-            resolution.Code.Equals(value, StringComparison.OrdinalIgnoreCase) ||
-            resolution.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
+        return GetAll<MeasurementUnit>().First(type =>
+            type.Code.Equals(value, StringComparison.OrdinalIgnoreCase) ||
+            type.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
     }
 }

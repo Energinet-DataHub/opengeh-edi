@@ -12,25 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.Common;
-
-public class DocumentFormat : EnumerationType
+public class DocumentType : EnumerationType
 {
-    public static readonly DocumentFormat Xml = new(0, nameof(Xml));
-    public static readonly DocumentFormat Json = new(1, nameof(Json));
-    public static readonly DocumentFormat Ebix = new(2, nameof(Ebix));
+    public static readonly DocumentType NotifyAggregatedMeasureData = new(7, nameof(NotifyAggregatedMeasureData), MessageCategory.Aggregations);
+    public static readonly DocumentType RejectRequestAggregatedMeasureData = new(8, nameof(RejectRequestAggregatedMeasureData), MessageCategory.Aggregations);
 
-    private DocumentFormat(int id, string name)
+    protected DocumentType(int id, string name, MessageCategory category)
         : base(id, name)
     {
+        Category = category;
     }
 
-    public static DocumentFormat From(string valueToParse)
+    public MessageCategory Category { get; }
+
+    public override string ToString()
     {
-        return GetAll<DocumentFormat>()
-            .First(format => format.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase));
+        return Name;
     }
 }

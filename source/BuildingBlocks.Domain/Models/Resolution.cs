@@ -15,14 +15,14 @@
 using System;
 using System.Linq;
 
-namespace Energinet.DataHub.EDI.Common;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public class ReasonCode : EnumerationType
+public class Resolution : EnumerationType
 {
-    public static readonly ReasonCode FullyAccepted = new(0, nameof(FullyAccepted), "A01");
-    public static readonly ReasonCode FullyRejected = new(1, nameof(FullyRejected), "A02");
+    public static readonly Resolution Hourly = new(0, nameof(Hourly), "PT1H");
+    public static readonly Resolution QuarterHourly = new(1, nameof(QuarterHourly), "XXXX");
 
-    public ReasonCode(int id, string name, string code)
+    private Resolution(int id, string name, string code)
         : base(id, name)
     {
         Code = code;
@@ -30,11 +30,10 @@ public class ReasonCode : EnumerationType
 
     public string Code { get; }
 
-    public static ReasonCode From(string valueToParseFrom)
+    public static Resolution From(string value)
     {
-        return GetAll
-                <ReasonCode>()
-            .First(reasonCode => reasonCode.Name.Equals(valueToParseFrom, StringComparison.OrdinalIgnoreCase) ||
-                                 reasonCode.Code.Equals(valueToParseFrom, StringComparison.OrdinalIgnoreCase));
+        return GetAll<Resolution>().First(resolution =>
+            resolution.Code.Equals(value, StringComparison.OrdinalIgnoreCase) ||
+            resolution.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
     }
 }

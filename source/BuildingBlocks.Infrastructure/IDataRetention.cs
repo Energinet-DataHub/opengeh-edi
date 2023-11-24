@@ -12,14 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Common;
+using System.Threading;
+using System.Threading.Tasks;
 
-public class IncomingDocumentType : EnumerationType
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
+
+/// <summary>
+/// Represent the contract for data retention for a single data source.
+/// A data source can be a database table.
+/// </summary>
+public interface IDataRetention
 {
-    public static readonly IncomingDocumentType RequestAggregatedMeasureData = new(0, nameof(RequestAggregatedMeasureData));
-
-    public IncomingDocumentType(int id, string name)
-        : base(id, name)
-    {
-    }
+    /// <summary>
+    /// Responsible for cleaning the no longer needed data.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
+    Task CleanupAsync(CancellationToken cancellationToken);
 }

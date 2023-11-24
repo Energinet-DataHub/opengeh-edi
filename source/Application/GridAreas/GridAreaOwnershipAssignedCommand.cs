@@ -13,8 +13,9 @@
 // limitations under the License.
 
 using System.Text.Json.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Common.Actors;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.Application.GridAreas;

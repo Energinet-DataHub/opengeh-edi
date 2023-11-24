@@ -12,16 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Common;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public class MessageCategory : EnumerationType
+public class IncomingDocumentType : EnumerationType
 {
-    public static readonly MessageCategory None = new(0, nameof(None));
-    public static readonly MessageCategory Aggregations = new(1, nameof(Aggregations));
+    public static readonly IncomingDocumentType RequestAggregatedMeasureData = new(0, nameof(RequestAggregatedMeasureData));
 
-    // Message category can not be peeked
-
-    private MessageCategory(int id, string name)
+    public IncomingDocumentType(int id, string name)
         : base(id, name)
     {
     }

@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using MediatR;
+using NodaTime;
 
-namespace Energinet.DataHub.EDI.Common
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain
 {
-    #pragma warning disable CA1040
-    /// <summary>
-    /// CQRS command object
-    /// </summary>
-    public interface ICommand<out TResponse> : IRequest<TResponse>
+    public class DomainEvent : INotification
     {
+        public Guid Id { get; } = Guid.NewGuid();
+
+        public Instant OccurredOn { get; } = SystemClock.Instance.GetCurrentInstant();
     }
-#pragma warning restore
 }

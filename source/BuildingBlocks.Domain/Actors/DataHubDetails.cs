@@ -12,24 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using MediatR;
-
-namespace Energinet.DataHub.EDI.Common
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors
 {
-    [Serializable]
-    public abstract class InternalCommand : ICommand<Unit>
+    public static class DataHubDetails
     {
-        protected InternalCommand()
-        {
-            Id = Guid.NewGuid();
-        }
-
-        protected InternalCommand(Guid id)
-        {
-            Id = id;
-        }
-
-        public Guid Id { get; }
+        public static ActorNumber IdentificationNumber => ActorNumber.Create("5790001330552");
     }
 }

@@ -14,7 +14,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Energinet.DataHub.EDI.Common.DataRetention;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Microsoft.Extensions.DependencyInjection;
 

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Common.TimeEvents;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
