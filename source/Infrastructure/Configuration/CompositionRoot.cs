@@ -135,12 +135,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddMessageParserServices()
-        {
-            IncomingMessageParsingServices.AddIncomingMessageParsingServices(_services);
-            return this;
-        }
-
         public CompositionRoot AddRemoteBusinessService<TRequest, TReply>(string remoteRequestQueueName, string responseQueueName)
             where TRequest : class
             where TReply : class

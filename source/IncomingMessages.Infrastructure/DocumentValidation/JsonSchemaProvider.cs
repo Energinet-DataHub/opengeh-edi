@@ -14,7 +14,7 @@
 
 using Json.Schema;
 
-namespace Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+namespace IncomingMessages.Infrastructure.DocumentValidation;
 
 public class JsonSchemaProvider : SchemaProvider
 {

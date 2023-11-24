@@ -16,7 +16,7 @@ using System.Diagnostics;
 using System.Xml;
 using System.Xml.Schema;
 
-namespace Energinet.DataHub.EDI.Infrastructure.DocumentValidation.Xml
+namespace IncomingMessages.Infrastructure.DocumentValidation.Xml
 {
     public static class XmlDocumentValidator
     {
