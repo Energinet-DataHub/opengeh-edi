@@ -16,7 +16,7 @@ namespace IncomingMessages.Infrastructure.DocumentValidation.Ebix
 {
     public sealed class EbixSchemas : SchemaBase, ISchema
     {
-        private static readonly string _schemaPath = $"Ebix{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}document{Path.DirectorySeparatorChar}";
+        private static readonly string _schemaPath = $"DocumentValidation{Path.DirectorySeparatorChar}Ebix{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}document{Path.DirectorySeparatorChar}";
 
         public EbixSchemas()
         {

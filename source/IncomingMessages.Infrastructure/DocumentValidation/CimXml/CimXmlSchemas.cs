@@ -16,7 +16,7 @@ namespace IncomingMessages.Infrastructure.DocumentValidation.CimXml
 {
     public sealed class CimXmlSchemas : SchemaBase, ISchema
     {
-        private static readonly string _schemaPath = $"CimXml{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}";
+        private static readonly string _schemaPath = $"DocumentValidation{Path.DirectorySeparatorChar}CimXml{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}";
 
         public CimXmlSchemas()
         {
