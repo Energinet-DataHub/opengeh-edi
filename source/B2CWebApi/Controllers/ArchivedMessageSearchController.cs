@@ -13,9 +13,8 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
-using Energinet.DataHub.EDI.Common.Serialization;
 using Microsoft.AspNetCore.Mvc;
-using NodaTime;
+using NodaTime.Extensions;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 
@@ -23,18 +22,16 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 [Route("[controller]")]
 public class ArchivedMessageSearchController : ControllerBase
 {
-    private readonly ISerializer _serializer;
     private readonly IArchivedMessagesClient _archivedMessagesClient;
 
     public ArchivedMessageSearchController(
-        ISerializer serializer,
         IArchivedMessagesClient archivedMessagesClient)
     {
-        _serializer = serializer;
         _archivedMessagesClient = archivedMessagesClient;
     }
 
     [HttpPost]
+    [ProducesResponseType(typeof(ArchivedMessageResult[]), StatusCodes.Status200OK)]
     public async Task<ActionResult> RequestAsync(SearchArchivedMessagesCriteria request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
@@ -43,8 +40,8 @@ public class ArchivedMessageSearchController : ControllerBase
         {
             CreationPeriod = request.CreatedDuringPeriod is not null
                 ? new EDI.ArchivedMessages.Interfaces.MessageCreationPeriod(
-                    request.CreatedDuringPeriod.Start,
-                    request.CreatedDuringPeriod.End)
+                    request.CreatedDuringPeriod.Start.ToInstant(),
+                    request.CreatedDuringPeriod.End.ToInstant())
                 : null,
             MessageId = request.MessageId,
             SenderNumber = request.SenderNumber,
@@ -54,7 +51,14 @@ public class ArchivedMessageSearchController : ControllerBase
         };
         var result = await _archivedMessagesClient.SearchAsync(query, cancellationToken).ConfigureAwait(false);
 
-        return Ok(_serializer.Serialize(result.Messages));
+        return Ok(result.Messages.Select(x => new ArchivedMessageResult(
+            x.Id,
+            x.MessageId,
+            x.DocumentType,
+            x.SenderNumber,
+            x.ReceiverNumber,
+            x.CreatedAt.ToDateTimeOffset(),
+            x.BusinessReason)));
     }
 }
 
@@ -68,4 +72,14 @@ public record SearchArchivedMessagesCriteria(
     IReadOnlyList<string>? BusinessReasons);
 
 [Serializable]
-public record MessageCreationPeriod(Instant Start, Instant End);
+public record MessageCreationPeriod(DateTimeOffset Start, DateTimeOffset End);
+
+[Serializable]
+public record ArchivedMessageResult(
+    string Id,
+    string? MessageId,
+    string DocumentType,
+    string SenderNumber,
+    string ReceiverNumber,
+    DateTimeOffset CreatedAt,
+    string? BusinessReason);

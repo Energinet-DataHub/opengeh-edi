@@ -29,6 +29,7 @@ public class ArchivedMessageGetDocumentController : ControllerBase
     }
 
     [HttpPost]
+    [ProducesResponseType(typeof(Stream), StatusCodes.Status200OK)]
     public async Task<ActionResult> RequestAsync(string id, CancellationToken cancellationToken)
     {
         if (id == null) throw new ArgumentNullException(nameof(id));
