@@ -24,25 +24,25 @@ using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.EDI.Api.IncomingMessages;
+namespace Energinet.DataHub.EDI.Api.EventListeners;
 
-public class IncomingMessagesListener
+public class ProcessInitializationListener
 {
-    private readonly ILogger<IncomingMessagesListener> _logger;
+    private readonly ILogger<ProcessInitializationListener> _logger;
     private readonly IMediator _mediator;
     private readonly ISerializer _serializer;
 
-    public IncomingMessagesListener(ILogger<IncomingMessagesListener> logger, IMediator mediator, ISerializer serializer)
+    public ProcessInitializationListener(ILogger<ProcessInitializationListener> logger, IMediator mediator, ISerializer serializer)
     {
         _logger = logger;
         _mediator = mediator;
         _serializer = serializer;
     }
 
-    [Function(nameof(IncomingMessagesListener))]
+    [Function(nameof(ProcessInitializationListener))]
     public async Task RunAsync(
         [ServiceBusTrigger(
-            "%INCOMING_MESSAGES_QUEUE_NAME%",
+            "%INCOMING_PROCESS_QUEUE_NAME%",
             Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER")]
         byte[] eventData,
         FunctionContext context)
@@ -51,7 +51,8 @@ public class IncomingMessagesListener
         var eventDetails = context.ExtractEventDetails();
         _logger.LogInformation("Integration event details: {EventDetails}", eventDetails);
         //This is a temporary solution, an upcoming PR will pass the eventData to a generic handler.
-        var marketMessage = _serializer.Deserialize<RequestAggregatedMeasureDataMarketMessage>(System.Text.Encoding.UTF8.GetString(eventData));
+        //The generic handler will then deserialize the eventData and pass it to the correct handler.
+        var marketMessage = _serializer.Deserialize<RequestAggregatedMeasureDataDto>(System.Text.Encoding.UTF8.GetString(eventData));
         await _mediator.Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
     }
 }

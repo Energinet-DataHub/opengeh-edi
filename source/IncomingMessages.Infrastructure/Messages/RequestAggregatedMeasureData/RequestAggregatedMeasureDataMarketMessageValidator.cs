@@ -51,17 +51,17 @@ namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
         }
 
         public async Task<Result> ValidateAsync(
-            RequestAggregatedMeasureDataMarketMessage requestAggregatedMeasureDataMarketMessage,
+            RequestAggregatedMeasureDataDto requestAggregatedMeasureDataDto,
             CancellationToken cancellationToken)
         {
-            ArgumentNullException.ThrowIfNull(requestAggregatedMeasureDataMarketMessage);
+            ArgumentNullException.ThrowIfNull(requestAggregatedMeasureDataDto);
 
-            var authorizeSenderTask = AuthorizeSenderAsync(requestAggregatedMeasureDataMarketMessage);
-            var verifyReceiverTask = VerifyReceiverAsync(requestAggregatedMeasureDataMarketMessage);
-            var checkMessageIdTask = CheckMessageIdAsync(requestAggregatedMeasureDataMarketMessage.SenderNumber, requestAggregatedMeasureDataMarketMessage.MessageId, cancellationToken);
-            var checkMessageTypeTask = CheckMessageTypeAsync(requestAggregatedMeasureDataMarketMessage.MessageType, cancellationToken);
-            var checkProcessTypeTask = CheckBusinessReasonAsync(requestAggregatedMeasureDataMarketMessage.BusinessReason, cancellationToken);
-            var checkBusinessTypeTask = CheckBusinessTypeAsync(requestAggregatedMeasureDataMarketMessage.BusinessType, cancellationToken);
+            var authorizeSenderTask = AuthorizeSenderAsync(requestAggregatedMeasureDataDto);
+            var verifyReceiverTask = VerifyReceiverAsync(requestAggregatedMeasureDataDto);
+            var checkMessageIdTask = CheckMessageIdAsync(requestAggregatedMeasureDataDto.SenderNumber, requestAggregatedMeasureDataDto.MessageId, cancellationToken);
+            var checkMessageTypeTask = CheckMessageTypeAsync(requestAggregatedMeasureDataDto.MessageType, cancellationToken);
+            var checkProcessTypeTask = CheckBusinessReasonAsync(requestAggregatedMeasureDataDto.BusinessReason, cancellationToken);
+            var checkBusinessTypeTask = CheckBusinessTypeAsync(requestAggregatedMeasureDataDto.BusinessType, cancellationToken);
 
             await Task.WhenAll(
                 authorizeSenderTask,
@@ -72,13 +72,13 @@ namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
                 checkBusinessTypeTask).ConfigureAwait(false);
 
             var transactionIdsToBeStored = new List<string>();
-            foreach (var serie in requestAggregatedMeasureDataMarketMessage.Series)
+            foreach (var serie in requestAggregatedMeasureDataDto.Series)
             {
                 var transactionId = serie.Id;
 
                 if (await CheckTransactionIdAsync(
                         transactionId,
-                        requestAggregatedMeasureDataMarketMessage.SenderNumber,
+                        requestAggregatedMeasureDataDto.SenderNumber,
                         transactionIdsToBeStored,
                         cancellationToken).ConfigureAwait(false))
                 {
@@ -96,10 +96,10 @@ namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
                 using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
                 await _transactionIdRepository.StoreAsync(
-                    requestAggregatedMeasureDataMarketMessage.SenderNumber,
+                    requestAggregatedMeasureDataDto.SenderNumber,
                     transactionIdsToBeStored,
                     cancellationToken).ConfigureAwait(false);
-                await _messageIdRepository.StoreAsync(requestAggregatedMeasureDataMarketMessage.SenderNumber, requestAggregatedMeasureDataMarketMessage.MessageId, cancellationToken)
+                await _messageIdRepository.StoreAsync(requestAggregatedMeasureDataDto.SenderNumber, requestAggregatedMeasureDataDto.MessageId, cancellationToken)
                     .ConfigureAwait(false);
 
                 scope.Complete();
@@ -187,15 +187,15 @@ namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
             _errors.AddRange(result.Errors);
         }
 
-        private async Task AuthorizeSenderAsync(RequestAggregatedMeasureDataMarketMessage marketMessage)
+        private async Task AuthorizeSenderAsync(RequestAggregatedMeasureDataDto dto)
         {
-            var result = await _senderAuthorizer.AuthorizeAsync(marketMessage.SenderNumber, marketMessage.SenderRoleCode, marketMessage.AuthenticatedUser, marketMessage.AuthenticatedUserRole).ConfigureAwait(false);
+            var result = await _senderAuthorizer.AuthorizeAsync(dto.SenderNumber, dto.SenderRoleCode, dto.AuthenticatedUser, dto.AuthenticatedUserRole).ConfigureAwait(false);
             _errors.AddRange(result.Errors);
         }
 
-        private async Task VerifyReceiverAsync(RequestAggregatedMeasureDataMarketMessage marketMessage)
+        private async Task VerifyReceiverAsync(RequestAggregatedMeasureDataDto dto)
         {
-            var receiverVerification = await _receiverValidator.VerifyAsync(marketMessage.ReceiverNumber, marketMessage.ReceiverRoleCode).ConfigureAwait(false);
+            var receiverVerification = await _receiverValidator.VerifyAsync(dto.ReceiverNumber, dto.ReceiverRoleCode).ConfigureAwait(false);
             _errors.AddRange(receiverVerification.Errors);
         }
 

@@ -19,7 +19,7 @@ namespace Energinet.DataHub.EDI.Process.Interfaces;
 /// <summary>
 /// Responsible for carrying the market message data from the incoming message before any data validation.
 /// </summary>
-public record RequestAggregatedMeasureDataMarketMessage(
+public record RequestAggregatedMeasureDataDto(
     string SenderNumber,
     string SenderRoleCode,
     string ReceiverNumber,

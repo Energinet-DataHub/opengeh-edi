@@ -85,7 +85,7 @@ public class MessageParserTests
         var result = await _marketMessageParser.ParseAsync(message, format, IncomingDocumentType.RequestAggregatedMeasureData, CancellationToken.None);
         using var assertionScope = new AssertionScope();
         Assert.True(result.Success);
-        var marketMessage = result!.MarketMessage!;
+        var marketMessage = result!.Dto!;
         Assert.True(marketMessage != null);
         Assert.Equal("123564789123564789123564789123564789", marketMessage.MessageId);
         Assert.Equal("D05", marketMessage.BusinessReason);
@@ -96,7 +96,7 @@ public class MessageParserTests
         //Assert.Equal("2022-12-17T09:30:47Z", marketMessage.CreatedAt);
         Assert.Equal("23", marketMessage.BusinessType);
 
-        foreach (var serie in result!.MarketMessage!.Series)
+        foreach (var serie in result!.Dto!.Series)
         {
             Assert.True(serie != null);
             Assert.Equal("123353185", serie.Id);

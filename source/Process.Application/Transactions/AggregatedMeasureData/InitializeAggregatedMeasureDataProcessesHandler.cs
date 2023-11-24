@@ -39,20 +39,20 @@ public class InitializeAggregatedMeasureDataProcessesHandler : IRequestHandler<I
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        ArgumentNullException.ThrowIfNull(request.MarketMessage);
+        ArgumentNullException.ThrowIfNull(request.Dto);
 
-        CreateAggregatedMeasureDataProcess(request.MarketMessage);
+        CreateAggregatedMeasureDataProcess(request.Dto);
 
         return Task.FromResult(Unit.Value);
     }
 
     private void CreateAggregatedMeasureDataProcess(
-        RequestAggregatedMeasureDataMarketMessage marketMessage)
+        RequestAggregatedMeasureDataDto dto)
     {
-        var actorSenderNumber = ActorNumber.Create(marketMessage.SenderNumber);
-        var businessReason = BusinessReason.FromCode(marketMessage.BusinessReason);
+        var actorSenderNumber = ActorNumber.Create(dto.SenderNumber);
+        var businessReason = BusinessReason.FromCode(dto.BusinessReason);
 
-        foreach (var serie in marketMessage.Series)
+        foreach (var serie in dto.Series)
         {
             var settlementVersion = !string.IsNullOrWhiteSpace(serie.SettlementSeriesVersion)
                 ? SettlementVersion.FromCode(serie.SettlementSeriesVersion)
@@ -63,7 +63,7 @@ public class InitializeAggregatedMeasureDataProcessesHandler : IRequestHandler<I
                     ProcessId.New(),
                     BusinessTransactionId.Create(serie.Id),
                     actorSenderNumber,
-                    marketMessage.SenderRoleCode,
+                    dto.SenderRoleCode,
                     businessReason,
                     serie.MarketEvaluationPointType,
                     serie.MarketEvaluationSettlementMethod,

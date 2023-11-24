@@ -37,7 +37,7 @@ public class IncomingRequestAggregatedMeasuredDataSender
     }
 
     public async Task SendAsync(
-        RequestAggregatedMeasureDataMarketMessage request,
+        RequestAggregatedMeasureDataDto request,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request, nameof(request));
@@ -45,7 +45,7 @@ public class IncomingRequestAggregatedMeasuredDataSender
             new ServiceBusMessage(
                 _serializer.Serialize(request))
             {
-                Subject = nameof(RequestAggregatedMeasureDataMarketMessage),
+                Subject = nameof(RequestAggregatedMeasureDataDto),
             };
 
         await _senderCreator.SendAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);

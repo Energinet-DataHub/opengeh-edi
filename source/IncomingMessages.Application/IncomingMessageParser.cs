@@ -70,24 +70,24 @@ public class IncomingMessageParser : IIncomingMessageParser
         await _archivedMessagesClient.CreateAsync(
             new ArchivedMessage(
                 Guid.NewGuid().ToString(),
-                requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!.MessageId,
+                requestAggregatedMeasureDataMarketMessageParserResult.Dto!.MessageId,
                 IncomingDocumentType.RequestAggregatedMeasureData.Name,
-                requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!.SenderNumber,
-                requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!.ReceiverNumber,
+                requestAggregatedMeasureDataMarketMessageParserResult.Dto!.SenderNumber,
+                requestAggregatedMeasureDataMarketMessageParserResult.Dto!.ReceiverNumber,
                 SystemClock.Instance.GetCurrentInstant(),
-                requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!.BusinessReason,
+                requestAggregatedMeasureDataMarketMessageParserResult.Dto!.BusinessReason,
                 message),
             cancellationToken).ConfigureAwait(false);
 
         // Note that the current implementation could save the messageId and transactionId, then fail to send the service bus message.
         var result = await _aggregatedMeasureDataMarketMessageValidator
-            .ValidateAsync(requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!, cancellationToken)
+            .ValidateAsync(requestAggregatedMeasureDataMarketMessageParserResult.Dto!, cancellationToken)
             .ConfigureAwait(false);
 
         if (result.Success)
         {
             await _incomingRequestAggregatedMeasuredDataSender.SendAsync(
-                    requestAggregatedMeasureDataMarketMessageParserResult.MarketMessage!,
+                    requestAggregatedMeasureDataMarketMessageParserResult.Dto!,
                     cancellationToken)
                 .ConfigureAwait(false);
 

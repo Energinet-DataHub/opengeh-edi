@@ -21,14 +21,14 @@ namespace IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 
 public static class RequestAggregatedMeasureDataMarketMessageFactory
 {
-    public static RequestAggregatedMeasureDataMarketMessage Create(
+    public static RequestAggregatedMeasureDataDto Create(
         MessageHeader header,
         ReadOnlyCollection<Serie> series)
     {
         if (header == null) throw new ArgumentNullException(nameof(header));
         if (series == null) throw new ArgumentNullException(nameof(series));
 
-        return new RequestAggregatedMeasureDataMarketMessage(
+        return new RequestAggregatedMeasureDataDto(
             header.SenderId,
             header.SenderRole,
             header.ReceiverId,
@@ -43,7 +43,7 @@ public static class RequestAggregatedMeasureDataMarketMessageFactory
             series);
     }
 
-    public static RequestAggregatedMeasureDataMarketMessage Create(
+    public static RequestAggregatedMeasureDataDto Create(
         Energinet.DataHub.Edi.Requests.RequestAggregatedMeasureData requestAggregatedMeasureData,
         Instant createdAt)
     {
@@ -61,7 +61,7 @@ public static class RequestAggregatedMeasureDataMarketMessageFactory
                 string.IsNullOrWhiteSpace(serie.BalanceResponsiblePartyMarketParticipantId) ? null : serie.BalanceResponsiblePartyMarketParticipantId,
                 string.IsNullOrWhiteSpace(serie.SettlementSeriesVersion) ? null : serie.SettlementSeriesVersion)).ToList();
 
-        return new RequestAggregatedMeasureDataMarketMessage(
+        return new RequestAggregatedMeasureDataDto(
             requestAggregatedMeasureData.SenderId,
             requestAggregatedMeasureData.SenderRoleCode,
             requestAggregatedMeasureData.ReceiverId,

@@ -130,15 +130,15 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         _serviceBusClientSenderFactory.Dispose();
     }
 
-    private static void AssertProcessValues(AggregatedMeasureDataProcess process, RequestAggregatedMeasureDataMarketMessage marketMessage)
+    private static void AssertProcessValues(AggregatedMeasureDataProcess process, RequestAggregatedMeasureDataDto dto)
     {
-        var marketMessageSerie = marketMessage.Series.Single();
+        var marketMessageSerie = dto.Series.Single();
 
         Assert.NotEqual(Guid.Empty, process.ProcessId.Id);
         Assert.Equal(marketMessageSerie.Id, process.BusinessTransactionId.Id);
-        Assert.Equal(marketMessage.SenderNumber, process.RequestedByActorId.Value);
-        Assert.Equal(marketMessage.SenderRoleCode, process.RequestedByActorRoleCode);
-        Assert.Equal(marketMessage.BusinessReason, process.BusinessReason.Code);
+        Assert.Equal(dto.SenderNumber, process.RequestedByActorId.Value);
+        Assert.Equal(dto.SenderRoleCode, process.RequestedByActorRoleCode);
+        Assert.Equal(dto.BusinessReason, process.BusinessReason.Code);
         Assert.Equal(marketMessageSerie.MarketEvaluationPointType, process.MeteringPointType);
         Assert.Equal(marketMessageSerie.MarketEvaluationSettlementMethod, process.SettlementMethod);
         Assert.Equal(marketMessageSerie.StartDateAndOrTimeDateTime, process.StartOfPeriod);

@@ -101,13 +101,13 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
         return this;
     }
 
-    internal RequestAggregatedMeasureDataMarketMessage Build()
+    internal RequestAggregatedMeasureDataDto Build()
     {
         var messageParser = new RequestAggregatedMeasureDataMarketMessageParserResult(
             RequestAggregatedMeasureDataMarketMessageFactory.Create(
                 CreateHeader(),
                 new List<Serie> { CreateSerieCreateRecord() }.AsReadOnly()));
-        return messageParser.MarketMessage!;
+        return messageParser.Dto!;
     }
 
     private Serie CreateSerieCreateRecord() =>

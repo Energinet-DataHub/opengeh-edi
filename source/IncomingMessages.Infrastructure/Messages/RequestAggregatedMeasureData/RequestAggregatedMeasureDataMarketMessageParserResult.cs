@@ -24,15 +24,15 @@ namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
             Errors = errors;
         }
 
-        public RequestAggregatedMeasureDataMarketMessageParserResult(RequestAggregatedMeasureDataMarketMessage marketMessage)
+        public RequestAggregatedMeasureDataMarketMessageParserResult(RequestAggregatedMeasureDataDto dto)
         {
-            MarketMessage = marketMessage;
+            Dto = dto;
         }
 
         public IReadOnlyCollection<ValidationError> Errors { get; } = new List<ValidationError>();
 
         public bool Success => Errors.Count == 0;
 
-        public RequestAggregatedMeasureDataMarketMessage? MarketMessage { get; }
+        public RequestAggregatedMeasureDataDto? Dto { get; }
     }
 }
