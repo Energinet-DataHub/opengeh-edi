@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using NodaTime.Extensions;
 
@@ -61,25 +62,3 @@ public class ArchivedMessageSearchController : ControllerBase
             x.BusinessReason)));
     }
 }
-
-[Serializable]
-public record SearchArchivedMessagesCriteria(
-    MessageCreationPeriod? CreatedDuringPeriod,
-    string? MessageId,
-    string? SenderNumber,
-    string? ReceiverNumber,
-    IReadOnlyList<string>? DocumentTypes,
-    IReadOnlyList<string>? BusinessReasons);
-
-[Serializable]
-public record MessageCreationPeriod(DateTimeOffset Start, DateTimeOffset End);
-
-[Serializable]
-public record ArchivedMessageResult(
-    string Id,
-    string? MessageId,
-    string DocumentType,
-    string SenderNumber,
-    string ReceiverNumber,
-    DateTimeOffset CreatedAt,
-    string? BusinessReason);
