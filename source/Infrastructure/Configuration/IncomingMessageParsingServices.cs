@@ -12,12 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.CimXml;
-using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.Response;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration;
@@ -26,16 +22,7 @@ internal static class IncomingMessageParsingServices
 {
     internal static void AddIncomingMessageParsingServices(IServiceCollection services)
     {
-        RegisterB2BResponseServices(services);
         RegisterSchemaProviders(services);
-        RegisterRequestAggregatedMeasureDataHandling(services);
-    }
-
-    private static void RegisterB2BResponseServices(IServiceCollection services)
-    {
-        services.AddSingleton<IResponseFactory, JsonResponseFactory>();
-        services.AddSingleton<IResponseFactory, XmlResponseFactory>();
-        services.AddSingleton<ResponseFactory>();
     }
 
     private static void RegisterSchemaProviders(IServiceCollection services)
@@ -43,20 +30,5 @@ internal static class IncomingMessageParsingServices
         services.AddSingleton<CimJsonSchemas>();
         services.AddSingleton<CimXmlSchemaProvider>();
         services.AddSingleton<JsonSchemaProvider>();
-    }
-
-    private static void RegisterRequestAggregatedMeasureDataHandling(IServiceCollection services)
-    {
-        services
-            .AddScoped<IMessageParser, IncomingMessages.RequestAggregatedMeasureData.XmlMessageParser>();
-        services
-            .AddScoped<IMessageParser, IncomingMessages.RequestAggregatedMeasureData.JsonMessageParser>();
-        services.AddScoped<RequestAggregatedMeasureDataMarketMessageParser>();
-        services.AddTransient<RequestAggregatedMeasureDataValidator>();
-        services.AddTransient<SenderAuthorizer>();
-        services.AddScoped<ProcessTypeValidator>();
-        services.AddScoped<MessageTypeValidator>();
-        services.AddScoped<BusinessTypeValidator>();
-        services.AddScoped<CalculationResponsibleReceiverVerification>();
     }
 }
