@@ -185,7 +185,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                     sp.GetRequiredService<IActorRepository>(),
                     sp.GetRequiredService<AuthenticatedActor>());
             });
-            CompositionRoot.Initialize(_services)
+            CompositionRoot.Initialize(_services, DatabaseFixture.ConnectionString)
                 .AddRemoteBusinessService<DummyRequest, DummyReply>(
                     sp => new RemoteBusinessServiceRequestSenderSpy<DummyRequest>("Dummy"), "Dummy")
                 .AddDatabaseConnectionFactory(DatabaseFixture.ConnectionString)
@@ -201,8 +201,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
             ActorMessageQueueConfiguration.Configure(_services);
             ProcessConfiguration.Configure(_services);
+            ArchivedMessageConfiguration.Configure(_services, DatabaseFixture.ConnectionString);
             IncomingMessagesConfiguration.Configure(_services);
-            ArchivedMessageConfiguration.Configure(_services);
             _serviceProvider = _services.BuildServiceProvider();
         }
     }
