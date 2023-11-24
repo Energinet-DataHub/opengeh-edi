@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Response;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
-using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.Response;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+using IncomingMessages.Infrastructure.Messages;
+using IncomingMessages.Infrastructure.Response;
+using IncomingMessages.Infrastructure.ValidationErrors;
 using Newtonsoft.Json.Linq;
 using Xunit;
 using Xunit.Categories;
