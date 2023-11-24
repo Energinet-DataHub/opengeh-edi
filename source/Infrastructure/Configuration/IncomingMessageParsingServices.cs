@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
-using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.CimXml;
+using IncomingMessages.Infrastructure.DocumentValidation;
+using IncomingMessages.Infrastructure.DocumentValidation.CimXml;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration;

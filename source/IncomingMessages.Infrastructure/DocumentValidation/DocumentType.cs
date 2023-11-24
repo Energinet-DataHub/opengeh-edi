@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Infrastructure.DocumentValidation
-{
-    public abstract class SchemaProvider : ISchemaProvider
-    {
-        public abstract Task<T?> GetSchemaAsync<T>(string businessProcessType, string version, CancellationToken cancellationToken);
+namespace IncomingMessages.Infrastructure.DocumentValidation;
 
-        protected abstract Task<T?> LoadSchemaWithDependentSchemasAsync<T>(string location, CancellationToken cancellationToken);
-    }
+public enum DocumentType
+{
+    AggregationResult,
+    CustomerMasterData,
+    RejectRequestAggregatedMeasureData, // RSM-16 Reject Document
 }

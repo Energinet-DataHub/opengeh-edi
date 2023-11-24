@@ -14,21 +14,20 @@
 
 using System.Xml.Schema;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Infrastructure.DocumentValidation.Xml;
+using IncomingMessages.Infrastructure.DocumentValidation.Xml;
 
-namespace Energinet.DataHub.EDI.Infrastructure.DocumentValidation.Ebix;
+namespace IncomingMessages.Infrastructure.DocumentValidation.CimXml;
 
-public class EbixValidator : IValidator
+public class CimXmlValidator : IValidator
 {
     private readonly ISchemaProvider<XmlSchema> _schemaProvider;
 
-    public EbixValidator(ISchemaProvider<XmlSchema> schemaProvider)
+    public CimXmlValidator(ISchemaProvider<XmlSchema> schemaProvider)
     {
         _schemaProvider = schemaProvider;
     }
 
-    public DocumentFormat HandledFormat => DocumentFormat.Ebix;
+    public DocumentFormat HandledFormat => DocumentFormat.Xml;
 
     public async Task<ValidationResult> ValidateAsync(
         Stream document, DocumentType type, string version, CancellationToken cancellationToken)
