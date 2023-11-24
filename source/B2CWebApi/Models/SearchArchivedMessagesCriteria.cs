@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
+using Energinet.DataHub.EDI.B2CWebApi.Controllers;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1707", Justification = "To match naming in other domains")]
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1056", Justification = "Nuget expects a string")]
-public class EdiOptions
-{
-    public string EDI_BASE_URL { get; set; } = string.Empty;
+namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
-    public string EDI_DATABASE_CONNECTION_STRING { get; set; } = string.Empty;
-}
+[Serializable]
+public record SearchArchivedMessagesCriteria(
+    MessageCreationPeriod? CreatedDuringPeriod,
+    string? MessageId,
+    string? SenderNumber,
+    string? ReceiverNumber,
+    IReadOnlyList<string>? DocumentTypes,
+    IReadOnlyList<string>? BusinessReasons);
