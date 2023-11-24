@@ -42,7 +42,7 @@ public class ProcessInitializationListener
     [Function(nameof(ProcessInitializationListener))]
     public async Task RunAsync(
         [ServiceBusTrigger(
-            "%INCOMING_PROCESS_QUEUE_NAME%",
+            "%INCOMING_MESSAGES_QUEUE_NAME%",
             Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER")]
         byte[] eventData,
         FunctionContext context)
