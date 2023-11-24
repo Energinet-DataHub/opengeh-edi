@@ -18,6 +18,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.Common;
@@ -25,6 +26,7 @@ using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+using IncomingMessages.Infrastructure;
 using IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -66,6 +68,28 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
       // Assert
       var message = _senderSpy.Message;
       Assert.NotNull(message);
+    }
+
+    [Fact]
+    public async Task Transaction_and_message_ids_are_not_saved_when_failing_to_send_to_ServiceBus()
+    {
+        // Assert
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("5799999933318"), Restriction.Owned, MarketRole.BalanceResponsibleParty));
+        _senderSpy.ShouldFail = true;
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ServiceBusException>(() => _incomingMessagesRequest.ParseAsync(
+            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
+            DocumentFormat.Json,
+            IncomingDocumentType.RequestAggregatedMeasureData,
+            CancellationToken.None));
+
+        var message = _senderSpy.Message;
+        Assert.Null(message);
+        Assert.Empty(_incomingMessageContext.MessageIdForSenders.ToList());
+        Assert.Empty(_incomingMessageContext.TransactionIdForSenders.ToList());
+        _senderSpy.ShouldFail = false;
     }
 
     [Fact]

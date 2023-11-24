@@ -18,13 +18,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
-using Energinet.DataHub.EDI.Process.Interfaces;
 using IncomingMessages.Infrastructure;
 using IncomingMessages.Infrastructure.Messages;
 using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 using IncomingMessages.Infrastructure.Response;
+using Microsoft.Data.SqlClient;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application;
@@ -36,19 +37,22 @@ public class IncomingMessageParser : IIncomingMessageParser
     private readonly RequestAggregatedMeasureDataValidator _aggregatedMeasureDataMarketMessageValidator;
     private readonly ResponseFactory _responseFactory;
     private readonly IArchivedMessagesClient _archivedMessagesClient;
+    private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
 
     public IncomingMessageParser(
         MarketMessageParser marketMessageParser,
         IncomingRequestAggregatedMeasuredDataSender incomingRequestAggregatedMeasuredDataSender,
         RequestAggregatedMeasureDataValidator aggregatedMeasureDataMarketMessageValidator,
         ResponseFactory responseFactory,
-        IArchivedMessagesClient archivedMessagesClient)
+        IArchivedMessagesClient archivedMessagesClient,
+        IDatabaseConnectionFactory databaseConnectionFactory)
     {
         _marketMessageParser = marketMessageParser;
         _incomingRequestAggregatedMeasuredDataSender = incomingRequestAggregatedMeasuredDataSender;
         _aggregatedMeasureDataMarketMessageValidator = aggregatedMeasureDataMarketMessageValidator;
         _responseFactory = responseFactory;
         _archivedMessagesClient = archivedMessagesClient;
+        _databaseConnectionFactory = databaseConnectionFactory;
     }
 
     public async Task<ResponseMessage> ParseAsync(
@@ -79,7 +83,11 @@ public class IncomingMessageParser : IIncomingMessageParser
                 message),
             cancellationToken).ConfigureAwait(false);
 
-        // Note that the current implementation could save the messageId and transactionId, then fail to send the service bus message.
+        using var connection =
+            (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken)
+                .ConfigureAwait(false);
+        using var transaction = await connection.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
+
         var result = await _aggregatedMeasureDataMarketMessageValidator
             .ValidateAsync(requestAggregatedMeasureDataMarketMessageParserResult.Dto!, cancellationToken)
             .ConfigureAwait(false);
@@ -90,6 +98,8 @@ public class IncomingMessageParser : IIncomingMessageParser
                     requestAggregatedMeasureDataMarketMessageParserResult.Dto!,
                     cancellationToken)
                 .ConfigureAwait(false);
+
+            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
 
             return new ResponseMessage();
         }
