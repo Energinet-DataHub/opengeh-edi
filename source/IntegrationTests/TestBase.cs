@@ -197,8 +197,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                     correlation.SetId(Guid.NewGuid().ToString());
                     return correlation;
                 })
-                .AddMessagePublishing()
-                .AddMessageParserServices();
+                .AddMessagePublishing();
 
             ActorMessageQueueConfiguration.Configure(_services);
             ProcessConfiguration.Configure(_services);

@@ -16,6 +16,8 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using IncomingMessages.Infrastructure;
 using IncomingMessages.Infrastructure.Configuration.DataAccess;
+using IncomingMessages.Infrastructure.DocumentValidation;
+using IncomingMessages.Infrastructure.DocumentValidation.CimXml;
 using IncomingMessages.Infrastructure.Messages;
 using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 using IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
@@ -46,5 +48,10 @@ public static class IncomingMessagesConfiguration
         services.AddSingleton<IResponseFactory, JsonResponseFactory>();
         services.AddSingleton<IResponseFactory, XmlResponseFactory>();
         services.AddSingleton<ResponseFactory>();
+
+        //RegisterSchemaProviders
+        services.AddSingleton<CimJsonSchemas>();
+        services.AddSingleton<CimXmlSchemaProvider>();
+        services.AddSingleton<JsonSchemaProvider>();
     }
 }

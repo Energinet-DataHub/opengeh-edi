@@ -135,8 +135,7 @@ namespace Energinet.DataHub.EDI.Api
                         .AddRequestLogging(
                             runtime.REQUEST_RESPONSE_LOGGING_CONNECTION_STRING!,
                             runtime.REQUEST_RESPONSE_LOGGING_CONTAINER_NAME!)
-                        .AddMessagePublishing()
-                        .AddMessageParserServices();
+                        .AddMessagePublishing();
 
                     services.AddLiveHealthCheck();
                     services.AddExternalDomainServiceBusQueuesHealthCheck(

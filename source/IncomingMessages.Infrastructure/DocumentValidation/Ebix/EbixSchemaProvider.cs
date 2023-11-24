@@ -15,7 +15,7 @@
 using System.Xml;
 using System.Xml.Schema;
 
-namespace Energinet.DataHub.EDI.Infrastructure.DocumentValidation.Ebix;
+namespace IncomingMessages.Infrastructure.DocumentValidation.Ebix;
 
 public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
 {

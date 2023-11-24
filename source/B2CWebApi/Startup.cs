@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Text.Json.Serialization;
+using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Logging.LoggingMiddleware;
@@ -64,6 +65,8 @@ public class Startup
 
             config.AddSecurityRequirement(securityRequirement);
         });
+        serviceCollection.AddApplicationInsightsTelemetry(options => options.EnableAdaptiveSampling = false);
+
         serviceCollection.AddControllers()
             .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
         serviceCollection.AddHealthChecks();

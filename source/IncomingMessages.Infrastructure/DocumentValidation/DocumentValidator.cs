@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
+namespace IncomingMessages.Infrastructure.DocumentValidation;
 
 public class DocumentValidator
 {
