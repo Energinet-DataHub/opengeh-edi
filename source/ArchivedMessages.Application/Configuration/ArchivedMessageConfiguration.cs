@@ -12,17 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using Dapper;
+using Dapper.NodaTime;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
 
 public static class ArchivedMessageConfiguration
 {
-    public static void Configure(IServiceCollection services)
+    public static void Configure(IServiceCollection services, string databaseConnectionString)
     {
+        services.AddDatabaseConnectionFactory(databaseConnectionString);
         services.AddTransient<IArchivedMessageRepository, ArchivedMessageRepository>();
         services.AddTransient<IArchivedMessagesClient, ArchivedMessagesClient>();
+        ConfigureDapper();
+    }
+
+    private static void AddDatabaseConnectionFactory(this IServiceCollection services, string connectionString)
+    {
+        if (connectionString == null) throw new ArgumentNullException(nameof(connectionString));
+        services.AddSingleton<IDatabaseConnectionFactory>(_ => new SqlDatabaseConnectionFactory(connectionString));
+    }
+
+    private static void ConfigureDapper()
+    {
+        SqlMapper.AddTypeHandler(InstantHandler.Default);
     }
 }
