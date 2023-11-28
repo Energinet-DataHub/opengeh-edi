@@ -19,31 +19,31 @@ using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
 public class WhenADequeueIsRequestedTests : TestBase
 {
+    private readonly IEnqueueMessage _enqueueMessage;
     private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
-    private readonly IOutGoingMessagesClient _outgoingMessagesClient;
 
     public WhenADequeueIsRequestedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
-        _outgoingMessagesClient = GetService<IOutGoingMessagesClient>();
+        _enqueueMessage = GetService<IEnqueueMessage>();
     }
 
     [Fact]
     public async Task Dequeue_is_unsuccessful_when_bundle_does_not_exist()
     {
-        var dequeueResult = await _outgoingMessagesClient.DequeueAsync(new DequeueRequestDto(Guid.NewGuid().ToString(), MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)));
+        var dequeueResult = await InvokeCommandAsync(new DequeueCommand(Guid.NewGuid().ToString(), MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)));
 
         Assert.False(dequeueResult.Success);
     }
@@ -57,7 +57,7 @@ public class WhenADequeueIsRequestedTests : TestBase
             .WithReceiverRole(MarketRole.EnergySupplier)
             .Build();
         await EnqueueMessage(enqueueMessageEvent);
-        var dequeueResult = await _outgoingMessagesClient.DequeueAsync(new DequeueRequestDto(unknownMessageId, MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)));
+        var dequeueResult = await InvokeCommandAsync(new DequeueCommand(unknownMessageId, MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)));
 
         Assert.False(dequeueResult.Success);
     }
@@ -70,16 +70,14 @@ public class WhenADequeueIsRequestedTests : TestBase
             .WithReceiverRole(MarketRole.EnergySupplier)
             .Build();
         await EnqueueMessage(enqueueMessageEvent);
-        var peekResult = await _outgoingMessagesClient.PeekAsync(
-            new PeekRequest(
+        var peekResult = await InvokeCommandAsync(new PeekCommand(
             ActorNumber.Create(SampleData.NewEnergySupplierNumber),
             MessageCategory.Aggregations,
             MarketRole.EnergySupplier,
-            DocumentFormat.Xml),
-            CancellationToken.None);
+            DocumentFormat.Xml));
 
-        var dequeueResult = await _outgoingMessagesClient.DequeueAsync(new DequeueRequestDto(peekResult.MessageId.GetValueOrDefault().ToString(), MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)));
-        await GetService<ActorMessageQueueContext>().SaveChangesAsync();
+        var dequeueResult = await InvokeCommandAsync(new DequeueCommand(peekResult.MessageId.GetValueOrDefault().ToString(), MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)));
+
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var found = await connection
             .QuerySingleOrDefaultAsync<bool>("SELECT IsDequeued FROM [dbo].Bundles");
@@ -90,7 +88,7 @@ public class WhenADequeueIsRequestedTests : TestBase
 
     private async Task EnqueueMessage(OutgoingMessageDto message)
     {
-        await _outgoingMessagesClient.EnqueueAsync(message);
+        await _enqueueMessage.EnqueueAsync(message);
         await GetService<ActorMessageQueueContext>().SaveChangesAsync();
     }
 }

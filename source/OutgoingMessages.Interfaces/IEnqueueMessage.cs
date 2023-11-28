@@ -12,6 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using System.Threading.Tasks;
 
-public record DequeueRequestResult(bool Success);
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+
+/// <summary>
+/// Contract for enqueueing messages
+/// </summary>
+public interface IEnqueueMessage
+{
+    /// <summary>
+    /// Enqueue a message
+    /// </summary>
+    Task EnqueueAsync(OutgoingMessageDto outgoingMessage);
+}
