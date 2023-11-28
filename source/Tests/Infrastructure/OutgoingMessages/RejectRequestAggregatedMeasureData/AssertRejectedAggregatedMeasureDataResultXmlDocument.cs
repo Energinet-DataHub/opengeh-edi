@@ -23,9 +23,6 @@ namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequ
 
 public class AssertRejectedAggregatedMeasureDataResultXmlDocument : IAssertRejectedAggregatedMeasureDataResultDocument
 {
-    /// <summary>
-    ///   The document asserter.
-    /// </summary>
     private readonly AssertXmlDocument _documentAsserter;
 
     public AssertRejectedAggregatedMeasureDataResultXmlDocument(AssertXmlDocument documentAsserter)
