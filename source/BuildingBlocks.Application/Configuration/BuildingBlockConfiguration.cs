@@ -14,15 +14,23 @@
 
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using ServiceBusClientOptions = BuildingBlocks.Application.Configuration.Options.ServiceBusClientOptions;
 
 namespace BuildingBlocks.Application.Configuration;
 
 public static class BuildingBlockConfiguration
 {
-    public static void Configure(IServiceCollection services, string serviceBusConnectionString)
+    public static void AddBuildingBlocks(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<ServiceBusClient>(_ => new ServiceBusClient(serviceBusConnectionString));
+        services
+            .AddOptions<ServiceBusClientOptions>()
+            .Bind(configuration)
+            .Validate(o => !string.IsNullOrEmpty(o.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND), "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND must be set");
+
+        services.AddSingleton<ServiceBusClient>(provider => new ServiceBusClient(provider.GetRequiredService<IOptions<ServiceBusClientOptions>>().Value.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND));
         services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactory>();
     }
 }

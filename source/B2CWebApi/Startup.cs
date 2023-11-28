@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Text.Json.Serialization;
-using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Logging.LoggingMiddleware;
@@ -73,16 +72,14 @@ public class Startup
         serviceCollection.AddHttpContextAccessor();
 
         serviceCollection.AddOptions<JwtOptions>().Bind(Configuration);
-        serviceCollection.AddOptions<EdiOptions>().Bind(Configuration);
         serviceCollection.AddOptions<DateTimeOptions>().Bind(Configuration);
 
         serviceCollection.AddHttpLoggingScope(DomainName);
         serviceCollection.AddSingleton<ISerializer, Serializer>();
         serviceCollection.AddScoped<AuthenticatedActor>();
 
-        var ediClientOptions = Configuration.Get<EdiOptions>()!;
-        ArchivedMessageConfiguration.Configure(serviceCollection, ediClientOptions.EDI_DATABASE_CONNECTION_STRING);
-        IncomingMessagesConfiguration.Configure(serviceCollection, ediClientOptions.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!);
+        serviceCollection.AddArchivedMessagesModule(Configuration);
+        serviceCollection.AddIncomingMessagesModule(Configuration);
 
         serviceCollection.AddJwtTokenSecurity(Configuration);
         serviceCollection.AddDateTimeConfiguration(Configuration);

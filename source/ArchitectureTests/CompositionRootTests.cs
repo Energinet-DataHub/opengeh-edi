@@ -27,6 +27,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using MediatR;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Xunit;
@@ -39,7 +40,13 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
 
         public CompositionRootTests()
         {
-            _host = Program.ConfigureHost(Program.DevelopmentTokenValidationParameters(), new TestEnvironment());
+            var testEnvironment = new TestEnvironment();
+            Environment.SetEnvironmentVariable("SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND", TestEnvironment.CreateFakeServiceBusConnectionString());
+            Environment.SetEnvironmentVariable("INCOMING_MESSAGES_QUEUE_NAME", "FakeQueueName");
+            var config = new ConfigurationBuilder()
+                .AddEnvironmentVariables()
+                .Build();
+            _host = Program.ConfigureHost(Program.DevelopmentTokenValidationParameters(), testEnvironment, config);
         }
 
         #region Member data providers
@@ -169,6 +176,15 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
             public override string? DB_CONNECTION_STRING =>
                 CreateConnectionString();
 
+            public static string CreateFakeServiceBusConnectionString()
+            {
+                return new StringBuilder()
+                    .Append(CultureInfo.InvariantCulture, $"Endpoint=sb://sb-{Guid.NewGuid():N}.servicebus.windows.net/;")
+                    .Append("SharedAccessKeyName=send;")
+                    .Append(CultureInfo.InvariantCulture, $"SharedAccessKey={Guid.NewGuid():N}")
+                    .ToString();
+            }
+
             public override bool IsRunningLocally()
             {
                 return true;
@@ -177,15 +193,6 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
             protected override string? GetEnvironmentVariable(string variable)
             {
                 return Guid.NewGuid().ToString();
-            }
-
-            private static string CreateFakeServiceBusConnectionString()
-            {
-                return new StringBuilder()
-                    .Append(CultureInfo.InvariantCulture, $"Endpoint=sb://sb-{Guid.NewGuid():N}.servicebus.windows.net/;")
-                    .Append("SharedAccessKeyName=send;")
-                    .Append(CultureInfo.InvariantCulture, $"SharedAccessKey={Guid.NewGuid():N}")
-                    .ToString();
             }
 
             private static string CreateConnectionString()

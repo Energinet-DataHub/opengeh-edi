@@ -19,12 +19,10 @@ using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.GridAreas;
-using Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.Serialization;
@@ -65,7 +63,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             AddGridAreaServices();
             IntegrationEventsConfiguration.Configure(services);
             InboxEventsConfiguration.Configure(services);
-            ArchivedMessageConfiguration.Configure(services, connectionString);
             QueryHandlingConfiguration.Configure(services);
             DataRetentionConfiguration.Configure(services);
         }

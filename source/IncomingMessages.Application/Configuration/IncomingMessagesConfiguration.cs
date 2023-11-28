@@ -14,6 +14,7 @@
 
 using BuildingBlocks.Application.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
+using Energinet.DataHub.EDI.IncomingMessages.Application.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using IncomingMessages.Infrastructure;
 using IncomingMessages.Infrastructure.Configuration.DataAccess;
@@ -23,21 +24,29 @@ using IncomingMessages.Infrastructure.Messages;
 using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 using IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 using IncomingMessages.Infrastructure.Response;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.Configuration;
 
 public static class IncomingMessagesConfiguration
 {
-    public static void Configure(IServiceCollection services, string serviceBusConnectionString)
+    public static void AddIncomingMessagesModule(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddOptions<ServiceBusClientOptions>()
+            .Bind(configuration)
+            .Validate(
+                o => !string.IsNullOrEmpty(o.INCOMING_MESSAGES_QUEUE_NAME),
+                "INCOMING_MESSAGES_QUEUE_NAME must be set");
+
         services.AddScopedSqlDbContext<IncomingMessagesContext>();
         services.AddScoped<IIncomingMessageParser, IncomingMessageParser>();
         services.AddScoped<ITransactionIdRepository, TransactionIdRepository>();
         services.AddScoped<IMessageIdRepository, MessageIdRepository>();
         services.AddScoped<IMessageParser, XmlMessageParser>();
         services.AddScoped<IMessageParser, JsonMessageParser>();
-        services.AddScoped<IMessageParser, ProtoMessageParser>();
+        services.AddScoped<IMessageParser, B2CJsonMessageParser>();
         services.AddScoped<MarketMessageParser>();
         services.AddTransient<SenderAuthorizer>();
         services.AddTransient<IncomingRequestAggregatedMeasuredDataSender>();
@@ -49,12 +58,13 @@ public static class IncomingMessagesConfiguration
         services.AddSingleton<IResponseFactory, JsonResponseFactory>();
         services.AddSingleton<IResponseFactory, XmlResponseFactory>();
         services.AddSingleton<ResponseFactory>();
+        services.AddSingleton(provider => new IncomingMessagesServiceBusClientConfiguration(provider.GetRequiredService<IOptions<ServiceBusClientOptions>>().Value.INCOMING_MESSAGES_QUEUE_NAME));
 
         //RegisterSchemaProviders
         services.AddSingleton<CimJsonSchemas>();
         services.AddSingleton<CimXmlSchemaProvider>();
         services.AddSingleton<JsonSchemaProvider>();
 
-        BuildingBlockConfiguration.Configure(services, serviceBusConnectionString);
+        services.AddBuildingBlocks(configuration);
     }
 }

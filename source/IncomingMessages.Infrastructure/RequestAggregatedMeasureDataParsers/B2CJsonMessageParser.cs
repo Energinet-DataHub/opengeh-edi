@@ -20,11 +20,11 @@ using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 
 namespace IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 
-public class ProtoMessageParser : IMessageParser
+public class B2CJsonMessageParser : IMessageParser
 {
     private readonly ISerializer _serializer;
 
-    public ProtoMessageParser(
+    public B2CJsonMessageParser(
         ISerializer serializer)
         : base()
     {

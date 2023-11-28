@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
+namespace BuildingBlocks.Application.Configuration.Options;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1707", Justification = "To match naming in other domains")]
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1056", Justification = "Nuget expects a string")]
-public class EdiOptions
+
+public class ServiceBusClientOptions
 {
     public string SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND { get; set; } = string.Empty;
-
-    public string EDI_DATABASE_CONNECTION_STRING { get; set; } = string.Empty;
 }
