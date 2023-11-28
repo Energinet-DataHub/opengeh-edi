@@ -15,6 +15,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
@@ -25,26 +26,42 @@ public class OutgoingMessagesClient : IOutGoingMessagesClient
     private readonly MessagePeeker _messagePeeker;
     private readonly MessageDequeuer _messageDequeuer;
     private readonly IMessageEnqueuer _messageEnqueuer;
+    private readonly ActorMessageQueueContext _actorMessageQueueContext;
 
-    public OutgoingMessagesClient(MessagePeeker messagePeeker, MessageDequeuer messageDequeuer, IMessageEnqueuer messageEnqueuer)
+    public OutgoingMessagesClient(
+        MessagePeeker messagePeeker,
+        MessageDequeuer messageDequeuer,
+        IMessageEnqueuer messageEnqueuer,
+        ActorMessageQueueContext actorMessageQueueContext)
     {
         _messagePeeker = messagePeeker;
         _messageDequeuer = messageDequeuer;
         _messageEnqueuer = messageEnqueuer;
+        _actorMessageQueueContext = actorMessageQueueContext;
     }
 
     public async Task<DequeueRequestResult> DequeueAsync(DequeueRequestDto request)
     {
-        return await _messageDequeuer.DequeueAsync(request).ConfigureAwait(false);
+        var dequeueRequestResult = await _messageDequeuer.DequeueAsync(request).ConfigureAwait(false);
+        _actorMessageQueueContext.SaveChangesAsync().ConfigureAwait(false);
+        return dequeueRequestResult;
     }
 
     public async Task<PeekResult> PeekAsync(PeekRequest request, CancellationToken cancellationToken)
     {
-        return await _messagePeeker.PeekAsync(request, cancellationToken).ConfigureAwait(false);
+        var peekResult = await _messagePeeker.PeekAsync(request, cancellationToken).ConfigureAwait(false);
+        _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        return peekResult;
     }
 
     public async Task EnqueueAsync(OutgoingMessageDto outgoingMessage)
     {
         await _messageEnqueuer.EnqueueAsync(outgoingMessage).ConfigureAwait(false);
+    }
+
+    public async Task EnqueueAndCommitAsync(OutgoingMessageDto outgoingMessage)
+    {
+        _actorMessageQueueContext.SaveChangesAsync().ConfigureAwait(false);
+        _messageEnqueuer.EnqueueAsync(outgoingMessage).ConfigureAwait(false);
     }
 }

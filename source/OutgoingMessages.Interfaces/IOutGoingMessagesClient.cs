@@ -41,4 +41,10 @@ public interface IOutGoingMessagesClient
     /// </summary>
     /// <param name="outgoingMessage"></param>
     Task EnqueueAsync(OutgoingMessageDto outgoingMessage);
+
+    /// <summary>
+    ///  Enqueue a message, commit the imdediately
+    /// </summary>
+    /// <param name="outgoingMessage"></param>
+    Task EnqueueAndCommitAsync(OutgoingMessageDto outgoingMessage);
 }
