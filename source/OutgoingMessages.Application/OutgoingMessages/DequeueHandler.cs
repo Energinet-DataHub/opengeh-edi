@@ -13,40 +13,41 @@
 // limitations under the License.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using MediatR;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
 
-public class MessageDequeuer
+public class DequeueHandler : IRequestHandler<DequeueCommand, DequeCommandResult>
 {
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
 
-    public MessageDequeuer(IActorMessageQueueRepository actorMessageQueueRepository)
+    public DequeueHandler(IActorMessageQueueRepository actorMessageQueueRepository)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
     }
 
-    public async Task<DequeueRequestResult> DequeueAsync(DequeueRequestDto request)
+    public async Task<DequeCommandResult> Handle(DequeueCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         if (Guid.TryParse(request.MessageId, out var messageId) == false)
         {
-            return new DequeueRequestResult(false);
+            return new DequeCommandResult(false);
         }
 
         var bundleId = BundleId.Create(messageId);
         var actorQueue = await _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.MarketRole).ConfigureAwait(false);
         if (actorQueue == null)
         {
-            return new DequeueRequestResult(false);
+            return new DequeCommandResult(false);
         }
 
         var successful = actorQueue.Dequeue(bundleId);
 
-        return new DequeueRequestResult(successful);
+        return new DequeCommandResult(successful);
     }
 }

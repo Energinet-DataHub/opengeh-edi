@@ -13,15 +13,17 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.Domain;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using IncomingMessages.Infrastructure;
+using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
@@ -32,16 +34,16 @@ public class PeekRequestListener
 {
     private readonly AuthenticatedActor _authenticatedActor;
     private readonly ILogger<PeekRequestListener> _logger;
-    private readonly IOutGoingMessagesClient _outGoingMessagesClient;
+    private readonly IMediator _mediator;
 
     public PeekRequestListener(
         AuthenticatedActor authenticatedActor,
         ILogger<PeekRequestListener> logger,
-        IOutGoingMessagesClient outGoingMessagesClient)
+        IMediator mediator)
     {
         _authenticatedActor = authenticatedActor;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _outGoingMessagesClient = outGoingMessagesClient;
+        _mediator = mediator;
     }
 
     [Function("PeekRequestListener")]
@@ -52,12 +54,10 @@ public class PeekRequestListener
             Route = "peek/{messageCategory}")]
         HttpRequestData request,
         FunctionContext executionContext,
-        string messageCategory,
-        CancellationToken hostCancellationToken)
+        string messageCategory)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var cancellationToken = request.GetCancellationToken(hostCancellationToken);
         var contentType = request.Headers.GetContentType();
         var desiredDocumentFormat = CimFormatParser.ParseFromContentTypeHeaderValue(contentType);
         if (desiredDocumentFormat is null)
@@ -74,13 +74,11 @@ public class PeekRequestListener
             msgCategory = EnumerationType.FromName<MessageCategory>(messageCategory);
         }
 
-        var peekResult = await _outGoingMessagesClient.PeekAsync(
-            new PeekRequest(
+        var peekResult = await _mediator.Send(new PeekCommand(
             _authenticatedActor.CurrentActorIdentity.ActorNumber,
             msgCategory,
             _authenticatedActor.CurrentActorIdentity.MarketRole!,
-            desiredDocumentFormat),
-            cancellationToken).ConfigureAwait(false);
+            desiredDocumentFormat)).ConfigureAwait(false);
 
         var response = HttpResponseData.CreateResponse(request);
         if (peekResult.MessageId is null)
