@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using BuildingBlocks.Application.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using IncomingMessages.Infrastructure;
@@ -28,7 +29,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application.Configuration;
 
 public static class IncomingMessagesConfiguration
 {
-    public static void Configure(IServiceCollection services)
+    public static void Configure(IServiceCollection services, string serviceBusConnectionString)
     {
         services.AddScopedSqlDbContext<IncomingMessagesContext>();
         services.AddScoped<IIncomingMessageParser, IncomingMessageParser>();
@@ -53,5 +54,7 @@ public static class IncomingMessagesConfiguration
         services.AddSingleton<CimJsonSchemas>();
         services.AddSingleton<CimXmlSchemaProvider>();
         services.AddSingleton<JsonSchemaProvider>();
+
+        BuildingBlockConfiguration.Configure(services, serviceBusConnectionString);
     }
 }

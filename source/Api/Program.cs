@@ -118,7 +118,6 @@ namespace Energinet.DataHub.EDI.Api
                     });
 
                     CompositionRoot.Initialize(services, databaseConnectionString!)
-                        .AddMessageBus(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!)
                         .AddRemoteBusinessService<DummyRequest, DummyReply>("Dummy", "Dummy")
                         .AddBearerAuthentication(tokenValidationParameters)
                         .AddDatabaseConnectionFactory(databaseConnectionString!)
@@ -155,7 +154,7 @@ namespace Energinet.DataHub.EDI.Api
 
                     ActorMessageQueueConfiguration.Configure(services);
                     ProcessConfiguration.Configure(services);
-                    IncomingMessagesConfiguration.Configure(services);
+                    IncomingMessagesConfiguration.Configure(services, runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!);
                 })
                 .ConfigureLogging(logging =>
                 {

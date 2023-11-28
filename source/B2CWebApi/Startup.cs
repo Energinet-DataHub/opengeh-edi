@@ -82,7 +82,7 @@ public class Startup
 
         var ediClientOptions = Configuration.Get<EdiOptions>()!;
         ArchivedMessageConfiguration.Configure(serviceCollection, ediClientOptions.EDI_DATABASE_CONNECTION_STRING);
-        IncomingMessagesConfiguration.Configure(serviceCollection);
+        IncomingMessagesConfiguration.Configure(serviceCollection, ediClientOptions.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!);
 
         serviceCollection.AddJwtTokenSecurity(Configuration);
         serviceCollection.AddDateTimeConfiguration(Configuration);

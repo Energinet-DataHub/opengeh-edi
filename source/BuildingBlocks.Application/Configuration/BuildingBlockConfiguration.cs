@@ -12,13 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
+using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
+using Microsoft.Extensions.DependencyInjection;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1707", Justification = "To match naming in other domains")]
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1056", Justification = "Nuget expects a string")]
-public class EdiOptions
+namespace BuildingBlocks.Application.Configuration;
+
+public static class BuildingBlockConfiguration
 {
-    public string SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND { get; set; } = string.Empty;
-
-    public string EDI_DATABASE_CONNECTION_STRING { get; set; } = string.Empty;
+    public static void Configure(IServiceCollection services, string serviceBusConnectionString)
+    {
+        services.AddSingleton<ServiceBusClient>(_ => new ServiceBusClient(serviceBusConnectionString));
+        services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactory>();
+    }
 }

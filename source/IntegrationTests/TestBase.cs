@@ -166,10 +166,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             _services.AddSingleton(new WholesaleServiceBusClientConfiguration("Fake"));
             _services.AddSingleton(new IncomingMessagesServiceBusClientConfiguration("Fake"));
 
-            _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
-            _services.AddSingleton(
-                _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
-
             _services.AddTransient<InboxEventsProcessor>();
             _services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>>(_ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy);
             _services.AddTransient<INotificationHandler<TestNotification>>(
@@ -202,7 +198,10 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             ActorMessageQueueConfiguration.Configure(_services);
             ProcessConfiguration.Configure(_services);
             ArchivedMessageConfiguration.Configure(_services, DatabaseFixture.ConnectionString);
-            IncomingMessagesConfiguration.Configure(_services);
+            IncomingMessagesConfiguration.Configure(_services, CreateFakeServiceBusConnectionString());
+
+            // Replace the services with stub implementations.
+            _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
             _serviceProvider = _services.BuildServiceProvider();
         }
     }

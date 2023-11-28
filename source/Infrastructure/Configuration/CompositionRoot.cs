@@ -75,13 +75,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             return new CompositionRoot(services, connectionString);
         }
 
-        public CompositionRoot AddMessageBus(string connectionString)
-        {
-            _services.AddSingleton<ServiceBusClient>(_ => new ServiceBusClient(connectionString));
-            _services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactory>();
-            return this;
-        }
-
         public CompositionRoot AddDatabaseContext(string databaseConnectionString)
         {
             _services.AddScoped<SqlConnectionSource>(sp => new SqlConnectionSource(databaseConnectionString!));
