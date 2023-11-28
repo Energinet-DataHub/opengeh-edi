@@ -14,7 +14,7 @@
 
 using System.Threading.Tasks;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Contracts;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 
 /// <summary>
 /// Contract for enqueueing messages

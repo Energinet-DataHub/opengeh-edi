@@ -12,6 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Contracts;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 
 public record DequeCommandResult(bool Success);

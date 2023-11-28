@@ -49,7 +49,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutgoingMessages.Domain", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutgoingMessages.Infrastructure", "OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj", "{CC07DBD6-D7E6-4D1B-A784-757B547D16F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutgoingMessages.Contracts", "OutgoingMessages.Contracts\OutgoingMessages.Contracts.csproj", "{B94C8B3F-A3A3-4666-B0FD-1FF2BCED7613}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutgoingMessages.Interfaces", "OutgoingMessages.Interfaces\OutgoingMessages.Interfaces.csproj", "{B94C8B3F-A3A3-4666-B0FD-1FF2BCED7613}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Process.Interfaces", "Process.Interfaces\Process.Interfaces.csproj", "{AABD04CD-00B3-4CCA-A81E-26B83E63EF6C}"
 EndProject
