@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.OutgoingMessages.Contracts;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 
