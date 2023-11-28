@@ -40,7 +40,7 @@ public class DequeueRequestListener
         FunctionContext executionContext,
         string messageId)
     {
-        var result = await _outGoingMessagesClient.DequeueAsync(
+        var result = await _outGoingMessagesClient.DequeueAndCommitAsync(
             new DequeueRequestDto(
                 messageId,
                 _authenticatedActor.CurrentActorIdentity.MarketRole!,

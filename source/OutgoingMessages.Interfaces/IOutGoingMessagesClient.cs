@@ -27,14 +27,14 @@ public interface IOutGoingMessagesClient
     /// Dequeues a message from the queue
     /// </summary>
     /// <param name="request"></param>
-    Task<DequeueRequestResult> DequeueAsync(DequeueRequestDto request);
+    Task<DequeueRequestResult> DequeueAndCommitAsync(DequeueRequestDto request);
 
     /// <summary>
     ///  Peek a message from the queue
     /// </summary>
     /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
-    Task<PeekResult> PeekAsync(PeekRequest request, CancellationToken cancellationToken);
+    Task<PeekResult> PeekAndCommitAsync(PeekRequest request, CancellationToken cancellationToken);
 
     /// <summary>
     ///  Enqueue a message

@@ -73,7 +73,7 @@ public class WhenEnqueueingTests : TestBase
         var message = _outgoingMessageDtoBuilder.Build();
         await EnqueueMessage(message);
 
-        var result = await _outgoingMessagesClient.PeekAsync(
+        var result = await _outgoingMessagesClient.PeekAndCommitAsync(
             new PeekRequest(
                 message.ReceiverId,
                 MessageCategory.Aggregations,
@@ -93,7 +93,7 @@ public class WhenEnqueueingTests : TestBase
         var message2 = _outgoingMessageDtoBuilder.Build();
         await EnqueueMessage(message2);
 
-        var result = await _outgoingMessagesClient.PeekAsync(new PeekRequest(message.ReceiverId, message.DocumentType.Category, message.ReceiverRole, DocumentFormat.Ebix), CancellationToken.None);
+        var result = await _outgoingMessagesClient.PeekAndCommitAsync(new PeekRequest(message.ReceiverId, message.DocumentType.Category, message.ReceiverRole, DocumentFormat.Ebix), CancellationToken.None);
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = "SELECT top 1 id FROM [dbo].[Bundles] order by created";
         var id = await
@@ -113,13 +113,13 @@ public class WhenEnqueueingTests : TestBase
             MessageCategory.Aggregations,
             message.ReceiverRole,
             DocumentFormat.Xml);
-        var peekResult = await _outgoingMessagesClient.PeekAsync(peekCommand, CancellationToken.None);
+        var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(peekCommand, CancellationToken.None);
         var dequeueCommand = new DequeueRequestDto(
             peekResult.MessageId!.Value.ToString(),
             message.ReceiverRole,
             message.ReceiverId);
 
-        var result = await _outgoingMessagesClient.DequeueAsync(dequeueCommand);
+        var result = await _outgoingMessagesClient.DequeueAndCommitAsync(dequeueCommand);
 
         Assert.True(result.Success);
     }

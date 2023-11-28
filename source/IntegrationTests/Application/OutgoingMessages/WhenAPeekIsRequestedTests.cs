@@ -131,7 +131,7 @@ public class WhenAPeekIsRequestedTests : TestBase
 
     private Task<PeekResult> PeekMessage(MessageCategory category)
     {
-        return _outgoingMessagesClient.PeekAsync(new PeekRequest(ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, MarketRole.EnergySupplier, DocumentFormat.Xml), CancellationToken.None);
+        return _outgoingMessagesClient.PeekAndCommitAsync(new PeekRequest(ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, MarketRole.EnergySupplier, DocumentFormat.Xml), CancellationToken.None);
     }
 
     private async Task AssertMessageIsArchived(Guid? messageId)

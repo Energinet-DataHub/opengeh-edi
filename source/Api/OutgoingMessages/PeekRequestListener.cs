@@ -74,7 +74,7 @@ public class PeekRequestListener
             msgCategory = EnumerationType.FromName<MessageCategory>(messageCategory);
         }
 
-        var peekResult = await _outGoingMessagesClient.PeekAsync(
+        var peekResult = await _outGoingMessagesClient.PeekAndCommitAsync(
             new PeekRequest(
             _authenticatedActor.CurrentActorIdentity.ActorNumber,
             msgCategory,

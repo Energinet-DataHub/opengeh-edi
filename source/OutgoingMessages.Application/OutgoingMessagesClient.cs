@@ -40,14 +40,14 @@ public class OutgoingMessagesClient : IOutGoingMessagesClient
         _actorMessageQueueContext = actorMessageQueueContext;
     }
 
-    public async Task<DequeueRequestResult> DequeueAsync(DequeueRequestDto request)
+    public async Task<DequeueRequestResult> DequeueAndCommitAsync(DequeueRequestDto request)
     {
         var dequeueRequestResult = await _messageDequeuer.DequeueAsync(request).ConfigureAwait(false);
         _actorMessageQueueContext.SaveChangesAsync().ConfigureAwait(false);
         return dequeueRequestResult;
     }
 
-    public async Task<PeekResult> PeekAsync(PeekRequest request, CancellationToken cancellationToken)
+    public async Task<PeekResult> PeekAndCommitAsync(PeekRequest request, CancellationToken cancellationToken)
     {
         var peekResult = await _messagePeeker.PeekAsync(request, cancellationToken).ConfigureAwait(false);
         _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
