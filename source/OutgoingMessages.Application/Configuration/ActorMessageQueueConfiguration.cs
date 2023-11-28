@@ -18,16 +18,16 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
-using Energinet.DataHub.EDI.OutgoingMessages.Contracts;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using PeekResult = Energinet.DataHub.EDI.OutgoingMessages.Contracts.PeekResult;
+using PeekResult = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.PeekResult;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.Configuration;
 
