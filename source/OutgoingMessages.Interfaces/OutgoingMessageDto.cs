@@ -16,7 +16,7 @@ using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Contracts;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 
 /// <summary>
 /// Contract for an outgoing message

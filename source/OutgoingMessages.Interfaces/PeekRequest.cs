@@ -15,7 +15,7 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Contracts;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 
 public record PeekRequest(
     ActorNumber ActorNumber,
