@@ -14,6 +14,7 @@
 
 using System.Xml;
 using System.Xml.Schema;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace IncomingMessages.Infrastructure.DocumentValidation.Ebix;
 
@@ -98,11 +99,10 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
 
     private static string ParseDocumentType(DocumentType document)
     {
-        return document switch
-        {
-            DocumentType.AggregationResult => "DK_AggregatedMeteredDataTimeSeries",
-            DocumentType.RejectRequestAggregatedMeasureData => "DK_RejectRequestMeteredDataAggregated",
-            _ => throw new InvalidOperationException("Unknown document type"),
-        };
+        if (document == DocumentType.NotifyAggregatedMeasureData)
+            return "DK_AggregatedMeteredDataTimeSeries";
+        if (document == DocumentType.RejectRequestAggregatedMeasureData)
+            return "DK_RejectRequestMeteredDataAggregated";
+        throw new InvalidOperationException("Unknown document type");
     }
 }
