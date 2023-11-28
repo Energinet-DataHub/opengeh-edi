@@ -12,21 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Globalization;
-using System.Text;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 
-namespace PerformanceTest.MoveIn;
-
-public class Utf8StringWriter : StringWriter
-{
-    public Utf8StringWriter(StringBuilder builder)
-        : base(builder, CultureInfo.InvariantCulture)
-    {
-    }
-
-    // Use UTF8 encoding but write no BOM to the wire
-    public override Encoding Encoding
-    {
-        get { return new UTF8Encoding(false); } // in real code I'll cache this encoding.
-    }
-}
+public record DequeCommandResult(bool Success);

@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace IncomingMessages.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public enum DocumentType
-{
-    AggregationResult,
-    CustomerMasterData,
-    RejectRequestAggregatedMeasureData, // RSM-16 Reject Document
-}
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+
+public record DequeueCommand(string MessageId, MarketRole MarketRole, ActorNumber ActorNumber) : ICommand<DequeCommandResult>;

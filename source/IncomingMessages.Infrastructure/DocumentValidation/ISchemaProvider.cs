@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Xml.Schema;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace IncomingMessages.Infrastructure.DocumentValidation
 {

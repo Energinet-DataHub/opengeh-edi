@@ -12,16 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace PerformanceTest.MoveIn;
+using System;
+using System.IO;
 
-/// <summary>
-/// Service for triggering a move in.
-/// </summary>
-public interface IMoveInService
-{
-    /// <summary>
-    /// Request a move in for a given actor.
-    /// </summary>
-    /// <param name="uniqueActorNumber"></param>
-    Task MoveInAsync(string? uniqueActorNumber);
-}
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+
+public record PeekResult(Stream? Bundle, Guid? MessageId = default);
