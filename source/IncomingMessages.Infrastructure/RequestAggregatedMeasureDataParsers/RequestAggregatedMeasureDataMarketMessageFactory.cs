@@ -15,7 +15,6 @@
 using System.Collections.ObjectModel;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Interfaces;
-using NodaTime;
 
 namespace IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 
@@ -34,45 +33,10 @@ public static class RequestAggregatedMeasureDataMarketMessageFactory
             header.ReceiverId,
             header.ReceiverRole,
             header.BusinessReason,
-            header.AuthenticatedUser,
-            header.AuthenticatedUserRole,
             header.MessageType,
             header.MessageId,
             header.CreatedAt,
             header.BusinessType,
-            series);
-    }
-
-    public static RequestAggregatedMeasureDataDto Create(
-        Energinet.DataHub.Edi.Requests.RequestAggregatedMeasureData requestAggregatedMeasureData,
-        Instant createdAt)
-    {
-        if (requestAggregatedMeasureData == null) throw new ArgumentNullException(nameof(requestAggregatedMeasureData));
-
-        var series = requestAggregatedMeasureData.Series
-            .Select(serie => new Serie(
-                serie.Id,
-                string.IsNullOrWhiteSpace(serie.MarketEvaluationPointType) ? null : serie.MarketEvaluationPointType,
-                string.IsNullOrWhiteSpace(serie.MarketEvaluationSettlementMethod) ? null : serie.MarketEvaluationSettlementMethod,
-                serie.StartDateAndOrTimeDateTime,
-                string.IsNullOrWhiteSpace(serie.EndDateAndOrTimeDateTime) ? null : serie.EndDateAndOrTimeDateTime,
-                string.IsNullOrWhiteSpace(serie.MeteringGridAreaDomainId) ? null : serie.MeteringGridAreaDomainId,
-                string.IsNullOrWhiteSpace(serie.EnergySupplierMarketParticipantId) ? null : serie.EnergySupplierMarketParticipantId,
-                string.IsNullOrWhiteSpace(serie.BalanceResponsiblePartyMarketParticipantId) ? null : serie.BalanceResponsiblePartyMarketParticipantId,
-                string.IsNullOrWhiteSpace(serie.SettlementSeriesVersion) ? null : serie.SettlementSeriesVersion)).ToList();
-
-        return new RequestAggregatedMeasureDataDto(
-            requestAggregatedMeasureData.SenderId,
-            requestAggregatedMeasureData.SenderRoleCode,
-            requestAggregatedMeasureData.ReceiverId,
-            requestAggregatedMeasureData.ReceiverRoleCode,
-            requestAggregatedMeasureData.BusinessReason,
-            requestAggregatedMeasureData.AuthenticatedUser,
-            requestAggregatedMeasureData.AuthenticatedUserRoleCode,
-            requestAggregatedMeasureData.MessageType,
-            requestAggregatedMeasureData.MessageId,
-            createdAt.ToString(),
-            BusinessType: "23",
             series);
     }
 }

@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common.DateTime;
-using Energinet.DataHub.Edi.Requests;
+using Energinet.DataHub.EDI.Common.Serialization;
+using Energinet.DataHub.EDI.Process.Interfaces;
 using IncomingMessages.Infrastructure.Messages;
 using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 
@@ -22,27 +22,24 @@ namespace IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 
 public class ProtoMessageParser : IMessageParser
 {
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly ISerializer _serializer;
 
-    public ProtoMessageParser(ISystemDateTimeProvider systemDateTimeProvider)
+    public ProtoMessageParser(
+        ISerializer serializer)
         : base()
     {
-        _systemDateTimeProvider = systemDateTimeProvider;
+        _serializer = serializer;
     }
 
-    public DocumentFormat HandledFormat => DocumentFormat.Proto;
+    public DocumentFormat HandledFormat => DocumentFormat.Json;
 
-    public IncomingDocumentType DocumentType => IncomingDocumentType.RequestAggregatedMeasureData;
+    public IncomingDocumentType DocumentType => IncomingDocumentType.B2CRequestAggregatedMeasureData;
 
-    public Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(
+    public async Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(
         Stream message,
         CancellationToken cancellationToken)
     {
-        var requestAggregatedMeasureData = RequestAggregatedMeasureData.Parser.ParseFrom(message);
-        var marketMessage = RequestAggregatedMeasureDataMarketMessageFactory.Create(
-            requestAggregatedMeasureData,
-            _systemDateTimeProvider.Now());
-        var mes = new RequestAggregatedMeasureDataMarketMessageParserResult(marketMessage);
-        return Task.FromResult(mes);
+        var requestAggregatedMeasureData = await _serializer.DeserializeAsync<RequestAggregatedMeasureDataDto>(message, cancellationToken).ConfigureAwait(false);
+        return new RequestAggregatedMeasureDataMarketMessageParserResult(requestAggregatedMeasureData);
     }
 }

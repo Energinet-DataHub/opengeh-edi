@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text;
 using Energinet.DataHub.Core.App.Common;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Common.DateTime;
+using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
-using Google.Protobuf;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NodaTime;
@@ -32,15 +34,21 @@ public class RequestAggregatedMeasureDataController : ControllerBase
     private readonly UserContext<FrontendUser> _userContext;
     private readonly DateTimeZone _dateTimeZone;
     private readonly IIncomingMessageParser _incomingMessageParser;
+    private readonly ISerializer _serializer;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
     public RequestAggregatedMeasureDataController(
         UserContext<FrontendUser> userContext,
         DateTimeZone dateTimeZone,
-        IIncomingMessageParser incomingMessageParser)
+        IIncomingMessageParser incomingMessageParser,
+        ISerializer serializer,
+        ISystemDateTimeProvider systemDateTimeProvider)
     {
         _userContext = userContext;
         _dateTimeZone = dateTimeZone;
         _incomingMessageParser = incomingMessageParser;
+        _serializer = serializer;
+        _systemDateTimeProvider = systemDateTimeProvider;
     }
 
     [HttpPost]
@@ -54,12 +62,13 @@ public class RequestAggregatedMeasureDataController : ControllerBase
                 request,
                 currentUser.ActorNumber,
                 currentUser.Role,
-                _dateTimeZone);
+                _dateTimeZone,
+                _systemDateTimeProvider.Now());
 
         var responseMessage = await _incomingMessageParser.ParseAsync(
-                GenerateStreamFromString(message.ToByteArray()),
-                DocumentFormat.Proto,
-                IncomingDocumentType.RequestAggregatedMeasureData,
+                GenerateStreamFromString(_serializer.Serialize(message)),
+                DocumentFormat.Json,
+                IncomingDocumentType.B2CRequestAggregatedMeasureData,
                 cancellationToken,
                 DocumentFormat.Json)
             .ConfigureAwait(false);
@@ -72,12 +81,11 @@ public class RequestAggregatedMeasureDataController : ControllerBase
         return Ok(responseMessage.MessageBody);
     }
 
-    private static Stream GenerateStreamFromString(byte[] dataToStream)
+    private static Stream GenerateStreamFromString(string jsonString)
     {
-        if (dataToStream == null) throw new ArgumentNullException(nameof(dataToStream));
-        var stream = new MemoryStream();
-        stream.Write(dataToStream, 0, dataToStream.Length);
-        stream.Position = 0;
-        return stream;
+        var encoding = Encoding.UTF8;
+        var byteArray = encoding.GetBytes(jsonString);
+        var memoryStream = new MemoryStream(byteArray);
+        return memoryStream;
     }
 }

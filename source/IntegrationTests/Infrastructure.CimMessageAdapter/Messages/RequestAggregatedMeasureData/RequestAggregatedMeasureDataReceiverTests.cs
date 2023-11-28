@@ -491,16 +491,17 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         Assert.Contains(result.Errors, error => error is NotSupportedBusinessType);
     }
 
-    private static RequestAggregatedMeasureDataDto CreateMarketMessageWithAuthentication(RequestAggregatedMeasureDataDto dto, string knownSenderId, string knownSenderRole)
+    private RequestAggregatedMeasureDataDto CreateMarketMessageWithAuthentication(RequestAggregatedMeasureDataDto dto, string knownSenderId, string knownSenderRole)
     {
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create(knownSenderId), restriction: Restriction.None,  MarketRole.FromCode(knownSenderRole)));
+
         return new RequestAggregatedMeasureDataDto(
             dto.SenderNumber,
             dto.SenderRoleCode,
             dto.ReceiverNumber,
             dto.ReceiverRoleCode,
             dto.BusinessReason,
-            knownSenderId,
-            knownSenderRole,
             dto.MessageType,
             dto.MessageId,
             dto.CreatedAt,

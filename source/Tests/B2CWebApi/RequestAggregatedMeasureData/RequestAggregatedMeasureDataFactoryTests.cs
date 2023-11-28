@@ -46,23 +46,24 @@ public class RequestAggregatedMeasureDataFactoryTests
             request,
             senderId,
             MarketRole.MeteredDataResponsible.Name,
-            _dateTimeZone);
+            _dateTimeZone,
+            SystemClock.Instance.GetCurrentInstant());
 
         using var assertionScope = new AssertionScope();
         Assert.Equal("D04", result.BusinessReason);
-        Assert.Equal(senderId, result.SenderId);
+        Assert.Equal(senderId, result.SenderNumber);
         Assert.Equal(MarketRole.MeteredDataResponsible.Code, result.SenderRoleCode);
         Assert.Equal("E74", result.MessageType);
 
         Assert.All(result.Series, serie =>
         {
             Assert.Equal("E18", serie.MarketEvaluationPointType);
-            Assert.False(serie.HasMarketEvaluationSettlementMethod);
-            Assert.False(serie.HasSettlementSeriesVersion);
+            Assert.Null(serie.MarketEvaluationSettlementMethod);
+            Assert.Null(serie.SettlementSeriesVersion);
 
             var startDate = InstantPattern.General.Parse(serie.StartDateAndOrTimeDateTime).GetValueOrThrow();
             Assert.Equal(startDay, startDate.Day());
-            var endDate = InstantPattern.General.Parse(serie.EndDateAndOrTimeDateTime).GetValueOrThrow();
+            var endDate = InstantPattern.General.Parse(serie.EndDateAndOrTimeDateTime!).GetValueOrThrow();
             Assert.Equal(endDay, endDate.Day());
         });
     }
@@ -85,9 +86,10 @@ public class RequestAggregatedMeasureDataFactoryTests
             request,
             "9876543210987",
             MarketRole.MeteredDataResponsible.Name,
-            _dateTimeZone);
+            _dateTimeZone,
+            SystemClock.Instance.GetCurrentInstant());
 
-        var endDate = InstantPattern.General.Parse(result.Series.First()!.EndDateAndOrTimeDateTime).GetValueOrThrow();
+        var endDate = InstantPattern.General.Parse(result.Series.First()!.EndDateAndOrTimeDateTime!).GetValueOrThrow();
         Assert.Equal(endDay - 1, endDate.Day());
     }
 }

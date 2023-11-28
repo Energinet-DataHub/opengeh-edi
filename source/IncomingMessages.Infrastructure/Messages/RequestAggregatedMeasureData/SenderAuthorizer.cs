@@ -28,32 +28,20 @@ namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
             _actorAuthenticator = actorAuthenticator;
         }
 
-        public Task<Result> AuthorizeAsync(string senderNumber, string senderRoleCode, string? authenticatedUser = null, string? authenticatedUserRole = null)
+        public Task<Result> AuthorizeAsync(string senderNumber, string senderRoleCode)
         {
             if (senderNumber == null) throw new ArgumentNullException(nameof(senderNumber));
             if (senderRoleCode == null) throw new ArgumentNullException(nameof(senderRoleCode));
-            EnsureSenderIdMatches(senderNumber, authenticatedUser);
+            EnsureSenderIdMatches(senderNumber);
             EnsureSenderRoleCode(senderRoleCode);
-            EnsureCurrentUserHasRequiredRole(senderRoleCode, authenticatedUserRole);
+            EnsureCurrentUserHasRequiredRole(senderRoleCode);
 
             return Task.FromResult(_validationErrors.Count == 0 ? Result.Succeeded() : Result.Failure(_validationErrors.ToArray()));
         }
 
-        private bool SenderNumberIsNotEqualSenderNumberOfAuthorizedUser(string senderNumber, string? authenticatedUser)
+        private void EnsureCurrentUserHasRequiredRole(string senderRole)
         {
-            return _actorAuthenticator.CurrentActorIdentity.ActorNumber.Value.Equals(senderNumber, StringComparison.OrdinalIgnoreCase) == false
-                && !(!string.IsNullOrWhiteSpace(authenticatedUser) && authenticatedUser.Equals(senderNumber, StringComparison.Ordinal));
-        }
-
-        private bool SenderRoleIsNotEqualRoleOfAuthorizedUser(string senderRole, string? authenticatedUserRole)
-        {
-            return !_actorAuthenticator.CurrentActorIdentity.HasRole(MarketRole.FromCode(senderRole))
-                && !(!string.IsNullOrWhiteSpace(authenticatedUserRole) && authenticatedUserRole.Equals(senderRole, StringComparison.Ordinal));
-        }
-
-        private void EnsureCurrentUserHasRequiredRole(string senderRole, string? authenticatedUserRole = null)
-        {
-            if (SenderRoleIsNotEqualRoleOfAuthorizedUser(senderRole, authenticatedUserRole))
+            if (!_actorAuthenticator.CurrentActorIdentity.HasRole(MarketRole.FromCode(senderRole)))
             {
                 _validationErrors.Add(new AuthenticatedUserDoesNotHoldRequiredRoleType());
             }
@@ -69,9 +57,9 @@ namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
             }
         }
 
-        private void EnsureSenderIdMatches(string senderNumber, string? authenticatedUser = null)
+        private void EnsureSenderIdMatches(string senderNumber)
         {
-            if (SenderNumberIsNotEqualSenderNumberOfAuthorizedUser(senderNumber, authenticatedUser))
+            if (_actorAuthenticator.CurrentActorIdentity.ActorNumber.Value.Equals(senderNumber, StringComparison.OrdinalIgnoreCase) == false)
             {
                 _validationErrors.Add(new AuthenticatedUserDoesNotMatchSenderId());
             }
