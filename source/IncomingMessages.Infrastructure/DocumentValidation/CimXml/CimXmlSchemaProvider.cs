@@ -14,6 +14,7 @@
 
 using System.Xml;
 using System.Xml.Schema;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace IncomingMessages.Infrastructure.DocumentValidation.CimXml;
 
@@ -28,7 +29,9 @@ public class CimXmlSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
 
     public Task<XmlSchema?> GetAsync(DocumentType type, string version, CancellationToken cancellationToken)
     {
-        var schemaName = _schema.GetSchemaLocation(ParseDocumentType(type), version);
+        ArgumentNullException.ThrowIfNull(type, nameof(type));
+
+        var schemaName = _schema.GetSchemaLocation(type.Name, version);
 
         if (schemaName == null)
         {
@@ -77,16 +80,5 @@ public class CimXmlSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
         }
 
         return (T)(object)xmlSchema;
-    }
-
-    private static string ParseDocumentType(DocumentType document)
-    {
-        return document switch
-        {
-            DocumentType.AggregationResult => "notifyaggregatedmeasuredata",
-            DocumentType.CustomerMasterData => "CharacteristicsOfACustomerAtAnAp",
-            DocumentType.RejectRequestAggregatedMeasureData => "RejectRequestAggregatedMeasureData",
-            _ => throw new InvalidOperationException("Unknown document type"),
-        };
     }
 }

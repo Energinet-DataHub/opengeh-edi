@@ -23,10 +23,8 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
 using IncomingMessages.Infrastructure.DocumentValidation;
 using Xunit;
-using DocumentType = IncomingMessages.Infrastructure.DocumentValidation.DocumentType;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 
