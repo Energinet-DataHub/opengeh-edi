@@ -12,22 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
-using Energinet.DataHub.EDI.Common.DataRetention;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
-using Energinet.DataHub.EDI.OutgoingMessages.Contracts;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages.Queueing;
-using MediatR;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
-using PeekResult = Energinet.DataHub.EDI.OutgoingMessages.Contracts.PeekResult;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.Configuration;
 
@@ -48,16 +46,18 @@ public static class ActorMessageQueueConfiguration
         services.AddScoped<IMessageRecordParser, MessageRecordParser>();
 
         //MessageEnqueueingConfiguration
-        services.AddTransient<IEnqueueMessage, EnqueueMessage>();
+        services.AddTransient<IMessageEnqueuer, MessageEnqueuer>();
         services.AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>();
 
         //PeekConfiguration
         services.AddScoped<IActorMessageQueueRepository, ActorMessageQueueRepository>();
         services.AddScoped<IMarketDocumentRepository, MarketDocumentRepository>();
-        services.AddTransient<IRequestHandler<PeekCommand, PeekResult>, PeekHandler>();
+        services.AddTransient<MessagePeeker>();
 
         //DequeConfiguration
-        services.AddTransient<IRequestHandler<DequeueCommand, DequeCommandResult>, DequeueHandler>();
+        services.AddTransient<MessageDequeuer>();
         services.AddTransient<IDataRetention, DequeuedBundlesRetention>();
+
+        services.AddTransient<IOutGoingMessagesClient, OutgoingMessagesClient>();
     }
 }

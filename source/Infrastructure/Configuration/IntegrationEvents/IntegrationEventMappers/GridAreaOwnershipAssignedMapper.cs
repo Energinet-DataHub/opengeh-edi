@@ -16,8 +16,9 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.Application.GridAreas;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using NodaTime.Serialization.Protobuf;
 

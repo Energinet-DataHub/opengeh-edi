@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.GridAreas;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
@@ -100,8 +101,8 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
     {
         return resolution switch
         {
-            Resolution.Pt15M => Common.Resolution.QuarterHourly.Name,
-            Resolution.Pt1H => Common.Resolution.Hourly.Name,
+            Resolution.Pt15M => BuildingBlocks.Domain.Models.Resolution.QuarterHourly.Name,
+            Resolution.Pt1H => BuildingBlocks.Domain.Models.Resolution.Hourly.Name,
             Resolution.Unspecified => throw new InvalidOperationException("Could not map resolution type"),
             _ => throw new InvalidOperationException("Unknown resolution type"),
         };

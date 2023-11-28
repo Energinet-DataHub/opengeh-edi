@@ -27,6 +27,7 @@ using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
+using Energinet.DataHub.EDI.IncomingMessages.Application.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
@@ -35,6 +36,7 @@ using Energinet.DataHub.EDI.Process.Application.Configuration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.Reflection;
+using IncomingMessages.Infrastructure;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -92,6 +94,8 @@ namespace Energinet.DataHub.EDI.Api
 
                     services.AddSingleton(new WholesaleServiceBusClientConfiguration(
                         runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!));
+                    services.AddSingleton(new IncomingMessagesServiceBusClientConfiguration(
+                        runtime.INCOMING_MESSAGES_QUEUE_NAME!));
 
                     services.AddApplicationInsights();
                     services.ConfigureFunctionsApplicationInsights();
@@ -112,7 +116,7 @@ namespace Energinet.DataHub.EDI.Api
                             sp.GetRequiredService<AuthenticatedActor>());
                     });
 
-                    CompositionRoot.Initialize(services)
+                    CompositionRoot.Initialize(services, databaseConnectionString!)
                         .AddMessageBus(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!)
                         .AddRemoteBusinessService<DummyRequest, DummyReply>("Dummy", "Dummy")
                         .AddBearerAuthentication(tokenValidationParameters)
@@ -130,8 +134,7 @@ namespace Energinet.DataHub.EDI.Api
                         .AddRequestLogging(
                             runtime.REQUEST_RESPONSE_LOGGING_CONNECTION_STRING!,
                             runtime.REQUEST_RESPONSE_LOGGING_CONTAINER_NAME!)
-                        .AddMessagePublishing()
-                        .AddMessageParserServices();
+                        .AddMessagePublishing();
 
                     services.AddLiveHealthCheck();
                     services.AddExternalDomainServiceBusQueuesHealthCheck(
@@ -151,6 +154,7 @@ namespace Energinet.DataHub.EDI.Api
 
                     ActorMessageQueueConfiguration.Configure(services);
                     ProcessConfiguration.Configure(services);
+                    IncomingMessagesConfiguration.Configure(services);
                 })
                 .ConfigureLogging(logging =>
                 {

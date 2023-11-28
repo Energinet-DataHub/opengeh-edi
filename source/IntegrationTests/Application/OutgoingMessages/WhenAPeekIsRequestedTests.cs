@@ -19,31 +19,34 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Dapper;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.OutgoingMessages.Contracts;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using MediatR;
 using Xunit;
-using DocumentType = Energinet.DataHub.EDI.Common.DocumentType;
-using MessageCategory = Energinet.DataHub.EDI.Common.MessageCategory;
+using DocumentType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.DocumentType;
+using MessageCategory = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MessageCategory;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
 public class WhenAPeekIsRequestedTests : TestBase
 {
-    private readonly IEnqueueMessage _enqueueMessage;
     private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
+    private readonly IOutGoingMessagesClient _outgoingMessagesClient;
 
     public WhenAPeekIsRequestedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
-        _enqueueMessage = GetService<IEnqueueMessage>();
+        _outgoingMessagesClient = GetService<IOutGoingMessagesClient>();
     }
 
     [Fact]
@@ -128,8 +131,7 @@ public class WhenAPeekIsRequestedTests : TestBase
 
     private Task<PeekResult> PeekMessage(MessageCategory category)
     {
-        var mediatr = GetService<IMediator>();
-        return mediatr.Send(new PeekCommand(ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, MarketRole.EnergySupplier, DocumentFormat.Xml));
+        return _outgoingMessagesClient.PeekAsync(new PeekRequest(ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, MarketRole.EnergySupplier, DocumentFormat.Xml), CancellationToken.None);
     }
 
     private async Task AssertMessageIsArchived(Guid? messageId)
@@ -144,7 +146,7 @@ public class WhenAPeekIsRequestedTests : TestBase
 
     private async Task EnqueueMessage(OutgoingMessageDto message)
     {
-        await _enqueueMessage.EnqueueAsync(message);
+        await _outgoingMessagesClient.EnqueueAsync(message);
         await GetService<ActorMessageQueueContext>().SaveChangesAsync();
     }
 }

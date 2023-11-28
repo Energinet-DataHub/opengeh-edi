@@ -52,16 +52,6 @@ runs:
           --configuration Release \
           --output '${{ inputs.output_path }}\functions\api'
 
-    - name: Publish PerformanceTest
-      shell: bash
-      run: |
-        dotnet publish \
-          'source/PerformanceTest/PerformanceTest.csproj' \
-          --no-build \
-          --no-restore \
-          --configuration Release \
-          --output '${{ inputs.output_path }}\functions\performancetest'
-
     - name: Publish AcceptanceTest
       shell: bash
       run: |

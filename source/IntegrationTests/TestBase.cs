@@ -24,13 +24,14 @@ using Energinet.DataHub.EDI.Api.Authentication;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
-using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Common.Actors;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.Common.DateTime;
-using Energinet.DataHub.EDI.Common.TimeEvents;
+using Energinet.DataHub.EDI.IncomingMessages.Application.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
@@ -44,6 +45,8 @@ using Energinet.DataHub.EDI.Process.Application.Configuration;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Google.Protobuf;
+using IncomingMessages.Infrastructure;
+using IncomingMessages.Infrastructure.Configuration.DataAccess;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -56,6 +59,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
         private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
         private readonly B2BContext _b2BContext;
         private readonly ProcessContext _processContext;
+        private readonly IncomingMessagesContext _incomingMessagesContext;
         private ServiceCollection? _services;
         private IServiceProvider _serviceProvider = default!;
         private bool _disposed;
@@ -70,7 +74,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             BuildServices();
             _b2BContext = GetService<B2BContext>();
             _processContext = GetService<ProcessContext>();
-
+            _incomingMessagesContext = GetService<IncomingMessagesContext>();
             var authenticatedActor = GetService<AuthenticatedActor>();
             authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None));
         }
@@ -100,6 +104,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
             _b2BContext.Dispose();
             _processContext.Dispose();
+            _incomingMessagesContext.Dispose();
             _serviceBusSenderFactoryStub.Dispose();
             ((ServiceProvider)_serviceProvider!).Dispose();
             _disposed = true;
@@ -159,6 +164,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             _services = new ServiceCollection();
 
             _services.AddSingleton(new WholesaleServiceBusClientConfiguration("Fake"));
+            _services.AddSingleton(new IncomingMessagesServiceBusClientConfiguration("Fake"));
+
             _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
             _services.AddSingleton(
                 _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
@@ -178,7 +185,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                     sp.GetRequiredService<IActorRepository>(),
                     sp.GetRequiredService<AuthenticatedActor>());
             });
-            CompositionRoot.Initialize(_services)
+            CompositionRoot.Initialize(_services, DatabaseFixture.ConnectionString)
                 .AddRemoteBusinessService<DummyRequest, DummyReply>(
                     sp => new RemoteBusinessServiceRequestSenderSpy<DummyRequest>("Dummy"), "Dummy")
                 .AddDatabaseConnectionFactory(DatabaseFixture.ConnectionString)
@@ -190,12 +197,12 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                     correlation.SetId(Guid.NewGuid().ToString());
                     return correlation;
                 })
-                .AddMessagePublishing()
-                .AddMessageParserServices();
+                .AddMessagePublishing();
 
             ActorMessageQueueConfiguration.Configure(_services);
             ProcessConfiguration.Configure(_services);
-            ArchivedMessageConfiguration.Configure(_services);
+            ArchivedMessageConfiguration.Configure(_services, DatabaseFixture.ConnectionString);
+            IncomingMessagesConfiguration.Configure(_services);
             _serviceProvider = _services.BuildServiceProvider();
         }
     }

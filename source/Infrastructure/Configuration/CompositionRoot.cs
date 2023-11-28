@@ -26,11 +26,9 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
-using Energinet.DataHub.EDI.Common.DataRetention;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.Actors;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.FeatureFlag;
@@ -38,7 +36,6 @@ using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
 using Energinet.DataHub.EDI.Infrastructure.GridAreas;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
-using Energinet.DataHub.EDI.Infrastructure.IncomingMessages;
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using MediatR;
 using MediatR.Registration;
@@ -52,13 +49,11 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
     {
         private readonly IServiceCollection _services;
 
-        private CompositionRoot(IServiceCollection services)
+        private CompositionRoot(IServiceCollection services, string connectionString)
         {
             _services = services;
             services.AddSingleton<HttpClient>();
             services.AddSingleton<ISerializer, Serializer>();
-            services.AddScoped<ITransactionIdRepository, TransactionIdRepository>();
-            services.AddScoped<IMessageIdRepository, MessageIdRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IFeatureFlagProvider, FeatureFlagProviderProvider>();
 
@@ -70,14 +65,14 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             AddGridAreaServices();
             IntegrationEventsConfiguration.Configure(services);
             InboxEventsConfiguration.Configure(services);
-            ArchivedMessageConfiguration.Configure(services);
+            ArchivedMessageConfiguration.Configure(services, connectionString);
             QueryHandlingConfiguration.Configure(services);
             DataRetentionConfiguration.Configure(services);
         }
 
-        public static CompositionRoot Initialize(IServiceCollection services)
+        public static CompositionRoot Initialize(IServiceCollection services, string connectionString)
         {
-            return new CompositionRoot(services);
+            return new CompositionRoot(services, connectionString);
         }
 
         public CompositionRoot AddMessageBus(string connectionString)
@@ -137,12 +132,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
         public CompositionRoot AddMessagePublishing()
         {
             _services.AddScoped<IActorRepository, ActorRepository>();
-            return this;
-        }
-
-        public CompositionRoot AddMessageParserServices()
-        {
-            IncomingMessageParsingServices.AddIncomingMessageParsingServices(_services);
             return this;
         }
 

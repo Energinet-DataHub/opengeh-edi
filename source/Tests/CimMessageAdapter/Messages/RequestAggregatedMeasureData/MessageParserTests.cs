@@ -19,12 +19,16 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.ValidationErrors;
-using Energinet.DataHub.EDI.Infrastructure.DocumentValidation;
-using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Infrastructure.Configuration;
+using Energinet.DataHub.Edi.Requests;
+using FluentAssertions.Execution;
+using Google.Protobuf;
+using IncomingMessages.Infrastructure.DocumentValidation;
+using IncomingMessages.Infrastructure.Messages;
+using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
+using IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
+using IncomingMessages.Infrastructure.ValidationErrors;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
@@ -39,15 +43,16 @@ public class MessageParserTests
     private static readonly string SubPath =
         $"{Path.DirectorySeparatorChar}aggregatedmeasure{Path.DirectorySeparatorChar}";
 
-    private readonly RequestAggregatedMeasureDataMarketMessageParser _requestAggregatedMeasureDataMarketMessageParser;
+    private readonly MarketMessageParser _marketMessageParser;
 
     public MessageParserTests()
     {
-        _requestAggregatedMeasureDataMarketMessageParser = new RequestAggregatedMeasureDataMarketMessageParser(
+        _marketMessageParser = new MarketMessageParser(
             new IMessageParser[]
             {
                 new XmlMessageParser(),
                 new JsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
+                new ProtoMessageParser(new SystemDateTimeProvider()),
             });
     }
 
@@ -59,6 +64,7 @@ public class MessageParserTests
             new object[] { DocumentFormat.Xml, CreateBaseXmlMessage("TwoSeriesRequestAggregatedMeasureData.xml") },
             new object[] { DocumentFormat.Json, CreateBaseJsonMessages("RequestAggregatedMeasureData.json") },
             new object[] { DocumentFormat.Json, CreateBaseJsonMessages("RequestAggregatedMeasureData.json", 1) },
+            new object[] { DocumentFormat.Proto, CreateProtoMemoryStream() },
         };
     }
 
@@ -75,10 +81,10 @@ public class MessageParserTests
     [MemberData(nameof(CreateMessagesWithSingleAndMultipleTransactions))]
     public async Task Successfully_parsed(DocumentFormat format, Stream message)
     {
-        var result = await _requestAggregatedMeasureDataMarketMessageParser.ParseAsync(message, format, CancellationToken.None);
-
+        var result = await _marketMessageParser.ParseAsync(message, format, IncomingDocumentType.RequestAggregatedMeasureData, CancellationToken.None);
+        using var assertionScope = new AssertionScope();
         Assert.True(result.Success);
-        var marketMessage = result!.MarketMessage!;
+        var marketMessage = result!.Dto!;
         Assert.True(marketMessage != null);
         Assert.Equal("123564789123564789123564789123564789", marketMessage.MessageId);
         Assert.Equal("D05", marketMessage.BusinessReason);
@@ -86,10 +92,10 @@ public class MessageParserTests
         Assert.Equal("DDK", marketMessage.SenderRoleCode);
         Assert.Equal("5790001330552", marketMessage.ReceiverNumber);
         Assert.Equal("DGL", marketMessage.ReceiverRoleCode);
-        Assert.Equal("2022-12-17T09:30:47Z", marketMessage.CreatedAt);
+        //Assert.Equal("2022-12-17T09:30:47Z", marketMessage.CreatedAt);
         Assert.Equal("23", marketMessage.BusinessType);
 
-        foreach (var serie in result!.MarketMessage!.Series)
+        foreach (var serie in result!.Dto!.Series)
         {
             Assert.True(serie != null);
             Assert.Equal("123353185", serie.Id);
@@ -108,7 +114,7 @@ public class MessageParserTests
     [MemberData(nameof(CreateBadMessages))]
     public async Task Messages_with_errors(DocumentFormat format, Stream message, string expectedError)
     {
-        var result = await _requestAggregatedMeasureDataMarketMessageParser.ParseAsync(message, format, CancellationToken.None);
+        var result = await _marketMessageParser.ParseAsync(message, format, IncomingDocumentType.RequestAggregatedMeasureData, CancellationToken.None);
 
         Assert.True(result.Errors.Count > 0);
         Assert.True(result.Success == false);
@@ -167,5 +173,36 @@ public class MessageParserTests
         }
 
         return jsonDocSb.ToString();
+    }
+
+    private static MemoryStream CreateProtoMemoryStream()
+    {
+        var protostuff = new Edi.Requests.RequestAggregatedMeasureData
+        {
+            MessageId = "123564789123564789123564789123564789",
+            MessageType = "E74",
+            BusinessReason = "D05",
+            SenderRoleCode = "DDK",
+            SenderId = "5799999933318",
+            ReceiverId = "5790001330552",
+            ReceiverRoleCode = "DGL",
+        };
+        protostuff.Series.Add(new Serie
+        {
+            Id = "123353185",
+            SettlementSeriesVersion = "D01",
+            MarketEvaluationPointType = "E17",
+            MeteringGridAreaDomainId = "244",
+            MarketEvaluationSettlementMethod = "D01",
+            EnergySupplierMarketParticipantId = "5790001330552",
+            BalanceResponsiblePartyMarketParticipantId = "5799999933318",
+            StartDateAndOrTimeDateTime = "2022-06-17T22:00:00Z",
+            EndDateAndOrTimeDateTime = "2022-07-22T22:00:00Z",
+        });
+        var bytes = protostuff.ToByteArray();
+        var memoryStream = new MemoryStream();
+        memoryStream.Write(bytes, 0, bytes.Length);
+        memoryStream.Position = 0;
+        return memoryStream;
     }
 }

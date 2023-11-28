@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  
+  <PropertyGroup>
+    <AssemblyName>Energinet.DataHub.EDI.OutgoingMessages.Interfaces</AssemblyName>
+    <RootNamespace>Energinet.DataHub.EDI.OutgoingMessages.Interfaces</RootNamespace>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

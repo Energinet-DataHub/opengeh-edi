@@ -15,13 +15,17 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.OutgoingMessages.Contracts;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
@@ -29,13 +33,13 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 public class WhenOutgoingMessagesAreCreatedTests : TestBase
 {
     private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
-    private readonly IEnqueueMessage _enqueueMessage;
+    private readonly IMessageEnqueuer _messageEnqueuer;
 
     public WhenOutgoingMessagesAreCreatedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
-        _enqueueMessage = GetService<IEnqueueMessage>();
+        _messageEnqueuer = GetService<IMessageEnqueuer>();
     }
 
     [Fact]
@@ -65,7 +69,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase
 
     private async Task EnqueueMessage(OutgoingMessageDto message)
     {
-        await _enqueueMessage.EnqueueAsync(message);
+        await _messageEnqueuer.EnqueueAsync(message);
         await GetService<ActorMessageQueueContext>().SaveChangesAsync();
     }
 }

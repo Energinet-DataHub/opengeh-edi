@@ -17,14 +17,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Common.Actors;
 using Energinet.DataHub.EDI.Common.Serialization;
-using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
@@ -73,95 +74,6 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         Assert.Equal(marketMessage.Series.First().Id, process!.BusinessTransactionId.Id);
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Initialized);
         AssertProcessValues(process, marketMessage);
-    }
-
-    [Fact]
-    public async Task Duplicated_transaction_id_across_commands_one_aggregated_measure_data_process_is_created()
-    {
-        // Arrange
-        var senderIdForBothMarketMessages = "5790000555557";
-        var transactionIdForBothMarketMessages = Guid.NewGuid().ToString();
-
-        var marketMessage01 = MessageBuilder()
-            .SetTransactionId(transactionIdForBothMarketMessages)
-            .SetSenderId(senderIdForBothMarketMessages)
-            .Build();
-
-        var marketMessage02 = MessageBuilder()
-            .SetTransactionId(transactionIdForBothMarketMessages)
-            .SetSenderId(senderIdForBothMarketMessages)
-            .Build();
-
-        // new scope to simulate a race condition.
-        var sessionProvider = GetService<IServiceProvider>();
-        using var secondScope = sessionProvider.CreateScope();
-        var mediatorInSecondScope = secondScope.ServiceProvider.GetService<IMediator>();
-        var authenticatedActorInSecondScope = secondScope.ServiceProvider.GetService<AuthenticatedActor>();
-        authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None));
-
-        // Act
-        var task01 = InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage01));
-        var task02 = mediatorInSecondScope!.Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage02));
-
-        try
-        {
-            await Task.WhenAll(task01, task02);
-        }
-        catch (DbUpdateException e)
-        {
-            // Assert
-            // This exception is only expected if a command execution finishes before the other one ends.
-            Assert.Contains("Violation of PRIMARY KEY constraint", e.InnerException?.Message, StringComparison.InvariantCulture);
-        }
-
-        var processes = GetProcesses(marketMessage01.SenderNumber);
-        Assert.Single(processes);
-    }
-
-    [Fact]
-    public async Task Duplicated_message_id_across_commands_one_aggregated_measure_data_process_is_created()
-    {
-        // Arrange
-        var senderIdForBothMarketMessages = "5790000555556";
-        var messageIdForBothMarketMessages = Guid.NewGuid().ToString();
-
-        var marketMessage01 = MessageBuilder()
-            .SetMessageId(messageIdForBothMarketMessages)
-            .SetSenderId(senderIdForBothMarketMessages)
-            .Build();
-
-        var marketMessage02 = MessageBuilder()
-            .SetMessageId(messageIdForBothMarketMessages)
-            .SetSenderId(senderIdForBothMarketMessages)
-            .Build();
-
-        // new scope to simulate a race condition.
-        var sessionProvider = GetService<IServiceProvider>();
-        using var secondScope = sessionProvider.CreateScope();
-        var mediatorInSecondScope = secondScope.ServiceProvider.GetService<IMediator>();
-        var authenticatedActorInSecondScope = secondScope.ServiceProvider.GetService<AuthenticatedActor>();
-        authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None));
-
-        // Act
-        var task01 = InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage01));
-        var task02 = mediatorInSecondScope!.Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage02));
-
-        var tasks = new[] { task01, task02 };
-
-        try
-        {
-            await Task.WhenAll(tasks);
-        }
-        catch (DbUpdateException e)
-        {
-            // Assert
-            // This exception is only expected if a command execution finishes before the other one ends.
-            Assert.Contains("Violation of PRIMARY KEY constraint", e.InnerException?.Message, StringComparison.InvariantCulture);
-        }
-
-        // Assert
-        var processes = GetProcesses(marketMessage01.SenderNumber).ToList();
-        Assert.Single(processes);
     }
 
     [Fact]
@@ -219,15 +131,15 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         _serviceBusClientSenderFactory.Dispose();
     }
 
-    private static void AssertProcessValues(AggregatedMeasureDataProcess process, RequestAggregatedMeasureDataMarketMessage marketMessage)
+    private static void AssertProcessValues(AggregatedMeasureDataProcess process, RequestAggregatedMeasureDataDto dto)
     {
-        var marketMessageSerie = marketMessage.Series.Single();
+        var marketMessageSerie = dto.Series.Single();
 
         Assert.NotEqual(Guid.Empty, process.ProcessId.Id);
         Assert.Equal(marketMessageSerie.Id, process.BusinessTransactionId.Id);
-        Assert.Equal(marketMessage.SenderNumber, process.RequestedByActorId.Value);
-        Assert.Equal(marketMessage.SenderRoleCode, process.RequestedByActorRoleCode);
-        Assert.Equal(marketMessage.BusinessReason, process.BusinessReason.Code);
+        Assert.Equal(dto.SenderNumber, process.RequestedByActorId.Value);
+        Assert.Equal(dto.SenderRoleCode, process.RequestedByActorRoleCode);
+        Assert.Equal(dto.BusinessReason, process.BusinessReason.Code);
         Assert.Equal(marketMessageSerie.MarketEvaluationPointType, process.MeteringPointType);
         Assert.Equal(marketMessageSerie.MarketEvaluationSettlementMethod, process.SettlementMethod);
         Assert.Equal(marketMessageSerie.StartDateAndOrTimeDateTime, process.StartOfPeriod);

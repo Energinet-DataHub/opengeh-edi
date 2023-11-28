@@ -15,10 +15,9 @@
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Common;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
-using DocumentType = Energinet.DataHub.EDI.Infrastructure.DocumentValidation.DocumentType;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.AggregationResult;
 
@@ -105,7 +104,7 @@ public class AssertAggregationResultEbixDocument : IAssertAggregationResultDocum
 
     public async Task<IAssertAggregationResultDocument> DocumentIsValidAsync()
     {
-        await _documentAsserter.HasValidStructureAsync(DocumentType.AggregationResult, "3").ConfigureAwait(false);
+        await _documentAsserter.HasValidStructureAsync(DocumentType.NotifyAggregatedMeasureData, "3").ConfigureAwait(false);
         return this;
     }
 

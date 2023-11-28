@@ -14,15 +14,14 @@
 
 using System;
 using System.Collections.Generic;
-using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Common.Actors;
-using Energinet.DataHub.EDI.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.Infrastructure.IncomingMessages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Process.Interfaces;
+using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
+using IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 using NodaTime;
-using MessageHeader = Energinet.DataHub.EDI.Common.MessageHeader;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 
@@ -101,13 +100,13 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
         return this;
     }
 
-    internal RequestAggregatedMeasureDataMarketMessage Build()
+    internal RequestAggregatedMeasureDataDto Build()
     {
         var messageParser = new RequestAggregatedMeasureDataMarketMessageParserResult(
             RequestAggregatedMeasureDataMarketMessageFactory.Create(
                 CreateHeader(),
                 new List<Serie> { CreateSerieCreateRecord() }.AsReadOnly()));
-        return messageParser.MarketMessage!;
+        return messageParser.Dto!;
     }
 
     private Serie CreateSerieCreateRecord() =>
