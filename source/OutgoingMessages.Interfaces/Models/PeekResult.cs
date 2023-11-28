@@ -15,6 +15,6 @@
 using System;
 using System.IO;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
 public record PeekResult(Stream? Bundle, Guid? MessageId = default);

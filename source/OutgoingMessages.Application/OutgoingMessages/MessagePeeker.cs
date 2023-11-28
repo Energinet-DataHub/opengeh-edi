@@ -17,18 +17,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-using MediatR;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using NodaTime;
-using PeekResult = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.PeekResult;
+using PeekResult = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.PeekResult;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
 
-public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
+public class MessagePeeker
 {
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
     private readonly IMarketDocumentRepository _marketDocumentRepository;
@@ -37,7 +36,7 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
     private readonly ActorMessageQueueContext _actorMessageQueueContext;
     private readonly IArchivedMessagesClient _archivedMessageClient;
 
-    public PeekHandler(
+    public MessagePeeker(
         IActorMessageQueueRepository actorMessageQueueRepository,
         IMarketDocumentRepository marketDocumentRepository,
         DocumentFactory documentFactory,
@@ -53,7 +52,7 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
         _archivedMessageClient = archivedMessageClient;
     }
 
-    public async Task<PeekResult> Handle(PeekCommand request, CancellationToken cancellationToken)
+    public async Task<PeekResult> PeekAsync(PeekRequest request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
         await EnsureBundleIsClosedBeforePeekingAsync(request).ConfigureAwait(false);
@@ -96,7 +95,7 @@ public class PeekHandler : IRequestHandler<PeekCommand, PeekResult>
         return new PeekResult(document.Payload, document.BundleId.Id);
     }
 
-    private async Task EnsureBundleIsClosedBeforePeekingAsync(PeekCommand request)
+    private async Task EnsureBundleIsClosedBeforePeekingAsync(PeekRequest request)
     {
         // Right after we call Peek(), we close the bundle. This is to ensure that the bundle wont be added more messages, after we have peeked.
         // And before we are able to update the bundle to closed in the database.
