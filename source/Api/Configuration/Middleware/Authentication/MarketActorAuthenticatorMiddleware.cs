@@ -22,7 +22,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.MarketActors
+namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication
 {
     public class MarketActorAuthenticatorMiddleware : IFunctionsWorkerMiddleware
     {
@@ -43,7 +43,7 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.Mark
 
             if (!context.IsRequestFromUser())
             {
-                _logger.LogInformation("Functions is not triggered by HTTP. Call next middleware.");
+                _logger.LogInformation("Functions is not triggered by HTTP, skipping authentication");
                 await next(context).ConfigureAwait(false);
                 return;
             }
@@ -51,14 +51,14 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.Mark
             var httpRequestData = context.GetHttpRequestData();
             if (httpRequestData == null)
             {
-                _logger.LogTrace("No HTTP request data was available.");
+                _logger.LogTrace("No HTTP request data was available, skipping authentication");
                 await next(context).ConfigureAwait(false);
                 return;
             }
 
             if (currentClaimsPrincipal.ClaimsPrincipal is null)
             {
-                _logger.LogError("Current claims principal is null. Cannot continue.");
+                _logger.LogError("Current claims principal is null, responding with 401 Unauthorized");
                 context.RespondWithUnauthorized(httpRequestData);
                 return;
             }

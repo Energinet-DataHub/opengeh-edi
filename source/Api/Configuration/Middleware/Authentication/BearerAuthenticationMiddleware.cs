@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
@@ -20,7 +22,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.Bearer
+namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication
 {
     public class BearerAuthenticationMiddleware : IFunctionsWorkerMiddleware
     {
@@ -34,17 +36,19 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.Bear
         public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
         {
             if (next == null) throw new ArgumentNullException(nameof(next));
-            if (!context.IsRequestFromUser())
-            {
-                _logger.LogInformation("Functions is not triggered by HTTP. Call next middleware.");
-                await next(context).ConfigureAwait(false);
-                return;
-            }
 
             var httpRequestData = context.GetHttpRequestData();
             if (httpRequestData == null)
             {
-                _logger.LogTrace("No HTTP request data was available.");
+                await next(context).ConfigureAwait(false);
+                return;
+            }
+
+            if (
+                httpRequestData.Headers.TryGetValues("Content-Type", out var contentTypeValues)
+                && contentTypeValues.SingleOrDefault() == "application/ebix")
+            {
+                _logger.LogTrace("Content-Type was application/ebix, skipping bearer authentication");
                 await next(context).ConfigureAwait(false);
                 return;
             }
@@ -54,7 +58,7 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.Bear
             if (result.Success == false)
             {
                 LogParseResult(result);
-                context.RespondWithUnauthorized(httpRequestData);
+                await next(context).ConfigureAwait(false);
                 return;
             }
 
