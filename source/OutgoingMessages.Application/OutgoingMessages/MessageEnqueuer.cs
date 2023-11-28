@@ -21,13 +21,13 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
 
-public class EnqueueMessage : IEnqueueMessage
+public class MessageEnqueuer : IMessageEnqueuer
 {
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-    public EnqueueMessage(
+    public MessageEnqueuer(
         IActorMessageQueueRepository actorMessageQueueRepository,
         IOutgoingMessageRepository outgoingMessageRepository,
         ISystemDateTimeProvider systemDateTimeProvider)

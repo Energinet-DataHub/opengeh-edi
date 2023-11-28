@@ -12,10 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
-
 namespace Energinet.DataHub.EDI.OutgoingMessages.Contracts;
 
-public record PeekCommand(ActorNumber ActorNumber, MessageCategory MessageCategory, MarketRole ActorRole, DocumentFormat DocumentFormat) : ICommand<PeekResult>;
+public record DequeueRequestResult(bool Success);

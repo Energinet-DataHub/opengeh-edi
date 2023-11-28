@@ -15,6 +15,7 @@
 using System;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
@@ -34,16 +35,16 @@ public class PeekRequestListener
 {
     private readonly AuthenticatedActor _authenticatedActor;
     private readonly ILogger<PeekRequestListener> _logger;
-    private readonly IMediator _mediator;
+    private readonly IOutGoingMessagesClient _outGoingMessagesClient;
 
     public PeekRequestListener(
         AuthenticatedActor authenticatedActor,
         ILogger<PeekRequestListener> logger,
-        IMediator mediator)
+        IOutGoingMessagesClient outGoingMessagesClient)
     {
         _authenticatedActor = authenticatedActor;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _mediator = mediator;
+        _outGoingMessagesClient = outGoingMessagesClient;
     }
 
     [Function("PeekRequestListener")]
@@ -54,10 +55,12 @@ public class PeekRequestListener
             Route = "peek/{messageCategory}")]
         HttpRequestData request,
         FunctionContext executionContext,
-        string messageCategory)
+        string messageCategory,
+        CancellationToken hostCancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
+        var cancellationToken = request.GetCancellationToken(hostCancellationToken);
         var contentType = request.Headers.GetContentType();
         var desiredDocumentFormat = CimFormatParser.ParseFromContentTypeHeaderValue(contentType);
         if (desiredDocumentFormat is null)
@@ -74,11 +77,13 @@ public class PeekRequestListener
             msgCategory = EnumerationType.FromName<MessageCategory>(messageCategory);
         }
 
-        var peekResult = await _mediator.Send(new PeekCommand(
+        var peekResult = await _outGoingMessagesClient.PeekAsync(
+            new PeekRequest(
             _authenticatedActor.CurrentActorIdentity.ActorNumber,
             msgCategory,
             _authenticatedActor.CurrentActorIdentity.MarketRole!,
-            desiredDocumentFormat)).ConfigureAwait(false);
+            desiredDocumentFormat),
+            cancellationToken).ConfigureAwait(false);
 
         var response = HttpResponseData.CreateResponse(request);
         if (peekResult.MessageId is null)

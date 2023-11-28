@@ -13,13 +13,14 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.OutgoingMessages.Contracts;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Contracts;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
 
 /// <summary>
 /// Contract for enqueueing messages
 /// </summary>
-public interface IEnqueueMessage
+public interface IMessageEnqueuer
 {
     /// <summary>
     /// Enqueue a message

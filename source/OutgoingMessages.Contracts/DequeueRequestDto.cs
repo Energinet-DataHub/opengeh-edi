@@ -13,9 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Contracts;
 
-public record DequeueCommand(string MessageId, MarketRole MarketRole, ActorNumber ActorNumber) : ICommand<DequeCommandResult>;
+public record DequeueRequestDto(string MessageId, MarketRole MarketRole, ActorNumber ActorNumber);
