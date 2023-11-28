@@ -14,6 +14,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Contracts;
 

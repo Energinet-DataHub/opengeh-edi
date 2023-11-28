@@ -13,10 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
-<<<<<<<< HEAD:source/OutgoingMessages.Interfaces/DequeueRequestDto.cs
-========
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
->>>>>>>> main:source/OutgoingMessages.Interfaces/PeekCommand.cs
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 

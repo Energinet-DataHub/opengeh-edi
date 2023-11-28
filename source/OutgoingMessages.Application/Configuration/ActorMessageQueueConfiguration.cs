@@ -26,7 +26,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAc
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages.Queueing;
 using Microsoft.Extensions.DependencyInjection;
-using PeekResult = Energinet.DataHub.EDI.OutgoingMessages.Contracts.PeekResult;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.Configuration;
 

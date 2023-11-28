@@ -15,7 +15,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Contracts;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using MediatR;
@@ -24,16 +23,16 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasu
 
 public class EnqueueMessageHandler : INotificationHandler<EnqueueMessageEvent>
 {
-    private readonly IMessageEnqueuer _messageEnqueuer;
+    private readonly IOutGoingMessagesClient _outGoingMessagesClient;
 
-    public EnqueueMessageHandler(IMessageEnqueuer messageEnqueuer)
+    public EnqueueMessageHandler(IOutGoingMessagesClient outGoingMessagesClient)
     {
-        _messageEnqueuer = messageEnqueuer ?? throw new ArgumentNullException(nameof(messageEnqueuer));
+        _outGoingMessagesClient = outGoingMessagesClient;
     }
 
     public async Task Handle(EnqueueMessageEvent notification, CancellationToken cancellationToken)
     {
         if (notification == null) throw new ArgumentNullException(nameof(notification));
-        await _messageEnqueuer.EnqueueAsync(notification.OutgoingMessageDto).ConfigureAwait(false);
+        await _outGoingMessagesClient.EnqueueAsync(notification.OutgoingMessageDto).ConfigureAwait(false);
     }
 }
