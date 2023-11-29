@@ -189,7 +189,7 @@ namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
 
         private async Task AuthorizeSenderAsync(RequestAggregatedMeasureDataDto dto)
         {
-            var result = await _senderAuthorizer.AuthorizeAsync(dto.SenderNumber, dto.SenderRoleCode, dto.AuthenticatedUser, dto.AuthenticatedUserRole).ConfigureAwait(false);
+            var result = await _senderAuthorizer.AuthorizeAsync(dto.SenderNumber, dto.SenderRoleCode).ConfigureAwait(false);
             _errors.AddRange(result.Errors);
         }
 

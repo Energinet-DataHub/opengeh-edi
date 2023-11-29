@@ -12,25 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess
 {
     public class SqlDatabaseConnectionFactory : IDatabaseConnectionFactory
     {
-        private readonly string _connectionString;
+        private readonly SqlDatabaseConnectionOptions _options;
 
-        public SqlDatabaseConnectionFactory(string connectionString)
+        public SqlDatabaseConnectionFactory(IOptions<SqlDatabaseConnectionOptions> options)
         {
-            _connectionString = connectionString;
+            if (options == null) throw new ArgumentNullException(nameof(options));
+            _options = options.Value;
         }
 
         public IDbConnection GetConnectionAndOpen()
         {
-            var connection = new SqlConnection(_connectionString);
+            var connection = new SqlConnection(_options.DB_CONNECTION_STRING);
             connection.Open();
 
             return connection;
@@ -38,7 +42,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess
 
         public async ValueTask<IDbConnection> GetConnectionAndOpenAsync(CancellationToken cancellationToken)
         {
-            var connection = new SqlConnection(_connectionString);
+            var connection = new SqlConnection(_options.DB_CONNECTION_STRING);
             await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
 
             return connection;
