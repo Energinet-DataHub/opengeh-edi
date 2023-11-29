@@ -25,8 +25,6 @@ public record RequestAggregatedMeasureDataDto(
     string ReceiverNumber,
     string ReceiverRoleCode,
     string BusinessReason,
-    string? AuthenticatedUser,
-    string? AuthenticatedUserRole,
     string MessageType,
     string MessageId,
     string CreatedAt,

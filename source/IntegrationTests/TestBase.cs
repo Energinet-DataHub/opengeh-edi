@@ -17,7 +17,6 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Api.Authentication;
@@ -27,6 +26,7 @@ using Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
@@ -48,6 +48,7 @@ using Google.Protobuf;
 using IncomingMessages.Infrastructure;
 using IncomingMessages.Infrastructure.Configuration.DataAccess;
 using MediatR;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -133,15 +134,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return ProcessBackgroundTasksAsync();
         }
 
-        private static string CreateFakeServiceBusConnectionString()
-        {
-            return new StringBuilder()
-                .Append(CultureInfo.InvariantCulture, $"Endpoint=sb://sb-{Guid.NewGuid():N}.servicebus.windows.net/;")
-                .Append("SharedAccessKeyName=send;")
-                .Append(CultureInfo.InvariantCulture, $"SharedAccessKey={Guid.NewGuid():N}")
-                .ToString();
-        }
-
         private async Task ProcessInternalCommandsAsync()
         {
             await ProcessBackgroundTasksAsync();
@@ -161,14 +153,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests
         private void BuildServices()
         {
             Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
+            Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", DatabaseFixture.ConnectionString);
+            Environment.SetEnvironmentVariable("WHOLESALE_INBOX_MESSAGE_QUEUE_NAME", "Fake");
+            Environment.SetEnvironmentVariable("INCOMING_MESSAGES_QUEUE_NAME", "Fake");
+
+            var config = new ConfigurationBuilder()
+                .AddEnvironmentVariables()
+                .Build();
             _services = new ServiceCollection();
-
-            _services.AddSingleton(new WholesaleServiceBusClientConfiguration("Fake"));
-            _services.AddSingleton(new IncomingMessagesServiceBusClientConfiguration("Fake"));
-
-            _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
-            _services.AddSingleton(
-                _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
 
             _services.AddTransient<InboxEventsProcessor>();
             _services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>>(_ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy);
@@ -188,7 +180,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             CompositionRoot.Initialize(_services, DatabaseFixture.ConnectionString)
                 .AddRemoteBusinessService<DummyRequest, DummyReply>(
                     sp => new RemoteBusinessServiceRequestSenderSpy<DummyRequest>("Dummy"), "Dummy")
-                .AddDatabaseConnectionFactory(DatabaseFixture.ConnectionString)
                 .AddDatabaseContext(DatabaseFixture.ConnectionString)
                 .AddSystemClock(new SystemDateTimeProviderStub())
                 .AddCorrelationContext(_ =>
@@ -200,9 +191,15 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 .AddMessagePublishing();
 
             ActorMessageQueueConfiguration.Configure(_services);
-            ProcessConfiguration.Configure(_services);
-            ArchivedMessageConfiguration.Configure(_services, DatabaseFixture.ConnectionString);
-            IncomingMessagesConfiguration.Configure(_services);
+
+            _services.AddProcessModule(config);
+            _services.AddArchivedMessagesModule(config);
+            _services.AddIncomingMessagesModule(config);
+
+            // Replace the services with stub implementations.
+            // - Building blocks
+            _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
+
             _serviceProvider = _services.BuildServiceProvider();
         }
     }

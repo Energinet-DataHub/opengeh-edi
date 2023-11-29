@@ -19,16 +19,18 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Energinet.DataHub.EDI.B2CWebApi.Factories;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Infrastructure.Configuration;
-using Energinet.DataHub.Edi.Requests;
+using Energinet.DataHub.EDI.Common.Serialization;
+using Energinet.DataHub.EDI.Process.Interfaces;
 using FluentAssertions.Execution;
-using Google.Protobuf;
 using IncomingMessages.Infrastructure.DocumentValidation;
 using IncomingMessages.Infrastructure.Messages;
 using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 using IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 using IncomingMessages.Infrastructure.ValidationErrors;
+using NodaTime;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
@@ -52,7 +54,7 @@ public class MessageParserTests
             {
                 new XmlMessageParser(),
                 new JsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
-                new ProtoMessageParser(new SystemDateTimeProvider()),
+                new B2CJsonMessageParser(new Serializer()),
             });
     }
 
@@ -64,7 +66,14 @@ public class MessageParserTests
             new object[] { DocumentFormat.Xml, CreateBaseXmlMessage("TwoSeriesRequestAggregatedMeasureData.xml") },
             new object[] { DocumentFormat.Json, CreateBaseJsonMessages("RequestAggregatedMeasureData.json") },
             new object[] { DocumentFormat.Json, CreateBaseJsonMessages("RequestAggregatedMeasureData.json", 1) },
-            new object[] { DocumentFormat.Proto, CreateProtoMemoryStream() },
+        };
+    }
+
+    public static IEnumerable<object[]> CreateB2CMessagesWithSingleAndMultipleTransactions()
+    {
+        return new List<object[]>
+        {
+            new object[] { DocumentFormat.Json, CreateProtoMemoryStream() },
         };
     }
 
@@ -82,6 +91,39 @@ public class MessageParserTests
     public async Task Successfully_parsed(DocumentFormat format, Stream message)
     {
         var result = await _marketMessageParser.ParseAsync(message, format, IncomingDocumentType.RequestAggregatedMeasureData, CancellationToken.None);
+        using var assertionScope = new AssertionScope();
+        Assert.True(result.Success);
+        var marketMessage = result!.Dto!;
+        Assert.True(marketMessage != null);
+        Assert.Equal("123564789123564789123564789123564789", marketMessage.MessageId);
+        Assert.Equal("D05", marketMessage.BusinessReason);
+        Assert.Equal("5799999933318", marketMessage.SenderNumber);
+        Assert.Equal("DDK", marketMessage.SenderRoleCode);
+        Assert.Equal("5790001330552", marketMessage.ReceiverNumber);
+        Assert.Equal("DGL", marketMessage.ReceiverRoleCode);
+        //Assert.Equal("2022-12-17T09:30:47Z", marketMessage.CreatedAt);
+        Assert.Equal("23", marketMessage.BusinessType);
+
+        foreach (var serie in result!.Dto!.Series)
+        {
+            Assert.True(serie != null);
+            Assert.Equal("123353185", serie.Id);
+            Assert.Equal("5799999933318", serie.BalanceResponsiblePartyMarketParticipantId);
+            Assert.Equal("5790001330552", serie.EnergySupplierMarketParticipantId);
+            Assert.Equal("E17", serie.MarketEvaluationPointType);
+            Assert.Equal("244", serie.MeteringGridAreaDomainId);
+            Assert.Equal("D01", serie.MarketEvaluationSettlementMethod);
+            Assert.Equal("2022-07-22T22:00:00Z", serie.EndDateAndOrTimeDateTime);
+            Assert.Equal("2022-06-17T22:00:00Z", serie.StartDateAndOrTimeDateTime);
+            Assert.Equal("D01", serie.SettlementSeriesVersion);
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(CreateB2CMessagesWithSingleAndMultipleTransactions))]
+    public async Task Successfully_parsed_b2c_messages(DocumentFormat format, Stream message)
+    {
+        var result = await _marketMessageParser.ParseAsync(message, format, IncomingDocumentType.B2CRequestAggregatedMeasureData, CancellationToken.None);
         using var assertionScope = new AssertionScope();
         Assert.True(result.Success);
         var marketMessage = result!.Dto!;
@@ -177,32 +219,34 @@ public class MessageParserTests
 
     private static MemoryStream CreateProtoMemoryStream()
     {
-        var protostuff = new Edi.Requests.RequestAggregatedMeasureData
-        {
-            MessageId = "123564789123564789123564789123564789",
-            MessageType = "E74",
-            BusinessReason = "D05",
-            SenderRoleCode = "DDK",
-            SenderId = "5799999933318",
-            ReceiverId = "5790001330552",
-            ReceiverRoleCode = "DGL",
-        };
-        protostuff.Series.Add(new Serie
-        {
-            Id = "123353185",
-            SettlementSeriesVersion = "D01",
-            MarketEvaluationPointType = "E17",
-            MeteringGridAreaDomainId = "244",
-            MarketEvaluationSettlementMethod = "D01",
-            EnergySupplierMarketParticipantId = "5790001330552",
-            BalanceResponsiblePartyMarketParticipantId = "5799999933318",
-            StartDateAndOrTimeDateTime = "2022-06-17T22:00:00Z",
-            EndDateAndOrTimeDateTime = "2022-07-22T22:00:00Z",
-        });
-        var bytes = protostuff.ToByteArray();
-        var memoryStream = new MemoryStream();
-        memoryStream.Write(bytes, 0, bytes.Length);
-        memoryStream.Position = 0;
+        var dateTimeZone = DateTimeZoneProviders.Tzdb["Europe/Copenhagen"];
+        var serie = new Serie(
+            "123353185",
+            "E17",
+            "D01",
+            InstantFormatFactory.SetInstantToMidnight("2022-06-17T22:00:00Z", dateTimeZone).ToString(),
+            InstantFormatFactory.SetInstantToMidnight("2022-07-22T22:00:00Z", dateTimeZone).ToString(),
+            "244",
+            "5790001330552",
+            "5799999933318",
+            "D01");
+
+        var request = new RequestAggregatedMeasureDataDto(
+            "5799999933318",
+            "DDK",
+            DataHubDetails.IdentificationNumber.Value,
+            MarketRole.CalculationResponsibleRole.Code,
+            "D05",
+            "E74",
+            "123564789123564789123564789123564789",
+            SystemClock.Instance.GetCurrentInstant().ToString(),
+            BusinessType: "23",
+            new[] { serie });
+
+        var jsonString = new Serializer().Serialize(request);
+        var encoding = Encoding.UTF8;
+        var byteArray = encoding.GetBytes(jsonString);
+        var memoryStream = new MemoryStream(byteArray);
         return memoryStream;
     }
 }

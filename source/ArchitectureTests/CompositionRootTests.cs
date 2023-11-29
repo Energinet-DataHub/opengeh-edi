@@ -20,6 +20,7 @@ using System.Reflection;
 using System.Text;
 using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Xml;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
@@ -27,6 +28,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using MediatR;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Xunit;
@@ -39,7 +41,15 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
 
         public CompositionRootTests()
         {
-            _host = Program.ConfigureHost(Program.DevelopmentTokenValidationParameters(), new TestEnvironment());
+            var testEnvironment = new TestEnvironment();
+            Environment.SetEnvironmentVariable("SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND", TestEnvironment.CreateFakeServiceBusConnectionString());
+            Environment.SetEnvironmentVariable("WHOLESALE_INBOX_MESSAGE_QUEUE_NAME", "FakeQueueName");
+            Environment.SetEnvironmentVariable("INCOMING_MESSAGES_QUEUE_NAME", "FakeQueueName");
+            Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", TestEnvironment.CreateConnectionString());
+            var config = new ConfigurationBuilder()
+                .AddEnvironmentVariables()
+                .Build();
+            _host = Program.ConfigureHost(Program.DevelopmentTokenValidationParameters(), testEnvironment, config);
         }
 
         #region Member data providers
@@ -169,17 +179,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
             public override string? DB_CONNECTION_STRING =>
                 CreateConnectionString();
 
-            public override bool IsRunningLocally()
-            {
-                return true;
-            }
-
-            protected override string? GetEnvironmentVariable(string variable)
-            {
-                return Guid.NewGuid().ToString();
-            }
-
-            private static string CreateFakeServiceBusConnectionString()
+            public static string CreateFakeServiceBusConnectionString()
             {
                 return new StringBuilder()
                     .Append(CultureInfo.InvariantCulture, $"Endpoint=sb://sb-{Guid.NewGuid():N}.servicebus.windows.net/;")
@@ -188,10 +188,20 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
                     .ToString();
             }
 
-            private static string CreateConnectionString()
+            public static string CreateConnectionString()
             {
                 return
                     "Server=(LocalDB)\\\\MSSQLLocalDB;Database=B2BTransactions;User=User;Password=Password;TrustServerCertificate=true;Encrypt=True;Trusted_Connection=True;";
+            }
+
+            public override bool IsRunningLocally()
+            {
+                return true;
+            }
+
+            protected override string? GetEnvironmentVariable(string variable)
+            {
+                return Guid.NewGuid().ToString();
             }
         }
     }

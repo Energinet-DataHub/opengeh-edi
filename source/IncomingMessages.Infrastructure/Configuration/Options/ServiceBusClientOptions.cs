@@ -12,15 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
+namespace IncomingMessages.Infrastructure.Configuration.Options;
 
-/// <summary>
-/// Interface for configurations
-/// </summary>
-public interface IServiceBusClientConfiguration
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1707", Justification = "To match naming in other domains")]
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1056", Justification = "Nuget expects a string")]
+public class ServiceBusClientOptions
 {
-    /// <summary>
-    /// Queue name for service
-    /// </summary>
-    string QueueName { get; }
+    public string INCOMING_MESSAGES_QUEUE_NAME { get; set; } = string.Empty;
 }

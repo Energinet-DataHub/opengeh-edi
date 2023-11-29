@@ -12,11 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text;
 using Energinet.DataHub.Core.App.Common;
-using Energinet.DataHub.EDI.B2CWebApi.Clients;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Common.DateTime;
+using Energinet.DataHub.EDI.Common.Serialization;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NodaTime;
@@ -27,18 +31,24 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 [Route("[controller]")]
 public class RequestAggregatedMeasureDataController : ControllerBase
 {
-    private readonly RequestAggregatedMeasureDataHttpClient _requestAggregatedMeasureDataHttpClient;
     private readonly UserContext<FrontendUser> _userContext;
     private readonly DateTimeZone _dateTimeZone;
+    private readonly IIncomingMessageParser _incomingMessageParser;
+    private readonly ISerializer _serializer;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
     public RequestAggregatedMeasureDataController(
-        RequestAggregatedMeasureDataHttpClient requestAggregatedMeasureDataHttpClient,
         UserContext<FrontendUser> userContext,
-        DateTimeZone dateTimeZone)
+        DateTimeZone dateTimeZone,
+        IIncomingMessageParser incomingMessageParser,
+        ISerializer serializer,
+        ISystemDateTimeProvider systemDateTimeProvider)
     {
-        _requestAggregatedMeasureDataHttpClient = requestAggregatedMeasureDataHttpClient;
         _userContext = userContext;
         _dateTimeZone = dateTimeZone;
+        _incomingMessageParser = incomingMessageParser;
+        _serializer = serializer;
+        _systemDateTimeProvider = systemDateTimeProvider;
     }
 
     [HttpPost]
@@ -46,26 +56,36 @@ public class RequestAggregatedMeasureDataController : ControllerBase
     public async Task<ActionResult> RequestAsync(RequestAggregatedMeasureDataMarketRequest request, CancellationToken cancellationToken)
     {
         var currentUser = _userContext.CurrentUser;
-        var token = GetToken(currentUser);
 
-        var validationMessage = await _requestAggregatedMeasureDataHttpClient.RequestAsync(
-            RequestAggregatedMeasureDataHttpFactory.Create(request, currentUser.ActorNumber, currentUser.Role, _dateTimeZone),
-            token,
-            cancellationToken).ConfigureAwait(false);
+        var message =
+            RequestAggregatedMeasureDataHttpFactory.Create(
+                request,
+                currentUser.ActorNumber,
+                currentUser.Role,
+                _dateTimeZone,
+                _systemDateTimeProvider.Now());
 
-        if (string.IsNullOrWhiteSpace(validationMessage))
-            return Ok();
+        var responseMessage = await _incomingMessageParser.ParseAsync(
+                GenerateStreamFromString(_serializer.Serialize(message)),
+                DocumentFormat.Json,
+                IncomingDocumentType.B2CRequestAggregatedMeasureData,
+                cancellationToken,
+                DocumentFormat.Json)
+            .ConfigureAwait(false);
 
-        return BadRequest(validationMessage);
+        if (responseMessage.IsErrorResponse)
+        {
+            return BadRequest();
+        }
+
+        return Ok(responseMessage.MessageBody);
     }
 
-    private static string GetToken(FrontendUser currentUser)
+    private static Stream GenerateStreamFromString(string jsonString)
     {
-        return TokenBuilder.BuildToken(
-            currentUser.ActorNumber,
-#pragma warning disable CA1308
-            currentUser.Role.ToLowerInvariant(),
-#pragma warning restore CA1308
-            currentUser.Azp);
+        var encoding = Encoding.UTF8;
+        var byteArray = encoding.GetBytes(jsonString);
+        var memoryStream = new MemoryStream(byteArray);
+        return memoryStream;
     }
 }
