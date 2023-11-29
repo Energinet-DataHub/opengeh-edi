@@ -44,6 +44,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
             var testEnvironment = new TestEnvironment();
             Environment.SetEnvironmentVariable("SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND", TestEnvironment.CreateFakeServiceBusConnectionString());
             Environment.SetEnvironmentVariable("WHOLESALE_INBOX_MESSAGE_QUEUE_NAME", "FakeQueueName");
+            Environment.SetEnvironmentVariable("INCOMING_MESSAGES_QUEUE_NAME", "FakeQueueName");
             Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", TestEnvironment.CreateConnectionString());
             var config = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
