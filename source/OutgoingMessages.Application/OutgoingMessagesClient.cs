@@ -43,25 +43,19 @@ public class OutgoingMessagesClient : IOutGoingMessagesClient
     public async Task<DequeueRequestResult> DequeueAndCommitAsync(DequeueRequestDto request)
     {
         var dequeueRequestResult = await _messageDequeuer.DequeueAsync(request).ConfigureAwait(false);
-        _actorMessageQueueContext.SaveChangesAsync().ConfigureAwait(false);
+        await _actorMessageQueueContext.SaveChangesAsync().ConfigureAwait(false);
         return dequeueRequestResult;
     }
 
     public async Task<PeekResult> PeekAndCommitAsync(PeekRequest request, CancellationToken cancellationToken)
     {
         var peekResult = await _messagePeeker.PeekAsync(request, cancellationToken).ConfigureAwait(false);
-        _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return peekResult;
     }
 
     public async Task EnqueueAsync(OutgoingMessageDto outgoingMessage)
     {
         await _messageEnqueuer.EnqueueAsync(outgoingMessage).ConfigureAwait(false);
-    }
-
-    public async Task EnqueueAndCommitAsync(OutgoingMessageDto outgoingMessage)
-    {
-        _actorMessageQueueContext.SaveChangesAsync().ConfigureAwait(false);
-        _messageEnqueuer.EnqueueAsync(outgoingMessage).ConfigureAwait(false);
     }
 }

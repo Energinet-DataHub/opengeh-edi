@@ -33,6 +33,6 @@ public class EnqueueMessageHandler : INotificationHandler<EnqueueMessageEvent>
     public async Task Handle(EnqueueMessageEvent notification, CancellationToken cancellationToken)
     {
         if (notification == null) throw new ArgumentNullException(nameof(notification));
-        await _outGoingMessagesClient.EnqueueAndCommitAsync(notification.OutgoingMessageDto).ConfigureAwait(false);
+        await _outGoingMessagesClient.EnqueueAsync(notification.OutgoingMessageDto).ConfigureAwait(false);
     }
 }

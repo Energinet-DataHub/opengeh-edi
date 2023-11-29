@@ -35,6 +35,7 @@ public class WhenEnqueueingTests : TestBase
     private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IOutGoingMessagesClient _outgoingMessagesClient;
+    private readonly ActorMessageQueueContext _context;
 
     public WhenEnqueueingTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
@@ -42,15 +43,15 @@ public class WhenEnqueueingTests : TestBase
         _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutGoingMessagesClient>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
+        _context = GetService<ActorMessageQueueContext>();
     }
 
     [Fact]
     public async Task Outgoing_message_is_enqueued()
     {
         var message = _outgoingMessageDtoBuilder.Build();
-        await EnqueueMessage(message);
+        await EnqueueAndCommitAsync(message);
 
-        // TODO: (LRN) Ensure we have a ActorQueue with a bundle with the expected OutgoingMessage.
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = "SELECT * FROM [dbo].[OutgoingMessages]";
         var result = await
@@ -71,7 +72,7 @@ public class WhenEnqueueingTests : TestBase
     public async Task Can_peek_message()
     {
         var message = _outgoingMessageDtoBuilder.Build();
-        await EnqueueMessage(message);
+        await EnqueueAndCommitAsync(message);
 
         var result = await _outgoingMessagesClient.PeekAndCommitAsync(
             new PeekRequest(
@@ -88,10 +89,10 @@ public class WhenEnqueueingTests : TestBase
     public async Task Can_peek_oldest_bundle()
     {
         var message = _outgoingMessageDtoBuilder.Build();
-        await EnqueueMessage(message);
+        await EnqueueAndCommitAsync(message);
         ((SystemDateTimeProviderStub)_systemDateTimeProvider).SetNow(_systemDateTimeProvider.Now().PlusSeconds(1));
         var message2 = _outgoingMessageDtoBuilder.Build();
-        await EnqueueMessage(message2);
+        await EnqueueAndCommitAsync(message2);
 
         var result = await _outgoingMessagesClient.PeekAndCommitAsync(new PeekRequest(message.ReceiverId, message.DocumentType.Category, message.ReceiverRole, DocumentFormat.Ebix), CancellationToken.None);
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
@@ -107,7 +108,7 @@ public class WhenEnqueueingTests : TestBase
     public async Task Can_dequeue_bundle()
     {
         var message = _outgoingMessageDtoBuilder.Build();
-        await EnqueueMessage(message);
+        await EnqueueAndCommitAsync(message);
         var peekCommand = new PeekRequest(
             message.ReceiverId,
             MessageCategory.Aggregations,
@@ -124,9 +125,15 @@ public class WhenEnqueueingTests : TestBase
         Assert.True(result.Success);
     }
 
-    private async Task EnqueueMessage(OutgoingMessageDto message)
+    protected override void Dispose(bool disposing)
+    {
+        _context.Dispose();
+        base.Dispose(disposing);
+    }
+
+    private async Task EnqueueAndCommitAsync(OutgoingMessageDto message)
     {
         await _outgoingMessagesClient.EnqueueAsync(message);
-        await GetService<ActorMessageQueueContext>().SaveChangesAsync();
+        await _context.SaveChangesAsync();
     }
 }

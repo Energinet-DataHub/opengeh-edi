@@ -24,27 +24,21 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 public interface IOutGoingMessagesClient
 {
     /// <summary>
-    /// Dequeues a message from the queue
+    /// Dequeues a message from the queue and commit.
     /// </summary>
     /// <param name="request"></param>
     Task<DequeueRequestResult> DequeueAndCommitAsync(DequeueRequestDto request);
 
     /// <summary>
-    ///  Peek a message from the queue
+    ///  Peek a message from the queue and commit.
     /// </summary>
     /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
     Task<PeekResult> PeekAndCommitAsync(PeekRequest request, CancellationToken cancellationToken);
 
     /// <summary>
-    ///  Enqueue a message
+    ///  Enqueue a message, no commit. Currently ONLY used by the Process module which handles the commit itself.
     /// </summary>
     /// <param name="outgoingMessage"></param>
     Task EnqueueAsync(OutgoingMessageDto outgoingMessage);
-
-    /// <summary>
-    ///  Enqueue a message, commit the imdediately
-    /// </summary>
-    /// <param name="outgoingMessage"></param>
-    Task EnqueueAndCommitAsync(OutgoingMessageDto outgoingMessage);
 }
