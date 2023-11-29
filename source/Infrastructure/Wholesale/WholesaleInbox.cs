@@ -34,7 +34,7 @@ public class WholesaleInbox : IWholesaleInbox
         if (serviceBusSenderFactory == null) throw new ArgumentNullException(nameof(serviceBusSenderFactory));
         if (options == null) throw new ArgumentNullException(nameof(options));
 
-        _senderCreator = serviceBusSenderFactory.GetSender(options.Value.INCOMING_MESSAGES_QUEUE_NAME);
+        _senderCreator = serviceBusSenderFactory.GetSender(options.Value.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME);
     }
 
     public async Task SendAsync(

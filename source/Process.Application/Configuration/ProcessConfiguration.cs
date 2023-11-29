@@ -43,8 +43,8 @@ public static class ProcessConfiguration
         services.AddOptions<ServiceBusClientOptions>()
             .Bind(configuration)
             .Validate(
-                o => !string.IsNullOrEmpty(o.INCOMING_MESSAGES_QUEUE_NAME),
-                "INCOMING_MESSAGES_QUEUE_NAME must be set");
+                o => !string.IsNullOrEmpty(o.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME),
+                "WHOLESALE_INBOX_MESSAGE_QUEUE_NAME must be set");
 
         services.AddScopedSqlDbContext<ProcessContext>();
 

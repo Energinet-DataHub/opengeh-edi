@@ -18,5 +18,5 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1056", Justification = "Nuget expects a string")]
 public class ServiceBusClientOptions
 {
-    public string INCOMING_MESSAGES_QUEUE_NAME { get; set; } = string.Empty;
+    public string WHOLESALE_INBOX_MESSAGE_QUEUE_NAME { get; set; } = string.Empty;
 }
