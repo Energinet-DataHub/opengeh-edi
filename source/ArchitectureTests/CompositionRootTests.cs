@@ -20,6 +20,7 @@ using System.Reflection;
 using System.Text;
 using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Xml;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
@@ -43,6 +44,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
             var testEnvironment = new TestEnvironment();
             Environment.SetEnvironmentVariable("SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND", TestEnvironment.CreateFakeServiceBusConnectionString());
             Environment.SetEnvironmentVariable("INCOMING_MESSAGES_QUEUE_NAME", "FakeQueueName");
+            Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", TestEnvironment.CreateConnectionString());
             var config = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
                 .Build();
@@ -185,6 +187,12 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
                     .ToString();
             }
 
+            public static string CreateConnectionString()
+            {
+                return
+                    "Server=(LocalDB)\\\\MSSQLLocalDB;Database=B2BTransactions;User=User;Password=Password;TrustServerCertificate=true;Encrypt=True;Trusted_Connection=True;";
+            }
+
             public override bool IsRunningLocally()
             {
                 return true;
@@ -193,12 +201,6 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
             protected override string? GetEnvironmentVariable(string variable)
             {
                 return Guid.NewGuid().ToString();
-            }
-
-            private static string CreateConnectionString()
-            {
-                return
-                    "Server=(LocalDB)\\\\MSSQLLocalDB;Database=B2BTransactions;User=User;Password=Password;TrustServerCertificate=true;Encrypt=True;Trusted_Connection=True;";
             }
         }
     }

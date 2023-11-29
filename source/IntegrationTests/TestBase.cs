@@ -153,12 +153,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests
         private void BuildServices()
         {
             Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
+            Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", DatabaseFixture.ConnectionString);
+            Environment.SetEnvironmentVariable("WHOLESALE_INBOX_MESSAGE_QUEUE_NAME", "Fake");
+            Environment.SetEnvironmentVariable("INCOMING_MESSAGES_QUEUE_NAME", "Fake");
+
             var config = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
                 .Build();
             _services = new ServiceCollection();
-
-            _services.AddSingleton(new WholesaleServiceBusClientConfiguration("Fake"));
 
             _services.AddTransient<InboxEventsProcessor>();
             _services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>>(_ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy);
@@ -178,7 +180,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             CompositionRoot.Initialize(_services, DatabaseFixture.ConnectionString)
                 .AddRemoteBusinessService<DummyRequest, DummyReply>(
                     sp => new RemoteBusinessServiceRequestSenderSpy<DummyRequest>("Dummy"), "Dummy")
-                .AddDatabaseConnectionFactory(DatabaseFixture.ConnectionString)
                 .AddDatabaseContext(DatabaseFixture.ConnectionString)
                 .AddSystemClock(new SystemDateTimeProviderStub())
                 .AddCorrelationContext(_ =>
@@ -190,20 +191,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 .AddMessagePublishing();
 
             ActorMessageQueueConfiguration.Configure(_services);
-            ProcessConfiguration.Configure(_services);
 
+            _services.AddProcessModule(config);
             _services.AddArchivedMessagesModule(config);
             _services.AddIncomingMessagesModule(config);
 
             // Replace the services with stub implementations.
             // - Building blocks
             _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
-
-            // - Archived Messages Module
-            _services.AddSingleton<IDatabaseConnectionFactory, SqlDatabaseConnectionFactory>(_ => new SqlDatabaseConnectionFactory(DatabaseFixture.ConnectionString));
-
-            // - Incoming Messages Module
-            _services.AddSingleton(_ => new IncomingMessagesServiceBusClientConfiguration("Fake"));
 
             _serviceProvider = _services.BuildServiceProvider();
         }

@@ -16,6 +16,8 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.Process.Interfaces;
+using Microsoft.Extensions.Options;
+using ServiceBusClientOptions = IncomingMessages.Infrastructure.Configuration.Options.ServiceBusClientOptions;
 
 namespace IncomingMessages.Infrastructure;
 
@@ -26,14 +28,14 @@ public class IncomingRequestAggregatedMeasuredDataSender
 
     public IncomingRequestAggregatedMeasuredDataSender(
         IServiceBusSenderFactory serviceBusSenderFactory,
-        IncomingMessagesServiceBusClientConfiguration incomingMessagesServiceBusClientConfiguration,
+        IOptions<ServiceBusClientOptions> options,
         ISerializer serializer)
     {
         if (serviceBusSenderFactory == null) throw new ArgumentNullException(nameof(serviceBusSenderFactory));
-        if (incomingMessagesServiceBusClientConfiguration == null) throw new ArgumentNullException(nameof(incomingMessagesServiceBusClientConfiguration));
+        if (options == null) throw new ArgumentNullException(nameof(options));
         _serializer = serializer;
 
-        _senderCreator = serviceBusSenderFactory.GetSender(incomingMessagesServiceBusClientConfiguration.QueueName);
+        _senderCreator = serviceBusSenderFactory.GetSender(options.Value.INCOMING_MESSAGES_QUEUE_NAME);
     }
 
     public async Task SendAsync(

@@ -99,9 +99,6 @@ namespace Energinet.DataHub.EDI.Api
                 {
                     var databaseConnectionString = runtime.DB_CONNECTION_STRING;
 
-                    services.AddSingleton(new WholesaleServiceBusClientConfiguration(
-                        runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!));
-
                     services.AddApplicationInsights();
                     services.ConfigureFunctionsApplicationInsights();
 
@@ -124,7 +121,6 @@ namespace Energinet.DataHub.EDI.Api
                     CompositionRoot.Initialize(services, databaseConnectionString!)
                         .AddRemoteBusinessService<DummyRequest, DummyReply>("Dummy", "Dummy")
                         .AddBearerAuthentication(tokenValidationParameters)
-                        .AddDatabaseConnectionFactory(databaseConnectionString!)
                         .AddSystemClock(new SystemDateTimeProvider())
                         .AddDatabaseContext(databaseConnectionString!)
                         .AddCorrelationContext(_ =>
@@ -159,7 +155,7 @@ namespace Energinet.DataHub.EDI.Api
                     services.AddArchivedMessagesModule(configuration);
                     services.AddIncomingMessagesModule(configuration);
                     ActorMessageQueueConfiguration.Configure(services);
-                    ProcessConfiguration.Configure(services);
+                    services.AddProcessModule(configuration);
                 })
                 .ConfigureLogging(logging =>
                 {

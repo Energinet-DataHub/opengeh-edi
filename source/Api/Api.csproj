@@ -61,7 +61,6 @@ limitations under the License.
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
           <CopyToPublishDirectory>Always</CopyToPublishDirectory>
         </None>
-        <None Remove="test.settings.json" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\ArchivedMessages.Application\ArchivedMessages.Application.csproj" />

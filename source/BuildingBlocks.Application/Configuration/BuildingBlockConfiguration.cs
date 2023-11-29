@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,8 +31,14 @@ public static class BuildingBlockConfiguration
             .AddOptions<ServiceBusClientOptions>()
             .Bind(configuration)
             .Validate(o => !string.IsNullOrEmpty(o.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND), "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND must be set");
+        services
+            .AddOptions<SqlDatabaseConnectionOptions>()
+            .Bind(configuration)
+            .Validate(o => !string.IsNullOrEmpty(o.DB_CONNECTION_STRING), "DB_CONNECTION_STRING must be set");
 
         services.AddSingleton<ServiceBusClient>(provider => new ServiceBusClient(provider.GetRequiredService<IOptions<ServiceBusClientOptions>>().Value.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND));
+
+        services.AddSingleton<IDatabaseConnectionFactory, SqlDatabaseConnectionFactory>();
         services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactory>();
     }
 }

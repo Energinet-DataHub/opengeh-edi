@@ -93,13 +93,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddDatabaseConnectionFactory(string connectionString)
-        {
-            if (connectionString == null) throw new ArgumentNullException(nameof(connectionString));
-            _services.AddSingleton<IDatabaseConnectionFactory>(_ => new SqlDatabaseConnectionFactory(connectionString));
-            return this;
-        }
-
         public CompositionRoot AddCorrelationContext(Func<IServiceProvider, ICorrelationContext> action)
         {
             _services.AddScoped(action);

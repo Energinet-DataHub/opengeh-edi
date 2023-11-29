@@ -14,10 +14,10 @@
 
 using BuildingBlocks.Application.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
-using Energinet.DataHub.EDI.IncomingMessages.Application.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using IncomingMessages.Infrastructure;
 using IncomingMessages.Infrastructure.Configuration.DataAccess;
+using IncomingMessages.Infrastructure.Configuration.Options;
 using IncomingMessages.Infrastructure.DocumentValidation;
 using IncomingMessages.Infrastructure.DocumentValidation.CimXml;
 using IncomingMessages.Infrastructure.Messages;
@@ -58,7 +58,6 @@ public static class IncomingMessagesConfiguration
         services.AddSingleton<IResponseFactory, JsonResponseFactory>();
         services.AddSingleton<IResponseFactory, XmlResponseFactory>();
         services.AddSingleton<ResponseFactory>();
-        services.AddSingleton(provider => new IncomingMessagesServiceBusClientConfiguration(provider.GetRequiredService<IOptions<ServiceBusClientOptions>>().Value.INCOMING_MESSAGES_QUEUE_NAME));
 
         //RegisterSchemaProviders
         services.AddSingleton<CimJsonSchemas>();

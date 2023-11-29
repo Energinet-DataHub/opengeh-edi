@@ -27,17 +27,25 @@ using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.Processing;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
 using MediatR;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.Process.Application.Configuration;
 
 public static class ProcessConfiguration
 {
-    public static void Configure(IServiceCollection services)
+    public static void AddProcessModule(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddOptions<ServiceBusClientOptions>()
+            .Bind(configuration)
+            .Validate(
+                o => !string.IsNullOrEmpty(o.INCOMING_MESSAGES_QUEUE_NAME),
+                "INCOMING_MESSAGES_QUEUE_NAME must be set");
+
         services.AddScopedSqlDbContext<ProcessContext>();
 
         //EventsConfiguration
