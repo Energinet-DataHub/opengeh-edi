@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;

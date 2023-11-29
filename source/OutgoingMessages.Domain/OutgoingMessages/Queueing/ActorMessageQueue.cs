@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Common;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;

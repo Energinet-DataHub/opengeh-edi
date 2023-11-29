@@ -12,13 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using System;
+using System.IO;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 
-public record PeekRequest(
-    ActorNumber ActorNumber,
-    MessageCategory MessageCategory,
-    MarketRole ActorRole,
-    DocumentFormat DocumentFormat);
+public record PeekResult(Stream? Bundle, Guid? MessageId = default);
