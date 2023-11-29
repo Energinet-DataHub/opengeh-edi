@@ -79,7 +79,6 @@ public class WhenADequeueIsRequestedTests : TestBase
             CancellationToken.None);
 
         var dequeueResult = await _outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(peekResult.MessageId.GetValueOrDefault().ToString(), MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)), CancellationToken.None);
-        await GetService<ActorMessageQueueContext>().SaveChangesAsync();
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var found = await connection
             .QuerySingleOrDefaultAsync<bool>("SELECT IsDequeued FROM [dbo].Bundles");

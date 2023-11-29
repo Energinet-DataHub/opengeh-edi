@@ -109,12 +109,12 @@ public class WhenEnqueueingTests : TestBase
     {
         var message = _outgoingMessageDtoBuilder.Build();
         await EnqueueAndCommitAsync(message);
-        var peekCommand = new PeekRequestDto(
+        var peekRequestDto = new PeekRequestDto(
             message.ReceiverId,
             MessageCategory.Aggregations,
             message.ReceiverRole,
             DocumentFormat.Xml);
-        var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(peekCommand, CancellationToken.None);
+        var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(peekRequestDto, CancellationToken.None);
         var dequeueCommand = new DequeueRequestDto(
             peekResult.MessageId!.Value.ToString(),
             message.ReceiverRole,
