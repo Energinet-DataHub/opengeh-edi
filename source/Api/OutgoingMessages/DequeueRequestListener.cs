@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -38,13 +40,16 @@ public class DequeueRequestListener
         [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "dequeue/{messageId}"),]
         HttpRequestData request,
         FunctionContext executionContext,
-        string messageId)
+        string messageId,
+        CancellationToken hostCancellationToken)
     {
+        var cancellationToken = request.GetCancellationToken(hostCancellationToken);
         var result = await _outGoingMessagesClient.DequeueAndCommitAsync(
             new DequeueRequestDto(
                 messageId,
                 _authenticatedActor.CurrentActorIdentity.MarketRole!,
-                _authenticatedActor.CurrentActorIdentity.ActorNumber!)).ConfigureAwait(false);
+                _authenticatedActor.CurrentActorIdentity.ActorNumber),
+            cancellationToken).ConfigureAwait(false);
 
         return result.Success
             ? request.CreateResponse(HttpStatusCode.OK)

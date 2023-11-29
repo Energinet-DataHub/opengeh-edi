@@ -199,7 +199,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 })
                 .AddMessagePublishing();
 
-            ActorMessageQueueConfiguration.Configure(_services);
+            OutgoingMessagesConfiguration.Configure(_services);
             ProcessConfiguration.Configure(_services);
             ArchivedMessageConfiguration.Configure(_services, DatabaseFixture.ConnectionString);
             IncomingMessagesConfiguration.Configure(_services);

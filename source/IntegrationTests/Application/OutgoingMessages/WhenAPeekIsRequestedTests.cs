@@ -129,9 +129,9 @@ public class WhenAPeekIsRequestedTests : TestBase
         return numberOfBundles == 1;
     }
 
-    private Task<PeekResult> PeekMessage(MessageCategory category)
+    private Task<PeekResultDto> PeekMessage(MessageCategory category)
     {
-        return _outgoingMessagesClient.PeekAndCommitAsync(new PeekRequest(ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, MarketRole.EnergySupplier, DocumentFormat.Xml), CancellationToken.None);
+        return _outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, MarketRole.EnergySupplier, DocumentFormat.Xml), CancellationToken.None);
     }
 
     private async Task AssertMessageIsArchived(Guid? messageId)

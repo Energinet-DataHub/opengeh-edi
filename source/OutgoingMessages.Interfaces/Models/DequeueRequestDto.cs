@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public record DequeCommandResult(bool Success);
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+
+public record DequeueRequestDto(string MessageId, MarketRole MarketRole, ActorNumber ActorNumber) : ICommand<DequeueRequestResultDto>;

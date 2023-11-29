@@ -25,13 +25,13 @@ public class OutgoingMessagesClient : IOutGoingMessagesClient
 {
     private readonly MessagePeeker _messagePeeker;
     private readonly MessageDequeuer _messageDequeuer;
-    private readonly IMessageEnqueuer _messageEnqueuer;
+    private readonly MessageEnqueuer _messageEnqueuer;
     private readonly ActorMessageQueueContext _actorMessageQueueContext;
 
     public OutgoingMessagesClient(
         MessagePeeker messagePeeker,
         MessageDequeuer messageDequeuer,
-        IMessageEnqueuer messageEnqueuer,
+        MessageEnqueuer messageEnqueuer,
         ActorMessageQueueContext actorMessageQueueContext)
     {
         _messagePeeker = messagePeeker;
@@ -40,14 +40,19 @@ public class OutgoingMessagesClient : IOutGoingMessagesClient
         _actorMessageQueueContext = actorMessageQueueContext;
     }
 
-    public async Task<DequeueRequestResult> DequeueAndCommitAsync(DequeueRequestDto request)
+    public async Task<DequeueRequestResultDto> DequeueAndCommitAsync(DequeueRequestDto request, CancellationToken cancellationToken)
     {
-        var dequeueRequestResult = await _messageDequeuer.DequeueAsync(request).ConfigureAwait(false);
-        await _actorMessageQueueContext.SaveChangesAsync().ConfigureAwait(false);
+        var dequeueRequestResult = await _messageDequeuer.DequeueAsync(request, cancellationToken).ConfigureAwait(false);
+        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return dequeueRequestResult;
     }
 
-    public async Task<PeekResult> PeekAndCommitAsync(PeekRequest request, CancellationToken cancellationToken)
+    public Task<DequeueRequestResultDto> DequeueAndCommitAsync(DequeueRequestDto request)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public async Task<PeekResultDto> PeekAndCommitAsync(PeekRequestDto request, CancellationToken cancellationToken)
     {
         var peekResult = await _messagePeeker.PeekAsync(request, cancellationToken).ConfigureAwait(false);
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

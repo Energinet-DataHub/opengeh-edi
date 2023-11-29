@@ -27,14 +27,15 @@ public interface IOutGoingMessagesClient
     /// Dequeues a message from the queue and commit.
     /// </summary>
     /// <param name="request"></param>
-    Task<DequeueRequestResult> DequeueAndCommitAsync(DequeueRequestDto request);
+    /// <param name="cancellationToken"></param>
+    Task<DequeueRequestResultDto> DequeueAndCommitAsync(DequeueRequestDto request, CancellationToken cancellationToken);
 
     /// <summary>
     ///  Peek a message from the queue and commit.
     /// </summary>
     /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
-    Task<PeekResult> PeekAndCommitAsync(PeekRequest request, CancellationToken cancellationToken);
+    Task<PeekResultDto> PeekAndCommitAsync(PeekRequestDto request, CancellationToken cancellationToken);
 
     /// <summary>
     ///  Enqueue a message, no commit. Currently ONLY used by the Process module which handles the commit itself.

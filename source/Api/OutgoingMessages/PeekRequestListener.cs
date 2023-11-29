@@ -75,7 +75,7 @@ public class PeekRequestListener
         }
 
         var peekResult = await _outGoingMessagesClient.PeekAndCommitAsync(
-            new PeekRequest(
+            new PeekRequestDto(
             _authenticatedActor.CurrentActorIdentity.ActorNumber,
             msgCategory,
             _authenticatedActor.CurrentActorIdentity.MarketRole!,

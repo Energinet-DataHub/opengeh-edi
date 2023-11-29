@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.IO;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-
-public record PeekResult(Stream? Bundle, Guid? MessageId = default);
+public record DequeueRequestResultDto(bool Success);
