@@ -186,6 +186,7 @@ namespace Energinet.DataHub.EDI.Api
         private static void ConfigureAuthenticationMiddleware(IFunctionsWorkerApplicationBuilder worker)
         {
             worker.UseMiddleware<BearerAuthenticationMiddleware>();
+            worker.UseMiddleware<CertificateAuthenticationMiddleware>();
             worker.UseMiddleware<MarketActorAuthenticatorMiddleware>();
         }
 
