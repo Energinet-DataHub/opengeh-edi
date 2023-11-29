@@ -25,7 +25,9 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAc
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using PeekResult = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.PeekResult;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.Configuration;
 
@@ -46,18 +48,16 @@ public static class ActorMessageQueueConfiguration
         services.AddScoped<IMessageRecordParser, MessageRecordParser>();
 
         //MessageEnqueueingConfiguration
-        services.AddTransient<IMessageEnqueuer, MessageEnqueuer>();
+        services.AddTransient<IEnqueueMessage, EnqueueMessage>();
         services.AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>();
 
         //PeekConfiguration
         services.AddScoped<IActorMessageQueueRepository, ActorMessageQueueRepository>();
         services.AddScoped<IMarketDocumentRepository, MarketDocumentRepository>();
-        services.AddTransient<MessagePeeker>();
+        services.AddTransient<IRequestHandler<PeekCommand, PeekResult>, PeekHandler>();
 
         //DequeConfiguration
-        services.AddTransient<MessageDequeuer>();
+        services.AddTransient<IRequestHandler<DequeueCommand, DequeCommandResult>, DequeueHandler>();
         services.AddTransient<IDataRetention, DequeuedBundlesRetention>();
-
-        services.AddTransient<IOutGoingMessagesClient, OutgoingMessagesClient>();
     }
 }

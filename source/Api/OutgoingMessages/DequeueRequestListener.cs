@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 
@@ -24,12 +25,12 @@ namespace Energinet.DataHub.EDI.Api.OutgoingMessages;
 
 public class DequeueRequestListener
 {
-    private readonly IOutGoingMessagesClient _outGoingMessagesClient;
+    private readonly IMediator _mediator;
     private readonly AuthenticatedActor _authenticatedActor;
 
-    public DequeueRequestListener(IOutGoingMessagesClient outGoingMessagesClient, AuthenticatedActor authenticatedActor)
+    public DequeueRequestListener(IMediator mediator, AuthenticatedActor authenticatedActor)
     {
-        _outGoingMessagesClient = outGoingMessagesClient;
+        _mediator = mediator;
         _authenticatedActor = authenticatedActor;
     }
 
@@ -40,12 +41,7 @@ public class DequeueRequestListener
         FunctionContext executionContext,
         string messageId)
     {
-        var result = await _outGoingMessagesClient.DequeueAsync(
-            new DequeueRequestDto(
-                messageId,
-                _authenticatedActor.CurrentActorIdentity.MarketRole!,
-                _authenticatedActor.CurrentActorIdentity.ActorNumber!)).ConfigureAwait(false);
-
+        var result = await _mediator.Send(new DequeueCommand(messageId, _authenticatedActor.CurrentActorIdentity.MarketRole!, _authenticatedActor.CurrentActorIdentity.ActorNumber!)).ConfigureAwait(false);
         return result.Success
             ? request.CreateResponse(HttpStatusCode.OK)
             : request.CreateResponse(HttpStatusCode.BadRequest);
