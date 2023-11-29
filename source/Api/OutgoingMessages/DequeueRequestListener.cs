@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-using MediatR;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 
@@ -25,12 +26,12 @@ namespace Energinet.DataHub.EDI.Api.OutgoingMessages;
 
 public class DequeueRequestListener
 {
-    private readonly IMediator _mediator;
+    private readonly IOutGoingMessagesClient _outGoingMessagesClient;
     private readonly AuthenticatedActor _authenticatedActor;
 
-    public DequeueRequestListener(IMediator mediator, AuthenticatedActor authenticatedActor)
+    public DequeueRequestListener(IOutGoingMessagesClient outGoingMessagesClient, AuthenticatedActor authenticatedActor)
     {
-        _mediator = mediator;
+        _outGoingMessagesClient = outGoingMessagesClient;
         _authenticatedActor = authenticatedActor;
     }
 
@@ -39,9 +40,17 @@ public class DequeueRequestListener
         [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "dequeue/{messageId}"),]
         HttpRequestData request,
         FunctionContext executionContext,
-        string messageId)
+        string messageId,
+        CancellationToken hostCancellationToken)
     {
-        var result = await _mediator.Send(new DequeueCommand(messageId, _authenticatedActor.CurrentActorIdentity.MarketRole!, _authenticatedActor.CurrentActorIdentity.ActorNumber!)).ConfigureAwait(false);
+        var cancellationToken = request.GetCancellationToken(hostCancellationToken);
+        var result = await _outGoingMessagesClient.DequeueAndCommitAsync(
+            new DequeueRequestDto(
+                messageId,
+                _authenticatedActor.CurrentActorIdentity.MarketRole!,
+                _authenticatedActor.CurrentActorIdentity.ActorNumber),
+            cancellationToken).ConfigureAwait(false);
+
         return result.Success
             ? request.CreateResponse(HttpStatusCode.OK)
             : request.CreateResponse(HttpStatusCode.BadRequest);
