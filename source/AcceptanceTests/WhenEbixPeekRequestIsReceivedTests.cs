@@ -35,7 +35,7 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : TestRunner
             new EbixDriver(new Uri(ApiManagementUri, "/ebix")));
     }
 
-    [Fact]
+    [Fact(Skip = "Missing certificate handling implementation")]
     public async Task Actor_can_peek_calculation_result_in_ebix_format()
     {
         var token = await _ebix.LoginAsActor(AzureEntraClientId, AzureEntraClientSecret);
