@@ -29,7 +29,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.Configuration;
 
-public static class OutgoingMessagesConfiguration
+public static class ActorMessageQueueConfiguration
 {
     public static void Configure(IServiceCollection services)
     {

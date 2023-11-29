@@ -153,7 +153,7 @@ namespace Energinet.DataHub.EDI.Api
                     };
                     services.AddSubscriber<IntegrationEventHandler>(integrationEventDescriptors);
 
-                    OutgoingMessagesConfiguration.Configure(services);
+                    ActorMessageQueueConfiguration.Configure(services);
                     ProcessConfiguration.Configure(services);
                     IncomingMessagesConfiguration.Configure(services);
                 })
