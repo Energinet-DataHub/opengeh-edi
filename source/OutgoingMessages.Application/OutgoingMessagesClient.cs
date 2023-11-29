@@ -47,11 +47,6 @@ public class OutgoingMessagesClient : IOutGoingMessagesClient
         return dequeueRequestResult;
     }
 
-    public Task<DequeueRequestResultDto> DequeueAndCommitAsync(DequeueRequestDto request)
-    {
-        throw new System.NotImplementedException();
-    }
-
     public async Task<PeekResultDto> PeekAndCommitAsync(PeekRequestDto request, CancellationToken cancellationToken)
     {
         var peekResult = await _messagePeeker.PeekAsync(request, cancellationToken).ConfigureAwait(false);
