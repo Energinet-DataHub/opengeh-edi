@@ -15,6 +15,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
@@ -24,18 +25,18 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 
 public class ForwardAggregationResultHandler : IRequestHandler<ForwardAggregationResult, Unit>
 {
-    private readonly IMediator _mediator;
+    private readonly IOutGoingMessagesClient _outGoingMessagesClient;
 
-    public ForwardAggregationResultHandler(IMediator mediator)
+    public ForwardAggregationResultHandler(IOutGoingMessagesClient outGoingMessagesClient)
     {
-        _mediator = mediator;
+        _outGoingMessagesClient = outGoingMessagesClient;
     }
 
     public async Task<Unit> Handle(ForwardAggregationResult request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
         var message = AggregationResultMessageFactory.CreateMessage(request.Result, ProcessId.New());
-        await _mediator.Publish(new EnqueueMessageEvent(message), cancellationToken).ConfigureAwait(false);
+        await _outGoingMessagesClient.EnqueueAsync(message).ConfigureAwait(false);
         return await Unit.Task.ConfigureAwait(false);
     }
 }
