@@ -29,7 +29,8 @@ public class ArchivedMessageGetDocumentController : ControllerBase
     }
 
     [HttpPost]
-    [ProducesResponseType(typeof(Stream), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [Produces("text/plain")]
     public async Task<ActionResult> RequestAsync(string id, CancellationToken cancellationToken)
     {
         if (id == null) throw new ArgumentNullException(nameof(id));

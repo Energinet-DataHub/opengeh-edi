@@ -48,6 +48,7 @@ limitations under the License.
 
     <ItemGroup>
       <ProjectReference Include="..\Api\Api.csproj" />
+      <ProjectReference Include="..\IntegrationTests\IntegrationTests.csproj" />
       <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj" />
     </ItemGroup>
 

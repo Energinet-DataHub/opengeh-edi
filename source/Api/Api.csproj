@@ -63,6 +63,7 @@ limitations under the License.
         </None>
     </ItemGroup>
     <ItemGroup>
+      <ProjectReference Include="..\ArchivedMessages.Application\ArchivedMessages.Application.csproj" />
       <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Application\OutgoingMessages.Application.csproj" />
       <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />

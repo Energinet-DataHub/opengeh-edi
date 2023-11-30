@@ -12,16 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 
-namespace IncomingMessages.Infrastructure;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-public class IncomingMessagesServiceBusClientConfiguration : IServiceBusClientConfiguration
-{
-    public IncomingMessagesServiceBusClientConfiguration(string queueName)
-    {
-        QueueName = queueName;
-    }
-
-    public string QueueName { get; }
-}
+public record DequeueRequestDto(string MessageId, MarketRole MarketRole, ActorNumber ActorNumber);

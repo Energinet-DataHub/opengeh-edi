@@ -12,16 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Wholesale;
-
-public class WholesaleServiceBusClientConfiguration : IServiceBusClientConfiguration
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1707", Justification = "To match naming in other domains")]
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1056", Justification = "Nuget expects a string")]
+public class SqlDatabaseConnectionOptions
 {
-    public WholesaleServiceBusClientConfiguration(string queueName)
-    {
-        QueueName = queueName;
-    }
-
-    public string QueueName { get; }
+    public string DB_CONNECTION_STRING { get; set; } = string.Empty;
 }

@@ -25,20 +25,20 @@ using Energinet.DataHub.EDI.Api.Configuration.Middleware;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.Application.Actors;
+using Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Configuration;
 using Energinet.DataHub.EDI.Process.Application.Configuration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.Reflection;
-using IncomingMessages.Infrastructure;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -54,7 +54,11 @@ namespace Energinet.DataHub.EDI.Api
         {
             var runtime = RuntimeEnvironment.Default;
             var tokenValidationParameters = await GetTokenValidationParametersAsync(runtime).ConfigureAwait(false);
-            var host = ConfigureHost(tokenValidationParameters, runtime);
+            var config = new ConfigurationBuilder()
+                .AddEnvironmentVariables()
+                .Build();
+
+            var host = ConfigureHost(tokenValidationParameters, runtime, config);
 
             await host.RunAsync().ConfigureAwait(false);
         }
@@ -74,7 +78,8 @@ namespace Energinet.DataHub.EDI.Api
 
         public static IHost ConfigureHost(
             TokenValidationParameters tokenValidationParameters,
-            RuntimeEnvironment runtime)
+            RuntimeEnvironment runtime,
+            IConfiguration configuration)
         {
             return new HostBuilder()
                 .ConfigureFunctionsWorkerDefaults(
@@ -92,11 +97,6 @@ namespace Energinet.DataHub.EDI.Api
                 .ConfigureServices(services =>
                 {
                     var databaseConnectionString = runtime.DB_CONNECTION_STRING;
-
-                    services.AddSingleton(new WholesaleServiceBusClientConfiguration(
-                        runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!));
-                    services.AddSingleton(new IncomingMessagesServiceBusClientConfiguration(
-                        runtime.INCOMING_MESSAGES_QUEUE_NAME!));
 
                     services.AddApplicationInsights();
                     services.ConfigureFunctionsApplicationInsights();
@@ -118,10 +118,8 @@ namespace Energinet.DataHub.EDI.Api
                     });
 
                     CompositionRoot.Initialize(services, databaseConnectionString!)
-                        .AddMessageBus(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!)
                         .AddRemoteBusinessService<DummyRequest, DummyReply>("Dummy", "Dummy")
                         .AddBearerAuthentication(tokenValidationParameters)
-                        .AddDatabaseConnectionFactory(databaseConnectionString!)
                         .AddSystemClock(new SystemDateTimeProvider())
                         .AddDatabaseContext(databaseConnectionString!)
                         .AddCorrelationContext(_ =>
@@ -154,9 +152,10 @@ namespace Energinet.DataHub.EDI.Api
                     };
                     services.AddSubscriber<IntegrationEventHandler>(integrationEventDescriptors);
 
+                    services.AddArchivedMessagesModule(configuration);
+                    services.AddIncomingMessagesModule(configuration);
                     ActorMessageQueueConfiguration.Configure(services);
-                    ProcessConfiguration.Configure(services);
-                    IncomingMessagesConfiguration.Configure(services);
+                    services.AddProcessModule(configuration);
                 })
                 .ConfigureLogging(logging =>
                 {

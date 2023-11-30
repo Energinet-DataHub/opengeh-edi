@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-
-public record PeekCommand(ActorNumber ActorNumber, MessageCategory MessageCategory, MarketRole ActorRole, DocumentFormat DocumentFormat) : ICommand<PeekResult>;
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1707", Justification = "To match naming in other domains")]
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1056", Justification = "Nuget expects a string")]
+public class ServiceBusClientOptions
+{
+    public string WHOLESALE_INBOX_MESSAGE_QUEUE_NAME { get; set; } = string.Empty;
+}

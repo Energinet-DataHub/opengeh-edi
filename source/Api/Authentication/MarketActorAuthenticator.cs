@@ -40,15 +40,6 @@ namespace Energinet.DataHub.EDI.Api.Authentication
         {
             if (claimsPrincipal == null) throw new ArgumentNullException(nameof(claimsPrincipal));
 
-            var token = GetClaimValueFrom(claimsPrincipal, "token");
-
-            // TODO: Temporarly hack for authorizing users originating from portal. Remove when JWT is updated
-            if (UserOriginatesFromPortal(token))
-            {
-                _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.Owned));
-                return true;
-            }
-
             var rolesFromClaims = GetClaimValuesFrom(claimsPrincipal, ClaimTypes.Role);
             var role = ParseRole(rolesFromClaims);
 
@@ -70,11 +61,6 @@ namespace Energinet.DataHub.EDI.Api.Authentication
 
             _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, marketRole: marketRole));
             return true;
-        }
-
-        private static bool UserOriginatesFromPortal(string? token)
-        {
-            return token != null;
         }
 
         private static string? GetClaimValueFrom(ClaimsPrincipal claimsPrincipal, string claimName)

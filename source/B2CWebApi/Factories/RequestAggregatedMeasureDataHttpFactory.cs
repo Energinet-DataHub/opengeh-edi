@@ -13,71 +13,58 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.B2CWebApi.Models;
-using Energinet.DataHub.Edi.Requests;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+using Energinet.DataHub.EDI.Process.Interfaces;
 using NodaTime;
+using MarketRole = Energinet.DataHub.EDI.B2CWebApi.Models.MarketRole;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Factories;
 
 public static class RequestAggregatedMeasureDataHttpFactory
 {
-    public static RequestAggregatedMeasureData Create(
+    public static RequestAggregatedMeasureDataDto Create(
         RequestAggregatedMeasureDataMarketRequest request,
-        string actorNumber,
-        string role,
-        DateTimeZone dateTimeZone)
+        string senderNumber,
+        string senderRole,
+        DateTimeZone dateTimeZone,
+        Instant now)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
 
-        var senderRoleCode = MapRoleNameToCode(role);
-        var data = new RequestAggregatedMeasureData
-        {
-            MessageId = Guid.NewGuid().ToString(),
-            SenderId = actorNumber,
-            SenderRoleCode = senderRoleCode,
-            ReceiverId = "5790001330552",
-            ReceiverRoleCode = MarketRole.CalculationResponsibleRole.Code,
-            AuthenticatedUser = actorNumber,
-            AuthenticatedUserRoleCode = senderRoleCode,
-            BusinessReason = MapToBusinessReasonCode(request.ProcessType),
-            MessageType = "E74",
-        };
+        var senderRoleCode = MapRoleNameToCode(senderRole);
 
-        var serie = new Serie
-        {
-            Id = Guid.NewGuid().ToString(),
-            StartDateAndOrTimeDateTime = InstantFormatFactory.SetInstantToMidnight(request.StartDate, dateTimeZone).ToString(),
-            EndDateAndOrTimeDateTime = InstantFormatFactory.SetInstantToMidnight(request.EndDate, dateTimeZone, Duration.FromMilliseconds(1)).ToString(),
-        };
+        var serie = new Serie(
+            Guid.NewGuid().ToString(),
+            MapEvaluationPointType(request),
+            MapSettlementMethod(request),
+            InstantFormatFactory.SetInstantToMidnight(request.StartDate, dateTimeZone).ToString(),
+            string.IsNullOrWhiteSpace(request.EndDate) ? null : InstantFormatFactory.SetInstantToMidnight(request.EndDate, dateTimeZone, Duration.FromMilliseconds(1)).ToString(),
+            request.GridArea,
+            request.EnergySupplierId,
+            request.BalanceResponsibleId,
+            SetSettlementSeriesVersion(request.ProcessType));
 
-        if (request.GridArea != null)
-        {
-            serie.MeteringGridAreaDomainId = request.GridArea;
-        }
-
-        if (request.EnergySupplierId != null)
-        {
-            serie.EnergySupplierMarketParticipantId = request.EnergySupplierId;
-        }
-
-        if (request.BalanceResponsibleId != null)
-        {
-            serie.BalanceResponsiblePartyMarketParticipantId = request.BalanceResponsibleId;
-        }
-
-        if (request.ProcessType == ProcessType.FirstCorrection || request.ProcessType == ProcessType.SecondCorrection || request.ProcessType == ProcessType.ThirdCorrection)
-        {
-            serie.SettlementSeriesVersion = SetSettlementSeriesVersion(request.ProcessType);
-        }
-
-        MapEvaluationPointTypeAndSettlementMethod(serie, request);
-
-        data.Series.Add(serie);
-
-        return data;
+        return new RequestAggregatedMeasureDataDto(
+            senderNumber,
+            senderRoleCode,
+            DataHubDetails.IdentificationNumber.Value,
+            MarketRole.CalculationResponsibleRole.Code,
+            MapToBusinessReasonCode(request.ProcessType),
+            "E74",
+            Guid.NewGuid().ToString(),
+            now.ToString(),
+            BusinessType: "23",
+            new[] { serie });
     }
 
-    private static string SetSettlementSeriesVersion(ProcessType processType)
+    private static string? SetSettlementSeriesVersion(ProcessType processType)
     {
+        if (processType != ProcessType.FirstCorrection && processType != ProcessType.SecondCorrection &&
+            processType != ProcessType.ThirdCorrection)
+        {
+            return null;
+        }
+
         if (processType == ProcessType.FirstCorrection)
         {
             return "D01";
@@ -88,12 +75,7 @@ public static class RequestAggregatedMeasureDataHttpFactory
             return "D02";
         }
 
-        if (processType == ProcessType.ThirdCorrection)
-        {
-            return "D03";
-        }
-
-        throw new ArgumentOutOfRangeException(nameof(processType), processType, "Unknown ProcessType for setting SettlementSeriesVersion");
+        return "D03";
     }
 
     private static string MapToBusinessReasonCode(ProcessType requestProcessType)
@@ -110,28 +92,34 @@ public static class RequestAggregatedMeasureDataHttpFactory
         };
     }
 
-    private static void MapEvaluationPointTypeAndSettlementMethod(Serie serie, RequestAggregatedMeasureDataMarketRequest request)
+    private static string? MapEvaluationPointType(RequestAggregatedMeasureDataMarketRequest request)
     {
         switch (request.MeteringPointType)
         {
             case MeteringPointType.Production:
-                serie.MarketEvaluationPointType = "E18";
-                break;
+                return "E18";
             case MeteringPointType.FlexConsumption:
-                serie.MarketEvaluationPointType = "E17";
-                serie.MarketEvaluationSettlementMethod = "D01";
-                break;
             case MeteringPointType.TotalConsumption:
-                serie.MarketEvaluationPointType = "E17";
-                break;
             case MeteringPointType.NonProfiledConsumption:
-                serie.MarketEvaluationPointType = "E17";
-                serie.MarketEvaluationSettlementMethod = "E02";
-                break;
+                return "E17";
             case MeteringPointType.Exchange:
-                serie.MarketEvaluationPointType = "E20";
-                break;
+                return "E20";
         }
+
+        return null;
+    }
+
+    private static string? MapSettlementMethod(RequestAggregatedMeasureDataMarketRequest request)
+    {
+        switch (request.MeteringPointType)
+        {
+            case MeteringPointType.FlexConsumption:
+                return "D01";
+            case MeteringPointType.NonProfiledConsumption:
+                return "E02";
+        }
+
+        return null;
     }
 
     private static string MapRoleNameToCode(string roleName)
