@@ -88,6 +88,12 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware
             return functionContext.InstanceServices.GetRequiredService<T>();
         }
 
+        internal static IEnumerable<T> GetServices<T>(this FunctionContext functionContext)
+            where T : notnull
+        {
+            return functionContext.InstanceServices.GetServices<T>();
+        }
+
         /// <summary>
         /// Parses correlation id from service bus message
         /// </summary>

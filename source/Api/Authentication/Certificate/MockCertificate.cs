@@ -13,15 +13,22 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
-using System.Net.Http.Headers;
+using System.Security.Cryptography.X509Certificates;
 
-namespace Energinet.DataHub.EDI.Api.Common;
+namespace Energinet.DataHub.EDI.Api.Authentication.Certificate;
 
-internal static class HttpHeadersExtensions
+public class MockCertificate : X509Certificate2
 {
-    internal static string GetContentType(this HttpHeaders headers)
+    private readonly string _thumbprint;
+
+    public MockCertificate(string thumbprint)
+        : base(Array.Empty<byte>())
     {
-        return headers.GetValues("Content-Type").FirstOrDefault() ?? throw new InvalidOperationException("No Content-Type found in request headers");
+        _thumbprint = thumbprint;
+    }
+
+    public override string GetCertHashString()
+    {
+        return _thumbprint;
     }
 }

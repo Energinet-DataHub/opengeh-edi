@@ -40,39 +40,41 @@ namespace Energinet.DataHub.EDI.Api.Authentication
         {
             if (claimsPrincipal == null) throw new ArgumentNullException(nameof(claimsPrincipal));
 
+            var token = GetClaimValueFrom(claimsPrincipal, "token");
+
             // TODO: Temporarly hack for authorizing users originating from portal. Remove when JWT is updated
-            if (UserOriginatesFromPortal(claimsPrincipal))
+            if (UserOriginatesFromPortal(token))
             {
                 _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.Owned));
                 return true;
             }
 
-            var userIdFromSts = GetClaimValueFrom(claimsPrincipal, ClaimsMap.UserId);
-            if (string.IsNullOrWhiteSpace(userIdFromSts))
-            {
-                return false;
-            }
+            var rolesFromClaims = GetClaimValuesFrom(claimsPrincipal, ClaimTypes.Role);
+            var role = ParseRole(rolesFromClaims);
 
-            var actorNumber = await _actorRepository.GetActorNumberByExternalIdAsync(userIdFromSts, cancellationToken).ConfigureAwait(false);
-            if (actorNumber is null)
-            {
-                return false;
-            }
+            var userIdFromAzp = GetClaimValueFrom(claimsPrincipal, ClaimsMap.UserId);
+            var actorNumber = !string.IsNullOrEmpty(userIdFromAzp)
+                ? await _actorRepository.GetActorNumberByExternalIdAsync(userIdFromAzp, cancellationToken).ConfigureAwait(false)
+                : null;
 
-            var marketRole = ParseRole(claimsPrincipal);
+            return Authenticate(actorNumber, role);
+        }
+
+        public bool Authenticate(ActorNumber? actorNumber, MarketRole? marketRole)
+        {
             if (marketRole is null)
-            {
                 return false;
-            }
+
+            if (actorNumber is null)
+                return false;
 
             _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, marketRole: marketRole));
             return true;
         }
 
-        // TODO: Temporarly hack for authorizing users originating from portal. Remove when JWT is updated
-        private static bool UserOriginatesFromPortal(ClaimsPrincipal claimsPrincipal)
+        private static bool UserOriginatesFromPortal(string? token)
         {
-            return claimsPrincipal.FindFirst(claim => claim.Type.Equals("token", StringComparison.OrdinalIgnoreCase)) is not null;
+            return token != null;
         }
 
         private static string? GetClaimValueFrom(ClaimsPrincipal claimsPrincipal, string claimName)
@@ -81,19 +83,21 @@ namespace Energinet.DataHub.EDI.Api.Authentication
                 .Value;
         }
 
-        private static MarketRole? ParseRole(ClaimsPrincipal claimsPrincipal)
+        private static IEnumerable<string> GetClaimValuesFrom(ClaimsPrincipal claimsPrincipal, string claimName)
         {
-            var roleClaims = claimsPrincipal.FindAll(claim =>
-                    claim.Type.Equals(ClaimTypes.Role, StringComparison.OrdinalIgnoreCase))
-                .Select(claim => claim.Value)
-                .ToList();
+            return claimsPrincipal.FindAll(claim => claim.Type.Equals(claimName, StringComparison.OrdinalIgnoreCase))
+                .Select(claim => claim.Value);
+        }
 
-            if (!roleClaims.Any() || roleClaims.Count > 1)
+        private static MarketRole? ParseRole(IEnumerable<string> roles)
+        {
+            var roleList = roles.ToList();
+            if (!roleList.Any() || roleList.Count > 1)
             {
                 return null;
             }
 
-            return ClaimsMap.RoleFrom(roleClaims.First());
+            return ClaimsMap.RoleFrom(roleList.Single());
         }
     }
 }

@@ -13,8 +13,10 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Authentication;
+using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
@@ -37,9 +39,8 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (next == null) throw new ArgumentNullException(nameof(next));
-            var marketActorAuthenticator = context.GetService<IMarketActorAuthenticator>();
             var authenticatedActor = context.GetService<AuthenticatedActor>();
-            var currentClaimsPrincipal = context.GetService<CurrentClaimsPrincipal>();
+            var authenticationMethods = context.GetServices<IAuthenticationMethod>();
 
             if (!context.IsRequestFromUser())
             {
@@ -48,25 +49,15 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication
                 return;
             }
 
-            var httpRequestData = context.GetHttpRequestData();
-            if (httpRequestData == null)
-            {
-                _logger.LogTrace("No HTTP request data was available, skipping authentication");
-                await next(context).ConfigureAwait(false);
-                return;
-            }
+            var httpRequestData = context.GetHttpRequestData() ?? throw new ArgumentException("No HTTP request data was available, even though the function was triggered by HTTP");
 
-            if (currentClaimsPrincipal.ClaimsPrincipal is null)
-            {
-                _logger.LogError("Current claims principal is null, responding with 401 Unauthorized");
-                context.RespondWithUnauthorized(httpRequestData);
-                return;
-            }
+            var authenticationMethod = authenticationMethods.Single(a => a.ShouldHandle(httpRequestData));
 
-            var authenticated = await marketActorAuthenticator.AuthenticateAsync(currentClaimsPrincipal.ClaimsPrincipal!, context.CancellationToken).ConfigureAwait(false);
+            var authenticated = await authenticationMethod.AuthenticateAsync(httpRequestData, context.CancellationToken).ConfigureAwait(false);
+
             if (!authenticated)
             {
-                _logger.LogError("Could not authenticate market actor identity. This is due to the current claims identity does hold the required claims.");
+                _logger.LogError("Could not authenticate market actor identity. This is due to the http request data does not hold the required claims or the required certificate.");
                 context.RespondWithUnauthorized(httpRequestData);
                 return;
             }

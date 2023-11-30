@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.Api.Authentication;
+using Energinet.DataHub.EDI.Api.Authentication.Certificate;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
@@ -149,6 +150,7 @@ namespace Energinet.DataHub.EDI.Api
                         CalculationResultCompleted.Descriptor,
                         ActorActivated.Descriptor,
                         GridAreaOwnershipAssigned.Descriptor,
+                        ActorCertificateCredentialsAssigned.Descriptor,
                     };
                     services.AddSubscriber<IntegrationEventHandler>(integrationEventDescriptors);
 
@@ -173,6 +175,15 @@ namespace Energinet.DataHub.EDI.Api
 
         public static void AddAuthentication(this IServiceCollection services, Func<IServiceProvider, IMarketActorAuthenticator>? authenticatorBuilder = null)
         {
+            #if DEBUG
+            services.AddTransient<IClientCertificateRetriever, MockClientCertificateRetriever>();
+            #else
+            services.AddTransient<IClientCertificateRetriever, HeaderClientCertificateRetriever>();
+            #endif
+
+            services.AddTransient<IAuthenticationMethod, BearerTokenAuthenticationMethod>();
+            services.AddTransient<IAuthenticationMethod, CertificateAuthenticationMethod>();
+
             if (authenticatorBuilder is null)
             {
                 services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
@@ -185,8 +196,6 @@ namespace Energinet.DataHub.EDI.Api
 
         private static void ConfigureAuthenticationMiddleware(IFunctionsWorkerApplicationBuilder worker)
         {
-            worker.UseMiddleware<BearerAuthenticationMiddleware>();
-            worker.UseMiddleware<CertificateAuthenticationMiddleware>();
             worker.UseMiddleware<MarketActorAuthenticatorMiddleware>();
         }
 

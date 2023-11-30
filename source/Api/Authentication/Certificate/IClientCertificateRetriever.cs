@@ -12,16 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
-using System.Net.Http.Headers;
+using System.Security.Cryptography.X509Certificates;
+using Microsoft.Azure.Functions.Worker.Http;
 
-namespace Energinet.DataHub.EDI.Api.Common;
+namespace Energinet.DataHub.EDI.Api.Authentication.Certificate;
 
-internal static class HttpHeadersExtensions
+/// <summary>
+/// Service for retrieving the client certificate from http request data
+/// </summary>
+public interface IClientCertificateRetriever
 {
-    internal static string GetContentType(this HttpHeaders headers)
-    {
-        return headers.GetValues("Content-Type").FirstOrDefault() ?? throw new InvalidOperationException("No Content-Type found in request headers");
-    }
+    /// <summary>
+    /// Retrieves the client certificate from http request data, which is typically added to the request headers by API Management
+    /// </summary>
+    X509Certificate2? GetCertificate(HttpRequestData httpRequestData);
 }

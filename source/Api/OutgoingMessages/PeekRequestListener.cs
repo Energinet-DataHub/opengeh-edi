@@ -54,12 +54,12 @@ public class PeekRequestListener
             Route = "peek/{messageCategory}")]
         HttpRequestData request,
         FunctionContext executionContext,
-        string messageCategory)
+        string? messageCategory)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         var contentType = request.Headers.GetContentType();
-        var desiredDocumentFormat = CimFormatParser.ParseFromContentTypeHeaderValue(contentType);
+        var desiredDocumentFormat = DocumentFormatParser.ParseFromContentTypeHeaderValue(contentType);
         if (desiredDocumentFormat is null)
         {
             _logger.LogInformation(
@@ -67,16 +67,13 @@ public class PeekRequestListener
             return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
         }
 
-        var msgCategory = MessageCategory.None;
-
-        if (desiredDocumentFormat != DocumentFormat.Ebix)
-        {
-            msgCategory = EnumerationType.FromName<MessageCategory>(messageCategory);
-        }
+        var parsedMessageCategory = messageCategory != null && desiredDocumentFormat != DocumentFormat.Ebix
+            ? EnumerationType.FromName<MessageCategory>(messageCategory)
+            : MessageCategory.None;
 
         var peekResult = await _mediator.Send(new PeekCommand(
             _authenticatedActor.CurrentActorIdentity.ActorNumber,
-            msgCategory,
+            parsedMessageCategory,
             _authenticatedActor.CurrentActorIdentity.MarketRole!,
             desiredDocumentFormat)).ConfigureAwait(false);
 

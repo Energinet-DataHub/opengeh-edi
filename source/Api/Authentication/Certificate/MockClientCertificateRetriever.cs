@@ -12,19 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Security.Claims;
+using System;
+using System.Security.Cryptography.X509Certificates;
+using Energinet.DataHub.EDI.Api.Configuration;
+using Microsoft.Azure.Functions.Worker.Http;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication
+namespace Energinet.DataHub.EDI.Api.Authentication.Certificate;
+
+public class MockClientCertificateRetriever : IClientCertificateRetriever
 {
-    public class CurrentClaimsPrincipal
+    public X509Certificate2? GetCertificate(HttpRequestData httpRequestData)
     {
-        private ClaimsPrincipal? _currentUser;
+        ArgumentNullException.ThrowIfNull(httpRequestData);
 
-        public ClaimsPrincipal? ClaimsPrincipal => _currentUser;
+        var certificate = new MockCertificate("12345");
 
-        public void SetCurrentUser(ClaimsPrincipal currentUser)
-        {
-            _currentUser = currentUser;
-        }
+        return certificate;
     }
 }
