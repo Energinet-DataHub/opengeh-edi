@@ -12,21 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text.Json.Serialization;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
-using MediatR;
+// ReSharper disable once CheckNamespace -- Protobuf is generated in another namespace
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
-
-public class ForwardAggregationResult : ICommand<Unit>
+public partial class ActorActivated
 {
-    public ForwardAggregationResult(Aggregation result)
-    {
-        Result = result;
-    }
-
-    public Aggregation Result { get; }
+    public const string EventName = "ActorActivated";
+    public const int CurrentMinorVersion = 1;
 }

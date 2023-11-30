@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
+using MediatR;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
@@ -27,10 +28,10 @@ public class TestIntegrationEventMapper : IIntegrationEventMapper
 
     public int MappedCount { get; private set; }
 
-    public Task<InternalCommand> MapToCommandAsync(IntegrationEvent integrationEvent)
+    public Task<ICommand<Unit>> MapToCommandAsync(IntegrationEvent integrationEvent)
     {
         MappedCount++;
 
-        return Task.FromResult<InternalCommand>(new TestCommand());
+        return Task.FromResult<ICommand<Unit>>(new TestCommand());
     }
 }

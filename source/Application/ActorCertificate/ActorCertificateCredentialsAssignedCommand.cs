@@ -12,21 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text.Json.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using MediatR;
+using NodaTime;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Application.ActorCertificate;
 
-public class ForwardAggregationResult : ICommand<Unit>
-{
-    public ForwardAggregationResult(Aggregation result)
-    {
-        Result = result;
-    }
-
-    public Aggregation Result { get; }
-}
+public record ActorCertificateCredentialsAssignedCommand(ActorNumber ActorNumber, MarketRole ActorRole, string Thumbprint, Instant ValidFrom, int SequenceNumber) : ICommand<Unit>;

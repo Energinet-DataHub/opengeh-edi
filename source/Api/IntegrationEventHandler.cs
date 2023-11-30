@@ -58,8 +58,8 @@ public class IntegrationEventHandler : IIntegrationEventHandler
             return;
         }
 
-        var internalCommand = await integrationEventMapper!.MapToCommandAsync(integrationEvent).ConfigureAwait(false);
+        var command = await integrationEventMapper!.MapToCommandAsync(integrationEvent).ConfigureAwait(false);
 
-        await _mediator.Send(internalCommand).ConfigureAwait(false);
+        await _mediator.Send(command).ConfigureAwait(false);
     }
 }
