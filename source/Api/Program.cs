@@ -55,7 +55,6 @@ namespace Energinet.DataHub.EDI.Api
             var runtime = RuntimeEnvironment.Default;
             var tokenValidationParameters = await GetTokenValidationParametersAsync(runtime).ConfigureAwait(false);
             var config = new ConfigurationBuilder()
-                .AddJsonFile("local.settings.json")
                 .AddEnvironmentVariables()
                 .Build();
 
