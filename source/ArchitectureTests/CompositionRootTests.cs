@@ -65,7 +65,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
         public static IEnumerable<object[]> GetRequestHandlerRequirements()
             => ResolveTypes(
                 typeof(IRequestHandler<,>),
-                new[] { typeof(InitializeAggregatedMeasureDataProcessesHandler).Assembly, typeof(PeekHandler).Assembly });
+                new[] { typeof(InitializeAggregatedMeasureDataProcessesHandler).Assembly, typeof(MessagePeeker).Assembly });
 
         public static IEnumerable<object[]> GetNotificationsHandlerRequirements()
             => ResolveTypes(
