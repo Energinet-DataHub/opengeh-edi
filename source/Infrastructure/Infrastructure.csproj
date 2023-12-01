@@ -36,7 +36,7 @@ limitations under the License.
     <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="4.1.0" />
     <PackageReference Include="MediatR" Version="12.1.1" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.6.3" />
+    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
     <PackageReference Include="NodaTime.Serialization.Protobuf" Version="2.0.0" />
     <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.0.0" />
