@@ -21,7 +21,7 @@ namespace Energinet.DataHub.EDI.Api.Authentication.Certificate;
 
 public class HeaderClientCertificateRetriever : IClientCertificateRetriever
 {
-    private const string CertificateHeaderName = "ClientCert";
+    public const string CertificateHeaderName = "ClientCert";
 
     public X509Certificate2? GetCertificate(HttpRequestData httpRequestData)
     {
@@ -34,7 +34,7 @@ public class HeaderClientCertificateRetriever : IClientCertificateRetriever
             return null;
         }
 
-        var certificate = new X509Certificate2(Convert.FromBase64String(certificates.Single()));
+        var certificate = new X509Certificate2(Convert.FromHexString(certificates.Single()));
 
         return certificate;
     }

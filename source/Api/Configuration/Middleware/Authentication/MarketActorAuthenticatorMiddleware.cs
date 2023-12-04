@@ -47,9 +47,7 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication
                 return;
             }
 
-            var t2 = await context.GetHttpRequestDataAsync().ConfigureAwait(false);
-
-            var httpRequestData = context.GetHttpRequestData() ?? throw new ArgumentException("No HTTP request data was available, even though the function was triggered by HTTP");
+            var httpRequestData = await context.GetHttpRequestDataAsync().ConfigureAwait(false) ?? throw new ArgumentException("No HTTP request data was available, even though the function was triggered by HTTP");
 
             var authenticationMethod = authenticationMethods.Single(a => a.ShouldHandle(httpRequestData));
 
