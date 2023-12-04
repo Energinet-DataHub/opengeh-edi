@@ -23,16 +23,16 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasu
 
 public class EnqueueMessageHandler : INotificationHandler<EnqueueMessageEvent>
 {
-    private readonly IOutGoingMessagesClient _outGoingMessagesClient;
+    private readonly IOutgoingMessagesClient _outgoingMessagesClient;
 
-    public EnqueueMessageHandler(IOutGoingMessagesClient outGoingMessagesClient)
+    public EnqueueMessageHandler(IOutgoingMessagesClient outgoingMessagesClient)
     {
-        _outGoingMessagesClient = outGoingMessagesClient;
+        _outgoingMessagesClient = outgoingMessagesClient;
     }
 
     public async Task Handle(EnqueueMessageEvent notification, CancellationToken cancellationToken)
     {
         if (notification == null) throw new ArgumentNullException(nameof(notification));
-        await _outGoingMessagesClient.EnqueueAsync(notification.OutgoingMessageDto).ConfigureAwait(false);
+        await _outgoingMessagesClient.EnqueueAsync(notification.OutgoingMessageDto).ConfigureAwait(false);
     }
 }
