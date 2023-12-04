@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.Application.ActorCertificate;
+namespace Energinet.DataHub.EDI.Domain.ActorCertificates;
 
 /// <summary>
 /// Repository for looking up actor certificates
@@ -27,12 +26,12 @@ public interface IActorCertificateRepository
     /// Create or update actor certificate from ActorCertificateCredentialsAssigned integration event
     /// </summary>
     /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-    Task CreateOrUpdateAsync(ActorNumber actorNumber, MarketRole role, string thumbprint, Instant validFrom, int sequenceNumber);
+    Task CreateOrUpdateAsync(ActorNumber actorNumber, MarketRole role, CertificateThumbprint thumbprint, Instant validFrom, int sequenceNumber);
 
     /// <summary>
     /// Get actor certificate from thumbprint
     /// </summary>
     /// <param name="thumbprint"></param>
     /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
-    Task<Domain.ActorCertificate?> GetFromThumbprintAsync(string thumbprint);
+    Task<ActorCertificates.ActorCertificate?> GetFromThumbprintAsync(CertificateThumbprint thumbprint);
 }

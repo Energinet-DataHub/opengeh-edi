@@ -16,6 +16,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.ActorCertificate;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.ActorCertificates;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
@@ -31,7 +32,7 @@ public class ActorCertificateRepository : IActorCertificateRepository
         _dbContext = dbContext;
     }
 
-    public async Task CreateOrUpdateAsync(ActorNumber actorNumber, MarketRole role, string thumbprint, Instant validFrom, int sequenceNumber)
+    public async Task CreateOrUpdateAsync(ActorNumber actorNumber, MarketRole role, CertificateThumbprint thumbprint, Instant validFrom, int sequenceNumber)
     {
         var existingActorCertificate = await _dbContext.ActorCertificates
             .Where(ac => ac.ActorNumber == actorNumber && ac.ActorRole == role)
@@ -39,7 +40,7 @@ public class ActorCertificateRepository : IActorCertificateRepository
 
         if (existingActorCertificate == null)
         {
-            var newActorCertificate = new Domain.ActorCertificate(actorNumber, role, thumbprint, validFrom, sequenceNumber);
+            var newActorCertificate = new Domain.ActorCertificates.ActorCertificate(actorNumber, role, thumbprint, validFrom, sequenceNumber);
             _dbContext.ActorCertificates.Add(newActorCertificate);
         }
         else if (existingActorCertificate.SequenceNumber < sequenceNumber)
@@ -48,7 +49,7 @@ public class ActorCertificateRepository : IActorCertificateRepository
         }
     }
 
-    public Task<Domain.ActorCertificate?> GetFromThumbprintAsync(string thumbprint)
+    public Task<Domain.ActorCertificates.ActorCertificate?> GetFromThumbprintAsync(CertificateThumbprint thumbprint)
     {
         return _dbContext.ActorCertificates
             .Where(ac => ac.Thumbprint == thumbprint)

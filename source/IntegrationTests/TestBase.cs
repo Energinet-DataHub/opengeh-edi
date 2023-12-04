@@ -50,6 +50,7 @@ using IncomingMessages.Infrastructure.Configuration.DataAccess;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests
@@ -62,7 +63,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
         private readonly ProcessContext _processContext;
         private readonly IncomingMessagesContext _incomingMessagesContext;
         private ServiceCollection? _services;
-        private IServiceProvider _serviceProvider = default!;
         private bool _disposed;
 
         protected TestBase(DatabaseFixture databaseFixture)
@@ -80,6 +80,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None));
         }
 
+        protected IServiceProvider ServiceProvider { get; private set; } = null!;
+
         protected TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
 
         protected TestNotificationHandlerSpy InboxEventNotificationHandler { get; }
@@ -93,7 +95,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
         public T GetService<T>()
             where T : notnull
         {
-            return _serviceProvider!.GetRequiredService<T>();
+            return ServiceProvider!.GetRequiredService<T>();
         }
 
         protected virtual void Dispose(bool disposing)
@@ -107,7 +109,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             _processContext.Dispose();
             _incomingMessagesContext.Dispose();
             _serviceBusSenderFactoryStub.Dispose();
-            ((ServiceProvider)_serviceProvider!).Dispose();
+            ((ServiceProvider)ServiceProvider!).Dispose();
             _disposed = true;
         }
 
@@ -188,7 +190,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                     correlation.SetId(Guid.NewGuid().ToString());
                     return correlation;
                 })
-                .AddMessagePublishing();
+                .AddMessagePublishing()
+                .AddBearerAuthentication(new TokenValidationParameters());
 
             ActorMessageQueueConfiguration.Configure(_services);
 
@@ -200,7 +203,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             // - Building blocks
             _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
 
-            _serviceProvider = _services.BuildServiceProvider();
+            ServiceProvider = _services.BuildServiceProvider();
         }
     }
 }

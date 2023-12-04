@@ -15,13 +15,13 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.Domain;
+namespace Energinet.DataHub.EDI.Domain.ActorCertificates;
 
 public class ActorCertificate
 {
     private readonly Guid _id;
 
-    public ActorCertificate(ActorNumber actorNumber, MarketRole actorRole, string thumbprint, Instant validFrom, int sequenceNumber)
+    public ActorCertificate(ActorNumber actorNumber, MarketRole actorRole, CertificateThumbprint thumbprint, Instant validFrom, int sequenceNumber)
     {
         _id = Guid.NewGuid();
         ActorNumber = actorNumber;
@@ -40,13 +40,13 @@ public class ActorCertificate
 
     public MarketRole ActorRole { get; }
 
-    public string Thumbprint { get; private set; }
+    public CertificateThumbprint Thumbprint { get; private set; }
 
     public Instant ValidFrom { get; private set; }
 
     public int SequenceNumber { get; private set; }
 
-    public void Update(string thumbprint, Instant validFrom, int sequenceNumber)
+    public void Update(CertificateThumbprint thumbprint, Instant validFrom, int sequenceNumber)
     {
         if (sequenceNumber <= SequenceNumber)
             throw new ArgumentException("Sequence number must be greater than current sequence number", nameof(sequenceNumber));

@@ -18,6 +18,7 @@ using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.Application.ActorCertificate;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Domain.ActorCertificates;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using MediatR;
 using NodaTime.Serialization.Protobuf;
@@ -39,7 +40,7 @@ public class ActorCertificateCredentialsAssignedMapper : IIntegrationEventMapper
             new ActorCertificateCredentialsAssignedCommand(
                 ActorNumber.Create(message.ActorNumber),
                 GetMarketRole(message.ActorRole),
-                message.CertificateThumbprint,
+                new CertificateThumbprint(message.CertificateThumbprint),
                 message.ValidFrom.ToInstant(),
                 message.SequenceNumber));
     }

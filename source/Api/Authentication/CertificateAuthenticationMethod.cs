@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Authentication.Certificate;
 using Energinet.DataHub.EDI.Api.Common;
-using Energinet.DataHub.EDI.Application.ActorCertificate;
+using Energinet.DataHub.EDI.Domain.ActorCertificates;
 using Microsoft.Azure.Functions.Worker.Http;
 
 namespace Energinet.DataHub.EDI.Api.Authentication;
@@ -49,7 +49,7 @@ public class CertificateAuthenticationMethod : IAuthenticationMethod
         if (certificate == null)
             return false;
 
-        var actorCertificate = await _actorCertificateRepository.GetFromThumbprintAsync(certificate.Thumbprint).ConfigureAwait(false);
+        var actorCertificate = await _actorCertificateRepository.GetFromThumbprintAsync(new CertificateThumbprint(certificate.Thumbprint)).ConfigureAwait(false);
 
         if (actorCertificate == null)
             return false;

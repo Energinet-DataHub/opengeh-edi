@@ -27,6 +27,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.Serialization;
+using Energinet.DataHub.EDI.Domain.ActorCertificates;
 using Energinet.DataHub.EDI.Infrastructure.ActorCertificate;
 using Energinet.DataHub.EDI.Infrastructure.Actors;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
@@ -176,6 +177,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
         private void AddActorCertificateServices()
         {
             _services.AddTransient<IActorCertificateRepository, ActorCertificateRepository>();
+            _services.AddTransient<IRequestHandler<ActorCertificateCredentialsAssignedCommand, Unit>, ActorCertificateCredentialsAssignedCommandHandler>();
         }
 
         private void AddWholeSaleInBox()

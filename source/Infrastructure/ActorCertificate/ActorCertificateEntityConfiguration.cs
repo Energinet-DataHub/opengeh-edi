@@ -14,14 +14,15 @@
 
 using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+using Energinet.DataHub.EDI.Domain.ActorCertificates;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energinet.DataHub.EDI.Infrastructure.ActorCertificate;
 
-public class ActorCertificateEntityConfiguration : IEntityTypeConfiguration<Domain.ActorCertificate>
+public class ActorCertificateEntityConfiguration : IEntityTypeConfiguration<Domain.ActorCertificates.ActorCertificate>
 {
-    public void Configure(EntityTypeBuilder<Domain.ActorCertificate> builder)
+    public void Configure(EntityTypeBuilder<Domain.ActorCertificates.ActorCertificate> builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
@@ -32,7 +33,8 @@ public class ActorCertificateEntityConfiguration : IEntityTypeConfiguration<Doma
             .HasConversion(actorNumber => actorNumber.Value, dbValue => ActorNumber.Create(dbValue));
         builder.Property(receiver => receiver.ActorRole)
             .HasConversion(actorRole => actorRole.Code, dbValue => MarketRole.FromCode(dbValue));
-        builder.Property(entity => entity.Thumbprint);
+        builder.Property(entity => entity.Thumbprint)
+            .HasConversion(thumbprint => thumbprint.Thumbprint, dbValue => new CertificateThumbprint(dbValue));
         builder.Property(entity => entity.ValidFrom);
         builder.Property(entity => entity.SequenceNumber);
     }

@@ -16,10 +16,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Authentication;
-using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.Common.Serialization;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
@@ -48,6 +46,8 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication
                 await next(context).ConfigureAwait(false);
                 return;
             }
+
+            var t2 = await context.GetHttpRequestDataAsync().ConfigureAwait(false);
 
             var httpRequestData = context.GetHttpRequestData() ?? throw new ArgumentException("No HTTP request data was available, even though the function was triggered by HTTP");
 

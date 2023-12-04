@@ -15,6 +15,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Domain.ActorCertificates;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Application.ActorCertificate;

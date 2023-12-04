@@ -41,7 +41,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 
         public DbSet<GridAreaOwner> GridAreaOwners { get; private set; }
 
-        public DbSet<Domain.ActorCertificate> ActorCertificates { get; private set; }
+        public DbSet<Domain.ActorCertificates.ActorCertificate> ActorCertificates { get; private set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
