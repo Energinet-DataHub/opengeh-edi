@@ -174,11 +174,7 @@ namespace Energinet.DataHub.EDI.Api
 
         public static void AddAuthentication(this IServiceCollection services, Func<IServiceProvider, IMarketActorAuthenticator>? authenticatorBuilder = null)
         {
-            #if DEBUG
-            services.AddTransient<IClientCertificateRetriever, MockClientCertificateRetriever>();
-            #else
             services.AddTransient<IClientCertificateRetriever, HeaderClientCertificateRetriever>();
-            #endif
 
             services.AddTransient<IAuthenticationMethod, BearerTokenAuthenticationMethod>();
             services.AddTransient<IAuthenticationMethod, CertificateAuthenticationMethod>();
