@@ -19,9 +19,9 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 
 /// <summary>
-///   Contract for dequeuing messages
+/// Client for for interacting with outgoing messages.
 /// </summary>
-public interface IOutGoingMessagesClient
+public interface IOutgoingMessagesClient
 {
     /// <summary>
     /// Dequeues a message from the queue and commit.
