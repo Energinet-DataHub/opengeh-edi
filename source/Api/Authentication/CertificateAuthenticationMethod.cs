@@ -39,7 +39,7 @@ public class CertificateAuthenticationMethod : IAuthenticationMethod
     {
         ArgumentNullException.ThrowIfNull(httpRequestData);
 
-        var contentType = httpRequestData.Headers.GetContentType();
+        var contentType = httpRequestData.Headers.TryGetContentType();
         return contentType == "application/ebix";
     }
 

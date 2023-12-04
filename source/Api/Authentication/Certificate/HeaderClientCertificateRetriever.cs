@@ -14,14 +14,22 @@
 
 using System;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.Api.Authentication.Certificate;
 
 public class HeaderClientCertificateRetriever : IClientCertificateRetriever
 {
     public const string CertificateHeaderName = "ClientCert";
+    private readonly ILogger<HeaderClientCertificateRetriever> _logger;
+
+    public HeaderClientCertificateRetriever(ILogger<HeaderClientCertificateRetriever> logger)
+    {
+        _logger = logger;
+    }
 
     public X509Certificate2? GetCertificate(HttpRequestData httpRequestData)
     {
@@ -34,7 +42,17 @@ public class HeaderClientCertificateRetriever : IClientCertificateRetriever
             return null;
         }
 
-        var certificate = new X509Certificate2(Convert.FromHexString(certificates.Single()));
+        X509Certificate2? certificate;
+
+        try
+        {
+            certificate = new X509Certificate2(Convert.FromHexString(certificates.Single()));
+        }
+        catch (CryptographicException e)
+        {
+            _logger.LogWarning(e, "Error creating certificate from header");
+            certificate = null;
+        }
 
         return certificate;
     }
