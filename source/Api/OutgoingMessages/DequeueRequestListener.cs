@@ -26,12 +26,12 @@ namespace Energinet.DataHub.EDI.Api.OutgoingMessages;
 
 public class DequeueRequestListener
 {
-    private readonly IOutGoingMessagesClient _outGoingMessagesClient;
+    private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly AuthenticatedActor _authenticatedActor;
 
-    public DequeueRequestListener(IOutGoingMessagesClient outGoingMessagesClient, AuthenticatedActor authenticatedActor)
+    public DequeueRequestListener(IOutgoingMessagesClient outgoingMessagesClient, AuthenticatedActor authenticatedActor)
     {
-        _outGoingMessagesClient = outGoingMessagesClient;
+        _outgoingMessagesClient = outgoingMessagesClient;
         _authenticatedActor = authenticatedActor;
     }
 
@@ -44,7 +44,7 @@ public class DequeueRequestListener
         CancellationToken hostCancellationToken)
     {
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);
-        var result = await _outGoingMessagesClient.DequeueAndCommitAsync(
+        var result = await _outgoingMessagesClient.DequeueAndCommitAsync(
             new DequeueRequestDto(
                 messageId,
                 _authenticatedActor.CurrentActorIdentity.MarketRole!,
