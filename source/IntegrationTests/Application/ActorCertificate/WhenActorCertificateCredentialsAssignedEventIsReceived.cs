@@ -106,30 +106,35 @@ public class WhenActorCertificateCredentialsAssignedEventIsReceived : TestBase
             .SetActorNumber("1111111111111")
             .SetActorRole(EicFunction.EnergySupplier)
             .SetSequenceNumber(1)
+            .SetCertificateThumbprint("1")
             .Build();
 
         var integrationEventForActorRole2 = new ActorCertificateCredentialsAssignedEventBuilder()
             .SetActorNumber("1111111111111")
             .SetActorRole(EicFunction.BalanceResponsibleParty)
             .SetSequenceNumber(1)
+            .SetCertificateThumbprint("2")
             .Build();
 
         var integrationEventForActorRole2b = new ActorCertificateCredentialsAssignedEventBuilder()
             .SetActorNumber("1111111111111")
             .SetActorRole(EicFunction.BalanceResponsibleParty)
             .SetSequenceNumber(2)
+            .SetCertificateThumbprint("2b")
             .Build();
 
         var integrationEventForActorRole3 = new ActorCertificateCredentialsAssignedEventBuilder()
             .SetActorNumber("2222222222222")
             .SetActorRole(EicFunction.EnergySupplier)
             .SetSequenceNumber(1)
+            .SetCertificateThumbprint("3")
             .Build();
 
         var integrationEventForActorRole4 = new ActorCertificateCredentialsAssignedEventBuilder()
             .SetActorNumber("2222222222222")
             .SetActorRole(EicFunction.BalanceResponsibleParty)
             .SetSequenceNumber(1)
+            .SetCertificateThumbprint("4")
             .Build();
 
         await HavingReceivedAndHandledIntegrationEventAsync(integrationEventForActorRole1);
