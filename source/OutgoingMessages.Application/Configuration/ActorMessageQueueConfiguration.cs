@@ -58,6 +58,6 @@ public static class ActorMessageQueueConfiguration
         services.AddTransient<MessageDequeuer>();
         services.AddTransient<IDataRetention, DequeuedBundlesRetention>();
 
-        services.AddTransient<IOutGoingMessagesClient, OutgoingMessagesClient>();
+        services.AddTransient<IOutgoingMessagesClient, OutgoingMessagesClient>();
     }
 }

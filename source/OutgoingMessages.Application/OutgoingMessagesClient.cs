@@ -21,7 +21,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
 
-public class OutgoingMessagesClient : IOutGoingMessagesClient
+public class OutgoingMessagesClient : IOutgoingMessagesClient
 {
     private readonly MessagePeeker _messagePeeker;
     private readonly MessageDequeuer _messageDequeuer;

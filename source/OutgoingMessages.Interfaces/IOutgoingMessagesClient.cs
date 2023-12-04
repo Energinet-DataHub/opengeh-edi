@@ -21,7 +21,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 /// <summary>
 ///   Contract for dequeuing messages
 /// </summary>
-public interface IOutGoingMessagesClient
+public interface IOutgoingMessagesClient
 {
     /// <summary>
     /// Dequeues a message from the queue and commit.

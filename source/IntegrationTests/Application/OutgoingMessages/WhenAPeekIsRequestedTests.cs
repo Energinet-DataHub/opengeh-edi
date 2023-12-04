@@ -40,13 +40,13 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 public class WhenAPeekIsRequestedTests : TestBase
 {
     private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
-    private readonly IOutGoingMessagesClient _outgoingMessagesClient;
+    private readonly IOutgoingMessagesClient _outgoingMessagesClient;
 
     public WhenAPeekIsRequestedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
-        _outgoingMessagesClient = GetService<IOutGoingMessagesClient>();
+        _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
     }
 
     [Fact]
