@@ -32,16 +32,16 @@ public class PeekRequestListener
 {
     private readonly AuthenticatedActor _authenticatedActor;
     private readonly ILogger<PeekRequestListener> _logger;
-    private readonly IOutGoingMessagesClient _outGoingMessagesClient;
+    private readonly IOutgoingMessagesClient _outgoingMessagesClient;
 
     public PeekRequestListener(
         AuthenticatedActor authenticatedActor,
         ILogger<PeekRequestListener> logger,
-        IOutGoingMessagesClient outGoingMessagesClient)
+        IOutgoingMessagesClient outgoingMessagesClient)
     {
         _authenticatedActor = authenticatedActor;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _outGoingMessagesClient = outGoingMessagesClient;
+        _outgoingMessagesClient = outgoingMessagesClient;
     }
 
     [Function("PeekRequestListener")]
@@ -71,7 +71,7 @@ public class PeekRequestListener
             ? EnumerationType.FromName<MessageCategory>(messageCategory)
             : MessageCategory.None;
 
-        var peekResult = await _outGoingMessagesClient.PeekAndCommitAsync(
+        var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(
             new PeekRequestDto(
             _authenticatedActor.CurrentActorIdentity.ActorNumber,
             parsedMessageCategory,

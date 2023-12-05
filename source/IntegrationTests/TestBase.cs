@@ -17,6 +17,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BuildingBlocks.Application.Configuration;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Api.Authentication;
@@ -26,6 +27,7 @@ using Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
@@ -179,10 +181,12 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                     sp.GetRequiredService<IActorRepository>(),
                     sp.GetRequiredService<AuthenticatedActor>());
             });
-            CompositionRoot.Initialize(_services, DatabaseFixture.ConnectionString)
+
+            _services.AddScopedSqlDbContext<B2BContext>(config);
+
+            CompositionRoot.Initialize(_services)
                 .AddRemoteBusinessService<DummyRequest, DummyReply>(
                     sp => new RemoteBusinessServiceRequestSenderSpy<DummyRequest>("Dummy"), "Dummy")
-                .AddDatabaseContext(DatabaseFixture.ConnectionString)
                 .AddSystemClock(new SystemDateTimeProviderStub())
                 .AddCorrelationContext(_ =>
                 {
@@ -193,8 +197,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 .AddMessagePublishing()
                 .AddBearerAuthentication(new TokenValidationParameters());
 
-            ActorMessageQueueConfiguration.Configure(_services);
-
+            _services.AddActorMessageQueueModule(config);
             _services.AddProcessModule(config);
             _services.AddArchivedMessagesModule(config);
             _services.AddIncomingMessagesModule(config);

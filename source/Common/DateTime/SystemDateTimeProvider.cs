@@ -12,21 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+using NodaTime;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
-
-public static class SqlExtensions
+namespace Energinet.DataHub.EDI.Common.DateTime
 {
-    public static void AddScopedSqlDbContext<TDbContext>(
-        this IServiceCollection services)
-        where TDbContext : DbContext
+    public class SystemDateTimeProvider : ISystemDateTimeProvider
     {
-        services.AddDbContext<TDbContext>((sp, o) =>
-        {
-            var source = sp.GetRequiredService<SqlConnectionSource>();
-            o.UseSqlServer(source.Connection, y => y.UseNodaTime());
-        });
+        public Instant Now() => SystemClock.Instance.GetCurrentInstant();
     }
 }

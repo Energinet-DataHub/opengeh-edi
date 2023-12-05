@@ -34,14 +34,14 @@ public class WhenEnqueueingTests : TestBase
 {
     private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-    private readonly IOutGoingMessagesClient _outgoingMessagesClient;
+    private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ActorMessageQueueContext _context;
 
     public WhenEnqueueingTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
-        _outgoingMessagesClient = GetService<IOutGoingMessagesClient>();
+        _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
         _context = GetService<ActorMessageQueueContext>();
     }
