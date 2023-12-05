@@ -12,17 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
+namespace BuildingBlocks.Application.Configuration;
 
 public static class SqlExtensions
 {
     public static void AddScopedSqlDbContext<TDbContext>(
-        this IServiceCollection services)
+        this IServiceCollection services,
+        IConfiguration configuration)
         where TDbContext : DbContext
     {
+        services
+            .AddOptions<SqlDatabaseConnectionOptions>()
+            .Bind(configuration)
+            .Validate(o => !string.IsNullOrEmpty(o.DB_CONNECTION_STRING), "DB_CONNECTION_STRING must be set");
+
+        services.AddScoped<SqlConnectionSource>();
+
         services.AddDbContext<TDbContext>((sp, o) =>
         {
             var source = sp.GetRequiredService<SqlConnectionSource>();

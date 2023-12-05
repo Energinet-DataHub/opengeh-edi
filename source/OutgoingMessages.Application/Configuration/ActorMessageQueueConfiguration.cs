@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using BuildingBlocks.Application.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
@@ -25,15 +25,16 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAc
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.Configuration;
 
 public static class ActorMessageQueueConfiguration
 {
-    public static void Configure(IServiceCollection services)
+    public static void AddActorMessageQueueModule(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScopedSqlDbContext<ActorMessageQueueContext>();
+        services.AddScopedSqlDbContext<ActorMessageQueueContext>(configuration);
 
         //AddMessageGenerationServices
         services.AddScoped<DocumentFactory>();
