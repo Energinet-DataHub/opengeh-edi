@@ -131,9 +131,6 @@ namespace Energinet.DataHub.EDI.Api
 
                             return correlationContext;
                         })
-                        .AddRequestLogging(
-                            runtime.REQUEST_RESPONSE_LOGGING_CONNECTION_STRING!,
-                            runtime.REQUEST_RESPONSE_LOGGING_CONTAINER_NAME!)
                         .AddMessagePublishing();
 
                     services.AddLiveHealthCheck();

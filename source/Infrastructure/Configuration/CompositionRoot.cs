@@ -15,14 +15,12 @@
 using System;
 using System.Net.Http;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.Serialization;
@@ -38,7 +36,6 @@ using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using MediatR;
 using MediatR.Registration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration
@@ -96,19 +93,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
         public CompositionRoot AddCorrelationContext(Func<IServiceProvider, ICorrelationContext> action)
         {
             _services.AddScoped(action);
-            return this;
-        }
-
-        public CompositionRoot AddRequestLogging(string blobStorageConnectionString, string storageContainerName)
-        {
-            if (blobStorageConnectionString == null) throw new ArgumentNullException(nameof(blobStorageConnectionString));
-            if (storageContainerName == null) throw new ArgumentNullException(nameof(storageContainerName));
-            _services.AddSingleton<IRequestResponseLogging>(s =>
-            {
-                var factory = s.GetRequiredService<ILoggerFactory>();
-                var logger = factory.CreateLogger<RequestResponseLoggingBlobStorage>();
-                return new RequestResponseLoggingBlobStorage(blobStorageConnectionString, storageContainerName, logger);
-            });
             return this;
         }
 
