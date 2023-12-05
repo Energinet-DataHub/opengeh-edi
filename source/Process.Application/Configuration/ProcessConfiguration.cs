@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
+using BuildingBlocks.Application.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
@@ -46,7 +46,7 @@ public static class ProcessConfiguration
                 o => !string.IsNullOrEmpty(o.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME),
                 "WHOLESALE_INBOX_MESSAGE_QUEUE_NAME must be set");
 
-        services.AddScopedSqlDbContext<ProcessContext>();
+        services.AddScopedSqlDbContext<ProcessContext>(configuration);
 
         //EventsConfiguration
         //TODO: can we move them out and delete ref to Infrastructure?

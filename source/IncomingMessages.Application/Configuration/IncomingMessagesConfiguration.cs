@@ -40,7 +40,7 @@ public static class IncomingMessagesConfiguration
                 o => !string.IsNullOrEmpty(o.INCOMING_MESSAGES_QUEUE_NAME),
                 "INCOMING_MESSAGES_QUEUE_NAME must be set");
 
-        services.AddScopedSqlDbContext<IncomingMessagesContext>();
+        services.AddScopedSqlDbContext<IncomingMessagesContext>(configuration);
         services.AddScoped<IIncomingMessageParser, IncomingMessageParser>();
         services.AddScoped<ITransactionIdRepository, TransactionIdRepository>();
         services.AddScoped<IMessageIdRepository, MessageIdRepository>();
