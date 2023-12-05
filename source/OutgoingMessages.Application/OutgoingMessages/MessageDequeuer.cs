@@ -19,16 +19,21 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
 
 public class MessageDequeuer
 {
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
+    private readonly ILogger<MessageDequeuer> _logger;
 
-    public MessageDequeuer(IActorMessageQueueRepository actorMessageQueueRepository)
+    public MessageDequeuer(
+        IActorMessageQueueRepository actorMessageQueueRepository,
+        ILogger<MessageDequeuer> logger)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
+        _logger = logger;
     }
 
     public async Task<DequeueRequestResultDto> DequeueAsync(DequeueRequestDto request, CancellationToken cancellationToken)
@@ -37,6 +42,7 @@ public class MessageDequeuer
 
         if (Guid.TryParse(request.MessageId, out var messageId) == false)
         {
+            _logger.LogWarning("Invalid message id: {MessageId}", request.MessageId);
             return new DequeueRequestResultDto(false);
         }
 
@@ -44,11 +50,12 @@ public class MessageDequeuer
         var actorQueue = await _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.MarketRole).ConfigureAwait(false);
         if (actorQueue == null)
         {
+            _logger.LogWarning("Actor queue not found for actor number: {ActorNumber} and market role: {MarketRole}", request.ActorNumber, request.MarketRole);
             return new DequeueRequestResultDto(false);
         }
 
         var successful = actorQueue.Dequeue(bundleId);
-
+        _logger.LogInformation("Dequeue request result: {Successful} for bundleId: {BundleId}", successful, bundleId);
         return new DequeueRequestResultDto(successful);
     }
 }
