@@ -100,8 +100,6 @@ namespace Energinet.DataHub.EDI.Api
                 })
                 .ConfigureServices(services =>
                 {
-                    var databaseConnectionString = runtime.DB_CONNECTION_STRING;
-
                     services.AddApplicationInsights();
                     services.ConfigureFunctionsApplicationInsights();
 
