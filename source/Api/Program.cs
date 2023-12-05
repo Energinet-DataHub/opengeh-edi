@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
+using BuildingBlocks.Application.Configuration;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.Api.Authentication;
@@ -27,11 +28,13 @@ using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Configuration;
 using Energinet.DataHub.EDI.Process.Application.Configuration;
@@ -97,8 +100,6 @@ namespace Energinet.DataHub.EDI.Api
                 })
                 .ConfigureServices(services =>
                 {
-                    var databaseConnectionString = runtime.DB_CONNECTION_STRING;
-
                     services.AddApplicationInsights();
                     services.ConfigureFunctionsApplicationInsights();
 
@@ -118,11 +119,12 @@ namespace Energinet.DataHub.EDI.Api
                             sp.GetRequiredService<AuthenticatedActor>());
                     });
 
-                    CompositionRoot.Initialize(services, databaseConnectionString!)
+                    services.AddScopedSqlDbContext<B2BContext>(configuration);
+
+                    CompositionRoot.Initialize(services)
                         .AddRemoteBusinessService<DummyRequest, DummyReply>("Dummy", "Dummy")
                         .AddBearerAuthentication(tokenValidationParameters)
                         .AddSystemClock(new SystemDateTimeProvider())
-                        .AddDatabaseContext(databaseConnectionString!)
                         .AddCorrelationContext(_ =>
                         {
                             var correlationContext = new CorrelationContext();
@@ -154,7 +156,7 @@ namespace Energinet.DataHub.EDI.Api
 
                     services.AddArchivedMessagesModule(configuration);
                     services.AddIncomingMessagesModule(configuration);
-                    ActorMessageQueueConfiguration.Configure(services);
+                    services.AddActorMessageQueueModule(configuration);
                     services.AddProcessModule(configuration);
                 })
                 .ConfigureLogging(logging =>
