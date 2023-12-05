@@ -47,7 +47,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
     {
         private readonly IServiceCollection _services;
 
-        private CompositionRoot(IServiceCollection services, string connectionString)
+        private CompositionRoot(IServiceCollection services)
         {
             _services = services;
             services.AddSingleton<HttpClient>();
@@ -67,16 +67,9 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             DataRetentionConfiguration.Configure(services);
         }
 
-        public static CompositionRoot Initialize(IServiceCollection services, string connectionString)
+        public static CompositionRoot Initialize(IServiceCollection services)
         {
-            return new CompositionRoot(services, connectionString);
-        }
-
-        public CompositionRoot AddDatabaseContext(string databaseConnectionString)
-        {
-            _services.AddScoped<SqlConnectionSource>(sp => new SqlConnectionSource(databaseConnectionString!));
-            _services.AddScopedSqlDbContext<B2BContext>();
-            return this;
+            return new CompositionRoot(services);
         }
 
         public CompositionRoot AddSystemClock(ISystemDateTimeProvider provider)

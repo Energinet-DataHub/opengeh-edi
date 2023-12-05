@@ -13,16 +13,21 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 
 public sealed class SqlConnectionSource : IDisposable
 {
-    public SqlConnectionSource(string databaseConnectionString)
+    public SqlConnectionSource(IOptions<SqlDatabaseConnectionOptions> options)
     {
-        var builder = new SqlConnectionStringBuilder(databaseConnectionString);
-        builder.Encrypt = true;
+        if (options == null) throw new ArgumentNullException(nameof(options));
+        var builder = new SqlConnectionStringBuilder(options.Value.DB_CONNECTION_STRING)
+        {
+            Encrypt = true,
+        };
         Connection = new SqlConnection(builder.ConnectionString);
     }
 
