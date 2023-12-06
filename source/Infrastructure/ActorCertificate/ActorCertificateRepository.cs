@@ -32,27 +32,22 @@ public class ActorCertificateRepository : IActorCertificateRepository
         _dbContext = dbContext;
     }
 
-    public async Task CreateOrUpdateAsync(ActorNumber actorNumber, MarketRole role, CertificateThumbprint thumbprint, Instant validFrom, int sequenceNumber)
-    {
-        var existingActorCertificate = await _dbContext.ActorCertificates
-            .Where(ac => ac.ActorNumber == actorNumber && ac.ActorRole == role)
-            .SingleOrDefaultAsync().ConfigureAwait(false);
-
-        if (existingActorCertificate == null)
-        {
-            var newActorCertificate = new Domain.ActorCertificates.ActorCertificate(actorNumber, role, thumbprint, validFrom, sequenceNumber);
-            _dbContext.ActorCertificates.Add(newActorCertificate);
-        }
-        else if (existingActorCertificate.SequenceNumber < sequenceNumber)
-        {
-            existingActorCertificate.Update(thumbprint, validFrom, sequenceNumber);
-        }
-    }
-
     public Task<Domain.ActorCertificates.ActorCertificate?> GetFromThumbprintAsync(CertificateThumbprint thumbprint)
     {
         return _dbContext.ActorCertificates
             .Where(ac => ac.Thumbprint == thumbprint)
             .SingleOrDefaultAsync();
+    }
+
+    public Task<Domain.ActorCertificates.ActorCertificate?> GetFromActorRoleAsync(ActorNumber actorNumber, MarketRole actorRole)
+    {
+        return _dbContext.ActorCertificates
+            .Where(ac => ac.ActorNumber == actorNumber && ac.ActorRole == actorRole)
+            .SingleOrDefaultAsync();
+    }
+
+    public void Add(Domain.ActorCertificates.ActorCertificate newActorCertificate)
+    {
+        _dbContext.ActorCertificates.Add(newActorCertificate);
     }
 }

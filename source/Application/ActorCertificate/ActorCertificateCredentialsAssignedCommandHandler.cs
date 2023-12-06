@@ -33,7 +33,17 @@ public class ActorCertificateCredentialsAssignedCommandHandler : IRequestHandler
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        await _actorCertificateRepository.CreateOrUpdateAsync(request.ActorNumber, request.ActorRole, request.Thumbprint, request.ValidFrom, request.SequenceNumber).ConfigureAwait(false);
+        var existingCertificate = await _actorCertificateRepository.GetFromActorRoleAsync(request.ActorNumber, request.ActorRole).ConfigureAwait(false);
+
+        if (existingCertificate == null)
+        {
+            var newCertificate = new Domain.ActorCertificates.ActorCertificate(request.ActorNumber, request.ActorRole, request.Thumbprint, request.ValidFrom, request.SequenceNumber);
+            _actorCertificateRepository.Add(newCertificate);
+        }
+        else
+        {
+            existingCertificate.Update(request.Thumbprint, request.ValidFrom, request.SequenceNumber);
+        }
 
         return Unit.Value;
     }
