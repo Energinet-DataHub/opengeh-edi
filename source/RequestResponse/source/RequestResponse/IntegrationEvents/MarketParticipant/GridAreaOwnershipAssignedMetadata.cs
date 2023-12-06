@@ -12,19 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Security.Claims;
+// ReSharper disable once CheckNamespace -- Protobuf is in with another namespace
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication
+public partial class GridAreaOwnershipAssigned
 {
-    public class CurrentClaimsPrincipal
-    {
-        private ClaimsPrincipal? _currentUser;
-
-        public ClaimsPrincipal? ClaimsPrincipal => _currentUser;
-
-        public void SetCurrentUser(ClaimsPrincipal currentUser)
-        {
-            _currentUser = currentUser;
-        }
-    }
+    public const string EventName = "GridAreaOwnershipAssigned";
+    public const int CurrentMinorVersion = 1;
 }

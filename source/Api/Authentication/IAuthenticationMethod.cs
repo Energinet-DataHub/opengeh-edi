@@ -12,26 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.Messaging.Communication;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
-using MediatR;
+using Microsoft.Azure.Functions.Worker.Http;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
+namespace Energinet.DataHub.EDI.Api.Authentication;
 
 /// <summary>
-/// Process specific type(s) of integration events
+/// Authentication method for handling user authentication in http requests
 /// </summary>
-public interface IIntegrationEventMapper
+public interface IAuthenticationMethod
 {
     /// <summary>
-    /// Event type the processor handles
+    /// Check if the authentication method should handle user authentication for the http request
     /// </summary>
-    public string EventTypeToHandle { get; }
+    /// <param name="httpRequestData"></param>
+    bool ShouldHandle(HttpRequestData httpRequestData);
 
     /// <summary>
-    /// Process a single integration event
+    /// Authenticates the user for the http request
     /// </summary>
-    public Task<ICommand<Unit>> MapToCommandAsync(IntegrationEvent integrationEvent);
+    Task<bool> AuthenticateAsync(HttpRequestData httpRequestData, CancellationToken cancellationToken);
 }

@@ -30,7 +30,7 @@ public class CimFormatParserTests
     public void Can_parse_from_known_content_header_value(string contentHeaderValue, string expectedCimFormat)
     {
         var expectedFormat = EnumerationType.FromName<DocumentFormat>(expectedCimFormat);
-        var parsedFormat = CimFormatParser.ParseFromContentTypeHeaderValue(contentHeaderValue);
+        var parsedFormat = DocumentFormatParser.ParseFromContentTypeHeaderValue(contentHeaderValue);
 
         Assert.Equal(expectedFormat, parsedFormat);
     }
@@ -40,7 +40,7 @@ public class CimFormatParserTests
     [InlineData("text")]
     public void Return_null_if_content_type_is_unknown(string contentType)
     {
-        var parsedFormat = CimFormatParser.ParseFromContentTypeHeaderValue(contentType);
+        var parsedFormat = DocumentFormatParser.ParseFromContentTypeHeaderValue(contentType);
 
         Assert.Null(parsedFormat);
     }

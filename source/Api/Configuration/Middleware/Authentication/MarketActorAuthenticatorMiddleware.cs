@@ -13,16 +13,16 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.Common.Serialization;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.MarketActors
+namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication
 {
     public class MarketActorAuthenticatorMiddleware : IFunctionsWorkerMiddleware
     {
@@ -37,36 +37,25 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication.Mark
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (next == null) throw new ArgumentNullException(nameof(next));
-            var marketActorAuthenticator = context.GetService<IMarketActorAuthenticator>();
             var authenticatedActor = context.GetService<AuthenticatedActor>();
-            var currentClaimsPrincipal = context.GetService<CurrentClaimsPrincipal>();
+            var authenticationMethods = context.GetServices<IAuthenticationMethod>();
 
             if (!context.IsRequestFromUser())
             {
-                _logger.LogInformation("Functions is not triggered by HTTP. Call next middleware.");
+                _logger.LogInformation("Functions is not triggered by HTTP, skipping authentication");
                 await next(context).ConfigureAwait(false);
                 return;
             }
 
-            var httpRequestData = context.GetHttpRequestData();
-            if (httpRequestData == null)
-            {
-                _logger.LogTrace("No HTTP request data was available.");
-                await next(context).ConfigureAwait(false);
-                return;
-            }
+            var httpRequestData = await context.GetHttpRequestDataAsync().ConfigureAwait(false) ?? throw new ArgumentException("No HTTP request data was available, even though the function was triggered by HTTP");
 
-            if (currentClaimsPrincipal.ClaimsPrincipal is null)
-            {
-                _logger.LogError("Current claims principal is null. Cannot continue.");
-                context.RespondWithUnauthorized(httpRequestData);
-                return;
-            }
+            var authenticationMethod = authenticationMethods.Single(a => a.ShouldHandle(httpRequestData));
 
-            var authenticated = await marketActorAuthenticator.AuthenticateAsync(currentClaimsPrincipal.ClaimsPrincipal!, context.CancellationToken).ConfigureAwait(false);
+            var authenticated = await authenticationMethod.AuthenticateAsync(httpRequestData, context.CancellationToken).ConfigureAwait(false);
+
             if (!authenticated)
             {
-                _logger.LogError("Could not authenticate market actor identity. This is due to the current claims identity does hold the required claims.");
+                _logger.LogError("Could not authenticate market actor identity. This is due to the http request data does not hold the required claims, there are multiple roles in the claims, or in case of ebIX the required certificate.");
                 context.RespondWithUnauthorized(httpRequestData);
                 return;
             }

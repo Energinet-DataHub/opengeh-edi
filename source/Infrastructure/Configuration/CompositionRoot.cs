@@ -15,15 +15,17 @@
 using System;
 using System.Net.Http;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.EDI.Application.ActorCertificate;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.Serialization;
+using Energinet.DataHub.EDI.Domain.ActorCertificates;
+using Energinet.DataHub.EDI.Infrastructure.ActorCertificate;
 using Energinet.DataHub.EDI.Infrastructure.Actors;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
@@ -58,6 +60,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             AddActorServices();
             AddWholeSaleInBox();
             AddGridAreaServices();
+            AddActorCertificateServices();
             IntegrationEventsConfiguration.Configure(services);
             InboxEventsConfiguration.Configure(services);
             QueryHandlingConfiguration.Configure(services);
@@ -78,7 +81,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
 
         public CompositionRoot AddBearerAuthentication(TokenValidationParameters tokenValidationParameters)
         {
-            _services.AddScoped<CurrentClaimsPrincipal>();
             _services.AddScoped(sp => new JwtTokenParser(tokenValidationParameters));
             return this;
         }
@@ -146,6 +148,12 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             _services.AddScoped<IRequestHandler<GridAreaOwnershipAssignedCommand, Unit>, GridAreaOwnershipAssignedHandler>();
             _services.AddScoped<IGridAreaRepository, GridAreaRepository>();
             _services.AddTransient<IDataRetention, GridAreaOwnerRetention>();
+        }
+
+        private void AddActorCertificateServices()
+        {
+            _services.AddTransient<IActorCertificateRepository, ActorCertificateRepository>();
+            _services.AddTransient<IRequestHandler<ActorCertificateCredentialsAssignedCommand, Unit>, ActorCertificateCredentialsAssignedCommandHandler>();
         }
 
         private void AddWholeSaleInBox()

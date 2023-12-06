@@ -12,21 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text.Json.Serialization;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
-using MediatR;
+using System.Security.Cryptography.X509Certificates;
+using Microsoft.Azure.Functions.Worker.Http;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Api.Authentication.Certificate;
 
-public class ForwardAggregationResult : ICommand<Unit>
+/// <summary>
+/// Service for retrieving the client certificate from http request data
+/// </summary>
+public interface IClientCertificateRetriever
 {
-    public ForwardAggregationResult(Aggregation result)
-    {
-        Result = result;
-    }
-
-    public Aggregation Result { get; }
+    /// <summary>
+    /// Retrieves the client certificate from http request data, which is typically added to the request headers by API Management
+    /// </summary>
+    X509Certificate2? GetCertificate(HttpRequestData httpRequestData);
 }

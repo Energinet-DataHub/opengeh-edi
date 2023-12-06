@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
+using MediatR;
 using NodaTime.Serialization.Protobuf;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
@@ -28,14 +29,14 @@ public class GridAreaOwnershipAssignedMapper : IIntegrationEventMapper
 {
     public string EventTypeToHandle => GridAreaOwnershipAssigned.EventName;
 
-    public Task<InternalCommand> MapToCommandAsync(IntegrationEvent integrationEvent)
+    public Task<ICommand<Unit>> MapToCommandAsync(IntegrationEvent integrationEvent)
     {
         if (integrationEvent == null)
             throw new ArgumentNullException(nameof(integrationEvent));
 
         var gridAreaOwnershipAssignedEvent = (GridAreaOwnershipAssigned)integrationEvent.Message;
 
-        return Task.FromResult<InternalCommand>(
+        return Task.FromResult<ICommand<Unit>>(
             new GridAreaOwnershipAssignedCommand(
                 gridAreaOwnershipAssignedEvent.GridAreaCode,
                 gridAreaOwnershipAssignedEvent.ValidFrom.ToInstant(),
