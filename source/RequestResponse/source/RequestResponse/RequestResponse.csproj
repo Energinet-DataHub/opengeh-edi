@@ -77,6 +77,12 @@ limitations under the License.
         <CompileOutputs>True</CompileOutputs>
         <Generator>MSBuild:Compile</Generator>
       </Protobuf>
+      <Protobuf Update="IntegrationEvents\MarketPaticipant\ActorCertificateCredentialsAssigned .proto">
+        <OutputDir>obj\Debug\net7.0\</OutputDir>
+      </Protobuf>
+      <Protobuf Update="IntegrationEvents\MarketPaticipant\EicFunction.proto">
+        <OutputDir>obj\Debug\net7.0\</OutputDir>
+      </Protobuf>
     </ItemGroup>
 
 </Project>

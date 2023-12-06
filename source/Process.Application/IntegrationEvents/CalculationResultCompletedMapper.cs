@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 using Energinet.DataHub.Wholesale.Contracts.Events;
+using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Application.IntegrationEvents;
 
@@ -35,7 +36,7 @@ public class CalculationResultCompletedMapper : IIntegrationEventMapper
 
     public string EventTypeToHandle => CalculationResultCompleted.EventName;
 
-    public async Task<InternalCommand> MapToCommandAsync(IntegrationEvent integrationEvent)
+    public async Task<ICommand<Unit>> MapToCommandAsync(IntegrationEvent integrationEvent)
     {
         if (integrationEvent == null)
             throw new ArgumentNullException(nameof(integrationEvent));

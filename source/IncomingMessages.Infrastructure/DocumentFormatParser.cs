@@ -16,7 +16,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace IncomingMessages.Infrastructure;
 
-public static class CimFormatParser
+public static class DocumentFormatParser
 {
     public static DocumentFormat? ParseFromContentTypeHeaderValue(string value)
     {

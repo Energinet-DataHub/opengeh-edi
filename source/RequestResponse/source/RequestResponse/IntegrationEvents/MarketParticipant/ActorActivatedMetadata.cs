@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+// ReSharper disable once CheckNamespace -- Protobuf is generated in another namespace
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 
-namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication;
-
-public record ActorForAuthentication(Guid ActorId, string Identifier);
+public partial class ActorActivated
+{
+    public const string EventName = "ActorActivated";
+    public const int CurrentMinorVersion = 1;
+}

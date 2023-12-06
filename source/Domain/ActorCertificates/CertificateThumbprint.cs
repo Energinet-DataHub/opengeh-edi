@@ -12,21 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text.Json.Serialization;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
-using MediatR;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Domain.ActorCertificates;
 
-public class ForwardAggregationResult : ICommand<Unit>
+public class CertificateThumbprint : ValueObject
 {
-    public ForwardAggregationResult(Aggregation result)
+    public CertificateThumbprint(string thumbprint)
     {
-        Result = result;
+        Thumbprint = thumbprint;
     }
 
-    public Aggregation Result { get; }
+    public string Thumbprint { get; }
 }

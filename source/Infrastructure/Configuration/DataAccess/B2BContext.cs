@@ -15,6 +15,7 @@
 using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.Domain.GridAreaOwners;
+using Energinet.DataHub.EDI.Infrastructure.ActorCertificate;
 using Energinet.DataHub.EDI.Infrastructure.Actors;
 using Energinet.DataHub.EDI.Infrastructure.GridAreas;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
@@ -40,6 +41,8 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 
         public DbSet<GridAreaOwner> GridAreaOwners { get; private set; }
 
+        public DbSet<Domain.ActorCertificates.ActorCertificate> ActorCertificates { get; private set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
@@ -47,6 +50,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
             modelBuilder.ApplyConfiguration(new ReceivedInboxEventEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ActorEntityConfiguration());
             modelBuilder.ApplyConfiguration(new GridAreaOwnerEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new ActorCertificateEntityConfiguration());
         }
     }
 }

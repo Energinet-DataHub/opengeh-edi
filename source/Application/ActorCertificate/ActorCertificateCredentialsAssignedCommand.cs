@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Domain.ActorCertificates;
+using MediatR;
+using NodaTime;
 
-public partial class ActorActivated
-{
-    public const string EventName = "ActorActivated";
-    public const int CurrentMinorVersion = 1;
-}
+namespace Energinet.DataHub.EDI.Application.ActorCertificate;
+
+public record ActorCertificateCredentialsAssignedCommand(ActorNumber ActorNumber, MarketRole ActorRole, CertificateThumbprint Thumbprint, Instant ValidFrom, int SequenceNumber) : ICommand<Unit>;

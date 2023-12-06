@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
+using MediatR;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 
@@ -27,13 +28,13 @@ public class B2BActorActivatedMapper : IIntegrationEventMapper
 {
     public string EventTypeToHandle => ActorActivated.EventName;
 
-    public Task<InternalCommand> MapToCommandAsync(IntegrationEvent integrationEvent)
+    public Task<ICommand<Unit>> MapToCommandAsync(IntegrationEvent integrationEvent)
     {
         if (integrationEvent == null)
             throw new ArgumentNullException(nameof(integrationEvent));
 
         var actorActivatedEvent = (ActorActivated)integrationEvent.Message;
 
-        return Task.FromResult<InternalCommand>(new CreateActorCommand(actorActivatedEvent.ExternalActorId, ActorNumber.Create(actorActivatedEvent.ActorNumber)));
+        return Task.FromResult<ICommand<Unit>>(new CreateActorCommand(actorActivatedEvent.ExternalActorId, ActorNumber.Create(actorActivatedEvent.ActorNumber)));
     }
 }

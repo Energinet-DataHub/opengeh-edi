@@ -48,16 +48,6 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware
                    context.FunctionDefinition.Name != "HealthCheck";
         }
 
-        internal static HttpRequestData? GetHttpRequestData(this FunctionContext functionContext)
-        {
-            if (functionContext == null) throw new ArgumentNullException(nameof(functionContext));
-
-            var functionBindingsFeature = functionContext.GetIFunctionBindingsFeature();
-            var type = functionBindingsFeature.GetType();
-            var inputData = type.GetProperties().Single(p => p.Name == "InputData").GetValue(functionBindingsFeature) as IReadOnlyDictionary<string, object>;
-            return inputData?.Values.SingleOrDefault(o => o is HttpRequestData) as HttpRequestData;
-        }
-
         /// <summary>
         /// Sets the FunctionContext IFunctionBindingsFeature InvocationResult with a HttpResponseData.
         /// </summary>
@@ -86,6 +76,12 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware
             where T : notnull
         {
             return functionContext.InstanceServices.GetRequiredService<T>();
+        }
+
+        internal static IEnumerable<T> GetServices<T>(this FunctionContext functionContext)
+            where T : notnull
+        {
+            return functionContext.InstanceServices.GetServices<T>();
         }
 
         /// <summary>
