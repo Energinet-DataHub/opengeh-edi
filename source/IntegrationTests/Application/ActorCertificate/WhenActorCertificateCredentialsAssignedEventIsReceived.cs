@@ -151,14 +151,17 @@ public class WhenActorCertificateCredentialsAssignedEventIsReceived : TestBase
     [Fact]
     public async Task When_received_multiple_ActorCertificateCredentialsAssigned_events_out_of_order_then_highest_sequence_number_is_applied_with_correct_values()
     {
+        var expectedCertificateThumbprint = "thumbprint-b";
+        var expectedSequenceNumber = 4;
+
         var integrationEvent1 = new ActorCertificateCredentialsAssignedEventBuilder()
             .SetSequenceNumber(1)
             .SetCertificateThumbprint("thumbprint-a")
             .Build();
 
         var integrationEvent4 = new ActorCertificateCredentialsAssignedEventBuilder()
-            .SetSequenceNumber(4)
-            .SetCertificateThumbprint("thumbprint-b")
+            .SetSequenceNumber(expectedSequenceNumber)
+            .SetCertificateThumbprint(expectedCertificateThumbprint)
             .Build();
 
         var integrationEvent2 = new ActorCertificateCredentialsAssignedEventBuilder()
@@ -178,10 +181,10 @@ public class WhenActorCertificateCredentialsAssignedEventIsReceived : TestBase
 
         var actorCertificates = await GetActorCertificatesFromDatabaseAsync();
 
-        Assert.Single(actorCertificates);
+        var actualCertificate = Assert.Single(actorCertificates);
         Assert.Multiple(
-            () => Assert.Equal("thumbprint-b", actorCertificates.Single().Thumbprint),
-            () => Assert.Equal(4, actorCertificates.Single().SequenceNumber));
+            () => Assert.Equal(expectedCertificateThumbprint, actualCertificate.Thumbprint),
+            () => Assert.Equal(expectedSequenceNumber, actualCertificate.SequenceNumber));
     }
 
     private async Task HavingReceivedAndHandledIntegrationEventAsync(ActorCertificateCredentialsAssigned actorCertificateCredentialsAssigned)
