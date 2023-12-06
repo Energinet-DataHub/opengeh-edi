@@ -32,7 +32,7 @@ namespace Energinet.DataHub.EDI.Api.Authentication
         Task<bool> AuthenticateAsync(ClaimsPrincipal claimsPrincipal, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Authenticates a user
+        /// Authenticates a market actor
         /// </summary>
         /// <param name="actorNumber">Actor number, typically found from the external id in the `azp` claim</param>
         /// <param name="marketRole">User role, typically found from the `role` claim</param>
