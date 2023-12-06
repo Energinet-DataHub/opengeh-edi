@@ -15,17 +15,23 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Domain.ActorCertificates;
 using MediatR;
+using Microsoft.Extensions.Logging;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.Application.ActorCertificate;
 
 public class ActorCertificateCredentialsAssignedCommandHandler : IRequestHandler<ActorCertificateCredentialsAssignedCommand, Unit>
 {
+    private readonly ILogger<ActorCertificateCredentialsAssignedCommandHandler> _logger;
     private readonly IActorCertificateRepository _actorCertificateRepository;
 
-    public ActorCertificateCredentialsAssignedCommandHandler(IActorCertificateRepository actorCertificateRepository)
+    public ActorCertificateCredentialsAssignedCommandHandler(ILogger<ActorCertificateCredentialsAssignedCommandHandler> logger, IActorCertificateRepository actorCertificateRepository)
     {
+        _logger = logger;
         _actorCertificateRepository = actorCertificateRepository;
     }
 
@@ -40,9 +46,13 @@ public class ActorCertificateCredentialsAssignedCommandHandler : IRequestHandler
             var newCertificate = new Domain.ActorCertificates.ActorCertificate(request.ActorNumber, request.ActorRole, request.Thumbprint, request.ValidFrom, request.SequenceNumber);
             _actorCertificateRepository.Add(newCertificate);
         }
-        else
+        else if (existingCertificate.SequenceNumber < request.SequenceNumber)
         {
             existingCertificate.Update(request.Thumbprint, request.ValidFrom, request.SequenceNumber);
+        }
+        else
+        {
+            _logger.LogInformation("Skip updating actor certificate for actor {ActorNumber} with role {ActorRole}, since the received sequence number {ReceivedSequenceNumber} is lower than the current sequence number {CurrentSequenceNumber}", existingCertificate.ActorNumber.Value, existingCertificate.ActorRole.Name, request.SequenceNumber, existingCertificate.SequenceNumber);
         }
 
         return Unit.Value;
