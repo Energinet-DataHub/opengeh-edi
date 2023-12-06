@@ -25,7 +25,7 @@ namespace Energinet.DataHub.EDI.Api.Authentication
     public interface IMarketActorAuthenticator
     {
         /// <summary>
-        /// Authenticates a user from a claims principal
+        /// Authenticates a market actor from a claims principal
         /// </summary>
         /// <param name="claimsPrincipal"></param>
         /// <param name="cancellationToken"></param>
