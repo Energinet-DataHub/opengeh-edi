@@ -100,7 +100,7 @@ public class WhenActorCertificateCredentialsAssignedEventIsReceived : TestBase
     }
 
     [Fact]
-    public async Task When_received_multiple_ActorCertificateCredentialsAssigned_events_for_different_actors_then_correct_count_exists()
+    public async Task When_received_multiple_ActorCertificateCredentialsAssigned_events_for_4_different_actor_roles_then_4_actor_certificates_exists_in_database()
     {
         var integrationEventForActorRole1 = new ActorCertificateCredentialsAssignedEventBuilder()
             .SetActorNumber("1111111111111")
