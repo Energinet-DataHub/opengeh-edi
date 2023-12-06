@@ -34,9 +34,9 @@ internal sealed class EbixRequestDsl
 
     #pragma warning disable VSTHRD200
 
-    internal async Task EmptyQueueForActor(string actorNumber, string actorRole, string token)
+    internal async Task EmptyQueueForActor(string actorNumber, string actorRole)
     {
-        await _edi.EmptyQueueAsync(actorNumber, new[] { actorRole, }, token).ConfigureAwait(false);
+        await _edi.EmptyQueueAsync(actorNumber, new[] { actorRole, }).ConfigureAwait(false);
     }
 
     internal Task<string> LoginAsActor(string azureEntraClientId, string azureEntraClientSecret)
@@ -44,14 +44,14 @@ internal sealed class EbixRequestDsl
         return _azureAuthentication.GetAzureAdTokenAsync(azureEntraClientId, azureEntraClientSecret);
     }
 
-    internal Task PublishAggregationResultFor(string gridArea, string balanceResponsibleNumber)
+    internal Task PublishAggregationResultFor(string gridArea)
     {
-        return _wholesale.PublishAggregationResultAsync(gridArea, balanceResponsibleNumber);
+        return _wholesale.PublishAggregationResultAsync(gridArea);
     }
 
-    internal async Task ConfirmPeekIsCorrectEbixFormatAndDocumentType(string token)
+    internal async Task ConfirmPeekIsEbixFormatAndCorrectDocumentType()
     {
-        var response = await _ebix.PeekMessageWithTimeoutAsync(token).ConfigureAwait(false);
+        var response = await _ebix.PeekMessageWithTimeoutAsync().ConfigureAwait(false);
 
         Assert.Multiple(
             () => Assert.NotNull(response?.MessageContainer?.Payload),

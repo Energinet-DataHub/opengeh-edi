@@ -86,7 +86,7 @@ internal sealed class EdiDriver : IDisposable
         if (peekResponse.StatusCode == HttpStatusCode.OK)
         {
             await DequeueAsync(token, GetMessageId(peekResponse)).ConfigureAwait(false);
-            await EmptyQueueAsync(actorNumber, marketRoles).ConfigureAwait(false);
+            await EmptyQueueAsync(actorNumber, marketRoles, tokenOverride).ConfigureAwait(false);
         }
     }
 
@@ -147,7 +147,7 @@ internal sealed class EdiDriver : IDisposable
         string jsonRequestAcceptedFilePath;
         string jsonRequestAsynchronousRejectedFilePath;
 
-        if (actorNumber.Equals(TestRunner.BalanceResponsibleActorNumber, StringComparison.OrdinalIgnoreCase))
+        if (actorNumber.Equals(TestRunner.AcceptanceTestActorNumber, StringComparison.OrdinalIgnoreCase))
         {
             jsonRequestAcceptedFilePath = "Messages/json/RequestAggregatedMeasureDataBalanceResponsible.json";
             jsonRequestAsynchronousRejectedFilePath = "Messages/json/RequestAggregatedMeasureDataBalanceResponsibleWithBadPeriod.json";
