@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+using Energinet.DataHub.EDI.AcceptanceTests.Factories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Google.Protobuf;
 using Microsoft.Extensions.Configuration;
@@ -47,7 +48,7 @@ public class TestRunner : IAsyncDisposable
         var actorActivated = ActorFactory.CreateActorActivated(AcceptanceTestActorNumber, AzpToken);
         _ = EventPublisher.PublishAsync(ActorActivated.EventName, actorActivated.ToByteArray());
 
-        var actorCertificateAssigned = ActorCertificateFactory.CreateActorCertificateAssigned(AcceptanceTestActorNumber, EicFunction.MeteredDataResponsible, "49D64F012A19C6F6FDFB0EA91D417873599D3325");
+        var actorCertificateAssigned = ActorCertificateFactory.CreateActorCertificateAssigned(AcceptanceTestActorNumber, EicFunction.MeteredDataResponsible, "39D64F012A19C6F6FDFB0EA91D417873599D3325");
         _ = EventPublisher.PublishAsync(ActorCertificateCredentialsAssigned.EventName, actorCertificateAssigned.ToByteArray());
 
         ApiManagementUri = new Uri(root.GetValue<string>("API_MANAGEMENT_URL") ?? "https://apim-shared-sharedres-u-001.azure-api.net/");
