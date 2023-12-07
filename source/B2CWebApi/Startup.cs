@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.B2CWebApi.Configuration;
 using Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Configuration;
 using Microsoft.OpenApi.Models;
@@ -74,6 +75,7 @@ public class Startup
         serviceCollection.AddOptions<JwtOptions>().Bind(Configuration);
         serviceCollection.AddOptions<DateTimeOptions>().Bind(Configuration);
 
+        serviceCollection.AddScoped<ISystemDateTimeProvider, SystemDateTimeProvider>();
         serviceCollection.AddHttpLoggingScope(DomainName);
         serviceCollection.AddSingleton<ISerializer, Serializer>();
         serviceCollection.AddScoped<AuthenticatedActor>();
