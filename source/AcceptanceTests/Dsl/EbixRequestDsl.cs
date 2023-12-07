@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Net;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
 
@@ -34,9 +35,9 @@ internal sealed class EbixRequestDsl
 
     #pragma warning disable VSTHRD200
 
-    internal async Task EmptyQueueForActor(string actorNumber, string actorRole, string token)
+    internal async Task EmptyQueueForActor(string actorNumber, string actorRole)
     {
-        await _edi.EmptyQueueAsync(actorNumber, new[] { actorRole, }, token).ConfigureAwait(false);
+        await _edi.EmptyQueueAsync(actorNumber, new[] { actorRole, }).ConfigureAwait(false);
     }
 
     internal Task<string> LoginAsActor(string azureEntraClientId, string azureEntraClientSecret)
@@ -44,17 +45,26 @@ internal sealed class EbixRequestDsl
         return _azureAuthentication.GetAzureAdTokenAsync(azureEntraClientId, azureEntraClientSecret);
     }
 
-    internal Task PublishAggregationResultFor(string gridArea, string balanceResponsibleNumber)
+    internal Task PublishAggregationResultFor(string gridArea)
     {
-        return _wholesale.PublishAggregationResultAsync(gridArea, balanceResponsibleNumber);
+        return _wholesale.PublishAggregationResultAsync(gridArea);
     }
 
-    internal async Task ConfirmPeekIsCorrectEbixFormatAndDocumentType(string token)
+    internal async Task ConfirmPeekIsEbixFormatAndCorrectDocumentType()
     {
-        var response = await _ebix.PeekMessageWithTimeoutAsync(token).ConfigureAwait(false);
+        var response = await _ebix.PeekMessageAsync(timeoutInSeconds: 60).ConfigureAwait(false);
 
         Assert.Multiple(
             () => Assert.NotNull(response?.MessageContainer?.Payload),
             () => Assert.Equal("AggregatedMeteredDataTimeSeries", response!.MessageContainer.DocumentType));
+    }
+
+    internal async Task ConfirmPeekWithoutCertificateIsNotAllowed()
+    {
+        var response = await _ebix.PeekMessageWithoutCertificateAsync().ConfigureAwait(false);
+
+        Assert.Multiple(
+            () => Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode),
+            () => Assert.Contains("Certificate rejected", response.ReasonPhrase, StringComparison.InvariantCultureIgnoreCase));
     }
 }
