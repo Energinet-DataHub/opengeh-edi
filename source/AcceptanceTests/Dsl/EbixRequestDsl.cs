@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Net;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
 
@@ -51,10 +52,19 @@ internal sealed class EbixRequestDsl
 
     internal async Task ConfirmPeekIsEbixFormatAndCorrectDocumentType()
     {
-        var response = await _ebix.PeekMessageWithTimeoutAsync().ConfigureAwait(false);
+        var response = await _ebix.PeekMessageAsync(timeoutInSeconds: 60).ConfigureAwait(false);
 
         Assert.Multiple(
             () => Assert.NotNull(response?.MessageContainer?.Payload),
             () => Assert.Equal("AggregatedMeteredDataTimeSeries", response!.MessageContainer.DocumentType));
+    }
+
+    internal async Task ConfirmPeekWithoutCertificateIsNotAllowed()
+    {
+        var response = await _ebix.PeekMessageWithoutCertificateAsync().ConfigureAwait(false);
+
+        Assert.Multiple(
+            () => Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode),
+            () => Assert.Contains("Certificate rejected", response.ReasonPhrase, StringComparison.InvariantCultureIgnoreCase));
     }
 }

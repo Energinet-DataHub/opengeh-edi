@@ -14,6 +14,7 @@
 
 using System.Diagnostics;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
@@ -24,6 +25,7 @@ internal sealed class EbixDriver : IDisposable
 {
     private readonly marketMessagingB2BServiceV01PortTypeClient _ebixServiceClient;
     private readonly X509Certificate2? _certificate;
+    private readonly HttpClient _httpClient;
 
     public EbixDriver(Uri dataHubUrlEbixUrl, string ebixCertificatePassword)
     {
@@ -49,9 +51,14 @@ internal sealed class EbixDriver : IDisposable
         var certificateRaw = File.ReadAllBytes("./Drivers/Ebix/DH3-test-mosaik-1-private-and-public.pfx");
         _certificate = new X509Certificate2(certificateRaw, ebixCertificatePassword);
         _ebixServiceClient.ClientCredentials.ClientCertificate.Certificate = _certificate;
+
+        _httpClient = new HttpClient
+        {
+            BaseAddress = dataHubUrlEbixUrl,
+        };
     }
 
-    public async Task<peekMessageResponse?> PeekMessageWithTimeoutAsync()
+    public async Task<peekMessageResponse?> PeekMessageAsync(int? timeoutInSeconds)
     {
         if (_ebixServiceClient.State != CommunicationState.Opened)
             _ebixServiceClient.Open();
@@ -65,9 +72,9 @@ internal sealed class EbixDriver : IDisposable
         OperationContext.Current.OutgoingMessageProperties[HttpRequestMessageProperty.Name] = requestMessage;
 
         var stopWatch = Stopwatch.StartNew();
-        var timeBeforeTimeout = new TimeSpan(0, 1, 0);
+        var timeBeforeTimeout = timeoutInSeconds != null ? new TimeSpan(0, 0, timeoutInSeconds.Value) : TimeSpan.Zero;
         Exception? lastException = null;
-        while (stopWatch.ElapsedMilliseconds < timeBeforeTimeout.TotalMilliseconds)
+        do
         {
             try
             {
@@ -75,15 +82,26 @@ internal sealed class EbixDriver : IDisposable
             }
             catch (CommunicationException e)
             {
-                Console.WriteLine("Encountered CommunicationException while peeking. This is probably because the message hasn't been handled yet, so we're trying again in 500ms. The exception was:");
+                Console.WriteLine(
+                    "Encountered CommunicationException while peeking. This is probably because the message hasn't been handled yet, so we're trying again in 500ms. The exception was:");
                 Console.WriteLine(e);
                 lastException = e;
             }
 
             await Task.Delay(500).ConfigureAwait(false);
         }
+        while (stopWatch.ElapsedMilliseconds < timeBeforeTimeout.TotalMilliseconds);
 
         throw new TimeoutException("Unable to retrieve peek result within time limit", lastException);
+    }
+
+    public async Task<HttpResponseMessage> PeekMessageWithoutCertificateAsync()
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Post, new Uri("?soapAction=peekMessage", UriKind.Relative));
+        request.Content = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>());
+        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/ebix");
+
+        return await _httpClient.SendAsync(request).ConfigureAwait(false);
     }
 
     public void Dispose()
@@ -92,5 +110,6 @@ internal sealed class EbixDriver : IDisposable
             _ebixServiceClient.Close();
 
         _certificate?.Dispose();
+        _httpClient.Dispose();
     }
 }

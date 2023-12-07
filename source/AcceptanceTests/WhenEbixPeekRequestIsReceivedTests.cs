@@ -43,4 +43,10 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : TestRunner
 
         await _ebix.ConfirmPeekIsEbixFormatAndCorrectDocumentType();
     }
+
+    [Fact]
+    public async Task Actor_cannot_peek_ebix_api_without_certificate()
+    {
+        await _ebix.ConfirmPeekWithoutCertificateIsNotAllowed();
+    }
 }
