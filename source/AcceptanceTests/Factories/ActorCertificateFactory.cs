@@ -15,16 +15,17 @@
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Google.Protobuf.WellKnownTypes;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Factories;
 
-public static class ActorFactory
+public static class ActorCertificateFactory
 {
-    public static ActorActivated CreateActorActivated(string actorNumber, string b2CId) =>
+    public static ActorCertificateCredentialsAssigned CreateActorCertificateAssigned(string actorNumber, EicFunction actorRole, string thumbprint) =>
         new()
         {
             ActorNumber = actorNumber,
-            ExternalActorId = b2CId,
-            ActorNumberType = ActorNumberType.Gln,
-            ValidFrom = Timestamp.FromDateTime(DateTime.UtcNow),
+            ActorRole = actorRole,
+            CertificateThumbprint = thumbprint,
+            ValidFrom = DateTime.UtcNow.ToTimestamp(),
+            SequenceNumber = 1,
         };
 }
