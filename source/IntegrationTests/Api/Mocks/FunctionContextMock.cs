@@ -29,9 +29,9 @@ using Microsoft.Azure.Functions.Worker.Http;
 namespace Energinet.DataHub.EDI.IntegrationTests.Api.Mocks;
 
 [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:Elements should be documented", Justification = "Test class")]
-internal sealed class MockFunctionContext : FunctionContext
+internal sealed class FunctionContextMock : FunctionContext
 {
-    public MockFunctionContext(IServiceProvider serviceProvider, TriggerType triggerType, string? contentType, string? bearerToken, string? certificateHexString)
+    public FunctionContextMock(IServiceProvider serviceProvider, TriggerType triggerType, string? contentType, string? bearerToken, string? certificateHexString)
     {
         InstanceServices = serviceProvider;
 

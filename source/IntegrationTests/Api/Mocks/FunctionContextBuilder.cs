@@ -41,9 +41,9 @@ internal sealed class FunctionContextBuilder
         return this;
     }
 
-    internal MockFunctionContext Build()
+    internal FunctionContextMock Build()
     {
-        return new MockFunctionContext(
+        return new FunctionContextMock(
             _serviceProvider,
             _triggerType,
             _contentType,

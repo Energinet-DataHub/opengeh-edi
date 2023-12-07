@@ -268,11 +268,11 @@ public class WhenActorIsTryingToAuthenticate : TestBase
         });
     }
 
-    private MockFunctionContext CreateMockFunctionContext(TriggerType triggerType, string? contentType = "application/json", string? bearerToken = null, X509Certificate2? certificate = null)
+    private FunctionContextMock CreateMockFunctionContext(TriggerType triggerType, string? contentType = "application/json", string? bearerToken = null, X509Certificate2? certificate = null)
     {
         var certificateHexString = certificate?.GetRawCertDataString();
 
-        var mockFunctionContext = new MockFunctionContext(ServiceProvider, triggerType, contentType, bearerToken, certificateHexString);
+        var mockFunctionContext = new FunctionContextMock(ServiceProvider, triggerType, contentType, bearerToken, certificateHexString);
 
         return mockFunctionContext;
     }
