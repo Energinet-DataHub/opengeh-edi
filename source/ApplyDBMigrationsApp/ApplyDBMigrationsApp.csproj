@@ -170,8 +170,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202309211415 ArchivedMessage MessageId is longer.sql" />
     <EmbeddedResource Include="Scripts\Model\202309271021 Remove ResponseData from AggregatedMeasureDataProcesses.sql" />
     <EmbeddedResource Include="Scripts\Model\202310231618 Change SettlementVersion of AggregatedMeasuredDataProcess type to nvarchar.sql" />
-    <None Remove="Scripts\Model\202312051414 Update ActorCertificate thumbprints - FOR TESTING.sql" />
-    <EmbeddedResource Include="Scripts\Model\202312051414 Update ActorCertificate thumbprints - FOR TESTING.sql" />
+    <EmbeddedResource Include="Scripts\Model\202312070943 Update ActorCertificate thumbprints - FOR TESTING.sql" />
   </ItemGroup>
 
   <ItemGroup>
