@@ -38,8 +38,8 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : TestRunner
     [Fact]
     public async Task Actor_can_peek_calculation_result_in_ebix_format()
     {
-        await _ebix.EmptyQueueForActor(AcceptanceTestActorNumber, AcceptanceTestActorRole);
-        await _ebix.PublishAggregationResultFor(AcceptanceTestActorGridArea);
+        await _ebix.EmptyQueueForActor(ActorNumber, ActorRole);
+        await _ebix.PublishAggregationResultFor(ActorGridArea);
 
         await _ebix.ConfirmPeekIsEbixFormatAndCorrectDocumentType();
     }

@@ -23,10 +23,10 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 
 public class TestRunner : IAsyncDisposable
 {
-    internal const string AcceptanceTestActorNumber = "5790000610976"; // Corresponds to the "Mosaic 03" actor in the UI.
-    internal const string AcceptanceTestActorRole = "metereddataresponsible";
-    internal const string AcceptanceTestActorGridArea = "543";
-    internal const EicFunction AcceptanceTestActorEicFunction = EicFunction.MeteredDataResponsible;
+    internal const string ActorNumber = "5790000610976"; // Corresponds to the "Mosaic 03" actor in the UI.
+    internal const string ActorGridArea = "543";
+    internal const string ActorRole = "metereddataresponsible";
+    private const EicFunction ActorEicFunction = EicFunction.MeteredDataResponsible;
 
     protected TestRunner()
     {
@@ -42,21 +42,22 @@ public class TestRunner : IAsyncDisposable
 
         var serviceBusConnectionString = secretsConfiguration.GetValue<string>("sb-domain-relay-manage-connection-string")!;
         var topicName = secretsConfiguration.GetValue<string>("sbt-shres-integrationevent-received-name")!;
-        EventPublisher = new IntegrationEventPublisher(serviceBusConnectionString, topicName);
         AzpToken = root.GetValue<string>("AZP_TOKEN") ?? throw new InvalidOperationException("AZP_TOKEN is not set in configuration");
-
-        var actorActivated = ActorFactory.CreateActorActivated(AcceptanceTestActorNumber, AzpToken);
-        _ = EventPublisher.PublishAsync(ActorActivated.EventName, actorActivated.ToByteArray());
-
-        var actorCertificateAssigned = ActorCertificateFactory.CreateActorCertificateAssigned(AcceptanceTestActorNumber, EicFunction.MeteredDataResponsible, "39D64F012A19C6F6FDFB0EA91D417873599D3325");
-        _ = EventPublisher.PublishAsync(ActorCertificateCredentialsAssigned.EventName, actorCertificateAssigned.ToByteArray());
-
         ApiManagementUri = new Uri(root.GetValue<string>("API_MANAGEMENT_URL") ?? "https://apim-shared-sharedres-u-001.azure-api.net/");
         AzureEntraTenantId = root.GetValue<string>("AZURE_ENTRA_TENANT_ID") ?? "4a7411ea-ac71-4b63-9647-b8bd4c5a20e0";
         AzureEntraBackendAppId = root.GetValue<string>("AZURE_ENTRA_BACKEND_APP_ID") ?? "fe8b720c-fda4-4aaa-9c6d-c0d2ed6584fe";
         AzureEntraClientId = root.GetValue<string>("AZURE_ENTRA_CLIENT_ID") ?? "D8E67800-B7EF-4025-90BB-FE06E1639117";
         AzureEntraClientSecret = root.GetValue<string>("AZURE_ENTRA_CLIENT_SECRET") ?? throw new InvalidOperationException("AZURE_ENTRA_CLIENT_SECRET is not set in configuration");
+        EbixCertificateThumbprint = root.GetValue<string>("EBIX_CERTIFICATE_THUMBPRINT") ?? "39D64F012A19C6F6FDFB0EA91D417873599D3325";
         EbixCertificatePassword = root.GetValue<string>("EBIX_CERTIFICATE_PASSWORD") ?? throw new InvalidOperationException("EBIX_CERTIFICATE_PASSWORD is not set in configuration");
+
+        EventPublisher = new IntegrationEventPublisher(serviceBusConnectionString, topicName);
+
+        var actorActivated = ActorFactory.CreateActorActivated(ActorNumber, AzpToken);
+        _ = EventPublisher.PublishAsync(ActorActivated.EventName, actorActivated.ToByteArray());
+
+        var actorCertificateAssigned = ActorCertificateFactory.CreateActorCertificateAssigned(ActorNumber, ActorEicFunction, EbixCertificateThumbprint);
+        _ = EventPublisher.PublishAsync(ActorCertificateCredentialsAssigned.EventName, actorCertificateAssigned.ToByteArray());
     }
 
     internal IntegrationEventPublisher EventPublisher { get; }
@@ -76,6 +77,8 @@ public class TestRunner : IAsyncDisposable
     internal string AzureEntraBackendAppId { get; }
 
     internal string EbixCertificatePassword { get; }
+
+    private string EbixCertificateThumbprint { get; }
 
     public async ValueTask DisposeAsync()
     {
