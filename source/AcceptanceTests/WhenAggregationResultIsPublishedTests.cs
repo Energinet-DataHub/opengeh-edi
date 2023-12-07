@@ -35,11 +35,11 @@ public sealed class WhenAggregationResultIsPublishedTests : TestRunner
     [Fact]
     public async Task Actor_can_peek_and_dequeue_aggregation_result()
     {
-        await _aggregations.EmptyQueueForActor(actorNumber: "5790000610976", actorRole: "metereddataresponsible");
+        await _aggregations.EmptyQueueForActor(actorNumber: ActorNumber, actorRole: ActorRole);
 
-        await _aggregations.PublishResultFor(gridAreaCode: "543");
+        await _aggregations.PublishResultFor(gridAreaCode: ActorGridArea);
 
         await _aggregations
-            .ConfirmResultIsAvailableFor(actorNumber: "5790000610976", actorRole: "metereddataresponsible");
+            .ConfirmResultIsAvailableFor(actorNumber: ActorNumber, actorRole: ActorRole);
     }
 }
