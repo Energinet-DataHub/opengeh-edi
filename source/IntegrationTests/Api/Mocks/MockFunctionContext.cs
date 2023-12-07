@@ -47,7 +47,6 @@ internal sealed class MockFunctionContext : FunctionContext
             mockHttpRequestData.Headers.Add(HeaderClientCertificateRetriever.CertificateHeaderName, certificateHexString);
 
         Features.Set<IHttpRequestDataFeature>(new MockHttpRequestDataFeature(mockHttpRequestData));
-
         Features.Set<IFunctionBindingsFeature>(new MockFunctionBindingsFeature());
 
         FunctionDefinition = new MockFunctionDefinition(triggerType);
@@ -71,6 +70,12 @@ internal sealed class MockFunctionContext : FunctionContext
 
     public override IInvocationFeatures Features { get; } = new MockFeatures();
 
+    public HttpResponseData? GetHttpResponse()
+    {
+        var functionBindingsFeature = Features.Get<IFunctionBindingsFeature>();
+        return (HttpResponseData?)functionBindingsFeature?.InvocationResult;
+    }
+
     private sealed class MockFeatures : IInvocationFeatures
     {
         private readonly Dictionary<Type, object> _features = new();
@@ -85,7 +90,7 @@ internal sealed class MockFunctionContext : FunctionContext
             return GetEnumerator();
         }
 
-        public void Set<T>(T instance)
+        public void Set<T>(T? instance)
         {
             var type = typeof(T);
 
@@ -97,9 +102,7 @@ internal sealed class MockFunctionContext : FunctionContext
 
         public T? Get<T>()
         {
-            var type = typeof(T);
-
-            return (T?)_features.GetValueOrDefault(type);
+            return (T?)_features.GetValueOrDefault(typeof(T));
         }
     }
 
@@ -163,27 +166,27 @@ internal sealed class MockFunctionContext : FunctionContext
     {
         public MockFunctionDefinition(TriggerType triggerType)
         {
-            // context.FunctionDefinition.InputBindings.Any(input => input.Value.Type.Equals(triggerType.ToString(), StringComparison.OrdinalIgnoreCase));
             var dictionary = new Dictionary<string, BindingMetadata>
             {
                 { "Trigger", new MockBindingMetadata(triggerType.ToString(), triggerType.ToString(), BindingDirection.In) },
             };
             InputBindings = ImmutableDictionary.CreateRange(dictionary);
+            Parameters = ImmutableArray<FunctionParameter>.Empty;
         }
 
         public override ImmutableArray<FunctionParameter> Parameters { get; }
 
-        public override string PathToAssembly { get; } = null!;
+        public override string PathToAssembly => null!;
 
-        public override string EntryPoint { get; } = null!;
+        public override string EntryPoint => null!;
 
-        public override string Id { get; } = null!;
+        public override string Id => null!;
 
-        public override string Name { get; } = null!;
+        public override string Name => null!;
 
         public override IImmutableDictionary<string, BindingMetadata> InputBindings { get; }
 
-        public override IImmutableDictionary<string, BindingMetadata> OutputBindings { get; } = null!;
+        public override IImmutableDictionary<string, BindingMetadata> OutputBindings => null!;
     }
 
     private sealed class MockBindingMetadata : BindingMetadata

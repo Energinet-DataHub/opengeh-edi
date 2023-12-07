@@ -14,6 +14,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
@@ -110,6 +111,24 @@ public class WhenActorIsTryingToAuthenticate : TestBase
 
         // Assert
         Assert.Equal(0, _nextSpy.NextCalledCount);
+    }
+
+    [Fact]
+    public async Task When_calling_authentication_middleware_without_certificate_then_the_http_response_is_unauthorized()
+    {
+        // Arrange
+        var functionContext = _functionContextBuilder
+            .TriggeredByHttp("application/ebix", withCertificate: null)
+            .Build();
+        var sut = CreateMarketActorAuthenticatorMiddleware();
+
+        // Act
+        await sut.Invoke(functionContext, _next);
+
+        // Assert
+        var response = functionContext.GetHttpResponse();
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
     [Fact]
