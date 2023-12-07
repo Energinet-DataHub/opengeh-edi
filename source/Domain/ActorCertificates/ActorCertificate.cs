@@ -49,7 +49,7 @@ public class ActorCertificate
     public void Update(CertificateThumbprint thumbprint, Instant validFrom, int sequenceNumber)
     {
         if (sequenceNumber <= SequenceNumber)
-            throw new ArgumentException("Sequence number must be greater than current sequence number", nameof(sequenceNumber));
+            throw new ArgumentException($"New sequence number ({sequenceNumber}) must be greater than current sequence number ({SequenceNumber})", nameof(sequenceNumber));
 
         Thumbprint = thumbprint;
         ValidFrom = validFrom;

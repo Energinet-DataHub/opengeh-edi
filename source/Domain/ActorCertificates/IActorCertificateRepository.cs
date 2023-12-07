@@ -23,15 +23,18 @@ namespace Energinet.DataHub.EDI.Domain.ActorCertificates;
 public interface IActorCertificateRepository
 {
     /// <summary>
-    /// Create or update actor certificate from ActorCertificateCredentialsAssigned integration event
+    /// Get actor certificate from thumbprint. Returns null if no actor certificate was found.
     /// </summary>
-    /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-    Task CreateOrUpdateAsync(ActorNumber actorNumber, MarketRole role, CertificateThumbprint thumbprint, Instant validFrom, int sequenceNumber);
+    Task<ActorCertificate?> GetFromThumbprintAsync(CertificateThumbprint thumbprint);
 
     /// <summary>
-    /// Get actor certificate from thumbprint
+    /// Get actor certificate from the actor and role combination. Returns null if no actor certificate was found for the given combination.
     /// </summary>
-    /// <param name="thumbprint"></param>
-    /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
-    Task<ActorCertificates.ActorCertificate?> GetFromThumbprintAsync(CertificateThumbprint thumbprint);
+    Task<ActorCertificate?> GetFromActorRoleAsync(ActorNumber actorNumber, MarketRole actorRole);
+
+    /// <summary>
+    /// Add the actor certificate to storage
+    /// </summary>
+    /// <param name="newActorCertificate"></param>
+    void Add(ActorCertificate newActorCertificate);
 }

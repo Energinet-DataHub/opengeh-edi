@@ -25,14 +25,14 @@ namespace Energinet.DataHub.EDI.Api.Authentication
     public interface IMarketActorAuthenticator
     {
         /// <summary>
-        /// Authenticates a user from a claims principal
+        /// Authenticates a market actor from a claims principal
         /// </summary>
         /// <param name="claimsPrincipal"></param>
         /// <param name="cancellationToken"></param>
         Task<bool> AuthenticateAsync(ClaimsPrincipal claimsPrincipal, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Authenticates a user
+        /// Authenticates a market actor
         /// </summary>
         /// <param name="actorNumber">Actor number, typically found from the external id in the `azp` claim</param>
         /// <param name="marketRole">User role, typically found from the `role` claim</param>
