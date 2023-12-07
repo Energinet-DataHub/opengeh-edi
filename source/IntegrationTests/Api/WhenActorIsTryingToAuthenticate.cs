@@ -27,6 +27,8 @@ using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.IntegrationTests.Api.Mocks;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NodaTime;
@@ -41,12 +43,16 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Api;
 public class WhenActorIsTryingToAuthenticate : TestBase
 {
     private readonly NextSpy _nextSpy;
+    private readonly FunctionExecutionDelegate _next;
+    private readonly FunctionContextBuilder _functionContextBuilder;
 
     public WhenActorIsTryingToAuthenticate(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         AuthenticatedActor.SetAuthenticatedActor(null);
         _nextSpy = new NextSpy();
+        _next = _nextSpy.Next;
+        _functionContextBuilder = new FunctionContextBuilder(ServiceProvider);
     }
 
     [Fact]
@@ -55,11 +61,15 @@ public class WhenActorIsTryingToAuthenticate : TestBase
         // Arrange
         using var testCertificate = CreateTestCertificate();
         await CreateActorCertificatesInDatabase(withThumbprint: testCertificate.Thumbprint);
-        var mockFunctionContext = CreateMockFunctionContext(TriggerType.HttpTrigger, contentType: "application/ebix", certificate: testCertificate);
+
+        var functionContext = _functionContextBuilder
+            .TriggeredByHttp("application/ebix", withCertificate: testCertificate)
+            .Build();
+
         var sut = CreateMarketActorAuthenticatorMiddleware();
 
         // Act
-        await sut.Invoke(mockFunctionContext, _nextSpy.Next);
+        await sut.Invoke(functionContext, _next);
 
         // Assert
         Assert.Equal(1, _nextSpy.NextCalledCount);
@@ -73,12 +83,14 @@ public class WhenActorIsTryingToAuthenticate : TestBase
         using var testCertificate = CreateTestCertificate();
         await CreateActorCertificatesInDatabase(withActorNumber: expectedActorNumber, withThumbprint: testCertificate.Thumbprint);
 
-        var mockFunctionContext = CreateMockFunctionContext(TriggerType.HttpTrigger, contentType: "application/ebix", certificate: testCertificate);
+        var functionContext = _functionContextBuilder
+            .TriggeredByHttp("application/ebix", withCertificate: testCertificate)
+            .Build();
 
         var sut = CreateMarketActorAuthenticatorMiddleware();
 
         // Act
-        await sut.Invoke(mockFunctionContext, _nextSpy.Next);
+        await sut.Invoke(functionContext, _next);
 
         // Assert
         Assert.Equal(expectedActorNumber, AuthenticatedActor.CurrentActorIdentity.ActorNumber.Value);
@@ -88,11 +100,13 @@ public class WhenActorIsTryingToAuthenticate : TestBase
     public async Task When_calling_authentication_middleware_without_certificate_then_next_is_not_called()
     {
         // Arrange
-        var mockFunctionContext = CreateMockFunctionContext(TriggerType.HttpTrigger, contentType: "application/ebix", certificate: null);
+        var functionContext = _functionContextBuilder
+            .TriggeredByHttp("application/ebix", withCertificate: null)
+            .Build();
         var sut = CreateMarketActorAuthenticatorMiddleware();
 
         // Act
-        await sut.Invoke(mockFunctionContext, _nextSpy.Next);
+        await sut.Invoke(functionContext, _next);
 
         // Assert
         Assert.Equal(0, _nextSpy.NextCalledCount);
@@ -105,11 +119,13 @@ public class WhenActorIsTryingToAuthenticate : TestBase
         await CreateActorCertificatesInDatabase(withThumbprint: "incorrect-thumbprint");
 
         using var testCertificate = CreateTestCertificate();
-        var mockFunctionContext = CreateMockFunctionContext(TriggerType.HttpTrigger, contentType: "application/ebix", certificate: testCertificate);
+        var functionContext = _functionContextBuilder
+            .TriggeredByHttp("application/ebix", withCertificate: testCertificate)
+            .Build();
         var sut = CreateMarketActorAuthenticatorMiddleware();
 
         // Act
-        await sut.Invoke(mockFunctionContext, _nextSpy.Next);
+        await sut.Invoke(functionContext, _next);
 
         // Assert
         Assert.Equal(0, _nextSpy.NextCalledCount);
@@ -122,12 +138,14 @@ public class WhenActorIsTryingToAuthenticate : TestBase
         using var testCertificate = CreateTestCertificate();
         await CreateActorCertificatesInDatabase(withThumbprint: testCertificate.Thumbprint);
 
-        var mockFunctionContext = CreateMockFunctionContext(TriggerType.HttpTrigger, contentType: "application/ebix");
+        var functionContext = _functionContextBuilder
+            .TriggeredByHttp("application/ebix", withCertificate: null)
+            .Build();
 
         var sut = CreateMarketActorAuthenticatorMiddleware();
 
         // Act
-        await sut.Invoke(mockFunctionContext, _nextSpy.Next);
+        await sut.Invoke(functionContext, _next);
 
         // Assert
         Assert.Throws<InvalidOperationException>(() => AuthenticatedActor.CurrentActorIdentity.ActorNumber.Value);
@@ -140,12 +158,14 @@ public class WhenActorIsTryingToAuthenticate : TestBase
         using var testCertificate = CreateTestCertificate();
         await CreateActorCertificatesInDatabase(withThumbprint: "incorrect-thumbprint");
 
-        var mockFunctionContext = CreateMockFunctionContext(TriggerType.HttpTrigger, contentType: "application/ebix", certificate: testCertificate);
+        var functionContext = _functionContextBuilder
+            .TriggeredByHttp("application/ebix", withCertificate: null)
+            .Build();
 
         var sut = CreateMarketActorAuthenticatorMiddleware();
 
         // Act
-        await sut.Invoke(mockFunctionContext, _nextSpy.Next);
+        await sut.Invoke(functionContext, _next);
 
         // Assert
         Assert.Throws<InvalidOperationException>(() => AuthenticatedActor.CurrentActorIdentity.ActorNumber.Value);
@@ -163,11 +183,14 @@ public class WhenActorIsTryingToAuthenticate : TestBase
             .WithClaim(ClaimsMap.UserId, externalId)
             .CreateToken();
 
-        var mockFunctionContext = CreateMockFunctionContext(TriggerType.HttpTrigger, contentType: null, bearerToken: token);
+        var functionContext = _functionContextBuilder
+            .TriggeredByHttp(withContentType: null, withToken: token)
+            .Build();
+
         var sut = CreateMarketActorAuthenticatorMiddleware();
 
         // Act
-        await sut.Invoke(mockFunctionContext, _nextSpy.Next);
+        await sut.Invoke(functionContext, _next);
 
         // Assert
         Assert.Equal(1, _nextSpy.NextCalledCount);
