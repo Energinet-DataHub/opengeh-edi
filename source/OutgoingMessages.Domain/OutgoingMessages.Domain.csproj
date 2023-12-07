@@ -6,12 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
-    <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj"/>
+    <ProjectReference Include="..\Common\Common.csproj"/>
+    <ProjectReference Include="..\MaterData.Domain\MaterData.Domain.csproj"/>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.0.0" />
+    <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.0.0"/>
   </ItemGroup>
 
 </Project>

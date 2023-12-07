@@ -13,26 +13,24 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
-using Energinet.DataHub.EDI.Domain.GridAreaOwners;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.MasterData.Domain.Actors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.EDI.Infrastructure.GridAreas;
+namespace Energinet.DataHub.EDI.MasterData.Infrastructure.Actors;
 
-public class GridAreaOwnerEntityConfiguration : IEntityTypeConfiguration<GridAreaOwner>
+public class ActorEntityConfiguration : IEntityTypeConfiguration<Actor>
 {
-    public void Configure(EntityTypeBuilder<GridAreaOwner> builder)
+    public void Configure(EntityTypeBuilder<Actor> builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        builder.ToTable("GridAreaOwner", "dbo");
+        builder.ToTable("Actor", "dbo");
         builder.HasKey("_id");
         builder.Property<Guid>("_id").HasColumnName("Id");
-        builder.Property(entity => entity.GridAreaCode);
-        builder.Property(entity => entity.ValidFrom);
-        builder.Property(entity => entity.SequenceNumber);
-        builder.Property(receiver => receiver.GridAreaOwnerActorNumber)
+        builder.Property(receiver => receiver.ActorNumber).HasColumnName("ActorNumber")
             .HasConversion(toDbValue => toDbValue.Value, fromDbValue => ActorNumber.Create(fromDbValue));
+        builder.Property(entity => entity.ExternalId);
     }
 }

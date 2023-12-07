@@ -13,9 +13,7 @@
 // limitations under the License.
 
 using System;
-using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using BuildingBlocks.Application.Configuration;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
@@ -24,11 +22,8 @@ using Energinet.DataHub.EDI.Api.Authentication;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
@@ -37,17 +32,16 @@ using Energinet.DataHub.EDI.IncomingMessages.Application.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
-using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Configuration;
 using Energinet.DataHub.EDI.Process.Application.Configuration;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Google.Protobuf;
-using IncomingMessages.Infrastructure;
 using IncomingMessages.Infrastructure.Configuration.DataAccess;
 using MediatR;
 using Microsoft.Extensions.Configuration;
@@ -62,6 +56,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
     {
         private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
         private readonly B2BContext _b2BContext;
+        private readonly MasterDataContext _masterDataContext;
         private readonly ProcessContext _processContext;
         private readonly IncomingMessagesContext _incomingMessagesContext;
         private ServiceCollection? _services;
@@ -76,6 +71,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             InboxEventNotificationHandler = new TestNotificationHandlerSpy();
             BuildServices();
             _b2BContext = GetService<B2BContext>();
+            _masterDataContext = GetService<MasterDataContext>();
             _processContext = GetService<ProcessContext>();
             _incomingMessagesContext = GetService<IncomingMessagesContext>();
             var authenticatedActor = GetService<AuthenticatedActor>();
@@ -108,6 +104,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             }
 
             _b2BContext.Dispose();
+            _masterDataContext.Dispose();
             _processContext.Dispose();
             _incomingMessagesContext.Dispose();
             _serviceBusSenderFactoryStub.Dispose();
@@ -183,6 +180,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             });
 
             _services.AddScopedSqlDbContext<B2BContext>(config);
+            _services.AddScopedSqlDbContext<MasterDataContext>(config);
 
             CompositionRoot.Initialize(_services)
                 .AddRemoteBusinessService<DummyRequest, DummyReply>(

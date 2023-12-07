@@ -20,7 +20,7 @@ using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Microsoft.Data.SqlClient;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Actors;
+namespace Energinet.DataHub.EDI.MasterData.Infrastructure.Actors;
 
 public class ActorRegistry : IActorRegistry
 {

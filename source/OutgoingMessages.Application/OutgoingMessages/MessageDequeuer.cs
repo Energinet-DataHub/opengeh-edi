@@ -16,9 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
-using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;

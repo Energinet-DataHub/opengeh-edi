@@ -12,13 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Diagnostics;
-using System.Net;
-using System.Net.Http.Headers;
 using System.Text.Json;
-using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
-using Energinet.DataHub.EDI.AcceptanceTests.Factories;
-using Microsoft.Azure.Amqp.Framing;
 using Newtonsoft.Json.Linq;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;

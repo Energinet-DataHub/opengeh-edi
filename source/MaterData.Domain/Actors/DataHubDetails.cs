@@ -12,28 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+namespace Energinet.DataHub.EDI.MasterData.Domain.Actors;
 
-public class InvalidActorNumberException : Exception
+public static class DataHubDetails
 {
-    private InvalidActorNumberException(string message)
-        : base(message)
-    {
-    }
-
-    private InvalidActorNumberException()
-    {
-    }
-
-    private InvalidActorNumberException(string message, Exception innerException)
-        : base(message, innerException)
-    {
-    }
-
-    public static InvalidActorNumberException Create(string invalidActorNumber)
-    {
-        return new InvalidActorNumberException($"{invalidActorNumber} is not a valid actor number");
-    }
+    public static ActorNumber IdentificationNumber => ActorNumber.Create("5790001330552");
 }

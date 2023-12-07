@@ -15,8 +15,8 @@
 using System.Security.Claims;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.EDI.B2CWebApi.Exceptions;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Security;
 

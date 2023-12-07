@@ -14,12 +14,10 @@
 
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.ActorCertificate;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Domain.ActorCertificates;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.Infrastructure.ActorCertificate;
 

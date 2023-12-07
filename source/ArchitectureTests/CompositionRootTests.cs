@@ -21,7 +21,6 @@ using System.Text;
 using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.B2CWebApi;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
-using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Xml;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;

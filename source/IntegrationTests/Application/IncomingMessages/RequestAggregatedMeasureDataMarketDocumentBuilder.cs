@@ -14,9 +14,9 @@
 
 using System;
 using System.Collections.Generic;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.MasterData.Domain.Actors;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;

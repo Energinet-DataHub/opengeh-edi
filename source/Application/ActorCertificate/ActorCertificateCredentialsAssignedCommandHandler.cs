@@ -15,12 +15,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Domain.ActorCertificates;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.Application.ActorCertificate;
 

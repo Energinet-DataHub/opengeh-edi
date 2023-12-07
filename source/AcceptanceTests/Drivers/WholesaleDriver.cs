@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
+using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 

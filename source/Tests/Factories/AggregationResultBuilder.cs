@@ -14,10 +14,8 @@
 
 using System;
 using System.Collections.Generic;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Domain.GridAreaOwners;
+using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using NodaTime;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;

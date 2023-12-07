@@ -20,7 +20,6 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using IncomingMessages.Infrastructure;
 using Microsoft.Azure.Functions.Worker;
