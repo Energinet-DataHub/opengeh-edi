@@ -21,7 +21,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 internal sealed class WholesaleDriver
 {
-    private const string BalanceResponsiblePartyMarketRoleCode = "DDK";
+    public const string BalanceResponsiblePartyMarketRoleCode = "DDK";
     private readonly IntegrationEventPublisher _integrationEventPublisher;
 
     internal WholesaleDriver(IntegrationEventPublisher integrationEventPublisher)

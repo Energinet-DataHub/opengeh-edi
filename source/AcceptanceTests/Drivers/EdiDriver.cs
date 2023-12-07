@@ -19,6 +19,7 @@ using System.Text;
 using System.Text.Json;
 using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
 using Energinet.DataHub.EDI.AcceptanceTests.Factories;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Microsoft.Data.SqlClient;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
@@ -45,7 +46,7 @@ internal sealed class EdiDriver : IDisposable
     public async Task<Stream> RequestAggregatedMeasureDataAsync(string actorNumber, string[] marketRoles, bool asyncError = false, string? overrideToken = null)
     {
         var token = overrideToken ?? TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
-        var response = await RequestAggregatedMeasureDataAsync(actorNumber, token, asyncError).ConfigureAwait(false);
+        var response = await RequestAggregatedMeasureDataAsync(token, asyncError).ConfigureAwait(false);
 
         var document = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
         return document;
@@ -142,23 +143,25 @@ internal sealed class EdiDriver : IDisposable
         return peekResponse.Headers.GetValues("MessageId").First();
     }
 
-    private static string GetContent(string actorNumber, bool asyncError)
+    private static string GetContent(bool forceAsyncError, MarketRole? marketRole = null)
     {
         string jsonRequestAcceptedFilePath;
         string jsonRequestAsynchronousRejectedFilePath;
 
-        if (actorNumber.Equals(TestRunner.AcceptanceTestActorNumber, StringComparison.OrdinalIgnoreCase))
+        switch (marketRole?.Code)
         {
-            jsonRequestAcceptedFilePath = "Messages/json/RequestAggregatedMeasureDataBalanceResponsible.json";
-            jsonRequestAsynchronousRejectedFilePath = "Messages/json/RequestAggregatedMeasureDataBalanceResponsibleWithBadPeriod.json";
-        }
-        else
-        {
-            jsonRequestAcceptedFilePath = "Messages/json/RequestAggregatedMeasureData.json";
-            jsonRequestAsynchronousRejectedFilePath = "Messages/json/RequestAggregatedMeasureDataWithBadPeriod.json";
+            case WholesaleDriver.BalanceResponsiblePartyMarketRoleCode:
+                jsonRequestAcceptedFilePath = "Messages/json/RequestAggregatedMeasureDataBalanceResponsible.json";
+                jsonRequestAsynchronousRejectedFilePath = "Messages/json/RequestAggregatedMeasureDataBalanceResponsibleWithBadPeriod.json";
+                break;
+
+            default:
+                jsonRequestAcceptedFilePath = "Messages/json/RequestAggregatedMeasureData.json";
+                jsonRequestAsynchronousRejectedFilePath = "Messages/json/RequestAggregatedMeasureDataWithBadPeriod.json";
+                break;
         }
 
-        var jsonFilePath = asyncError
+        var jsonFilePath = forceAsyncError
             ? jsonRequestAsynchronousRejectedFilePath
             : jsonRequestAcceptedFilePath;
 
@@ -170,11 +173,11 @@ internal sealed class EdiDriver : IDisposable
         return jsonContent;
     }
 
-    private async Task<HttpResponseMessage> RequestAggregatedMeasureDataAsync(string actorNumber, string token, bool asyncError)
+    private async Task<HttpResponseMessage> RequestAggregatedMeasureDataAsync(string token, bool asyncError)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, "api/RequestAggregatedMeasureMessageReceiver");
         request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
-        request.Content = new StringContent(GetContent(actorNumber, asyncError), Encoding.UTF8, "application/json");
+        request.Content = new StringContent(GetContent(asyncError), Encoding.UTF8, "application/json");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
         var aggregatedMeasureDataResponse = await _httpClient.SendAsync(request).ConfigureAwait(false);
