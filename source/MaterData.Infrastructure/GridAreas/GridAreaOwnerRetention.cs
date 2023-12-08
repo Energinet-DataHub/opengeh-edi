@@ -17,36 +17,36 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.Common.DateTime;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.Infrastructure.GridAreas;
+namespace Energinet.DataHub.EDI.MasterData.Infrastructure.GridAreas;
 
 public class GridAreaOwnerRetention : IDataRetention
 {
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-    private readonly B2BContext _b2BContext;
+    private readonly MasterDataContext _masterDataContext;
 
     public GridAreaOwnerRetention(
         ISystemDateTimeProvider systemDateTimeProvider,
-        B2BContext b2BContext)
+        MasterDataContext masterDataContext)
     {
         _systemDateTimeProvider = systemDateTimeProvider;
-        _b2BContext = b2BContext;
+        _masterDataContext = masterDataContext;
     }
 
     public async Task CleanupAsync(CancellationToken cancellationToken)
     {
        var now = _systemDateTimeProvider.Now();
        var monthAgo = now.Plus(-Duration.FromDays(30));
-       _b2BContext.GridAreaOwners.RemoveRange(
-            _b2BContext.GridAreaOwners
+       _masterDataContext.GridAreaOwners.RemoveRange(
+           _masterDataContext.GridAreaOwners
                 .Where(x => x.ValidFrom < monthAgo)
-                .Where(x => _b2BContext.GridAreaOwners.Any(y =>
+                .Where(x => _masterDataContext.GridAreaOwners.Any(y =>
                     y.GridAreaCode == x.GridAreaCode
                     && y.ValidFrom < now
                     && y.SequenceNumber > x.SequenceNumber)));
 
-       await _b2BContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+       await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 }

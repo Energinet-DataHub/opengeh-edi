@@ -13,11 +13,7 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
-using Energinet.DataHub.EDI.Domain.GridAreaOwners;
 using Energinet.DataHub.EDI.Infrastructure.ActorCertificate;
-using Energinet.DataHub.EDI.Infrastructure.Actors;
-using Energinet.DataHub.EDI.Infrastructure.GridAreas;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,10 +33,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 
         public DbSet<ReceivedInboxEvent> ReceivedInboxEvents { get; private set; }
 
-        public DbSet<Actor> Actors { get; private set; }
-
-        public DbSet<GridAreaOwner> GridAreaOwners { get; private set; }
-
         public DbSet<Domain.ActorCertificates.ActorCertificate> ActorCertificates { get; private set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -48,8 +40,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
 
             modelBuilder.ApplyConfiguration(new ReceivedInboxEventEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new ActorEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new GridAreaOwnerEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ActorCertificateEntityConfiguration());
         }
     }

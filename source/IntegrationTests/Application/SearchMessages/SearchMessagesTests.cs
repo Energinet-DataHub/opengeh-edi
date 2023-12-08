@@ -19,13 +19,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using NodaTime;
+using NodaTime.Text;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.SearchMessages;
@@ -244,7 +243,7 @@ public class SearchMessagesTests : TestBase
 
     private static Instant CreatedAt(string date)
     {
-        return NodaTime.Text.InstantPattern.General.Parse(date).Value;
+        return InstantPattern.General.Parse(date).Value;
     }
 
     private ArchivedMessage CreateArchivedMessage(

@@ -13,9 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Domain;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Domain.Transactions.Aggregations;

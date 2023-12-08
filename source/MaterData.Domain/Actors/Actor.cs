@@ -12,10 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors
+using System;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+
+namespace Energinet.DataHub.EDI.MasterData.Domain.Actors;
+
+public class Actor
 {
-    public static class DataHubDetails
+    private readonly Guid _id;
+
+    public Actor(ActorNumber actorNumber, string externalId)
     {
-        public static ActorNumber IdentificationNumber => ActorNumber.Create("5790001330552");
+        _id = Guid.NewGuid();
+        ActorNumber = actorNumber;
+        ExternalId = externalId;
     }
+
+#pragma warning disable
+    private Actor()
+    {
+    }
+
+    public ActorNumber ActorNumber { get; set; }
+
+    public string ExternalId { get; set; }
 }
