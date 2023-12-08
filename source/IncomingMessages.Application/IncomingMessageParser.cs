@@ -26,6 +26,7 @@ using IncomingMessages.Infrastructure.Messages;
 using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 using IncomingMessages.Infrastructure.Response;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application;
@@ -38,6 +39,7 @@ public class IncomingMessageParser : IIncomingMessageParser
     private readonly ResponseFactory _responseFactory;
     private readonly IArchivedMessagesClient _archivedMessagesClient;
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
+    private readonly ILogger<IncomingMessageParser> _logger;
 
     public IncomingMessageParser(
         MarketMessageParser marketMessageParser,
@@ -45,7 +47,8 @@ public class IncomingMessageParser : IIncomingMessageParser
         RequestAggregatedMeasureDataValidator aggregatedMeasureDataMarketMessageValidator,
         ResponseFactory responseFactory,
         IArchivedMessagesClient archivedMessagesClient,
-        IDatabaseConnectionFactory databaseConnectionFactory)
+        IDatabaseConnectionFactory databaseConnectionFactory,
+        ILogger<IncomingMessageParser> logger)
     {
         _marketMessageParser = marketMessageParser;
         _incomingRequestAggregatedMeasuredDataSender = incomingRequestAggregatedMeasuredDataSender;
@@ -53,6 +56,7 @@ public class IncomingMessageParser : IIncomingMessageParser
         _responseFactory = responseFactory;
         _archivedMessagesClient = archivedMessagesClient;
         _databaseConnectionFactory = databaseConnectionFactory;
+        _logger = logger;
     }
 
     public async Task<ResponseMessage> ParseAsync(
@@ -62,15 +66,18 @@ public class IncomingMessageParser : IIncomingMessageParser
         CancellationToken cancellationToken,
         DocumentFormat responseFormat = null!)
     {
+        if (message == null) throw new ArgumentNullException(nameof(message));
         var requestAggregatedMeasureDataMarketMessageParserResult =
             await _marketMessageParser.ParseAsync(message, documentFormat, documentType, cancellationToken).ConfigureAwait(false);
 
         if (requestAggregatedMeasureDataMarketMessageParserResult.Errors.Any())
         {
             var res = Result.Failure(requestAggregatedMeasureDataMarketMessageParserResult.Errors.ToArray());
+            _logger.LogInformation("Failed to parse incoming message. Errors: {Errors}", res.Errors);
             return _responseFactory.From(res, responseFormat ?? documentFormat);
         }
 
+        RewindStream(message);
         await _archivedMessagesClient.CreateAsync(
             new ArchivedMessage(
                 Guid.NewGuid().ToString(),
@@ -104,6 +111,15 @@ public class IncomingMessageParser : IIncomingMessageParser
             return new ResponseMessage();
         }
 
+        _logger.LogInformation(
+            "Failed to validate incoming message: {MessageId}. Errors: {Errors}",
+            requestAggregatedMeasureDataMarketMessageParserResult.Dto.MessageId,
+            requestAggregatedMeasureDataMarketMessageParserResult.Errors);
         return _responseFactory.From(result, responseFormat ?? documentFormat);
+    }
+
+    private static void RewindStream(Stream message)
+    {
+        message.Seek(0, SeekOrigin.Begin);
     }
 }
