@@ -14,7 +14,6 @@
 
 using Energinet.DataHub.EDI.AcceptanceTests.Factories;
 using Google.Protobuf;
-using Microsoft.Data.SqlClient;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 

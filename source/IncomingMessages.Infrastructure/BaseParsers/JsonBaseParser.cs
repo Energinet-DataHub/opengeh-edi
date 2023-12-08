@@ -15,7 +15,6 @@
 using System.Globalization;
 using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
 using IncomingMessages.Infrastructure.DocumentValidation;
 using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 using IncomingMessages.Infrastructure.ValidationErrors;

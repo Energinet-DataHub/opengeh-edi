@@ -16,21 +16,21 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.GridAreas;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.DateTime;
-using Energinet.DataHub.EDI.Domain.GridAreaOwners;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
+using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.Infrastructure.GridAreas;
+namespace Energinet.DataHub.EDI.MasterData.Infrastructure.GridAreas;
 
 public class GridAreaRepository : IGridAreaRepository
 {
-    private readonly B2BContext _dbContext;
+    private readonly MasterDataContext _dbContext;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-    public GridAreaRepository(B2BContext dbContext, ISystemDateTimeProvider systemDateTimeProvider)
+    public GridAreaRepository(MasterDataContext dbContext, ISystemDateTimeProvider systemDateTimeProvider)
     {
         _dbContext = dbContext;
         _systemDateTimeProvider = systemDateTimeProvider;

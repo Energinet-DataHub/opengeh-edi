@@ -14,10 +14,8 @@
 
 using System;
 using System.Linq;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public class MarketRole : EnumerationType
 {
