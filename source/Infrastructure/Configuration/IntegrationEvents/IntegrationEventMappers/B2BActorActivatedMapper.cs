@@ -16,9 +16,7 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.Application.Actors;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using MediatR;
 

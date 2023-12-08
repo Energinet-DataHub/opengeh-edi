@@ -16,12 +16,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.DateTime;
-using Energinet.DataHub.EDI.Domain.GridAreaOwners;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.GridAreas;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
+using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.MasterData.Infrastructure.GridAreas;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using Xunit;
@@ -30,12 +30,12 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Retention;
 
 public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
 {
-    private readonly B2BContext _b2bContext;
+    private readonly MasterDataContext _masterDataContext;
 
     public RemoveOldGridAreaOwnersWhenADayHasPassedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _b2bContext = GetService<B2BContext>();
+        _masterDataContext = GetService<MasterDataContext>();
     }
 
     [Fact]
@@ -49,7 +49,9 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
 
         await AddActorsToDatabaseAsync(new List<GridAreaOwner>() { gridAreaOwner1, gridAreaOwner2 });
 
-        var sut = new GridAreaOwnerRetention(new SystemProviderMock(Instant.FromUtc(2023, 11, 3, 0, 0, 0)), _b2bContext);
+        var sut = new GridAreaOwnerRetention(
+            new SystemProviderMock(Instant.FromUtc(2023, 11, 3, 0, 0, 0)),
+            _masterDataContext);
 
         // Act
         await sut.CleanupAsync(CancellationToken.None);
@@ -71,7 +73,9 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
 
         await AddActorsToDatabaseAsync(new List<GridAreaOwner>() { gridAreaOwner1, gridAreaOwner2 });
 
-        var sut = new GridAreaOwnerRetention(new SystemProviderMock(Instant.FromUtc(2023, 11, 3, 0, 0, 0)), _b2bContext);
+        var sut = new GridAreaOwnerRetention(
+            new SystemProviderMock(Instant.FromUtc(2023, 11, 3, 0, 0, 0)),
+            _masterDataContext);
 
         // Act
         await sut.CleanupAsync(CancellationToken.None);
@@ -95,7 +99,9 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
         var gridAreaOwner4 = new GridAreaOwner(gridAreaCode2, Instant.FromUtc(2023, 10, 2, 0, 0, 0), ActorNumber.Create("9876543210987"), 2);
         await AddActorsToDatabaseAsync(new List<GridAreaOwner>() { gridAreaOwner3, gridAreaOwner4 });
 
-        var sut = new GridAreaOwnerRetention(new SystemProviderMock(Instant.FromUtc(2023, 11, 3, 0, 0, 0)), _b2bContext);
+        var sut = new GridAreaOwnerRetention(
+            new SystemProviderMock(Instant.FromUtc(2023, 11, 3, 0, 0, 0)),
+            _masterDataContext);
 
         // Act
         await sut.CleanupAsync(CancellationToken.None);
@@ -107,19 +113,19 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
 
     protected override void Dispose(bool disposing)
     {
-        _b2bContext.Dispose();
+        _masterDataContext.Dispose();
         base.Dispose(disposing);
     }
 
     private async Task AddActorsToDatabaseAsync(List<GridAreaOwner> gridAreaOwners)
     {
-        await _b2bContext.GridAreaOwners.AddRangeAsync(gridAreaOwners);
-        await _b2bContext.SaveChangesAsync();
+        await _masterDataContext.GridAreaOwners.AddRangeAsync(gridAreaOwners);
+        await _masterDataContext.SaveChangesAsync();
     }
 
     private async Task<List<GridAreaOwner>> GetGridAreaOwnersForGridArea(string gridAreaCode)
     {
-        return await _b2bContext.GridAreaOwners
+        return await _masterDataContext.GridAreaOwners
             .Where(x => x.GridAreaCode == gridAreaCode)
             .ToListAsync();
     }

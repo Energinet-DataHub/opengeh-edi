@@ -18,9 +18,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Application.GridAreas;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Exceptions;
@@ -94,12 +92,12 @@ public class AggregationFactory
         return new Period(InstantPattern.General.Parse(startOfPeriod).Value, InstantPattern.General.Parse(endOfPeriod).Value);
     }
 
-    private static GridAreaDetails MapGridAreaDetails(Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.GridAreaDetails timeSerieGridAreaDetails)
+    private static GridAreaDetails MapGridAreaDetails(Domain.Transactions.AggregatedMeasureData.GridAreaDetails timeSerieGridAreaDetails)
     {
         return new GridAreaDetails(timeSerieGridAreaDetails.GridAreaCode, timeSerieGridAreaDetails.OperatorNumber);
     }
 
-    private static List<Point> MapPoints(IReadOnlyList<Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.Point> points)
+    private static List<Point> MapPoints(IReadOnlyList<Domain.Transactions.AggregatedMeasureData.Point> points)
     {
         return points.Select(point => new Point(point.Position, point.Quantity, point.Quality, point.SampleTime))
             .ToList();

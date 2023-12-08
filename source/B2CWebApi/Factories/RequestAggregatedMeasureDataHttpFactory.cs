@@ -13,10 +13,9 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.B2CWebApi.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+using Energinet.DataHub.EDI.MasterData.Domain.Actors;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using NodaTime;
-using MarketRole = Energinet.DataHub.EDI.B2CWebApi.Models.MarketRole;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Factories;
 
