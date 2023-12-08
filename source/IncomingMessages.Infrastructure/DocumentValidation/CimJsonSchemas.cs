@@ -24,7 +24,9 @@ public sealed class CimJsonSchemas : SchemaBase, ISchema
 
     public CimJsonSchemas()
     {
-        InitializeSchemas(FillSchemaDictionary(_schemaPath));
+        var executionPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+        var absoluteSchemaPath = Path.Combine(executionPath!, _schemaPath);
+        InitializeSchemas(FillSchemaDictionary(absoluteSchemaPath));
     }
 
     public string SchemaPath => _schemaPath;
