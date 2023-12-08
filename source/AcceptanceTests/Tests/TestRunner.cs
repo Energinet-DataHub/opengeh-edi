@@ -18,14 +18,14 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Google.Protobuf;
 using Microsoft.Extensions.Configuration;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 
 public class TestRunner : IAsyncDisposable
 {
     internal const string BalanceResponsibleActorNumber = "5790000392551"; // Corresponds to the "Test til Phoenix" actor in the UI. Actor numbers in the UI doesn't equal the actor numbers we have in our database (our database has bad data).
     internal const string BalanceResponsibleActorRole = "balanceresponsibleparty";
 
-    protected TestRunner()
+    public TestRunner()
     {
         var root = new ConfigurationBuilder()
             .AddJsonFile("integrationtest.local.settings.json", true)
