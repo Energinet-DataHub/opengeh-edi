@@ -119,7 +119,7 @@ public class IncomingMessageParser : IIncomingMessageParser
         return _responseFactory.From(result, responseFormat ?? documentFormat);
     }
 
-    private static void EnsureStreamIsRewound(Stream message)
+    private static void RewindStream(Stream message)
     {
         message.Seek(0, SeekOrigin.Begin);
     }
