@@ -58,6 +58,9 @@ public class TestRunner : IAsyncDisposable
 
         var actorCertificateAssigned = ActorCertificateFactory.CreateActorCertificateAssigned(ActorNumber, ActorEicFunction, EbixCertificateThumbprint);
         _ = EventPublisher.PublishAsync(ActorCertificateCredentialsAssigned.EventName, actorCertificateAssigned.ToByteArray());
+
+        var gridAreaOwnerAssigned = GridAreaFactory.AssignedGridAreaOwner(ActorNumber, ActorGridArea, ActorEicFunction);
+        _ = EventPublisher.PublishAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnerAssigned.ToByteArray());
     }
 
     internal IntegrationEventPublisher EventPublisher { get; }
