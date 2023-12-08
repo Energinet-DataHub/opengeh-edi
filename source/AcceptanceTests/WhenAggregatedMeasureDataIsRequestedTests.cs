@@ -49,4 +49,22 @@ public sealed class WhenAggregatedMeasureDataIsRequestedTests : TestRunner
 
         await _aggregationRequest.ConfirmRejectedResultIsAvailableFor(actorNumber: ActorNumber, actorRole: ActorRole);
     }
+
+    [Fact]
+    public async Task Actor_cannot_request_aggregated_measure_data_without_token()
+    {
+        await _aggregationRequest.ConfirmRequestAggregatedMeasureDataWithoutTokenIsNotAllowed();
+    }
+
+    [Fact]
+    public async Task Actor_cannot_peek_without_token()
+    {
+        await _aggregationRequest.ConfirmPeekWithoutTokenIsNotAllowed();
+    }
+
+    [Fact]
+    public async Task Actor_cannot_dequeue_without_token()
+    {
+        await _aggregationRequest.ConfirmDequeueWithoutTokenIsNotAllowed();
+    }
 }
