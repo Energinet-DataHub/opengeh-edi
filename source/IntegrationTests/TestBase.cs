@@ -14,13 +14,12 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using BuildingBlocks.Application.Configuration;
-using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Api.Authentication;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
-using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -37,7 +36,9 @@ using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.Marke
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
-using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.MasterData.Application.Configuration;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Configuration;
 using Energinet.DataHub.EDI.Process.Application.Configuration;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
@@ -48,6 +49,7 @@ using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+using IIntegrationEventHandler = Energinet.DataHub.Core.Messaging.Communication.Subscriber.IIntegrationEventHandler;
 
 namespace Energinet.DataHub.EDI.IntegrationTests
 {
@@ -56,7 +58,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
     {
         private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
         private readonly B2BContext _b2BContext;
-        private readonly MasterDataContext _masterDataContext;
         private readonly ProcessContext _processContext;
         private readonly IncomingMessagesContext _incomingMessagesContext;
         private ServiceCollection? _services;
@@ -71,7 +72,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             InboxEventNotificationHandler = new TestNotificationHandlerSpy();
             BuildServices();
             _b2BContext = GetService<B2BContext>();
-            _masterDataContext = GetService<MasterDataContext>();
             _processContext = GetService<ProcessContext>();
             _incomingMessagesContext = GetService<IncomingMessagesContext>();
             AuthenticatedActor = GetService<AuthenticatedActor>();
@@ -106,7 +106,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             }
 
             _b2BContext.Dispose();
-            _masterDataContext.Dispose();
             _processContext.Dispose();
             _incomingMessagesContext.Dispose();
             _serviceBusSenderFactoryStub.Dispose();
@@ -117,6 +116,11 @@ namespace Energinet.DataHub.EDI.IntegrationTests
         protected Task<TResult> InvokeCommandAsync<TResult>(ICommand<TResult> command)
         {
             return GetService<IMediator>().Send(command);
+        }
+
+        protected Task CreateActorIfNotExistAsync(CreateActorDto createActorDto)
+        {
+            return GetService<IMasterDataClient>().CreateActorIfNotExistAsync(createActorDto, CancellationToken.None);
         }
 
         protected async Task HavingReceivedInboxEventAsync(string eventType, IMessage eventPayload, Guid processId)
@@ -174,12 +178,11 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             _services.AddTransient<IRequestHandler<TestCreateOutgoingMessageCommand, Unit>, TestCreateOutgoingCommandHandler>();
 
             _services.AddScopedSqlDbContext<B2BContext>(config);
-            _services.AddScopedSqlDbContext<MasterDataContext>(config);
 
             _services.AddTransient<IIntegrationEventHandler, IntegrationEventHandler>();
             _services.AddAuthentication(
                 sp => new MarketActorAuthenticator(
-                    sp.GetRequiredService<IActorRepository>(),
+                    sp.GetRequiredService<IMasterDataClient>(),
                     sp.GetRequiredService<AuthenticatedActor>()));
 
             CompositionRoot.Initialize(_services)
@@ -192,13 +195,13 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                     correlation.SetId(Guid.NewGuid().ToString());
                     return correlation;
                 })
-                .AddMessagePublishing()
                 .AddBearerAuthentication(JwtTokenParserTests.DisableAllTokenValidations);
 
             _services.AddActorMessageQueueModule(config);
             _services.AddProcessModule(config);
             _services.AddArchivedMessagesModule(config);
             _services.AddIncomingMessagesModule(config);
+            _services.AddMasterDataModule(config);
 
             // Replace the services with stub implementations.
             // - Building blocks

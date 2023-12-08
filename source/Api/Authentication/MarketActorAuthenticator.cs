@@ -18,21 +18,21 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
 
 namespace Energinet.DataHub.EDI.Api.Authentication
 {
     public class MarketActorAuthenticator : IMarketActorAuthenticator
     {
-        private readonly IActorRepository _actorRepository;
+        private readonly IMasterDataClient _masterDataClient;
         private readonly AuthenticatedActor _authenticatedActor;
 
-        public MarketActorAuthenticator(IActorRepository actorRepository, AuthenticatedActor authenticatedActor)
+        public MarketActorAuthenticator(IMasterDataClient masterDataClient, AuthenticatedActor authenticatedActor)
         {
-            _actorRepository = actorRepository;
+            _masterDataClient = masterDataClient;
             _authenticatedActor = authenticatedActor;
         }
 
@@ -45,7 +45,8 @@ namespace Energinet.DataHub.EDI.Api.Authentication
 
             var userIdFromAzp = GetClaimValueFrom(claimsPrincipal, ClaimsMap.UserId);
             var actorNumber = !string.IsNullOrEmpty(userIdFromAzp)
-                ? await _actorRepository.GetActorNumberByExternalIdAsync(userIdFromAzp, cancellationToken).ConfigureAwait(false)
+                ? await _masterDataClient.GetActorNumberByExternalIdAsync(userIdFromAzp, cancellationToken)
+                    .ConfigureAwait(false)
                 : null;
 
             return Authenticate(actorNumber, role);

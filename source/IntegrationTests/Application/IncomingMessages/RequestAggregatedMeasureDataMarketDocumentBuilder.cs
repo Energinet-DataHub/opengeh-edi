@@ -14,9 +14,9 @@
 
 using System;
 using System.Collections.Generic;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
-using Energinet.DataHub.EDI.MasterData.Domain.Actors;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
@@ -33,7 +33,7 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
     private readonly string _messageType = "E74";
     private readonly string _businessType = "23";
     private readonly BusinessReason _businessReason = BusinessReason.PreliminaryAggregation;
-    private readonly ActorNumber _receiverId = DataHubDetails.IdentificationNumber;
+    private readonly ActorNumber _receiverId = DataHubDetails.DataHubActorNumber;
     private readonly MarketRole _receiverRole = MarketRole.CalculationResponsibleRole;
     private readonly string _createdAt = SystemClock.Instance.GetCurrentInstant().ToString();
     private string _senderId = SampleData.NewEnergySupplierNumber;

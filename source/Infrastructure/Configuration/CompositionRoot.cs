@@ -15,17 +15,12 @@
 using System;
 using System.Net.Http;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.EDI.Application.ActorCertificate;
-using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.Application.Configuration;
-using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.Serialization;
-using Energinet.DataHub.EDI.Domain.ActorCertificates;
-using Energinet.DataHub.EDI.Infrastructure.ActorCertificate;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.FeatureFlag;
@@ -33,9 +28,6 @@ using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Infrastructure.Wholesale;
-using Energinet.DataHub.EDI.MasterData.Infrastructure.Actors;
-using Energinet.DataHub.EDI.MasterData.Infrastructure.GridAreas;
-using MediatR;
 using MediatR.Registration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -57,10 +49,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             AddMediatR();
             services.AddLogging();
             AddAuthenticatedActor();
-            AddActorServices();
             AddWholeSaleInBox();
-            AddGridAreaServices();
-            AddActorCertificateServices();
             IntegrationEventsConfiguration.Configure(services);
             InboxEventsConfiguration.Configure(services);
             QueryHandlingConfiguration.Configure(services);
@@ -88,12 +77,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
         public CompositionRoot AddCorrelationContext(Func<IServiceProvider, ICorrelationContext> action)
         {
             _services.AddScoped(action);
-            return this;
-        }
-
-        public CompositionRoot AddMessagePublishing()
-        {
-            _services.AddScoped<IActorRepository, ActorRepository>();
             return this;
         }
 
@@ -135,24 +118,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
         private void AddAuthenticatedActor()
         {
             _services.AddScoped<AuthenticatedActor>();
-        }
-
-        private void AddActorServices()
-        {
-            _services.AddScoped<IRequestHandler<CreateActorCommand, Unit>, CreateActorHandler>();
-        }
-
-        private void AddGridAreaServices()
-        {
-            _services.AddScoped<IRequestHandler<GridAreaOwnershipAssignedCommand, Unit>, GridAreaOwnershipAssignedHandler>();
-            _services.AddScoped<IGridAreaRepository, GridAreaRepository>();
-            _services.AddTransient<IDataRetention, GridAreaOwnerRetention>();
-        }
-
-        private void AddActorCertificateServices()
-        {
-            _services.AddTransient<IActorCertificateRepository, ActorCertificateRepository>();
-            _services.AddTransient<IRequestHandler<ActorCertificateCredentialsAssignedCommand, Unit>, ActorCertificateCredentialsAssignedCommandHandler>();
         }
 
         private void AddWholeSaleInBox()

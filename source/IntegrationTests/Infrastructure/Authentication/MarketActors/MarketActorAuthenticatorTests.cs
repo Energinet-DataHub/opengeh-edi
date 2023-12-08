@@ -18,11 +18,11 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Authentication;
-using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Xunit;
 using Xunit.Categories;
 
@@ -111,9 +111,11 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
             return new ClaimsPrincipal(identity);
         }
 
-        private async Task CreateActorAsync()
+        private Task CreateActorAsync()
         {
-            await InvokeCommandAsync(new CreateActorCommand(SampleData.StsAssignedUserId, ActorNumber.Create(SampleData.ActorNumber))).ConfigureAwait(false);
+            return CreateActorIfNotExistAsync(new CreateActorDto(
+                SampleData.StsAssignedUserId,
+                ActorNumber.Create(SampleData.ActorNumber)));
         }
     }
 }

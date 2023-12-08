@@ -16,7 +16,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 using Energinet.DataHub.Wholesale.Contracts.Events;
@@ -24,27 +23,32 @@ using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Application.IntegrationEvents;
 
-public class CalculationResultCompletedMapper : IIntegrationEventMapper
+public class CalculationResultCompletedProcessor : IIntegrationEventProcessor
 {
     private readonly AggregationFactory _aggregationFactory;
+    private readonly IMediator _mediator;
 
-    public CalculationResultCompletedMapper(AggregationFactory aggregationFactory)
+    public CalculationResultCompletedProcessor(AggregationFactory aggregationFactory, IMediator mediator)
     {
         _aggregationFactory = aggregationFactory;
+        _mediator = mediator;
     }
 
     public string EventTypeToHandle => CalculationResultCompleted.EventName;
 
-    public async Task<ICommand<Unit>> MapToCommandAsync(IntegrationEvent integrationEvent)
+    public async Task HandleAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         if (integrationEvent == null)
             throw new ArgumentNullException(nameof(integrationEvent));
 
         var calculationResultCompletedIntegrationEvent = (CalculationResultCompleted)integrationEvent.Message;
 
-        var aggregation = await _aggregationFactory.CreateAsync(calculationResultCompletedIntegrationEvent, CancellationToken.None).ConfigureAwait(false);
+        var aggregation = await _aggregationFactory
+            .CreateAsync(calculationResultCompletedIntegrationEvent, CancellationToken.None)
+            .ConfigureAwait(false);
+
         var forwardAggregationResult = new ForwardAggregationResult(aggregation);
 
-        return forwardAggregationResult;
+        await _mediator.Send(forwardAggregationResult, cancellationToken).ConfigureAwait(false);
     }
 }

@@ -13,32 +13,40 @@
 // limitations under the License.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
-using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
-using MediatR;
 using NodaTime.Serialization.Protobuf;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 
-public class GridAreaOwnershipAssignedMapper : IIntegrationEventMapper
+internal sealed class GridAreaOwnershipAssignedIntegrationEventProcessor : IIntegrationEventProcessor
 {
+    private readonly IMasterDataClient _masterDataClient;
+
+    public GridAreaOwnershipAssignedIntegrationEventProcessor(IMasterDataClient masterDataClient)
+    {
+        _masterDataClient = masterDataClient;
+    }
+
     public string EventTypeToHandle => GridAreaOwnershipAssigned.EventName;
 
-    public Task<ICommand<Unit>> MapToCommandAsync(IntegrationEvent integrationEvent)
+    public Task HandleAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
-        if (integrationEvent == null)
-            throw new ArgumentNullException(nameof(integrationEvent));
+        ArgumentNullException.ThrowIfNull(integrationEvent);
 
         var gridAreaOwnershipAssignedEvent = (GridAreaOwnershipAssigned)integrationEvent.Message;
 
-        return Task.FromResult<ICommand<Unit>>(
-            new GridAreaOwnershipAssignedCommand(
+        return _masterDataClient.UpdateGridAreaOwnershipAsync(
+            new GridAreaOwnershipAssignedDto(
                 gridAreaOwnershipAssignedEvent.GridAreaCode,
                 gridAreaOwnershipAssignedEvent.ValidFrom.ToInstant(),
                 ActorNumber.Create(gridAreaOwnershipAssignedEvent.ActorNumber),
-                gridAreaOwnershipAssignedEvent.SequenceNumber));
+                gridAreaOwnershipAssignedEvent.SequenceNumber),
+            cancellationToken);
     }
 }

@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Energinet.DataHub.EDI.MasterData.Interfaces</AssemblyName>
+    <RootNamespace>Energinet.DataHub.EDI.MasterData.Interfaces</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj"/>
+  </ItemGroup>
+  <ItemDefinitionGroup>
+    <ProjectReference>
+      <PrivateAssets>all</PrivateAssets>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+</Project>

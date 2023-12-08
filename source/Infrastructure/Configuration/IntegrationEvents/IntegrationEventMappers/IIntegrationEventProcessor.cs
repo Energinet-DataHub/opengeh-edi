@@ -14,28 +14,22 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using NodaTime;
+using Energinet.DataHub.Core.Messaging.Communication;
 
-namespace Energinet.DataHub.EDI.Application.GridAreas;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 
 /// <summary>
-/// Responsible for accessing a grid area.
+/// Process specific type(s) of integration events
 /// </summary>
-public interface IGridAreaRepository
+public interface IIntegrationEventProcessor
 {
     /// <summary>
-    /// Responsible for creating a grid area if it does not exist.
+    /// Event type the processor handles
     /// </summary>
-    Task UpdateOwnershipAsync(
-        string gridAreaCode,
-        Instant validFrom,
-        ActorNumber actorNumber,
-        int sequenceNumber,
-        CancellationToken cancellationToken);
+    public string EventTypeToHandle { get; }
 
     /// <summary>
-    /// Responsible for getting the grid operator for a given grid area.
+    /// Process a single integration event
     /// </summary>
-    Task<ActorNumber> GetGridOwnerForAsync(string gridAreaCode, CancellationToken cancellationToken);
+    public Task HandleAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken);
 }

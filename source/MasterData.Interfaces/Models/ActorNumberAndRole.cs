@@ -12,24 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.Application.Actors;
+namespace Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 
-/// <summary>
-/// Service for looking up actor details
-/// </summary>
-public interface IActorRepository
-{
-    /// <summary>
-    /// Get actor number by id
-    /// </summary>
-    Task<ActorNumber?> GetActorNumberByExternalIdAsync(string externalId, CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Creates a new actor
-    /// </summary>
-    Task CreateIfNotExistAsync(ActorNumber actorNumber, string externalId, CancellationToken cancellationToken);
-}
+public sealed record ActorNumberAndRoleDto(ActorNumber ActorNumber, MarketRole MarketRole);

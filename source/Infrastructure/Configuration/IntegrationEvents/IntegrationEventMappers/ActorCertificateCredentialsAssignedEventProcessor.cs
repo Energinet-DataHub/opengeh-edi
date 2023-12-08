@@ -13,35 +13,44 @@
 // limitations under the License.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
-using Energinet.DataHub.EDI.Application.ActorCertificate;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Domain.ActorCertificates;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
-using MediatR;
 using NodaTime.Serialization.Protobuf;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 
-public class ActorCertificateCredentialsAssignedMapper : IIntegrationEventMapper
+#pragma warning disable CA1711
+internal sealed class ActorCertificateCredentialsAssignedEventProcessor : IIntegrationEventProcessor
+#pragma warning restore CA1711
 {
+    private readonly IMasterDataClient _masterDataClient;
+
+    public ActorCertificateCredentialsAssignedEventProcessor(IMasterDataClient masterDataClient)
+    {
+        _masterDataClient = masterDataClient;
+    }
+
     public string EventTypeToHandle => ActorCertificateCredentialsAssigned.EventName;
 
-    public Task<ICommand<Unit>> MapToCommandAsync(IntegrationEvent integrationEvent)
+    public Task HandleAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
-        if (integrationEvent == null)
-            throw new ArgumentNullException(nameof(integrationEvent));
+        ArgumentNullException.ThrowIfNull(integrationEvent);
 
         var message = (ActorCertificateCredentialsAssigned)integrationEvent.Message;
 
-        return Task.FromResult<ICommand<Unit>>(
-            new ActorCertificateCredentialsAssignedCommand(
+        return _masterDataClient.CreateOrUpdateActorCertificateAsync(
+            new ActorCertificateCredentialsAssignedDto(
                 ActorNumber.Create(message.ActorNumber),
                 GetMarketRole(message.ActorRole),
-                new CertificateThumbprint(message.CertificateThumbprint),
+                new CertificateThumbprintDto(message.CertificateThumbprint),
                 message.ValidFrom.ToInstant(),
-                message.SequenceNumber));
+                message.SequenceNumber),
+            cancellationToken);
     }
 
     private static MarketRole GetMarketRole(EicFunction actorRole)
