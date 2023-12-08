@@ -140,28 +140,28 @@ internal sealed class EdiDriver : IDisposable
 
     public async Task RequestAggregatedMeasureDataWithoutTokenAsync()
     {
-        var exception = await Record.ExceptionAsync(() => RequestAggregatedMeasureDataAsync(null, false)).ConfigureAwait(false);
+        var act = () => RequestAggregatedMeasureDataAsync(null, false);
 
-        Assert.NotNull(exception);
-        var httpRequestException = Assert.IsType<HttpRequestException>(exception);
+        var httpRequestException = await Assert.ThrowsAsync<HttpRequestException>(act).ConfigureAwait(false);
+
         Assert.Equal(HttpStatusCode.Unauthorized, httpRequestException.StatusCode);
     }
 
     public async Task PeekMessageWithoutTokenAsync()
     {
-        var exception = await Record.ExceptionAsync(() => PeekAsync(null)).ConfigureAwait(false);
+        var act = () => PeekAsync(null);
 
-        Assert.NotNull(exception);
-        var httpRequestException = Assert.IsType<HttpRequestException>(exception);
+        var httpRequestException = await Assert.ThrowsAsync<HttpRequestException>(act).ConfigureAwait(false);
+
         Assert.Equal(HttpStatusCode.Unauthorized, httpRequestException.StatusCode);
     }
 
     public async Task DequeueMessageWithoutTokenAsync(string messageId)
     {
-        var exception = await Record.ExceptionAsync(() => DequeueAsync(null, messageId)).ConfigureAwait(false);
+        var act = () => DequeueAsync(null, messageId);
 
-        Assert.NotNull(exception);
-        var httpRequestException = Assert.IsType<HttpRequestException>(exception);
+        var httpRequestException = await Assert.ThrowsAsync<HttpRequestException>(act).ConfigureAwait(false);
+
         Assert.Equal(HttpStatusCode.Unauthorized, httpRequestException.StatusCode);
     }
 
