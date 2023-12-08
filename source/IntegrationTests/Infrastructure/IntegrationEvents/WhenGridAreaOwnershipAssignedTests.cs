@@ -20,13 +20,13 @@ using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Common.DateTime;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.GridAreas;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.MasterData.Infrastructure.GridAreas;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.DependencyInjection;
@@ -185,7 +185,7 @@ public class WhenGridAreaOwnershipAssignedTests : TestBase
     {
         var serviceScopeFactory = GetService<IServiceScopeFactory>();
         using var newScope = serviceScopeFactory.CreateScope();
-        var context = newScope.ServiceProvider.GetRequiredService<B2BContext>();
+        var context = newScope.ServiceProvider.GetRequiredService<MasterDataContext>();
         var systemTime = newScope.ServiceProvider.GetRequiredService<ISystemDateTimeProvider>();
         var gridAreaRepository = new GridAreaRepository(context, systemTime);
         return await gridAreaRepository.GetGridOwnerForAsync(gridAreaCode, CancellationToken.None).ConfigureAwait(false);

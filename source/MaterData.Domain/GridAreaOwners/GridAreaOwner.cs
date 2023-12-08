@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+using System;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.Domain.GridAreaOwners;
+namespace Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
 
 public class GridAreaOwner
 {

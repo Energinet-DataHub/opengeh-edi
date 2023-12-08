@@ -14,25 +14,26 @@
 
 using System;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Exceptions;
 
-public class Actor
+public class InvalidActorNumberException : Exception
 {
-    private readonly Guid _id;
-
-    public Actor(ActorNumber actorNumber, string externalId)
-    {
-        _id = Guid.NewGuid();
-        ActorNumber = actorNumber;
-        ExternalId = externalId;
-    }
-
-#pragma warning disable
-    private Actor()
+    private InvalidActorNumberException(string message)
+        : base(message)
     {
     }
 
-    public ActorNumber ActorNumber { get; set; }
+    private InvalidActorNumberException()
+    {
+    }
 
-    public string ExternalId { get; set; }
+    private InvalidActorNumberException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+
+    public static InvalidActorNumberException Create(string invalidActorNumber)
+    {
+        return new InvalidActorNumberException($"{invalidActorNumber} is not a valid actor number");
+    }
 }

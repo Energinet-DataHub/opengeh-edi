@@ -16,15 +16,13 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.MasterData.Domain.Actors;
+using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Xunit;
@@ -48,7 +46,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .WithActorNumber(SampleData.GridOperatorNumber)
-            .Store(GetService<B2BContext>());
+            .Store(GetService<MasterDataContext>());
 
         _eventBuilder
             .WithProcessType(ProcessType.BalanceFixing)
@@ -77,7 +75,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .WithActorNumber(SampleData.GridOperatorNumber)
-            .Store(GetService<B2BContext>());
+            .Store(GetService<MasterDataContext>());
 
         _eventBuilder
             .WithProcessType(ProcessType.BalanceFixing)
@@ -105,7 +103,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .WithActorNumber(SampleData.GridOperatorNumber)
-            .Store(GetService<B2BContext>());
+            .Store(GetService<MasterDataContext>());
 
         _eventBuilder
             .WithProcessType(ProcessType.BalanceFixing)
@@ -137,7 +135,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .WithActorNumber(SampleData.BalanceResponsibleNumber)
-            .Store(GetService<B2BContext>());
+            .Store(GetService<MasterDataContext>());
 
         _eventBuilder
             .WithProcessType(ProcessType.BalanceFixing)
@@ -171,7 +169,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .WithActorNumber(SampleData.BalanceResponsibleNumber)
-            .Store(GetService<B2BContext>());
+            .Store(GetService<MasterDataContext>());
 
         _eventBuilder
             .WithProcessType(ProcessType.BalanceFixing)
@@ -210,7 +208,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .WithActorNumber(SampleData.GridOperatorNumber)
-            .Store(GetService<B2BContext>());
+            .Store(GetService<MasterDataContext>());
 
         _eventBuilder
             .WithProcessType(processType)
@@ -240,7 +238,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .WithActorNumber(SampleData.GridOperatorNumber)
-            .Store(GetService<B2BContext>());
+            .Store(GetService<MasterDataContext>());
 
         _eventBuilder
             .WithProcessType(processType)

@@ -19,7 +19,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Ebix;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Xml;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;

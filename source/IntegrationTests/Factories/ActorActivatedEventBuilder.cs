@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
