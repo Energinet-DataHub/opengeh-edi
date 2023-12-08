@@ -63,7 +63,6 @@ public class IncomingMessageParser : IIncomingMessageParser
         CancellationToken cancellationToken,
         DocumentFormat responseFormat = null!)
     {
-        if (message == null) throw new ArgumentNullException(nameof(message));
         var requestAggregatedMeasureDataMarketMessageParserResult =
             await _marketMessageParser.ParseAsync(message, documentFormat, documentType, cancellationToken).ConfigureAwait(false);
 
@@ -73,7 +72,6 @@ public class IncomingMessageParser : IIncomingMessageParser
             return _responseFactory.From(res, responseFormat ?? documentFormat);
         }
 
-        EnsureStreamIsRewound(message);
         await _archivedMessagesClient.CreateAsync(
             new ArchivedMessage(
                 Guid.NewGuid().ToString(),
@@ -108,10 +106,5 @@ public class IncomingMessageParser : IIncomingMessageParser
         }
 
         return _responseFactory.From(result, responseFormat ?? documentFormat);
-    }
-
-    private static void EnsureStreamIsRewound(Stream message)
-    {
-        message.Seek(0, SeekOrigin.Begin);
     }
 }
