@@ -78,7 +78,7 @@ public class IncomingMessageParser : IIncomingMessageParser
             return _responseFactory.From(res, responseFormat ?? documentFormat);
         }
 
-        EnsureStreamIsRewound(message);
+        RewindStream(message);
         await _archivedMessagesClient.CreateAsync(
             new ArchivedMessage(
                 Guid.NewGuid().ToString(),
