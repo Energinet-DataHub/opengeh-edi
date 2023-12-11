@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
+using Energinet.DataHub.EDI.AcceptanceTests.Tests;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests;
@@ -21,15 +23,17 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 
 [IntegrationTest]
-public sealed class WhenAggregatedMeasureDataIsRequestedTests : TestRunner
+[Collection("Acceptance test collection")]
+public sealed class WhenAggregatedMeasureDataIsRequestedTests
 {
     private const string ActorNumber = "5790000610976";
     private const string ActorRole = "metereddataresponsible";
     private readonly AggregatedMeasureDataRequestDsl _aggregationRequest;
 
-    public WhenAggregatedMeasureDataIsRequestedTests()
+    public WhenAggregatedMeasureDataIsRequestedTests(TestRunner runner)
     {
-        _aggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(AzpToken, ConnectionString));
+        Debug.Assert(runner != null, nameof(runner) + " != null");
+        _aggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(runner.AzpToken, runner.ConnectionString));
     }
 
     [Fact]

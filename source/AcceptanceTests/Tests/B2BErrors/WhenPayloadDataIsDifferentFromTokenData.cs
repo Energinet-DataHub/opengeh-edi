@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 using Energinet.DataHub.EDI.AcceptanceTests.Factories;
 using Energinet.DataHub.EDI.AcceptanceTests.Responses.xml;
 using Energinet.DataHub.EDI.AcceptanceTests.TestData;
+using Energinet.DataHub.EDI.AcceptanceTests.Tests.Asserters;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.B2BErrors;
@@ -27,23 +28,23 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.B2BErrors;
 [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Test code should not configure await.")]
 [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Testing")]
 [Collection("Acceptance test collection")]
-public class AuthenticationErrors
+public class WhenPayloadDataIsDifferentFromTokenData
 {
     private const string ActorNumber = "5790000701414";
     private const string ActorRole = "energysupplier";
     private readonly ITestOutputHelper _output;
     private readonly AggregatedMeasureDataRequestDsl _aggregationRequest;
 
-    public AuthenticationErrors(ITestOutputHelper output, TestRunner runner)
+    public WhenPayloadDataIsDifferentFromTokenData(ITestOutputHelper output, TestRunner runner)
     {
         _output = output;
         _aggregationRequest = _aggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(runner.AzpToken, runner.ConnectionString));
     }
 
     [Fact]
-    public async Task MismatchingSenderIdProducesAuthenticationErrorAsync()
+    public async Task SenderMarketParticipantMridIsDifferentFromMridInTokenAsync()
     {
-        var payload = PayloadBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.MismatchingSenderIdData());
+        var payload = PayloadBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.WrongSenderMarketParticipantMrid());
 
         var response = await _aggregationRequest.AggregatedMeasureDataWithXmlPayload(ActorNumber, ActorRole, payload);
 
