@@ -25,14 +25,14 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.B2BErrors;
 [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Test code should not configure await.")]
 [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Testing")]
 [Collection("Acceptance test collection")]
-public class WhenPayloadDataIsDifferentFromTokenData
+public class WhenPayloadDataIsDifferentFromTokenDataTests
 {
     private const string ActorNumber = "5790000701414";
     private const string ActorRole = "energysupplier";
     private readonly ITestOutputHelper _output;
     private readonly AggregatedMeasureDataRequestDsl _aggregationRequest;
 
-    public WhenPayloadDataIsDifferentFromTokenData(ITestOutputHelper output, TestRunner runner)
+    public WhenPayloadDataIsDifferentFromTokenDataTests(ITestOutputHelper output, TestRunner runner)
     {
         _output = output;
         _aggregationRequest = _aggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(runner.AzpToken, runner.ConnectionString));
@@ -41,7 +41,7 @@ public class WhenPayloadDataIsDifferentFromTokenData
     [Fact]
     public async Task Sender_market_participant_mrid_is_different_from_mrid_in_token_Async()
     {
-        var payload = PayloadBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.WrongSenderMarketParticipantMrid());
+        var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.WrongSenderMarketParticipantMrid());
 
         var response = await _aggregationRequest.AggregatedMeasureDataWithXmlPayload(ActorNumber, ActorRole, payload);
 
@@ -56,7 +56,7 @@ public class WhenPayloadDataIsDifferentFromTokenData
     [Fact]
     public async Task MismatchingSenderRoleTypeProducesAuthenticationErrorAsync()
     {
-        var payload = PayloadBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.SenderRoleTypeNotAuthorized());
+        var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.SenderRoleTypeNotAuthorized());
 
         var response = await _aggregationRequest.AggregatedMeasureDataWithXmlPayload(ActorNumber, ActorRole, payload);
 

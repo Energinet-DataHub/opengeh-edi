@@ -29,7 +29,6 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.Edi.Responses;
-using Energinet.DataHub.MeteringPoints.RequestResponse.Response;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Xunit;

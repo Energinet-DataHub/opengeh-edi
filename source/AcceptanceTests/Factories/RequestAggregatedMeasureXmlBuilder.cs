@@ -17,7 +17,7 @@ using Energinet.DataHub.EDI.AcceptanceTests.TestData;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Factories;
 
-internal sealed class PayloadBuilder
+internal sealed class RequestAggregatedMeasureXmlBuilder
 {
     public static XmlDocument BuildEnergySupplierXmlPayload(Dictionary<string, string> testData)
     {
