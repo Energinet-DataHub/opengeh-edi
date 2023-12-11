@@ -140,7 +140,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
         private void AddActorServices()
         {
             _services.AddScoped<IRequestHandler<CreateActorCommand, Unit>, CreateActorHandler>();
-            _services.AddScoped<IActorRegistry, ActorRegistry>();
         }
 
         private void AddGridAreaServices()
