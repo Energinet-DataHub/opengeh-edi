@@ -28,6 +28,7 @@ public static class IntegrationEventsConfiguration
         services.AddTransient<IReceivedIntegrationEventRepository, ReceivedIntegrationEventRepository>();
         services.AddTransient<IIntegrationEventMapper, B2BActorActivatedMapper>();
         services.AddTransient<IIntegrationEventMapper, GridAreaOwnershipAssignedMapper>();
+        services.AddTransient<IIntegrationEventMapper, ActorCertificateCredentialsAssignedMapper>();
 
         services.AddTransient<IReadOnlyDictionary<string, IIntegrationEventMapper>>(sp => sp.GetServices<IIntegrationEventMapper>().ToDictionary(m => m.EventTypeToHandle, m => m));
     }

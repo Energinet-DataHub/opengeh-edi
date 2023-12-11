@@ -38,17 +38,21 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
             new AzureAuthenticationDriver(_runner.AzureEntraTenantId, _runner.AzureEntraBackendAppId),
             new EdiDriver(_runner.AzpToken, _runner.ConnectionString),
             new WholesaleDriver(_runner.EventPublisher),
-            new EbixDriver(new Uri(_runner.ApiManagementUri, "/ebix")));
+            new EbixDriver(new Uri(_runner.ApiManagementUri, "/ebix", EbixCertificatePassword)));
     }
 
-    [Fact(Skip = "Missing certificate handling implementation")]
+    [Fact]
     public async Task Actor_can_peek_calculation_result_in_ebix_format()
     {
-        var token = await _ebix.LoginAsActor(_runner.AzureEntraClientId, _runner.AzureEntraClientSecret);
+        await _ebix.EmptyQueueForActor(_runner.ActorNumber, _runner.ActorRole);
+        await _ebix.PublishAggregationResultFor(_runner.ActorGridArea);
 
-        await _ebix.EmptyQueueForActor(TestRunner.BalanceResponsibleActorNumber, TestRunner.BalanceResponsibleActorRole, token);
-        await _ebix.PublishAggregationResultFor("543", TestRunner.BalanceResponsibleActorNumber);
+        await _ebix.ConfirmPeekIsEbixFormatAndCorrectDocumentType();
+    }
 
-        await _ebix.ConfirmPeekIsCorrectEbixFormatAndDocumentType(token);
+    [Fact]
+    public async Task Actor_cannot_peek_ebix_api_without_certificate()
+    {
+        await _ebix.ConfirmPeekWithoutCertificateIsNotAllowed();
     }
 }

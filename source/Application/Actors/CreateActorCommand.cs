@@ -12,16 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json.Serialization;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
+using MediatR;
 
 namespace Energinet.DataHub.EDI.Application.Actors;
 
-public class CreateActorCommand : InternalCommand
+public class CreateActorCommand : ICommand<Unit>
 {
-    [JsonConstructor]
     public CreateActorCommand(string externalId, ActorNumber actorNumber)
     {
         ActorNumber = actorNumber;

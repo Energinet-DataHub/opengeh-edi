@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
-using Energinet.DataHub.EDI.Domain.GridAreaOwners;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
+using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using NodaTime;
 
@@ -28,13 +28,13 @@ public class GridAreaBuilder
     private static ActorNumber _actorNumber = ActorNumber.Create("5148796574821");
 
 #pragma warning disable CA1822
-    public void Store(B2BContext b2BContext)
+    public void Store(MasterDataContext masterDataContext)
 #pragma warning restore CA1822
     {
-        if (b2BContext == null) throw new ArgumentNullException(nameof(b2BContext));
+        if (masterDataContext == null) throw new ArgumentNullException(nameof(masterDataContext));
         var gridArea = Build();
-        b2BContext.GridAreaOwners.Add(gridArea);
-        b2BContext.SaveChanges();
+        masterDataContext.GridAreaOwners.Add(gridArea);
+        masterDataContext.SaveChanges();
     }
 
     public GridAreaBuilder WithGridAreaCode(string gridAreaCode)

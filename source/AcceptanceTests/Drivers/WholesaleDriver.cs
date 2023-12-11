@@ -12,14 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
+using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 internal sealed class WholesaleDriver
 {
+    public const string BalanceResponsiblePartyMarketRoleCode = "DDK";
     private readonly IntegrationEventPublisher _integrationEventPublisher;
 
     internal WholesaleDriver(IntegrationEventPublisher integrationEventPublisher)
@@ -27,11 +30,13 @@ internal sealed class WholesaleDriver
         _integrationEventPublisher = integrationEventPublisher;
     }
 
-    internal Task PublishAggregationResultAsync(string gridAreaCode, string? balanceResponsibleId = null)
+    internal Task PublishAggregationResultAsync(string gridAreaCode, MarketRole? marketRole = null, string? actorNumber = null)
     {
-        var aggregation = !string.IsNullOrEmpty(balanceResponsibleId)
-            ? CreateAggregationResultAvailableEventForBalanceResponsible(gridAreaCode, balanceResponsibleId)
-            : CreateAggregationResultAvailableEventFor(gridAreaCode);
+        var aggregation = marketRole?.Code switch
+        {
+            BalanceResponsiblePartyMarketRoleCode => CreateAggregationResultAvailableEventForBalanceResponsible(gridAreaCode, actorNumber ?? throw new ArgumentNullException(nameof(actorNumber))),
+            _ => CreateAggregationResultAvailableEventFor(gridAreaCode),
+        };
 
         return _integrationEventPublisher.PublishAsync(
             "CalculationResultCompleted",

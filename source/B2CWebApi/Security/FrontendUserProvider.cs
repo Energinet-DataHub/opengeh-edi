@@ -15,8 +15,8 @@
 using System.Security.Claims;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.EDI.B2CWebApi.Exceptions;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Security;
 
@@ -68,7 +68,7 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
         if (azp is null)
             throw new MissingAzpException();
 
-        SetAuthenticatedActor(ActorNumber.Create(actorNumber), accessAllData: isFas);
+        SetAuthenticatedActor(ActorNumber.Create(actorNumber), accessAllData: isFas, role: TryGetMarketRole(role));
         return Task.FromResult<FrontendUser?>(new FrontendUser(
             userId,
             actorId,
@@ -78,19 +78,33 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
             azp));
     }
 
-    private void SetAuthenticatedActor(ActorNumber actorNumber, bool accessAllData)
+    private static MarketRole? TryGetMarketRole(string role)
+    {
+        try
+        {
+            return EnumerationType.FromName<MarketRole>(role);
+        }
+        catch (InvalidOperationException)
+        {
+            return null;
+        }
+    }
+
+    private void SetAuthenticatedActor(ActorNumber actorNumber, bool accessAllData, MarketRole? role)
     {
         if (accessAllData)
         {
             _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
                 actorNumber,
-                restriction: Restriction.None));
+                restriction: Restriction.None,
+                marketRole: role));
         }
         else
         {
             _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
                 actorNumber,
-                restriction: Restriction.Owned));
+                restriction: Restriction.Owned,
+                marketRole: role));
         }
     }
 }

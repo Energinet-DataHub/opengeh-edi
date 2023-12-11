@@ -12,23 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
+using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 
-public class ForwardAggregationResult : InternalCommand
+public class ForwardAggregationResult : ICommand<Unit>
 {
-    [JsonConstructor]
-    public ForwardAggregationResult(Guid id, Aggregation result)
-    : base(id)
-    {
-        Result = result;
-    }
-
     public ForwardAggregationResult(Aggregation result)
     {
         Result = result;

@@ -26,8 +26,6 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 [Collection("Acceptance test collection")]
 public sealed class WhenAggregatedMeasureDataIsRequestedTests
 {
-    private const string ActorNumber = "5790000610976";
-    private const string ActorRole = "metereddataresponsible";
     private readonly AggregatedMeasureDataRequestDsl _aggregationRequest;
 
     public WhenAggregatedMeasureDataIsRequestedTests(TestRunner runner)

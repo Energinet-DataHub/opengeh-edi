@@ -19,19 +19,21 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Energinet.DataHub.EDI.Api;
+using Energinet.DataHub.EDI.B2CWebApi;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
-using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Xml;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using MediatR;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Xunit;
+using Program = Energinet.DataHub.EDI.Api.Program;
 
 namespace Energinet.DataHub.EDI.ArchitectureTests
 {
@@ -147,6 +149,27 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
         {
             using var scope = _host.Services.CreateScope();
             Assert.True(scope.ServiceProvider.CanSatisfyRequirement(requirement));
+        }
+
+        [Fact(DisplayName = nameof(All_dependencies_can_be_resolved_in_b2c_app))]
+        public void All_dependencies_can_be_resolved_in_b2c_app()
+        {
+            Host.CreateDefaultBuilder()
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder
+                        .UseDefaultServiceProvider((_, options) =>
+                        {
+                            // See https://learn.microsoft.com/en-us/aspnet/core/fundamentals/host/web-host?view=aspnetcore-7.0#scope-validation
+                            options.ValidateScopes = true;
+                            // Validate the service provider during build
+                            options.ValidateOnBuild = true;
+                        })
+                        // Add controllers as services to enable validation of controller dependencies
+                        // See https://andrewlock.net/new-in-asp-net-core-3-service-provider-validation/#1-controller-constructor-dependencies-aren-t-checked
+                        .ConfigureServices(collection => collection.AddControllers().AddControllersAsServices())
+                        .UseStartup<Startup>();
+                }).Build();
         }
 
         private static IEnumerable<object[]> ResolveTypes(Type targetType, Assembly[] assemblies)

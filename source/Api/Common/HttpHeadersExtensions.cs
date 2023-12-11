@@ -22,8 +22,12 @@ internal static class HttpHeadersExtensions
 {
     internal static string GetContentType(this HttpHeaders headers)
     {
-        var contentHeader = headers.GetValues("Content-Type").FirstOrDefault();
-        if (contentHeader == null) throw new InvalidOperationException("No Content-Type found in request headers");
-        return contentHeader;
+        return TryGetContentType(headers) ?? throw new InvalidOperationException("No Content-Type found in request headers");
+    }
+
+    internal static string? TryGetContentType(this HttpHeaders headers)
+    {
+        headers.TryGetValues("Content-Type", out var contentTypes);
+        return contentTypes?.FirstOrDefault() ?? null;
     }
 }

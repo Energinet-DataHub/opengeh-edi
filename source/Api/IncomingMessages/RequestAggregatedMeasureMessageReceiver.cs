@@ -20,7 +20,6 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using IncomingMessages.Infrastructure;
 using Microsoft.Azure.Functions.Worker;
@@ -39,11 +38,11 @@ public class RequestAggregatedMeasureMessageReceiver
         ILogger<RequestAggregatedMeasureMessageReceiver> logger,
         IIncomingMessageParser incomingMessageParser,
         ICorrelationContext correlationContext)
-        {
+    {
         _logger = logger;
         _incomingMessageParser = incomingMessageParser;
         _correlationContext = correlationContext;
-        }
+    }
 
     [Function(nameof(RequestAggregatedMeasureMessageReceiver))]
     public async Task<HttpResponseData> RunAsync(
@@ -56,18 +55,18 @@ public class RequestAggregatedMeasureMessageReceiver
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);
 
         var contentType = request.Headers.GetContentType();
-        var cimFormat = CimFormatParser.ParseFromContentTypeHeaderValue(contentType);
-        if (cimFormat is null)
+        var documentFormat = DocumentFormatParser.ParseFromContentTypeHeaderValue(contentType);
+        if (documentFormat is null)
         {
             _logger.LogInformation(
-                "Could not parse desired CIM format from Content-Type header value: {ContentType}", contentType);
+                "Could not parse desired document format from Content-Type header value: {ContentType}", contentType);
             return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
         }
 
         var responseMessage = await _incomingMessageParser
             .ParseAsync(
                 request.Body,
-                cimFormat,
+                documentFormat,
                 IncomingDocumentType.RequestAggregatedMeasureData,
                 cancellationToken).ConfigureAwait(false);
 

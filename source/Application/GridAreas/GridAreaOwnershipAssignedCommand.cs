@@ -12,17 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json.Serialization;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
+using MediatR;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.Application.GridAreas;
 
-public class GridAreaOwnershipAssignedCommand : InternalCommand
+public class GridAreaOwnershipAssignedCommand : ICommand<Unit>
 {
-    [JsonConstructor]
     public GridAreaOwnershipAssignedCommand(string gridAreaCode, Instant validFrom, ActorNumber gridAreaOwnerActorNumber, int sequenceNumber)
     {
         GridAreaCode = gridAreaCode;

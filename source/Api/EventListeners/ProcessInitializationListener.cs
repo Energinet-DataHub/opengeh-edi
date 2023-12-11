@@ -14,9 +14,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.Messaging.Communication;
-using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
-using Energinet.DataHub.EDI.Api.EventListeners;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Interfaces;
