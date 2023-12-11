@@ -12,13 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Energinet.DataHub.EDI.AcceptanceTests;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 using Energinet.DataHub.EDI.AcceptanceTests.Factories;
-using Energinet.DataHub.EDI.AcceptanceTests.Responses.xml;
 using Energinet.DataHub.EDI.AcceptanceTests.TestData;
 using Energinet.DataHub.EDI.AcceptanceTests.Tests.Asserters;
 using Xunit.Abstractions;
@@ -42,7 +39,7 @@ public class WhenPayloadDataIsDifferentFromTokenData
     }
 
     [Fact]
-    public async Task SenderMarketParticipantMridIsDifferentFromMridInTokenAsync()
+    public async Task Sender_market_participant_mrid_is_different_from_mrid_in_token_Async()
     {
         var payload = PayloadBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.WrongSenderMarketParticipantMrid());
 
