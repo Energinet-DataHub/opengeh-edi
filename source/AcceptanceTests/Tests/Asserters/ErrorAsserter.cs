@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Responses.xml;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.Asserters;
 
+[SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Test code should not configure await")]
 public static class ErrorAsserter
 {
     public static Task AssertCorrectErrorIsReturnedAsync(string expectedErrorCode, string expectedErrorMessage, string response)

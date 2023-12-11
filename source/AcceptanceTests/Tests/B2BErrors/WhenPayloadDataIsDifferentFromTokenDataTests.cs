@@ -39,7 +39,7 @@ public class WhenPayloadDataIsDifferentFromTokenDataTests
     }
 
     [Fact]
-    public async Task Sender_market_participant_mrid_is_different_from_mrid_in_token_Async()
+    public async Task Sender_market_participant_mrid_is_different_from_mrid_in_token()
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.WrongSenderMarketParticipantMrid());
 
@@ -47,14 +47,11 @@ public class WhenPayloadDataIsDifferentFromTokenDataTests
 
         _output.WriteLine(response);
 
-        await ErrorAsserter.AssertCorrectErrorIsReturnedAsync(
-            "00002",
-            "Sender id does not match id of current authenticated user",
-            response);
+        await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00002", "Sender id does not match id of current authenticated user", response);
     }
 
     [Fact]
-    public async Task MismatchingSenderRoleTypeProducesAuthenticationErrorAsync()
+    public async Task Mismatching_sender_role_type_produces_authentication_error()
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.SenderRoleTypeNotAuthorized());
 
@@ -62,9 +59,6 @@ public class WhenPayloadDataIsDifferentFromTokenDataTests
 
         _output.WriteLine(response);
 
-        await ErrorAsserter.AssertCorrectErrorIsReturnedAsync(
-            "00003",
-            "Sender role type is not authorized to use this type of message",
-            response);
+        await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00003", "Sender role type is not authorized to use this type of message", response);
     }
 }
