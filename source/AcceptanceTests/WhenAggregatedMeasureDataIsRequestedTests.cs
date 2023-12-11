@@ -37,20 +37,20 @@ public sealed class WhenAggregatedMeasureDataIsRequestedTests
     [Fact]
     public async Task Actor_can_peek_and_dequeue_message_after_aggregated_measure_data_has_been_requested()
     {
-        await _aggregationRequest.EmptyQueueForActor(actorNumber: ActorNumber, actorRole: ActorRole);
+        await _aggregationRequest.EmptyQueueForActor(actorNumber: TestRunner.ActorNumber, actorRole: TestRunner.ActorRole);
 
-        await _aggregationRequest.AggregatedMeasureDataFor(actorNumber: ActorNumber, actorRole: ActorRole);
+        await _aggregationRequest.AggregatedMeasureDataFor(actorNumber: TestRunner.ActorNumber, actorRole: TestRunner.ActorRole);
 
-        await _aggregationRequest.ConfirmAcceptedResultIsAvailableFor(actorNumber: ActorNumber, actorRole: ActorRole);
+        await _aggregationRequest.ConfirmAcceptedResultIsAvailableFor(actorNumber: TestRunner.ActorNumber, actorRole: TestRunner.ActorRole);
     }
 
     [Fact]
     public async Task Actor_can_peek_and_dequeue_rejected_message_after_aggregated_measure_data_has_been_requested()
     {
-        await _aggregationRequest.EmptyQueueForActor(actorNumber: ActorNumber, actorRole: ActorRole);
+        await _aggregationRequest.EmptyQueueForActor(actorNumber: TestRunner.ActorNumber, actorRole: TestRunner.ActorRole);
 
-        await _aggregationRequest.RejectedAggregatedMeasureDataFor(actorNumber: ActorNumber, actorRole: ActorRole);
+        await _aggregationRequest.RejectedAggregatedMeasureDataFor(actorNumber: TestRunner.ActorNumber, actorRole: TestRunner.ActorRole);
 
-        await _aggregationRequest.ConfirmRejectedResultIsAvailableFor(actorNumber: ActorNumber, actorRole: ActorRole);
+        await _aggregationRequest.ConfirmRejectedResultIsAvailableFor(actorNumber: TestRunner.ActorNumber, actorRole: TestRunner.ActorRole);
     }
 }

@@ -38,14 +38,14 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
             new AzureAuthenticationDriver(_runner.AzureEntraTenantId, _runner.AzureEntraBackendAppId),
             new EdiDriver(_runner.AzpToken, _runner.ConnectionString),
             new WholesaleDriver(_runner.EventPublisher),
-            new EbixDriver(new Uri(_runner.ApiManagementUri, "/ebix", EbixCertificatePassword)));
+            new EbixDriver(new Uri(_runner.ApiManagementUri, "/ebix"), runner.EbixCertificatePassword));
     }
 
     [Fact]
     public async Task Actor_can_peek_calculation_result_in_ebix_format()
     {
-        await _ebix.EmptyQueueForActor(_runner.ActorNumber, _runner.ActorRole);
-        await _ebix.PublishAggregationResultFor(_runner.ActorGridArea);
+        await _ebix.EmptyQueueForActor(TestRunner.ActorNumber, TestRunner.ActorNumber);
+        await _ebix.PublishAggregationResultFor(TestRunner.ActorGridArea);
 
         await _ebix.ConfirmPeekIsEbixFormatAndCorrectDocumentType();
     }
