@@ -16,19 +16,20 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.Application.Actors;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.MasterData.Domain.Actors;
+using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Actors;
+namespace Energinet.DataHub.EDI.MasterData.Infrastructure.Actors;
 
 public class ActorRepository : IActorRepository
 {
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
-    private readonly B2BContext _dbContext;
+    private readonly MasterDataContext _dbContext;
 
-    public ActorRepository(IDatabaseConnectionFactory databaseConnectionFactory, B2BContext dbContext)
+    public ActorRepository(IDatabaseConnectionFactory databaseConnectionFactory, MasterDataContext dbContext)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
         _dbContext = dbContext;

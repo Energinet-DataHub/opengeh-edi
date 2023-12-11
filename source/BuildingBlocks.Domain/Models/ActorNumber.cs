@@ -13,8 +13,9 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Exceptions;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public class ActorNumber : ValueObject
 {
