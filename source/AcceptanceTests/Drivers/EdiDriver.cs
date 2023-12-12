@@ -17,8 +17,10 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
 using Energinet.DataHub.EDI.AcceptanceTests.Factories;
+using Energinet.DataHub.EDI.AcceptanceTests.Tests.Asserters;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Microsoft.Data.SqlClient;
 
@@ -136,6 +138,19 @@ internal sealed class EdiDriver : IDisposable
         await command.Connection.OpenAsync().ConfigureAwait(false);
         var exist = await command.ExecuteScalarAsync().ConfigureAwait(false);
         Assert.NotNull(exist);
+    }
+
+    public async Task<string> RequestAggregatedMeasureDataAsyncXmlAsync(string actorNumber, string[] marketRoles, XmlDocument payload)
+    {
+        var token = TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
+        using var request = new HttpRequestMessage(HttpMethod.Post, "/api/RequestAggregatedMeasureMessageReceiver");
+        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+        request.Content = new StringContent(payload.OuterXml, Encoding.UTF8, "application/xml");
+        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/xml");
+        var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
+        var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+        return responseString;
     }
 
     private static string GetMessageId(HttpResponseMessage peekResponse)

@@ -19,7 +19,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Google.Protobuf;
 using Microsoft.Extensions.Configuration;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 
 public class TestRunner : IAsyncDisposable
 {
@@ -28,7 +28,7 @@ public class TestRunner : IAsyncDisposable
     internal const string ActorRole = "metereddataresponsible";
     private const EicFunction ActorEicFunction = EicFunction.MeteredDataResponsible;
 
-    protected TestRunner()
+    public TestRunner()
     {
         var root = new ConfigurationBuilder()
             .AddJsonFile("integrationtest.local.settings.json", true)
