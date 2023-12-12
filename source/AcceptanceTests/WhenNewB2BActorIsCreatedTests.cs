@@ -12,22 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
+using Energinet.DataHub.EDI.AcceptanceTests.Tests;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
-
 [IntegrationTest]
-public sealed class WhenNewB2BActorIsCreatedTests : TestRunner
+[Collection("Acceptance test collection")]
+public sealed class WhenNewB2BActorIsCreatedTests
 {
     private readonly ActorDsl _actorDsl;
 
-    public WhenNewB2BActorIsCreatedTests()
+    public WhenNewB2BActorIsCreatedTests(TestRunner runner)
     {
-        _actorDsl = new ActorDsl(new MarketParticipantDriver(EventPublisher), new EdiDriver(AzpToken, ConnectionString));
+        Debug.Assert(runner != null, nameof(runner) + " != null");
+        _actorDsl = new ActorDsl(new MarketParticipantDriver(runner.EventPublisher), new EdiDriver(runner.AzpToken, runner.ConnectionString));
     }
 
     [Fact]
