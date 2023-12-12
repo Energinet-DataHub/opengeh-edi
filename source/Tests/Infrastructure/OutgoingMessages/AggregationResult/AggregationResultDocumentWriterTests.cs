@@ -112,6 +112,19 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
 
     [Theory]
     [InlineData(nameof(DocumentFormat.Ebix))]
+    public async Task Quality_element_is_excluded_if_value_is_missing(string documentFormat)
+    {
+        _timeSeries
+            .WithPoint(new Point(1, 1, Quality.Missing.Name, "2022-12-12T23:00:00Z"));
+
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
+
+        AssertDocument(document, DocumentFormat.From(documentFormat))
+            .QualityIsNotPresentForPosition(1);
+    }
+
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Ebix))]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     public async Task Settlement_method_is_excluded(string documentFormat)
