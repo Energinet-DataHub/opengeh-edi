@@ -140,9 +140,8 @@ internal sealed class EdiDriver : IDisposable
         Assert.NotNull(exist);
     }
 
-    public async Task<string> RequestAggregatedMeasureDataAsyncXmlAsync(string actorNumber, string[] marketRoles, XmlDocument payload)
+    public async Task<string> RequestAggregatedMeasureDataAsyncXmlAsync(XmlDocument payload, string token)
     {
-        var token = TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
         using var request = new HttpRequestMessage(HttpMethod.Post, "/api/RequestAggregatedMeasureMessageReceiver");
         request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
         request.Content = new StringContent(payload.OuterXml, Encoding.UTF8, "application/xml");

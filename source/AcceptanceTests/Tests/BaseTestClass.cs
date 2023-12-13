@@ -12,9 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics;
+using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
+using Energinet.DataHub.EDI.AcceptanceTests.Factories;
+using Xunit.Abstractions;
+
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 
 public class BaseTestClass
 {
-    
+    protected const string ActorNumber = "5790000701414";
+    protected const string ActorRole = "energysupplier";
+
+    protected BaseTestClass(ITestOutputHelper output, TestRunner runner)
+    {
+        Debug.Assert(runner != null, nameof(runner) + " != null");
+        Output = output;
+        Token = TokenBuilder.BuildToken(ActorNumber, new[] { ActorRole }, runner.AzpToken);
+        AggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(runner.AzpToken, runner.ConnectionString));
+    }
+
+    protected ITestOutputHelper Output { get; }
+
+    protected AggregatedMeasureDataRequestDsl AggregationRequest { get; }
+
+    protected string Token { get; }
 }

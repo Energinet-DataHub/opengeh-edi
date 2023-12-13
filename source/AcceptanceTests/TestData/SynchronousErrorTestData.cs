@@ -66,7 +66,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             };
         }
 
-        /*public Dictionary<string, string> MessageIdIsNotUnique()
+        public static Dictionary<string, string> MessageIdIsNotUnique()
         {
             return new Dictionary<string, string>
             {
@@ -74,7 +74,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             };
         }
 
-        public Dictionary<string, string> TransactionIdIsNotUnique()
+        public static Dictionary<string, string> TransactionIdIsNotUnique()
         {
             return new Dictionary<string, string>
             {
@@ -82,15 +82,15 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             };
         }
 
-        public Dictionary<string, string> EmptyMessageId()
+        public static Dictionary<string, string> EmptyMessageId()
         {
             return new Dictionary<string, string>
             {
-                { "cim:mRID", "" },
+                { "cim:mRID", string.Empty },
             };
         }
 
-        public Dictionary<string, string> EmptyTransactionId()
+        /*public Dictionary<string, string> EmptyTransactionId()
         {
             return new Dictionary<string, string>
             {
