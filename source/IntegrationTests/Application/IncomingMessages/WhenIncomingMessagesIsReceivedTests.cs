@@ -13,14 +13,18 @@
 // limitations under the License.
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
+using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -54,7 +58,8 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
     {
       // Assert
       var authenticatedActor = GetService<AuthenticatedActor>();
-      authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("5799999933318"), Restriction.Owned, MarketRole.BalanceResponsibleParty));
+      var senderActorNumber = ActorNumber.Create("5799999933318");
+      authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, MarketRole.BalanceResponsibleParty));
 
       // Act
       await _incomingMessagesRequest.ParseAsync(
@@ -64,8 +69,12 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
           CancellationToken.None);
 
       // Assert
+      var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
+      var messageIds = await GetMessageIdsAsync(senderActorNumber);
       var message = _senderSpy.Message;
       Assert.NotNull(message);
+      Assert.Single(transactionIds);
+      Assert.Single(messageIds);
     }
 
     [Fact]
@@ -73,7 +82,8 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
     {
         // Assert
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("5799999933318"), Restriction.Owned, MarketRole.BalanceResponsibleParty));
+        var senderActorNumber = ActorNumber.Create("5799999933318");
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, MarketRole.BalanceResponsibleParty));
         _senderSpy.ShouldFail = true;
 
         // Act & Assert
@@ -83,10 +93,12 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             IncomingDocumentType.RequestAggregatedMeasureData,
             CancellationToken.None));
 
+        var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
+        var messageIds = await GetMessageIdsAsync(senderActorNumber);
         var message = _senderSpy.Message;
         Assert.Null(message);
-        Assert.Empty(_incomingMessageContext.MessageIdForSenders.ToList());
-        Assert.Empty(_incomingMessageContext.TransactionIdForSenders.ToList());
+        Assert.Empty(transactionIds);
+        Assert.Empty(messageIds);
         _senderSpy.ShouldFail = false;
     }
 
@@ -95,14 +107,17 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
     {
         // Arrange
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("5799999933318"), Restriction.Owned, MarketRole.BalanceResponsibleParty));
+        var senderActorNumber = ActorNumber.Create("5799999933318");
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, MarketRole.BalanceResponsibleParty));
 
-        // Act
         // new scope to simulate a race condition.
         var sessionProvider = GetService<IServiceProvider>();
         using var secondScope = sessionProvider.CreateScope();
         var authenticatedActorInSecondScope = secondScope.ServiceProvider.GetService<AuthenticatedActor>();
         var secondParser = secondScope.ServiceProvider.GetRequiredService<IIncomingMessageParser>();
+
+        authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, restriction: Restriction.None));
+
         var task01 = _incomingMessagesRequest.ParseAsync(
             ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
             DocumentFormat.Json,
@@ -113,21 +128,17 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
             CancellationToken.None);
-        authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("5799999933318"), restriction: Restriction.None));
 
-        try
-        {
-            await Task.WhenAll(task01, task02);
-        }
-        catch (DbUpdateException e)
-        {
-            // Assert
-            // This exception is only expected if a command execution finishes before the other one ends.
-            Assert.Contains("Violation of PRIMARY KEY constraint", e.InnerException?.Message, StringComparison.InvariantCulture);
-        }
+        // Act
+        await Task.WhenAll(task01, task02);
 
         // Assert
+        var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
+        var messageIds = await GetMessageIdsAsync(senderActorNumber);
         var message = _senderSpy.Message;
+
+        Assert.Single(transactionIds);
+        Assert.Single(messageIds);
         Assert.NotNull(message);
     }
 
@@ -135,8 +146,9 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
     public async Task Transaction_and_message_ids_are_not_saved_when_receiving_a_faulted_request()
     {
         // Assert
+        var senderActorNumber = ActorNumber.Create("5799999933318");
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("5799999933318"), Restriction.Owned, MarketRole.BalanceResponsibleParty));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, MarketRole.BalanceResponsibleParty));
 
         // Act
         await _incomingMessagesRequest.ParseAsync(
@@ -146,10 +158,13 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             CancellationToken.None);
 
         // Assert
+        var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
+        var messageIds = await GetMessageIdsAsync(senderActorNumber);
         var message = _senderSpy.Message;
+
         Assert.Null(message);
-        Assert.Empty(_incomingMessageContext.MessageIdForSenders.ToList());
-        Assert.Empty(_incomingMessageContext.TransactionIdForSenders.ToList());
+        Assert.Empty(transactionIds);
+        Assert.Empty(messageIds);
     }
 
     protected override void Dispose(bool disposing)
@@ -171,5 +186,21 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         stream.Position = 0;
 
         return stream;
+    }
+
+    private async Task<List<dynamic>> GetTransactionIdsAsync(ActorNumber senderNumber)
+    {
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+        var sql = $"SELECT [TransactionId] FROM [dbo].[TransactionRegistry] WHERE SenderId = '{senderNumber.Value}'";
+        var results = await connection.QueryAsync(sql);
+        return results.ToList();
+    }
+
+    private async Task<List<dynamic>> GetMessageIdsAsync(ActorNumber senderNumber)
+    {
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+        var sql = $"SELECT [MessageId] FROM [dbo].[MessageRegistry] WHERE SenderId = '{senderNumber.Value}'";
+        var results = await connection.QueryAsync<dynamic>(sql);
+        return results.ToList();
     }
 }
