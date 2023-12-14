@@ -66,4 +66,9 @@ internal sealed class AggregatedMeasureDataRequestDsl
     {
         return _edi.DequeueMessageWithoutTokenAsync("irrelevant-message-id");
     }
+
+    internal Task<string> AggregatedMeasureDataWithXmlPayload(string actorNumber, string marketRoles, XmlDocument payload)
+    {
+        return _edi.RequestAggregatedMeasureDataAsyncXmlAsync(actorNumber, new[] { marketRoles }, payload);
+    }
 }
