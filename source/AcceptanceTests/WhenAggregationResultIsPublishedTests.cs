@@ -23,7 +23,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 
 [IntegrationTest]
-[Collection("Acceptance test collection")]
+[Collection(TestRunner.AcceptanceTestCollection)]
 public sealed class WhenAggregationResultIsPublishedTests
 {
     private readonly AggregationResultDsl _aggregations;
