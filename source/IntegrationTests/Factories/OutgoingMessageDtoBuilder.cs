@@ -14,11 +14,8 @@
 
 using System;
 using System.Collections.Generic;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Domain.GridAreaOwners;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
@@ -33,7 +30,7 @@ public class OutgoingMessageDtoBuilder
     private static readonly Guid _processId = ProcessId.Create(Guid.NewGuid()).Id;
     private static readonly BusinessReason _businessReason = BusinessReason.BalanceFixing;
     private static readonly GridAreaOwner _gridAreaOwnerDetails = new("805", Instant.FromDateTimeUtc(DateTime.UtcNow), ActorNumber.Create("1234567891045"), 1);
-    private static readonly IReadOnlyList<Process.Domain.Transactions.Aggregations.OutgoingMessage.Point> _points = new List<Process.Domain.Transactions.Aggregations.OutgoingMessage.Point>();
+    private static readonly IReadOnlyList<Point> _points = new List<Point>();
     private static ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
     private static MarketRole _receiverRole = MarketRole.MeteringDataAdministrator;
 

@@ -12,27 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.EDI.AcceptanceTests.Tests;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
+namespace Energinet.DataHub.EDI.AcceptanceTests;
 
-public class Actor
+[CollectionDefinition(TestRunner.AcceptanceTestCollection)]
+public class AcceptanceTestContext : ICollectionFixture<TestRunner>
 {
-    private readonly Guid _id;
-
-    public Actor(ActorNumber actorNumber, string externalId)
-    {
-        _id = Guid.NewGuid();
-        ActorNumber = actorNumber;
-        ExternalId = externalId;
-    }
-
-#pragma warning disable
-    private Actor()
-    {
-    }
-
-    public ActorNumber ActorNumber { get; set; }
-
-    public string ExternalId { get; set; }
 }

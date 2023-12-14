@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
+using Energinet.DataHub.EDI.AcceptanceTests.Tests;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests;
@@ -21,32 +23,34 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 
 [IntegrationTest]
-public sealed class WhenAggregatedMeasureDataIsRequestedTests : TestRunner
+[Collection(TestRunner.AcceptanceTestCollection)]
+public sealed class WhenAggregatedMeasureDataIsRequestedTests
 {
     private readonly AggregatedMeasureDataRequestDsl _aggregationRequest;
 
-    public WhenAggregatedMeasureDataIsRequestedTests()
+    public WhenAggregatedMeasureDataIsRequestedTests(TestRunner runner)
     {
-        _aggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(AzpToken, ConnectionString));
+        Debug.Assert(runner != null, nameof(runner) + " != null");
+        _aggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(runner.AzpToken, runner.ConnectionString));
     }
 
     [Fact]
     public async Task Actor_can_peek_and_dequeue_message_after_aggregated_measure_data_has_been_requested()
     {
-        await _aggregationRequest.EmptyQueueForActor(actorNumber: ActorNumber, actorRole: ActorRole);
+        await _aggregationRequest.EmptyQueueForActor(actorNumber: TestRunner.ActorNumber, actorRole: TestRunner.ActorRole);
 
-        await _aggregationRequest.AggregatedMeasureDataFor(actorNumber: ActorNumber, actorRole: ActorRole);
+        await _aggregationRequest.AggregatedMeasureDataFor(actorNumber: TestRunner.ActorNumber, actorRole: TestRunner.ActorRole);
 
-        await _aggregationRequest.ConfirmAcceptedResultIsAvailableFor(actorNumber: ActorNumber, actorRole: ActorRole);
+        await _aggregationRequest.ConfirmAcceptedResultIsAvailableFor(actorNumber: TestRunner.ActorNumber, actorRole: TestRunner.ActorRole);
     }
 
     [Fact]
     public async Task Actor_can_peek_and_dequeue_rejected_message_after_aggregated_measure_data_has_been_requested()
     {
-        await _aggregationRequest.EmptyQueueForActor(actorNumber: ActorNumber, actorRole: ActorRole);
+        await _aggregationRequest.EmptyQueueForActor(actorNumber: TestRunner.ActorNumber, actorRole: TestRunner.ActorRole);
 
-        await _aggregationRequest.RejectedAggregatedMeasureDataFor(actorNumber: ActorNumber, actorRole: ActorRole);
+        await _aggregationRequest.RejectedAggregatedMeasureDataFor(actorNumber: TestRunner.ActorNumber, actorRole: TestRunner.ActorRole);
 
-        await _aggregationRequest.ConfirmRejectedResultIsAvailableFor(actorNumber: ActorNumber, actorRole: ActorRole);
+        await _aggregationRequest.ConfirmRejectedResultIsAvailableFor(actorNumber: TestRunner.ActorNumber, actorRole: TestRunner.ActorRole);
     }
 }

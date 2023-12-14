@@ -14,16 +14,14 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.Common;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.MasterData.Domain.Actors;
+using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
@@ -55,7 +53,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         // Arrange
         _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
-            .Store(GetService<B2BContext>());
+            .Store(GetService<MasterDataContext>());
         var process = BuildProcess();
         var acceptedEvent = GetAcceptedEvent(process);
 
@@ -81,7 +79,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         // Arrange
         _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
-            .Store(GetService<B2BContext>());
+            .Store(GetService<MasterDataContext>());
         var process = BuildProcess();
         var acceptedEvent = GetAcceptedEvent(process);
 

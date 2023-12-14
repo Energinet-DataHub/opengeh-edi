@@ -19,7 +19,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Ebix;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Xml;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
@@ -144,10 +143,12 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
                 // Begin IntervalEnergyObservation
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "IntervalEnergyObservation", null).ConfigureAwait(false);
                 await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Position", null, point.Position.ToString(NumberFormatInfo.InvariantInfo)).ConfigureAwait(false);
-                if (point.Quantity is not null)
+                if (point.Quantity is not null
+                    && TryParseQuantityQuality(point.Quality, out var quality)
+                    && quality != Quality.Missing)
                 {
                     await writer.WriteElementStringAsync(DocumentDetails.Prefix, "EnergyQuantity", null, point.Quantity.ToString()!).ConfigureAwait(false);
-                    await WriteEbixCodeWithAttributesAsync("QuantityQuality", EbixCode.Of(Quality.From(point.Quality)), writer).ConfigureAwait(false);
+                    await WriteEbixCodeWithAttributesAsync("QuantityQuality", EbixCode.Of(quality), writer).ConfigureAwait(false);
                 }
                 else
                 {
@@ -166,5 +167,11 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             // End PayloadEnergyTimeSeries
         }
+    }
+
+    private static bool TryParseQuantityQuality(string pointQuality, out Quality quality)
+    {
+        quality = Quality.From(pointQuality);
+        return true;
     }
 }

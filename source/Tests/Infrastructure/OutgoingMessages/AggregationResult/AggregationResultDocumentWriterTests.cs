@@ -15,12 +15,10 @@
 using System.IO;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
@@ -105,6 +103,19 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     {
         _timeSeries
             .WithPoint(new Point(1, 1, Quality.Measured.Name, "2022-12-12T23:00:00Z"));
+
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
+
+        AssertDocument(document, DocumentFormat.From(documentFormat))
+            .QualityIsNotPresentForPosition(1);
+    }
+
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Ebix))]
+    public async Task Quality_element_is_excluded_if_value_is_missing(string documentFormat)
+    {
+        _timeSeries
+            .WithPoint(new Point(1, 1, Quality.Missing.Name, "2022-12-12T23:00:00Z"));
 
         var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
 

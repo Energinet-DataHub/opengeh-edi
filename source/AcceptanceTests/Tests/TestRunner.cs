@@ -19,16 +19,19 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Google.Protobuf;
 using Microsoft.Extensions.Configuration;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 
+// ReSharper disable once ClassNeverInstantiated.Global -- Used by Dependency Injection in our tests
 public class TestRunner : IAsyncDisposable
 {
+    internal const string AcceptanceTestCollection = "Acceptance test collection";
+
     internal const string ActorNumber = "5790000610976"; // Corresponds to the "Mosaic 03" actor in the UI.
     internal const string ActorGridArea = "543";
     internal const string ActorRole = "metereddataresponsible";
     private const EicFunction ActorEicFunction = EicFunction.MeteredDataResponsible;
 
-    protected TestRunner()
+    public TestRunner()
     {
         var root = new ConfigurationBuilder()
             .AddJsonFile("integrationtest.local.settings.json", true)
@@ -58,6 +61,9 @@ public class TestRunner : IAsyncDisposable
 
         var actorCertificateAssigned = ActorCertificateFactory.CreateActorCertificateAssigned(ActorNumber, ActorEicFunction, EbixCertificateThumbprint);
         _ = EventPublisher.PublishAsync(ActorCertificateCredentialsAssigned.EventName, actorCertificateAssigned.ToByteArray());
+
+        var gridAreaOwnerAssigned = GridAreaFactory.AssignedGridAreaOwner(ActorNumber, ActorGridArea, ActorEicFunction);
+        _ = EventPublisher.PublishAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnerAssigned.ToByteArray());
     }
 
     internal IntegrationEventPublisher EventPublisher { get; }

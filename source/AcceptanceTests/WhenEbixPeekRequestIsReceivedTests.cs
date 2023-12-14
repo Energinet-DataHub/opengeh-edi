@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
+using Energinet.DataHub.EDI.AcceptanceTests.Tests;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests;
@@ -22,24 +24,28 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 
 [IntegrationTest]
-public sealed class WhenEbixPeekRequestIsReceivedTests : TestRunner
+[Collection(TestRunner.AcceptanceTestCollection)]
+public sealed class WhenEbixPeekRequestIsReceivedTests
 {
     private readonly EbixRequestDsl _ebix;
+    private readonly TestRunner _runner;
 
-    public WhenEbixPeekRequestIsReceivedTests()
+    public WhenEbixPeekRequestIsReceivedTests(TestRunner runner)
     {
+        Debug.Assert(runner != null, nameof(runner) + " != null");
+        _runner = runner;
         _ebix = new EbixRequestDsl(
-            new AzureAuthenticationDriver(AzureEntraTenantId, AzureEntraBackendAppId),
-            new EdiDriver(AzpToken, ConnectionString),
-            new WholesaleDriver(EventPublisher),
-            new EbixDriver(new Uri(ApiManagementUri, "/ebix"), EbixCertificatePassword));
+            new AzureAuthenticationDriver(_runner.AzureEntraTenantId, _runner.AzureEntraBackendAppId),
+            new EdiDriver(_runner.AzpToken, _runner.ConnectionString),
+            new WholesaleDriver(_runner.EventPublisher),
+            new EbixDriver(new Uri(_runner.ApiManagementUri, "/ebix"), runner.EbixCertificatePassword));
     }
 
     [Fact]
     public async Task Actor_can_peek_calculation_result_in_ebix_format()
     {
-        await _ebix.EmptyQueueForActor(ActorNumber, ActorRole);
-        await _ebix.PublishAggregationResultFor(ActorGridArea);
+        await _ebix.EmptyQueueForActor(TestRunner.ActorNumber, TestRunner.ActorRole);
+        await _ebix.PublishAggregationResultFor(TestRunner.ActorGridArea);
 
         await _ebix.ConfirmPeekIsEbixFormatAndCorrectDocumentType();
     }
