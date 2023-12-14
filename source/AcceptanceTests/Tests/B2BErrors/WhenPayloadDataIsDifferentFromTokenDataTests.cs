@@ -24,7 +24,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.B2BErrors;
 
 [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Test code should not configure await.")]
 [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Testing")]
-[Collection("Acceptance test collection")]
+[Collection(TestRunner.AcceptanceTestCollection)]
 public class WhenPayloadDataIsDifferentFromTokenDataTests
 {
     private const string ActorNumber = "5790000701414";

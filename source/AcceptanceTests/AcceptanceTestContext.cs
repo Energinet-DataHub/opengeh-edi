@@ -16,7 +16,7 @@ using Energinet.DataHub.EDI.AcceptanceTests.Tests;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests;
 
-[CollectionDefinition("Acceptance test collection")]
+[CollectionDefinition(TestRunner.AcceptanceTestCollection)]
 public class AcceptanceTestContext : ICollectionFixture<TestRunner>
 {
 }
