@@ -27,27 +27,24 @@ jobs:
 
   # Run all tests in 'IntegrationTests.dll'
   integration_tests:
-    needs: dotnet_ci_build
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v12
     with:
       tests_dll_file_path: \source\IntegrationTests\bin\Release\net7.0\Energinet.DataHub.EDI.IntegrationTests.dll
-      download_attempt_limit: 20 # 20 retries, 15 seconds delay = 5 minutes
+      download_attempt_limit: 20 # 20 retries, 15 seconds delay = 5 minutes max wait
       dotnet_version: 7.0.200
 
   # Run all tests in 'ArchitectureTests.dll'
   architecture_tests:
-    needs: dotnet_ci_build
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v12
     with:
       tests_dll_file_path: \source\ArchitectureTests\bin\Release\net7.0\Energinet.DataHub.EDI.ArchitectureTests.dll
-      download_attempt_limit: 20 # 20 retries, 15 seconds delay = 5 minutes
+      download_attempt_limit: 20 # 20 retries, 15 seconds delay = 5 minutes max wait
       dotnet_version: 7.0.200
 
   # Run all tests in 'Tests.dll'
   tests:
-    needs: dotnet_ci_build
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v12
     with:
       tests_dll_file_path: \source\Tests\bin\Release\net7.0\Energinet.DataHub.EDI.Tests.dll
-      download_attempt_limit: 20 # 20 retries, 15 seconds delay = 5 minutes
+      download_attempt_limit: 20 # 20 retries, 15 seconds delay = 5 minutes max wait
       dotnet_version: 7.0.200
