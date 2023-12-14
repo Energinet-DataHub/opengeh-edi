@@ -67,7 +67,7 @@ internal sealed class EbixDriver : IDisposable
 
         // Add a HTTP Header to an outgoing request
         var requestMessage = new HttpRequestMessageProperty();
-        requestMessage.Headers.Add(HttpRequestHeader.ContentType, "application/Ebix");
+        requestMessage.Headers.Add(HttpRequestHeader.ContentType, "text/xml");
 
         OperationContext.Current.OutgoingMessageProperties[HttpRequestMessageProperty.Name] = requestMessage;
 
@@ -95,7 +95,7 @@ internal sealed class EbixDriver : IDisposable
         throw new TimeoutException("Unable to retrieve peek result within time limit", lastException);
     }
 
-    public async Task DequeueMessageAsync(string messageId, int? timeoutInSeconds)
+    public async Task DequeueMessageAsync(string messageId)
     {
         if (_ebixServiceClient.State != CommunicationState.Opened)
             _ebixServiceClient.Open();
@@ -104,32 +104,21 @@ internal sealed class EbixDriver : IDisposable
 
         // Add a HTTP Header to an outgoing request
         var requestMessage = new HttpRequestMessageProperty();
-        requestMessage.Headers.Add(HttpRequestHeader.ContentType, "application/Ebix");
+        requestMessage.Headers.Add(HttpRequestHeader.ContentType, "text/xml");
 
         OperationContext.Current.OutgoingMessageProperties[HttpRequestMessageProperty.Name] = requestMessage;
 
-        var stopWatch = Stopwatch.StartNew();
-        var timeBeforeTimeout = timeoutInSeconds != null ? new TimeSpan(0, 0, timeoutInSeconds.Value) : TimeSpan.Zero;
-        Exception? lastException = null;
-        do
+        try
         {
-            try
-            {
-                await _ebixServiceClient.dequeueMessageAsync(messageId).ConfigureAwait(false);
-            }
-            catch (CommunicationException e)
-            {
-                Console.WriteLine(
-                    "Encountered CommunicationException while dequeuing. The exception was:");
-                Console.WriteLine(e);
-                lastException = e;
-            }
-
-            await Task.Delay(500).ConfigureAwait(false);
+            await _ebixServiceClient.dequeueMessageAsync(messageId).ConfigureAwait(false);
         }
-        while (stopWatch.ElapsedMilliseconds < timeBeforeTimeout.TotalMilliseconds);
-
-        throw new TimeoutException("Unable to retrieve deque result within time limit", lastException);
+        catch (CommunicationException e)
+        {
+            Console.WriteLine(
+                "Encountered CommunicationException while dequeuing. The exception was:");
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
     public async Task<HttpResponseMessage> PeekMessageWithoutCertificateAsync()

@@ -55,7 +55,7 @@ internal sealed class EbixRequestDsl
     {
         var response = await _ebix.PeekMessageAsync(timeoutInSeconds: 60).ConfigureAwait(false);
 
-        await _ebix.DequeueMessageAsync(GetMessageId(response!), timeoutInSeconds: 60).ConfigureAwait(false);
+        await _ebix.DequeueMessageAsync(GetMessageId(response!)).ConfigureAwait(false);
 
         Assert.Multiple(
             () => Assert.NotNull(response?.MessageContainer?.Payload),
