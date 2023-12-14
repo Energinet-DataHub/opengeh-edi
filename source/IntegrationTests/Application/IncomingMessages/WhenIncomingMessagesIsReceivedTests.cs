@@ -72,9 +72,11 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
       var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
       var messageIds = await GetMessageIdsAsync(senderActorNumber);
       var message = _senderSpy.Message;
-      Assert.NotNull(message);
-      Assert.Single(transactionIds);
-      Assert.Single(messageIds);
+
+      Assert.Multiple(
+          () => Assert.NotNull(message),
+          () => Assert.Single(transactionIds),
+          () => Assert.Single(messageIds));
     }
 
     [Fact]
@@ -96,9 +98,12 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
         var messageIds = await GetMessageIdsAsync(senderActorNumber);
         var message = _senderSpy.Message;
-        Assert.Null(message);
-        Assert.Empty(transactionIds);
-        Assert.Empty(messageIds);
+
+        Assert.Multiple(
+            () => Assert.Null(message),
+            () => Assert.Empty(transactionIds),
+            () => Assert.Empty(messageIds));
+
         _senderSpy.ShouldFail = false;
     }
 
@@ -137,9 +142,10 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var messageIds = await GetMessageIdsAsync(senderActorNumber);
         var message = _senderSpy.Message;
 
-        Assert.Single(transactionIds);
-        Assert.Single(messageIds);
-        Assert.NotNull(message);
+        Assert.Multiple(
+            () => Assert.NotNull(message),
+            () => Assert.Single(transactionIds),
+            () => Assert.Single(messageIds));
     }
 
     [Fact]
@@ -162,9 +168,10 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var messageIds = await GetMessageIdsAsync(senderActorNumber);
         var message = _senderSpy.Message;
 
-        Assert.Null(message);
-        Assert.Empty(transactionIds);
-        Assert.Empty(messageIds);
+        Assert.Multiple(
+            () => Assert.Null(message),
+            () => Assert.Empty(transactionIds),
+            () => Assert.Empty(messageIds));
     }
 
     protected override void Dispose(bool disposing)

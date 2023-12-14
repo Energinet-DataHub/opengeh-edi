@@ -93,16 +93,12 @@ namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
 
             try
             {
-                using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-
-                await _transactionIdRepository.StoreAsync(
+                await _transactionIdRepository.AddAsync(
                     requestAggregatedMeasureDataDto.SenderNumber,
                     transactionIdsToBeStored,
                     cancellationToken).ConfigureAwait(false);
-                await _messageIdRepository.StoreAsync(requestAggregatedMeasureDataDto.SenderNumber, requestAggregatedMeasureDataDto.MessageId, cancellationToken)
+                await _messageIdRepository.AddAsync(requestAggregatedMeasureDataDto.SenderNumber, requestAggregatedMeasureDataDto.MessageId, cancellationToken)
                     .ConfigureAwait(false);
-
-                scope.Complete();
             }
             catch (NotSuccessfulTransactionIdsStorageException)
             {

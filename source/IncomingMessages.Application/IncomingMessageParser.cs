@@ -19,9 +19,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using IncomingMessages.Infrastructure;
+using IncomingMessages.Infrastructure.Configuration.DataAccess;
 using IncomingMessages.Infrastructure.Messages;
 using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 using IncomingMessages.Infrastructure.Response;
@@ -38,7 +40,7 @@ public class IncomingMessageParser : IIncomingMessageParser
     private readonly RequestAggregatedMeasureDataValidator _aggregatedMeasureDataMarketMessageValidator;
     private readonly ResponseFactory _responseFactory;
     private readonly IArchivedMessagesClient _archivedMessagesClient;
-    private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<IncomingMessageParser> _logger;
 
     public IncomingMessageParser(
@@ -47,7 +49,7 @@ public class IncomingMessageParser : IIncomingMessageParser
         RequestAggregatedMeasureDataValidator aggregatedMeasureDataMarketMessageValidator,
         ResponseFactory responseFactory,
         IArchivedMessagesClient archivedMessagesClient,
-        IDatabaseConnectionFactory databaseConnectionFactory,
+        IUnitOfWork unitOfWork,
         ILogger<IncomingMessageParser> logger)
     {
         _marketMessageParser = marketMessageParser;
@@ -55,7 +57,7 @@ public class IncomingMessageParser : IIncomingMessageParser
         _aggregatedMeasureDataMarketMessageValidator = aggregatedMeasureDataMarketMessageValidator;
         _responseFactory = responseFactory;
         _archivedMessagesClient = archivedMessagesClient;
-        _databaseConnectionFactory = databaseConnectionFactory;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -90,17 +92,14 @@ public class IncomingMessageParser : IIncomingMessageParser
                 message),
             cancellationToken).ConfigureAwait(false);
 
-        using var connection =
-            (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken)
-                .ConfigureAwait(false);
-        using var transaction = await connection.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
-
         var result = await _aggregatedMeasureDataMarketMessageValidator
             .ValidateAsync(requestAggregatedMeasureDataMarketMessageParserResult.Dto!, cancellationToken)
             .ConfigureAwait(false);
 
         if (result.Success)
         {
+            using var transaction = await _unitOfWork.SaveWithoutCommitAsync().ConfigureAwait(false);
+
             await _incomingRequestAggregatedMeasuredDataSender.SendAsync(
                     requestAggregatedMeasureDataMarketMessageParserResult.Dto!,
                     cancellationToken)

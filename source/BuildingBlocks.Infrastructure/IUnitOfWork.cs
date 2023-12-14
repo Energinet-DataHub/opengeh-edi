@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure
 {
@@ -22,8 +23,13 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure
     public interface IUnitOfWork
     {
         /// <summary>
-        /// Commits all changes made to the database in the current transaction asynchronously.
+        /// Commits all changes made to the database in asynchronously.
         /// </summary>
-        Task CommitTransactionAsync();
+        Task CommitAsync();
+
+        /// <summary>
+        /// Save changes and returns the used transaction without commiting.
+        /// </summary>
+        Task<IDbContextTransaction> SaveWithoutCommitAsync();
     }
 }

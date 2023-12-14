@@ -45,14 +45,23 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
             _masterDataContext = masterDataContext;
         }
 
-        public async Task CommitTransactionAsync()
+        public async Task<IDbContextTransaction> SaveWithoutCommitAsync()
         {
-            using var transaction = await BeginTransactionAsync().ConfigureAwait(false);
+            var transaction = await BeginTransactionAsync().ConfigureAwait(false);
+
             await _b2BContext.SaveChangesAsync().ConfigureAwait(false);
             await _processContext.SaveChangesAsync().ConfigureAwait(false);
             await _actorMessageQueueContext.SaveChangesAsync().ConfigureAwait(false);
             await _incomingMessagesContext.SaveChangesAsync().ConfigureAwait(false);
             await _masterDataContext.SaveChangesAsync().ConfigureAwait(false);
+
+            return transaction;
+        }
+
+        public async Task CommitAsync()
+        {
+            using var transaction = await SaveWithoutCommitAsync().ConfigureAwait(false);
+
             await transaction.CommitAsync().ConfigureAwait(false);
         }
 

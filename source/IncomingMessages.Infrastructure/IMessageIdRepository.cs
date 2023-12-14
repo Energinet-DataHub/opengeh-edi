@@ -22,7 +22,7 @@ namespace IncomingMessages.Infrastructure
         /// <summary>
         /// Store message id for the sender
         /// </summary>
-        Task StoreAsync(string senderNumber, string messageId, CancellationToken cancellationToken);
+        Task AddAsync(string senderNumber, string messageId, CancellationToken cancellationToken);
 
         /// <summary>
         /// Checks if <paramref name="messageId"/> is already registered by the sender <paramref name="senderNumber"/>

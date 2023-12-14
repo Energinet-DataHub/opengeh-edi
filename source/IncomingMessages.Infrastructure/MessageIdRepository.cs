@@ -19,19 +19,19 @@ namespace IncomingMessages.Infrastructure
 {
     public class MessageIdRepository : IMessageIdRepository
     {
-        private readonly IncomingMessagesContext _b2BContext;
+        private readonly IncomingMessagesContext _incomingMessagesContext;
 
         public MessageIdRepository(
-            IncomingMessagesContext b2BContext)
+            IncomingMessagesContext incomingMessagesContext)
         {
-            _b2BContext = b2BContext;
+            _incomingMessagesContext = incomingMessagesContext;
         }
 
-        public async Task StoreAsync(string senderNumber, string messageId, CancellationToken cancellationToken)
+        public async Task AddAsync(string senderNumber, string messageId, CancellationToken cancellationToken)
         {
             if (senderNumber == null) throw new ArgumentNullException(nameof(senderNumber));
 
-            await _b2BContext.MessageIdForSenders.AddAsync(
+            await _incomingMessagesContext.MessageIdForSenders.AddAsync(
                     new MessageIdForSender(messageId, senderNumber), cancellationToken)
                 .ConfigureAwait(false);
         }
@@ -51,7 +51,7 @@ namespace IncomingMessages.Infrastructure
 
         private MessageIdForSender? GetMessageFromInMemoryCollection(string senderNumber, string messageId)
         {
-            return _b2BContext.MessageIdForSenders.Local
+            return _incomingMessagesContext.MessageIdForSenders.Local
                 .FirstOrDefault(x => x.MessageId == messageId && x.SenderId == senderNumber);
         }
 
@@ -60,7 +60,7 @@ namespace IncomingMessages.Infrastructure
             string messageId,
             CancellationToken cancellationToken)
         {
-            return await _b2BContext.MessageIdForSenders
+            return await _incomingMessagesContext.MessageIdForSenders
                 .FirstOrDefaultAsync(
                     messageIdForSender => messageIdForSender.MessageId == messageId
                                               && messageIdForSender.SenderId == senderId,
