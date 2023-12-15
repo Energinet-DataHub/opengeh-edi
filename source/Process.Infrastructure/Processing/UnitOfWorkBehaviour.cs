@@ -62,7 +62,7 @@ public class UnitOfWorkBehaviour<TRequest, TResponse> : IPipelineBehavior<TReque
         }
         else
         {
-            await _unitOfWork.CommitAsync().ConfigureAwait(false);
+            await _unitOfWork.CommitTransactionAsync().ConfigureAwait(false);
         }
 
         return result;

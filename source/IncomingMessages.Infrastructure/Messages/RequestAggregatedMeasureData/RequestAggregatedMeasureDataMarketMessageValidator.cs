@@ -41,7 +41,7 @@ namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
             IReceiverValidator receiverValidator,
             IBusinessTypeValidator businessTypeValidator)
         {
-            _messageIdRepository = messageIdRepository ?? throw new ArgumentNullException(nameof(messageIdRepository));
+            _messageIdRepository = messageIdRepository;
             _transactionIdRepository = transactionIdRepository;
             _senderAuthorizer = senderAuthorizer;
             _processTypeValidator = processTypeValidator;
@@ -84,29 +84,6 @@ namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
                 {
                     transactionIdsToBeStored.Add(transactionId);
                 }
-            }
-
-            if (_errors.Count > 0)
-            {
-                return Result.Failure(_errors.ToArray());
-            }
-
-            try
-            {
-                await _transactionIdRepository.AddAsync(
-                    requestAggregatedMeasureDataDto.SenderNumber,
-                    transactionIdsToBeStored,
-                    cancellationToken).ConfigureAwait(false);
-                await _messageIdRepository.AddAsync(requestAggregatedMeasureDataDto.SenderNumber, requestAggregatedMeasureDataDto.MessageId, cancellationToken)
-                    .ConfigureAwait(false);
-            }
-            catch (NotSuccessfulTransactionIdsStorageException)
-            {
-                _errors.Add(new DuplicateTransactionIdDetected());
-            }
-            catch (NotSuccessfulMessageIdStorageException e)
-            {
-                _errors.Add(new DuplicateMessageIdDetected(e.MessageId));
             }
 
             if (_errors.Count > 0)

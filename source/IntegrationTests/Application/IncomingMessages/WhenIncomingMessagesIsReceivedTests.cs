@@ -38,7 +38,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 
 public class WhenIncomingMessagesIsReceivedTests : TestBase
 {
-    private readonly IIncomingMessageParser _incomingMessagesRequest;
+    private readonly IIncomingMessageClient _incomingMessagesRequest;
     private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
     private readonly ServiceBusSenderSpy _senderSpy;
     private readonly IncomingMessagesContext _incomingMessageContext;
@@ -49,7 +49,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IServiceBusSenderFactory>();
         _senderSpy = new ServiceBusSenderSpy("Fake");
         _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
-        _incomingMessagesRequest = GetService<IIncomingMessageParser>();
+        _incomingMessagesRequest = GetService<IIncomingMessageClient>();
         _incomingMessageContext = GetService<IncomingMessagesContext>();
     }
 
@@ -62,7 +62,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
       authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, MarketRole.BalanceResponsibleParty));
 
       // Act
-      await _incomingMessagesRequest.ParseAsync(
+      await _incomingMessagesRequest.HandleAsync(
           ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
           DocumentFormat.Json,
           IncomingDocumentType.RequestAggregatedMeasureData,
@@ -89,7 +89,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         _senderSpy.ShouldFail = true;
 
         // Act & Assert
-        await Assert.ThrowsAsync<ServiceBusException>(() => _incomingMessagesRequest.ParseAsync(
+        await Assert.ThrowsAsync<ServiceBusException>(() => _incomingMessagesRequest.HandleAsync(
             ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
@@ -119,16 +119,16 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var sessionProvider = GetService<IServiceProvider>();
         using var secondScope = sessionProvider.CreateScope();
         var authenticatedActorInSecondScope = secondScope.ServiceProvider.GetService<AuthenticatedActor>();
-        var secondParser = secondScope.ServiceProvider.GetRequiredService<IIncomingMessageParser>();
+        var secondParser = secondScope.ServiceProvider.GetRequiredService<IIncomingMessageClient>();
 
         authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, restriction: Restriction.None));
 
-        var task01 = _incomingMessagesRequest.ParseAsync(
+        var task01 = _incomingMessagesRequest.HandleAsync(
             ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
             CancellationToken.None);
-        var task02 = secondParser.ParseAsync(
+        var task02 = secondParser.HandleAsync(
             ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
@@ -157,7 +157,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, MarketRole.BalanceResponsibleParty));
 
         // Act
-        await _incomingMessagesRequest.ParseAsync(
+        await _incomingMessagesRequest.HandleAsync(
             ReadJsonFile("Application\\IncomingMessages\\FailSchemeValidationAggregatedMeasureData.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,

@@ -23,13 +23,8 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure
     public interface IUnitOfWork
     {
         /// <summary>
-        /// Commits all changes made to the database in asynchronously.
+        /// Commits all changes made to the database in the current transaction asynchronously.
         /// </summary>
-        Task CommitAsync();
-
-        /// <summary>
-        /// Save changes and returns the used transaction without commiting.
-        /// </summary>
-        Task<IDbContextTransaction> SaveWithoutCommitAsync();
+        Task CommitTransactionAsync();
     }
 }

@@ -22,46 +22,55 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+using Energinet.DataHub.EDI.Process.Interfaces;
 using IncomingMessages.Infrastructure;
 using IncomingMessages.Infrastructure.Configuration.DataAccess;
 using IncomingMessages.Infrastructure.Messages;
+using IncomingMessages.Infrastructure.Messages.Exceptions;
 using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 using IncomingMessages.Infrastructure.Response;
+using IncomingMessages.Infrastructure.ValidationErrors;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application;
 
-public class IncomingMessageParser : IIncomingMessageParser
+public class IncomingMessageClient : IIncomingMessageClient
 {
     private readonly MarketMessageParser _marketMessageParser;
     private readonly IncomingRequestAggregatedMeasuredDataSender _incomingRequestAggregatedMeasuredDataSender;
     private readonly RequestAggregatedMeasureDataValidator _aggregatedMeasureDataMarketMessageValidator;
     private readonly ResponseFactory _responseFactory;
     private readonly IArchivedMessagesClient _archivedMessagesClient;
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly ILogger<IncomingMessageParser> _logger;
+    private readonly ILogger<IncomingMessageClient> _logger;
+    private readonly IncomingMessagesContext _incomingMessagesContext;
+    private readonly IMessageIdRepository _messageIdRepository;
+    private readonly ITransactionIdRepository _transactionIdRepository;
 
-    public IncomingMessageParser(
+    public IncomingMessageClient(
         MarketMessageParser marketMessageParser,
         IncomingRequestAggregatedMeasuredDataSender incomingRequestAggregatedMeasuredDataSender,
         RequestAggregatedMeasureDataValidator aggregatedMeasureDataMarketMessageValidator,
         ResponseFactory responseFactory,
         IArchivedMessagesClient archivedMessagesClient,
-        IUnitOfWork unitOfWork,
-        ILogger<IncomingMessageParser> logger)
+        ILogger<IncomingMessageClient> logger,
+        IncomingMessagesContext incomingMessagesContext,
+        IMessageIdRepository messageIdRepository,
+        ITransactionIdRepository transactionIdRepository)
     {
         _marketMessageParser = marketMessageParser;
         _incomingRequestAggregatedMeasuredDataSender = incomingRequestAggregatedMeasuredDataSender;
         _aggregatedMeasureDataMarketMessageValidator = aggregatedMeasureDataMarketMessageValidator;
         _responseFactory = responseFactory;
         _archivedMessagesClient = archivedMessagesClient;
-        _unitOfWork = unitOfWork;
         _logger = logger;
+        _incomingMessagesContext = incomingMessagesContext;
+        _messageIdRepository = messageIdRepository;
+        _transactionIdRepository = transactionIdRepository;
     }
 
-    public async Task<ResponseMessage> ParseAsync(
+    public async Task<ResponseMessage> HandleAsync(
         Stream message,
         DocumentFormat documentFormat,
         IncomingDocumentType documentType,
@@ -70,7 +79,8 @@ public class IncomingMessageParser : IIncomingMessageParser
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
         var requestAggregatedMeasureDataMarketMessageParserResult =
-            await _marketMessageParser.ParseAsync(message, documentFormat, documentType, cancellationToken).ConfigureAwait(false);
+            await _marketMessageParser.ParseAsync(message, documentFormat, documentType, cancellationToken)
+                .ConfigureAwait(false);
 
         if (requestAggregatedMeasureDataMarketMessageParserResult.Errors.Any())
         {
@@ -92,14 +102,26 @@ public class IncomingMessageParser : IIncomingMessageParser
                 message),
             cancellationToken).ConfigureAwait(false);
 
-        var result = await _aggregatedMeasureDataMarketMessageValidator
+        using var transaction = await _incomingMessagesContext.Database.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
+        var validationResult = await _aggregatedMeasureDataMarketMessageValidator
             .ValidateAsync(requestAggregatedMeasureDataMarketMessageParserResult.Dto!, cancellationToken)
             .ConfigureAwait(false);
 
+        if (!validationResult.Success)
+        {
+            _logger.LogInformation(
+                "Failed to validate incoming message: {MessageId}. Errors: {Errors}",
+                requestAggregatedMeasureDataMarketMessageParserResult.Dto.MessageId,
+                requestAggregatedMeasureDataMarketMessageParserResult.Errors);
+            return _responseFactory.From(validationResult, responseFormat ?? documentFormat);
+        }
+
+        var result = await SaveMessageIdAndTransactionIdAsync(
+            requestAggregatedMeasureDataMarketMessageParserResult.Dto,
+            cancellationToken).ConfigureAwait(false);
+
         if (result.Success)
         {
-            using var transaction = await _unitOfWork.SaveWithoutCommitAsync().ConfigureAwait(false);
-
             await _incomingRequestAggregatedMeasuredDataSender.SendAsync(
                     requestAggregatedMeasureDataMarketMessageParserResult.Dto!,
                     cancellationToken)
@@ -111,7 +133,7 @@ public class IncomingMessageParser : IIncomingMessageParser
         }
 
         _logger.LogInformation(
-            "Failed to validate incoming message: {MessageId}. Errors: {Errors}",
+            "Failed to save incoming message: {MessageId}. Errors: {Errors}",
             requestAggregatedMeasureDataMarketMessageParserResult.Dto.MessageId,
             requestAggregatedMeasureDataMarketMessageParserResult.Errors);
         return _responseFactory.From(result, responseFormat ?? documentFormat);
@@ -120,5 +142,33 @@ public class IncomingMessageParser : IIncomingMessageParser
     private static void RewindStream(Stream message)
     {
         message.Seek(0, SeekOrigin.Begin);
+    }
+
+    private async Task<Result> SaveMessageIdAndTransactionIdAsync(
+        RequestAggregatedMeasureDataDto requestAggregatedMeasureDataDto, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _transactionIdRepository.AddAsync(
+                requestAggregatedMeasureDataDto.SenderNumber,
+                requestAggregatedMeasureDataDto.Series.Select(x => x.Id).ToList(),
+                cancellationToken).ConfigureAwait(false);
+            await _messageIdRepository.AddAsync(
+                    requestAggregatedMeasureDataDto.SenderNumber,
+                    requestAggregatedMeasureDataDto.MessageId,
+                    cancellationToken)
+                .ConfigureAwait(false);
+        }
+        catch (NotSuccessfulTransactionIdsStorageException)
+        {
+            return Result.Failure(new DuplicateTransactionIdDetected());
+        }
+        catch (NotSuccessfulMessageIdStorageException e)
+        {
+            return Result.Failure(new DuplicateMessageIdDetected(e.MessageId));
+        }
+
+        await _incomingMessagesContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        return Result.Succeeded();
     }
 }

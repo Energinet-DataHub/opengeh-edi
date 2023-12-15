@@ -20,7 +20,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 
 #pragma warning disable SA1600
-public interface IIncomingMessageParser
+public interface IIncomingMessageClient
 {
-    Task<ResponseMessage> ParseAsync(Stream message, DocumentFormat documentFormat, IncomingDocumentType documentType, CancellationToken cancellationToken, DocumentFormat responseFormat = null!);
+    Task<ResponseMessage> HandleAsync(Stream message, DocumentFormat documentFormat, IncomingDocumentType documentType, CancellationToken cancellationToken, DocumentFormat responseFormat = null!);
 }

@@ -39,7 +39,7 @@ public static class IncomingMessagesConfiguration
                 "INCOMING_MESSAGES_QUEUE_NAME must be set");
 
         services.AddScopedSqlDbContext<IncomingMessagesContext>(configuration);
-        services.AddScoped<IIncomingMessageParser, IncomingMessageParser>();
+        services.AddScoped<IIncomingMessageClient, IncomingMessageClient>();
         services.AddScoped<ITransactionIdRepository, TransactionIdRepository>();
         services.AddScoped<IMessageIdRepository, MessageIdRepository>();
         services.AddScoped<IMessageParser, XmlMessageParser>();
