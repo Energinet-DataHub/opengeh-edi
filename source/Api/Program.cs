@@ -108,7 +108,6 @@ namespace Energinet.DataHub.EDI.Api
                         {
                             return new DevMarketActorAuthenticator(
                                 sp.GetRequiredService<IActorRepository>(),
-                                sp.GetRequiredService<IActorRegistry>(),
                                 sp.GetRequiredService<IDatabaseConnectionFactory>(),
                                 sp.GetRequiredService<AuthenticatedActor>());
                         }
