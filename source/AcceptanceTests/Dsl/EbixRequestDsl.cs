@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Net;
+using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
 
@@ -50,13 +51,15 @@ internal sealed class EbixRequestDsl
         return _wholesale.PublishAggregationResultAsync(gridArea);
     }
 
-    internal async Task ConfirmPeekIsEbixFormatAndCorrectDocumentType()
+    internal async Task ConfirmEbixResultIsAvailableForActor()
     {
         var response = await _ebix.PeekMessageAsync(timeoutInSeconds: 60).ConfigureAwait(false);
 
+        await _ebix.DequeueMessageAsync(GetMessageId(response!)).ConfigureAwait(false);
+
         Assert.Multiple(
             () => Assert.NotNull(response?.MessageContainer?.Payload),
-            () => Assert.Equal("AggregatedMeteredDataTimeSeries", response!.MessageContainer.DocumentType));
+            () => Assert.Equal("AggregatedMeteredDataTimeSeries", response?.MessageContainer?.DocumentType));
     }
 
     internal async Task ConfirmPeekWithoutCertificateIsNotAllowed()
@@ -66,5 +69,14 @@ internal sealed class EbixRequestDsl
         Assert.Multiple(
             () => Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode),
             () => Assert.Contains("Certificate rejected", response.ReasonPhrase, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private static string GetMessageId(peekMessageResponse response)
+    {
+        var nsmgr = new XmlNamespaceManager(new NameTable());
+        nsmgr.AddNamespace("ns0", "un:unece:260:data:EEM-DK_AggregatedMeteredDataTimeSeries:v3");
+        var query = "/ns0:HeaderEnergyDocument/ns0:Identification";
+        var node = response.MessageContainer.Payload.SelectSingleNode(query, nsmgr);
+        return node!.InnerText;
     }
 }
