@@ -1,0 +1,188 @@
+﻿// Copyright 2020 Energinet DataHub A/S
+//
+// Licensed under the Apache License, Version 2.0 (the "License2");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System.Diagnostics.CodeAnalysis;
+
+namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
+
+    [SuppressMessage("Security", "CA5394:Do not use insecure randomness", Justification = "Number generator not exposed")]
+    public static class SynchronousErrorTestData
+    {
+        public static Dictionary<string, string> DefaultEnergySupplierTestData()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:mRID", GenerateRandomString(36) },
+                { "cim:type", "E74" },
+                { "cim:process.processType", "D05" },
+                { "cim:businessSector.type", "23" },
+                { "cim:sender_MarketParticipant.mRID", "5790000701414" },
+                { "cim:sender_MarketParticipant.marketRole.type", "DDQ" },
+                { "cim:receiver_MarketParticipant.mRID", "5790001330552" },
+                { "cim:receiver_MarketParticipant.marketRole.type", "DGL" },
+                { "cim:createdDateTime", "2022-12-17T09:30:47Z" },
+            };
+        }
+
+        public static Dictionary<string, string> DefaultEnergySupplierSeriesTestData()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:mRID", GenerateRandomString(36) },
+                { "cim:settlement_Series.version", "D01" },
+                { "cim:marketEvaluationPoint.type", "E17" },
+                { "cim:marketEvaluationPoint.settlementMethod", "D01" },
+                { "cim:start_DateAndOrTime.dateTime", "2022-06-23T22:00:00Z" },
+                { "cim:end_DateAndOrTime.dateTime", "2022-07-18T22:00:00Z" },
+                { "cim:meteringGridArea_Domain.mRID", "244" },
+                { "cim:energySupplier_MarketParticipant.mRID", "5790000701414" },
+            };
+        }
+
+        public static Dictionary<string, string> WrongSenderMarketParticipantMrid()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:sender_MarketParticipant.mRID", "5790000701413" },
+            };
+        }
+
+        public static Dictionary<string, string> SenderRoleTypeNotAuthorized()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:sender_MarketParticipant.marketRole.type", "DGL" },
+            };
+        }
+
+        /*public Dictionary<string, string> MessageIdIsNotUnique()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:mRID", "B6Qhv7Dls6zdnvgna3cQqXu0PAzFqKco8GLc" },
+            };
+        }
+
+        public Dictionary<string, string> TransactionIdIsNotUnique()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:mRID", "aX5fNO7st0zVIemSRek4GM1FCSRbQ28PMIZO" },
+            };
+        }
+
+        public Dictionary<string, string> EmptyMessageId()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:mRID", "" },
+            };
+        }
+
+        public Dictionary<string, string> EmptyTransactionId()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:mRID", "" },
+            };
+        }
+
+        public Dictionary<string, string> InvalidTransactionId()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:mRID", "invalidId" },
+            };
+        }
+
+        public Dictionary<string, string> SchemaVersionIsInvalid()
+        {
+            //TODO: add dynamic handling of xml header creation
+            return new Dictionary<string, string>
+            {
+                { "cim:mRID", "invalidId" },
+            };
+        }
+
+        public Dictionary<string, string> SchemaValidationErrorOnType()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:businessSector.type", "232" },
+            };
+        }
+
+        public Dictionary<string, string> InvalidReceiverId()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:receiver_MarketParticipant.mRID", "5790001330553" },
+            };
+        }
+
+        public Dictionary<string, string> InvalidReceiverRole()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:receiver_MarketParticipant.marketRole.type", "DDZ" },
+            };
+        }
+
+        public Dictionary<string, string> InvalidLengthOfMessageId()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:mRID", "lasjfejhrtajhfksagjebrtafnnvsgietjafehtaafaertzrshgsyr" },
+            };
+        }
+
+        public Dictionary<string, string> TypeIsNotSupported()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:type", "E73" },
+            };
+        }
+
+        public Dictionary<string, string> ProcessTypeIsNotSupported()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:process.processType", "D09" },
+            };
+        }
+
+        public Dictionary<string, string> InvalidBusinessType()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:businessSector.type", "27" },
+            };
+        }
+        */
+
+        private static string GenerateRandomString(int length)
+        {
+            string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            string result = string.Empty;
+
+            int charactersLength = characters.Length;
+            for (int i = 0; i < length; i++)
+            {
+                result += characters.ToCharArray().GetValue(new Random().Next(1, charactersLength));
+            }
+
+            return result;
+        }
+}
