@@ -51,7 +51,7 @@ internal sealed class EbixRequestDsl
         return _wholesale.PublishAggregationResultAsync(gridArea);
     }
 
-    internal async Task ConfirmPeekIsEbixFormatAndCorrectDocumentType()
+    internal async Task ConfirmEbixResultIsAvailableForActor()
     {
         var response = await _ebix.PeekMessageAsync(timeoutInSeconds: 60).ConfigureAwait(false);
 
@@ -59,7 +59,7 @@ internal sealed class EbixRequestDsl
 
         Assert.Multiple(
             () => Assert.NotNull(response?.MessageContainer?.Payload),
-            () => Assert.Equal("AggregatedMeteredDataTimeSeries", response!.MessageContainer.DocumentType));
+            () => Assert.Equal("AggregatedMeteredDataTimeSeries", response?.MessageContainer?.DocumentType));
     }
 
     internal async Task ConfirmPeekWithoutCertificateIsNotAllowed()

@@ -42,12 +42,12 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
     }
 
     [Fact]
-    public async Task Actor_can_peek_and_dequeue_calculation_result_in_ebix_format()
+    public async Task Actor_can_peek_and_dequeue_aggregation_result_in_ebIX_format()
     {
         await _ebix.EmptyQueueForActor(TestRunner.ActorNumber, TestRunner.ActorRole);
         await _ebix.PublishAggregationResultFor(TestRunner.ActorGridArea);
 
-        await _ebix.ConfirmPeekIsEbixFormatAndCorrectDocumentType();
+        await _ebix.ConfirmEbixResultIsAvailableForActor();
     }
 
     [Fact]
