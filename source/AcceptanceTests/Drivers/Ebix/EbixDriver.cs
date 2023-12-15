@@ -95,6 +95,32 @@ internal sealed class EbixDriver : IDisposable
         throw new TimeoutException("Unable to retrieve peek result within time limit", lastException);
     }
 
+    public async Task DequeueMessageAsync(string messageId)
+    {
+        if (_ebixServiceClient.State != CommunicationState.Opened)
+            _ebixServiceClient.Open();
+
+        using var operationScope = new OperationContextScope(_ebixServiceClient.InnerChannel);
+
+        // Add a HTTP Header to an outgoing request
+        var requestMessage = new HttpRequestMessageProperty();
+        requestMessage.Headers.Add(HttpRequestHeader.ContentType, "text/xml");
+
+        OperationContext.Current.OutgoingMessageProperties[HttpRequestMessageProperty.Name] = requestMessage;
+
+        try
+        {
+            await _ebixServiceClient.dequeueMessageAsync(messageId).ConfigureAwait(false);
+        }
+        catch (CommunicationException e)
+        {
+            Console.WriteLine(
+                "Encountered CommunicationException while dequeuing. The exception was:");
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
     public async Task<HttpResponseMessage> PeekMessageWithoutCertificateAsync()
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, new Uri("?soapAction=peekMessage", UriKind.Relative));
