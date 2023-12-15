@@ -19,18 +19,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using IncomingMessages.Infrastructure;
 using IncomingMessages.Infrastructure.Configuration.DataAccess;
 using IncomingMessages.Infrastructure.Messages;
-using IncomingMessages.Infrastructure.Messages.Exceptions;
 using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 using IncomingMessages.Infrastructure.Response;
 using IncomingMessages.Infrastructure.ValidationErrors;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 
@@ -70,7 +68,7 @@ public class IncomingMessageClient : IIncomingMessageClient
         _transactionIdRepository = transactionIdRepository;
     }
 
-    public async Task<ResponseMessage> HandleAsync(
+    public async Task<ResponseMessage> RegisterAndSendAsync(
         Stream message,
         DocumentFormat documentFormat,
         IncomingDocumentType documentType,
@@ -102,7 +100,6 @@ public class IncomingMessageClient : IIncomingMessageClient
                 message),
             cancellationToken).ConfigureAwait(false);
 
-        using var transaction = await _incomingMessagesContext.Database.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
         var validationResult = await _aggregatedMeasureDataMarketMessageValidator
             .ValidateAsync(requestAggregatedMeasureDataMarketMessageParserResult.Dto!, cancellationToken)
             .ConfigureAwait(false);
@@ -116,6 +113,7 @@ public class IncomingMessageClient : IIncomingMessageClient
             return _responseFactory.From(validationResult, responseFormat ?? documentFormat);
         }
 
+        using var transaction = await _incomingMessagesContext.Database.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
         var result = await SaveMessageIdAndTransactionIdAsync(
             requestAggregatedMeasureDataMarketMessageParserResult.Dto,
             cancellationToken).ConfigureAwait(false);
@@ -147,28 +145,35 @@ public class IncomingMessageClient : IIncomingMessageClient
     private async Task<Result> SaveMessageIdAndTransactionIdAsync(
         RequestAggregatedMeasureDataDto requestAggregatedMeasureDataDto, CancellationToken cancellationToken)
     {
+        await _transactionIdRepository.AddAsync(
+            requestAggregatedMeasureDataDto.SenderNumber,
+            requestAggregatedMeasureDataDto.Series.Select(x => x.Id).ToList(),
+            cancellationToken).ConfigureAwait(false);
+        await _messageIdRepository.AddAsync(
+                requestAggregatedMeasureDataDto.SenderNumber,
+                requestAggregatedMeasureDataDto.MessageId,
+                cancellationToken)
+            .ConfigureAwait(false);
+
         try
         {
-            await _transactionIdRepository.AddAsync(
-                requestAggregatedMeasureDataDto.SenderNumber,
-                requestAggregatedMeasureDataDto.Series.Select(x => x.Id).ToList(),
-                cancellationToken).ConfigureAwait(false);
-            await _messageIdRepository.AddAsync(
-                    requestAggregatedMeasureDataDto.SenderNumber,
-                    requestAggregatedMeasureDataDto.MessageId,
-                    cancellationToken)
-                .ConfigureAwait(false);
+            await _incomingMessagesContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
-        catch (NotSuccessfulTransactionIdsStorageException)
+        catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlException
+                                           && sqlException.Message.Contains(
+                                               "Violation of PRIMARY KEY constraint 'PK_TransactionRegistry_TransactionIdAndSenderId'",
+                                               StringComparison.OrdinalIgnoreCase))
         {
             return Result.Failure(new DuplicateTransactionIdDetected());
         }
-        catch (NotSuccessfulMessageIdStorageException e)
+        catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlException
+                                           && sqlException.Message.Contains(
+                                               "Violation of PRIMARY KEY constraint 'PK_MessageRegistry_MessageIdAndSenderId'",
+                                               StringComparison.OrdinalIgnoreCase))
         {
-            return Result.Failure(new DuplicateMessageIdDetected(e.MessageId));
+            return Result.Failure(new DuplicateMessageIdDetected(requestAggregatedMeasureDataDto.MessageId));
         }
 
-        await _incomingMessagesContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return Result.Succeeded();
     }
 }

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure
 {

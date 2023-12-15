@@ -64,7 +64,7 @@ public class RequestAggregatedMeasureMessageReceiver
         }
 
         var responseMessage = await _incomingMessageClient
-            .HandleAsync(
+            .RegisterAndSendAsync(
                 request.Body,
                 documentFormat,
                 IncomingDocumentType.RequestAggregatedMeasureData,

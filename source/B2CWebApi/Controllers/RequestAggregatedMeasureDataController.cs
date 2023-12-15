@@ -65,7 +65,7 @@ public class RequestAggregatedMeasureDataController : ControllerBase
                 _dateTimeZone,
                 _systemDateTimeProvider.Now());
 
-        var responseMessage = await _incomingMessageClient.HandleAsync(
+        var responseMessage = await _incomingMessageClient.RegisterAndSendAsync(
                 GenerateStreamFromString(_serializer.Serialize(message)),
                 DocumentFormat.Json,
                 IncomingDocumentType.B2CRequestAggregatedMeasureData,

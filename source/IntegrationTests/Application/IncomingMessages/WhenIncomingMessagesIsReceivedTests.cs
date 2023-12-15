@@ -62,7 +62,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
       authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, MarketRole.BalanceResponsibleParty));
 
       // Act
-      await _incomingMessagesRequest.HandleAsync(
+      await _incomingMessagesRequest.RegisterAndSendAsync(
           ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
           DocumentFormat.Json,
           IncomingDocumentType.RequestAggregatedMeasureData,
@@ -89,7 +89,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         _senderSpy.ShouldFail = true;
 
         // Act & Assert
-        await Assert.ThrowsAsync<ServiceBusException>(() => _incomingMessagesRequest.HandleAsync(
+        await Assert.ThrowsAsync<ServiceBusException>(() => _incomingMessagesRequest.RegisterAndSendAsync(
             ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
@@ -111,6 +111,8 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
     public async Task Only_one_request_pr_transactionId_and_messageId_is_accepted()
     {
         // Arrange
+        var exceptedDuplicateTransactionIdDetectedErrorCode = "00110";
+        var exceptedDuplicateMessageIdDetectedErrorCode = "00101";
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, MarketRole.BalanceResponsibleParty));
@@ -121,21 +123,21 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var authenticatedActorInSecondScope = secondScope.ServiceProvider.GetService<AuthenticatedActor>();
         var secondParser = secondScope.ServiceProvider.GetRequiredService<IIncomingMessageClient>();
 
-        authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, restriction: Restriction.None));
+        authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, restriction: Restriction.None, MarketRole.BalanceResponsibleParty));
 
-        var task01 = _incomingMessagesRequest.HandleAsync(
+        var task01 = _incomingMessagesRequest.RegisterAndSendAsync(
             ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
             CancellationToken.None);
-        var task02 = secondParser.HandleAsync(
+        var task02 = secondParser.RegisterAndSendAsync(
             ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
             CancellationToken.None);
 
         // Act
-        await Task.WhenAll(task01, task02);
+        IEnumerable<ResponseMessage> results = await Task.WhenAll(task01, task02);
 
         // Assert
         var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
@@ -143,6 +145,15 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var message = _senderSpy.Message;
 
         Assert.Multiple(
+            () => Assert.NotNull(results),
+            () => Assert.Single(results.Where(result => result.IsErrorResponse)),
+            () => Assert.Single(results.Where(result =>
+                result.MessageBody.Contains(
+                exceptedDuplicateTransactionIdDetectedErrorCode,
+                StringComparison.OrdinalIgnoreCase)
+                || result.MessageBody.Contains(
+                    exceptedDuplicateMessageIdDetectedErrorCode,
+                    StringComparison.OrdinalIgnoreCase))),
             () => Assert.NotNull(message),
             () => Assert.Single(transactionIds),
             () => Assert.Single(messageIds));
@@ -157,7 +168,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, MarketRole.BalanceResponsibleParty));
 
         // Act
-        await _incomingMessagesRequest.HandleAsync(
+        await _incomingMessagesRequest.RegisterAndSendAsync(
             ReadJsonFile("Application\\IncomingMessages\\FailSchemeValidationAggregatedMeasureData.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
