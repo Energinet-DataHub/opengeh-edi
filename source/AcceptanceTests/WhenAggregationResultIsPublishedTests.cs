@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
+using Energinet.DataHub.EDI.AcceptanceTests.Tests;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests;
@@ -21,25 +23,27 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 
 [IntegrationTest]
-public sealed class WhenAggregationResultIsPublishedTests : TestRunner
+[Collection(TestRunner.AcceptanceTestCollection)]
+public sealed class WhenAggregationResultIsPublishedTests
 {
     private readonly AggregationResultDsl _aggregations;
 
-    public WhenAggregationResultIsPublishedTests()
+    public WhenAggregationResultIsPublishedTests(TestRunner runner)
     {
+        Debug.Assert(runner != null, nameof(runner) + " != null");
         _aggregations = new AggregationResultDsl(
-            new EdiDriver(AzpToken, ConnectionString),
-            new WholesaleDriver(EventPublisher));
+            new EdiDriver(runner.AzpToken, runner.ConnectionString),
+            new WholesaleDriver(runner.EventPublisher));
     }
 
     [Fact]
     public async Task Actor_can_peek_and_dequeue_aggregation_result()
     {
-        await _aggregations.EmptyQueueForActor(actorNumber: ActorNumber, actorRole: ActorRole);
+        await _aggregations.EmptyQueueForActor(actorNumber: TestRunner.ActorNumber, actorRole: TestRunner.ActorRole);
 
-        await _aggregations.PublishResultFor(gridAreaCode: ActorGridArea);
+        await _aggregations.PublishResultFor(gridAreaCode: TestRunner.ActorGridArea);
 
         await _aggregations
-            .ConfirmResultIsAvailableFor(actorNumber: ActorNumber, actorRole: ActorRole);
+            .ConfirmResultIsAvailableFor(actorNumber: TestRunner.ActorNumber, actorRole: TestRunner.ActorRole);
     }
 }

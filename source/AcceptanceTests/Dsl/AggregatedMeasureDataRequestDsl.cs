@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
@@ -50,5 +51,25 @@ internal sealed class AggregatedMeasureDataRequestDsl
     internal Task EmptyQueueForActor(string actorNumber, string actorRole)
     {
         return _edi.EmptyQueueAsync(actorNumber, new[] { actorRole });
+    }
+
+    internal Task ConfirmRequestAggregatedMeasureDataWithoutTokenIsNotAllowed()
+    {
+        return _edi.RequestAggregatedMeasureDataWithoutTokenAsync();
+    }
+
+    internal Task ConfirmPeekWithoutTokenIsNotAllowed()
+    {
+        return _edi.PeekMessageWithoutTokenAsync();
+    }
+
+    internal Task ConfirmDequeueWithoutTokenIsNotAllowed()
+    {
+        return _edi.DequeueMessageWithoutTokenAsync("irrelevant-message-id");
+    }
+
+    internal Task<string> AggregatedMeasureDataWithXmlPayload(string actorNumber, string marketRoles, XmlDocument payload)
+    {
+        return _edi.RequestAggregatedMeasureDataAsyncXmlAsync(actorNumber, new[] { marketRoles }, payload);
     }
 }
