@@ -27,18 +27,17 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 [Collection("Acceptance test collection")]
 public sealed class WhenEbixPeekRequestIsReceivedTests
 {
-    private readonly EbixRequestDsl _ebix;
     private readonly TestRunner _runner;
+    private readonly EbixRequestDsl _ebix;
 
     public WhenEbixPeekRequestIsReceivedTests(TestRunner runner)
     {
         Debug.Assert(runner != null, nameof(runner) + " != null");
         _runner = runner;
         _ebix = new EbixRequestDsl(
-            new AzureAuthenticationDriver(_runner.AzureEntraTenantId, _runner.AzureEntraBackendAppId),
-            new EdiDriver(_runner.AzpToken, _runner.ConnectionString),
-            new WholesaleDriver(_runner.EventPublisher),
-            new EbixDriver(new Uri(_runner.ApiManagementUri, "/ebix"), runner.EbixCertificatePassword));
+            new EdiDriver(runner.AzpToken, runner.ConnectionString),
+            new WholesaleDriver(runner.EventPublisher),
+            new EbixDriver(new Uri(runner.ApiManagementUri, "/ebix"), runner.EbixCertificatePassword));
     }
 
     [Fact]

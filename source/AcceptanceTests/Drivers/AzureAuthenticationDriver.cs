@@ -12,23 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Net.Http.Json;
 using System.Text.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
-
 public sealed class AzureAuthenticationDriver : IDisposable
 {
     private readonly string _tenantId;
     private readonly string _backendAppId;
+    private readonly Uri _azureB2CTenantUri;
+    private readonly string _backendBffScope;
+    private readonly string _frontendAppId;
+    private readonly Uri _marketParticipantUri;
     private readonly HttpClient _httpClient;
 
-    public AzureAuthenticationDriver(string tenantId, string backendAppId)
+    public AzureAuthenticationDriver(string tenantId, string backendAppId, Uri azureB2CTenantUri, string backendBffScope, string frontendAppId, Uri? marketParticipantUrl)
     {
         _tenantId = tenantId;
         _backendAppId = backendAppId;
+        _azureB2CTenantUri = azureB2CTenantUri;
+        _backendBffScope = backendBffScope;
+        _frontendAppId = frontendAppId;
+        _marketParticipantUri = marketParticipantUrl ?? new Uri("https://app-webapi-markpart-u-001.azurewebsites.net");
         _httpClient = new HttpClient();
     }
 
@@ -37,7 +45,7 @@ public sealed class AzureAuthenticationDriver : IDisposable
         _httpClient.Dispose();
     }
 
-    public async Task<string> GetAzureAdTokenAsync(string clientId, string clientSecret)
+    public async Task<string> GetB2BTokenAsync(string clientId, string clientSecret)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, new Uri($"https://login.microsoftonline.com/{_tenantId}/oauth2/v2.0/token", UriKind.Absolute));
 
@@ -50,17 +58,74 @@ public sealed class AzureAuthenticationDriver : IDisposable
         });
 
         var response = await _httpClient.SendAsync(request);
-
-        var resultContent = await response.Content.ReadAsStringAsync();
         response.EnsureSuccessStatusCode();
 
-        var resultAsJObject = JObject.Parse(resultContent);
+        var accessToken = await response.Content.ReadFromJsonAsync<AccessTokenResponse>();
 
-        var accessToken = resultAsJObject.Value<string>("access_token");
+        if (string.IsNullOrEmpty(accessToken?.AccessToken))
+            throw new JsonException($"Couldn't parse Azure AD access token. Response content: {await response.Content.ReadAsStringAsync()}");
 
-        if (string.IsNullOrEmpty(accessToken))
-            throw new JsonException($"Couldn't parse Azure AD access token. Response content: {resultContent}");
-
-        return accessToken;
+        return accessToken.AccessToken;
     }
+
+    public async Task<string> GetB2CTokenAsync(string username, string password)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Post, _azureB2CTenantUri);
+
+        request.Content = new MultipartFormDataContent
+        {
+#pragma warning disable CA2000
+            { new StringContent(username), "username" },
+            { new StringContent(password), "password" },
+            { new StringContent("password"), "grant_type" },
+            { new StringContent($"openid {_backendBffScope} offline_access"), "scope" },
+            { new StringContent(_frontendAppId), "client_id" },
+            { new StringContent("token id_token"), "response_type" },
+#pragma warning restore CA2000
+        };
+
+        var response = await _httpClient.SendAsync(request);
+
+        var responseContent = await response.Content.ReadAsStringAsync();
+        response.EnsureSuccessStatusCode();
+
+        var tokenResult = await response.Content.ReadFromJsonAsync<AccessTokenResponse>()
+                    ?? throw new InvalidOperationException($"Couldn't get acceptance test B2C token for user {username}");
+
+        var tokenFromMarketParticipant = await GetB2CTokenWithPermissionsFromMarketParticipantAsync(tokenResult.AccessToken);
+
+        return tokenFromMarketParticipant;
+    }
+
+    private async Task<string> GetB2CTokenWithPermissionsFromMarketParticipantAsync(string azureAdToken)
+    {
+        var actorId = await GetActorIdFromTokenAsync(azureAdToken);
+
+        using var response = await _httpClient.PostAsJsonAsync(
+            new Uri(_marketParticipantUri, $"token"),
+            new { ActorId = actorId, ExternalToken = azureAdToken, });
+
+        response.EnsureSuccessStatusCode();
+
+        var token = await response.Content.ReadFromJsonAsync<TokenFromMarketParticipantResponse>()
+                    ?? throw new InvalidOperationException("Couldn't get acceptance test token from market participant");
+
+        return token.Token;
+    }
+
+    private async Task<Guid> GetActorIdFromTokenAsync(string azureAdToken)
+    {
+        var actorResponse = await _httpClient.GetFromJsonAsync<ActorResponse>(new Uri(_marketParticipantUri, $"user/actors?externalToken={azureAdToken}"))
+                            ?? throw new InvalidOperationException("Couldn't get acceptance test actor from azure ad token");
+
+        var actorFromToken = actorResponse.ActorIds?.FirstOrDefault() ?? throw new InvalidOperationException("The user requested for the domain test does not have actors assigned");
+
+        return actorFromToken;
+    }
+
+    private sealed record ActorResponse(IEnumerable<Guid>? ActorIds);
+
+    private sealed record TokenFromMarketParticipantResponse(string Token);
+
+    private sealed record AccessTokenResponse([property: JsonPropertyName("access_token")] string AccessToken);
 }
