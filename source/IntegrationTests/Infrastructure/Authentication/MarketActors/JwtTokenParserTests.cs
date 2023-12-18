@@ -28,7 +28,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
     public class JwtTokenParserTests
     {
 #pragma warning disable CA5404 // Do not disable token validation checks
-        private static TokenValidationParameters DisableAllTokenValidations => new()
+        public static TokenValidationParameters DisableAllTokenValidations => new()
         {
             ValidateAudience = false,
             ValidateLifetime = false,

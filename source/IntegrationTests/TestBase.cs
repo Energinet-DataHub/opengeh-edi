@@ -33,6 +33,7 @@ using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
@@ -46,7 +47,6 @@ using IncomingMessages.Infrastructure.Configuration.DataAccess;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests
@@ -74,9 +74,11 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             _masterDataContext = GetService<MasterDataContext>();
             _processContext = GetService<ProcessContext>();
             _incomingMessagesContext = GetService<IncomingMessagesContext>();
-            var authenticatedActor = GetService<AuthenticatedActor>();
-            authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None));
+            AuthenticatedActor = GetService<AuthenticatedActor>();
+            AuthenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None));
         }
+
+        protected AuthenticatedActor AuthenticatedActor { get; }
 
         protected IServiceProvider ServiceProvider { get; private set; } = null!;
 
@@ -171,16 +173,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             _services.AddTransient<IRequestHandler<TestCommand, Unit>, TestCommandHandler>();
             _services.AddTransient<IRequestHandler<TestCreateOutgoingMessageCommand, Unit>, TestCreateOutgoingCommandHandler>();
 
-            _services.AddTransient<IIntegrationEventHandler, IntegrationEventHandler>();
-            _services.AddAuthentication(sp =>
-            {
-                return new MarketActorAuthenticator(
-                    sp.GetRequiredService<IActorRepository>(),
-                    sp.GetRequiredService<AuthenticatedActor>());
-            });
-
             _services.AddScopedSqlDbContext<B2BContext>(config);
             _services.AddScopedSqlDbContext<MasterDataContext>(config);
+
+            _services.AddTransient<IIntegrationEventHandler, IntegrationEventHandler>();
+            _services.AddAuthentication(
+                sp => new MarketActorAuthenticator(
+                    sp.GetRequiredService<IActorRepository>(),
+                    sp.GetRequiredService<AuthenticatedActor>()));
 
             CompositionRoot.Initialize(_services)
                 .AddRemoteBusinessService<DummyRequest, DummyReply>(
@@ -193,7 +193,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                     return correlation;
                 })
                 .AddMessagePublishing()
-                .AddBearerAuthentication(new TokenValidationParameters());
+                .AddBearerAuthentication(JwtTokenParserTests.DisableAllTokenValidations);
 
             _services.AddActorMessageQueueModule(config);
             _services.AddProcessModule(config);
