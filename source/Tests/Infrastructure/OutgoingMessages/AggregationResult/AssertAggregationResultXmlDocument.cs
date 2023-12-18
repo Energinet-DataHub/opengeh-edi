@@ -138,6 +138,12 @@ public class AssertAggregationResultXmlDocument : IAssertAggregationResultDocume
         return this;
     }
 
+    public IAssertAggregationResultDocument QualityIsPresentForPosition(int position, string quantityQualityCode)
+    {
+        _documentAsserter.HasValue($"Series[1]/Period/Point[{position}]/quality", quantityQualityCode);
+        return this;
+    }
+
     public IAssertAggregationResultDocument HasBusinessReason(BusinessReason businessReason)
     {
         _documentAsserter.HasValue("process.processType", CimCode.Of(businessReason));

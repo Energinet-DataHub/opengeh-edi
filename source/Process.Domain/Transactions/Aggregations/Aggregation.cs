@@ -32,7 +32,7 @@ public record Aggregation(
     string? ReceiverRole = null,
     string? SettlementVersion = null);
 
-public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
+public record Point(int Position, decimal? Quantity, CalculatedQuantityQuality QuantityQuality, string SampleTime);
 
 public record ActorGrouping(string? EnergySupplierNumber, string? BalanceResponsibleNumber);
 

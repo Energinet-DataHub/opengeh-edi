@@ -19,6 +19,7 @@ using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Common.Serialization;
+using FluentAssertions;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Assertions;
@@ -112,10 +113,20 @@ public class AssertOutgoingMessage
     }
 
     public AssertOutgoingMessage HasMessageRecordValue<TMessageRecord>(
-        Func<TMessageRecord, object?> propertySelector, object? expectedValue)
+        Func<TMessageRecord, object?> propertySelector,
+        object? expectedValue)
     {
         var sut = _serializer.Deserialize<TMessageRecord>(_message.MessageRecord);
-        Assert.Equal(expectedValue, propertySelector(sut));
+        ((object)propertySelector(sut)).Should().Be(expectedValue);
+        return this;
+    }
+
+    public AssertOutgoingMessage HasMessageRecordValue<TMessageRecord, TProperty>(
+        Func<TMessageRecord, TProperty?> propertySelector,
+        Action<TProperty?> assertion)
+    {
+        var sut = _serializer.Deserialize<TMessageRecord>(_message.MessageRecord);
+        assertion(propertySelector(sut));
         return this;
     }
 }
