@@ -88,7 +88,7 @@ internal sealed class EbixRequestDsl
         var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         Assert.Multiple(
-            () => Assert.Equal(HttpStatusCode.OK, response.StatusCode),
+            () => Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode),
             () => Assert.Contains("<faultstring>B2B-900", responseBody, StringComparison.InvariantCulture),
             () => Assert.Contains("<faultcode>soap-env:Client", responseBody, StringComparison.InvariantCulture));
     }
@@ -99,7 +99,7 @@ internal sealed class EbixRequestDsl
 
         var thrownException = await Assert.ThrowsAsync<FaultException>(act).ConfigureAwait(false);
 
-        Assert.Contains("B2B-201", thrownException.Reason.ToString(), StringComparison.InvariantCulture);
+        Assert.StartsWith("B2B-201:", thrownException.Reason.ToString(), StringComparison.InvariantCulture);
     }
 
     private static string GetMessageId(peekMessageResponse response)
