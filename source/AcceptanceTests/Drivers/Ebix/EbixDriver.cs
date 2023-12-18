@@ -110,11 +110,10 @@ internal sealed class EbixDriver : IDisposable
 
         try
         {
-            await _ebixServiceClient.dequeueMessageAsync("88888888").ConfigureAwait(false);
+            await _ebixServiceClient.dequeueMessageAsync(messageId).ConfigureAwait(false);
         }
         catch (CommunicationException e)
         {
-            var i = e.Data;
             Console.WriteLine(
                 "Encountered CommunicationException while dequeuing. The exception was:");
             Console.WriteLine(e);
