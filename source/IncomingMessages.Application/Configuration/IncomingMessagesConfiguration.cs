@@ -53,6 +53,7 @@ public static class IncomingMessagesConfiguration
         services.AddScoped<MessageTypeValidator>();
         services.AddScoped<BusinessTypeValidator>();
         services.AddScoped<CalculationResponsibleReceiverVerification>();
+        services.AddScoped<IRequestAggregatedMeasureDataReceiver, RequestAggregatedMeasureDataReceiver>();
         services.AddSingleton<IResponseFactory, JsonResponseFactory>();
         services.AddSingleton<IResponseFactory, XmlResponseFactory>();
         services.AddSingleton<ResponseFactory>();
