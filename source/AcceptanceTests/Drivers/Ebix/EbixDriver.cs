@@ -18,6 +18,8 @@ using System.Net.Http.Headers;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
+using System.ServiceModel.Description;
+using System.ServiceModel.Dispatcher;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
 
@@ -25,7 +27,9 @@ internal sealed class EbixDriver : IDisposable
 {
     private readonly marketMessagingB2BServiceV01PortTypeClient _ebixServiceClient;
     private readonly X509Certificate2? _certificate;
-    private readonly HttpClient _httpClient;
+    private readonly HttpClient _unauthorizedHttpClient;
+    private readonly HttpClient _httpClientWithCertificate;
+    private readonly HttpClientHandler _certificateHttpClientHandler;
 
     public EbixDriver(Uri dataHubUrlEbixUrl, string ebixCertificatePassword)
     {
@@ -52,7 +56,18 @@ internal sealed class EbixDriver : IDisposable
         _certificate = new X509Certificate2(certificateRaw, ebixCertificatePassword);
         _ebixServiceClient.ClientCredentials.ClientCertificate.Certificate = _certificate;
 
-        _httpClient = new HttpClient
+        _unauthorizedHttpClient = new HttpClient
+        {
+            BaseAddress = dataHubUrlEbixUrl,
+        };
+
+        _certificateHttpClientHandler = new HttpClientHandler
+        {
+            ClientCertificates = { _certificate },
+            CheckCertificateRevocationList = true,
+        };
+
+        _httpClientWithCertificate = new HttpClient(_certificateHttpClientHandler)
         {
             BaseAddress = dataHubUrlEbixUrl,
         };
@@ -121,13 +136,25 @@ internal sealed class EbixDriver : IDisposable
         }
     }
 
+    public async Task<HttpResponseMessage> DequeueWithoutRequestBodyAsync()
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Post, new Uri("?soapAction=dequeueMessage", UriKind.Relative));
+
+        var emptyRequestBody = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>());
+        emptyRequestBody.Headers.ContentType = new MediaTypeHeaderValue("application/ebix");
+
+        request.Content = emptyRequestBody;
+
+        return await _httpClientWithCertificate.SendAsync(request).ConfigureAwait(false);
+    }
+
     public async Task<HttpResponseMessage> PeekMessageWithoutCertificateAsync()
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, new Uri("?soapAction=peekMessage", UriKind.Relative));
         request.Content = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>());
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/ebix");
 
-        return await _httpClient.SendAsync(request).ConfigureAwait(false);
+        return await _unauthorizedHttpClient.SendAsync(request).ConfigureAwait(false);
     }
 
     public void Dispose()
@@ -136,6 +163,17 @@ internal sealed class EbixDriver : IDisposable
             _ebixServiceClient.Close();
 
         _certificate?.Dispose();
-        _httpClient.Dispose();
+        _unauthorizedHttpClient.Dispose();
+        _certificateHttpClientHandler.Dispose();
+        _httpClientWithCertificate.Dispose();
+    }
+
+    public async Task<HttpResponseMessage> DequeueMessageWithoutCertificateAsync()
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Post, new Uri("?soapAction=dequeueMessage", UriKind.Relative));
+        request.Content = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>());
+        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/ebix");
+
+        return await _unauthorizedHttpClient.SendAsync(request).ConfigureAwait(false);
     }
 }
