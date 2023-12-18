@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Net;
+using System.ServiceModel;
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
@@ -69,6 +70,36 @@ internal sealed class EbixRequestDsl
         Assert.Multiple(
             () => Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode),
             () => Assert.Contains("Certificate rejected", response.ReasonPhrase, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    internal async Task ConfirmDequeueWithoutCertificateIsNotAllowed()
+    {
+        var response = await _ebix.DequeueMessageWithoutCertificateAsync().ConfigureAwait(false);
+
+        Assert.Multiple(
+            () => Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode),
+            () => Assert.Contains("Certificate rejected", response.ReasonPhrase, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    internal async Task ConfirmInvalidDequeueRequestGivesEbixError()
+    {
+        var response = await _ebix.DequeueWithoutRequestBodyAsync().ConfigureAwait(false);
+
+        var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+        Assert.Multiple(
+            () => Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode),
+            () => Assert.Contains("<faultstring>B2B-900", responseBody, StringComparison.InvariantCulture),
+            () => Assert.Contains("<faultcode>soap-env:Client", responseBody, StringComparison.InvariantCulture));
+    }
+
+    internal async Task ConfirmDequeueWithIncorrectMessageIdGivesEbixError()
+    {
+        var act = () => _ebix.DequeueMessageAsync("incorrect-message-id");
+
+        var thrownException = await Assert.ThrowsAsync<FaultException>(act).ConfigureAwait(false);
+
+        Assert.StartsWith("B2B-201:", thrownException.Reason.ToString(), StringComparison.InvariantCulture);
     }
 
     private static string GetMessageId(peekMessageResponse response)
