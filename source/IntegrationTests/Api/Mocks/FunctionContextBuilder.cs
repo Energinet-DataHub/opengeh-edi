@@ -18,6 +18,10 @@ using Energinet.DataHub.Core.App.FunctionApp;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Api.Mocks;
 
+/// <summary>
+/// Builds a mock of a function context, for use in tests where an Azure Function's FunctionContext is needed (an example is testing functions middleware).
+/// - Supports triggered by HTTP, and needs to be expanded if we want to test something like ServiceBus triggers.
+/// </summary>
 internal sealed class FunctionContextBuilder
 {
     private readonly IServiceProvider _serviceProvider;
@@ -31,6 +35,12 @@ internal sealed class FunctionContextBuilder
         _serviceProvider = serviceProvider;
     }
 
+    /// <summary>
+    /// Set the function context to be triggered by HTTP, to simulate an Azure Function that uses a HttpTrigger
+    /// </summary>
+    /// <param name="withContentType">Sets the mock HTTP request content type to the specified value</param>
+    /// <param name="withToken">If not null, sets the mock HTTP request's Authorization header to the specified bearer token</param>
+    /// <param name="withCertificate">If not null, sets the mock HTTP request's ClientCert header to a raw hex string representing the certificate</param>
     public FunctionContextBuilder TriggeredByHttp(string? withContentType, string? withToken = null, X509Certificate2? withCertificate = null)
     {
         _triggerType = TriggerType.HttpTrigger;

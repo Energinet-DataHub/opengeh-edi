@@ -16,6 +16,10 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Api.Mocks;
 
+/// <summary>
+/// Used to simulate the IFunctionBindingsFeature that is internal in Microsofts Azure Functions package.
+/// - Holds the InvocationResult which is typically (when using HTTP triggered functions) the returned HTTP response (an instance of HttpResponseData)
+/// </summary>
 [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:Elements should be documented", Justification = "Test class")]
 internal interface IFunctionBindingsFeature
 {

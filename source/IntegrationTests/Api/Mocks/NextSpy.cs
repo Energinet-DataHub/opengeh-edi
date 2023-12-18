@@ -18,14 +18,17 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Api.Mocks;
 
+/// <summary>
+/// A spy used for testing Azure Functions middleware, which registers if next() is called inside the middleware.
+/// </summary>
 [SuppressMessage("Style", "VSTHRD200", Justification = "Test class")]
 internal sealed class NextSpy
 {
-    public int NextCalledCount { get; private set; }
+    public bool NextWasCalled { get; private set; }
 
     public Task Next(FunctionContext ctx)
     {
-        NextCalledCount++;
+        NextWasCalled = true;
         return Task.CompletedTask;
     }
 }

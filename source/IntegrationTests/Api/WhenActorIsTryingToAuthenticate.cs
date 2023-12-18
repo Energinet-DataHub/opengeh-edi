@@ -72,7 +72,7 @@ public class WhenActorIsTryingToAuthenticate : TestBase
         await sut.Invoke(functionContext, _next);
 
         // Assert
-        Assert.Equal(1, _nextSpy.NextCalledCount);
+        Assert.True(_nextSpy.NextWasCalled);
     }
 
     [Fact]
@@ -109,7 +109,7 @@ public class WhenActorIsTryingToAuthenticate : TestBase
         await sut.Invoke(functionContext, _next);
 
         // Assert
-        Assert.Equal(0, _nextSpy.NextCalledCount);
+        Assert.False(_nextSpy.NextWasCalled);
     }
 
     [Fact]
@@ -146,7 +146,7 @@ public class WhenActorIsTryingToAuthenticate : TestBase
         await sut.Invoke(functionContext, _next);
 
         // Assert
-        Assert.Equal(0, _nextSpy.NextCalledCount);
+        Assert.False(_nextSpy.NextWasCalled);
     }
 
     [Fact]
@@ -211,7 +211,7 @@ public class WhenActorIsTryingToAuthenticate : TestBase
         await sut.Invoke(functionContext, _next);
 
         // Assert
-        Assert.Equal(1, _nextSpy.NextCalledCount);
+        Assert.True(_nextSpy.NextWasCalled);
     }
 
     private static MarketActorAuthenticatorMiddleware CreateMarketActorAuthenticatorMiddleware()

@@ -28,6 +28,11 @@ using Microsoft.Azure.Functions.Worker.Http;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Api.Mocks;
 
+/// <summary>
+/// A mock of FunctionContext, for use in tests where the FunctionContext is needed (an example is testing functions middleware). Should be build using the FunctionContextBuilder class. Build to support testing the MarketActorAuthenticatorMiddleware, so it probably must be expanded to support other cases as well.
+/// - Only supports triggered by HTTP, and can set a content type, bearer token and/or a client request certificate.
+/// - Must use the custom GetHttpResponse() function to get the HttpResponseData. The build in extension method GetHttpResponseData() does not work using the mock, since the implementation in the official Azure Function package expects an instance of IFunctionBindingsFeature which is internal.
+/// </summary>
 [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:Elements should be documented", Justification = "Test class")]
 internal sealed class FunctionContextMock : FunctionContext
 {
