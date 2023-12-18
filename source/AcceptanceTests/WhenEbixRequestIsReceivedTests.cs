@@ -25,12 +25,12 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 
 [IntegrationTest]
 [Collection(TestRunner.AcceptanceTestCollection)]
-public sealed class WhenEbixPeekRequestIsReceivedTests
+public sealed class WhenEbixRequestIsReceivedTests
 {
     private readonly EbixRequestDsl _ebix;
     private readonly TestRunner _runner;
 
-    public WhenEbixPeekRequestIsReceivedTests(TestRunner runner)
+    public WhenEbixRequestIsReceivedTests(TestRunner runner)
     {
         Debug.Assert(runner != null, nameof(runner) + " != null");
         _runner = runner;
@@ -51,8 +51,26 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
     }
 
     [Fact]
+    public async Task Dequeue_request_without_content_gives_ebIX_error_B2B_900()
+    {
+        await _ebix.ConfirmInvalidDequeueRequestGivesEbixError();
+    }
+
+    [Fact]
+    public async Task Dequeue_request_with_incorrect_message_id_gives_ebIX_error_B2B_201()
+    {
+        await _ebix.ConfirmDequeueWithIncorrectMessageIdGivesEbixError();
+    }
+
+    [Fact]
     public async Task Actor_cannot_peek_ebix_api_without_certificate()
     {
         await _ebix.ConfirmPeekWithoutCertificateIsNotAllowed();
+    }
+
+    [Fact]
+    public async Task Actor_cannot_dequeue_ebix_api_without_certificate()
+    {
+        await _ebix.ConfirmDequeueWithoutCertificateIsNotAllowed();
     }
 }
