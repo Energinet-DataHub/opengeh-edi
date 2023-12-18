@@ -18,19 +18,17 @@ using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.B2BErrors;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
+[SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 
 [Collection("Acceptance test collection")]
 [IntegrationTest]
 [SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "Acceptance Test class")]
-[SuppressMessage("Naming", "CA1707:Identifiers should not contain underscores", Justification = "Acceptance Test class")]
-[SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods", Justification = "Acceptance Test class")]
-public sealed class WhenGettingB2CToken
+public sealed class WhenGettingB2CTokenTests
 {
     private readonly TestRunner _runner;
     private readonly AzureAuthenticationDriver _azureAuthentication;
 
-    public WhenGettingB2CToken(TestRunner runner)
+    public WhenGettingB2CTokenTests(TestRunner runner)
     {
         _runner = runner;
 
