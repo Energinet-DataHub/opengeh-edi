@@ -111,8 +111,6 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
     public async Task Only_one_request_pr_transactionId_and_messageId_is_accepted()
     {
         // Arrange
-        var exceptedDuplicateTransactionIdDetectedErrorCode = "00110";
-        var exceptedDuplicateMessageIdDetectedErrorCode = "00101";
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, MarketRole.BalanceResponsibleParty));
@@ -146,17 +144,50 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
 
         Assert.Multiple(
             () => Assert.NotNull(results),
-            () => Assert.Single(results.Where(result => result.IsErrorResponse)),
-            () => Assert.Single(results.Where(result =>
-                result.MessageBody.Contains(
-                exceptedDuplicateTransactionIdDetectedErrorCode,
-                StringComparison.OrdinalIgnoreCase)
-                || result.MessageBody.Contains(
-                    exceptedDuplicateMessageIdDetectedErrorCode,
-                    StringComparison.OrdinalIgnoreCase))),
             () => Assert.NotNull(message),
             () => Assert.Single(transactionIds),
             () => Assert.Single(messageIds));
+    }
+
+    [Fact]
+    public async Task Second_request_with_same_transactionId_and_messageId_is_rejected()
+    {
+        // Arrange
+        var exceptedDuplicateTransactionIdDetectedErrorCode = "00110";
+        var exceptedDuplicateMessageIdDetectedErrorCode = "00101";
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        var senderActorNumber = ActorNumber.Create("5799999933318");
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, MarketRole.BalanceResponsibleParty));
+
+        // new scope to simulate a race condition.
+        var sessionProvider = GetService<IServiceProvider>();
+        using var secondScope = sessionProvider.CreateScope();
+        var authenticatedActorInSecondScope = secondScope.ServiceProvider.GetService<AuthenticatedActor>();
+        var secondParser = secondScope.ServiceProvider.GetRequiredService<IIncomingMessageClient>();
+
+        authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, restriction: Restriction.None, MarketRole.BalanceResponsibleParty));
+
+        var task01 = _incomingMessagesRequest.RegisterAndSendAsync(
+            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
+            DocumentFormat.Json,
+            IncomingDocumentType.RequestAggregatedMeasureData,
+            CancellationToken.None);
+        var task02 = secondParser.RegisterAndSendAsync(
+            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
+            DocumentFormat.Json,
+            IncomingDocumentType.RequestAggregatedMeasureData,
+            CancellationToken.None);
+
+        // Act
+        IEnumerable<ResponseMessage> results = await Task.WhenAll(task01, task02);
+
+        // Assert
+        Assert.Multiple(
+            () => Assert.NotNull(results),
+            () => Assert.Single(results.Where(result => result.IsErrorResponse)),
+            () => Assert.Single(results.Where(result =>
+                result.MessageBody.Contains(exceptedDuplicateTransactionIdDetectedErrorCode, StringComparison.OrdinalIgnoreCase)
+                || result.MessageBody.Contains(exceptedDuplicateMessageIdDetectedErrorCode, StringComparison.OrdinalIgnoreCase))));
     }
 
     [Fact]
