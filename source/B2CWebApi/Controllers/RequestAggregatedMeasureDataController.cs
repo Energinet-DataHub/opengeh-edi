@@ -33,20 +33,20 @@ public class RequestAggregatedMeasureDataController : ControllerBase
 {
     private readonly UserContext<FrontendUser> _userContext;
     private readonly DateTimeZone _dateTimeZone;
-    private readonly IIncomingMessageParser _incomingMessageParser;
+    private readonly IIncomingMessageClient _incomingMessageClient;
     private readonly ISerializer _serializer;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
     public RequestAggregatedMeasureDataController(
         UserContext<FrontendUser> userContext,
         DateTimeZone dateTimeZone,
-        IIncomingMessageParser incomingMessageParser,
+        IIncomingMessageClient incomingMessageClient,
         ISerializer serializer,
         ISystemDateTimeProvider systemDateTimeProvider)
     {
         _userContext = userContext;
         _dateTimeZone = dateTimeZone;
-        _incomingMessageParser = incomingMessageParser;
+        _incomingMessageClient = incomingMessageClient;
         _serializer = serializer;
         _systemDateTimeProvider = systemDateTimeProvider;
     }
@@ -65,7 +65,7 @@ public class RequestAggregatedMeasureDataController : ControllerBase
                 _dateTimeZone,
                 _systemDateTimeProvider.Now());
 
-        var responseMessage = await _incomingMessageParser.ParseAsync(
+        var responseMessage = await _incomingMessageClient.RegisterAndSendAsync(
                 GenerateStreamFromString(_serializer.Serialize(message)),
                 DocumentFormat.Json,
                 IncomingDocumentType.B2CRequestAggregatedMeasureData,

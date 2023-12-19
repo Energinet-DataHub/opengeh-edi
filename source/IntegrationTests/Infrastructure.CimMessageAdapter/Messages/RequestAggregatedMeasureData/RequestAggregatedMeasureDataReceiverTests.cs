@@ -18,9 +18,11 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dapper;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
@@ -277,20 +279,23 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     }
 
     [Fact]
-    public async Task Message_ids_must_be_unique_for_sender()
+    public async Task Message_ids_must_not_exists_for_sender()
     {
-        await using var message01 = BusinessMessageBuilder
+        var senderActorNumber = "1234567890123";
+        var existingMessageId = "123564789123564789123564789123564789";
+        await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
+            .WithMessageId(existingMessageId)
+            .WithSenderId(senderActorNumber)
             .WithReceiverId("5790001330552")
             .Message();
+        await StoreMessageIdForActorAsync(existingMessageId, senderActorNumber);
 
-        var messageParserResult = await ParseMessageAsync(message01);
-        var result01 = await _requestAggregatedMeasureDataValidator.ValidateAsync(messageParserResult.Dto!, CancellationToken.None);
-        var result02 = await _requestAggregatedMeasureDataValidator.ValidateAsync(messageParserResult.Dto!, CancellationToken.None);
+        var messageParserResult = await ParseMessageAsync(message);
+        var result = await _requestAggregatedMeasureDataValidator.ValidateAsync(messageParserResult.Dto!, CancellationToken.None);
 
-        Assert.True(result01.Success);
-        Assert.DoesNotContain(result01.Errors, error => error is DuplicateMessageIdDetected);
-        Assert.Contains(result02.Errors, error => error is DuplicateMessageIdDetected);
+        Assert.False(result.Success);
+        Assert.Contains(result.Errors, error => error is DuplicateMessageIdDetected);
     }
 
     [Theory]
@@ -511,5 +516,16 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     private Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseMessageAsync(Stream message)
     {
         return _marketMessageParser.ParseAsync(message, DocumentFormat.Xml, IncomingDocumentType.RequestAggregatedMeasureData, CancellationToken.None);
+    }
+
+    private async Task StoreMessageIdForActorAsync(string messageId, string senderActorNumber)
+    {
+        var databaseConnectionFactory = GetService<IDatabaseConnectionFactory>();
+        using var dbConnection = await databaseConnectionFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+
+        await dbConnection.ExecuteAsync(
+                "INSERT INTO [dbo].[MessageRegistry] ([MessageId], [SenderId]) VALUES (@MessageId, @SenderId)",
+                new { MessageId = messageId, SenderId = senderActorNumber })
+            .ConfigureAwait(false);
     }
 }

@@ -12,20 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
-using System.Threading.Tasks;
+using System.Diagnostics.CodeAnalysis;
 
-namespace Energinet.DataHub.EDI.Application.Actors;
+namespace Energinet.DataHub.EDI.IntegrationTests.Api.Mocks;
 
 /// <summary>
-/// Add new actors to DB
+/// Used to simulate the IFunctionBindingsFeature that is internal in Microsofts Azure Functions package.
+/// - Holds the InvocationResult which is typically (when using HTTP triggered functions) the returned HTTP response (an instance of HttpResponseData)
 /// </summary>
-public interface IActorRegistry
+[SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:Elements should be documented", Justification = "Test class")]
+internal interface IFunctionBindingsFeature
 {
-    /// <summary>
-    /// Store actors
-    /// </summary>
-    /// <param name="createActorCommand"></param>
-    /// <param name="cancellationToken"></param>
-    Task<bool> TryStoreAsync(CreateActorCommand createActorCommand, CancellationToken cancellationToken);
+    object? InvocationResult { get; set; }
 }

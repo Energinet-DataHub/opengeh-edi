@@ -37,7 +37,7 @@ namespace IncomingMessages.Infrastructure
             return transaction != null;
         }
 
-        public async Task StoreAsync(
+        public async Task AddAsync(
             string senderId,
             IReadOnlyList<string> transactionIds,
             CancellationToken cancellationToken)

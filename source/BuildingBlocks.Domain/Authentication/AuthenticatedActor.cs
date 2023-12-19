@@ -38,7 +38,7 @@ public class AuthenticatedActor
     /// <summary>
     /// Set the authenticated actor
     /// </summary>
-    public void SetAuthenticatedActor(ActorIdentity actorIdentity)
+    public void SetAuthenticatedActor(ActorIdentity? actorIdentity)
     {
         _currentIdentity = actorIdentity;
     }

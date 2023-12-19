@@ -20,7 +20,6 @@ using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 
@@ -28,17 +27,14 @@ namespace Energinet.DataHub.EDI.Api.Authentication;
 
 public class DevMarketActorAuthenticator : MarketActorAuthenticator
 {
-    private readonly IActorRegistry _actorRegistry;
     private readonly IDatabaseConnectionFactory _connectionFactory;
 
     public DevMarketActorAuthenticator(
         IActorRepository actorRepository,
-        IActorRegistry actorRegistry,
         IDatabaseConnectionFactory connectionFactory,
         AuthenticatedActor authenticatedActor)
         : base(actorRepository, authenticatedActor)
     {
-        _actorRegistry = actorRegistry;
         _connectionFactory = connectionFactory;
     }
 
@@ -47,19 +43,20 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
         ArgumentNullException.ThrowIfNull(claimsPrincipal);
 
         var actorNumberClaim = claimsPrincipal.FindFirst(claim => claim.Type.Equals("test-actornumber", StringComparison.OrdinalIgnoreCase));
-        if (actorNumberClaim is not null)
+        if (actorNumberClaim is null)
         {
-            var actor = await FindActorAsync(actorNumberClaim.Value, cancellationToken).ConfigureAwait(false);
-            if (actor is null)
-            {
-                actor = new Actor(actorNumberClaim.Value, Guid.NewGuid().ToString());
-                await RegisterActorAsync(actor, cancellationToken).ConfigureAwait(false);
-            }
-
-            return await base.AuthenticateAsync(ReplaceCurrent(claimsPrincipal, actor), cancellationToken).ConfigureAwait(false);
+            return await base.AuthenticateAsync(claimsPrincipal, cancellationToken).ConfigureAwait(false);
         }
 
-        return await base.AuthenticateAsync(claimsPrincipal, cancellationToken).ConfigureAwait(false);
+        var actor = await FindActorAsync(actorNumberClaim.Value, cancellationToken).ConfigureAwait(false);
+        if (actor is null)
+        {
+            return await base.AuthenticateAsync(claimsPrincipal, cancellationToken).ConfigureAwait(false);
+        }
+
+        var claimsWithUpdatedActor = ReplaceCurrent(claimsPrincipal, actor);
+
+        return await base.AuthenticateAsync(claimsWithUpdatedActor, cancellationToken).ConfigureAwait(false);
     }
 
     private static ClaimsPrincipal ReplaceCurrent(ClaimsPrincipal currentClaimsPrincipal, Actor actor)
@@ -82,11 +79,6 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
                 "SELECT ActorNumber, ExternalId FROM dbo.Actor WHERE ActorNumber = @ActorNumber",
                 new { ActorNumber = actorNumber })
             .ConfigureAwait(false);
-    }
-
-    private Task RegisterActorAsync(Actor actor, CancellationToken cancellationToken)
-    {
-        return _actorRegistry.TryStoreAsync(new CreateActorCommand(actor.ExternalId, ActorNumber.Create(actor.ActorNumber)), cancellationToken);
     }
 
     #pragma warning disable
