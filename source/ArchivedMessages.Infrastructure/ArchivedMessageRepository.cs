@@ -43,6 +43,7 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
     public async Task AddAsync(ArchivedMessage message, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(message);
+        RewindStream(message.Document);
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         // Read the content of the stream into a byte array
         byte[] documentBytes;
@@ -122,5 +123,10 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
         }
 
         return (SqlCommand)command;
+    }
+
+    private static void RewindStream(Stream message)
+    {
+        message.Seek(0, SeekOrigin.Begin);
     }
 }

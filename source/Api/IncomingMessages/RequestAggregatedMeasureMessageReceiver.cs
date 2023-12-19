@@ -31,16 +31,16 @@ namespace Energinet.DataHub.EDI.Api.IncomingMessages;
 public class RequestAggregatedMeasureMessageReceiver
 {
     private readonly ILogger<RequestAggregatedMeasureMessageReceiver> _logger;
-    private readonly IIncomingMessageParser _incomingMessageParser;
+    private readonly IIncomingMessageClient _incomingMessageClient;
     private readonly ICorrelationContext _correlationContext;
 
     public RequestAggregatedMeasureMessageReceiver(
         ILogger<RequestAggregatedMeasureMessageReceiver> logger,
-        IIncomingMessageParser incomingMessageParser,
+        IIncomingMessageClient incomingMessageClient,
         ICorrelationContext correlationContext)
     {
         _logger = logger;
-        _incomingMessageParser = incomingMessageParser;
+        _incomingMessageClient = incomingMessageClient;
         _correlationContext = correlationContext;
     }
 
@@ -63,8 +63,8 @@ public class RequestAggregatedMeasureMessageReceiver
             return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
         }
 
-        var responseMessage = await _incomingMessageParser
-            .ParseAsync(
+        var responseMessage = await _incomingMessageClient
+            .RegisterAndSendAsync(
                 request.Body,
                 documentFormat,
                 IncomingDocumentType.RequestAggregatedMeasureData,
