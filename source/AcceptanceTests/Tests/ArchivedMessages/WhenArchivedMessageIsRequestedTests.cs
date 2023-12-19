@@ -29,23 +29,19 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.ArchivedMessages;
 [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Testing")]
 public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 {
-    private readonly TestRunner _testRunner;
+    private readonly AcceptanceTestFixture _fixture;
     private readonly ArchivedMessageDsl _archivedMessage;
 
-    public WhenArchivedMessageIsRequestedTests(ITestOutputHelper output, TestRunner runner)
-        : base(output, runner)
+    public WhenArchivedMessageIsRequestedTests(ITestOutputHelper output, AcceptanceTestFixture fixture)
+        : base(output, fixture)
     {
-        Debug.Assert(runner != null, nameof(runner) + " != null");
-        _testRunner = runner;
+        Debug.Assert(fixture != null, nameof(fixture) + " != null");
+        _fixture = fixture;
         _archivedMessage = new ArchivedMessageDsl(
             new AzureAuthenticationDriver(
-                runner.AzureEntraTenantId,
-                runner.AzureEntraBackendAppId,
-                runner.AzureEntraB2CTenantUrl,
-                runner.AzureEntraBackendBffScope,
-                runner.AzureEntraFrontendAppId,
-                new Uri("https://app-webapi-markpart-u-001.azurewebsites.net")),
-            new B2CDriver());
+                fixture.AzureEntraTenantId,
+                fixture.AzureEntraBackendAppId),
+            new B2CDriver(fixture.B2CAuthorizedHttpClient));
     }
 
     [Fact]

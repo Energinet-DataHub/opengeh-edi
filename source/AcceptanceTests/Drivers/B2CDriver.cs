@@ -19,30 +19,29 @@ using System.Text.Json.Nodes;
 using Energinet.DataHub.EDI.AcceptanceTests.Responses.json;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Nito.AsyncEx;
 using Xunit.Sdk;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 public sealed class B2CDriver : IDisposable
 {
-    private readonly HttpClient _httpClient;
+    private readonly AsyncLazy<HttpClient> _httpClient;
 
-    public B2CDriver()
+    public B2CDriver(AsyncLazy<HttpClient> b2CHttpClient)
     {
-        _httpClient = new HttpClient();
-        _httpClient.BaseAddress = new Uri("https://app-b2cwebapi-edi-t-001.azurewebsites.net/");
+        _httpClient = b2CHttpClient;
     }
 
     public void Dispose()
     {
-        _httpClient.Dispose();
     }
 
     public async Task<List<ArchivedMessageSearchResponse>> RequestArchivedMessageSearchAsync(string token, JObject payload)
     {
         if (payload == null) throw new ArgumentNullException(nameof(payload));
         using var request = new HttpRequestMessage(HttpMethod.Post, "/ArchivedMessageSearch");
-        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+        //request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
         request.Content = new StringContent(payload.ToString(), Encoding.UTF8, "application/json");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         var response = await _httpClient.SendAsync(request).ConfigureAwait(false);

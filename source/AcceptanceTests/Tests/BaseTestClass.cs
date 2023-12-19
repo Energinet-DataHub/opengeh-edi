@@ -30,16 +30,12 @@ public class BaseTestClass
         ArgumentNullException.ThrowIfNull(fixture);
 
         Output = output;
-        BaseTestRunner = runner;
+        BaseTestFixture = fixture;
         Token = TokenBuilder.BuildToken(ActorNumber, new[] { ActorRole }, fixture.AzpToken);
         AggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(fixture.AzpToken, fixture.ConnectionString));
         AzureAuthenticationDriver = new AzureAuthenticationDriver(
             fixture.AzureEntraTenantId,
-            fixture.AzureEntraBackendAppId,
-            fixture.AzureEntraB2CTenantUrl,
-            fixture.AzureEntraBackendBffScope,
-            fixture.AzureEntraFrontendAppId,
-            new Uri("https://app-webapi-markpart-u-001.azurewebsites.net"));
+            fixture.AzureEntraBackendAppId);
     }
 
     protected ITestOutputHelper Output { get; }
@@ -48,7 +44,7 @@ public class BaseTestClass
 
     protected AzureAuthenticationDriver AzureAuthenticationDriver { get; }
 
-    protected TestRunner BaseTestRunner { get; }
+    protected AcceptanceTestFixture BaseTestFixture { get; }
 
     protected string Token { get; set; }
 }
