@@ -37,7 +37,7 @@ internal sealed class ActorCertificateCredentialsAssignedEventProcessor : IInteg
 
     public string EventTypeToHandle => ActorCertificateCredentialsAssigned.EventName;
 
-    public Task HandleAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    public Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 

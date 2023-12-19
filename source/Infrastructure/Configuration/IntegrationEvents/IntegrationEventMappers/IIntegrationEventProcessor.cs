@@ -31,5 +31,5 @@ public interface IIntegrationEventProcessor
     /// <summary>
     /// Process a single integration event
     /// </summary>
-    public Task HandleAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken);
+    public Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken);
 }

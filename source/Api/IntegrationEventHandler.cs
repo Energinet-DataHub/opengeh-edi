@@ -67,7 +67,7 @@ public sealed class IntegrationEventHandler : IIntegrationEventHandler
         }
 
         await integrationEventMapper
-            .HandleAsync(integrationEvent, CancellationToken.None)
+            .ProcessAsync(integrationEvent, CancellationToken.None)
             .ConfigureAwait(false);
     }
 }

@@ -36,7 +36,7 @@ public class CalculationResultCompletedProcessor : IIntegrationEventProcessor
 
     public string EventTypeToHandle => CalculationResultCompleted.EventName;
 
-    public async Task HandleAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    public async Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         if (integrationEvent == null)
             throw new ArgumentNullException(nameof(integrationEvent));

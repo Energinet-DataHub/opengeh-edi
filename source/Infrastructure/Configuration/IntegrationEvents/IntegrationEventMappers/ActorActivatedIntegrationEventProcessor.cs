@@ -36,7 +36,7 @@ internal sealed class ActorActivatedIntegrationEventProcessor : IIntegrationEven
 
     public string EventTypeToHandle => ActorActivated.EventName;
 
-    public Task HandleAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    public Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 

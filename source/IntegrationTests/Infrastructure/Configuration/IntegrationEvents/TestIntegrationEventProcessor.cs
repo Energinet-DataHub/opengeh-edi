@@ -35,7 +35,7 @@ public class TestIntegrationEventProcessor : IIntegrationEventProcessor
 
     public int MappedCount { get; private set; }
 
-    public async Task HandleAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    public async Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         MappedCount++;
 

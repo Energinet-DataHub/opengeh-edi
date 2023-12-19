@@ -35,7 +35,7 @@ internal sealed class GridAreaOwnershipAssignedIntegrationEventProcessor : IInte
 
     public string EventTypeToHandle => GridAreaOwnershipAssigned.EventName;
 
-    public Task HandleAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    public Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
