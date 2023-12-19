@@ -22,15 +22,16 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 
 public class BaseTestClass
 {
-    protected const string ActorNumber = "5790000701414";
-    protected const string ActorRole = "energysupplier";
+    private const string ActorNumber = "5790000701414";
+    private const string ActorRole = "energysupplier";
 
-    protected BaseTestClass(ITestOutputHelper output, TestRunner runner)
+    protected BaseTestClass(ITestOutputHelper output, AcceptanceTestFixture fixture)
     {
-        Debug.Assert(runner != null, nameof(runner) + " != null");
+        ArgumentNullException.ThrowIfNull(fixture);
+
         Output = output;
-        Token = TokenBuilder.BuildToken(ActorNumber, new[] { ActorRole }, runner.AzpToken);
-        AggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(runner.AzpToken, runner.ConnectionString));
+        Token = TokenBuilder.BuildToken(ActorNumber, new[] { ActorRole }, fixture.AzpToken);
+        AggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(fixture.AzpToken, fixture.ConnectionString));
     }
 
     protected ITestOutputHelper Output { get; }

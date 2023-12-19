@@ -12,11 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Tests;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests;
 
-[CollectionDefinition("Acceptance test collection")]
-public class AcceptanceTestContext : ICollectionFixture<TestRunner>
+[CollectionDefinition(AcceptanceTestCollectionName)]
+[SuppressMessage("Naming", "CA1711:Identifiers should not have incorrect suffix", Justification = "This is a XUNIT Collection")]
+public class AcceptanceTestCollection : ICollectionFixture<AcceptanceTestFixture>
 {
+    public const string AcceptanceTestCollectionName = "Acceptance test collection";
+
+    // This class has no code, and is never created. Its purpose is simply
+    // to be the place to apply [CollectionDefinition] and all the
+    // ICollectionFixture<> interfaces.
+    // See: https://xunit.net/docs/shared-context#collection-fixture
 }

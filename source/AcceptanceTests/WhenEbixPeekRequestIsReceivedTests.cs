@@ -24,27 +24,26 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 
 [IntegrationTest]
-[Collection("Acceptance test collection")]
+[Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
 public sealed class WhenEbixPeekRequestIsReceivedTests
 {
-    private readonly TestRunner _runner;
     private readonly EbixRequestDsl _ebix;
 
-    public WhenEbixPeekRequestIsReceivedTests(TestRunner runner)
+    public WhenEbixPeekRequestIsReceivedTests(AcceptanceTestFixture fixture)
     {
-        Debug.Assert(runner != null, nameof(runner) + " != null");
-        _runner = runner;
+        ArgumentNullException.ThrowIfNull(fixture);
+
         _ebix = new EbixRequestDsl(
-            new EdiDriver(runner.AzpToken, runner.ConnectionString),
-            new WholesaleDriver(runner.EventPublisher),
-            new EbixDriver(new Uri(runner.ApiManagementUri, "/ebix"), runner.EbixCertificatePassword));
+            new EdiDriver(fixture.AzpToken, fixture.ConnectionString),
+            new WholesaleDriver(fixture.EventPublisher),
+            new EbixDriver(new Uri(fixture.ApiManagementUri, "/ebix"), fixture.EbixCertificatePassword));
     }
 
     [Fact]
     public async Task Actor_can_peek_calculation_result_in_ebix_format()
     {
-        await _ebix.EmptyQueueForActor(TestRunner.ActorNumber, TestRunner.ActorNumber);
-        await _ebix.PublishAggregationResultFor(TestRunner.ActorGridArea);
+        await _ebix.EmptyQueueForActor(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorNumber);
+        await _ebix.PublishAggregationResultFor(AcceptanceTestFixture.ActorGridArea);
 
         await _ebix.ConfirmPeekIsEbixFormatAndCorrectDocumentType();
     }

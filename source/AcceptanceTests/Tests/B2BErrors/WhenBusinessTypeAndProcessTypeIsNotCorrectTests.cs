@@ -16,10 +16,11 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.B2BErrors;
 
+[Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
 public class WhenBusinessTypeAndProcessTypeIsNotCorrectTests : BaseTestClass
 {
-    protected WhenBusinessTypeAndProcessTypeIsNotCorrectTests(ITestOutputHelper output, TestRunner runner)
-        : base(output, runner)
+    public WhenBusinessTypeAndProcessTypeIsNotCorrectTests(ITestOutputHelper output, AcceptanceTestFixture fixture)
+        : base(output, fixture)
     {
     }
 }
