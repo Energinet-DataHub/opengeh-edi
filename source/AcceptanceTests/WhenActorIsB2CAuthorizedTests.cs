@@ -38,10 +38,7 @@ public sealed class WhenActorIsB2CAuthorizedTests
 
         using var request = new HttpRequestMessage(HttpMethod.Post, new Uri(_fixture.B2CApiUri, "ArchivedMessageSearch"));
 
-        request.Content = JsonContent.Create(new
-        {
-            MessageId = Guid.NewGuid(),
-        });
+        request.Content = JsonContent.Create(new { });
 
         var response = await authorizedHttpClient.SendAsync(request);
 
