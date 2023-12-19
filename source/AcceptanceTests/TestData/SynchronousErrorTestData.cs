@@ -23,7 +23,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
         {
             return new Dictionary<string, string>
             {
-                { "cim:mRID", GenerateRandomString(36) },
+                { "cim:mRID", Guid.NewGuid().ToString() },
                 { "cim:type", "E74" },
                 { "cim:process.processType", "D05" },
                 { "cim:businessSector.type", "23" },
@@ -39,7 +39,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
         {
             return new Dictionary<string, string>
             {
-                { "cim:mRID", GenerateRandomString(36) },
+                { "cim:mRID", Guid.NewGuid().ToString() },
                 { "cim:settlement_Series.version", "D01" },
                 { "cim:marketEvaluationPoint.type", "E17" },
                 { "cim:marketEvaluationPoint.settlementMethod", "D01" },
@@ -171,18 +171,4 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             };
         }
         */
-
-        private static string GenerateRandomString(int length)
-        {
-            string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            string result = string.Empty;
-
-            int charactersLength = characters.Length;
-            for (int i = 0; i < length; i++)
-            {
-                result += characters.ToCharArray().GetValue(new Random().Next(1, charactersLength));
-            }
-
-            return result;
-        }
 }

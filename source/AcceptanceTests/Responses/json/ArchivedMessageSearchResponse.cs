@@ -16,5 +16,17 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Responses.json;
 
 public class ArchivedMessageSearchResponse
 {
-    
+    public string? Id { get; set; }
+
+    public string? MessageId { get; set; }
+
+    public string? DocumentType { get; set; }
+
+    public string? SenderNumber { get; set; }
+
+    public string? ReceiverNumber { get; set; }
+
+    public DateTime CreatedAt { get; set; }
+
+    public string? BusinessReason { get; set; }
 }

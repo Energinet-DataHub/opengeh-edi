@@ -29,13 +29,25 @@ public class BaseTestClass
     {
         Debug.Assert(runner != null, nameof(runner) + " != null");
         Output = output;
+        BaseTestRunner = runner;
         Token = TokenBuilder.BuildToken(ActorNumber, new[] { ActorRole }, runner.AzpToken);
         AggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(runner.AzpToken, runner.ConnectionString));
+        AzureAuthenticationDriver = new AzureAuthenticationDriver(
+            runner.AzureEntraTenantId,
+            runner.AzureEntraBackendAppId,
+            runner.AzureEntraB2CTenantUrl,
+            runner.AzureEntraBackendBffScope,
+            runner.AzureEntraFrontendAppId,
+            new Uri("https://app-webapi-markpart-u-001.azurewebsites.net"));
     }
 
     protected ITestOutputHelper Output { get; }
 
     protected AggregatedMeasureDataRequestDsl AggregationRequest { get; }
 
-    protected string Token { get; }
+    protected AzureAuthenticationDriver AzureAuthenticationDriver { get; }
+
+    protected TestRunner BaseTestRunner { get; }
+
+    protected string Token { get; set; }
 }

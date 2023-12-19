@@ -12,9 +12,56 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Net.Http.Headers;
+using System.Runtime.InteropServices.JavaScript;
+using System.Text;
+using System.Text.Json.Nodes;
+using Energinet.DataHub.EDI.AcceptanceTests.Responses.json;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Xunit.Sdk;
+
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
-public class B2CDriver
+public sealed class B2CDriver : IDisposable
 {
-    
+    private readonly HttpClient _httpClient;
+
+    public B2CDriver()
+    {
+        _httpClient = new HttpClient();
+        _httpClient.BaseAddress = new Uri("https://app-b2cwebapi-edi-t-001.azurewebsites.net/");
+    }
+
+    public void Dispose()
+    {
+        _httpClient.Dispose();
+    }
+
+    public async Task<List<ArchivedMessageSearchResponse>> RequestArchivedMessageSearchAsync(string token, JObject payload)
+    {
+        if (payload == null) throw new ArgumentNullException(nameof(payload));
+        using var request = new HttpRequestMessage(HttpMethod.Post, "/ArchivedMessageSearch");
+        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+        request.Content = new StringContent(payload.ToString(), Encoding.UTF8, "application/json");
+        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
+        var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+        var archivedMessageResponse = JsonConvert.DeserializeObject<List<ArchivedMessageSearchResponse>>(responseString) ?? throw new InvalidOperationException("Did not receive valid response");
+
+        return archivedMessageResponse;
+    }
+
+    public async Task<string> ArchivedMessageGetDocumentAsync(string token, string messageId)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Post, "/ArchivedMessageGetDocument?id=" + messageId);
+        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+        request.Content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
+        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
+        var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+        return responseString;
+    }
 }

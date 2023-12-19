@@ -13,37 +13,115 @@
 // limitations under the License.
 
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers;
+using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
+using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
+using Energinet.DataHub.EDI.AcceptanceTests.Factories;
+using Energinet.DataHub.EDI.AcceptanceTests.Responses.json;
+using Energinet.DataHub.EDI.AcceptanceTests.TestData;
+using Newtonsoft.Json;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.ArchivedMessages;
 
 [Collection("Acceptance test collection")]
-public class WhenArchivedMessageIsRequested : BaseTestClass
+[SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Testing")]
+public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 {
-    private readonly AzureAuthenticationDriver _azureAuthenticationDriver;
-    private readonly Task<string> _azureToken;
+    private readonly TestRunner _testRunner;
+    private readonly ArchivedMessageDsl _archivedMessage;
 
-    public WhenArchivedMessageIsRequested(ITestOutputHelper output, TestRunner runner)
+    public WhenArchivedMessageIsRequestedTests(ITestOutputHelper output, TestRunner runner)
         : base(output, runner)
     {
         Debug.Assert(runner != null, nameof(runner) + " != null");
-        _azureAuthenticationDriver = new AzureAuthenticationDriver(runner.AzureEntraTenantId, runner.AzureEntraBackendAppId);
-        _azureToken =
-            _azureAuthenticationDriver.GetAzureAdTokenAsync(runner.AzureEntraClientId, runner.AzureEntraClientSecret);
+        _testRunner = runner;
+        _archivedMessage = new ArchivedMessageDsl(
+            new AzureAuthenticationDriver(
+                runner.AzureEntraTenantId,
+                runner.AzureEntraBackendAppId,
+                runner.AzureEntraB2CTenantUrl,
+                runner.AzureEntraBackendBffScope,
+                runner.AzureEntraFrontendAppId,
+                new Uri("https://app-webapi-markpart-u-001.azurewebsites.net")),
+            new B2CDriver());
     }
 
-
     [Fact]
-    public Task Test_name()
+    public async Task Archived_message_is_searchable_after_peek()
     {
-        Output.WriteLine(_azureToken);
+        var b2CToken = await _archivedMessage.GetTokenForActorAsync(_testRunner.B2cUsername, _testRunner.B2cPassword);
+        var response = await _archivedMessage.RequestArchivedMessageSearchAsync(
+            b2CToken,
+            ArchivedMessageData.GetSearchableDataObject(
+                "3da757e4-2a9c-486d-a39a-d48addf8b965",
+                null!,
+                null!,
+                null!,
+                null!));
+
+        var id = response![0].Id;
+        foreach (var item in response!)
+        {
+            Output.WriteLine($"Id: {item.Id}");
+            Output.WriteLine($"MessageId: {item.MessageId}");
+            Output.WriteLine($"DocumentType: {item.DocumentType}");
+            Output.WriteLine($"SenderNumber: {item.SenderNumber}");
+            Output.WriteLine($"ReceiverNumber: {item.ReceiverNumber}");
+            Output.WriteLine($"CreatedAt: {item.CreatedAt}");
+            Output.WriteLine($"BusinessReason: {item.BusinessReason}");
+        }
     }
 
     [Fact]
-    public async Task Test_name()
+    public async Task Archived_message_is_getable_after_peek()
     {
+        _azureToken = await await _archivedMessage.GetTokenForActorAsync(_testRunner.AzureEntraClientId, _testRunner.AzureEntraClientSecret);
+
+        Assert.NotSame(Token, _azureToken);
+    }
+
+    [Fact]
+    public async Task Archived_message_is_created_after_aggregated_measure_data_request()
+    {
+        var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload();
+        var messageId = payload.SelectNodes("/cim:RequestAggregatedMeasureData_MarketDocument/cim:mRID");
+
+        await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+
+        var b2CToken = await _archivedMessage.GetTokenForActorAsync(_testRunner.AzureEntraClientId, _testRunner.AzureEntraClientSecret);
+
+        var response = await _archivedMessage.RequestArchivedMessageSearchAsync(
+            b2CToken,
+            ArchivedMessageData.GetSearchableDataObject(
+                "3da757e4-2a9c-486d-a39a-d48addf8b965",
+                null!,
+                null!,
+                null!,
+                null!));
+    }
+
+    [Fact]
+    public async Task Archived_messages_is_returned_with_correct_format()
+    {
+        var b2CToken = await _archivedMessage.GetTokenForActorAsync(_testRunner.B2cUsername, _testRunner.B2cPassword);
+        var response = await _archivedMessage.RequestArchivedMessageSearchAsync(
+            b2CToken,
+            ArchivedMessageData.GetSearchableDataObject(
+                "3da757e4-2a9c-486d-a39a-d48addf8b965",
+                null!,
+                null!,
+                null!,
+                null!));
+
+        var archivedMessage = response[0];
+        Assert.NotNull(archivedMessage.Id);
+        Assert.NotNull(archivedMessage.MessageId);
+        Assert.NotNull(archivedMessage.DocumentType);
+        Assert.NotNull(archivedMessage.SenderNumber);
+        Assert.NotNull(archivedMessage.ReceiverNumber);
+        Assert.IsType<DateTime>(archivedMessage.CreatedAt);
+        Assert.NotNull(archivedMessage.BusinessReason);
     }
 }

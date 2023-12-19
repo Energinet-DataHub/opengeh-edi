@@ -12,9 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Json.Nodes;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
 
-public class ArchivedMessageData
+public static class ArchivedMessageData
 {
-    
+    public static JObject GetSearchableDataObject(string messageId, string senderNumber, string receiverNumber, string documentTypes, string businessResaons)
+    {
+        var searchableDataObject = new
+        {
+            dateTimeFrom = @"2023-12-13T23:00:49.284Z",
+            dateTimeTo = "2023-12-14T22:59:49.284Z",
+            messageId,
+            senderNumber,
+            receiverNumber,
+            documentTypes,
+            businessResaons,
+        };
+
+        string jsonData = JsonConvert.SerializeObject(searchableDataObject);
+
+        return JObject.Parse(jsonData);
+    }
 }
