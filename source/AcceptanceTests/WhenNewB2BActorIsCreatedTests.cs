@@ -30,7 +30,7 @@ public sealed class WhenNewB2BActorIsCreatedTests
     public WhenNewB2BActorIsCreatedTests(TestRunner runner)
     {
         Debug.Assert(runner != null, nameof(runner) + " != null");
-        _actorDsl = new ActorDsl(new MarketParticipantDriver(runner.EventPublisher), new EdiDriver(runner.AzpToken, runner.ConnectionString));
+        _actorDsl = new ActorDsl(new MarketParticipantDriver(runner.EventPublisher), new EdiDriver(runner.AzpToken, runner.ConnectionString, runner.EdiB2BBaseUri));
     }
 
     [Fact]
