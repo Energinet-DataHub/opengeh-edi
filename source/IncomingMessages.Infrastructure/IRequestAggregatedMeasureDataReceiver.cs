@@ -12,21 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace IncomingMessages.Infrastructure
+using Energinet.DataHub.EDI.Process.Interfaces;
+using IncomingMessages.Infrastructure.Messages;
+
+namespace IncomingMessages.Infrastructure;
+
+/// <summary>
+/// Responsible for receiving a incoming message.
+/// </summary>
+public interface IRequestAggregatedMeasureDataReceiver
 {
     /// <summary>
-    /// Store containing message id for all received market documents
+    /// Responsible for receiving the incoming message.
     /// </summary>
-    public interface IMessageIdRepository
-    {
-        /// <summary>
-        /// Store message id for the sender
-        /// </summary>
-        Task AddAsync(string senderNumber, string messageId, CancellationToken cancellationToken);
-
-        /// <summary>
-        /// Checks if <paramref name="messageId"/> is already registered by the sender <paramref name="senderNumber"/>
-        /// </summary>
-        Task<bool> MessageIdExistsAsync(string senderNumber, string messageId, CancellationToken cancellationToken);
-    }
+    Task<Result> ReceiveAsync(
+        RequestAggregatedMeasureDataDto requestAggregatedMeasureDataDto,
+        CancellationToken cancellationToken);
 }

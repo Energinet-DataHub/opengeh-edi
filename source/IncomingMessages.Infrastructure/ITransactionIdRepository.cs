@@ -30,7 +30,7 @@ namespace IncomingMessages.Infrastructure
         /// <summary>
         /// Store transaction ids for the specified sender
         /// </summary>
-        Task StoreAsync(
+        Task AddAsync(
             string senderId,
             IReadOnlyList<string> transactionIds,
             CancellationToken cancellationToken);
