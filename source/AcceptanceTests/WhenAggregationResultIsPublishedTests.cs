@@ -32,7 +32,7 @@ public sealed class WhenAggregationResultIsPublishedTests
     {
         Debug.Assert(runner != null, nameof(runner) + " != null");
         _aggregations = new AggregationResultDsl(
-            new EdiDriver(runner.AzpToken, runner.ConnectionString),
+            new EdiDriver(runner.AzpToken, runner.ConnectionString, runner.EdiB2BBaseUri),
             new WholesaleDriver(runner.EventPublisher));
     }
 

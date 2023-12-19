@@ -31,7 +31,7 @@ public sealed class WhenAggregatedMeasureDataIsRequestedTests
     public WhenAggregatedMeasureDataIsRequestedTests(TestRunner runner)
     {
         Debug.Assert(runner != null, nameof(runner) + " != null");
-        _aggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(runner.AzpToken, runner.ConnectionString));
+        _aggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(runner.AzpToken, runner.ConnectionString, runner.EdiB2BBaseUri));
     }
 
     [Fact]
