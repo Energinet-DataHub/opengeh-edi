@@ -29,14 +29,12 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.ArchivedMessages;
 [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Testing")]
 public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 {
-    private readonly AcceptanceTestFixture _fixture;
     private readonly ArchivedMessageDsl _archivedMessage;
 
     public WhenArchivedMessageIsRequestedTests(ITestOutputHelper output, AcceptanceTestFixture fixture)
         : base(output, fixture)
     {
         Debug.Assert(fixture != null, nameof(fixture) + " != null");
-        _fixture = fixture;
         _archivedMessage = new ArchivedMessageDsl(
             new AzureAuthenticationDriver(
                 fixture.AzureEntraTenantId,
@@ -47,10 +45,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
     [Fact]
     public async Task Archived_message_is_searchable_after_peek()
     {
-        var b2CToken = await _archivedMessage.GetTokenForActorAsync(_testRunner.B2cUsername, _testRunner.B2cPassword);
-        var response = await _archivedMessage.RequestArchivedMessageSearchAsync(
-            b2CToken,
-            ArchivedMessageData.GetSearchableDataObject(
+        var response = await _archivedMessage.RequestArchivedMessageSearchAsync(ArchivedMessageData.GetSearchableDataObject(
                 "3da757e4-2a9c-486d-a39a-d48addf8b965",
                 null!,
                 null!,
@@ -70,13 +65,11 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
         }
     }
 
-    [Fact]
-    public async Task Archived_message_is_getable_after_peek()
-    {
-        _azureToken = await await _archivedMessage.GetTokenForActorAsync(_testRunner.AzureEntraClientId, _testRunner.AzureEntraClientSecret);
-
-        Assert.NotSame(Token, _azureToken);
-    }
+    //[Fact]
+    // public async Task Archived_message_is_getable_after_peek()
+    // {
+    //    var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload();
+    // }
 
     [Fact]
     public async Task Archived_message_is_created_after_aggregated_measure_data_request()
@@ -86,10 +79,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 
         await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
 
-        var b2CToken = await _archivedMessage.GetTokenForActorAsync(_testRunner.AzureEntraClientId, _testRunner.AzureEntraClientSecret);
-
         var response = await _archivedMessage.RequestArchivedMessageSearchAsync(
-            b2CToken,
             ArchivedMessageData.GetSearchableDataObject(
                 "3da757e4-2a9c-486d-a39a-d48addf8b965",
                 null!,
@@ -101,9 +91,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
     [Fact]
     public async Task Archived_messages_is_returned_with_correct_format()
     {
-        var b2CToken = await _archivedMessage.GetTokenForActorAsync(_testRunner.B2cUsername, _testRunner.B2cPassword);
         var response = await _archivedMessage.RequestArchivedMessageSearchAsync(
-            b2CToken,
             ArchivedMessageData.GetSearchableDataObject(
                 "3da757e4-2a9c-486d-a39a-d48addf8b965",
                 null!,

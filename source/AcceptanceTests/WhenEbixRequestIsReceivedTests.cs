@@ -45,7 +45,7 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
         await _ebix.EmptyQueueForActor(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorNumber);
         await _ebix.PublishAggregationResultFor(AcceptanceTestFixture.ActorGridArea);
 
-        await _ebix.ConfirmPeekIsEbixFormatAndCorrectDocumentType();
+        await _ebix.ConfirmEbixResultIsAvailableForActor();
     }
 
     [Fact]

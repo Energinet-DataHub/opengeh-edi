@@ -37,14 +37,15 @@ public sealed class B2CDriver : IDisposable
     {
     }
 
-    public async Task<List<ArchivedMessageSearchResponse>> RequestArchivedMessageSearchAsync(string token, JObject payload)
+    public async Task<List<ArchivedMessageSearchResponse>> RequestArchivedMessageSearchAsync(JObject payload)
     {
+        var b2cClient = await _httpClient;
         if (payload == null) throw new ArgumentNullException(nameof(payload));
         using var request = new HttpRequestMessage(HttpMethod.Post, "/ArchivedMessageSearch");
         //request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
         request.Content = new StringContent(payload.ToString(), Encoding.UTF8, "application/json");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-        var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
+        var response = await b2cClient.SendAsync(request).ConfigureAwait(false);
         var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         var archivedMessageResponse = JsonConvert.DeserializeObject<List<ArchivedMessageSearchResponse>>(responseString) ?? throw new InvalidOperationException("Did not receive valid response");
@@ -52,13 +53,14 @@ public sealed class B2CDriver : IDisposable
         return archivedMessageResponse;
     }
 
-    public async Task<string> ArchivedMessageGetDocumentAsync(string token, string messageId)
+    public async Task<string> ArchivedMessageGetDocumentAsync(string messageId)
     {
+        var b2cClient = await _httpClient;
         using var request = new HttpRequestMessage(HttpMethod.Post, "/ArchivedMessageGetDocument?id=" + messageId);
-        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+        //request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
         request.Content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-        var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
+        var response = await b2cClient.SendAsync(request).ConfigureAwait(false);
         var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         return responseString;

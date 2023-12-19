@@ -32,18 +32,13 @@ public class ArchivedMessageDsl
         _b2CDriver = b2CDriver;
     }
 
-    internal Task<string> GetTokenForActorAsync(string username, string password)
+    internal Task<string> ArchivedMessageGetDocumentAsync(string messageId)
     {
-        return _azureAuthentication.GetB2CTokenAsync(username, password);
+        return _b2CDriver.ArchivedMessageGetDocumentAsync(messageId);
     }
 
-    internal Task<string> ArchivedMessageGetDocumentAsync(string token, string messageId)
+    internal Task<List<ArchivedMessageSearchResponse>> RequestArchivedMessageSearchAsync(JObject payload)
     {
-        return _b2CDriver.ArchivedMessageGetDocumentAsync(token, messageId);
-    }
-
-    internal Task<List<ArchivedMessageSearchResponse>> RequestArchivedMessageSearchAsync(string token, JObject payload)
-    {
-        return _b2CDriver.RequestArchivedMessageSearchAsync(token, payload);
+        return _b2CDriver.RequestArchivedMessageSearchAsync(payload);
     }
 }
