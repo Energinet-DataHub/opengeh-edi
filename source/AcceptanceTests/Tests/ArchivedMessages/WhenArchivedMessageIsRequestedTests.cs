@@ -30,11 +30,13 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.ArchivedMessages;
 public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 {
     private readonly ArchivedMessageDsl _archivedMessage;
+    private readonly AcceptanceTestFixture _fixture;
 
     public WhenArchivedMessageIsRequestedTests(ITestOutputHelper output, AcceptanceTestFixture fixture)
         : base(output, fixture)
     {
         Debug.Assert(fixture != null, nameof(fixture) + " != null");
+        _fixture = fixture;
         _archivedMessage = new ArchivedMessageDsl(
             new AzureAuthenticationDriver(
                 fixture.AzureEntraTenantId,
@@ -45,8 +47,8 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
     [Fact]
     public async Task Archived_message_is_searchable_after_peek()
     {
-        var response = await _archivedMessage.RequestArchivedMessageSearchAsync(ArchivedMessageData.GetSearchableDataObject(
-                "3da757e4-2a9c-486d-a39a-d48addf8b965",
+        var response = await _archivedMessage.RequestArchivedMessageSearchAsync(new Uri(_fixture.B2CApiUri, "ArchivedMessageSearch"), ArchivedMessageData.GetSearchableDataObject(
+                null!,
                 null!,
                 null!,
                 null!,
@@ -75,23 +77,27 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
     public async Task Archived_message_is_created_after_aggregated_measure_data_request()
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload();
-        var messageId = payload.SelectNodes("/cim:RequestAggregatedMeasureData_MarketDocument/cim:mRID");
+        var messageId = payload?.GetElementsByTagName("cim:mRID")[0]?.InnerText;
 
-        await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+        if (payload != null) await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
 
         var response = await _archivedMessage.RequestArchivedMessageSearchAsync(
+            new Uri(_fixture.B2CApiUri, "ArchivedMessageSearch"),
             ArchivedMessageData.GetSearchableDataObject(
-                "3da757e4-2a9c-486d-a39a-d48addf8b965",
+                messageId!,
                 null!,
                 null!,
                 null!,
                 null!));
+
+        Assert.NotNull(response[0].Id);
     }
 
     [Fact]
     public async Task Archived_messages_is_returned_with_correct_format()
     {
         var response = await _archivedMessage.RequestArchivedMessageSearchAsync(
+            new Uri(_fixture.B2CApiUri, "ArchivedMessageSearch"),
             ArchivedMessageData.GetSearchableDataObject(
                 "3da757e4-2a9c-486d-a39a-d48addf8b965",
                 null!,

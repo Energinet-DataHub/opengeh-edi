@@ -37,11 +37,11 @@ public sealed class B2CDriver : IDisposable
     {
     }
 
-    public async Task<List<ArchivedMessageSearchResponse>> RequestArchivedMessageSearchAsync(JObject payload)
+    public async Task<List<ArchivedMessageSearchResponse>> RequestArchivedMessageSearchAsync(Uri requestUri, JObject payload)
     {
         var b2cClient = await _httpClient;
         if (payload == null) throw new ArgumentNullException(nameof(payload));
-        using var request = new HttpRequestMessage(HttpMethod.Post, "/ArchivedMessageSearch");
+        using var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
         //request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
         request.Content = new StringContent(payload.ToString(), Encoding.UTF8, "application/json");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");

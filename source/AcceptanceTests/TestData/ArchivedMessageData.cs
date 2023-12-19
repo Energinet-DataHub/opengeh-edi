@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Text.Json.Nodes;
+using FluentAssertions.Common;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -24,8 +25,8 @@ public static class ArchivedMessageData
     {
         var searchableDataObject = new
         {
-            dateTimeFrom = @"2023-12-13T23:00:49.284Z",
-            dateTimeTo = "2023-12-14T22:59:49.284Z",
+            dateTimeFrom = DateTime.UtcNow.AddMinutes(-5).ToString("s") + "Z",
+            dateTimeTo = DateTime.UtcNow.AddMinutes(5).ToString("s") + "Z",
             messageId,
             senderNumber,
             receiverNumber,

@@ -37,8 +37,8 @@ public class ArchivedMessageDsl
         return _b2CDriver.ArchivedMessageGetDocumentAsync(messageId);
     }
 
-    internal Task<List<ArchivedMessageSearchResponse>> RequestArchivedMessageSearchAsync(JObject payload)
+    internal Task<List<ArchivedMessageSearchResponse>> RequestArchivedMessageSearchAsync(Uri requestUri, JObject payload)
     {
-        return _b2CDriver.RequestArchivedMessageSearchAsync(payload);
+        return _b2CDriver.RequestArchivedMessageSearchAsync(requestUri, payload);
     }
 }
