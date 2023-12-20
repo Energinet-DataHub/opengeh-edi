@@ -13,19 +13,10 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using MediatR;
 
-namespace Energinet.DataHub.EDI.Application.Actors;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
-public class CreateActorCommand : ICommand<Unit>
+public static class DataHubDetails
 {
-    public CreateActorCommand(string externalId, ActorNumber actorNumber)
-    {
-        ActorNumber = actorNumber;
-        ExternalId = externalId;
-    }
-
-    public string ExternalId { get; }
-
-    public ActorNumber ActorNumber { get; }
+    public static ActorNumber DataHubActorNumber => ActorNumber.Create("5790001330552");
 }

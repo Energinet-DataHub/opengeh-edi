@@ -16,9 +16,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.Edi.Responses;
@@ -31,11 +31,11 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 
 public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
 {
-    private readonly IGridAreaRepository _gridAreaRepository;
+    private readonly IMasterDataClient _masterDataClient;
 
-    public AggregatedTimeSeriesRequestAcceptedEventMapper(IGridAreaRepository gridAreaRepository)
+    public AggregatedTimeSeriesRequestAcceptedEventMapper(IMasterDataClient masterDataClient)
     {
-        _gridAreaRepository = gridAreaRepository;
+        _masterDataClient = masterDataClient;
     }
 
     public async Task<INotification> MapFromAsync(byte[] payload, Guid referenceId, CancellationToken cancellationToken)
@@ -82,14 +82,19 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         };
     }
 
-    private static IReadOnlyList<Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
+    private static IReadOnlyList<Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
     {
-        var points = new List<Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.Point>();
+        var points = new List<Point>();
 
         var pointPosition = 1;
         foreach (var point in timeSeriesPoints)
         {
-            points.Add(new Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.Point(pointPosition, Parse(point.Quantity), MapQuality(point.QuantityQuality), point.Time.ToString()));
+            points.Add(new Point(
+                pointPosition,
+                Parse(point.Quantity),
+                MapQuality(point.QuantityQuality),
+                point.Time.ToString()));
+
             pointPosition++;
         }
 
@@ -143,7 +148,9 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
 
     private async Task<GridAreaDetails> MapGridAreaDetailsAsync(string gridAreaCode, CancellationToken cancellationToken)
     {
-        var gridOperatorNumber = await _gridAreaRepository.GetGridOwnerForAsync(gridAreaCode, cancellationToken).ConfigureAwait(false);
+        var gridOperatorNumber = await _masterDataClient
+            .GetGridOwnerForGridAreaCodeAsync(gridAreaCode, cancellationToken)
+            .ConfigureAwait(false);
 
         return new GridAreaDetails(gridAreaCode, gridOperatorNumber.Value);
     }

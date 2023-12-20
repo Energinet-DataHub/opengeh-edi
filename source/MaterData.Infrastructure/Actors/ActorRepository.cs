@@ -15,7 +15,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.MasterData.Domain.Actors;
@@ -27,12 +26,12 @@ namespace Energinet.DataHub.EDI.MasterData.Infrastructure.Actors;
 public class ActorRepository : IActorRepository
 {
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
-    private readonly MasterDataContext _dbContext;
+    private readonly MasterDataContext _masterDataContext;
 
-    public ActorRepository(IDatabaseConnectionFactory databaseConnectionFactory, MasterDataContext dbContext)
+    public ActorRepository(IDatabaseConnectionFactory databaseConnectionFactory, MasterDataContext masterDataContext)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
-        _dbContext = dbContext;
+        _masterDataContext = masterDataContext;
     }
 
     public async Task<ActorNumber?> GetActorNumberByExternalIdAsync(string externalId, CancellationToken cancellationToken)
@@ -54,12 +53,16 @@ public class ActorRepository : IActorRepository
     public async Task CreateIfNotExistAsync(ActorNumber actorNumber, string externalId, CancellationToken cancellationToken)
     {
         if (await ActorDoesNotExistsAsync(actorNumber, externalId, cancellationToken).ConfigureAwait(false))
-            await _dbContext.Actors.AddAsync(new Actor(actorNumber, externalId), cancellationToken).ConfigureAwait(false);
+        {
+            await _masterDataContext.Actors
+                .AddAsync(new Actor(actorNumber, externalId), cancellationToken)
+                .ConfigureAwait(false);
+        }
     }
 
     private async Task<bool> ActorDoesNotExistsAsync(ActorNumber actorNumber, string externalId, CancellationToken cancellationToken)
     {
-        return !await _dbContext.Actors
+        return !await _masterDataContext.Actors
             .AnyAsync(
                 actor => actor.ActorNumber == actorNumber
                                && actor.ExternalId == externalId,

@@ -15,7 +15,7 @@
 using System;
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
+using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using NodaTime;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
@@ -25,7 +25,13 @@ namespace Energinet.DataHub.EDI.Tests.Factories;
 public class AggregationResultBuilder
 {
     private MeteringPointType _meteringPointType = MeteringPointType.Consumption;
-    private GridAreaOwner _gridAreaOwner = new("870", Instant.FromDateTimeUtc(DateTime.UtcNow), ActorNumber.Create("1234567890123"), 1);
+
+    private GridAreaOwnershipAssignedDto _gridAreaOwner = new(
+        "870",
+        Instant.FromDateTimeUtc(DateTime.UtcNow),
+        ActorNumber.Create("1234567890123"),
+        1);
+
     private SettlementType? _settlementType;
     private ActorGrouping _actorGrouping = new ActorGrouping(null, null);
 
@@ -42,10 +48,10 @@ public class AggregationResultBuilder
             _settlementType?.Name,
             BusinessReason.BalanceFixing.Name,
             _actorGrouping,
-            new GridAreaDetails(_gridAreaOwner.GridAreaCode, _gridAreaOwner.GridAreaOwnerActorNumber.Value));
+            new GridAreaDetails(_gridAreaOwner.GridAreaCode, _gridAreaOwner.GridAreaOwner.Value));
     }
 
-    public AggregationResultBuilder WithGridAreaDetails(GridAreaOwner gridAreaOwner)
+    public AggregationResultBuilder WithGridAreaDetails(GridAreaOwnershipAssignedDto gridAreaOwner)
     {
         _gridAreaOwner = gridAreaOwner;
         return this;

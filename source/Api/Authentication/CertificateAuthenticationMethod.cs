@@ -17,7 +17,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Authentication.Certificate;
 using Energinet.DataHub.EDI.Api.Common;
-using Energinet.DataHub.EDI.Domain.ActorCertificates;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Microsoft.Azure.Functions.Worker.Http;
 
 namespace Energinet.DataHub.EDI.Api.Authentication;
@@ -25,13 +26,16 @@ namespace Energinet.DataHub.EDI.Api.Authentication;
 public class CertificateAuthenticationMethod : IAuthenticationMethod
 {
     private readonly IClientCertificateRetriever _clientCertificateRetriever;
-    private readonly IActorCertificateRepository _actorCertificateRepository;
+    private readonly IMasterDataClient _masterDataClient;
     private readonly IMarketActorAuthenticator _marketActorAuthenticator;
 
-    public CertificateAuthenticationMethod(IClientCertificateRetriever clientCertificateRetriever, IActorCertificateRepository actorCertificateRepository, IMarketActorAuthenticator marketActorAuthenticator)
+    public CertificateAuthenticationMethod(
+        IClientCertificateRetriever clientCertificateRetriever,
+        IMasterDataClient masterDataClient,
+        IMarketActorAuthenticator marketActorAuthenticator)
     {
         _clientCertificateRetriever = clientCertificateRetriever;
-        _actorCertificateRepository = actorCertificateRepository;
+        _masterDataClient = masterDataClient;
         _marketActorAuthenticator = marketActorAuthenticator;
     }
 
@@ -49,11 +53,15 @@ public class CertificateAuthenticationMethod : IAuthenticationMethod
         if (certificate == null)
             return false;
 
-        var actorCertificate = await _actorCertificateRepository.GetFromThumbprintAsync(new CertificateThumbprint(certificate.Thumbprint)).ConfigureAwait(false);
+        var actorNumberAndRole = await _masterDataClient
+            .GetActorNumberAndRoleFromThumbprintAsync(new CertificateThumbprintDto(certificate.Thumbprint))
+            .ConfigureAwait(false);
 
-        if (actorCertificate == null)
+        if (actorNumberAndRole == null)
+        {
             return false;
+        }
 
-        return _marketActorAuthenticator.Authenticate(actorCertificate.ActorNumber, actorCertificate.ActorRole);
+        return _marketActorAuthenticator.Authenticate(actorNumberAndRole.ActorNumber, actorNumberAndRole.MarketRole);
     }
 }

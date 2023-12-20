@@ -15,7 +15,6 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
@@ -27,12 +26,12 @@ namespace Energinet.DataHub.EDI.MasterData.Infrastructure.GridAreas;
 
 public class GridAreaRepository : IGridAreaRepository
 {
-    private readonly MasterDataContext _dbContext;
+    private readonly MasterDataContext _masterDataContext;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-    public GridAreaRepository(MasterDataContext dbContext, ISystemDateTimeProvider systemDateTimeProvider)
+    public GridAreaRepository(MasterDataContext masterDataContext, ISystemDateTimeProvider systemDateTimeProvider)
     {
-        _dbContext = dbContext;
+        _masterDataContext = masterDataContext;
         _systemDateTimeProvider = systemDateTimeProvider;
     }
 
@@ -43,13 +42,15 @@ public class GridAreaRepository : IGridAreaRepository
         int sequenceNumber,
         CancellationToken cancellationToken)
     {
-        await _dbContext.GridAreaOwners.AddAsync(new GridAreaOwner(gridAreaCode, validFrom, actorNumber, sequenceNumber), cancellationToken).ConfigureAwait(false);
+        await _masterDataContext.GridAreaOwners
+            .AddAsync(new GridAreaOwner(gridAreaCode, validFrom, actorNumber, sequenceNumber), cancellationToken)
+            .ConfigureAwait(false);
     }
 
     public async Task<ActorNumber> GetGridOwnerForAsync(string gridAreaCode, CancellationToken cancellationToken)
     {
         var now = _systemDateTimeProvider.Now();
-        var gridAreaOwner = await _dbContext.GridAreaOwners
+        var gridAreaOwner = await _masterDataContext.GridAreaOwners
             .Where(gridArea => gridArea.GridAreaCode == gridAreaCode && gridArea.ValidFrom <= now)
             .OrderByDescending(gridArea => gridArea.SequenceNumber)
             .FirstAsync(cancellationToken).ConfigureAwait(false);

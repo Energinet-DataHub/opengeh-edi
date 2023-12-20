@@ -12,25 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using MediatR;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
+namespace Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 
-/// <summary>
-/// Process specific type(s) of integration events
-/// </summary>
-public interface IIntegrationEventMapper
-{
-    /// <summary>
-    /// Event type the processor handles
-    /// </summary>
-    public string EventTypeToHandle { get; }
-
-    /// <summary>
-    /// Process a single integration event
-    /// </summary>
-    public Task<ICommand<Unit>> MapToCommandAsync(IntegrationEvent integrationEvent);
-}
+public sealed record ActorNumberAndRoleDto(ActorNumber ActorNumber, MarketRole MarketRole);

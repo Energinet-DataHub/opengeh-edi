@@ -15,8 +15,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.MasterData.Domain.Actors;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
@@ -29,8 +29,21 @@ public class AggregationResultMessage : OutgoingMessageDto
     //     Series = new Serializer().Deserialize<TimeSeries>(messageRecord)!;
     // }
 
-    private AggregationResultMessage(ActorNumber receiverId, Guid processId, string businessReason, MarketRole receiverRole, TimeSeries series)
-        : base(DocumentType.NotifyAggregatedMeasureData, receiverId, processId, businessReason, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringDataAdministrator, new Serializer().Serialize(series))
+    private AggregationResultMessage(
+        ActorNumber receiverId,
+        Guid processId,
+        string businessReason,
+        MarketRole receiverRole,
+        TimeSeries series)
+        : base(
+            DocumentType.NotifyAggregatedMeasureData,
+            receiverId,
+            processId,
+            businessReason,
+            receiverRole,
+            DataHubDetails.DataHubActorNumber,
+            MarketRole.MeteringDataAdministrator,
+            new Serializer().Serialize(series))
     {
         Series = series;
     }

@@ -14,11 +14,11 @@
 
 using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Domain.ActorCertificates;
+using Energinet.DataHub.EDI.MasterData.Domain.ActorCertificates;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.EDI.Infrastructure.ActorCertificate;
+namespace Energinet.DataHub.EDI.MasterData.Infrastructure.ActorCertificate;
 
 public class ActorCertificateEntityConfiguration : IEntityTypeConfiguration<Domain.ActorCertificates.ActorCertificate>
 {
