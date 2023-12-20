@@ -238,7 +238,7 @@ internal sealed class EdiDriver : IDisposable
         return jsonContent;
     }
 
-    private async Task<HttpResponseMessage> RequestAggregatedMeasureDataAsync(string token, bool asyncError)
+    private async Task<HttpResponseMessage> RequestAggregatedMeasureDataAsync(string? token, bool asyncError)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, "api/RequestAggregatedMeasureMessageReceiver");
         request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
@@ -257,7 +257,7 @@ internal sealed class EdiDriver : IDisposable
         return aggregatedMeasureDataResponse;
     }
 
-    private async Task<HttpResponseMessage> PeekAsync(string token)
+    private async Task<HttpResponseMessage> PeekAsync(string? token)
     {
         using var request = new HttpRequestMessage(HttpMethod.Get, "api/peek/aggregations");
         request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
@@ -268,7 +268,7 @@ internal sealed class EdiDriver : IDisposable
         return peekResponse;
     }
 
-    private async Task DequeueAsync(string token, string messageId)
+    private async Task DequeueAsync(string? token, string messageId)
     {
         using var request = new HttpRequestMessage(HttpMethod.Delete, $"api/dequeue/{messageId}");
         request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
