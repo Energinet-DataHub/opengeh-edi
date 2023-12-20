@@ -4,4 +4,10 @@
     <AssemblyName>Energinet.DataHub.EDI.Process.Interfaces</AssemblyName>
     <RootNamespace>Energinet.DataHub.EDI.Process.Interfaces</RootNamespace>
   </PropertyGroup>
+
+  <ItemDefinitionGroup>
+    <ProjectReference>
+      <PrivateAssets>all</PrivateAssets>
+    </ProjectReference>
+  </ItemDefinitionGroup>
 </Project>
