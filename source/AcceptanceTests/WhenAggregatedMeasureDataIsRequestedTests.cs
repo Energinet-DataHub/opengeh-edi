@@ -31,7 +31,6 @@ public sealed class WhenAggregatedMeasureDataIsRequestedTests
     public WhenAggregatedMeasureDataIsRequestedTests(AcceptanceTestFixture fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
-
         _aggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(fixture.AzpToken, fixture.ConnectionString));
     }
 

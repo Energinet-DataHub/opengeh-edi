@@ -22,7 +22,7 @@ using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
@@ -50,9 +50,10 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
     [Fact]
     public async Task Event_is_marked_as_processed_when_a_handler_has_handled_it_successfully()
     {
-        _gridAreaBuilder
+        await _gridAreaBuilder
             .WithGridAreaCode(GridAreaCode)
-            .Store(GetService<MasterDataContext>());
+            .StoreAsync(GetService<IMasterDataClient>());
+
         RegisterInboxEvent();
 
         await _processor.ProcessEventsAsync(CancellationToken.None);

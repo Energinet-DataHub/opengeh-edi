@@ -13,10 +13,13 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using NodaTime;
 
-namespace Energinet.DataHub.EDI.MasterData.Domain.Actors;
+namespace Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 
-public static class DataHubDetails
-{
-    public static ActorNumber IdentificationNumber => ActorNumber.Create("5790001330552");
-}
+public sealed record ActorCertificateCredentialsAssignedDto(
+    ActorNumber ActorNumber,
+    MarketRole ActorRole,
+    CertificateThumbprintDto ThumbprintDto,
+    Instant ValidFrom,
+    int SequenceNumber);

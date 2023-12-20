@@ -26,10 +26,13 @@ public static class IntegrationEventsConfiguration
     {
         services.AddTransient<IDataRetention, ReceivedIntegrationEventsRetention>();
         services.AddTransient<IReceivedIntegrationEventRepository, ReceivedIntegrationEventRepository>();
-        services.AddTransient<IIntegrationEventMapper, B2BActorActivatedMapper>();
-        services.AddTransient<IIntegrationEventMapper, GridAreaOwnershipAssignedMapper>();
-        services.AddTransient<IIntegrationEventMapper, ActorCertificateCredentialsAssignedMapper>();
 
-        services.AddTransient<IReadOnlyDictionary<string, IIntegrationEventMapper>>(sp => sp.GetServices<IIntegrationEventMapper>().ToDictionary(m => m.EventTypeToHandle, m => m));
+        services.AddTransient<IIntegrationEventProcessor, ActorActivatedIntegrationEventProcessor>();
+        services.AddTransient<IIntegrationEventProcessor, GridAreaOwnershipAssignedIntegrationEventProcessor>();
+        services.AddTransient<IIntegrationEventProcessor, ActorCertificateCredentialsAssignedEventProcessor>();
+
+        services.AddTransient<IReadOnlyDictionary<string, IIntegrationEventProcessor>>(
+            sp => sp.GetServices<IIntegrationEventProcessor>()
+                .ToDictionary(m => m.EventTypeToHandle, m => m));
     }
 }

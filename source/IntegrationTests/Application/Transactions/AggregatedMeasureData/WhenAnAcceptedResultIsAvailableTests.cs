@@ -14,14 +14,14 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.MasterData.Domain.Actors;
-using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
@@ -51,9 +51,10 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     public async Task Aggregated_measure_data_response_is_accepted()
     {
         // Arrange
-        _gridAreaBuilder
+        await _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
-            .Store(GetService<MasterDataContext>());
+            .StoreAsync(GetService<IMasterDataClient>());
+
         var process = BuildProcess();
         var acceptedEvent = GetAcceptedEvent(process);
 
@@ -68,7 +69,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
-            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
+            .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId);
     }
@@ -77,9 +78,10 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     public async Task Received_2_accepted_events_for_same_aggregated_measure_data_process()
     {
         // Arrange
-        _gridAreaBuilder
+        await _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
-            .Store(GetService<MasterDataContext>());
+            .StoreAsync(GetService<IMasterDataClient>());
+
         var process = BuildProcess();
         var acceptedEvent = GetAcceptedEvent(process);
 
@@ -95,7 +97,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
-            .HasSenderId(DataHubDetails.IdentificationNumber.Value);
+            .HasSenderId(DataHubDetails.DataHubActorNumber.Value);
     }
 
     protected override void Dispose(bool disposing)

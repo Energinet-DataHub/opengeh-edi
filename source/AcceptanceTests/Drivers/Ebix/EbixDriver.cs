@@ -82,7 +82,7 @@ internal sealed class EbixDriver : IDisposable
 
         // Add a HTTP Header to an outgoing request
         var requestMessage = new HttpRequestMessageProperty();
-        requestMessage.Headers.Add(HttpRequestHeader.ContentType, "text/xml");
+        requestMessage.Headers.Add(HttpRequestHeader.ContentType, "application/ebix");
 
         OperationContext.Current.OutgoingMessageProperties[HttpRequestMessageProperty.Name] = requestMessage;
 
@@ -119,7 +119,7 @@ internal sealed class EbixDriver : IDisposable
 
         // Add a HTTP Header to an outgoing request
         var requestMessage = new HttpRequestMessageProperty();
-        requestMessage.Headers.Add(HttpRequestHeader.ContentType, "text/xml");
+        requestMessage.Headers.Add(HttpRequestHeader.ContentType, "application/ebix");
 
         OperationContext.Current.OutgoingMessageProperties[HttpRequestMessageProperty.Name] = requestMessage;
 

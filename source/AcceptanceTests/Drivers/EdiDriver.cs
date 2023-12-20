@@ -20,7 +20,6 @@ using System.Text.Json;
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
 using Energinet.DataHub.EDI.AcceptanceTests.Factories;
-using Energinet.DataHub.EDI.AcceptanceTests.Tests.Asserters;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Microsoft.Data.SqlClient;
 
@@ -32,12 +31,12 @@ internal sealed class EdiDriver : IDisposable
     private readonly string _connectionString;
     private readonly HttpClient _httpClient;
 
-    public EdiDriver(string azpToken, string connectionString)
+    public EdiDriver(string azpToken, string connectionString, Uri ediB2BBaseUri)
     {
         _azpToken = azpToken;
         _connectionString = connectionString;
         _httpClient = new HttpClient();
-        _httpClient.BaseAddress = new Uri("https://func-api-edi-u-001.azurewebsites.net/");
+        _httpClient.BaseAddress = ediB2BBaseUri;
     }
 
     public void Dispose()

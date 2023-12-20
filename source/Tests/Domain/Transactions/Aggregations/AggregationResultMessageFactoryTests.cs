@@ -14,7 +14,7 @@
 
 using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
+using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
@@ -45,7 +45,11 @@ public class AggregationResultMessageFactoryTests
     {
         var result = _aggregationResult
             .ForProduction()
-            .WithGridAreaDetails(new GridAreaOwner("870", Instant.FromDateTimeUtc(DateTime.UtcNow), ActorNumber.Create("1234567890123"), 1))
+            .WithGridAreaDetails(new GridAreaOwnershipAssignedDto(
+                "870",
+                Instant.FromDateTimeUtc(DateTime.UtcNow),
+                ActorNumber.Create("1234567890123"),
+                1))
             .Build();
 
         var message = CreateMessage(result);

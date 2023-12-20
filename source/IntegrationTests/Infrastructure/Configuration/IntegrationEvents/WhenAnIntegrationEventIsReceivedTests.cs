@@ -18,7 +18,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.Core.Messaging.Communication;
-using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
@@ -27,6 +26,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Xunit;
+using IIntegrationEventHandler = Energinet.DataHub.Core.Messaging.Communication.Subscriber.IIntegrationEventHandler;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
@@ -35,22 +35,20 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
     private readonly IntegrationEvent _testIntegrationEvent1;
     private readonly IntegrationEvent _unknownIntegrationEvent;
 
-    private readonly TestIntegrationEventMapper _testIntegrationEventMapper;
+    private readonly TestIntegrationEventProcessor _testIntegrationEventProcessor;
     private readonly IIntegrationEventHandler _handler;
 
     public WhenAnIntegrationEventIsReceivedTests(DatabaseFixture databaseFixture)
      : base(databaseFixture)
     {
-        _testIntegrationEventMapper = new TestIntegrationEventMapper();
+        _testIntegrationEventProcessor = new TestIntegrationEventProcessor(GetService<IMediator>());
         _handler = new IntegrationEventHandler(
                 GetService<ILogger<IntegrationEventHandler>>(),
-                GetService<IMediator>(),
                 GetService<IReceivedIntegrationEventRepository>(),
-                new Dictionary<string, IIntegrationEventMapper>
+                new Dictionary<string, IIntegrationEventProcessor>
                 {
-                    { _testIntegrationEventMapper.EventTypeToHandle, _testIntegrationEventMapper },
-                })
-            ;
+                    { _testIntegrationEventProcessor.EventTypeToHandle, _testIntegrationEventProcessor },
+                });
 
         _testIntegrationEvent1 = new IntegrationEvent(Guid.NewGuid(), TestIntegrationEventMessage.TestIntegrationEventName, 1, new TestIntegrationEventMessage());
         _unknownIntegrationEvent = new IntegrationEvent(Guid.NewGuid(), "unknown-event-type", 1, null!);
@@ -67,7 +65,7 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
 
         var isRegistered = await EventIsRegisteredInDatabase(EventId1);
         Assert.True(isRegistered);
-        Assert.Equal(1, _testIntegrationEventMapper.MappedCount);
+        Assert.Equal(1, _testIntegrationEventProcessor.MappedCount);
     }
 
     [Fact]
@@ -78,7 +76,7 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
         var isRegistered = await EventIsRegisteredInDatabase(EventIdUnknown);
 
         Assert.False(isRegistered);
-        Assert.Equal(0, _testIntegrationEventMapper.MappedCount);
+        Assert.Equal(0, _testIntegrationEventProcessor.MappedCount);
     }
 
     [Fact]
@@ -90,7 +88,7 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
         var isRegistered = await EventIsRegisteredInDatabase(EventId1);
 
         Assert.True(isRegistered);
-        Assert.Equal(1, _testIntegrationEventMapper.MappedCount);
+        Assert.Equal(1, _testIntegrationEventProcessor.MappedCount);
     }
 
     [Fact]
@@ -108,7 +106,7 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
         var isRegistered = await EventIsRegisteredInDatabase(EventId1);
 
         Assert.True(isRegistered);
-        Assert.Equal(1, _testIntegrationEventMapper.MappedCount);
+        Assert.Equal(1, _testIntegrationEventProcessor.MappedCount);
     }
 
     private Task HandleEvent(IntegrationEvent integrationEvent)

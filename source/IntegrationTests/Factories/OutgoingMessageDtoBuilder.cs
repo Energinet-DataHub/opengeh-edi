@@ -15,11 +15,9 @@
 using System;
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
-using NodaTime;
 using NodaTime.Extensions;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
@@ -27,9 +25,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
 public class OutgoingMessageDtoBuilder
 {
+    private const string GridAreaCode = "805";
     private static readonly Guid _processId = ProcessId.Create(Guid.NewGuid()).Id;
     private static readonly BusinessReason _businessReason = BusinessReason.BalanceFixing;
-    private static readonly GridAreaOwner _gridAreaOwnerDetails = new("805", Instant.FromDateTimeUtc(DateTime.UtcNow), ActorNumber.Create("1234567891045"), 1);
     private static readonly IReadOnlyList<Point> _points = new List<Point>();
     private static ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
     private static MarketRole _receiverRole = MarketRole.MeteringDataAdministrator;
@@ -42,7 +40,7 @@ public class OutgoingMessageDtoBuilder
             _receiverNumber,
             _receiverRole,
             _processId,
-            _gridAreaOwnerDetails.GridAreaCode,
+            GridAreaCode,
             MeteringPointType.Consumption.Name,
             SettlementType.NonProfiled.Name,
             MeasurementUnit.Kwh.Name,

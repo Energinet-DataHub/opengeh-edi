@@ -12,28 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.Domain.ActorCertificates;
+namespace Energinet.DataHub.EDI.MasterData.Domain.Actors;
 
 /// <summary>
-/// Repository for looking up actor certificates
+/// Service for looking up actor details
 /// </summary>
-public interface IActorCertificateRepository
+public interface IActorRepository
 {
     /// <summary>
-    /// Get actor certificate from thumbprint. Returns null if no actor certificate was found.
+    /// Get actor number by id
     /// </summary>
-    Task<ActorCertificate?> GetFromThumbprintAsync(CertificateThumbprint thumbprint);
+    Task<ActorNumber?> GetActorNumberByExternalIdAsync(string externalId, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Get actor certificate from the actor and role combination. Returns null if no actor certificate was found for the given combination.
+    /// Creates a new actor
     /// </summary>
-    Task<ActorCertificate?> GetFromActorRoleAsync(ActorNumber actorNumber, MarketRole actorRole);
-
-    /// <summary>
-    /// Add the actor certificate to storage
-    /// </summary>
-    /// <param name="newActorCertificate"></param>
-    void Add(ActorCertificate newActorCertificate);
+    Task CreateIfNotExistAsync(ActorNumber actorNumber, string externalId, CancellationToken cancellationToken);
 }

@@ -25,7 +25,6 @@ using Energinet.DataHub.EDI.Api.Authentication.Certificate;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
-using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
@@ -34,7 +33,8 @@ using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.MasterData.Application.Configuration;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Configuration;
 using Energinet.DataHub.EDI.Process.Application.Configuration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
@@ -107,18 +107,17 @@ namespace Energinet.DataHub.EDI.Api
                         if (runtime.IsRunningLocally() || runtime.ALLOW_TEST_TOKENS)
                         {
                             return new DevMarketActorAuthenticator(
-                                sp.GetRequiredService<IActorRepository>(),
+                                sp.GetRequiredService<IMasterDataClient>(),
                                 sp.GetRequiredService<IDatabaseConnectionFactory>(),
                                 sp.GetRequiredService<AuthenticatedActor>());
                         }
 
                         return new MarketActorAuthenticator(
-                            sp.GetRequiredService<IActorRepository>(),
+                            sp.GetRequiredService<IMasterDataClient>(),
                             sp.GetRequiredService<AuthenticatedActor>());
                     });
 
                     services.AddScopedSqlDbContext<B2BContext>(configuration);
-                    services.AddScopedSqlDbContext<MasterDataContext>(configuration);
 
                     CompositionRoot.Initialize(services)
                         .AddRemoteBusinessService<DummyRequest, DummyReply>("Dummy", "Dummy")
@@ -131,8 +130,7 @@ namespace Energinet.DataHub.EDI.Api
                             correlationContext.SetId(Guid.NewGuid().ToString());
 
                             return correlationContext;
-                        })
-                        .AddMessagePublishing();
+                        });
 
                     services.AddLiveHealthCheck();
                     services.AddExternalDomainServiceBusQueuesHealthCheck(
@@ -155,6 +153,7 @@ namespace Energinet.DataHub.EDI.Api
                     services.AddIncomingMessagesModule(configuration);
                     services.AddActorMessageQueueModule(configuration);
                     services.AddProcessModule(configuration);
+                    services.AddMasterDataModule(configuration);
                 })
                 .ConfigureLogging(logging =>
                 {

@@ -19,11 +19,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Interfaces;
@@ -63,8 +63,15 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     {
 #pragma warning disable CA2007
 
-        await InvokeCommandAsync(new CreateActorCommand(SampleData.StsAssignedUserId, ActorNumber.Create(SampleData.SenderId)));
-        await InvokeCommandAsync(new CreateActorCommand(SampleData.SecondStsAssignedUserId, ActorNumber.Create(SampleData.SecondSenderId)));
+        await CreateActorIfNotExistAsync(
+            new CreateActorDto(
+                SampleData.StsAssignedUserId,
+                ActorNumber.Create(SampleData.SenderId)));
+
+        await CreateActorIfNotExistAsync(
+            new CreateActorDto(
+                SampleData.SecondStsAssignedUserId,
+                ActorNumber.Create(SampleData.SecondSenderId)));
     }
 
     public Task DisposeAsync()

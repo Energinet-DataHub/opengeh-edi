@@ -15,11 +15,11 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.MasterData.Domain.Actors;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -58,7 +58,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase
         Assert.Equal(result.DocumentType, DocumentType.NotifyAggregatedMeasureData.Name);
         Assert.Equal(result.ReceiverId, SampleData.NewEnergySupplierNumber);
         Assert.Equal(result.ReceiverRole, MarketRole.EnergySupplier.Name);
-        Assert.Equal(result.SenderId, DataHubDetails.IdentificationNumber.Value);
+        Assert.Equal(result.SenderId, DataHubDetails.DataHubActorNumber.Value);
         Assert.Equal(result.SenderRole, MarketRole.MeteringDataAdministrator.Name);
         Assert.Equal(BusinessReason.BalanceFixing.Name, result.BusinessReason);
         Assert.NotNull(result.MessageRecord);

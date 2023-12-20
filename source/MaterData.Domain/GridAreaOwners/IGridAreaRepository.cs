@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.Application.GridAreas;
+namespace Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
 
 /// <summary>
 /// Responsible for accessing a grid area.

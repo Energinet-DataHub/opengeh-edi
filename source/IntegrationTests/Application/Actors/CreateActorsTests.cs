@@ -13,36 +13,38 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using MediatR;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Actors;
 
 public class CreateActorsTests : TestBase
 {
-    private readonly IMediator _mediator;
+    private readonly IMasterDataClient _masterDataClient;
     private readonly IDatabaseConnectionFactory _connectionFactory;
 
     public CreateActorsTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _mediator = GetService<IMediator>();
+        _masterDataClient = GetService<IMasterDataClient>();
         _connectionFactory = GetService<IDatabaseConnectionFactory>();
     }
 
     [Fact]
     public async Task Actor_is_created()
     {
-        var command = CreateCommand();
+        var createActorDto = CreateDto();
 
-        await _mediator.Send(command);
+        await _masterDataClient.CreateActorIfNotExistAsync(createActorDto, CancellationToken.None);
 
         var actor = await GetActor();
 
@@ -51,9 +53,29 @@ public class CreateActorsTests : TestBase
         Assert.Equal(SampleData.ExternalId, actor.ExternalId);
     }
 
-    private static CreateActorCommand CreateCommand()
+    [Fact]
+    public async Task Actor_is_not_created_multiple_times()
     {
-        return new CreateActorCommand(SampleData.ExternalId, ActorNumber.Create(SampleData.ActorNumber));
+        var createActorDto1 = CreateDto();
+        var createActorDto2 = CreateDto();
+        var createActorDto3 = CreateDto();
+        var createActorDto4 = CreateDto();
+
+        await _masterDataClient.CreateActorIfNotExistAsync(createActorDto1, CancellationToken.None);
+        await _masterDataClient.CreateActorIfNotExistAsync(createActorDto2, CancellationToken.None);
+        await _masterDataClient.CreateActorIfNotExistAsync(createActorDto3, CancellationToken.None);
+        await _masterDataClient.CreateActorIfNotExistAsync(createActorDto4, CancellationToken.None);
+
+        var actors = (await GetAllActors()).ToList();
+
+        Assert.Single(actors);
+        Assert.Equal(SampleData.ActorNumber, actors.First().ActorNumber);
+        Assert.Equal(SampleData.ExternalId, actors.First().ExternalId);
+    }
+
+    private static CreateActorDto CreateDto()
+    {
+        return new CreateActorDto(SampleData.ExternalId, ActorNumber.Create(SampleData.ActorNumber));
     }
 
     private async Task<Actor> GetActor()
@@ -61,6 +83,18 @@ public class CreateActorsTests : TestBase
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = $"SELECT Id, ActorNumber, ExternalId FROM [dbo].[Actor] WHERE ExternalId = '{SampleData.ExternalId}' AND ActorNumber = '{SampleData.ActorNumber}'";
         return await connection.QuerySingleOrDefaultAsync<Actor>(sql);
+    }
+
+    private async Task<IEnumerable<Actor>> GetAllActors()
+    {
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
+        var sql =
+            $"SELECT Id, ActorNumber, ExternalId " +
+            $"FROM [dbo].[Actor] " +
+            $"WHERE ExternalId = '{SampleData.ExternalId}' " +
+            $"AND ActorNumber = '{SampleData.ActorNumber}'";
+
+        return await connection.QueryAsync<Actor>(sql);
     }
 
 #pragma warning disable
