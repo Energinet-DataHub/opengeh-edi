@@ -13,26 +13,39 @@
 // limitations under the License.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
-using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
-using MediatR;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 
-public class B2BActorActivatedMapper : IIntegrationEventMapper
+#pragma warning disable CA1711
+internal sealed class ActorActivatedIntegrationEventProcessor : IIntegrationEventProcessor
+#pragma warning restore CA1711
 {
+    private readonly IMasterDataClient _masterDataClient;
+
+    public ActorActivatedIntegrationEventProcessor(IMasterDataClient masterDataClient)
+    {
+        _masterDataClient = masterDataClient;
+    }
+
     public string EventTypeToHandle => ActorActivated.EventName;
 
-    public Task<ICommand<Unit>> MapToCommandAsync(IntegrationEvent integrationEvent)
+    public Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
-        if (integrationEvent == null)
-            throw new ArgumentNullException(nameof(integrationEvent));
+        ArgumentNullException.ThrowIfNull(integrationEvent);
 
         var actorActivatedEvent = (ActorActivated)integrationEvent.Message;
 
-        return Task.FromResult<ICommand<Unit>>(new CreateActorCommand(actorActivatedEvent.ExternalActorId, ActorNumber.Create(actorActivatedEvent.ActorNumber)));
+        return _masterDataClient.CreateActorIfNotExistAsync(
+            new CreateActorDto(
+                actorActivatedEvent.ExternalActorId,
+                ActorNumber.Create(actorActivatedEvent.ActorNumber)),
+            cancellationToken);
     }
 }

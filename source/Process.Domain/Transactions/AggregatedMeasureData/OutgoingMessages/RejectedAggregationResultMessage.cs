@@ -14,16 +14,29 @@
 
 using System;
 using System.Collections.Generic;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.MasterData.Domain.Actors;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages;
 
 public class RejectedAggregationResultMessage : OutgoingMessageDto
 {
-    public RejectedAggregationResultMessage(ActorNumber receiverId, Guid processId, string businessReason, MarketRole receiverRole, RejectedTimeSerie series)
-        : base(DocumentType.RejectRequestAggregatedMeasureData, receiverId, processId, businessReason, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringDataAdministrator, new Serializer().Serialize(series))
+    public RejectedAggregationResultMessage(
+        ActorNumber receiverId,
+        Guid processId,
+        string businessReason,
+        MarketRole receiverRole,
+        RejectedTimeSerie series)
+        : base(
+            DocumentType.RejectRequestAggregatedMeasureData,
+            receiverId,
+            processId,
+            businessReason,
+            receiverRole,
+            DataHubDetails.DataHubActorNumber,
+            MarketRole.MeteringDataAdministrator,
+            new Serializer().Serialize(series))
     {
         Series = series;
     }

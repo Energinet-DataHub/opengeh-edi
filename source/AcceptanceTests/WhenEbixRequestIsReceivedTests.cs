@@ -36,7 +36,7 @@ public sealed class WhenEbixRequestIsReceivedTests
         _runner = runner;
         _ebix = new EbixRequestDsl(
             new AzureAuthenticationDriver(_runner.AzureEntraTenantId, _runner.AzureEntraBackendAppId),
-            new EdiDriver(_runner.AzpToken, _runner.ConnectionString),
+            new EdiDriver(_runner.AzpToken, _runner.ConnectionString, runner.EdiB2BBaseUri),
             new WholesaleDriver(_runner.EventPublisher),
             new EbixDriver(new Uri(_runner.ApiManagementUri, "/ebix"), runner.EbixCertificatePassword));
     }

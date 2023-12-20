@@ -35,7 +35,7 @@ public class WhenPayloadDataIsDifferentFromTokenDataTests
     public WhenPayloadDataIsDifferentFromTokenDataTests(ITestOutputHelper output, TestRunner runner)
     {
         _output = output;
-        _aggregationRequest = _aggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(runner.AzpToken, runner.ConnectionString));
+        _aggregationRequest = _aggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(runner.AzpToken, runner.ConnectionString, runner.EdiB2BBaseUri));
     }
 
     [Fact]

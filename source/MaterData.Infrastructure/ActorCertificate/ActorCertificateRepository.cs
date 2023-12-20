@@ -13,39 +13,45 @@
 // limitations under the License.
 
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Domain.ActorCertificates;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.MasterData.Domain.ActorCertificates;
+using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.EDI.Infrastructure.ActorCertificate;
+namespace Energinet.DataHub.EDI.MasterData.Infrastructure.ActorCertificate;
 
 public class ActorCertificateRepository : IActorCertificateRepository
 {
-    private readonly B2BContext _dbContext;
+    private readonly MasterDataContext _masterDataContext;
 
-    public ActorCertificateRepository(B2BContext dbContext)
+    public ActorCertificateRepository(MasterDataContext masterDataContext)
     {
-        _dbContext = dbContext;
+        _masterDataContext = masterDataContext;
     }
 
     public Task<Domain.ActorCertificates.ActorCertificate?> GetFromThumbprintAsync(CertificateThumbprint thumbprint)
     {
-        return _dbContext.ActorCertificates
+        return _masterDataContext.ActorCertificates
             .Where(ac => ac.Thumbprint == thumbprint)
             .SingleOrDefaultAsync();
     }
 
-    public Task<Domain.ActorCertificates.ActorCertificate?> GetFromActorRoleAsync(ActorNumber actorNumber, MarketRole actorRole)
+    public Task<Domain.ActorCertificates.ActorCertificate?> GetFromActorRoleAsync(
+        ActorNumber actorNumber,
+        MarketRole actorRole)
     {
-        return _dbContext.ActorCertificates
+        return _masterDataContext.ActorCertificates
             .Where(ac => ac.ActorNumber == actorNumber && ac.ActorRole == actorRole)
             .SingleOrDefaultAsync();
     }
 
-    public void Add(Domain.ActorCertificates.ActorCertificate newActorCertificate)
+    public async Task AddAsync(
+        Domain.ActorCertificates.ActorCertificate newActorCertificate,
+        CancellationToken cancellationToken)
     {
-        _dbContext.ActorCertificates.Add(newActorCertificate);
+        await _masterDataContext.ActorCertificates.AddAsync(newActorCertificate, cancellationToken)
+            .ConfigureAwait(false);
     }
 }

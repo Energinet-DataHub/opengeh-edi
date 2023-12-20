@@ -17,8 +17,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Exceptions;
@@ -35,11 +35,11 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 
 public class AggregationFactory
 {
-    private readonly IGridAreaRepository _gridAreaRepository;
+    private readonly IMasterDataClient _masterDataClient;
 
-    public AggregationFactory(IGridAreaRepository gridAreaRepository)
+    public AggregationFactory(IMasterDataClient masterDataClient)
     {
-        _gridAreaRepository = gridAreaRepository;
+        _masterDataClient = masterDataClient;
     }
 
     public static Aggregation Create(
@@ -286,7 +286,9 @@ public class AggregationFactory
             _ => throw new InvalidOperationException("Unknown aggregation level"),
         };
 
-        var gridOperatorNumber = await _gridAreaRepository.GetGridOwnerForAsync(gridAreaCode, cancellationToken).ConfigureAwait(false);
+        var gridOperatorNumber = await _masterDataClient
+            .GetGridOwnerForGridAreaCodeAsync(gridAreaCode, cancellationToken)
+            .ConfigureAwait(false);
 
         return new GridAreaDetails(gridAreaCode, gridOperatorNumber.Value);
     }

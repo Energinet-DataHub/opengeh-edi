@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.B2CWebApi.Models;
-using Energinet.DataHub.EDI.MasterData.Domain.Actors;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using NodaTime;
 
@@ -46,7 +46,7 @@ public static class RequestAggregatedMeasureDataHttpFactory
         return new RequestAggregatedMeasureDataDto(
             senderNumber,
             senderRoleCode,
-            DataHubDetails.IdentificationNumber.Value,
+            DataHubDetails.DataHubActorNumber.Value,
             MarketRole.CalculationResponsibleRole.Code,
             MapToBusinessReasonCode(request.ProcessType),
             "E74",

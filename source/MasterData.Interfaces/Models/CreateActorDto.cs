@@ -13,26 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using MediatR;
-using NodaTime;
 
-namespace Energinet.DataHub.EDI.Application.GridAreas;
+namespace Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 
-public class GridAreaOwnershipAssignedCommand : ICommand<Unit>
-{
-    public GridAreaOwnershipAssignedCommand(string gridAreaCode, Instant validFrom, ActorNumber gridAreaOwnerActorNumber, int sequenceNumber)
-    {
-        GridAreaCode = gridAreaCode;
-        ValidFrom = validFrom;
-        GridAreaOwnerActorNumber = gridAreaOwnerActorNumber;
-        SequenceNumber = sequenceNumber;
-    }
-
-    public string GridAreaCode { get; }
-
-    public Instant ValidFrom { get; }
-
-    public ActorNumber GridAreaOwnerActorNumber { get; }
-
-    public int SequenceNumber { get; }
-}
+public sealed record CreateActorDto(string ExternalId, ActorNumber ActorNumber);

@@ -18,10 +18,10 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.Application.Actors;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
 
 namespace Energinet.DataHub.EDI.Api.Authentication;
 
@@ -30,10 +30,10 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
     private readonly IDatabaseConnectionFactory _connectionFactory;
 
     public DevMarketActorAuthenticator(
-        IActorRepository actorRepository,
+        IMasterDataClient masterDataClient,
         IDatabaseConnectionFactory connectionFactory,
         AuthenticatedActor authenticatedActor)
-        : base(actorRepository, authenticatedActor)
+        : base(masterDataClient, authenticatedActor)
     {
         _connectionFactory = connectionFactory;
     }

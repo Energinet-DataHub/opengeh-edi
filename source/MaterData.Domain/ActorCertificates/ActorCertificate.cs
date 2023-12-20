@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.Domain.ActorCertificates;
+namespace Energinet.DataHub.EDI.MasterData.Domain.ActorCertificates;
 
 public class ActorCertificate
 {
@@ -44,13 +45,14 @@ public class ActorCertificate
 
     public Instant ValidFrom { get; private set; }
 
+    /// <summary>
+    /// Sequence number is used to determine which certificate is the newest.
+    /// </summary>
     public int SequenceNumber { get; private set; }
 
     public void Update(CertificateThumbprint thumbprint, Instant validFrom, int sequenceNumber)
     {
-        if (sequenceNumber <= SequenceNumber)
-            throw new ArgumentException($"New sequence number ({sequenceNumber}) must be greater than current sequence number ({SequenceNumber})", nameof(sequenceNumber));
-
+        if (sequenceNumber < SequenceNumber) return;
         Thumbprint = thumbprint;
         ValidFrom = validFrom;
         SequenceNumber = sequenceNumber;

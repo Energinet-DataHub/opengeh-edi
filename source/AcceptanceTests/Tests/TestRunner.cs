@@ -54,6 +54,7 @@ public class TestRunner : IAsyncDisposable
         AzureEntraClientSecret = root.GetValue<string>("AZURE_ENTRA_CLIENT_SECRET") ?? throw new InvalidOperationException("AZURE_ENTRA_CLIENT_SECRET is not set in configuration");
         EbixCertificateThumbprint = root.GetValue<string>("EBIX_CERTIFICATE_THUMBPRINT") ?? "39D64F012A19C6F6FDFB0EA91D417873599D3325";
         EbixCertificatePassword = root.GetValue<string>("EBIX_CERTIFICATE_PASSWORD") ?? throw new InvalidOperationException("EBIX_CERTIFICATE_PASSWORD is not set in configuration");
+        EdiB2BBaseUri = new Uri(secretsConfiguration.GetValue<string>("func-edi-api-base-url") ?? throw new InvalidOperationException("func-edi-api-base-url secret is not set in configuration"));
 
         EventPublisher = new IntegrationEventPublisher(serviceBusConnectionString, topicName);
 
@@ -84,6 +85,8 @@ public class TestRunner : IAsyncDisposable
     internal string AzureEntraBackendAppId { get; }
 
     internal string EbixCertificatePassword { get; }
+
+    internal Uri EdiB2BBaseUri { get; }
 
     private string EbixCertificateThumbprint { get; }
 

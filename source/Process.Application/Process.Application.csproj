@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj"/>
     <ProjectReference Include="..\OutgoingMessages.Application\OutgoingMessages.Application.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     <ProjectReference Include="..\OutgoingMessages.Interfaces\OutgoingMessages.Interfaces.csproj" />
