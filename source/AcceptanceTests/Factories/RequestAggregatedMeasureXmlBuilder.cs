@@ -19,6 +19,11 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Factories;
 
 internal sealed class RequestAggregatedMeasureXmlBuilder
 {
+    public static XmlDocument BuildEnergySupplierXmlPayload()
+    {
+        return BuildEnergySupplierXmlPayload(new Dictionary<string, string>());
+    }
+
     public static XmlDocument BuildEnergySupplierXmlPayload(Dictionary<string, string> testData)
     {
         var defaultData = SynchronousErrorTestData.DefaultEnergySupplierTestData();

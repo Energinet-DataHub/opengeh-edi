@@ -24,28 +24,26 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 
 [IntegrationTest]
-[Collection(TestRunner.AcceptanceTestCollection)]
-public sealed class WhenEbixRequestIsReceivedTests
+[Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
+public sealed class WhenEbixPeekRequestIsReceivedTests
 {
     private readonly EbixRequestDsl _ebix;
-    private readonly TestRunner _runner;
 
-    public WhenEbixRequestIsReceivedTests(TestRunner runner)
+    public WhenEbixPeekRequestIsReceivedTests(AcceptanceTestFixture fixture)
     {
-        Debug.Assert(runner != null, nameof(runner) + " != null");
-        _runner = runner;
+        ArgumentNullException.ThrowIfNull(fixture);
+
         _ebix = new EbixRequestDsl(
-            new AzureAuthenticationDriver(_runner.AzureEntraTenantId, _runner.AzureEntraBackendAppId),
-            new EdiDriver(_runner.AzpToken, _runner.ConnectionString, runner.EdiB2BBaseUri),
-            new WholesaleDriver(_runner.EventPublisher),
-            new EbixDriver(new Uri(_runner.ApiManagementUri, "/ebix"), runner.EbixCertificatePassword));
+            new EdiDriver(fixture.AzpToken, fixture.ConnectionString, fixture.EdiB2BBaseUri),
+            new WholesaleDriver(fixture.EventPublisher),
+            new EbixDriver(new Uri(fixture.ApiManagementUri, "/ebix"), fixture.EbixCertificatePassword));
     }
 
     [Fact]
     public async Task Actor_can_peek_and_dequeue_aggregation_result_in_ebIX_format()
     {
-        await _ebix.EmptyQueueForActor(TestRunner.ActorNumber, TestRunner.ActorRole);
-        await _ebix.PublishAggregationResultFor(TestRunner.ActorGridArea);
+        await _ebix.EmptyQueueForActor(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole);
+        await _ebix.PublishAggregationResultFor(AcceptanceTestFixture.ActorGridArea);
 
         await _ebix.ConfirmEbixResultIsAvailableForActor();
     }
