@@ -14,22 +14,22 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.Core.Messaging.Communication;
 
-namespace Energinet.DataHub.EDI.Application.Actors;
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 
 /// <summary>
-/// Service for looking up actor details
+/// Process specific type(s) of integration events
 /// </summary>
-public interface IActorRepository
+public interface IIntegrationEventProcessor
 {
     /// <summary>
-    /// Get actor number by id
+    /// Event type the processor handles
     /// </summary>
-    Task<ActorNumber?> GetActorNumberByExternalIdAsync(string externalId, CancellationToken cancellationToken);
+    public string EventTypeToHandle { get; }
 
     /// <summary>
-    /// Creates a new actor
+    /// Process a single integration event
     /// </summary>
-    Task CreateIfNotExistAsync(ActorNumber actorNumber, string externalId, CancellationToken cancellationToken);
+    public Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken);
 }

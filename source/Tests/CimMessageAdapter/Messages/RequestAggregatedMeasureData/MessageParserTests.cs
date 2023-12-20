@@ -20,9 +20,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.Serialization;
-using Energinet.DataHub.EDI.MasterData.Domain.Actors;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using FluentAssertions.Execution;
 using IncomingMessages.Infrastructure.DocumentValidation;
@@ -234,7 +234,7 @@ public class MessageParserTests
         var request = new RequestAggregatedMeasureDataDto(
             "5799999933318",
             "DDK",
-            DataHubDetails.IdentificationNumber.Value,
+            DataHubDetails.DataHubActorNumber.Value,
             MarketRole.CalculationResponsibleRole.Code,
             "D05",
             "E74",

@@ -16,13 +16,13 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.MasterData.Domain.Actors;
-using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Xunit;
@@ -43,10 +43,10 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     [Fact]
     public async Task Non_profiled_consumption_result_is_sent_the_energy_supplier()
     {
-        _gridAreaBuilder
+        await _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .WithActorNumber(SampleData.GridOperatorNumber)
-            .Store(GetService<MasterDataContext>());
+            .StoreAsync(GetService<IMasterDataClient>());
 
         _eventBuilder
             .WithProcessType(ProcessType.BalanceFixing)
@@ -61,7 +61,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         outgoingMessage
             .HasReceiverId(SampleData.EnergySupplierNumber.Value)
             .HasReceiverRole(MarketRole.EnergySupplier.Name)
-            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
+            .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.Period.Start, SampleData.StartOfPeriod)
             .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.Period.End, SampleData.EndOfPeriod)
@@ -72,10 +72,10 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     [Fact]
     public async Task Total_non_profiled_consumption_is_sent_to_the_grid_operator()
     {
-        _gridAreaBuilder
+        await _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .WithActorNumber(SampleData.GridOperatorNumber)
-            .Store(GetService<MasterDataContext>());
+            .StoreAsync(GetService<IMasterDataClient>());
 
         _eventBuilder
             .WithProcessType(ProcessType.BalanceFixing)
@@ -92,7 +92,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         message.HasReceiverId(SampleData.GridOperatorNumber.Value)
             .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
-            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
+            .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, MeteringPointType.Consumption.Name)
             .HasMessageRecordValue<TimeSeries>(property => property.SettlementType!, SettlementType.NonProfiled.Name);
     }
@@ -100,10 +100,10 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     [Fact]
     public async Task Total_production_result_is_sent_to_the_grid_operator()
     {
-        _gridAreaBuilder
+        await _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .WithActorNumber(SampleData.GridOperatorNumber)
-            .Store(GetService<MasterDataContext>());
+            .StoreAsync(GetService<IMasterDataClient>());
 
         _eventBuilder
             .WithProcessType(ProcessType.BalanceFixing)
@@ -120,7 +120,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         message.HasReceiverId(SampleData.GridOperatorNumber.Value)
             .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
-            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
+            .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasMessageRecordValue<TimeSeries>(x => x.GridAreaCode, SampleData.GridAreaCode)
             .HasMessageRecordValue<TimeSeries>(x => x.Resolution, BuildingBlocks.Domain.Models.Resolution.QuarterHourly.Name)
             .HasMessageRecordValue<TimeSeries>(x => x.MeasureUnitType, MeasurementUnit.Kwh.Name)
@@ -132,10 +132,10 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     [Fact]
     public async Task Consumption_per_energy_supplier_result_is_sent_to_the_balance_responsible()
     {
-        _gridAreaBuilder
+        await _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .WithActorNumber(SampleData.BalanceResponsibleNumber)
-            .Store(GetService<MasterDataContext>());
+            .StoreAsync(GetService<IMasterDataClient>());
 
         _eventBuilder
             .WithProcessType(ProcessType.BalanceFixing)
@@ -153,7 +153,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         outgoingMessage
             .HasReceiverId(SampleData.BalanceResponsibleNumber.Value)
             .HasReceiverRole(MarketRole.BalanceResponsibleParty.Name)
-            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
+            .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasMessageRecordValue<TimeSeries>(
                 series => series.BalanceResponsibleNumber!,
@@ -166,10 +166,10 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     [Fact]
     public async Task Total_non_profiled_consumption_result_is_sent_to_the_balance_responsible()
     {
-        _gridAreaBuilder
+        await _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .WithActorNumber(SampleData.BalanceResponsibleNumber)
-            .Store(GetService<MasterDataContext>());
+            .StoreAsync(GetService<IMasterDataClient>());
 
         _eventBuilder
             .WithProcessType(ProcessType.BalanceFixing)
@@ -187,7 +187,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         outgoingMessage
             .HasReceiverId(SampleData.BalanceResponsibleNumber.Value)
             .HasReceiverRole(MarketRole.BalanceResponsibleParty.Name)
-            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
+            .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasMessageRecordValue<TimeSeries>(
                 series => series.BalanceResponsibleNumber!,
@@ -205,10 +205,10 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     public async Task Exchange_is_sent_to_the_grid_operator(ProcessType processType, string businessReasonName, TimeSeriesType timeSeriesType)
     {
         var businessReason = BusinessReason.FromName(businessReasonName);
-        _gridAreaBuilder
+        await _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .WithActorNumber(SampleData.GridOperatorNumber)
-            .Store(GetService<MasterDataContext>());
+            .StoreAsync(GetService<IMasterDataClient>());
 
         _eventBuilder
             .WithProcessType(processType)
@@ -224,7 +224,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         message.HasReceiverId(SampleData.GridOperatorNumber.Value)
             .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
-            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
+            .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasBusinessReason(businessReason)
             .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, MeteringPointType.Exchange.Name);
     }
@@ -235,10 +235,10 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     public async Task Total_consumption_is_sent_to_the_grid_operator(ProcessType processType, string businessReasonName, TimeSeriesType timeSeriesType)
     {
         var businessReason = BusinessReason.FromName(businessReasonName);
-        _gridAreaBuilder
+        await _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .WithActorNumber(SampleData.GridOperatorNumber)
-            .Store(GetService<MasterDataContext>());
+            .StoreAsync(GetService<IMasterDataClient>());
 
         _eventBuilder
             .WithProcessType(processType)
@@ -254,7 +254,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         message.HasReceiverId(SampleData.GridOperatorNumber.Value)
             .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
-            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
+            .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasBusinessReason(businessReason)
             .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, MeteringPointType.Consumption.Name);
     }

@@ -12,16 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain;
+namespace Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 
-namespace Energinet.DataHub.EDI.Domain.ActorCertificates;
-
-public class CertificateThumbprint : ValueObject
-{
-    public CertificateThumbprint(string thumbprint)
-    {
-        Thumbprint = thumbprint;
-    }
-
-    public string Thumbprint { get; }
-}
+public sealed record CertificateThumbprintDto(string Thumbprint);

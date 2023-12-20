@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -21,16 +22,25 @@ using MediatR;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
-public class TestIntegrationEventMapper : IIntegrationEventMapper
+public class TestIntegrationEventProcessor : IIntegrationEventProcessor
 {
+    private readonly IMediator _mediator;
+
+    public TestIntegrationEventProcessor(IMediator mediator)
+    {
+        _mediator = mediator;
+    }
+
     public string EventTypeToHandle => TestIntegrationEventMessage.TestIntegrationEventName;
 
     public int MappedCount { get; private set; }
 
-    public Task<ICommand<Unit>> MapToCommandAsync(IntegrationEvent integrationEvent)
+    public async Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         MappedCount++;
 
-        return Task.FromResult<ICommand<Unit>>(new TestCommand());
+        var fromResult = await Task.FromResult<ICommand<Unit>>(new TestCommand());
+
+        await _mediator.Send(fromResult, cancellationToken).ConfigureAwait(false);
     }
 }

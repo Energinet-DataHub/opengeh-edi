@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Application.Actors;
-using Energinet.DataHub.EDI.Application.GridAreas;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
+using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Domain.Commands;
@@ -42,8 +41,7 @@ internal static class InternalCommandConfiguration
     private static InternalCommandMapper CreateInternalCommandMap()
     {
         var mapper = new InternalCommandMapper();
-        mapper.Add("CreateActor", typeof(CreateActorCommand));
-        mapper.Add("GridAreaOwnershipAssigned", typeof(GridAreaOwnershipAssignedCommand));
+        mapper.Add("GridAreaOwnershipAssigned", typeof(GridAreaOwnershipAssignedDto));
         mapper.Add("Aggregations.ForwardAggregationResult", typeof(ForwardAggregationResult));
         mapper.Add("SendAggregatedMeasureRequestToWholesale", typeof(SendAggregatedMeasureRequestToWholesale));
         mapper.Add("AcceptedAggregatedTimeSerie", typeof(AcceptedAggregatedTimeSerie));

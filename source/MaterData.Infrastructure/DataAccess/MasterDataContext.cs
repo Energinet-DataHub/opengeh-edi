@@ -15,6 +15,7 @@
 using System;
 using Energinet.DataHub.EDI.MasterData.Domain.Actors;
 using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
+using Energinet.DataHub.EDI.MasterData.Infrastructure.ActorCertificate;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Actors;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.GridAreas;
 using Microsoft.EntityFrameworkCore;
@@ -41,11 +42,16 @@ public class MasterDataContext : DbContext
     // It is used by EF.
     public DbSet<GridAreaOwner> GridAreaOwners { get; private set; }
 
+    // ReSharper disable once UnusedAutoPropertyAccessor.Local
+    // It is used by EF.
+    public DbSet<Domain.ActorCertificates.ActorCertificate> ActorCertificates { get; private set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
 
         modelBuilder.ApplyConfiguration(new ActorEntityConfiguration());
         modelBuilder.ApplyConfiguration(new GridAreaOwnerEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new ActorCertificateEntityConfiguration());
     }
 }

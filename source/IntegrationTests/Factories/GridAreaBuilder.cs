@@ -13,9 +13,11 @@
 // limitations under the License.
 
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
-using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using NodaTime;
 
@@ -28,13 +30,13 @@ public class GridAreaBuilder
     private static ActorNumber _actorNumber = ActorNumber.Create("5148796574821");
 
 #pragma warning disable CA1822
-    public void Store(MasterDataContext masterDataContext)
+    public Task StoreAsync(IMasterDataClient masterDataContext)
 #pragma warning restore CA1822
     {
-        if (masterDataContext == null) throw new ArgumentNullException(nameof(masterDataContext));
+        ArgumentNullException.ThrowIfNull(masterDataContext);
         var gridArea = Build();
-        masterDataContext.GridAreaOwners.Add(gridArea);
-        masterDataContext.SaveChanges();
+        return masterDataContext
+            .UpdateGridAreaOwnershipAsync(gridArea, CancellationToken.None);
     }
 
     public GridAreaBuilder WithGridAreaCode(string gridAreaCode)
@@ -49,8 +51,8 @@ public class GridAreaBuilder
         return this;
     }
 
-    private static GridAreaOwner Build()
+    private static GridAreaOwnershipAssignedDto Build()
     {
-        return new GridAreaOwner(_gridArea, _fromDateTimeUtc, _actorNumber, 1);
+        return new GridAreaOwnershipAssignedDto(_gridArea, _fromDateTimeUtc, _actorNumber, 1);
     }
 }
