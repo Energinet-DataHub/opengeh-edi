@@ -47,11 +47,22 @@ public class ActorCertificateRepository : IActorCertificateRepository
             .SingleOrDefaultAsync();
     }
 
-    public async Task AddAsync(
-        Domain.ActorCertificates.ActorCertificate newActorCertificate,
+    public void Add(Domain.ActorCertificates.ActorCertificate newActorCertificate)
+    {
+        _masterDataContext.ActorCertificates.Add(newActorCertificate);
+    }
+
+    public async Task DeleteAsync(
+        ActorNumber actorNumber,
+        CertificateThumbprint certificateThumbprint,
         CancellationToken cancellationToken)
     {
-        await _masterDataContext.ActorCertificates.AddAsync(newActorCertificate, cancellationToken)
+        var actorCertificate = await _masterDataContext.ActorCertificates
+            .Where(ac => ac.ActorNumber == actorNumber && ac.Thumbprint == certificateThumbprint)
+            .SingleOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
+
+        if (actorCertificate != null)
+            _masterDataContext.ActorCertificates.Remove(actorCertificate);
     }
 }

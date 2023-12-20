@@ -36,5 +36,10 @@ public interface IActorCertificateRepository
     /// <summary>
     /// Add the actor certificate to storage
     /// </summary>
-    Task AddAsync(ActorCertificate newActorCertificate, CancellationToken cancellationToken);
+    void Add(ActorCertificate newActorCertificate);
+
+    /// <summary>
+    /// Delete the actor certificate for specified actor and certificate thumbprint
+    /// </summary>
+    Task DeleteAsync(ActorNumber actorNumber, CertificateThumbprint certificateThumbprint, CancellationToken cancellationToken);
 }
