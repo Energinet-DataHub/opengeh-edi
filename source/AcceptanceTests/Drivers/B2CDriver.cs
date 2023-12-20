@@ -42,7 +42,6 @@ public sealed class B2CDriver : IDisposable
         var b2cClient = await _httpClient;
         if (payload == null) throw new ArgumentNullException(nameof(payload));
         using var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
-        //request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
         request.Content = new StringContent(payload.ToString(), Encoding.UTF8, "application/json");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         var response = await b2cClient.SendAsync(request).ConfigureAwait(false);
@@ -53,13 +52,12 @@ public sealed class B2CDriver : IDisposable
         return archivedMessageResponse;
     }
 
-    public async Task<string> ArchivedMessageGetDocumentAsync(string messageId)
+    public async Task<string> ArchivedMessageGetDocumentAsync(Uri requestUri)
     {
         var b2cClient = await _httpClient;
-        using var request = new HttpRequestMessage(HttpMethod.Post, "/ArchivedMessageGetDocument?id=" + messageId);
-        //request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
-        request.Content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
-        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        using var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
+        request.Content = new StringContent(string.Empty, Encoding.UTF8, "application/xml");
+        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/xml");
         var response = await b2cClient.SendAsync(request).ConfigureAwait(false);
         var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 

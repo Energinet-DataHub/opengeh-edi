@@ -31,6 +31,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 {
     private readonly ArchivedMessageDsl _archivedMessage;
     private readonly AcceptanceTestFixture _fixture;
+    private readonly AggregationResultDsl _aggregationResult;
 
     public WhenArchivedMessageIsRequestedTests(ITestOutputHelper output, AcceptanceTestFixture fixture)
         : base(output, fixture)
@@ -42,36 +43,10 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
                 fixture.AzureEntraTenantId,
                 fixture.AzureEntraBackendAppId),
             new B2CDriver(fixture.B2CAuthorizedHttpClient));
+        _aggregationResult = new AggregationResultDsl(
+            new EdiDriver(fixture.AzpToken, fixture.ConnectionString),
+            new WholesaleDriver(fixture.EventPublisher));
     }
-
-    [Fact]
-    public async Task Archived_message_is_searchable_after_peek()
-    {
-        var response = await _archivedMessage.RequestArchivedMessageSearchAsync(new Uri(_fixture.B2CApiUri, "ArchivedMessageSearch"), ArchivedMessageData.GetSearchableDataObject(
-                null!,
-                null!,
-                null!,
-                null!,
-                null!));
-
-        var id = response![0].Id;
-        foreach (var item in response!)
-        {
-            Output.WriteLine($"Id: {item.Id}");
-            Output.WriteLine($"MessageId: {item.MessageId}");
-            Output.WriteLine($"DocumentType: {item.DocumentType}");
-            Output.WriteLine($"SenderNumber: {item.SenderNumber}");
-            Output.WriteLine($"ReceiverNumber: {item.ReceiverNumber}");
-            Output.WriteLine($"CreatedAt: {item.CreatedAt}");
-            Output.WriteLine($"BusinessReason: {item.BusinessReason}");
-        }
-    }
-
-    //[Fact]
-    // public async Task Archived_message_is_getable_after_peek()
-    // {
-    //    var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload();
-    // }
 
     [Fact]
     public async Task Archived_message_is_created_after_aggregated_measure_data_request()
@@ -90,22 +65,58 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
                 null!,
                 null!));
 
+        await _aggregationResult.ConfirmResultIsAvailableForToken(Token);
+
         Assert.NotNull(response[0].Id);
     }
 
     [Fact]
+    public async Task Archived_message_is_getable_after_peek()
+     {
+        var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload();
+
+        var messageId = payload?.GetElementsByTagName("cim:mRID")[0]?.InnerText;
+
+        if (payload != null) await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+
+        await _aggregationResult.ConfirmResultIsAvailableForToken(Token);
+
+        var archivedRequestResponse = await _archivedMessage.RequestArchivedMessageSearchAsync(
+            new Uri(_fixture.B2CApiUri, "ArchivedMessageSearch"),
+            ArchivedMessageData.GetSearchableDataObject(
+                messageId!,
+                null!,
+                null!,
+                null!,
+                null!));
+
+        var response = await _archivedMessage.ArchivedMessageGetDocumentAsync(new Uri(_fixture.B2CApiUri, "/ArchivedMessageGetDocument?id=" + archivedRequestResponse[0].Id));
+
+        Assert.Equal(payload?.OuterXml, response);
+     }
+
+    [Fact]
     public async Task Archived_messages_is_returned_with_correct_format()
     {
+        var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload();
+
+        await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+
+        var messageId = payload?.GetElementsByTagName("cim:mRID")[0]?.InnerText;
+
         var response = await _archivedMessage.RequestArchivedMessageSearchAsync(
             new Uri(_fixture.B2CApiUri, "ArchivedMessageSearch"),
             ArchivedMessageData.GetSearchableDataObject(
-                "3da757e4-2a9c-486d-a39a-d48addf8b965",
+                messageId!,
                 null!,
                 null!,
                 null!,
                 null!));
 
         var archivedMessage = response[0];
+
+        await _aggregationResult.ConfirmResultIsAvailableForToken(Token);
+
         Assert.NotNull(archivedMessage.Id);
         Assert.NotNull(archivedMessage.MessageId);
         Assert.NotNull(archivedMessage.DocumentType);
