@@ -54,6 +54,21 @@ public sealed class AggregatedMeasureDataRequestDsl
         return _edi.EmptyQueueAsync(actorNumber, new[] { actorRole });
     }
 
+    internal Task ConfirmRequestAggregatedMeasureDataWithoutTokenIsNotAllowed()
+    {
+        return _edi.RequestAggregatedMeasureDataWithoutTokenAsync();
+    }
+
+    internal Task ConfirmPeekWithoutTokenIsNotAllowed()
+    {
+        return _edi.PeekMessageWithoutTokenAsync();
+    }
+
+    internal Task ConfirmDequeueWithoutTokenIsNotAllowed()
+    {
+        return _edi.DequeueMessageWithoutTokenAsync("irrelevant-message-id");
+    }
+
     internal Task<string> AggregatedMeasureDataWithXmlPayload(XmlDocument payload, string token)
     {
         return _edi.RequestAggregatedMeasureDataAsyncXmlAsync(payload, token);

@@ -31,7 +31,7 @@ public sealed class WhenAggregatedMeasureDataIsRequestedTests
     public WhenAggregatedMeasureDataIsRequestedTests(AcceptanceTestFixture fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
-        _aggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(fixture.AzpToken, fixture.ConnectionString));
+        _aggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(fixture.AzpToken, fixture.ConnectionString, fixture.EdiB2BBaseUri));
     }
 
     [Fact]
@@ -52,5 +52,23 @@ public sealed class WhenAggregatedMeasureDataIsRequestedTests
         await _aggregationRequest.RejectedAggregatedMeasureDataFor(actorNumber: AcceptanceTestFixture.ActorNumber, actorRole: AcceptanceTestFixture.ActorRole);
 
         await _aggregationRequest.ConfirmRejectedResultIsAvailableFor(actorNumber: AcceptanceTestFixture.ActorNumber, actorRole: AcceptanceTestFixture.ActorRole);
+    }
+
+    [Fact]
+    public async Task Actor_cannot_request_aggregated_measure_data_without_token()
+    {
+        await _aggregationRequest.ConfirmRequestAggregatedMeasureDataWithoutTokenIsNotAllowed();
+    }
+
+    [Fact]
+    public async Task Actor_cannot_peek_without_token()
+    {
+        await _aggregationRequest.ConfirmPeekWithoutTokenIsNotAllowed();
+    }
+
+    [Fact]
+    public async Task Actor_cannot_dequeue_without_token()
+    {
+        await _aggregationRequest.ConfirmDequeueWithoutTokenIsNotAllowed();
     }
 }

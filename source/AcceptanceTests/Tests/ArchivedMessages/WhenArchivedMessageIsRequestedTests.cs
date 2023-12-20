@@ -44,7 +44,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
                 fixture.AzureEntraBackendAppId),
             new B2CDriver(fixture.B2CAuthorizedHttpClient));
         _aggregationResult = new AggregationResultDsl(
-            new EdiDriver(fixture.AzpToken, fixture.ConnectionString),
+            new EdiDriver(fixture.AzpToken, fixture.ConnectionString, fixture.EdiB2BBaseUri),
             new WholesaleDriver(fixture.EventPublisher));
     }
 

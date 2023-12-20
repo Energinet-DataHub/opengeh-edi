@@ -33,7 +33,7 @@ public sealed class WhenAggregationResultIsPublishedTests
         ArgumentNullException.ThrowIfNull(fixture);
 
         _aggregations = new AggregationResultDsl(
-            new EdiDriver(fixture.AzpToken, fixture.ConnectionString),
+            new EdiDriver(fixture.AzpToken, fixture.ConnectionString, fixture.EdiB2BBaseUri),
             new WholesaleDriver(fixture.EventPublisher));
     }
 

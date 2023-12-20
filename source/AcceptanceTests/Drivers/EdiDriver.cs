@@ -164,6 +164,33 @@ internal sealed class EdiDriver : IDisposable
         Assert.NotNull(exist);
     }
 
+    public async Task RequestAggregatedMeasureDataWithoutTokenAsync()
+    {
+        var act = () => RequestAggregatedMeasureDataAsync(null, false);
+
+        var httpRequestException = await Assert.ThrowsAsync<HttpRequestException>(act).ConfigureAwait(false);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, httpRequestException.StatusCode);
+    }
+
+    public async Task PeekMessageWithoutTokenAsync()
+    {
+        var act = () => PeekAsync(null);
+
+        var httpRequestException = await Assert.ThrowsAsync<HttpRequestException>(act).ConfigureAwait(false);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, httpRequestException.StatusCode);
+    }
+
+    public async Task DequeueMessageWithoutTokenAsync(string messageId)
+    {
+        var act = () => DequeueAsync(null, messageId);
+
+        var httpRequestException = await Assert.ThrowsAsync<HttpRequestException>(act).ConfigureAwait(false);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, httpRequestException.StatusCode);
+    }
+
     public async Task<string> RequestAggregatedMeasureDataAsyncXmlAsync(XmlDocument payload, string token)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, "/api/RequestAggregatedMeasureMessageReceiver");

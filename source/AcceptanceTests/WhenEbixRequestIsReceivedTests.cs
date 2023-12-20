@@ -34,23 +34,41 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
         ArgumentNullException.ThrowIfNull(fixture);
 
         _ebix = new EbixRequestDsl(
-            new EdiDriver(fixture.AzpToken, fixture.ConnectionString),
+            new EdiDriver(fixture.AzpToken, fixture.ConnectionString, fixture.EdiB2BBaseUri),
             new WholesaleDriver(fixture.EventPublisher),
             new EbixDriver(new Uri(fixture.ApiManagementUri, "/ebix"), fixture.EbixCertificatePassword));
     }
 
     [Fact]
-    public async Task Actor_can_peek_calculation_result_in_ebix_format()
+    public async Task Actor_can_peek_and_dequeue_aggregation_result_in_ebIX_format()
     {
-        await _ebix.EmptyQueueForActor(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorNumber);
+        await _ebix.EmptyQueueForActor(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole);
         await _ebix.PublishAggregationResultFor(AcceptanceTestFixture.ActorGridArea);
 
         await _ebix.ConfirmEbixResultIsAvailableForActor();
     }
 
     [Fact]
+    public async Task Dequeue_request_without_content_gives_ebIX_error_B2B_900()
+    {
+        await _ebix.ConfirmInvalidDequeueRequestGivesEbixError();
+    }
+
+    [Fact]
+    public async Task Dequeue_request_with_incorrect_message_id_gives_ebIX_error_B2B_201()
+    {
+        await _ebix.ConfirmDequeueWithIncorrectMessageIdGivesEbixError();
+    }
+
+    [Fact]
     public async Task Actor_cannot_peek_ebix_api_without_certificate()
     {
         await _ebix.ConfirmPeekWithoutCertificateIsNotAllowed();
+    }
+
+    [Fact]
+    public async Task Actor_cannot_dequeue_ebix_api_without_certificate()
+    {
+        await _ebix.ConfirmDequeueWithoutCertificateIsNotAllowed();
     }
 }
