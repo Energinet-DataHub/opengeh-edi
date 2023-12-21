@@ -37,20 +37,20 @@ internal sealed class ActorCertificateCredentialsAssignedEventProcessor : IInteg
 
     public string EventTypeToHandle => ActorCertificateCredentialsAssigned.EventName;
 
-    public Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    public async Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
         var message = (ActorCertificateCredentialsAssigned)integrationEvent.Message;
 
-        return _masterDataClient.CreateOrUpdateActorCertificateAsync(
+        await _masterDataClient.CreateOrUpdateActorCertificateAsync(
             new ActorCertificateCredentialsAssignedDto(
                 ActorNumber.Create(message.ActorNumber),
                 GetMarketRole(message.ActorRole),
                 new CertificateThumbprintDto(message.CertificateThumbprint),
                 message.ValidFrom.ToInstant(),
                 message.SequenceNumber),
-            cancellationToken);
+            cancellationToken).ConfigureAwait(false);
     }
 
     private static MarketRole GetMarketRole(EicFunction actorRole)

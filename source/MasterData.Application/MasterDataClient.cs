@@ -102,7 +102,7 @@ internal sealed class MasterDataClient : IMasterDataClient
 
         if (existingCertificate == null)
         {
-            await CreateNewActorCertificateAsync(request, cancellationToken).ConfigureAwait(false);
+            CreateNewActorCertificate(request);
         }
         else
         {
@@ -128,9 +128,21 @@ internal sealed class MasterDataClient : IMasterDataClient
             : null;
     }
 
-    private Task CreateNewActorCertificateAsync(
-        ActorCertificateCredentialsAssignedDto request,
+    public async Task DeleteActorCertificateAsync(
+        ActorCertificateCredentialsRemovedDto actorCertificateCredentialsRemovedDto,
         CancellationToken cancellationToken)
+    {
+        await _actorCertificateRepository
+            .DeleteAsync(
+                actorCertificateCredentialsRemovedDto.ActorNumber,
+                new CertificateThumbprint(actorCertificateCredentialsRemovedDto.ThumbprintDto.Thumbprint),
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    private void CreateNewActorCertificate(ActorCertificateCredentialsAssignedDto request)
     {
         var newCertificate = new ActorCertificate(
             request.ActorNumber,
@@ -139,7 +151,6 @@ internal sealed class MasterDataClient : IMasterDataClient
             request.ValidFrom,
             request.SequenceNumber);
 
-        return _actorCertificateRepository
-            .AddAsync(newCertificate, cancellationToken);
+        _actorCertificateRepository.Add(newCertificate);
     }
 }
