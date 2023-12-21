@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Net.Http.Json;
 using System.Text.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
-
 public sealed class AzureAuthenticationDriver : IDisposable
 {
     private readonly string _tenantId;
@@ -37,7 +37,7 @@ public sealed class AzureAuthenticationDriver : IDisposable
         _httpClient.Dispose();
     }
 
-    public async Task<string> GetAzureAdTokenAsync(string clientId, string clientSecret)
+    public async Task<string> GetB2BTokenAsync(string clientId, string clientSecret)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, new Uri($"https://login.microsoftonline.com/{_tenantId}/oauth2/v2.0/token", UriKind.Absolute));
 
@@ -50,17 +50,15 @@ public sealed class AzureAuthenticationDriver : IDisposable
         });
 
         var response = await _httpClient.SendAsync(request);
-
-        var resultContent = await response.Content.ReadAsStringAsync();
         response.EnsureSuccessStatusCode();
 
-        var resultAsJObject = JObject.Parse(resultContent);
+        var accessToken = await response.Content.ReadFromJsonAsync<AccessTokenResponse>();
 
-        var accessToken = resultAsJObject.Value<string>("access_token");
+        if (string.IsNullOrEmpty(accessToken?.AccessToken))
+            throw new JsonException($"Couldn't parse Azure AD access token. Response content: {await response.Content.ReadAsStringAsync()}");
 
-        if (string.IsNullOrEmpty(accessToken))
-            throw new JsonException($"Couldn't parse Azure AD access token. Response content: {resultContent}");
-
-        return accessToken;
+        return accessToken.AccessToken;
     }
 }
+
+public sealed record AccessTokenResponse([property: JsonPropertyName("access_token")] string AccessToken);

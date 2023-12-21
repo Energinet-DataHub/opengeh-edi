@@ -23,27 +23,28 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 
 [IntegrationTest]
-[Collection(TestRunner.AcceptanceTestCollection)]
+[Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
 public sealed class WhenAggregationResultIsPublishedTests
 {
     private readonly AggregationResultDsl _aggregations;
 
-    public WhenAggregationResultIsPublishedTests(TestRunner runner)
+    public WhenAggregationResultIsPublishedTests(AcceptanceTestFixture fixture)
     {
-        Debug.Assert(runner != null, nameof(runner) + " != null");
+        ArgumentNullException.ThrowIfNull(fixture);
+
         _aggregations = new AggregationResultDsl(
-            new EdiDriver(runner.AzpToken, runner.ConnectionString, runner.EdiB2BBaseUri),
-            new WholesaleDriver(runner.EventPublisher));
+            new EdiDriver(fixture.AzpToken, fixture.ConnectionString, fixture.EdiB2BBaseUri),
+            new WholesaleDriver(fixture.EventPublisher));
     }
 
     [Fact]
     public async Task Actor_can_peek_and_dequeue_aggregation_result()
     {
-        await _aggregations.EmptyQueueForActor(actorNumber: TestRunner.ActorNumber, actorRole: TestRunner.ActorRole);
+        await _aggregations.EmptyQueueForActor(actorNumber: AcceptanceTestFixture.ActorNumber, actorRole: AcceptanceTestFixture.ActorRole);
 
-        await _aggregations.PublishResultFor(gridAreaCode: TestRunner.ActorGridArea);
+        await _aggregations.PublishResultFor(gridAreaCode: AcceptanceTestFixture.ActorGridArea);
 
         await _aggregations
-            .ConfirmResultIsAvailableFor(actorNumber: TestRunner.ActorNumber, actorRole: TestRunner.ActorRole);
+            .ConfirmResultIsAvailableFor(actorNumber: AcceptanceTestFixture.ActorNumber, actorRole: AcceptanceTestFixture.ActorRole);
     }
 }

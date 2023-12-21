@@ -14,10 +14,11 @@
 
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+using Energinet.DataHub.EDI.AcceptanceTests.Tests.Asserters;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
-internal sealed class AggregatedMeasureDataRequestDsl
+public sealed class AggregatedMeasureDataRequestDsl
 {
     private readonly EdiDriver _edi;
 
@@ -68,8 +69,8 @@ internal sealed class AggregatedMeasureDataRequestDsl
         return _edi.DequeueMessageWithoutTokenAsync("irrelevant-message-id");
     }
 
-    internal Task<string> AggregatedMeasureDataWithXmlPayload(string actorNumber, string marketRoles, XmlDocument payload)
+    internal Task<string> AggregatedMeasureDataWithXmlPayload(XmlDocument payload, string token)
     {
-        return _edi.RequestAggregatedMeasureDataAsyncXmlAsync(actorNumber, new[] { marketRoles }, payload);
+        return _edi.RequestAggregatedMeasureDataAsyncXmlAsync(payload, token);
     }
 }
