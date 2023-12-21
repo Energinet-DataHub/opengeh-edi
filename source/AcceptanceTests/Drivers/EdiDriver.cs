@@ -56,6 +56,11 @@ internal sealed class EdiDriver : IDisposable
     public async Task<Stream> PeekMessageAsync(string actorNumber, string[] marketRoles)
     {
         var token = TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
+        return await PeekMessageAsync(token).ConfigureAwait(false);
+    }
+
+    public async Task<Stream> PeekMessageAsync(string token)
+    {
         var stopWatch = Stopwatch.StartNew();
         while (stopWatch.ElapsedMilliseconds < 60000)
         {
@@ -166,9 +171,8 @@ internal sealed class EdiDriver : IDisposable
         Assert.Equal(HttpStatusCode.Unauthorized, httpRequestException.StatusCode);
     }
 
-    public async Task<string> RequestAggregatedMeasureDataAsyncXmlAsync(string actorNumber, string[] marketRoles, XmlDocument payload)
+    public async Task<string> RequestAggregatedMeasureDataAsyncXmlAsync(XmlDocument payload, string token)
     {
-        var token = TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
         using var request = new HttpRequestMessage(HttpMethod.Post, "/api/RequestAggregatedMeasureMessageReceiver");
         request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
         request.Content = new StringContent(payload.OuterXml, Encoding.UTF8, "application/xml");
@@ -217,10 +221,7 @@ internal sealed class EdiDriver : IDisposable
     private async Task<HttpResponseMessage> RequestAggregatedMeasureDataAsync(string? token, bool asyncError)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, "api/RequestAggregatedMeasureMessageReceiver");
-
-        if (!string.IsNullOrEmpty(token))
-            request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
-
+        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
         request.Content = new StringContent(GetContent(asyncError), Encoding.UTF8, "application/json");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
@@ -239,10 +240,7 @@ internal sealed class EdiDriver : IDisposable
     private async Task<HttpResponseMessage> PeekAsync(string? token)
     {
         using var request = new HttpRequestMessage(HttpMethod.Get, "api/peek/aggregations");
-
-        if (!string.IsNullOrEmpty(token))
-            request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
-
+        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
         request.Content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         var peekResponse = await _httpClient.SendAsync(request).ConfigureAwait(false);
@@ -253,10 +251,7 @@ internal sealed class EdiDriver : IDisposable
     private async Task DequeueAsync(string? token, string messageId)
     {
         using var request = new HttpRequestMessage(HttpMethod.Delete, $"api/dequeue/{messageId}");
-
-        if (!string.IsNullOrEmpty(token))
-            request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
-
+        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
         var dequeueResponse = await _httpClient.SendAsync(request).ConfigureAwait(false);
         dequeueResponse.EnsureSuccessStatusCode();
     }
