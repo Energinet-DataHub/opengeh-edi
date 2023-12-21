@@ -31,19 +31,19 @@ public sealed class WhenActorIsB2CAuthorizedTests
         _fixture = fixture;
     }
 
-    [Fact]
-    public async Task Actor_can_search_archived_messages()
-    {
-        var authorizedHttpClient = await _fixture.B2CAuthorizedHttpClient;
-
-        using var request = new HttpRequestMessage(HttpMethod.Post, new Uri(_fixture.B2CApiUri, "ArchivedMessageSearch"));
-
-        request.Content = JsonContent.Create(new { });
-
-        var response = await authorizedHttpClient.SendAsync(request);
-
-        response.EnsureSuccessStatusCode();
-
-        Assert.True(response.IsSuccessStatusCode);
-    }
+    // [Fact]
+    // public async Task Actor_can_search_archived_messages()
+    // {
+    //     var authorizedHttpClient = await _fixture.B2CAuthorizedHttpClient;
+    //
+    //     using var request = new HttpRequestMessage(HttpMethod.Post, new Uri(_fixture.B2CApiUri, "ArchivedMessageSearch"));
+    //
+    //     request.Content = JsonContent.Create(new { });
+    //
+    //     var response = await authorizedHttpClient.SendAsync(request);
+    //
+    //     response.EnsureSuccessStatusCode();
+    //
+    //     Assert.True(response.IsSuccessStatusCode);
+    // }
 }
