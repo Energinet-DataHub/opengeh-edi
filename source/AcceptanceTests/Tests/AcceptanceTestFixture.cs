@@ -51,7 +51,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
         var dbConnectionString = $"Server={sqlServer};Authentication=Active Directory Default;Database={databaseName};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
         ConnectionString = dbConnectionString;
 
-        var serviceBusConnectionString = secretsConfiguration.GetValue<string>("sb-domain-relay-manage-connection-string") ?? throw new InvalidOperationException("sb-domain-relay-manage-connection-string secret is not set in configuration");;
+        var serviceBusConnectionString = secretsConfiguration.GetValue<string>("sb-domain-relay-manage-connection-string") ?? throw new InvalidOperationException("sb-domain-relay-manage-connection-string secret is not set in configuration");
         var topicName = secretsConfiguration.GetValue<string>("sbt-shres-integrationevent-received-name") ?? throw new InvalidOperationException("sbt-shres-integrationevent-received-name secret is not set in configuration");
         AzpToken = root.GetValue<string>("AZP_TOKEN") ?? throw new InvalidOperationException("AZP_TOKEN is not set in configuration");
         ApiManagementUri = new Uri(secretsConfiguration.GetValue<string>("apim-gateway-url") ?? throw new InvalidOperationException("apim-gateway-url secret is not set in configuration"));
