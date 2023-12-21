@@ -35,9 +35,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.ActorCertificate;
 [SuppressMessage("Style", "VSTHRD200", Justification = "Test class")]
 [SuppressMessage("Naming", "CA1707", Justification = "Test class")]
 [IntegrationTest]
-public class WheActorCertificateCredentialsRemovedEventIsReceived : TestBase
+public class WhenActorCertificateCredentialsRemovedEventIsReceived : TestBase
 {
-    public WheActorCertificateCredentialsRemovedEventIsReceived(DatabaseFixture databaseFixture)
+    public WhenActorCertificateCredentialsRemovedEventIsReceived(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
     }
