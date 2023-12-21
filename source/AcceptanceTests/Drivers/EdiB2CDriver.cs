@@ -24,11 +24,11 @@ using Xunit.Sdk;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
-public sealed class B2CDriver : IDisposable
+public sealed class EdiB2CDriver : IDisposable
 {
     private readonly AsyncLazy<HttpClient> _httpClient;
 
-    public B2CDriver(AsyncLazy<HttpClient> b2CHttpClient)
+    public EdiB2CDriver(AsyncLazy<HttpClient> b2CHttpClient)
     {
         _httpClient = b2CHttpClient;
     }

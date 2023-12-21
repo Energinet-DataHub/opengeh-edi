@@ -24,21 +24,21 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 public class ArchivedMessageDsl
 {
     private readonly AzureAuthenticationDriver _azureAuthentication;
-    private readonly B2CDriver _b2CDriver;
+    private readonly EdiB2CDriver _ediB2CDriver;
 
-    public ArchivedMessageDsl(AzureAuthenticationDriver azureAuthentication, B2CDriver b2CDriver)
+    public ArchivedMessageDsl(AzureAuthenticationDriver azureAuthentication, EdiB2CDriver ediB2CDriver)
     {
         _azureAuthentication = azureAuthentication;
-        _b2CDriver = b2CDriver;
+        _ediB2CDriver = ediB2CDriver;
     }
 
     internal Task<string> ArchivedMessageGetDocumentAsync(Uri requestUri)
     {
-        return _b2CDriver.ArchivedMessageGetDocumentAsync(requestUri);
+        return _ediB2CDriver.ArchivedMessageGetDocumentAsync(requestUri);
     }
 
     internal Task<List<ArchivedMessageSearchResponse>> RequestArchivedMessageSearchAsync(Uri requestUri, JObject payload)
     {
-        return _b2CDriver.RequestArchivedMessageSearchAsync(requestUri, payload);
+        return _ediB2CDriver.RequestArchivedMessageSearchAsync(requestUri, payload);
     }
 }

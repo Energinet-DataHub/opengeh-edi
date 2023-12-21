@@ -56,27 +56,7 @@ internal sealed class EdiDriver : IDisposable
     public async Task<Stream> PeekMessageAsync(string actorNumber, string[] marketRoles)
     {
         var token = TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
-        var stopWatch = Stopwatch.StartNew();
-        while (stopWatch.ElapsedMilliseconds < 60000)
-        {
-            var peekResponse = await PeekAsync(token)
-                .ConfigureAwait(false);
-            if (peekResponse.StatusCode == HttpStatusCode.OK)
-            {
-                var document = await peekResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                await DequeueAsync(token, GetMessageId(peekResponse)).ConfigureAwait(false);
-                return document;
-            }
-
-            if (peekResponse.StatusCode != HttpStatusCode.NoContent)
-            {
-                throw new UnexpectedPeekResponseException($"Unexpected Peek response: {peekResponse.StatusCode}");
-            }
-
-            await Task.Delay(500).ConfigureAwait(false);
-        }
-
-        throw new TimeoutException("Unable to retrieve peek result within time limit");
+        return await PeekMessageAsync(token).ConfigureAwait(false);
     }
 
     public async Task<Stream> PeekMessageAsync(string token)
