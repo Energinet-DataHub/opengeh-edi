@@ -12,11 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.AcceptanceTests.Tests;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Responses.json;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests;
-
-[CollectionDefinition(TestRunner.AcceptanceTestCollection)]
-public class AcceptanceTestContext : ICollectionFixture<TestRunner>
+public class ArchivedMessageSearchResponse
 {
+    public string? Id { get; set; }
+
+    public string? MessageId { get; set; }
+
+    public string? DocumentType { get; set; }
+
+    public string? SenderNumber { get; set; }
+
+    public string? ReceiverNumber { get; set; }
+
+    public DateTime CreatedAt { get; set; }
+
+    public string? BusinessReason { get; set; }
 }

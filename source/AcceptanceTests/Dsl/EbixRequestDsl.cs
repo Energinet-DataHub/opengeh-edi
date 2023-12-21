@@ -22,14 +22,12 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
 internal sealed class EbixRequestDsl
 {
-    private readonly AzureAuthenticationDriver _azureAuthentication;
     private readonly EdiDriver _edi;
     private readonly WholesaleDriver _wholesale;
     private readonly EbixDriver _ebix;
 
-    public EbixRequestDsl(AzureAuthenticationDriver azureAuthentication, EdiDriver edi, WholesaleDriver wholesale, EbixDriver ebix)
+    public EbixRequestDsl(EdiDriver edi, WholesaleDriver wholesale, EbixDriver ebix)
     {
-        _azureAuthentication = azureAuthentication;
         _edi = edi;
         _wholesale = wholesale;
         _ebix = ebix;
@@ -40,11 +38,6 @@ internal sealed class EbixRequestDsl
     internal async Task EmptyQueueForActor(string actorNumber, string actorRole)
     {
         await _edi.EmptyQueueAsync(actorNumber, new[] { actorRole, }).ConfigureAwait(false);
-    }
-
-    internal Task<string> LoginAsActor(string azureEntraClientId, string azureEntraClientSecret)
-    {
-        return _azureAuthentication.GetAzureAdTokenAsync(azureEntraClientId, azureEntraClientSecret);
     }
 
     internal Task PublishAggregationResultFor(string gridArea)
