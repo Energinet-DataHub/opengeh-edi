@@ -145,6 +145,7 @@ namespace Energinet.DataHub.EDI.Api
                         CalculationResultCompleted.Descriptor,
                         ActorActivated.Descriptor,
                         GridAreaOwnershipAssigned.Descriptor,
+                        ActorCertificateCredentialsRemoved.Descriptor,
                         ActorCertificateCredentialsAssigned.Descriptor,
                     };
                     services.AddSubscriber<IntegrationEventHandler>(integrationEventDescriptors);
