@@ -50,8 +50,6 @@ public class TestRunner : IAsyncDisposable
         ApiManagementUri = new Uri(secretsConfiguration.GetValue<string>("apim-gateway-url") ?? throw new InvalidOperationException("apim-gateway-url secret is not set in configuration"));
         AzureEntraTenantId = root.GetValue<string>("AZURE_ENTRA_TENANT_ID") ?? "4a7411ea-ac71-4b63-9647-b8bd4c5a20e0";
         AzureEntraBackendAppId = root.GetValue<string>("AZURE_ENTRA_BACKEND_APP_ID") ?? "fe8b720c-fda4-4aaa-9c6d-c0d2ed6584fe";
-        AzureEntraClientId = root.GetValue<string>("AZURE_ENTRA_CLIENT_ID") ?? "D8E67800-B7EF-4025-90BB-FE06E1639117";
-        AzureEntraClientSecret = root.GetValue<string>("AZURE_ENTRA_CLIENT_SECRET") ?? throw new InvalidOperationException("AZURE_ENTRA_CLIENT_SECRET is not set in configuration");
         EbixCertificateThumbprint = root.GetValue<string>("EBIX_CERTIFICATE_THUMBPRINT") ?? "39D64F012A19C6F6FDFB0EA91D417873599D3325";
         EbixCertificatePassword = root.GetValue<string>("EBIX_CERTIFICATE_PASSWORD") ?? throw new InvalidOperationException("EBIX_CERTIFICATE_PASSWORD is not set in configuration");
         EdiB2BBaseUri = new Uri(secretsConfiguration.GetValue<string>("func-edi-api-base-url") ?? throw new InvalidOperationException("func-edi-api-base-url secret is not set in configuration"));
@@ -61,7 +59,7 @@ public class TestRunner : IAsyncDisposable
         var actorActivated = ActorFactory.CreateActorActivated(ActorNumber, AzpToken);
         _ = EventPublisher.PublishAsync(ActorActivated.EventName, actorActivated.ToByteArray());
 
-        var actorCertificateAssigned = ActorCertificateFactory.CreateActorCertificateAssigned(ActorNumber, ActorEicFunction, EbixCertificateThumbprint);
+        var actorCertificateAssigned = ActorCertificateFactory.CreateActorCertificateAssigned(ActorNumber, ActorRole, EbixCertificateThumbprint);
         _ = EventPublisher.PublishAsync(ActorCertificateCredentialsAssigned.EventName, actorCertificateAssigned.ToByteArray());
 
         var gridAreaOwnerAssigned = GridAreaFactory.AssignedGridAreaOwner(ActorNumber, ActorGridArea, ActorEicFunction);
@@ -76,10 +74,6 @@ public class TestRunner : IAsyncDisposable
 
     internal Uri ApiManagementUri { get; }
 
-    internal string AzureEntraClientId { get; }
-
-    internal string AzureEntraClientSecret { get; }
-
     internal string AzureEntraTenantId { get; }
 
     internal string AzureEntraBackendAppId { get; }
@@ -88,7 +82,7 @@ public class TestRunner : IAsyncDisposable
 
     internal Uri EdiB2BBaseUri { get; }
 
-    private string EbixCertificateThumbprint { get; }
+    internal string EbixCertificateThumbprint { get; }
 
     public async ValueTask DisposeAsync()
     {

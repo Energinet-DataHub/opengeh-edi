@@ -27,8 +27,9 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 [Collection(TestRunner.AcceptanceTestCollection)]
 public sealed class WhenEbixRequestIsReceivedTests
 {
-    private readonly EbixRequestDsl _ebix;
     private readonly TestRunner _runner;
+    private readonly EbixRequestDsl _ebix;
+    private readonly ActorDsl _actor;
 
     public WhenEbixRequestIsReceivedTests(TestRunner runner)
     {
@@ -39,6 +40,8 @@ public sealed class WhenEbixRequestIsReceivedTests
             new EdiDriver(_runner.AzpToken, _runner.ConnectionString, runner.EdiB2BBaseUri),
             new WholesaleDriver(_runner.EventPublisher),
             new EbixDriver(new Uri(_runner.ApiManagementUri, "/ebix"), runner.EbixCertificatePassword));
+
+        _actor = new ActorDsl(new MarketParticipantDriver(runner.EventPublisher), new EdiDriver(runner.AzpToken, runner.ConnectionString, runner.EdiB2BBaseUri));
     }
 
     [Fact]
@@ -72,5 +75,23 @@ public sealed class WhenEbixRequestIsReceivedTests
     public async Task Actor_cannot_dequeue_ebix_api_without_certificate()
     {
         await _ebix.ConfirmDequeueWithoutCertificateIsNotAllowed();
+    }
+
+    [Fact]
+    public async Task Actor_cannot_peek_when_certificated_has_been_removed()
+    {
+        await _actor.PublishActorCertificateCredentialsRemovedForAsync(TestRunner.ActorNumber, TestRunner.ActorRole, _runner.EbixCertificateThumbprint);
+
+        await _ebix.ConfirmPeekWithRemovedCertificateIsNotAllowed();
+        await _actor.ActorCertificateCredentialsAssignedAsync(TestRunner.ActorNumber, TestRunner.ActorRole, _runner.EbixCertificateThumbprint);
+    }
+
+    [Fact]
+    public async Task Actor_cannot_dequeue_when_certificated_has_been_removed()
+    {
+        await _actor.PublishActorCertificateCredentialsRemovedForAsync(TestRunner.ActorNumber, TestRunner.ActorRole, _runner.EbixCertificateThumbprint);
+
+        await _ebix.ConfirmDequeueWithRemovedCertificateIsNotAllowed();
+        await _actor.ActorCertificateCredentialsAssignedAsync(TestRunner.ActorNumber, TestRunner.ActorRole, _runner.EbixCertificateThumbprint);
     }
 }

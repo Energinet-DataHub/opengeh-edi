@@ -18,8 +18,6 @@ using System.Net.Http.Headers;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
-using System.ServiceModel.Description;
-using System.ServiceModel.Dispatcher;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
 

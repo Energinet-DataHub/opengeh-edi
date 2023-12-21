@@ -1,7 +1,6 @@
 ﻿{
   "AZP_TOKEN": "<acceptance test azp token using for auth token>",
   "SHARED_KEYVAULT_NAME": "<key vault name>",
-  "AZURE_ENTRA_CLIENT_ID": "<azure entra client id for api management login>",
-  "AZURE_ENTRA_CLIENT_SECRET": "<azure entra client secret for api management login>",
-  "EBIX_CERTIFICATE_PASSWORD": "<certificate password for performing an ebix peek in api management>"
+  "EBIX_CERTIFICATE_PASSWORD": "<certificate password for performing an ebix peek in api management>",
+  "MSSQL_EDI_DATABASE_NAME": "<mssql edi database name>"
 }
