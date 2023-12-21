@@ -30,6 +30,7 @@ public static class IntegrationEventsConfiguration
         services.AddTransient<IIntegrationEventProcessor, ActorActivatedIntegrationEventProcessor>();
         services.AddTransient<IIntegrationEventProcessor, GridAreaOwnershipAssignedIntegrationEventProcessor>();
         services.AddTransient<IIntegrationEventProcessor, ActorCertificateCredentialsAssignedEventProcessor>();
+        services.AddTransient<IIntegrationEventProcessor, ActorCertificateCredentialsRemovedEventProcessor>();
 
         services.AddTransient<IReadOnlyDictionary<string, IIntegrationEventProcessor>>(
             sp => sp.GetServices<IIntegrationEventProcessor>()

@@ -22,15 +22,16 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 [IntegrationTest]
-[Collection(TestRunner.AcceptanceTestCollection)]
+[Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
 public sealed class WhenNewB2BActorIsCreatedTests
 {
     private readonly ActorDsl _actorDsl;
 
-    public WhenNewB2BActorIsCreatedTests(TestRunner runner)
+    public WhenNewB2BActorIsCreatedTests(AcceptanceTestFixture fixture)
     {
-        Debug.Assert(runner != null, nameof(runner) + " != null");
-        _actorDsl = new ActorDsl(new MarketParticipantDriver(runner.EventPublisher), new EdiDriver(runner.AzpToken, runner.ConnectionString, runner.EdiB2BBaseUri));
+        ArgumentNullException.ThrowIfNull(fixture);
+
+        _actorDsl = new ActorDsl(new MarketParticipantDriver(fixture.EventPublisher), new EdiDriver(fixture.AzpToken, fixture.ConnectionString, fixture.EdiB2BBaseUri));
     }
 
     [Fact]

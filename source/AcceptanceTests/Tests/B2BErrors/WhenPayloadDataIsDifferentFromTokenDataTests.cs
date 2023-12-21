@@ -23,19 +23,12 @@ using Xunit.Abstractions;
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.B2BErrors;
 
 [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Test code should not configure await.")]
-[SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Testing")]
-[Collection(TestRunner.AcceptanceTestCollection)]
-public class WhenPayloadDataIsDifferentFromTokenDataTests
+[Collection("Acceptance test collection")]
+public class WhenPayloadDataIsDifferentFromTokenDataTests : BaseTestClass
 {
-    private const string ActorNumber = "5790000701414";
-    private const string ActorRole = "energysupplier";
-    private readonly ITestOutputHelper _output;
-    private readonly AggregatedMeasureDataRequestDsl _aggregationRequest;
-
-    public WhenPayloadDataIsDifferentFromTokenDataTests(ITestOutputHelper output, TestRunner runner)
+    public WhenPayloadDataIsDifferentFromTokenDataTests(ITestOutputHelper output, AcceptanceTestFixture fixture)
+        : base(output, fixture)
     {
-        _output = output;
-        _aggregationRequest = _aggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(runner.AzpToken, runner.ConnectionString, runner.EdiB2BBaseUri));
     }
 
     [Fact]
@@ -43,9 +36,9 @@ public class WhenPayloadDataIsDifferentFromTokenDataTests
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.WrongSenderMarketParticipantMrid());
 
-        var response = await _aggregationRequest.AggregatedMeasureDataWithXmlPayload(ActorNumber, ActorRole, payload);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
 
-        _output.WriteLine(response);
+        Output.WriteLine(response);
 
         await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00002", "Sender id does not match id of current authenticated user", response);
     }
@@ -55,9 +48,9 @@ public class WhenPayloadDataIsDifferentFromTokenDataTests
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.SenderRoleTypeNotAuthorized());
 
-        var response = await _aggregationRequest.AggregatedMeasureDataWithXmlPayload(ActorNumber, ActorRole, payload);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
 
-        _output.WriteLine(response);
+        Output.WriteLine(response);
 
         await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00003", "Sender role type is not authorized to use this type of message", response);
     }

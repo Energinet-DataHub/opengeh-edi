@@ -23,7 +23,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
         {
             return new Dictionary<string, string>
             {
-                { "cim:mRID", GenerateRandomString(36) },
+                { "cim:mRID", Guid.NewGuid().ToString() },
                 { "cim:type", "E74" },
                 { "cim:process.processType", "D05" },
                 { "cim:businessSector.type", "23" },
@@ -39,7 +39,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
         {
             return new Dictionary<string, string>
             {
-                { "cim:mRID", GenerateRandomString(36) },
+                { "cim:mRID", Guid.NewGuid().ToString() },
                 { "cim:settlement_Series.version", "D01" },
                 { "cim:marketEvaluationPoint.type", "E17" },
                 { "cim:marketEvaluationPoint.settlementMethod", "D01" },
@@ -66,7 +66,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             };
         }
 
-        /*public Dictionary<string, string> MessageIdIsNotUnique()
+        public static Dictionary<string, string> MessageIdIsNotUnique()
         {
             return new Dictionary<string, string>
             {
@@ -74,7 +74,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             };
         }
 
-        public Dictionary<string, string> TransactionIdIsNotUnique()
+        public static Dictionary<string, string> TransactionIdIsNotUnique()
         {
             return new Dictionary<string, string>
             {
@@ -82,15 +82,15 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             };
         }
 
-        public Dictionary<string, string> EmptyMessageId()
+        public static Dictionary<string, string> EmptyMessageId()
         {
             return new Dictionary<string, string>
             {
-                { "cim:mRID", "" },
+                { "cim:mRID", string.Empty },
             };
         }
 
-        public Dictionary<string, string> EmptyTransactionId()
+        /*public Dictionary<string, string> EmptyTransactionId()
         {
             return new Dictionary<string, string>
             {
@@ -171,18 +171,4 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             };
         }
         */
-
-        private static string GenerateRandomString(int length)
-        {
-            string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            string result = string.Empty;
-
-            int charactersLength = characters.Length;
-            for (int i = 0; i < length; i++)
-            {
-                result += characters.ToCharArray().GetValue(new Random().Next(1, charactersLength));
-            }
-
-            return result;
-        }
 }

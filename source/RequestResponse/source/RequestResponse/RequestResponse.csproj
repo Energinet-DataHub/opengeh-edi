@@ -83,6 +83,9 @@ limitations under the License.
       <Protobuf Update="IntegrationEvents\MarketPaticipant\EicFunction.proto">
         <OutputDir>obj\Debug\net7.0\</OutputDir>
       </Protobuf>
+      <Protobuf Update="IntegrationEvents\MarketParticipant\ActorCertificateCredentialsRemoved.proto">
+        <OutputDir>obj\Debug\net7.0\</OutputDir>
+      </Protobuf>
     </ItemGroup>
 
 </Project>
