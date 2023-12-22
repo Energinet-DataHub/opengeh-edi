@@ -19,6 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
@@ -31,12 +32,14 @@ public class CreateActorsTests : TestBase
 {
     private readonly IMasterDataClient _masterDataClient;
     private readonly IDatabaseConnectionFactory _connectionFactory;
+    private readonly IUnitOfWork _unitOfWork;
 
     public CreateActorsTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _masterDataClient = GetService<IMasterDataClient>();
         _connectionFactory = GetService<IDatabaseConnectionFactory>();
+        _unitOfWork = GetService<IUnitOfWork>();
     }
 
     [Fact]
@@ -45,6 +48,7 @@ public class CreateActorsTests : TestBase
         var createActorDto = CreateDto();
 
         await _masterDataClient.CreateActorIfNotExistAsync(createActorDto, CancellationToken.None);
+        await _unitOfWork.CommitTransactionAsync();
 
         var actor = await GetActor();
 
@@ -54,7 +58,7 @@ public class CreateActorsTests : TestBase
     }
 
     [Fact]
-    public async Task Actor_is_not_created_multiple_times()
+    public async Task Actor_is_not_created_multiple_times_with_single_commit()
     {
         var createActorDto1 = CreateDto();
         var createActorDto2 = CreateDto();
@@ -65,6 +69,31 @@ public class CreateActorsTests : TestBase
         await _masterDataClient.CreateActorIfNotExistAsync(createActorDto2, CancellationToken.None);
         await _masterDataClient.CreateActorIfNotExistAsync(createActorDto3, CancellationToken.None);
         await _masterDataClient.CreateActorIfNotExistAsync(createActorDto4, CancellationToken.None);
+        await _unitOfWork.CommitTransactionAsync();
+
+        var actors = (await GetAllActors()).ToList();
+
+        Assert.Single(actors);
+        Assert.Equal(SampleData.ActorNumber, actors.First().ActorNumber);
+        Assert.Equal(SampleData.ExternalId, actors.First().ExternalId);
+    }
+
+    [Fact]
+    public async Task Actor_is_not_created_multiple_times_with_multiple_commit()
+    {
+        var createActorDto1 = CreateDto();
+        var createActorDto2 = CreateDto();
+        var createActorDto3 = CreateDto();
+        var createActorDto4 = CreateDto();
+
+        await _masterDataClient.CreateActorIfNotExistAsync(createActorDto1, CancellationToken.None);
+        await _unitOfWork.CommitTransactionAsync();
+        await _masterDataClient.CreateActorIfNotExistAsync(createActorDto2, CancellationToken.None);
+        await _unitOfWork.CommitTransactionAsync();
+        await _masterDataClient.CreateActorIfNotExistAsync(createActorDto3, CancellationToken.None);
+        await _unitOfWork.CommitTransactionAsync();
+        await _masterDataClient.CreateActorIfNotExistAsync(createActorDto4, CancellationToken.None);
+        await _unitOfWork.CommitTransactionAsync();
 
         var actors = (await GetAllActors()).ToList();
 

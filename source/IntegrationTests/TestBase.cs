@@ -37,6 +37,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.Intern
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.MasterData.Application.Configuration;
+using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Configuration;
@@ -58,6 +59,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
     {
         private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
         private readonly B2BContext _b2BContext;
+        private readonly MasterDataContext _masterDataContext;
         private readonly ProcessContext _processContext;
         private readonly IncomingMessagesContext _incomingMessagesContext;
         private ServiceCollection? _services;
@@ -72,6 +74,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             InboxEventNotificationHandler = new TestNotificationHandlerSpy();
             BuildServices();
             _b2BContext = GetService<B2BContext>();
+            _masterDataContext = GetService<MasterDataContext>();
             _processContext = GetService<ProcessContext>();
             _incomingMessagesContext = GetService<IncomingMessagesContext>();
             AuthenticatedActor = GetService<AuthenticatedActor>();
@@ -106,6 +109,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             }
 
             _b2BContext.Dispose();
+            _masterDataContext.Dispose();
             _processContext.Dispose();
             _incomingMessagesContext.Dispose();
             _serviceBusSenderFactoryStub.Dispose();
