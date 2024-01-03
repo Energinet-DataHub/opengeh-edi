@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
@@ -52,7 +53,13 @@ public class ActorRepository : IActorRepository
 
     public async Task CreateIfNotExistAsync(ActorNumber actorNumber, string externalId, CancellationToken cancellationToken)
     {
-        if (await ActorDoesNotExistsAsync(actorNumber, externalId, cancellationToken).ConfigureAwait(false))
+        var actorAlreadyExists = await ActorAlreadyExistsInDbOrLocalTransactionAsync(
+                actorNumber,
+                externalId,
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        if (!actorAlreadyExists)
         {
             await _masterDataContext.Actors
                 .AddAsync(new Actor(actorNumber, externalId), cancellationToken)
@@ -60,13 +67,20 @@ public class ActorRepository : IActorRepository
         }
     }
 
-    private async Task<bool> ActorDoesNotExistsAsync(ActorNumber actorNumber, string externalId, CancellationToken cancellationToken)
+    private async Task<bool> ActorAlreadyExistsInDbOrLocalTransactionAsync(
+        ActorNumber actorNumber,
+        string externalId,
+        CancellationToken cancellationToken)
     {
-        return !await _masterDataContext.Actors
+        var actorAlreadyExistsInDb = await _masterDataContext.Actors
             .AnyAsync(
-                actor => actor.ActorNumber == actorNumber
-                               && actor.ExternalId == externalId,
-                cancellationToken: cancellationToken)
+                actor => actor.ActorNumber == actorNumber && actor.ExternalId == externalId,
+                cancellationToken)
             .ConfigureAwait(false);
+
+        var actorAlreadyAddedInSameTransaction = _masterDataContext.Actors.Local
+            .Any(actor => actor.ActorNumber == actorNumber && actor.ExternalId == externalId);
+
+        return actorAlreadyExistsInDb || actorAlreadyAddedInSameTransaction;
     }
 }

@@ -69,6 +69,7 @@ public class CreateActorsTests : TestBase
         await _masterDataClient.CreateActorIfNotExistAsync(createActorDto2, CancellationToken.None);
         await _masterDataClient.CreateActorIfNotExistAsync(createActorDto3, CancellationToken.None);
         await _masterDataClient.CreateActorIfNotExistAsync(createActorDto4, CancellationToken.None);
+
         await _unitOfWork.CommitTransactionAsync();
 
         var actors = (await GetAllActors()).ToList();

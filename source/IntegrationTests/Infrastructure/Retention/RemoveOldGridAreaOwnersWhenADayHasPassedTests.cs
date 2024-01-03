@@ -33,11 +33,13 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Retention;
 public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
 {
     private readonly IMasterDataClient _masterDataClient;
+    private readonly IUnitOfWork _unitOfWork;
 
     public RemoveOldGridAreaOwnersWhenADayHasPassedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _masterDataClient = GetService<IMasterDataClient>();
+        _unitOfWork = GetService<IUnitOfWork>();
     }
 
     [Fact]
@@ -179,6 +181,8 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
     {
         foreach (var gao in gridAreaOwners)
             await _masterDataClient.UpdateGridAreaOwnershipAsync(gao, CancellationToken.None);
+
+        await _unitOfWork.CommitTransactionAsync();
     }
 
     private async Task<ActorNumber> GetGridAreaOwnersForGridArea(string gridAreaCode)

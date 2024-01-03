@@ -23,6 +23,7 @@ using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
@@ -122,9 +123,15 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return GetService<IMediator>().Send(command);
         }
 
-        protected Task CreateActorIfNotExistAsync(CreateActorDto createActorDto)
+        protected async Task CreateActorIfNotExistAsync(CreateActorDto createActorDto)
         {
-            return GetService<IMasterDataClient>().CreateActorIfNotExistAsync(createActorDto, CancellationToken.None);
+            await GetService<IMasterDataClient>()
+                .CreateActorIfNotExistAsync(createActorDto, CancellationToken.None)
+                .ConfigureAwait(false);
+
+            await GetService<IUnitOfWork>()
+                .CommitTransactionAsync()
+                .ConfigureAwait(false);
         }
 
         protected async Task HavingReceivedInboxEventAsync(string eventType, IMessage eventPayload, Guid processId)
