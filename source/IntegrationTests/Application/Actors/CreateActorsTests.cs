@@ -80,7 +80,7 @@ public class CreateActorsTests : TestBase
     }
 
     [Fact]
-    public async Task Actor_is_not_created_multiple_times_with_multiple_commit()
+    public async Task Actor_is_not_created_multiple_times_with_multiple_commits()
     {
         var createActorDto1 = CreateDto();
         var createActorDto2 = CreateDto();
