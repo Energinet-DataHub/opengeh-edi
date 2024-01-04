@@ -40,7 +40,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
     public AcceptanceTestFixture()
     {
         var root = new ConfigurationBuilder()
-            .AddJsonFile("integrationtest.local.settings.json", true)
+            .AddJsonFile("acceptancetest.local.settings.json", true)
             .AddEnvironmentVariables()
             .Build();
         var secretsConfiguration = BuildSecretsConfiguration(root);
