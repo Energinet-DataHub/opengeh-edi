@@ -23,7 +23,7 @@ using Xunit.Abstractions;
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.B2BErrors;
 
 [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Test code should not configure await.")]
-[Collection("Acceptance test collection")]
+[Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
 public class WhenPayloadDataIsDifferentFromTokenDataTests : BaseTestClass
 {
     public WhenPayloadDataIsDifferentFromTokenDataTests(ITestOutputHelper output, AcceptanceTestFixture fixture)

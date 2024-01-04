@@ -71,6 +71,6 @@ public sealed class AggregatedMeasureDataRequestDsl
 
     internal Task<string> AggregatedMeasureDataWithXmlPayload(XmlDocument payload, string token)
     {
-        return _edi.RequestAggregatedMeasureDataAsyncXmlAsync(payload, token);
+        return _edi.RequestAggregatedMeasureDataXmlAsync(payload, token);
     }
 }
