@@ -63,18 +63,7 @@ public abstract class MasterDataClientTests : TestBase
             return new CreateActorDto(SampleData.ExternalId, ActorNumber.Create(SampleData.SomeActorNumber));
         }
 
-        private async Task<Actor> GetActor()
-        {
-            using var connection = await _connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
-            var sql =
-                $"SELECT Id, ActorNumber, ExternalId " +
-                $"FROM [dbo].[Actor] " +
-                $"WHERE ExternalId = '{SampleData.ExternalId}' AND ActorNumber = '{SampleData.SomeActorNumber}'";
-
-            return await connection.QuerySingleOrDefaultAsync<Actor>(sql);
-        }
-
-        private async Task<IEnumerable<Actor>> GetAllActors()
+        private async Task<IEnumerable<Actor>> GetActors()
         {
             using var connection = await _connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
             var sql =
@@ -99,12 +88,12 @@ public abstract class MasterDataClientTests : TestBase
                 await _masterDataClient.CreateActorIfNotExistAsync(createActorDto, CancellationToken.None);
                 await _unitOfWork.CommitTransactionAsync();
 
-                var actors = (await GetAllActors()).ToList();
+                var actors = (await GetActors()).ToList();
 
-                Assert.Single(actors);
+                actors.Should().ContainSingle();
                 var actor = actors.First();
-                Assert.Equal(SampleData.SomeActorNumber, actor.ActorNumber);
-                Assert.Equal(SampleData.ExternalId, actor.ExternalId);
+                actor.ActorNumber.Should().Be(SampleData.SomeActorNumber);
+                actor.ExternalId.Should().Be(SampleData.ExternalId);
             }
 
             [Fact]
@@ -122,11 +111,12 @@ public abstract class MasterDataClientTests : TestBase
 
                 await _unitOfWork.CommitTransactionAsync();
 
-                var actors = (await GetAllActors()).ToList();
+                var actors = (await GetActors()).ToList();
 
-                Assert.Single(actors);
-                Assert.Equal(SampleData.SomeActorNumber, actors.First().ActorNumber);
-                Assert.Equal(SampleData.ExternalId, actors.First().ExternalId);
+                actors.Should().ContainSingle();
+                var actor = actors.First();
+                actor.ActorNumber.Should().Be(SampleData.SomeActorNumber);
+                actor.ExternalId.Should().Be(SampleData.ExternalId);
             }
 
             [Fact]
@@ -146,11 +136,12 @@ public abstract class MasterDataClientTests : TestBase
                 await _masterDataClient.CreateActorIfNotExistAsync(createActorDto4, CancellationToken.None);
                 await _unitOfWork.CommitTransactionAsync();
 
-                var actors = (await GetAllActors()).ToList();
+                var actors = (await GetActors()).ToList();
 
-                Assert.Single(actors);
-                Assert.Equal(SampleData.SomeActorNumber, actors.First().ActorNumber);
-                Assert.Equal(SampleData.ExternalId, actors.First().ExternalId);
+                actors.Should().ContainSingle();
+                var actor = actors.First();
+                actor.ActorNumber.Should().Be(SampleData.SomeActorNumber);
+                actor.ExternalId.Should().Be(SampleData.ExternalId);
             }
         }
 
@@ -179,7 +170,7 @@ public abstract class MasterDataClientTests : TestBase
                 await _masterDataClient.CreateActorIfNotExistAsync(createActorDto, CancellationToken.None);
                 await _unitOfWork.CommitTransactionAsync();
 
-                (await GetAllActors()).ToList().Should().NotBeNullOrEmpty();
+                (await GetActors()).ToList().Should().NotBeNullOrEmpty();
 
                 var result = await _masterDataClient.GetActorNumberByExternalIdAsync(
                     Guid.Parse("2ad87ee6-730e-4c2e-ba95-b220b1b7953d").ToString(),
@@ -196,7 +187,7 @@ public abstract class MasterDataClientTests : TestBase
                 await _masterDataClient.CreateActorIfNotExistAsync(createActorDto, CancellationToken.None);
                 await _unitOfWork.CommitTransactionAsync();
 
-                (await GetAllActors()).ToList().Should().NotBeNullOrEmpty();
+                (await GetActors()).ToList().Should().NotBeNullOrEmpty();
 
                 var result = await _masterDataClient.GetActorNumberByExternalIdAsync(
                     SampleData.ExternalId,
@@ -215,7 +206,7 @@ public abstract class MasterDataClientTests : TestBase
                 await _masterDataClient.CreateActorIfNotExistAsync(createActorDto2, CancellationToken.None);
                 await _unitOfWork.CommitTransactionAsync();
 
-                (await GetAllActors()).ToList().Should().HaveCount(2);
+                (await GetActors()).ToList().Should().HaveCount(2);
 
                 var result = await _masterDataClient.GetActorNumberByExternalIdAsync(
                     SampleData.ExternalId,
