@@ -32,7 +32,7 @@ public class BaseTestClass
         Output = output;
         BaseTestFixture = fixture;
         Token = TokenBuilder.BuildToken(ActorNumber, new[] { ActorRole }, fixture.EnergySupplierAzpToken);
-        AggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(fixture.MeteredDataResponsibleAzpToken, fixture.ConnectionString, fixture.EdiB2BBaseUri));
+        AggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(fixture.EnergySupplierAzpToken, fixture.ConnectionString, fixture.EdiB2BBaseUri));
         AzureAuthenticationDriver = new AzureAuthenticationDriver(
             fixture.AzureEntraTenantId,
             fixture.AzureEntraBackendAppId);
