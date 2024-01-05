@@ -59,8 +59,8 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
         var serviceBusConnectionString = root.GetValue<string>("sb-domain-relay-manage-connection-string") ?? throw new InvalidOperationException("sb-domain-relay-manage-connection-string secret is not set in configuration");
         var topicName = root.GetValue<string>("sbt-shres-integrationevent-received-name") ?? throw new InvalidOperationException("sbt-shres-integrationevent-received-name secret is not set in configuration");
-        MeteredDataResponsibleAzpToken = root.GetValue<string>("METERED_DATA_RESPONSIBLE_AZP_TOKEN") ?? throw new InvalidOperationException("AZP_TOKEN is not set in configuration");
-        EnergySupplierAzpToken = root.GetValue<string>("ENERGY_SUPPLIER_AZP_TOKEN") ?? throw new InvalidOperationException("AZP_TOKEN is not set in configuration");
+        MeteredDataResponsibleAzpToken = root.GetValue<string>("METERED_DATA_RESPONSIBLE_AZP_TOKEN") ?? throw new InvalidOperationException("MeteredDataResponsibleAzpToken is not set in configuration");
+        EnergySupplierAzpToken = root.GetValue<string>("ENERGY_SUPPLIER_AZP_TOKEN") ?? throw new InvalidOperationException("EnergySupplierAzpToken is not set in configuration");
         ApiManagementUri = new Uri(root.GetValue<string>("apim-gateway-url") ?? throw new InvalidOperationException("apim-gateway-url secret is not set in configuration"));
         AzureEntraTenantId = root.GetValue<string>("AZURE_ENTRA_TENANT_ID") ?? "4a7411ea-ac71-4b63-9647-b8bd4c5a20e0";
         AzureEntraBackendAppId = root.GetValue<string>("AZURE_ENTRA_BACKEND_APP_ID") ?? "fe8b720c-fda4-4aaa-9c6d-c0d2ed6584fe";
