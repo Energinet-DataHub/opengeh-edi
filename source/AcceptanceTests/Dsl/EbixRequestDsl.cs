@@ -17,6 +17,8 @@ using System.ServiceModel;
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
+using FluentAssertions;
+using FluentAssertions.Execution;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
@@ -80,10 +82,10 @@ internal sealed class EbixRequestDsl
 
         var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-        Assert.Multiple(
-            () => Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode),
-            () => Assert.Contains("<faultstring>B2B-900", responseBody, StringComparison.InvariantCulture),
-            () => Assert.Contains("<faultcode>soap-env:Client", responseBody, StringComparison.InvariantCulture));
+        using var assertionScope = new AssertionScope();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        responseBody.Should().Contain("<faultstring>B2B-900").And.Contain("<faultcode>soap-env:Client");
     }
 
     internal async Task ConfirmDequeueWithIncorrectMessageIdGivesEbixError()

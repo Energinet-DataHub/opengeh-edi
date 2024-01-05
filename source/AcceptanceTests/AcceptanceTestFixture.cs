@@ -39,28 +39,35 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
     public AcceptanceTestFixture()
     {
-        var root = new ConfigurationBuilder()
-            .AddJsonFile("integrationtest.local.settings.json", true)
-            .AddEnvironmentVariables()
-            .Build();
-        var secretsConfiguration = BuildSecretsConfiguration(root);
+        var configurationBuilder = new ConfigurationBuilder()
+            .AddJsonFile("acceptancetest.local.settings.json", true)
+            .AddEnvironmentVariables();
 
-        var sqlServer = secretsConfiguration.GetValue<string>("mssql-data-url") ?? throw new InvalidOperationException("mssql-data-url secret is not set in configuration");
-        var databaseName = secretsConfiguration.GetValue<string>("mssql-edi-database-name") ?? throw new InvalidOperationException("mssql-edi-database-name secret is not set in configuration");
+        #if !DEBUG
+        var jsonConfiguration = configurationBuilder.Build();
+        var keyVaultName = jsonConfiguration.GetValue<string>("SHARED_KEYVAULT_NAME");
+
+        configurationBuilder = configurationBuilder.AddAuthenticatedAzureKeyVault($"https://{keyVaultName}.vault.azure.net/");
+        #endif
+
+        var root = configurationBuilder.Build();
+
+        var sqlServer = root.GetValue<string>("mssql-data-url") ?? throw new InvalidOperationException("mssql-data-url secret is not set in configuration");
+        var databaseName = root.GetValue<string>("mssql-edi-database-name") ?? throw new InvalidOperationException("mssql-edi-database-name secret is not set in configuration");
         var dbConnectionString = $"Server={sqlServer};Authentication=Active Directory Default;Database={databaseName};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
         ConnectionString = dbConnectionString;
 
-        var serviceBusConnectionString = secretsConfiguration.GetValue<string>("sb-domain-relay-manage-connection-string") ?? throw new InvalidOperationException("sb-domain-relay-manage-connection-string secret is not set in configuration");
-        var topicName = secretsConfiguration.GetValue<string>("sbt-shres-integrationevent-received-name") ?? throw new InvalidOperationException("sbt-shres-integrationevent-received-name secret is not set in configuration");
+        var serviceBusConnectionString = root.GetValue<string>("sb-domain-relay-manage-connection-string") ?? throw new InvalidOperationException("sb-domain-relay-manage-connection-string secret is not set in configuration");
+        var topicName = root.GetValue<string>("sbt-shres-integrationevent-received-name") ?? throw new InvalidOperationException("sbt-shres-integrationevent-received-name secret is not set in configuration");
         AzpToken = root.GetValue<string>("AZP_TOKEN") ?? throw new InvalidOperationException("AZP_TOKEN is not set in configuration");
-        ApiManagementUri = new Uri(secretsConfiguration.GetValue<string>("apim-gateway-url") ?? throw new InvalidOperationException("apim-gateway-url secret is not set in configuration"));
+        ApiManagementUri = new Uri(root.GetValue<string>("apim-gateway-url") ?? throw new InvalidOperationException("apim-gateway-url secret is not set in configuration"));
         AzureEntraTenantId = root.GetValue<string>("AZURE_ENTRA_TENANT_ID") ?? "4a7411ea-ac71-4b63-9647-b8bd4c5a20e0";
         AzureEntraBackendAppId = root.GetValue<string>("AZURE_ENTRA_BACKEND_APP_ID") ?? "fe8b720c-fda4-4aaa-9c6d-c0d2ed6584fe";
         AzureEntraClientId = root.GetValue<string>("AZURE_ENTRA_CLIENT_ID") ?? "D8E67800-B7EF-4025-90BB-FE06E1639117";
         AzureEntraClientSecret = root.GetValue<string>("AZURE_ENTRA_CLIENT_SECRET") ?? throw new InvalidOperationException("AZURE_ENTRA_CLIENT_SECRET is not set in configuration");
         _ebixCertificateThumbprint = root.GetValue<string>("EBIX_CERTIFICATE_THUMBPRINT") ?? "39D64F012A19C6F6FDFB0EA91D417873599D3325";
         EbixCertificatePassword = root.GetValue<string>("EBIX_CERTIFICATE_PASSWORD") ?? throw new InvalidOperationException("EBIX_CERTIFICATE_PASSWORD is not set in configuration");
-        EdiB2BBaseUri = new Uri(secretsConfiguration.GetValue<string>("func-edi-api-base-url") ?? throw new InvalidOperationException("func-edi-api-base-url secret is not set in configuration"));
+        EdiB2BBaseUri = new Uri(root.GetValue<string>("func-edi-api-base-url") ?? throw new InvalidOperationException("func-edi-api-base-url secret is not set in configuration"));
         _azureEntraB2CTenantUrl = new Uri(root.GetValue<string>("AZURE_B2C_TENANT_URL") ?? "https://devdatahubb2c.b2clogin.com/tfp/devdatahubb2c.onmicrosoft.com/B2C_1_ROPC_Auth/oauth2/v2.0/token");
         _azureEntraFrontendAppId = root.GetValue<string>("AZURE_ENTRA_FRONTEND_APP_ID") ?? "bf76fc24-cfec-498f-8979-ab4123792472";
         _azureEntraBackendBffScope = root.GetValue<string>("AZURE_ENTRA_BACKEND_BFF_SCOPE") ?? "https://devDataHubB2C.onmicrosoft.com/backend-bff/api";
@@ -108,9 +115,11 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
         var initializeTasks = new List<Task>
         {
+#if !DEBUG // Locally we cannot access the Azure Service Bus, so this will fail
             EventPublisher.PublishAsync(ActorActivated.EventName, actorActivated.ToByteArray()),
             EventPublisher.PublishAsync(ActorCertificateCredentialsAssigned.EventName, actorCertificateAssigned.ToByteArray()),
             EventPublisher.PublishAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnerAssigned.ToByteArray()),
+#endif
         };
 
         await Task.WhenAll(initializeTasks).ConfigureAwait(false);
@@ -122,16 +131,6 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
         if (B2CAuthorizedHttpClient.IsStarted)
             (await B2CAuthorizedHttpClient).Dispose();
-    }
-
-    private static IConfigurationRoot BuildSecretsConfiguration(IConfigurationRoot root)
-    {
-        var sharedKeyVaultName = root.GetValue<string>("SHARED_KEYVAULT_NAME");
-        var sharedKeyVaultUrl = $"https://{sharedKeyVaultName}.vault.azure.net/";
-
-        return new ConfigurationBuilder()
-            .AddAuthenticatedAzureKeyVault(sharedKeyVaultUrl)
-            .Build();
     }
 
     private Task<HttpClient> CreateB2CAuthorizedHttpClientAsync()
