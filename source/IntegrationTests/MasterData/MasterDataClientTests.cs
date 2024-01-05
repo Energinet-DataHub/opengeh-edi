@@ -958,19 +958,9 @@ public abstract class MasterDataClientTests : TestBase
 
         internal static string ExternalId => Guid.Parse("9222905B-8B02-4D8B-A2C1-3BD51B1AD8D9").ToString();
 
-        internal static string NameOfBalanceFixingCompletedIntegrationEvent => "BalanceFixingCompleted";
-
         internal static ActorNumber GridOperatorNumber => ActorNumber.Create("8200000007739");
 
         internal static string GridAreaCode => "805";
-
-        internal static Guid ResultId => Guid.Parse("42AB7292-FE2E-4F33-B537-4A15FEDB9754");
-
-        internal static string MeteringPointType => "E18";
-
-        internal static string MeasureUnitType => "KWH";
-
-        internal static string Resolution => "PT1H";
 
         internal static Instant StartOfPeriod => EffectiveDateFactory.InstantAsOfToday();
 
