@@ -34,7 +34,7 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
         ArgumentNullException.ThrowIfNull(fixture);
 
         _ebix = new EbixRequestDsl(
-            new EdiDriver(fixture.AzpToken, fixture.ConnectionString, fixture.EdiB2BBaseUri),
+            new EdiDriver(fixture.MeteredDataResponsibleAzpToken, fixture.ConnectionString, fixture.EdiB2BBaseUri),
             new WholesaleDriver(fixture.EventPublisher),
             new EbixDriver(new Uri(fixture.ApiManagementUri, "/ebix"), fixture.EbixCertificatePassword));
     }
