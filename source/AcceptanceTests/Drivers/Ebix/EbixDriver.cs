@@ -13,13 +13,9 @@
 // limitations under the License.
 
 using System.Diagnostics;
-using System.Net;
-using System.Net.Http.Headers;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
-using System.ServiceModel.Description;
-using System.ServiceModel.Dispatcher;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
 
@@ -80,12 +76,6 @@ internal sealed class EbixDriver : IDisposable
 
         using var operationScope = new OperationContextScope(_ebixServiceClient.InnerChannel);
 
-        // Add a HTTP Header to an outgoing request
-        var requestMessage = new HttpRequestMessageProperty();
-        requestMessage.Headers.Add(HttpRequestHeader.ContentType, "application/ebix");
-
-        OperationContext.Current.OutgoingMessageProperties[HttpRequestMessageProperty.Name] = requestMessage;
-
         var stopWatch = Stopwatch.StartNew();
         var timeBeforeTimeout = timeoutInSeconds != null ? new TimeSpan(0, 0, timeoutInSeconds.Value) : TimeSpan.Zero;
         Exception? lastException = null;
@@ -119,7 +109,6 @@ internal sealed class EbixDriver : IDisposable
 
         // Add a HTTP Header to an outgoing request
         var requestMessage = new HttpRequestMessageProperty();
-        requestMessage.Headers.Add(HttpRequestHeader.ContentType, "application/ebix");
 
         OperationContext.Current.OutgoingMessageProperties[HttpRequestMessageProperty.Name] = requestMessage;
 
@@ -141,7 +130,6 @@ internal sealed class EbixDriver : IDisposable
         using var request = new HttpRequestMessage(HttpMethod.Post, new Uri("?soapAction=dequeueMessage", UriKind.Relative));
 
         var emptyRequestBody = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>());
-        emptyRequestBody.Headers.ContentType = new MediaTypeHeaderValue("application/ebix");
 
         request.Content = emptyRequestBody;
 
@@ -152,7 +140,6 @@ internal sealed class EbixDriver : IDisposable
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, new Uri("?soapAction=peekMessage", UriKind.Relative));
         request.Content = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>());
-        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/ebix");
 
         return await _unauthorizedHttpClient.SendAsync(request).ConfigureAwait(false);
     }
@@ -172,7 +159,6 @@ internal sealed class EbixDriver : IDisposable
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, new Uri("?soapAction=dequeueMessage", UriKind.Relative));
         request.Content = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>());
-        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/ebix");
 
         return await _unauthorizedHttpClient.SendAsync(request).ConfigureAwait(false);
     }
