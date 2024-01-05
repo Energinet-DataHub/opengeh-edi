@@ -171,7 +171,7 @@ internal sealed class EdiDriver : IDisposable
         Assert.Equal(HttpStatusCode.Unauthorized, httpRequestException.StatusCode);
     }
 
-    public async Task<string> RequestAggregatedMeasureDataAsyncXmlAsync(XmlDocument payload, string token)
+    public async Task<string> RequestAggregatedMeasureDataXmlAsync(XmlDocument payload, string token)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, "/api/RequestAggregatedMeasureMessageReceiver");
         request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
@@ -179,6 +179,8 @@ internal sealed class EdiDriver : IDisposable
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/xml");
         var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
         var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+        response.EnsureSuccessStatusCode();
 
         return responseString;
     }
