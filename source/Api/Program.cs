@@ -45,6 +45,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
@@ -56,6 +57,7 @@ namespace Energinet.DataHub.EDI.Api
         public static async Task Main()
         {
             var runtime = RuntimeEnvironment.Default;
+            IdentityModelEventSource.ShowPII = true;
             var tokenValidationParameters = await GetTokenValidationParametersAsync(runtime).ConfigureAwait(false);
             var config = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
