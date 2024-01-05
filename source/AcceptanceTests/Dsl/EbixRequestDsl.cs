@@ -86,11 +86,6 @@ internal sealed class EbixRequestDsl
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         responseBody.Should().Contain("<faultstring>B2B-900").And.Contain("<faultcode>soap-env:Client");
-
-        // Assert.Multiple(
-        //     () => Assert.Equal(HttpStatusCode.OK, response.StatusCode),
-        //     () => Assert.Contains("<faultstring>B2B-900", responseBody, StringComparison.InvariantCulture),
-        //     () => Assert.Contains("<faultcode>soap-env:Client", responseBody, StringComparison.InvariantCulture));
     }
 
     internal async Task ConfirmDequeueWithIncorrectMessageIdGivesEbixError()
