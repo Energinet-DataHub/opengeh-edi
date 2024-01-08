@@ -37,7 +37,6 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
 
         _ebix = new EbixRequestDsl(
             new EdiDriver(
-                fixture.MeteredDataResponsibleCredential.AzpToken,
                 fixture.ConnectionString,
                 fixture.EdiB2BBaseUri,
                 new AzureAuthenticationDriver(

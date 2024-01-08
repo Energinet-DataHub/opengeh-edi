@@ -28,7 +28,6 @@ public class BaseTestClass
         BaseTestFixture = fixture;
         AggregationRequest = new AggregatedMeasureDataRequestDsl(
             new EdiDriver(
-                fixture.EnergySupplierCredential.AzpToken,
                 fixture.ConnectionString,
                 fixture.EdiB2BBaseUri,
                 new AzureAuthenticationDriver(

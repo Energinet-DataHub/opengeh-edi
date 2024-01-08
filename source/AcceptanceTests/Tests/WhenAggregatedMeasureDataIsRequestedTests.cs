@@ -33,7 +33,6 @@ public sealed class WhenAggregatedMeasureDataIsRequestedTests
         ArgumentNullException.ThrowIfNull(fixture);
         _aggregationRequest = new AggregatedMeasureDataRequestDsl(
             new EdiDriver(
-                fixture.MeteredDataResponsibleCredential.AzpToken,
                 fixture.ConnectionString,
                 fixture.EdiB2BBaseUri,
                 new AzureAuthenticationDriver(

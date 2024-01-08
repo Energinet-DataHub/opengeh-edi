@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Diagnostics;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
-using Energinet.DataHub.EDI.AcceptanceTests.Tests;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 [IntegrationTest]
@@ -34,7 +32,6 @@ public sealed class WhenNewB2BActorIsCreatedTests
         _actorDsl = new ActorDsl(
             new MarketParticipantDriver(fixture.EventPublisher),
             new EdiDriver(
-                fixture.MeteredDataResponsibleCredential.AzpToken,
                 fixture.ConnectionString,
                 fixture.EdiB2BBaseUri,
                 new AzureAuthenticationDriver(fixture.AzureEntraTenantId, fixture.AzureEntraBackendAppId)));

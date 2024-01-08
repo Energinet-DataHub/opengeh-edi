@@ -34,7 +34,6 @@ public sealed class WhenAggregationResultIsPublishedTests
 
         _aggregations = new AggregationResultDsl(
             new EdiDriver(
-                fixture.MeteredDataResponsibleCredential.AzpToken,
                 fixture.ConnectionString,
                 fixture.EdiB2BBaseUri,
                 new AzureAuthenticationDriver(

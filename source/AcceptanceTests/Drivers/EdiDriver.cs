@@ -19,7 +19,6 @@ using System.Text;
 using System.Text.Json;
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
-using Energinet.DataHub.EDI.AcceptanceTests.Factories;
 using Energinet.DataHub.EDI.AcceptanceTests.TestData;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Microsoft.Data.SqlClient;
@@ -28,18 +27,15 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 internal sealed class EdiDriver : IDisposable
 {
-    private readonly string _azpToken;
     private readonly string _connectionString;
     private readonly AzureAuthenticationDriver _authenticationDriver;
     private readonly HttpClient _httpClient;
 
     public EdiDriver(
-        string azpToken,
         string connectionString,
         Uri ediB2BBaseUri,
         AzureAuthenticationDriver authenticationDriver)
     {
-        _azpToken = azpToken;
         _connectionString = connectionString;
         _httpClient = new HttpClient();
         _httpClient.BaseAddress = ediB2BBaseUri;
@@ -67,11 +63,7 @@ internal sealed class EdiDriver : IDisposable
         var token = await _authenticationDriver
             .GetB2BTokenAsync(actorCredential.ClientId, actorCredential.ClientSecret)
             .ConfigureAwait(false);
-        return await PeekMessageAsync(token).ConfigureAwait(false);
-    }
 
-    public async Task<Stream> PeekMessageAsync(string token)
-    {
         var stopWatch = Stopwatch.StartNew();
         while (stopWatch.ElapsedMilliseconds < 60000)
         {

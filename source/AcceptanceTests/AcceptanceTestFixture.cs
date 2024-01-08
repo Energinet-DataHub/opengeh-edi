@@ -19,20 +19,16 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Microsoft.Extensions.Configuration;
 using Nito.AsyncEx;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
+namespace Energinet.DataHub.EDI.AcceptanceTests;
 
 // ReSharper disable once ClassNeverInstantiated.Global -- Instantiated by XUnit
 public class AcceptanceTestFixture : IAsyncLifetime
 {
     internal const string ActorNumber = "5790000610976"; // Corresponds to the "Mosaic 03" actor in the UI.
     internal const string ActorGridArea = "543";
-    internal const string ActorRole = "metereddataresponsible";
     private const EicFunction ActorEicFunction = EicFunction.MeteredDataResponsible;
 
     private readonly string _ebixCertificateThumbprint;
-    private readonly Uri _azureEntraB2CTenantUrl;
-    private readonly string _azureEntraFrontendAppId;
-    private readonly string _azureEntraBackendBffScope;
     private readonly string _b2cUsername;
     private readonly string _b2cPassword;
 
@@ -74,9 +70,6 @@ public class AcceptanceTestFixture : IAsyncLifetime
         _ebixCertificateThumbprint = root.GetValue<string>("EBIX_CERTIFICATE_THUMBPRINT") ?? "39D64F012A19C6F6FDFB0EA91D417873599D3325";
         EbixCertificatePassword = root.GetValue<string>("EBIX_CERTIFICATE_PASSWORD") ?? throw new InvalidOperationException("EBIX_CERTIFICATE_PASSWORD is not set in configuration");
         EdiB2BBaseUri = new Uri(root.GetValue<string>("func-edi-api-base-url") ?? throw new InvalidOperationException("func-edi-api-base-url secret is not set in configuration"));
-        _azureEntraB2CTenantUrl = new Uri(root.GetValue<string>("AZURE_B2C_TENANT_URL") ?? "https://devdatahubb2c.b2clogin.com/tfp/devdatahubb2c.onmicrosoft.com/B2C_1_ROPC_Auth/oauth2/v2.0/token");
-        _azureEntraFrontendAppId = root.GetValue<string>("AZURE_ENTRA_FRONTEND_APP_ID") ?? "bf76fc24-cfec-498f-8979-ab4123792472";
-        _azureEntraBackendBffScope = root.GetValue<string>("AZURE_ENTRA_BACKEND_BFF_SCOPE") ?? "https://devDataHubB2C.onmicrosoft.com/backend-bff/api";
         MarketParticipantUri = new Uri(root.GetValue<string>("MARKET_PARTICIPANT_URI") ?? "https://app-webapi-markpart-u-001.azurewebsites.net");
         B2CApiUri = new Uri(root.GetValue<string>("B2C_API_URI") ?? "https://app-b2cwebapi-edi-u-001.azurewebsites.net");
         // _b2cUsername = root.GetValue<string>("B2C_USERNAME") ?? throw new InvalidOperationException("B2C_USERNAME is not set in configuration");
