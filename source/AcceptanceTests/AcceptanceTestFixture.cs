@@ -28,7 +28,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
 {
     internal const string EbixActorNumberMeteredDataResponsible = "5790000610976"; // Corresponds to the "Mosaic 03" actor in the UI.
     internal const string EbixActorGridArea = "543";
-    internal const string ActorNumberMeteredDataResponsible = "5790000701414";
+    internal const string CimActorNumber = "5790000701414";
     internal const string ActorGridArea = "544";
     private const EicFunction ActorEicFunction = EicFunction.MeteredDataResponsible;
 
@@ -112,16 +112,18 @@ public class AcceptanceTestFixture : IAsyncLifetime
     public async Task InitializeAsync()
     {
         var ebixActorActivated = ActorFactory.CreateActorActivated(EbixActorNumberMeteredDataResponsible, string.Empty);
-        var actorActivated = ActorFactory.CreateActorActivated(ActorNumberMeteredDataResponsible, MeteredDataResponsibleCredential.AzpToken);
+        var meteredDataResponsibleActivated = ActorFactory.CreateActorActivated(CimActorNumber, MeteredDataResponsibleCredential.AzpToken);
+        var energySupplierActivated = ActorFactory.CreateActorActivated(CimActorNumber, EnergySupplierCredential.AzpToken);
         var actorCertificateAssigned = ActorCertificateFactory.CreateActorCertificateAssigned(EbixActorNumberMeteredDataResponsible, ActorEicFunction, _ebixCertificateThumbprint);
         var ebixGridAreaOwnerAssigned = GridAreaFactory.AssignedGridAreaOwner(EbixActorNumberMeteredDataResponsible, EbixActorGridArea, ActorEicFunction);
-        var gridAreaOwnerAssigned = GridAreaFactory.AssignedGridAreaOwner(ActorNumberMeteredDataResponsible, ActorGridArea, ActorEicFunction);
+        var gridAreaOwnerAssigned = GridAreaFactory.AssignedGridAreaOwner(CimActorNumber, ActorGridArea, ActorEicFunction);
 
         var initializeTasks = new List<Task>
         {
 #if !DEBUG // Locally we cannot access the Azure Service Bus, so this will fail
             EventPublisher.PublishAsync(ActorActivated.EventName, ebixActorActivated.ToByteArray()),
-            EventPublisher.PublishAsync(ActorActivated.EventName, actorActivated.ToByteArray()),
+            EventPublisher.PublishAsync(ActorActivated.EventName, meteredDataResponsibleActivated.ToByteArray()),
+            EventPublisher.PublishAsync(ActorActivated.EventName, energySupplierActivated.ToByteArray()),
             EventPublisher.PublishAsync(ActorCertificateCredentialsAssigned.EventName, actorCertificateAssigned.ToByteArray()),
             EventPublisher.PublishAsync(GridAreaOwnershipAssigned.EventName, ebixGridAreaOwnerAssigned.ToByteArray()),
             EventPublisher.PublishAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnerAssigned.ToByteArray()),
