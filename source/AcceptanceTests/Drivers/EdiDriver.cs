@@ -188,8 +188,6 @@ internal sealed class EdiDriver : IDisposable
         var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
         var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-        response.EnsureSuccessStatusCode();
-
         return responseString;
     }
 
