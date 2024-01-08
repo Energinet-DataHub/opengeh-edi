@@ -49,7 +49,6 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
         var azpTokenClaim = claimsPrincipal.FindFirst(claim => claim.Type.Equals(ClaimsMap.UserId, StringComparison.OrdinalIgnoreCase));
         if (!string.IsNullOrWhiteSpace(azpTokenClaim?.Value))
         {
-            _logger.LogInformation("azp claim found. Falling back to default authentication. {azpTokenClaim}", azpTokenClaim.Value);
             return await base.AuthenticateAsync(claimsPrincipal, cancellationToken).ConfigureAwait(false);
         }
 
