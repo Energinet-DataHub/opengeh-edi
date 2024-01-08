@@ -48,6 +48,7 @@ using IncomingMessages.Infrastructure.Configuration.DataAccess;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Xunit;
 using IIntegrationEventHandler = Energinet.DataHub.Core.Messaging.Communication.Subscriber.IIntegrationEventHandler;
 
@@ -183,7 +184,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             _services.AddAuthentication(
                 sp => new MarketActorAuthenticator(
                     sp.GetRequiredService<IMasterDataClient>(),
-                    sp.GetRequiredService<AuthenticatedActor>()));
+                    sp.GetRequiredService<AuthenticatedActor>(),
+                    sp.GetRequiredService<ILogger<MarketActorAuthenticator>>()));
 
             CompositionRoot.Initialize(_services)
                 .AddRemoteBusinessService<DummyRequest, DummyReply>(

@@ -109,12 +109,14 @@ namespace Energinet.DataHub.EDI.Api
                             return new DevMarketActorAuthenticator(
                                 sp.GetRequiredService<IMasterDataClient>(),
                                 sp.GetRequiredService<IDatabaseConnectionFactory>(),
-                                sp.GetRequiredService<AuthenticatedActor>());
+                                sp.GetRequiredService<AuthenticatedActor>(),
+                                sp.GetRequiredService<ILogger<DevMarketActorAuthenticator>>());
                         }
 
                         return new MarketActorAuthenticator(
                             sp.GetRequiredService<IMasterDataClient>(),
-                            sp.GetRequiredService<AuthenticatedActor>());
+                            sp.GetRequiredService<AuthenticatedActor>(),
+                            sp.GetRequiredService<ILogger<MarketActorAuthenticator>>());
                     });
 
                     services.AddScopedSqlDbContext<B2BContext>(configuration);
