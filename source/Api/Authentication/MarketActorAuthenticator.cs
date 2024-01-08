@@ -45,11 +45,12 @@ namespace Energinet.DataHub.EDI.Api.Authentication
         public virtual async Task<bool> AuthenticateAsync(ClaimsPrincipal claimsPrincipal, CancellationToken cancellationToken)
         {
             if (claimsPrincipal == null) throw new ArgumentNullException(nameof(claimsPrincipal));
-
+            _logger.LogInformation("claimsPrincipal: {ClaimsPrincipal}", string.Join(",", claimsPrincipal.Claims));
             var rolesFromClaims = GetClaimValuesFrom(claimsPrincipal, ClaimTypes.Role);
             var role = ParseRole(rolesFromClaims);
 
             var userIdFromAzp = GetClaimValueFrom(claimsPrincipal, ClaimsMap.UserId);
+            _logger.LogInformation("azp claim value: {Azp}", userIdFromAzp ?? "null");
             var actorNumber = !string.IsNullOrEmpty(userIdFromAzp)
                 ? await _masterDataClient.GetActorNumberByExternalIdAsync(userIdFromAzp, cancellationToken)
                     .ConfigureAwait(false)
@@ -62,9 +63,7 @@ namespace Energinet.DataHub.EDI.Api.Authentication
         {
             if (actorNumber is null)
             {
-                _logger.LogError(
-                    @"Could not authenticate market actor identity.
-                             This is due to missing actorNumber for the Azp token");
+                _logger.LogError("Could not authenticate market actor identity. This is due to missing actorNumber for the Azp token");
                 return false;
             }
 
