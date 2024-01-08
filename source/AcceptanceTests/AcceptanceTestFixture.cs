@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration; // DO NOT REMOVE THIS! use in debug mode
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Factories;
 using Energinet.DataHub.EDI.AcceptanceTests.TestData;
@@ -60,7 +61,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
         var meteredDataResponsibleAzpToken = root.GetValue<string>("METERED_DATA_RESPONSIBLE_AZP_TOKEN") ?? throw new InvalidOperationException("METERED_DATA_RESPONSIBLE_AZP_TOKEN is not set in configuration");
         MeteredDataResponsibleCredential = new ActorCredential(azureEntraClientId, meteredDataResponsibleSecret, meteredDataResponsibleAzpToken);
 
-        var energySupplierSecret = root.GetValue<string>("ENERGY_SUPPLIER_CLIENT_SECRET") ?? throw new InvalidOperationException("ENERGY_SUPPLIER_CLIENT_SECRET is not set in configuration");
+        var energySupplierSecret = root.GetValue<string>("ENERGY_SUPPLIER_CLIENT_SECRET") ?? throw new InvalidOperationException("AZURE_ENTRA_CLIENT_SECRET is not set in configuration");
         var energySupplierAzpToken = root.GetValue<string>("ENERGY_SUPPLIER_AZP_TOKEN") ?? throw new InvalidOperationException("ENERGY_SUPPLIER_AZP_TOKEN is not set in configuration");
         EnergySupplierCredential = new ActorCredential(azureEntraClientId, energySupplierSecret, energySupplierAzpToken);
 
