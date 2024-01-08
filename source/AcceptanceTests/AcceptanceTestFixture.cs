@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Factories;
 using Energinet.DataHub.EDI.AcceptanceTests.TestData;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
+using Google.Protobuf; // DO NOT REMOVE THIS! use in debug mode
 using Microsoft.Extensions.Configuration;
 using Nito.AsyncEx;
 
