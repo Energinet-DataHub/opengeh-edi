@@ -60,7 +60,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
         var meteredDataResponsibleAzpToken = root.GetValue<string>("METERED_DATA_RESPONSIBLE_AZP_TOKEN") ?? throw new InvalidOperationException("METERED_DATA_RESPONSIBLE_AZP_TOKEN is not set in configuration");
         MeteredDataResponsibleCredential = new ActorCredential(azureEntraClientId, meteredDataResponsibleSecret, meteredDataResponsibleAzpToken);
 
-        var energySupplierSecret = root.GetValue<string>("AZURE_ENTRA_CLIENT_SECRET") ?? throw new InvalidOperationException("AZURE_ENTRA_CLIENT_SECRET is not set in configuration");
+        var energySupplierSecret = root.GetValue<string>("ENERGY_SUPPLIER_CLIENT_SECRET") ?? throw new InvalidOperationException("ENERGY_SUPPLIER_CLIENT_SECRET is not set in configuration");
         var energySupplierAzpToken = root.GetValue<string>("ENERGY_SUPPLIER_AZP_TOKEN") ?? throw new InvalidOperationException("ENERGY_SUPPLIER_AZP_TOKEN is not set in configuration");
         EnergySupplierCredential = new ActorCredential(azureEntraClientId, energySupplierSecret, energySupplierAzpToken);
 
