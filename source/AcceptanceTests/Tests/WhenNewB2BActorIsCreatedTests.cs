@@ -31,7 +31,7 @@ public sealed class WhenNewB2BActorIsCreatedTests
     {
         ArgumentNullException.ThrowIfNull(fixture);
 
-        _actorDsl = new ActorDsl(new MarketParticipantDriver(fixture.EventPublisher), new EdiDriver(fixture.AzpToken, fixture.ConnectionString, fixture.EdiB2BBaseUri));
+        _actorDsl = new ActorDsl(new MarketParticipantDriver(fixture.EventPublisher), new EdiDriver(fixture.MeteredDataResponsibleAzpToken, fixture.ConnectionString, fixture.EdiB2BBaseUri));
     }
 
     [Fact]
