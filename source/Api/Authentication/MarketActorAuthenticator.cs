@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.Api.Authentication
 {
@@ -29,11 +30,16 @@ namespace Energinet.DataHub.EDI.Api.Authentication
     {
         private readonly IMasterDataClient _masterDataClient;
         private readonly AuthenticatedActor _authenticatedActor;
+        private readonly ILogger<MarketActorAuthenticator> _logger;
 
-        public MarketActorAuthenticator(IMasterDataClient masterDataClient, AuthenticatedActor authenticatedActor)
+        public MarketActorAuthenticator(
+            IMasterDataClient masterDataClient,
+            AuthenticatedActor authenticatedActor,
+            ILogger<MarketActorAuthenticator> logger)
         {
             _masterDataClient = masterDataClient;
             _authenticatedActor = authenticatedActor;
+            _logger = logger;
         }
 
         public virtual async Task<bool> AuthenticateAsync(ClaimsPrincipal claimsPrincipal, CancellationToken cancellationToken)
@@ -54,11 +60,22 @@ namespace Energinet.DataHub.EDI.Api.Authentication
 
         public bool Authenticate(ActorNumber? actorNumber, MarketRole? marketRole)
         {
-            if (marketRole is null)
-                return false;
-
             if (actorNumber is null)
+            {
+                _logger.LogError(
+                    @"Could not authenticate market actor identity.
+                             This is due to missing actorNumber for the Azp token");
                 return false;
+            }
+
+            if (marketRole is null)
+            {
+                _logger.LogError(
+                    @"Could not authenticate market actor identity.
+                    This is due to missing marketRole in the http request data claims for ActorNumber: {ActorNumber}.",
+                    actorNumber);
+                return false;
+            }
 
             _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, marketRole: marketRole));
             return true;

@@ -56,6 +56,7 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication
             if (!authenticated)
             {
                 _logger.LogError("Could not authenticate market actor identity. This is due to the http request data does not hold the required claims, there are multiple roles in the claims, or in case of ebIX the required certificate.");
+                _logger.LogInformation("Authentication method used: {AuthenticationMethod}", authenticationMethod.GetType().Name);
                 context.RespondWithUnauthorized(httpRequestData);
                 return;
             }

@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.Api.Authentication;
 
@@ -32,8 +33,9 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
     public DevMarketActorAuthenticator(
         IMasterDataClient masterDataClient,
         IDatabaseConnectionFactory connectionFactory,
-        AuthenticatedActor authenticatedActor)
-        : base(masterDataClient, authenticatedActor)
+        AuthenticatedActor authenticatedActor,
+        ILogger<DevMarketActorAuthenticator> logger)
+        : base(masterDataClient, authenticatedActor, logger)
     {
         _connectionFactory = connectionFactory;
     }
