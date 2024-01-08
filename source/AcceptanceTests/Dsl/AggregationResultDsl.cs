@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+using Energinet.DataHub.EDI.AcceptanceTests.TestData;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
@@ -34,18 +35,18 @@ internal sealed class AggregationResultDsl
         return _wholesale.PublishAggregationResultAsync(gridAreaCode);
     }
 
-    internal Task ConfirmResultIsAvailableFor(string actorNumber, string actorRole)
+    internal Task ConfirmResultIsAvailableFor(ActorCredential actorCredential)
     {
-        return _edi.PeekMessageAsync(actorNumber, new[] { actorRole, });
+        return _edi.PeekMessageAsync(actorCredential);
     }
 
-    internal Task ConfirmResultIsAvailableForToken(string token)
+    internal Task ConfirmResultIsAvailableForToken(ActorCredential actorCredential)
     {
-        return _edi.PeekMessageAsync(token);
+        return _edi.PeekMessageAsync(actorCredential);
     }
 
-    internal async Task EmptyQueueForActor(string actorNumber, string actorRole)
+    internal async Task EmptyQueueForActor(ActorCredential actorCredential)
     {
-        await _edi.EmptyQueueAsync(actorNumber, new[] { actorRole, }).ConfigureAwait(false);
+        await _edi.EmptyQueueAsync(actorCredential).ConfigureAwait(false);
     }
 }

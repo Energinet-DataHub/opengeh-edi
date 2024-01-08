@@ -27,14 +27,22 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
 public sealed class WhenEbixPeekRequestIsReceivedTests
 {
+    private readonly AcceptanceTestFixture _fixture;
     private readonly EbixRequestDsl _ebix;
 
     public WhenEbixPeekRequestIsReceivedTests(AcceptanceTestFixture fixture)
     {
+        _fixture = fixture;
         ArgumentNullException.ThrowIfNull(fixture);
 
         _ebix = new EbixRequestDsl(
-            new EdiDriver(fixture.MeteredDataResponsibleAzpToken, fixture.ConnectionString, fixture.EdiB2BBaseUri),
+            new EdiDriver(
+                fixture.MeteredDataResponsibleCredential.AzpToken,
+                fixture.ConnectionString,
+                fixture.EdiB2BBaseUri,
+                new AzureAuthenticationDriver(
+                    fixture.AzureEntraTenantId,
+                    fixture.AzureEntraBackendAppId)),
             new WholesaleDriver(fixture.EventPublisher),
             new EbixDriver(new Uri(fixture.ApiManagementUri, "/ebix"), fixture.EbixCertificatePassword));
     }
@@ -42,7 +50,7 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
     [Fact]
     public async Task Actor_can_peek_and_dequeue_aggregation_result_in_ebIX_format()
     {
-        await _ebix.EmptyQueueForActor(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole);
+        await _ebix.EmptyQueueForActor(_fixture.MeteredDataResponsibleCredential);
         await _ebix.PublishAggregationResultFor(AcceptanceTestFixture.ActorGridArea);
 
         await _ebix.ConfirmEbixResultIsAvailableForActor();

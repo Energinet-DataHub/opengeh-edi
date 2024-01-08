@@ -17,6 +17,7 @@ using System.ServiceModel;
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
+using Energinet.DataHub.EDI.AcceptanceTests.TestData;
 using FluentAssertions;
 using FluentAssertions.Execution;
 
@@ -37,9 +38,9 @@ internal sealed class EbixRequestDsl
 
     #pragma warning disable VSTHRD200
 
-    internal async Task EmptyQueueForActor(string actorNumber, string actorRole)
+    internal async Task EmptyQueueForActor(ActorCredential actorCredential)
     {
-        await _edi.EmptyQueueAsync(actorNumber, new[] { actorRole, }).ConfigureAwait(false);
+        await _edi.EmptyQueueAsync(actorCredential).ConfigureAwait(false);
     }
 
     internal Task PublishAggregationResultFor(string gridArea)

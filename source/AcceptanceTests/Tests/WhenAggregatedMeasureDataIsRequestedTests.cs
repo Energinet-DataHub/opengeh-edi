@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Diagnostics;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
-using Energinet.DataHub.EDI.AcceptanceTests.Tests;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 
@@ -26,32 +24,41 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
 public sealed class WhenAggregatedMeasureDataIsRequestedTests
 {
+    private readonly AcceptanceTestFixture _fixture;
     private readonly AggregatedMeasureDataRequestDsl _aggregationRequest;
 
     public WhenAggregatedMeasureDataIsRequestedTests(AcceptanceTestFixture fixture)
     {
+        _fixture = fixture;
         ArgumentNullException.ThrowIfNull(fixture);
-        _aggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(fixture.MeteredDataResponsibleAzpToken, fixture.ConnectionString, fixture.EdiB2BBaseUri));
+        _aggregationRequest = new AggregatedMeasureDataRequestDsl(
+            new EdiDriver(
+                fixture.MeteredDataResponsibleCredential.AzpToken,
+                fixture.ConnectionString,
+                fixture.EdiB2BBaseUri,
+                new AzureAuthenticationDriver(
+                    fixture.AzureEntraTenantId,
+                    fixture.AzureEntraBackendAppId)));
     }
 
     [Fact]
     public async Task Actor_can_peek_and_dequeue_message_after_aggregated_measure_data_has_been_requested()
     {
-        await _aggregationRequest.EmptyQueueForActor(actorNumber: AcceptanceTestFixture.ActorNumber, actorRole: AcceptanceTestFixture.ActorRole);
+        await _aggregationRequest.EmptyQueueForActor(_fixture.MeteredDataResponsibleCredential);
 
-        await _aggregationRequest.AggregatedMeasureDataFor(actorNumber: AcceptanceTestFixture.ActorNumber, actorRole: AcceptanceTestFixture.ActorRole);
+        await _aggregationRequest.AggregatedMeasureDataFor(_fixture.MeteredDataResponsibleCredential);
 
-        await _aggregationRequest.ConfirmAcceptedResultIsAvailableFor(actorNumber: AcceptanceTestFixture.ActorNumber, actorRole: AcceptanceTestFixture.ActorRole);
+        await _aggregationRequest.ConfirmAcceptedResultIsAvailableFor(_fixture.MeteredDataResponsibleCredential);
     }
 
     [Fact]
     public async Task Actor_can_peek_and_dequeue_rejected_message_after_aggregated_measure_data_has_been_requested()
     {
-        await _aggregationRequest.EmptyQueueForActor(actorNumber: AcceptanceTestFixture.ActorNumber, actorRole: AcceptanceTestFixture.ActorRole);
+        await _aggregationRequest.EmptyQueueForActor(_fixture.MeteredDataResponsibleCredential);
 
-        await _aggregationRequest.RejectedAggregatedMeasureDataFor(actorNumber: AcceptanceTestFixture.ActorNumber, actorRole: AcceptanceTestFixture.ActorRole);
+        await _aggregationRequest.RejectedAggregatedMeasureDataFor(_fixture.MeteredDataResponsibleCredential);
 
-        await _aggregationRequest.ConfirmRejectedResultIsAvailableFor(actorNumber: AcceptanceTestFixture.ActorNumber, actorRole: AcceptanceTestFixture.ActorRole);
+        await _aggregationRequest.ConfirmRejectedResultIsAvailableFor(_fixture.MeteredDataResponsibleCredential);
     }
 
     [Fact]

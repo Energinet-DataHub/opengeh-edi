@@ -104,14 +104,6 @@ namespace Energinet.DataHub.EDI.Api
 
                     services.AddAuthentication(sp =>
                     {
-                        if (runtime.IsRunningLocally() || runtime.ALLOW_TEST_TOKENS)
-                        {
-                            return new DevMarketActorAuthenticator(
-                                sp.GetRequiredService<IMasterDataClient>(),
-                                sp.GetRequiredService<IDatabaseConnectionFactory>(),
-                                sp.GetRequiredService<AuthenticatedActor>());
-                        }
-
                         return new MarketActorAuthenticator(
                             sp.GetRequiredService<IMasterDataClient>(),
                             sp.GetRequiredService<AuthenticatedActor>());
@@ -195,13 +187,6 @@ namespace Energinet.DataHub.EDI.Api
 
         private static async Task<TokenValidationParameters> GetTokenValidationParametersAsync(RuntimeEnvironment runtime)
         {
-            if (runtime.IsRunningLocally() || runtime.ALLOW_TEST_TOKENS)
-            {
-#pragma warning disable CA5404 // Do not disable token validation checks
-                return DevelopmentTokenValidationParameters();
-#pragma warning restore CA5404 // Do not disable token validation checks
-            }
-
             var tenantId = Environment.GetEnvironmentVariable("B2C_TENANT_ID") ?? throw new InvalidOperationException("B2C tenant id not found.");
             var audience = Environment.GetEnvironmentVariable("BACKEND_SERVICE_APP_ID") ?? throw new InvalidOperationException("Backend service app id not found.");
             var metaDataAddress = $"https://login.microsoftonline.com/{tenantId}/v2.0/.well-known/openid-configuration";

@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Diagnostics;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
-using Energinet.DataHub.EDI.AcceptanceTests.Tests;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 
@@ -26,25 +24,33 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
 public sealed class WhenAggregationResultIsPublishedTests
 {
+    private readonly AcceptanceTestFixture _fixture;
     private readonly AggregationResultDsl _aggregations;
 
     public WhenAggregationResultIsPublishedTests(AcceptanceTestFixture fixture)
     {
+        _fixture = fixture;
         ArgumentNullException.ThrowIfNull(fixture);
 
         _aggregations = new AggregationResultDsl(
-            new EdiDriver(fixture.MeteredDataResponsibleAzpToken, fixture.ConnectionString, fixture.EdiB2BBaseUri),
+            new EdiDriver(
+                fixture.MeteredDataResponsibleCredential.AzpToken,
+                fixture.ConnectionString,
+                fixture.EdiB2BBaseUri,
+                new AzureAuthenticationDriver(
+                    fixture.AzureEntraTenantId,
+                    fixture.AzureEntraBackendAppId)),
             new WholesaleDriver(fixture.EventPublisher));
     }
 
     [Fact]
     public async Task Actor_can_peek_and_dequeue_aggregation_result()
     {
-        await _aggregations.EmptyQueueForActor(actorNumber: AcceptanceTestFixture.ActorNumber, actorRole: AcceptanceTestFixture.ActorRole);
+        await _aggregations.EmptyQueueForActor(_fixture.MeteredDataResponsibleCredential);
 
         await _aggregations.PublishResultFor(gridAreaCode: AcceptanceTestFixture.ActorGridArea);
 
         await _aggregations
-            .ConfirmResultIsAvailableFor(actorNumber: AcceptanceTestFixture.ActorNumber, actorRole: AcceptanceTestFixture.ActorRole);
+            .ConfirmResultIsAvailableFor(_fixture.MeteredDataResponsibleCredential);
     }
 }

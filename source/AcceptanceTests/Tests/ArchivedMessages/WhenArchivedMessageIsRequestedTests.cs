@@ -15,12 +15,9 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
-using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 using Energinet.DataHub.EDI.AcceptanceTests.Factories;
-using Energinet.DataHub.EDI.AcceptanceTests.Responses.json;
 using Energinet.DataHub.EDI.AcceptanceTests.TestData;
-using Newtonsoft.Json;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.ArchivedMessages;
@@ -44,7 +41,13 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
                 fixture.AzureEntraBackendAppId),
             new EdiB2CDriver(fixture.B2CAuthorizedHttpClient));
         _aggregationResult = new AggregationResultDsl(
-            new EdiDriver(fixture.MeteredDataResponsibleAzpToken, fixture.ConnectionString, fixture.EdiB2BBaseUri),
+            new EdiDriver(
+                fixture.MeteredDataResponsibleCredential.AzpToken,
+                fixture.ConnectionString,
+                fixture.EdiB2BBaseUri,
+                new AzureAuthenticationDriver(
+                    fixture.AzureEntraTenantId,
+                    fixture.AzureEntraBackendAppId)),
             new WholesaleDriver(fixture.EventPublisher));
     }
 
@@ -54,7 +57,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload();
         var messageId = payload?.GetElementsByTagName("cim:mRID")[0]?.InnerText;
 
-        if (payload != null) await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+        if (payload != null) await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, _fixture.EnergySupplierCredential);
 
         var response = await _archivedMessage.RequestArchivedMessageSearchAsync(
             new Uri(_fixture.B2CApiUri, "ArchivedMessageSearch"),
@@ -65,7 +68,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
                 null!,
                 null!));
 
-        await _aggregationResult.ConfirmResultIsAvailableForToken(Token);
+        await _aggregationResult.ConfirmResultIsAvailableForToken(_fixture.EnergySupplierCredential);
 
         Assert.NotNull(response[0].Id);
     }
@@ -77,9 +80,9 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 
         var messageId = payload?.GetElementsByTagName("cim:mRID")[0]?.InnerText;
 
-        if (payload != null) await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+        if (payload != null) await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, _fixture.EnergySupplierCredential);
 
-        await _aggregationResult.ConfirmResultIsAvailableForToken(Token);
+        await _aggregationResult.ConfirmResultIsAvailableForToken(_fixture.EnergySupplierCredential);
 
         var archivedRequestResponse = await _archivedMessage.RequestArchivedMessageSearchAsync(
             new Uri(_fixture.B2CApiUri, "ArchivedMessageSearch"),
@@ -100,7 +103,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload();
 
-        await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+        await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, _fixture.EnergySupplierCredential);
 
         var messageId = payload?.GetElementsByTagName("cim:mRID")[0]?.InnerText;
 
@@ -115,7 +118,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 
         var archivedMessage = response[0];
 
-        await _aggregationResult.ConfirmResultIsAvailableForToken(Token);
+        await _aggregationResult.ConfirmResultIsAvailableForToken(_fixture.EnergySupplierCredential);
 
         Assert.NotNull(archivedMessage.Id);
         Assert.NotNull(archivedMessage.MessageId);

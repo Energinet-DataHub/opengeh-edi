@@ -24,17 +24,20 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.B2BErrors;
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
 public class WhenTransactionIdAndMessageIdIsNotCorrectTests : BaseTestClass
 {
+    private readonly AcceptanceTestFixture _fixture;
+
     public WhenTransactionIdAndMessageIdIsNotCorrectTests(ITestOutputHelper output, AcceptanceTestFixture fixture)
         : base(output, fixture)
     {
+        _fixture = fixture;
     }
 
     [Fact]
     public async Task Message_id_is_not_unique()
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.MessageIdIsNotUnique());
-        await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
-        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+        await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, _fixture.EnergySupplierCredential);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, _fixture.EnergySupplierCredential);
 
         Output.WriteLine(response);
 
@@ -47,8 +50,8 @@ public class WhenTransactionIdAndMessageIdIsNotCorrectTests : BaseTestClass
         var payload =
             RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.TransactionIdIsNotUnique());
 
-        await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
-        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+        await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, _fixture.EnergySupplierCredential);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, _fixture.EnergySupplierCredential);
 
         Output.WriteLine(response);
 
@@ -62,7 +65,7 @@ public class WhenTransactionIdAndMessageIdIsNotCorrectTests : BaseTestClass
             RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData
                 .EmptyMessageId());
 
-        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, _fixture.EnergySupplierCredential);
 
         Output.WriteLine(response);
 

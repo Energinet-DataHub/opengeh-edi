@@ -20,6 +20,7 @@ using System.Text.Json;
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
 using Energinet.DataHub.EDI.AcceptanceTests.Factories;
+using Energinet.DataHub.EDI.AcceptanceTests.TestData;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Microsoft.Data.SqlClient;
 
@@ -29,14 +30,20 @@ internal sealed class EdiDriver : IDisposable
 {
     private readonly string _azpToken;
     private readonly string _connectionString;
+    private readonly AzureAuthenticationDriver _authenticationDriver;
     private readonly HttpClient _httpClient;
 
-    public EdiDriver(string azpToken, string connectionString, Uri ediB2BBaseUri)
+    public EdiDriver(
+        string azpToken,
+        string connectionString,
+        Uri ediB2BBaseUri,
+        AzureAuthenticationDriver authenticationDriver)
     {
         _azpToken = azpToken;
         _connectionString = connectionString;
         _httpClient = new HttpClient();
         _httpClient.BaseAddress = ediB2BBaseUri;
+        _authenticationDriver = authenticationDriver;
     }
 
     public void Dispose()
@@ -44,18 +51,22 @@ internal sealed class EdiDriver : IDisposable
         _httpClient.Dispose();
     }
 
-    public async Task<Stream> RequestAggregatedMeasureDataAsync(string actorNumber, string[] marketRoles, bool asyncError = false, string? overrideToken = null)
+    public async Task<Stream> RequestAggregatedMeasureDataAsync(ActorCredential actorCredential, bool asyncError = false)
     {
-        var token = overrideToken ?? TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
+        var token = await _authenticationDriver
+            .GetB2BTokenAsync(actorCredential.ClientId, actorCredential.ClientSecret)
+            .ConfigureAwait(false);
         var response = await RequestAggregatedMeasureDataAsync(token, asyncError).ConfigureAwait(false);
 
         var document = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
         return document;
     }
 
-    public async Task<Stream> PeekMessageAsync(string actorNumber, string[] marketRoles)
+    public async Task<Stream> PeekMessageAsync(ActorCredential actorCredential)
     {
-        var token = TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
+        var token = await _authenticationDriver
+            .GetB2BTokenAsync(actorCredential.ClientId, actorCredential.ClientSecret)
+            .ConfigureAwait(false);
         return await PeekMessageAsync(token).ConfigureAwait(false);
     }
 
@@ -84,22 +95,24 @@ internal sealed class EdiDriver : IDisposable
         throw new TimeoutException("Unable to retrieve peek result within time limit");
     }
 
-    public async Task EmptyQueueAsync(string actorNumber, string[] marketRoles, string? tokenOverride = null)
+    public async Task EmptyQueueAsync(ActorCredential actorCredential)
     {
-        var token = tokenOverride ?? TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
+        var token = await _authenticationDriver
+            .GetB2BTokenAsync(actorCredential.ClientId, actorCredential.ClientSecret)
+            .ConfigureAwait(false);
 
         var peekResponse = await PeekAsync(token)
                 .ConfigureAwait(false);
         if (peekResponse.StatusCode == HttpStatusCode.OK)
         {
             await DequeueAsync(token, GetMessageId(peekResponse)).ConfigureAwait(false);
-            await EmptyQueueAsync(actorNumber, marketRoles, tokenOverride).ConfigureAwait(false);
+            await EmptyQueueAsync(actorCredential).ConfigureAwait(false);
         }
     }
 
-    public async Task PeekAcceptedAggregationMessageAsync(string actorNumber, string[] roles)
+    public async Task PeekAcceptedAggregationMessageAsync(ActorCredential actorCredential)
     {
-        var documentStream = await PeekMessageAsync(actorNumber, roles).ConfigureAwait(false);
+        var documentStream = await PeekMessageAsync(actorCredential).ConfigureAwait(false);
         var jsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(documentStream).ConfigureAwait(false);
 
         var documentIsOfExpectedType = jsonElement.TryGetProperty(
@@ -113,9 +126,9 @@ internal sealed class EdiDriver : IDisposable
             .GetString());
     }
 
-    public async Task PeekRejectedMessageAsync(string actorNumber, string[] roles)
+    public async Task PeekRejectedMessageAsync(ActorCredential actorCredential)
     {
-        var documentStream = await PeekMessageAsync(actorNumber, roles).ConfigureAwait(false);
+        var documentStream = await PeekMessageAsync(actorCredential).ConfigureAwait(false);
         var jsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(documentStream).ConfigureAwait(false);
 
         var documentIsOfExpectedType = jsonElement.TryGetProperty(
@@ -146,7 +159,7 @@ internal sealed class EdiDriver : IDisposable
 
     public async Task RequestAggregatedMeasureDataWithoutTokenAsync()
     {
-        var act = () => RequestAggregatedMeasureDataAsync(null, false);
+        var act = () => RequestAggregatedMeasureDataAsync(string.Empty, false);
 
         var httpRequestException = await Assert.ThrowsAsync<HttpRequestException>(act).ConfigureAwait(false);
 
@@ -171,8 +184,11 @@ internal sealed class EdiDriver : IDisposable
         Assert.Equal(HttpStatusCode.Unauthorized, httpRequestException.StatusCode);
     }
 
-    public async Task<string> RequestAggregatedMeasureDataXmlAsync(XmlDocument payload, string token)
+    public async Task<string> RequestAggregatedMeasureDataXmlAsync(XmlDocument payload, ActorCredential actorCredential)
     {
+        var token = await _authenticationDriver
+            .GetB2BTokenAsync(actorCredential.ClientId, actorCredential.ClientSecret)
+            .ConfigureAwait(false);
         using var request = new HttpRequestMessage(HttpMethod.Post, "/api/RequestAggregatedMeasureMessageReceiver");
         request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
         request.Content = new StringContent(payload.OuterXml, Encoding.UTF8, "application/xml");

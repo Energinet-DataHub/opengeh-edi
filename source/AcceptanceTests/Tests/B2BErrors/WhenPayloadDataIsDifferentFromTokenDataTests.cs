@@ -26,9 +26,12 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.B2BErrors;
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
 public class WhenPayloadDataIsDifferentFromTokenDataTests : BaseTestClass
 {
+    private readonly AcceptanceTestFixture _fixture;
+
     public WhenPayloadDataIsDifferentFromTokenDataTests(ITestOutputHelper output, AcceptanceTestFixture fixture)
         : base(output, fixture)
     {
+        _fixture = fixture;
     }
 
     [Fact]
@@ -36,7 +39,7 @@ public class WhenPayloadDataIsDifferentFromTokenDataTests : BaseTestClass
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.WrongSenderMarketParticipantMrid());
 
-        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, _fixture.EnergySupplierCredential);
 
         Output.WriteLine(response);
 
@@ -48,7 +51,7 @@ public class WhenPayloadDataIsDifferentFromTokenDataTests : BaseTestClass
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.SenderRoleTypeNotAuthorized());
 
-        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, _fixture.EnergySupplierCredential);
 
         Output.WriteLine(response);
 
