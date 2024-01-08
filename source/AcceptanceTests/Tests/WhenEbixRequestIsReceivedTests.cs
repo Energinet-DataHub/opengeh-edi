@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Diagnostics;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
-using Energinet.DataHub.EDI.AcceptanceTests.Tests;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 
@@ -27,21 +25,13 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
 public sealed class WhenEbixPeekRequestIsReceivedTests
 {
-    private readonly AcceptanceTestFixture _fixture;
     private readonly EbixRequestDsl _ebix;
 
     public WhenEbixPeekRequestIsReceivedTests(AcceptanceTestFixture fixture)
     {
-        _fixture = fixture;
         ArgumentNullException.ThrowIfNull(fixture);
 
         _ebix = new EbixRequestDsl(
-            new EdiDriver(
-                fixture.ConnectionString,
-                fixture.EdiB2BBaseUri,
-                new AzureAuthenticationDriver(
-                    fixture.AzureEntraTenantId,
-                    fixture.AzureEntraBackendAppId)),
             new WholesaleDriver(fixture.EventPublisher),
             new EbixDriver(new Uri(fixture.ApiManagementUri, "/ebix"), fixture.EbixCertificatePassword));
     }
@@ -49,8 +39,8 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
     [Fact]
     public async Task Actor_can_peek_and_dequeue_aggregation_result_in_ebIX_format()
     {
-        await _ebix.EmptyQueueForActor(_fixture.MeteredDataResponsibleCredential);
-        await _ebix.PublishAggregationResultFor(AcceptanceTestFixture.ActorGridArea);
+        await _ebix.EmptyQueueForActor();
+        await _ebix.PublishAggregationResultFor(AcceptanceTestFixture.EbixActorGridArea);
 
         await _ebix.ConfirmEbixResultIsAvailableForActor();
     }

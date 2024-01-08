@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
+using System.Xml;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
 
@@ -67,6 +68,17 @@ internal sealed class EbixDriver : IDisposable
         {
             BaseAddress = dataHubUrlEbixUrl,
         };
+    }
+
+    public async Task EmptyQueueAsync()
+    {
+        var peekResponse = await PeekMessageAsync(timeoutInSeconds: 60)
+            .ConfigureAwait(false);
+        if (peekResponse?.MessageContainer.Payload is not null)
+        {
+            await DequeueMessageAsync(GetMessageId(peekResponse)).ConfigureAwait(false);
+            await EmptyQueueAsync().ConfigureAwait(false);
+        }
     }
 
     public async Task<peekMessageResponse?> PeekMessageAsync(int? timeoutInSeconds)
@@ -161,5 +173,14 @@ internal sealed class EbixDriver : IDisposable
         request.Content = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>());
 
         return await _unauthorizedHttpClient.SendAsync(request).ConfigureAwait(false);
+    }
+
+    private static string GetMessageId(peekMessageResponse response)
+    {
+        var nsmgr = new XmlNamespaceManager(new NameTable());
+        nsmgr.AddNamespace("ns0", "un:unece:260:data:EEM-DK_AggregatedMeteredDataTimeSeries:v3");
+        var query = "/ns0:HeaderEnergyDocument/ns0:Identification";
+        var node = response.MessageContainer.Payload.SelectSingleNode(query, nsmgr);
+        return node!.InnerText;
     }
 }

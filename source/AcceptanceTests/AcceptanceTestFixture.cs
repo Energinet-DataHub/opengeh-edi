@@ -26,8 +26,10 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 // ReSharper disable once ClassNeverInstantiated.Global -- Instantiated by XUnit
 public class AcceptanceTestFixture : IAsyncLifetime
 {
-    internal const string ActorNumber = "5790000610976"; // Corresponds to the "Mosaic 03" actor in the UI.
-    internal const string ActorGridArea = "543";
+    internal const string EbixActorNumberMeteredDataResponsible = "5790000610976"; // Corresponds to the "Mosaic 03" actor in the UI.
+    internal const string EbixActorGridArea = "543";
+    internal const string ActorNumberMeteredDataResponsible = "5790000701414";
+    internal const string ActorGridArea = "544";
     private const EicFunction ActorEicFunction = EicFunction.MeteredDataResponsible;
 
     private readonly string _ebixCertificateThumbprint;
@@ -57,14 +59,15 @@ public class AcceptanceTestFixture : IAsyncLifetime
         var serviceBusConnectionString = root.GetValue<string>("sb-domain-relay-manage-connection-string") ?? throw new InvalidOperationException("sb-domain-relay-manage-connection-string secret is not set in configuration");
         var topicName = root.GetValue<string>("sbt-shres-integrationevent-received-name") ?? throw new InvalidOperationException("sbt-shres-integrationevent-received-name secret is not set in configuration");
 
-        var azureEntraClientId = root.GetValue<string>("AZURE_ENTRA_CLIENT_ID") ?? "D8E67800-B7EF-4025-90BB-FE06E1639117";
+        var meteredDataResponsibleId = root.GetValue<string>("METERED_DATA_RESPONSIBLE_CLIENT_ID") ?? throw new InvalidOperationException("METERED_DATA_RESPONSIBLE_CLIENT_ID is not set in configuration");
         var meteredDataResponsibleSecret = root.GetValue<string>("METERED_DATA_RESPONSIBLE_CLIENT_SECRET") ?? throw new InvalidOperationException("METERED_DATA_RESPONSIBLE_CLIENT_SECRET is not set in configuration");
         var meteredDataResponsibleAzpToken = root.GetValue<string>("METERED_DATA_RESPONSIBLE_AZP_TOKEN") ?? throw new InvalidOperationException("METERED_DATA_RESPONSIBLE_AZP_TOKEN is not set in configuration");
-        MeteredDataResponsibleCredential = new ActorCredential(azureEntraClientId, meteredDataResponsibleSecret, meteredDataResponsibleAzpToken);
+        MeteredDataResponsibleCredential = new ActorCredential(meteredDataResponsibleId, meteredDataResponsibleSecret, meteredDataResponsibleAzpToken);
 
+        var energySupplierId = root.GetValue<string>("ENERGY_SUPPLIER_CLIENT_ID") ?? throw new InvalidOperationException("ENERGY_SUPPLIER_CLIENT_ID is not set in configuration");
         var energySupplierSecret = root.GetValue<string>("ENERGY_SUPPLIER_CLIENT_SECRET") ?? throw new InvalidOperationException("AZURE_ENTRA_CLIENT_SECRET is not set in configuration");
         var energySupplierAzpToken = root.GetValue<string>("ENERGY_SUPPLIER_AZP_TOKEN") ?? throw new InvalidOperationException("ENERGY_SUPPLIER_AZP_TOKEN is not set in configuration");
-        EnergySupplierCredential = new ActorCredential(azureEntraClientId, energySupplierSecret, energySupplierAzpToken);
+        EnergySupplierCredential = new ActorCredential(energySupplierId, energySupplierSecret, energySupplierAzpToken);
 
         ApiManagementUri = new Uri(root.GetValue<string>("apim-gateway-url") ?? throw new InvalidOperationException("apim-gateway-url secret is not set in configuration"));
         AzureEntraTenantId = root.GetValue<string>("AZURE_ENTRA_TENANT_ID") ?? "4a7411ea-ac71-4b63-9647-b8bd4c5a20e0";
@@ -108,15 +111,19 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        var actorActivated = ActorFactory.CreateActorActivated(ActorNumber, MeteredDataResponsibleCredential.AzpToken);
-        var actorCertificateAssigned = ActorCertificateFactory.CreateActorCertificateAssigned(ActorNumber, ActorEicFunction, _ebixCertificateThumbprint);
-        var gridAreaOwnerAssigned = GridAreaFactory.AssignedGridAreaOwner(ActorNumber, ActorGridArea, ActorEicFunction);
+        var ebixActorActivated = ActorFactory.CreateActorActivated(EbixActorNumberMeteredDataResponsible, string.Empty);
+        var actorActivated = ActorFactory.CreateActorActivated(ActorNumberMeteredDataResponsible, MeteredDataResponsibleCredential.AzpToken);
+        var actorCertificateAssigned = ActorCertificateFactory.CreateActorCertificateAssigned(EbixActorNumberMeteredDataResponsible, ActorEicFunction, _ebixCertificateThumbprint);
+        var ebixGridAreaOwnerAssigned = GridAreaFactory.AssignedGridAreaOwner(EbixActorNumberMeteredDataResponsible, EbixActorGridArea, ActorEicFunction);
+        var gridAreaOwnerAssigned = GridAreaFactory.AssignedGridAreaOwner(ActorNumberMeteredDataResponsible, ActorGridArea, ActorEicFunction);
 
         var initializeTasks = new List<Task>
         {
 #if !DEBUG // Locally we cannot access the Azure Service Bus, so this will fail
+            EventPublisher.PublishAsync(ActorActivated.EventName, ebixActorActivated.ToByteArray()),
             EventPublisher.PublishAsync(ActorActivated.EventName, actorActivated.ToByteArray()),
             EventPublisher.PublishAsync(ActorCertificateCredentialsAssigned.EventName, actorCertificateAssigned.ToByteArray()),
+            EventPublisher.PublishAsync(GridAreaOwnershipAssigned.EventName, ebixGridAreaOwnerAssigned.ToByteArray()),
             EventPublisher.PublishAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnerAssigned.ToByteArray()),
 #endif
         };
