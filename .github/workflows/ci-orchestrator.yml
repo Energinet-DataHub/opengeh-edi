@@ -43,7 +43,6 @@ jobs:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
     uses: ./.github/workflows/ci-dotnet.yml
-    secrets: inherit
 
   render_c4model_views:
     needs: changes
