@@ -39,8 +39,8 @@ public class WhenPayloadDataIsDifferentFromTokenDataTests : BaseTestClass
         Output.WriteLine("B2C tenant id: " + _fixture.AzureB2CTenantId);
         Output.WriteLine("AzureEntraBackendAppId: " + _fixture.AzureEntraBackendAppId);
         Output.WriteLine("MeteredDataResponsibleCredential ClientId: " + _fixture.MeteredDataResponsibleCredential.ClientId);
-        Output.WriteLine("EnergySupplierCredential ClientId: " + _fixture.EnergySupplierCredential.ClientId);
         Output.WriteLine("MeteredDataResponsibleCredential ClientSecret: " + t);
+        Output.WriteLine("MeteredDataResponsibleCredential ClientSecret length: " + _fixture.MeteredDataResponsibleCredential.ClientSecret.Length);
 
         var e = _fixture.EnergySupplierCredential.ClientId.Substring(0, 4);
         var c = _fixture.EnergySupplierCredential.ClientSecret.Substring(0, 4);
