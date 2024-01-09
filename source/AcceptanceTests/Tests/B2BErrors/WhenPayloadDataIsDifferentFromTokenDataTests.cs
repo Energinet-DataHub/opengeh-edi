@@ -41,7 +41,10 @@ public class WhenPayloadDataIsDifferentFromTokenDataTests : BaseTestClass
 
         var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, _fixture.EnergySupplierCredential);
 
-        Output.WriteLine(response);
+        Output.WriteLine("B2C tenant id: ", _fixture.AzureB2CTenantId);
+        Output.WriteLine("AzureEntraBackendAppId: ", _fixture.AzureEntraBackendAppId);
+        Output.WriteLine("ClientId: ", _fixture.MeteredDataResponsibleCredential.ClientId);
+        Output.WriteLine("ClientSecret: ", _fixture.MeteredDataResponsibleCredential.ClientSecret);
 
         await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00002", "Sender id does not match id of current authenticated user", response);
     }
