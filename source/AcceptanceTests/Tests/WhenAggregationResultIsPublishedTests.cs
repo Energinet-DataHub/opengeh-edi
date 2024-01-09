@@ -47,7 +47,7 @@ public sealed class WhenAggregationResultIsPublishedTests
     {
         await _aggregations.EmptyQueueForActor(_fixture.MeteredDataResponsibleCredential);
 
-        await _aggregations.PublishResultFor(gridAreaCode: AcceptanceTestFixture.ActorGridArea);
+        await _aggregations.PublishResultFor(gridAreaCode: AcceptanceTestFixture.CimActorGridArea);
 
         await _aggregations
             .ConfirmResultIsAvailableFor(_fixture.MeteredDataResponsibleCredential);

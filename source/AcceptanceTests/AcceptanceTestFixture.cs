@@ -26,10 +26,10 @@ namespace Energinet.DataHub.EDI.AcceptanceTests;
 // ReSharper disable once ClassNeverInstantiated.Global -- Instantiated by XUnit
 public class AcceptanceTestFixture : IAsyncLifetime
 {
-    internal const string EbixActorNumberMeteredDataResponsible = "5790000610976"; // Corresponds to the "Mosaic 03" actor in the UI.
+    internal const string EbixActorNumber = "5790000610976"; // Corresponds to the "Mosaic 03" actor in the UI.
     internal const string EbixActorGridArea = "543";
     internal const string CimActorNumber = "5790000701414";
-    internal const string ActorGridArea = "544";
+    internal const string CimActorGridArea = "544";
     private const EicFunction ActorEicFunction = EicFunction.MeteredDataResponsible;
 
     private readonly string _ebixCertificateThumbprint;
@@ -111,12 +111,12 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        var ebixActorActivated = ActorFactory.CreateActorActivated(EbixActorNumberMeteredDataResponsible, string.Empty);
+        var ebixActorActivated = ActorFactory.CreateActorActivated(EbixActorNumber, string.Empty);
         var meteredDataResponsibleActivated = ActorFactory.CreateActorActivated(CimActorNumber, MeteredDataResponsibleCredential.AzpToken);
         var energySupplierActivated = ActorFactory.CreateActorActivated(CimActorNumber, EnergySupplierCredential.AzpToken);
-        var actorCertificateAssigned = ActorCertificateFactory.CreateActorCertificateAssigned(EbixActorNumberMeteredDataResponsible, ActorEicFunction, _ebixCertificateThumbprint);
-        var ebixGridAreaOwnerAssigned = GridAreaFactory.AssignedGridAreaOwner(EbixActorNumberMeteredDataResponsible, EbixActorGridArea, ActorEicFunction);
-        var gridAreaOwnerAssigned = GridAreaFactory.AssignedGridAreaOwner(CimActorNumber, ActorGridArea, ActorEicFunction);
+        var actorCertificateAssigned = ActorCertificateFactory.CreateActorCertificateAssigned(EbixActorNumber, ActorEicFunction, _ebixCertificateThumbprint);
+        var ebixGridAreaOwnerAssigned = GridAreaFactory.AssignedGridAreaOwner(EbixActorNumber, EbixActorGridArea, ActorEicFunction);
+        var gridAreaOwnerAssigned = GridAreaFactory.AssignedGridAreaOwner(CimActorNumber, CimActorGridArea, ActorEicFunction);
 
         var initializeTasks = new List<Task>
         {
