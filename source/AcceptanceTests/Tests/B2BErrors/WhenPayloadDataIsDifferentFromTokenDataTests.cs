@@ -39,8 +39,11 @@ public class WhenPayloadDataIsDifferentFromTokenDataTests : BaseTestClass
     {
         Output.WriteLine("B2C tenant id: " + _fixture.AzureB2CTenantId);
         Output.WriteLine("AzureEntraBackendAppId: " + _fixture.AzureEntraBackendAppId);
-        Output.WriteLine("ClientId: " + _fixture.MeteredDataResponsibleCredential.ClientId);
-        Output.WriteLine("ClientSecret: " + _fixture.MeteredDataResponsibleCredential.ClientSecret);
+        Output.WriteLine("MeteredDataResponsibleCredential ClientId: " + _fixture.MeteredDataResponsibleCredential.ClientId);
+        Output.WriteLine("MeteredDataResponsibleCredential ClientSecret: " + _fixture.MeteredDataResponsibleCredential.ClientSecret);
+
+        Output.WriteLine("EnergySupplierCredential ClientId: " + _fixture.EnergySupplierCredential.ClientId);
+        Output.WriteLine("EnergySupplierCredential ClientSecret: " + _fixture.EnergySupplierCredential.ClientSecret);
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.WrongSenderMarketParticipantMrid());
 
         var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, _fixture.EnergySupplierCredential);
