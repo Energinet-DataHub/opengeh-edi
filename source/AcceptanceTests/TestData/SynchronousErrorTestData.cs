@@ -62,7 +62,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
         {
             return new Dictionary<string, string>
             {
-                { "cim:sender_MarketParticipant.marketRole.type", "DGL" },
+                { "cim:sender_MarketParticipant.marketRole.type", "DDK" },
             };
         }
 
