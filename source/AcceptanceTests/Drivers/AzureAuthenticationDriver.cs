@@ -15,6 +15,7 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
@@ -23,12 +24,14 @@ public sealed class AzureAuthenticationDriver : IDisposable
 {
     private readonly string _tenantId;
     private readonly string _backendAppId;
+    private readonly ITestOutputHelper _output;
     private readonly HttpClient _httpClient;
 
-    public AzureAuthenticationDriver(string tenantId, string backendAppId)
+    public AzureAuthenticationDriver(string tenantId, string backendAppId, ITestOutputHelper? output = null)
     {
         _tenantId = tenantId;
         _backendAppId = backendAppId;
+        _output = output!;
         _httpClient = new HttpClient();
     }
 
@@ -39,6 +42,14 @@ public sealed class AzureAuthenticationDriver : IDisposable
 
     public async Task<string> GetB2BTokenAsync(string clientId, string clientSecret)
     {
+        if (clientSecret == null) throw new ArgumentNullException(nameof(clientSecret));
+        var t = clientSecret.Substring(0, 4);
+        _output.WriteLine("B2C tenant id: " + _tenantId);
+        _output.WriteLine("AzureEntraBackendAppId: " + _backendAppId);
+        _output.WriteLine("ClientId: " + clientId);
+        _output.WriteLine("ClientSecret: " + t);
+        _output.WriteLine("MeteredDataResponsibleCredential ClientSecret length: " + clientSecret.Length);
+
         using var request = new HttpRequestMessage(HttpMethod.Post, new Uri($"https://login.microsoftonline.com/{_tenantId}/oauth2/v2.0/token", UriKind.Absolute));
 
         request.Content = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
