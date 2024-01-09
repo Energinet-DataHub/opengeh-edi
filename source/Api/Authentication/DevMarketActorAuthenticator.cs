@@ -22,35 +22,47 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.Api.Authentication;
 
 public class DevMarketActorAuthenticator : MarketActorAuthenticator
 {
     private readonly IDatabaseConnectionFactory _connectionFactory;
+    private readonly ILogger<DevMarketActorAuthenticator> _logger;
 
     public DevMarketActorAuthenticator(
         IMasterDataClient masterDataClient,
         IDatabaseConnectionFactory connectionFactory,
-        AuthenticatedActor authenticatedActor)
-        : base(masterDataClient, authenticatedActor)
+        AuthenticatedActor authenticatedActor,
+        ILogger<DevMarketActorAuthenticator> logger)
+        : base(masterDataClient, authenticatedActor, logger)
     {
         _connectionFactory = connectionFactory;
+        _logger = logger;
     }
 
     public override async Task<bool> AuthenticateAsync(ClaimsPrincipal claimsPrincipal, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(claimsPrincipal);
 
+        var azpTokenClaim = claimsPrincipal.FindFirst(claim => claim.Type.Equals(ClaimsMap.UserId, StringComparison.OrdinalIgnoreCase));
+        if (!string.IsNullOrWhiteSpace(azpTokenClaim?.Value))
+        {
+            return await base.AuthenticateAsync(claimsPrincipal, cancellationToken).ConfigureAwait(false);
+        }
+
         var actorNumberClaim = claimsPrincipal.FindFirst(claim => claim.Type.Equals("test-actornumber", StringComparison.OrdinalIgnoreCase));
         if (actorNumberClaim is null)
         {
+            _logger.LogInformation("No test-actornumber claim found. Falling back to default authentication.");
             return await base.AuthenticateAsync(claimsPrincipal, cancellationToken).ConfigureAwait(false);
         }
 
         var actor = await FindActorAsync(actorNumberClaim.Value, cancellationToken).ConfigureAwait(false);
         if (actor is null)
         {
+            _logger.LogInformation("No actor found for test-actornumber claim. Falling back to default authentication.");
             return await base.AuthenticateAsync(claimsPrincipal, cancellationToken).ConfigureAwait(false);
         }
 
@@ -59,11 +71,11 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
         return await base.AuthenticateAsync(claimsWithUpdatedActor, cancellationToken).ConfigureAwait(false);
     }
 
-    private static ClaimsPrincipal ReplaceCurrent(ClaimsPrincipal currentClaimsPrincipal, Actor actor)
+    private ClaimsPrincipal ReplaceCurrent(ClaimsPrincipal currentClaimsPrincipal, Actor actor)
     {
         var claims = currentClaimsPrincipal.Claims.Where(claim => !claim.Type.Equals(ClaimsMap.UserId, StringComparison.OrdinalIgnoreCase)).ToList();
         claims.Add(new Claim(ClaimsMap.UserId, actor.ExternalId));
-
+        _logger.LogInformation($"Replaced current claims with {actor.ExternalId} for test-actornumber {actor.ActorNumber}.");
         var identity = new ClaimsIdentity(claims);
         return new ClaimsPrincipal(identity);
     }
