@@ -72,12 +72,20 @@ internal sealed class EbixDriver : IDisposable
 
     public async Task EmptyQueueAsync()
     {
-        var peekResponse = await PeekMessageAsync(timeoutInSeconds: 60)
-            .ConfigureAwait(false);
-        if (peekResponse?.MessageContainer.Payload is not null)
+        try
         {
-            await DequeueMessageAsync(GetMessageId(peekResponse)).ConfigureAwait(false);
-            await EmptyQueueAsync().ConfigureAwait(false);
+            var peekResponse = await PeekMessageAsync(timeoutInSeconds: 60)
+                .ConfigureAwait(false);
+
+            if (peekResponse?.MessageContainer.Payload is not null)
+            {
+                await DequeueMessageAsync(GetMessageId(peekResponse)).ConfigureAwait(false);
+                await EmptyQueueAsync().ConfigureAwait(false);
+            }
+        }
+        catch (CommunicationException)
+        {
+            return; // temp fix for no content when peeking
         }
     }
 
