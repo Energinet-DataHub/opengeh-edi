@@ -31,7 +31,7 @@ public class BaseTestClass
                 fixture.ConnectionString,
                 fixture.EdiB2BBaseUri,
                 new AzureAuthenticationDriver(
-                    fixture.AzureEntraTenantId,
+                    fixture.AzureB2CTenantId,
                     fixture.AzureEntraBackendAppId)));
     }
 

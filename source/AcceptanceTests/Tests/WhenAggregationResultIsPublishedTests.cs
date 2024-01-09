@@ -37,7 +37,7 @@ public sealed class WhenAggregationResultIsPublishedTests
                 fixture.ConnectionString,
                 fixture.EdiB2BBaseUri,
                 new AzureAuthenticationDriver(
-                    fixture.AzureEntraTenantId,
+                    fixture.AzureB2CTenantId,
                     fixture.AzureEntraBackendAppId)),
             new WholesaleDriver(fixture.EventPublisher));
     }

@@ -74,8 +74,8 @@ public class AcceptanceTestFixture : IAsyncLifetime
         EnergySupplierCredential = new ActorCredential(energySupplierId, energySupplierSecret, energySupplierAzpToken);
 
         ApiManagementUri = new Uri(root.GetValue<string>("apim-gateway-url") ?? throw new InvalidOperationException("apim-gateway-url secret is not set in configuration"));
-        AzureEntraTenantId = root.GetValue<string>("AZURE_ENTRA_TENANT_ID") ?? "4a7411ea-ac71-4b63-9647-b8bd4c5a20e0";
-        AzureEntraBackendAppId = root.GetValue<string>("AZURE_ENTRA_BACKEND_APP_ID") ?? "fe8b720c-fda4-4aaa-9c6d-c0d2ed6584fe";
+        AzureB2CTenantId = root.GetValue<string>("apim_b2c_tenant_id") ?? "e9aa9b15-7200-441e-b255-927506b3494";
+        AzureEntraBackendAppId = root.GetValue<string>("apim_b2b_app_id") ?? throw new InvalidOperationException("AZURE_ENTRA_BACKEND_APP_ID is not set in configuration");
         _ebixCertificateThumbprint = root.GetValue<string>("EBIX_CERTIFICATE_THUMBPRINT") ?? "39D64F012A19C6F6FDFB0EA91D417873599D3325";
         EbixCertificatePassword = root.GetValue<string>("EBIX_CERTIFICATE_PASSWORD") ?? throw new InvalidOperationException("EBIX_CERTIFICATE_PASSWORD is not set in configuration");
         EdiB2BBaseUri = new Uri(root.GetValue<string>("func-edi-api-base-url") ?? throw new InvalidOperationException("func-edi-api-base-url secret is not set in configuration"));
@@ -104,7 +104,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
     internal Uri ApiManagementUri { get; }
 
-    internal string AzureEntraTenantId { get; }
+    internal string AzureB2CTenantId { get; }
 
     internal string AzureEntraBackendAppId { get; }
 

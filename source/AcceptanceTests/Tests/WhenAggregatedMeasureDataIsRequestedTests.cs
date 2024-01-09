@@ -36,7 +36,7 @@ public sealed class WhenAggregatedMeasureDataIsRequestedTests
                 fixture.ConnectionString,
                 fixture.EdiB2BBaseUri,
                 new AzureAuthenticationDriver(
-                    fixture.AzureEntraTenantId,
+                    fixture.AzureB2CTenantId,
                     fixture.AzureEntraBackendAppId)));
     }
 

@@ -34,7 +34,7 @@ public sealed class WhenNewB2BActorIsCreatedTests
             new EdiDriver(
                 fixture.ConnectionString,
                 fixture.EdiB2BBaseUri,
-                new AzureAuthenticationDriver(fixture.AzureEntraTenantId, fixture.AzureEntraBackendAppId)));
+                new AzureAuthenticationDriver(fixture.AzureB2CTenantId, fixture.AzureEntraBackendAppId)));
     }
 
     [Fact]

@@ -37,7 +37,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
         _fixture = fixture;
         _archivedMessage = new ArchivedMessageDsl(
             new AzureAuthenticationDriver(
-                fixture.AzureEntraTenantId,
+                fixture.AzureB2CTenantId,
                 fixture.AzureEntraBackendAppId),
             new EdiB2CDriver(fixture.B2CAuthorizedHttpClient));
         _aggregationResult = new AggregationResultDsl(
@@ -45,7 +45,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
                 fixture.ConnectionString,
                 fixture.EdiB2BBaseUri,
                 new AzureAuthenticationDriver(
-                    fixture.AzureEntraTenantId,
+                    fixture.AzureB2CTenantId,
                     fixture.AzureEntraBackendAppId)),
             new WholesaleDriver(fixture.EventPublisher));
     }
