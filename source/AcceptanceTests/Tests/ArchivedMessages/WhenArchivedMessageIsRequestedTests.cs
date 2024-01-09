@@ -15,12 +15,9 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
-using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 using Energinet.DataHub.EDI.AcceptanceTests.Factories;
-using Energinet.DataHub.EDI.AcceptanceTests.Responses.json;
 using Energinet.DataHub.EDI.AcceptanceTests.TestData;
-using Newtonsoft.Json;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.ArchivedMessages;
