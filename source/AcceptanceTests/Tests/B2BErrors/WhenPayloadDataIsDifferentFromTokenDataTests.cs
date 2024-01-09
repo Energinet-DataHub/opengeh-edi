@@ -37,10 +37,10 @@ public class WhenPayloadDataIsDifferentFromTokenDataTests : BaseTestClass
     [Fact]
     public async Task Sender_market_participant_mrid_is_different_from_mrid_in_token()
     {
-        Output.WriteLine("B2C tenant id: ", _fixture.AzureB2CTenantId);
-        Output.WriteLine("AzureEntraBackendAppId: ", _fixture.AzureEntraBackendAppId);
-        Output.WriteLine("ClientId: ", _fixture.MeteredDataResponsibleCredential.ClientId);
-        Output.WriteLine("ClientSecret: ", _fixture.MeteredDataResponsibleCredential.ClientSecret);
+        Output.WriteLine("B2C tenant id: " + _fixture.AzureB2CTenantId);
+        Output.WriteLine("AzureEntraBackendAppId: " + _fixture.AzureEntraBackendAppId);
+        Output.WriteLine("ClientId: " + _fixture.MeteredDataResponsibleCredential.ClientId);
+        Output.WriteLine("ClientSecret: " + _fixture.MeteredDataResponsibleCredential.ClientSecret);
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.WrongSenderMarketParticipantMrid());
 
         var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, _fixture.EnergySupplierCredential);
