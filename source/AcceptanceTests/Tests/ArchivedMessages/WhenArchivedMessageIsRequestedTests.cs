@@ -50,7 +50,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
             new WholesaleDriver(fixture.EventPublisher));
     }
 
-    [Fact(Skip = "Currently environments are not setup")]
+    [Fact]
     public async Task Archived_message_is_created_after_aggregated_measure_data_request()
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload();
@@ -72,7 +72,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
         Assert.NotNull(response[0].Id);
     }
 
-    [Fact(Skip = "Currently environments are not setup")]
+    [Fact]
     public async Task Archived_message_is_getable_after_peek()
      {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload();
@@ -97,7 +97,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
         Assert.Equal(payload?.OuterXml, response);
      }
 
-    [Fact(Skip = "Currently environments are not setup")]
+    [Fact]
     public async Task Archived_messages_is_returned_with_correct_format()
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload();
