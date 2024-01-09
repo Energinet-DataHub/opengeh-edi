@@ -35,9 +35,9 @@ internal sealed class AggregationResultDsl
         return _wholesale.PublishAggregationResultAsync(gridAreaCode);
     }
 
-    internal Task ConfirmResultIsAvailableFor(ActorCredential actorCredential)
+    internal Task ConfirmResultIsAvailableFor()
     {
-        return _edi.PeekMessageAsync(actorCredential);
+        return _edi.PeekMessageAsync();
     }
 
     internal Task ConfirmResultIsAvailableForToken(ActorCredential actorCredential)
@@ -45,8 +45,8 @@ internal sealed class AggregationResultDsl
         return _edi.PeekMessageAsync(actorCredential);
     }
 
-    internal async Task EmptyQueueForActor(ActorCredential actorCredential)
+    internal async Task EmptyQueueForActor()
     {
-        await _edi.EmptyQueueAsync(actorCredential).ConfigureAwait(false);
+        await _edi.EmptyQueueAsync().ConfigureAwait(false);
     }
 }

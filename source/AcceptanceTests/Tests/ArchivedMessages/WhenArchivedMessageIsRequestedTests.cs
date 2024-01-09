@@ -42,11 +42,10 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
             new EdiB2CDriver(fixture.B2CAuthorizedHttpClient));
         _aggregationResult = new AggregationResultDsl(
             new EdiDriver(
-                fixture.ConnectionString,
                 fixture.EdiB2BBaseUri,
-                new AzureAuthenticationDriver(
-                    fixture.AzureB2CTenantId,
-                    fixture.AzureEntraBackendAppId)),
+                fixture.AzureB2CTenantId,
+                fixture.AzureEntraBackendAppId,
+                _fixture.EnergySupplierCredential),
             new WholesaleDriver(fixture.EventPublisher));
     }
 
@@ -56,7 +55,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload();
         var messageId = payload?.GetElementsByTagName("cim:mRID")[0]?.InnerText;
 
-        if (payload != null) await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, _fixture.EnergySupplierCredential);
+        if (payload != null) await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 
         var response = await _archivedMessage.RequestArchivedMessageSearchAsync(
             new Uri(_fixture.B2CApiUri, "ArchivedMessageSearch"),
@@ -79,7 +78,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 
         var messageId = payload?.GetElementsByTagName("cim:mRID")[0]?.InnerText;
 
-        if (payload != null) await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, _fixture.EnergySupplierCredential);
+        if (payload != null) await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 
         await _aggregationResult.ConfirmResultIsAvailableForToken(_fixture.EnergySupplierCredential);
 
@@ -102,7 +101,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload();
 
-        await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, _fixture.EnergySupplierCredential);
+        await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 
         var messageId = payload?.GetElementsByTagName("cim:mRID")[0]?.InnerText;
 

@@ -33,31 +33,30 @@ public sealed class WhenAggregatedMeasureDataIsRequestedTests
         ArgumentNullException.ThrowIfNull(fixture);
         _aggregationRequest = new AggregatedMeasureDataRequestDsl(
             new EdiDriver(
-                fixture.ConnectionString,
                 fixture.EdiB2BBaseUri,
-                new AzureAuthenticationDriver(
-                    fixture.AzureB2CTenantId,
-                    fixture.AzureEntraBackendAppId)));
+                fixture.AzureB2CTenantId,
+                fixture.AzureEntraBackendAppId,
+                fixture.MeteredDataResponsibleCredential));
     }
 
     [Fact]
     public async Task Actor_can_peek_and_dequeue_message_after_aggregated_measure_data_has_been_requested()
     {
-        await _aggregationRequest.EmptyQueueForActor(_fixture.MeteredDataResponsibleCredential);
+        await _aggregationRequest.EmptyQueueForActor();
 
-        await _aggregationRequest.AggregatedMeasureDataFor(_fixture.MeteredDataResponsibleCredential);
+        await _aggregationRequest.AggregatedMeasureDataFor();
 
-        await _aggregationRequest.ConfirmAcceptedResultIsAvailableFor(_fixture.MeteredDataResponsibleCredential);
+        await _aggregationRequest.ConfirmAcceptedResultIsAvailableFor();
     }
 
     [Fact]
     public async Task Actor_can_peek_and_dequeue_rejected_message_after_aggregated_measure_data_has_been_requested()
     {
-        await _aggregationRequest.EmptyQueueForActor(_fixture.MeteredDataResponsibleCredential);
+        await _aggregationRequest.EmptyQueueForActor();
 
-        await _aggregationRequest.RejectedAggregatedMeasureDataFor(_fixture.MeteredDataResponsibleCredential);
+        await _aggregationRequest.RejectedAggregatedMeasureDataFor();
 
-        await _aggregationRequest.ConfirmRejectedResultIsAvailableFor(_fixture.MeteredDataResponsibleCredential);
+        await _aggregationRequest.ConfirmRejectedResultIsAvailableFor();
     }
 
     [Fact]

@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
-using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 using Energinet.DataHub.EDI.AcceptanceTests.Factories;
 using Energinet.DataHub.EDI.AcceptanceTests.TestData;
 using Energinet.DataHub.EDI.AcceptanceTests.Tests.Asserters;
@@ -37,16 +35,20 @@ public class WhenPayloadDataIsDifferentFromTokenDataTests : BaseTestClass
     [Fact]
     public async Task Sender_market_participant_mrid_is_different_from_mrid_in_token()
     {
+        var t = _fixture.MeteredDataResponsibleCredential.ClientSecret.Substring(0, 4);
         Output.WriteLine("B2C tenant id: " + _fixture.AzureB2CTenantId);
         Output.WriteLine("AzureEntraBackendAppId: " + _fixture.AzureEntraBackendAppId);
         Output.WriteLine("MeteredDataResponsibleCredential ClientId: " + _fixture.MeteredDataResponsibleCredential.ClientId);
-        Output.WriteLine("MeteredDataResponsibleCredential ClientSecret: " + _fixture.MeteredDataResponsibleCredential.ClientSecret);
-
         Output.WriteLine("EnergySupplierCredential ClientId: " + _fixture.EnergySupplierCredential.ClientId);
-        Output.WriteLine("EnergySupplierCredential ClientSecret: " + _fixture.EnergySupplierCredential.ClientSecret);
+        Output.WriteLine("MeteredDataResponsibleCredential ClientSecret: " + t);
+
+        var e = _fixture.EnergySupplierCredential.ClientId.Substring(0, 4);
+        var c = _fixture.EnergySupplierCredential.ClientSecret.Substring(0, 4);
+        Output.WriteLine("EnergySupplierCredential ClientId: " + e);
+        Output.WriteLine("EnergySupplierCredential ClientSecret: " + c);
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.WrongSenderMarketParticipantMrid());
 
-        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, _fixture.EnergySupplierCredential);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 
         await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00002", "Sender id does not match id of current authenticated user", response);
     }
@@ -56,7 +58,7 @@ public class WhenPayloadDataIsDifferentFromTokenDataTests : BaseTestClass
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.SenderRoleTypeNotAuthorized());
 
-        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, _fixture.EnergySupplierCredential);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 
         Output.WriteLine(response);
 

@@ -31,10 +31,8 @@ public sealed class WhenNewB2BActorIsCreatedTests
 
         _actorDsl = new ActorDsl(
             new MarketParticipantDriver(fixture.EventPublisher),
-            new EdiDriver(
-                fixture.ConnectionString,
-                fixture.EdiB2BBaseUri,
-                new AzureAuthenticationDriver(fixture.AzureB2CTenantId, fixture.AzureEntraBackendAppId)));
+            new EdiActorDriver(
+                fixture.ConnectionString));
     }
 
     [Fact]

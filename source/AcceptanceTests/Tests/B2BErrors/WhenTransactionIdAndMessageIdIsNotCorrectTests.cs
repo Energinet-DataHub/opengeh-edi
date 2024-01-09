@@ -36,8 +36,8 @@ public class WhenTransactionIdAndMessageIdIsNotCorrectTests : BaseTestClass
     public async Task Message_id_is_not_unique()
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.MessageIdIsNotUnique());
-        await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, _fixture.EnergySupplierCredential);
-        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, _fixture.EnergySupplierCredential);
+        await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 
         Output.WriteLine(response);
 
@@ -50,8 +50,8 @@ public class WhenTransactionIdAndMessageIdIsNotCorrectTests : BaseTestClass
         var payload =
             RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.TransactionIdIsNotUnique());
 
-        await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, _fixture.EnergySupplierCredential);
-        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, _fixture.EnergySupplierCredential);
+        await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 
         Output.WriteLine(response);
 
@@ -65,7 +65,7 @@ public class WhenTransactionIdAndMessageIdIsNotCorrectTests : BaseTestClass
             RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData
                 .EmptyMessageId());
 
-        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, _fixture.EnergySupplierCredential);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 
         Output.WriteLine(response);
 

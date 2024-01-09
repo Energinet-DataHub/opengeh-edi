@@ -28,11 +28,10 @@ public class BaseTestClass
         BaseTestFixture = fixture;
         AggregationRequest = new AggregatedMeasureDataRequestDsl(
             new EdiDriver(
-                fixture.ConnectionString,
                 fixture.EdiB2BBaseUri,
-                new AzureAuthenticationDriver(
-                    fixture.AzureB2CTenantId,
-                    fixture.AzureEntraBackendAppId)));
+                fixture.AzureB2CTenantId,
+                fixture.AzureEntraBackendAppId,
+                fixture.EnergySupplierCredential));
     }
 
     protected ITestOutputHelper Output { get; }

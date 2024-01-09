@@ -30,29 +30,29 @@ public sealed class AggregatedMeasureDataRequestDsl
         _edi = ediDriver;
     }
 
-    internal Task AggregatedMeasureDataFor(ActorCredential actorCredential)
+    internal Task AggregatedMeasureDataFor()
     {
-        return _edi.RequestAggregatedMeasureDataAsync(actorCredential);
+        return _edi.RequestAggregatedMeasureDataAsync();
     }
 
-    internal Task ConfirmAcceptedResultIsAvailableFor(ActorCredential actorCredential)
+    internal Task ConfirmAcceptedResultIsAvailableFor()
     {
-        return _edi.PeekAcceptedAggregationMessageAsync(actorCredential);
+        return _edi.PeekAcceptedAggregationMessageAsync();
     }
 
-    internal Task RejectedAggregatedMeasureDataFor(ActorCredential actorCredential)
+    internal Task RejectedAggregatedMeasureDataFor()
     {
-        return _edi.RequestAggregatedMeasureDataAsync(actorCredential, asyncError: true);
+        return _edi.RequestAggregatedMeasureDataAsync(asyncError: true);
     }
 
-    internal Task ConfirmRejectedResultIsAvailableFor(ActorCredential actorCredential)
+    internal Task ConfirmRejectedResultIsAvailableFor()
     {
-        return _edi.PeekRejectedMessageAsync(actorCredential);
+        return _edi.PeekRejectedMessageAsync();
     }
 
-    internal Task EmptyQueueForActor(ActorCredential actorCredential)
+    internal Task EmptyQueueForActor()
     {
-        return _edi.EmptyQueueAsync(actorCredential);
+        return _edi.EmptyQueueAsync();
     }
 
     internal Task ConfirmRequestAggregatedMeasureDataWithoutTokenIsNotAllowed()
@@ -70,8 +70,8 @@ public sealed class AggregatedMeasureDataRequestDsl
         return _edi.DequeueMessageWithoutTokenAsync("irrelevant-message-id");
     }
 
-    internal Task<string> AggregatedMeasureDataWithXmlPayload(XmlDocument payload, ActorCredential actorCredential)
+    internal Task<string> AggregatedMeasureDataWithXmlPayload(XmlDocument payload)
     {
-        return _edi.RequestAggregatedMeasureDataXmlAsync(payload, actorCredential);
+        return _edi.RequestAggregatedMeasureDataXmlAsync(payload);
     }
 }

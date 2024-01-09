@@ -34,22 +34,20 @@ public sealed class WhenAggregationResultIsPublishedTests
 
         _aggregations = new AggregationResultDsl(
             new EdiDriver(
-                fixture.ConnectionString,
                 fixture.EdiB2BBaseUri,
-                new AzureAuthenticationDriver(
-                    fixture.AzureB2CTenantId,
-                    fixture.AzureEntraBackendAppId)),
+                fixture.AzureB2CTenantId,
+                fixture.AzureEntraBackendAppId,
+                fixture.MeteredDataResponsibleCredential),
             new WholesaleDriver(fixture.EventPublisher));
     }
 
     [Fact]
     public async Task Actor_can_peek_and_dequeue_aggregation_result()
     {
-        await _aggregations.EmptyQueueForActor(_fixture.MeteredDataResponsibleCredential);
+        await _aggregations.EmptyQueueForActor();
 
         await _aggregations.PublishResultFor(gridAreaCode: AcceptanceTestFixture.CimActorGridArea);
 
-        await _aggregations
-            .ConfirmResultIsAvailableFor(_fixture.MeteredDataResponsibleCredential);
+        await _aggregations.ConfirmResultIsAvailableFor();
     }
 }

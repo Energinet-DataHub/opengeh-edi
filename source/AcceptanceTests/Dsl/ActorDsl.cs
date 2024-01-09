@@ -19,14 +19,14 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 internal sealed class ActorDsl
 {
     private readonly MarketParticipantDriver _marketParticipant;
-    private readonly EdiDriver _ediDriver;
+    private readonly EdiActorDriver _ediActorDriver;
 
     internal ActorDsl(
         MarketParticipantDriver marketParticipantDriver,
-        EdiDriver ediDriver)
+        EdiActorDriver ediActorDriver)
     {
         _marketParticipant = marketParticipantDriver;
-        _ediDriver = ediDriver;
+        _ediActorDriver = ediActorDriver;
     }
 
     public async Task PublishResultForAsync(string actorNumber, string b2CId)
@@ -36,6 +36,6 @@ internal sealed class ActorDsl
 
     public async Task ConfirmActorIsAvailableAsync(string actorNumber, string b2CId)
     {
-        await _ediDriver.ActorExistsAsync(actorNumber, b2CId).ConfigureAwait(false);
+        await _ediActorDriver.ActorExistsAsync(actorNumber, b2CId).ConfigureAwait(false);
     }
 }
