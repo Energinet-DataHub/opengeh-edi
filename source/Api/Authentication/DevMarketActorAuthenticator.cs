@@ -47,6 +47,7 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
         ArgumentNullException.ThrowIfNull(claimsPrincipal);
 
         var azpTokenClaim = claimsPrincipal.FindFirst(claim => claim.Type.Equals(ClaimsMap.UserId, StringComparison.OrdinalIgnoreCase));
+        _logger.LogInformation("claimsPrincipal: {ClaimsPrincipal}", string.Join(",", claimsPrincipal.Claims));
         if (!string.IsNullOrWhiteSpace(azpTokenClaim?.Value))
         {
             return await base.AuthenticateAsync(claimsPrincipal, cancellationToken).ConfigureAwait(false);

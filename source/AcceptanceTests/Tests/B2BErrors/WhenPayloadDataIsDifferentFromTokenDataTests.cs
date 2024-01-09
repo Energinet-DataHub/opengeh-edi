@@ -26,9 +26,12 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.B2BErrors;
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
 public class WhenPayloadDataIsDifferentFromTokenDataTests : BaseTestClass
 {
+    private readonly AcceptanceTestFixture _fixture;
+
     public WhenPayloadDataIsDifferentFromTokenDataTests(ITestOutputHelper output, AcceptanceTestFixture fixture)
         : base(output, fixture)
     {
+        _fixture = fixture;
     }
 
     [Fact]
@@ -50,6 +53,8 @@ public class WhenPayloadDataIsDifferentFromTokenDataTests : BaseTestClass
 
         var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
 
+        Output.WriteLine("EnergySupplierAzpToken: " + _fixture.EnergySupplierAzpToken);
+        Output.WriteLine("Token: " + Token);
         Output.WriteLine(response);
 
         await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00003", "Sender role type is not authorized to use this type of message", response);
