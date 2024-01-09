@@ -31,8 +31,7 @@ public class BaseTestClass
                 fixture.EdiB2BBaseUri,
                 fixture.AzureB2CTenantId,
                 fixture.AzureEntraBackendAppId,
-                fixture.EnergySupplierCredential,
-                Output));
+                fixture.EnergySupplierCredential));
     }
 
     protected ITestOutputHelper Output { get; }

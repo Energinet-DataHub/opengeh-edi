@@ -35,15 +35,13 @@ internal sealed class EdiDriver : IDisposable
         Uri ediB2BBaseUri,
         string tenantId,
         string backendAppId,
-        ActorCredential actorCredential,
-        ITestOutputHelper? output = null)
+        ActorCredential actorCredential)
     {
         _httpClient = new HttpClient();
         _httpClient.BaseAddress = ediB2BBaseUri;
         _authenticationDriver = new AzureAuthenticationDriver(
             tenantId,
-            backendAppId,
-            output);
+            backendAppId);
         Token = new AsyncLazy<string>(() => GetTokenAsync(actorCredential));
     }
 

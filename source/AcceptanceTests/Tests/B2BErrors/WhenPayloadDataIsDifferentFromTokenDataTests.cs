@@ -24,28 +24,14 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.B2BErrors;
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
 public class WhenPayloadDataIsDifferentFromTokenDataTests : BaseTestClass
 {
-    private readonly AcceptanceTestFixture _fixture;
-
     public WhenPayloadDataIsDifferentFromTokenDataTests(ITestOutputHelper output, AcceptanceTestFixture fixture)
         : base(output, fixture)
     {
-        _fixture = fixture;
     }
 
     [Fact]
     public async Task Sender_market_participant_mrid_is_different_from_mrid_in_token()
     {
-        var t = _fixture.MeteredDataResponsibleCredential.ClientSecret.Substring(0, 4);
-        Output.WriteLine("B2C tenant id: " + _fixture.AzureB2CTenantId);
-        Output.WriteLine("AzureEntraBackendAppId: " + _fixture.AzureEntraBackendAppId);
-        Output.WriteLine("MeteredDataResponsibleCredential ClientId: " + _fixture.MeteredDataResponsibleCredential.ClientId);
-        Output.WriteLine("MeteredDataResponsibleCredential ClientSecret: " + t);
-        Output.WriteLine("MeteredDataResponsibleCredential ClientSecret length: " + _fixture.MeteredDataResponsibleCredential.ClientSecret.Length);
-
-        var e = _fixture.EnergySupplierCredential.ClientId.Substring(0, 4);
-        var c = _fixture.EnergySupplierCredential.ClientSecret.Substring(0, 4);
-        Output.WriteLine("EnergySupplierCredential ClientId: " + e);
-        Output.WriteLine("EnergySupplierCredential ClientSecret: " + c);
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.WrongSenderMarketParticipantMrid());
 
         var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
