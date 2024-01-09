@@ -83,7 +83,7 @@ internal sealed class EbixDriver : IDisposable
                 await EmptyQueueAsync().ConfigureAwait(false);
             }
         }
-        catch (CommunicationException)
+        catch (TimeoutException e) when (e.InnerException is CommunicationException)
         {
             return; // temp fix for no content when peeking
         }
