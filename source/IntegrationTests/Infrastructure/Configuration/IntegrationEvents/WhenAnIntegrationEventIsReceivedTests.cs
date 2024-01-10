@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.Api;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
@@ -48,7 +49,8 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
                 new Dictionary<string, IIntegrationEventProcessor>
                 {
                     { _testIntegrationEventProcessor.EventTypeToHandle, _testIntegrationEventProcessor },
-                });
+                },
+                GetService<IUnitOfWork>());
 
         _testIntegrationEvent1 = new IntegrationEvent(Guid.NewGuid(), TestIntegrationEventMessage.TestIntegrationEventName, 1, new TestIntegrationEventMessage());
         _unknownIntegrationEvent = new IntegrationEvent(Guid.NewGuid(), "unknown-event-type", 1, null!);

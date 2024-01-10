@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Microsoft.Extensions.Logging;
@@ -31,15 +32,18 @@ public sealed class IntegrationEventHandler : IIntegrationEventHandler
     private readonly ILogger<IntegrationEventHandler> _logger;
     private readonly IReceivedIntegrationEventRepository _receivedIntegrationEventRepository;
     private readonly IReadOnlyDictionary<string, IIntegrationEventProcessor> _integrationEventProcessors;
+    private readonly IUnitOfWork _unitOfWork;
 
     public IntegrationEventHandler(
         ILogger<IntegrationEventHandler> logger,
         IReceivedIntegrationEventRepository receivedIntegrationEventRepository,
-        IReadOnlyDictionary<string, IIntegrationEventProcessor> integrationEventProcessors)
+        IReadOnlyDictionary<string, IIntegrationEventProcessor> integrationEventProcessors,
+        IUnitOfWork unitOfWork)
     {
         _logger = logger;
         _receivedIntegrationEventRepository = receivedIntegrationEventRepository;
         _integrationEventProcessors = integrationEventProcessors;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task HandleAsync(IntegrationEvent integrationEvent)
@@ -69,5 +73,7 @@ public sealed class IntegrationEventHandler : IIntegrationEventHandler
         await integrationEventMapper
             .ProcessAsync(integrationEvent, CancellationToken.None)
             .ConfigureAwait(false);
+
+        await _unitOfWork.CommitTransactionAsync().ConfigureAwait(false);
     }
 }

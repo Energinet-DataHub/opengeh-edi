@@ -52,7 +52,7 @@ public class ActorCertificate
 
     public void Update(CertificateThumbprint thumbprint, Instant validFrom, int sequenceNumber)
     {
-        if (sequenceNumber < SequenceNumber) return;
+        if (sequenceNumber <= SequenceNumber) return;
         Thumbprint = thumbprint;
         ValidFrom = validFrom;
         SequenceNumber = sequenceNumber;

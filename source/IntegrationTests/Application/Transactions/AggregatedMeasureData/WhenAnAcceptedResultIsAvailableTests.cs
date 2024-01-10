@@ -16,6 +16,7 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
@@ -53,7 +54,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         // Arrange
         await _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
-            .StoreAsync(GetService<IMasterDataClient>());
+            .StoreAsync(GetService<IMasterDataClient>(), GetService<IUnitOfWork>());
 
         var process = BuildProcess();
         var acceptedEvent = GetAcceptedEvent(process);
@@ -80,7 +81,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         // Arrange
         await _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
-            .StoreAsync(GetService<IMasterDataClient>());
+            .StoreAsync(GetService<IMasterDataClient>(), GetService<IUnitOfWork>());
 
         var process = BuildProcess();
         var acceptedEvent = GetAcceptedEvent(process);

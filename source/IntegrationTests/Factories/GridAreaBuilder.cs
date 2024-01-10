@@ -16,6 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
@@ -30,13 +31,19 @@ public class GridAreaBuilder
     private static ActorNumber _actorNumber = ActorNumber.Create("5148796574821");
 
 #pragma warning disable CA1822
-    public Task StoreAsync(IMasterDataClient masterDataContext)
+    public Task StoreAsync(IMasterDataClient masterDataContext, IUnitOfWork unitOfWork)
 #pragma warning restore CA1822
     {
         ArgumentNullException.ThrowIfNull(masterDataContext);
+        ArgumentNullException.ThrowIfNull(unitOfWork);
+
         var gridArea = Build();
-        return masterDataContext
-            .UpdateGridAreaOwnershipAsync(gridArea, CancellationToken.None);
+
+        _ = masterDataContext
+            .UpdateGridAreaOwnershipAsync(gridArea, CancellationToken.None)
+            .ConfigureAwait(false);
+
+        return unitOfWork.CommitTransactionAsync();
     }
 
     public GridAreaBuilder WithGridAreaCode(string gridAreaCode)

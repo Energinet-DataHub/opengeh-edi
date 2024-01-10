@@ -18,6 +18,7 @@ using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
@@ -46,7 +47,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         await _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .WithActorNumber(SampleData.GridOperatorNumber)
-            .StoreAsync(GetService<IMasterDataClient>());
+            .StoreAsync(GetService<IMasterDataClient>(), GetService<IUnitOfWork>());
 
         _eventBuilder
             .WithProcessType(ProcessType.BalanceFixing)
@@ -75,7 +76,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         await _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .WithActorNumber(SampleData.GridOperatorNumber)
-            .StoreAsync(GetService<IMasterDataClient>());
+            .StoreAsync(GetService<IMasterDataClient>(), GetService<IUnitOfWork>());
 
         _eventBuilder
             .WithProcessType(ProcessType.BalanceFixing)
@@ -103,7 +104,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         await _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .WithActorNumber(SampleData.GridOperatorNumber)
-            .StoreAsync(GetService<IMasterDataClient>());
+            .StoreAsync(GetService<IMasterDataClient>(), GetService<IUnitOfWork>());
 
         _eventBuilder
             .WithProcessType(ProcessType.BalanceFixing)
@@ -135,7 +136,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         await _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .WithActorNumber(SampleData.BalanceResponsibleNumber)
-            .StoreAsync(GetService<IMasterDataClient>());
+            .StoreAsync(GetService<IMasterDataClient>(), GetService<IUnitOfWork>());
 
         _eventBuilder
             .WithProcessType(ProcessType.BalanceFixing)
@@ -169,7 +170,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         await _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .WithActorNumber(SampleData.BalanceResponsibleNumber)
-            .StoreAsync(GetService<IMasterDataClient>());
+            .StoreAsync(GetService<IMasterDataClient>(), GetService<IUnitOfWork>());
 
         _eventBuilder
             .WithProcessType(ProcessType.BalanceFixing)
@@ -208,7 +209,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         await _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .WithActorNumber(SampleData.GridOperatorNumber)
-            .StoreAsync(GetService<IMasterDataClient>());
+            .StoreAsync(GetService<IMasterDataClient>(), GetService<IUnitOfWork>());
 
         _eventBuilder
             .WithProcessType(processType)
@@ -238,7 +239,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         await _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .WithActorNumber(SampleData.GridOperatorNumber)
-            .StoreAsync(GetService<IMasterDataClient>());
+            .StoreAsync(GetService<IMasterDataClient>(), GetService<IUnitOfWork>());
 
         _eventBuilder
             .WithProcessType(processType)

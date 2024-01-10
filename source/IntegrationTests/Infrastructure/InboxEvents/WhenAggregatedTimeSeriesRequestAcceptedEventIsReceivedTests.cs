@@ -16,6 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
@@ -52,9 +53,9 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
     {
         await _gridAreaBuilder
             .WithGridAreaCode(GridAreaCode)
-            .StoreAsync(GetService<IMasterDataClient>());
+            .StoreAsync(GetService<IMasterDataClient>(), GetService<IUnitOfWork>());
 
-        RegisterInboxEvent();
+        await RegisterInboxEvent();
 
         await _processor.ProcessEventsAsync(CancellationToken.None);
 
@@ -85,7 +86,7 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
         return timeSerie;
     }
 
-    private void RegisterInboxEvent()
+    private Task RegisterInboxEvent()
     {
         var context = GetService<B2BContext>();
         context.ReceivedInboxEvents.Add(new ReceivedInboxEvent(
@@ -94,7 +95,8 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
             _referenceId,
             _aggregatedTimeSeriesRequestAcceptedResponse.ToByteArray(),
             GetService<ISystemDateTimeProvider>().Now()));
-        context.SaveChanges();
+
+        return GetService<IUnitOfWork>().CommitTransactionAsync();
     }
 
     private async Task EventIsMarkedAsProcessedAsync(string eventId)
