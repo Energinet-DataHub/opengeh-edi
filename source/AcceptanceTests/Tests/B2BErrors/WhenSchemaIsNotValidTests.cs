@@ -12,10 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
+using Energinet.DataHub.EDI.AcceptanceTests;
+using Energinet.DataHub.EDI.AcceptanceTests.Factories;
+using Energinet.DataHub.EDI.AcceptanceTests.TestData;
+using Energinet.DataHub.EDI.AcceptanceTests.Tests;
+using Energinet.DataHub.EDI.AcceptanceTests.Tests.Asserters;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.B2BErrors;
 
+[SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Test code should not configure await.")]
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
 public class WhenSchemaIsNotValidTests : BaseTestClass
 {
