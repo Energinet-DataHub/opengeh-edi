@@ -121,9 +121,6 @@ public class AcceptanceTestFixture : IAsyncLifetime
         var initializeTasks = new List<Task>
         {
 #if !DEBUG // Locally we cannot access the Azure Service Bus, so this will fail
-            EventPublisher.PublishAsync(ActorActivated.EventName, ebixActorActivated.ToByteArray()),
-            EventPublisher.PublishAsync(ActorActivated.EventName, meteredDataResponsibleActivated.ToByteArray()),
-            EventPublisher.PublishAsync(ActorActivated.EventName, energySupplierActivated.ToByteArray()),
             EventPublisher.PublishAsync(ActorCertificateCredentialsAssigned.EventName, actorCertificateAssigned.ToByteArray()),
             EventPublisher.PublishAsync(GridAreaOwnershipAssigned.EventName, ebixGridAreaOwnerAssigned.ToByteArray()),
             EventPublisher.PublishAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnerAssigned.ToByteArray()),
