@@ -40,9 +40,9 @@ internal sealed class AggregationResultDsl
         return _edi.PeekMessageAsync();
     }
 
-    internal Task ConfirmResultIsAvailableForToken(ActorCredential actorCredential)
+    internal Task ConfirmResultIsAvailableForToken()
     {
-        return _edi.PeekMessageAsync(actorCredential);
+        return _edi.PeekMessageAsync();
     }
 
     internal async Task EmptyQueueForActor()

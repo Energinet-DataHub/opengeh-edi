@@ -14,7 +14,6 @@
 
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
-using Xunit.Abstractions;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
@@ -25,20 +24,17 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
 public sealed class WhenAggregatedMeasureDataIsRequestedTests
 {
-    private readonly AcceptanceTestFixture _fixture;
     private readonly AggregatedMeasureDataRequestDsl _aggregationRequest;
 
-    public WhenAggregatedMeasureDataIsRequestedTests(AcceptanceTestFixture fixture, ITestOutputHelper output)
+    public WhenAggregatedMeasureDataIsRequestedTests(AcceptanceTestFixture fixture)
     {
-        _fixture = fixture;
         ArgumentNullException.ThrowIfNull(fixture);
         _aggregationRequest = new AggregatedMeasureDataRequestDsl(
             new EdiDriver(
                 fixture.EdiB2BBaseUri,
                 fixture.AzureB2CTenantId,
                 fixture.AzureEntraBackendAppId,
-                fixture.MeteredDataResponsibleCredential,
-                output));
+                fixture.MeteredDataResponsibleCredential));
     }
 
     [Fact]

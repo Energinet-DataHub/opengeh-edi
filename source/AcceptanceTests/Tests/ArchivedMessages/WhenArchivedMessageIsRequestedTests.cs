@@ -66,7 +66,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
                 null!,
                 null!));
 
-        await _aggregationResult.ConfirmResultIsAvailableForToken(_fixture.EnergySupplierCredential);
+        await _aggregationResult.ConfirmResultIsAvailableForToken();
 
         Assert.NotNull(response[0].Id);
     }
@@ -80,7 +80,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 
         if (payload != null) await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 
-        await _aggregationResult.ConfirmResultIsAvailableForToken(_fixture.EnergySupplierCredential);
+        await _aggregationResult.ConfirmResultIsAvailableForToken();
 
         var archivedRequestResponse = await _archivedMessage.RequestArchivedMessageSearchAsync(
             new Uri(_fixture.B2CApiUri, "ArchivedMessageSearch"),
@@ -116,7 +116,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 
         var archivedMessage = response[0];
 
-        await _aggregationResult.ConfirmResultIsAvailableForToken(_fixture.EnergySupplierCredential);
+        await _aggregationResult.ConfirmResultIsAvailableForToken();
 
         Assert.NotNull(archivedMessage.Id);
         Assert.NotNull(archivedMessage.MessageId);

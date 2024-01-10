@@ -22,7 +22,6 @@ using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
 using Energinet.DataHub.EDI.AcceptanceTests.TestData;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Nito.AsyncEx;
-using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
@@ -35,15 +34,13 @@ internal sealed class EdiDriver : IDisposable
         Uri ediB2BBaseUri,
         string tenantId,
         string backendAppId,
-        ActorCredential actorCredential,
-        ITestOutputHelper? output = null)
+        ActorCredential actorCredential)
     {
         _httpClient = new HttpClient();
         _httpClient.BaseAddress = ediB2BBaseUri;
         _authenticationDriver = new AzureAuthenticationDriver(
             tenantId,
-            backendAppId,
-            output);
+            backendAppId);
         Token = new AsyncLazy<string>(() => GetTokenAsync(actorCredential));
     }
 
@@ -63,11 +60,9 @@ internal sealed class EdiDriver : IDisposable
         return document;
     }
 
-    public async Task<Stream> PeekMessageAsync(ActorCredential? actorCredential = null)
+    public async Task<Stream> PeekMessageAsync()
     {
-        var token = actorCredential is not null ? await _authenticationDriver
-            .GetB2BTokenAsync(actorCredential.ClientId, actorCredential.ClientSecret)
-            .ConfigureAwait(false) : await Token;
+        var token = await Token;
 
         var stopWatch = Stopwatch.StartNew();
         while (stopWatch.ElapsedMilliseconds < 60000)
