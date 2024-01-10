@@ -12,31 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.IO;
+using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
+using NodaTime;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
 
-public class MarketDocument
+public class OutgoingMessageDocumentClient : IOutgoingMessageDocumentClient
 {
-    private readonly Guid _id;
-
-    public MarketDocument(Stream payload, BundleId bundleId, UploadedDocumentReference uploadedDocumentReference)
+    public Task<UploadedDocumentReference> UploadDocumentAsync(Stream marketDocumentFile, ActorNumber receiver, Instant timestamp)
     {
-        _id = Guid.NewGuid();
-        Payload = payload;
-        BundleId = bundleId;
-        UploadedDocumentReference = uploadedDocumentReference;
-    }
+        var reference = UploadedDocumentReference.Create("foo");
 
-    public Stream Payload { get; }
-
-    public BundleId BundleId { get; }
-
-    public UploadedDocumentReference UploadedDocumentReference { get; }
-
-#pragma warning disable
-    private MarketDocument()
-    {
+        return Task.FromResult(reference);
     }
 }

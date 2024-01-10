@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages.Queueing;
@@ -58,6 +59,9 @@ public static class ActorMessageQueueConfiguration
         //DequeConfiguration
         services.AddTransient<MessageDequeuer>();
         services.AddTransient<IDataRetention, DequeuedBundlesRetention>();
+
+        //OutgoingMessageDocumentClient
+        services.AddTransient<IOutgoingMessageDocumentClient, OutgoingMessageDocumentClient>();
 
         services.AddTransient<IOutgoingMessagesClient, OutgoingMessagesClient>();
     }

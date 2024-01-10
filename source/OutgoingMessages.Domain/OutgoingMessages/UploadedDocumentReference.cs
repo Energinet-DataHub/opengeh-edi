@@ -13,30 +13,23 @@
 // limitations under the License.
 
 using System;
-using System.IO;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 
-public class MarketDocument
+public class UploadedDocumentReference : ValueObject
 {
-    private readonly Guid _id;
-
-    public MarketDocument(Stream payload, BundleId bundleId, UploadedDocumentReference uploadedDocumentReference)
+    private UploadedDocumentReference(string reference)
     {
-        _id = Guid.NewGuid();
-        Payload = payload;
-        BundleId = bundleId;
-        UploadedDocumentReference = uploadedDocumentReference;
+        Value = reference;
     }
 
-    public Stream Payload { get; }
+    public string Value { get; }
 
-    public BundleId BundleId { get; }
-
-    public UploadedDocumentReference UploadedDocumentReference { get; }
-
-#pragma warning disable
-    private MarketDocument()
+    public static UploadedDocumentReference Create(string reference)
     {
+        if (string.IsNullOrEmpty(reference)) throw new ArgumentNullException(nameof(reference));
+
+        return new UploadedDocumentReference(reference);
     }
 }
