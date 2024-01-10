@@ -32,7 +32,7 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
     public Task<FrontendUser?> ProvideUserAsync(
         Guid userId,
         Guid actorId,
-        bool isFas,
+        bool multiTenancy,
         IEnumerable<Claim> claims)
     {
         if (claims == null) throw new ArgumentNullException(nameof(claims));
@@ -68,11 +68,11 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
         if (azp is null)
             throw new MissingAzpException();
 
-        SetAuthenticatedActor(ActorNumber.Create(actorNumber), accessAllData: isFas, role: TryGetMarketRole(role));
+        SetAuthenticatedActor(ActorNumber.Create(actorNumber), accessAllData: multiTenancy, role: TryGetMarketRole(role));
         return Task.FromResult<FrontendUser?>(new FrontendUser(
             userId,
             actorId,
-            isFas,
+            multiTenancy,
             actorNumber,
             role,
             azp));
