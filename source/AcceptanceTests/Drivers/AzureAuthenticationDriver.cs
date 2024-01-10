@@ -46,13 +46,14 @@ public sealed class AzureAuthenticationDriver : IDisposable
         if (clientSecret == null) throw new ArgumentNullException(nameof(clientSecret));
         if (_output != null)
         {
-            var t = clientSecret.Substring(0, 4);
-            var c = clientId.Substring(0, 4);
+            var t = clientSecret.Substring(0, clientSecret.Length <= 4 ? 4 : clientSecret.Length);
+            var c = clientId.Substring(0, clientId.Length <= 4 ? 4 : clientId.Length);
             _output.WriteLine("B2C tenant id: " + _tenantId);
             _output.WriteLine("AzureEntraBackendAppId: " + _backendAppId);
             _output.WriteLine("ClientId: " + c);
             _output.WriteLine("ClientSecret: " + t);
-            _output.WriteLine("MeteredDataResponsibleCredential ClientSecret length: " + clientSecret.Length);
+            _output.WriteLine("ClientSecret length: " + clientSecret.Length);
+            _output.WriteLine("ClientId length: " + clientId.Length);
         }
 
         using var request = new HttpRequestMessage(HttpMethod.Post, new Uri($"https://login.microsoftonline.com/{_tenantId}/oauth2/v2.0/token", UriKind.Absolute));
