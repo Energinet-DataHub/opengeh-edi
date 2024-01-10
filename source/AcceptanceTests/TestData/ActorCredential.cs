@@ -17,4 +17,4 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
 /// <summary>
 /// Represents a credential for an actor that can interact with EDI.
 /// </summary>
-public record ActorCredential(string ClientId, string ClientSecret, string AzpToken);
+public record ActorCredential(string ClientId, string ClientSecret);

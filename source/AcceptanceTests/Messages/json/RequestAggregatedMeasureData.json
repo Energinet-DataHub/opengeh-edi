@@ -17,7 +17,7 @@
     },
     "sender_MarketParticipant.mRID": {
       "codingScheme": "A10",
-      "value": "5790000701414"
+      "value": "5790000392551"
     },
     "sender_MarketParticipant.marketRole.type": {
       "value": "MDR"
@@ -28,8 +28,8 @@
     "Series": [
       {
         "mRID": "{TransactionId}",
-        "start_DateAndOrTime.dateTime": "2023-07-26T22:00:00Z",
-        "end_DateAndOrTime.dateTime": "2023-07-27T22:00:00Z",
+        "start_DateAndOrTime.dateTime": "2023-01-30T22:00:00Z",
+        "end_DateAndOrTime.dateTime": "2023-02-01T22:00:00Z",
         "marketEvaluationPoint.settlementMethod": {
           "value": "D01"
         },
@@ -38,7 +38,7 @@
         },
         "meteringGridArea_Domain.mRID": {
           "codingScheme": "NDK",
-          "value": "544"
+          "value": "804"
         }
       }
     ]

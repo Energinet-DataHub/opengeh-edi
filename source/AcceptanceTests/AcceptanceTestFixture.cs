@@ -29,8 +29,8 @@ public class AcceptanceTestFixture : IAsyncLifetime
 {
     internal const string EbixActorNumber = "5790000610976"; // Corresponds to the "Mosaic 03" actor in the UI.
     internal const string EbixActorGridArea = "543";
-    internal const string CimActorNumber = "5790000701414";
-    internal const string CimActorGridArea = "544";
+    internal const string CimActorNumber = "5790000392551";
+    internal const string CimActorGridArea = "804";
     private const EicFunction ActorEicFunction = EicFunction.MeteredDataResponsible;
 
     private readonly string _ebixCertificateThumbprint;
@@ -65,13 +65,11 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
         var meteredDataResponsibleId = root.GetValue<string>("METERED_DATA_RESPONSIBLE_CLIENT_ID") ?? throw new InvalidOperationException("METERED_DATA_RESPONSIBLE_CLIENT_ID is not set in configuration");
         var meteredDataResponsibleSecret = root.GetValue<string>("METERED_DATA_RESPONSIBLE_CLIENT_SECRET") ?? throw new InvalidOperationException("METERED_DATA_RESPONSIBLE_CLIENT_SECRET is not set in configuration");
-        var meteredDataResponsibleAzpToken = root.GetValue<string>("METERED_DATA_RESPONSIBLE_AZP_TOKEN") ?? throw new InvalidOperationException("METERED_DATA_RESPONSIBLE_AZP_TOKEN is not set in configuration");
-        MeteredDataResponsibleCredential = new ActorCredential(meteredDataResponsibleId, meteredDataResponsibleSecret, meteredDataResponsibleAzpToken);
+        MeteredDataResponsibleCredential = new ActorCredential(meteredDataResponsibleId, meteredDataResponsibleSecret);
 
         var energySupplierId = root.GetValue<string>("ENERGY_SUPPLIER_CLIENT_ID") ?? throw new InvalidOperationException("ENERGY_SUPPLIER_CLIENT_ID is not set in configuration");
         var energySupplierSecret = root.GetValue<string>("ENERGY_SUPPLIER_CLIENT_SECRET") ?? throw new InvalidOperationException("ENERGY_SUPPLIER_CLIENT_SECRET is not set in configuration");
-        var energySupplierAzpToken = root.GetValue<string>("ENERGY_SUPPLIER_AZP_TOKEN") ?? throw new InvalidOperationException("ENERGY_SUPPLIER_AZP_TOKEN is not set in configuration");
-        EnergySupplierCredential = new ActorCredential(energySupplierId, energySupplierSecret, energySupplierAzpToken);
+        EnergySupplierCredential = new ActorCredential(energySupplierId, energySupplierSecret);
 
         ApiManagementUri = new Uri(root.GetValue<string>("apim-gateway-url") ?? throw new InvalidOperationException("apim-gateway-url secret is not set in configuration"));
         AzureB2CTenantId = root.GetValue<string>("b2c-tenant-id") ?? "e9aa9b15-7200-441e-b255-927506b3494";
@@ -116,9 +114,6 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        var ebixActorActivated = ActorFactory.CreateActorActivated(EbixActorNumber, string.Empty);
-        var meteredDataResponsibleActivated = ActorFactory.CreateActorActivated(CimActorNumber, MeteredDataResponsibleCredential.AzpToken);
-        var energySupplierActivated = ActorFactory.CreateActorActivated(CimActorNumber, EnergySupplierCredential.AzpToken);
         var actorCertificateAssigned = ActorCertificateFactory.CreateActorCertificateAssigned(EbixActorNumber, ActorEicFunction, _ebixCertificateThumbprint);
         var ebixGridAreaOwnerAssigned = GridAreaFactory.AssignedGridAreaOwner(EbixActorNumber, EbixActorGridArea, ActorEicFunction);
         var gridAreaOwnerAssigned = GridAreaFactory.AssignedGridAreaOwner(CimActorNumber, CimActorGridArea, ActorEicFunction);
