@@ -46,8 +46,8 @@ public sealed class AzureAuthenticationDriver : IDisposable
         if (clientSecret == null) throw new ArgumentNullException(nameof(clientSecret));
         if (_output != null)
         {
-            var t = clientSecret.Substring(0, clientSecret.Length <= 4 ? 4 : clientSecret.Length);
-            var c = clientId.Substring(0, clientId.Length <= 4 ? 4 : clientId.Length);
+            var t = clientSecret.Substring(0, clientSecret.Length >= 4 ? 4 : clientSecret.Length);
+            var c = clientId.Substring(0, clientId.Length >= 4 ? 4 : clientId.Length);
             _output.WriteLine("B2C tenant id: " + _tenantId);
             _output.WriteLine("AzureEntraBackendAppId: " + _backendAppId);
             _output.WriteLine("ClientId: " + c);
