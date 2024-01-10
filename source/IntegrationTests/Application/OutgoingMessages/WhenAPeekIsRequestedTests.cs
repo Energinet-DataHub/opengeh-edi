@@ -27,6 +27,8 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using FluentAssertions;
+using FluentAssertions.Execution;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
@@ -103,6 +105,21 @@ public class WhenAPeekIsRequestedTests : TestBase
         await AssertMessageIsArchived(result.MessageId);
     }
 
+    [Fact]
+    public async Task The_generated_market_document_is_added_to_database()
+    {
+        var message = _outgoingMessageDtoBuilder
+            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            .WithReceiverRole(MarketRole.EnergySupplier)
+            .Build();
+        await EnqueueMessage(message);
+
+        var result = await PeekMessage(MessageCategory.Aggregations);
+
+        result.MessageId.Should().NotBeNull();
+        await AssertMarketDocumentExists(result.MessageId!.Value);
+    }
+
     private static string ConvertMemoryStreamToString(Stream memoryStream)
     {
         // Reset the position of the MemoryStream to the beginning
@@ -136,6 +153,17 @@ public class WhenAPeekIsRequestedTests : TestBase
             await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var found = await connection.ExecuteScalarAsync<bool>(sqlStatement);
         Assert.True(found);
+    }
+
+    private async Task AssertMarketDocumentExists(Guid marketDocumentBundleId)
+    {
+        var sqlStatement =
+            $"SELECT COUNT(*) FROM [dbo].[MarketDocuments] WHERE BundleId = '{marketDocumentBundleId}'";
+        using var connection =
+            await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+        var found = await connection.ExecuteScalarAsync<bool>(sqlStatement);
+
+        found.Should().BeTrue();
     }
 
     private async Task EnqueueMessage(OutgoingMessageDto message)
