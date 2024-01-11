@@ -65,7 +65,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
         var energySupplierId = root.GetValue<string>("ENERGY_SUPPLIER_CLIENT_ID") ?? throw new InvalidOperationException("ENERGY_SUPPLIER_CLIENT_ID is not set in configuration");
         var energySupplierSecret = root.GetValue<string>("ENERGY_SUPPLIER_CLIENT_SECRET") ?? throw new InvalidOperationException("ENERGY_SUPPLIER_CLIENT_SECRET is not set in configuration");
-        B2BEnergySupplierAuthorizedHttpClient = new AsyncLazy<HttpClient>(() => CreateB2BAuthorizedHttpClientAsync(azureB2CTenantId, azureEntraBackendAppId, energySupplierId, energySupplierSecret, ediB2BBaseUri));
+        B2BEnergySupplierAuthorizedHttpClient = new AsyncLazy<HttpClient>(() => CreateB2BAuthorizedHttpClient2Async(azureB2CTenantId, azureEntraBackendAppId, energySupplierId, energySupplierSecret, ediB2BBaseUri));
 
         ApiManagementUri = new Uri(root.GetValue<string>("apim-gateway-url") ?? throw new InvalidOperationException("apim-gateway-url secret is not set in configuration"));
 
@@ -113,6 +113,25 @@ public class AcceptanceTestFixture : IAsyncLifetime
     }
 
     private static async Task<HttpClient> CreateB2BAuthorizedHttpClientAsync(
+        string azureB2CTenantId,
+        string azureEntraBackendAppId,
+        string clientId,
+        string clientSecret,
+        Uri baseAddress)
+    {
+        var httpClient = new HttpClient();
+
+        var tokenRetriever = new B2BTokenReceiver(httpClient, azureB2CTenantId, azureEntraBackendAppId);
+        var token = await tokenRetriever
+            .GetB2BTokenAsync(clientId, clientSecret)
+            .ConfigureAwait(false);
+
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+        httpClient.BaseAddress = baseAddress;
+        return httpClient;
+    }
+
+    private static async Task<HttpClient> CreateB2BAuthorizedHttpClient2Async(
         string azureB2CTenantId,
         string azureEntraBackendAppId,
         string clientId,
