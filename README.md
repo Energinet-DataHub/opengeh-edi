@@ -1,7 +1,5 @@
 # EDI domain
 
-[![codecov](https://codecov.io/gh/Energinet-DataHub/geh-edi/branch/main/graph/badge.svg?token=R80X7DC6C0)](https://codecov.io/gh/Energinet-DataHub/opengeh-edi)
-
 ## Intro
 
 The EDI domain is responsible for handling incoming and outgoing message too and from DataHub.
