@@ -90,21 +90,39 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             };
         }
 
-        /*public Dictionary<string, string> EmptyTransactionId()
+        public static Dictionary<string, string> SchemaValidationErrorOnWrongBusinessSectorType()
         {
             return new Dictionary<string, string>
             {
-                { "cim:mRID", "" },
+                { "cim:businessSector.type", "232" },
             };
         }
 
-        public Dictionary<string, string> InvalidTransactionId()
+        public static Dictionary<string, string> InvalidLengthOfMessageId()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:mRID", Guid.NewGuid() + "1" },
+            };
+        }
+
+        public static Dictionary<string, string> EmptyTransactionId()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:mRID", string.Empty },
+            };
+        }
+
+        public static Dictionary<string, string> InvalidTransactionId()
         {
             return new Dictionary<string, string>
             {
                 { "cim:mRID", "invalidId" },
             };
         }
+
+        /*
 
         public Dictionary<string, string> SchemaVersionIsInvalid()
         {
@@ -112,14 +130,6 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             return new Dictionary<string, string>
             {
                 { "cim:mRID", "invalidId" },
-            };
-        }
-
-        public Dictionary<string, string> SchemaValidationErrorOnType()
-        {
-            return new Dictionary<string, string>
-            {
-                { "cim:businessSector.type", "232" },
             };
         }
 
