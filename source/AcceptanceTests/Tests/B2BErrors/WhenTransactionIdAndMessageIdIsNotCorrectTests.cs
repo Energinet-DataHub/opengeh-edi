@@ -83,7 +83,7 @@ public class WhenTransactionIdAndMessageIdIsNotCorrectTests : BaseTestClass
     }
 
     [Fact]
-    public async Task Transaction_is_is_invalid_produces_error()
+    public async Task Transaction_id_is_invalid_produces_error()
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.InvalidTransactionId());
 
