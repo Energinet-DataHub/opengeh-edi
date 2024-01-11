@@ -18,18 +18,17 @@ using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
-public sealed class AzureAuthenticationDriver : IDisposable
+public class B2BTokenReceiver
 {
+    private readonly HttpClient _httpClient;
     private readonly string _tenantId;
     private readonly string _backendAppId;
-    private readonly HttpClient _httpClient;
 
-    public AzureAuthenticationDriver(string tenantId, string backendAppId)
+    public B2BTokenReceiver(HttpClient httpClient, string tenantId, string backendAppId)
     {
         _tenantId = tenantId;
         _backendAppId = backendAppId;
-        _httpClient = new HttpClient();
+        _httpClient = httpClient;
     }
 
     public void Dispose()
@@ -51,13 +50,13 @@ public sealed class AzureAuthenticationDriver : IDisposable
             new("scope", $"{_backendAppId}/.default"),
         });
 
-        var response = await _httpClient.SendAsync(request);
+        var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
 
-        var accessToken = await response.Content.ReadFromJsonAsync<AccessTokenResponse>();
+        var accessToken = await response.Content.ReadFromJsonAsync<AccessTokenResponse>().ConfigureAwait(false);
 
         if (string.IsNullOrEmpty(accessToken?.AccessToken))
-            throw new JsonException($"Couldn't parse Azure AD access token. Response content: {await response.Content.ReadAsStringAsync()}");
+            throw new JsonException($"Couldn't parse Azure AD access token. Response content: {await response.Content.ReadAsStringAsync().ConfigureAwait(false)}");
 
         return accessToken.AccessToken;
     }

@@ -24,20 +24,15 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
 public sealed class WhenAggregationResultIsPublishedTests
 {
-    private readonly AcceptanceTestFixture _fixture;
     private readonly AggregationResultDsl _aggregations;
 
     public WhenAggregationResultIsPublishedTests(AcceptanceTestFixture fixture)
     {
-        _fixture = fixture;
         ArgumentNullException.ThrowIfNull(fixture);
 
         _aggregations = new AggregationResultDsl(
             new EdiDriver(
-                fixture.EdiB2BBaseUri,
-                fixture.AzureB2CTenantId,
-                fixture.AzureEntraBackendAppId,
-                fixture.MeteredDataResponsibleCredential),
+                fixture.B2BMeteredDataResponsibleAuthorizedHttpClient),
             new WholesaleDriver(fixture.EventPublisher));
     }
 

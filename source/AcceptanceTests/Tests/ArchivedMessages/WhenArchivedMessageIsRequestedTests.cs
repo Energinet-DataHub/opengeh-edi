@@ -36,16 +36,10 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
         Debug.Assert(fixture != null, nameof(fixture) + " != null");
         _fixture = fixture;
         _archivedMessage = new ArchivedMessageDsl(
-            new AzureAuthenticationDriver(
-                fixture.AzureB2CTenantId,
-                fixture.AzureEntraBackendAppId),
             new EdiB2CDriver(fixture.B2CAuthorizedHttpClient));
         _aggregationResult = new AggregationResultDsl(
             new EdiDriver(
-                fixture.EdiB2BBaseUri,
-                fixture.AzureB2CTenantId,
-                fixture.AzureEntraBackendAppId,
-                _fixture.EnergySupplierCredential),
+                _fixture.B2BEnergySupplierAuthorizedHttpClient),
             new WholesaleDriver(fixture.EventPublisher));
     }
 
