@@ -2,7 +2,7 @@
 
 Energinet and any contributors reserve all others rights, whether under their respective copyrights, patents, licenses, or trademarks, whether by implication, estoppel or otherwise.
 
-It is our intention to acknowledge all third-party product licenses used in this document. If you miss your license please contact greenenergyhub@energinet.dk, and we will take action to change the file.
+It is our intention to acknowledge all third-party product licenses used in this document. If you miss your license please contact <greenenergyhub@energinet.dk>, and we will take action to change the file.
 
 ## Third-Party Licenses
 
@@ -44,7 +44,6 @@ The Green Energy Hub repository relies on open source libraries and tools. We re
 | `Azure/functions-action@v1`                          | <https://github.com/Azure/functions-action>                          | MIT                    |
 | `actions/checkout@master`                            | <https://github.com/actions/checkout>                                | MIT                    |
 | `actions/checkout@v2`                                | <https://github.com/actions/checkout>                                | MIT                    |
-| `codecov/codecov-action@v1`                          | <https://github.com/codecov/codecov-action>                          | MIT                    |
 | `actions/download-artifact@v2`                       | <https://github.com/actions/download-artifact>                       | MIT                    |
 | `actions/setup-dotnet@v1`                            | <https://github.com/actions/setup-dotnet>                            | MIT                    |
 | `actions/setup-python@v2`                            | <https://github.com/actions/setup-python>                            | MIT                    |
