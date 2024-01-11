@@ -61,11 +61,11 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
         var meteredDataResponsibleId = root.GetValue<string>("METERED_DATA_RESPONSIBLE_CLIENT_ID") ?? throw new InvalidOperationException("METERED_DATA_RESPONSIBLE_CLIENT_ID is not set in configuration");
         var meteredDataResponsibleSecret = root.GetValue<string>("METERED_DATA_RESPONSIBLE_CLIENT_SECRET") ?? throw new InvalidOperationException("METERED_DATA_RESPONSIBLE_CLIENT_SECRET is not set in configuration");
-        B2BMeteredDataResponsibleAuthorizedHttpClient = new AsyncLazy<HttpClient>(() => CreateB2BAuthorizedHttpClientAsync(azureB2CTenantId, azureEntraBackendAppId, meteredDataResponsibleId, meteredDataResponsibleSecret, ediB2BBaseUri));
+        B2BMeteredDataResponsibleAuthorizedHttpClient = new AsyncLazy<HttpClient>(() => CreateB2BMeteredDataResponsibleAuthorizedHttpClientAsync(azureB2CTenantId, azureEntraBackendAppId, meteredDataResponsibleId, meteredDataResponsibleSecret, ediB2BBaseUri));
 
         var energySupplierId = root.GetValue<string>("ENERGY_SUPPLIER_CLIENT_ID") ?? throw new InvalidOperationException("ENERGY_SUPPLIER_CLIENT_ID is not set in configuration");
         var energySupplierSecret = root.GetValue<string>("ENERGY_SUPPLIER_CLIENT_SECRET") ?? throw new InvalidOperationException("ENERGY_SUPPLIER_CLIENT_SECRET is not set in configuration");
-        B2BEnergySupplierAuthorizedHttpClient = new AsyncLazy<HttpClient>(() => CreateB2BAuthorizedHttpClient2Async(azureB2CTenantId, azureEntraBackendAppId, energySupplierId, energySupplierSecret, ediB2BBaseUri));
+        B2BEnergySupplierAuthorizedHttpClient = new AsyncLazy<HttpClient>(() => CreateB2BEnergySupplierAuthorizedHttpClientAsync(azureB2CTenantId, azureEntraBackendAppId, energySupplierId, energySupplierSecret, ediB2BBaseUri));
 
         ApiManagementUri = new Uri(root.GetValue<string>("apim-gateway-url") ?? throw new InvalidOperationException("apim-gateway-url secret is not set in configuration"));
 
@@ -112,39 +112,41 @@ public class AcceptanceTestFixture : IAsyncLifetime
             (await B2CAuthorizedHttpClient).Dispose();
     }
 
-    private static async Task<HttpClient> CreateB2BAuthorizedHttpClientAsync(
+    private static async Task<HttpClient> CreateB2BMeteredDataResponsibleAuthorizedHttpClientAsync(
         string azureB2CTenantId,
         string azureEntraBackendAppId,
         string clientId,
         string clientSecret,
         Uri baseAddress)
     {
-        var httpClient = new HttpClient();
+        var httpTokenClient = new HttpClient();
 
-        var tokenRetriever = new B2BTokenReceiver(httpClient, azureB2CTenantId, azureEntraBackendAppId);
+        var tokenRetriever = new B2BTokenReceiver(httpTokenClient, azureB2CTenantId, azureEntraBackendAppId);
         var token = await tokenRetriever
             .GetB2BTokenAsync(clientId, clientSecret)
             .ConfigureAwait(false);
 
+        var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
         httpClient.BaseAddress = baseAddress;
         return httpClient;
     }
 
-    private static async Task<HttpClient> CreateB2BAuthorizedHttpClient2Async(
+    private static async Task<HttpClient> CreateB2BEnergySupplierAuthorizedHttpClientAsync(
         string azureB2CTenantId,
         string azureEntraBackendAppId,
         string clientId,
         string clientSecret,
         Uri baseAddress)
     {
-        var httpClient = new HttpClient();
+        var httpTokenClient = new HttpClient();
 
-        var tokenRetriever = new B2BTokenReceiver(httpClient, azureB2CTenantId, azureEntraBackendAppId);
+        var tokenRetriever = new B2BTokenReceiver(httpTokenClient, azureB2CTenantId, azureEntraBackendAppId);
         var token = await tokenRetriever
             .GetB2BTokenAsync(clientId, clientSecret)
             .ConfigureAwait(false);
 
+        var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
         httpClient.BaseAddress = baseAddress;
         return httpClient;
