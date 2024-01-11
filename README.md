@@ -19,9 +19,7 @@ For people on the project please read the internal documentation (Confluence) fo
 
 ## Where can I get more help?
 
-Read about community for Green Energy Hub [here](https://github.com/Energinet-DataHub/green-energy-hub/blob/main/COMMUNITY.md) and learn about how to get involved and get help.
-
-Please note that we have provided a [Dictionary](https://github.com/Energinet-DataHub/green-energy-hub/tree/main/docs/dictionary-and-concepts) to help understand many of the terms used throughout the repository.
+Read about community for Green Energy Hub [here](https://github.com/Energinet-DataHub/green-energy-hub) and learn about how to get involved and get help.
 
 ## Thanks to all the people who already contributed
 
