@@ -12,15 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
+using Energinet.DataHub.EDI.AcceptanceTests.Factories;
+using Energinet.DataHub.EDI.AcceptanceTests.TestData;
+using Energinet.DataHub.EDI.AcceptanceTests.Tests.Asserters;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.B2BErrors;
 
+[SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Test code should not configure await.")]
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
 public class WhenBusinessTypeAndProcessTypeIsNotCorrectTests : BaseTestClass
 {
     public WhenBusinessTypeAndProcessTypeIsNotCorrectTests(ITestOutputHelper output, AcceptanceTestFixture fixture)
         : base(output, fixture)
     {
+    }
+
+    [Fact]
+    public async Task Wrong_business_sector_type_produces_schema_validation_error()
+    {
+        var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.SchemaValidationErrorOnWrongBusinessSectorType());
+
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+
+        Output.WriteLine(response);
+
+        await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00302", "schema validation error", response);
     }
 }
