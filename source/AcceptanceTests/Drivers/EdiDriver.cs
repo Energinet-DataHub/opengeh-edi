@@ -137,7 +137,16 @@ internal sealed class EdiDriver : IDisposable
 
     public async Task PeekMessageWithoutTokenAsync()
     {
-        var act = () => PeekAsync(null);
+        var act = async () =>
+        {
+            var b2bClient = await _httpClient;
+            using var request = new HttpRequestMessage(HttpMethod.Get, "api/peek/aggregations");
+            request.Headers.Authorization = new AuthenticationHeaderValue("bearer", null);
+            request.Content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
+            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            var peekResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
+            peekResponse.EnsureSuccessStatusCode();
+        };
 
         var httpRequestException = await Assert.ThrowsAsync<HttpRequestException>(act).ConfigureAwait(false);
 
@@ -146,7 +155,14 @@ internal sealed class EdiDriver : IDisposable
 
     public async Task DequeueMessageWithoutTokenAsync(string messageId)
     {
-        var act = () => DequeueAsync(messageId);
+        var act = async () =>
+        {
+            var b2bClient = await _httpClient;
+            using var request = new HttpRequestMessage(HttpMethod.Delete, $"api/dequeue/{messageId}");
+            request.Headers.Authorization = new AuthenticationHeaderValue("bearer", null);
+            var dequeueResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
+            dequeueResponse.EnsureSuccessStatusCode();
+        };
 
         var httpRequestException = await Assert.ThrowsAsync<HttpRequestException>(act).ConfigureAwait(false);
 
@@ -201,11 +217,10 @@ internal sealed class EdiDriver : IDisposable
         return jsonContent;
     }
 
-    private async Task<HttpResponseMessage> PeekAsync(string? token = null)
+    private async Task<HttpResponseMessage> PeekAsync()
     {
         var b2bClient = await _httpClient;
         using var request = new HttpRequestMessage(HttpMethod.Get, "api/peek/aggregations");
-        if (token is not null) request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
         request.Content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         var peekResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
@@ -213,11 +228,10 @@ internal sealed class EdiDriver : IDisposable
         return peekResponse;
     }
 
-    private async Task DequeueAsync(string messageId, string? token = null)
+    private async Task DequeueAsync(string messageId)
     {
         var b2bClient = await _httpClient;
         using var request = new HttpRequestMessage(HttpMethod.Delete, $"api/dequeue/{messageId}");
-        if (token is not null) request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
         var dequeueResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
         dequeueResponse.EnsureSuccessStatusCode();
     }
