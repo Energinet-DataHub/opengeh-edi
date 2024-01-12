@@ -103,6 +103,6 @@ public class WhenTransactionIdAndMessageIdIsNotCorrectTests : BaseTestClass
 
         Output.WriteLine(response);
 
-        await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00305", "Message id " + payload.GetElementsByTagName("cim:mRID")[0]?.InnerText + "1 is invalid. Must contain 36 characters.", response);
+        await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00305", "Message id " + payload.GetElementsByTagName("cim:mRID")[0]?.InnerText + " is invalid. Must contain 36 characters.", response);
     }
 }
