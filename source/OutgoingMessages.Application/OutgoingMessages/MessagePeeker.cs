@@ -79,14 +79,14 @@ public class MessagePeeker
 
             await _archivedMessageClient.CreateAsync(
                 new ArchivedMessage(
-                peekResult.BundleId.Id.ToString(),
-                peekResult.BundleId.Id.ToString(),
-                outgoingMessageBundle.DocumentType.ToString(),
-                outgoingMessageBundle.SenderId.Value,
-                outgoingMessageBundle.Receiver.Number.Value,
-                timestamp,
-                outgoingMessageBundle.BusinessReason,
-                result),
+                   Guid.NewGuid().ToString(),
+                   peekResult.BundleId.Id.ToString(),
+                   outgoingMessageBundle.DocumentType.ToString(),
+                   outgoingMessageBundle.SenderId.Value,
+                   outgoingMessageBundle.Receiver.Number.Value,
+                   timestamp,
+                   outgoingMessageBundle.BusinessReason,
+                   result),
                 cancellationToken).ConfigureAwait(false);
         }
 
