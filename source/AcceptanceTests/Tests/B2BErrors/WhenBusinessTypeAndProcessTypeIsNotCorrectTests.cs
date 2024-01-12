@@ -14,6 +14,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Factories;
+using Energinet.DataHub.EDI.AcceptanceTests.Responses.xml;
 using Energinet.DataHub.EDI.AcceptanceTests.TestData;
 using Energinet.DataHub.EDI.AcceptanceTests.Tests.Asserters;
 using Xunit.Abstractions;
@@ -34,10 +35,12 @@ public class WhenBusinessTypeAndProcessTypeIsNotCorrectTests : BaseTestClass
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.SchemaValidationErrorOnWrongBusinessSectorType());
 
-        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 
         Output.WriteLine(response);
 
-        await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00302", "schema validation error", response);
+        var responseError = SynchronousError.BuildB2BErrorResponse(response);
+        Assert.Equal("00302", responseError!.Code);
+        Assert.Contains("schema validation error", responseError.Message, StringComparison.InvariantCultureIgnoreCase);
     }
 }

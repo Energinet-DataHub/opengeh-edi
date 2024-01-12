@@ -34,8 +34,8 @@ public class WhenTransactionIdAndMessageIdIsNotCorrectTests : BaseTestClass
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.MessageIdIsNotUnique());
 
-        await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
-        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+        await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 
         Output.WriteLine(response);
 
@@ -49,7 +49,7 @@ public class WhenTransactionIdAndMessageIdIsNotCorrectTests : BaseTestClass
             RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData
                 .EmptyMessageId());
 
-        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 
         Output.WriteLine(response);
 
@@ -62,8 +62,8 @@ public class WhenTransactionIdAndMessageIdIsNotCorrectTests : BaseTestClass
         var payload =
             RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.TransactionIdIsNotUnique());
 
-        await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
-        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+        await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 
         Output.WriteLine(response);
 
@@ -75,7 +75,7 @@ public class WhenTransactionIdAndMessageIdIsNotCorrectTests : BaseTestClass
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.EmptyTransactionId());
 
-        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 
         Output.WriteLine(response);
 
@@ -87,7 +87,7 @@ public class WhenTransactionIdAndMessageIdIsNotCorrectTests : BaseTestClass
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.InvalidTransactionId());
 
-        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 
         Output.WriteLine(response);
 
@@ -99,10 +99,10 @@ public class WhenTransactionIdAndMessageIdIsNotCorrectTests : BaseTestClass
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.InvalidLengthOfMessageId());
 
-        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 
         Output.WriteLine(response);
 
-        await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00305", "Message id " + payload.GetElementsByTagName("cim:mRID")[0]?.InnerText + "1 is invalid. Must contain 36 characters.", response);
+        await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00305", "Message id " + payload.GetElementsByTagName("cim:mRID")[0]?.InnerText + " is invalid. Must contain 36 characters.", response);
     }
 }
