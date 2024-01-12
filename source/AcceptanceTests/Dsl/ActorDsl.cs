@@ -34,8 +34,8 @@ internal sealed class ActorDsl
         await _marketParticipant.PublishActorActivatedAsync(actorNumber, b2CId).ConfigureAwait(false);
     }
 
-    public async Task ConfirmActorIsAvailableAsync(string actorNumber, string b2CId)
+    public async Task<bool> ConfirmActorIsAvailableAsync(string actorNumber, string b2CId)
     {
-        await _ediActorDriver.ActorExistsAsync(actorNumber, b2CId).ConfigureAwait(false);
+        return await _ediActorDriver.ActorExistsAsync(actorNumber, b2CId).ConfigureAwait(false);
     }
 }

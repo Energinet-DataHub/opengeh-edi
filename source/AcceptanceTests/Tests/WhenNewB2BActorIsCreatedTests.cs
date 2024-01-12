@@ -41,6 +41,7 @@ public sealed class WhenNewB2BActorIsCreatedTests
         var b2CId = Guid.NewGuid().ToString();
         await _actorDsl.PublishResultForAsync(actorNumber: "8880000610888", b2CId: b2CId);
 
-        await _actorDsl.ConfirmActorIsAvailableAsync(actorNumber: "8880000610888", b2CId: b2CId);
+        var exists = await _actorDsl.ConfirmActorIsAvailableAsync(actorNumber: "8880000610888", b2CId: b2CId);
+        Assert.True(exists);
     }
 }

@@ -25,7 +25,7 @@ public class EdiActorDriver
         _connectionString = connectionString;
     }
 
-    public async Task ActorExistsAsync(string actorNumber, string azpToken)
+    public async Task<bool> ActorExistsAsync(string actorNumber, string azpToken)
     {
         using var connection = new SqlConnection(_connectionString);
         using var command = new SqlCommand();
@@ -36,7 +36,6 @@ public class EdiActorDriver
         command.Connection = connection;
 
         await command.Connection.OpenAsync().ConfigureAwait(false);
-        var exist = await command.ExecuteScalarAsync().ConfigureAwait(false);
-        Assert.NotNull(exist);
+        return await command.ExecuteScalarAsync().ConfigureAwait(false) != null;
     }
 }
