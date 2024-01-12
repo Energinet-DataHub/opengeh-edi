@@ -36,6 +36,8 @@ public class WhenPayloadDataIsDifferentFromTokenDataTests : BaseTestClass
 
         var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 
+        Output.WriteLine(response);
+
         await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00002", "Sender id does not match id of current authenticated user", response);
     }
 
