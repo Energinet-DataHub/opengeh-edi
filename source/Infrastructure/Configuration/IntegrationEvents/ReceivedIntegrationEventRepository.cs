@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
@@ -27,24 +28,21 @@ public class ReceivedIntegrationEventRepository : IReceivedIntegrationEventRepos
     // Error code can be found here: https://learn.microsoft.com/en-us/sql/relational-databases/errors-events/database-engine-events-and-errors-2000-to-2999?view=sql-server-ver16
     private const int UniqueConstraintSqlException = 2627;
 
-    private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
     private readonly ISystemDateTimeProvider _dateTimeProvider;
 
-    public ReceivedIntegrationEventRepository(IDatabaseConnectionFactory databaseConnectionFactory, ISystemDateTimeProvider dateTimeProvider)
+    public ReceivedIntegrationEventRepository(ISystemDateTimeProvider dateTimeProvider)
     {
-        _databaseConnectionFactory = databaseConnectionFactory;
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task<AddReceivedIntegrationEventResult> AddIfNotExistsAsync(Guid eventId, string eventType)
+    public async Task<AddReceivedIntegrationEventResult> AddIfNotExistsAsync(Guid eventId, string eventType, IDbConnection dbConnection, IDbTransaction dbTransaction)
     {
-        using var dbConnection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
-
         try
         {
             await dbConnection.ExecuteAsync(
                     "INSERT INTO [dbo].[ReceivedIntegrationEvents] ([Id], [EventType], [OccurredOn]) VALUES (@id, @eventType, @occuredOn)",
-                    new { id = eventId.ToString(), eventType = eventType, occuredOn = _dateTimeProvider.Now() })
+                    new { id = eventId.ToString(), eventType = eventType, occuredOn = _dateTimeProvider.Now() },
+                    dbTransaction)
                 .ConfigureAwait(false);
         }
         catch (SqlException sqlException)

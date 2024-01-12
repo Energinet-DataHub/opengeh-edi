@@ -48,7 +48,8 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
                 new Dictionary<string, IIntegrationEventProcessor>
                 {
                     { _testIntegrationEventProcessor.EventTypeToHandle, _testIntegrationEventProcessor },
-                });
+                },
+                GetService<IDatabaseConnectionFactory>());
 
         _testIntegrationEvent1 = new IntegrationEvent(Guid.NewGuid(), TestIntegrationEventMessage.TestIntegrationEventName, 1, new TestIntegrationEventMessage());
         _unknownIntegrationEvent = new IntegrationEvent(Guid.NewGuid(), "unknown-event-type", 1, null!);
@@ -57,6 +58,26 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
     private string EventId1 => _testIntegrationEvent1.EventIdentification.ToString();
 
     private string EventIdUnknown => _unknownIntegrationEvent.EventIdentification.ToString();
+
+    [Fact]
+    public async Task Event_is_not_registered_if_processing_fails()
+    {
+        var integrationEvent = new IntegrationEvent(Guid.NewGuid(), TestIntegrationEventMessage.TestIntegrationEventName, 1, new TestIntegrationEventMessage());
+        var testIntegrationEventProcessor = new TestFailingIntegrationEventProcessor(GetService<IMediator>());
+        var sut = new IntegrationEventHandler(
+            GetService<ILogger<IntegrationEventHandler>>(),
+            GetService<IReceivedIntegrationEventRepository>(),
+            new Dictionary<string, IIntegrationEventProcessor>
+            {
+                { testIntegrationEventProcessor.EventTypeToHandle, testIntegrationEventProcessor },
+            },
+            GetService<IDatabaseConnectionFactory>());
+
+        await Assert.ThrowsAsync<Exception>(() => sut.HandleAsync(integrationEvent));
+
+        var isRegistered = await EventIsRegisteredInDatabase(integrationEvent.EventIdentification.ToString());
+        Assert.False(isRegistered);
+    }
 
     [Fact]
     public async Task Event_is_registered_and_mapped_if_it_is_a_known_event()

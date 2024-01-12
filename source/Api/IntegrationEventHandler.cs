@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Microsoft.Extensions.Logging;
@@ -31,15 +32,18 @@ public sealed class IntegrationEventHandler : IIntegrationEventHandler
     private readonly ILogger<IntegrationEventHandler> _logger;
     private readonly IReceivedIntegrationEventRepository _receivedIntegrationEventRepository;
     private readonly IReadOnlyDictionary<string, IIntegrationEventProcessor> _integrationEventProcessors;
+    private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
 
     public IntegrationEventHandler(
         ILogger<IntegrationEventHandler> logger,
         IReceivedIntegrationEventRepository receivedIntegrationEventRepository,
-        IReadOnlyDictionary<string, IIntegrationEventProcessor> integrationEventProcessors)
+        IReadOnlyDictionary<string, IIntegrationEventProcessor> integrationEventProcessors,
+        IDatabaseConnectionFactory databaseConnectionFactory)
     {
         _logger = logger;
         _receivedIntegrationEventRepository = receivedIntegrationEventRepository;
         _integrationEventProcessors = integrationEventProcessors;
+        _databaseConnectionFactory = databaseConnectionFactory;
     }
 
     public async Task HandleAsync(IntegrationEvent integrationEvent)
@@ -53,21 +57,41 @@ public sealed class IntegrationEventHandler : IIntegrationEventHandler
             return;
         }
 
-        var addResult = await _receivedIntegrationEventRepository.AddIfNotExistsAsync(integrationEvent.EventIdentification, integrationEvent.EventName).ConfigureAwait(false);
-
-        if (addResult != AddReceivedIntegrationEventResult.EventRegistered)
-        {
-            _logger.LogWarning(
-                "Integration event \"{EventIdentification}\" with event type \"{EventType}\" wasn't registered successfully. Registration result: {RegisterIntegrationEventResult}",
-                integrationEvent.EventIdentification,
-                integrationEvent.EventName,
-                addResult.ToString());
-
-            return;
-        }
-
-        await integrationEventMapper
-            .ProcessAsync(integrationEvent, CancellationToken.None)
+        var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(CancellationToken.None)
             .ConfigureAwait(false);
+        using var transaction = connection.BeginTransaction();
+        try
+        {
+            var addResult = await _receivedIntegrationEventRepository
+                .AddIfNotExistsAsync(integrationEvent.EventIdentification, integrationEvent.EventName, connection, transaction)
+                .ConfigureAwait(false);
+
+            if (addResult != AddReceivedIntegrationEventResult.EventRegistered)
+            {
+                _logger.LogWarning(
+                    "Integration event \"{EventIdentification}\" with event type \"{EventType}\" wasn't registered successfully. Registration result: {RegisterIntegrationEventResult}",
+                    integrationEvent.EventIdentification,
+                    integrationEvent.EventName,
+                    addResult.ToString());
+
+                return;
+            }
+
+            await integrationEventMapper
+                .ProcessAsync(integrationEvent, CancellationToken.None)
+                .ConfigureAwait(false);
+
+            transaction.Commit();
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(
+                exception,
+                "Failed to process integration event \"{EventIdentification}\" with event type \"{EventType}\"",
+                integrationEvent.EventIdentification,
+                integrationEvent.EventName);
+            transaction.Rollback();
+            throw;
+        }
     }
 }

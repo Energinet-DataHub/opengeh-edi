@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Data;
 using System.Threading.Tasks;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
@@ -26,5 +27,5 @@ public interface IReceivedIntegrationEventRepository
     /// Add a Received Integration Event to the database, if it doesn't already exists
     /// </summary>
     /// <returns>Returns true if the event was added to the database, and false if the event wasn't added because it already exists</returns>
-    Task<AddReceivedIntegrationEventResult> AddIfNotExistsAsync(Guid eventId, string eventType);
+    Task<AddReceivedIntegrationEventResult> AddIfNotExistsAsync(Guid eventId, string eventType, IDbConnection dbConnection, IDbTransaction dbTransaction);
 }
