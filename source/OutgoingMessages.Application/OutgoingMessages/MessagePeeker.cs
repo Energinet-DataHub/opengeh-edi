@@ -97,9 +97,9 @@ public class MessagePeeker
                     cancellationToken)
                 .ConfigureAwait(false);
 
-            var uploadedDocumentReference = await uploadDocumentTask.ConfigureAwait(false);
+            var fileStorageReference = await uploadDocumentTask.ConfigureAwait(false);
 
-            document = new MarketDocument(result, peekResult.BundleId, uploadedDocumentReference);
+            document = new MarketDocument(result, peekResult.BundleId, fileStorageReference);
             _marketDocumentRepository.Add(document);
         }
 

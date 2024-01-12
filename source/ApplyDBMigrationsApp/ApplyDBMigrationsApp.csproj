@@ -143,6 +143,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202311301050 Create ActorCertificate table.sql" />
     <EmbeddedResource Include="Scripts\Model\202312041319 Add unique constraint to ActorCertificate thumbprint.sql" />
     <EmbeddedResource Include="Scripts\Model\202401101436 Add UploadedDocumentReference to MarketDocument.sql" />
+    <EmbeddedResource Include="Scripts\Model\202401120843 Rename MarketDocument UploadedDocumentReference to FileStorageReference.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
     <None Remove="Scripts\Model\202310231329 Alter Bundles1.sql" />

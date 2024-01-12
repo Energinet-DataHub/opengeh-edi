@@ -34,11 +34,11 @@ public interface IOutgoingMessageDocumentClient
     /// <param name="bundleId">The bundle-id for the market document</param>
     /// <param name="timestamp">The timestamp from the created market document</param>
     /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-    Task<UploadedDocumentReference> UploadDocumentAsync(Stream marketDocumentFile, ActorNumber receiverActorNumber, BundleId bundleId, Instant timestamp);
+    Task<FileStorageReference> UploadDocumentAsync(Stream marketDocumentFile, ActorNumber receiverActorNumber, BundleId bundleId, Instant timestamp);
 
     /// <summary>
     /// Download a market document file by its unique reference
     /// </summary>
-    /// <param name="reference">A <see cref="UploadedDocumentReference"/> typically found on a <see cref="MarketDocument"/></param>
-    Task<Stream> DownloadDocumentAsync(UploadedDocumentReference reference);
+    /// <param name="reference">A <see cref="FileStorageReference"/> typically found on a <see cref="MarketDocument"/></param>
+    Task<Stream> DownloadDocumentAsync(FileStorageReference reference);
 }

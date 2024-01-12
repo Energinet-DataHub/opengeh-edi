@@ -17,20 +17,20 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 
-public class UploadedDocumentReference : ValueObject
+public class FileStorageReference : ValueObject
 {
-    private UploadedDocumentReference(string reference)
+    private FileStorageReference(string reference)
     {
         Value = reference;
     }
 
     public string Value { get; }
 
-    public static UploadedDocumentReference Create(string reference)
+    public static FileStorageReference Create(string reference)
     {
         if (string.IsNullOrEmpty(reference)) throw new ArgumentNullException(nameof(reference));
 
-        return new UploadedDocumentReference(reference);
+        return new FileStorageReference(reference);
     }
 
     public override string ToString() => Value;

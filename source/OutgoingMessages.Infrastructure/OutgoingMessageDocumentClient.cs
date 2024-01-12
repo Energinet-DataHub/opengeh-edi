@@ -33,7 +33,7 @@ public class OutgoingMessageDocumentClient : IOutgoingMessageDocumentClient
         _fileStorageClient = fileStorageClient;
     }
 
-    public async Task<UploadedDocumentReference> UploadDocumentAsync(Stream marketDocumentFile, ActorNumber receiverActorNumber, BundleId bundleId, Instant timestamp)
+    public async Task<FileStorageReference> UploadDocumentAsync(Stream marketDocumentFile, ActorNumber receiverActorNumber, BundleId bundleId, Instant timestamp)
     {
         ArgumentNullException.ThrowIfNull(marketDocumentFile);
         ArgumentNullException.ThrowIfNull(receiverActorNumber);
@@ -42,7 +42,7 @@ public class OutgoingMessageDocumentClient : IOutgoingMessageDocumentClient
 
         var documentReference = $"outgoing/{receiverActorNumber.Value}/{timestamp.Year()}/{timestamp.Month()}/{timestamp.Day()}/{bundleId.Id:N}";
 
-        var reference = UploadedDocumentReference.Create(documentReference);
+        var reference = FileStorageReference.Create(documentReference);
 
         var referenceWithFolder = $"outgoing/{reference.Value}";
 
@@ -52,7 +52,7 @@ public class OutgoingMessageDocumentClient : IOutgoingMessageDocumentClient
         return reference;
     }
 
-    public Task<Stream> DownloadDocumentAsync(UploadedDocumentReference reference)
+    public Task<Stream> DownloadDocumentAsync(FileStorageReference reference)
     {
         throw new NotImplementedException();
     }

@@ -21,19 +21,19 @@ public class MarketDocument
 {
     private readonly Guid _id;
 
-    public MarketDocument(Stream payload, BundleId bundleId, UploadedDocumentReference uploadedDocumentReference)
+    public MarketDocument(Stream payload, BundleId bundleId, FileStorageReference fileStorageReference)
     {
         _id = Guid.NewGuid();
         Payload = payload;
         BundleId = bundleId;
-        UploadedDocumentReference = uploadedDocumentReference;
+        FileStorageReference = fileStorageReference;
     }
 
     public Stream Payload { get; }
 
     public BundleId BundleId { get; }
 
-    public UploadedDocumentReference UploadedDocumentReference { get; }
+    public FileStorageReference FileStorageReference { get; }
 
 #pragma warning disable
     private MarketDocument()
