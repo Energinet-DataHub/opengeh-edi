@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
@@ -35,6 +36,7 @@ public class MessagePeeker
     private readonly ActorMessageQueueContext _actorMessageQueueContext;
     private readonly IArchivedMessagesClient _archivedMessageClient;
     private readonly IOutgoingMessageDocumentClient _outgoingMessageDocumentClient;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
     public MessagePeeker(
         IActorMessageQueueRepository actorMessageQueueRepository,
@@ -43,7 +45,8 @@ public class MessagePeeker
         IOutgoingMessageRepository outgoingMessageRepository,
         ActorMessageQueueContext actorMessageQueueContext,
         IArchivedMessagesClient archivedMessageClient,
-        IOutgoingMessageDocumentClient outgoingMessageDocumentClient)
+        IOutgoingMessageDocumentClient outgoingMessageDocumentClient,
+        ISystemDateTimeProvider systemDateTimeProvider)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _marketDocumentRepository = marketDocumentRepository;
@@ -52,6 +55,7 @@ public class MessagePeeker
         _actorMessageQueueContext = actorMessageQueueContext;
         _archivedMessageClient = archivedMessageClient;
         _outgoingMessageDocumentClient = outgoingMessageDocumentClient;
+        _systemDateTimeProvider = systemDateTimeProvider;
     }
 
     public async Task<PeekResultDto> PeekAsync(PeekRequestDto request, CancellationToken cancellationToken)
@@ -73,12 +77,12 @@ public class MessagePeeker
 
         if (document == null)
         {
-            var timestamp = SystemClock.Instance.GetCurrentInstant();
+            var timestamp = _systemDateTimeProvider.Now();
 
             var outgoingMessageBundle = await _outgoingMessageRepository.GetAsync(peekResult.BundleId).ConfigureAwait(false);
             var result = await _documentFactory.CreateFromAsync(outgoingMessageBundle, request.DocumentFormat, timestamp).ConfigureAwait(false);
 
-            var uploadDocumentTask = _outgoingMessageDocumentClient.UploadDocumentAsync(result, outgoingMessageBundle.Receiver.Number, timestamp);
+            var uploadDocumentTask = _outgoingMessageDocumentClient.UploadDocumentAsync(result, outgoingMessageBundle.Receiver.Number, peekResult.BundleId, timestamp);
 
             await _archivedMessageClient.CreateAsync(
                     new ArchivedMessage(

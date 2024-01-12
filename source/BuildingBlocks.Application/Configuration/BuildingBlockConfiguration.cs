@@ -15,6 +15,7 @@
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,5 +41,15 @@ public static class BuildingBlockConfiguration
 
         services.AddSingleton<IDatabaseConnectionFactory, SqlDatabaseConnectionFactory>();
         services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactory>();
+
+        services
+            .AddOptions<AzureDataLakeConnectionOptions>()
+            .Bind(configuration)
+            .Validate(o => !string.IsNullOrEmpty(o.AZURE_DATA_LAKE_URI), $"{nameof(AzureDataLakeConnectionOptions.AZURE_DATA_LAKE_URI)} must be set in configuration")
+            .Validate(o => !string.IsNullOrEmpty(o.AZURE_STORAGE_ACCOUNT_NAME), $"{nameof(AzureDataLakeConnectionOptions.AZURE_STORAGE_ACCOUNT_NAME)} must be set in configuration")
+            .Validate(o => !string.IsNullOrEmpty(o.AZURE_STORAGE_ACCOUNT_KEY), $"{nameof(AzureDataLakeConnectionOptions.AZURE_STORAGE_ACCOUNT_KEY)} must be set in configuration")
+            .Validate(o => !string.IsNullOrEmpty(o.AZURE_DATA_LAKE_FILESYSTEM_NAME), $"{nameof(AzureDataLakeConnectionOptions.AZURE_DATA_LAKE_FILESYSTEM_NAME)} must be set in configuration");
+
+        services.AddTransient<IFileStorageClient, DataLakeFileStorageClient>();
     }
 }

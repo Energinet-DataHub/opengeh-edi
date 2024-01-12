@@ -12,20 +12,48 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
+using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
 
 public class OutgoingMessageDocumentClient : IOutgoingMessageDocumentClient
 {
-    public Task<UploadedDocumentReference> UploadDocumentAsync(Stream marketDocumentFile, ActorNumber receiver, Instant timestamp)
-    {
-        var reference = UploadedDocumentReference.Create("foo");
+    private readonly IFileStorageClient _fileStorageClient;
 
-        return Task.FromResult(reference);
+    public OutgoingMessageDocumentClient(IFileStorageClient fileStorageClient)
+    {
+        _fileStorageClient = fileStorageClient;
+    }
+
+    public async Task<UploadedDocumentReference> UploadDocumentAsync(Stream marketDocumentFile, ActorNumber receiverActorNumber, BundleId bundleId, Instant timestamp)
+    {
+        ArgumentNullException.ThrowIfNull(marketDocumentFile);
+        ArgumentNullException.ThrowIfNull(receiverActorNumber);
+        ArgumentNullException.ThrowIfNull(bundleId);
+        ArgumentNullException.ThrowIfNull(timestamp);
+
+        var documentReference = $"outgoing/{receiverActorNumber.Value}/{timestamp.Year()}/{timestamp.Month()}/{timestamp.Day()}/{bundleId.Id:N}";
+
+        var reference = UploadedDocumentReference.Create(documentReference);
+
+        var referenceWithFolder = $"outgoing/{reference.Value}";
+
+        referenceWithFolder = $"{bundleId.Id:N}";
+        await _fileStorageClient.UploadAsync(referenceWithFolder, marketDocumentFile).ConfigureAwait(false);
+
+        return reference;
+    }
+
+    public Task<Stream> DownloadDocumentAsync(UploadedDocumentReference reference)
+    {
+        throw new NotImplementedException();
     }
 }

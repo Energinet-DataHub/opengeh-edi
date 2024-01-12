@@ -31,10 +31,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.Configuration;
 
-public static class ActorMessageQueueConfiguration
+public static class OutgoingMessagesConfiguration
 {
-    public static void AddActorMessageQueueModule(this IServiceCollection services, IConfiguration configuration)
+    public static void AddOutgoingMessagesModule(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddBuildingBlocks(configuration);
+
         services.AddScopedSqlDbContext<ActorMessageQueueContext>(configuration);
 
         //AddMessageGenerationServices

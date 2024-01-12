@@ -32,4 +32,6 @@ public class UploadedDocumentReference : ValueObject
 
         return new UploadedDocumentReference(reference);
     }
+
+    public override string ToString() => Value;
 }

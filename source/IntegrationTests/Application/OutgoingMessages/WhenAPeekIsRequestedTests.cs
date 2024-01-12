@@ -21,14 +21,18 @@ using System.Xml.Linq;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
+using NodaTime;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
@@ -37,12 +41,14 @@ public class WhenAPeekIsRequestedTests : TestBase
 {
     private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
+    private readonly SystemDateTimeProviderStub _systemDateTimeProvider;
 
     public WhenAPeekIsRequestedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
+        _systemDateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
     }
 
     [Fact]
@@ -120,16 +126,55 @@ public class WhenAPeekIsRequestedTests : TestBase
         await AssertMarketDocumentExists(result.MessageId!.Value);
     }
 
-    private static string ConvertMemoryStreamToString(Stream memoryStream)
+    [Fact]
+    public async Task The_generated_market_document_file_has_correct_name()
     {
-        // Reset the position of the MemoryStream to the beginning
-        memoryStream.Seek(0, SeekOrigin.Begin);
+        var message = _outgoingMessageDtoBuilder
+            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            .WithReceiverRole(MarketRole.EnergySupplier)
+            .Build();
 
-        // Create a StreamReader and read the contents of the MemoryStream
-        using (var reader = new StreamReader(memoryStream, Encoding.UTF8))
-        {
-            return reader.ReadToEnd();
-        }
+        await EnqueueMessage(message);
+        var createdAtTimestamp = Instant.FromUtc(2024, 1, 1, 0, 0);
+        _systemDateTimeProvider.SetNow(createdAtTimestamp);
+        var expectedUploadedDocumentReferencePrefix = $"{SampleData.NewEnergySupplierNumber}/{createdAtTimestamp.Year()}/{createdAtTimestamp.Month()}/{createdAtTimestamp.Day()}";
+
+        var result = await PeekMessage(MessageCategory.Aggregations);
+
+        result.MessageId.Should().NotBeNull();
+
+        var expectedUploadedDocumentReference = $"{expectedUploadedDocumentReferencePrefix}/{result.MessageId!.Value:N}";
+        await AssertMarketDocumentFileIsUploaded(result.MessageId!.Value, expectedUploadedDocumentReference);
+    }
+
+    [Fact]
+    public async Task The_generated_market_document_file_is_added_to_file_storage()
+    {
+        var message = _outgoingMessageDtoBuilder
+            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            .WithReceiverRole(MarketRole.EnergySupplier)
+            .Build();
+        await EnqueueMessage(message);
+        var createdAtTimestamp = Instant.FromUtc(2024, 1, 1, 0, 0);
+        _systemDateTimeProvider.SetNow(createdAtTimestamp);
+        var expectedUploadedDocumentReferencePrefix = $"{SampleData.NewEnergySupplierNumber}/{createdAtTimestamp.Year()}/{createdAtTimestamp.Month()}/{createdAtTimestamp.Day()}";
+
+        var result = await PeekMessage(MessageCategory.Aggregations);
+
+        result.MessageId.Should().NotBeNull();
+
+        var expectedUploadedDocumentReference = $"{expectedUploadedDocumentReferencePrefix}/{result.MessageId!.Value:N}";
+        await AssertMarketDocumentFileIsUploaded(result.MessageId!.Value, expectedUploadedDocumentReference);
+    }
+
+    private async Task AssertMarketDocumentFileIsUploaded(Guid marketDocumentBundleId, string expectedUploadedDocumentReference)
+    {
+        using var connection =
+            await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+
+        var uploadedDocumentReference = await connection.ExecuteScalarAsync<string>($"SELECT UploadedDocumentReference FROM [dbo].[MarketDocuments] WHERE BundleId = '{marketDocumentBundleId}'");
+
+        uploadedDocumentReference.Should().Be(expectedUploadedDocumentReference);
     }
 
     private async Task<bool> BundleIsRegistered()
