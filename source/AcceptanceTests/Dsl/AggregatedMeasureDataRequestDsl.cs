@@ -14,6 +14,7 @@
 
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+using Energinet.DataHub.EDI.AcceptanceTests.TestData;
 using Energinet.DataHub.EDI.AcceptanceTests.Tests.Asserters;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
@@ -29,29 +30,29 @@ public sealed class AggregatedMeasureDataRequestDsl
         _edi = ediDriver;
     }
 
-    internal Task AggregatedMeasureDataFor(string actorNumber, string actorRole)
+    internal Task AggregatedMeasureDataFor()
     {
-        return _edi.RequestAggregatedMeasureDataAsync(actorNumber, new[] { actorRole });
+        return _edi.RequestAggregatedMeasureDataAsync();
     }
 
-    internal Task ConfirmAcceptedResultIsAvailableFor(string actorNumber, string actorRole)
+    internal Task ConfirmAcceptedResultIsAvailableFor()
     {
-        return _edi.PeekAcceptedAggregationMessageAsync(actorNumber, new[] { actorRole });
+        return _edi.PeekAcceptedAggregationMessageAsync();
     }
 
-    internal Task RejectedAggregatedMeasureDataFor(string actorNumber, string actorRole)
+    internal Task RejectedAggregatedMeasureDataFor()
     {
-        return _edi.RequestAggregatedMeasureDataAsync(actorNumber, new[] { actorRole }, asyncError: true);
+        return _edi.RequestAggregatedMeasureDataAsync(asyncError: true);
     }
 
-    internal Task ConfirmRejectedResultIsAvailableFor(string actorNumber, string actorRole)
+    internal Task ConfirmRejectedResultIsAvailableFor()
     {
-        return _edi.PeekRejectedMessageAsync(actorNumber, new[] { actorRole });
+        return _edi.PeekRejectedMessageAsync();
     }
 
-    internal Task EmptyQueueForActor(string actorNumber, string actorRole)
+    internal Task EmptyQueueForActor()
     {
-        return _edi.EmptyQueueAsync(actorNumber, new[] { actorRole });
+        return _edi.EmptyQueueAsync();
     }
 
     internal Task ConfirmRequestAggregatedMeasureDataWithoutTokenIsNotAllowed()
@@ -69,8 +70,8 @@ public sealed class AggregatedMeasureDataRequestDsl
         return _edi.DequeueMessageWithoutTokenAsync("irrelevant-message-id");
     }
 
-    internal Task<string> AggregatedMeasureDataWithXmlPayload(XmlDocument payload, string token)
+    internal Task<string> AggregatedMeasureDataWithXmlPayload(XmlDocument payload)
     {
-        return _edi.RequestAggregatedMeasureDataXmlAsync(payload, token);
+        return _edi.RequestAggregatedMeasureDataXmlAsync(payload);
     }
 }
