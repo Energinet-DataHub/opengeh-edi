@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
@@ -49,7 +50,7 @@ public sealed class IntegrationEventHandler : IIntegrationEventHandler
     public async Task HandleAsync(IntegrationEvent integrationEvent)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
-
+        var stopWatch = Stopwatch.StartNew();
         _integrationEventProcessors.TryGetValue(integrationEvent.EventName, out var integrationEventMapper);
 
         if (integrationEventMapper is null)
@@ -68,11 +69,13 @@ public sealed class IntegrationEventHandler : IIntegrationEventHandler
 
             if (addResult != AddReceivedIntegrationEventResult.EventRegistered)
             {
+                stopWatch.Stop();
                 _logger.LogWarning(
-                    "Integration event \"{EventIdentification}\" with event type \"{EventType}\" wasn't registered successfully. Registration result: {RegisterIntegrationEventResult}",
+                    "Integration event \"{EventIdentification}\" with event type \"{EventType}\" wasn't registered successfully. Registration result: {RegisterIntegrationEventResult} in {ElapsedMilliseconds} ms",
                     integrationEvent.EventIdentification,
                     integrationEvent.EventName,
-                    addResult.ToString());
+                    addResult.ToString(),
+                    stopWatch.ElapsedMilliseconds);
 
                 return;
             }
@@ -82,14 +85,22 @@ public sealed class IntegrationEventHandler : IIntegrationEventHandler
                 .ConfigureAwait(false);
 
             transaction.Commit();
+            stopWatch.Stop();
+            _logger.LogInformation(
+                "Processed integration event \"{EventIdentification}\" with event type \"{EventType}\" in {ElapsedMilliseconds} ms",
+                integrationEvent.EventIdentification,
+                integrationEvent.EventName,
+                stopWatch.ElapsedMilliseconds);
         }
         catch (Exception exception)
         {
+            stopWatch.Stop();
             _logger.LogError(
                 exception,
-                "Failed to process integration event \"{EventIdentification}\" with event type \"{EventType}\"",
+                "Failed to process integration event \"{EventIdentification}\" with event type \"{EventType}\" in {ElapsedMilliseconds} ms",
                 integrationEvent.EventIdentification,
-                integrationEvent.EventName);
+                integrationEvent.EventName,
+                stopWatch.ElapsedMilliseconds);
             transaction.Rollback();
             throw;
         }
