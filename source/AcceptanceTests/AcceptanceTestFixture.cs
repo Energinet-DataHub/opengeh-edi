@@ -13,25 +13,19 @@
 // limitations under the License.
 
 using System.Net.Http.Headers;
-using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration; // DO NOT REMOVE THIS! use in debug mode
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
-using Energinet.DataHub.EDI.AcceptanceTests.Factories;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
-using Google.Protobuf;
 using Microsoft.Extensions.Configuration;
 using Nito.AsyncEx;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
+namespace Energinet.DataHub.EDI.AcceptanceTests;
 
 // ReSharper disable once ClassNeverInstantiated.Global -- Instantiated by XUnit
 public class AcceptanceTestFixture : IAsyncLifetime
 {
-    internal const string ActorNumber = "5790000610976"; // Corresponds to the "Mosaic 03" actor in the UI.
-    internal const string ActorGridArea = "543";
-    internal const string ActorRole = "metereddataresponsible";
-    private const EicFunction ActorEicFunction = EicFunction.MeteredDataResponsible;
+    internal const string EbixActorGridArea = "543";
+    internal const string CimActorGridArea = "804";
 
-    private readonly string _ebixCertificateThumbprint;
     private readonly Uri _azureEntraB2CTenantUrl;
     private readonly string _azureEntraFrontendAppId;
     private readonly string _azureEntraBackendBffScope;
@@ -60,16 +54,22 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
         var serviceBusConnectionString = root.GetValue<string>("sb-domain-relay-manage-connection-string") ?? throw new InvalidOperationException("sb-domain-relay-manage-connection-string secret is not set in configuration");
         var topicName = root.GetValue<string>("sbt-shres-integrationevent-received-name") ?? throw new InvalidOperationException("sbt-shres-integrationevent-received-name secret is not set in configuration");
-        MeteredDataResponsibleAzpToken = root.GetValue<string>("METERED_DATA_RESPONSIBLE_AZP_TOKEN") ?? throw new InvalidOperationException("MeteredDataResponsibleAzpToken is not set in configuration");
-        EnergySupplierAzpToken = root.GetValue<string>("ENERGY_SUPPLIER_AZP_TOKEN") ?? throw new InvalidOperationException("EnergySupplierAzpToken is not set in configuration");
+
+        var azureB2CTenantId = root.GetValue<string>("b2c-tenant-id") ?? "e9aa9b15-7200-441e-b255-927506b3494";
+        var azureEntraBackendAppId = root.GetValue<string>("backend-b2b-app-id") ?? throw new InvalidOperationException("backend-b2b-app-id is not set in configuration");
+        var ediB2BBaseUri = new Uri(root.GetValue<string>("func-edi-api-base-url") ?? throw new InvalidOperationException("func-edi-api-base-url secret is not set in configuration"));
+
+        var meteredDataResponsibleId = root.GetValue<string>("METERED_DATA_RESPONSIBLE_CLIENT_ID") ?? throw new InvalidOperationException("METERED_DATA_RESPONSIBLE_CLIENT_ID is not set in configuration");
+        var meteredDataResponsibleSecret = root.GetValue<string>("METERED_DATA_RESPONSIBLE_CLIENT_SECRET") ?? throw new InvalidOperationException("METERED_DATA_RESPONSIBLE_CLIENT_SECRET is not set in configuration");
+        B2BMeteredDataResponsibleAuthorizedHttpClient = new AsyncLazy<HttpClient>(() => CreateB2BMeteredDataResponsibleAuthorizedHttpClientAsync(azureB2CTenantId, azureEntraBackendAppId, meteredDataResponsibleId, meteredDataResponsibleSecret, ediB2BBaseUri));
+
+        var energySupplierId = root.GetValue<string>("ENERGY_SUPPLIER_CLIENT_ID") ?? throw new InvalidOperationException("ENERGY_SUPPLIER_CLIENT_ID is not set in configuration");
+        var energySupplierSecret = root.GetValue<string>("ENERGY_SUPPLIER_CLIENT_SECRET") ?? throw new InvalidOperationException("ENERGY_SUPPLIER_CLIENT_SECRET is not set in configuration");
+        B2BEnergySupplierAuthorizedHttpClient = new AsyncLazy<HttpClient>(() => CreateB2BEnergySupplierAuthorizedHttpClientAsync(azureB2CTenantId, azureEntraBackendAppId, energySupplierId, energySupplierSecret, ediB2BBaseUri));
+
         ApiManagementUri = new Uri(root.GetValue<string>("apim-gateway-url") ?? throw new InvalidOperationException("apim-gateway-url secret is not set in configuration"));
-        AzureEntraTenantId = root.GetValue<string>("AZURE_ENTRA_TENANT_ID") ?? "4a7411ea-ac71-4b63-9647-b8bd4c5a20e0";
-        AzureEntraBackendAppId = root.GetValue<string>("AZURE_ENTRA_BACKEND_APP_ID") ?? "fe8b720c-fda4-4aaa-9c6d-c0d2ed6584fe";
-        AzureEntraClientId = root.GetValue<string>("AZURE_ENTRA_CLIENT_ID") ?? "D8E67800-B7EF-4025-90BB-FE06E1639117";
-        AzureEntraClientSecret = root.GetValue<string>("AZURE_ENTRA_CLIENT_SECRET") ?? throw new InvalidOperationException("AZURE_ENTRA_CLIENT_SECRET is not set in configuration");
-        _ebixCertificateThumbprint = root.GetValue<string>("EBIX_CERTIFICATE_THUMBPRINT") ?? "39D64F012A19C6F6FDFB0EA91D417873599D3325";
+
         EbixCertificatePassword = root.GetValue<string>("EBIX_CERTIFICATE_PASSWORD") ?? throw new InvalidOperationException("EBIX_CERTIFICATE_PASSWORD is not set in configuration");
-        EdiB2BBaseUri = new Uri(root.GetValue<string>("func-edi-api-base-url") ?? throw new InvalidOperationException("func-edi-api-base-url secret is not set in configuration"));
         _azureEntraB2CTenantUrl = new Uri(root.GetValue<string>("AZURE_B2C_TENANT_URL") ?? "https://devdatahubb2c.b2clogin.com/tfp/devdatahubb2c.onmicrosoft.com/B2C_1_ROPC_Auth/oauth2/v2.0/token");
         _azureEntraFrontendAppId = root.GetValue<string>("AZURE_ENTRA_FRONTEND_APP_ID") ?? "bf76fc24-cfec-498f-8979-ab4123792472";
         _azureEntraBackendBffScope = root.GetValue<string>("AZURE_ENTRA_BACKEND_BFF_SCOPE") ?? "https://devDataHubB2C.onmicrosoft.com/backend-bff/api";
@@ -89,42 +89,19 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
     internal string ConnectionString { get; }
 
-    internal string MeteredDataResponsibleAzpToken { get; }
-
-    internal string EnergySupplierAzpToken { get; }
-
     internal Uri ApiManagementUri { get; }
-
-    internal string AzureEntraClientId { get; }
-
-    internal string AzureEntraClientSecret { get; }
-
-    internal string AzureEntraTenantId { get; }
-
-    internal string AzureEntraBackendAppId { get; }
 
     internal string EbixCertificatePassword { get; }
 
-    internal Uri EdiB2BBaseUri { get; }
-
     internal AsyncLazy<HttpClient> B2CAuthorizedHttpClient { get; }
 
-    public async Task InitializeAsync()
+    internal AsyncLazy<HttpClient> B2BMeteredDataResponsibleAuthorizedHttpClient { get; }
+
+    internal AsyncLazy<HttpClient> B2BEnergySupplierAuthorizedHttpClient { get; }
+
+    public Task InitializeAsync()
     {
-        var actorActivated = ActorFactory.CreateActorActivated(ActorNumber, MeteredDataResponsibleAzpToken);
-        var actorCertificateAssigned = ActorCertificateFactory.CreateActorCertificateAssigned(ActorNumber, ActorEicFunction, _ebixCertificateThumbprint);
-        var gridAreaOwnerAssigned = GridAreaFactory.AssignedGridAreaOwner(ActorNumber, ActorGridArea, ActorEicFunction);
-
-        var initializeTasks = new List<Task>
-        {
-#if !DEBUG // Locally we cannot access the Azure Service Bus, so this will fail
-            EventPublisher.PublishAsync(ActorActivated.EventName, actorActivated.ToByteArray()),
-            EventPublisher.PublishAsync(ActorCertificateCredentialsAssigned.EventName, actorCertificateAssigned.ToByteArray()),
-            EventPublisher.PublishAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnerAssigned.ToByteArray()),
-#endif
-        };
-
-        await Task.WhenAll(initializeTasks).ConfigureAwait(false);
+        return Task.CompletedTask;
     }
 
     public async Task DisposeAsync()
@@ -133,6 +110,46 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
         if (B2CAuthorizedHttpClient.IsStarted)
             (await B2CAuthorizedHttpClient).Dispose();
+    }
+
+    private static async Task<HttpClient> CreateB2BMeteredDataResponsibleAuthorizedHttpClientAsync(
+        string azureB2CTenantId,
+        string azureEntraBackendAppId,
+        string clientId,
+        string clientSecret,
+        Uri baseAddress)
+    {
+        var httpTokenClient = new HttpClient();
+
+        var tokenRetriever = new B2BTokenReceiver(httpTokenClient, azureB2CTenantId, azureEntraBackendAppId);
+        var token = await tokenRetriever
+            .GetB2BTokenAsync(clientId, clientSecret)
+            .ConfigureAwait(false);
+
+        var httpClient = new HttpClient();
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+        httpClient.BaseAddress = baseAddress;
+        return httpClient;
+    }
+
+    private static async Task<HttpClient> CreateB2BEnergySupplierAuthorizedHttpClientAsync(
+        string azureB2CTenantId,
+        string azureEntraBackendAppId,
+        string clientId,
+        string clientSecret,
+        Uri baseAddress)
+    {
+        var httpTokenClient = new HttpClient();
+
+        var tokenRetriever = new B2BTokenReceiver(httpTokenClient, azureB2CTenantId, azureEntraBackendAppId);
+        var token = await tokenRetriever
+            .GetB2BTokenAsync(clientId, clientSecret)
+            .ConfigureAwait(false);
+
+        var httpClient = new HttpClient();
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+        httpClient.BaseAddress = baseAddress;
+        return httpClient;
     }
 
     private async Task<HttpClient> CreateB2CAuthorizedHttpClientAsync()

@@ -12,39 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Diagnostics;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
-using Energinet.DataHub.EDI.AcceptanceTests.Factories;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 
 public class BaseTestClass
 {
-    private const string ActorNumber = "5790000701414";
-    private const string ActorRole = "energysupplier";
-
     protected BaseTestClass(ITestOutputHelper output, AcceptanceTestFixture fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
 
         Output = output;
         BaseTestFixture = fixture;
-        Token = TokenBuilder.BuildToken(ActorNumber, new[] { ActorRole }, fixture.EnergySupplierAzpToken);
-        AggregationRequest = new AggregatedMeasureDataRequestDsl(new EdiDriver(fixture.EnergySupplierAzpToken, fixture.ConnectionString, fixture.EdiB2BBaseUri));
-        AzureAuthenticationDriver = new AzureAuthenticationDriver(
-            fixture.AzureEntraTenantId,
-            fixture.AzureEntraBackendAppId);
+        AggregationRequest = new AggregatedMeasureDataRequestDsl(
+            new EdiDriver(
+                fixture.B2BEnergySupplierAuthorizedHttpClient));
     }
 
     protected ITestOutputHelper Output { get; }
 
     protected AggregatedMeasureDataRequestDsl AggregationRequest { get; }
 
-    protected AzureAuthenticationDriver AzureAuthenticationDriver { get; }
-
     protected AcceptanceTestFixture BaseTestFixture { get; }
-
-    protected string Token { get; set; }
 }

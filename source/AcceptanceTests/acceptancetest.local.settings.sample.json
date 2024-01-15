@@ -18,5 +18,14 @@
   
   "apim-gateway-url": "<api management url>",
   
-  "func-edi-api-base-url": "<edi b2b api function base url>"  
+  "func-edi-api-base-url": "<edi b2b api function base url>" ,
+  
+  "b2c-tenant-id": "<azure b2c tenat id>",
+  
+  "backend-b2b-app-id": "<azure b2c tenant id>",
+  
+  "METERED_DATA_RESPONSIBLE_CLIENT_ID": "<client id to generate token for metered data responsible>",
+  "METERED_DATA_RESPONSIBLE_CLIENT_SECRET": "<client secret to generate token for metered data responsible>",
+  "ENERGY_SUPPLIER_CLIENT_ID": "<client id to generate token for energy supplier>",
+  "ENERGY_SUPPLIER_CLIENT_SECRET": "<client secret to generate token for energy supplier>"
 }
