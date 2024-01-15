@@ -49,7 +49,6 @@ public class MessageEnqueuer
 
         if (messageQueue == null)
         {
-            _logger.LogInformation("Creating new message queue for Actor: {ActorNumber}, MarketRole", message.Receiver.Number);
             messageQueue = ActorMessageQueue.CreateFor(message.Receiver);
             await _actorMessageQueueRepository.AddAsync(messageQueue).ConfigureAwait(false);
         }
