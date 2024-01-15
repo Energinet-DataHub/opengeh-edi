@@ -50,6 +50,7 @@ public class DataLakeFileStorageClient : IFileStorageClient
             await container.CreateAsync().ConfigureAwait(false);
 
         await container.UploadBlobAsync(reference, stream).ConfigureAwait(false);
+
         // var dataLakeFileSystemClient = _dataLakeServiceClient.GetFileSystemClient("filesystemtest");
         //
         // var fileSystemExists = await dataLakeFileSystemClient.ExistsAsync().ConfigureAwait(false);

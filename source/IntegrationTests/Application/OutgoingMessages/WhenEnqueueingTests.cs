@@ -13,8 +13,14 @@
 // limitations under the License.
 
 using System;
+using System.IO;
+using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
@@ -26,6 +32,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAc
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using NodaTime;
 using Xunit;
@@ -149,21 +156,45 @@ public class WhenEnqueueingTests : TestBase
     // }
 
     [Fact]
-    public async Task The_market_document_message_is_added_to_file_storage_with_correct_name()
+    public async Task Outgoing_message_has_correct_file_storage_reference()
     {
+        // Arrange
         var message = _outgoingMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
-            // .WithReceiverRole(MarketRole.EnergySupplier)
             .Build();
 
         var createdAtTimestamp = Instant.FromUtc(2024, 1, 1, 0, 0);
         _systemDateTimeProvider.SetNow(createdAtTimestamp);
-        var expectedFileStorageReference = $"{SampleData.NewEnergySupplierNumber}/{createdAtTimestamp.Year()}/{createdAtTimestamp.Month()}/{createdAtTimestamp.Day()}/{message.Id}";
+        var expectedFileStorageReference = $"{SampleData.NewEnergySupplierNumber}/{createdAtTimestamp.Year():0000}/{createdAtTimestamp.Month():00}/{createdAtTimestamp.Day():00}/{message.Id:N}";
 
+        // Act
         await EnqueueAndCommitAsync(message);
 
-        var actualFileStorageReference = await GetOutgoingMessageFileStorageReference(message.Id);
+        // Assert
+        var actualFileStorageReference = await GetOutgoingMessageFileStorageReferenceFromDatabase(message.Id);
         actualFileStorageReference.Should().Be(expectedFileStorageReference);
+    }
+
+    [Fact]
+    public async Task Outgoing_message_record_is_added_to_file_storage_with_correct_content()
+    {
+        // Arrange
+        var message = _outgoingMessageDtoBuilder
+            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            .Build();
+
+        // Act
+        await EnqueueAndCommitAsync(message);
+
+        // Assert
+        var fileStorageReference = await GetOutgoingMessageFileStorageReferenceFromDatabase(message.Id);
+
+        var fileContent = await GetFileFromFileStorage(fileStorageReference);
+
+        fileContent.HasValue.Should().BeTrue();
+
+        var fileContentAsString = await GetStreamContentAsString(fileContent.Value.Content);
+        fileContentAsString.Should().Be(message.MessageRecord);
     }
 
     protected override void Dispose(bool disposing)
@@ -172,7 +203,27 @@ public class WhenEnqueueingTests : TestBase
         base.Dispose(disposing);
     }
 
-    private async Task<string> GetOutgoingMessageFileStorageReference(Guid id)
+    private static async Task<string> GetStreamContentAsString(Stream stream)
+    {
+        using var streamReader = new StreamReader(stream, Encoding.UTF8);
+        var stringContent = await streamReader.ReadToEndAsync();
+
+        return stringContent;
+    }
+
+    private static async Task<Response<BlobDownloadInfo>> GetFileFromFileStorage(string fileStorageReference)
+    {
+        var azuriteBlobConnectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING");
+        var blobServiceClient = new BlobServiceClient(azuriteBlobConnectionString);
+
+        var container = blobServiceClient.GetBlobContainerClient("outgoing");
+        var blob = container.GetBlobClient(fileStorageReference);
+
+        var blobContent = await blob.DownloadAsync();
+        return blobContent;
+    }
+
+    private async Task<string> GetOutgoingMessageFileStorageReferenceFromDatabase(Guid id)
     {
         using var connection =
             await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
@@ -181,16 +232,6 @@ public class WhenEnqueueingTests : TestBase
 
         return fileStorageReference;
     }
-
-    // private async Task AssertMarketDocumentFileIsUploaded(Guid marketDocumentBundleId, string expectedFileStorageReference)
-    // {
-    //     using var connection =
-    //         await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-    //
-    //     var fileStorageReference = await connection.ExecuteScalarAsync<string>($"SELECT FileStorageReference FROM [dbo].[MarketDocuments] WHERE BundleId = '{marketDocumentBundleId}'");
-    //
-    //     fileStorageReference.Should().Be(expectedFileStorageReference);
-    // }
 
     private async Task EnqueueAndCommitAsync(OutgoingMessageDto message)
     {

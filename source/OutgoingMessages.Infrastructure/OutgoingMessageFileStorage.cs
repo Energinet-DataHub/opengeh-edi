@@ -44,9 +44,6 @@ public class OutgoingMessageFileStorage : IOutgoingMessageFileStorage
 
         var reference = FileStorageReference.Create(documentReference);
 
-        // var referenceWithFolder = $"outgoing/{reference.Value}";
-
-        // referenceWithFolder = $"{bundleId.Id:N}";
         await _fileStorageClient.UploadAsync("outgoing", reference.Value, messageStream).ConfigureAwait(false);
 
         return reference;

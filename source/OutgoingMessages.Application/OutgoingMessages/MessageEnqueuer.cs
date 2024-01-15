@@ -46,7 +46,7 @@ public class MessageEnqueuer
     {
         if (messageToEnqueue == null) throw new ArgumentNullException(nameof(messageToEnqueue));
 
-        var messageId = Guid.NewGuid();
+        var messageId = messageToEnqueue.Id;
         var messageReceiver = Receiver.Create(messageToEnqueue.ReceiverId, messageToEnqueue.ReceiverRole);
 
         using var messageAsStream = CreateStream(messageToEnqueue.MessageRecord);
