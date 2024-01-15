@@ -19,9 +19,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.Edi.Responses;
+using FluentAssertions;
+using FluentAssertions.Equivalency;
 using MediatR;
-using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 
@@ -31,26 +33,28 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
 
     public static void AssertExpectedNotifications(AggregatedTimeSeriesRequestAccepted aggregatedTimeSeriesRequestAccepted)
     {
-        if (aggregatedTimeSeriesRequestAccepted == null) throw new ArgumentNullException(nameof(aggregatedTimeSeriesRequestAccepted));
+        ArgumentNullException.ThrowIfNull(aggregatedTimeSeriesRequestAccepted);
 
-        var firstSerie = aggregatedTimeSeriesRequestAccepted.Series.FirstOrDefault();
-        Assert.NotNull(firstSerie);
-        Assert.NotNull(_actualNotifications);
-        Assert.Single(_actualNotifications);
-        Assert.Contains(_actualNotifications, notification => notification is AggregatedTimeSerieRequestWasAccepted);
+        var firstSeries = aggregatedTimeSeriesRequestAccepted.Series.FirstOrDefault();
+        firstSeries.Should().NotBeNull();
+
+        _actualNotifications.Should().NotBeNull();
+        _actualNotifications.Should().ContainSingle();
+        _actualNotifications.Should().ContainItemsAssignableTo<AggregatedTimeSerieRequestWasAccepted>();
+
         var actualNotification = _actualNotifications.Single() as AggregatedTimeSerieRequestWasAccepted;
-        var actualTimeSerie = actualNotification!.AggregatedTimeSeries[0];
-        Assert.NotNull(actualTimeSerie);
-        Assert.Equal(firstSerie.GridArea, actualTimeSerie.GridAreaDetails.GridAreaCode);
-        Assert.Equal(MapUnitType(firstSerie), actualTimeSerie.UnitType);
-        Assert.Equal(MapMeteringPointType(firstSerie), actualTimeSerie.MeteringPointType);
-        foreach (var point in actualTimeSerie.Points)
-        {
-            Assert.Contains(firstSerie.TimeSeriesPoints, exceptedPoint =>
-                exceptedPoint.Time.ToString() == point.SampleTime &&
-                MapQuality(exceptedPoint.QuantityQuality) == point.Quality &&
-                Parse(exceptedPoint.Quantity) == point.Quantity);
-        }
+        actualNotification.Should().NotBeNull();
+        actualNotification!.AggregatedTimeSeries.Should().ContainSingle();
+
+        var actualTimeSeries = actualNotification.AggregatedTimeSeries[0];
+        actualTimeSeries.Should().NotBeNull();
+        actualTimeSeries.GridAreaDetails.GridAreaCode.Should().Be(firstSeries!.GridArea);
+        actualTimeSeries.UnitType.Should().Be(MapUnitType(firstSeries));
+        actualTimeSeries.MeteringPointType.Should().Be(MapMeteringPointType(firstSeries));
+        actualTimeSeries.Points.Should()
+            .BeEquivalentTo(
+                firstSeries.TimeSeriesPoints,
+                opt => opt.Using(new PointsComparer()));
     }
 
     public Task Handle(AggregatedTimeSerieRequestWasAccepted notification, CancellationToken cancellationToken)
@@ -59,14 +63,15 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
         return Task.CompletedTask;
     }
 
-    private static string MapQuality(QuantityQuality quality)
+    private static CalculatedQuantityQuality MapQuality(QuantityQuality quality)
     {
         return quality switch
         {
-            QuantityQuality.Incomplete => Quality.Incomplete.Name,
-            QuantityQuality.Measured => Quality.Measured.Name,
-            QuantityQuality.Missing => Quality.Missing.Name,
-            QuantityQuality.Estimated => Quality.Estimated.Name,
+            QuantityQuality.Incomplete => CalculatedQuantityQuality.Incomplete,
+            QuantityQuality.Measured => CalculatedQuantityQuality.Measured,
+            QuantityQuality.Missing => CalculatedQuantityQuality.Missing, // EdiQuantityQuality.NotAvailable?
+            QuantityQuality.Estimated => CalculatedQuantityQuality.Estimated,
+            QuantityQuality.Calculated => CalculatedQuantityQuality.Calculated,
             QuantityQuality.Unspecified => throw new InvalidOperationException("Quality is not specified"),
             _ => throw new InvalidOperationException("Unknown quality type"),
         };
@@ -106,5 +111,25 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
             QuantityUnit.Unspecified => throw new InvalidOperationException("Could not map unit type"),
             _ => throw new InvalidOperationException("Unknown unit type"),
         };
+    }
+
+    private sealed class PointsComparer : IEquivalencyStep
+    {
+        public EquivalencyResult Handle(
+            Comparands comparands,
+            IEquivalencyValidationContext context,
+            IEquivalencyValidator nestedValidator)
+        {
+            if (comparands is not { Subject: Point p, Expectation: TimeSeriesPoint tsp })
+            {
+                return EquivalencyResult.ContinueWithNext;
+            }
+
+            p.SampleTime.Should().Be(tsp.Time.ToString());
+            p.QuantityQuality.Should().Be(MapQuality(tsp.QuantityQuality));
+            p.Quantity.Should().Be(Parse(tsp.Quantity));
+
+            return EquivalencyResult.AssertionCompleted;
+        }
     }
 }

@@ -21,6 +21,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
+using FluentAssertions;
 using IncomingMessages.Infrastructure.DocumentValidation;
 using Json.Schema;
 using Xunit;
@@ -175,6 +176,24 @@ internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationRe
             .GetProperty("Point").EnumerateArray().ToList()[position - 1];
 
         Assert.Throws<KeyNotFoundException>(() => point.GetProperty("quality"));
+        return this;
+    }
+
+    public IAssertAggregationResultDocument QualityIsPresentForPosition(
+        int position,
+        string quantityQualityCode)
+    {
+        var quality = FirstTimeSeriesElement()
+            .GetProperty("Period")
+            .GetProperty("Point")
+            .EnumerateArray()
+            .ToList()[position - 1]
+            .GetProperty("quality")
+            .GetProperty("value");
+
+        quality.Should().NotBeNull();
+        quality.ToString().Should().Be(quantityQualityCode);
+
         return this;
     }
 
