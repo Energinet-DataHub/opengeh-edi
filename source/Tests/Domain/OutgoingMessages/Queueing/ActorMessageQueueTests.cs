@@ -176,7 +176,7 @@ public class ActorMessageQueueTests
             messageType ?? DocumentType.NotifyAggregatedMeasureData,
             receiver.Number,
             ProcessId.New().Id,
-            processType?.Code ?? BusinessReason.BalanceFixing.Code,
+            processType?.Name ?? BusinessReason.BalanceFixing.Name,
             receiver.ActorRole,
             ActorNumber.Create("1234567890987"),
             MarketRole.MeteringPointAdministrator,
