@@ -260,6 +260,68 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, MeteringPointType.Consumption.Name);
     }
 
+    [Theory]
+    [InlineData(TimeSeriesType.Production)]
+    [InlineData(TimeSeriesType.FlexConsumption)]
+    [InlineData(TimeSeriesType.NonProfiledConsumption)]
+    [InlineData(TimeSeriesType.NetExchangePerGa)]
+    [InlineData(TimeSeriesType.NetExchangePerNeighboringGa)]
+    [InlineData(TimeSeriesType.TotalConsumption)]
+    public async Task Message_is_created_for_supported_time_series_type(TimeSeriesType timeSeriesType)
+    {
+        var businessReason = BusinessReason.FromName(nameof(BusinessReason.BalanceFixing));
+        await _gridAreaBuilder
+            .WithGridAreaCode(SampleData.GridAreaCode)
+            .WithActorNumber(SampleData.GridOperatorNumber)
+            .StoreAsync(GetService<IMasterDataClient>());
+
+        _eventBuilder
+            .WithResolution(Resolution.Quarter)
+            .WithMeasurementUnit(QuantityUnit.Kwh)
+            .AggregatedBy(SampleData.GridAreaCode, null, null)
+            .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
+            .ResultOf(timeSeriesType);
+
+        await HavingReceivedAndHandledIntegrationEventAsync(EnergyResultProducedV2.EventName, _eventBuilder.Build());
+
+        var message = await OutgoingMessageAsync(MarketRole.MeteredDataResponsible, businessReason);
+        message.HasReceiverId(SampleData.GridOperatorNumber.Value)
+            .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
+            .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
+            .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
+            .HasBusinessReason(businessReason);
+    }
+
+    [Theory]
+    [InlineData(TimeSeriesType.GridLoss)]
+    [InlineData(TimeSeriesType.TempProduction)]
+    [InlineData(TimeSeriesType.NegativeGridLoss)]
+    [InlineData(TimeSeriesType.PositiveGridLoss)]
+    [InlineData(TimeSeriesType.TempFlexConsumption)]
+    public async Task Message_is_not_created_for_unsupported_time_series_type(TimeSeriesType timeSeriesType)
+    {
+        var businessReason = BusinessReason.FromName(nameof(BusinessReason.BalanceFixing));
+        await _gridAreaBuilder
+            .WithGridAreaCode(SampleData.GridAreaCode)
+            .WithActorNumber(SampleData.GridOperatorNumber)
+            .StoreAsync(GetService<IMasterDataClient>());
+
+        _eventBuilder
+            .WithResolution(Resolution.Quarter)
+            .WithMeasurementUnit(QuantityUnit.Kwh)
+            .AggregatedBy(SampleData.GridAreaCode, null, null)
+            .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
+            .ResultOf(timeSeriesType);
+
+        await HavingReceivedAndHandledIntegrationEventAsync(EnergyResultProducedV2.EventName, _eventBuilder.Build());
+
+        await AssertOutgoingMessage.OutgoingMessageIsNullAsync(
+            DocumentType.NotifyAggregatedMeasureData.Name,
+            businessReason.Name,
+            MarketRole.MeteredDataResponsible,
+            GetService<IDatabaseConnectionFactory>());
+    }
+
     private async Task<AssertOutgoingMessage> OutgoingMessageAsync(MarketRole roleOfReceiver, BusinessReason businessReason)
     {
         return await AssertOutgoingMessage.OutgoingMessageAsync(
