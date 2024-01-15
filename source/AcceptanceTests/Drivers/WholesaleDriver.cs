@@ -40,7 +40,7 @@ internal sealed class WholesaleDriver
         };
 
         return _integrationEventPublisher.PublishAsync(
-            "CalculationResultCompleted",
+            EnergyResultProducedV2.EventName,
             aggregation.ToByteArray());
     }
 
