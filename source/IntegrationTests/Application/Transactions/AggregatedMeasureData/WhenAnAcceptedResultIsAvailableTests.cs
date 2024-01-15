@@ -27,11 +27,17 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Xunit;
 using Xunit.Categories;
+using DecimalValue = Energinet.DataHub.Edi.Responses.DecimalValue;
+using QuantityQuality = Energinet.DataHub.Edi.Responses.QuantityQuality;
+using QuantityUnit = Energinet.DataHub.Edi.Responses.QuantityUnit;
 using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
+using TimeSeriesPoint = Energinet.DataHub.Edi.Responses.TimeSeriesPoint;
+using TimeSeriesType = Energinet.DataHub.Edi.Responses.TimeSeriesType;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.AggregatedMeasureData;
 

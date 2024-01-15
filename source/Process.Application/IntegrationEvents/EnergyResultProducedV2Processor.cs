@@ -18,33 +18,33 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
-using Energinet.DataHub.Wholesale.Contracts.Events;
+using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Application.IntegrationEvents;
 
-public class CalculationResultCompletedProcessor : IIntegrationEventProcessor
+public class EnergyResultProducedV2Processor : IIntegrationEventProcessor
 {
     private readonly AggregationFactory _aggregationFactory;
     private readonly IMediator _mediator;
 
-    public CalculationResultCompletedProcessor(AggregationFactory aggregationFactory, IMediator mediator)
+    public EnergyResultProducedV2Processor(AggregationFactory aggregationFactory, IMediator mediator)
     {
         _aggregationFactory = aggregationFactory;
         _mediator = mediator;
     }
 
-    public string EventTypeToHandle => CalculationResultCompleted.EventName;
+    public string EventTypeToHandle => EnergyResultProducedV2.EventName;
 
     public async Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         if (integrationEvent == null)
             throw new ArgumentNullException(nameof(integrationEvent));
 
-        var calculationResultCompletedIntegrationEvent = (CalculationResultCompleted)integrationEvent.Message;
+        var energyResultProducedV2 = (EnergyResultProducedV2)integrationEvent.Message;
 
         var aggregation = await _aggregationFactory
-            .CreateAsync(calculationResultCompletedIntegrationEvent, CancellationToken.None)
+            .CreateAsync(energyResultProducedV2, CancellationToken.None)
             .ConfigureAwait(false);
 
         var forwardAggregationResult = new ForwardAggregationResult(aggregation);

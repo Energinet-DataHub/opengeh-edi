@@ -23,12 +23,10 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 [SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods", Justification = "Naming has to be sensible")]
 public class ArchivedMessageDsl
 {
-    private readonly AzureAuthenticationDriver _azureAuthentication;
     private readonly EdiB2CDriver _ediB2CDriver;
 
-    public ArchivedMessageDsl(AzureAuthenticationDriver azureAuthentication, EdiB2CDriver ediB2CDriver)
+    public ArchivedMessageDsl(EdiB2CDriver ediB2CDriver)
     {
-        _azureAuthentication = azureAuthentication;
         _ediB2CDriver = ediB2CDriver;
     }
 

@@ -137,7 +137,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     private async Task AssertMessageIsArchived(Guid? messageId)
     {
         var sqlStatement =
-            $"SELECT COUNT(*) FROM [dbo].[ArchivedMessages] WHERE Id = '{messageId}'";
+            $"SELECT COUNT(*) FROM [dbo].[ArchivedMessages] WHERE MessageId = '{messageId}'";
         using var connection =
             await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var found = await connection.ExecuteScalarAsync<bool>(sqlStatement);

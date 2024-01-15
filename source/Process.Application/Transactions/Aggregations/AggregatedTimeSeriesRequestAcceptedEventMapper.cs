@@ -122,14 +122,15 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         };
     }
 
-    private static string MapQuality(QuantityQuality quality)
+    private static CalculatedQuantityQuality MapQuality(QuantityQuality quality)
     {
         return quality switch
         {
-            QuantityQuality.Incomplete => Quality.Incomplete.Name,
-            QuantityQuality.Measured => Quality.Measured.Name,
-            QuantityQuality.Missing => Quality.Missing.Name,
-            QuantityQuality.Estimated => Quality.Estimated.Name,
+            QuantityQuality.Incomplete => CalculatedQuantityQuality.Incomplete,
+            QuantityQuality.Measured => CalculatedQuantityQuality.Measured,
+            QuantityQuality.Missing => CalculatedQuantityQuality.NotAvailable,
+            QuantityQuality.Estimated => CalculatedQuantityQuality.Estimated,
+            QuantityQuality.Calculated => CalculatedQuantityQuality.Calculated,
             QuantityQuality.Unspecified => throw new InvalidOperationException("Quality is not specified"),
             _ => throw new InvalidOperationException("Unknown quality type"),
         };

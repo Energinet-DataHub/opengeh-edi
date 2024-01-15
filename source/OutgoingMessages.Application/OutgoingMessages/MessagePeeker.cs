@@ -79,17 +79,16 @@ public class MessagePeeker
             var result = await _documentFactory.CreateFromAsync(outgoingMessageBundle, request.DocumentFormat, timestamp).ConfigureAwait(false);
 
             await _archivedMessageClient.CreateAsync(
-                    new ArchivedMessage(
-                    peekResult.BundleId.Id.ToString(),
-                    peekResult.BundleId.Id.ToString(),
-                    outgoingMessageBundle.DocumentType.ToString(),
-                    outgoingMessageBundle.SenderId.Value,
-                    outgoingMessageBundle.Receiver.Number.Value,
-                    timestamp,
-                    outgoingMessageBundle.BusinessReason,
-                    result),
-                    cancellationToken)
-                .ConfigureAwait(false);
+                new ArchivedMessage(
+                   Guid.NewGuid().ToString(),
+                   peekResult.BundleId.Id.ToString(),
+                   outgoingMessageBundle.DocumentType.ToString(),
+                   outgoingMessageBundle.SenderId.Value,
+                   outgoingMessageBundle.Receiver.Number.Value,
+                   timestamp,
+                   outgoingMessageBundle.BusinessReason,
+                   result),
+                cancellationToken).ConfigureAwait(false);
 
             document = new MarketDocument(result, peekResult.BundleId);
             _marketDocumentRepository.Add(document);

@@ -19,57 +19,56 @@ using System.Text;
 using System.Text.Json;
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
-using Energinet.DataHub.EDI.AcceptanceTests.Factories;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Microsoft.Data.SqlClient;
+using Nito.AsyncEx;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 internal sealed class EdiDriver : IDisposable
 {
-    private readonly string _azpToken;
-    private readonly string _connectionString;
-    private readonly HttpClient _httpClient;
+    private readonly AsyncLazy<HttpClient> _httpClient;
 
-    public EdiDriver(string azpToken, string connectionString, Uri ediB2BBaseUri)
+    public EdiDriver(AsyncLazy<HttpClient> b2bHttpClient)
     {
-        _azpToken = azpToken;
-        _connectionString = connectionString;
-        _httpClient = new HttpClient();
-        _httpClient.BaseAddress = ediB2BBaseUri;
+        _httpClient = b2bHttpClient;
     }
 
     public void Dispose()
     {
-        _httpClient.Dispose();
     }
 
-    public async Task<Stream> RequestAggregatedMeasureDataAsync(string actorNumber, string[] marketRoles, bool asyncError = false, string? overrideToken = null)
+    public async Task<Stream> RequestAggregatedMeasureDataAsync(bool asyncError = false, string? token = null)
     {
-        var token = overrideToken ?? TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
-        var response = await RequestAggregatedMeasureDataAsync(token, asyncError).ConfigureAwait(false);
+        var b2bClient = await _httpClient;
+        using var request = new HttpRequestMessage(HttpMethod.Post, "api/RequestAggregatedMeasureMessageReceiver");
+        if (token is not null) request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+        request.Content = new StringContent(GetContent(asyncError), Encoding.UTF8, "application/json");
+        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-        var document = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+        var aggregatedMeasureDataResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
+        if (aggregatedMeasureDataResponse.StatusCode == HttpStatusCode.BadRequest)
+        {
+            var responseContent = await aggregatedMeasureDataResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+            throw new BadAggregatedMeasureDataRequestException($"responseContent: {responseContent}");
+        }
+
+        aggregatedMeasureDataResponse.EnsureSuccessStatusCode();
+
+        var document = await aggregatedMeasureDataResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
         return document;
     }
 
-    public async Task<Stream> PeekMessageAsync(string actorNumber, string[] marketRoles)
-    {
-        var token = TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
-        return await PeekMessageAsync(token).ConfigureAwait(false);
-    }
-
-    public async Task<Stream> PeekMessageAsync(string token)
+    public async Task<Stream> PeekMessageAsync()
     {
         var stopWatch = Stopwatch.StartNew();
         while (stopWatch.ElapsedMilliseconds < 60000)
         {
-            var peekResponse = await PeekAsync(token)
+            var peekResponse = await PeekAsync()
                 .ConfigureAwait(false);
             if (peekResponse.StatusCode == HttpStatusCode.OK)
             {
                 var document = await peekResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                await DequeueAsync(token, GetMessageId(peekResponse)).ConfigureAwait(false);
+                await DequeueAsync(GetMessageId(peekResponse)).ConfigureAwait(false);
                 return document;
             }
 
@@ -84,22 +83,20 @@ internal sealed class EdiDriver : IDisposable
         throw new TimeoutException("Unable to retrieve peek result within time limit");
     }
 
-    public async Task EmptyQueueAsync(string actorNumber, string[] marketRoles, string? tokenOverride = null)
+    public async Task EmptyQueueAsync()
     {
-        var token = tokenOverride ?? TokenBuilder.BuildToken(actorNumber, marketRoles, _azpToken);
-
-        var peekResponse = await PeekAsync(token)
+        var peekResponse = await PeekAsync()
                 .ConfigureAwait(false);
         if (peekResponse.StatusCode == HttpStatusCode.OK)
         {
-            await DequeueAsync(token, GetMessageId(peekResponse)).ConfigureAwait(false);
-            await EmptyQueueAsync(actorNumber, marketRoles, tokenOverride).ConfigureAwait(false);
+            await DequeueAsync(GetMessageId(peekResponse)).ConfigureAwait(false);
+            await EmptyQueueAsync().ConfigureAwait(false);
         }
     }
 
-    public async Task PeekAcceptedAggregationMessageAsync(string actorNumber, string[] roles)
+    public async Task PeekAcceptedAggregationMessageAsync()
     {
-        var documentStream = await PeekMessageAsync(actorNumber, roles).ConfigureAwait(false);
+        var documentStream = await PeekMessageAsync().ConfigureAwait(false);
         var jsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(documentStream).ConfigureAwait(false);
 
         var documentIsOfExpectedType = jsonElement.TryGetProperty(
@@ -113,9 +110,9 @@ internal sealed class EdiDriver : IDisposable
             .GetString());
     }
 
-    public async Task PeekRejectedMessageAsync(string actorNumber, string[] roles)
+    public async Task PeekRejectedMessageAsync()
     {
-        var documentStream = await PeekMessageAsync(actorNumber, roles).ConfigureAwait(false);
+        var documentStream = await PeekMessageAsync().ConfigureAwait(false);
         var jsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(documentStream).ConfigureAwait(false);
 
         var documentIsOfExpectedType = jsonElement.TryGetProperty(
@@ -129,24 +126,9 @@ internal sealed class EdiDriver : IDisposable
             .GetString());
     }
 
-    public async Task ActorExistsAsync(string actorNumber, string azpToken)
-    {
-        using var connection = new SqlConnection(_connectionString);
-        using var command = new SqlCommand();
-
-        command.CommandText = "SELECT COUNT(*) FROM [Actor] WHERE ActorNumber = @ActorNumber AND ExternalId = @ExternalId";
-        command.Parameters.AddWithValue("@ActorNumber", actorNumber);
-        command.Parameters.AddWithValue("@ExternalId", azpToken);
-        command.Connection = connection;
-
-        await command.Connection.OpenAsync().ConfigureAwait(false);
-        var exist = await command.ExecuteScalarAsync().ConfigureAwait(false);
-        Assert.NotNull(exist);
-    }
-
     public async Task RequestAggregatedMeasureDataWithoutTokenAsync()
     {
-        var act = () => RequestAggregatedMeasureDataAsync(null, false);
+        var act = () => RequestAggregatedMeasureDataAsync(false, string.Empty);
 
         var httpRequestException = await Assert.ThrowsAsync<HttpRequestException>(act).ConfigureAwait(false);
 
@@ -155,7 +137,16 @@ internal sealed class EdiDriver : IDisposable
 
     public async Task PeekMessageWithoutTokenAsync()
     {
-        var act = () => PeekAsync(null);
+        var act = async () =>
+        {
+            var b2bClient = await _httpClient;
+            using var request = new HttpRequestMessage(HttpMethod.Get, "api/peek/aggregations");
+            request.Headers.Authorization = new AuthenticationHeaderValue("bearer", null);
+            request.Content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
+            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            var peekResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
+            peekResponse.EnsureSuccessStatusCode();
+        };
 
         var httpRequestException = await Assert.ThrowsAsync<HttpRequestException>(act).ConfigureAwait(false);
 
@@ -164,20 +155,28 @@ internal sealed class EdiDriver : IDisposable
 
     public async Task DequeueMessageWithoutTokenAsync(string messageId)
     {
-        var act = () => DequeueAsync(null, messageId);
+        var act = async () =>
+        {
+            var b2bClient = await _httpClient;
+            using var request = new HttpRequestMessage(HttpMethod.Delete, $"api/dequeue/{messageId}");
+            request.Headers.Authorization = new AuthenticationHeaderValue("bearer", null);
+            var dequeueResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
+            dequeueResponse.EnsureSuccessStatusCode();
+        };
 
         var httpRequestException = await Assert.ThrowsAsync<HttpRequestException>(act).ConfigureAwait(false);
 
         Assert.Equal(HttpStatusCode.Unauthorized, httpRequestException.StatusCode);
     }
 
-    public async Task<string> RequestAggregatedMeasureDataXmlAsync(XmlDocument payload, string token)
+    public async Task<string> RequestAggregatedMeasureDataXmlAsync(XmlDocument payload, string? token = null)
     {
+        var b2bClient = await _httpClient;
         using var request = new HttpRequestMessage(HttpMethod.Post, "/api/RequestAggregatedMeasureMessageReceiver");
-        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+        if (token is not null) request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
         request.Content = new StringContent(payload.OuterXml, Encoding.UTF8, "application/xml");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/xml");
-        var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
+        var response = await b2bClient.SendAsync(request).ConfigureAwait(false);
         var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         return responseString;
@@ -218,41 +217,22 @@ internal sealed class EdiDriver : IDisposable
         return jsonContent;
     }
 
-    private async Task<HttpResponseMessage> RequestAggregatedMeasureDataAsync(string? token, bool asyncError)
+    private async Task<HttpResponseMessage> PeekAsync()
     {
-        using var request = new HttpRequestMessage(HttpMethod.Post, "api/RequestAggregatedMeasureMessageReceiver");
-        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
-        request.Content = new StringContent(GetContent(asyncError), Encoding.UTF8, "application/json");
-        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-        var aggregatedMeasureDataResponse = await _httpClient.SendAsync(request).ConfigureAwait(false);
-        if (aggregatedMeasureDataResponse.StatusCode == HttpStatusCode.BadRequest)
-        {
-            var responseContent = await aggregatedMeasureDataResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new BadAggregatedMeasureDataRequestException($"responseContent: {responseContent}");
-        }
-
-        aggregatedMeasureDataResponse.EnsureSuccessStatusCode();
-
-        return aggregatedMeasureDataResponse;
-    }
-
-    private async Task<HttpResponseMessage> PeekAsync(string? token)
-    {
+        var b2bClient = await _httpClient;
         using var request = new HttpRequestMessage(HttpMethod.Get, "api/peek/aggregations");
-        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
         request.Content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-        var peekResponse = await _httpClient.SendAsync(request).ConfigureAwait(false);
+        var peekResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
         peekResponse.EnsureSuccessStatusCode();
         return peekResponse;
     }
 
-    private async Task DequeueAsync(string? token, string messageId)
+    private async Task DequeueAsync(string messageId)
     {
+        var b2bClient = await _httpClient;
         using var request = new HttpRequestMessage(HttpMethod.Delete, $"api/dequeue/{messageId}");
-        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
-        var dequeueResponse = await _httpClient.SendAsync(request).ConfigureAwait(false);
+        var dequeueResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
         dequeueResponse.EnsureSuccessStatusCode();
     }
 }

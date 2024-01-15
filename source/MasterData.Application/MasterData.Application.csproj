@@ -7,7 +7,7 @@
     <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj"/>
     <ProjectReference Include="..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj"/>
     <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj"/>
-    <ProjectReference Include="..\MaterData.Infrastructure\MaterData.Infrastructure.csproj"/>
+    <ProjectReference Include="..\MasterData.Infrastructure\MasterData.Infrastructure.csproj" />
   </ItemGroup>
   <ItemDefinitionGroup>
     <ProjectReference>

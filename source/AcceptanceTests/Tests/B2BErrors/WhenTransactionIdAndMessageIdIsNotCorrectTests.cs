@@ -33,26 +33,13 @@ public class WhenTransactionIdAndMessageIdIsNotCorrectTests : BaseTestClass
     public async Task Message_id_is_not_unique()
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.MessageIdIsNotUnique());
-        await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
-        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+
+        await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 
         Output.WriteLine(response);
 
         await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00101", "Message id 'B6Qhv7Dls6zdnvgna3cQqXu0PAzFqKco8GLc' is not unique", response);
-    }
-
-    [Fact]
-    public async Task Transaction_id_is_not_unique()
-    {
-        var payload =
-            RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.TransactionIdIsNotUnique());
-
-        await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
-        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
-
-        Output.WriteLine(response);
-
-        await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00102", "Transaction id 'aX5fNO7st0zVIemSRek4GM1FCSRbQ28PMIZO' is not unique and will not be processed.", response);
     }
 
     [Fact]
@@ -62,10 +49,60 @@ public class WhenTransactionIdAndMessageIdIsNotCorrectTests : BaseTestClass
             RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData
                 .EmptyMessageId());
 
-        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 
         Output.WriteLine(response);
 
         await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00201", "The id of the message cannot be empty", response);
+    }
+
+    [Fact]
+    public async Task Transaction_id_is_not_unique()
+    {
+        var payload =
+            RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.TransactionIdIsNotUnique());
+
+        await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
+
+        Output.WriteLine(response);
+
+        await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00102", "Transaction id 'aX5fNO7st0zVIemSRek4GM1FCSRbQ28PMIZO' is not unique and will not be processed.", response);
+    }
+
+    [Fact]
+    public async Task Transaction_id_is_empty_produces_error()
+    {
+        var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.EmptyTransactionId());
+
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
+
+        Output.WriteLine(response);
+
+        await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00202", "Transaction id cannot be empty", response);
+    }
+
+    [Fact]
+    public async Task Transaction_id_is_invalid_produces_error()
+    {
+        var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.InvalidTransactionId());
+
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
+
+        Output.WriteLine(response);
+
+        await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00205", "Transaction id invalidId is invalid. Must contain 36 characters.", response);
+    }
+
+    [Fact]
+    public async Task Message_id_is_not_the_correct_length_produces_error()
+    {
+        var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.InvalidLengthOfMessageId());
+
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
+
+        Output.WriteLine(response);
+
+        await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00305", "Message id " + payload.GetElementsByTagName("cim:mRID")[0]?.InnerText + " is invalid. Must contain 36 characters.", response);
     }
 }

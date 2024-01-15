@@ -77,7 +77,7 @@ public class AggregationResultMessage : OutgoingMessageDto
             energySupplierNumber,
             balanceResponsibleNumber,
             period,
-            points.Select(p => new Point(p.Position, p.Quantity, p.Quality, p.SampleTime)).ToList(),
+            points.Select(p => new Point(p.Position, p.Quantity, p.QuantityQuality, p.SampleTime)).ToList(),
             originalTransactionIdReference,
             settlementVersion);
         return new AggregationResultMessage(
@@ -103,4 +103,4 @@ public record TimeSeries(
     string? OriginalTransactionIdReference = null,
     string? SettlementVersion = null);
 
-public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
+public record Point(int Position, decimal? Quantity, CalculatedQuantityQuality QuantityQuality, string SampleTime);

@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
-using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 using Energinet.DataHub.EDI.AcceptanceTests.Factories;
 using Energinet.DataHub.EDI.AcceptanceTests.TestData;
 using Energinet.DataHub.EDI.AcceptanceTests.Tests.Asserters;
@@ -36,7 +34,7 @@ public class WhenPayloadDataIsDifferentFromTokenDataTests : BaseTestClass
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.WrongSenderMarketParticipantMrid());
 
-        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 
         Output.WriteLine(response);
 
@@ -48,7 +46,7 @@ public class WhenPayloadDataIsDifferentFromTokenDataTests : BaseTestClass
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.SenderRoleTypeNotAuthorized());
 
-        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload, Token);
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 
         Output.WriteLine(response);
 

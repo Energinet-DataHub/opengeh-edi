@@ -144,11 +144,14 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "IntervalEnergyObservation", null).ConfigureAwait(false);
                 await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Position", null, point.Position.ToString(NumberFormatInfo.InvariantInfo)).ConfigureAwait(false);
                 if (point.Quantity is not null
-                    && TryParseQuantityQuality(point.Quality, out var quality)
-                    && quality != Quality.Missing)
+                    && EbixCode.Of(point.QuantityQuality) is not null)
                 {
                     await writer.WriteElementStringAsync(DocumentDetails.Prefix, "EnergyQuantity", null, point.Quantity.ToString()!).ConfigureAwait(false);
-                    await WriteEbixCodeWithAttributesAsync("QuantityQuality", EbixCode.Of(quality), writer).ConfigureAwait(false);
+                    await WriteEbixCodeWithAttributesAsync(
+                            "QuantityQuality",
+                            EbixCode.Of(point.QuantityQuality)!,
+                            writer)
+                        .ConfigureAwait(false);
                 }
                 else
                 {
@@ -167,11 +170,5 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             // End PayloadEnergyTimeSeries
         }
-    }
-
-    private static bool TryParseQuantityQuality(string pointQuality, out Quality quality)
-    {
-        quality = Quality.From(pointQuality);
-        return true;
     }
 }

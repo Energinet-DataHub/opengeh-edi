@@ -75,9 +75,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingBlocks.Application"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MasterData", "MasterData", "{819E6A12-3F25-4639-BD1B-488921D60DC7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MaterData.Domain", "MaterData.Domain\MaterData.Domain.csproj", "{535421FA-4F87-461A-A5FB-0432325B8A46}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterData.Domain", "MasterData.Domain\MasterData.Domain.csproj", "{535421FA-4F87-461A-A5FB-0432325B8A46}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MaterData.Infrastructure", "MaterData.Infrastructure\MaterData.Infrastructure.csproj", "{D998D908-C775-40E8-9603-1439A726A394}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterData.Infrastructure", "MasterData.Infrastructure\MasterData.Infrastructure.csproj", "{D998D908-C775-40E8-9603-1439A726A394}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterData.Interfaces", "MasterData.Interfaces\MasterData.Interfaces.csproj", "{55D58519-8CCF-4CF8-8975-32D7F741E292}"
 EndProject
