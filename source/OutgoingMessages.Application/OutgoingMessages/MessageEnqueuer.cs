@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
 
@@ -26,15 +27,18 @@ public class MessageEnqueuer
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly ILogger<MessageDequeuer> _logger;
 
     public MessageEnqueuer(
         IActorMessageQueueRepository actorMessageQueueRepository,
         IOutgoingMessageRepository outgoingMessageRepository,
-        ISystemDateTimeProvider systemDateTimeProvider)
+        ISystemDateTimeProvider systemDateTimeProvider,
+        ILogger<MessageDequeuer> logger)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _outgoingMessageRepository = outgoingMessageRepository;
         _systemDateTimeProvider = systemDateTimeProvider;
+        _logger = logger;
     }
 
     public async Task EnqueueAsync(OutgoingMessageDto outgoingMessage)
@@ -55,6 +59,7 @@ public class MessageEnqueuer
 
         messageQueue.Enqueue(message, _systemDateTimeProvider.Now());
         _outgoingMessageRepository.Add(message);
+        _logger.LogInformation("Message enqueued: {Message} for Actor: {ActorNumber}", message.Id, message.Receiver.Number);
     }
 
     private static OutgoingMessage MapOutgoingMessage(OutgoingMessageDto messageDto)
