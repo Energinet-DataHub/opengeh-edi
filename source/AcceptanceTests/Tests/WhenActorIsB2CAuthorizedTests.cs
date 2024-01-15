@@ -13,10 +13,9 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using System.Net.Http.Json;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.B2BErrors;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 
 [SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 

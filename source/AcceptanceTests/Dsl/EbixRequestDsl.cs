@@ -17,6 +17,7 @@ using System.ServiceModel;
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
+using Energinet.DataHub.EDI.AcceptanceTests.TestData;
 using FluentAssertions;
 using FluentAssertions.Execution;
 
@@ -24,22 +25,20 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
 internal sealed class EbixRequestDsl
 {
-    private readonly EdiDriver _edi;
     private readonly WholesaleDriver _wholesale;
     private readonly EbixDriver _ebix;
 
-    public EbixRequestDsl(EdiDriver edi, WholesaleDriver wholesale, EbixDriver ebix)
+    public EbixRequestDsl(WholesaleDriver wholesale, EbixDriver ebix)
     {
-        _edi = edi;
         _wholesale = wholesale;
         _ebix = ebix;
     }
 
     #pragma warning disable VSTHRD200
 
-    internal async Task EmptyQueueForActor(string actorNumber, string actorRole)
+    internal async Task EmptyQueueForActor()
     {
-        await _edi.EmptyQueueAsync(actorNumber, new[] { actorRole, }).ConfigureAwait(false);
+        await _ebix.EmptyQueueAsync().ConfigureAwait(false);
     }
 
     internal Task PublishAggregationResultFor(string gridArea)

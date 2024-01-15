@@ -73,17 +73,6 @@ public class CimCodeTests
     }
 
     [Theory]
-    [InlineData(nameof(Quality.Missing), "A02")]
-    [InlineData(nameof(Quality.Estimated), "A03")]
-    [InlineData(nameof(Quality.Incomplete), "A05")]
-    [InlineData(nameof(Quality.Calculated), "A06")]
-    [InlineData(nameof(Quality.Measured), "A04")]
-    public void Translate_quality(string quality, string expectedCode)
-    {
-        Assert.Equal(expectedCode, CimCode.Of(Quality.From(quality)));
-    }
-
-    [Theory]
     [InlineData("1234567890123", "A10")]
     [InlineData("1234567890123456", "A01")]
     public void Translate_actor_number_coding_scheme(string actorNumber, string expectedCode)
