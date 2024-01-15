@@ -175,6 +175,23 @@ public class WhenEnqueueingTests : TestBase
         fileContentAsString.Should().Be(message.MessageRecord);
     }
 
+    [Fact]
+    public async Task Uploading_duplicate_outgoing_message_records_to_file_storage_throws_exception() // EDK: Is it correct that we never check for enqueuing duplicate outgoing messages?
+    {
+        // Arrange
+        var message = _outgoingMessageDtoBuilder
+            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            .Build();
+
+        // Act
+        await EnqueueAndCommitAsync(message);
+        var enqueueDuplicate = async () => await EnqueueAndCommitAsync(message);
+
+        // Assert
+        (await enqueueDuplicate.Should().ThrowAsync<RequestFailedException>())
+            .And.ErrorCode.Should().Be("BlobAlreadyExists");
+    }
+
     protected override void Dispose(bool disposing)
     {
         _context.Dispose();
