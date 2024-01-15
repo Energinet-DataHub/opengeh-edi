@@ -18,13 +18,5 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Opti
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1056", Justification = "Nuget expects a string")]
 public class AzureDataLakeConnectionOptions
 {
-    public string AZURE_DATA_LAKE_URI { get; set; } = string.Empty;
-
-    public string AZURE_STORAGE_ACCOUNT_NAME { get; set; } = string.Empty;
-
-    public string AZURE_STORAGE_ACCOUNT_KEY { get; set; } = string.Empty;
-
-    public string AZURE_DATA_LAKE_FILESYSTEM_NAME { get; set; } = string.Empty;
-
-    public string AZURE_STORAGE_ACCOUNT_CONNECTION_STRING { get; set; } = string.Empty;
+    public string AZURE_STORAGE_ACCOUNT_CONNECTION_STRING { get; init; } = string.Empty;
 }

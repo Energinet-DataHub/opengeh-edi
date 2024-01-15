@@ -45,10 +45,7 @@ public static class BuildingBlockConfiguration
         services
             .AddOptions<AzureDataLakeConnectionOptions>()
             .Bind(configuration)
-            .Validate(o => !string.IsNullOrEmpty(o.AZURE_DATA_LAKE_URI), $"{nameof(AzureDataLakeConnectionOptions.AZURE_DATA_LAKE_URI)} must be set in configuration")
-            .Validate(o => !string.IsNullOrEmpty(o.AZURE_STORAGE_ACCOUNT_NAME), $"{nameof(AzureDataLakeConnectionOptions.AZURE_STORAGE_ACCOUNT_NAME)} must be set in configuration")
-            .Validate(o => !string.IsNullOrEmpty(o.AZURE_STORAGE_ACCOUNT_KEY), $"{nameof(AzureDataLakeConnectionOptions.AZURE_STORAGE_ACCOUNT_KEY)} must be set in configuration")
-            .Validate(o => !string.IsNullOrEmpty(o.AZURE_DATA_LAKE_FILESYSTEM_NAME), $"{nameof(AzureDataLakeConnectionOptions.AZURE_DATA_LAKE_FILESYSTEM_NAME)} must be set in configuration");
+            .Validate(o => !string.IsNullOrEmpty(o.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING), $"{nameof(AzureDataLakeConnectionOptions.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING)} must be set in configuration");
 
         services.AddTransient<IFileStorageClient, DataLakeFileStorageClient>();
     }

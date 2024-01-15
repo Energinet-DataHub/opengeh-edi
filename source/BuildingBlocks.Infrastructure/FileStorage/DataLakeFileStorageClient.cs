@@ -26,18 +26,13 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 public class DataLakeFileStorageClient : IFileStorageClient
 {
     private readonly BlobServiceClient _blobClient;
-    private readonly DataLakeServiceClient _dataLakeServiceClient;
+    // private readonly DataLakeServiceClient _dataLakeServiceClient;
 
     public DataLakeFileStorageClient(IOptions<AzureDataLakeConnectionOptions> options)
     {
         ArgumentNullException.ThrowIfNull(options);
 
-        var credentials = new StorageSharedKeyCredential(options.Value.AZURE_STORAGE_ACCOUNT_NAME, options.Value.AZURE_STORAGE_ACCOUNT_KEY);
-
         _blobClient = new BlobServiceClient(options.Value.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING);
-
-        // var dataLakeServiceClient = new DataLakeServiceClient(new Uri(options.Value.AZURE_DATA_LAKE_URI), credentials);
-        _dataLakeServiceClient = new DataLakeServiceClient(options.Value.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING);
     }
 
     public async Task UploadAsync(string rootFolder, string reference, Stream stream)
@@ -50,21 +45,6 @@ public class DataLakeFileStorageClient : IFileStorageClient
             await container.CreateAsync().ConfigureAwait(false);
 
         await container.UploadBlobAsync(reference, stream).ConfigureAwait(false);
-
-        // var dataLakeFileSystemClient = _dataLakeServiceClient.GetFileSystemClient("filesystemtest");
-        //
-        // var fileSystemExists = await dataLakeFileSystemClient.ExistsAsync().ConfigureAwait(false);
-        //
-        // if (!fileSystemExists)
-        //     await dataLakeFileSystemClient.CreateAsync().ConfigureAwait(false);
-        //
-        // var fileClient = dataLakeFileSystemClient.GetFileClient(reference);
-        //
-        // var fileExists = await fileClient.ExistsAsync().ConfigureAwait(false);
-        // if (!fileExists)
-        //     await fileClient.CreateAsync().ConfigureAwait(false); // <-- doesn't work in Azurite? :(
-        //
-        // await fileClient.UploadAsync(stream, overwrite: false).ConfigureAwait(false);
      }
 
     public async Task<Stream> DownloadAsync(string rootFolder, string reference)
@@ -77,13 +57,5 @@ public class DataLakeFileStorageClient : IFileStorageClient
         await blob.DownloadToAsync(stream).ConfigureAwait(false);
 
         return stream;
-        // await _dataLakeFileSystemClient.CreateIfNotExistsAsync().ConfigureAwait(false);
-        //
-        // var fileClient = _dataLakeFileSystemClient.GetFileClient(reference);
-        //
-        // var destinationStream = new MemoryStream();
-        // await fileClient.ReadToAsync(destinationStream).ConfigureAwait(false);
-        //
-        // return destinationStream;
     }
 }

@@ -163,11 +163,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
             Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", DatabaseFixture.ConnectionString);
             Environment.SetEnvironmentVariable("WHOLESALE_INBOX_MESSAGE_QUEUE_NAME", "Fake");
-            Environment.SetEnvironmentVariable("AZURE_DATA_LAKE_URI", "http://127.0.0.1:10000");
-            Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_NAME", "devstoreaccount1");
-            Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_KEY", "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==");
-            Environment.SetEnvironmentVariable("AZURE_DATA_LAKE_FILESYSTEM_NAME", "asdsa");
-            Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;");
+            Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", "UseDevelopmentStorage=true");
 
             var config = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
