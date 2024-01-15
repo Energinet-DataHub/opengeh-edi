@@ -16,6 +16,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Azure.Storage;
+using Azure.Storage.Blobs;
 using Azure.Storage.Files.DataLake;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Microsoft.Extensions.Options;
@@ -24,7 +25,8 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 
 public class DataLakeFileStorageClient : IFileStorageClient
 {
-    private readonly DataLakeFileSystemClient _dataLakeFileSystemClient;
+    private readonly BlobServiceClient _blobClient;
+    private readonly DataLakeServiceClient _dataLakeServiceClient;
 
     public DataLakeFileStorageClient(IOptions<AzureDataLakeConnectionOptions> options)
     {
@@ -32,29 +34,55 @@ public class DataLakeFileStorageClient : IFileStorageClient
 
         var credentials = new StorageSharedKeyCredential(options.Value.AZURE_STORAGE_ACCOUNT_NAME, options.Value.AZURE_STORAGE_ACCOUNT_KEY);
 
+        _blobClient = new BlobServiceClient(options.Value.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING);
+
         // var dataLakeServiceClient = new DataLakeServiceClient(new Uri(options.Value.AZURE_DATA_LAKE_URI), credentials);
-        var dataLakeServiceClient = new DataLakeServiceClient(options.Value.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING);
-        _dataLakeFileSystemClient = dataLakeServiceClient.GetFileSystemClient(options.Value.AZURE_DATA_LAKE_FILESYSTEM_NAME);
+        _dataLakeServiceClient = new DataLakeServiceClient(options.Value.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING);
     }
 
-    public async Task UploadAsync(string reference, Stream stream)
+    public async Task UploadAsync(string rootFolder, string reference, Stream stream)
     {
-        await _dataLakeFileSystemClient.CreateIfNotExistsAsync().ConfigureAwait(false);
+        var container = _blobClient.GetBlobContainerClient(rootFolder);
 
-        var fileClient = _dataLakeFileSystemClient.GetFileClient(reference);
+        var containerExists = await container.ExistsAsync().ConfigureAwait(false);
 
-        await fileClient.UploadAsync(stream, overwrite: false).ConfigureAwait(false);
-    }
+        if (!containerExists)
+            await container.CreateAsync().ConfigureAwait(false);
 
-    public async Task<Stream> DownloadAsync(string reference)
+        await container.UploadBlobAsync(reference, stream).ConfigureAwait(false);
+        // var dataLakeFileSystemClient = _dataLakeServiceClient.GetFileSystemClient("filesystemtest");
+        //
+        // var fileSystemExists = await dataLakeFileSystemClient.ExistsAsync().ConfigureAwait(false);
+        //
+        // if (!fileSystemExists)
+        //     await dataLakeFileSystemClient.CreateAsync().ConfigureAwait(false);
+        //
+        // var fileClient = dataLakeFileSystemClient.GetFileClient(reference);
+        //
+        // var fileExists = await fileClient.ExistsAsync().ConfigureAwait(false);
+        // if (!fileExists)
+        //     await fileClient.CreateAsync().ConfigureAwait(false); // <-- doesn't work in Azurite? :(
+        //
+        // await fileClient.UploadAsync(stream, overwrite: false).ConfigureAwait(false);
+     }
+
+    public async Task<Stream> DownloadAsync(string rootFolder, string reference)
     {
-        await _dataLakeFileSystemClient.CreateIfNotExistsAsync().ConfigureAwait(false);
+        var container = _blobClient.GetBlobContainerClient(rootFolder);
 
-        var fileClient = _dataLakeFileSystemClient.GetFileClient(reference);
+        var blob = container.GetBlobClient(reference);
 
-        var destinationStream = new MemoryStream();
-        await fileClient.ReadToAsync(destinationStream).ConfigureAwait(false);
+        var stream = new MemoryStream();
+        await blob.DownloadToAsync(stream).ConfigureAwait(false);
 
-        return destinationStream;
+        return stream;
+        // await _dataLakeFileSystemClient.CreateIfNotExistsAsync().ConfigureAwait(false);
+        //
+        // var fileClient = _dataLakeFileSystemClient.GetFileClient(reference);
+        //
+        // var destinationStream = new MemoryStream();
+        // await fileClient.ReadToAsync(destinationStream).ConfigureAwait(false);
+        //
+        // return destinationStream;
     }
 }

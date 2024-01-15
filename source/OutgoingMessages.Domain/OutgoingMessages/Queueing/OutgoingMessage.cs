@@ -19,8 +19,9 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 {
     public class OutgoingMessage
     {
-        public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, Guid processId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+        public OutgoingMessage(Guid id, DocumentType documentType, ActorNumber receiverId, Guid processId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord, FileStorageReference fileStorageReference)
         {
+            Id = id;
             DocumentType = documentType;
             ReceiverId = receiverId;
             ProcessId = processId;
@@ -29,7 +30,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             SenderId = senderId;
             SenderRole = senderRole;
             MessageRecord = messageRecord;
-            Id = Guid.NewGuid();
+            FileStorageReference = fileStorageReference;
         }
 
         public Guid Id { get; }
@@ -56,28 +57,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
         public BundleId? AssignedBundleId { get; private set; }
 
-        public static OutgoingMessage Create(
-            Receiver receiver,
-            BusinessReason businessReason,
-            DocumentType documentType,
-            Guid processId,
-            ActorNumber senderId,
-            MarketRole senderRole,
-            string messageRecord)
-        {
-            ArgumentNullException.ThrowIfNull(receiver);
-            ArgumentNullException.ThrowIfNull(businessReason);
-
-            return new OutgoingMessage(
-                documentType,
-                receiver.Number,
-                processId,
-                businessReason.Name,
-                receiver.ActorRole,
-                senderId,
-                senderRole,
-                messageRecord);
-        }
+        public FileStorageReference FileStorageReference { get; private set; }
 
         public void AssignToBundle(BundleId bundleId)
         {

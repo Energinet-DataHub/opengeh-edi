@@ -25,7 +25,9 @@ using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using FluentAssertions;
 using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
+using NodaTime;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
@@ -33,7 +35,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 public class WhenEnqueueingTests : TestBase
 {
     private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly SystemDateTimeProviderStub _systemDateTimeProvider;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ActorMessageQueueContext _context;
 
@@ -42,7 +44,7 @@ public class WhenEnqueueingTests : TestBase
     {
         _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
-        _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
+        _systemDateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
         _context = GetService<ActorMessageQueueContext>();
     }
 
@@ -90,7 +92,7 @@ public class WhenEnqueueingTests : TestBase
     {
         var message = _outgoingMessageDtoBuilder.Build();
         await EnqueueAndCommitAsync(message);
-        ((SystemDateTimeProviderStub)_systemDateTimeProvider).SetNow(_systemDateTimeProvider.Now().PlusSeconds(1));
+        _systemDateTimeProvider.SetNow(_systemDateTimeProvider.Now().PlusSeconds(1));
         var message2 = _outgoingMessageDtoBuilder.Build();
         await EnqueueAndCommitAsync(message2);
 
@@ -125,11 +127,70 @@ public class WhenEnqueueingTests : TestBase
         Assert.True(result.Success);
     }
 
+    // [Fact]
+    // public async Task The_generated_market_document_file_has_correct_name()
+    // {
+    //     var message = _outgoingMessageDtoBuilder
+    //         .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+    //         .WithReceiverRole(MarketRole.EnergySupplier)
+    //         .Build();
+    //
+    //     await EnqueueMessage(message);
+    //     var createdAtTimestamp = Instant.FromUtc(2024, 1, 1, 0, 0);
+    //     _systemDateTimeProvider.SetNow(createdAtTimestamp);
+    //     var expectedFileStorageReferencePrefix = $"{SampleData.NewEnergySupplierNumber}/{createdAtTimestamp.Year()}/{createdAtTimestamp.Month()}/{createdAtTimestamp.Day()}";
+    //
+    //     var result = await PeekMessage(MessageCategory.Aggregations);
+    //
+    //     result.MessageId.Should().NotBeNull();
+    //
+    //     var expectedFileStorageReference = $"{expectedFileStorageReferencePrefix}/{result.MessageId!.Value:N}";
+    //     await AssertMarketDocumentFileIsUploaded(result.MessageId!.Value, expectedFileStorageReference);
+    // }
+
+    [Fact]
+    public async Task The_market_document_message_is_added_to_file_storage_with_correct_name()
+    {
+        var message = _outgoingMessageDtoBuilder
+            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            // .WithReceiverRole(MarketRole.EnergySupplier)
+            .Build();
+
+        var createdAtTimestamp = Instant.FromUtc(2024, 1, 1, 0, 0);
+        _systemDateTimeProvider.SetNow(createdAtTimestamp);
+        var expectedFileStorageReference = $"{SampleData.NewEnergySupplierNumber}/{createdAtTimestamp.Year()}/{createdAtTimestamp.Month()}/{createdAtTimestamp.Day()}/{message.Id}";
+
+        await EnqueueAndCommitAsync(message);
+
+        var actualFileStorageReference = await GetOutgoingMessageFileStorageReference(message.Id);
+        actualFileStorageReference.Should().Be(expectedFileStorageReference);
+    }
+
     protected override void Dispose(bool disposing)
     {
         _context.Dispose();
         base.Dispose(disposing);
     }
+
+    private async Task<string> GetOutgoingMessageFileStorageReference(Guid id)
+    {
+        using var connection =
+            await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+
+        var fileStorageReference = await connection.ExecuteScalarAsync<string>($"SELECT FileStorageReference FROM [dbo].[OutgoingMessages] WHERE Id = '{id}'");
+
+        return fileStorageReference;
+    }
+
+    // private async Task AssertMarketDocumentFileIsUploaded(Guid marketDocumentBundleId, string expectedFileStorageReference)
+    // {
+    //     using var connection =
+    //         await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+    //
+    //     var fileStorageReference = await connection.ExecuteScalarAsync<string>($"SELECT FileStorageReference FROM [dbo].[MarketDocuments] WHERE BundleId = '{marketDocumentBundleId}'");
+    //
+    //     fileStorageReference.Should().Be(expectedFileStorageReference);
+    // }
 
     private async Task EnqueueAndCommitAsync(OutgoingMessageDto message)
     {

@@ -25,7 +25,7 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
 {
     private readonly ActorMessageQueueContext _context;
 
-    public OutgoingMessageRepository(ActorMessageQueueContext context)
+    public OutgoingMessageRepository(ActorMessageQueueContext context, IOutgoingMessageFileStorage outgoingMessageFileStorage)
     {
         _context = context;
     }

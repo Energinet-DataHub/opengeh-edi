@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using NodaTime;
@@ -165,15 +167,20 @@ public class ActorMessageQueueTests
         BusinessReason? processType = null,
         DocumentType? messageType = null)
     {
-        return OutgoingMessage.Create(
-            receiver ?? Receiver.Create(
-                ActorNumber.Create("1234567890124"),
-                MarketRole.EnergySupplier),
-            processType ?? BusinessReason.BalanceFixing,
+        receiver ??= Receiver.Create(
+            ActorNumber.Create("1234567890124"),
+            MarketRole.EnergySupplier);
+
+        return new OutgoingMessage(
+            Guid.NewGuid(),
             messageType ?? DocumentType.NotifyAggregatedMeasureData,
+            receiver.Number,
             ProcessId.New().Id,
+            processType?.Code ?? BusinessReason.BalanceFixing.Code,
+            receiver.ActorRole,
             ActorNumber.Create("1234567890987"),
             MarketRole.MeteringPointAdministrator,
-            string.Empty);
+            string.Empty,
+            FileStorageReference.Create("dummy"));
     }
 }

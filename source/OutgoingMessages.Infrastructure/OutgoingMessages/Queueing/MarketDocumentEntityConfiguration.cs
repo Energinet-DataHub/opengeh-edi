@@ -38,10 +38,5 @@ public class MarketDocumentEntityConfiguration : IEntityTypeConfiguration<Market
             .HasConversion(
                 toDbValue => ((MemoryStream)toDbValue).ToArray(),
                 fromDbValue => new MemoryStream(fromDbValue));
-
-        builder.Property(md => md.FileStorageReference)
-            .HasConversion(
-                fileStorageReference => fileStorageReference.Value,
-                dbValue => FileStorageReference.Create(dbValue));
     }
 }

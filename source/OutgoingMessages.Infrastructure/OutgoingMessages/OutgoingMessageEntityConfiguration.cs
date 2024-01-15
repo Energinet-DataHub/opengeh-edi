@@ -14,6 +14,7 @@
 
 using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -60,6 +61,11 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages
                 fromDbValue => fromDbValue == Guid.Empty ? null : BundleId.Create(fromDbValue));
 
             builder.Ignore(x => x.Receiver);
+
+            builder.Property(om => om.FileStorageReference)
+                .HasConversion(
+                    fileStorageReference => fileStorageReference.Value,
+                    dbValue => FileStorageReference.Create(dbValue));
         }
     }
 }

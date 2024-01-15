@@ -24,30 +24,30 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
 
-public class OutgoingMessageDocumentClient : IOutgoingMessageDocumentClient
+public class OutgoingMessageFileStorage : IOutgoingMessageFileStorage
 {
     private readonly IFileStorageClient _fileStorageClient;
 
-    public OutgoingMessageDocumentClient(IFileStorageClient fileStorageClient)
+    public OutgoingMessageFileStorage(IFileStorageClient fileStorageClient)
     {
         _fileStorageClient = fileStorageClient;
     }
 
-    public async Task<FileStorageReference> UploadDocumentAsync(Stream marketDocumentFile, ActorNumber receiverActorNumber, BundleId bundleId, Instant timestamp)
+    public async Task<FileStorageReference> UploadAsync(Stream messageStream, ActorNumber receiverActorNumber, Guid id, Instant timestamp)
     {
-        ArgumentNullException.ThrowIfNull(marketDocumentFile);
+        ArgumentNullException.ThrowIfNull(messageStream);
         ArgumentNullException.ThrowIfNull(receiverActorNumber);
-        ArgumentNullException.ThrowIfNull(bundleId);
+        ArgumentNullException.ThrowIfNull(id);
         ArgumentNullException.ThrowIfNull(timestamp);
 
-        var documentReference = $"outgoing/{receiverActorNumber.Value}/{timestamp.Year()}/{timestamp.Month()}/{timestamp.Day()}/{bundleId.Id:N}";
+        var documentReference = $"{receiverActorNumber.Value}/{timestamp.Year():0000}/{timestamp.Month():00}/{timestamp.Day():00}/{id:N}";
 
         var reference = FileStorageReference.Create(documentReference);
 
-        var referenceWithFolder = $"outgoing/{reference.Value}";
+        // var referenceWithFolder = $"outgoing/{reference.Value}";
 
-        referenceWithFolder = $"{bundleId.Id:N}";
-        await _fileStorageClient.UploadAsync(referenceWithFolder, marketDocumentFile).ConfigureAwait(false);
+        // referenceWithFolder = $"{bundleId.Id:N}";
+        await _fileStorageClient.UploadAsync("outgoing", reference.Value, messageStream).ConfigureAwait(false);
 
         return reference;
     }

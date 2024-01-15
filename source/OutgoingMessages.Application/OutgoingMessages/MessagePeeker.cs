@@ -23,7 +23,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
 
@@ -35,7 +34,6 @@ public class MessagePeeker
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly ActorMessageQueueContext _actorMessageQueueContext;
     private readonly IArchivedMessagesClient _archivedMessageClient;
-    private readonly IOutgoingMessageDocumentClient _outgoingMessageDocumentClient;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
     public MessagePeeker(
@@ -45,7 +43,6 @@ public class MessagePeeker
         IOutgoingMessageRepository outgoingMessageRepository,
         ActorMessageQueueContext actorMessageQueueContext,
         IArchivedMessagesClient archivedMessageClient,
-        IOutgoingMessageDocumentClient outgoingMessageDocumentClient,
         ISystemDateTimeProvider systemDateTimeProvider)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
@@ -54,7 +51,6 @@ public class MessagePeeker
         _outgoingMessageRepository = outgoingMessageRepository;
         _actorMessageQueueContext = actorMessageQueueContext;
         _archivedMessageClient = archivedMessageClient;
-        _outgoingMessageDocumentClient = outgoingMessageDocumentClient;
         _systemDateTimeProvider = systemDateTimeProvider;
     }
 
@@ -82,8 +78,6 @@ public class MessagePeeker
             var outgoingMessageBundle = await _outgoingMessageRepository.GetAsync(peekResult.BundleId).ConfigureAwait(false);
             var result = await _documentFactory.CreateFromAsync(outgoingMessageBundle, request.DocumentFormat, timestamp).ConfigureAwait(false);
 
-            var uploadDocumentTask = _outgoingMessageDocumentClient.UploadDocumentAsync(result, outgoingMessageBundle.Receiver.Number, peekResult.BundleId, timestamp);
-
             await _archivedMessageClient.CreateAsync(
                     new ArchivedMessage(
                     peekResult.BundleId.Id.ToString(),
@@ -97,9 +91,7 @@ public class MessagePeeker
                     cancellationToken)
                 .ConfigureAwait(false);
 
-            var fileStorageReference = await uploadDocumentTask.ConfigureAwait(false);
-
-            document = new MarketDocument(result, peekResult.BundleId, fileStorageReference);
+            document = new MarketDocument(result, peekResult.BundleId);
             _marketDocumentRepository.Add(document);
         }
 

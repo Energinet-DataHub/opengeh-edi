@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -24,17 +25,17 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
 /// <summary>
 /// Client for saving outgoing message market documents
 /// </summary>
-public interface IOutgoingMessageDocumentClient
+public interface IOutgoingMessageFileStorage
 {
     /// <summary>
     /// Upload the the outgoing message market document
     /// </summary>
-    /// <param name="marketDocumentFile">The market document to upload, typically created by the DocumentFactory</param>
+    /// <param name="messageStream">The market document to upload, typically created by the DocumentFactory</param>
     /// <param name="receiverActorNumber">The Actor Number for the actor receiving the market document</param>
-    /// <param name="bundleId">The bundle-id for the market document</param>
+    /// <param name="id">The id for the outgoing message</param>
     /// <param name="timestamp">The timestamp from the created market document</param>
     /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-    Task<FileStorageReference> UploadDocumentAsync(Stream marketDocumentFile, ActorNumber receiverActorNumber, BundleId bundleId, Instant timestamp);
+    Task<FileStorageReference> UploadAsync(Stream messageStream, ActorNumber receiverActorNumber, Guid id, Instant timestamp);
 
     /// <summary>
     /// Download a market document file by its unique reference
