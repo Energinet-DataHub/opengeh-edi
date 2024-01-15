@@ -50,7 +50,7 @@ public static class ProcessConfiguration
 
         //EventsConfiguration
         //TODO: can we move them out and delete ref to Infrastructure?
-        services.AddTransient<IIntegrationEventProcessor, CalculationResultCompletedProcessor>();
+        services.AddTransient<IIntegrationEventProcessor, EnergyResultProducedV2Processor>();
         services.AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestAcceptedEventMapper>();
         services.AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestRejectedMapper>();
 

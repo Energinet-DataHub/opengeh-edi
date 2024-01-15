@@ -32,14 +32,6 @@ public class CalculationResultCompletedEventMapperTests
         }
     }
 
-    public static IEnumerable<object[]> QuantityQualities()
-    {
-        foreach (var number in Enum.GetValues(typeof(QuantityQuality)))
-        {
-            yield return new[] { number };
-        }
-    }
-
     public static IEnumerable<object[]> Resolutions()
     {
         foreach (var number in Enum.GetValues(typeof(Resolution)))
@@ -68,7 +60,7 @@ public class CalculationResultCompletedEventMapperTests
     [MemberData(nameof(ProcessTypes))]
     public void Ensure_handling_all_process_types(ProcessType processType)
     {
-        var method = GetMethod("MapProcessTypeFromCalculationResult");
+        var method = GetMethod("MapCalculationType");
 
         // Act
         if (processType != ProcessType.Unspecified)
@@ -85,7 +77,7 @@ public class CalculationResultCompletedEventMapperTests
     [MemberData(nameof(Resolutions))]
     public void Ensure_handling_all_resolutions(Resolution resolution)
     {
-        var method = GetMethod("MapResolutionFromCalculationResult");
+        var method = GetMethod("MapResolution");
 
         // Act
         if (resolution != Resolution.Unspecified)
@@ -99,27 +91,10 @@ public class CalculationResultCompletedEventMapperTests
     }
 
     [Theory]
-    [MemberData(nameof(QuantityQualities))]
-    public void Ensure_handling_all_quantity_qualities(QuantityQuality quantityQuality)
-    {
-        var method = GetMethod("MapQualityFromCalculationResult");
-
-        // Act
-        if (quantityQuality != QuantityQuality.Unspecified)
-        {
-            method.Invoke(obj: null, parameters: new object[] { quantityQuality });
-        }
-        else
-        {
-            AssertException<InvalidOperationException>(quantityQuality, method);
-        }
-    }
-
-    [Theory]
     [MemberData(nameof(QuantityUnits))]
     public void Ensure_handling_all_quantity_units(QuantityUnit quantityUnit)
     {
-        var method = GetMethod("MapQuantityUnitFromCalculationResult");
+        var method = GetMethod("MapQuantityUnit");
 
         // Act
         if (quantityUnit != QuantityUnit.Unspecified)
@@ -136,7 +111,7 @@ public class CalculationResultCompletedEventMapperTests
     [MemberData(nameof(TimeSeriesTypes))]
     public void Ensure_handling_all_timeSeries_types(TimeSeriesType timeSeriesType)
     {
-        var method = GetMethod("MapMeteringPointTypeFromCalculationResult");
+        var method = GetMethod("MapMeteringPointType");
 
         // Act
         if (IsNotSupportedTimeSeriesType(timeSeriesType))

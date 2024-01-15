@@ -19,6 +19,10 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 
 public static class EbixCode
 {
+    public const string QuantityQualityCodeMeasured = "E01";
+    public const string QuantityQualityCodeEstimated = "56";
+    public const string QuantityQualityCodeCalculated = "D01";
+
     public static string Of(BusinessReason businessReason)
     {
         ArgumentNullException.ThrowIfNull(businessReason);
@@ -149,18 +153,18 @@ public static class EbixCode
         throw NoCodeFoundFor(resolution.Name);
     }
 
-    public static string Of(Quality quality)
+    public static string? Of(CalculatedQuantityQuality calculatedQuantityQuality)
     {
-        ArgumentNullException.ThrowIfNull(quality);
-
-        if (quality == Quality.Estimated)
-            return "56";
-        if (quality == Quality.Calculated)
-            return "D01";
-        if (quality == Quality.Measured)
-            return "E01";
-
-        throw NoCodeFoundFor(quality.Name);
+        return calculatedQuantityQuality switch
+        {
+            CalculatedQuantityQuality.Estimated => QuantityQualityCodeEstimated,
+            CalculatedQuantityQuality.Incomplete => QuantityQualityCodeEstimated,
+            CalculatedQuantityQuality.Measured => QuantityQualityCodeMeasured,
+            CalculatedQuantityQuality.Calculated => QuantityQualityCodeMeasured,
+            CalculatedQuantityQuality.Missing => null,
+            CalculatedQuantityQuality.NotAvailable => null,
+            _ => throw NoCodeFoundFor(calculatedQuantityQuality.ToString()),
+        };
     }
 
     public static string Of(ReasonCode reasonCode)

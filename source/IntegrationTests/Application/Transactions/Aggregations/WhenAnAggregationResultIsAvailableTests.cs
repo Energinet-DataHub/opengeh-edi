@@ -24,15 +24,16 @@ using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
-using Energinet.DataHub.Wholesale.Contracts.Events;
+using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Xunit;
-using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
+using static Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.EnergyResultProducedV2.Types;
+using Resolution = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.EnergyResultProducedV2.Types.Resolution;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.Aggregations;
 
 public class WhenAnAggregationResultIsAvailableTests : TestBase
 {
-    private readonly CalculationResultCompletedEventBuilder _eventBuilder = new();
+    private readonly EnergyResultProducedV2EventBuilder _eventBuilder = new();
     private readonly GridAreaBuilder _gridAreaBuilder = new();
 
     public WhenAnAggregationResultIsAvailableTests(DatabaseFixture databaseFixture)
@@ -49,13 +50,13 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .StoreAsync(GetService<IMasterDataClient>());
 
         _eventBuilder
-            .WithProcessType(ProcessType.BalanceFixing)
+            .WithCalculationType(CalculationType.BalanceFixing)
             .AggregatedBy(SampleData.GridAreaCode, null, SampleData.EnergySupplierNumber.Value)
             .ResultOf(TimeSeriesType.NonProfiledConsumption)
             .WithResolution(Resolution.Quarter)
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod);
 
-        await HavingReceivedAndHandledIntegrationEventAsync(CalculationResultCompleted.EventName, _eventBuilder.Build());
+        await HavingReceivedAndHandledIntegrationEventAsync(EnergyResultProducedV2.EventName, _eventBuilder.Build());
 
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.EnergySupplier, BusinessReason.BalanceFixing);
         outgoingMessage
@@ -78,14 +79,14 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .StoreAsync(GetService<IMasterDataClient>());
 
         _eventBuilder
-            .WithProcessType(ProcessType.BalanceFixing)
+            .WithCalculationType(CalculationType.BalanceFixing)
             .WithResolution(Resolution.Quarter)
             .WithMeasurementUnit(QuantityUnit.Kwh)
             .AggregatedBy(SampleData.GridAreaCode, null, null)
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
             .ResultOf(TimeSeriesType.NonProfiledConsumption);
 
-        await HavingReceivedAndHandledIntegrationEventAsync(CalculationResultCompleted.EventName, _eventBuilder.Build());
+        await HavingReceivedAndHandledIntegrationEventAsync(EnergyResultProducedV2.EventName, _eventBuilder.Build());
 
         var message = await OutgoingMessageAsync(
             MarketRole.MeteredDataResponsible, BusinessReason.BalanceFixing);
@@ -106,14 +107,14 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .StoreAsync(GetService<IMasterDataClient>());
 
         _eventBuilder
-            .WithProcessType(ProcessType.BalanceFixing)
+            .WithCalculationType(CalculationType.BalanceFixing)
             .WithResolution(Resolution.Quarter)
             .WithMeasurementUnit(QuantityUnit.Kwh)
             .AggregatedBy(SampleData.GridAreaCode, null, null)
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
             .ResultOf(TimeSeriesType.Production);
 
-        await HavingReceivedAndHandledIntegrationEventAsync(CalculationResultCompleted.EventName, _eventBuilder.Build());
+        await HavingReceivedAndHandledIntegrationEventAsync(EnergyResultProducedV2.EventName, _eventBuilder.Build());
 
         var message = await OutgoingMessageAsync(
             MarketRole.MeteredDataResponsible, BusinessReason.BalanceFixing);
@@ -138,14 +139,14 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .StoreAsync(GetService<IMasterDataClient>());
 
         _eventBuilder
-            .WithProcessType(ProcessType.BalanceFixing)
+            .WithCalculationType(CalculationType.BalanceFixing)
             .WithResolution(Resolution.Quarter)
             .WithMeasurementUnit(QuantityUnit.Kwh)
             .AggregatedBy(SampleData.GridAreaCode, SampleData.BalanceResponsibleNumber.Value, SampleData.EnergySupplierNumber.Value)
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
             .ResultOf(TimeSeriesType.NonProfiledConsumption);
 
-        await HavingReceivedAndHandledIntegrationEventAsync(CalculationResultCompleted.EventName, _eventBuilder.Build());
+        await HavingReceivedAndHandledIntegrationEventAsync(EnergyResultProducedV2.EventName, _eventBuilder.Build());
 
         var outgoingMessage = await OutgoingMessageAsync(
             MarketRole.BalanceResponsibleParty,
@@ -172,14 +173,14 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .StoreAsync(GetService<IMasterDataClient>());
 
         _eventBuilder
-            .WithProcessType(ProcessType.BalanceFixing)
+            .WithCalculationType(CalculationType.BalanceFixing)
             .WithResolution(Resolution.Quarter)
             .WithMeasurementUnit(QuantityUnit.Kwh)
             .AggregatedBy(SampleData.GridAreaCode, SampleData.BalanceResponsibleNumber.Value, null)
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
             .ResultOf(TimeSeriesType.NonProfiledConsumption);
 
-        await HavingReceivedAndHandledIntegrationEventAsync(CalculationResultCompleted.EventName, _eventBuilder.Build());
+        await HavingReceivedAndHandledIntegrationEventAsync(EnergyResultProducedV2.EventName, _eventBuilder.Build());
 
         var outgoingMessage = await OutgoingMessageAsync(
             MarketRole.BalanceResponsibleParty,
@@ -198,11 +199,11 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     }
 
     [Theory]
-    [InlineData(ProcessType.BalanceFixing, nameof(BusinessReason.BalanceFixing), TimeSeriesType.NetExchangePerGa)]
-    [InlineData(ProcessType.BalanceFixing, nameof(BusinessReason.BalanceFixing), TimeSeriesType.NetExchangePerNeighboringGa)]
-    [InlineData(ProcessType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.NetExchangePerGa)]
-    [InlineData(ProcessType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.NetExchangePerNeighboringGa)]
-    public async Task Exchange_is_sent_to_the_grid_operator(ProcessType processType, string businessReasonName, TimeSeriesType timeSeriesType)
+    [InlineData(CalculationType.BalanceFixing, nameof(BusinessReason.BalanceFixing), TimeSeriesType.NetExchangePerGa)]
+    [InlineData(CalculationType.BalanceFixing, nameof(BusinessReason.BalanceFixing), TimeSeriesType.NetExchangePerNeighboringGa)]
+    [InlineData(CalculationType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.NetExchangePerGa)]
+    [InlineData(CalculationType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.NetExchangePerNeighboringGa)]
+    public async Task Exchange_is_sent_to_the_grid_operator(CalculationType calculationType, string businessReasonName, TimeSeriesType timeSeriesType)
     {
         var businessReason = BusinessReason.FromName(businessReasonName);
         await _gridAreaBuilder
@@ -211,14 +212,14 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .StoreAsync(GetService<IMasterDataClient>());
 
         _eventBuilder
-            .WithProcessType(processType)
+            .WithCalculationType(calculationType)
             .WithResolution(Resolution.Quarter)
             .WithMeasurementUnit(QuantityUnit.Kwh)
             .AggregatedBy(SampleData.GridAreaCode, null, null)
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
             .ResultOf(timeSeriesType);
 
-        await HavingReceivedAndHandledIntegrationEventAsync(CalculationResultCompleted.EventName, _eventBuilder.Build());
+        await HavingReceivedAndHandledIntegrationEventAsync(EnergyResultProducedV2.EventName, _eventBuilder.Build());
 
         var message = await OutgoingMessageAsync(MarketRole.MeteredDataResponsible, businessReason);
         message.HasReceiverId(SampleData.GridOperatorNumber.Value)
@@ -230,9 +231,9 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     }
 
     [Theory]
-    [InlineData(ProcessType.BalanceFixing, nameof(BusinessReason.BalanceFixing), TimeSeriesType.TotalConsumption)]
-    [InlineData(ProcessType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.TotalConsumption)]
-    public async Task Total_consumption_is_sent_to_the_grid_operator(ProcessType processType, string businessReasonName, TimeSeriesType timeSeriesType)
+    [InlineData(CalculationType.BalanceFixing, nameof(BusinessReason.BalanceFixing), TimeSeriesType.TotalConsumption)]
+    [InlineData(CalculationType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.TotalConsumption)]
+    public async Task Total_consumption_is_sent_to_the_grid_operator(CalculationType calculationType, string businessReasonName, TimeSeriesType timeSeriesType)
     {
         var businessReason = BusinessReason.FromName(businessReasonName);
         await _gridAreaBuilder
@@ -241,14 +242,14 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .StoreAsync(GetService<IMasterDataClient>());
 
         _eventBuilder
-            .WithProcessType(processType)
+            .WithCalculationType(calculationType)
             .WithResolution(Resolution.Quarter)
             .WithMeasurementUnit(QuantityUnit.Kwh)
             .AggregatedBy(SampleData.GridAreaCode, null, null)
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
             .ResultOf(timeSeriesType);
 
-        await HavingReceivedAndHandledIntegrationEventAsync(CalculationResultCompleted.EventName, _eventBuilder.Build());
+        await HavingReceivedAndHandledIntegrationEventAsync(EnergyResultProducedV2.EventName, _eventBuilder.Build());
 
         var message = await OutgoingMessageAsync(MarketRole.MeteredDataResponsible, businessReason);
         message.HasReceiverId(SampleData.GridOperatorNumber.Value)
@@ -268,12 +269,12 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             GetService<IDatabaseConnectionFactory>());
     }
 
-    private async Task HavingReceivedAndHandledIntegrationEventAsync(string eventType, CalculationResultCompleted calculationResultCompleted)
+    private Task HavingReceivedAndHandledIntegrationEventAsync(string eventType, EnergyResultProducedV2 calculationResultCompleted)
     {
         var integrationEventHandler = GetService<IIntegrationEventHandler>();
 
         var integrationEvent = new IntegrationEvent(Guid.NewGuid(), eventType, 1, calculationResultCompleted);
 
-        await integrationEventHandler.HandleAsync(integrationEvent).ConfigureAwait(false);
+        return integrationEventHandler.HandleAsync(integrationEvent);
     }
 }

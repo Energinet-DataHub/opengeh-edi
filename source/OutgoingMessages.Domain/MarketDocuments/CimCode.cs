@@ -19,6 +19,12 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 
 public static class CimCode
 {
+    public const string QuantityQualityCodeIncomplete = "A05";
+    public const string QuantityQualityCodeEstimated = "A03";
+    public const string QuantityQualityCodeMeasured = "A04";
+    public const string QuantityQualityCodeCalculated = "A06";
+    public const string QuantityQualityCodeNotAvailable = "A02";
+
     public static string Of(BusinessReason businessReason)
     {
         ArgumentNullException.ThrowIfNull(businessReason);
@@ -149,22 +155,18 @@ public static class CimCode
         throw NoCodeFoundFor(resolution.Name);
     }
 
-    public static string Of(Quality quality)
+    public static string Of(CalculatedQuantityQuality calculatedQuantityQuality)
     {
-        ArgumentNullException.ThrowIfNull(quality);
-
-        if (quality == Quality.Estimated)
-            return "A03";
-        if (quality == Quality.Incomplete)
-            return "A05";
-        if (quality == Quality.Calculated)
-            return "A06";
-        if (quality == Quality.Measured)
-            return "A04";
-        if (quality == Quality.Missing)
-            return "A02";
-
-        throw NoCodeFoundFor(quality.Name);
+        return calculatedQuantityQuality switch
+        {
+            CalculatedQuantityQuality.Missing => QuantityQualityCodeIncomplete,
+            CalculatedQuantityQuality.Incomplete => QuantityQualityCodeIncomplete,
+            CalculatedQuantityQuality.Estimated => QuantityQualityCodeEstimated,
+            CalculatedQuantityQuality.Measured => QuantityQualityCodeMeasured,
+            CalculatedQuantityQuality.Calculated => QuantityQualityCodeCalculated,
+            CalculatedQuantityQuality.NotAvailable => QuantityQualityCodeNotAvailable,
+            _ => throw NoCodeFoundFor(calculatedQuantityQuality.ToString()),
+        };
     }
 
     public static string Of(ReasonCode reasonCode)
