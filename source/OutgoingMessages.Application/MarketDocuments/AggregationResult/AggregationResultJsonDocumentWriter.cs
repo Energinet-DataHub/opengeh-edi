@@ -142,11 +142,11 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
                 writer.WriteNumberValue(point.Position);
                 writer.WriteEndObject();
 
-                if (Quality.From(point.Quality) != Quality.Measured)
+                if (point.QuantityQuality != CalculatedQuantityQuality.Measured)
                 {
                     writer.WriteObject(
                         "quality",
-                        new KeyValuePair<string, string>("value", Quality.From(point.Quality).Code));
+                        new KeyValuePair<string, string>("value", CimCode.Of(point.QuantityQuality)));
                 }
 
                 if (point.Quantity.HasValue)

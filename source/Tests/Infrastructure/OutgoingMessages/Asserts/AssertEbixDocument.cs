@@ -40,6 +40,7 @@ public class AssertEbixDocument
     {
         _prefix = prefix;
         using var reader = XmlReader.Create(stream);
+
         _originalMessage = XDocument.Load(reader);
 
         var elm = _originalMessage.Root!.Descendants().Single(x => x.Name.LocalName == "Payload").Descendants().First();
@@ -80,6 +81,7 @@ public class AssertEbixDocument
     {
         ArgumentNullException.ThrowIfNull(xpath);
         Assert.Null(_document.Root?.XPathSelectElement(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager));
+
         return this;
     }
 

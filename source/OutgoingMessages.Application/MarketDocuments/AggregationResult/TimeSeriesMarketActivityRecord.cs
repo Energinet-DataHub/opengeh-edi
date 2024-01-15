@@ -32,4 +32,4 @@ public record TimeSeriesMarketActivityRecord(
     string? OriginalTransactionIdReference = null,
     string? SettlementVersion = null);
 
-public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
+public record Point(int Position, decimal? Quantity, CalculatedQuantityQuality QuantityQuality, string SampleTime);

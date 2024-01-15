@@ -14,141 +14,150 @@
 
 using System;
 using System.Collections.Generic;
-using Energinet.DataHub.Wholesale.Contracts.Events;
+using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf.WellKnownTypes;
 using NodaTime;
 using NodaTime.Serialization.Protobuf;
+using static Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.EnergyResultProducedV2.Types;
+using DecimalValue = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue;
 using Duration = NodaTime.Duration;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
-internal sealed class CalculationResultCompletedEventBuilder
+internal sealed class EnergyResultProducedV2EventBuilder
 {
-    private readonly List<TimeSeriesPoint> _timeSeriesPoints = new()
-    {
-        new TimeSeriesPoint()
-        {
-            Time = Timestamp.FromDateTime(DateTime.UtcNow),
-            Quantity = new DecimalValue() { Nanos = 1, Units = 1 },
-            QuantityQuality = QuantityQuality.Measured,
-        },
-    };
-
-    private ProcessType _processType = ProcessType.BalanceFixing;
+    private CalculationType _calculationType = CalculationType.BalanceFixing;
     private Resolution _resolution = Resolution.Quarter;
     private QuantityUnit _measurementUnit = QuantityUnit.Kwh;
     private AggregationPerGridArea? _aggregationPerGridArea;
     private AggregationPerEnergySupplierPerGridArea? _aggregationPerEnergySupplier;
-    private AggregationPerEnergySupplierPerBalanceResponsiblePartyPerGridArea? _aggregationPerBalanceResponsiblePerEnergySupplier;
+
+    private IEnumerable<QuantityQuality> _quantityQualities = new List<QuantityQuality> { QuantityQuality.Measured };
+
+    private AggregationPerEnergySupplierPerBalanceResponsiblePartyPerGridArea?
+        _aggregationPerBalanceResponsiblePerEnergySupplier;
+
     private AggregationPerBalanceResponsiblePartyPerGridArea? _aggregationPerBalanceResponsible;
     private Timestamp _startOfPeriod = SystemClock.Instance.GetCurrentInstant().ToTimestamp();
     private Timestamp _endOfPeriod = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(1)).ToTimestamp();
-    private TimeSeriesType _timeSeriesType = TimeSeriesType.NonProfiledConsumption;
 
-    internal CalculationResultCompleted Build()
+    private TimeSeriesType _timeSeriesType =
+        TimeSeriesType.NonProfiledConsumption;
+
+    internal EnergyResultProducedV2 Build()
     {
-        CalculationResultCompleted @event;
+        List<TimeSeriesPoint> timeSeriesPoints = new()
+        {
+            new TimeSeriesPoint
+            {
+                Time = Timestamp.FromDateTime(DateTime.UtcNow),
+                Quantity = new DecimalValue { Nanos = 1, Units = 1 },
+                QuantityQualities = { _quantityQualities },
+            },
+        };
+
+        EnergyResultProducedV2 @event;
         if (_aggregationPerGridArea is not null)
         {
-            @event = new CalculationResultCompleted()
+            @event = new EnergyResultProducedV2
             {
-                ProcessType = _processType,
+                CalculationType = _calculationType,
                 Resolution = _resolution,
-                BatchId = Guid.NewGuid().ToString(),
+                CalculationId = Guid.NewGuid().ToString(),
                 QuantityUnit = _measurementUnit,
                 AggregationPerGridarea = _aggregationPerGridArea,
                 PeriodStartUtc = _startOfPeriod,
                 PeriodEndUtc = _endOfPeriod,
                 TimeSeriesType = _timeSeriesType,
             };
-            @event.TimeSeriesPoints.Add(_timeSeriesPoints);
+            @event.TimeSeriesPoints.Add(timeSeriesPoints);
             return @event;
         }
 
         if (_aggregationPerEnergySupplier is not null)
         {
-            @event = new CalculationResultCompleted()
+            @event = new EnergyResultProducedV2
             {
-                ProcessType = _processType,
+                CalculationType = _calculationType,
                 Resolution = _resolution,
-                BatchId = Guid.NewGuid().ToString(),
+                CalculationId = Guid.NewGuid().ToString(),
                 QuantityUnit = _measurementUnit,
                 AggregationPerEnergysupplierPerGridarea = _aggregationPerEnergySupplier,
                 PeriodStartUtc = _startOfPeriod,
                 PeriodEndUtc = _endOfPeriod,
                 TimeSeriesType = _timeSeriesType,
             };
-            @event.TimeSeriesPoints.Add(_timeSeriesPoints);
+            @event.TimeSeriesPoints.Add(timeSeriesPoints);
             return @event;
         }
 
         if (_aggregationPerBalanceResponsiblePerEnergySupplier is not null)
         {
-            @event = new CalculationResultCompleted()
+            @event = new EnergyResultProducedV2
             {
-                ProcessType = _processType,
+                CalculationType = _calculationType,
                 Resolution = _resolution,
-                BatchId = Guid.NewGuid().ToString(),
+                CalculationId = Guid.NewGuid().ToString(),
                 QuantityUnit = _measurementUnit,
                 AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea = _aggregationPerBalanceResponsiblePerEnergySupplier,
                 PeriodStartUtc = _startOfPeriod,
                 PeriodEndUtc = _endOfPeriod,
                 TimeSeriesType = _timeSeriesType,
             };
-            @event.TimeSeriesPoints.Add(_timeSeriesPoints);
+            @event.TimeSeriesPoints.Add(timeSeriesPoints);
             return @event;
         }
 
         if (_aggregationPerBalanceResponsible is not null)
         {
-            @event = new CalculationResultCompleted()
+            @event = new EnergyResultProducedV2
             {
-                ProcessType = _processType,
+                CalculationType = _calculationType,
                 Resolution = _resolution,
-                BatchId = Guid.NewGuid().ToString(),
+                CalculationId = Guid.NewGuid().ToString(),
                 QuantityUnit = _measurementUnit,
                 AggregationPerBalanceresponsiblepartyPerGridarea = _aggregationPerBalanceResponsible,
                 PeriodStartUtc = _startOfPeriod,
                 PeriodEndUtc = _endOfPeriod,
                 TimeSeriesType = _timeSeriesType,
             };
-            @event.TimeSeriesPoints.Add(_timeSeriesPoints);
+            @event.TimeSeriesPoints.Add(timeSeriesPoints);
             return @event;
         }
 
-        @event = new CalculationResultCompleted()
+        @event = new EnergyResultProducedV2
         {
-            ProcessType = _processType,
+            CalculationType = _calculationType,
             Resolution = _resolution,
-            BatchId = Guid.NewGuid().ToString(),
+            CalculationId = Guid.NewGuid().ToString(),
             QuantityUnit = _measurementUnit,
             PeriodStartUtc = _startOfPeriod,
             PeriodEndUtc = _endOfPeriod,
             TimeSeriesType = _timeSeriesType,
         };
-        @event.TimeSeriesPoints.Add(_timeSeriesPoints);
+        @event.TimeSeriesPoints.Add(timeSeriesPoints);
         return @event;
     }
 
-    internal CalculationResultCompletedEventBuilder WithProcessType(ProcessType processType)
+    internal EnergyResultProducedV2EventBuilder WithCalculationType(CalculationType calculationType)
     {
-        _processType = processType;
+        _calculationType = calculationType;
         return this;
     }
 
-    internal CalculationResultCompletedEventBuilder WithResolution(Resolution resolution)
+    internal EnergyResultProducedV2EventBuilder WithResolution(Resolution resolution)
     {
         _resolution = resolution;
         return this;
     }
 
-    internal CalculationResultCompletedEventBuilder WithMeasurementUnit(QuantityUnit measurementUnit)
+    internal EnergyResultProducedV2EventBuilder WithMeasurementUnit(QuantityUnit measurementUnit)
     {
         _measurementUnit = measurementUnit;
         return this;
     }
 
-    internal CalculationResultCompletedEventBuilder AggregatedBy(string gridAreaCode, string? balanceResponsibleNumber = null, string? energySupplierNumber = null)
+    internal EnergyResultProducedV2EventBuilder AggregatedBy(string gridAreaCode, string? balanceResponsibleNumber = null, string? energySupplierNumber = null)
     {
         _aggregationPerGridArea = null;
         _aggregationPerEnergySupplier = null;
@@ -157,51 +166,57 @@ internal sealed class CalculationResultCompletedEventBuilder
 
         if (balanceResponsibleNumber is null && energySupplierNumber is null)
         {
-            _aggregationPerGridArea = new AggregationPerGridArea() { GridAreaCode = gridAreaCode, };
+            _aggregationPerGridArea =
+                new AggregationPerGridArea { GridAreaCode = gridAreaCode };
         }
 
         if (energySupplierNumber is not null && balanceResponsibleNumber is null)
         {
-            _aggregationPerEnergySupplier = new AggregationPerEnergySupplierPerGridArea()
+            _aggregationPerEnergySupplier = new AggregationPerEnergySupplierPerGridArea
             {
-                GridAreaCode = gridAreaCode, EnergySupplierGlnOrEic = energySupplierNumber,
+                GridAreaCode = gridAreaCode, EnergySupplierId = energySupplierNumber,
             };
         }
 
         if (balanceResponsibleNumber is not null && energySupplierNumber is not null)
         {
             _aggregationPerBalanceResponsiblePerEnergySupplier =
-                new AggregationPerEnergySupplierPerBalanceResponsiblePartyPerGridArea()
+                new AggregationPerEnergySupplierPerBalanceResponsiblePartyPerGridArea
                 {
                     GridAreaCode = gridAreaCode,
-                    EnergySupplierGlnOrEic = energySupplierNumber,
-                    BalanceResponsiblePartyGlnOrEic = balanceResponsibleNumber,
+                    EnergySupplierId = energySupplierNumber,
+                    BalanceResponsibleId = balanceResponsibleNumber,
                 };
         }
 
         if (balanceResponsibleNumber is not null && energySupplierNumber is null)
         {
             _aggregationPerBalanceResponsible =
-                new AggregationPerBalanceResponsiblePartyPerGridArea()
+                new AggregationPerBalanceResponsiblePartyPerGridArea
                 {
-                    GridAreaCode = gridAreaCode,
-                    BalanceResponsiblePartyGlnOrEic = balanceResponsibleNumber,
+                    GridAreaCode = gridAreaCode, BalanceResponsibleId = balanceResponsibleNumber,
                 };
         }
 
         return this;
     }
 
-    internal CalculationResultCompletedEventBuilder WithPeriod(Instant startOfPeriod, Instant endOfPeriod)
+    internal EnergyResultProducedV2EventBuilder WithPeriod(Instant startOfPeriod, Instant endOfPeriod)
     {
         _startOfPeriod = startOfPeriod.ToTimestamp();
         _endOfPeriod = endOfPeriod.ToTimestamp();
         return this;
     }
 
-    internal CalculationResultCompletedEventBuilder ResultOf(TimeSeriesType timeSeriesType)
+    internal EnergyResultProducedV2EventBuilder ResultOf(TimeSeriesType timeSeriesType)
     {
         _timeSeriesType = timeSeriesType;
+        return this;
+    }
+
+    internal EnergyResultProducedV2EventBuilder WithQuantityQualities(IEnumerable<QuantityQuality> quantityQualities)
+    {
+        _quantityQualities = quantityQualities;
         return this;
     }
 }

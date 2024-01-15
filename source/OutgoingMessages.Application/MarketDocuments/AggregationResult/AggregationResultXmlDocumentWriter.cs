@@ -107,12 +107,12 @@ public class AggregationResultXmlDocumentWriter : DocumentWriter
 
     private Task WriteQualityIfRequiredAsync(XmlWriter writer, Point point)
     {
-        if (point.Quality is null)
-            return Task.CompletedTask;
-
-        if (Quality.From(point.Quality) == Quality.Measured)
-            return Task.CompletedTask;
-
-        return writer.WriteElementStringAsync(DocumentDetails.Prefix, "quality", null, Quality.From(point.Quality).Code);
+        return point.QuantityQuality == CalculatedQuantityQuality.Measured
+            ? Task.CompletedTask
+            : writer.WriteElementStringAsync(
+            DocumentDetails.Prefix,
+            "quality",
+            null,
+            CimCode.Of(point.QuantityQuality));
     }
 }
