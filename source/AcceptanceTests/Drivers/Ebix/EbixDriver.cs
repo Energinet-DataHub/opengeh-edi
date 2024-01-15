@@ -105,11 +105,15 @@ internal sealed class EbixDriver : IDisposable
             {
                 return await _ebixServiceClient.peekMessageAsync().ConfigureAwait(false);
             }
-            catch (CommunicationException e)
+            catch (CommunicationException e) when (e is FaultException)
             {
                 Console.WriteLine(
                     "Encountered CommunicationException while peeking. This is probably because the message hasn't been handled yet, so we're trying again in 500ms. The exception was:");
                 Console.WriteLine(e);
+                throw;
+            }
+            catch (CommunicationException e)
+            {
                 lastException = e;
             }
 
