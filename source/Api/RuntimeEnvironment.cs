@@ -45,9 +45,6 @@ namespace Energinet.DataHub.EDI.Api
         public string? SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE =>
             GetEnvironmentVariable(nameof(SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE));
 
-        public virtual bool ALLOW_TEST_TOKENS =>
-            bool.Parse(GetEnvironmentVariable(nameof(ALLOW_TEST_TOKENS)) ?? "false");
-
         public string? AzureWebJobsStorage =>
             GetEnvironmentVariable(nameof(AzureWebJobsStorage));
 
