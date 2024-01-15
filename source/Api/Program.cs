@@ -39,6 +39,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application.Configuration;
 using Energinet.DataHub.EDI.Process.Application.Configuration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Energinet.DataHub.Wholesale.Contracts.Events;
+using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf.Reflection;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
@@ -135,7 +136,7 @@ namespace Energinet.DataHub.EDI.Api
 
                     var integrationEventDescriptors = new List<MessageDescriptor>
                     {
-                        CalculationResultCompleted.Descriptor,
+                        EnergyResultProducedV2.Descriptor,
                         ActorActivated.Descriptor,
                         GridAreaOwnershipAssigned.Descriptor,
                         ActorCertificateCredentialsRemoved.Descriptor,
