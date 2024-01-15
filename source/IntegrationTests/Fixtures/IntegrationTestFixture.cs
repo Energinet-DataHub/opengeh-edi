@@ -12,15 +12,130 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Threading.Tasks;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
+using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
 {
-    [CollectionDefinition("IntegrationTest")]
-    public class IntegrationTestFixture : ICollectionFixture<DatabaseFixture>
+    public class IntegrationTestFixture : IDisposable, IAsyncLifetime
     {
-        // This class has no code, and is never created. Its purpose is simply
-        // to be the place to apply [CollectionDefinition] and all the
-        // ICollectionFixture<> interfaces.
+        private readonly B2BContext _b2bContext;
+        private bool _disposed;
+
+        public IntegrationTestFixture()
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<B2BContext>();
+            optionsBuilder
+                .UseSqlServer(DatabaseConnectionString, options => options.UseNodaTime());
+
+            _b2bContext = new B2BContext(optionsBuilder.Options);
+
+            AzuriteManager = new AzuriteManager(useOAuth: true);
+        }
+
+        public static string DatabaseConnectionString
+        {
+            get
+            {
+                var connectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;Initial Catalog=B2BTransactions;Integrated Security=True;Connection Timeout=60";
+
+                var configuration = new ConfigurationBuilder()
+                    .AddJsonFile("appsettings.local.json", optional: true)
+                    .Build();
+
+                var connectionStringFromConfig = configuration.GetConnectionString("Default");
+                if (!string.IsNullOrEmpty(connectionStringFromConfig))
+                    connectionString = connectionStringFromConfig;
+
+                var environmentVariableConnectionString = Environment.GetEnvironmentVariable("B2B_MESSAGING_CONNECTION_STRING");
+                if (!string.IsNullOrWhiteSpace(environmentVariableConnectionString))
+                {
+                    connectionString = environmentVariableConnectionString;
+                }
+
+                return connectionString;
+            }
+        }
+
+        public AzuriteManager AzuriteManager { get; }
+
+        public Task InitializeAsync()
+        {
+            CreateSchema();
+            CleanupDatabase();
+            AzuriteManager.StartAzurite();
+
+            return Task.CompletedTask;
+        }
+
+        public Task DisposeAsync()
+        {
+            Dispose();
+            return Task.CompletedTask;
+        }
+
+        public void CleanupDatabase()
+        {
+            var cleanupStatement =
+                $"DELETE FROM [dbo].[MoveInTransactions] " +
+                $"DELETE FROM [dbo].[UpdateCustomerMasterDataTransactions] " +
+                $"DELETE FROM [dbo].[MessageRegistry] " +
+                $"DELETE FROM [dbo].[TransactionRegistry]" +
+                $"DELETE FROM [dbo].[OutgoingMessages] " +
+                $"DELETE FROM [dbo].[ReasonTranslations] " +
+                $"DELETE FROM [dbo].[QueuedInternalCommands] " +
+                $"DELETE FROM [dbo].[MarketEvaluationPoints]" +
+                $"DELETE FROM [dbo].[Actor]" +
+                $"DELETE FROM [dbo].[ReceivedIntegrationEvents]" +
+                $"DELETE FROM [dbo].[AggregatedMeasureDataProcesses]" +
+                $"DELETE FROM [dbo].[ArchivedMessages]" +
+                $"DELETE FROM [dbo].[MarketDocuments]" +
+                $"DELETE FROM [dbo].[Bundles]" +
+                $"DELETE FROM [dbo].[ActorMessageQueues]" +
+                $"DELETE FROM [dbo].[ReceivedInboxEvents]" +
+                $"DELETE FROM [dbo].[MessageRegistry]" +
+                $"DELETE FROM [dbo].[TransactionRegistry]" +
+                $"DELETE FROM [dbo].[Actor]" +
+                $"DELETE FROM [dbo].[GridAreaOwner]" +
+                $"DELETE FROM [dbo].[ActorCertificate]";
+
+            _b2bContext.Database.ExecuteSqlRaw(cleanupStatement);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                CleanupDatabase();
+                _b2bContext.Dispose();
+                AzuriteManager.Dispose();
+            }
+
+            _disposed = true;
+        }
+
+        private static void CreateSchema()
+        {
+            var upgradeResult = DbUpgradeRunner.RunDbUpgrade(DatabaseConnectionString);
+            if (!upgradeResult.Successful)
+                throw new InvalidOperationException("Database upgrade failed", upgradeResult.Error);
+        }
     }
 }

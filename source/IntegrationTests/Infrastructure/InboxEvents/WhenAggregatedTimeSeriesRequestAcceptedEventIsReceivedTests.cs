@@ -40,8 +40,8 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
     private readonly AggregatedTimeSeriesRequestAccepted _aggregatedTimeSeriesRequestAcceptedResponse;
     private readonly GridAreaBuilder _gridAreaBuilder = new();
 
-    public WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _processor = GetService<InboxEventsProcessor>();
         _aggregatedTimeSeriesRequestAcceptedResponse = CreateResponseFromWholeSale();

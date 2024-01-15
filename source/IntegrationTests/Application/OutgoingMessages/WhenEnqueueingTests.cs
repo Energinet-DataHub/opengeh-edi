@@ -14,7 +14,6 @@
 
 using System;
 using System.IO;
-using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -46,8 +45,8 @@ public class WhenEnqueueingTests : TestBase
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ActorMessageQueueContext _context;
 
-    public WhenEnqueueingTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public WhenEnqueueingTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
@@ -133,27 +132,6 @@ public class WhenEnqueueingTests : TestBase
 
         Assert.True(result.Success);
     }
-
-    // [Fact]
-    // public async Task The_generated_market_document_file_has_correct_name()
-    // {
-    //     var message = _outgoingMessageDtoBuilder
-    //         .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
-    //         .WithReceiverRole(MarketRole.EnergySupplier)
-    //         .Build();
-    //
-    //     await EnqueueMessage(message);
-    //     var createdAtTimestamp = Instant.FromUtc(2024, 1, 1, 0, 0);
-    //     _systemDateTimeProvider.SetNow(createdAtTimestamp);
-    //     var expectedFileStorageReferencePrefix = $"{SampleData.NewEnergySupplierNumber}/{createdAtTimestamp.Year()}/{createdAtTimestamp.Month()}/{createdAtTimestamp.Day()}";
-    //
-    //     var result = await PeekMessage(MessageCategory.Aggregations);
-    //
-    //     result.MessageId.Should().NotBeNull();
-    //
-    //     var expectedFileStorageReference = $"{expectedFileStorageReferencePrefix}/{result.MessageId!.Value:N}";
-    //     await AssertMarketDocumentFileIsUploaded(result.MessageId!.Value, expectedFileStorageReference);
-    // }
 
     [Fact]
     public async Task Outgoing_message_has_correct_file_storage_reference()

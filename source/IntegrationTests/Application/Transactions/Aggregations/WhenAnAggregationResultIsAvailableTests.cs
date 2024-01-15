@@ -36,8 +36,8 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     private readonly EnergyResultProducedV2EventBuilder _eventBuilder = new();
     private readonly GridAreaBuilder _gridAreaBuilder = new();
 
-    public WhenAnAggregationResultIsAvailableTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public WhenAnAggregationResultIsAvailableTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
     }
 

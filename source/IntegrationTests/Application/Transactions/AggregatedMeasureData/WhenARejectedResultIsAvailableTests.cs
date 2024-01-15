@@ -35,8 +35,8 @@ public class WhenARejectedResultIsAvailableTests : TestBase
 {
     private readonly ProcessContext _processContext;
 
-    public WhenARejectedResultIsAvailableTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public WhenARejectedResultIsAvailableTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _processContext = GetService<ProcessContext>();
     }

@@ -46,8 +46,8 @@ public sealed class EnergyResultProducedV2ToAggregationResultTests : TestBase
     private readonly EnergyResultProducedV2EventBuilder _eventBuilder = new();
     private readonly GridAreaBuilder _gridAreaBuilder = new();
 
-    public EnergyResultProducedV2ToAggregationResultTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public EnergyResultProducedV2ToAggregationResultTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _masterDataClient = GetService<IMasterDataClient>();
         _integrationEventHandler = GetService<IIntegrationEventHandler>();

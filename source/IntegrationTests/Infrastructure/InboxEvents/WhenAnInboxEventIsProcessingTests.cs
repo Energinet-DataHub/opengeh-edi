@@ -36,8 +36,8 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
     private readonly InboxEventsProcessor _inboxProcessor;
     private readonly TestInboxEventMapper _testInboxEventMapper;
 
-    public WhenAnInboxEventIsProcessingTests(DatabaseFixture databaseFixture)
-     : base(databaseFixture)
+    public WhenAnInboxEventIsProcessingTests(IntegrationTestFixture integrationTestFixture)
+     : base(integrationTestFixture)
     {
         _testInboxEventMapper = new TestInboxEventMapper();
         _inboxProcessor = new InboxEventsProcessor(

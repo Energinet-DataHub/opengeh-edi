@@ -53,8 +53,8 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
     private readonly IMasterDataClient _masterDataClient;
 
-    public AggregatedTimeSeriesRequestAcceptedToAggregationResultTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public AggregatedTimeSeriesRequestAcceptedToAggregationResultTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _processContext = GetService<ProcessContext>();
         _inboxEventReceiver = GetService<InboxEventReceiver>();

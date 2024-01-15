@@ -38,8 +38,8 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
     private readonly TestIntegrationEventProcessor _testIntegrationEventProcessor;
     private readonly IIntegrationEventHandler _handler;
 
-    public WhenAnIntegrationEventIsReceivedTests(DatabaseFixture databaseFixture)
-     : base(databaseFixture)
+    public WhenAnIntegrationEventIsReceivedTests(IntegrationTestFixture integrationTestFixture)
+     : base(integrationTestFixture)
     {
         _testIntegrationEventProcessor = new TestIntegrationEventProcessor(GetService<IMediator>());
         _handler = new IntegrationEventHandler(

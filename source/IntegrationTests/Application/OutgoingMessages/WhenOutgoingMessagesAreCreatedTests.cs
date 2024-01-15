@@ -32,8 +32,8 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase
     private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
     private readonly IOutgoingMessagesClient _outgoingMessageClient;
 
-    public WhenOutgoingMessagesAreCreatedTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public WhenOutgoingMessagesAreCreatedTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
         _outgoingMessageClient = GetService<IOutgoingMessagesClient>();

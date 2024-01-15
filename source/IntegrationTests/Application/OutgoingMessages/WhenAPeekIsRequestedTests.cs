@@ -39,8 +39,8 @@ public class WhenAPeekIsRequestedTests : TestBase
     private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
 
-    public WhenAPeekIsRequestedTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public WhenAPeekIsRequestedTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();

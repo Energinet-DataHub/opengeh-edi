@@ -47,8 +47,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     private readonly GridAreaBuilder _gridAreaBuilder = new();
     private readonly ProcessContext _processContext;
 
-    public WhenAnAcceptedResultIsAvailableTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public WhenAnAcceptedResultIsAvailableTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _processContext = GetService<ProcessContext>();
     }

@@ -25,31 +25,34 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 
 public class DataLakeFileStorageClient : IFileStorageClient
 {
-    private readonly BlobServiceClient _blobClient;
+    private readonly BlobServiceClient _blobStorageClient;
     // private readonly DataLakeServiceClient _dataLakeServiceClient;
 
     public DataLakeFileStorageClient(IOptions<AzureDataLakeConnectionOptions> options)
     {
         ArgumentNullException.ThrowIfNull(options);
 
-        _blobClient = new BlobServiceClient(options.Value.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING);
+        _blobStorageClient = new BlobServiceClient(options.Value.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING);
     }
 
     public async Task UploadAsync(string rootFolder, string reference, Stream stream)
     {
-        var container = _blobClient.GetBlobContainerClient(rootFolder);
+        ArgumentNullException.ThrowIfNull(stream);
+
+        var container = _blobStorageClient.GetBlobContainerClient(rootFolder);
 
         var containerExists = await container.ExistsAsync().ConfigureAwait(false);
 
         if (!containerExists)
             await container.CreateAsync().ConfigureAwait(false);
 
+        stream.Position = 0;
         await container.UploadBlobAsync(reference, stream).ConfigureAwait(false);
-     }
+    }
 
     public async Task<Stream> DownloadAsync(string rootFolder, string reference)
     {
-        var container = _blobClient.GetBlobContainerClient(rootFolder);
+        var container = _blobStorageClient.GetBlobContainerClient(rootFolder);
 
         var blob = container.GetBlobClient(reference);
 

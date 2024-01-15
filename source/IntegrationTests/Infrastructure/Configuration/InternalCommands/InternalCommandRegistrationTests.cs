@@ -28,8 +28,8 @@ public class InternalCommandRegistrationTests : TestBase
 {
     private readonly InternalCommandMapper _mapper;
 
-    public InternalCommandRegistrationTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public InternalCommandRegistrationTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _mapper = GetService<InternalCommandMapper>();
     }
