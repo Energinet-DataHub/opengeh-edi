@@ -36,41 +36,12 @@ public class AssertOutgoingMessage
         _message = message;
     }
 
-    public static async Task<AssertOutgoingMessage> OutgoingMessageAsync(Guid processId, string documentType, string businessReason, IDatabaseConnectionFactory connectionFactoryFactory)
-    {
-        if (connectionFactoryFactory == null) throw new ArgumentNullException(nameof(connectionFactoryFactory));
-        using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
-        var message = connection.QuerySingle(
-            $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.ProcessId, m.BusinessReason," +
-            $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
-            $" FROM [dbo].[OutgoingMessages] m" +
-            $" WHERE m.ProcessId = '{processId}' AND m.DocumentType = '{documentType}' AND m.BusinessReason = '{businessReason}'");
-
-        Assert.NotNull(message);
-        return new AssertOutgoingMessage(message);
-    }
-
-    public static async Task<AssertOutgoingMessage> OutgoingMessageAsync(Guid processId, string documentType, string businessReason, MarketRole receiverRole, IDatabaseConnectionFactory connectionFactoryFactory)
-    {
-        if (connectionFactoryFactory == null) throw new ArgumentNullException(nameof(connectionFactoryFactory));
-        ArgumentNullException.ThrowIfNull(receiverRole);
-        using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
-        var message = connection.QuerySingle(
-            $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.ProcessId, m.BusinessReason," +
-            $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
-            $" FROM [dbo].[OutgoingMessages] m" +
-            $" WHERE m.ProcessId = '{processId}' AND m.DocumentType = '{documentType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Name}'");
-
-        Assert.NotNull(message);
-        return new AssertOutgoingMessage(message);
-    }
-
     public static async Task<AssertOutgoingMessage> OutgoingMessageAsync(string messageType, string businessReason, MarketRole receiverRole, IDatabaseConnectionFactory connectionFactoryFactory)
     {
         if (connectionFactoryFactory == null) throw new ArgumentNullException(nameof(connectionFactoryFactory));
         ArgumentNullException.ThrowIfNull(receiverRole);
         using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
-        var message = connection.QuerySingle(
+        var message = await connection.QuerySingleAsync(
             $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.ProcessId, m.BusinessReason," +
             $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
             $" FROM [dbo].[OutgoingMessages] m" +
@@ -78,6 +49,20 @@ public class AssertOutgoingMessage
 
         Assert.NotNull(message);
         return new AssertOutgoingMessage(message);
+    }
+
+    public static async Task OutgoingMessageIsNullAsync(string messageType, string businessReason, MarketRole receiverRole, IDatabaseConnectionFactory connectionFactoryFactory)
+    {
+        if (connectionFactoryFactory == null) throw new ArgumentNullException(nameof(connectionFactoryFactory));
+        ArgumentNullException.ThrowIfNull(receiverRole);
+        using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+        var message = await connection.QuerySingleOrDefaultAsync(
+            $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.ProcessId, m.BusinessReason," +
+            $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
+            $" FROM [dbo].[OutgoingMessages] m" +
+            $" WHERE m.DocumentType = '{messageType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Name}'");
+
+        Assert.Null(message);
     }
 
     public AssertOutgoingMessage HasReceiverId(string receiverId)
