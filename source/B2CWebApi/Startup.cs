@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Text.Json.Serialization;
+using BuildingBlocks.Application.Configuration.Logging;
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Logging.LoggingMiddleware;
@@ -24,6 +25,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Configuration;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.OpenApi.Models;
 
 namespace Energinet.DataHub.EDI.B2CWebApi;
@@ -66,7 +68,7 @@ public class Startup
             config.AddSecurityRequirement(securityRequirement);
         });
         serviceCollection.AddApplicationInsightsTelemetry(options => options.EnableAdaptiveSampling = false);
-
+        serviceCollection.AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>();
         serviceCollection.AddControllers()
             .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
         serviceCollection.AddHealthChecks();
