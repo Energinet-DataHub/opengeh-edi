@@ -72,24 +72,21 @@ internal sealed class EbixDriver : IDisposable
 
     public async Task EmptyQueueAsync()
     {
-        try
-        {
-            var peekResponse = await PeekMessageAsync(timeoutInSeconds: 60)
-                .ConfigureAwait(false);
+        var peekResponse = await PeekMessageAsync(0)
+            .ConfigureAwait(false);
 
-            if (peekResponse?.MessageContainer.Payload is not null)
-            {
-                await DequeueMessageAsync(GetMessageId(peekResponse)).ConfigureAwait(false);
-                await EmptyQueueAsync().ConfigureAwait(false);
-            }
-        }
-        catch (TimeoutException e) when (e.InnerException is CommunicationException)
+        if (peekResponse?.MessageContainer.Payload is not null)
         {
-            return; // temp fix for no content when peeking
+            await DequeueMessageAsync(GetMessageId(peekResponse)).ConfigureAwait(false);
+            await EmptyQueueAsync().ConfigureAwait(false);
+        }
+        else
+        {
+            Console.WriteLine("peekResponse?.MessageContainer.Payload is just null");
         }
     }
 
-    public async Task<peekMessageResponse?> PeekMessageAsync(int? timeoutInSeconds)
+    public async Task<peekMessageResponse?> PeekMessageAsync(int? timeoutInSeconds = 600)
     {
         if (_ebixServiceClient.State != CommunicationState.Opened)
             _ebixServiceClient.Open();
@@ -105,15 +102,11 @@ internal sealed class EbixDriver : IDisposable
             {
                 return await _ebixServiceClient.peekMessageAsync().ConfigureAwait(false);
             }
-            catch (CommunicationException e) when (e is FaultException)
+            catch (CommunicationException e)
             {
                 Console.WriteLine(
                     "Encountered CommunicationException while peeking. This is probably because the message hasn't been handled yet, so we're trying again in 500ms. The exception was:");
                 Console.WriteLine(e);
-                throw;
-            }
-            catch (CommunicationException e)
-            {
                 lastException = e;
             }
 
