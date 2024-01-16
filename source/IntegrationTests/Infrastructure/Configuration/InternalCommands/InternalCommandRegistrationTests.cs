@@ -18,7 +18,7 @@ using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using Xunit;
 
@@ -36,7 +36,12 @@ public class InternalCommandRegistrationTests : TestBase
 
     public static IEnumerable<object[]> GetInternalCommands()
     {
-        var allTypes = ApplicationAssemblies.Application.GetTypes().Concat(ApplicationAssemblies.Infrastructure.GetTypes()).Concat(typeof(ForwardAggregationResult).Assembly.GetTypes());
+        var allTypes = ApplicationAssemblies
+            .Application
+            .GetTypes()
+            .Concat(ApplicationAssemblies.Infrastructure.GetTypes())
+            .Concat(typeof(EnqueueMessageHandler).Assembly.GetTypes());
+
         return allTypes
             .Where(x => x.BaseType == typeof(InternalCommand))
             .Select(x => new[] { x });
