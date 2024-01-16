@@ -88,6 +88,11 @@ public static class EdiQualityMapper
             };
     }
 
+    /// <summary>
+    ///     Converts a collection of quantity qualities to EDI quality.
+    /// </summary>
+    /// <param name="quantityQualities">The collection of quantity qualities to convert.</param>
+    /// <returns>The calculated quantity quality based on the input collection.</returns>
     public static CalculatedQuantityQuality QuantityQualityCollectionToEdiQuality(
         ICollection<QuantityQuality> quantityQualities)
     {

@@ -48,6 +48,11 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.Aggreg
     Justification = "Test class")]
 public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests : TestBase
 {
+    private static readonly QuantityQuality[][] _quantityQualityPowerSet = FastPowerSet(
+        Enum.GetValues(typeof(QuantityQuality))
+            .Cast<QuantityQuality>()
+            .ToArray());
+
     private readonly GridAreaBuilder _gridAreaBuilder = new();
     private readonly ProcessContext _processContext;
     private readonly InboxEventReceiver _inboxEventReceiver;
@@ -65,39 +70,104 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
         _fileStorageClient = GetService<IFileStorageClient>();
     }
 
-    public static IEnumerable<object[]> ExpectedQuantityQualityMappings()
+    public static IEnumerable<object[]> QuantityQualityPowerSet()
     {
-        // First element is the QuantityQuality from the message,
-        // the second element is the expected CalculatedQuantityQuality
-        return new[]
-        {
-            new object[] { QuantityQuality.Missing, CalculatedQuantityQuality.NotAvailable },
-            new object[] { QuantityQuality.Estimated, CalculatedQuantityQuality.Estimated },
-            new object[] { QuantityQuality.Measured, CalculatedQuantityQuality.Measured },
-            new object[] { QuantityQuality.Incomplete, CalculatedQuantityQuality.Incomplete },
-            new object[] { QuantityQuality.Calculated, CalculatedQuantityQuality.Calculated },
-        };
+        return _quantityQualityPowerSet.Select(x => new object[] { x });
     }
 
-    [Fact]
-    public async Task Unspecified_quantity_quality_is_a_technical_artefact_and_produces_a_mapping_error()
+    public static IEnumerable<object[]> QuantityQualityPowerSetWithMissing()
     {
-        var act = async () =>
-        {
-            await AggregatedTimeSeriesRequestAcceptedWithQuantityQualityToOutgoingMessage(QuantityQuality.Unspecified);
-        };
+        return _quantityQualityPowerSet
+            .Where(x => x.Contains(QuantityQuality.Missing))
+            .Where(
+                x => x.Length > 2
+                     || (x.Length > 1 && !x.Contains(QuantityQuality.Unspecified)))
+            .Select(x => new object[] { x });
+    }
 
-        await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("Sequence contains no elements");
+    public static IEnumerable<object[]> QuantityQualityPowerSetOnlyMissing()
+    {
+        return _quantityQualityPowerSet
+            .Where(x => x.Contains(QuantityQuality.Missing))
+            .Where(
+                x => x.Length == 1
+                     || (x.Length == 2 && x.Contains(QuantityQuality.Unspecified)))
+            .Select(x => new object[] { x });
+    }
+
+    public static IEnumerable<object[]> QuantityQualityPowerSetWithoutMissingWithEstimated()
+    {
+        return _quantityQualityPowerSet
+            .Where(x => x.Contains(QuantityQuality.Estimated))
+            .Where(x => !x.Contains(QuantityQuality.Missing))
+            .Select(x => new object[] { x });
+    }
+
+    public static IEnumerable<object[]> QuantityQualityPowerSetWithoutMissingEstimatedWithMeasured()
+    {
+        return _quantityQualityPowerSet
+            .Where(x => x.Contains(QuantityQuality.Measured))
+            .Where(x => !x.Contains(QuantityQuality.Missing))
+            .Where(x => !x.Contains(QuantityQuality.Estimated))
+            .Select(x => new object[] { x });
+    }
+
+    public static IEnumerable<object[]> QuantityQualityPowerSetWithoutMissingEstimatedMeasuredWithCalculated()
+    {
+        return _quantityQualityPowerSet
+            .Where(x => x.Contains(QuantityQuality.Calculated))
+            .Where(x => !x.Contains(QuantityQuality.Missing))
+            .Where(x => !x.Contains(QuantityQuality.Estimated))
+            .Where(x => !x.Contains(QuantityQuality.Measured))
+            .Select(x => new object[] { x });
+    }
+
+    public static IEnumerable<object[]> QuantityQualityPowerSetWithoutMissingEstimatedMeasuredCalculated()
+    {
+        return _quantityQualityPowerSet
+            .Where(x => !x.Contains(QuantityQuality.Missing))
+            .Where(x => !x.Contains(QuantityQuality.Estimated))
+            .Where(x => !x.Contains(QuantityQuality.Measured))
+            .Where(x => !x.Contains(QuantityQuality.Calculated))
+            .Select(x => new object[] { x });
     }
 
     [Theory]
-    [MemberData(nameof(ExpectedQuantityQualityMappings))]
-    public async Task Quantity_quality_is_mapped_correctly(
-        QuantityQuality quantityQuality,
+    [MemberData(nameof(QuantityQualityPowerSet))]
+    public async Task EnergyResultProducedV2_with_power_set_values_of_quantity_quality_produces_Aggregation(
+        QuantityQuality[] quantityQualities)
+    {
+        var result = await AggregatedTimeSeriesRequestAcceptedWithQuantityQualityToOutgoingMessage(quantityQualities);
+
+        // Assert
+        result
+            .HasMessageRecordValue<TimeSeries, IReadOnlyList<Point>>(
+                series => series.Point,
+                points => points.Should().ContainSingle())
+            .HasMessageRecordValue<TimeSeries, Point>(
+                series => series.Point[0],
+                point =>
+                {
+                    point.Should().NotBeNull();
+                    point!.QuantityQuality.Should().BeDefined();
+                });
+    }
+
+    [Theory]
+    [InlineData(null, CalculatedQuantityQuality.NotAvailable)]
+    [InlineData(QuantityQuality.Estimated, CalculatedQuantityQuality.Estimated)]
+    [InlineData(QuantityQuality.Measured, CalculatedQuantityQuality.Measured)]
+    [InlineData(QuantityQuality.Missing, CalculatedQuantityQuality.Missing)]
+    [InlineData(QuantityQuality.Calculated, CalculatedQuantityQuality.Calculated)]
+    public async Task Unspecified_quantity_quality_is_ignored_as_it_is_a_technical_artefact(
+        QuantityQuality? quantityQuality,
         CalculatedQuantityQuality calculatedQuantityQuality)
     {
-        // Arrange & Act
-        var result = await AggregatedTimeSeriesRequestAcceptedWithQuantityQualityToOutgoingMessage(quantityQuality);
+        var result = quantityQuality.HasValue
+            ? await AggregatedTimeSeriesRequestAcceptedWithQuantityQualityToOutgoingMessage(
+                new[] { QuantityQuality.Unspecified, quantityQuality.Value })
+            : await AggregatedTimeSeriesRequestAcceptedWithQuantityQualityToOutgoingMessage(
+                new[] { QuantityQuality.Unspecified });
 
         // Assert
         result
@@ -113,14 +183,148 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
                 });
     }
 
-    [Fact]
-    public void Ensure_all_enums_are_part_of_expected_mapping()
+    [Theory]
+    [MemberData(nameof(QuantityQualityPowerSetOnlyMissing))]
+    public async Task
+        EnergyResultProducedV2_with_quantity_quality_Missing_produces_Aggregation_with_Missing_quantity_quality(
+            QuantityQuality[] quantityQualities)
     {
-        ExpectedQuantityQualityMappings()
-            .SelectMany((q, _) => q)
-            .Cast<QuantityQuality>()
-            .Should()
-            .Contain(QuantityQualities().SelectMany(q => q).Cast<QuantityQuality>());
+        ArgumentNullException.ThrowIfNull(quantityQualities, nameof(quantityQualities));
+
+        var result = await AggregatedTimeSeriesRequestAcceptedWithQuantityQualityToOutgoingMessage(quantityQualities);
+
+        // Assert
+        result
+            .HasMessageRecordValue<TimeSeries, IReadOnlyList<Point>>(
+                series => series.Point,
+                points => points.Should().ContainSingle())
+            .HasMessageRecordValue<TimeSeries, Point>(
+                series => series.Point[0],
+                point =>
+                {
+                    point.Should().NotBeNull();
+                    point!.QuantityQuality.Should().Be(CalculatedQuantityQuality.Missing);
+                });
+    }
+
+    [Theory]
+    [MemberData(nameof(QuantityQualityPowerSetWithMissing))]
+    public async Task
+        EnergyResultProducedV2_with_quantity_quality_containing_Missing_produces_Aggregation_with_Incomplete_quantity_quality(
+            QuantityQuality[] quantityQualities)
+    {
+        ArgumentNullException.ThrowIfNull(quantityQualities, nameof(quantityQualities));
+
+        var result = await AggregatedTimeSeriesRequestAcceptedWithQuantityQualityToOutgoingMessage(quantityQualities);
+
+        // Assert
+        result
+            .HasMessageRecordValue<TimeSeries, IReadOnlyList<Point>>(
+                series => series.Point,
+                points => points.Should().ContainSingle())
+            .HasMessageRecordValue<TimeSeries, Point>(
+                series => series.Point[0],
+                point =>
+                {
+                    point.Should().NotBeNull();
+                    point!.QuantityQuality.Should().Be(CalculatedQuantityQuality.Incomplete);
+                });
+    }
+
+    [Theory]
+    [MemberData(nameof(QuantityQualityPowerSetWithoutMissingWithEstimated))]
+    public async Task
+        EnergyResultProducedV2_with_quantity_quality_not_containing_Missing_but_contains_Estimated_produces_Aggregation_with_Estimated_quantity_quality(
+            QuantityQuality[] quantityQualities)
+    {
+        ArgumentNullException.ThrowIfNull(quantityQualities, nameof(quantityQualities));
+
+        var result = await AggregatedTimeSeriesRequestAcceptedWithQuantityQualityToOutgoingMessage(quantityQualities);
+
+        // Assert
+        result
+            .HasMessageRecordValue<TimeSeries, IReadOnlyList<Point>>(
+                series => series.Point,
+                points => points.Should().ContainSingle())
+            .HasMessageRecordValue<TimeSeries, Point>(
+                series => series.Point[0],
+                point =>
+                {
+                    point.Should().NotBeNull();
+                    point!.QuantityQuality.Should().Be(CalculatedQuantityQuality.Estimated);
+                });
+    }
+
+    [Theory]
+    [MemberData(nameof(QuantityQualityPowerSetWithoutMissingEstimatedWithMeasured))]
+    public async Task
+        EnergyResultProducedV2_with_quantity_quality_not_containing_Missing_or_Estimated_but_contains_Measured_produces_Aggregation_with_Measured_quantity_quality(
+            QuantityQuality[] quantityQualities)
+    {
+        ArgumentNullException.ThrowIfNull(quantityQualities, nameof(quantityQualities));
+
+        var result = await AggregatedTimeSeriesRequestAcceptedWithQuantityQualityToOutgoingMessage(quantityQualities);
+
+        // Assert
+        result
+            .HasMessageRecordValue<TimeSeries, IReadOnlyList<Point>>(
+                series => series.Point,
+                points => points.Should().ContainSingle())
+            .HasMessageRecordValue<TimeSeries, Point>(
+                series => series.Point[0],
+                point =>
+                {
+                    point.Should().NotBeNull();
+                    point!.QuantityQuality.Should().Be(CalculatedQuantityQuality.Measured);
+                });
+    }
+
+    [Theory]
+    [MemberData(nameof(QuantityQualityPowerSetWithoutMissingEstimatedMeasuredWithCalculated))]
+    public async Task
+        EnergyResultProducedV2_with_quantity_quality_not_containing_Missing_Estimated_or_Measured_but_contains_Calculated_produces_Aggregation_with_Calculated_quantity_quality(
+            QuantityQuality[] quantityQualities)
+    {
+        ArgumentNullException.ThrowIfNull(quantityQualities, nameof(quantityQualities));
+
+        var result = await AggregatedTimeSeriesRequestAcceptedWithQuantityQualityToOutgoingMessage(quantityQualities);
+
+        // Assert
+        result
+            .HasMessageRecordValue<TimeSeries, IReadOnlyList<Point>>(
+                series => series.Point,
+                points => points.Should().ContainSingle())
+            .HasMessageRecordValue<TimeSeries, Point>(
+                series => series.Point[0],
+                point =>
+                {
+                    point.Should().NotBeNull();
+                    point!.QuantityQuality.Should().Be(CalculatedQuantityQuality.Calculated);
+                });
+    }
+
+    [Theory]
+    [MemberData(nameof(QuantityQualityPowerSetWithoutMissingEstimatedMeasuredCalculated))]
+    public async Task
+        EnergyResultProducedV2_with_quantity_quality_not_containing_Missing_Estimated_Measured_or_Calculated_produces_Aggregation_with_NotAvailable_quantity_quality(
+            QuantityQuality[] quantityQualities)
+    {
+        ArgumentNullException.ThrowIfNull(quantityQualities, nameof(quantityQualities));
+
+        var result = await AggregatedTimeSeriesRequestAcceptedWithQuantityQualityToOutgoingMessage(quantityQualities);
+
+        // Assert
+        result
+            .HasMessageRecordValue<TimeSeries, IReadOnlyList<Point>>(
+                series => series.Point,
+                points => points.Should().ContainSingle())
+            .HasMessageRecordValue<TimeSeries, Point>(
+                series => series.Point[0],
+                point =>
+                {
+                    point.Should().NotBeNull();
+                    point!.QuantityQuality.Should().Be(CalculatedQuantityQuality.NotAvailable);
+                });
     }
 
     protected override void Dispose(bool disposing)
@@ -129,17 +333,8 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
         _processContext.Dispose();
     }
 
-    private static IEnumerable<object[]> QuantityQualities()
-    {
-        return Enum.GetValues(typeof(QuantityQuality))
-            .Cast<QuantityQuality>()
-            .Where(quality => quality != QuantityQuality.Unspecified)
-            .Cast<object>()
-            .Select(quality => new[] { quality });
-    }
-
     private async Task<AssertOutgoingMessage> AggregatedTimeSeriesRequestAcceptedWithQuantityQualityToOutgoingMessage(
-        QuantityQuality quantityQuality)
+        IEnumerable<QuantityQuality> quantityQuality)
     {
         await _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
@@ -163,14 +358,14 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
         return await OutgoingMessageAsync();
     }
 
-    private static AggregatedTimeSeriesRequestAccepted CreateEventWithQuantityQuality(QuantityQuality quantityQuality)
+    private static AggregatedTimeSeriesRequestAccepted CreateEventWithQuantityQuality(IEnumerable<QuantityQuality> quantityQuality)
     {
         var timeSeriesPoint = new TimeSeriesPoint
         {
             Quantity = new DecimalValue { Units = 1, Nanos = 1 },
-            QuantityQuality = quantityQuality,
             Time = new Timestamp { Seconds = 1, Nanos = 1 },
         };
+        timeSeriesPoint.QuantityQuality.AddRange(quantityQuality);
 
         var series = new Series
         {
@@ -185,6 +380,30 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
         requestAccepted.Series.Add(series);
 
         return requestAccepted;
+    }
+
+    // Taken from https://stackoverflow.com/questions/19890781/creating-a-power-set-of-a-sequence
+    // by user https://stackoverflow.com/users/1740808/sergeys
+    private static T[][] FastPowerSet<T>(IReadOnlyList<T> seq)
+    {
+        var powerSet = new T[1 << seq.Count][];
+        powerSet[0] = Array.Empty<T>(); // starting only with empty set
+
+        for (var i = 0; i < seq.Count; i++)
+        {
+            var cur = seq[i];
+            var count = 1 << i; // doubling list each time
+            for (var j = 0; j < count; j++)
+            {
+                var source = powerSet[j];
+                var destination = powerSet[count + j] = new T[source.Length + 1];
+                for (var q = 0; q < source.Length; q++)
+                    destination[q] = source[q];
+                destination[source.Length] = cur;
+            }
+        }
+
+        return powerSet;
     }
 
     private AggregatedMeasureDataProcess BuildProcess()

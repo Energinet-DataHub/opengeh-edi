@@ -67,9 +67,8 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
     {
         return quality switch
         {
-            QuantityQuality.Incomplete => CalculatedQuantityQuality.Incomplete,
             QuantityQuality.Measured => CalculatedQuantityQuality.Measured,
-            QuantityQuality.Missing => CalculatedQuantityQuality.Missing, // EdiQuantityQuality.NotAvailable?
+            QuantityQuality.Missing => CalculatedQuantityQuality.Missing,
             QuantityQuality.Estimated => CalculatedQuantityQuality.Estimated,
             QuantityQuality.Calculated => CalculatedQuantityQuality.Calculated,
             QuantityQuality.Unspecified => throw new InvalidOperationException("Quality is not specified"),
@@ -125,8 +124,11 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
                 return EquivalencyResult.ContinueWithNext;
             }
 
+            tsp.QuantityQuality.Should()
+                .ContainSingle("this is just a migration of an old test, where we only had one quality");
+
             p.SampleTime.Should().Be(tsp.Time.ToString());
-            p.QuantityQuality.Should().Be(MapQuality(tsp.QuantityQuality));
+            p.QuantityQuality.Should().Be(MapQuality(tsp.QuantityQuality.Single()));
             p.Quantity.Should().Be(Parse(tsp.Quantity));
 
             return EquivalencyResult.AssertionCompleted;
