@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
 
@@ -29,17 +30,20 @@ public class MessageEnqueuer
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IOutgoingMessageFileStorage _outgoingMessageFileStorage;
+    private readonly ILogger<MessageDequeuer> _logger;
 
     public MessageEnqueuer(
         IActorMessageQueueRepository actorMessageQueueRepository,
         IOutgoingMessageRepository outgoingMessageRepository,
         ISystemDateTimeProvider systemDateTimeProvider,
-        IOutgoingMessageFileStorage outgoingMessageFileStorage)
+        IOutgoingMessageFileStorage outgoingMessageFileStorage,
+        ILogger<MessageDequeuer> logger)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _outgoingMessageRepository = outgoingMessageRepository;
         _systemDateTimeProvider = systemDateTimeProvider;
         _outgoingMessageFileStorage = outgoingMessageFileStorage;
+        _logger = logger;
     }
 
     public async Task EnqueueAsync(OutgoingMessageDto messageToEnqueue)
@@ -63,6 +67,7 @@ public class MessageEnqueuer
 
         if (messageQueue == null)
         {
+            _logger.LogInformation("Creating new message queue for Actor: {ActorNumber}, MarketRole", messageReceiver.Number);
             messageQueue = ActorMessageQueue.CreateFor(messageReceiver);
             await _actorMessageQueueRepository.AddAsync(messageQueue).ConfigureAwait(false);
         }
@@ -83,6 +88,7 @@ public class MessageEnqueuer
 
         messageQueue.Enqueue(outgoingMessage, _systemDateTimeProvider.Now());
         _outgoingMessageRepository.Add(outgoingMessage);
+        _logger.LogInformation("Message enqueued: {Message} for Actor: {ActorNumber}", outgoingMessage.Id, outgoingMessage.Receiver.Number);
     }
 
     private static Stream CreateStream(string message)
