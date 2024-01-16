@@ -40,7 +40,7 @@ internal sealed class EdiDriver : IDisposable
     public async Task<Stream> RequestAggregatedMeasureDataAsync(bool asyncError = false, string? token = null)
     {
         var b2bClient = await _httpClient;
-        using var request = new HttpRequestMessage(HttpMethod.Post, "api/RequestAggregatedMeasureMessageReceiver");
+        using var request = new HttpRequestMessage(HttpMethod.Post, "v1.0/cim/requestaggregatedmeasuredata");
         if (token is not null) request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
         request.Content = new StringContent(GetContent(asyncError), Encoding.UTF8, "application/json");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
@@ -140,7 +140,7 @@ internal sealed class EdiDriver : IDisposable
         var act = async () =>
         {
             var b2bClient = await _httpClient;
-            using var request = new HttpRequestMessage(HttpMethod.Get, "api/peek/aggregations");
+            using var request = new HttpRequestMessage(HttpMethod.Get, "v1.0/cim/peekMessage/aggregations");
             request.Headers.Authorization = new AuthenticationHeaderValue("bearer", null);
             request.Content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
@@ -158,7 +158,7 @@ internal sealed class EdiDriver : IDisposable
         var act = async () =>
         {
             var b2bClient = await _httpClient;
-            using var request = new HttpRequestMessage(HttpMethod.Delete, $"api/dequeue/{messageId}");
+            using var request = new HttpRequestMessage(HttpMethod.Delete, $"v1.0/cim/dequeue/{messageId}");
             request.Headers.Authorization = new AuthenticationHeaderValue("bearer", null);
             var dequeueResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
             dequeueResponse.EnsureSuccessStatusCode();
@@ -172,7 +172,7 @@ internal sealed class EdiDriver : IDisposable
     public async Task<string> RequestAggregatedMeasureDataXmlAsync(XmlDocument payload, string? token = null)
     {
         var b2bClient = await _httpClient;
-        using var request = new HttpRequestMessage(HttpMethod.Post, "/api/RequestAggregatedMeasureMessageReceiver");
+        using var request = new HttpRequestMessage(HttpMethod.Post, "v1.0/cim/requestaggregatedmeasuredata");
         if (token is not null) request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
         request.Content = new StringContent(payload.OuterXml, Encoding.UTF8, "application/xml");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/xml");
@@ -220,7 +220,7 @@ internal sealed class EdiDriver : IDisposable
     private async Task<HttpResponseMessage> PeekAsync()
     {
         var b2bClient = await _httpClient;
-        using var request = new HttpRequestMessage(HttpMethod.Get, "api/peek/aggregations");
+        using var request = new HttpRequestMessage(HttpMethod.Get, "v1.0/cim/peekMessage/aggregations");
         request.Content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         var peekResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
@@ -231,7 +231,7 @@ internal sealed class EdiDriver : IDisposable
     private async Task DequeueAsync(string messageId)
     {
         var b2bClient = await _httpClient;
-        using var request = new HttpRequestMessage(HttpMethod.Delete, $"api/dequeue/{messageId}");
+        using var request = new HttpRequestMessage(HttpMethod.Delete, $"v1.0/cim/dequeue/{messageId}");
         var dequeueResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
         dequeueResponse.EnsureSuccessStatusCode();
     }
