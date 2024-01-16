@@ -62,19 +62,6 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             _messageRecord = null!; // Message record is set later from FileStorage
         }
 
-//         /// <summary>
-//         /// DO NOT DELETE THIS OR CREATE A CONSTRUCTOR WITH LESS PARAMETERS.
-//         /// Entity Framework needs this, since it uses the constructor with the least parameters.
-//         /// Thereafter assign the rest of the parameters via reflection.
-//         /// To avoid setting FileStorageReference when EF loads entity from database
-//         /// </summary>
-//         /// <remarks> Dont use this! </remarks>
-// #pragma warning disable CS8618
-//         private OutgoingMessage()
-// #pragma warning restore CS8618
-//         {
-//         }
-
         public OutgoingMessageId Id { get; }
 
         public bool IsPublished { get; private set; }
