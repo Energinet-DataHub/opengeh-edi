@@ -58,4 +58,10 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     {
         await _messageEnqueuer.EnqueueAsync(outgoingMessage).ConfigureAwait(false);
     }
+
+    public async Task EnqueueAndCommitAsync(OutgoingMessageDto outgoingMessage, CancellationToken cancellationToken)
+    {
+        await _messageEnqueuer.EnqueueAsync(outgoingMessage).ConfigureAwait(false);
+        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
 }

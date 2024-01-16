@@ -18,26 +18,28 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Domain.Transactions;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
-using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.Process.Application.IntegrationEvents;
 
-public class EnergyResultProducedV2Processor : IIntegrationEventProcessor
+public sealed class EnergyResultProducedV2Processor : IIntegrationEventProcessor
 {
     private readonly AggregationFactory _aggregationFactory;
-    private readonly IMediator _mediator;
+    private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ILogger<EnergyResultProducedV2Processor> _logger;
 
     public EnergyResultProducedV2Processor(
         AggregationFactory aggregationFactory,
-        IMediator mediator,
+        IOutgoingMessagesClient outgoingMessagesClient,
         ILogger<EnergyResultProducedV2Processor> logger)
     {
         _aggregationFactory = aggregationFactory;
-        _mediator = mediator;
+        _outgoingMessagesClient = outgoingMessagesClient;
         _logger = logger;
     }
 
@@ -62,8 +64,8 @@ public class EnergyResultProducedV2Processor : IIntegrationEventProcessor
             .CreateAsync(energyResultProducedV2, CancellationToken.None)
             .ConfigureAwait(false);
 
-        var forwardAggregationResult = new ForwardAggregationResult(aggregation);
+        var message = AggregationResultMessageFactory.CreateMessage(aggregation, ProcessId.New());
 
-        await _mediator.Send(forwardAggregationResult, cancellationToken).ConfigureAwait(false);
+        await _outgoingMessagesClient.EnqueueAndCommitAsync(message, cancellationToken).ConfigureAwait(false);
     }
 }

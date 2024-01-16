@@ -42,7 +42,6 @@ internal static class InternalCommandConfiguration
     {
         var mapper = new InternalCommandMapper();
         mapper.Add("GridAreaOwnershipAssigned", typeof(GridAreaOwnershipAssignedDto));
-        mapper.Add("Aggregations.ForwardAggregationResult", typeof(ForwardAggregationResult));
         mapper.Add("SendAggregatedMeasureRequestToWholesale", typeof(SendAggregatedMeasureRequestToWholesale));
         mapper.Add("AcceptedAggregatedTimeSerie", typeof(AcceptedAggregatedTimeSerie));
         mapper.Add("RejectedAggregatedTimeSeries", typeof(RejectedAggregatedTimeSeries));
