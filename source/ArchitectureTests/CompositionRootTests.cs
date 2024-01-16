@@ -48,7 +48,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
             Environment.SetEnvironmentVariable("WHOLESALE_INBOX_MESSAGE_QUEUE_NAME", "FakeQueueName");
             Environment.SetEnvironmentVariable("INCOMING_MESSAGES_QUEUE_NAME", "FakeQueueName");
             Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", TestEnvironment.CreateConnectionString());
-            Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", TestEnvironment.CreateFakeStorageConnectionString());
+            Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", TestEnvironment.CreateStorageConnectionString());
             var config = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
                 .Build();
@@ -218,7 +218,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
                     "Server=(LocalDB)\\\\MSSQLLocalDB;Database=B2BTransactions;User=User;Password=Password;TrustServerCertificate=true;Encrypt=True;Trusted_Connection=True;";
             }
 
-            public static string CreateFakeStorageConnectionString() => "UseDevelopmentStorage=True";
+            public static string CreateStorageConnectionString() => "UseDevelopmentStorage=True";
 
             public override bool IsRunningLocally()
             {
