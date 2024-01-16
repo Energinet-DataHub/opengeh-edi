@@ -42,4 +42,9 @@ public interface IOutgoingMessagesClient
     /// </summary>
     /// <param name="outgoingMessage"></param>
     Task EnqueueAsync(OutgoingMessageDto outgoingMessage);
+
+    /// <summary>
+    ///     Enqueue a message, WITH commit. Currently ONLY used by the Process module wrt reception of events.
+    /// </summary>
+    Task EnqueueAndCommitAsync(OutgoingMessageDto outgoingMessage, CancellationToken cancellationToken);
 }
