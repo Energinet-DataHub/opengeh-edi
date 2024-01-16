@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
@@ -23,6 +25,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.EDI.Process.Application.IntegrationEvents;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Xunit;
@@ -39,6 +42,18 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     public WhenAnAggregationResultIsAvailableTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
     {
+    }
+
+    public static IEnumerable<object[]> SupportedTimeSeriesTypes()
+    {
+        return EnergyResultProducedProcessorExtensions.SupportedTimeSeriesTypes().Select(e => new[] { (object)e });
+    }
+
+    public static IEnumerable<object[]> NotSupportedTimeSeriesTypes()
+    {
+        return Enum.GetValues<TimeSeriesType>()
+            .Where(x => !EnergyResultProducedProcessorExtensions.SupportedTimeSeriesTypes().Contains(x))
+            .Select(e => new[] { (object)e });
     }
 
     [Fact]
@@ -258,6 +273,59 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasBusinessReason(businessReason)
             .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, MeteringPointType.Consumption.Name);
+    }
+
+    [Theory(DisplayName = nameof(Message_is_created_for_supported_time_series_type))]
+    [MemberData(nameof(SupportedTimeSeriesTypes))]
+    public async Task Message_is_created_for_supported_time_series_type(TimeSeriesType timeSeriesType)
+    {
+        var businessReason = BusinessReason.FromName(nameof(BusinessReason.BalanceFixing));
+        await _gridAreaBuilder
+            .WithGridAreaCode(SampleData.GridAreaCode)
+            .WithActorNumber(SampleData.GridOperatorNumber)
+            .StoreAsync(GetService<IMasterDataClient>());
+
+        _eventBuilder
+            .WithResolution(Resolution.Quarter)
+            .WithMeasurementUnit(QuantityUnit.Kwh)
+            .AggregatedBy(SampleData.GridAreaCode, null, null)
+            .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
+            .ResultOf(timeSeriesType);
+
+        await HavingReceivedAndHandledIntegrationEventAsync(EnergyResultProducedV2.EventName, _eventBuilder.Build());
+
+        var message = await OutgoingMessageAsync(MarketRole.MeteredDataResponsible, businessReason);
+        message.HasReceiverId(SampleData.GridOperatorNumber.Value)
+            .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
+            .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
+            .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
+            .HasBusinessReason(businessReason);
+    }
+
+    [Theory(DisplayName = nameof(Message_is_not_created_for_unsupported_time_series_type))]
+    [MemberData(nameof(NotSupportedTimeSeriesTypes))]
+    public async Task Message_is_not_created_for_unsupported_time_series_type(TimeSeriesType timeSeriesType)
+    {
+        var businessReason = BusinessReason.FromName(nameof(BusinessReason.BalanceFixing));
+        await _gridAreaBuilder
+            .WithGridAreaCode(SampleData.GridAreaCode)
+            .WithActorNumber(SampleData.GridOperatorNumber)
+            .StoreAsync(GetService<IMasterDataClient>());
+
+        _eventBuilder
+            .WithResolution(Resolution.Quarter)
+            .WithMeasurementUnit(QuantityUnit.Kwh)
+            .AggregatedBy(SampleData.GridAreaCode, null, null)
+            .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
+            .ResultOf(timeSeriesType);
+
+        await HavingReceivedAndHandledIntegrationEventAsync(EnergyResultProducedV2.EventName, _eventBuilder.Build());
+
+        await AssertOutgoingMessage.OutgoingMessageIsNullAsync(
+            DocumentType.NotifyAggregatedMeasureData.Name,
+            businessReason.Name,
+            MarketRole.MeteredDataResponsible,
+            GetService<IDatabaseConnectionFactory>());
     }
 
     private async Task<AssertOutgoingMessage> OutgoingMessageAsync(MarketRole roleOfReceiver, BusinessReason businessReason)

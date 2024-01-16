@@ -67,7 +67,7 @@ public class MessageEnqueuer
 
         if (messageQueue == null)
         {
-            _logger.LogInformation("Creating new message queue for Actor number: {ActorNumber}, MarketRole", messageReceiver.Number);
+            _logger.LogInformation("Creating new message queue for Actor: {ActorNumber}, MarketRole: {MarketRole}", messageReceiver.Number.Value, messageReceiver.ActorRole.Name);
             messageQueue = ActorMessageQueue.CreateFor(messageReceiver);
             await _actorMessageQueueRepository.AddAsync(messageQueue).ConfigureAwait(false);
         }
@@ -88,7 +88,7 @@ public class MessageEnqueuer
 
         messageQueue.Enqueue(outgoingMessage, _systemDateTimeProvider.Now());
         _outgoingMessageRepository.Add(outgoingMessage);
-        _logger.LogInformation("Message enqueued with id: {Message} for Actor number: {ActorNumber}", outgoingMessage.Id, outgoingMessage.Receiver.Number);
+        _logger.LogInformation("Message enqueued: {Message} for Actor: {ActorNumber}", outgoingMessage.Id, outgoingMessage.Receiver.Number.Value);
     }
 
     private static Stream CreateStream(string message)

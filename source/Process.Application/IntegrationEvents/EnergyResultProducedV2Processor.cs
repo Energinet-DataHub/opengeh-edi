@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
@@ -20,6 +21,7 @@ using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.Integ
 using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.Process.Application.IntegrationEvents;
 
@@ -27,11 +29,16 @@ public class EnergyResultProducedV2Processor : IIntegrationEventProcessor
 {
     private readonly AggregationFactory _aggregationFactory;
     private readonly IMediator _mediator;
+    private readonly ILogger<EnergyResultProducedV2Processor> _logger;
 
-    public EnergyResultProducedV2Processor(AggregationFactory aggregationFactory, IMediator mediator)
+    public EnergyResultProducedV2Processor(
+        AggregationFactory aggregationFactory,
+        IMediator mediator,
+        ILogger<EnergyResultProducedV2Processor> logger)
     {
         _aggregationFactory = aggregationFactory;
         _mediator = mediator;
+        _logger = logger;
     }
 
     public string EventTypeToHandle => EnergyResultProducedV2.EventName;
@@ -42,6 +49,14 @@ public class EnergyResultProducedV2Processor : IIntegrationEventProcessor
             throw new ArgumentNullException(nameof(integrationEvent));
 
         var energyResultProducedV2 = (EnergyResultProducedV2)integrationEvent.Message;
+
+        if (!EnergyResultProducedProcessorExtensions.SupportedTimeSeriesTypes().Contains(energyResultProducedV2.TimeSeriesType))
+        {
+            _logger.LogInformation(
+                "TimeSeriesType {TimeSeriesType} is not supported",
+                energyResultProducedV2.TimeSeriesType);
+            return;
+        }
 
         var aggregation = await _aggregationFactory
             .CreateAsync(energyResultProducedV2, CancellationToken.None)
