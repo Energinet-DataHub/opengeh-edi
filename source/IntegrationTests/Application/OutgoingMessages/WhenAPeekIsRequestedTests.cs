@@ -118,7 +118,9 @@ public class WhenAPeekIsRequestedTests : TestBase
         var result = await PeekMessage(MessageCategory.Aggregations);
 
         result.MessageId.Should().NotBeNull();
-        await AssertMarketDocumentExists(result.MessageId!.Value);
+
+        var marketDocumentExists = await MarketDocumentExists(result.MessageId!.Value);
+        marketDocumentExists.Should().BeTrue();
     }
 
     private async Task<bool> BundleIsRegistered()
@@ -144,15 +146,15 @@ public class WhenAPeekIsRequestedTests : TestBase
         Assert.True(found);
     }
 
-    private async Task AssertMarketDocumentExists(Guid marketDocumentBundleId)
+    private async Task<bool> MarketDocumentExists(Guid marketDocumentBundleId)
     {
         var sqlStatement =
             $"SELECT COUNT(*) FROM [dbo].[MarketDocuments] WHERE BundleId = '{marketDocumentBundleId}'";
         using var connection =
             await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-        var found = await connection.ExecuteScalarAsync<bool>(sqlStatement);
+        var exists = await connection.ExecuteScalarAsync<bool>(sqlStatement);
 
-        found.Should().BeTrue();
+        return exists;
     }
 
     private async Task EnqueueMessage(OutgoingMessageDto message)

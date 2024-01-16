@@ -100,10 +100,12 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             () => Assert.NotNull(result.AssignedBundleId),
         };
 
-        Assert.Multiple(propertyAssertions); // Asserts that all columns are asserted, increase number when we add more columns & their assertions
+        Assert.Multiple(propertyAssertions);
 
-        var actualColumnCount = ((IDictionary<string, object>)result).Count;
-        Assert.Equal(propertyAssertions.Length, actualColumnCount);
+        // Confirm that all database columns are asserted
+        var databaseColumnsCount = ((IDictionary<string, object>)result).Count;
+        var propertiesAssertedCount = propertyAssertions.Length;
+        propertiesAssertedCount.Should().Be(databaseColumnsCount, "asserted properties count should be equal to OutgoingMessage database columns count");
     }
 
     [Fact]
