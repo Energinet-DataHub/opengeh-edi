@@ -53,14 +53,14 @@ public class MessageEnqueuer
 
         if (messageQueue == null)
         {
-            _logger.LogInformation("Creating new message queue for Actor: {ActorNumber}, MarketRole", message.Receiver.Number);
+            _logger.LogInformation("Creating new message queue for Actor: {ActorNumber}, MarketRole: {MarketRole}", message.Receiver.Number.Value, message.Receiver.ActorRole.Name);
             messageQueue = ActorMessageQueue.CreateFor(message.Receiver);
             await _actorMessageQueueRepository.AddAsync(messageQueue).ConfigureAwait(false);
         }
 
         messageQueue.Enqueue(message, _systemDateTimeProvider.Now());
         _outgoingMessageRepository.Add(message);
-        _logger.LogInformation("Message enqueued: {Message} for Actor: {ActorNumber}", message.Id, message.Receiver.Number);
+        _logger.LogInformation("Message enqueued: {Message} for Actor: {ActorNumber}", message.Id, message.Receiver.Number.Value);
     }
 
     private static OutgoingMessage MapOutgoingMessage(OutgoingMessageDto messageDto)
