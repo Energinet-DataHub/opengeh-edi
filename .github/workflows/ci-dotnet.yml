@@ -27,7 +27,7 @@ jobs:
 
   # Run all tests in 'IntegrationTests.dll'
   integration_tests:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@kerbou/bump-azurite-version
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v12
     with:
       tests_dll_file_path: \source\IntegrationTests\bin\Release\net7.0\Energinet.DataHub.EDI.IntegrationTests.dll
       download_attempt_limit: 20    # 20 retries with 15 seconds delay = 5 minutes wait before timeout
