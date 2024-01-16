@@ -15,9 +15,8 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Azure.Storage;
 using Azure.Storage.Blobs;
-using Azure.Storage.Files.DataLake;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Microsoft.Extensions.Options;
 
@@ -35,9 +34,10 @@ public class DataLakeFileStorageClient : IFileStorageClient
         _blobStorageClient = new BlobServiceClient(options.Value.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING);
     }
 
-    public async Task UploadAsync(string rootFolder, string reference, Stream stream)
+    public async Task UploadAsync(string rootFolder, FileStorageReference reference, Stream stream)
     {
         ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(reference);
 
         var container = _blobStorageClient.GetBlobContainerClient(rootFolder);
 
@@ -46,19 +46,22 @@ public class DataLakeFileStorageClient : IFileStorageClient
         if (!containerExists)
             await container.CreateAsync().ConfigureAwait(false);
 
-        stream.Position = 0;
-        await container.UploadBlobAsync(reference, stream).ConfigureAwait(false);
+        stream.Position = 0; // Make sure we read the entire stream
+        await container.UploadBlobAsync(reference.Value, stream).ConfigureAwait(false);
     }
 
-    public async Task<Stream> DownloadAsync(string rootFolder, string reference)
+    public async Task<Stream> DownloadAsync(string rootFolder, FileStorageReference reference)
     {
+        ArgumentNullException.ThrowIfNull(reference);
+
         var container = _blobStorageClient.GetBlobContainerClient(rootFolder);
 
-        var blob = container.GetBlobClient(reference);
+        var blob = container.GetBlobClient(reference.Value);
 
         var stream = new MemoryStream();
         await blob.DownloadToAsync(stream).ConfigureAwait(false);
 
+        stream.Position = 0; // Make sure stream is ready to be read
         return stream;
     }
 }

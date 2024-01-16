@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -23,6 +24,7 @@ using Azure.Storage.Blobs.Models;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -38,42 +40,70 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
-public class WhenEnqueueingTests : TestBase
+public class WhenEnqueueingOutgoingMessageTests : TestBase
 {
     private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
     private readonly SystemDateTimeProviderStub _systemDateTimeProvider;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ActorMessageQueueContext _context;
+    private readonly IFileStorageClient _fileStorageClient;
 
-    public WhenEnqueueingTests(IntegrationTestFixture integrationTestFixture)
+    public WhenEnqueueingOutgoingMessageTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
     {
         _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
+        _fileStorageClient = GetService<IFileStorageClient>();
         _systemDateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
         _context = GetService<ActorMessageQueueContext>();
     }
 
     [Fact]
-    public async Task Outgoing_message_is_enqueued()
+    public async Task Outgoing_message_is_added_to_database_with_correct_values()
     {
-        var message = _outgoingMessageDtoBuilder.Build();
-        await EnqueueAndCommitAsync(message);
+        // Arrange
+        var message = _outgoingMessageDtoBuilder
+            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            .Build();
+
+        var createdAtTimestamp = Instant.FromUtc(2024, 1, 1, 0, 0);
+        _systemDateTimeProvider.SetNow(createdAtTimestamp);
+
+        // Act
+        var createdOutgoingMessageId = await EnqueueAndCommitAsync(message);
+
+        // Assert
+        var expectedFileStorageReference = $"{SampleData.NewEnergySupplierNumber}/{createdAtTimestamp.Year():0000}/{createdAtTimestamp.Month():00}/{createdAtTimestamp.Day():00}/{createdOutgoingMessageId.Value:N}";
 
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = "SELECT * FROM [dbo].[OutgoingMessages]";
         var result = await
             connection
                 .QuerySingleOrDefaultAsync(sql);
+
         Assert.NotNull(result);
-        Assert.Equal(result.DocumentType, DocumentType.NotifyAggregatedMeasureData.Name);
-        Assert.Equal(result.ReceiverId, message.ReceiverId.Value);
-        Assert.Equal(result.ReceiverRole, message.ReceiverRole.Name);
-        Assert.Equal(result.SenderId, message.SenderId.Value);
-        Assert.Equal(result.SenderRole, message.SenderRole.Name);
-        Assert.Equal(result.BusinessReason, message.BusinessReason);
-        Assert.NotNull(result.MessageRecord);
-        Assert.NotNull(result.AssignedBundleId);
+
+        var propertyAssertions = new Action[]
+        {
+            () => Assert.Equal(createdOutgoingMessageId.Value, result.Id),
+            () => Assert.NotNull(result.RecordId),
+            () => Assert.Equal(message.ProcessId, result.ProcessId),
+            () => Assert.Equal(DocumentType.NotifyAggregatedMeasureData.Name, result.DocumentType),
+            () => Assert.Equal(message.ReceiverId.Value, result.ReceiverId),
+            () => Assert.Equal(message.ReceiverRole.Name, result.ReceiverRole),
+            () => Assert.Equal(message.SenderId.Value, result.SenderId),
+            () => Assert.Equal(message.SenderRole.Name, result.SenderRole),
+            () => Assert.Equal(message.BusinessReason, result.BusinessReason),
+            () => Assert.Equal(expectedFileStorageReference, result.FileStorageReference),
+            () => Assert.Equal("OutgoingMessage", result.Discriminator),
+            () => Assert.False(result.IsPublished),
+            () => Assert.NotNull(result.AssignedBundleId),
+        };
+
+        Assert.Multiple(propertyAssertions); // Asserts that all columns are asserted, increase number when we add more columns & their assertions
+
+        var actualColumnCount = ((IDictionary<string, object>)result).Count;
+        Assert.Equal(propertyAssertions.Length, actualColumnCount);
     }
 
     [Fact]
@@ -134,26 +164,6 @@ public class WhenEnqueueingTests : TestBase
     }
 
     [Fact]
-    public async Task Outgoing_message_has_correct_file_storage_reference()
-    {
-        // Arrange
-        var message = _outgoingMessageDtoBuilder
-            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
-            .Build();
-
-        var createdAtTimestamp = Instant.FromUtc(2024, 1, 1, 0, 0);
-        _systemDateTimeProvider.SetNow(createdAtTimestamp);
-        var expectedFileStorageReference = $"{SampleData.NewEnergySupplierNumber}/{createdAtTimestamp.Year():0000}/{createdAtTimestamp.Month():00}/{createdAtTimestamp.Day():00}/{message.Id:N}";
-
-        // Act
-        await EnqueueAndCommitAsync(message);
-
-        // Assert
-        var actualFileStorageReference = await GetOutgoingMessageFileStorageReferenceFromDatabase(message.Id);
-        actualFileStorageReference.Should().Be(expectedFileStorageReference);
-    }
-
-    [Fact]
     public async Task Outgoing_message_record_is_added_to_file_storage_with_correct_content()
     {
         // Arrange
@@ -162,10 +172,10 @@ public class WhenEnqueueingTests : TestBase
             .Build();
 
         // Act
-        await EnqueueAndCommitAsync(message);
+        var createdId = await EnqueueAndCommitAsync(message);
 
         // Assert
-        var fileStorageReference = await GetOutgoingMessageFileStorageReferenceFromDatabase(message.Id);
+        var fileStorageReference = await GetOutgoingMessageFileStorageReferenceFromDatabase(createdId);
 
         var fileContent = await GetFileFromFileStorage(fileStorageReference);
 
@@ -176,7 +186,7 @@ public class WhenEnqueueingTests : TestBase
     }
 
     [Fact]
-    public async Task Uploading_duplicate_outgoing_message_records_to_file_storage_throws_exception() // EDK: Is it correct that we never check for enqueuing duplicate outgoing messages?
+    public async Task Uploading_duplicate_outgoing_message_to_file_storage_throws_exception()
     {
         // Arrange
         var message = _outgoingMessageDtoBuilder
@@ -184,11 +194,12 @@ public class WhenEnqueueingTests : TestBase
             .Build();
 
         // Act
-        await EnqueueAndCommitAsync(message);
-        var enqueueDuplicate = async () => await EnqueueAndCommitAsync(message);
+        var createdId = await EnqueueAndCommitAsync(message);
+        var fileStorageReference = await GetOutgoingMessageFileStorageReferenceFromDatabase(createdId);
+        var uploadDuplicateFile = async () => await _fileStorageClient.UploadAsync("outgoing", new FileStorageReference(fileStorageReference), new MemoryStream(new byte[] { 0x20 }));
 
         // Assert
-        (await enqueueDuplicate.Should().ThrowAsync<RequestFailedException>())
+        (await uploadDuplicateFile.Should().ThrowAsync<RequestFailedException>())
             .And.ErrorCode.Should().Be("BlobAlreadyExists");
     }
 
@@ -218,19 +229,21 @@ public class WhenEnqueueingTests : TestBase
         return blobContent;
     }
 
-    private async Task<string> GetOutgoingMessageFileStorageReferenceFromDatabase(Guid id)
+    private async Task<string> GetOutgoingMessageFileStorageReferenceFromDatabase(OutgoingMessageId id)
     {
         using var connection =
             await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
 
-        var fileStorageReference = await connection.ExecuteScalarAsync<string>($"SELECT FileStorageReference FROM [dbo].[OutgoingMessages] WHERE Id = '{id}'");
+        var fileStorageReference = await connection.ExecuteScalarAsync<string>($"SELECT FileStorageReference FROM [dbo].[OutgoingMessages] WHERE Id = '{id.Value}'");
 
         return fileStorageReference;
     }
 
-    private async Task EnqueueAndCommitAsync(OutgoingMessageDto message)
+    private async Task<OutgoingMessageId> EnqueueAndCommitAsync(OutgoingMessageDto message)
     {
-        await _outgoingMessagesClient.EnqueueAsync(message);
+        var outgoingMessageId = await _outgoingMessagesClient.EnqueueAsync(message);
         await _context.SaveChangesAsync();
+
+        return outgoingMessageId;
     }
 }

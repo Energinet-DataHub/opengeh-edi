@@ -15,6 +15,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Azure;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 
@@ -29,12 +30,12 @@ public interface IFileStorageClient
     /// <param name="rootFolder">The root folder for the file. If using Azure Blob Storage this is the container name</param>
     /// <param name="reference">A unique string representing the file, which can have any string value. If a file already exists with the given reference, a <see cref="RequestFailedException" /> will be thrown</param>
     /// <param name="stream">A stream which contains the binary file</param>
-    Task UploadAsync(string rootFolder, string reference, Stream stream);
+    Task UploadAsync(string rootFolder, FileStorageReference reference, Stream stream);
 
     /// <summary>
     /// Downloads a file as a stream, found by the given reference string
     /// </summary>
     /// <param name="rootFolder">The root folder for the file. If using Azure Blob Storage this is the container name</param>
     /// <param name="reference">The reference string is used to determine which file to download</param>
-    Task<Stream> DownloadAsync(string rootFolder, string reference);
+    Task<Stream> DownloadAsync(string rootFolder, FileStorageReference reference);
 }

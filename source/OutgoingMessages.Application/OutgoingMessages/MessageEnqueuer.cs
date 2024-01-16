@@ -29,78 +29,64 @@ public class MessageEnqueuer
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-    private readonly IOutgoingMessageFileStorage _outgoingMessageFileStorage;
     private readonly ILogger<MessageDequeuer> _logger;
 
     public MessageEnqueuer(
         IActorMessageQueueRepository actorMessageQueueRepository,
         IOutgoingMessageRepository outgoingMessageRepository,
         ISystemDateTimeProvider systemDateTimeProvider,
-        IOutgoingMessageFileStorage outgoingMessageFileStorage,
         ILogger<MessageDequeuer> logger)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _outgoingMessageRepository = outgoingMessageRepository;
         _systemDateTimeProvider = systemDateTimeProvider;
-        _outgoingMessageFileStorage = outgoingMessageFileStorage;
         _logger = logger;
     }
 
-    public async Task EnqueueAsync(OutgoingMessageDto messageToEnqueue)
+    public async Task<OutgoingMessageId> EnqueueAsync(OutgoingMessageDto messageToEnqueue)
     {
         if (messageToEnqueue == null) throw new ArgumentNullException(nameof(messageToEnqueue));
 
-        var messageId = messageToEnqueue.Id;
-        var messageReceiver = Receiver.Create(messageToEnqueue.ReceiverId, messageToEnqueue.ReceiverRole);
-
-        using var messageAsStream = CreateStream(messageToEnqueue.MessageRecord);
-        var timestamp = _systemDateTimeProvider.Now();
-        var uploadFileTask = _outgoingMessageFileStorage.UploadAsync(
-            messageAsStream,
-            messageReceiver.Number,
-            messageId,
-            timestamp);
-
-        var messageQueue = await _actorMessageQueueRepository.ActorMessageQueueForAsync(
-            messageReceiver.Number,
-            messageReceiver.ActorRole).ConfigureAwait(false);
-
-        if (messageQueue == null)
-        {
-            _logger.LogInformation("Creating new message queue for Actor: {ActorNumber}, MarketRole: {MarketRole}", messageReceiver.Number.Value, messageReceiver.ActorRole.Name);
-            messageQueue = ActorMessageQueue.CreateFor(messageReceiver);
-            await _actorMessageQueueRepository.AddAsync(messageQueue).ConfigureAwait(false);
-        }
-
-        var fileStorageReference = await uploadFileTask.ConfigureAwait(false);
-
         var outgoingMessage = new OutgoingMessage(
-            messageId,
             messageToEnqueue.DocumentType,
-            messageReceiver.Number,
+            messageToEnqueue.ReceiverId,
             messageToEnqueue.ProcessId,
             messageToEnqueue.BusinessReason,
-            messageReceiver.ActorRole,
+            messageToEnqueue.ReceiverRole,
             messageToEnqueue.SenderId,
             messageToEnqueue.SenderRole,
             messageToEnqueue.MessageRecord,
-            fileStorageReference);
+            _systemDateTimeProvider.Now());
 
-        messageQueue.Enqueue(outgoingMessage, _systemDateTimeProvider.Now());
-        _outgoingMessageRepository.Add(outgoingMessage);
+        var addToRepositoryTask = _outgoingMessageRepository.AddAsync(outgoingMessage);
+        var addToActorMessageQueueTask = AddToActorMessageQueueAsync(outgoingMessage);
+
+        await Task.WhenAll(addToRepositoryTask, addToActorMessageQueueTask).ConfigureAwait(false);
         _logger.LogInformation("Message enqueued: {Message} for Actor: {ActorNumber}", outgoingMessage.Id, outgoingMessage.Receiver.Number.Value);
+
+        return outgoingMessage.Id;
     }
 
-    private static Stream CreateStream(string message)
+    private async Task AddToActorMessageQueueAsync(OutgoingMessage outgoingMessage)
     {
-        var stream = new MemoryStream();
-#pragma warning disable CA2000
-        // Is disposed when the MemoryStream is disposed
-        var writer = new StreamWriter(stream);
-#pragma warning restore CA2000
-        writer.Write(message);
-        writer.Flush();
-        stream.Position = 0;
-        return stream;
+        var outgoingMessageReceiver = Receiver.Create(outgoingMessage.ReceiverId, outgoingMessage.ReceiverRole);
+        var actorMessageQueue = await GetMessageQueueForReceiverAsync(outgoingMessageReceiver).ConfigureAwait(false);
+        actorMessageQueue.Enqueue(outgoingMessage, _systemDateTimeProvider.Now());
+    }
+
+    private async Task<ActorMessageQueue> GetMessageQueueForReceiverAsync(Receiver receiver)
+    {
+        var messageQueue = await _actorMessageQueueRepository.ActorMessageQueueForAsync(
+            receiver.Number,
+            receiver.ActorRole).ConfigureAwait(false);
+
+        if (messageQueue == null)
+        {
+            _logger.LogInformation("Creating new message queue for Actor: {ActorNumber}, MarketRole: {MarketRole}", receiver.Number.Value, receiver.ActorRole.Name);
+            messageQueue = ActorMessageQueue.CreateFor(receiver);
+            await _actorMessageQueueRepository.AddAsync(messageQueue).ConfigureAwait(false);
+        }
+
+        return messageQueue;
     }
 }

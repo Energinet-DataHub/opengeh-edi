@@ -13,25 +13,17 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public class FileStorageReference : ValueObject
+public record FileStorageReference
 {
-    private FileStorageReference(string reference)
+    public FileStorageReference(string value)
     {
-        Value = reference;
+        if (string.IsNullOrEmpty(value)) throw new ArgumentNullException(nameof(value));
+
+        Value = value;
     }
 
     public string Value { get; }
-
-    public static FileStorageReference Create(string reference)
-    {
-        if (string.IsNullOrEmpty(reference)) throw new ArgumentNullException(nameof(reference));
-
-        return new FileStorageReference(reference);
-    }
-
-    public override string ToString() => Value;
 }

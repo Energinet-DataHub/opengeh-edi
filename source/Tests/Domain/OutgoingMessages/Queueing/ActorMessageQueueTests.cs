@@ -14,6 +14,7 @@
 
 using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
@@ -172,7 +173,6 @@ public class ActorMessageQueueTests
             MarketRole.EnergySupplier);
 
         return new OutgoingMessage(
-            Guid.NewGuid(),
             messageType ?? DocumentType.NotifyAggregatedMeasureData,
             receiver.Number,
             ProcessId.New().Id,
@@ -181,6 +181,6 @@ public class ActorMessageQueueTests
             ActorNumber.Create("1234567890987"),
             MarketRole.MeteringPointAdministrator,
             string.Empty,
-            FileStorageReference.Create("dummy"));
+            Instant.FromUtc(2024, 1, 1, 0, 0));
     }
 }

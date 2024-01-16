@@ -62,9 +62,6 @@ public static class OutgoingMessagesConfiguration
         services.AddTransient<MessageDequeuer>();
         services.AddTransient<IDataRetention, DequeuedBundlesRetention>();
 
-        //OutgoingMessageFileStorage
-        services.AddTransient<IOutgoingMessageFileStorage, OutgoingMessageFileStorage>();
-
         services.AddTransient<IOutgoingMessagesClient, OutgoingMessagesClient>();
     }
 }
