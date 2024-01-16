@@ -19,7 +19,7 @@ namespace Energinet.DataHub.EDI.Process.Application.IntegrationEvents;
 
 public static class EnergyResultProducedProcessorExtensions
 {
-    public static IList<EnergyResultProducedV2.Types.TimeSeriesType> SupportedTimeSeriesTypes() =>
+    public static IReadOnlyCollection<EnergyResultProducedV2.Types.TimeSeriesType> SupportedTimeSeriesTypes() =>
         new List<EnergyResultProducedV2.Types.TimeSeriesType>
         {
             EnergyResultProducedV2.Types.TimeSeriesType.Production,
