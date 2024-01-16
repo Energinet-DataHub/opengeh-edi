@@ -23,9 +23,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages
     public interface IOutgoingMessageRepository
     {
         /// <summary>
-        /// Store outgoing message
+        /// Store outgoing message in database & file storage
         /// </summary>
-        /// <param name="message"></param>
         Task AddAsync(OutgoingMessage message);
 
         /// <summary>
