@@ -19,6 +19,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
@@ -52,6 +53,7 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
     private readonly InboxEventReceiver _inboxEventReceiver;
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
     private readonly IMasterDataClient _masterDataClient;
+    private readonly IFileStorageClient _fileStorageClient;
 
     public AggregatedTimeSeriesRequestAcceptedToAggregationResultTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
@@ -60,6 +62,7 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
         _inboxEventReceiver = GetService<InboxEventReceiver>();
         _databaseConnectionFactory = GetService<IDatabaseConnectionFactory>();
         _masterDataClient = GetService<IMasterDataClient>();
+        _fileStorageClient = GetService<IFileStorageClient>();
     }
 
     public static IEnumerable<object[]> ExpectedQuantityQualityMappings()
@@ -213,6 +216,7 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
             DocumentType.NotifyAggregatedMeasureData.Name,
             BusinessReason.BalanceFixing.Name,
             MarketRole.BalanceResponsibleParty,
-            _databaseConnectionFactory);
+            _databaseConnectionFactory,
+            _fileStorageClient);
     }
 }

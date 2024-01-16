@@ -20,6 +20,7 @@ using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -45,6 +46,7 @@ public sealed class EnergyResultProducedV2ToAggregationResultTests : TestBase
 
     private readonly EnergyResultProducedV2EventBuilder _eventBuilder = new();
     private readonly GridAreaBuilder _gridAreaBuilder = new();
+    private readonly IFileStorageClient _fileStorageClient;
 
     public EnergyResultProducedV2ToAggregationResultTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
@@ -52,6 +54,7 @@ public sealed class EnergyResultProducedV2ToAggregationResultTests : TestBase
         _masterDataClient = GetService<IMasterDataClient>();
         _integrationEventHandler = GetService<IIntegrationEventHandler>();
         _databaseConnectionFactory = GetService<IDatabaseConnectionFactory>();
+        _fileStorageClient = GetService<IFileStorageClient>();
     }
 
     public static IEnumerable<object[]> QuantityQualityPowerSet()
@@ -359,6 +362,7 @@ public sealed class EnergyResultProducedV2ToAggregationResultTests : TestBase
             DocumentType.NotifyAggregatedMeasureData.Name,
             BusinessReason.BalanceFixing.Name,
             MarketRole.MeteredDataResponsible,
-            _databaseConnectionFactory);
+            _databaseConnectionFactory,
+            _fileStorageClient);
     }
 }

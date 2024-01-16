@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
@@ -88,7 +89,8 @@ public class WhenARejectedResultIsAvailableTests : TestBase
             DocumentType.RejectRequestAggregatedMeasureData.Name,
             businessReason.Name,
             roleOfReceiver,
-            GetService<IDatabaseConnectionFactory>());
+            GetService<IDatabaseConnectionFactory>(),
+            GetService<IFileStorageClient>());
     }
 
     private AggregatedMeasureDataProcess BuildProcess()
