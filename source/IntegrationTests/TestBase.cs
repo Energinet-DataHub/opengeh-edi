@@ -68,6 +68,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
         {
             ArgumentNullException.ThrowIfNull(integrationTestFixture);
             integrationTestFixture.CleanupDatabase();
+            integrationTestFixture.CleanupFileStorage();
             _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
             TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
             InboxEventNotificationHandler = new TestNotificationHandlerSpy();

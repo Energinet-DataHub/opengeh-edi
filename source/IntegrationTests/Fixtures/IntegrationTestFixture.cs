@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.IO;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
@@ -69,7 +71,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
         {
             CreateSchema();
             CleanupDatabase();
+
             AzuriteManager.StartAzurite();
+            CleanupFileStorage();
 
             return Task.CompletedTask;
         }
@@ -108,6 +112,47 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
             _b2bContext.Database.ExecuteSqlRaw(cleanupStatement);
         }
 
+        public void CleanupFileStorage(bool disposing = false)
+        {
+            var blobServiceClient = new BlobServiceClient(AzuriteManager.BlobStorageConnectionString);
+
+            var containers = blobServiceClient.GetBlobContainers();
+
+            foreach (var containerToDelete in containers)
+                blobServiceClient.DeleteBlobContainer(containerToDelete.Name);
+
+            if (disposing)
+            {
+                // Cleanup actual Azurite "database" files
+                if (Directory.Exists("__blobstorage__"))
+                    Directory.Delete("__blobstorage__", true);
+
+                if (Directory.Exists("__queuestorage__"))
+                    Directory.Delete("__queuestorage__", true);
+
+                if (Directory.Exists("__tablestorage__"))
+                    Directory.Delete("__tablestorage__", true);
+
+                if (File.Exists("__azurite_db_blob__.json"))
+                    File.Delete("__azurite_db_blob__.json");
+
+                if (File.Exists("__azurite_db_blob_extent__.json"))
+                    File.Delete("__azurite_db_blob_extent__.json");
+
+                if (File.Exists("__azurite_db_queue__.json"))
+                    File.Delete("__azurite_db_queue__.json");
+
+                if (File.Exists("__azurite_db_queue_extent__.json"))
+                    File.Delete("__azurite_db_queue_extent__.json");
+
+                if (File.Exists("__azurite_db_table__.json"))
+                    File.Delete("__azurite_db_table__.json");
+
+                if (File.Exists("__azurite_db_table_extent__.json"))
+                    File.Delete("__azurite_db_table_extent__.json");
+            }
+        }
+
         public void Dispose()
         {
             Dispose(true);
@@ -125,6 +170,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
             {
                 CleanupDatabase();
                 _b2bContext.Dispose();
+
+                CleanupFileStorage(true);
                 AzuriteManager.Dispose();
             }
 
