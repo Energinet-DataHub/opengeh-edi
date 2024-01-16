@@ -75,7 +75,7 @@ internal sealed class EbixDriver : IDisposable
         var peekResponse = await PeekMessageAsync(0)
             .ConfigureAwait(false);
 
-        if (peekResponse?.MessageContainer.Payload is not null)
+        if (peekResponse?.MessageContainer?.Payload is not null)
         {
             await DequeueMessageAsync(GetMessageId(peekResponse)).ConfigureAwait(false);
             await EmptyQueueAsync().ConfigureAwait(false);
