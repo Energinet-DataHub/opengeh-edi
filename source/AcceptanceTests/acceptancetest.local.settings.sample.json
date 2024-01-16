@@ -1,8 +1,4 @@
 ﻿{
-  "AZP_TOKEN": "<acceptance test azp token using for auth token>",
-  "SHARED_KEYVAULT_NAME": "<key vault name>",
-  "AZURE_ENTRA_CLIENT_ID": "<azure entra client id for api management login>",
-  "AZURE_ENTRA_CLIENT_SECRET": "<azure entra client secret for api management login>",
   "EBIX_CERTIFICATE_PASSWORD": "<certificate password for performing an ebix peek in api management>",
   "AZURE_B2C_TENANT_URL": "<optional: azure b2c tenant (ROPC) url>",
   "AZURE_ENTRA_FRONTEND_APP_ID": "<optional: frontend app id in b2c tenant>",
