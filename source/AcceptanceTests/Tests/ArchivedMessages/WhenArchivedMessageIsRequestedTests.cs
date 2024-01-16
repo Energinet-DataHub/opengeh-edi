@@ -52,7 +52,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
         if (payload != null) await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 
         var response = await _archivedMessage.RequestArchivedMessageSearchAsync(
-            new Uri(_fixture.B2CApiUri, "ArchivedMessageSearch"),
+            new Uri(_fixture.ApiManagementUri, "ArchivedMessageSearch"),
             ArchivedMessageData.GetSearchableDataObject(
                 messageId!,
                 null!,
@@ -77,7 +77,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
         await _aggregationResult.ConfirmResultIsAvailableForToken();
 
         var archivedRequestResponse = await _archivedMessage.RequestArchivedMessageSearchAsync(
-            new Uri(_fixture.B2CApiUri, "ArchivedMessageSearch"),
+            new Uri(_fixture.ApiManagementUri, "ArchivedMessageSearch"),
             ArchivedMessageData.GetSearchableDataObject(
                 messageId!,
                 null!,
@@ -85,7 +85,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
                 null!,
                 null!));
 
-        var response = await _archivedMessage.ArchivedMessageGetDocumentAsync(new Uri(_fixture.B2CApiUri, "/ArchivedMessageGetDocument?id=" + archivedRequestResponse[0].Id));
+        var response = await _archivedMessage.ArchivedMessageGetDocumentAsync(new Uri(_fixture.ApiManagementUri, "/ArchivedMessageGetDocument?id=" + archivedRequestResponse[0].Id));
 
         Assert.Equal(payload?.OuterXml, response);
      }
@@ -100,7 +100,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
         var messageId = payload?.GetElementsByTagName("cim:mRID")[0]?.InnerText;
 
         var response = await _archivedMessage.RequestArchivedMessageSearchAsync(
-            new Uri(_fixture.B2CApiUri, "ArchivedMessageSearch"),
+            new Uri(_fixture.ApiManagementUri, "ArchivedMessageSearch"),
             ArchivedMessageData.GetSearchableDataObject(
                 messageId!,
                 null!,
