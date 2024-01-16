@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
@@ -23,6 +25,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.EDI.Process.Application.IntegrationEvents;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Xunit;
@@ -39,6 +42,18 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     public WhenAnAggregationResultIsAvailableTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
+    }
+
+    public static IEnumerable<object[]> SupportedTimeSeriesTypes()
+    {
+        return EnergyResultProducedProcessorExtensions.SupportedTimeSeriesTypes().Select(e => new[] { (object)e });
+    }
+
+    public static IEnumerable<object[]> NotSupportedTimeSeriesTypes()
+    {
+        return Enum.GetValues<TimeSeriesType>()
+            .Where(x => !EnergyResultProducedProcessorExtensions.SupportedTimeSeriesTypes().Contains(x))
+            .Select(e => new[] { (object)e });
     }
 
     [Fact]
@@ -260,13 +275,8 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, MeteringPointType.Consumption.Name);
     }
 
-    [Theory]
-    [InlineData(TimeSeriesType.Production)]
-    [InlineData(TimeSeriesType.FlexConsumption)]
-    [InlineData(TimeSeriesType.NonProfiledConsumption)]
-    [InlineData(TimeSeriesType.NetExchangePerGa)]
-    [InlineData(TimeSeriesType.NetExchangePerNeighboringGa)]
-    [InlineData(TimeSeriesType.TotalConsumption)]
+    [Theory(DisplayName = nameof(Message_is_created_for_supported_time_series_type))]
+    [MemberData(nameof(SupportedTimeSeriesTypes))]
     public async Task Message_is_created_for_supported_time_series_type(TimeSeriesType timeSeriesType)
     {
         var businessReason = BusinessReason.FromName(nameof(BusinessReason.BalanceFixing));
@@ -292,12 +302,8 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .HasBusinessReason(businessReason);
     }
 
-    [Theory]
-    [InlineData(TimeSeriesType.GridLoss)]
-    [InlineData(TimeSeriesType.TempProduction)]
-    [InlineData(TimeSeriesType.NegativeGridLoss)]
-    [InlineData(TimeSeriesType.PositiveGridLoss)]
-    [InlineData(TimeSeriesType.TempFlexConsumption)]
+    [Theory(DisplayName = nameof(Message_is_not_created_for_unsupported_time_series_type))]
+    [MemberData(nameof(NotSupportedTimeSeriesTypes))]
     public async Task Message_is_not_created_for_unsupported_time_series_type(TimeSeriesType timeSeriesType)
     {
         var businessReason = BusinessReason.FromName(nameof(BusinessReason.BalanceFixing));

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
@@ -30,16 +29,6 @@ public class EnergyResultProducedV2Processor : IIntegrationEventProcessor
     private readonly AggregationFactory _aggregationFactory;
     private readonly IMediator _mediator;
     private readonly ILogger<EnergyResultProducedV2Processor> _logger;
-
-    private readonly IList<EnergyResultProducedV2.Types.TimeSeriesType> _allowedTimeSeriesTypes = new List<EnergyResultProducedV2.Types.TimeSeriesType>
-    {
-        EnergyResultProducedV2.Types.TimeSeriesType.Production,
-        EnergyResultProducedV2.Types.TimeSeriesType.FlexConsumption,
-        EnergyResultProducedV2.Types.TimeSeriesType.NonProfiledConsumption,
-        EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerGa,
-        EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerNeighboringGa,
-        EnergyResultProducedV2.Types.TimeSeriesType.TotalConsumption,
-    };
 
     public EnergyResultProducedV2Processor(
         AggregationFactory aggregationFactory,
@@ -60,7 +49,7 @@ public class EnergyResultProducedV2Processor : IIntegrationEventProcessor
 
         var energyResultProducedV2 = (EnergyResultProducedV2)integrationEvent.Message;
 
-        if (!_allowedTimeSeriesTypes.Contains(energyResultProducedV2.TimeSeriesType))
+        if (!EnergyResultProducedProcessorExtensions.SupportedTimeSeriesTypes().Contains(energyResultProducedV2.TimeSeriesType))
         {
             _logger.LogInformation(
                 "TimeSeriesType {TimeSeriesType} is not supported",
