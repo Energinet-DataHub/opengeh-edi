@@ -25,7 +25,6 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 public class DataLakeFileStorageClient : IFileStorageClient
 {
     private readonly BlobServiceClient _blobStorageClient;
-    // private readonly DataLakeServiceClient _dataLakeServiceClient;
 
     public DataLakeFileStorageClient(IOptions<AzureDataLakeConnectionOptions> options)
     {
