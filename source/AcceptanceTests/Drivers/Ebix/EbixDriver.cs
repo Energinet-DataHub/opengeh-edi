@@ -82,7 +82,7 @@ internal sealed class EbixDriver : IDisposable
         }
     }
 
-    public async Task<peekMessageResponse?> PeekMessageAsync(int? timeoutInSeconds = 600)
+    public async Task<peekMessageResponse?> PeekMessageAsync()
     {
         if (_ebixServiceClient.State != CommunicationState.Opened)
             _ebixServiceClient.Open();
@@ -90,7 +90,7 @@ internal sealed class EbixDriver : IDisposable
         using var operationScope = new OperationContextScope(_ebixServiceClient.InnerChannel);
 
         var stopWatch = Stopwatch.StartNew();
-        var timeBeforeTimeout = timeoutInSeconds != null ? new TimeSpan(0, 0, timeoutInSeconds.Value) : TimeSpan.Zero;
+        var timeBeforeTimeout = new TimeSpan(0, 10, 0);
         Exception? lastException = null;
         do
         {
