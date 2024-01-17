@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -34,18 +33,12 @@ using FluentAssertions;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Xunit;
-using Xunit.Categories;
 using Enum = System.Enum;
 using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point;
 using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
-[IntegrationTest]
-[SuppressMessage(
-    "StyleCop.CSharp.OrderingRules",
-    "SA1204:Static elements should appear before instance elements",
-    Justification = "Test class")]
 public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests : TestBase
 {
     private static readonly QuantityQuality[][] _quantityQualityPowerSet = FastPowerSet(
@@ -72,64 +65,64 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
 
     public static IEnumerable<object[]> QuantityQualityPowerSet()
     {
-        return _quantityQualityPowerSet.Select(x => new object[] { x });
+        return _quantityQualityPowerSet.Select(qqs => new object[] { qqs });
     }
 
     public static IEnumerable<object[]> QuantityQualityPowerSetWithMissing()
     {
         return _quantityQualityPowerSet
-            .Where(x => x.Contains(QuantityQuality.Missing))
+            .Where(qqs => qqs.Contains(QuantityQuality.Missing))
             .Where(
-                x => x.Length > 2
-                     || (x.Length > 1 && !x.Contains(QuantityQuality.Unspecified)))
-            .Select(x => new object[] { x });
+                qqs => qqs.Length > 2
+                       || (qqs.Length > 1 && !qqs.Contains(QuantityQuality.Unspecified)))
+            .Select(qqs => new object[] { qqs });
     }
 
     public static IEnumerable<object[]> QuantityQualityPowerSetOnlyMissing()
     {
         return _quantityQualityPowerSet
-            .Where(x => x.Contains(QuantityQuality.Missing))
+            .Where(qqs => qqs.Contains(QuantityQuality.Missing))
             .Where(
-                x => x.Length == 1
-                     || (x.Length == 2 && x.Contains(QuantityQuality.Unspecified)))
-            .Select(x => new object[] { x });
+                qqs => qqs.Length == 1
+                       || (qqs.Length == 2 && qqs.Contains(QuantityQuality.Unspecified)))
+            .Select(qqs => new object[] { qqs });
     }
 
     public static IEnumerable<object[]> QuantityQualityPowerSetWithoutMissingWithEstimated()
     {
         return _quantityQualityPowerSet
-            .Where(x => x.Contains(QuantityQuality.Estimated))
-            .Where(x => !x.Contains(QuantityQuality.Missing))
-            .Select(x => new object[] { x });
+            .Where(qqs => qqs.Contains(QuantityQuality.Estimated))
+            .Where(qqs => !qqs.Contains(QuantityQuality.Missing))
+            .Select(qqs => new object[] { qqs });
     }
 
     public static IEnumerable<object[]> QuantityQualityPowerSetWithoutMissingEstimatedWithMeasured()
     {
         return _quantityQualityPowerSet
-            .Where(x => x.Contains(QuantityQuality.Measured))
-            .Where(x => !x.Contains(QuantityQuality.Missing))
-            .Where(x => !x.Contains(QuantityQuality.Estimated))
-            .Select(x => new object[] { x });
+            .Where(qqs => qqs.Contains(QuantityQuality.Measured))
+            .Where(qqs => !qqs.Contains(QuantityQuality.Missing))
+            .Where(qqs => !qqs.Contains(QuantityQuality.Estimated))
+            .Select(qqs => new object[] { qqs });
     }
 
     public static IEnumerable<object[]> QuantityQualityPowerSetWithoutMissingEstimatedMeasuredWithCalculated()
     {
         return _quantityQualityPowerSet
-            .Where(x => x.Contains(QuantityQuality.Calculated))
-            .Where(x => !x.Contains(QuantityQuality.Missing))
-            .Where(x => !x.Contains(QuantityQuality.Estimated))
-            .Where(x => !x.Contains(QuantityQuality.Measured))
-            .Select(x => new object[] { x });
+            .Where(qqs => qqs.Contains(QuantityQuality.Calculated))
+            .Where(qqs => !qqs.Contains(QuantityQuality.Missing))
+            .Where(qqs => !qqs.Contains(QuantityQuality.Estimated))
+            .Where(qqs => !qqs.Contains(QuantityQuality.Measured))
+            .Select(qqs => new object[] { qqs });
     }
 
     public static IEnumerable<object[]> QuantityQualityPowerSetWithoutMissingEstimatedMeasuredCalculated()
     {
         return _quantityQualityPowerSet
-            .Where(x => !x.Contains(QuantityQuality.Missing))
-            .Where(x => !x.Contains(QuantityQuality.Estimated))
-            .Where(x => !x.Contains(QuantityQuality.Measured))
-            .Where(x => !x.Contains(QuantityQuality.Calculated))
-            .Select(x => new object[] { x });
+            .Where(qqs => !qqs.Contains(QuantityQuality.Missing))
+            .Where(qqs => !qqs.Contains(QuantityQuality.Estimated))
+            .Where(qqs => !qqs.Contains(QuantityQuality.Measured))
+            .Where(qqs => !qqs.Contains(QuantityQuality.Calculated))
+            .Select(qqs => new object[] { qqs });
     }
 
     [Theory]
@@ -333,37 +326,12 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
         _processContext.Dispose();
     }
 
-    private async Task<AssertOutgoingMessage> AggregatedTimeSeriesRequestAcceptedWithQuantityQualityToOutgoingMessage(
+    private static AggregatedTimeSeriesRequestAccepted CreateEventWithQuantityQuality(
         IEnumerable<QuantityQuality> quantityQuality)
-    {
-        await _gridAreaBuilder
-            .WithGridAreaCode(SampleData.GridAreaCode)
-            .StoreAsync(_masterDataClient);
-
-        var process = BuildProcess();
-        var requestAccepted = CreateEventWithQuantityQuality(quantityQuality);
-
-        await _inboxEventReceiver
-            .ReceiveAsync(
-                Guid.NewGuid().ToString(),
-                nameof(AggregatedTimeSeriesRequestAccepted),
-                process.ProcessId.Id,
-                requestAccepted.ToByteArray());
-
-        await HavingReceivedInboxEventAsync(
-            nameof(AggregatedTimeSeriesRequestAccepted),
-            requestAccepted,
-            process.ProcessId.Id);
-
-        return await OutgoingMessageAsync();
-    }
-
-    private static AggregatedTimeSeriesRequestAccepted CreateEventWithQuantityQuality(IEnumerable<QuantityQuality> quantityQuality)
     {
         var timeSeriesPoint = new TimeSeriesPoint
         {
-            Quantity = new DecimalValue { Units = 1, Nanos = 1 },
-            Time = new Timestamp { Seconds = 1, Nanos = 1 },
+            Quantity = new DecimalValue { Units = 1, Nanos = 1 }, Time = new Timestamp { Seconds = 1, Nanos = 1 },
         };
         timeSeriesPoint.QuantityQuality.AddRange(quantityQuality);
 
@@ -404,6 +372,31 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
         }
 
         return powerSet;
+    }
+
+    private async Task<AssertOutgoingMessage> AggregatedTimeSeriesRequestAcceptedWithQuantityQualityToOutgoingMessage(
+        IEnumerable<QuantityQuality> quantityQuality)
+    {
+        await _gridAreaBuilder
+            .WithGridAreaCode(SampleData.GridAreaCode)
+            .StoreAsync(_masterDataClient);
+
+        var process = BuildProcess();
+        var requestAccepted = CreateEventWithQuantityQuality(quantityQuality);
+
+        await _inboxEventReceiver
+            .ReceiveAsync(
+                Guid.NewGuid().ToString(),
+                nameof(AggregatedTimeSeriesRequestAccepted),
+                process.ProcessId.Id,
+                requestAccepted.ToByteArray());
+
+        await HavingReceivedInboxEventAsync(
+            nameof(AggregatedTimeSeriesRequestAccepted),
+            requestAccepted,
+            process.ProcessId.Id);
+
+        return await OutgoingMessageAsync();
     }
 
     private AggregatedMeasureDataProcess BuildProcess()
