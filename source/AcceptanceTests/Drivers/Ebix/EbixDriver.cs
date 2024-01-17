@@ -80,10 +80,6 @@ internal sealed class EbixDriver : IDisposable
             await DequeueMessageAsync(GetMessageId(peekResponse)).ConfigureAwait(false);
             await EmptyQueueAsync().ConfigureAwait(false);
         }
-        else
-        {
-            Console.WriteLine("peekResponse?.MessageContainer.Payload is just null");
-        }
     }
 
     public async Task<peekMessageResponse?> PeekMessageAsync(int? timeoutInSeconds = 600)
