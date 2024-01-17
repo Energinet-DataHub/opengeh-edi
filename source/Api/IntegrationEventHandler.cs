@@ -58,7 +58,7 @@ public sealed class IntegrationEventHandler : IIntegrationEventHandler
             return;
         }
 
-        var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(CancellationToken.None)
+        using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(CancellationToken.None)
             .ConfigureAwait(false);
         using var transaction = connection.BeginTransaction();
         try
