@@ -107,6 +107,12 @@ public class InternalCommandProcessorTests : TestBase
         AssertIsProcessedSuccessful(command);
     }
 
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        Connection.Dispose();
+    }
+
     private void AssertSingleActorMessageQueue()
     {
         var checkStatement =
