@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using NodaTime;
@@ -80,8 +81,6 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
         public MarketRole SenderRole { get; }
 
-        public string MessageRecord => _messageRecord;
-
         public Receiver Receiver => Receiver.Create(ReceiverId, ReceiverRole);
 
         public BundleId? AssignedBundleId { get; private set; }
@@ -96,6 +95,12 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
         public void SetMessageRecord(string messageRecord)
         {
             _messageRecord = messageRecord;
+        }
+
+        [SuppressMessage("Design", "CA1024:Use properties where appropriate", Justification = "Will cause error because of serialization and message record maybe being null at the time")]
+        public string GetMessageRecord()
+        {
+            return _messageRecord;
         }
 
         private static FileStorageReference CreateFileStorageReference(OutgoingMessageId id, ActorNumber receiverActorNumber, Instant timestamp)

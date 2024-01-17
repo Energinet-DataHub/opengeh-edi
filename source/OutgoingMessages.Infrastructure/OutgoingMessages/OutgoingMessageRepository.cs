@@ -42,7 +42,7 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
 
         _context.OutgoingMessages.Add(message);
 
-        using var messageRecordStream = ConvertToStream(message.MessageRecord);
+        using var messageRecordStream = ConvertToStream(message.GetMessageRecord());
 
         // Must await here instead of returning the Task, since messageRecordStream gets disposed when returning from function
         await _fileStorageClient.UploadAsync(
