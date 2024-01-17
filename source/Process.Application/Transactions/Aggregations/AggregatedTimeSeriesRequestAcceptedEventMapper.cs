@@ -124,7 +124,7 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
 
     private static CalculatedQuantityQuality MapQuality(ICollection<QuantityQuality> quantityQualities)
     {
-        return EdiQualityMapper.QuantityQualityCollectionToEdiQuality(quantityQualities);
+        return CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(quantityQualities);
     }
 
     private static decimal? Parse(DecimalValue? input)

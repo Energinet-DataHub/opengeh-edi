@@ -62,7 +62,7 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 ///         </item>
 ///     </list>
 /// </summary>
-public static class EdiQualityMapper
+public static class CalculatedQuantityQualityMapper
 {
     /// <summary>
     ///     Converts a collection of quantity qualities to EDI quality.

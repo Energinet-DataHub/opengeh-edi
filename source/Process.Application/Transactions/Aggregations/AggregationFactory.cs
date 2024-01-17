@@ -251,7 +251,7 @@ public class AggregationFactory
                 new Point(
                     pointPosition,
                     Parse(point.Quantity),
-                    EdiQualityMapper.QuantityQualityCollectionToEdiQuality(point.QuantityQualities),
+                    CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(point.QuantityQualities),
                     point.Time.ToString()));
             pointPosition++;
         }
