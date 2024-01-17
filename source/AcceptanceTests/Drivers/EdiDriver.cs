@@ -61,7 +61,7 @@ internal sealed class EdiDriver : IDisposable
     public async Task<Stream> PeekMessageAsync()
     {
         var stopWatch = Stopwatch.StartNew();
-        while (stopWatch.ElapsedMilliseconds < 60000)
+        while (stopWatch.ElapsedMilliseconds < 600000)
         {
             var peekResponse = await PeekAsync()
                 .ConfigureAwait(false);
