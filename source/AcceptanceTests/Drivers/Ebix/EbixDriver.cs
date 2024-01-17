@@ -72,7 +72,7 @@ internal sealed class EbixDriver : IDisposable
 
     public async Task EmptyQueueAsync()
     {
-        var peekResponse = await PeekMessageAsync(0)
+        var peekResponse = await PeekAsync()
             .ConfigureAwait(false);
 
         if (peekResponse?.MessageContainer?.Payload is not null)
@@ -175,5 +175,10 @@ internal sealed class EbixDriver : IDisposable
         var query = "/ns0:HeaderEnergyDocument/ns0:Identification";
         var node = response.MessageContainer.Payload.SelectSingleNode(query, nsmgr);
         return node!.InnerText;
+    }
+
+    private async Task<peekMessageResponse?> PeekAsync()
+    {
+        return await _ebixServiceClient.peekMessageAsync().ConfigureAwait(false);
     }
 }
