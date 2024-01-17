@@ -122,6 +122,30 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             };
         }
 
+        public static Dictionary<string, string> TypeIsNotSupported()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:type", "E73" },
+            };
+        }
+
+        public static Dictionary<string, string> ProcessTypeIsNotSupported()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:process.processType", "D09" },
+            };
+        }
+
+        public static Dictionary<string, string> InvalidBusinessType()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:businessSector.type", "27" },
+            };
+        }
+
         /*
 
         public Dictionary<string, string> SchemaVersionIsInvalid()
@@ -154,30 +178,6 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             return new Dictionary<string, string>
             {
                 { "cim:mRID", "lasjfejhrtajhfksagjebrtafnnvsgietjafehtaafaertzrshgsyr" },
-            };
-        }
-
-        public Dictionary<string, string> TypeIsNotSupported()
-        {
-            return new Dictionary<string, string>
-            {
-                { "cim:type", "E73" },
-            };
-        }
-
-        public Dictionary<string, string> ProcessTypeIsNotSupported()
-        {
-            return new Dictionary<string, string>
-            {
-                { "cim:process.processType", "D09" },
-            };
-        }
-
-        public Dictionary<string, string> InvalidBusinessType()
-        {
-            return new Dictionary<string, string>
-            {
-                { "cim:businessSector.type", "27" },
             };
         }
         */
