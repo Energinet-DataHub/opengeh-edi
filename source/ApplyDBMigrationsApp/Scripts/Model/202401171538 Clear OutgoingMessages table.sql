@@ -1,2 +1,1 @@
--- noinspection SqlWithoutWhere
-DELETE FROM [dbo].[OutgoingMessages]
+TRUNCATE TABLE [dbo].[OutgoingMessages]
