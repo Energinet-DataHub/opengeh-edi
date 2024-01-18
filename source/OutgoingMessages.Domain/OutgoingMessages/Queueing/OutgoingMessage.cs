@@ -39,7 +39,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             FileStorageReference = CreateFileStorageReference(Id, ReceiverId, timestamp);
         }
 
-        // Used by EF
+        // ReSharper disable once UnusedMember.Local -- Used by Entity Framework
         private OutgoingMessage(
             DocumentType documentType,
             ActorNumber receiverId,
@@ -97,7 +97,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             _messageRecord = messageRecord;
         }
 
-        [SuppressMessage("Design", "CA1024:Use properties where appropriate", Justification = "Will cause error because of serialization and message record maybe being null at the time")]
+        [SuppressMessage("Design", "CA1024:Use properties where appropriate", Justification = "Can cause error as a property because of serialization and message record maybe being null at the time")]
         public string GetMessageRecord()
         {
             return _messageRecord;
