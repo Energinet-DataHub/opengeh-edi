@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Azure.Identity;
 using Azure.Messaging.ServiceBus;
+using Azure.Storage.Blobs;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,5 +43,23 @@ public static class BuildingBlockConfiguration
 
         services.AddSingleton<IDatabaseConnectionFactory, SqlDatabaseConnectionFactory>();
         services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactory>();
+
+        services
+            .AddOptions<BlobServiceClientConnectionOptions>()
+            .Bind(configuration)
+            .Validate(o => !string.IsNullOrEmpty(o.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING) || !string.IsNullOrEmpty(o.AZURE_STORAGE_ACCOUNT_URL), $"{nameof(BlobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING)} or {nameof(BlobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_URL)} (if using Default Azure Credentials) must be set in configuration");
+
+        services.AddTransient<BlobServiceClient>(
+            x =>
+            {
+                var options = x.GetRequiredService<IOptions<BlobServiceClientConnectionOptions>>();
+                var blobServiceClient = !string.IsNullOrEmpty(options.Value.AZURE_STORAGE_ACCOUNT_URL) // Uses AZURE_STORAGE_ACCOUNT_URL to run with Azure credentials in our Azure environments, and uses AZURE_STORAGE_ACCOUNT_CONNECTION_STRING to run locally and in our tests
+                    ? new BlobServiceClient(new Uri(options.Value.AZURE_STORAGE_ACCOUNT_URL), new DefaultAzureCredential())
+                    : new BlobServiceClient(options.Value.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING);
+
+                return blobServiceClient;
+            });
+
+        services.AddTransient<IFileStorageClient, DataLakeFileStorageClient>();
     }
 }

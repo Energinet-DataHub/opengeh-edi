@@ -23,13 +23,12 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages
     public interface IOutgoingMessageRepository
     {
         /// <summary>
-        /// Add message to queue
+        /// Add outgoing message to database and file storage
         /// </summary>
-        /// <param name="message"></param>
-        void Add(OutgoingMessage message);
+        Task AddAsync(OutgoingMessage message);
 
         /// <summary>
-        /// Get all messages assigned to a bundle by id.
+        /// Get all messages assigned to a bundle by id
         /// </summary>
         Task<OutgoingMessageBundle> GetAsync(BundleId bundleId);
     }

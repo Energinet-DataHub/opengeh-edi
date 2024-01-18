@@ -12,22 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+using System;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-/// <summary>
-///  Repository for market documents
-/// </summary>
-public interface IMarketDocumentRepository
+public record FileStorageReference
 {
-    /// <summary>
-    /// Get document by bundle id
-    /// </summary>
-    Task<MarketDocument?> GetAsync(BundleId bundleId);
+    public FileStorageReference(string value)
+    {
+        if (string.IsNullOrEmpty(value)) throw new ArgumentNullException(nameof(value));
 
-    /// <summary>
-    /// Add document to repository
-    /// </summary>
-    void Add(MarketDocument marketDocument);
+        Value = value;
+    }
+
+    public string Value { get; }
 }

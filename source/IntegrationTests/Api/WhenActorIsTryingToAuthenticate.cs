@@ -46,8 +46,8 @@ public class WhenActorIsTryingToAuthenticate : TestBase
     private readonly FunctionExecutionDelegate _next;
     private readonly FunctionContextBuilder _functionContextBuilder;
 
-    public WhenActorIsTryingToAuthenticate(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public WhenActorIsTryingToAuthenticate(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         AuthenticatedActor.SetAuthenticatedActor(null);
         _nextSpy = new NextSpy();
