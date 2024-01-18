@@ -144,8 +144,9 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202312041319 Add unique constraint to ActorCertificate thumbprint.sql" />
     <EmbeddedResource Include="Scripts\Model\202401121301 Add FileStorageReference column to OutgoingMessages.sql" />
     <EmbeddedResource Include="Scripts\Model\202401161321 Remove MessageRecord column from OutgoingMessages.sql" />
-    <EmbeddedResource Include="Scripts\Model\202401171538 Clear OutgoingMessages table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202401171531 Clear OutgoingMessages table.sql" />
     <EmbeddedResource Include="Scripts\Model\202401171540 Make FileStorageReference column not null for OutgoingMessages.sql" />
+    <EmbeddedResource Include="Scripts\Model\202401171533 Clear Bundles and ActorMessageQueues table.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
     <None Remove="Scripts\Model\202310231329 Alter Bundles1.sql" />
