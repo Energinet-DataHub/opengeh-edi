@@ -148,7 +148,7 @@ namespace Energinet.DataHub.EDI.Api
 
                     services.AddArchivedMessagesModule(configuration);
                     services.AddIncomingMessagesModule(configuration);
-                    services.AddActorMessageQueueModule(configuration);
+                    services.AddOutgoingMessagesModule(configuration);
                     services.AddProcessModule(configuration);
                     services.AddMasterDataModule(configuration);
                 })

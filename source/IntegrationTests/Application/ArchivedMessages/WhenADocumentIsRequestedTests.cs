@@ -30,8 +30,8 @@ public class WhenADocumentIsRequestedTests : TestBase
     private readonly IArchivedMessagesClient _archivedMessagesClient;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-    public WhenADocumentIsRequestedTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public WhenADocumentIsRequestedTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _archivedMessagesClient = GetService<IArchivedMessagesClient>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();

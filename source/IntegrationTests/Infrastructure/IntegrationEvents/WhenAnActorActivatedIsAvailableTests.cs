@@ -31,8 +31,8 @@ public class WhenAnActorActivatedIsAvailableTests : TestBase
 {
     private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public WhenAnActorActivatedIsAvailableTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public WhenAnActorActivatedIsAvailableTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _connectionFactory = GetService<IDatabaseConnectionFactory>();
     }

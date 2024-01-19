@@ -32,8 +32,8 @@ public class WhenADequeueIsRequestedTests : TestBase
     private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
 
-    public WhenADequeueIsRequestedTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public WhenADequeueIsRequestedTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();

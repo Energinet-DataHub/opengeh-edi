@@ -12,22 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
-
-/// <summary>
-///  Repository for market documents
-/// </summary>
-public interface IMarketDocumentRepository
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1707", Justification = "To match naming in other domains")]
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1056", Justification = "Nuget expects a string")]
+public class BlobServiceClientConnectionOptions
 {
-    /// <summary>
-    /// Get document by bundle id
-    /// </summary>
-    Task<MarketDocument?> GetAsync(BundleId bundleId);
+    public string AZURE_STORAGE_ACCOUNT_CONNECTION_STRING { get; init; } = string.Empty;
 
-    /// <summary>
-    /// Add document to repository
-    /// </summary>
-    void Add(MarketDocument marketDocument);
+    public string AZURE_STORAGE_ACCOUNT_URL { get; init; } = string.Empty;
 }

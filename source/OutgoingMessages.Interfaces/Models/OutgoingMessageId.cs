@@ -12,22 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+using System;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-/// <summary>
-///  Repository for market documents
-/// </summary>
-public interface IMarketDocumentRepository
+public record OutgoingMessageId
 {
-    /// <summary>
-    /// Get document by bundle id
-    /// </summary>
-    Task<MarketDocument?> GetAsync(BundleId bundleId);
+    private OutgoingMessageId(Guid value)
+    {
+        Value = value;
+    }
 
-    /// <summary>
-    /// Add document to repository
-    /// </summary>
-    void Add(MarketDocument marketDocument);
+    public Guid Value { get; }
+
+    public static OutgoingMessageId New()
+    {
+        return new OutgoingMessageId(Guid.NewGuid());
+    }
+
+    public static OutgoingMessageId CreateFromExisting(Guid existingOutgoingMessageId)
+    {
+        return new OutgoingMessageId(existingOutgoingMessageId);
+    }
 }

@@ -39,8 +39,8 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     private readonly ProcessContext _processContext;
     private readonly RequestAggregatedMeasureDataValidator _requestAggregatedMeasureDataValidator;
 
-    public RequestAggregatedMeasureDataReceiverTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public RequestAggregatedMeasureDataReceiverTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _marketMessageParser = GetService<MarketMessageParser>();
         _processContext = GetService<ProcessContext>();

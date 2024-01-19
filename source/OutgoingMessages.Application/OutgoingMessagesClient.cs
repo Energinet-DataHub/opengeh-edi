@@ -15,6 +15,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -54,9 +55,9 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         return peekResult;
     }
 
-    public async Task EnqueueAsync(OutgoingMessageDto outgoingMessage)
+    public Task<OutgoingMessageId> EnqueueAsync(OutgoingMessageDto outgoingMessage)
     {
-        await _messageEnqueuer.EnqueueAsync(outgoingMessage).ConfigureAwait(false);
+        return _messageEnqueuer.EnqueueAsync(outgoingMessage);
     }
 
     public async Task EnqueueAndCommitAsync(OutgoingMessageDto outgoingMessage, CancellationToken cancellationToken)
