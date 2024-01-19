@@ -68,9 +68,10 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
         var point = new TimeSeriesPoint()
         {
             Quantity = quantity,
-            QuantityQuality = QuantityQuality.Incomplete,
             Time = new Timestamp() { Seconds = 1, },
         };
+        point.QuantityQualities.Add(QuantityQuality.Estimated);
+
         var series = new Series()
         {
             GridArea = GridAreaCode,
