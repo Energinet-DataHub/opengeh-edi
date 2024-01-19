@@ -12,22 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+using System.Diagnostics.CodeAnalysis;
+using Xunit;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
+namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 
-/// <summary>
-///  Repository for market documents
-/// </summary>
-public interface IMarketDocumentRepository
+[CollectionDefinition("IntegrationTest")]
+[SuppressMessage("Naming", "CA1711:Identifiers should not have incorrect suffix", Justification = "Is actually a collection")]
+public class IntegrationTestCollection : ICollectionFixture<IntegrationTestFixture>
 {
-    /// <summary>
-    /// Get document by bundle id
-    /// </summary>
-    Task<MarketDocument?> GetAsync(BundleId bundleId);
-
-    /// <summary>
-    /// Add document to repository
-    /// </summary>
-    void Add(MarketDocument marketDocument);
+    // This class has no code, and is never created. Its purpose is simply
+    // to be the place to apply [CollectionDefinition] and all the
+    // ICollectionFixture<> interfaces.
 }

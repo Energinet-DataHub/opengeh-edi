@@ -43,8 +43,8 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
     private readonly ServiceBusSenderSpy _senderSpy;
     private readonly IncomingMessagesContext _incomingMessageContext;
 
-    public WhenIncomingMessagesIsReceivedTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public WhenIncomingMessagesIsReceivedTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IServiceBusSenderFactory>();
         _senderSpy = new ServiceBusSenderSpy("Fake");

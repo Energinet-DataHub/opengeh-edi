@@ -37,8 +37,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.ActorCertificate;
 [IntegrationTest]
 public class WhenActorCertificateCredentialsRemovedEventIsReceived : TestBase
 {
-    public WhenActorCertificateCredentialsRemovedEventIsReceived(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public WhenActorCertificateCredentialsRemovedEventIsReceived(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
     }
 

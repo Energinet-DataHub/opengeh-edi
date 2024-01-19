@@ -32,8 +32,8 @@ public class CreateActorsTests : TestBase
     private readonly IMasterDataClient _masterDataClient;
     private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public CreateActorsTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public CreateActorsTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _masterDataClient = GetService<IMasterDataClient>();
         _connectionFactory = GetService<IDatabaseConnectionFactory>();

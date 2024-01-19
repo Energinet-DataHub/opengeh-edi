@@ -40,12 +40,9 @@ public class OutgoingMessageDto
         SenderId = senderId;
         SenderRole = senderRole;
         MessageRecord = messageRecord;
-        Id = Guid.NewGuid();
     }
 
     public DocumentType DocumentType { get; set; }
-
-    public Guid Id { get; }
 
     public ActorNumber ReceiverId { get; }
 

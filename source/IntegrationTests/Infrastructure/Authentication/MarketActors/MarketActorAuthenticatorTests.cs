@@ -34,8 +34,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
         private readonly IMarketActorAuthenticator _authenticator;
         private readonly AuthenticatedActor _authenticatedActor;
 
-        public MarketActorAuthenticatorTests(DatabaseFixture databaseFixture)
-            : base(databaseFixture)
+        public MarketActorAuthenticatorTests(IntegrationTestFixture integrationTestFixture)
+            : base(integrationTestFixture)
         {
             _authenticator = GetService<IMarketActorAuthenticator>();
             _authenticatedActor = GetService<AuthenticatedActor>();
