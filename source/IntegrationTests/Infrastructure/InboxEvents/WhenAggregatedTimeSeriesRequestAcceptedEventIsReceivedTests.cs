@@ -70,7 +70,7 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
             Quantity = quantity,
             Time = new Timestamp() { Seconds = 1, },
         };
-        point.QuantityQuality.Add(QuantityQuality.Estimated);
+        point.QuantityQualities.Add(QuantityQuality.Estimated);
 
         var series = new Series()
         {

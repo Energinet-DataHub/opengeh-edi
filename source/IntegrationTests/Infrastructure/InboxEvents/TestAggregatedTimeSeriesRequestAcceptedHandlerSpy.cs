@@ -124,11 +124,11 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
                 return EquivalencyResult.ContinueWithNext;
             }
 
-            tsp.QuantityQuality.Should()
+            tsp.QuantityQualities.Should()
                 .ContainSingle("this is just a migration of an old test, where we only had one quality");
 
             p.SampleTime.Should().Be(tsp.Time.ToString());
-            p.QuantityQuality.Should().Be(MapQuality(tsp.QuantityQuality.Single()));
+            p.QuantityQuality.Should().Be(MapQuality(tsp.QuantityQualities.Single()));
             p.Quantity.Should().Be(Parse(tsp.Quantity));
 
             return EquivalencyResult.AssertionCompleted;

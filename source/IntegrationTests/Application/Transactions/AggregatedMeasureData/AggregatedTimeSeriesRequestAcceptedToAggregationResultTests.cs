@@ -333,7 +333,7 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
         {
             Quantity = new DecimalValue { Units = 1, Nanos = 1 }, Time = new Timestamp { Seconds = 1, Nanos = 1 },
         };
-        timeSeriesPoint.QuantityQuality.AddRange(quantityQuality);
+        timeSeriesPoint.QuantityQualities.AddRange(quantityQuality);
 
         var series = new Series
         {

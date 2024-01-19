@@ -92,7 +92,7 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
             points.Add(new Point(
                 pointPosition,
                 Parse(point.Quantity),
-                MapQuality(point.QuantityQuality),
+                MapQuality(point.QuantityQualities),
                 point.Time.ToString()));
 
             pointPosition++;
