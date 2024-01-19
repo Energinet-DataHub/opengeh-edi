@@ -1,27 +1,21 @@
 ﻿{
-  "EBIX_CERTIFICATE_PASSWORD": "<certificate password for performing an ebix peek in api management>",
-  "AZURE_B2C_TENANT_URL": "<optional: azure b2c tenant (ROPC) url>",
-  "AZURE_ENTRA_FRONTEND_APP_ID": "<optional: frontend app id in b2c tenant>",
-  "AZURE_ENTRA_BACKEND_BFF_SCOPE": "<optional: backend bff scope in b2c tenant>",
-  "B2C_USERNAME": "<username for user in b2c tenant>",
-  "B2C_PASSWORD": "<password for user in b2c tenant>",
-  
-  "mssql-data-url": "<mssql server url, for use in sql connection string (Server=...)>",
-  "mssql-edi-database-name": "<mssql database name, for use in sql connection string (Database=...)>",
-  
-  "sb-domain-relay-manage-connection-string": "<service bus connection string (with 'send' rights)>",
-  "sbt-shres-integrationevent-received-name": "<integrationevent-received service bus topic name>",
-  
-  "apim-gateway-url": "<api management url>",
-  
-  "func-edi-api-base-url": "<edi b2b api function base url>" ,
-  
-  "b2c-tenant-id": "<azure b2c tenat id>",
-  
-  "backend-b2b-app-id": "<azure b2c tenant id>",
-  
   "METERED_DATA_RESPONSIBLE_CLIENT_ID": "<client id to generate token for metered data responsible>",
   "METERED_DATA_RESPONSIBLE_CLIENT_SECRET": "<client secret to generate token for metered data responsible>",
   "ENERGY_SUPPLIER_CLIENT_ID": "<client id to generate token for energy supplier>",
-  "ENERGY_SUPPLIER_CLIENT_SECRET": "<client secret to generate token for energy supplier>"
+  "ENERGY_SUPPLIER_CLIENT_SECRET": "<client secret to generate token for energy supplier>",
+
+  "SHARED_KEYVAULT_NAME": "<SHARED_KEYVAULT_NAME>",
+  "EBIX_CERTIFICATE_PASSWORD": "<certificate password for performing an ebix peek in api management>",
+
+  "AZURE_B2C_TENANT_URL": "<optional: azure b2c tenant (ROPC) url>",
+  "AZURE_ENTRA_FRONTEND_APP_ID": "<optional: frontend app id in b2c tenant>",
+  "AZURE_ENTRA_BACKEND_BFF_SCOPE": "<optional: backend bff scope in b2c tenant>",
+
+  "METERED_DATA_RESPONSIBLE_CLIENT_ID": "<client id to generate token for metered data responsible>",
+  "METERED_DATA_RESPONSIBLE_CLIENT_SECRET": "<client secret to generate token for metered data responsible>",
+  "ENERGY_SUPPLIER_CLIENT_ID": "<client id to generate token for energy supplier>",
+  "ENERGY_SUPPLIER_CLIENT_SECRET": "<client secret to generate token for energy supplier>",
+  
+  "B2C_USERNAME": "<username for user in b2c tenant>",
+  "B2C_PASSWORD": "<password for user in b2c tenant>"
 }
