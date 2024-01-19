@@ -35,7 +35,7 @@ public class RejectedAggregationResultMessage : OutgoingMessageDto
             businessReason,
             receiverRole,
             DataHubDetails.DataHubActorNumber,
-            MarketRole.MeteringDataAdministrator,
+            MarketRole.MeteredDataAdministrator,
             new Serializer().Serialize(series))
     {
         Series = series;

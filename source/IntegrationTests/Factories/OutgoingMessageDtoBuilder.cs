@@ -30,7 +30,7 @@ public class OutgoingMessageDtoBuilder
     private static readonly BusinessReason _businessReason = BusinessReason.BalanceFixing;
     private static readonly IReadOnlyList<Point> _points = new List<Point>();
     private static ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
-    private static MarketRole _receiverRole = MarketRole.MeteringDataAdministrator;
+    private static MarketRole _receiverRole = MarketRole.MeteredDataAdministrator;
 
 #pragma warning disable CA1822
     public OutgoingMessageDto Build()

@@ -111,8 +111,11 @@ public static class CimCode
             return "DDM";
         if (marketRole == MarketRole.MeteredDataResponsible)
             return "MDR";
-        if (marketRole == MarketRole.MeteringDataAdministrator)
+        if (marketRole == MarketRole.MeteredDataAdministrator)
+        {
             return "DGL";
+        }
+
         if (marketRole == MarketRole.MeteringPointAdministrator)
             return "DDZ";
         if (marketRole == MarketRole.BalanceResponsibleParty)

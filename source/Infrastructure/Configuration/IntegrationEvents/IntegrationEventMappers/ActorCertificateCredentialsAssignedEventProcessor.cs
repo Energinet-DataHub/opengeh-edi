@@ -60,18 +60,40 @@ internal sealed class ActorCertificateCredentialsAssignedEventProcessor : IInteg
             EicFunction.MeteringPointAdministrator => MarketRole.MeteringPointAdministrator,
             EicFunction.EnergySupplier => MarketRole.EnergySupplier,
             EicFunction.GridAccessProvider => MarketRole.GridOperator,
-            EicFunction.MeteredDataAdministrator => MarketRole.MeteringDataAdministrator,
+            EicFunction.MeteredDataAdministrator => MarketRole.MeteredDataAdministrator,
             EicFunction.MeteredDataResponsible => MarketRole.MeteredDataResponsible,
             EicFunction.BalanceResponsibleParty => MarketRole.BalanceResponsibleParty,
-            // TODO: MarketRole.CalculationResponsibleRole and MarketRole.MasterDataResponsibleRole cannot be created, since they are duplicates
-            _ => throw new ArgumentOutOfRangeException(nameof(actorRole), actorRole, "Unknown EicFunction market role value"),
+            EicFunction.ImbalanceSettlementResponsible => MarketRole.ImbalanceSettlementResponsible,
+            EicFunction.SystemOperator => MarketRole.SystemOperator,
+            EicFunction.DanishEnergyAgency => MarketRole.DanishEnergyAgency,
+            EicFunction.Unspecified => throw new ArgumentOutOfRangeException(
+                nameof(actorRole),
+                actorRole,
+                "Unsupported EicFunction actor role"),
+            EicFunction.BillingAgent => throw new ArgumentOutOfRangeException(
+                nameof(actorRole),
+                actorRole,
+                "Unsupported EicFunction actor role"),
+            EicFunction.DatahubAdministrator => throw new ArgumentOutOfRangeException(
+                nameof(actorRole),
+                actorRole,
+                "Unsupported EicFunction actor role"),
+            EicFunction.IndependentAggregator => throw new ArgumentOutOfRangeException(
+                nameof(actorRole),
+                actorRole,
+                "Unsupported EicFunction actor role"),
+            EicFunction.SerialEnergyTrader => throw new ArgumentOutOfRangeException(
+                nameof(actorRole),
+                actorRole,
+                "Unsupported EicFunction actor role"),
+            EicFunction.MeterOperator => throw new ArgumentOutOfRangeException(
+                nameof(actorRole),
+                actorRole,
+                "Unsupported EicFunction actor role"),
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(actorRole),
+                actorRole,
+                "Unknown EicFunction actor role value"),
         };
-
-        // EicFunction.BillingAgent = ??
-        // EicFunction.SystemOperator = ??
-        // EicFunction.DanishEnergyAgency = ??
-        // EicFunction.DatahubAdministrator = ??
-        // EicFunction.IndependentAggregator = ?? DEA?
-        // EicFunction.SerialEnergyTrader = ??
     }
 }
