@@ -146,6 +146,22 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             };
         }
 
+        public static Dictionary<string, string> InvalidReceiverId()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:receiver_MarketParticipant.mRID", "5790001330553" },
+            };
+        }
+
+        public static Dictionary<string, string> InvalidReceiverRole()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:receiver_MarketParticipant.marketRole.type", "DDZ" },
+            };
+        }
+
         /*
 
         public Dictionary<string, string> SchemaVersionIsInvalid()
@@ -154,30 +170,6 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             return new Dictionary<string, string>
             {
                 { "cim:mRID", "invalidId" },
-            };
-        }
-
-        public Dictionary<string, string> InvalidReceiverId()
-        {
-            return new Dictionary<string, string>
-            {
-                { "cim:receiver_MarketParticipant.mRID", "5790001330553" },
-            };
-        }
-
-        public Dictionary<string, string> InvalidReceiverRole()
-        {
-            return new Dictionary<string, string>
-            {
-                { "cim:receiver_MarketParticipant.marketRole.type", "DDZ" },
-            };
-        }
-
-        public Dictionary<string, string> InvalidLengthOfMessageId()
-        {
-            return new Dictionary<string, string>
-            {
-                { "cim:mRID", "lasjfejhrtajhfksagjebrtafnnvsgietjafehtaafaertzrshgsyr" },
             };
         }
         */
