@@ -26,8 +26,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.ArchivedMessages;
 
 [Collection("Acceptance test collection")]
 [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Testing")]
-[SuppressMessage("ReSharper", "HeuristicUnreachableCode", Justification = "Testing")]
-[SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1137:Elements should have the same indentation", Justification = "Testing")]
+[SuppressMessage("ReSharper", "HeuristicUnreachableCode", Justification = "Unreachable code is disabled for local executions")]
 public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 {
     private readonly ArchivedMessageDsl _archivedMessage;

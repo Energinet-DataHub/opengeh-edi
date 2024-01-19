@@ -91,7 +91,6 @@ internal sealed class EbixDriver : IDisposable
 
         var stopWatch = Stopwatch.StartNew();
         var timeBeforeTimeout = new TimeSpan(0, 10, 0);
-        Exception? lastException = null;
         do
         {
             var peekResult = await _ebixServiceClient.peekMessageAsync().ConfigureAwait(false);
@@ -102,7 +101,7 @@ internal sealed class EbixDriver : IDisposable
         }
         while (stopWatch.ElapsedMilliseconds < timeBeforeTimeout.TotalMilliseconds);
 
-        throw new TimeoutException("Unable to retrieve peek result within time limit", lastException);
+        throw new TimeoutException("Unable to retrieve peek result within time limit");
     }
 
     public async Task DequeueMessageAsync(string messageId)

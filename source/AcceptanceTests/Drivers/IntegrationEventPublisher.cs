@@ -23,7 +23,12 @@ internal sealed class IntegrationEventPublisher : IAsyncDisposable
 
     internal IntegrationEventPublisher(string connectionString, string topicName)
     {
-        _client = new ServiceBusClient(connectionString);
+        _client = new ServiceBusClient(
+            connectionString,
+            new ServiceBusClientOptions()
+            {
+                TransportType = ServiceBusTransportType.AmqpWebSockets, // Firewall is not open for AMQP and Therefore, needs to go over WebSockets.
+            });
         _sender = _client.CreateSender(topicName);
     }
 
