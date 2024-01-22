@@ -38,12 +38,10 @@ public class AcceptanceTestFixture : IAsyncLifetime
             .AddJsonFile("acceptancetest.local.settings.json", true)
             .AddEnvironmentVariables();
 
-        #if !DEBUG
         var jsonConfiguration = configurationBuilder.Build();
         var keyVaultName = jsonConfiguration.GetValue<string>("SHARED_KEYVAULT_NAME");
 
         configurationBuilder = configurationBuilder.AddAuthenticatedAzureKeyVault($"https://{keyVaultName}.vault.azure.net/");
-        #endif
 
         var root = configurationBuilder.Build();
 
