@@ -12,15 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 using Xunit.Categories;
+#pragma warning disable CS0162 // Unreachable code detected
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
+[SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 [IntegrationTest]
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
+[SuppressMessage("ReSharper", "HeuristicUnreachableCode", Justification = "Unreachable code is disabled for local executions")]
 public sealed class WhenNewB2BActorIsCreatedTests
 {
     private readonly ActorDsl _actorDsl;
@@ -38,6 +41,9 @@ public sealed class WhenNewB2BActorIsCreatedTests
     [Fact]
     public async Task Actor_is_created()
     {
+#if DEBUG
+        return; // skipped locally, b2c api is not public available
+#endif
         var b2CId = Guid.NewGuid().ToString();
         await _actorDsl.PublishResultForAsync(actorNumber: "8880000610888", b2CId: b2CId);
 
