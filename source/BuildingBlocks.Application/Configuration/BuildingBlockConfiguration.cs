@@ -22,7 +22,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using ServiceBusClientOptions = BuildingBlocks.Application.Configuration.Options.ServiceBusClientOptions;
+using EdiServiceBusClientOptions = BuildingBlocks.Application.Configuration.Options.ServiceBusClientOptions;
 
 namespace BuildingBlocks.Application.Configuration;
 
@@ -31,7 +31,7 @@ public static class BuildingBlockConfiguration
     public static void AddBuildingBlocks(this IServiceCollection services, IConfiguration configuration)
     {
         services
-            .AddOptions<ServiceBusClientOptions>()
+            .AddOptions<EdiServiceBusClientOptions>()
             .Bind(configuration)
             .Validate(o => !string.IsNullOrEmpty(o.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND), "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND must be set");
         services
@@ -39,7 +39,12 @@ public static class BuildingBlockConfiguration
             .Bind(configuration)
             .Validate(o => !string.IsNullOrEmpty(o.DB_CONNECTION_STRING), "DB_CONNECTION_STRING must be set");
 
-        services.AddSingleton<ServiceBusClient>(provider => new ServiceBusClient(provider.GetRequiredService<IOptions<ServiceBusClientOptions>>().Value.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND));
+        services.AddSingleton<ServiceBusClient>(provider => new ServiceBusClient(
+            provider.GetRequiredService<IOptions<EdiServiceBusClientOptions>>().Value.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND,
+            new ServiceBusClientOptions()
+            {
+                TransportType = ServiceBusTransportType.AmqpWebSockets,
+            }));
 
         services.AddSingleton<IDatabaseConnectionFactory, SqlDatabaseConnectionFactory>();
         services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactory>();
