@@ -161,16 +161,4 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
                 { "cim:receiver_MarketParticipant.marketRole.type", "DDZ" },
             };
         }
-
-        /*
-
-        public Dictionary<string, string> SchemaVersionIsInvalid()
-        {
-            //TODO: add dynamic handling of xml header creation
-            return new Dictionary<string, string>
-            {
-                { "cim:mRID", "invalidId" },
-            };
-        }
-        */
 }

@@ -13,15 +13,35 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
+using Energinet.DataHub.EDI.AcceptanceTests.Factories;
+using Energinet.DataHub.EDI.AcceptanceTests.TestData;
+using Energinet.DataHub.EDI.AcceptanceTests.Tests.Asserters;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.B2BErrors;
 
+[SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Test code should not configure await.")]
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
 public class WhenSchemaIsNotValidTests : BaseTestClass
 {
     public WhenSchemaIsNotValidTests(ITestOutputHelper output, AcceptanceTestFixture fixture)
         : base(output, fixture)
     {
+    }
+
+    [Fact]
+    public async Task Invalid_xml_namespace_produces_schema_validation_error()
+    {
+        var payload =
+            RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload("urn:ediel.org:measure:requestaggregatedmeasuredata:123:1");
+
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
+
+        Output.WriteLine(response);
+
+        await ErrorAsserter.AssertCorrectErrorIsReturnedAsync(
+            "00301",
+            "Schema version 123.1 for business process type requestaggregatedmeasuredata does not exist",
+            response);
     }
 }
