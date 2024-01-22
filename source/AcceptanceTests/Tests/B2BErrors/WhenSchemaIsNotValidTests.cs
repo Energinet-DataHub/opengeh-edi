@@ -33,7 +33,7 @@ public class WhenSchemaIsNotValidTests : BaseTestClass
     public async Task Invalid_xml_namespace_produces_schema_validation_error()
     {
         var payload =
-            RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload("urn:ediel.org:measure:requestaggregatedmeasuredata:123:1 urn-ediel-org-measure-requestaggregatedmeasuredata-0-1.xsd");
+            RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload("urn:ediel.org:measure:requestaggregatedmeasuredata:123:1");
 
         var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 

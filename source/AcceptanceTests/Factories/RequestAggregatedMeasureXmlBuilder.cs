@@ -30,12 +30,12 @@ internal sealed class RequestAggregatedMeasureXmlBuilder
         return BuildEnergySupplierXmlPayload(testData, string.Empty);
     }
 
-    public static XmlDocument BuildEnergySupplierXmlPayload(string xmlNamespaceAttribute)
+    public static XmlDocument BuildEnergySupplierXmlPayload(string cimXmlNamespaceUri)
     {
-        return BuildEnergySupplierXmlPayload(new Dictionary<string, string>(), xmlNamespaceAttribute);
+        return BuildEnergySupplierXmlPayload(new Dictionary<string, string>(), cimXmlNamespaceUri);
     }
 
-    public static XmlDocument BuildEnergySupplierXmlPayload(Dictionary<string, string> testData, string xmlNamespaceAttribute)
+    public static XmlDocument BuildEnergySupplierXmlPayload(Dictionary<string, string> testData, string cimXmlNamespaceUri)
     {
         var defaultData = SynchronousErrorTestData.DefaultEnergySupplierTestData();
         var defaultSeriesData = SynchronousErrorTestData.DefaultEnergySupplierSeriesTestData();
@@ -46,9 +46,12 @@ internal sealed class RequestAggregatedMeasureXmlBuilder
         string xmlNamespace = "urn:ediel.org:measure:requestaggregatedmeasuredata:0:1";
 
         // BUILD XML HEADER
-        XmlElement meteredDataRequest = xmlPayload.CreateElement("cim", "RequestAggregatedMeasureData_MarketDocument", "urn:ediel.org:measure:requestaggregatedmeasuredata:0:1");
+        var cimNamespaceUri = cimXmlNamespaceUri.IsNullOrEmpty()
+            ? "urn:ediel.org:measure:requestaggregatedmeasuredata:0:1"
+            : cimXmlNamespaceUri;
+        XmlElement meteredDataRequest = xmlPayload.CreateElement("cim", "RequestAggregatedMeasureData_MarketDocument", cimXmlNamespaceUri);
         var secondAttribute = xmlPayload.CreateAttribute("xsi", "schemaLocation", "urn:ediel.org:measure:requestaggregatedmeasuredata:0:1 urn-ediel-org-measure-requestaggregatedmeasuredata-0-1.xsd");
-        secondAttribute.Value = xmlNamespaceAttribute.IsNullOrEmpty() ? "urn:ediel.org:measure:requestaggregatedmeasuredata:0:1 urn-ediel-org-measure-requestaggregatedmeasuredata-0-1.xsd" : xmlNamespaceAttribute;
+        secondAttribute.Value = "urn:ediel.org:measure:requestaggregatedmeasuredata:0:1 urn-ediel-org-measure-requestaggregatedmeasuredata-0-1.xsd";
         meteredDataRequest.Attributes.Append(secondAttribute);
         meteredDataRequest.SetAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
 
