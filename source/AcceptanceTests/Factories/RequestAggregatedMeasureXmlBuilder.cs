@@ -49,7 +49,7 @@ internal sealed class RequestAggregatedMeasureXmlBuilder
         var cimNamespaceUri = cimXmlNamespaceUri.IsNullOrEmpty()
             ? "urn:ediel.org:measure:requestaggregatedmeasuredata:0:1"
             : cimXmlNamespaceUri;
-        XmlElement meteredDataRequest = xmlPayload.CreateElement("cim", "RequestAggregatedMeasureData_MarketDocument", cimXmlNamespaceUri);
+        XmlElement meteredDataRequest = xmlPayload.CreateElement("cim", "RequestAggregatedMeasureData_MarketDocument", cimNamespaceUri);
         var secondAttribute = xmlPayload.CreateAttribute("xsi", "schemaLocation", "urn:ediel.org:measure:requestaggregatedmeasuredata:0:1 urn-ediel-org-measure-requestaggregatedmeasuredata-0-1.xsd");
         secondAttribute.Value = "urn:ediel.org:measure:requestaggregatedmeasuredata:0:1 urn-ediel-org-measure-requestaggregatedmeasuredata-0-1.xsd";
         meteredDataRequest.Attributes.Append(secondAttribute);
