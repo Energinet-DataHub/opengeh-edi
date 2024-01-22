@@ -14,6 +14,7 @@
 
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.TestData;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Factories;
 
@@ -21,10 +22,20 @@ internal sealed class RequestAggregatedMeasureXmlBuilder
 {
     public static XmlDocument BuildEnergySupplierXmlPayload()
     {
-        return BuildEnergySupplierXmlPayload(new Dictionary<string, string>());
+        return BuildEnergySupplierXmlPayload(new Dictionary<string, string>(), string.Empty);
     }
 
     public static XmlDocument BuildEnergySupplierXmlPayload(Dictionary<string, string> testData)
+    {
+        return BuildEnergySupplierXmlPayload(testData, string.Empty);
+    }
+
+    public static XmlDocument BuildEnergySupplierXmlPayload(string xmlNamespaceAttribute)
+    {
+        return BuildEnergySupplierXmlPayload(new Dictionary<string, string>(), xmlNamespaceAttribute);
+    }
+
+    public static XmlDocument BuildEnergySupplierXmlPayload(Dictionary<string, string> testData, string xmlNamespaceAttribute)
     {
         var defaultData = SynchronousErrorTestData.DefaultEnergySupplierTestData();
         var defaultSeriesData = SynchronousErrorTestData.DefaultEnergySupplierSeriesTestData();
@@ -37,7 +48,7 @@ internal sealed class RequestAggregatedMeasureXmlBuilder
         // BUILD XML HEADER
         XmlElement meteredDataRequest = xmlPayload.CreateElement("cim", "RequestAggregatedMeasureData_MarketDocument", "urn:ediel.org:measure:requestaggregatedmeasuredata:0:1");
         var secondAttribute = xmlPayload.CreateAttribute("xsi", "schemaLocation", "urn:ediel.org:measure:requestaggregatedmeasuredata:0:1 urn-ediel-org-measure-requestaggregatedmeasuredata-0-1.xsd");
-        secondAttribute.Value = "urn:ediel.org:measure:requestaggregatedmeasuredata:0:1 urn-ediel-org-measure-requestaggregatedmeasuredata-0-1.xsd";
+        secondAttribute.Value = xmlNamespaceAttribute.IsNullOrEmpty() ? "urn:ediel.org:measure:requestaggregatedmeasuredata:0:1 urn-ediel-org-measure-requestaggregatedmeasuredata-0-1.xsd" : xmlNamespaceAttribute;
         meteredDataRequest.Attributes.Append(secondAttribute);
         meteredDataRequest.SetAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
 
