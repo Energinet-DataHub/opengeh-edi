@@ -36,8 +36,8 @@ public class WhenAnInboxEventIsReceivedTests : TestBase
     private readonly Guid _referenceId = Guid.NewGuid();
     private InboxEventReceiver _receiver;
 
-    public WhenAnInboxEventIsReceivedTests(DatabaseFixture databaseFixture)
-     : base(databaseFixture)
+    public WhenAnInboxEventIsReceivedTests(IntegrationTestFixture integrationTestFixture)
+     : base(integrationTestFixture)
     {
         _receiver = new InboxEventReceiver(
             GetService<B2BContext>(),
@@ -98,7 +98,7 @@ public class WhenAnInboxEventIsReceivedTests : TestBase
 
     private async Task EventIsRegisteredWithInbox(string eventId, int expectedNumberOfRegisteredEvents = 1)
     {
-        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var numberOfRegisteredEvents = connection.ExecuteScalar<int>($"SELECT COUNT(*) FROM dbo.ReceivedInboxEvents WHERE Id = @EventId", new { EventId = eventId, });
         Assert.Equal(expectedNumberOfRegisteredEvents, numberOfRegisteredEvents);
     }

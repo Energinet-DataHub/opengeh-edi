@@ -35,8 +35,8 @@ public class InternalCommandProcessorTests : TestBase
     private readonly ICommandScheduler _scheduler;
     private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public InternalCommandProcessorTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public InternalCommandProcessorTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _processor = GetService<InternalCommandProcessor>();
         _scheduler = GetService<ICommandScheduler>();
@@ -105,6 +105,12 @@ public class InternalCommandProcessorTests : TestBase
         AssertSingleActorMessageQueue();
         AssertOutgoingMessage(2);
         AssertIsProcessedSuccessful(command);
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        Connection.Dispose();
     }
 
     private void AssertSingleActorMessageQueue()

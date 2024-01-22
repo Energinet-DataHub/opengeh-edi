@@ -64,14 +64,15 @@ namespace Energinet.DataHub.EDI.IntegrationTests
         private ServiceCollection? _services;
         private bool _disposed;
 
-        protected TestBase(DatabaseFixture databaseFixture)
+        protected TestBase(IntegrationTestFixture integrationTestFixture)
         {
-            ArgumentNullException.ThrowIfNull(databaseFixture);
-            databaseFixture.CleanupDatabase();
+            ArgumentNullException.ThrowIfNull(integrationTestFixture);
+            integrationTestFixture.CleanupDatabase();
+            integrationTestFixture.CleanupFileStorage();
             _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
             TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
             InboxEventNotificationHandler = new TestNotificationHandlerSpy();
-            BuildServices();
+            BuildServices(integrationTestFixture.AzuriteManager.BlobStorageConnectionString);
             _b2BContext = GetService<B2BContext>();
             _processContext = GetService<ProcessContext>();
             _incomingMessagesContext = GetService<IncomingMessagesContext>();
@@ -158,12 +159,13 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(datetimeProvider.Now()));
         }
 
-        private void BuildServices()
+        private void BuildServices(string fileStorageConnectionString)
         {
             Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
-            Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", DatabaseFixture.ConnectionString);
+            Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", IntegrationTestFixture.DatabaseConnectionString);
             Environment.SetEnvironmentVariable("WHOLESALE_INBOX_MESSAGE_QUEUE_NAME", "Fake");
             Environment.SetEnvironmentVariable("INCOMING_MESSAGES_QUEUE_NAME", "Fake");
+            Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", fileStorageConnectionString);
 
             var config = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
@@ -199,7 +201,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 })
                 .AddBearerAuthentication(JwtTokenParserTests.DisableAllTokenValidations);
 
-            _services.AddActorMessageQueueModule(config);
+            _services.AddOutgoingMessagesModule(config);
             _services.AddProcessModule(config);
             _services.AddArchivedMessagesModule(config);
             _services.AddIncomingMessagesModule(config);

@@ -92,7 +92,7 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
             points.Add(new Point(
                 pointPosition,
                 Parse(point.Quantity),
-                MapQuality(point.QuantityQuality),
+                MapQuality(point.QuantityQualities),
                 point.Time.ToString()));
 
             pointPosition++;
@@ -122,18 +122,9 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         };
     }
 
-    private static CalculatedQuantityQuality MapQuality(QuantityQuality quality)
+    private static CalculatedQuantityQuality MapQuality(ICollection<QuantityQuality> quantityQualities)
     {
-        return quality switch
-        {
-            QuantityQuality.Incomplete => CalculatedQuantityQuality.Incomplete,
-            QuantityQuality.Measured => CalculatedQuantityQuality.Measured,
-            QuantityQuality.Missing => CalculatedQuantityQuality.NotAvailable,
-            QuantityQuality.Estimated => CalculatedQuantityQuality.Estimated,
-            QuantityQuality.Calculated => CalculatedQuantityQuality.Calculated,
-            QuantityQuality.Unspecified => throw new InvalidOperationException("Quality is not specified"),
-            _ => throw new InvalidOperationException("Unknown quality type"),
-        };
+        return CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(quantityQualities);
     }
 
     private static decimal? Parse(DecimalValue? input)

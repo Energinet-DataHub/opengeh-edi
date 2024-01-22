@@ -122,6 +122,46 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             };
         }
 
+        public static Dictionary<string, string> TypeIsNotSupported()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:type", "E73" },
+            };
+        }
+
+        public static Dictionary<string, string> ProcessTypeIsNotSupported()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:process.processType", "D09" },
+            };
+        }
+
+        public static Dictionary<string, string> InvalidBusinessType()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:businessSector.type", "27" },
+            };
+        }
+
+        public static Dictionary<string, string> InvalidReceiverId()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:receiver_MarketParticipant.mRID", "5790001330553" },
+            };
+        }
+
+        public static Dictionary<string, string> InvalidReceiverRole()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:receiver_MarketParticipant.marketRole.type", "DDZ" },
+            };
+        }
+
         /*
 
         public Dictionary<string, string> SchemaVersionIsInvalid()
@@ -130,54 +170,6 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             return new Dictionary<string, string>
             {
                 { "cim:mRID", "invalidId" },
-            };
-        }
-
-        public Dictionary<string, string> InvalidReceiverId()
-        {
-            return new Dictionary<string, string>
-            {
-                { "cim:receiver_MarketParticipant.mRID", "5790001330553" },
-            };
-        }
-
-        public Dictionary<string, string> InvalidReceiverRole()
-        {
-            return new Dictionary<string, string>
-            {
-                { "cim:receiver_MarketParticipant.marketRole.type", "DDZ" },
-            };
-        }
-
-        public Dictionary<string, string> InvalidLengthOfMessageId()
-        {
-            return new Dictionary<string, string>
-            {
-                { "cim:mRID", "lasjfejhrtajhfksagjebrtafnnvsgietjafehtaafaertzrshgsyr" },
-            };
-        }
-
-        public Dictionary<string, string> TypeIsNotSupported()
-        {
-            return new Dictionary<string, string>
-            {
-                { "cim:type", "E73" },
-            };
-        }
-
-        public Dictionary<string, string> ProcessTypeIsNotSupported()
-        {
-            return new Dictionary<string, string>
-            {
-                { "cim:process.processType", "D09" },
-            };
-        }
-
-        public Dictionary<string, string> InvalidBusinessType()
-        {
-            return new Dictionary<string, string>
-            {
-                { "cim:businessSector.type", "27" },
             };
         }
         */

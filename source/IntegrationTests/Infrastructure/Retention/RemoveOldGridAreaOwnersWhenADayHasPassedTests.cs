@@ -34,8 +34,8 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
 {
     private readonly IMasterDataClient _masterDataClient;
 
-    public RemoveOldGridAreaOwnersWhenADayHasPassedTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public RemoveOldGridAreaOwnersWhenADayHasPassedTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _masterDataClient = GetService<IMasterDataClient>();
     }

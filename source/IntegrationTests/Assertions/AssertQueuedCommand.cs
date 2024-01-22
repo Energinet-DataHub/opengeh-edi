@@ -44,7 +44,8 @@ public class AssertQueuedCommand
         var commandMetadata = mapper.GetByType(typeof(TCommandType));
         var sql =
             $"SELECT Data FROM [dbo].[QueuedInternalCommands] WHERE Type = @CommandType";
-        var commandPayloads = connectionFactory.GetConnectionAndOpen()
+        using var dbConnection = connectionFactory.GetConnectionAndOpen();
+        var commandPayloads = dbConnection
             .Query<string>(
             sql,
             new { CommandType = commandMetadata.CommandName, })

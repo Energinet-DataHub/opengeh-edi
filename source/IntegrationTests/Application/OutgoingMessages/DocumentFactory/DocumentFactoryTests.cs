@@ -26,8 +26,8 @@ public class DocumentFactoryTests
 {
     private readonly IEnumerable<IDocumentWriter> _documentWriters;
 
-    public DocumentFactoryTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public DocumentFactoryTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _documentWriters = GetService<IEnumerable<IDocumentWriter>>();
     }
