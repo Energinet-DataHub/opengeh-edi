@@ -64,7 +64,7 @@ public static class AggregationResultMessageFactory
     {
         return AggregationResultMessage.Create(
             ActorNumber.Create(result.GridAreaDetails!.OperatorNumber),
-            MarketRole.MeteredDataResponsible,
+            ActorRole.MeteredDataResponsible,
             processId.Id,
             result.GridAreaDetails.GridAreaCode,
             result.MeteringPointType,
@@ -85,7 +85,7 @@ public static class AggregationResultMessageFactory
     {
         return AggregationResultMessage.Create(
             ActorNumber.Create(result.ActorGrouping!.EnergySupplierNumber!),
-            MarketRole.EnergySupplier,
+            ActorRole.EnergySupplier,
             processId.Id,
             result.GridAreaDetails.GridAreaCode,
             result.MeteringPointType,
@@ -107,7 +107,7 @@ public static class AggregationResultMessageFactory
         return AggregationResultMessage.Create(
             ActorNumber.Create(
                 result.ActorGrouping!.BalanceResponsibleNumber!),
-            MarketRole.BalanceResponsibleParty,
+            ActorRole.BalanceResponsibleParty,
             processId.Id,
             result.GridAreaDetails.GridAreaCode,
             result.MeteringPointType,

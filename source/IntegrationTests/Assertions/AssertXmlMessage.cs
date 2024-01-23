@@ -110,9 +110,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Assertions
             return this;
         }
 
-        internal AssertXmlMessage HasReceiverRole(MarketRole marketRole)
+        internal AssertXmlMessage HasReceiverRole(ActorRole actorRole)
         {
-            Assert.Equal(marketRole.Name, GetMessageHeaderValue("receiver_MarketParticipant.marketRole.type"));
+            Assert.Equal(actorRole.Name, GetMessageHeaderValue("receiver_MarketParticipant.marketRole.type"));
             return this;
         }
 

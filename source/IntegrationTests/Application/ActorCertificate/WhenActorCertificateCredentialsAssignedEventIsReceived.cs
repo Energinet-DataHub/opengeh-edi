@@ -63,7 +63,7 @@ public class WhenActorCertificateCredentialsAssignedEventIsReceived : TestBase
         Assert.Single(actorCertificates);
         Assert.Multiple(
             () => Assert.Equal("1234567891234567", actorCertificates.Single().ActorNumber),
-            () => Assert.Equal(MarketRole.EnergySupplier.Code, actorCertificates.Single().ActorRole),
+            () => Assert.Equal(ActorRole.EnergySupplier.Code, actorCertificates.Single().ActorRole),
             () => Assert.Equal("12345", actorCertificates.Single().Thumbprint),
             () => Assert.Equal(Instant.FromUtc(2023, 12, 1, 0, 0), actorCertificates.Single().ValidFrom),
             () => Assert.Equal(1, actorCertificates.Single().SequenceNumber));

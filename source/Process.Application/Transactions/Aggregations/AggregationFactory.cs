@@ -118,17 +118,17 @@ public class AggregationFactory
 
     private static string MapReceiverRole(AggregatedMeasureDataProcess process)
     {
-        return MarketRole.FromCode(process.RequestedByActorRoleCode).Name;
+        return ActorRole.FromCode(process.RequestedByActorRoleCode).Name;
     }
 
     private static ActorGrouping MapActorGrouping(AggregatedMeasureDataProcess process)
     {
-        if (process.RequestedByActorRoleCode == MarketRole.BalanceResponsibleParty.Code)
+        if (process.RequestedByActorRoleCode == ActorRole.BalanceResponsibleParty.Code)
         {
             return new ActorGrouping(null, process.BalanceResponsibleId);
         }
 
-        if (process.RequestedByActorRoleCode == MarketRole.EnergySupplier.Code)
+        if (process.RequestedByActorRoleCode == ActorRole.EnergySupplier.Code)
         {
             return new ActorGrouping(process.EnergySupplierId, null);
         }

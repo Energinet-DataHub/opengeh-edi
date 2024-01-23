@@ -101,11 +101,11 @@ public static class CimCode
         throw NoCodeFoundFor(meteringPointType.Name);
     }
 
-    public static string Of(MarketRole marketRole)
+    public static string Of(ActorRole actorRole)
     {
-        ArgumentNullException.ThrowIfNull(marketRole);
+        ArgumentNullException.ThrowIfNull(actorRole);
 
-        return marketRole.Code;
+        return actorRole.Code;
     }
 
     public static string Of(SettlementType settlementType)

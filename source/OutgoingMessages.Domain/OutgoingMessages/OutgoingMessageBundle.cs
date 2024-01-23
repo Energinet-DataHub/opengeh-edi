@@ -21,7 +21,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages
 {
     public class OutgoingMessageBundle
     {
-        public OutgoingMessageBundle(DocumentType documentType, ActorNumber receiverId, Guid processId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, bool isPublished, BundleId assignedBundleId, IReadOnlyCollection<OutgoingMessage> outgoingMessages)
+        public OutgoingMessageBundle(DocumentType documentType, ActorNumber receiverId, Guid processId, string businessReason, ActorRole receiverRole, ActorNumber senderId, ActorRole senderRole, bool isPublished, BundleId assignedBundleId, IReadOnlyCollection<OutgoingMessage> outgoingMessages)
         {
             DocumentType = documentType;
             ReceiverId = receiverId;
@@ -48,11 +48,11 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages
 
         public string BusinessReason { get; }
 
-        public MarketRole ReceiverRole { get; }
+        public ActorRole ReceiverRole { get; }
 
         public ActorNumber SenderId { get; }
 
-        public MarketRole SenderRole { get; }
+        public ActorRole SenderRole { get; }
 
         public Receiver Receiver => Receiver.Create(ReceiverId, ReceiverRole);
 

@@ -74,12 +74,12 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
 
         await HavingReceivedAndHandledIntegrationEventAsync(EnergyResultProducedV2.EventName, _eventBuilder.Build());
 
-        var outgoingMessage = await OutgoingMessageAsync(MarketRole.EnergySupplier, BusinessReason.BalanceFixing);
+        var outgoingMessage = await OutgoingMessageAsync(ActorRole.EnergySupplier, BusinessReason.BalanceFixing);
         outgoingMessage
             .HasReceiverId(SampleData.EnergySupplierNumber.Value)
-            .HasReceiverRole(MarketRole.EnergySupplier.Code)
+            .HasReceiverRole(ActorRole.EnergySupplier.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
-            .HasSenderRole(MarketRole.MeteredDataAdministrator.Code)
+            .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.Period.Start, SampleData.StartOfPeriod)
             .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.Period.End, SampleData.EndOfPeriod)
             .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.GridAreaCode, SampleData.GridAreaCode)
@@ -105,10 +105,10 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         await HavingReceivedAndHandledIntegrationEventAsync(EnergyResultProducedV2.EventName, _eventBuilder.Build());
 
         var message = await OutgoingMessageAsync(
-            MarketRole.MeteredDataResponsible, BusinessReason.BalanceFixing);
+            ActorRole.MeteredDataResponsible, BusinessReason.BalanceFixing);
         message.HasReceiverId(SampleData.GridOperatorNumber.Value)
-            .HasReceiverRole(MarketRole.MeteredDataResponsible.Code)
-            .HasSenderRole(MarketRole.MeteredDataAdministrator.Code)
+            .HasReceiverRole(ActorRole.MeteredDataResponsible.Code)
+            .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, MeteringPointType.Consumption.Name)
             .HasMessageRecordValue<TimeSeries>(property => property.SettlementType!, SettlementType.NonProfiled.Name);
@@ -133,10 +133,10 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         await HavingReceivedAndHandledIntegrationEventAsync(EnergyResultProducedV2.EventName, _eventBuilder.Build());
 
         var message = await OutgoingMessageAsync(
-            MarketRole.MeteredDataResponsible, BusinessReason.BalanceFixing);
+            ActorRole.MeteredDataResponsible, BusinessReason.BalanceFixing);
         message.HasReceiverId(SampleData.GridOperatorNumber.Value)
-            .HasReceiverRole(MarketRole.MeteredDataResponsible.Code)
-            .HasSenderRole(MarketRole.MeteredDataAdministrator.Code)
+            .HasReceiverRole(ActorRole.MeteredDataResponsible.Code)
+            .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasMessageRecordValue<TimeSeries>(x => x.GridAreaCode, SampleData.GridAreaCode)
             .HasMessageRecordValue<TimeSeries>(x => x.Resolution, BuildingBlocks.Domain.Models.Resolution.QuarterHourly.Name)
@@ -165,13 +165,13 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         await HavingReceivedAndHandledIntegrationEventAsync(EnergyResultProducedV2.EventName, _eventBuilder.Build());
 
         var outgoingMessage = await OutgoingMessageAsync(
-            MarketRole.BalanceResponsibleParty,
+            ActorRole.BalanceResponsibleParty,
             BusinessReason.BalanceFixing);
         outgoingMessage
             .HasReceiverId(SampleData.BalanceResponsibleNumber.Value)
-            .HasReceiverRole(MarketRole.BalanceResponsibleParty.Code)
+            .HasReceiverRole(ActorRole.BalanceResponsibleParty.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
-            .HasSenderRole(MarketRole.MeteredDataAdministrator.Code)
+            .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasMessageRecordValue<TimeSeries>(
                 series => series.BalanceResponsibleNumber!,
                 SampleData.BalanceResponsibleNumber.Value)
@@ -199,13 +199,13 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         await HavingReceivedAndHandledIntegrationEventAsync(EnergyResultProducedV2.EventName, _eventBuilder.Build());
 
         var outgoingMessage = await OutgoingMessageAsync(
-            MarketRole.BalanceResponsibleParty,
+            ActorRole.BalanceResponsibleParty,
             BusinessReason.BalanceFixing);
         outgoingMessage
             .HasReceiverId(SampleData.BalanceResponsibleNumber.Value)
-            .HasReceiverRole(MarketRole.BalanceResponsibleParty.Code)
+            .HasReceiverRole(ActorRole.BalanceResponsibleParty.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
-            .HasSenderRole(MarketRole.MeteredDataAdministrator.Code)
+            .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasMessageRecordValue<TimeSeries>(
                 series => series.BalanceResponsibleNumber!,
                 SampleData.BalanceResponsibleNumber.Value)
@@ -237,10 +237,10 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
 
         await HavingReceivedAndHandledIntegrationEventAsync(EnergyResultProducedV2.EventName, _eventBuilder.Build());
 
-        var message = await OutgoingMessageAsync(MarketRole.MeteredDataResponsible, businessReason);
+        var message = await OutgoingMessageAsync(ActorRole.MeteredDataResponsible, businessReason);
         message.HasReceiverId(SampleData.GridOperatorNumber.Value)
-            .HasReceiverRole(MarketRole.MeteredDataResponsible.Code)
-            .HasSenderRole(MarketRole.MeteredDataAdministrator.Code)
+            .HasReceiverRole(ActorRole.MeteredDataResponsible.Code)
+            .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasBusinessReason(businessReason)
             .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, MeteringPointType.Exchange.Name);
@@ -267,10 +267,10 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
 
         await HavingReceivedAndHandledIntegrationEventAsync(EnergyResultProducedV2.EventName, _eventBuilder.Build());
 
-        var message = await OutgoingMessageAsync(MarketRole.MeteredDataResponsible, businessReason);
+        var message = await OutgoingMessageAsync(ActorRole.MeteredDataResponsible, businessReason);
         message.HasReceiverId(SampleData.GridOperatorNumber.Value)
-            .HasReceiverRole(MarketRole.MeteredDataResponsible.Code)
-            .HasSenderRole(MarketRole.MeteredDataAdministrator.Code)
+            .HasReceiverRole(ActorRole.MeteredDataResponsible.Code)
+            .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasBusinessReason(businessReason)
             .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, MeteringPointType.Consumption.Name);
@@ -295,10 +295,10 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
 
         await HavingReceivedAndHandledIntegrationEventAsync(EnergyResultProducedV2.EventName, _eventBuilder.Build());
 
-        var message = await OutgoingMessageAsync(MarketRole.MeteredDataResponsible, businessReason);
+        var message = await OutgoingMessageAsync(ActorRole.MeteredDataResponsible, businessReason);
         message.HasReceiverId(SampleData.GridOperatorNumber.Value)
-            .HasReceiverRole(MarketRole.MeteredDataResponsible.Code)
-            .HasSenderRole(MarketRole.MeteredDataAdministrator.Code)
+            .HasReceiverRole(ActorRole.MeteredDataResponsible.Code)
+            .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasBusinessReason(businessReason);
     }
@@ -325,11 +325,11 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         await AssertOutgoingMessage.OutgoingMessageIsNullAsync(
             DocumentType.NotifyAggregatedMeasureData.Name,
             businessReason.Name,
-            MarketRole.MeteredDataResponsible,
+            ActorRole.MeteredDataResponsible,
             GetService<IDatabaseConnectionFactory>());
     }
 
-    private async Task<AssertOutgoingMessage> OutgoingMessageAsync(MarketRole roleOfReceiver, BusinessReason businessReason)
+    private async Task<AssertOutgoingMessage> OutgoingMessageAsync(ActorRole roleOfReceiver, BusinessReason businessReason)
     {
         return await AssertOutgoingMessage.OutgoingMessageAsync(
             DocumentType.NotifyAggregatedMeasureData.Name,

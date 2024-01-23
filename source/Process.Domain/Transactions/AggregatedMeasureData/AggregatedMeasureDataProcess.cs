@@ -164,7 +164,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
                 RequestedByActorId,
                 ProcessId.Id,
                 rejectedAggregatedMeasureDataRequest.BusinessReason.Name,
-                MarketRole.FromCode(RequestedByActorRoleCode),
+                ActorRole.FromCode(RequestedByActorRoleCode),
                 rejectedTimeSerie);
         }
     }

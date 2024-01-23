@@ -16,4 +16,4 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 
-public sealed record ActorNumberAndRoleDto(ActorNumber ActorNumber, MarketRole MarketRole);
+public sealed record ActorNumberAndRoleDto(ActorNumber ActorNumber, ActorRole ActorRole);

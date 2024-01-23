@@ -187,7 +187,7 @@ internal sealed class EdiDriver : IDisposable
         return peekResponse.Headers.GetValues("MessageId").First();
     }
 
-    private static string GetContent(bool forceAsyncError, MarketRole? marketRole = null)
+    private static string GetContent(bool forceAsyncError, ActorRole? marketRole = null)
     {
         string jsonRequestAcceptedFilePath;
         string jsonRequestAsynchronousRejectedFilePath;

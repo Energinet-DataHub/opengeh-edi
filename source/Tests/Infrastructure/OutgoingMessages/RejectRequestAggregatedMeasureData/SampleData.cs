@@ -25,11 +25,11 @@ internal static class SampleData
 
     public static string SenderId => "1234567890123";
 
-    public static MarketRole SenderRole => MarketRole.MeteredDataAdministrator;
+    public static ActorRole SenderRole => ActorRole.MeteredDataAdministrator;
 
     public static string ReceiverId => "1234567890987";
 
-    public static MarketRole ReceiverRole => MarketRole.BalanceResponsibleParty;
+    public static ActorRole ReceiverRole => ActorRole.BalanceResponsibleParty;
 
     public static Instant CreationDate => InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value;
 
