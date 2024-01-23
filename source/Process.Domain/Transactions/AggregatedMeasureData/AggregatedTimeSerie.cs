@@ -25,7 +25,8 @@ public record AggregatedTimeSerie(
     string MeteringPointType,
     string UnitType,
     string Resolution,
-    GridAreaDetails GridAreaDetails);
+    GridAreaDetails GridAreaDetails,
+    long? CalculationResultVersion);
 
 [Serializable]
 public record Point(int Position, decimal? Quantity, CalculatedQuantityQuality QuantityQuality, string SampleTime);

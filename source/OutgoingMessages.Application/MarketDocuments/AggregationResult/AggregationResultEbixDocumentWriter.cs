@@ -164,8 +164,14 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
 
             await WriteElementIfHasValueAsync("OriginalBusinessDocument", timeSeries.OriginalTransactionIdReference, writer).ConfigureAwait(false);
 
-            // TODO XJOHO: We are currently not receiving Version from Wholesale - bug team-phoenix #78
-            await WriteElementIfHasValueAsync("Version", "1", writer).ConfigureAwait(false);
+            if (timeSeries.CalculationResultVersion.HasValue)
+            {
+                await WriteElementIfHasValueAsync("Version", timeSeries.CalculationResultVersion.Value.ToString(NumberFormatInfo.InvariantInfo), writer).ConfigureAwait(false);
+            }
+            else
+            {
+                await WriteElementIfHasValueAsync("Version", "1", writer).ConfigureAwait(false);
+            }
 
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             // End PayloadEnergyTimeSeries
