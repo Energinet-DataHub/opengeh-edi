@@ -28,13 +28,13 @@ public class JsonResponseFactory : IResponseFactory
 
     public ResponseMessage From(Result result)
     {
-        if (result == null) throw new ArgumentNullException(nameof(result));
+        ArgumentNullException.ThrowIfNull(result);
         return result.Success ? new ResponseMessage() : new ResponseMessage(CreateMessageBodyFrom(result));
     }
 
     private static string CreateMessageBodyFrom(Result result)
     {
-        if (result == null) throw new ArgumentNullException(nameof(result));
+        ArgumentNullException.ThrowIfNull(result);
         var messageBody = new MemoryStream();
         var options = new JsonWriterOptions() { Indented = true };
         using var writer = new Utf8JsonWriter(messageBody, options);

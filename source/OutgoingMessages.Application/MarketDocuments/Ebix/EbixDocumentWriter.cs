@@ -71,8 +71,7 @@ public abstract class EbixDocumentWriter : IDocumentWriter
 
     protected IReadOnlyCollection<TMarketActivityRecord> ParseFrom<TMarketActivityRecord>(IReadOnlyCollection<string> payloads)
     {
-        if (payloads == null)
-            throw new ArgumentNullException(nameof(payloads));
+        ArgumentNullException.ThrowIfNull(payloads);
         var marketActivityRecords = new List<TMarketActivityRecord>();
         foreach (var payload in payloads)
         {
@@ -84,19 +83,15 @@ public abstract class EbixDocumentWriter : IDocumentWriter
 
     protected Task WriteElementAsync(string name, string value, XmlWriter writer)
     {
-        if (writer == null)
-            throw new ArgumentNullException(nameof(writer));
+        ArgumentNullException.ThrowIfNull(writer);
         return writer.WriteElementStringAsync(DocumentDetails.Prefix, name, null, value);
     }
 
     protected async Task WriteEbixCodeWithAttributesAsync(string name, string ebixCode, XmlWriter writer)
     {
-        if (name == null)
-            throw new ArgumentNullException(nameof(name));
-        if (ebixCode == null)
-            throw new ArgumentNullException(nameof(ebixCode));
-        if (writer == null)
-            throw new ArgumentNullException(nameof(writer));
+        ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(ebixCode);
+        ArgumentNullException.ThrowIfNull(writer);
 
         await writer.WriteStartElementAsync(DocumentDetails.Prefix, name, null).ConfigureAwait(false);
         if (long.TryParse(ebixCode, out _))
@@ -104,7 +99,7 @@ public abstract class EbixDocumentWriter : IDocumentWriter
             // UN/CEFACT codelist
             await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "6").ConfigureAwait(false);
         }
-        else if (ebixCode.StartsWith("D", StringComparison.InvariantCulture) && ebixCode.Length == 3)
+        else if (ebixCode.StartsWith('D') && ebixCode.Length == 3)
         {
             // Danish codelist
             await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
@@ -128,12 +123,9 @@ public abstract class EbixDocumentWriter : IDocumentWriter
     /// <param name="writer">The XmlWriter</param>
     protected async Task WriteEbixSchemeCodeWithAttributesAsync(string name, string ebixSchemeCode, XmlWriter writer)
     {
-        if (name == null)
-            throw new ArgumentNullException(nameof(name));
-        if (ebixSchemeCode == null)
-            throw new ArgumentNullException(nameof(ebixSchemeCode));
-        if (writer == null)
-            throw new ArgumentNullException(nameof(writer));
+        ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(ebixSchemeCode);
+        ArgumentNullException.ThrowIfNull(writer);
 
         await writer.WriteStartElementAsync(DocumentDetails.Prefix, name, null).ConfigureAwait(false);
         if (long.TryParse(ebixSchemeCode, out _))
@@ -170,16 +162,6 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         }
 
         return Task.CompletedTask;
-    }
-
-    protected async Task WriteMridAsync(string localName, string id, string codingScheme, XmlWriter writer)
-    {
-        if (writer == null)
-            throw new ArgumentNullException(nameof(writer));
-        await writer.WriteStartElementAsync(DocumentDetails.Prefix, localName, null).ConfigureAwait(false);
-        await writer.WriteAttributeStringAsync(null, "codingScheme", null, codingScheme).ConfigureAwait(false);
-        writer.WriteValue(id);
-        await writer.WriteEndElementAsync().ConfigureAwait(false);
     }
 
     private static async Task WriteEndAsync(XmlWriter writer)

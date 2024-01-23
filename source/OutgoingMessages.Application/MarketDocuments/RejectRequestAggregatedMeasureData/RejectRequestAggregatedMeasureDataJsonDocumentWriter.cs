@@ -63,8 +63,8 @@ public class RejectRequestAggregatedMeasureDataJsonDocumentWriter : IDocumentWri
 
     private void WriteSeries(IReadOnlyCollection<string> marketActivityRecords, Utf8JsonWriter writer)
     {
-        if (marketActivityRecords == null) throw new ArgumentNullException(nameof(marketActivityRecords));
-        if (writer == null) throw new ArgumentNullException(nameof(writer));
+        ArgumentNullException.ThrowIfNull(marketActivityRecords);
+        ArgumentNullException.ThrowIfNull(writer);
 
         writer.WritePropertyName("Series");
         writer.WriteStartArray();
@@ -101,9 +101,9 @@ public class RejectRequestAggregatedMeasureDataJsonDocumentWriter : IDocumentWri
         writer.WriteEndObject();
     }
 
-    private IReadOnlyCollection<RejectedTimeSerieMarketActivityRecord> ParseFrom(IReadOnlyCollection<string> payloads)
+    private List<RejectedTimeSerieMarketActivityRecord> ParseFrom(IReadOnlyCollection<string> payloads)
     {
-        if (payloads == null) throw new ArgumentNullException(nameof(payloads));
+        ArgumentNullException.ThrowIfNull(payloads);
         var timeSeries = new List<RejectedTimeSerieMarketActivityRecord>();
         foreach (var payload in payloads)
         {

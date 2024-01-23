@@ -48,7 +48,7 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
 
         public InternalCommand ToCommand(ISerializer serializer)
         {
-            if (serializer == null) throw new ArgumentNullException(nameof(serializer));
+            ArgumentNullException.ThrowIfNull(serializer);
             var storedCommandType = System.Type.GetType(Type, true);
             return (InternalCommand)serializer.Deserialize(Data, storedCommandType!);
         }

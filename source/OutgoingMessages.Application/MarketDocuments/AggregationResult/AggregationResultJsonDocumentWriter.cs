@@ -64,8 +64,8 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
 
     private void WriteSeries(IReadOnlyCollection<string> marketActivityRecords, Utf8JsonWriter writer)
     {
-        if (marketActivityRecords == null) throw new ArgumentNullException(nameof(marketActivityRecords));
-        if (writer == null) throw new ArgumentNullException(nameof(writer));
+        ArgumentNullException.ThrowIfNull(marketActivityRecords);
+        ArgumentNullException.ThrowIfNull(writer);
 
         writer.WritePropertyName("Series");
         writer.WriteStartArray();
@@ -175,9 +175,9 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
         writer.WriteEndObject();
     }
 
-    private IReadOnlyCollection<TimeSeriesMarketActivityRecord> ParseFrom(IReadOnlyCollection<string> payloads)
+    private List<TimeSeriesMarketActivityRecord> ParseFrom(IReadOnlyCollection<string> payloads)
     {
-        if (payloads == null) throw new ArgumentNullException(nameof(payloads));
+        ArgumentNullException.ThrowIfNull(payloads);
         var timeSeries = new List<TimeSeriesMarketActivityRecord>();
         foreach (var payload in payloads)
         {

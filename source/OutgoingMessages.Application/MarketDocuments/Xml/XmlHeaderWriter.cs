@@ -25,9 +25,9 @@ internal static class XmlHeaderWriter
 {
     internal static async Task WriteAsync(XmlWriter writer, OutgoingMessageHeader messageHeader, DocumentDetails documentDetails, string? reasonCode)
     {
-        if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
-        if (writer == null) throw new ArgumentNullException(nameof(writer));
-        if (documentDetails == null) throw new ArgumentNullException(nameof(documentDetails));
+        ArgumentNullException.ThrowIfNull(messageHeader);
+        ArgumentNullException.ThrowIfNull(writer);
+        ArgumentNullException.ThrowIfNull(documentDetails);
 
         await writer.WriteStartDocumentAsync().ConfigureAwait(false);
         await writer.WriteStartElementAsync(

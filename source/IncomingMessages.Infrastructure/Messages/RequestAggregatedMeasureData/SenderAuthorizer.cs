@@ -30,8 +30,8 @@ namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
 
         public Task<Result> AuthorizeAsync(string senderNumber, string senderRoleCode)
         {
-            if (senderNumber == null) throw new ArgumentNullException(nameof(senderNumber));
-            if (senderRoleCode == null) throw new ArgumentNullException(nameof(senderRoleCode));
+            ArgumentNullException.ThrowIfNull(senderNumber);
+            ArgumentNullException.ThrowIfNull(senderRoleCode);
             EnsureSenderIdMatches(senderNumber);
             EnsureSenderRoleCode(senderRoleCode);
             EnsureCurrentUserHasRequiredRole(senderRoleCode);

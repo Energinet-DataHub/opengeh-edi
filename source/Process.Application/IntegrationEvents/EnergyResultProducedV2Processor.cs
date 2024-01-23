@@ -47,8 +47,7 @@ public sealed class EnergyResultProducedV2Processor : IIntegrationEventProcessor
 
     public async Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
-        if (integrationEvent == null)
-            throw new ArgumentNullException(nameof(integrationEvent));
+        ArgumentNullException.ThrowIfNull(integrationEvent);
 
         var energyResultProducedV2 = (EnergyResultProducedV2)integrationEvent.Message;
 

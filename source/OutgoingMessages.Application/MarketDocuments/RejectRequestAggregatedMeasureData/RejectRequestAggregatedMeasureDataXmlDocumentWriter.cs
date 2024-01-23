@@ -39,14 +39,14 @@ public class RejectRequestAggregatedMeasureDataXmlDocumentWriter : DocumentWrite
 
     public override bool HandlesType(DocumentType documentType)
     {
-        if (documentType == null) throw new ArgumentNullException(nameof(documentType));
+        ArgumentNullException.ThrowIfNull(documentType);
         return DocumentType.RejectRequestAggregatedMeasureData == documentType;
     }
 
     protected override async Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer)
     {
-        if (marketActivityPayloads == null) throw new ArgumentNullException(nameof(marketActivityPayloads));
-        if (writer == null) throw new ArgumentNullException(nameof(writer));
+        ArgumentNullException.ThrowIfNull(marketActivityPayloads);
+        ArgumentNullException.ThrowIfNull(writer);
 
         foreach (var rejectedTimeSerie in ParseFrom<RejectedTimeSerieMarketActivityRecord>(marketActivityPayloads))
         {

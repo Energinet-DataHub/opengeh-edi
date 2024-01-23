@@ -47,7 +47,7 @@ public class UnitOfWorkBehaviour<TRequest, TResponse> : IPipelineBehavior<TReque
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        if (next == null) throw new ArgumentNullException(nameof(next));
+        ArgumentNullException.ThrowIfNull(next);
 
         var result = await next().ConfigureAwait(false);
 

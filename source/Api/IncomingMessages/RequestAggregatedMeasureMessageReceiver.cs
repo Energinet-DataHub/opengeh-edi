@@ -50,7 +50,7 @@ public class RequestAggregatedMeasureMessageReceiver
         HttpRequestData request,
         CancellationToken hostCancellationToken)
     {
-        if (request is null) throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
 
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);
 

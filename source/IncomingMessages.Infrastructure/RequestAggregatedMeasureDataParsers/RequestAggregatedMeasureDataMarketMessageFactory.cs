@@ -24,8 +24,8 @@ public static class RequestAggregatedMeasureDataMarketMessageFactory
         MessageHeader header,
         ReadOnlyCollection<Serie> series)
     {
-        if (header == null) throw new ArgumentNullException(nameof(header));
-        if (series == null) throw new ArgumentNullException(nameof(series));
+        ArgumentNullException.ThrowIfNull(header);
+        ArgumentNullException.ThrowIfNull(series);
 
         return new RequestAggregatedMeasureDataDto(
             header.SenderId,

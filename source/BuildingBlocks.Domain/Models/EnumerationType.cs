@@ -76,15 +76,8 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models
 
         public static int AbsoluteDifference(EnumerationType firstValue, EnumerationType secondValue)
         {
-            if (firstValue is null)
-            {
-                throw new ArgumentNullException(nameof(firstValue));
-            }
-
-            if (secondValue is null)
-            {
-                throw new ArgumentNullException(nameof(secondValue));
-            }
+            ArgumentNullException.ThrowIfNull(firstValue);
+            ArgumentNullException.ThrowIfNull(secondValue);
 
             var absoluteDifference = Math.Abs(firstValue.Id - secondValue.Id);
             return absoluteDifference;
@@ -128,10 +121,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models
 
         public int CompareTo(object? obj)
         {
-            if (obj is null)
-            {
-                throw new ArgumentNullException(nameof(obj));
-            }
+            ArgumentNullException.ThrowIfNull(obj);
 
             return Id.CompareTo(((EnumerationType)obj).Id);
         }

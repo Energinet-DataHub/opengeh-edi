@@ -33,7 +33,7 @@ namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Aggregatio
 public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValidationFixture>
 {
     private readonly DocumentValidationFixture _documentValidation;
-    private readonly IMessageRecordParser _parser;
+    private readonly MessageRecordParser _parser;
     private readonly TimeSeriesBuilder _timeSeries;
 
     public AggregationResultDocumentWriterTests(

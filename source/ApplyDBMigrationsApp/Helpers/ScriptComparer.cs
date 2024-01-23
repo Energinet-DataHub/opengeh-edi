@@ -22,7 +22,7 @@ namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers
     /// </summary>
     public sealed class ScriptComparer : Comparer<string>
     {
-        private static readonly IComparer<string> _stringComparer = StringComparer.Ordinal;
+        private static readonly StringComparer _stringComparer = StringComparer.Ordinal;
 
 #pragma warning disable 8765 // Nullable doesn't match overriden, because of nullable.
         public override int Compare(string x, string y)

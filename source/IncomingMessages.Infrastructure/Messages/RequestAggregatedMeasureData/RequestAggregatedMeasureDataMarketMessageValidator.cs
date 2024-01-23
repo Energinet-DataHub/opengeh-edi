@@ -124,7 +124,7 @@ namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
 
         private async Task<bool> TransactionIdIsDuplicatedAsync(string senderNumber, string transactionId, CancellationToken cancellationToken)
         {
-            if (transactionId == null) throw new ArgumentNullException(nameof(transactionId));
+            ArgumentNullException.ThrowIfNull(transactionId);
 
             return await _transactionIdRepository
                 .TransactionIdExistsAsync(senderNumber, transactionId, cancellationToken).ConfigureAwait(false);

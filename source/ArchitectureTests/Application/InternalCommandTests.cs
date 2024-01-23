@@ -43,7 +43,7 @@ public class InternalCommandTests
     [MemberData(nameof(GetInternalCommands))]
     public void Has_json_constructor_attribute(Type internalCommand)
     {
-        if (internalCommand == null) throw new ArgumentNullException(nameof(internalCommand));
+        ArgumentNullException.ThrowIfNull(internalCommand);
         var jsonConstructorAttributes = internalCommand
             .GetConstructors()
             .SelectMany(c => c.GetCustomAttributes()

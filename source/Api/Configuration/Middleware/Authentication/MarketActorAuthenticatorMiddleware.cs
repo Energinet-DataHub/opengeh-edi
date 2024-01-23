@@ -35,8 +35,8 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication
 
         public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
         {
-            if (context == null) throw new ArgumentNullException(nameof(context));
-            if (next == null) throw new ArgumentNullException(nameof(next));
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(next);
             var authenticatedActor = context.GetService<AuthenticatedActor>();
             var authenticationMethods = context.GetServices<IAuthenticationMethod>();
 
