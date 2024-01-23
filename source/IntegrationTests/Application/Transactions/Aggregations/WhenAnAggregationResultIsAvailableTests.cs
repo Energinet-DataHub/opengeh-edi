@@ -77,9 +77,9 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.EnergySupplier, BusinessReason.BalanceFixing);
         outgoingMessage
             .HasReceiverId(SampleData.EnergySupplierNumber.Value)
-            .HasReceiverRole(MarketRole.EnergySupplier.Name)
+            .HasReceiverRole(MarketRole.EnergySupplier.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
-            .HasSenderRole(MarketRole.MeteredDataAdministrator.Name)
+            .HasSenderRole(MarketRole.MeteredDataAdministrator.Code)
             .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.Period.Start, SampleData.StartOfPeriod)
             .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.Period.End, SampleData.EndOfPeriod)
             .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.GridAreaCode, SampleData.GridAreaCode)
@@ -107,8 +107,8 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         var message = await OutgoingMessageAsync(
             MarketRole.MeteredDataResponsible, BusinessReason.BalanceFixing);
         message.HasReceiverId(SampleData.GridOperatorNumber.Value)
-            .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
-            .HasSenderRole(MarketRole.MeteredDataAdministrator.Name)
+            .HasReceiverRole(MarketRole.MeteredDataResponsible.Code)
+            .HasSenderRole(MarketRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, MeteringPointType.Consumption.Name)
             .HasMessageRecordValue<TimeSeries>(property => property.SettlementType!, SettlementType.NonProfiled.Name);
@@ -135,8 +135,8 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         var message = await OutgoingMessageAsync(
             MarketRole.MeteredDataResponsible, BusinessReason.BalanceFixing);
         message.HasReceiverId(SampleData.GridOperatorNumber.Value)
-            .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
-            .HasSenderRole(MarketRole.MeteredDataAdministrator.Name)
+            .HasReceiverRole(MarketRole.MeteredDataResponsible.Code)
+            .HasSenderRole(MarketRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasMessageRecordValue<TimeSeries>(x => x.GridAreaCode, SampleData.GridAreaCode)
             .HasMessageRecordValue<TimeSeries>(x => x.Resolution, BuildingBlocks.Domain.Models.Resolution.QuarterHourly.Name)
@@ -169,9 +169,9 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             BusinessReason.BalanceFixing);
         outgoingMessage
             .HasReceiverId(SampleData.BalanceResponsibleNumber.Value)
-            .HasReceiverRole(MarketRole.BalanceResponsibleParty.Name)
+            .HasReceiverRole(MarketRole.BalanceResponsibleParty.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
-            .HasSenderRole(MarketRole.MeteredDataAdministrator.Name)
+            .HasSenderRole(MarketRole.MeteredDataAdministrator.Code)
             .HasMessageRecordValue<TimeSeries>(
                 series => series.BalanceResponsibleNumber!,
                 SampleData.BalanceResponsibleNumber.Value)
@@ -203,9 +203,9 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             BusinessReason.BalanceFixing);
         outgoingMessage
             .HasReceiverId(SampleData.BalanceResponsibleNumber.Value)
-            .HasReceiverRole(MarketRole.BalanceResponsibleParty.Name)
+            .HasReceiverRole(MarketRole.BalanceResponsibleParty.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
-            .HasSenderRole(MarketRole.MeteredDataAdministrator.Name)
+            .HasSenderRole(MarketRole.MeteredDataAdministrator.Code)
             .HasMessageRecordValue<TimeSeries>(
                 series => series.BalanceResponsibleNumber!,
                 SampleData.BalanceResponsibleNumber.Value)
@@ -239,8 +239,8 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
 
         var message = await OutgoingMessageAsync(MarketRole.MeteredDataResponsible, businessReason);
         message.HasReceiverId(SampleData.GridOperatorNumber.Value)
-            .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
-            .HasSenderRole(MarketRole.MeteredDataAdministrator.Name)
+            .HasReceiverRole(MarketRole.MeteredDataResponsible.Code)
+            .HasSenderRole(MarketRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasBusinessReason(businessReason)
             .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, MeteringPointType.Exchange.Name);
@@ -269,8 +269,8 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
 
         var message = await OutgoingMessageAsync(MarketRole.MeteredDataResponsible, businessReason);
         message.HasReceiverId(SampleData.GridOperatorNumber.Value)
-            .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
-            .HasSenderRole(MarketRole.MeteredDataAdministrator.Name)
+            .HasReceiverRole(MarketRole.MeteredDataResponsible.Code)
+            .HasSenderRole(MarketRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasBusinessReason(businessReason)
             .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, MeteringPointType.Consumption.Name);
@@ -297,8 +297,8 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
 
         var message = await OutgoingMessageAsync(MarketRole.MeteredDataResponsible, businessReason);
         message.HasReceiverId(SampleData.GridOperatorNumber.Value)
-            .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
-            .HasSenderRole(MarketRole.MeteredDataAdministrator.Name)
+            .HasReceiverRole(MarketRole.MeteredDataResponsible.Code)
+            .HasSenderRole(MarketRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasBusinessReason(businessReason);
     }

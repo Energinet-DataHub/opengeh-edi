@@ -162,9 +162,9 @@ public class TimeSeriesBuilder
         return new OutgoingMessageHeader(
             _businessReason.Name,
             _senderNumber,
-            _senderRole.Name,
+            _senderRole.Code,
             _receiverNumber,
-            _receiverRole.Name,
+            _receiverRole.Code,
             _messageId,
             _timeStamp);
     }

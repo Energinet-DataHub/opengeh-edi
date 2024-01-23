@@ -78,7 +78,7 @@ internal static class EbixHeaderWriter
 
         await writer.WriteStartElementAsync(documentDetails.Prefix, "EnergyBusinessProcessRole", null).ConfigureAwait(false);
         await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
-        writer.WriteValue(EbixCode.Of(EnumerationType.FromName<MarketRole>(messageHeader.ReceiverRole)));
+        writer.WriteValue(EbixCode.Of(MarketRole.FromCode(messageHeader.ReceiverRole)));
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 
         await writer.WriteStartElementAsync(documentDetails.Prefix, "EnergyIndustryClassification", null).ConfigureAwait(false);
