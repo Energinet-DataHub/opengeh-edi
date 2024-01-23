@@ -51,7 +51,12 @@ public class AggregationFactory
         if (aggregatedMeasureDataProcess == null) throw new ArgumentNullException(nameof(aggregatedMeasureDataProcess));
         if (aggregatedTimeSerie == null) throw new ArgumentNullException(nameof(aggregatedTimeSerie));
 
-        if ((aggregatedMeasureDataProcess.MeteringPointType != null ? MeteringPointType.FromCode(aggregatedMeasureDataProcess.MeteringPointType).Name : null) != aggregatedTimeSerie.MeteringPointType) throw new ArgumentException("aggregatedTimeSerie.MeteringPointType isn't equal to aggregatedMeasureDataProcess.MeteringPointType", nameof(aggregatedTimeSerie));
+        if ((aggregatedMeasureDataProcess.MeteringPointType != null
+                ? MeteringPointType.FromCode(aggregatedMeasureDataProcess.MeteringPointType).Name
+                : null) != aggregatedTimeSerie.MeteringPointType)
+        {
+            throw new ArgumentException("AggregatedTimeSerie.MeteringPointType isn't equal to aggregatedMeasureDataProcess.MeteringPointType", nameof(aggregatedTimeSerie));
+        }
 
         return new Aggregation(
             MapPoints(aggregatedTimeSerie.Points),
