@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -74,8 +75,14 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
             writer.WriteStartObject();
 
             writer.WriteProperty("mRID", series.TransactionId.ToString());
-            // TODO XJOHO: We are currently not receiving version from Wholesale - bug team-phoenix #78
-            writer.WriteProperty("version", "1");
+            if (series.CalculationResultVersion.HasValue)
+            {
+                writer.WriteProperty("version", series.CalculationResultVersion.Value.ToString(NumberFormatInfo.InvariantInfo));
+            }
+            else
+            {
+                writer.WriteProperty("version", "1");
+            }
 
             writer.WriteObject(
                 "meteringGridArea_Domain.mRID",

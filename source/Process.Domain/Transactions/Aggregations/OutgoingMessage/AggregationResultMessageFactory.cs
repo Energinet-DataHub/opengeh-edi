@@ -76,6 +76,7 @@ public static class AggregationResultMessageFactory
             result.Period,
             result.Points.Select(p => new Point(p.Position, p.Quantity, p.QuantityQuality, p.SampleTime)).ToList(),
             EnumerationType.FromName<BusinessReason>(result.BusinessReason).Name,
+            result.CalculationResultVersion,
             result.OriginalTransactionIdReference,
             result.SettlementVersion);
     }
@@ -96,6 +97,7 @@ public static class AggregationResultMessageFactory
             result.Period,
             result.Points.Select(p => new Point(p.Position, p.Quantity, p.QuantityQuality, p.SampleTime)).ToList(),
             EnumerationType.FromName<BusinessReason>(result.BusinessReason).Name,
+            result.CalculationResultVersion,
             result.OriginalTransactionIdReference,
             result.SettlementVersion);
     }
@@ -117,6 +119,7 @@ public static class AggregationResultMessageFactory
             result.Period,
             result.Points.Select(p => new Point(p.Position, p.Quantity, p.QuantityQuality, p.SampleTime)).ToList(),
             EnumerationType.FromName<BusinessReason>(result.BusinessReason).Name,
+            result.CalculationResultVersion,
             result.OriginalTransactionIdReference,
             result.SettlementVersion);
     }

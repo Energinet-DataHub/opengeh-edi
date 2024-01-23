@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -194,6 +195,12 @@ internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationRe
         quality.Should().NotBeNull();
         quality.ToString().Should().Be(quantityQualityCode);
 
+        return this;
+    }
+
+    public IAssertAggregationResultDocument HasCalculationResultVersion(int version)
+    {
+        Assert.Equal(version.ToString(NumberFormatInfo.InvariantInfo), FirstTimeSeriesElement().GetProperty("version").ToString());
         return this;
     }
 

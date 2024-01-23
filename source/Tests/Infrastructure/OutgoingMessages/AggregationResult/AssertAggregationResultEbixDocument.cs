@@ -150,6 +150,12 @@ public class AssertAggregationResultEbixDocument : IAssertAggregationResultDocum
         return this;
     }
 
+    public IAssertAggregationResultDocument HasCalculationResultVersion(int version)
+    {
+        _documentAsserter.HasValue("PayloadEnergyTimeSeries[1]/Version", version.ToString(NumberFormatInfo.InvariantInfo));
+        return this;
+    }
+
     public IAssertAggregationResultDocument HasBusinessReason(BusinessReason businessReason)
     {
         _documentAsserter.HasValue("ProcessEnergyContext/EnergyBusinessProcess", EbixCode.Of(businessReason));

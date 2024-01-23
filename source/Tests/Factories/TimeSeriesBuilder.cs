@@ -26,6 +26,7 @@ namespace Energinet.DataHub.EDI.Tests.Factories;
 public class TimeSeriesBuilder
 {
     private readonly List<Point> _points = new();
+    private readonly long _calculationResultVersion = 1;
     private string _messageId = Guid.NewGuid().ToString();
     private Instant _timeStamp = SystemClock.Instance.GetCurrentInstant();
     private BusinessReason _businessReason = BusinessReason.BalanceFixing;
@@ -181,6 +182,7 @@ public class TimeSeriesBuilder
             _balanceResponsibleNumber,
             _period,
             _points,
+            _calculationResultVersion,
             _originalTransactionIdReference,
             _settlementVersion?.Name);
     }

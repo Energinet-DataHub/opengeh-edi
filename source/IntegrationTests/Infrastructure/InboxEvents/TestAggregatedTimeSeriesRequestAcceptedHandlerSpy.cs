@@ -55,6 +55,7 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
             .BeEquivalentTo(
                 firstSeries.TimeSeriesPoints,
                 opt => opt.Using(new PointsComparer()));
+        actualTimeSeries.CalculationResultVersion.Should().Be(firstSeries.CalculationResultVersion);
     }
 
     public Task Handle(AggregatedTimeSerieRequestWasAccepted notification, CancellationToken cancellationToken)
