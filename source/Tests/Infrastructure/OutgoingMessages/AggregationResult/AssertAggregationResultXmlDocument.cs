@@ -144,6 +144,12 @@ public class AssertAggregationResultXmlDocument : IAssertAggregationResultDocume
         return this;
     }
 
+    public IAssertAggregationResultDocument HasCalculationResultVersion(int version)
+    {
+        _documentAsserter.HasValue($"Series[1]/version", version.ToString(NumberFormatInfo.InvariantInfo));
+        return this;
+    }
+
     public IAssertAggregationResultDocument HasBusinessReason(BusinessReason businessReason)
     {
         _documentAsserter.HasValue("process.processType", CimCode.Of(businessReason));

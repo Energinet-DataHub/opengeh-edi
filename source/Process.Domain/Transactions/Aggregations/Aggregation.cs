@@ -30,7 +30,8 @@ public record Aggregation(
     string? OriginalTransactionIdReference = null,
     string? Receiver = null,
     string? ReceiverRole = null,
-    string? SettlementVersion = null);
+    string? SettlementVersion = null,
+    long? CalculationResultVersion = null);
 
 public record Point(int Position, decimal? Quantity, CalculatedQuantityQuality QuantityQuality, string SampleTime);
 

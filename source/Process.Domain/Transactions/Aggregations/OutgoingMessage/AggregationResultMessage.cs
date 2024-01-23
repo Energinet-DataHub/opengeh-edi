@@ -64,6 +64,7 @@ public class AggregationResultMessage : OutgoingMessageDto
         Period period,
         IReadOnlyList<Point> points,
         string businessReasonName,
+        long? resultCalculationResultVersion,
         string? originalTransactionIdReference = null,
         string? settlementVersion = null)
     {
@@ -78,6 +79,7 @@ public class AggregationResultMessage : OutgoingMessageDto
             balanceResponsibleNumber,
             period,
             points.Select(p => new Point(p.Position, p.Quantity, p.QuantityQuality, p.SampleTime)).ToList(),
+            resultCalculationResultVersion,
             originalTransactionIdReference,
             settlementVersion);
         return new AggregationResultMessage(
@@ -100,6 +102,7 @@ public record TimeSeries(
     string? BalanceResponsibleNumber,
     Period Period,
     IReadOnlyList<Point> Point,
+    long? CalculationResultVersion,
     string? OriginalTransactionIdReference = null,
     string? SettlementVersion = null);
 
