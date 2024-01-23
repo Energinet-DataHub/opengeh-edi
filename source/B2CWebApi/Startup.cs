@@ -33,6 +33,7 @@ namespace Energinet.DataHub.EDI.B2CWebApi;
 public class Startup
 {
     private const string DomainName = "EDI.B2CWebApi";
+    private static readonly string[] _securityFields = { "Bearer" };
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
     {
@@ -63,7 +64,7 @@ public class Startup
             config.AddSecurityDefinition("Bearer", securitySchema);
             config.SupportNonNullableReferenceTypes();
             config.UseAllOfToExtendReferenceSchemas();
-            var securityRequirement = new OpenApiSecurityRequirement { { securitySchema, new[] { "Bearer" } }, };
+            var securityRequirement = new OpenApiSecurityRequirement { { securitySchema, _securityFields }, };
 
             config.AddSecurityRequirement(securityRequirement);
         });

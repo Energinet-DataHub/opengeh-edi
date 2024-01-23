@@ -29,7 +29,7 @@ namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequ
 public class RejectRequestAggregatedMeasureDataResultDocumentWriterTests : IClassFixture<DocumentValidationFixture>
 {
     private readonly DocumentValidationFixture _documentValidation;
-    private readonly IMessageRecordParser _parser;
+    private readonly MessageRecordParser _parser;
     private readonly RejectedTimeSeriesBuilder _rejectedTimeSeries;
 
     public RejectRequestAggregatedMeasureDataResultDocumentWriterTests(DocumentValidationFixture documentValidation)

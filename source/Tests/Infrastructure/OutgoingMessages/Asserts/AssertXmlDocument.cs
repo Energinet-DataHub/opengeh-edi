@@ -13,9 +13,7 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,7 +28,6 @@ namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 
 public class AssertXmlDocument
 {
-    private const string MarketActivityRecordElementName = "MktActivityRecord";
     private readonly Stream _stream;
     private readonly string _prefix;
     private readonly DocumentValidator? _documentValidator;
@@ -53,39 +50,15 @@ public class AssertXmlDocument
         _documentValidator = documentValidator;
     }
 
-    public static AssertXmlDocument Document(Stream document, string prefix)
-    {
-        return new AssertXmlDocument(document, prefix);
-    }
-
     public static AssertXmlDocument Document(Stream document, string prefix, DocumentValidator validator)
     {
         return new AssertXmlDocument(document, prefix, validator);
     }
 
-    public AssertXmlDocument NumberOfMarketActivityRecordsIs(int expectedNumber)
-    {
-        Assert.Equal(expectedNumber, GetMarketActivityRecords().Count);
-        return this;
-    }
-
-    public AssertXmlDocument NumberOfUsagePointLocationsIs(int expectedNumber)
-    {
-        Assert.Equal(expectedNumber, GetUsagePointLocations().Count);
-        return this;
-    }
-
     public AssertXmlDocument HasValue(string xpath, string expectedValue)
     {
-        if (xpath == null) throw new ArgumentNullException(nameof(xpath));
+        ArgumentNullException.ThrowIfNull(xpath);
         Assert.Equal(expectedValue, _document.Root?.XPathSelectElement(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager)?.Value);
-        return this;
-    }
-
-    public AssertXmlDocument HasAttributeValue(string xpath, string attributeName, string expectedValue)
-    {
-        if (xpath == null) throw new ArgumentNullException(nameof(xpath));
-        Assert.Equal(expectedValue, _document.Root?.XPathSelectElement(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager)?.Attribute(attributeName)?.Value);
         return this;
     }
 
@@ -98,23 +71,10 @@ public class AssertXmlDocument
 
     public async Task<AssertXmlDocument> HasValidStructureAsync(DocumentType type, string version = "0.1")
     {
-        var validationResult = await _documentValidator!.ValidateAsync(_stream, DocumentFormat.Xml, type, CancellationToken.None, version).ConfigureAwait(false);
+        ArgumentNullException.ThrowIfNull(_documentValidator);
+        var validationResult = await _documentValidator.ValidateAsync(_stream, DocumentFormat.Xml, type, CancellationToken.None, version).ConfigureAwait(false);
         Assert.True(validationResult.IsValid);
         return this;
-    }
-
-    private List<XElement> GetMarketActivityRecords()
-    {
-        return _document.Root?.Elements()
-            .Where(x => x.Name.LocalName.Equals(MarketActivityRecordElementName, StringComparison.OrdinalIgnoreCase))
-            .ToList() ?? new List<XElement>();
-    }
-
-    private List<XElement> GetUsagePointLocations()
-    {
-        return _document.Root?.Descendants()
-            .Where(x => x.Name.LocalName.Equals("UsagePointLocation", StringComparison.OrdinalIgnoreCase))
-            .ToList() ?? new List<XElement>();
     }
 
     private string EnsureXPathHasPrefix(string xpath)

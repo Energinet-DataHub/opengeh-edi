@@ -48,8 +48,8 @@ public class AggregationFactory
         AggregatedMeasureDataProcess aggregatedMeasureDataProcess,
         AggregatedTimeSerie aggregatedTimeSerie)
     {
-        if (aggregatedMeasureDataProcess == null) throw new ArgumentNullException(nameof(aggregatedMeasureDataProcess));
-        if (aggregatedTimeSerie == null) throw new ArgumentNullException(nameof(aggregatedTimeSerie));
+        ArgumentNullException.ThrowIfNull(aggregatedMeasureDataProcess);
+        ArgumentNullException.ThrowIfNull(aggregatedTimeSerie);
 
         if ((aggregatedMeasureDataProcess.MeteringPointType != null
                 ? MeteringPointType.FromCode(aggregatedMeasureDataProcess.MeteringPointType).Name
@@ -79,7 +79,7 @@ public class AggregationFactory
         EnergyResultProducedV2 integrationEvent,
         CancellationToken cancellationToken)
     {
-        if (integrationEvent == null) throw new ArgumentNullException(nameof(integrationEvent));
+        ArgumentNullException.ThrowIfNull(integrationEvent);
 
         return new Aggregation(
             MapPoints(integrationEvent.TimeSeriesPoints),
@@ -246,7 +246,7 @@ public class AggregationFactory
         return new Period(integrationEvent.PeriodStartUtc.ToInstant(), integrationEvent.PeriodEndUtc.ToInstant());
     }
 
-    private static IReadOnlyList<Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
+    private static System.Collections.ObjectModel.ReadOnlyCollection<Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
     {
         var points = new List<Point>();
 

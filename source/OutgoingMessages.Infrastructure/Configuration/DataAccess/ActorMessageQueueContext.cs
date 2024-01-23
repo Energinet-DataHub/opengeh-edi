@@ -40,7 +40,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.Da
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
+            ArgumentNullException.ThrowIfNull(modelBuilder);
 
             modelBuilder.ApplyConfiguration(new OutgoingMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ActorMessageQueueEntityConfiguration());

@@ -28,7 +28,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Assertions;
 
 public class AssertOutgoingMessage
 {
-    private readonly ISerializer _serializer = new Serializer();
+    private readonly Serializer _serializer = new();
     private readonly dynamic _message;
     private readonly string _messageRecord;
 
@@ -67,7 +67,7 @@ public class AssertOutgoingMessage
 
     public static async Task OutgoingMessageIsNullAsync(string messageType, string businessReason, MarketRole receiverRole, IDatabaseConnectionFactory connectionFactoryFactory)
     {
-        if (connectionFactoryFactory == null) throw new ArgumentNullException(nameof(connectionFactoryFactory));
+        ArgumentNullException.ThrowIfNull(connectionFactoryFactory);
         ArgumentNullException.ThrowIfNull(receiverRole);
         using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var message = await connection.QuerySingleOrDefaultAsync(

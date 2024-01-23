@@ -34,7 +34,7 @@ public abstract class SchemaBase
 
     protected string? GetSchemaLocation(string businessProcessType, string version)
     {
-        if (businessProcessType == null) throw new ArgumentNullException(nameof(businessProcessType));
+        ArgumentNullException.ThrowIfNull(businessProcessType);
 
         var schemaName = string.Empty;
         var businessProcessTypeToUpper = businessProcessType.ToUpperInvariant();

@@ -33,7 +33,7 @@ public class ArchivedMessageGetDocumentController : ControllerBase
     [Produces("text/plain")]
     public async Task<ActionResult> RequestAsync(string id, CancellationToken cancellationToken)
     {
-        if (id == null) throw new ArgumentNullException(nameof(id));
+        ArgumentNullException.ThrowIfNull(id);
 
         var result = await _archivedMessagesClient.GetAsync(id, cancellationToken).ConfigureAwait(false);
 

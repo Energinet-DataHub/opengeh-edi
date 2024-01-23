@@ -24,7 +24,7 @@ public class ArchivedMessageEntityConfiguration : IEntityTypeConfiguration<Archi
 {
     public void Configure(EntityTypeBuilder<ArchivedMessage> builder)
     {
-        if (builder == null) throw new ArgumentNullException(nameof(builder));
+        ArgumentNullException.ThrowIfNull(builder);
 
         builder.ToTable("ArchivedMessages", "dbo");
         builder.HasKey(x => x.Id);

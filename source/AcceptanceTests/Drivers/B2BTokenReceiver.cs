@@ -38,8 +38,8 @@ public class B2BTokenReceiver
 
     public async Task<string> GetB2BTokenAsync(string clientId, string clientSecret)
     {
-        if (clientId == null) throw new ArgumentNullException(nameof(clientId));
-        if (clientSecret == null) throw new ArgumentNullException(nameof(clientSecret));
+        ArgumentNullException.ThrowIfNull(clientId);
+        ArgumentNullException.ThrowIfNull(clientSecret);
         using var request = new HttpRequestMessage(HttpMethod.Post, new Uri($"https://login.microsoftonline.com/{_tenantId}/oauth2/v2.0/token", UriKind.Absolute));
 
         request.Content = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>

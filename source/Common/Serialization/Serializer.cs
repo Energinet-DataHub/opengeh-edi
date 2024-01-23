@@ -61,10 +61,10 @@ namespace Energinet.DataHub.EDI.Common.Serialization
 
         public Task SerializeAsync<TValue>(Stream stream, TValue value)
         {
-            if (stream == null) throw new ArgumentNullException(nameof(stream));
-            if (value == null) throw new ArgumentNullException(nameof(value));
+            ArgumentNullException.ThrowIfNull(stream);
+            ArgumentNullException.ThrowIfNull(value);
 
-            return System.Text.Json.JsonSerializer.SerializeAsync(stream, value, _options);
+            return JsonSerializer.SerializeAsync(stream, value, _options);
         }
     }
 }

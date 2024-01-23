@@ -40,7 +40,7 @@ public sealed class EdiB2CDriver : IDisposable
     public async Task<List<ArchivedMessageSearchResponse>> RequestArchivedMessageSearchAsync(Uri requestUri, JObject payload)
     {
         var b2cClient = await _httpClient;
-        if (payload == null) throw new ArgumentNullException(nameof(payload));
+        ArgumentNullException.ThrowIfNull(payload);
         using var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
         request.Content = new StringContent(payload.ToString(), Encoding.UTF8, "application/json");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");

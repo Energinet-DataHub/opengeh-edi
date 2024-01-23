@@ -35,7 +35,7 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
         bool multiTenancy,
         IEnumerable<Claim> claims)
     {
-        if (claims == null) throw new ArgumentNullException(nameof(claims));
+        ArgumentNullException.ThrowIfNull(claims);
 
         string? actorNumber = null;
         string? role = null;
