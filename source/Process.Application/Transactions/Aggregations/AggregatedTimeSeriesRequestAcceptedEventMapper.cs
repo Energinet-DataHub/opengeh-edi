@@ -53,7 +53,8 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
                 MapMeteringPointType(aggregation.TimeSeriesType),
                 MapUnitType(aggregation.QuantityUnit),
                 MapResolution(aggregation.Resolution),
-                await MapGridAreaDetailsAsync(aggregation.GridArea, cancellationToken).ConfigureAwait(false)));
+                await MapGridAreaDetailsAsync(aggregation.GridArea, cancellationToken).ConfigureAwait(false),
+                aggregation.CalculationResultVersion));
         }
 
         return new AggregatedTimeSerieRequestWasAccepted(

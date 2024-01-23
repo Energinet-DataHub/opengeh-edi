@@ -77,7 +77,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
-            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId);
+            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId)
+            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1);
     }
 
     [Fact]
@@ -103,7 +104,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
-            .HasSenderId(DataHubDetails.DataHubActorNumber.Value);
+            .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
+            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1);
     }
 
     protected override void Dispose(bool disposing)
@@ -134,6 +136,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             TimeSeriesPoints = { point },
             TimeSeriesType = TimeSeriesType.Production,
             Resolution = Resolution.Pt15M,
+            CalculationResultVersion = 1,
         };
 
         var aggregatedTimeSerie = new AggregatedTimeSeriesRequestAccepted();
