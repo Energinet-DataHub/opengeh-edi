@@ -64,5 +64,3 @@ public class OutgoingMessageDtoBuilder
         return this;
     }
 }
-
-internal sealed record MessageRecordStub();

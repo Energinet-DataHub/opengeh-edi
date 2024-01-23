@@ -14,7 +14,6 @@
 
 using System.Transactions;
 using Energinet.DataHub.EDI.Process.Interfaces;
-using IncomingMessages.Infrastructure.Messages.Exceptions;
 using IncomingMessages.Infrastructure.ValidationErrors;
 
 namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
