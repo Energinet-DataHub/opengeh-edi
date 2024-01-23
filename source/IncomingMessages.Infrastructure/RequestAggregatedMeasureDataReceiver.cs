@@ -44,7 +44,7 @@ public class RequestAggregatedMeasureDataReceiver : IRequestAggregatedMeasureDat
         RequestAggregatedMeasureDataDto requestAggregatedMeasureDataDto,
         CancellationToken cancellationToken)
     {
-        if (requestAggregatedMeasureDataDto == null) throw new ArgumentNullException(nameof(requestAggregatedMeasureDataDto));
+        ArgumentNullException.ThrowIfNull(requestAggregatedMeasureDataDto);
 
         await AddMessageIdAndTransactionIdAsync(requestAggregatedMeasureDataDto, cancellationToken)
             .ConfigureAwait(false);

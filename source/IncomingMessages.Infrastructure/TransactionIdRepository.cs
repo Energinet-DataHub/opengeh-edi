@@ -42,7 +42,7 @@ namespace IncomingMessages.Infrastructure
             IReadOnlyList<string> transactionIds,
             CancellationToken cancellationToken)
         {
-            if (transactionIds == null) throw new ArgumentNullException(nameof(transactionIds));
+            ArgumentNullException.ThrowIfNull(transactionIds);
 
             foreach (var transactionId in transactionIds)
             {

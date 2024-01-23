@@ -63,7 +63,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
 
         public CompositionRoot AddSystemClock(ISystemDateTimeProvider provider)
         {
-            if (provider == null) throw new ArgumentNullException(nameof(provider));
+            ArgumentNullException.ThrowIfNull(provider);
             _services.AddScoped(sp => provider);
             return this;
         }

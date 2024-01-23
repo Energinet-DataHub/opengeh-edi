@@ -41,7 +41,7 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
 
         public CommandMetadata GetByType(Type commandType)
         {
-            if (commandType == null) throw new ArgumentNullException(nameof(commandType));
+            ArgumentNullException.ThrowIfNull(commandType);
             return _values.Values
                        .FirstOrDefault(metadata => metadata.CommandType == commandType) ??
                    throw new InvalidOperationException(

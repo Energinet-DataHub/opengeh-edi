@@ -56,7 +56,7 @@ public class InternalCommandRegistrationTests : TestBase
 
     private bool IsRegistered(Type commandType)
     {
-        if (commandType == null) throw new ArgumentNullException(nameof(commandType));
+        ArgumentNullException.ThrowIfNull(commandType);
         try
         {
             _mapper.GetByType(commandType);

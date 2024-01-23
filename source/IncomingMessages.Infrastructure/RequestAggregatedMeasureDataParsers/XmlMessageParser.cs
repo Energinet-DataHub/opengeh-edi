@@ -28,13 +28,8 @@ public class XmlMessageParser : IMessageParser
 {
     private const string SeriesRecordElementName = "Series";
     private const string HeaderElementName = "RequestAggregatedMeasureData_MarketDocument";
-    private readonly ISchemaProvider _schemaProvider;
+    private readonly CimXmlSchemaProvider _schemaProvider = new();
     private readonly List<ValidationError> _errors = new();
-
-    public XmlMessageParser()
-    {
-        _schemaProvider = new CimXmlSchemaProvider();
-    }
 
     public DocumentFormat HandledFormat => DocumentFormat.Xml;
 
@@ -42,7 +37,7 @@ public class XmlMessageParser : IMessageParser
 
     public async Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(Stream message, CancellationToken cancellationToken)
     {
-        if (message == null) throw new ArgumentNullException(nameof(message));
+        ArgumentNullException.ThrowIfNull(message);
 
         string version;
         string businessProcessType;
@@ -79,7 +74,7 @@ public class XmlMessageParser : IMessageParser
         {
             var parsedXmlData = await ParseXmlDataAsync(reader, cancellationToken).ConfigureAwait(false);
 
-            if (_errors.Any())
+            if (_errors.Count != 0)
             {
                return new RequestAggregatedMeasureDataMarketMessageParserResult(_errors.ToArray());
             }
@@ -105,7 +100,7 @@ public class XmlMessageParser : IMessageParser
 
     private static string GetBusinessReason(Stream message)
     {
-        if (message == null) throw new ArgumentNullException(nameof(message));
+        ArgumentNullException.ThrowIfNull(message);
         var split = SplitNamespace(message);
         var businessReason = split[3];
         return businessReason;
@@ -113,7 +108,7 @@ public class XmlMessageParser : IMessageParser
 
     private static string[] SplitNamespace(Stream message)
     {
-        if (message == null) throw new ArgumentNullException(nameof(message));
+        ArgumentNullException.ThrowIfNull(message);
 
         ResetMessagePosition(message);
         using var reader = XmlReader.Create(message);
@@ -138,7 +133,7 @@ public class XmlMessageParser : IMessageParser
 
     private static string GetVersion(Stream message)
     {
-        if (message == null) throw new ArgumentNullException(nameof(message));
+        ArgumentNullException.ThrowIfNull(message);
         var split = SplitNamespace(message);
         var version = split[4] + "." + split[5];
         return version;

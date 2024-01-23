@@ -26,7 +26,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus
 
         public ServiceBusSenderAdapter(ServiceBusClient serviceBusClient, string topicName)
         {
-            if (serviceBusClient == null) throw new ArgumentNullException(nameof(serviceBusClient));
+            ArgumentNullException.ThrowIfNull(serviceBusClient);
             TopicName = topicName;
             _serviceBusSender = serviceBusClient.CreateSender(topicName);
         }

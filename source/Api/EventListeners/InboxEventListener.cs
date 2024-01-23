@@ -43,8 +43,8 @@ public class InboxEventListener
         FunctionContext context,
         CancellationToken hostCancellationToken)
     {
-        if (message == null) throw new ArgumentNullException(nameof(message));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(message);
+        ArgumentNullException.ThrowIfNull(context);
 
         context.BindingContext.BindingData.TryGetValue("MessageId", out var eventId);
         ArgumentNullException.ThrowIfNull(eventId);

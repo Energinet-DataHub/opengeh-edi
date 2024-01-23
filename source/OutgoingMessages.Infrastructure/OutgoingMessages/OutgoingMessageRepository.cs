@@ -88,7 +88,7 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
         return convertedToString;
     }
 
-    private static Stream ConvertToStream(string message)
+    private static MemoryStream ConvertToStream(string message)
     {
         var stream = new MemoryStream();
 #pragma warning disable CA2000

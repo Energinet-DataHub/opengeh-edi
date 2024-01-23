@@ -40,7 +40,7 @@ public class RejectRequestAggregatedMeasureDataEbixDocumentWriter : EbixDocument
 
     public override bool HandlesType(DocumentType documentType)
     {
-        if (documentType == null) throw new ArgumentNullException(nameof(documentType));
+        ArgumentNullException.ThrowIfNull(documentType);
         return DocumentType.RejectRequestAggregatedMeasureData == documentType;
     }
 

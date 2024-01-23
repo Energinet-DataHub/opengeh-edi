@@ -26,8 +26,8 @@ public class CalculationResponsibleReceiverVerification : IReceiverValidator
 
     public Task<Result> VerifyAsync(string receiverNumber, string receiverRole)
     {
-        if (receiverNumber == null) throw new ArgumentNullException(nameof(receiverNumber));
-        if (receiverRole == null) throw new ArgumentNullException(nameof(receiverRole));
+        ArgumentNullException.ThrowIfNull(receiverNumber);
+        ArgumentNullException.ThrowIfNull(receiverRole);
 
         if (IsCalculationResponsible(receiverRole) == false)
         {

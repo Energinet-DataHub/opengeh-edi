@@ -23,13 +23,13 @@ namespace IncomingMessages.Infrastructure.ValidationErrors
 
         public static InvalidMessageStructure From(Exception exception)
         {
-            if (exception == null) throw new ArgumentNullException(nameof(exception));
+            ArgumentNullException.ThrowIfNull(exception);
             return new InvalidMessageStructure(exception.Message);
         }
 
         public static InvalidMessageStructure From(string message)
         {
-            if (message == null) throw new ArgumentNullException(nameof(message));
+            ArgumentNullException.ThrowIfNull(message);
             return new InvalidMessageStructure(message);
         }
     }
