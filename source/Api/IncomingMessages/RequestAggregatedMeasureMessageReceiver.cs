@@ -24,7 +24,10 @@ using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using IncomingMessages.Infrastructure;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 
 namespace Energinet.DataHub.EDI.Api.IncomingMessages;
 
@@ -44,6 +47,12 @@ public class RequestAggregatedMeasureMessageReceiver
         _correlationContext = correlationContext;
     }
 
+    [OpenApiOperation(operationId: "RequestAggregatedMeasureData", tags: new[] { "DataHub3" }, Description = "Is the endpoint for requesting previously aggregated measured data", Visibility = OpenApiVisibilityType.Important)]
+    [OpenApiSecurity("http", SecuritySchemeType.Http, Name = "Authorization", In = OpenApiSecurityLocationType.Header, Description = "JWT Authorization header using the Bearer scheme", Scheme = OpenApiSecuritySchemeType.Bearer, BearerFormat = "\"Authorization: Bearer {token}\"")]
+    [OpenApiParameter("Content-Type", In = ParameterLocation.Header, Required = true, Type = typeof(string), Summary = "Request", Description = "Content type for requested response")]
+    [OpenApiRequestBody("application/json", typeof(string), Description = "Must be supplied a valid RSM-016 request message")]
+    [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Accepted, Description = "Request accepted")]
+    [OpenApiResponseWithBody(statusCode: HttpStatusCode.BadRequest, contentType: "application/json", bodyType: typeof(string), Description = "Request validation failed, response contains error message")]
     [Function(nameof(RequestAggregatedMeasureMessageReceiver))]
     public async Task<HttpResponseData> RunAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")]

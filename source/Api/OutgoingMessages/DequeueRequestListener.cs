@@ -21,6 +21,9 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
+using Microsoft.OpenApi.Models;
 
 namespace Energinet.DataHub.EDI.Api.OutgoingMessages;
 
@@ -35,6 +38,11 @@ public class DequeueRequestListener
         _authenticatedActor = authenticatedActor;
     }
 
+    [OpenApiOperation(operationId: "Dequeue", tags: new[] { "DataHub3" }, Description = "Is the endpoint for dequeue messages", Visibility = OpenApiVisibilityType.Important)]
+    [OpenApiSecurity("http", SecuritySchemeType.Http, Name = "Authorization", In = OpenApiSecurityLocationType.Header, Description = "JWT Authorization header using the Bearer scheme", Scheme = OpenApiSecuritySchemeType.Bearer, BearerFormat = "\"Authorization: Bearer {token}\"")]
+    [OpenApiParameter("messageId", In = ParameterLocation.Path, Required = false, Type = typeof(string), Summary = "Category", Description = "The desired message to be dequeued")]
+    [OpenApiResponseWithoutBody(HttpStatusCode.Accepted, Description = "successful dequeue")]
+    [OpenApiResponseWithoutBody(HttpStatusCode.BadRequest, Description = "unsuccessful dequeue")]
     [Function("DequeueRequestListener")]
     public async Task<HttpResponseData> RunAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "dequeue/{messageId}"),]

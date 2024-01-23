@@ -40,12 +40,19 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware
             return context.FunctionDefinition.InputBindings.Any(input => input.Value.Type.Equals(triggerType.ToString(), StringComparison.OrdinalIgnoreCase));
         }
 
-        internal static bool IsRequestFromUser(this FunctionContext context)
+        /// <summary>
+        /// Is used to determine if the current request is omitted from authorization.
+        /// </summary>
+        internal static bool EndpointIsOmittedFromAuth(this FunctionContext context)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
-            return context.Is(TriggerType.HttpTrigger) &&
-                   context.FunctionDefinition.Name != "HealthCheck";
+            var healthCheckRequest = context.Is(TriggerType.HttpTrigger) && context.FunctionDefinition.Name == "HealthCheck";
+            var swaggerRequest = (context.Is(TriggerType.HttpTrigger) && context.FunctionDefinition.Name == "RenderSwaggerUI")
+                                 || (context.Is(TriggerType.HttpTrigger) && context.FunctionDefinition.Name == "RenderSwaggerDocument");
+
+            var endpointIsOmittedFromAuth = healthCheckRequest || swaggerRequest;
+            return endpointIsOmittedFromAuth;
         }
 
         /// <summary>

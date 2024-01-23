@@ -40,7 +40,7 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication
             var authenticatedActor = context.GetService<AuthenticatedActor>();
             var authenticationMethods = context.GetServices<IAuthenticationMethod>();
 
-            if (!context.IsRequestFromUser())
+            if (context.EndpointIsOmittedFromAuth())
             {
                 _logger.LogInformation("Functions is not triggered by HTTP, skipping authentication");
                 await next(context).ConfigureAwait(false);

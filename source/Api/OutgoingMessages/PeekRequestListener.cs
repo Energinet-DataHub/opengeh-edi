@@ -24,7 +24,10 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using IncomingMessages.Infrastructure;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 
 namespace Energinet.DataHub.EDI.Api.OutgoingMessages;
 
@@ -44,6 +47,12 @@ public class PeekRequestListener
         _outgoingMessagesClient = outgoingMessagesClient;
     }
 
+    [OpenApiOperation(operationId: "Peek", tags: new[] { "DataHub3" }, Description = "Is the endpoint for receiving messages", Visibility = OpenApiVisibilityType.Important)]
+    [OpenApiSecurity("http", SecuritySchemeType.Http, Name = "Authorization", In = OpenApiSecurityLocationType.Header, Description = "JWT Authorization header using the Bearer scheme", Scheme = OpenApiSecuritySchemeType.Bearer, BearerFormat = "\"Authorization: Bearer {token}\"")]
+    [OpenApiParameter("Content-Type", In = ParameterLocation.Header, Required = true, Type = typeof(string), Description = "The content type for requested response")]
+    [OpenApiParameter("messageCategory", In = ParameterLocation.Path, Required = false, Type = typeof(string), Description = "The desired message category to be peeked")]
+    [OpenApiResponseWithBody(statusCode: HttpStatusCode.Accepted, contentType: "application/json", bodyType: typeof(string), Description = "Returns the requested message")]
+    [OpenApiResponseWithoutBody(HttpStatusCode.NoContent, Description = "No message available to be peeked")]
     [Function("PeekRequestListener")]
     public async Task<HttpResponseData> RunAsync(
         [HttpTrigger(
