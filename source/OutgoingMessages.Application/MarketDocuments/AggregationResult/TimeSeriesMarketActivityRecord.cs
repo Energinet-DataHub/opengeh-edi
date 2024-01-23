@@ -29,6 +29,7 @@ public record TimeSeriesMarketActivityRecord(
     string? BalanceResponsibleNumber,
     Period Period,
     IReadOnlyList<Point> Point,
+    long? CalculationResultVersion = null,
     string? OriginalTransactionIdReference = null,
     string? SettlementVersion = null);
 

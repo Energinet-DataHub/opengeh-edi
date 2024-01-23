@@ -66,7 +66,8 @@ public class AggregationFactory
             aggregatedMeasureDataProcess.BusinessTransactionId.Id,
             aggregatedMeasureDataProcess.RequestedByActorId.Value,
             MapReceiverRole(aggregatedMeasureDataProcess),
-            aggregatedMeasureDataProcess.SettlementVersion?.Name);
+            aggregatedMeasureDataProcess.SettlementVersion?.Name,
+            aggregatedTimeSerie.CalculationResultVersion);
     }
 
     public async Task<Aggregation> CreateAsync(
