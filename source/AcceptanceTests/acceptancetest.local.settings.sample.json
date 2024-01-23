@@ -17,5 +17,6 @@
   "ENERGY_SUPPLIER_CLIENT_SECRET": "<client secret to generate token for energy supplier>",
   
   "B2C_USERNAME": "<username for user in b2c tenant>",
-  "B2C_PASSWORD": "<password for user in b2c tenant>"
+  "B2C_PASSWORD": "<password for user in b2c tenant>",
+  "MARKET_PARTICIPANT_URI": "<market participant url>"
 }
