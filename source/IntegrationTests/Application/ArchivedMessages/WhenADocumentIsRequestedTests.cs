@@ -91,8 +91,8 @@ public class WhenADocumentIsRequestedTests : TestBase
             string.IsNullOrWhiteSpace(id) ? Guid.NewGuid().ToString() : id,
             string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
             DocumentType.NotifyAggregatedMeasureData.Name,
-            "1234512345123",
-            "1234512345128",
+            ActorNumber.Create("1234512345123"),
+            ActorNumber.Create("1234512345128"),
             _systemDateTimeProvider.Now(),
             BusinessReason.BalanceFixing.Name,
             new MemoryStream());

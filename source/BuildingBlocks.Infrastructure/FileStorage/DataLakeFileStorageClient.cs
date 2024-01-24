@@ -29,12 +29,12 @@ public class DataLakeFileStorageClient : IFileStorageClient
         _blobServiceClient = blobServiceClient;
     }
 
-    public async Task UploadAsync(string rootFolder, FileStorageReference reference, Stream stream)
+    public async Task UploadAsync(FileStorageReference reference, Stream stream)
     {
         ArgumentNullException.ThrowIfNull(stream);
         ArgumentNullException.ThrowIfNull(reference);
 
-        var container = _blobServiceClient.GetBlobContainerClient(rootFolder);
+        var container = _blobServiceClient.GetBlobContainerClient(reference.Category);
 
         var containerExists = await container.ExistsAsync().ConfigureAwait(false);
 
@@ -45,11 +45,28 @@ public class DataLakeFileStorageClient : IFileStorageClient
         await container.UploadBlobAsync(reference.Value, stream).ConfigureAwait(false);
     }
 
-    public async Task<Stream> DownloadAsync(string rootFolder, FileStorageReference reference)
+    public async Task UploadAsync(FileStorageReference reference, string content)
+    {
+        var memoryStream = new MemoryStream();
+
+        // Is disposed when the MemoryStream is disposed
+#pragma warning disable CA2000
+        var streamWriter = new StreamWriter(memoryStream);
+#pragma warning restore CA2000
+
+        await streamWriter.WriteAsync(content).ConfigureAwait(false);
+        await streamWriter.FlushAsync().ConfigureAwait(false);
+
+        memoryStream.Position = 0; // Make sure the stream is ready to be read
+
+        await UploadAsync(reference, memoryStream).ConfigureAwait(false);
+    }
+
+    public async Task<Stream> DownloadAsync(FileStorageReference reference)
     {
         ArgumentNullException.ThrowIfNull(reference);
 
-        var container = _blobServiceClient.GetBlobContainerClient(rootFolder);
+        var container = _blobServiceClient.GetBlobContainerClient(reference.Category);
 
         var blob = container.GetBlobClient(reference.Value);
 

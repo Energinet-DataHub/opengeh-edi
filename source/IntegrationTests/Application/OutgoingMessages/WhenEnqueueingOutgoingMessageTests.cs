@@ -29,6 +29,7 @@ using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -198,7 +199,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         // Act
         var createdId = await EnqueueAndCommitAsync(message);
         var fileStorageReference = await GetOutgoingMessageFileStorageReferenceFromDatabase(createdId);
-        var uploadDuplicateFile = async () => await _fileStorageClient.UploadAsync("outgoing", new FileStorageReference(fileStorageReference), new MemoryStream(new byte[] { 0x20 }));
+        var uploadDuplicateFile = async () => await _fileStorageClient.UploadAsync(new FileStorageReference(OutgoingMessage.FileStorageCategory, fileStorageReference), new MemoryStream(new byte[] { 0x20 }));
 
         // Assert
         (await uploadDuplicateFile.Should().ThrowAsync<RequestFailedException>())

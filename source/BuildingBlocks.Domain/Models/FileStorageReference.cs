@@ -13,17 +13,33 @@
 // limitations under the License.
 
 using System;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public record FileStorageReference
 {
-    public FileStorageReference(string value)
+    public FileStorageReference(string category, string path)
     {
-        if (string.IsNullOrEmpty(value)) throw new ArgumentNullException(nameof(value));
+        ArgumentException.ThrowIfNullOrEmpty(category);
+        ArgumentException.ThrowIfNullOrEmpty(path);
 
-        Value = value;
+        Category = category;
+        Value = path;
     }
 
     public string Value { get; }
+
+    public string Category { get; }
+
+    public static FileStorageReference Create(string category, ActorNumber actorNumber, Instant timeStamp, string documentId)
+    {
+        ArgumentNullException.ThrowIfNull(actorNumber);
+
+        var dateTimeUtc = timeStamp.ToDateTimeUtc();
+
+        var reference = $"{actorNumber.Value}/{dateTimeUtc.Year:0000}/{dateTimeUtc.Month:00}/{dateTimeUtc.Day:00}/{documentId}";
+
+        return new FileStorageReference(category, reference);
+    }
 }

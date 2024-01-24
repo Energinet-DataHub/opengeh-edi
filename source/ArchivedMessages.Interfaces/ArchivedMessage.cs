@@ -12,17 +12,57 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
-public record ArchivedMessage(
-    string Id,
-    string? MessageId,
-    string DocumentType,
-    string? SenderNumber,
-    string? ReceiverNumber,
-    Instant CreatedAt,
-    string? BusinessReason,
-    Stream Document);
+public class ArchivedMessage
+{
+    public const string FileStorageCategory = "archived";
+
+    private readonly Stream _document;
+
+    public ArchivedMessage(
+        string id,
+        string? messageId,
+        string documentType,
+        ActorNumber senderNumber,
+        ActorNumber receiverNumber,
+        Instant createdAt,
+        string? businessReason,
+        Stream document)
+    {
+        MessageId = messageId;
+        DocumentType = documentType;
+        SenderNumber = senderNumber;
+        ReceiverNumber = receiverNumber;
+        CreatedAt = createdAt;
+        BusinessReason = businessReason;
+        _document = document;
+        Id = id;
+
+        FileStorageReference = FileStorageReference.Create(FileStorageCategory, ReceiverNumber, createdAt, Id);
+    }
+
+    public string Id { get; }
+
+    public string? MessageId { get; }
+
+    public string DocumentType { get; }
+
+    public ActorNumber SenderNumber { get; }
+
+    public ActorNumber ReceiverNumber { get; }
+
+    public Instant CreatedAt { get; }
+
+    public string? BusinessReason { get; }
+
+    public FileStorageReference FileStorageReference { get; }
+
+    [SuppressMessage("Design", "CA1024:Use properties where appropriate", Justification = "Can cause error as a property because of serialization and message record maybe being null at the time")]
+    public Stream GetDocumentStream() => _document;
+}

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -42,13 +41,10 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
 
         _context.OutgoingMessages.Add(message);
 
-        using var messageRecordStream = ConvertToStream(message.GetMessageRecord());
-
         // Must await here instead of returning the Task, since messageRecordStream gets disposed when returning from function
         await _fileStorageClient.UploadAsync(
-                "outgoing",
                 message.FileStorageReference,
-                messageRecordStream)
+                message.GetMessageRecord())
             .ConfigureAwait(false);
     }
 
@@ -62,7 +58,7 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
 
         await Task.WhenAll(downloadAndSetMessageRecordTasks).ConfigureAwait(false);
 
-        //All messages in a bundle have the same meta data
+        // All messages in a bundle have the same meta data
         var firstMessage = outgoingMessages.First();
 
         return new OutgoingMessageBundle(
@@ -88,23 +84,9 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
         return convertedToString;
     }
 
-    private static Stream ConvertToStream(string message)
-    {
-        var stream = new MemoryStream();
-#pragma warning disable CA2000
-        // Is disposed when the MemoryStream is disposed
-        var writer = new StreamWriter(stream);
-#pragma warning restore CA2000
-        writer.Write(message);
-        writer.Flush();
-
-        stream.Position = 0; // Make sure the stream is ready to be read
-        return stream;
-    }
-
     private async Task DownloadAndSetMessageRecordAsync(OutgoingMessage outgoingMessage)
     {
-        var messageRecordStream = await _fileStorageClient.DownloadAsync("outgoing", outgoingMessage.FileStorageReference).ConfigureAwait(false);
+        var messageRecordStream = await _fileStorageClient.DownloadAsync(outgoingMessage.FileStorageReference).ConfigureAwait(false);
 
         var messageRecord = await ConvertToStringAsync(messageRecordStream).ConfigureAwait(false);
 

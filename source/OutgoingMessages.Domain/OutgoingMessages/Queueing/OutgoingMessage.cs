@@ -23,6 +23,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 {
     public class OutgoingMessage
     {
+        public const string FileStorageCategory = "outgoing";
+
         private string _messageRecord;
 
         public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, Guid processId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord, Instant timestamp)
@@ -105,11 +107,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
         private static FileStorageReference CreateFileStorageReference(OutgoingMessageId id, ActorNumber receiverActorNumber, Instant timestamp)
         {
-            var dateTimeUtc = timestamp.ToDateTimeUtc();
-
-            var referenceString = $"{receiverActorNumber.Value}/{dateTimeUtc.Year:0000}/{dateTimeUtc.Month:00}/{dateTimeUtc.Day:00}/{id.Value:N}";
-
-            return new FileStorageReference(referenceString);
+            return FileStorageReference.Create(FileStorageCategory, receiverActorNumber, timestamp, id.Value.ToString("N"));
         }
     }
 }
