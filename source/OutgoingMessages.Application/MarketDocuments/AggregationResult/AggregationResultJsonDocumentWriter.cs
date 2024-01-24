@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Text.Json;
@@ -175,7 +176,7 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
         writer.WriteEndObject();
     }
 
-    private List<TimeSeriesMarketActivityRecord> ParseFrom(IReadOnlyCollection<string> payloads)
+    private ReadOnlyCollection<TimeSeriesMarketActivityRecord> ParseFrom(IReadOnlyCollection<string> payloads)
     {
         ArgumentNullException.ThrowIfNull(payloads);
         var timeSeries = new List<TimeSeriesMarketActivityRecord>();
@@ -184,6 +185,6 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
             timeSeries.Add(_parser.From<TimeSeriesMarketActivityRecord>(payload));
         }
 
-        return timeSeries;
+        return timeSeries.AsReadOnly();
     }
 }

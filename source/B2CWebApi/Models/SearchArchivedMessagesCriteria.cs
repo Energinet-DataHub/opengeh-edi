@@ -20,5 +20,5 @@ public record SearchArchivedMessagesCriteria(
     string? MessageId,
     string? SenderNumber,
     string? ReceiverNumber,
-    IReadOnlyList<string>? DocumentTypes,
-    IReadOnlyList<string>? BusinessReasons);
+    IReadOnlyCollection<string>? DocumentTypes,
+    IReadOnlyCollection<string>? BusinessReasons);

@@ -52,7 +52,7 @@ public class RejectedAggregationResultMessage : OutgoingMessageDto
 
 public record RejectedTimeSerie(
     Guid TransactionId,
-    IReadOnlyList<RejectReason> RejectReasons,
+    IReadOnlyCollection<RejectReason> RejectReasons,
     string OriginalTransactionIdReference);
 
 public record RejectReason(string ErrorCode, string ErrorMessage);

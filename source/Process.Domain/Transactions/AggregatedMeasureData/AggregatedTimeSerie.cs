@@ -21,7 +21,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
 
 [Serializable]
 public record AggregatedTimeSerie(
-    IReadOnlyList<Point> Points,
+    IReadOnlyCollection<Point> Points,
     string MeteringPointType,
     string UnitType,
     string Resolution,

@@ -33,7 +33,7 @@ public class RejectedTimeSeriesBuilder
     private readonly Instant _creationDate = SampleData.CreationDate;
     private readonly Guid _transactionId = SampleData.TransactionId;
     private readonly string _originalTransactionIdReference = SampleData.OriginalTransactionId;
-    private readonly IReadOnlyList<RejectReason> _rejectReasons = new List<RejectReason> { new(SampleData.SerieReasonCode, SampleData.SerieReasonMessage) };
+    private readonly IReadOnlyCollection<RejectReason> _rejectReasons = new List<RejectReason> { new(SampleData.SerieReasonCode, SampleData.SerieReasonMessage) };
 
     public static RejectedTimeSeriesBuilder RejectAggregatedMeasureDataResult()
     {

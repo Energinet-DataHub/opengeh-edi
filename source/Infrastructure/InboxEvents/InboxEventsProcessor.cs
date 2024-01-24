@@ -102,7 +102,7 @@ public class InboxEventsProcessor
         }).ConfigureAwait(false);
     }
 
-    private async Task<IReadOnlyList<ReceivedInboxEvent>> FindPendingMessagesAsync(CancellationToken cancellationToken)
+    private async Task<IReadOnlyCollection<ReceivedInboxEvent>> FindPendingMessagesAsync(CancellationToken cancellationToken)
     {
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         var sql = "SELECT " +
