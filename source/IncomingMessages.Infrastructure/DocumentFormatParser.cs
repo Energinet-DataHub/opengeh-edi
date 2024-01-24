@@ -20,7 +20,7 @@ public static class DocumentFormatParser
 {
     public static DocumentFormat? ParseFromContentTypeHeaderValue(string value)
     {
-        if (value == null) throw new ArgumentNullException(nameof(value));
+        ArgumentNullException.ThrowIfNull(value);
         var contentType = ParseContentTypeName(value);
 
         return EnumerationType.GetAll
@@ -32,7 +32,7 @@ public static class DocumentFormatParser
     {
         var contentTypeValues = value.Split(";");
         var contentTypeValue = contentTypeValues[0].Trim();
-        var contentType = contentTypeValue.Substring(contentTypeValue.IndexOf("/", StringComparison.OrdinalIgnoreCase) + 1);
+        var contentType = contentTypeValue.Substring(contentTypeValue.IndexOf('/', StringComparison.OrdinalIgnoreCase) + 1);
         return contentType;
     }
 }

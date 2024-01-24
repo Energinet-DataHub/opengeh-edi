@@ -28,12 +28,14 @@ public class MarketDocument
         BundleId = bundleId;
     }
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    // ReSharper disable once UnusedMember.Local
+    private MarketDocument()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    {
+    }
+
     public Stream Payload { get; }
 
     public BundleId BundleId { get; }
-
-    #pragma warning disable
-    private MarketDocument()
-    {
-    }
 }

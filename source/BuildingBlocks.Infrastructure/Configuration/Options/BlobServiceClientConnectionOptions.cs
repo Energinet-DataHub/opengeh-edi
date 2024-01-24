@@ -12,24 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 
-namespace Energinet.DataHub.EDI.Process.Domain.Transactions;
-
-/// <summary>
-/// Represent the provide id for the transaction. E.g. Serie id or MarketActivityRecord id.
-/// </summary>
-public class ActorProvidedId : ValueObject
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1707", Justification = "To match naming in other domains")]
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1056", Justification = "Nuget expects a string")]
+public class BlobServiceClientConnectionOptions
 {
-    private ActorProvidedId(string id)
-    {
-        Id = id;
-    }
+    public string AZURE_STORAGE_ACCOUNT_CONNECTION_STRING { get; init; } = string.Empty;
 
-    public string Id { get; }
-
-    public static ActorProvidedId Create(string id)
-    {
-        return new ActorProvidedId(id);
-    }
+    public string AZURE_STORAGE_ACCOUNT_URL { get; init; } = string.Empty;
 }

@@ -48,7 +48,7 @@ public class MasterDataContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
+        ArgumentNullException.ThrowIfNull(modelBuilder);
 
         modelBuilder.ApplyConfiguration(new ActorEntityConfiguration());
         modelBuilder.ApplyConfiguration(new GridAreaOwnerEntityConfiguration());

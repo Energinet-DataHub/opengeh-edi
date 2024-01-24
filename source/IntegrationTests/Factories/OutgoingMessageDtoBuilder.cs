@@ -49,7 +49,8 @@ public class OutgoingMessageDtoBuilder
             "1234567891911",
             new Period(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant()),
             _points,
-            _businessReason.Name);
+            _businessReason.Name,
+            1);
     }
 
     public OutgoingMessageDtoBuilder WithReceiverNumber(string receiverNumber)
@@ -64,5 +65,3 @@ public class OutgoingMessageDtoBuilder
         return this;
     }
 }
-
-internal sealed record MessageRecordStub();

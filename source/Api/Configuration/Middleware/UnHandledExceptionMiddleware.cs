@@ -38,8 +38,8 @@ public class UnHandledExceptionMiddleware : IFunctionsWorkerMiddleware
 
     public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
-        if (next == null) throw new ArgumentNullException(nameof(next));
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(next);
 
         // If the endpoint is omitted from auth, we dont want to intercept exceptions.
         if (context.EndpointIsOmittedFromAuth())

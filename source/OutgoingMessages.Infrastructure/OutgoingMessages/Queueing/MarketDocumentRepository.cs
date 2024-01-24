@@ -33,8 +33,8 @@ public class MarketDocumentRepository : IMarketDocumentRepository
         return await _actorMessageQueueContext.MarketDocuments.FirstOrDefaultAsync(x => x.BundleId == bundleId).ConfigureAwait(false);
     }
 
-    public async Task AddAsync(MarketDocument marketDocument)
+    public void Add(MarketDocument marketDocument)
     {
-        await _actorMessageQueueContext.AddAsync(marketDocument).ConfigureAwait(false);
+        _actorMessageQueueContext.Add(marketDocument);
     }
 }

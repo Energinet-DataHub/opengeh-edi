@@ -13,10 +13,12 @@
 // limitations under the License.
 
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Extensions.Logging;
 
@@ -41,38 +43,50 @@ public class MessageEnqueuer
         _logger = logger;
     }
 
-    public async Task EnqueueAsync(OutgoingMessageDto outgoingMessage)
+    public async Task<OutgoingMessageId> EnqueueAsync(OutgoingMessageDto messageToEnqueue)
     {
-        if (outgoingMessage == null) throw new ArgumentNullException(nameof(outgoingMessage));
+        ArgumentNullException.ThrowIfNull(messageToEnqueue);
 
-        var message = MapOutgoingMessage(outgoingMessage);
+        var outgoingMessage = new OutgoingMessage(
+            messageToEnqueue.DocumentType,
+            messageToEnqueue.ReceiverId,
+            messageToEnqueue.ProcessId,
+            messageToEnqueue.BusinessReason,
+            messageToEnqueue.ReceiverRole,
+            messageToEnqueue.SenderId,
+            messageToEnqueue.SenderRole,
+            messageToEnqueue.MessageRecord,
+            _systemDateTimeProvider.Now());
 
+        var addToRepositoryTask = _outgoingMessageRepository.AddAsync(outgoingMessage);
+        var addToActorMessageQueueTask = AddToActorMessageQueueAsync(outgoingMessage);
+
+        await Task.WhenAll(addToRepositoryTask, addToActorMessageQueueTask).ConfigureAwait(false);
+        _logger.LogInformation("Message enqueued: {Message} for Actor: {ActorNumber}", outgoingMessage.Id, outgoingMessage.Receiver.Number.Value);
+
+        return outgoingMessage.Id;
+    }
+
+    private async Task AddToActorMessageQueueAsync(OutgoingMessage outgoingMessage)
+    {
+        var outgoingMessageReceiver = Receiver.Create(outgoingMessage.ReceiverId, outgoingMessage.ReceiverRole);
+        var actorMessageQueue = await GetMessageQueueForReceiverAsync(outgoingMessageReceiver).ConfigureAwait(false);
+        actorMessageQueue.Enqueue(outgoingMessage, _systemDateTimeProvider.Now());
+    }
+
+    private async Task<ActorMessageQueue> GetMessageQueueForReceiverAsync(Receiver receiver)
+    {
         var messageQueue = await _actorMessageQueueRepository.ActorMessageQueueForAsync(
-            message.Receiver.Number,
-            message.Receiver.ActorRole).ConfigureAwait(false);
+            receiver.Number,
+            receiver.ActorRole).ConfigureAwait(false);
 
         if (messageQueue == null)
         {
-            _logger.LogInformation("Creating new message queue for Actor: {ActorNumber}, MarketRole: {MarketRole}", message.Receiver.Number.Value, message.Receiver.ActorRole.Name);
-            messageQueue = ActorMessageQueue.CreateFor(message.Receiver);
+            _logger.LogInformation("Creating new message queue for Actor: {ActorNumber}, MarketRole: {MarketRole}", receiver.Number.Value, receiver.ActorRole.Name);
+            messageQueue = ActorMessageQueue.CreateFor(receiver);
             await _actorMessageQueueRepository.AddAsync(messageQueue).ConfigureAwait(false);
         }
 
-        messageQueue.Enqueue(message, _systemDateTimeProvider.Now());
-        _outgoingMessageRepository.Add(message);
-        _logger.LogInformation("Message enqueued: {Message} for Actor: {ActorNumber}", message.Id, message.Receiver.Number.Value);
-    }
-
-    private static OutgoingMessage MapOutgoingMessage(OutgoingMessageDto messageDto)
-    {
-        return new OutgoingMessage(
-            messageDto.DocumentType,
-            messageDto.ReceiverId,
-            messageDto.ProcessId,
-            messageDto.BusinessReason,
-            messageDto.ReceiverRole,
-            messageDto.SenderId,
-            messageDto.SenderRole,
-            messageDto.MessageRecord);
+        return messageQueue;
     }
 }

@@ -14,7 +14,10 @@
 
 using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -24,42 +27,58 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages
     {
         public void Configure(EntityTypeBuilder<OutgoingMessage> builder)
         {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            ArgumentNullException.ThrowIfNull(builder);
 
             builder.ToTable("OutgoingMessages", "dbo");
+
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id)
-                .ValueGeneratedNever();
+                .ValueGeneratedNever()
+                .HasConversion(
+                    outgoingMessageId => outgoingMessageId.Value,
+                    dbValue => OutgoingMessageId.CreateFromExisting(dbValue));
 
             builder.Property(x => x.DocumentType)
                 .HasConversion(
                     toDbValue => toDbValue.Name,
                     fromDbValue => EnumerationType.FromName<DocumentType>(fromDbValue));
+
             builder.Property(x => x.IsPublished);
+
             builder.Property(x => x.ReceiverId)
                 .HasConversion(
                     toDbValue => toDbValue.Value,
                     fromDbValue => ActorNumber.Create(fromDbValue));
+
             builder.Property(x => x.ReceiverRole)
                 .HasConversion(
                     toDbValue => toDbValue.ToString(),
                     fromDbValue => EnumerationType.FromName<MarketRole>(fromDbValue));
+
             builder.Property(x => x.ProcessId);
+
             builder.Property(x => x.BusinessReason);
+
             builder.Property(x => x.SenderId)
                 .HasConversion(
                     toDbValue => toDbValue.Value,
                     fromDbValue => ActorNumber.Create(fromDbValue));
+
             builder.Property(x => x.SenderRole)
                 .HasConversion(
                     toDbValue => toDbValue.ToString(),
                     fromDbValue => EnumerationType.FromName<MarketRole>(fromDbValue));
-            builder.Property(x => x.MessageRecord);
+
             builder.Property(x => x.AssignedBundleId).HasConversion(
                 toDbValue => toDbValue == null ? Guid.Empty : toDbValue.Id,
                 fromDbValue => fromDbValue == Guid.Empty ? null : BundleId.Create(fromDbValue));
 
             builder.Ignore(x => x.Receiver);
+
+            builder.Property(om => om.FileStorageReference)
+                .HasConversion(
+                    fileStorageReference => fileStorageReference.Value,
+                    dbValue => new FileStorageReference(dbValue));
         }
     }
 }

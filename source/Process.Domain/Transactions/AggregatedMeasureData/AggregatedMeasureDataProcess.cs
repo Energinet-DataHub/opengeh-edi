@@ -124,7 +124,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
 
         public void IsAccepted(IReadOnlyList<Aggregation> aggregations)
         {
-            if (aggregations == null) throw new ArgumentNullException(nameof(aggregations));
+            ArgumentNullException.ThrowIfNull(aggregations);
 
             if (_state == State.Sent)
             {
@@ -139,7 +139,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
 
         public void IsRejected(RejectedAggregatedMeasureDataRequest rejectAggregatedMeasureDataRequest)
         {
-            if (rejectAggregatedMeasureDataRequest == null) throw new ArgumentNullException(nameof(rejectAggregatedMeasureDataRequest));
+            ArgumentNullException.ThrowIfNull(rejectAggregatedMeasureDataRequest);
 
             if (_state == State.Sent)
             {

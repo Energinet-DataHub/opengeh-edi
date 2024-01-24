@@ -17,6 +17,7 @@ using System.Xml;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using IncomingMessages.Infrastructure.Messages;
+using static System.ArgumentNullException;
 
 namespace IncomingMessages.Infrastructure.Response
 {
@@ -28,13 +29,13 @@ namespace IncomingMessages.Infrastructure.Response
 
         public ResponseMessage From(Result result)
         {
-            if (result == null) throw new ArgumentNullException(nameof(result));
+            ThrowIfNull(result);
             return result.Success ? new ResponseMessage() : new ResponseMessage(CreateMessageBodyFrom(result));
         }
 
         private static string CreateMessageBodyFrom(Result result)
         {
-            if (result == null) throw new ArgumentNullException(nameof(result));
+            ThrowIfNull(result);
             var messageBody = new StringBuilder();
             var settings = new XmlWriterSettings() { OmitXmlDeclaration = true, };
 

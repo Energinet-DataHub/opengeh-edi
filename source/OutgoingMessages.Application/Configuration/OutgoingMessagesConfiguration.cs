@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages.Queueing;
@@ -30,10 +31,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.Configuration;
 
-public static class ActorMessageQueueConfiguration
+public static class OutgoingMessagesConfiguration
 {
-    public static void AddActorMessageQueueModule(this IServiceCollection services, IConfiguration configuration)
+    public static void AddOutgoingMessagesModule(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddBuildingBlocks(configuration);
+
         services.AddScopedSqlDbContext<ActorMessageQueueContext>(configuration);
 
         //AddMessageGenerationServices

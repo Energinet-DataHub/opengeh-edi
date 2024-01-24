@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -63,8 +64,8 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
 
     private void WriteSeries(IReadOnlyCollection<string> marketActivityRecords, Utf8JsonWriter writer)
     {
-        if (marketActivityRecords == null) throw new ArgumentNullException(nameof(marketActivityRecords));
-        if (writer == null) throw new ArgumentNullException(nameof(writer));
+        ArgumentNullException.ThrowIfNull(marketActivityRecords);
+        ArgumentNullException.ThrowIfNull(writer);
 
         writer.WritePropertyName("Series");
         writer.WriteStartArray();
@@ -74,8 +75,14 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
             writer.WriteStartObject();
 
             writer.WriteProperty("mRID", series.TransactionId.ToString());
-            // TODO XJOHO: We are currently not receiving version from Wholesale - bug team-phoenix #78
-            writer.WriteProperty("version", "1");
+            if (series.CalculationResultVersion.HasValue)
+            {
+                writer.WriteProperty("version", series.CalculationResultVersion.Value.ToString(NumberFormatInfo.InvariantInfo));
+            }
+            else
+            {
+                writer.WriteProperty("version", "1");
+            }
 
             writer.WriteObject(
                 "meteringGridArea_Domain.mRID",
@@ -168,9 +175,9 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
         writer.WriteEndObject();
     }
 
-    private IReadOnlyCollection<TimeSeriesMarketActivityRecord> ParseFrom(IReadOnlyCollection<string> payloads)
+    private List<TimeSeriesMarketActivityRecord> ParseFrom(IReadOnlyCollection<string> payloads)
     {
-        if (payloads == null) throw new ArgumentNullException(nameof(payloads));
+        ArgumentNullException.ThrowIfNull(payloads);
         var timeSeries = new List<TimeSeriesMarketActivityRecord>();
         foreach (var payload in payloads)
         {

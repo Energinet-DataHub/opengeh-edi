@@ -29,7 +29,7 @@ namespace IncomingMessages.Infrastructure
 
         public async Task AddAsync(string senderNumber, string messageId, CancellationToken cancellationToken)
         {
-            if (senderNumber == null) throw new ArgumentNullException(nameof(senderNumber));
+            ArgumentNullException.ThrowIfNull(senderNumber);
 
             await _incomingMessagesContext.MessageIdForSenders.AddAsync(
                     new MessageIdForSender(messageId, senderNumber), cancellationToken)
@@ -41,7 +41,7 @@ namespace IncomingMessages.Infrastructure
             string messageId,
             CancellationToken cancellationToken)
         {
-            if (senderNumber == null) throw new ArgumentNullException(nameof(senderNumber));
+            ArgumentNullException.ThrowIfNull(senderNumber);
 
             var message = await GetMessageFromDbAsync(senderNumber, messageId, cancellationToken).ConfigureAwait(false)
                               ?? GetMessageFromInMemoryCollection(senderNumber, messageId);

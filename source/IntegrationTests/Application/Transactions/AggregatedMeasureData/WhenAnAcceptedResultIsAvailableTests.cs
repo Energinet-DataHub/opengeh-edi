@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
@@ -27,7 +28,6 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.Edi.Responses;
-using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Xunit;
@@ -47,8 +47,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     private readonly GridAreaBuilder _gridAreaBuilder = new();
     private readonly ProcessContext _processContext;
 
-    public WhenAnAcceptedResultIsAvailableTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public WhenAnAcceptedResultIsAvailableTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _processContext = GetService<ProcessContext>();
     }
@@ -77,7 +77,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
-            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId);
+            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId)
+            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1);
     }
 
     [Fact]
@@ -103,7 +104,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
-            .HasSenderId(DataHubDetails.DataHubActorNumber.Value);
+            .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
+            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1);
     }
 
     protected override void Dispose(bool disposing)
@@ -123,9 +125,10 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         var point = new TimeSeriesPoint()
         {
             Quantity = quantity,
-            QuantityQuality = QuantityQuality.Incomplete,
             Time = new Timestamp() { Seconds = 1, },
         };
+        point.QuantityQualities.Add(QuantityQuality.Estimated);
+
         var series = new Series
         {
             GridArea = aggregatedMeasureDataProcess.MeteringGridAreaDomainId,
@@ -133,6 +136,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             TimeSeriesPoints = { point },
             TimeSeriesType = TimeSeriesType.Production,
             Resolution = Resolution.Pt15M,
+            CalculationResultVersion = 1,
         };
 
         var aggregatedTimeSerie = new AggregatedTimeSeriesRequestAccepted();
@@ -161,7 +165,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             DocumentType.NotifyAggregatedMeasureData.Name,
             businessReason.Name,
             roleOfReceiver,
-            GetService<IDatabaseConnectionFactory>());
+            GetService<IDatabaseConnectionFactory>(),
+            GetService<IFileStorageClient>());
     }
 
     private AggregatedMeasureDataProcess BuildProcess(MarketRole? receiverRole = null)

@@ -20,6 +20,7 @@ using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -45,75 +46,77 @@ public sealed class EnergyResultProducedV2ToAggregationResultTests : TestBase
 
     private readonly EnergyResultProducedV2EventBuilder _eventBuilder = new();
     private readonly GridAreaBuilder _gridAreaBuilder = new();
+    private readonly IFileStorageClient _fileStorageClient;
 
-    public EnergyResultProducedV2ToAggregationResultTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public EnergyResultProducedV2ToAggregationResultTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _masterDataClient = GetService<IMasterDataClient>();
         _integrationEventHandler = GetService<IIntegrationEventHandler>();
         _databaseConnectionFactory = GetService<IDatabaseConnectionFactory>();
+        _fileStorageClient = GetService<IFileStorageClient>();
     }
 
     public static IEnumerable<object[]> QuantityQualityPowerSet()
     {
-        return _quantityQualityPowerSet.Select(x => new object[] { x });
+        return _quantityQualityPowerSet.Select(qqs => new object[] { qqs });
     }
 
     public static IEnumerable<object[]> QuantityQualityPowerSetWithMissing()
     {
         return _quantityQualityPowerSet
-            .Where(x => x.Contains(EnergyResultProducedV2.Types.QuantityQuality.Missing))
+            .Where(qqs => qqs.Contains(EnergyResultProducedV2.Types.QuantityQuality.Missing))
             .Where(
-                x => x.Length > 2
-                     || (x.Length > 1 && !x.Contains(EnergyResultProducedV2.Types.QuantityQuality.Unspecified)))
-            .Select(x => new object[] { x });
+                qqs => qqs.Length > 2
+                       || (qqs.Length > 1 && !qqs.Contains(EnergyResultProducedV2.Types.QuantityQuality.Unspecified)))
+            .Select(qqs => new object[] { qqs });
     }
 
     public static IEnumerable<object[]> QuantityQualityPowerSetOnlyMissing()
     {
         return _quantityQualityPowerSet
-            .Where(x => x.Contains(EnergyResultProducedV2.Types.QuantityQuality.Missing))
+            .Where(qqs => qqs.Contains(EnergyResultProducedV2.Types.QuantityQuality.Missing))
             .Where(
-                x => x.Length == 1
-                     || (x.Length == 2 && x.Contains(EnergyResultProducedV2.Types.QuantityQuality.Unspecified)))
-            .Select(x => new object[] { x });
+                qqs => qqs.Length == 1
+                       || (qqs.Length == 2 && qqs.Contains(EnergyResultProducedV2.Types.QuantityQuality.Unspecified)))
+            .Select(qqs => new object[] { qqs });
     }
 
     public static IEnumerable<object[]> QuantityQualityPowerSetWithoutMissingWithEstimated()
     {
         return _quantityQualityPowerSet
-            .Where(x => x.Contains(EnergyResultProducedV2.Types.QuantityQuality.Estimated))
-            .Where(x => !x.Contains(EnergyResultProducedV2.Types.QuantityQuality.Missing))
-            .Select(x => new object[] { x });
+            .Where(qqs => qqs.Contains(EnergyResultProducedV2.Types.QuantityQuality.Estimated))
+            .Where(qqs => !qqs.Contains(EnergyResultProducedV2.Types.QuantityQuality.Missing))
+            .Select(qqs => new object[] { qqs });
     }
 
     public static IEnumerable<object[]> QuantityQualityPowerSetWithoutMissingEstimatedWithMeasured()
     {
         return _quantityQualityPowerSet
-            .Where(x => x.Contains(EnergyResultProducedV2.Types.QuantityQuality.Measured))
-            .Where(x => !x.Contains(EnergyResultProducedV2.Types.QuantityQuality.Missing))
-            .Where(x => !x.Contains(EnergyResultProducedV2.Types.QuantityQuality.Estimated))
-            .Select(x => new object[] { x });
+            .Where(qqs => qqs.Contains(EnergyResultProducedV2.Types.QuantityQuality.Measured))
+            .Where(qqs => !qqs.Contains(EnergyResultProducedV2.Types.QuantityQuality.Missing))
+            .Where(qqs => !qqs.Contains(EnergyResultProducedV2.Types.QuantityQuality.Estimated))
+            .Select(qqs => new object[] { qqs });
     }
 
     public static IEnumerable<object[]> QuantityQualityPowerSetWithoutMissingEstimatedMeasuredWithCalculated()
     {
         return _quantityQualityPowerSet
-            .Where(x => x.Contains(EnergyResultProducedV2.Types.QuantityQuality.Calculated))
-            .Where(x => !x.Contains(EnergyResultProducedV2.Types.QuantityQuality.Missing))
-            .Where(x => !x.Contains(EnergyResultProducedV2.Types.QuantityQuality.Estimated))
-            .Where(x => !x.Contains(EnergyResultProducedV2.Types.QuantityQuality.Measured))
-            .Select(x => new object[] { x });
+            .Where(qqs => qqs.Contains(EnergyResultProducedV2.Types.QuantityQuality.Calculated))
+            .Where(qqs => !qqs.Contains(EnergyResultProducedV2.Types.QuantityQuality.Missing))
+            .Where(qqs => !qqs.Contains(EnergyResultProducedV2.Types.QuantityQuality.Estimated))
+            .Where(qqs => !qqs.Contains(EnergyResultProducedV2.Types.QuantityQuality.Measured))
+            .Select(qqs => new object[] { qqs });
     }
 
     public static IEnumerable<object[]> QuantityQualityPowerSetWithoutMissingEstimatedMeasuredCalculated()
     {
         return _quantityQualityPowerSet
-            .Where(x => !x.Contains(EnergyResultProducedV2.Types.QuantityQuality.Missing))
-            .Where(x => !x.Contains(EnergyResultProducedV2.Types.QuantityQuality.Estimated))
-            .Where(x => !x.Contains(EnergyResultProducedV2.Types.QuantityQuality.Measured))
-            .Where(x => !x.Contains(EnergyResultProducedV2.Types.QuantityQuality.Calculated))
-            .Select(x => new object[] { x });
+            .Where(qqs => !qqs.Contains(EnergyResultProducedV2.Types.QuantityQuality.Missing))
+            .Where(qqs => !qqs.Contains(EnergyResultProducedV2.Types.QuantityQuality.Estimated))
+            .Where(qqs => !qqs.Contains(EnergyResultProducedV2.Types.QuantityQuality.Measured))
+            .Where(qqs => !qqs.Contains(EnergyResultProducedV2.Types.QuantityQuality.Calculated))
+            .Select(qqs => new object[] { qqs });
     }
 
     [Theory]
@@ -359,6 +362,7 @@ public sealed class EnergyResultProducedV2ToAggregationResultTests : TestBase
             DocumentType.NotifyAggregatedMeasureData.Name,
             BusinessReason.BalanceFixing.Name,
             MarketRole.MeteredDataResponsible,
-            _databaseConnectionFactory);
+            _databaseConnectionFactory,
+            _fileStorageClient);
     }
 }

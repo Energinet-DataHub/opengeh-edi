@@ -13,29 +13,25 @@
 // limitations under the License.
 
 using System;
-using Google.Protobuf;
-using Google.Protobuf.Reflection;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-public class TestIntegrationEventMessage : IMessage
+public record OutgoingMessageId
 {
-    public const string TestIntegrationEventName = "test-integration-event";
-
-    public MessageDescriptor Descriptor => null!;
-
-    public void MergeFrom(CodedInputStream input)
+    private OutgoingMessageId(Guid value)
     {
-        throw new NotImplementedException();
+        Value = value;
     }
 
-    public void WriteTo(CodedOutputStream output)
+    public Guid Value { get; }
+
+    public static OutgoingMessageId New()
     {
-        throw new NotImplementedException();
+        return new OutgoingMessageId(Guid.NewGuid());
     }
 
-    public int CalculateSize()
+    public static OutgoingMessageId CreateFromExisting(Guid existingOutgoingMessageId)
     {
-        throw new NotImplementedException();
+        return new OutgoingMessageId(existingOutgoingMessageId);
     }
 }

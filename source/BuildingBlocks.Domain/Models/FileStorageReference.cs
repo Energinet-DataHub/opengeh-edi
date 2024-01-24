@@ -14,21 +14,16 @@
 
 using System;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Exceptions;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public class DBTransactionNotInitializedException : Exception
+public record FileStorageReference
 {
-    public DBTransactionNotInitializedException()
+    public FileStorageReference(string value)
     {
+        if (string.IsNullOrEmpty(value)) throw new ArgumentNullException(nameof(value));
+
+        Value = value;
     }
 
-    public DBTransactionNotInitializedException(string message)
-        : base(message)
-    {
-    }
-
-    public DBTransactionNotInitializedException(string message, Exception innerException)
-        : base(message, innerException)
-    {
-    }
+    public string Value { get; }
 }

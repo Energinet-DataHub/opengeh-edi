@@ -72,24 +72,17 @@ internal sealed class EbixDriver : IDisposable
 
     public async Task EmptyQueueAsync()
     {
-        try
-        {
-            var peekResponse = await PeekMessageAsync(timeoutInSeconds: 60)
-                .ConfigureAwait(false);
+        var peekResponse = await PeekAsync()
+            .ConfigureAwait(false);
 
-            if (peekResponse?.MessageContainer.Payload is not null)
-            {
-                await DequeueMessageAsync(GetMessageId(peekResponse)).ConfigureAwait(false);
-                await EmptyQueueAsync().ConfigureAwait(false);
-            }
-        }
-        catch (TimeoutException e) when (e.InnerException is CommunicationException)
+        if (peekResponse?.MessageContainer?.Payload is not null)
         {
-            return; // temp fix for no content when peeking
+            await DequeueMessageAsync(GetMessageId(peekResponse)).ConfigureAwait(false);
+            await EmptyQueueAsync().ConfigureAwait(false);
         }
     }
 
-    public async Task<peekMessageResponse?> PeekMessageAsync(int? timeoutInSeconds)
+    public async Task<peekMessageResponse?> PeekMessageAsync()
     {
         if (_ebixServiceClient.State != CommunicationState.Opened)
             _ebixServiceClient.Open();
@@ -97,31 +90,18 @@ internal sealed class EbixDriver : IDisposable
         using var operationScope = new OperationContextScope(_ebixServiceClient.InnerChannel);
 
         var stopWatch = Stopwatch.StartNew();
-        var timeBeforeTimeout = timeoutInSeconds != null ? new TimeSpan(0, 0, timeoutInSeconds.Value) : TimeSpan.Zero;
-        Exception? lastException = null;
+        var timeBeforeTimeout = new TimeSpan(0, 10, 0);
         do
         {
-            try
-            {
-                return await _ebixServiceClient.peekMessageAsync().ConfigureAwait(false);
-            }
-            catch (CommunicationException e) when (e is FaultException)
-            {
-                Console.WriteLine(
-                    "Encountered CommunicationException while peeking. This is probably because the message hasn't been handled yet, so we're trying again in 500ms. The exception was:");
-                Console.WriteLine(e);
-                throw;
-            }
-            catch (CommunicationException e)
-            {
-                lastException = e;
-            }
+            var peekResult = await _ebixServiceClient.peekMessageAsync().ConfigureAwait(false);
+            if (peekResult?.MessageContainer?.Payload is not null)
+                return peekResult;
 
             await Task.Delay(500).ConfigureAwait(false);
         }
         while (stopWatch.ElapsedMilliseconds < timeBeforeTimeout.TotalMilliseconds);
 
-        throw new TimeoutException("Unable to retrieve peek result within time limit", lastException);
+        throw new TimeoutException("Unable to retrieve peek result within time limit");
     }
 
     public async Task DequeueMessageAsync(string messageId)
@@ -194,5 +174,10 @@ internal sealed class EbixDriver : IDisposable
         var query = "/ns0:HeaderEnergyDocument/ns0:Identification";
         var node = response.MessageContainer.Payload.SelectSingleNode(query, nsmgr);
         return node!.InnerText;
+    }
+
+    private async Task<peekMessageResponse?> PeekAsync()
+    {
+        return await _ebixServiceClient.peekMessageAsync().ConfigureAwait(false);
     }
 }

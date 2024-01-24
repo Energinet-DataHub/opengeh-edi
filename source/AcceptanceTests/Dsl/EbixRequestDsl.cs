@@ -48,7 +48,7 @@ internal sealed class EbixRequestDsl
 
     internal async Task ConfirmEbixResultIsAvailableForActor()
     {
-        var response = await _ebix.PeekMessageAsync(timeoutInSeconds: 60).ConfigureAwait(false);
+        var response = await _ebix.PeekMessageAsync().ConfigureAwait(false);
 
         await _ebix.DequeueMessageAsync(GetMessageId(response!)).ConfigureAwait(false);
 

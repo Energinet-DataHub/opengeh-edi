@@ -26,7 +26,6 @@ using Energinet.DataHub.EDI.Tests.Fixtures;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions;
 using Xunit;
-using Xunit.Abstractions;
 using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.AggregationResult;
@@ -34,16 +33,13 @@ namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Aggregatio
 public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValidationFixture>
 {
     private readonly DocumentValidationFixture _documentValidation;
-    private readonly ITestOutputHelper _testOutputHelper;
-    private readonly IMessageRecordParser _parser;
+    private readonly MessageRecordParser _parser;
     private readonly TimeSeriesBuilder _timeSeries;
 
     public AggregationResultDocumentWriterTests(
-        DocumentValidationFixture documentValidation,
-        ITestOutputHelper testOutputHelper)
+        DocumentValidationFixture documentValidation)
     {
         _documentValidation = documentValidation;
-        _testOutputHelper = testOutputHelper;
         _parser = new MessageRecordParser(new Serializer());
         _timeSeries = TimeSeriesBuilder
             .AggregationResult();
@@ -86,6 +82,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .HasPoint(1, 1)
             .HasOriginalTransactionIdReference(SampleData.OriginalTransactionIdReference)
             .HasSettlementMethod(SettlementType.NonProfiled)
+            .HasCalculationResultVersion(1)
             .DocumentIsValidAsync();
     }
 

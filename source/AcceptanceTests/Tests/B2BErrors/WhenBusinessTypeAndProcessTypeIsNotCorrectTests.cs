@@ -16,6 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Factories;
 using Energinet.DataHub.EDI.AcceptanceTests.Responses.xml;
 using Energinet.DataHub.EDI.AcceptanceTests.TestData;
+using Energinet.DataHub.EDI.AcceptanceTests.Tests.Asserters;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.B2BErrors;
@@ -41,5 +42,56 @@ public class WhenBusinessTypeAndProcessTypeIsNotCorrectTests : BaseTestClass
         var responseError = SynchronousError.BuildB2BErrorResponse(response);
         Assert.Equal("00302", responseError!.Code);
         Assert.Contains("schema validation error", responseError.Message, StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    [Fact]
+    public async Task Invalid_cim_type_produces_type_error()
+    {
+        var payload =
+            RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(
+                SynchronousErrorTestData.TypeIsNotSupported());
+
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
+
+        Output.WriteLine(response);
+
+        await ErrorAsserter.AssertCorrectErrorIsReturnedAsync(
+            "00401",
+            "The type E73 is not supported",
+            response);
+    }
+
+    [Fact]
+    public async Task Invalid_process_type_produces_type_error()
+    {
+        var payload =
+            RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(
+                SynchronousErrorTestData.ProcessTypeIsNotSupported());
+
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
+
+        Output.WriteLine(response);
+
+        await ErrorAsserter.AssertCorrectErrorIsReturnedAsync(
+            "00402",
+            "The process type D09 is not support",
+            response);
+    }
+
+    [Fact]
+    public async Task Invalid_business_type_produces_type_error()
+    {
+        var payload =
+            RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(
+                SynchronousErrorTestData.InvalidBusinessType());
+
+        var response = await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
+
+        Output.WriteLine(response);
+
+        await ErrorAsserter.AssertCorrectErrorIsReturnedAsync(
+            "00403",
+            "The business type 27 is not supported",
+            response);
     }
 }

@@ -29,8 +29,8 @@ public class ResponseFactory
 
     public ResponseMessage From(Result result, DocumentFormat format)
     {
-        if (result == null) throw new ArgumentNullException(nameof(result));
-        if (format == null) throw new ArgumentNullException(nameof(format));
+        ArgumentNullException.ThrowIfNull(result);
+        ArgumentNullException.ThrowIfNull(format);
 
         var factory = _factories.FirstOrDefault(factory => factory.HandledFormat.Equals(format));
 

@@ -43,8 +43,8 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
     private readonly InternalCommandMapper _mapper;
     private readonly ISerializer _serializer;
 
-    public InitializeAggregatedMeasureDataProcessesCommandTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public InitializeAggregatedMeasureDataProcessesCommandTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _processContext = GetService<ProcessContext>();
         _mapper = GetService<InternalCommandMapper>();

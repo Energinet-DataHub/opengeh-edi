@@ -53,7 +53,8 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
                 MapMeteringPointType(aggregation.TimeSeriesType),
                 MapUnitType(aggregation.QuantityUnit),
                 MapResolution(aggregation.Resolution),
-                await MapGridAreaDetailsAsync(aggregation.GridArea, cancellationToken).ConfigureAwait(false)));
+                await MapGridAreaDetailsAsync(aggregation.GridArea, cancellationToken).ConfigureAwait(false),
+                aggregation.CalculationResultVersion));
         }
 
         return new AggregatedTimeSerieRequestWasAccepted(
@@ -82,7 +83,7 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         };
     }
 
-    private static IReadOnlyList<Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
+    private static System.Collections.ObjectModel.ReadOnlyCollection<Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
     {
         var points = new List<Point>();
 
@@ -92,7 +93,7 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
             points.Add(new Point(
                 pointPosition,
                 Parse(point.Quantity),
-                MapQuality(point.QuantityQuality),
+                MapQuality(point.QuantityQualities),
                 point.Time.ToString()));
 
             pointPosition++;
@@ -122,18 +123,9 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         };
     }
 
-    private static CalculatedQuantityQuality MapQuality(QuantityQuality quality)
+    private static CalculatedQuantityQuality MapQuality(ICollection<QuantityQuality> quantityQualities)
     {
-        return quality switch
-        {
-            QuantityQuality.Incomplete => CalculatedQuantityQuality.Incomplete,
-            QuantityQuality.Measured => CalculatedQuantityQuality.Measured,
-            QuantityQuality.Missing => CalculatedQuantityQuality.NotAvailable,
-            QuantityQuality.Estimated => CalculatedQuantityQuality.Estimated,
-            QuantityQuality.Calculated => CalculatedQuantityQuality.Calculated,
-            QuantityQuality.Unspecified => throw new InvalidOperationException("Quality is not specified"),
-            _ => throw new InvalidOperationException("Unknown quality type"),
-        };
+        return CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(quantityQualities);
     }
 
     private static decimal? Parse(DecimalValue? input)

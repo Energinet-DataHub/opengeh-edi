@@ -22,7 +22,7 @@ public static class HttpRequestDataExtensions
 {
     public static CancellationToken GetCancellationToken(this HttpRequestData request, CancellationToken hostCancellationToken)
     {
-        if (request == null) throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
 
         using var cancellationTokenSource =
             CancellationTokenSource.CreateLinkedTokenSource(

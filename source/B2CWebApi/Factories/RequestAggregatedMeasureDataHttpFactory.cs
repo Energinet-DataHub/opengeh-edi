@@ -28,7 +28,7 @@ public static class RequestAggregatedMeasureDataHttpFactory
         DateTimeZone dateTimeZone,
         Instant now)
     {
-        if (request == null) throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
 
         var senderRoleCode = MapRoleNameToCode(senderRole);
 

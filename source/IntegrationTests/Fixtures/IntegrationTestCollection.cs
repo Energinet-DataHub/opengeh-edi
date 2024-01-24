@@ -12,20 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
-using Google.Protobuf.WellKnownTypes;
+using System.Diagnostics.CodeAnalysis;
+using Xunit;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Factories;
+namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 
-public static class ActorCertificateFactory
+[CollectionDefinition("IntegrationTest")]
+[SuppressMessage("Naming", "CA1711:Identifiers should not have incorrect suffix", Justification = "Is actually a collection")]
+public class IntegrationTestCollection : ICollectionFixture<IntegrationTestFixture>
 {
-    public static ActorCertificateCredentialsAssigned CreateActorCertificateAssigned(string actorNumber, EicFunction actorRole, string thumbprint) =>
-        new()
-        {
-            ActorNumber = actorNumber,
-            ActorRole = actorRole,
-            CertificateThumbprint = thumbprint,
-            ValidFrom = DateTime.UtcNow.ToTimestamp(),
-            SequenceNumber = 1,
-        };
+    // This class has no code, and is never created. Its purpose is simply
+    // to be the place to apply [CollectionDefinition] and all the
+    // ICollectionFixture<> interfaces.
 }

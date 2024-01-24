@@ -36,7 +36,7 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware
         /// </summary>
         internal static bool Is(this FunctionContext context, TriggerType triggerType)
         {
-            if (context == null) throw new ArgumentNullException(nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
             return context.FunctionDefinition.InputBindings.Any(input => input.Value.Type.Equals(triggerType.ToString(), StringComparison.OrdinalIgnoreCase));
         }
 
@@ -45,7 +45,7 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware
         /// </summary>
         internal static bool EndpointIsOmittedFromAuth(this FunctionContext context)
         {
-            if (context == null) throw new ArgumentNullException(nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
 
             var healthCheckRequest = context.Is(TriggerType.HttpTrigger) && context.FunctionDefinition.Name == "HealthCheck";
             var swaggerRequest = (context.Is(TriggerType.HttpTrigger) && context.FunctionDefinition.Name == "RenderSwaggerUI")

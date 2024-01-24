@@ -56,9 +56,9 @@ public class ReceivedIntegrationEventsRetention : IDataRetention
                 DELETE FROM CTE;";
 
             using var connection =
-                (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken)
-                    .ConfigureAwait(false);
-            using var transaction = connection.BeginTransaction();
+                (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
+            using var transaction =
+                (SqlTransaction)await connection.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
             using var command = connection.CreateCommand();
             command.Parameters.AddWithValue(
                 "@LastMonthInstant",

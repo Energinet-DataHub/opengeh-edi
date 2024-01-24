@@ -21,6 +21,7 @@ using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -39,8 +40,8 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     private readonly EnergyResultProducedV2EventBuilder _eventBuilder = new();
     private readonly GridAreaBuilder _gridAreaBuilder = new();
 
-    public WhenAnAggregationResultIsAvailableTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public WhenAnAggregationResultIsAvailableTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
     }
 
@@ -334,7 +335,8 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             DocumentType.NotifyAggregatedMeasureData.Name,
             businessReason.Name,
             roleOfReceiver,
-            GetService<IDatabaseConnectionFactory>());
+            GetService<IDatabaseConnectionFactory>(),
+            GetService<IFileStorageClient>());
     }
 
     private Task HavingReceivedAndHandledIntegrationEventAsync(string eventType, EnergyResultProducedV2 calculationResultCompleted)

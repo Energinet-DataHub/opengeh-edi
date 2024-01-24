@@ -122,42 +122,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             };
         }
 
-        /*
-
-        public Dictionary<string, string> SchemaVersionIsInvalid()
-        {
-            //TODO: add dynamic handling of xml header creation
-            return new Dictionary<string, string>
-            {
-                { "cim:mRID", "invalidId" },
-            };
-        }
-
-        public Dictionary<string, string> InvalidReceiverId()
-        {
-            return new Dictionary<string, string>
-            {
-                { "cim:receiver_MarketParticipant.mRID", "5790001330553" },
-            };
-        }
-
-        public Dictionary<string, string> InvalidReceiverRole()
-        {
-            return new Dictionary<string, string>
-            {
-                { "cim:receiver_MarketParticipant.marketRole.type", "DDZ" },
-            };
-        }
-
-        public Dictionary<string, string> InvalidLengthOfMessageId()
-        {
-            return new Dictionary<string, string>
-            {
-                { "cim:mRID", "lasjfejhrtajhfksagjebrtafnnvsgietjafehtaafaertzrshgsyr" },
-            };
-        }
-
-        public Dictionary<string, string> TypeIsNotSupported()
+        public static Dictionary<string, string> TypeIsNotSupported()
         {
             return new Dictionary<string, string>
             {
@@ -165,7 +130,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             };
         }
 
-        public Dictionary<string, string> ProcessTypeIsNotSupported()
+        public static Dictionary<string, string> ProcessTypeIsNotSupported()
         {
             return new Dictionary<string, string>
             {
@@ -173,12 +138,27 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             };
         }
 
-        public Dictionary<string, string> InvalidBusinessType()
+        public static Dictionary<string, string> InvalidBusinessType()
         {
             return new Dictionary<string, string>
             {
                 { "cim:businessSector.type", "27" },
             };
         }
-        */
+
+        public static Dictionary<string, string> InvalidReceiverId()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:receiver_MarketParticipant.mRID", "5790001330553" },
+            };
+        }
+
+        public static Dictionary<string, string> InvalidReceiverRole()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:receiver_MarketParticipant.marketRole.type", "DDZ" },
+            };
+        }
 }

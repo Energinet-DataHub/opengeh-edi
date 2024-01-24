@@ -179,12 +179,12 @@ public static class EbixCode
         throw NoCodeFoundFor(reasonCode.Name);
     }
 
-    private static Exception NoCodeFoundFor(string domainType)
+    private static InvalidOperationException NoCodeFoundFor(string domainType)
     {
         return new InvalidOperationException($"No code has been defined for {domainType}");
     }
 
-    private static Exception NoBusinessReasonFoundFor(string businessReasonCode)
+    private static InvalidOperationException NoBusinessReasonFoundFor(string businessReasonCode)
     {
         return new InvalidOperationException($"No business reason has been defined for {businessReasonCode}");
     }
