@@ -140,7 +140,7 @@ internal sealed class EdiDriver : IDisposable
         var act = async () =>
         {
             var b2bClient = await _httpClient;
-            using var request = new HttpRequestMessage(HttpMethod.Get, "v1.0/cim/peekMessage/aggregations");
+            using var request = new HttpRequestMessage(HttpMethod.Get, "v1.0/cim/aggregations");
             request.Headers.Authorization = new AuthenticationHeaderValue("bearer", null);
             request.Content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
@@ -220,7 +220,7 @@ internal sealed class EdiDriver : IDisposable
     private async Task<HttpResponseMessage> PeekAsync()
     {
         var b2bClient = await _httpClient;
-        using var request = new HttpRequestMessage(HttpMethod.Get, "v1.0/cim/peekMessage/aggregations");
+        using var request = new HttpRequestMessage(HttpMethod.Get, "v1.0/cim/aggregations");
         request.Content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         var peekResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
