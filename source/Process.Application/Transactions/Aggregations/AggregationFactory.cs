@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -246,7 +247,7 @@ public class AggregationFactory
         return new Period(integrationEvent.PeriodStartUtc.ToInstant(), integrationEvent.PeriodEndUtc.ToInstant());
     }
 
-    private static System.Collections.ObjectModel.ReadOnlyCollection<Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
+    private static ReadOnlyCollection<Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
     {
         var points = new List<Point>();
 

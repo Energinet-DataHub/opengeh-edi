@@ -28,7 +28,7 @@ public class OutgoingMessageDtoBuilder
     private const string GridAreaCode = "805";
     private static readonly Guid _processId = ProcessId.Create(Guid.NewGuid()).Id;
     private static readonly BusinessReason _businessReason = BusinessReason.BalanceFixing;
-    private static readonly IReadOnlyList<Point> _points = new List<Point>();
+    private static readonly IReadOnlyCollection<Point> _points = new List<Point>();
     private static ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
     private static MarketRole _receiverRole = MarketRole.MeteringDataAdministrator;
 
