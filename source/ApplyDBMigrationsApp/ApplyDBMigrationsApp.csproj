@@ -24,7 +24,7 @@ limitations under the License.
   <ItemGroup>
     <PackageReference Include="dbup-sqlserver" Version="5.0.8" />
     <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
     <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.6.40">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -142,6 +142,12 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202311211120 Alter SequenceNumber to int of gridArea table.sql" />
     <EmbeddedResource Include="Scripts\Model\202311301050 Create ActorCertificate table.sql" />
     <EmbeddedResource Include="Scripts\Model\202312041319 Add unique constraint to ActorCertificate thumbprint.sql" />
+    <EmbeddedResource Include="Scripts\Model\202401121301 Add FileStorageReference column to OutgoingMessages.sql" />
+    <EmbeddedResource Include="Scripts\Model\202401161321 Remove MessageRecord column from OutgoingMessages.sql" />
+    <EmbeddedResource Include="Scripts\Model\202401171531 Clear OutgoingMessages table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202401171540 Make FileStorageReference column not null for OutgoingMessages.sql" />
+    <EmbeddedResource Include="Scripts\Model\202401171533 Clear Bundles and ActorMessageQueues table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202401230916 Clear OutgoingMessages and ActorMessageQueues table.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
     <None Remove="Scripts\Model\202310231329 Alter Bundles1.sql" />

@@ -33,8 +33,8 @@ public class RemoveInternalCommandsWhenADayHasPassedTests : TestBase
     private readonly InternalCommandsRetention _sut;
 
     public RemoveInternalCommandsWhenADayHasPassedTests(
-        DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+        IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _processContext = GetService<ProcessContext>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();

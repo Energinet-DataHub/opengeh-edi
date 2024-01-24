@@ -19,6 +19,10 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 
 public static class EbixCode
 {
+    public const string QuantityQualityCodeMeasured = "E01";
+    public const string QuantityQualityCodeEstimated = "56";
+    public const string QuantityQualityCodeCalculated = "D01";
+
     public static string Of(BusinessReason businessReason)
     {
         ArgumentNullException.ThrowIfNull(businessReason);
@@ -95,24 +99,11 @@ public static class EbixCode
         throw NoCodeFoundFor(meteringPointType.Name);
     }
 
-    public static string Of(MarketRole marketRole)
+    public static string Of(ActorRole actorRole)
     {
-        ArgumentNullException.ThrowIfNull(marketRole);
+        ArgumentNullException.ThrowIfNull(actorRole);
 
-        if (marketRole == MarketRole.EnergySupplier)
-            return "DDQ";
-        if (marketRole == MarketRole.GridOperator)
-            return "DDM";
-        if (marketRole == MarketRole.MeteredDataResponsible)
-            return "MDR";
-        if (marketRole == MarketRole.MeteringDataAdministrator)
-            return "DGL";
-        if (marketRole == MarketRole.MeteringPointAdministrator)
-            return "DDZ";
-        if (marketRole == MarketRole.BalanceResponsibleParty)
-            return "DDK";
-
-        throw NoCodeFoundFor(marketRole.Name);
+        return actorRole.Code;
     }
 
     public static string Of(SettlementType settlementType)
@@ -149,18 +140,18 @@ public static class EbixCode
         throw NoCodeFoundFor(resolution.Name);
     }
 
-    public static string Of(Quality quality)
+    public static string? Of(CalculatedQuantityQuality calculatedQuantityQuality)
     {
-        ArgumentNullException.ThrowIfNull(quality);
-
-        if (quality == Quality.Estimated)
-            return "56";
-        if (quality == Quality.Calculated)
-            return "D01";
-        if (quality == Quality.Measured)
-            return "E01";
-
-        throw NoCodeFoundFor(quality.Name);
+        return calculatedQuantityQuality switch
+        {
+            CalculatedQuantityQuality.Estimated => QuantityQualityCodeEstimated,
+            CalculatedQuantityQuality.Incomplete => QuantityQualityCodeEstimated,
+            CalculatedQuantityQuality.Measured => QuantityQualityCodeMeasured,
+            CalculatedQuantityQuality.Calculated => QuantityQualityCodeMeasured,
+            CalculatedQuantityQuality.Missing => null,
+            CalculatedQuantityQuality.NotAvailable => null,
+            _ => throw NoCodeFoundFor(calculatedQuantityQuality.ToString()),
+        };
     }
 
     public static string Of(ReasonCode reasonCode)
@@ -175,12 +166,12 @@ public static class EbixCode
         throw NoCodeFoundFor(reasonCode.Name);
     }
 
-    private static Exception NoCodeFoundFor(string domainType)
+    private static InvalidOperationException NoCodeFoundFor(string domainType)
     {
         return new InvalidOperationException($"No code has been defined for {domainType}");
     }
 
-    private static Exception NoBusinessReasonFoundFor(string businessReasonCode)
+    private static InvalidOperationException NoBusinessReasonFoundFor(string businessReasonCode)
     {
         return new InvalidOperationException($"No business reason has been defined for {businessReasonCode}");
     }

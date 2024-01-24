@@ -78,10 +78,13 @@ limitations under the License.
         <Generator>MSBuild:Compile</Generator>
       </Protobuf>
       <Protobuf Update="IntegrationEvents\MarketPaticipant\ActorCertificateCredentialsAssigned .proto">
-        <OutputDir>obj\Debug\net7.0\</OutputDir>
+        <OutputDir>obj\Debug\net8.0\</OutputDir>
       </Protobuf>
       <Protobuf Update="IntegrationEvents\MarketPaticipant\EicFunction.proto">
-        <OutputDir>obj\Debug\net7.0\</OutputDir>
+        <OutputDir>obj\Debug\net8.0\</OutputDir>
+      </Protobuf>
+      <Protobuf Update="IntegrationEvents\MarketParticipant\ActorCertificateCredentialsRemoved.proto">
+        <OutputDir>obj\Debug\net8.0\</OutputDir>
       </Protobuf>
       <Protobuf Update="IntegrationEvents\MarketParticipant\ActorCertificateCredentialsRemoved.proto">
         <OutputDir>obj\Debug\net7.0\</OutputDir>

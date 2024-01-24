@@ -32,10 +32,10 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
     public Task<FrontendUser?> ProvideUserAsync(
         Guid userId,
         Guid actorId,
-        bool isFas,
+        bool multiTenancy,
         IEnumerable<Claim> claims)
     {
-        if (claims == null) throw new ArgumentNullException(nameof(claims));
+        ArgumentNullException.ThrowIfNull(claims);
 
         string? actorNumber = null;
         string? role = null;
@@ -68,21 +68,21 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
         if (azp is null)
             throw new MissingAzpException();
 
-        SetAuthenticatedActor(ActorNumber.Create(actorNumber), accessAllData: isFas, role: TryGetMarketRole(role));
+        SetAuthenticatedActor(ActorNumber.Create(actorNumber), accessAllData: multiTenancy, role: TryGetMarketRole(role));
         return Task.FromResult<FrontendUser?>(new FrontendUser(
             userId,
             actorId,
-            isFas,
+            multiTenancy,
             actorNumber,
             role,
             azp));
     }
 
-    private static MarketRole? TryGetMarketRole(string role)
+    private static ActorRole? TryGetMarketRole(string role)
     {
         try
         {
-            return EnumerationType.FromName<MarketRole>(role);
+            return EnumerationType.FromName<ActorRole>(role);
         }
         catch (InvalidOperationException)
         {
@@ -90,7 +90,7 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
         }
     }
 
-    private void SetAuthenticatedActor(ActorNumber actorNumber, bool accessAllData, MarketRole? role)
+    private void SetAuthenticatedActor(ActorNumber actorNumber, bool accessAllData, ActorRole? role)
     {
         if (accessAllData)
         {

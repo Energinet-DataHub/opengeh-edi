@@ -35,8 +35,8 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication
 
         public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
         {
-            if (context == null) throw new ArgumentNullException(nameof(context));
-            if (next == null) throw new ArgumentNullException(nameof(next));
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(next);
             var authenticatedActor = context.GetService<AuthenticatedActor>();
             var authenticationMethods = context.GetServices<IAuthenticationMethod>();
 
@@ -55,7 +55,7 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication
 
             if (!authenticated)
             {
-                _logger.LogError("Could not authenticate market actor identity. This is due to the http request data does not hold the required claims, there are multiple roles in the claims, or in case of ebIX the required certificate.");
+                _logger.LogError("Could not authenticate market actor identity by using {AuthenticationMethod}", authenticationMethod.GetType().Name);
                 context.RespondWithUnauthorized(httpRequestData);
                 return;
             }

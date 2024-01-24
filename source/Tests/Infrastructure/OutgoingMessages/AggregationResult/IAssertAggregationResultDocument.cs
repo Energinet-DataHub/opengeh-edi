@@ -149,4 +149,14 @@ public interface IAssertAggregationResultDocument
     /// Asserts the settlement method
     /// </summary>
     IAssertAggregationResultDocument HasSettlementMethod(SettlementType settlementMethod);
+
+    /// <summary>
+    ///     Asserts the quality is present with the given code
+    /// </summary>
+    IAssertAggregationResultDocument QualityIsPresentForPosition(int position, string quantityQualityCode);
+
+    /// <summary>
+    ///     Asserts the calculation result version is present with the given number
+    /// </summary>
+    IAssertAggregationResultDocument HasCalculationResultVersion(int version);
 }

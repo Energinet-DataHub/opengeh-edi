@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.Serialization;
@@ -22,6 +24,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using FluentAssertions;
 using Xunit;
 using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point;
 
@@ -30,10 +33,11 @@ namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Aggregatio
 public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValidationFixture>
 {
     private readonly DocumentValidationFixture _documentValidation;
-    private readonly IMessageRecordParser _parser;
+    private readonly MessageRecordParser _parser;
     private readonly TimeSeriesBuilder _timeSeries;
 
-    public AggregationResultDocumentWriterTests(DocumentValidationFixture documentValidation)
+    public AggregationResultDocumentWriterTests(
+        DocumentValidationFixture documentValidation)
     {
         _documentValidation = documentValidation;
         _parser = new MessageRecordParser(new Serializer());
@@ -58,7 +62,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
                     .WithBalanceResponsibleNumber(SampleData.BalanceResponsibleNumber)
                     .WithEnergySupplierNumber(SampleData.EnergySupplierNumber)
                     .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
-                    .WithPoint(new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z"))
+                    .WithPoint(new Point(1, 1m, CalculatedQuantityQuality.Calculated, "2022-12-12T23:00:00Z"))
                     .WithOriginalTransactionIdReference(SampleData.OriginalTransactionIdReference)
                     .WithSettlementMethod(SettlementType.NonProfiled),
                 DocumentFormat.From(documentFormat));
@@ -78,6 +82,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .HasPoint(1, 1)
             .HasOriginalTransactionIdReference(SampleData.OriginalTransactionIdReference)
             .HasSettlementMethod(SettlementType.NonProfiled)
+            .HasCalculationResultVersion(1)
             .DocumentIsValidAsync();
     }
 
@@ -88,7 +93,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     public async Task Point_quantity_element_is_excluded_if_no_value(string documentFormat)
     {
         _timeSeries
-            .WithPoint(new Point(1, null, Quality.Missing.Name, "2022-12-12T23:00:00Z"));
+            .WithPoint(new Point(1, null, CalculatedQuantityQuality.Missing, "2022-12-12T23:00:00Z"));
 
         var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
 
@@ -99,10 +104,11 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
-    public async Task Quality_element_is_excluded_if_value_is_measured(string documentFormat)
+    public async Task Quality_element_is_excluded_if_edi_quantity_quality_is_measured(
+        string documentFormat)
     {
         _timeSeries
-            .WithPoint(new Point(1, 1, Quality.Measured.Name, "2022-12-12T23:00:00Z"));
+            .WithPoint(new Point(1, 1, CalculatedQuantityQuality.Measured, "2022-12-12T23:00:00Z"));
 
         var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
 
@@ -111,16 +117,73 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     }
 
     [Theory]
-    [InlineData(nameof(DocumentFormat.Ebix))]
-    public async Task Quality_element_is_excluded_if_value_is_missing(string documentFormat)
+    [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
+    public async Task Quality_element_has_correct_code_for_cim_formats(string documentFormat)
     {
-        _timeSeries
-            .WithPoint(new Point(1, 1, Quality.Missing.Name, "2022-12-12T23:00:00Z"));
+        var points = Enum.GetValues(typeof(CalculatedQuantityQuality))
+            .Cast<CalculatedQuantityQuality>()
+            .Order()
+            .Where(x => x != CalculatedQuantityQuality.Measured)
+            .Select((quality, index) => new Point(index, 1, quality, "2022-12-12T23:00:00Z"))
+            .ToList();
+
+        points.ForEach(point => _timeSeries.WithPoint(point));
 
         var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
 
+        // Assert
+        points.Should().HaveCount(5);
         AssertDocument(document, DocumentFormat.From(documentFormat))
-            .QualityIsNotPresentForPosition(1);
+            .QualityIsPresentForPosition(1, CimCode.QuantityQualityCodeIncomplete)
+            .QualityIsPresentForPosition(2, CimCode.QuantityQualityCodeIncomplete)
+            .QualityIsPresentForPosition(3, CimCode.QuantityQualityCodeEstimated)
+            .QualityIsPresentForPosition(4, CimCode.QuantityQualityCodeCalculated)
+            .QualityIsPresentForPosition(5, CimCode.QuantityQualityCodeNotAvailable);
+    }
+
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Ebix))]
+    public async Task Quality_element_is_excluded_if_edi_quantity_quality_is_missing_or_not_available(
+        string documentFormat)
+    {
+        _timeSeries
+            .WithPoint(new Point(1, 1, CalculatedQuantityQuality.Missing, "2022-12-12T23:00:00Z"));
+
+        _timeSeries
+            .WithPoint(new Point(2, 1, CalculatedQuantityQuality.NotAvailable, "2022-12-12T23:01:00Z"));
+
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
+
+        // Assert
+        AssertDocument(document, DocumentFormat.From(documentFormat))
+            .QualityIsNotPresentForPosition(1)
+            .QualityIsNotPresentForPosition(2);
+    }
+
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Ebix))]
+    public async Task Quality_element_has_correct_code_for_ebix_formats(string documentFormat)
+    {
+        var points = Enum.GetValues(typeof(CalculatedQuantityQuality))
+            .Cast<CalculatedQuantityQuality>()
+            .Order()
+            .Where(x => x != CalculatedQuantityQuality.Missing)
+            .Where(x => x != CalculatedQuantityQuality.NotAvailable)
+            .Select((quality, index) => new Point(index, 1, quality, "2022-12-12T23:00:00Z"))
+            .ToList();
+
+        points.ForEach(point => _timeSeries.WithPoint(point));
+
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
+
+        // Assert
+        points.Should().HaveCount(4);
+        AssertDocument(document, DocumentFormat.From(documentFormat))
+            .QualityIsPresentForPosition(1, EbixCode.QuantityQualityCodeEstimated)
+            .QualityIsPresentForPosition(2, EbixCode.QuantityQualityCodeEstimated)
+            .QualityIsPresentForPosition(3, EbixCode.QuantityQualityCodeMeasured)
+            .QualityIsPresentForPosition(4, EbixCode.QuantityQualityCodeMeasured);
     }
 
     [Theory]
@@ -199,7 +262,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .WithBusinessReason(BusinessReason.FromName(processType))
             .WithSettlementVersion(SettlementVersion.FromName(settlementVersion))
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
-            .WithPoint(new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z"));
+            .WithPoint(new Point(1, 1m, CalculatedQuantityQuality.Calculated, "2022-12-12T23:00:00Z"));
 
         var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
 

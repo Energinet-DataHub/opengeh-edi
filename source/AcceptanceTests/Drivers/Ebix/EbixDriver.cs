@@ -13,11 +13,10 @@
 // limitations under the License.
 
 using System.Diagnostics;
-using System.Net;
-using System.Net.Http.Headers;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
+using System.Xml;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
 
@@ -71,41 +70,38 @@ internal sealed class EbixDriver : IDisposable
         };
     }
 
-    public async Task<peekMessageResponse?> PeekMessageAsync(int? timeoutInSeconds)
+    public async Task EmptyQueueAsync()
+    {
+        var peekResponse = await PeekAsync()
+            .ConfigureAwait(false);
+
+        if (peekResponse?.MessageContainer?.Payload is not null)
+        {
+            await DequeueMessageAsync(GetMessageId(peekResponse)).ConfigureAwait(false);
+            await EmptyQueueAsync().ConfigureAwait(false);
+        }
+    }
+
+    public async Task<peekMessageResponse?> PeekMessageAsync()
     {
         if (_ebixServiceClient.State != CommunicationState.Opened)
             _ebixServiceClient.Open();
 
         using var operationScope = new OperationContextScope(_ebixServiceClient.InnerChannel);
 
-        // Add a HTTP Header to an outgoing request
-        var requestMessage = new HttpRequestMessageProperty();
-        requestMessage.Headers.Add(HttpRequestHeader.ContentType, "application/ebix");
-
-        OperationContext.Current.OutgoingMessageProperties[HttpRequestMessageProperty.Name] = requestMessage;
-
         var stopWatch = Stopwatch.StartNew();
-        var timeBeforeTimeout = timeoutInSeconds != null ? new TimeSpan(0, 0, timeoutInSeconds.Value) : TimeSpan.Zero;
-        Exception? lastException = null;
+        var timeBeforeTimeout = new TimeSpan(0, 10, 0);
         do
         {
-            try
-            {
-                return await _ebixServiceClient.peekMessageAsync().ConfigureAwait(false);
-            }
-            catch (CommunicationException e)
-            {
-                Console.WriteLine(
-                    "Encountered CommunicationException while peeking. This is probably because the message hasn't been handled yet, so we're trying again in 500ms. The exception was:");
-                Console.WriteLine(e);
-                lastException = e;
-            }
+            var peekResult = await _ebixServiceClient.peekMessageAsync().ConfigureAwait(false);
+            if (peekResult?.MessageContainer?.Payload is not null)
+                return peekResult;
 
             await Task.Delay(500).ConfigureAwait(false);
         }
         while (stopWatch.ElapsedMilliseconds < timeBeforeTimeout.TotalMilliseconds);
 
-        throw new TimeoutException("Unable to retrieve peek result within time limit", lastException);
+        throw new TimeoutException("Unable to retrieve peek result within time limit");
     }
 
     public async Task DequeueMessageAsync(string messageId)
@@ -117,7 +113,6 @@ internal sealed class EbixDriver : IDisposable
 
         // Add a HTTP Header to an outgoing request
         var requestMessage = new HttpRequestMessageProperty();
-        requestMessage.Headers.Add(HttpRequestHeader.ContentType, "application/ebix");
 
         OperationContext.Current.OutgoingMessageProperties[HttpRequestMessageProperty.Name] = requestMessage;
 
@@ -139,7 +134,6 @@ internal sealed class EbixDriver : IDisposable
         using var request = new HttpRequestMessage(HttpMethod.Post, new Uri("?soapAction=dequeueMessage", UriKind.Relative));
 
         var emptyRequestBody = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>());
-        emptyRequestBody.Headers.ContentType = new MediaTypeHeaderValue("application/ebix");
 
         request.Content = emptyRequestBody;
 
@@ -150,7 +144,6 @@ internal sealed class EbixDriver : IDisposable
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, new Uri("?soapAction=peekMessage", UriKind.Relative));
         request.Content = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>());
-        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/ebix");
 
         return await _unauthorizedHttpClient.SendAsync(request).ConfigureAwait(false);
     }
@@ -170,8 +163,21 @@ internal sealed class EbixDriver : IDisposable
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, new Uri("?soapAction=dequeueMessage", UriKind.Relative));
         request.Content = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>());
-        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/ebix");
 
         return await _unauthorizedHttpClient.SendAsync(request).ConfigureAwait(false);
+    }
+
+    private static string GetMessageId(peekMessageResponse response)
+    {
+        var nsmgr = new XmlNamespaceManager(new NameTable());
+        nsmgr.AddNamespace("ns0", "un:unece:260:data:EEM-DK_AggregatedMeteredDataTimeSeries:v3");
+        var query = "/ns0:HeaderEnergyDocument/ns0:Identification";
+        var node = response.MessageContainer.Payload.SelectSingleNode(query, nsmgr);
+        return node!.InnerText;
+    }
+
+    private async Task<peekMessageResponse?> PeekAsync()
+    {
+        return await _ebixServiceClient.peekMessageAsync().ConfigureAwait(false);
     }
 }

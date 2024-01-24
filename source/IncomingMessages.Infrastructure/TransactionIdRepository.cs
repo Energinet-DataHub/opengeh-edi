@@ -39,10 +39,10 @@ namespace IncomingMessages.Infrastructure
 
         public async Task AddAsync(
             string senderId,
-            IReadOnlyList<string> transactionIds,
+            IReadOnlyCollection<string> transactionIds,
             CancellationToken cancellationToken)
         {
-            if (transactionIds == null) throw new ArgumentNullException(nameof(transactionIds));
+            ArgumentNullException.ThrowIfNull(transactionIds);
 
             foreach (var transactionId in transactionIds)
             {

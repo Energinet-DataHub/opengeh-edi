@@ -23,7 +23,7 @@ public class TestCommandHandler : IRequestHandler<TestCommand, Unit>
 {
     public Task<Unit> Handle(TestCommand request, CancellationToken cancellationToken)
     {
-        if (request == null) throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
         if (request.ThrowException)
         {
             throw new InvalidOperationException("This is a test exception");

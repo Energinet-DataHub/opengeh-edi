@@ -22,8 +22,8 @@ public static class AggregationResultMessageFactory
 {
     public static AggregationResultMessage CreateMessage(Aggregation result, ProcessId processId)
     {
-        if (result == null) throw new ArgumentNullException(nameof(result));
-        if (processId == null) throw new ArgumentNullException(nameof(processId));
+        ArgumentNullException.ThrowIfNull(result);
+        ArgumentNullException.ThrowIfNull(processId);
 
         if (IsTotalResultPerGridArea(result))
         {
@@ -64,7 +64,7 @@ public static class AggregationResultMessageFactory
     {
         return AggregationResultMessage.Create(
             ActorNumber.Create(result.GridAreaDetails!.OperatorNumber),
-            MarketRole.MeteredDataResponsible,
+            ActorRole.MeteredDataResponsible,
             processId.Id,
             result.GridAreaDetails.GridAreaCode,
             result.MeteringPointType,
@@ -74,8 +74,9 @@ public static class AggregationResultMessageFactory
             result.ActorGrouping.EnergySupplierNumber,
             result.ActorGrouping.BalanceResponsibleNumber,
             result.Period,
-            result.Points.Select(p => new Point(p.Position, p.Quantity, p.Quality, p.SampleTime)).ToList(),
+            result.Points.Select(p => new Point(p.Position, p.Quantity, p.QuantityQuality, p.SampleTime)).ToList(),
             EnumerationType.FromName<BusinessReason>(result.BusinessReason).Name,
+            result.CalculationResultVersion,
             result.OriginalTransactionIdReference,
             result.SettlementVersion);
     }
@@ -84,7 +85,7 @@ public static class AggregationResultMessageFactory
     {
         return AggregationResultMessage.Create(
             ActorNumber.Create(result.ActorGrouping!.EnergySupplierNumber!),
-            MarketRole.EnergySupplier,
+            ActorRole.EnergySupplier,
             processId.Id,
             result.GridAreaDetails.GridAreaCode,
             result.MeteringPointType,
@@ -94,8 +95,9 @@ public static class AggregationResultMessageFactory
             result.ActorGrouping.EnergySupplierNumber,
             result.ActorGrouping.BalanceResponsibleNumber,
             result.Period,
-            result.Points.Select(p => new Point(p.Position, p.Quantity, p.Quality, p.SampleTime)).ToList(),
+            result.Points.Select(p => new Point(p.Position, p.Quantity, p.QuantityQuality, p.SampleTime)).ToList(),
             EnumerationType.FromName<BusinessReason>(result.BusinessReason).Name,
+            result.CalculationResultVersion,
             result.OriginalTransactionIdReference,
             result.SettlementVersion);
     }
@@ -105,7 +107,7 @@ public static class AggregationResultMessageFactory
         return AggregationResultMessage.Create(
             ActorNumber.Create(
                 result.ActorGrouping!.BalanceResponsibleNumber!),
-            MarketRole.BalanceResponsibleParty,
+            ActorRole.BalanceResponsibleParty,
             processId.Id,
             result.GridAreaDetails.GridAreaCode,
             result.MeteringPointType,
@@ -115,8 +117,9 @@ public static class AggregationResultMessageFactory
             result.ActorGrouping.EnergySupplierNumber,
             result.ActorGrouping.BalanceResponsibleNumber,
             result.Period,
-            result.Points.Select(p => new Point(p.Position, p.Quantity, p.Quality, p.SampleTime)).ToList(),
+            result.Points.Select(p => new Point(p.Position, p.Quantity, p.QuantityQuality, p.SampleTime)).ToList(),
             EnumerationType.FromName<BusinessReason>(result.BusinessReason).Name,
+            result.CalculationResultVersion,
             result.OriginalTransactionIdReference,
             result.SettlementVersion);
     }

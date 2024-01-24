@@ -38,15 +38,15 @@ public class CimCodeTests
     }
 
     [Theory]
-    [InlineData(nameof(MarketRole.MeteredDataResponsible), "MDR")]
-    [InlineData(nameof(MarketRole.MeteringDataAdministrator), "DGL")]
-    [InlineData(nameof(MarketRole.GridOperator), "DDM")]
-    [InlineData(nameof(MarketRole.BalanceResponsibleParty), "DDK")]
-    [InlineData(nameof(MarketRole.EnergySupplier), "DDQ")]
-    [InlineData(nameof(MarketRole.MeteringPointAdministrator), "DDZ")]
+    [InlineData(nameof(ActorRole.MeteredDataResponsible), "MDR")]
+    [InlineData(nameof(ActorRole.MeteredDataAdministrator), "DGL")]
+    [InlineData(nameof(ActorRole.GridOperator), "DDM")]
+    [InlineData(nameof(ActorRole.BalanceResponsibleParty), "DDK")]
+    [InlineData(nameof(ActorRole.EnergySupplier), "DDQ")]
+    [InlineData(nameof(ActorRole.MeteringPointAdministrator), "DDZ")]
     public void Translate_market_role(string marketRole, string expectedCode)
     {
-        Assert.Equal(expectedCode, CimCode.Of(EnumerationType.FromName<MarketRole>(marketRole)));
+        Assert.Equal(expectedCode, CimCode.Of(EnumerationType.FromName<ActorRole>(marketRole)));
     }
 
     [Theory]
@@ -70,17 +70,6 @@ public class CimCodeTests
     public void Translate_resolution(string resolution, string expectedCode)
     {
         Assert.Equal(expectedCode, CimCode.Of(Resolution.From(resolution)));
-    }
-
-    [Theory]
-    [InlineData(nameof(Quality.Missing), "A02")]
-    [InlineData(nameof(Quality.Estimated), "A03")]
-    [InlineData(nameof(Quality.Incomplete), "A05")]
-    [InlineData(nameof(Quality.Calculated), "A06")]
-    [InlineData(nameof(Quality.Measured), "A04")]
-    public void Translate_quality(string quality, string expectedCode)
-    {
-        Assert.Equal(expectedCode, CimCode.Of(Quality.From(quality)));
     }
 
     [Theory]

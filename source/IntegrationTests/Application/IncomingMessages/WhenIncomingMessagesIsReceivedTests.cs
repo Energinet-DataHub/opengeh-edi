@@ -43,8 +43,8 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
     private readonly ServiceBusSenderSpy _senderSpy;
     private readonly IncomingMessagesContext _incomingMessageContext;
 
-    public WhenIncomingMessagesIsReceivedTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public WhenIncomingMessagesIsReceivedTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IServiceBusSenderFactory>();
         _senderSpy = new ServiceBusSenderSpy("Fake");
@@ -59,7 +59,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
       // Assert
       var authenticatedActor = GetService<AuthenticatedActor>();
       var senderActorNumber = ActorNumber.Create("5799999933318");
-      authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, MarketRole.BalanceResponsibleParty));
+      authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
 
       // Act
       await _incomingMessagesRequest.RegisterAndSendAsync(
@@ -85,7 +85,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         // Assert
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, MarketRole.BalanceResponsibleParty));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
         _senderSpy.ShouldFail = true;
 
         // Act & Assert
@@ -113,7 +113,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         // Arrange
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, MarketRole.BalanceResponsibleParty));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
 
         // new scope to simulate a race condition.
         var sessionProvider = GetService<IServiceProvider>();
@@ -121,7 +121,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var authenticatedActorInSecondScope = secondScope.ServiceProvider.GetService<AuthenticatedActor>();
         var secondParser = secondScope.ServiceProvider.GetRequiredService<IIncomingMessageClient>();
 
-        authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, restriction: Restriction.None, MarketRole.BalanceResponsibleParty));
+        authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, restriction: Restriction.None, ActorRole.BalanceResponsibleParty));
 
         var task01 = _incomingMessagesRequest.RegisterAndSendAsync(
             ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
@@ -157,7 +157,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var exceptedDuplicateMessageIdDetectedErrorCode = "00101";
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, MarketRole.BalanceResponsibleParty));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
 
         // new scope to simulate a race condition.
         var sessionProvider = GetService<IServiceProvider>();
@@ -165,7 +165,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var authenticatedActorInSecondScope = secondScope.ServiceProvider.GetService<AuthenticatedActor>();
         var secondParser = secondScope.ServiceProvider.GetRequiredService<IIncomingMessageClient>();
 
-        authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, restriction: Restriction.None, MarketRole.BalanceResponsibleParty));
+        authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, restriction: Restriction.None, ActorRole.BalanceResponsibleParty));
 
         var task01 = _incomingMessagesRequest.RegisterAndSendAsync(
             ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
@@ -196,7 +196,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         // Assert
         var senderActorNumber = ActorNumber.Create("5799999933318");
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, MarketRole.BalanceResponsibleParty));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
 
         // Act
         await _incomingMessagesRequest.RegisterAndSendAsync(

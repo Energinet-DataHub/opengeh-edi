@@ -19,7 +19,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Rej
 
 public record RejectedTimeSerieMarketActivityRecord(
     Guid TransactionId,
-    IReadOnlyList<RejectReason> RejectReasons,
+    IReadOnlyCollection<RejectReason> RejectReasons,
     string OriginalTransactionIdReference);
 
 public record RejectReason(string ErrorCode, string ErrorMessage);

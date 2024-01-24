@@ -23,11 +23,11 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
         {
             return new Dictionary<string, string>
             {
-                { "cim:mRID", GenerateRandomString(36) },
+                { "cim:mRID", Guid.NewGuid().ToString() },
                 { "cim:type", "E74" },
                 { "cim:process.processType", "D05" },
                 { "cim:businessSector.type", "23" },
-                { "cim:sender_MarketParticipant.mRID", "5790000701414" },
+                { "cim:sender_MarketParticipant.mRID", "5790000392551" },
                 { "cim:sender_MarketParticipant.marketRole.type", "DDQ" },
                 { "cim:receiver_MarketParticipant.mRID", "5790001330552" },
                 { "cim:receiver_MarketParticipant.marketRole.type", "DGL" },
@@ -39,14 +39,14 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
         {
             return new Dictionary<string, string>
             {
-                { "cim:mRID", GenerateRandomString(36) },
+                { "cim:mRID", Guid.NewGuid().ToString() },
                 { "cim:settlement_Series.version", "D01" },
                 { "cim:marketEvaluationPoint.type", "E17" },
                 { "cim:marketEvaluationPoint.settlementMethod", "D01" },
                 { "cim:start_DateAndOrTime.dateTime", "2022-06-23T22:00:00Z" },
                 { "cim:end_DateAndOrTime.dateTime", "2022-07-18T22:00:00Z" },
-                { "cim:meteringGridArea_Domain.mRID", "244" },
-                { "cim:energySupplier_MarketParticipant.mRID", "5790000701414" },
+                { "cim:meteringGridArea_Domain.mRID", "804" },
+                { "cim:energySupplier_MarketParticipant.mRID", "5790000392551" },
             };
         }
 
@@ -66,7 +66,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             };
         }
 
-        /*public Dictionary<string, string> MessageIdIsNotUnique()
+        public static Dictionary<string, string> MessageIdIsNotUnique()
         {
             return new Dictionary<string, string>
             {
@@ -74,7 +74,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             };
         }
 
-        public Dictionary<string, string> TransactionIdIsNotUnique()
+        public static Dictionary<string, string> TransactionIdIsNotUnique()
         {
             return new Dictionary<string, string>
             {
@@ -82,40 +82,15 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             };
         }
 
-        public Dictionary<string, string> EmptyMessageId()
+        public static Dictionary<string, string> EmptyMessageId()
         {
             return new Dictionary<string, string>
             {
-                { "cim:mRID", "" },
+                { "cim:mRID", string.Empty },
             };
         }
 
-        public Dictionary<string, string> EmptyTransactionId()
-        {
-            return new Dictionary<string, string>
-            {
-                { "cim:mRID", "" },
-            };
-        }
-
-        public Dictionary<string, string> InvalidTransactionId()
-        {
-            return new Dictionary<string, string>
-            {
-                { "cim:mRID", "invalidId" },
-            };
-        }
-
-        public Dictionary<string, string> SchemaVersionIsInvalid()
-        {
-            //TODO: add dynamic handling of xml header creation
-            return new Dictionary<string, string>
-            {
-                { "cim:mRID", "invalidId" },
-            };
-        }
-
-        public Dictionary<string, string> SchemaValidationErrorOnType()
+        public static Dictionary<string, string> SchemaValidationErrorOnWrongBusinessSectorType()
         {
             return new Dictionary<string, string>
             {
@@ -123,31 +98,31 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             };
         }
 
-        public Dictionary<string, string> InvalidReceiverId()
+        public static Dictionary<string, string> InvalidLengthOfMessageId()
         {
             return new Dictionary<string, string>
             {
-                { "cim:receiver_MarketParticipant.mRID", "5790001330553" },
+                { "cim:mRID", Guid.NewGuid() + "1" },
             };
         }
 
-        public Dictionary<string, string> InvalidReceiverRole()
+        public static Dictionary<string, string> EmptyTransactionId()
         {
             return new Dictionary<string, string>
             {
-                { "cim:receiver_MarketParticipant.marketRole.type", "DDZ" },
+                { "cim:mRID", string.Empty },
             };
         }
 
-        public Dictionary<string, string> InvalidLengthOfMessageId()
+        public static Dictionary<string, string> InvalidTransactionId()
         {
             return new Dictionary<string, string>
             {
-                { "cim:mRID", "lasjfejhrtajhfksagjebrtafnnvsgietjafehtaafaertzrshgsyr" },
+                { "cim:mRID", "invalidId" },
             };
         }
 
-        public Dictionary<string, string> TypeIsNotSupported()
+        public static Dictionary<string, string> TypeIsNotSupported()
         {
             return new Dictionary<string, string>
             {
@@ -155,7 +130,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             };
         }
 
-        public Dictionary<string, string> ProcessTypeIsNotSupported()
+        public static Dictionary<string, string> ProcessTypeIsNotSupported()
         {
             return new Dictionary<string, string>
             {
@@ -163,26 +138,27 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
             };
         }
 
-        public Dictionary<string, string> InvalidBusinessType()
+        public static Dictionary<string, string> InvalidBusinessType()
         {
             return new Dictionary<string, string>
             {
                 { "cim:businessSector.type", "27" },
             };
         }
-        */
 
-        private static string GenerateRandomString(int length)
+        public static Dictionary<string, string> InvalidReceiverId()
         {
-            string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            string result = string.Empty;
-
-            int charactersLength = characters.Length;
-            for (int i = 0; i < length; i++)
+            return new Dictionary<string, string>
             {
-                result += characters.ToCharArray().GetValue(new Random().Next(1, charactersLength));
-            }
+                { "cim:receiver_MarketParticipant.mRID", "5790001330553" },
+            };
+        }
 
-            return result;
+        public static Dictionary<string, string> InvalidReceiverRole()
+        {
+            return new Dictionary<string, string>
+            {
+                { "cim:receiver_MarketParticipant.marketRole.type", "DDZ" },
+            };
         }
 }

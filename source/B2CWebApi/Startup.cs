@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Text.Json.Serialization;
+using BuildingBlocks.Application.Configuration.Logging;
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Logging.LoggingMiddleware;
@@ -24,6 +25,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Configuration;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.OpenApi.Models;
 
 namespace Energinet.DataHub.EDI.B2CWebApi;
@@ -31,6 +33,7 @@ namespace Energinet.DataHub.EDI.B2CWebApi;
 public class Startup
 {
     private const string DomainName = "EDI.B2CWebApi";
+    private static readonly string[] _securityFields = { "Bearer" };
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
     {
@@ -61,12 +64,12 @@ public class Startup
             config.AddSecurityDefinition("Bearer", securitySchema);
             config.SupportNonNullableReferenceTypes();
             config.UseAllOfToExtendReferenceSchemas();
-            var securityRequirement = new OpenApiSecurityRequirement { { securitySchema, new[] { "Bearer" } }, };
+            var securityRequirement = new OpenApiSecurityRequirement { { securitySchema, _securityFields }, };
 
             config.AddSecurityRequirement(securityRequirement);
         });
         serviceCollection.AddApplicationInsightsTelemetry(options => options.EnableAdaptiveSampling = false);
-
+        serviceCollection.AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>();
         serviceCollection.AddControllers()
             .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
         serviceCollection.AddHealthChecks();

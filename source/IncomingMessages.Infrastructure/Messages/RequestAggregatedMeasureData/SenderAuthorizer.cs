@@ -30,8 +30,8 @@ namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
 
         public Task<Result> AuthorizeAsync(string senderNumber, string senderRoleCode)
         {
-            if (senderNumber == null) throw new ArgumentNullException(nameof(senderNumber));
-            if (senderRoleCode == null) throw new ArgumentNullException(nameof(senderRoleCode));
+            ArgumentNullException.ThrowIfNull(senderNumber);
+            ArgumentNullException.ThrowIfNull(senderRoleCode);
             EnsureSenderIdMatches(senderNumber);
             EnsureSenderRoleCode(senderRoleCode);
             EnsureCurrentUserHasRequiredRole(senderRoleCode);
@@ -41,7 +41,7 @@ namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
 
         private void EnsureCurrentUserHasRequiredRole(string senderRole)
         {
-            if (!_actorAuthenticator.CurrentActorIdentity.HasRole(MarketRole.FromCode(senderRole)))
+            if (!_actorAuthenticator.CurrentActorIdentity.HasRole(ActorRole.FromCode(senderRole)))
             {
                 _validationErrors.Add(new AuthenticatedUserDoesNotHoldRequiredRoleType());
             }
@@ -49,9 +49,9 @@ namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
 
         private void EnsureSenderRoleCode(string senderRoleCode)
         {
-            if (!senderRoleCode.Equals(MarketRole.EnergySupplier.Code, StringComparison.OrdinalIgnoreCase)
-                && !senderRoleCode.Equals(MarketRole.MeteredDataResponsible.Code, StringComparison.OrdinalIgnoreCase)
-                && !senderRoleCode.Equals(MarketRole.BalanceResponsibleParty.Code, StringComparison.OrdinalIgnoreCase))
+            if (!senderRoleCode.Equals(ActorRole.EnergySupplier.Code, StringComparison.OrdinalIgnoreCase)
+                && !senderRoleCode.Equals(ActorRole.MeteredDataResponsible.Code, StringComparison.OrdinalIgnoreCase)
+                && !senderRoleCode.Equals(ActorRole.BalanceResponsibleParty.Code, StringComparison.OrdinalIgnoreCase))
             {
                 _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
             }

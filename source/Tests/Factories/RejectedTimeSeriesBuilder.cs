@@ -25,15 +25,15 @@ namespace Energinet.DataHub.EDI.Tests.Factories;
 public class RejectedTimeSeriesBuilder
 {
     private readonly string _receiverNumber = SampleData.ReceiverId;
-    private readonly MarketRole _receiverRole = SampleData.ReceiverRole;
+    private readonly ActorRole _receiverRole = SampleData.ReceiverRole;
     private readonly string _senderNumber = SampleData.SenderId;
-    private readonly MarketRole _senderRole = SampleData.SenderRole;
+    private readonly ActorRole _senderRole = SampleData.SenderRole;
     private readonly string _messageId = SampleData.MessageId;
     private readonly BusinessReason _businessReason = SampleData.BusinessReason;
     private readonly Instant _creationDate = SampleData.CreationDate;
     private readonly Guid _transactionId = SampleData.TransactionId;
     private readonly string _originalTransactionIdReference = SampleData.OriginalTransactionId;
-    private readonly IReadOnlyList<RejectReason> _rejectReasons = new List<RejectReason> { new(SampleData.SerieReasonCode, SampleData.SerieReasonMessage) };
+    private readonly IReadOnlyCollection<RejectReason> _rejectReasons = new List<RejectReason> { new(SampleData.SerieReasonCode, SampleData.SerieReasonMessage) };
 
     public static RejectedTimeSeriesBuilder RejectAggregatedMeasureDataResult()
     {
@@ -45,9 +45,9 @@ public class RejectedTimeSeriesBuilder
         return new OutgoingMessageHeader(
             _businessReason.Name,
             _senderNumber,
-            _senderRole.Name,
+            _senderRole.Code,
             _receiverNumber,
-            _receiverRole.Name,
+            _receiverRole.Code,
             _messageId,
             _creationDate);
     }

@@ -14,12 +14,28 @@
 
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.TestData;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Factories;
 
 internal sealed class RequestAggregatedMeasureXmlBuilder
 {
+    public static XmlDocument BuildEnergySupplierXmlPayload()
+    {
+        return BuildEnergySupplierXmlPayload(new Dictionary<string, string>(), string.Empty);
+    }
+
     public static XmlDocument BuildEnergySupplierXmlPayload(Dictionary<string, string> testData)
+    {
+        return BuildEnergySupplierXmlPayload(testData, string.Empty);
+    }
+
+    public static XmlDocument BuildEnergySupplierXmlPayload(string cimXmlNamespaceUri)
+    {
+        return BuildEnergySupplierXmlPayload(new Dictionary<string, string>(), cimXmlNamespaceUri);
+    }
+
+    public static XmlDocument BuildEnergySupplierXmlPayload(Dictionary<string, string> testData, string cimXmlNamespaceUri)
     {
         var defaultData = SynchronousErrorTestData.DefaultEnergySupplierTestData();
         var defaultSeriesData = SynchronousErrorTestData.DefaultEnergySupplierSeriesTestData();
@@ -30,7 +46,10 @@ internal sealed class RequestAggregatedMeasureXmlBuilder
         string xmlNamespace = "urn:ediel.org:measure:requestaggregatedmeasuredata:0:1";
 
         // BUILD XML HEADER
-        XmlElement meteredDataRequest = xmlPayload.CreateElement("cim", "RequestAggregatedMeasureData_MarketDocument", "urn:ediel.org:measure:requestaggregatedmeasuredata:0:1");
+        var cimNamespaceUri = cimXmlNamespaceUri.IsNullOrEmpty()
+            ? "urn:ediel.org:measure:requestaggregatedmeasuredata:0:1"
+            : cimXmlNamespaceUri;
+        XmlElement meteredDataRequest = xmlPayload.CreateElement("cim", "RequestAggregatedMeasureData_MarketDocument", cimNamespaceUri);
         var secondAttribute = xmlPayload.CreateAttribute("xsi", "schemaLocation", "urn:ediel.org:measure:requestaggregatedmeasuredata:0:1 urn-ediel-org-measure-requestaggregatedmeasuredata-0-1.xsd");
         secondAttribute.Value = "urn:ediel.org:measure:requestaggregatedmeasuredata:0:1 urn-ediel-org-measure-requestaggregatedmeasuredata-0-1.xsd";
         meteredDataRequest.Attributes.Append(secondAttribute);

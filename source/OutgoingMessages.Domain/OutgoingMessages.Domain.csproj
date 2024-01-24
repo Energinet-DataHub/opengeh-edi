@@ -8,10 +8,11 @@
   <ItemGroup>
     <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj"/>
     <ProjectReference Include="..\Common\Common.csproj"/>
+    <ProjectReference Include="..\OutgoingMessages.Interfaces\OutgoingMessages.Interfaces.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.0.0"/>
+    <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.1.2" />
   </ItemGroup>
 
 </Project>

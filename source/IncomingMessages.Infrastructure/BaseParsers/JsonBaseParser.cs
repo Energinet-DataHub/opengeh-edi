@@ -61,10 +61,7 @@ public abstract class JsonParserBase
 
     protected Task<JsonSchema?> GetSchemaAsync(string documentName, CancellationToken cancellationToken)
     {
-        if (documentName == null)
-        {
-            throw new ArgumentNullException(nameof(documentName));
-        }
+        ArgumentNullException.ThrowIfNull(documentName);
 
         return _schemaProvider.GetSchemaAsync<JsonSchema>(documentName.ToUpper(CultureInfo.InvariantCulture), "0", cancellationToken);
     }

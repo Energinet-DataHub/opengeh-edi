@@ -53,7 +53,7 @@ public abstract class DocumentWriter : IDocumentWriter
 
     public virtual bool HandlesType(DocumentType documentType)
     {
-        if (documentType == null) throw new ArgumentNullException(nameof(documentType));
+        ArgumentNullException.ThrowIfNull(documentType);
         return documentType.Name.Equals(_documentDetails.Type.Split("_")[0], StringComparison.OrdinalIgnoreCase);
     }
 
@@ -68,7 +68,7 @@ public abstract class DocumentWriter : IDocumentWriter
 
     protected IReadOnlyCollection<TMarketActivityRecord> ParseFrom<TMarketActivityRecord>(IReadOnlyCollection<string> payloads)
     {
-        if (payloads == null) throw new ArgumentNullException(nameof(payloads));
+        ArgumentNullException.ThrowIfNull(payloads);
         var marketActivityRecords = new List<TMarketActivityRecord>();
         foreach (var payload in payloads)
         {
@@ -80,7 +80,7 @@ public abstract class DocumentWriter : IDocumentWriter
 
     protected Task WriteElementAsync(string name, string value, XmlWriter writer)
     {
-        if (writer == null) throw new ArgumentNullException(nameof(writer));
+        ArgumentNullException.ThrowIfNull(writer);
         return writer.WriteElementStringAsync(DocumentDetails.Prefix, name, null, value);
     }
 
@@ -96,7 +96,7 @@ public abstract class DocumentWriter : IDocumentWriter
 
     protected async Task WriteMridAsync(string localName, string id, string codingScheme, XmlWriter writer)
     {
-        if (writer == null) throw new ArgumentNullException(nameof(writer));
+        ArgumentNullException.ThrowIfNull(writer);
         await writer.WriteStartElementAsync(DocumentDetails.Prefix, localName, null).ConfigureAwait(false);
         await writer.WriteAttributeStringAsync(null, "codingScheme", null, codingScheme).ConfigureAwait(false);
         writer.WriteValue(id);

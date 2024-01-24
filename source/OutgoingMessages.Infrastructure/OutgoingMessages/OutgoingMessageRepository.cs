@@ -12,8 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
@@ -24,21 +28,39 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages
 public class OutgoingMessageRepository : IOutgoingMessageRepository
 {
     private readonly ActorMessageQueueContext _context;
+    private readonly IFileStorageClient _fileStorageClient;
 
-    public OutgoingMessageRepository(ActorMessageQueueContext context)
+    public OutgoingMessageRepository(ActorMessageQueueContext context, IFileStorageClient fileStorageClient)
     {
         _context = context;
+        _fileStorageClient = fileStorageClient;
     }
 
-    public void Add(OutgoingMessage message)
+    public async Task AddAsync(OutgoingMessage message)
     {
+        ArgumentNullException.ThrowIfNull(message);
+
         _context.OutgoingMessages.Add(message);
+
+        using var messageRecordStream = ConvertToStream(message.GetMessageRecord());
+
+        // Must await here instead of returning the Task, since messageRecordStream gets disposed when returning from function
+        await _fileStorageClient.UploadAsync(
+                "outgoing",
+                message.FileStorageReference,
+                messageRecordStream)
+            .ConfigureAwait(false);
     }
 
     public async Task<OutgoingMessageBundle> GetAsync(BundleId bundleId)
     {
-        var outgoingMessages = (await _context.OutgoingMessages.Where(x => x.AssignedBundleId == bundleId)
-            .ToListAsync().ConfigureAwait(false)).AsReadOnly();
+        var outgoingMessages = await _context.OutgoingMessages.Where(x => x.AssignedBundleId == bundleId)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        var downloadAndSetMessageRecordTasks = outgoingMessages.Select(DownloadAndSetMessageRecordAsync);
+
+        await Task.WhenAll(downloadAndSetMessageRecordTasks).ConfigureAwait(false);
 
         //All messages in a bundle have the same meta data
         var firstMessage = outgoingMessages.First();
@@ -51,9 +73,41 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
             firstMessage.ReceiverRole,
             firstMessage.SenderId,
             firstMessage.SenderRole,
-            firstMessage.MessageRecord,
             firstMessage.IsPublished,
             bundleId,
             outgoingMessages);
+    }
+
+    private static async Task<string> ConvertToStringAsync(Stream stream)
+    {
+        using var streamReader = new StreamReader(stream);
+
+        stream.Position = 0; // Make sure we read the entire stream
+        var convertedToString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
+
+        return convertedToString;
+    }
+
+    private static MemoryStream ConvertToStream(string message)
+    {
+        var stream = new MemoryStream();
+#pragma warning disable CA2000
+        // Is disposed when the MemoryStream is disposed
+        var writer = new StreamWriter(stream);
+#pragma warning restore CA2000
+        writer.Write(message);
+        writer.Flush();
+
+        stream.Position = 0; // Make sure the stream is ready to be read
+        return stream;
+    }
+
+    private async Task DownloadAndSetMessageRecordAsync(OutgoingMessage outgoingMessage)
+    {
+        var messageRecordStream = await _fileStorageClient.DownloadAsync("outgoing", outgoingMessage.FileStorageReference).ConfigureAwait(false);
+
+        var messageRecord = await ConvertToStringAsync(messageRecordStream).ConfigureAwait(false);
+
+        outgoingMessage.SetMessageRecord(messageRecord);
     }
 }

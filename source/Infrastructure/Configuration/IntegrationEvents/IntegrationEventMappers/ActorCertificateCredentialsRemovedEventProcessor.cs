@@ -36,7 +36,7 @@ public class ActorCertificateCredentialsRemovedEventProcessor : IIntegrationEven
 
     public async Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
-        if (integrationEvent == null) throw new ArgumentNullException(nameof(integrationEvent));
+        ArgumentNullException.ThrowIfNull(integrationEvent);
 
         var message = (ActorCertificateCredentialsRemoved)integrationEvent.Message;
 

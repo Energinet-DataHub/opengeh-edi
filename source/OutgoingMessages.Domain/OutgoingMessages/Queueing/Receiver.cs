@@ -19,7 +19,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
 public class Receiver : ValueObject
 {
-    private Receiver(ActorNumber actorNumber, MarketRole actorRole)
+    private Receiver(ActorNumber actorNumber, ActorRole actorRole)
     {
         Number = actorNumber;
         ActorRole = actorRole;
@@ -32,9 +32,9 @@ public class Receiver : ValueObject
 
     public ActorNumber Number { get; }
 
-    public MarketRole ActorRole { get; }
+    public ActorRole ActorRole { get; }
 
-    public static Receiver Create(ActorNumber actorNumber, MarketRole actorRole)
+    public static Receiver Create(ActorNumber actorNumber, ActorRole actorRole)
     {
         return new Receiver(actorNumber, actorRole);
     }

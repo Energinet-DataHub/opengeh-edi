@@ -59,7 +59,7 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
         string location, CancellationToken cancellationToken)
         where T : default
     {
-        if (location == null) throw new ArgumentNullException(nameof(location));
+        ArgumentNullException.ThrowIfNull(location);
 
         // Ensure that only backslashes are used in paths
         location = location.Replace("/", "\\", StringComparison.InvariantCulture);

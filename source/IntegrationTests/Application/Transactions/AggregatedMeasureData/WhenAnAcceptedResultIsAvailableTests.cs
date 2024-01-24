@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
@@ -31,7 +32,12 @@ using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Xunit;
 using Xunit.Categories;
+using DecimalValue = Energinet.DataHub.Edi.Responses.DecimalValue;
+using QuantityQuality = Energinet.DataHub.Edi.Responses.QuantityQuality;
+using QuantityUnit = Energinet.DataHub.Edi.Responses.QuantityUnit;
 using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
+using TimeSeriesPoint = Energinet.DataHub.Edi.Responses.TimeSeriesPoint;
+using TimeSeriesType = Energinet.DataHub.Edi.Responses.TimeSeriesType;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
@@ -41,8 +47,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     private readonly GridAreaBuilder _gridAreaBuilder = new();
     private readonly ProcessContext _processContext;
 
-    public WhenAnAcceptedResultIsAvailableTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public WhenAnAcceptedResultIsAvailableTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _processContext = GetService<ProcessContext>();
     }
@@ -62,16 +68,17 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id);
 
         // Assert
-        var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
+        var outgoingMessage = await OutgoingMessageAsync(ActorRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
 
         outgoingMessage
             .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
-            .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
-            .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
+            .HasReceiverRole(process.RequestedByActorRoleCode)
+            .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
-            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId);
+            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId)
+            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1);
     }
 
     [Fact]
@@ -90,14 +97,15 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id);
 
         // Assert
-        var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
+        var outgoingMessage = await OutgoingMessageAsync(ActorRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
 
         outgoingMessage
             .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
-            .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
-            .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
-            .HasSenderId(DataHubDetails.DataHubActorNumber.Value);
+            .HasReceiverRole(process.RequestedByActorRoleCode)
+            .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
+            .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
+            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1);
     }
 
     protected override void Dispose(bool disposing)
@@ -117,9 +125,10 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         var point = new TimeSeriesPoint()
         {
             Quantity = quantity,
-            QuantityQuality = QuantityQuality.Incomplete,
             Time = new Timestamp() { Seconds = 1, },
         };
+        point.QuantityQualities.Add(QuantityQuality.Estimated);
+
         var series = new Series
         {
             GridArea = aggregatedMeasureDataProcess.MeteringGridAreaDomainId,
@@ -127,6 +136,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             TimeSeriesPoints = { point },
             TimeSeriesType = TimeSeriesType.Production,
             Resolution = Resolution.Pt15M,
+            CalculationResultVersion = 1,
         };
 
         var aggregatedTimeSerie = new AggregatedTimeSeriesRequestAccepted();
@@ -148,17 +158,18 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     }
 
     private async Task<AssertOutgoingMessage> OutgoingMessageAsync(
-        MarketRole roleOfReceiver,
+        ActorRole roleOfReceiver,
         BusinessReason businessReason)
     {
         return await AssertOutgoingMessage.OutgoingMessageAsync(
             DocumentType.NotifyAggregatedMeasureData.Name,
             businessReason.Name,
             roleOfReceiver,
-            GetService<IDatabaseConnectionFactory>());
+            GetService<IDatabaseConnectionFactory>(),
+            GetService<IFileStorageClient>());
     }
 
-    private AggregatedMeasureDataProcess BuildProcess(MarketRole? receiverRole = null)
+    private AggregatedMeasureDataProcess BuildProcess(ActorRole? receiverRole = null)
     {
         receiverRole ??= SampleData.BalanceResponsibleParty;
 
@@ -173,8 +184,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
           SampleData.StartOfPeriod,
           SampleData.EndOfPeriod,
           SampleData.GridAreaCode,
-          receiverRole == MarketRole.EnergySupplier ? SampleData.ReceiverNumber.Value : null,
-          receiverRole == MarketRole.BalanceResponsibleParty ? SampleData.ReceiverNumber.Value : null,
+          receiverRole == ActorRole.EnergySupplier ? SampleData.ReceiverNumber.Value : null,
+          receiverRole == ActorRole.BalanceResponsibleParty ? SampleData.ReceiverNumber.Value : null,
           null);
 
         process.WasSentToWholesale();

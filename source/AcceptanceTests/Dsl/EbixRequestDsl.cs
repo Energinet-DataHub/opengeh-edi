@@ -17,29 +17,28 @@ using System.ServiceModel;
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
+using Energinet.DataHub.EDI.AcceptanceTests.TestData;
+using FluentAssertions;
+using FluentAssertions.Execution;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
 internal sealed class EbixRequestDsl
 {
-    private readonly AzureAuthenticationDriver _azureAuthentication;
-    private readonly EdiDriver _edi;
     private readonly WholesaleDriver _wholesale;
     private readonly EbixDriver _ebix;
 
-    public EbixRequestDsl(AzureAuthenticationDriver azureAuthentication, EdiDriver edi, WholesaleDriver wholesale, EbixDriver ebix)
+    public EbixRequestDsl(WholesaleDriver wholesale, EbixDriver ebix)
     {
-        _azureAuthentication = azureAuthentication;
-        _edi = edi;
         _wholesale = wholesale;
         _ebix = ebix;
     }
 
     #pragma warning disable VSTHRD200
 
-    internal async Task EmptyQueueForActor(string actorNumber, string actorRole)
+    internal async Task EmptyQueueForActor()
     {
-        await _edi.EmptyQueueAsync(actorNumber, new[] { actorRole, }).ConfigureAwait(false);
+        await _ebix.EmptyQueueAsync().ConfigureAwait(false);
     }
 
     internal Task PublishAggregationResultFor(string gridArea)
@@ -49,7 +48,7 @@ internal sealed class EbixRequestDsl
 
     internal async Task ConfirmEbixResultIsAvailableForActor()
     {
-        var response = await _ebix.PeekMessageAsync(timeoutInSeconds: 60).ConfigureAwait(false);
+        var response = await _ebix.PeekMessageAsync().ConfigureAwait(false);
 
         await _ebix.DequeueMessageAsync(GetMessageId(response!)).ConfigureAwait(false);
 
@@ -82,10 +81,10 @@ internal sealed class EbixRequestDsl
 
         var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-        Assert.Multiple(
-            () => Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode),
-            () => Assert.Contains("<faultstring>B2B-900", responseBody, StringComparison.InvariantCulture),
-            () => Assert.Contains("<faultcode>soap-env:Client", responseBody, StringComparison.InvariantCulture));
+        using var assertionScope = new AssertionScope();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        responseBody.Should().Contain("<faultstring>B2B-900").And.Contain("<faultcode>soap-env:Client");
     }
 
     internal async Task ConfirmDequeueWithIncorrectMessageIdGivesEbixError()

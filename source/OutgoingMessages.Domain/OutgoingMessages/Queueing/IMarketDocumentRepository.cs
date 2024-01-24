@@ -29,5 +29,5 @@ public interface IMarketDocumentRepository
     /// <summary>
     /// Add document to repository
     /// </summary>
-    Task AddAsync(MarketDocument marketDocument);
+    void Add(MarketDocument marketDocument);
 }

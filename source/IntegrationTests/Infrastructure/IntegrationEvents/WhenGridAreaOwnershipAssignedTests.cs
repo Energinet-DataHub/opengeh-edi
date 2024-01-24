@@ -37,8 +37,8 @@ public class WhenGridAreaOwnershipAssignedTests : TestBase
     private readonly IDatabaseConnectionFactory _connectionFactory;
     private readonly GridAreaOwnershipAssignedEventBuilder _gridAreaOwnershipAssignedEventBuilder = new();
 
-    public WhenGridAreaOwnershipAssignedTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public WhenGridAreaOwnershipAssignedTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _connectionFactory = GetService<IDatabaseConnectionFactory>();
     }

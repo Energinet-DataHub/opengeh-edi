@@ -24,7 +24,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteB
 
         public RemoteBusinessServiceRequestSenderAdapter(ServiceBusClient serviceBusClient, string queueName)
         {
-            if (serviceBusClient == null) throw new ArgumentNullException(nameof(serviceBusClient));
+            ArgumentNullException.ThrowIfNull(serviceBusClient);
             QueueName = queueName;
             _serviceBusSender = serviceBusClient.CreateSender(queueName);
         }

@@ -26,12 +26,7 @@ namespace Energinet.DataHub.EDI.Tests.Domain.Transactions.Aggregations;
 
 public class AggregationResultMessageFactoryTests
 {
-    private readonly AggregationResultBuilder _aggregationResult;
-
-    public AggregationResultMessageFactoryTests()
-    {
-        _aggregationResult = new AggregationResultBuilder();
-    }
+    private readonly AggregationResultBuilder _aggregationResult = new();
 
     #region Grid_Operator
 
@@ -54,7 +49,7 @@ public class AggregationResultMessageFactoryTests
 
         var message = CreateMessage(result);
 
-        Assert.Equal(MarketRole.MeteredDataResponsible, message.ReceiverRole);
+        Assert.Equal(ActorRole.MeteredDataResponsible, message.ReceiverRole);
         Assert.Equal(result.GridAreaDetails?.OperatorNumber, message.ReceiverId.Value);
     }
 
@@ -72,7 +67,7 @@ public class AggregationResultMessageFactoryTests
 
         var message = CreateMessage(result);
 
-        Assert.Equal(MarketRole.MeteredDataResponsible, message.ReceiverRole);
+        Assert.Equal(ActorRole.MeteredDataResponsible, message.ReceiverRole);
         Assert.Equal(result.GridAreaDetails?.OperatorNumber, message.ReceiverId.Value);
         Assert.Equal(SettlementType.NonProfiled.Name, message.Series.SettlementType);
     }
@@ -91,7 +86,7 @@ public class AggregationResultMessageFactoryTests
 
         var message = CreateMessage(result);
 
-        Assert.Equal(MarketRole.MeteredDataResponsible, message.ReceiverRole);
+        Assert.Equal(ActorRole.MeteredDataResponsible, message.ReceiverRole);
         Assert.Equal(result.GridAreaDetails?.OperatorNumber, message.ReceiverId.Value);
         Assert.Equal(SettlementType.Flex.Name, message.Series.SettlementType);
     }
@@ -110,7 +105,7 @@ public class AggregationResultMessageFactoryTests
 
         var message = CreateMessage(result);
 
-        Assert.Equal(MarketRole.MeteredDataResponsible, message.ReceiverRole);
+        Assert.Equal(ActorRole.MeteredDataResponsible, message.ReceiverRole);
         Assert.Equal(result.GridAreaDetails?.OperatorNumber, message.ReceiverId.Value);
     }
 
@@ -126,7 +121,7 @@ public class AggregationResultMessageFactoryTests
 
         var message = CreateMessage(result);
 
-        Assert.Equal(MarketRole.EnergySupplier, message.ReceiverRole);
+        Assert.Equal(ActorRole.EnergySupplier, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.EnergySupplierNumber, message.ReceiverId.Value);
         Assert.Equal(SettlementType.NonProfiled.Name, message.Series.SettlementType);
     }
@@ -141,7 +136,7 @@ public class AggregationResultMessageFactoryTests
 
         var message = CreateMessage(result);
 
-        Assert.Equal(MarketRole.BalanceResponsibleParty, message.ReceiverRole);
+        Assert.Equal(ActorRole.BalanceResponsibleParty, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.BalanceResponsibleNumber, message.ReceiverId.Value);
         Assert.Equal(SettlementType.NonProfiled.Name, message.Series.SettlementType);
     }
@@ -156,7 +151,7 @@ public class AggregationResultMessageFactoryTests
 
         var message = CreateMessage(result);
 
-        Assert.Equal(MarketRole.BalanceResponsibleParty, message.ReceiverRole);
+        Assert.Equal(ActorRole.BalanceResponsibleParty, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.BalanceResponsibleNumber, message.ReceiverId.Value);
     }
 
@@ -170,7 +165,7 @@ public class AggregationResultMessageFactoryTests
 
         var message = CreateMessage(result);
 
-        Assert.Equal(MarketRole.BalanceResponsibleParty, message.ReceiverRole);
+        Assert.Equal(ActorRole.BalanceResponsibleParty, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.BalanceResponsibleNumber, message.ReceiverId.Value);
         Assert.Equal(SettlementType.Flex.Name, message.Series.SettlementType);
     }
@@ -185,7 +180,7 @@ public class AggregationResultMessageFactoryTests
 
         var message = CreateMessage(result);
 
-        Assert.Equal(MarketRole.EnergySupplier, message.ReceiverRole);
+        Assert.Equal(ActorRole.EnergySupplier, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.EnergySupplierNumber, message.ReceiverId.Value);
         Assert.Equal(SettlementType.Flex.Name, message.Series.SettlementType);
     }
@@ -200,7 +195,7 @@ public class AggregationResultMessageFactoryTests
 
         var message = CreateMessage(result);
 
-        Assert.Equal(MarketRole.EnergySupplier, message.ReceiverRole);
+        Assert.Equal(ActorRole.EnergySupplier, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.EnergySupplierNumber, message.ReceiverId.Value);
     }
 

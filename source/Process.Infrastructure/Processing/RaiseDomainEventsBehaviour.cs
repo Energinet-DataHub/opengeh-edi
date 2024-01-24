@@ -33,7 +33,7 @@ public class RaiseDomainEventsBehaviour<TRequest, TResponse> : IPipelineBehavior
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
-        if (next == null) throw new ArgumentNullException(nameof(next));
+        ArgumentNullException.ThrowIfNull(next);
 
         var result = await next().ConfigureAwait(false);
         var domainEvents = _domainEventsAccessor.GetAllDomainEvents();

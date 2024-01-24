@@ -35,7 +35,7 @@ public class ArchivedMessageSearchController : ControllerBase
     [ProducesResponseType(typeof(ArchivedMessageResult[]), StatusCodes.Status200OK)]
     public async Task<ActionResult> RequestAsync(SearchArchivedMessagesCriteria request, CancellationToken cancellationToken)
     {
-        if (request == null) throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
 
         var query = new GetMessagesQuery
         {

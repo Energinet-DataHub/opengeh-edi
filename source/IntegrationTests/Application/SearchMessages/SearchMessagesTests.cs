@@ -34,8 +34,8 @@ public class SearchMessagesTests : TestBase
     private readonly IArchivedMessagesClient _archivedMessagesClient;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-    public SearchMessagesTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public SearchMessagesTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _archivedMessagesClient = GetService<IArchivedMessagesClient>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();

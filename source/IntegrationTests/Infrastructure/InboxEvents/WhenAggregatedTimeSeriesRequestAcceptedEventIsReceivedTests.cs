@@ -40,8 +40,8 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
     private readonly AggregatedTimeSeriesRequestAccepted _aggregatedTimeSeriesRequestAcceptedResponse;
     private readonly GridAreaBuilder _gridAreaBuilder = new();
 
-    public WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _processor = GetService<InboxEventsProcessor>();
         _aggregatedTimeSeriesRequestAcceptedResponse = CreateResponseFromWholeSale();
@@ -68,9 +68,10 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
         var point = new TimeSeriesPoint()
         {
             Quantity = quantity,
-            QuantityQuality = QuantityQuality.Incomplete,
             Time = new Timestamp() { Seconds = 1, },
         };
+        point.QuantityQualities.Add(QuantityQuality.Estimated);
+
         var series = new Series()
         {
             GridArea = GridAreaCode,
@@ -99,7 +100,7 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
 
     private async Task EventIsMarkedAsProcessedAsync(string eventId)
     {
-        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var isProcessed = await connection.QueryFirstOrDefaultAsync($"SELECT * FROM dbo.ReceivedInboxEvents WHERE Id = @EventId AND ProcessedDate IS NOT NULL", new { EventId = eventId, });
         Assert.NotNull(isProcessed);
     }

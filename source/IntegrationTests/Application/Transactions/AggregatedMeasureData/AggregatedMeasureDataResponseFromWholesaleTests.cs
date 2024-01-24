@@ -39,8 +39,8 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
 {
     private readonly ProcessContext _processContext;
 
-    public AggregatedMeasureDataResponseFromWholesaleTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public AggregatedMeasureDataResponseFromWholesaleTests(IntegrationTestFixture integrationTestFixture)
+        : base(integrationTestFixture)
     {
         _processContext = GetService<ProcessContext>();
     }
@@ -163,7 +163,8 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
             SettlementType.NonProfiled.Name,
             BusinessReason.BalanceFixing.Name,
             new ActorGrouping("1234567891911", null),
-            new GridAreaDetails("805", "1234567891045"));
+            new GridAreaDetails("805", "1234567891045"),
+            1);
     }
 
     private static RejectedAggregatedMeasureDataRequest CreateRejectRequest()

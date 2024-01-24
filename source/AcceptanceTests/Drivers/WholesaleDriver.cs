@@ -13,10 +13,11 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.Wholesale.Contracts.Events;
+using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
-using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
+using static Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.EnergyResultProducedV2.Types;
+using DecimalValue = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
@@ -30,7 +31,7 @@ internal sealed class WholesaleDriver
         _integrationEventPublisher = integrationEventPublisher;
     }
 
-    internal Task PublishAggregationResultAsync(string gridAreaCode, MarketRole? marketRole = null, string? actorNumber = null)
+    internal Task PublishAggregationResultAsync(string gridAreaCode, ActorRole? marketRole = null, string? actorNumber = null)
     {
         var aggregation = marketRole?.Code switch
         {
@@ -39,47 +40,65 @@ internal sealed class WholesaleDriver
         };
 
         return _integrationEventPublisher.PublishAsync(
-            "CalculationResultCompleted",
+            EnergyResultProducedV2.EventName,
             aggregation.ToByteArray());
     }
 
-    private static CalculationResultCompleted CreateAggregationResultAvailableEventFor(string gridAreaCode)
+    private static EnergyResultProducedV2 CreateAggregationResultAvailableEventFor(string gridAreaCode)
     {
-        var processCompletedEvent = new CalculationResultCompleted()
+        var processCompletedEvent = new EnergyResultProducedV2
         {
-            Resolution = Resolution.Quarter,
+            Resolution = EnergyResultProducedV2.Types.Resolution.Quarter,
             QuantityUnit = QuantityUnit.Kwh,
-            ProcessType = ProcessType.BalanceFixing,
+            CalculationType = CalculationType.BalanceFixing,
             TimeSeriesType = TimeSeriesType.Production,
-            BatchId = Guid.NewGuid().ToString(),
+            CalculationId = Guid.NewGuid().ToString(),
             AggregationPerGridarea = new AggregationPerGridArea()
             {
                 GridAreaCode = gridAreaCode,
             },
             PeriodEndUtc = DateTime.UtcNow.ToTimestamp(),
             PeriodStartUtc = DateTime.UtcNow.ToTimestamp(),
-            TimeSeriesPoints = { new TimeSeriesPoint { Time = new Timestamp { Seconds = 100000 }, Quantity = new DecimalValue { Units = 123, Nanos = 1200000 }, QuantityQuality = QuantityQuality.Measured } },
+            TimeSeriesPoints =
+            {
+                new TimeSeriesPoint
+                {
+                    Time = new Timestamp { Seconds = 100000 },
+                    Quantity = new DecimalValue { Units = 123, Nanos = 1200000 },
+                    QuantityQualities = { QuantityQuality.Measured },
+                },
+            },
+            CalculationResultVersion = 404,
         };
         return processCompletedEvent;
     }
 
-    private static CalculationResultCompleted CreateAggregationResultAvailableEventForBalanceResponsible(string gridAreaCode, string actorNumber)
+    private static EnergyResultProducedV2 CreateAggregationResultAvailableEventForBalanceResponsible(
+        string gridAreaCode,
+        string actorNumber)
     {
-        var processCompletedEvent = new CalculationResultCompleted()
+        var processCompletedEvent = new EnergyResultProducedV2
         {
-            Resolution = Resolution.Quarter,
+            Resolution = EnergyResultProducedV2.Types.Resolution.Quarter,
             QuantityUnit = QuantityUnit.Kwh,
-            ProcessType = ProcessType.BalanceFixing,
+            CalculationType = CalculationType.BalanceFixing,
             TimeSeriesType = TimeSeriesType.Production,
-            BatchId = Guid.NewGuid().ToString(),
+            CalculationId = Guid.NewGuid().ToString(),
             AggregationPerBalanceresponsiblepartyPerGridarea = new AggregationPerBalanceResponsiblePartyPerGridArea
             {
-                GridAreaCode = gridAreaCode,
-                BalanceResponsiblePartyGlnOrEic = actorNumber,
+                GridAreaCode = gridAreaCode, BalanceResponsibleId = actorNumber,
             },
             PeriodEndUtc = DateTime.UtcNow.ToTimestamp(),
             PeriodStartUtc = DateTime.UtcNow.ToTimestamp(),
-            TimeSeriesPoints = { new TimeSeriesPoint { Time = new Timestamp { Seconds = 100000 }, Quantity = new DecimalValue { Units = 123, Nanos = 1200000 }, QuantityQuality = QuantityQuality.Measured } },
+            TimeSeriesPoints =
+            {
+                new TimeSeriesPoint
+                {
+                    Time = new Timestamp { Seconds = 100000 },
+                    Quantity = new DecimalValue { Units = 123, Nanos = 1200000 },
+                    QuantityQualities = { QuantityQuality.Measured },
+                },
+            },
         };
         return processCompletedEvent;
     }

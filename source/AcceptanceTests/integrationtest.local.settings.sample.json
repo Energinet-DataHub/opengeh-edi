@@ -1,6 +1,0 @@
-﻿{
-  "AZP_TOKEN": "<acceptance test azp token using for auth token>",
-  "SHARED_KEYVAULT_NAME": "<key vault name>",
-  "EBIX_CERTIFICATE_PASSWORD": "<certificate password for performing an ebix peek in api management>",
-  "MSSQL_EDI_DATABASE_NAME": "<mssql edi database name>"
-}

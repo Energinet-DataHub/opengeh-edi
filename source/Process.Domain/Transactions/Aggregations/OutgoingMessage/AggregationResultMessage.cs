@@ -33,7 +33,7 @@ public class AggregationResultMessage : OutgoingMessageDto
         ActorNumber receiverId,
         Guid processId,
         string businessReason,
-        MarketRole receiverRole,
+        ActorRole receiverRole,
         TimeSeries series)
         : base(
             DocumentType.NotifyAggregatedMeasureData,
@@ -42,7 +42,7 @@ public class AggregationResultMessage : OutgoingMessageDto
             businessReason,
             receiverRole,
             DataHubDetails.DataHubActorNumber,
-            MarketRole.MeteringDataAdministrator,
+            ActorRole.MeteredDataAdministrator,
             new Serializer().Serialize(series))
     {
         Series = series;
@@ -52,7 +52,7 @@ public class AggregationResultMessage : OutgoingMessageDto
 
     public static AggregationResultMessage Create(
         ActorNumber receiverNumber,
-        MarketRole receiverRole,
+        ActorRole receiverRole,
         Guid processId,
         string gridAreaCode,
         string meteringPointType,
@@ -62,8 +62,9 @@ public class AggregationResultMessage : OutgoingMessageDto
         string? energySupplierNumber,
         string? balanceResponsibleNumber,
         Period period,
-        IReadOnlyList<Point> points,
+        IReadOnlyCollection<Point> points,
         string businessReasonName,
+        long? resultCalculationResultVersion,
         string? originalTransactionIdReference = null,
         string? settlementVersion = null)
     {
@@ -77,7 +78,8 @@ public class AggregationResultMessage : OutgoingMessageDto
             energySupplierNumber,
             balanceResponsibleNumber,
             period,
-            points.Select(p => new Point(p.Position, p.Quantity, p.Quality, p.SampleTime)).ToList(),
+            points.Select(p => new Point(p.Position, p.Quantity, p.QuantityQuality, p.SampleTime)).ToList(),
+            resultCalculationResultVersion,
             originalTransactionIdReference,
             settlementVersion);
         return new AggregationResultMessage(
@@ -99,8 +101,9 @@ public record TimeSeries(
     string? EnergySupplierNumber,
     string? BalanceResponsibleNumber,
     Period Period,
-    IReadOnlyList<Point> Point,
+    IReadOnlyCollection<Point> Point,
+    long? CalculationResultVersion,
     string? OriginalTransactionIdReference = null,
     string? SettlementVersion = null);
 
-public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
+public record Point(int Position, decimal? Quantity, CalculatedQuantityQuality QuantityQuality, string SampleTime);

@@ -40,26 +40,20 @@ public class DocumentFactory
         ArgumentNullException.ThrowIfNull(bundle);
 
         var documentWriter =
-            _documentWriters.FirstOrDefault(writer =>
-            {
-                return writer.HandlesType(bundle.DocumentType) &&
-                       writer.HandlesFormat(documentFormat);
-            });
-
-        if (documentWriter is null)
-        {
-            throw new OutgoingMessageException($"Could not handle document type {bundle.DocumentType} in format {documentFormat}");
-        }
+            _documentWriters.FirstOrDefault(
+                writer => writer.HandlesType(bundle.DocumentType) && writer.HandlesFormat(documentFormat))
+            ?? throw new OutgoingMessageException(
+                $"Could not handle document type {bundle.DocumentType} in format {documentFormat}");
 
         return documentWriter.WriteAsync(
             new OutgoingMessageHeader(
                 bundle.BusinessReason,
                 bundle.SenderId.Value,
-                bundle.SenderRole.Name,
+                bundle.SenderRole.Code,
                 bundle.Receiver.Number.Value,
-                bundle.Receiver.ActorRole.Name,
+                bundle.Receiver.ActorRole.Code,
                 bundle.AssignedBundleId.Id.ToString(),
                 timestamp),
-            bundle.OutgoingMessages.Select(message => message.MessageRecord).ToList());
+            bundle.OutgoingMessages.Select(message => message.GetMessageRecord()).ToList());
     }
 }

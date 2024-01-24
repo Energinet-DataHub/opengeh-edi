@@ -45,10 +45,10 @@ public class MessageDequeuer
         }
 
         var bundleId = BundleId.Create(messageId);
-        var actorQueue = await _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.MarketRole).ConfigureAwait(false);
+        var actorQueue = await _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.ActorRole).ConfigureAwait(false);
         if (actorQueue == null)
         {
-            _logger.LogWarning("Actor queue not found for actor number: {ActorNumber} and market role: {MarketRole}", request.ActorNumber, request.MarketRole);
+            _logger.LogWarning("Actor queue not found for actor number: {ActorNumber} and market role: {MarketRole}", request.ActorNumber, request.ActorRole);
             return new DequeueRequestResultDto(false);
         }
 

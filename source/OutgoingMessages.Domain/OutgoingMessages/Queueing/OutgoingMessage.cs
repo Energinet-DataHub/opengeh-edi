@@ -13,14 +13,21 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using NodaTime;
+using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing
 {
     public class OutgoingMessage
     {
-        public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, Guid processId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+        private string _messageRecord;
+
+        public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, Guid processId, string businessReason, ActorRole receiverRole, ActorNumber senderId, ActorRole senderRole, string messageRecord, Instant timestamp)
         {
+            Id = OutgoingMessageId.New();
             DocumentType = documentType;
             ReceiverId = receiverId;
             ProcessId = processId;
@@ -28,11 +35,35 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             ReceiverRole = receiverRole;
             SenderId = senderId;
             SenderRole = senderRole;
-            MessageRecord = messageRecord;
-            Id = Guid.NewGuid();
+            _messageRecord = messageRecord;
+            FileStorageReference = CreateFileStorageReference(Id, ReceiverId, timestamp);
         }
 
-        public Guid Id { get; }
+        // ReSharper disable once UnusedMember.Local -- Used by Entity Framework
+        private OutgoingMessage(
+            DocumentType documentType,
+            ActorNumber receiverId,
+            Guid processId,
+            string businessReason,
+            ActorRole receiverRole,
+            ActorNumber senderId,
+            ActorRole senderRole,
+            FileStorageReference fileStorageReference)
+        {
+            Id = OutgoingMessageId.New();
+            DocumentType = documentType;
+            ReceiverId = receiverId;
+            ProcessId = processId;
+            BusinessReason = businessReason;
+            ReceiverRole = receiverRole;
+            SenderId = senderId;
+            SenderRole = senderRole;
+            FileStorageReference = fileStorageReference;
+
+            _messageRecord = null!; // Message record is set later from FileStorage
+        }
+
+        public OutgoingMessageId Id { get; }
 
         public bool IsPublished { get; private set; }
 
@@ -44,44 +75,41 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
         public string BusinessReason { get; }
 
-        public MarketRole ReceiverRole { get; }
+        public ActorRole ReceiverRole { get; }
 
         public ActorNumber SenderId { get; }
 
-        public MarketRole SenderRole { get; }
-
-        public string MessageRecord { get; }
+        public ActorRole SenderRole { get; }
 
         public Receiver Receiver => Receiver.Create(ReceiverId, ReceiverRole);
 
         public BundleId? AssignedBundleId { get; private set; }
 
-        public static OutgoingMessage Create(
-            Receiver receiver,
-            BusinessReason businessReason,
-            DocumentType documentType,
-            Guid processId,
-            ActorNumber senderId,
-            MarketRole senderRole,
-            string messageRecord)
-        {
-            ArgumentNullException.ThrowIfNull(receiver);
-            ArgumentNullException.ThrowIfNull(businessReason);
-
-            return new OutgoingMessage(
-                documentType,
-                receiver.Number,
-                processId,
-                businessReason.Name,
-                receiver.ActorRole,
-                senderId,
-                senderRole,
-                messageRecord);
-        }
+        public FileStorageReference FileStorageReference { get; private set; }
 
         public void AssignToBundle(BundleId bundleId)
         {
             AssignedBundleId = bundleId;
+        }
+
+        public void SetMessageRecord(string messageRecord)
+        {
+            _messageRecord = messageRecord;
+        }
+
+        [SuppressMessage("Design", "CA1024:Use properties where appropriate", Justification = "Can cause error as a property because of serialization and message record maybe being null at the time")]
+        public string GetMessageRecord()
+        {
+            return _messageRecord;
+        }
+
+        private static FileStorageReference CreateFileStorageReference(OutgoingMessageId id, ActorNumber receiverActorNumber, Instant timestamp)
+        {
+            var dateTimeUtc = timestamp.ToDateTimeUtc();
+
+            var referenceString = $"{receiverActorNumber.Value}/{dateTimeUtc.Year:0000}/{dateTimeUtc.Month:00}/{dateTimeUtc.Day:00}/{id.Value:N}";
+
+            return new FileStorageReference(referenceString);
         }
     }
 }
