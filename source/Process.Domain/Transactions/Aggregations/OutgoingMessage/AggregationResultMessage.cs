@@ -62,7 +62,7 @@ public class AggregationResultMessage : OutgoingMessageDto
         string? energySupplierNumber,
         string? balanceResponsibleNumber,
         Period period,
-        IReadOnlyList<Point> points,
+        IReadOnlyCollection<Point> points,
         string businessReasonName,
         long? resultCalculationResultVersion,
         string? originalTransactionIdReference = null,
@@ -101,7 +101,7 @@ public record TimeSeries(
     string? EnergySupplierNumber,
     string? BalanceResponsibleNumber,
     Period Period,
-    IReadOnlyList<Point> Point,
+    IReadOnlyCollection<Point> Point,
     long? CalculationResultVersion,
     string? OriginalTransactionIdReference = null,
     string? SettlementVersion = null);

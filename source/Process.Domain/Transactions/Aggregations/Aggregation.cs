@@ -18,7 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 
 public record Aggregation(
-    IReadOnlyList<Point> Points,
+    IReadOnlyCollection<Point> Points,
     string MeteringPointType,
     string MeasureUnitType,
     string Resolution,

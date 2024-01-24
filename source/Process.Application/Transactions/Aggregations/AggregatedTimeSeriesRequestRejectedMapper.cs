@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -45,8 +46,13 @@ public class AggregatedTimeSeriesRequestRejectedMapper : IInboxEventMapper
         return eventType.Equals(nameof(AggregatedTimeSeriesRequestRejected), StringComparison.OrdinalIgnoreCase);
     }
 
-    private static List<Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.RejectReason> MapRejectReasons(RepeatedField<RejectReason> rejectReasons)
+    private static ReadOnlyCollection<Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.RejectReason> MapRejectReasons(RepeatedField<RejectReason> rejectReasons)
     {
-        return rejectReasons.Select(reason => new Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.RejectReason(reason.ErrorCode, reason.ErrorMessage)).ToList();
+        return rejectReasons
+            .Select(reason => new Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.RejectReason(
+                reason.ErrorCode,
+                reason.ErrorMessage))
+            .ToList()
+            .AsReadOnly();
     }
 }
