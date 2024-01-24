@@ -39,7 +39,7 @@ public class CimCodeTests
 
     [Theory]
     [InlineData(nameof(MarketRole.MeteredDataResponsible), "MDR")]
-    [InlineData(nameof(MarketRole.MeteringDataAdministrator), "DGL")]
+    [InlineData(nameof(MarketRole.MeteredDataAdministrator), "DGL")]
     [InlineData(nameof(MarketRole.GridOperator), "DDM")]
     [InlineData(nameof(MarketRole.BalanceResponsibleParty), "DDK")]
     [InlineData(nameof(MarketRole.EnergySupplier), "DDQ")]
