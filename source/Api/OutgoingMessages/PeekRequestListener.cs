@@ -47,11 +47,36 @@ public class PeekRequestListener
         _outgoingMessagesClient = outgoingMessagesClient;
     }
 
-    [OpenApiOperation(operationId: "Peek", tags: new[] { "DataHub3" }, Description = "Is the endpoint for receiving messages", Visibility = OpenApiVisibilityType.Important)]
-    [OpenApiSecurity("http", SecuritySchemeType.Http, Name = "Authorization", In = OpenApiSecurityLocationType.Header, Description = "JWT Authorization header using the Bearer scheme", Scheme = OpenApiSecuritySchemeType.Bearer, BearerFormat = "\"Authorization: Bearer {token}\"")]
-    [OpenApiParameter("Content-Type", In = ParameterLocation.Header, Required = true, Type = typeof(string), Description = "The content type for requested response")]
-    [OpenApiParameter("messageCategory", In = ParameterLocation.Path, Required = false, Type = typeof(string), Description = "The desired message category to be peeked")]
-    [OpenApiResponseWithBody(statusCode: HttpStatusCode.Accepted, contentType: "application/json", bodyType: typeof(string), Description = "Returns the requested message")]
+    [OpenApiOperation(
+        "Peek",
+        "DataHub3",
+        Description = "Is the endpoint for receiving messages",
+        Visibility = OpenApiVisibilityType.Important)]
+    [OpenApiSecurity(
+        "http",
+        SecuritySchemeType.Http,
+        Name = "Authorization",
+        In = OpenApiSecurityLocationType.Header,
+        Description = "JWT Authorization header using the Bearer scheme",
+        Scheme = OpenApiSecuritySchemeType.Bearer,
+        BearerFormat = "\"Authorization: Bearer {token}\"")]
+    [OpenApiParameter(
+        "Content-Type",
+        In = ParameterLocation.Header,
+        Required = true,
+        Type = typeof(string),
+        Description = "The content type for requested response")]
+    [OpenApiParameter(
+        "messageCategory",
+        In = ParameterLocation.Path,
+        Required = false,
+        Type = typeof(string),
+        Description = "The desired message category to be peeked")]
+    [OpenApiResponseWithBody(
+        HttpStatusCode.Accepted,
+        "application/json",
+        typeof(string),
+        Description = "Returns the requested message")]
     [OpenApiResponseWithoutBody(HttpStatusCode.NoContent, Description = "No message available to be peeked")]
     [Function("PeekRequestListener")]
     public async Task<HttpResponseData> RunAsync(
@@ -72,7 +97,8 @@ public class PeekRequestListener
         if (desiredDocumentFormat is null)
         {
             _logger.LogInformation(
-                "Could not parse desired CIM format from Content-Type header value: {ContentType}", contentType);
+                "Could not parse desired CIM format from Content-Type header value: {ContentType}",
+                contentType);
             return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
         }
 
@@ -81,12 +107,13 @@ public class PeekRequestListener
             : MessageCategory.None;
 
         var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(
-            new PeekRequestDto(
-            _authenticatedActor.CurrentActorIdentity.ActorNumber,
-            parsedMessageCategory,
-            _authenticatedActor.CurrentActorIdentity.MarketRole!,
-            desiredDocumentFormat),
-            cancellationToken).ConfigureAwait(false);
+                new PeekRequestDto(
+                    _authenticatedActor.CurrentActorIdentity.ActorNumber,
+                    parsedMessageCategory,
+                    _authenticatedActor.CurrentActorIdentity.MarketRole!,
+                    desiredDocumentFormat),
+                cancellationToken)
+            .ConfigureAwait(false);
 
         var response = HttpResponseData.CreateResponse(request);
         if (peekResult.MessageId is null)
