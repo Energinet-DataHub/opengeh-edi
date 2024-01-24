@@ -16,6 +16,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
+using Energinet.DataHub.EDI.Api.OpenApi;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -40,17 +41,17 @@ public class DequeueRequestListener
 
     [OpenApiOperation(
         "Dequeue",
-        "DataHub3",
+        OpenApiResources.OpenApiOperationTag,
         Description = "Is the endpoint for dequeue messages",
         Visibility = OpenApiVisibilityType.Important)]
     [OpenApiSecurity(
-        "http",
+        OpenApiResources.OpenApiSecuritySchemaName,
         SecuritySchemeType.Http,
-        Name = "Authorization",
+        Name = OpenApiResources.OpenApiSecurityName,
         In = OpenApiSecurityLocationType.Header,
-        Description = "JWT Authorization header using the Bearer scheme",
+        Description = OpenApiResources.OpenApiSecurityDescription,
         Scheme = OpenApiSecuritySchemeType.Bearer,
-        BearerFormat = "\"Authorization: Bearer {token}\"")]
+        BearerFormat = OpenApiResources.OpenApiSecurityBearerFormat)]
     [OpenApiParameter(
         "messageId",
         In = ParameterLocation.Path,

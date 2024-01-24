@@ -18,6 +18,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
+using Energinet.DataHub.EDI.Api.OpenApi;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
@@ -53,13 +54,13 @@ public class RequestAggregatedMeasureMessageReceiver
         Description = "Is the endpoint for requesting previously aggregated measured data",
         Visibility = OpenApiVisibilityType.Important)]
     [OpenApiSecurity(
-        "http",
+        OpenApiResources.OpenApiSecuritySchemaName,
         SecuritySchemeType.Http,
-        Name = "Authorization",
+        Name = OpenApiResources.OpenApiSecurityName,
         In = OpenApiSecurityLocationType.Header,
-        Description = "JWT Authorization header using the Bearer scheme",
+        Description = OpenApiResources.OpenApiSecurityDescription,
         Scheme = OpenApiSecuritySchemeType.Bearer,
-        BearerFormat = "\"Authorization: Bearer {token}\"")]
+        BearerFormat = OpenApiResources.OpenApiSecurityBearerFormat)]
     [OpenApiParameter(
         "Content-Type",
         In = ParameterLocation.Header,

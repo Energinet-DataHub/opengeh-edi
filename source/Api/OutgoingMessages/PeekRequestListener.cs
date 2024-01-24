@@ -17,6 +17,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
+using Energinet.DataHub.EDI.Api.OpenApi;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -53,13 +54,13 @@ public class PeekRequestListener
         Description = "Is the endpoint for receiving messages",
         Visibility = OpenApiVisibilityType.Important)]
     [OpenApiSecurity(
-        "http",
+        OpenApiResources.OpenApiSecuritySchemaName,
         SecuritySchemeType.Http,
-        Name = "Authorization",
+        Name = OpenApiResources.OpenApiSecurityName,
         In = OpenApiSecurityLocationType.Header,
-        Description = "JWT Authorization header using the Bearer scheme",
+        Description = OpenApiResources.OpenApiSecurityDescription,
         Scheme = OpenApiSecuritySchemeType.Bearer,
-        BearerFormat = "\"Authorization: Bearer {token}\"")]
+        BearerFormat = OpenApiResources.OpenApiSecurityBearerFormat)]
     [OpenApiParameter(
         "Content-Type",
         In = ParameterLocation.Header,
