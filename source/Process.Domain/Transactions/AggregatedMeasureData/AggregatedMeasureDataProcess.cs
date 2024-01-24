@@ -122,7 +122,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             }
         }
 
-        public void IsAccepted(IReadOnlyList<Aggregation> aggregations)
+        public void IsAccepted(IReadOnlyCollection<Aggregation> aggregations)
         {
             ArgumentNullException.ThrowIfNull(aggregations);
 
@@ -164,7 +164,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
                 RequestedByActorId,
                 ProcessId.Id,
                 rejectedAggregatedMeasureDataRequest.BusinessReason.Name,
-                MarketRole.FromCode(RequestedByActorRoleCode),
+                ActorRole.FromCode(RequestedByActorRoleCode),
                 rejectedTimeSerie);
         }
     }

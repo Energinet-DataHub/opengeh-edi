@@ -50,7 +50,7 @@ internal static class JsonHeaderWriter
 
         writer.WriteObject(
             "receiver_MarketParticipant.marketRole.type",
-            new KeyValuePair<string, string>("value", CimCode.Of(EnumerationType.FromName<MarketRole>(messageHeader.ReceiverRole))));
+            new KeyValuePair<string, string>("value", CimCode.Of(ActorRole.FromCode(messageHeader.ReceiverRole))));
 
         writer.WriteObject(
             "sender_MarketParticipant.mRID",
@@ -59,7 +59,7 @@ internal static class JsonHeaderWriter
 
         writer.WriteObject(
             "sender_MarketParticipant.marketRole.type",
-            new KeyValuePair<string, string>("value", CimCode.Of(EnumerationType.FromName<MarketRole>(messageHeader.SenderRole))));
+            new KeyValuePair<string, string>("value", CimCode.Of(ActorRole.FromCode(messageHeader.SenderRole))));
 
         writer.WriteObject("type", new KeyValuePair<string, string>("value", typeCode));
     }

@@ -18,7 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 
 public record Aggregation(
-    IReadOnlyList<Point> Points,
+    IReadOnlyCollection<Point> Points,
     string MeteringPointType,
     string MeasureUnitType,
     string Resolution,
@@ -27,11 +27,11 @@ public record Aggregation(
     string BusinessReason,
     ActorGrouping ActorGrouping,
     GridAreaDetails GridAreaDetails,
+    long? CalculationResultVersion,
     string? OriginalTransactionIdReference = null,
     string? Receiver = null,
     string? ReceiverRole = null,
-    string? SettlementVersion = null,
-    long? CalculationResultVersion = null);
+    string? SettlementVersion = null);
 
 public record Point(int Position, decimal? Quantity, CalculatedQuantityQuality QuantityQuality, string SampleTime);
 

@@ -101,24 +101,11 @@ public static class CimCode
         throw NoCodeFoundFor(meteringPointType.Name);
     }
 
-    public static string Of(MarketRole marketRole)
+    public static string Of(ActorRole actorRole)
     {
-        ArgumentNullException.ThrowIfNull(marketRole);
+        ArgumentNullException.ThrowIfNull(actorRole);
 
-        if (marketRole == MarketRole.EnergySupplier)
-            return "DDQ";
-        if (marketRole == MarketRole.GridOperator)
-            return "DDM";
-        if (marketRole == MarketRole.MeteredDataResponsible)
-            return "MDR";
-        if (marketRole == MarketRole.MeteringDataAdministrator)
-            return "DGL";
-        if (marketRole == MarketRole.MeteringPointAdministrator)
-            return "DDZ";
-        if (marketRole == MarketRole.BalanceResponsibleParty)
-            return "DDK";
-
-        throw NoCodeFoundFor(marketRole.Name);
+        return actorRole.Code;
     }
 
     public static string Of(SettlementType settlementType)

@@ -19,7 +19,7 @@ namespace Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 
 public sealed record ActorCertificateCredentialsAssignedDto(
     ActorNumber ActorNumber,
-    MarketRole ActorRole,
+    ActorRole ActorRole,
     CertificateThumbprintDto ThumbprintDto,
     Instant ValidFrom,
     int SequenceNumber);

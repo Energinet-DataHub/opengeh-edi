@@ -33,7 +33,7 @@ public class AggregationResultMessage : OutgoingMessageDto
         ActorNumber receiverId,
         Guid processId,
         string businessReason,
-        MarketRole receiverRole,
+        ActorRole receiverRole,
         TimeSeries series)
         : base(
             DocumentType.NotifyAggregatedMeasureData,
@@ -42,7 +42,7 @@ public class AggregationResultMessage : OutgoingMessageDto
             businessReason,
             receiverRole,
             DataHubDetails.DataHubActorNumber,
-            MarketRole.MeteringDataAdministrator,
+            ActorRole.MeteredDataAdministrator,
             new Serializer().Serialize(series))
     {
         Series = series;
@@ -52,7 +52,7 @@ public class AggregationResultMessage : OutgoingMessageDto
 
     public static AggregationResultMessage Create(
         ActorNumber receiverNumber,
-        MarketRole receiverRole,
+        ActorRole receiverRole,
         Guid processId,
         string gridAreaCode,
         string meteringPointType,
@@ -62,7 +62,7 @@ public class AggregationResultMessage : OutgoingMessageDto
         string? energySupplierNumber,
         string? balanceResponsibleNumber,
         Period period,
-        IReadOnlyList<Point> points,
+        IReadOnlyCollection<Point> points,
         string businessReasonName,
         long? resultCalculationResultVersion,
         string? originalTransactionIdReference = null,
@@ -101,7 +101,7 @@ public record TimeSeries(
     string? EnergySupplierNumber,
     string? BalanceResponsibleNumber,
     Period Period,
-    IReadOnlyList<Point> Point,
+    IReadOnlyCollection<Point> Point,
     long? CalculationResultVersion,
     string? OriginalTransactionIdReference = null,
     string? SettlementVersion = null);

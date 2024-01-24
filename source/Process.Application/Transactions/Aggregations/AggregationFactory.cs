@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -68,11 +69,11 @@ public class AggregationFactory
             aggregatedMeasureDataProcess.BusinessReason.Name,
             MapActorGrouping(aggregatedMeasureDataProcess),
             MapGridAreaDetails(aggregatedTimeSerie.GridAreaDetails),
+            aggregatedTimeSerie.CalculationResultVersion,
             aggregatedMeasureDataProcess.BusinessTransactionId.Id,
             aggregatedMeasureDataProcess.RequestedByActorId.Value,
             MapReceiverRole(aggregatedMeasureDataProcess),
-            aggregatedMeasureDataProcess.SettlementVersion?.Name,
-            aggregatedTimeSerie.CalculationResultVersion);
+            aggregatedMeasureDataProcess.SettlementVersion?.Name);
     }
 
     public async Task<Aggregation> CreateAsync(
@@ -91,6 +92,7 @@ public class AggregationFactory
             MapCalculationType(integrationEvent.CalculationType),
             MapActorGrouping(integrationEvent),
             await GetGridAreaDetailsAsync(integrationEvent, cancellationToken).ConfigureAwait(false),
+            integrationEvent.CalculationResultVersion,
             SettlementVersion: MapSettlementVersion(integrationEvent.CalculationType));
     }
 
@@ -116,17 +118,17 @@ public class AggregationFactory
 
     private static string MapReceiverRole(AggregatedMeasureDataProcess process)
     {
-        return MarketRole.FromCode(process.RequestedByActorRoleCode).Name;
+        return ActorRole.FromCode(process.RequestedByActorRoleCode).Name;
     }
 
     private static ActorGrouping MapActorGrouping(AggregatedMeasureDataProcess process)
     {
-        if (process.RequestedByActorRoleCode == MarketRole.BalanceResponsibleParty.Code)
+        if (process.RequestedByActorRoleCode == ActorRole.BalanceResponsibleParty.Code)
         {
             return new ActorGrouping(null, process.BalanceResponsibleId);
         }
 
-        if (process.RequestedByActorRoleCode == MarketRole.EnergySupplier.Code)
+        if (process.RequestedByActorRoleCode == ActorRole.EnergySupplier.Code)
         {
             return new ActorGrouping(process.EnergySupplierId, null);
         }
@@ -246,7 +248,7 @@ public class AggregationFactory
         return new Period(integrationEvent.PeriodStartUtc.ToInstant(), integrationEvent.PeriodEndUtc.ToInstant());
     }
 
-    private static System.Collections.ObjectModel.ReadOnlyCollection<Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
+    private static ReadOnlyCollection<Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
     {
         var points = new List<Point>();
 

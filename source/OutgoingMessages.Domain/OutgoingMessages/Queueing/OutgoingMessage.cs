@@ -25,7 +25,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
     {
         private string _messageRecord;
 
-        public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, Guid processId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord, Instant timestamp)
+        public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, Guid processId, string businessReason, ActorRole receiverRole, ActorNumber senderId, ActorRole senderRole, string messageRecord, Instant timestamp)
         {
             Id = OutgoingMessageId.New();
             DocumentType = documentType;
@@ -45,9 +45,9 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             ActorNumber receiverId,
             Guid processId,
             string businessReason,
-            MarketRole receiverRole,
+            ActorRole receiverRole,
             ActorNumber senderId,
-            MarketRole senderRole,
+            ActorRole senderRole,
             FileStorageReference fileStorageReference)
         {
             Id = OutgoingMessageId.New();
@@ -75,11 +75,11 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
         public string BusinessReason { get; }
 
-        public MarketRole ReceiverRole { get; }
+        public ActorRole ReceiverRole { get; }
 
         public ActorNumber SenderId { get; }
 
-        public MarketRole SenderRole { get; }
+        public ActorRole SenderRole { get; }
 
         public Receiver Receiver => Receiver.Create(ReceiverId, ReceiverRole);
 

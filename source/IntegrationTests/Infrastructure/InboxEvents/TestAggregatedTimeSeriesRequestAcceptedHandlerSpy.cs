@@ -46,7 +46,7 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
         actualNotification.Should().NotBeNull();
         actualNotification!.AggregatedTimeSeries.Should().ContainSingle();
 
-        var actualTimeSeries = actualNotification.AggregatedTimeSeries[0];
+        var actualTimeSeries = actualNotification.AggregatedTimeSeries.First();
         actualTimeSeries.Should().NotBeNull();
         actualTimeSeries.GridAreaDetails.GridAreaCode.Should().Be(firstSeries!.GridArea);
         actualTimeSeries.UnitType.Should().Be(MapUnitType(firstSeries));

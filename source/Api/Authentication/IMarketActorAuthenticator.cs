@@ -36,6 +36,6 @@ namespace Energinet.DataHub.EDI.Api.Authentication
         /// </summary>
         /// <param name="actorNumber">Actor number, typically found from the external id in the `azp` claim</param>
         /// <param name="marketRole">User role, typically found from the `role` claim</param>
-        bool Authenticate(ActorNumber? actorNumber, MarketRole? marketRole);
+        bool Authenticate(ActorNumber? actorNumber, ActorRole? marketRole);
     }
 }

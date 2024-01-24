@@ -40,7 +40,7 @@ public class ActorCertificateRepository : IActorCertificateRepository
 
     public Task<Domain.ActorCertificates.ActorCertificate?> GetFromActorRoleAsync(
         ActorNumber actorNumber,
-        MarketRole actorRole)
+        ActorRole actorRole)
     {
         return _masterDataContext.ActorCertificates
             .Where(ac => ac.ActorNumber == actorNumber && ac.ActorRole == actorRole)

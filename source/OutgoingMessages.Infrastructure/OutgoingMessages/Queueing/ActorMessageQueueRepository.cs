@@ -31,7 +31,7 @@ public class ActorMessageQueueRepository : IActorMessageQueueRepository
         _actorMessageQueueContext = actorMessageQueueContext;
     }
 
-    public async Task<ActorMessageQueue?> ActorMessageQueueForAsync(ActorNumber actorNumber, MarketRole actorRole)
+    public async Task<ActorMessageQueue?> ActorMessageQueueForAsync(ActorNumber actorNumber, ActorRole actorRole)
     {
         ArgumentNullException.ThrowIfNull(actorNumber);
         ArgumentNullException.ThrowIfNull(actorRole);

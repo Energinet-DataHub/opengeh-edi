@@ -76,7 +76,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         // Arrange
         var marketMessage =
             MessageBuilder().
-                SetSenderRole(MarketRole.MeteredDataResponsible.Code).
+                SetSenderRole(ActorRole.MeteredDataResponsible.Code).
                 SetEnergySupplierId(null).
                 SetBalanceResponsibleId(null).
                 Build();
