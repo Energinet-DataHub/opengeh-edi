@@ -26,6 +26,10 @@ public class AcceptanceTestFixture : IAsyncLifetime
     internal const string EbixActorGridArea = "543";
     internal const string CimActorGridArea = "804";
 
+    internal const string ActorNumber = "5790000610976"; // Corresponds to the "Mosaic 03" actor in the UI.
+    internal const string ActorGridArea = "543";
+    internal const string ActorRole = "metereddataresponsible";
+
     private readonly Uri _azureEntraB2CTenantUrl;
     private readonly string _azureEntraFrontendAppId;
     private readonly string _azureEntraBackendBffScope;
@@ -65,6 +69,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
         var energySupplierSecret = root.GetValue<string>("ENERGY_SUPPLIER_CLIENT_SECRET") ?? throw new InvalidOperationException("ENERGY_SUPPLIER_CLIENT_SECRET is not set in configuration");
         B2BEnergySupplierAuthorizedHttpClient = new AsyncLazy<HttpClient>(() => CreateB2BEnergySupplierAuthorizedHttpClientAsync(azureB2CTenantId, azureEntraBackendAppId, energySupplierId, energySupplierSecret, ApiManagementUri));
 
+        EbixCertificateThumbprint = root.GetValue<string>("EBIX_CERTIFICATE_THUMBPRINT") ?? "39D64F012A19C6F6FDFB0EA91D417873599D3325";
         EbixCertificatePassword = root.GetValue<string>("EBIX_CERTIFICATE_PASSWORD") ?? throw new InvalidOperationException("EBIX_CERTIFICATE_PASSWORD is not set in configuration");
         _azureEntraB2CTenantUrl = new Uri(root.GetValue<string>("AZURE_B2C_TENANT_URL") ?? "https://devdatahubb2c.b2clogin.com/tfp/devdatahubb2c.onmicrosoft.com/B2C_1_ROPC_Auth/oauth2/v2.0/token");
         _azureEntraFrontendAppId = root.GetValue<string>("AZURE_ENTRA_FRONTEND_APP_ID") ?? "bf76fc24-cfec-498f-8979-ab4123792472";
@@ -85,6 +90,8 @@ public class AcceptanceTestFixture : IAsyncLifetime
     internal Uri ApiManagementUri { get; }
 
     internal string EbixCertificatePassword { get; }
+
+    internal string EbixCertificateThumbprint { get; }
 
     internal AsyncLazy<HttpClient> B2CAuthorizedHttpClient { get; }
 

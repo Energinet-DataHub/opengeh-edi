@@ -98,7 +98,7 @@ internal sealed class EbixRequestDsl
 
     internal async Task ConfirmPeekWithRemovedCertificateIsNotAllowed()
     {
-        var response = await _ebix.PeekMessageAsync(timeoutInSeconds: 60).ConfigureAwait(false);
+        var response = await _ebix.PeekMessageAsync().ConfigureAwait(false);
 
         // Assert.Multiple(
         //     () => Assert.Equal(HttpStatusCode.Forbidden, response.),

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using AutoFixture;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
@@ -26,14 +27,19 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 public sealed class WhenEbixPeekRequestIsReceivedTests
 {
     private readonly EbixRequestDsl _ebix;
+    private readonly AcceptanceTestFixture _fixture;
+    private readonly ActorDsl _actor;
 
     public WhenEbixPeekRequestIsReceivedTests(AcceptanceTestFixture fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
+        _fixture = fixture;
 
         _ebix = new EbixRequestDsl(
             new WholesaleDriver(fixture.EventPublisher),
             new EbixDriver(new Uri(fixture.ApiManagementUri, "/ebix"), fixture.EbixCertificatePassword));
+        _actor = new ActorDsl(new MarketParticipantDriver(fixture.EventPublisher), new EdiActorDriver(
+            fixture.ConnectionString));
     }
 
     [Fact]
@@ -72,18 +78,18 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
     [Fact]
     public async Task Actor_cannot_peek_when_certificated_has_been_removed()
     {
-        await _actor.PublishActorCertificateCredentialsRemovedForAsync(TestRunner.ActorNumber, TestRunner.ActorRole, _runner.EbixCertificateThumbprint);
+        await _actor.PublishActorCertificateCredentialsRemovedForAsync(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _fixture.EbixCertificateThumbprint);
 
         await _ebix.ConfirmPeekWithRemovedCertificateIsNotAllowed();
-        await _actor.ActorCertificateCredentialsAssignedAsync(TestRunner.ActorNumber, TestRunner.ActorRole, _runner.EbixCertificateThumbprint);
+        await _actor.ActorCertificateCredentialsAssignedAsync(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _fixture.EbixCertificateThumbprint);
     }
 
     [Fact]
     public async Task Actor_cannot_dequeue_when_certificated_has_been_removed()
     {
-        await _actor.PublishActorCertificateCredentialsRemovedForAsync(TestRunner.ActorNumber, TestRunner.ActorRole, _runner.EbixCertificateThumbprint);
+        await _actor.PublishActorCertificateCredentialsRemovedForAsync(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _fixture.EbixCertificateThumbprint);
 
         await _ebix.ConfirmDequeueWithRemovedCertificateIsNotAllowed();
-        await _actor.ActorCertificateCredentialsAssignedAsync(TestRunner.ActorNumber, TestRunner.ActorRole, _runner.EbixCertificateThumbprint);
+        await _actor.ActorCertificateCredentialsAssignedAsync(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _fixture.EbixCertificateThumbprint);
     }
 }
