@@ -27,7 +27,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages
     {
         public void Configure(EntityTypeBuilder<OutgoingMessage> builder)
         {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            ArgumentNullException.ThrowIfNull(builder);
 
             builder.ToTable("OutgoingMessages", "dbo");
 

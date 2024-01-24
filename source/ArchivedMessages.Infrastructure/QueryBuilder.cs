@@ -105,7 +105,7 @@ internal sealed class QueryBuilder
 
     private void AddFilter(string whereStatement, params KeyValuePair<string, object>[] queryParameters)
     {
-        if (!queryParameters.Any())
+        if (queryParameters.Length == 0)
         {
             return;
         }

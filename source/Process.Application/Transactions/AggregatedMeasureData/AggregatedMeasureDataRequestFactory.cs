@@ -24,7 +24,7 @@ public static class AggregatedMeasureDataRequestFactory
 {
     public static ServiceBusMessage CreateServiceBusMessage(AggregatedMeasureDataProcess process)
     {
-        if (process == null) throw new ArgumentNullException(nameof(process));
+        ArgumentNullException.ThrowIfNull(process);
 
         var body = CreateAggregatedMeasureDataRequest(process);
 
@@ -52,7 +52,7 @@ public static class AggregatedMeasureDataRequestFactory
         return period;
     }
 
-    private static IMessage CreateAggregatedMeasureDataRequest(AggregatedMeasureDataProcess process)
+    private static AggregatedTimeSeriesRequest CreateAggregatedMeasureDataRequest(AggregatedMeasureDataProcess process)
     {
         var request = new AggregatedTimeSeriesRequest()
         {

@@ -45,7 +45,7 @@ public class AggregatedTimeSeriesRequestRejectedMapper : IInboxEventMapper
         return eventType.Equals(nameof(AggregatedTimeSeriesRequestRejected), StringComparison.OrdinalIgnoreCase);
     }
 
-    private static IReadOnlyList<Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.RejectReason> MapRejectReasons(RepeatedField<RejectReason> rejectReasons)
+    private static List<Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.RejectReason> MapRejectReasons(RepeatedField<RejectReason> rejectReasons)
     {
         return rejectReasons.Select(reason => new Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.RejectReason(reason.ErrorCode, reason.ErrorMessage)).ToList();
     }

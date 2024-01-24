@@ -28,7 +28,7 @@ public class ActorNumber : ValueObject
 
     public static ActorNumber Create(string actorNumber)
     {
-        if (actorNumber == null) throw new ArgumentNullException(nameof(actorNumber));
+        ArgumentNullException.ThrowIfNull(actorNumber);
         return IsGlnNumber(actorNumber) || IsEic(actorNumber)
             ? new ActorNumber(actorNumber)
             : throw InvalidActorNumberException.Create(actorNumber);

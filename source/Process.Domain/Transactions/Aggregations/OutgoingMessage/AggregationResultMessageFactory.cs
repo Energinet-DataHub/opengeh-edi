@@ -22,8 +22,8 @@ public static class AggregationResultMessageFactory
 {
     public static AggregationResultMessage CreateMessage(Aggregation result, ProcessId processId)
     {
-        if (result == null) throw new ArgumentNullException(nameof(result));
-        if (processId == null) throw new ArgumentNullException(nameof(processId));
+        ArgumentNullException.ThrowIfNull(result);
+        ArgumentNullException.ThrowIfNull(processId);
 
         if (IsTotalResultPerGridArea(result))
         {

@@ -72,7 +72,7 @@ public class AssertEbixDocument
 
     public AssertEbixDocument HasValue(string xpath, string expectedValue)
     {
-        if (xpath == null) throw new ArgumentNullException(nameof(xpath));
+        ArgumentNullException.ThrowIfNull(xpath);
         Assert.Equal(expectedValue, _document.Root?.XPathSelectElement(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager)?.Value);
         return this;
     }

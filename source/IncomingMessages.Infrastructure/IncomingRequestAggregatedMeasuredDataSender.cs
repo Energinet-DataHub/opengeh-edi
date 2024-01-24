@@ -31,8 +31,8 @@ public class IncomingRequestAggregatedMeasuredDataSender
         IOptions<ServiceBusClientOptions> options,
         ISerializer serializer)
     {
-        if (serviceBusSenderFactory == null) throw new ArgumentNullException(nameof(serviceBusSenderFactory));
-        if (options == null) throw new ArgumentNullException(nameof(options));
+        ArgumentNullException.ThrowIfNull(serviceBusSenderFactory);
+        ArgumentNullException.ThrowIfNull(options);
         _serializer = serializer;
 
         _senderCreator = serviceBusSenderFactory.GetSender(options.Value.INCOMING_MESSAGES_QUEUE_NAME);

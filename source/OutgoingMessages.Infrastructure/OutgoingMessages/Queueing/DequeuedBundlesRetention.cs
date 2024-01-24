@@ -48,7 +48,8 @@ public class DequeuedBundlesRetention : IDataRetention
 
         using var connection =
             (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
-        using var transaction = connection.BeginTransaction();
+        using var transaction =
+            (SqlTransaction)await connection.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
         using var command = connection.CreateCommand();
         command.Transaction = transaction;
         command.CommandText = deleteStmt;
