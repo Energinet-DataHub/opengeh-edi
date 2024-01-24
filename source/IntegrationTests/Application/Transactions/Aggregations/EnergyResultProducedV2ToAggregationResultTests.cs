@@ -361,7 +361,7 @@ public sealed class EnergyResultProducedV2ToAggregationResultTests : TestBase
         return await AssertOutgoingMessage.OutgoingMessageAsync(
             DocumentType.NotifyAggregatedMeasureData.Name,
             BusinessReason.BalanceFixing.Name,
-            MarketRole.MeteredDataResponsible,
+            ActorRole.MeteredDataResponsible,
             _databaseConnectionFactory,
             _fileStorageClient);
     }

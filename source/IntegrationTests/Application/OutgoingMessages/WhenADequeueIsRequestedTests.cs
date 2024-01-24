@@ -42,7 +42,7 @@ public class WhenADequeueIsRequestedTests : TestBase
     [Fact]
     public async Task Dequeue_is_unsuccessful_when_bundle_does_not_exist()
     {
-        var dequeueResult = await _outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(Guid.NewGuid().ToString(), MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)), CancellationToken.None);
+        var dequeueResult = await _outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(Guid.NewGuid().ToString(), ActorRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)), CancellationToken.None);
 
         Assert.False(dequeueResult.Success);
     }
@@ -53,10 +53,10 @@ public class WhenADequeueIsRequestedTests : TestBase
         var unknownMessageId = Guid.NewGuid().ToString();
         var enqueueMessageEvent = _outgoingMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
-            .WithReceiverRole(MarketRole.EnergySupplier)
+            .WithReceiverRole(ActorRole.EnergySupplier)
             .Build();
         await EnqueueMessage(enqueueMessageEvent);
-        var dequeueResult = await _outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(unknownMessageId, MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)), CancellationToken.None);
+        var dequeueResult = await _outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(unknownMessageId, ActorRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)), CancellationToken.None);
 
         Assert.False(dequeueResult.Success);
     }
@@ -66,18 +66,18 @@ public class WhenADequeueIsRequestedTests : TestBase
     {
         var enqueueMessageEvent = _outgoingMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
-            .WithReceiverRole(MarketRole.EnergySupplier)
+            .WithReceiverRole(ActorRole.EnergySupplier)
             .Build();
         await EnqueueMessage(enqueueMessageEvent);
         var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(
             new PeekRequestDto(
             ActorNumber.Create(SampleData.NewEnergySupplierNumber),
             MessageCategory.Aggregations,
-            MarketRole.EnergySupplier,
+            ActorRole.EnergySupplier,
             DocumentFormat.Xml),
             CancellationToken.None);
 
-        var dequeueResult = await _outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(peekResult.MessageId.GetValueOrDefault().ToString(), MarketRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)), CancellationToken.None);
+        var dequeueResult = await _outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(peekResult.MessageId.GetValueOrDefault().ToString(), ActorRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)), CancellationToken.None);
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var found = await connection
             .QuerySingleOrDefaultAsync<bool>("SELECT IsDequeued FROM [dbo].Bundles");

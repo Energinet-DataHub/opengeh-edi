@@ -21,24 +21,24 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 
 public static class ClaimsMap
 {
-    private static readonly Dictionary<string, MarketRole> _rolesMap = new()
+    private static readonly Dictionary<string, ActorRole> _rolesMap = new()
     {
-        { "energysupplier", MarketRole.EnergySupplier },
-        { "gridaccessprovider", MarketRole.GridOperator },
-        { "metereddataresponsible", MarketRole.MeteredDataResponsible },
-        { "balanceresponsibleparty", MarketRole.BalanceResponsibleParty },
+        { "energysupplier", ActorRole.EnergySupplier },
+        { "gridaccessprovider", ActorRole.GridOperator },
+        { "metereddataresponsible", ActorRole.MeteredDataResponsible },
+        { "balanceresponsibleparty", ActorRole.BalanceResponsibleParty },
     };
 
     public static string UserId => "azp";
 
-    public static MarketRole? RoleFrom(string roleClaimValue)
+    public static ActorRole? RoleFrom(string roleClaimValue)
     {
         _rolesMap.TryGetValue(roleClaimValue, out var marketRole);
         return marketRole;
     }
 
-    public static Claim RoleFrom(MarketRole marketRole)
+    public static Claim RoleFrom(ActorRole actorRole)
     {
-        return new Claim(ClaimTypes.Role, _rolesMap.First(x => x.Value.Equals(marketRole)).Key);
+        return new Claim(ClaimTypes.Role, _rolesMap.First(x => x.Value.Equals(actorRole)).Key);
     }
 }

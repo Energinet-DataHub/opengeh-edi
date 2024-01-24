@@ -42,9 +42,9 @@ public class TestCreateOutgoingCommandHandler : IRequestHandler<TestCreateOutgoi
                 ActorNumber.Create("1234567891234"),
                 ProcessId.New().Id,
                 BusinessReason.BalanceFixing.Name,
-                MarketRole.EnergySupplier,
+                ActorRole.EnergySupplier,
                 ActorNumber.Create("1234567891234"),
-                MarketRole.MeteredDataAdministrator,
+                ActorRole.MeteredDataAdministrator,
                 "data");
 
             await _mediator.Publish(new EnqueueMessageEvent(message), cancellationToken).ConfigureAwait(false);

@@ -57,7 +57,7 @@ internal static class XmlHeaderWriter
                 documentDetails.Prefix,
                 "sender_MarketParticipant.marketRole.type",
                 null,
-                CimCode.Of(MarketRole.FromCode(messageHeader.SenderRole)))
+                CimCode.Of(ActorRole.FromCode(messageHeader.SenderRole)))
             .ConfigureAwait(false);
 
         await writer.WriteStartElementAsync(documentDetails.Prefix, "receiver_MarketParticipant.mRID", null).ConfigureAwait(false);
@@ -66,7 +66,7 @@ internal static class XmlHeaderWriter
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 
         await writer
-            .WriteElementStringAsync(documentDetails.Prefix, "receiver_MarketParticipant.marketRole.type", null, CimCode.Of(MarketRole.FromCode(messageHeader.ReceiverRole)))
+            .WriteElementStringAsync(documentDetails.Prefix, "receiver_MarketParticipant.marketRole.type", null, CimCode.Of(ActorRole.FromCode(messageHeader.ReceiverRole)))
             .ConfigureAwait(false);
         await writer.WriteElementStringAsync(documentDetails.Prefix, "createdDateTime", null, messageHeader.TimeStamp.ToString()).ConfigureAwait(false);
         if (reasonCode is not null)

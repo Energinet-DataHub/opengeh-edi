@@ -62,6 +62,6 @@ public class CertificateAuthenticationMethod : IAuthenticationMethod
             return false;
         }
 
-        return _marketActorAuthenticator.Authenticate(actorNumberAndRole.ActorNumber, actorNumberAndRole.MarketRole);
+        return _marketActorAuthenticator.Authenticate(actorNumberAndRole.ActorNumber, actorNumberAndRole.ActorRole);
     }
 }
