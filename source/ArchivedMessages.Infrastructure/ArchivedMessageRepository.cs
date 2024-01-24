@@ -49,7 +49,7 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
     {
         ArgumentNullException.ThrowIfNull(message);
 
-        await _fileStorageClient.UploadAsync(message.FileStorageReference, message.GetDocumentStream()).ConfigureAwait(false);
+        await _fileStorageClient.UploadAsync(message.FileStorageReference, message.Document).ConfigureAwait(false);
 
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
 
@@ -123,10 +123,5 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
         }
 
         return (SqlCommand)command;
-    }
-
-    private static void RewindStream(Stream message)
-    {
-        message.Seek(0, SeekOrigin.Begin);
     }
 }

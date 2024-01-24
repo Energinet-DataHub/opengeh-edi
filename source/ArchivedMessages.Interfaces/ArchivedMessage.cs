@@ -23,8 +23,6 @@ public class ArchivedMessage
 {
     public const string FileStorageCategory = "archived";
 
-    private readonly Stream _document;
-
     public ArchivedMessage(
         string id,
         string? messageId,
@@ -35,14 +33,14 @@ public class ArchivedMessage
         string? businessReason,
         Stream document)
     {
+        Id = id;
         MessageId = messageId;
         DocumentType = documentType;
         SenderNumber = senderNumber;
         ReceiverNumber = receiverNumber;
         CreatedAt = createdAt;
         BusinessReason = businessReason;
-        _document = document;
-        Id = id;
+        Document = document;
 
         FileStorageReference = FileStorageReference.Create(FileStorageCategory, ReceiverNumber, createdAt, Id);
     }
@@ -63,6 +61,5 @@ public class ArchivedMessage
 
     public FileStorageReference FileStorageReference { get; }
 
-    [SuppressMessage("Design", "CA1024:Use properties where appropriate", Justification = "Can cause error as a property because of serialization and message record maybe being null at the time")]
-    public Stream GetDocumentStream() => _document;
+    public Stream Document { get; }
 }
