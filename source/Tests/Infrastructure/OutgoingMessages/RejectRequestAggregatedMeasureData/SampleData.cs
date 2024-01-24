@@ -25,7 +25,7 @@ internal static class SampleData
 
     public static string SenderId => "1234567890123";
 
-    public static MarketRole SenderRole => MarketRole.MeteringDataAdministrator;
+    public static MarketRole SenderRole => MarketRole.MeteredDataAdministrator;
 
     public static string ReceiverId => "1234567890987";
 

@@ -33,7 +33,7 @@ public class TimeSeriesBuilder
     private string _receiverNumber = "1234567890123";
     private MarketRole _receiverRole = MarketRole.MeteredDataResponsible;
     private string _senderNumber = "1234567890321";
-    private MarketRole _senderRole = MarketRole.MeteringDataAdministrator;
+    private MarketRole _senderRole = MarketRole.MeteredDataAdministrator;
     private Guid _transactionId = Guid.NewGuid();
     private string _gridAreaCode = "870";
     private MeteringPointType _meteringPointType = MeteringPointType.Consumption;
@@ -162,9 +162,9 @@ public class TimeSeriesBuilder
         return new OutgoingMessageHeader(
             _businessReason.Name,
             _senderNumber,
-            _senderRole.Name,
+            _senderRole.Code,
             _receiverNumber,
-            _receiverRole.Name,
+            _receiverRole.Code,
             _messageId,
             _timeStamp);
     }

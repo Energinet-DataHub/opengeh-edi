@@ -51,7 +51,7 @@ public class AssertOutgoingMessage
             $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.ProcessId, m.BusinessReason," +
             $"m.ReceiverRole, m.SenderId, m.SenderRole, m.FileStorageReference " +
             $" FROM [dbo].[OutgoingMessages] m" +
-            $" WHERE m.DocumentType = '{messageType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Name}'");
+            $" WHERE m.DocumentType = '{messageType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Code}'");
 
         Assert.NotNull(message);
         Assert.NotNull(message.FileStorageReference);
@@ -74,7 +74,7 @@ public class AssertOutgoingMessage
             $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.ProcessId, m.BusinessReason," +
             $"m.ReceiverRole, m.SenderId, m.SenderRole, m.FileStorageReference " +
             $" FROM [dbo].[OutgoingMessages] m" +
-            $" WHERE m.DocumentType = '{messageType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Name}'");
+            $" WHERE m.DocumentType = '{messageType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Code}'");
 
         Assert.Null(message);
     }

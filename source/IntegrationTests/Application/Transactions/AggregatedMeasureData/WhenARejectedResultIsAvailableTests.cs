@@ -69,8 +69,8 @@ public class WhenARejectedResultIsAvailableTests : TestBase
         outgoingMessage
             .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
-            .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
-            .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
+            .HasReceiverRole(process.RequestedByActorRoleCode)
+            .HasSenderRole(MarketRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons.First().ErrorCode, rejectReason.ErrorCode)
             .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons.Last().ErrorCode, rejectReason2.ErrorCode);

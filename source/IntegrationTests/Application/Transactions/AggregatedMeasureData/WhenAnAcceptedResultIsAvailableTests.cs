@@ -73,8 +73,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         outgoingMessage
             .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
-            .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
-            .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
+            .HasReceiverRole(process.RequestedByActorRoleCode)
+            .HasSenderRole(MarketRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId)
@@ -102,8 +102,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         outgoingMessage
             .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
-            .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
-            .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
+            .HasReceiverRole(process.RequestedByActorRoleCode)
+            .HasSenderRole(MarketRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1);
     }

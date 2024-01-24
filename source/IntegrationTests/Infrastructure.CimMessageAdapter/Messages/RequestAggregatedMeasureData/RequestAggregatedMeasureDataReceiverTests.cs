@@ -409,7 +409,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     public async Task Multiple_activity_records_are_committed_as_processes()
     {
         var knownReceiverId = "5790001330552";
-        var knownReceiverRole = MarketRole.CalculationResponsibleRole.Code;
+        var knownReceiverRole = MarketRole.MeteredDataAdministrator.Code;
         var knownSenderId = "5790001330554";
         var knownSenderRole = MarketRole.EnergySupplier.Code;
         await using var message = BusinessMessageBuilder

@@ -34,7 +34,9 @@ public class ActorMessageQueueEntityConfiguration : IEntityTypeConfiguration<Act
             entityBuilder.Property(receiver => receiver.Number).HasColumnName("ActorNumber")
                 .HasConversion(toDbValue => toDbValue.Value, fromDbValue => ActorNumber.Create(fromDbValue));
             entityBuilder.Property(receiver => receiver.ActorRole).HasColumnName("ActorRole")
-                .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<MarketRole>(fromDbValue));
+                .HasConversion(
+                    toDbValue => toDbValue.Code,
+                    fromDbValue => MarketRole.FromCode(fromDbValue));
             entityBuilder.WithOwner();
         });
         builder.OwnsMany<Bundle>("_bundles", navigationBuilder =>

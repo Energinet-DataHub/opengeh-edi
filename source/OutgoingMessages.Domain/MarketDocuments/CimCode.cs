@@ -105,20 +105,7 @@ public static class CimCode
     {
         ArgumentNullException.ThrowIfNull(marketRole);
 
-        if (marketRole == MarketRole.EnergySupplier)
-            return "DDQ";
-        if (marketRole == MarketRole.GridOperator)
-            return "DDM";
-        if (marketRole == MarketRole.MeteredDataResponsible)
-            return "MDR";
-        if (marketRole == MarketRole.MeteringDataAdministrator)
-            return "DGL";
-        if (marketRole == MarketRole.MeteringPointAdministrator)
-            return "DDZ";
-        if (marketRole == MarketRole.BalanceResponsibleParty)
-            return "DDK";
-
-        throw NoCodeFoundFor(marketRole.Name);
+        return marketRole.Code;
     }
 
     public static string Of(SettlementType settlementType)
