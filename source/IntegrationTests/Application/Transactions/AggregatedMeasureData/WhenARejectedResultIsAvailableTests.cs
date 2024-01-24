@@ -65,12 +65,12 @@ public class WhenARejectedResultIsAvailableTests : TestBase
         await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestRejected), rejectEvent, process.ProcessId.Id);
 
         // Assert
-        var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
+        var outgoingMessage = await OutgoingMessageAsync(ActorRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
         outgoingMessage
             .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(process.RequestedByActorRoleCode)
-            .HasSenderRole(MarketRole.MeteredDataAdministrator.Code)
+            .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons.First().ErrorCode, rejectReason.ErrorCode)
             .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons.Last().ErrorCode, rejectReason2.ErrorCode);
@@ -83,7 +83,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
     }
 
     private async Task<AssertOutgoingMessage> OutgoingMessageAsync(
-        MarketRole roleOfReceiver,
+        ActorRole roleOfReceiver,
         BusinessReason businessReason)
     {
         return await AssertOutgoingMessage.OutgoingMessageAsync(

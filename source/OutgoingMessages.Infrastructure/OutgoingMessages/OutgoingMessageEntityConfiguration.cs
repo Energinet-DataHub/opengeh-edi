@@ -51,7 +51,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages
             builder.Property(x => x.ReceiverRole)
                 .HasConversion(
                     toDbValue => toDbValue.Code,
-                    fromDbValue => MarketRole.FromCode(fromDbValue));
+                    fromDbValue => ActorRole.FromCode(fromDbValue));
 
             builder.Property(x => x.ProcessId);
 
@@ -65,7 +65,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages
             builder.Property(x => x.SenderRole)
                 .HasConversion(
                     toDbValue => toDbValue.Code,
-                    fromDbValue => MarketRole.FromCode(fromDbValue));
+                    fromDbValue => ActorRole.FromCode(fromDbValue));
 
             builder.Property(x => x.AssignedBundleId).HasConversion(
                 toDbValue => toDbValue == null ? Guid.Empty : toDbValue.Id,

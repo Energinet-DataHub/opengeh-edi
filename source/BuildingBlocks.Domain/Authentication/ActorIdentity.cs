@@ -22,7 +22,7 @@ public class ActorIdentity
     public ActorIdentity(
         ActorNumber actorNumber,
         Restriction restriction,
-        MarketRole? marketRole = null)
+        ActorRole? marketRole = null)
     {
         ActorNumber = actorNumber;
         Restriction = restriction;
@@ -33,9 +33,9 @@ public class ActorIdentity
 
     public Restriction Restriction { get; set; }
 
-    public MarketRole? MarketRole { get; set; }
+    public ActorRole? MarketRole { get; set; }
 
-    public bool HasRole(MarketRole role)
+    public bool HasRole(ActorRole role)
     {
         return MarketRole != null && role != null && MarketRole.Name.Equals(role.Name, StringComparison.OrdinalIgnoreCase) && MarketRole.Code.Equals(role.Code, StringComparison.OrdinalIgnoreCase);
     }

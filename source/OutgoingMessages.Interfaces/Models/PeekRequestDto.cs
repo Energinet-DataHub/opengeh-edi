@@ -16,5 +16,5 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-public record PeekRequestDto(ActorNumber ActorNumber, MessageCategory MessageCategory, MarketRole ActorRole,
+public record PeekRequestDto(ActorNumber ActorNumber, MessageCategory MessageCategory, ActorRole ActorRole,
     DocumentFormat DocumentFormat);

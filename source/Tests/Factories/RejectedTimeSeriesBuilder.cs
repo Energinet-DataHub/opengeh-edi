@@ -25,9 +25,9 @@ namespace Energinet.DataHub.EDI.Tests.Factories;
 public class RejectedTimeSeriesBuilder
 {
     private readonly string _receiverNumber = SampleData.ReceiverId;
-    private readonly MarketRole _receiverRole = SampleData.ReceiverRole;
+    private readonly ActorRole _receiverRole = SampleData.ReceiverRole;
     private readonly string _senderNumber = SampleData.SenderId;
-    private readonly MarketRole _senderRole = SampleData.SenderRole;
+    private readonly ActorRole _senderRole = SampleData.SenderRole;
     private readonly string _messageId = SampleData.MessageId;
     private readonly BusinessReason _businessReason = SampleData.BusinessReason;
     private readonly Instant _creationDate = SampleData.CreationDate;

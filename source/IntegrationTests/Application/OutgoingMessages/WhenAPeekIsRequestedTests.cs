@@ -63,7 +63,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         var message = _outgoingMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
-            .WithReceiverRole(MarketRole.EnergySupplier)
+            .WithReceiverRole(ActorRole.EnergySupplier)
             .Build();
         await EnqueueMessage(message);
 
@@ -80,7 +80,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         var message = _outgoingMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
-            .WithReceiverRole(MarketRole.EnergySupplier)
+            .WithReceiverRole(ActorRole.EnergySupplier)
             .Build();
         await EnqueueMessage(message);
 
@@ -97,7 +97,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         var message = _outgoingMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
-            .WithReceiverRole(MarketRole.EnergySupplier)
+            .WithReceiverRole(ActorRole.EnergySupplier)
             .Build();
         await EnqueueMessage(message);
 
@@ -111,7 +111,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         var message = _outgoingMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
-            .WithReceiverRole(MarketRole.EnergySupplier)
+            .WithReceiverRole(ActorRole.EnergySupplier)
             .Build();
         await EnqueueMessage(message);
 
@@ -133,7 +133,7 @@ public class WhenAPeekIsRequestedTests : TestBase
 
     private Task<PeekResultDto> PeekMessage(MessageCategory category)
     {
-        return _outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, MarketRole.EnergySupplier, DocumentFormat.Xml), CancellationToken.None);
+        return _outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, ActorRole.EnergySupplier, DocumentFormat.Xml), CancellationToken.None);
     }
 
     private async Task AssertMessageIsArchived(Guid? messageId)

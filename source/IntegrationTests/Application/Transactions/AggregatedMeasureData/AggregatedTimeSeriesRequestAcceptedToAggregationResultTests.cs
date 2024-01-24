@@ -427,7 +427,7 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
         return await AssertOutgoingMessage.OutgoingMessageAsync(
             DocumentType.NotifyAggregatedMeasureData.Name,
             BusinessReason.BalanceFixing.Name,
-            MarketRole.BalanceResponsibleParty,
+            ActorRole.BalanceResponsibleParty,
             _databaseConnectionFactory,
             _fileStorageClient);
     }

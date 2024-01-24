@@ -32,7 +32,7 @@ public class ActorCertificateEntityConfiguration : IEntityTypeConfiguration<Doma
         builder.Property(receiver => receiver.ActorNumber)
             .HasConversion(actorNumber => actorNumber.Value, dbValue => ActorNumber.Create(dbValue));
         builder.Property(receiver => receiver.ActorRole)
-            .HasConversion(actorRole => actorRole.Code, dbValue => MarketRole.FromCode(dbValue));
+            .HasConversion(actorRole => actorRole.Code, dbValue => ActorRole.FromCode(dbValue));
         builder.Property(entity => entity.Thumbprint)
             .HasConversion(thumbprint => thumbprint.Thumbprint, dbValue => new CertificateThumbprint(dbValue));
         builder.Property(entity => entity.ValidFrom);

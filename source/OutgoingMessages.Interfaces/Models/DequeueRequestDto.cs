@@ -16,4 +16,4 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-public record DequeueRequestDto(string MessageId, MarketRole MarketRole, ActorNumber ActorNumber);
+public record DequeueRequestDto(string MessageId, ActorRole ActorRole, ActorNumber ActorNumber);

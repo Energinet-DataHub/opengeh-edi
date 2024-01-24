@@ -53,19 +53,19 @@ internal sealed class ActorCertificateCredentialsAssignedEventProcessor : IInteg
             cancellationToken).ConfigureAwait(false);
     }
 
-    private static MarketRole GetMarketRole(EicFunction actorRole)
+    private static ActorRole GetMarketRole(EicFunction actorRole)
     {
         return actorRole switch
         {
-            EicFunction.MeteringPointAdministrator => MarketRole.MeteringPointAdministrator,
-            EicFunction.EnergySupplier => MarketRole.EnergySupplier,
-            EicFunction.GridAccessProvider => MarketRole.GridOperator,
-            EicFunction.MeteredDataAdministrator => MarketRole.MeteredDataAdministrator,
-            EicFunction.MeteredDataResponsible => MarketRole.MeteredDataResponsible,
-            EicFunction.BalanceResponsibleParty => MarketRole.BalanceResponsibleParty,
-            EicFunction.ImbalanceSettlementResponsible => MarketRole.ImbalanceSettlementResponsible,
-            EicFunction.SystemOperator => MarketRole.SystemOperator,
-            EicFunction.DanishEnergyAgency => MarketRole.DanishEnergyAgency,
+            EicFunction.MeteringPointAdministrator => ActorRole.MeteringPointAdministrator,
+            EicFunction.EnergySupplier => ActorRole.EnergySupplier,
+            EicFunction.GridAccessProvider => ActorRole.GridOperator,
+            EicFunction.MeteredDataAdministrator => ActorRole.MeteredDataAdministrator,
+            EicFunction.MeteredDataResponsible => ActorRole.MeteredDataResponsible,
+            EicFunction.BalanceResponsibleParty => ActorRole.BalanceResponsibleParty,
+            EicFunction.ImbalanceSettlementResponsible => ActorRole.ImbalanceSettlementResponsible,
+            EicFunction.SystemOperator => ActorRole.SystemOperator,
+            EicFunction.DanishEnergyAgency => ActorRole.DanishEnergyAgency,
             EicFunction.Unspecified => throw new ArgumentOutOfRangeException(
                 nameof(actorRole),
                 actorRole,

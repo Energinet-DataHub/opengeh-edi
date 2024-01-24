@@ -34,13 +34,13 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
     private readonly string _businessType = "23";
     private readonly BusinessReason _businessReason = BusinessReason.PreliminaryAggregation;
     private readonly ActorNumber _receiverId = DataHubDetails.DataHubActorNumber;
-    private readonly MarketRole _receiverRole = MarketRole.MeteredDataAdministrator;
+    private readonly ActorRole _receiverRole = ActorRole.MeteredDataAdministrator;
     private readonly string _createdAt = SystemClock.Instance.GetCurrentInstant().ToString();
     private string _senderId = SampleData.NewEnergySupplierNumber;
     private string? _settlementVersion;
     private string _messageId = Guid.NewGuid().ToString();
     private string _serieId = Guid.NewGuid().ToString();
-    private string _senderRole = MarketRole.EnergySupplier.Code;
+    private string _senderRole = ActorRole.EnergySupplier.Code;
     private string _marketEvaluationPointType = "E17";
     private string? _marketEvaluationSettlementMethod = "D01";
     private string? _energySupplierMarketParticipantId = SampleData.NewEnergySupplierNumber;
