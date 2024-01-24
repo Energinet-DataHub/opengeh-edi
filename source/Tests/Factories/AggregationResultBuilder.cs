@@ -48,7 +48,8 @@ public class AggregationResultBuilder
             _settlementType?.Name,
             BusinessReason.BalanceFixing.Name,
             _actorGrouping,
-            new GridAreaDetails(_gridAreaOwner.GridAreaCode, _gridAreaOwner.GridAreaOwner.Value));
+            new GridAreaDetails(_gridAreaOwner.GridAreaCode, _gridAreaOwner.GridAreaOwner.Value),
+            1);
     }
 
     public AggregationResultBuilder WithGridAreaDetails(GridAreaOwnershipAssignedDto gridAreaOwner)

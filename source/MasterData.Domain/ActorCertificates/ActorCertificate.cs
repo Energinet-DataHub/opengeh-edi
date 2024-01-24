@@ -22,7 +22,7 @@ public class ActorCertificate
 {
     private readonly Guid _id;
 
-    public ActorCertificate(ActorNumber actorNumber, MarketRole actorRole, CertificateThumbprint thumbprint, Instant validFrom, int sequenceNumber)
+    public ActorCertificate(ActorNumber actorNumber, ActorRole actorRole, CertificateThumbprint thumbprint, Instant validFrom, int sequenceNumber)
     {
         _id = Guid.NewGuid();
         ActorNumber = actorNumber;
@@ -39,7 +39,7 @@ public class ActorCertificate
 
     public ActorNumber ActorNumber { get; }
 
-    public MarketRole ActorRole { get; }
+    public ActorRole ActorRole { get; }
 
     public CertificateThumbprint Thumbprint { get; private set; }
 

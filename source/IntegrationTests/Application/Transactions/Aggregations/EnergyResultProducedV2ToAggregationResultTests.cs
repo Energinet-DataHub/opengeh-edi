@@ -128,11 +128,11 @@ public sealed class EnergyResultProducedV2ToAggregationResultTests : TestBase
 
         // Assert
         result
-            .HasMessageRecordValue<TimeSeries, IReadOnlyList<Point>>(
+            .HasMessageRecordValue<TimeSeries, IReadOnlyCollection<Point>>(
                 series => series.Point,
                 points => points.Should().ContainSingle())
             .HasMessageRecordValue<TimeSeries, Point>(
-                series => series.Point[0],
+                series => series.Point.First(),
                 point =>
                 {
                     point.Should().NotBeNull();
@@ -158,11 +158,11 @@ public sealed class EnergyResultProducedV2ToAggregationResultTests : TestBase
 
         // Assert
         result
-            .HasMessageRecordValue<TimeSeries, IReadOnlyList<Point>>(
+            .HasMessageRecordValue<TimeSeries, IReadOnlyCollection<Point>>(
                 series => series.Point,
                 points => points.Should().ContainSingle())
             .HasMessageRecordValue<TimeSeries, Point>(
-                series => series.Point[0],
+                series => series.Point.First(),
                 point =>
                 {
                     point.Should().NotBeNull();
@@ -182,11 +182,11 @@ public sealed class EnergyResultProducedV2ToAggregationResultTests : TestBase
 
         // Assert
         result
-            .HasMessageRecordValue<TimeSeries, IReadOnlyList<Point>>(
+            .HasMessageRecordValue<TimeSeries, IReadOnlyCollection<Point>>(
                 series => series.Point,
                 points => points.Should().ContainSingle())
             .HasMessageRecordValue<TimeSeries, Point>(
-                series => series.Point[0],
+                series => series.Point.First(),
                 point =>
                 {
                     point.Should().NotBeNull();
@@ -206,11 +206,11 @@ public sealed class EnergyResultProducedV2ToAggregationResultTests : TestBase
 
         // Assert
         result
-            .HasMessageRecordValue<TimeSeries, IReadOnlyList<Point>>(
+            .HasMessageRecordValue<TimeSeries, IReadOnlyCollection<Point>>(
                 series => series.Point,
                 points => points.Should().ContainSingle())
             .HasMessageRecordValue<TimeSeries, Point>(
-                series => series.Point[0],
+                series => series.Point.First(),
                 point =>
                 {
                     point.Should().NotBeNull();
@@ -230,11 +230,11 @@ public sealed class EnergyResultProducedV2ToAggregationResultTests : TestBase
 
         // Assert
         result
-            .HasMessageRecordValue<TimeSeries, IReadOnlyList<Point>>(
+            .HasMessageRecordValue<TimeSeries, IReadOnlyCollection<Point>>(
                 series => series.Point,
                 points => points.Should().ContainSingle())
             .HasMessageRecordValue<TimeSeries, Point>(
-                series => series.Point[0],
+                series => series.Point.First(),
                 point =>
                 {
                     point.Should().NotBeNull();
@@ -254,11 +254,11 @@ public sealed class EnergyResultProducedV2ToAggregationResultTests : TestBase
 
         // Assert
         result
-            .HasMessageRecordValue<TimeSeries, IReadOnlyList<Point>>(
+            .HasMessageRecordValue<TimeSeries, IReadOnlyCollection<Point>>(
                 series => series.Point,
                 points => points.Should().ContainSingle())
             .HasMessageRecordValue<TimeSeries, Point>(
-                series => series.Point[0],
+                series => series.Point.First(),
                 point =>
                 {
                     point.Should().NotBeNull();
@@ -278,11 +278,11 @@ public sealed class EnergyResultProducedV2ToAggregationResultTests : TestBase
 
         // Assert
         result
-            .HasMessageRecordValue<TimeSeries, IReadOnlyList<Point>>(
+            .HasMessageRecordValue<TimeSeries, IReadOnlyCollection<Point>>(
                 series => series.Point,
                 points => points.Should().ContainSingle())
             .HasMessageRecordValue<TimeSeries, Point>(
-                series => series.Point[0],
+                series => series.Point.First(),
                 point =>
                 {
                     point.Should().NotBeNull();
@@ -302,11 +302,11 @@ public sealed class EnergyResultProducedV2ToAggregationResultTests : TestBase
 
         // Assert
         result
-            .HasMessageRecordValue<TimeSeries, IReadOnlyList<Point>>(
+            .HasMessageRecordValue<TimeSeries, IReadOnlyCollection<Point>>(
                 series => series.Point,
                 points => points.Should().ContainSingle())
             .HasMessageRecordValue<TimeSeries, Point>(
-                series => series.Point[0],
+                series => series.Point.First(),
                 point =>
                 {
                     point.Should().NotBeNull();
@@ -361,7 +361,7 @@ public sealed class EnergyResultProducedV2ToAggregationResultTests : TestBase
         return await AssertOutgoingMessage.OutgoingMessageAsync(
             DocumentType.NotifyAggregatedMeasureData.Name,
             BusinessReason.BalanceFixing.Name,
-            MarketRole.MeteredDataResponsible,
+            ActorRole.MeteredDataResponsible,
             _databaseConnectionFactory,
             _fileStorageClient);
     }

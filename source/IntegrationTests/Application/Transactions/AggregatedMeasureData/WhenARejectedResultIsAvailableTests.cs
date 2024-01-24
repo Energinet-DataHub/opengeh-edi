@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -64,15 +65,15 @@ public class WhenARejectedResultIsAvailableTests : TestBase
         await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestRejected), rejectEvent, process.ProcessId.Id);
 
         // Assert
-        var outgoingMessage = await OutgoingMessageAsync(MarketRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
+        var outgoingMessage = await OutgoingMessageAsync(ActorRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
         outgoingMessage
             .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
-            .HasReceiverRole(MarketRole.FromCode(process.RequestedByActorRoleCode).Name)
-            .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
+            .HasReceiverRole(process.RequestedByActorRoleCode)
+            .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
-            .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons[0].ErrorCode, rejectReason.ErrorCode)
-            .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons[1].ErrorCode, rejectReason2.ErrorCode);
+            .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons.First().ErrorCode, rejectReason.ErrorCode)
+            .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons.Last().ErrorCode, rejectReason2.ErrorCode);
     }
 
     protected override void Dispose(bool disposing)
@@ -82,7 +83,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
     }
 
     private async Task<AssertOutgoingMessage> OutgoingMessageAsync(
-        MarketRole roleOfReceiver,
+        ActorRole roleOfReceiver,
         BusinessReason businessReason)
     {
         return await AssertOutgoingMessage.OutgoingMessageAsync(

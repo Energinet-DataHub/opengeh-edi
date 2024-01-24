@@ -233,12 +233,12 @@ public class WhenActorIsTryingToAuthenticate : TestBase
 
     private async Task CreateActorCertificatesInDatabase(string? withActorNumber = null, string? withThumbprint = null)
     {
-        await CreateActorCertificateInDatabaseAsync(ActorNumber.Create("random-number-01"), MarketRole.EnergySupplier, "random-thumbprint-1");
-        await CreateActorCertificateInDatabaseAsync(ActorNumber.Create("random-number-02"), MarketRole.EnergySupplier, "random-thumbprint-2");
-        await CreateActorCertificateInDatabaseAsync(ActorNumber.Create(withActorNumber ?? "random-number-03"), MarketRole.EnergySupplier, withThumbprint ?? "random-thumbprint-3");
+        await CreateActorCertificateInDatabaseAsync(ActorNumber.Create("random-number-01"), ActorRole.EnergySupplier, "random-thumbprint-1");
+        await CreateActorCertificateInDatabaseAsync(ActorNumber.Create("random-number-02"), ActorRole.EnergySupplier, "random-thumbprint-2");
+        await CreateActorCertificateInDatabaseAsync(ActorNumber.Create(withActorNumber ?? "random-number-03"), ActorRole.EnergySupplier, withThumbprint ?? "random-thumbprint-3");
     }
 
-    private async Task CreateActorCertificateInDatabaseAsync(ActorNumber actorNumber, MarketRole actorRole, string thumbprint)
+    private async Task CreateActorCertificateInDatabaseAsync(ActorNumber actorNumber, ActorRole actorRole, string thumbprint)
     {
         var connectionFactory = GetService<IDatabaseConnectionFactory>();
 

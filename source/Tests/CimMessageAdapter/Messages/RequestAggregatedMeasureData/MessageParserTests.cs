@@ -235,7 +235,7 @@ public class MessageParserTests
             "5799999933318",
             "DDK",
             DataHubDetails.DataHubActorNumber.Value,
-            MarketRole.CalculationResponsibleRole.Code,
+            ActorRole.MeteredDataAdministrator.Code,
             "D05",
             "E74",
             "123564789123564789123564789123564789",

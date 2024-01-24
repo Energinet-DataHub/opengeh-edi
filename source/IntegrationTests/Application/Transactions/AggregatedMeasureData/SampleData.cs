@@ -27,5 +27,5 @@ internal sealed class SampleData
 
     internal static ActorNumber ReceiverNumber => ActorNumber.Create("8200000007743");
 
-    internal static MarketRole BalanceResponsibleParty => MarketRole.BalanceResponsibleParty;
+    internal static ActorRole BalanceResponsibleParty => ActorRole.BalanceResponsibleParty;
 }

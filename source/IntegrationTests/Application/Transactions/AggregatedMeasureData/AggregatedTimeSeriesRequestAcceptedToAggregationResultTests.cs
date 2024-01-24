@@ -134,11 +134,11 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
 
         // Assert
         result
-            .HasMessageRecordValue<TimeSeries, IReadOnlyList<Point>>(
+            .HasMessageRecordValue<TimeSeries, IReadOnlyCollection<Point>>(
                 series => series.Point,
                 points => points.Should().ContainSingle())
             .HasMessageRecordValue<TimeSeries, Point>(
-                series => series.Point[0],
+                series => series.Point.First(),
                 point =>
                 {
                     point.Should().NotBeNull();
@@ -164,11 +164,11 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
 
         // Assert
         result
-            .HasMessageRecordValue<TimeSeries, IReadOnlyList<Point>>(
+            .HasMessageRecordValue<TimeSeries, IReadOnlyCollection<Point>>(
                 series => series.Point,
                 points => points.Should().ContainSingle())
             .HasMessageRecordValue<TimeSeries, Point>(
-                series => series.Point[0],
+                series => series.Point.First(),
                 point =>
                 {
                     point.Should().NotBeNull();
@@ -188,11 +188,11 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
 
         // Assert
         result
-            .HasMessageRecordValue<TimeSeries, IReadOnlyList<Point>>(
+            .HasMessageRecordValue<TimeSeries, IReadOnlyCollection<Point>>(
                 series => series.Point,
                 points => points.Should().ContainSingle())
             .HasMessageRecordValue<TimeSeries, Point>(
-                series => series.Point[0],
+                series => series.Point.First(),
                 point =>
                 {
                     point.Should().NotBeNull();
@@ -212,11 +212,11 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
 
         // Assert
         result
-            .HasMessageRecordValue<TimeSeries, IReadOnlyList<Point>>(
+            .HasMessageRecordValue<TimeSeries, IReadOnlyCollection<Point>>(
                 series => series.Point,
                 points => points.Should().ContainSingle())
             .HasMessageRecordValue<TimeSeries, Point>(
-                series => series.Point[0],
+                series => series.Point.First(),
                 point =>
                 {
                     point.Should().NotBeNull();
@@ -236,11 +236,11 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
 
         // Assert
         result
-            .HasMessageRecordValue<TimeSeries, IReadOnlyList<Point>>(
+            .HasMessageRecordValue<TimeSeries, IReadOnlyCollection<Point>>(
                 series => series.Point,
                 points => points.Should().ContainSingle())
             .HasMessageRecordValue<TimeSeries, Point>(
-                series => series.Point[0],
+                series => series.Point.First(),
                 point =>
                 {
                     point.Should().NotBeNull();
@@ -260,11 +260,11 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
 
         // Assert
         result
-            .HasMessageRecordValue<TimeSeries, IReadOnlyList<Point>>(
+            .HasMessageRecordValue<TimeSeries, IReadOnlyCollection<Point>>(
                 series => series.Point,
                 points => points.Should().ContainSingle())
             .HasMessageRecordValue<TimeSeries, Point>(
-                series => series.Point[0],
+                series => series.Point.First(),
                 point =>
                 {
                     point.Should().NotBeNull();
@@ -284,11 +284,11 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
 
         // Assert
         result
-            .HasMessageRecordValue<TimeSeries, IReadOnlyList<Point>>(
+            .HasMessageRecordValue<TimeSeries, IReadOnlyCollection<Point>>(
                 series => series.Point,
                 points => points.Should().ContainSingle())
             .HasMessageRecordValue<TimeSeries, Point>(
-                series => series.Point[0],
+                series => series.Point.First(),
                 point =>
                 {
                     point.Should().NotBeNull();
@@ -308,11 +308,11 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
 
         // Assert
         result
-            .HasMessageRecordValue<TimeSeries, IReadOnlyList<Point>>(
+            .HasMessageRecordValue<TimeSeries, IReadOnlyCollection<Point>>(
                 series => series.Point,
                 points => points.Should().ContainSingle())
             .HasMessageRecordValue<TimeSeries, Point>(
-                series => series.Point[0],
+                series => series.Point.First(),
                 point =>
                 {
                     point.Should().NotBeNull();
@@ -427,7 +427,7 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
         return await AssertOutgoingMessage.OutgoingMessageAsync(
             DocumentType.NotifyAggregatedMeasureData.Name,
             BusinessReason.BalanceFixing.Name,
-            MarketRole.BalanceResponsibleParty,
+            ActorRole.BalanceResponsibleParty,
             _databaseConnectionFactory,
             _fileStorageClient);
     }

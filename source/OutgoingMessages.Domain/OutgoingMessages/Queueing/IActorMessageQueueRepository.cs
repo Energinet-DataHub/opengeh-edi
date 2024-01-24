@@ -25,7 +25,7 @@ public interface IActorMessageQueueRepository
     /// <summary>
     /// Get the the actor queue for the given actor number and message category.
     /// </summary>
-    Task<ActorMessageQueue?> ActorMessageQueueForAsync(ActorNumber actorNumber, MarketRole actorRole);
+    Task<ActorMessageQueue?> ActorMessageQueueForAsync(ActorNumber actorNumber, ActorRole actorRole);
 
     /// <summary>
     /// Add a new actor queue.

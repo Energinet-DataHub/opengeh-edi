@@ -23,7 +23,7 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasu
 public class AcceptedAggregatedTimeSerie : InternalCommand
 {
     [JsonConstructor]
-    public AcceptedAggregatedTimeSerie(Guid processId, IReadOnlyList<AggregatedTimeSerie> aggregatedTimeSeries)
+    public AcceptedAggregatedTimeSerie(Guid processId, IReadOnlyCollection<AggregatedTimeSerie> aggregatedTimeSeries)
     {
         ProcessId = processId;
         AggregatedTimeSeries = aggregatedTimeSeries;
@@ -31,5 +31,5 @@ public class AcceptedAggregatedTimeSerie : InternalCommand
 
     public Guid ProcessId { get; }
 
-    public IReadOnlyList<AggregatedTimeSerie> AggregatedTimeSeries { get; }
+    public IReadOnlyCollection<AggregatedTimeSerie> AggregatedTimeSeries { get; }
 }

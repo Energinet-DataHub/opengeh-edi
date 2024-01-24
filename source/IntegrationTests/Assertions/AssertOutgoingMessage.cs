@@ -40,7 +40,7 @@ public class AssertOutgoingMessage
         _messageRecord = messageRecord;
     }
 
-    public static async Task<AssertOutgoingMessage> OutgoingMessageAsync(string messageType, string businessReason, MarketRole receiverRole, IDatabaseConnectionFactory connectionFactoryFactory, IFileStorageClient fileStorageClient)
+    public static async Task<AssertOutgoingMessage> OutgoingMessageAsync(string messageType, string businessReason, ActorRole receiverRole, IDatabaseConnectionFactory connectionFactoryFactory, IFileStorageClient fileStorageClient)
     {
         ArgumentNullException.ThrowIfNull(receiverRole);
         ArgumentNullException.ThrowIfNull(connectionFactoryFactory);
@@ -51,7 +51,7 @@ public class AssertOutgoingMessage
             $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.ProcessId, m.BusinessReason," +
             $"m.ReceiverRole, m.SenderId, m.SenderRole, m.FileStorageReference " +
             $" FROM [dbo].[OutgoingMessages] m" +
-            $" WHERE m.DocumentType = '{messageType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Name}'");
+            $" WHERE m.DocumentType = '{messageType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Code}'");
 
         Assert.NotNull(message);
         Assert.NotNull(message.FileStorageReference);
@@ -65,7 +65,7 @@ public class AssertOutgoingMessage
         return new AssertOutgoingMessage(message, messageRecord);
     }
 
-    public static async Task OutgoingMessageIsNullAsync(string messageType, string businessReason, MarketRole receiverRole, IDatabaseConnectionFactory connectionFactoryFactory)
+    public static async Task OutgoingMessageIsNullAsync(string messageType, string businessReason, ActorRole receiverRole, IDatabaseConnectionFactory connectionFactoryFactory)
     {
         ArgumentNullException.ThrowIfNull(connectionFactoryFactory);
         ArgumentNullException.ThrowIfNull(receiverRole);
@@ -74,7 +74,7 @@ public class AssertOutgoingMessage
             $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.ProcessId, m.BusinessReason," +
             $"m.ReceiverRole, m.SenderId, m.SenderRole, m.FileStorageReference " +
             $" FROM [dbo].[OutgoingMessages] m" +
-            $" WHERE m.DocumentType = '{messageType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Name}'");
+            $" WHERE m.DocumentType = '{messageType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Code}'");
 
         Assert.Null(message);
     }

@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -101,7 +102,7 @@ public class RejectRequestAggregatedMeasureDataJsonDocumentWriter : IDocumentWri
         writer.WriteEndObject();
     }
 
-    private List<RejectedTimeSerieMarketActivityRecord> ParseFrom(IReadOnlyCollection<string> payloads)
+    private ReadOnlyCollection<RejectedTimeSerieMarketActivityRecord> ParseFrom(IReadOnlyCollection<string> payloads)
     {
         ArgumentNullException.ThrowIfNull(payloads);
         var timeSeries = new List<RejectedTimeSerieMarketActivityRecord>();
@@ -110,6 +111,6 @@ public class RejectRequestAggregatedMeasureDataJsonDocumentWriter : IDocumentWri
             timeSeries.Add(_parser.From<RejectedTimeSerieMarketActivityRecord>(payload));
         }
 
-        return timeSeries;
+        return timeSeries.AsReadOnly();
     }
 }
