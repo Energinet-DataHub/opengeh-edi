@@ -32,7 +32,7 @@ namespace IncomingMessages.Infrastructure
         /// </summary>
         Task AddAsync(
             string senderId,
-            IReadOnlyList<string> transactionIds,
+            IReadOnlyCollection<string> transactionIds,
             CancellationToken cancellationToken);
     }
 }
