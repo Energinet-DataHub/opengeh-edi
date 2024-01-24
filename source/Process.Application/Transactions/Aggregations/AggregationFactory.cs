@@ -68,11 +68,11 @@ public class AggregationFactory
             aggregatedMeasureDataProcess.BusinessReason.Name,
             MapActorGrouping(aggregatedMeasureDataProcess),
             MapGridAreaDetails(aggregatedTimeSerie.GridAreaDetails),
+            aggregatedTimeSerie.CalculationResultVersion,
             aggregatedMeasureDataProcess.BusinessTransactionId.Id,
             aggregatedMeasureDataProcess.RequestedByActorId.Value,
             MapReceiverRole(aggregatedMeasureDataProcess),
-            aggregatedMeasureDataProcess.SettlementVersion?.Name,
-            aggregatedTimeSerie.CalculationResultVersion);
+            aggregatedMeasureDataProcess.SettlementVersion?.Name);
     }
 
     public async Task<Aggregation> CreateAsync(
@@ -91,6 +91,7 @@ public class AggregationFactory
             MapCalculationType(integrationEvent.CalculationType),
             MapActorGrouping(integrationEvent),
             await GetGridAreaDetailsAsync(integrationEvent, cancellationToken).ConfigureAwait(false),
+            integrationEvent.CalculationResultVersion,
             SettlementVersion: MapSettlementVersion(integrationEvent.CalculationType));
     }
 

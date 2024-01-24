@@ -26,12 +26,7 @@ namespace Energinet.DataHub.EDI.Tests.Domain.Transactions.Aggregations;
 
 public class AggregationResultMessageFactoryTests
 {
-    private readonly AggregationResultBuilder _aggregationResult;
-
-    public AggregationResultMessageFactoryTests()
-    {
-        _aggregationResult = new AggregationResultBuilder();
-    }
+    private readonly AggregationResultBuilder _aggregationResult = new();
 
     #region Grid_Operator
 

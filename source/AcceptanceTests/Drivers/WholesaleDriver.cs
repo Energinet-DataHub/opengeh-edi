@@ -68,6 +68,7 @@ internal sealed class WholesaleDriver
                     QuantityQualities = { QuantityQuality.Measured },
                 },
             },
+            CalculationResultVersion = 404,
         };
         return processCompletedEvent;
     }
