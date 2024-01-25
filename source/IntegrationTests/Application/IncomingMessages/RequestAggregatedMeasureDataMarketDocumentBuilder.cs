@@ -41,7 +41,7 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
     private string _messageId = Guid.NewGuid().ToString();
     private string _serieId = Guid.NewGuid().ToString();
     private string _senderRole = ActorRole.EnergySupplier.Code;
-    private string _marketEvaluationPointType = "E17";
+    private string? _marketEvaluationPointType = "E17";
     private string? _marketEvaluationSettlementMethod = "D01";
     private string? _energySupplierMarketParticipantId = SampleData.NewEnergySupplierNumber;
     private string? _balanceResponsiblePartyMarketParticipantId = "5799999933318";
@@ -52,7 +52,7 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
         return this;
     }
 
-    public RequestAggregatedMeasureDataMarketDocumentBuilder SetMarketEvaluationPointType(string marketEvaluationPointType)
+    public RequestAggregatedMeasureDataMarketDocumentBuilder SetMarketEvaluationPointType(string? marketEvaluationPointType)
     {
         _marketEvaluationPointType = marketEvaluationPointType;
         return this;
