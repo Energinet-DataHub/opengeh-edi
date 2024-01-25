@@ -99,12 +99,13 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         var result = await PeekMessage(MessageCategory.Aggregations);
 
+        result.Bundle.Should().NotBeNull();
+        var generatedDocumentContent = await GetStreamContentAsStringAsync(result.Bundle!);
+
         var fileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(result.MessageId!.Value);
-
         var fileContent = await GetFileFromFileStorageAsync("archived", fileStorageReference);
-
-        var fileContentAsString = await GetStreamContentAsStringAsync(fileContent.Value.Content);
-        fileContentAsString.Should().Be(message.MessageRecord);
+        var archivedMessageFileContent = await GetStreamContentAsStringAsync(fileContent.Value.Content);
+        archivedMessageFileContent.Should().Be(generatedDocumentContent);
     }
 
     [Fact]
