@@ -47,11 +47,11 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            var healthCheckRequest = context.Is(TriggerType.HttpTrigger) && context.FunctionDefinition.Name == "HealthCheck";
-            var swaggerRequest = (context.Is(TriggerType.HttpTrigger) && context.FunctionDefinition.Name == "RenderSwaggerUI")
-                                 || (context.Is(TriggerType.HttpTrigger) && context.FunctionDefinition.Name == "RenderSwaggerDocument");
+            var isHealthCheckRequest = context.FunctionDefinition.Name == "HealthCheck";
+            var isSwaggerRequest = context.FunctionDefinition.Name == "RenderSwaggerUI" || context.FunctionDefinition.Name == "RenderSwaggerDocument";
+            var isNotHttpTrigger = !context.Is(TriggerType.HttpTrigger);
 
-            var endpointIsOmittedFromAuth = healthCheckRequest || swaggerRequest;
+            var endpointIsOmittedFromAuth = isHealthCheckRequest || isSwaggerRequest || isNotHttpTrigger;
             return endpointIsOmittedFromAuth;
         }
 

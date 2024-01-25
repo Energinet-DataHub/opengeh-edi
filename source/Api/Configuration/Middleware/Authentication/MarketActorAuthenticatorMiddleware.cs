@@ -42,12 +42,12 @@ namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication
 
             if (context.EndpointIsOmittedFromAuth())
             {
-                _logger.LogInformation("Functions is not triggered by HTTP, skipping authentication");
+                _logger.LogInformation("Functions is omitted from auth, skipping authentication");
                 await next(context).ConfigureAwait(false);
                 return;
             }
 
-            var httpRequestData = await context.GetHttpRequestDataAsync().ConfigureAwait(false) ?? throw new ArgumentException("No HTTP request data was available, even though the function was triggered by HTTP");
+            var httpRequestData = await context.GetHttpRequestDataAsync().ConfigureAwait(false) ?? throw new ArgumentException("No HTTP request data was available, even though the function was not omitted from auth");
 
             var authenticationMethod = authenticationMethods.Single(a => a.ShouldHandle(httpRequestData));
 
