@@ -89,11 +89,25 @@ internal sealed class EbixRequestDsl
 
     internal async Task ConfirmDequeueWithIncorrectMessageIdGivesEbixError()
     {
-        var act = () => _ebix.DequeueMessageAsync("incorrect-message-id");
+        var response = await _ebix.DequeueMessageWithoutCertificateAsync().ConfigureAwait(false);
 
-        var thrownException = await Assert.ThrowsAsync<FaultException>(act).ConfigureAwait(false);
+        Assert.Multiple(
+            () => Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode),
+            () => Assert.Contains("Certificate rejected", response.ReasonPhrase, StringComparison.InvariantCultureIgnoreCase));
+    }
 
-        Assert.StartsWith("B2B-201:", thrownException.Reason.ToString(), StringComparison.InvariantCulture);
+    internal async Task ConfirmPeekWithRemovedCertificateIsNotAllowed()
+    {
+        var response = await _ebix.PeekMessageWithoutCertificateAsync().ConfigureAwait(false);
+
+        Assert.Multiple(
+             () => Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode),
+             () => Assert.Contains("Certificate rejected", response.ReasonPhrase, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    internal async Task ConfirmDequeueWithRemovedCertificateIsNotAllowed()
+    {
+        await _ebix.DequeueMessageAsync("irrelevant-message-id").ConfigureAwait(false);
     }
 
     private static string GetMessageId(peekMessageResponse response)
