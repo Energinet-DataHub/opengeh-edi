@@ -14,6 +14,7 @@
 
 using System.Net;
 using System.ServiceModel;
+using System.ServiceModel.Security;
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
@@ -107,7 +108,9 @@ internal sealed class EbixRequestDsl
 
     internal async Task ConfirmDequeueWithRemovedCertificateIsNotAllowed()
     {
-        await _ebix.DequeueMessageAsync("irrelevant-message-id").ConfigureAwait(false);
+        var act = async () => await _ebix.DequeueMessageAsync("irrelevant-message-id").ConfigureAwait(false);
+
+        await Assert.ThrowsAsync<MessageSecurityException>(act).ConfigureAwait(false);
     }
 
     private static string GetMessageId(peekMessageResponse response)
