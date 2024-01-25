@@ -41,7 +41,8 @@ public class UnHandledExceptionMiddleware : IFunctionsWorkerMiddleware
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(next);
 
-        if (IsNotInHttpContext(context))
+        // If the endpoint is omitted from auth, we dont want to intercept exceptions.
+        if (context.EndpointIsOmittedFromAuth())
         {
             await next(context).ConfigureAwait(false);
         }
@@ -83,12 +84,6 @@ public class UnHandledExceptionMiddleware : IFunctionsWorkerMiddleware
                 }
             }
         }
-    }
-
-    private static bool IsNotInHttpContext(FunctionContext context)
-    {
-        return !context.Is(FunctionContextExtensions.TriggerType.HttpTrigger) ||
-               context.FunctionDefinition.Name == "HealthCheck";
     }
 
     private static OutputBindingData<HttpResponseData>? GetHttpOutputBindingFromMultipleOutputBinding(FunctionContext context)

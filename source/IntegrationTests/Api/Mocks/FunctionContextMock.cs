@@ -22,6 +22,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.FunctionApp;
+using Energinet.DataHub.Core.App.FunctionApp.Extensions;
 using Energinet.DataHub.EDI.Api.Authentication.Certificate;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -36,7 +37,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Api.Mocks;
 [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:Elements should be documented", Justification = "Test class")]
 internal sealed class FunctionContextMock : FunctionContext
 {
-    public FunctionContextMock(IServiceProvider serviceProvider, TriggerType triggerType, string? contentType, string? bearerToken, string? certificateHexString)
+    public FunctionContextMock(IServiceProvider serviceProvider, TriggerType triggerType, string? functionName, string? contentType, string? bearerToken, string? certificateHexString)
     {
         InstanceServices = serviceProvider;
 
@@ -54,7 +55,7 @@ internal sealed class FunctionContextMock : FunctionContext
         Features.Set<IHttpRequestDataFeature>(new MockHttpRequestDataFeature(mockHttpRequestData));
         Features.Set<IFunctionBindingsFeature>(new MockFunctionBindingsFeature());
 
-        FunctionDefinition = new MockFunctionDefinition(triggerType);
+        FunctionDefinition = new MockFunctionDefinition(triggerType, functionName);
     }
 
     public override string InvocationId { get; } = null!;
@@ -122,7 +123,8 @@ internal sealed class FunctionContextMock : FunctionContext
 
         public ValueTask<HttpRequestData?> GetHttpRequestDataAsync(FunctionContext context)
         {
-            return new ValueTask<HttpRequestData?>(_httpRequestData);
+            var httpRequestData = context.Is(TriggerType.HttpTrigger) ? _httpRequestData : null;
+            return new ValueTask<HttpRequestData?>(httpRequestData);
         }
     }
 
@@ -169,7 +171,7 @@ internal sealed class FunctionContextMock : FunctionContext
 
     private sealed class MockFunctionDefinition : FunctionDefinition
     {
-        public MockFunctionDefinition(TriggerType triggerType)
+        public MockFunctionDefinition(TriggerType triggerType, string? name)
         {
             var dictionary = new Dictionary<string, BindingMetadata>
             {
@@ -177,17 +179,18 @@ internal sealed class FunctionContextMock : FunctionContext
             };
             InputBindings = ImmutableDictionary.CreateRange(dictionary);
             Parameters = ImmutableArray<FunctionParameter>.Empty;
+            Name = name ?? null!;
         }
 
         public override ImmutableArray<FunctionParameter> Parameters { get; }
+
+        public override string Name { get; }
 
         public override string PathToAssembly => null!;
 
         public override string EntryPoint => null!;
 
         public override string Id => null!;
-
-        public override string Name => null!;
 
         public override IImmutableDictionary<string, BindingMetadata> InputBindings { get; }
 
