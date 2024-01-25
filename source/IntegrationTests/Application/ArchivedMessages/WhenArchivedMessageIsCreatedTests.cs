@@ -165,8 +165,8 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
             string.IsNullOrWhiteSpace(id) ? Guid.NewGuid().ToString() : id,
             string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
             DocumentType.NotifyAggregatedMeasureData.Name,
-            ActorNumber.Create("1234512345123"),
-            ActorNumber.Create(receiverNumber ?? "1234512345128"),
+            "1234512345123",
+            receiverNumber ?? "1234512345128",
             timestamp ?? Instant.FromUtc(2023, 01, 01, 0, 0),
             BusinessReason.BalanceFixing.Name,
             documentStream);

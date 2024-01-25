@@ -32,13 +32,13 @@ public record FileStorageReference
 
     public string Category { get; }
 
-    public static FileStorageReference Create(string category, ActorNumber actorNumber, Instant timeStamp, string documentId)
+    public static FileStorageReference Create(string category, string actorNumber, Instant timeStamp, string documentId)
     {
         ArgumentNullException.ThrowIfNull(actorNumber);
 
         var dateTimeUtc = timeStamp.ToDateTimeUtc();
 
-        var reference = $"{actorNumber.Value}/{dateTimeUtc.Year:0000}/{dateTimeUtc.Month:00}/{dateTimeUtc.Day:00}/{documentId}";
+        var reference = $"{actorNumber}/{dateTimeUtc.Year:0000}/{dateTimeUtc.Month:00}/{dateTimeUtc.Day:00}/{documentId}";
 
         return new FileStorageReference(category, reference);
     }

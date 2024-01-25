@@ -52,8 +52,8 @@ public class SearchMessagesTests : TestBase
         var messageInfo = result.Messages.FirstOrDefault(message => message.Id == archivedMessage.Id);
         Assert.NotNull(messageInfo);
         Assert.Equal(archivedMessage.DocumentType, messageInfo.DocumentType);
-        Assert.Equal(archivedMessage.SenderNumber.Value, messageInfo.SenderNumber);
-        Assert.Equal(archivedMessage.ReceiverNumber.Value, messageInfo.ReceiverNumber);
+        Assert.Equal(archivedMessage.SenderNumber, messageInfo.SenderNumber);
+        Assert.Equal(archivedMessage.ReceiverNumber, messageInfo.ReceiverNumber);
         Assert.Equal(archivedMessage.CreatedAt.ToDateTimeUtc().ToShortTimeString(), messageInfo.CreatedAt.ToDateTimeUtc().ToShortTimeString()); //TODO: LRN help me!
         Assert.Equal(archivedMessage.MessageId, messageInfo.MessageId);
     }
@@ -259,8 +259,8 @@ public class SearchMessagesTests : TestBase
             string.IsNullOrWhiteSpace(id) ? Guid.NewGuid().ToString() : id,
             messageId ?? "MessageId",
             documentType ?? DocumentType.NotifyAggregatedMeasureData.Name,
-            ActorNumber.Create(senderNumber ?? "1234512345123"),
-            ActorNumber.Create(receiverNumber ?? "1234512345128"),
+            senderNumber ?? "1234512345123",
+            receiverNumber ?? "1234512345128",
             createdAt.GetValueOrDefault(_systemDateTimeProvider.Now()),
             businessReason ?? BusinessReason.BalanceFixing.Name,
             new MemoryStream());

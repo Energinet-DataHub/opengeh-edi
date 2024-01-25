@@ -27,8 +27,8 @@ public class ArchivedMessage
         string id,
         string? messageId,
         string documentType,
-        ActorNumber senderNumber,
-        ActorNumber receiverNumber,
+        string senderNumber, // Doesn't use ActorNumber since we want to make sure to always create a ArchivedMessage
+        string receiverNumber, // Doesn't use ActorNumber since we want to make sure to always create a ArchivedMessage
         Instant createdAt,
         string? businessReason,
         Stream document)
@@ -51,9 +51,9 @@ public class ArchivedMessage
 
     public string DocumentType { get; }
 
-    public ActorNumber SenderNumber { get; }
+    public string SenderNumber { get; }
 
-    public ActorNumber ReceiverNumber { get; }
+    public string ReceiverNumber { get; }
 
     public Instant CreatedAt { get; }
 

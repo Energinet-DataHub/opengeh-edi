@@ -107,7 +107,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
         private static FileStorageReference CreateFileStorageReference(OutgoingMessageId id, ActorNumber receiverActorNumber, Instant timestamp)
         {
-            return FileStorageReference.Create(FileStorageCategory, receiverActorNumber, timestamp, id.Value.ToString("N"));
+            return FileStorageReference.Create(FileStorageCategory, receiverActorNumber.Value, timestamp, id.Value.ToString("N"));
         }
     }
 }

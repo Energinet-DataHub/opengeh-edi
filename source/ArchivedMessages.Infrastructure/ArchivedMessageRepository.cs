@@ -62,8 +62,8 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
         {
             message.Id,
             message.DocumentType,
-            ReceiverNumber = message.ReceiverNumber.Value,
-            SenderNumber = message.SenderNumber.Value,
+            message.ReceiverNumber,
+            message.SenderNumber,
             message.CreatedAt,
             message.BusinessReason,
             FileStorageReference = message.FileStorageReference.Value,
