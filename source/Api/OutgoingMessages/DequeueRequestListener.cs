@@ -16,18 +16,22 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
+using Energinet.DataHub.EDI.Api.OpenApi;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
+using Microsoft.OpenApi.Models;
 
 namespace Energinet.DataHub.EDI.Api.OutgoingMessages;
 
 public class DequeueRequestListener
 {
-    private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly AuthenticatedActor _authenticatedActor;
+    private readonly IOutgoingMessagesClient _outgoingMessagesClient;
 
     public DequeueRequestListener(IOutgoingMessagesClient outgoingMessagesClient, AuthenticatedActor authenticatedActor)
     {
@@ -35,9 +39,31 @@ public class DequeueRequestListener
         _authenticatedActor = authenticatedActor;
     }
 
+    [OpenApiOperation(
+        "Dequeue",
+        OpenApiResources.OpenApiOperationTag,
+        Description = "Is the endpoint for dequeue messages",
+        Visibility = OpenApiVisibilityType.Important)]
+    [OpenApiSecurity(
+        OpenApiResources.OpenApiSecuritySchemaName,
+        SecuritySchemeType.Http,
+        Name = OpenApiResources.OpenApiSecurityName,
+        In = OpenApiSecurityLocationType.Header,
+        Description = OpenApiResources.OpenApiSecurityDescription,
+        Scheme = OpenApiSecuritySchemeType.Bearer,
+        BearerFormat = OpenApiResources.OpenApiSecurityBearerFormat)]
+    [OpenApiParameter(
+        "messageId",
+        In = ParameterLocation.Path,
+        Required = false,
+        Type = typeof(string),
+        Summary = "Category",
+        Description = "The desired message to be dequeued")]
+    [OpenApiResponseWithoutBody(HttpStatusCode.Accepted, Description = "successful dequeue")]
+    [OpenApiResponseWithoutBody(HttpStatusCode.BadRequest, Description = "unsuccessful dequeue")]
     [Function("DequeueRequestListener")]
     public async Task<HttpResponseData> RunAsync(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "dequeue/{messageId}"),]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "dequeue/{messageId}")]
         HttpRequestData request,
         FunctionContext executionContext,
         string messageId,
@@ -45,11 +71,12 @@ public class DequeueRequestListener
     {
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);
         var result = await _outgoingMessagesClient.DequeueAndCommitAsync(
-            new DequeueRequestDto(
-                messageId,
-                _authenticatedActor.CurrentActorIdentity.MarketRole!,
-                _authenticatedActor.CurrentActorIdentity.ActorNumber),
-            cancellationToken).ConfigureAwait(false);
+                new DequeueRequestDto(
+                    messageId,
+                    _authenticatedActor.CurrentActorIdentity.MarketRole!,
+                    _authenticatedActor.CurrentActorIdentity.ActorNumber),
+                cancellationToken)
+            .ConfigureAwait(false);
 
         return result.Success
             ? request.CreateResponse(HttpStatusCode.OK)

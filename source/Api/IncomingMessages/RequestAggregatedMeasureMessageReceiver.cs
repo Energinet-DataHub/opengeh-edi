@@ -18,21 +18,25 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
+using Energinet.DataHub.EDI.Api.OpenApi;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using IncomingMessages.Infrastructure;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 
 namespace Energinet.DataHub.EDI.Api.IncomingMessages;
 
 public class RequestAggregatedMeasureMessageReceiver
 {
-    private readonly ILogger<RequestAggregatedMeasureMessageReceiver> _logger;
-    private readonly IIncomingMessageClient _incomingMessageClient;
     private readonly ICorrelationContext _correlationContext;
+    private readonly IIncomingMessageClient _incomingMessageClient;
+    private readonly ILogger<RequestAggregatedMeasureMessageReceiver> _logger;
 
     public RequestAggregatedMeasureMessageReceiver(
         ILogger<RequestAggregatedMeasureMessageReceiver> logger,
@@ -44,6 +48,36 @@ public class RequestAggregatedMeasureMessageReceiver
         _correlationContext = correlationContext;
     }
 
+    [OpenApiOperation(
+        "RequestAggregatedMeasureData",
+        "DataHub3",
+        Description = "Is the endpoint for requesting previously aggregated measured data",
+        Visibility = OpenApiVisibilityType.Important)]
+    [OpenApiSecurity(
+        OpenApiResources.OpenApiSecuritySchemaName,
+        SecuritySchemeType.Http,
+        Name = OpenApiResources.OpenApiSecurityName,
+        In = OpenApiSecurityLocationType.Header,
+        Description = OpenApiResources.OpenApiSecurityDescription,
+        Scheme = OpenApiSecuritySchemeType.Bearer,
+        BearerFormat = OpenApiResources.OpenApiSecurityBearerFormat)]
+    [OpenApiParameter(
+        "Content-Type",
+        In = ParameterLocation.Header,
+        Required = true,
+        Type = typeof(string),
+        Summary = "Request",
+        Description = "Content type for requested response")]
+    [OpenApiRequestBody(
+        "application/json",
+        typeof(string),
+        Description = "Must be supplied a valid RSM-016 request message")]
+    [OpenApiResponseWithoutBody(HttpStatusCode.Accepted, Description = "Request accepted")]
+    [OpenApiResponseWithBody(
+        HttpStatusCode.BadRequest,
+        "application/json",
+        typeof(string),
+        Description = "Request validation failed, response contains error message")]
     [Function(nameof(RequestAggregatedMeasureMessageReceiver))]
     public async Task<HttpResponseData> RunAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
@@ -59,7 +93,8 @@ public class RequestAggregatedMeasureMessageReceiver
         if (documentFormat is null)
         {
             _logger.LogInformation(
-                "Could not parse desired document format from Content-Type header value: {ContentType}", contentType);
+                "Could not parse desired document format from Content-Type header value: {ContentType}",
+                contentType);
             return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
         }
 
@@ -68,7 +103,8 @@ public class RequestAggregatedMeasureMessageReceiver
                 request.Body,
                 documentFormat,
                 IncomingDocumentType.RequestAggregatedMeasureData,
-                cancellationToken).ConfigureAwait(false);
+                cancellationToken)
+            .ConfigureAwait(false);
 
         if (responseMessage.IsErrorResponse)
         {
@@ -81,7 +117,9 @@ public class RequestAggregatedMeasureMessageReceiver
     }
 
     private HttpResponseData CreateResponse(
-        HttpRequestData request, HttpStatusCode statusCode, ResponseMessage responseMessage)
+        HttpRequestData request,
+        HttpStatusCode statusCode,
+        ResponseMessage responseMessage)
     {
         var response = request.CreateResponse(statusCode);
         response.WriteString(responseMessage.MessageBody, Encoding.UTF8);

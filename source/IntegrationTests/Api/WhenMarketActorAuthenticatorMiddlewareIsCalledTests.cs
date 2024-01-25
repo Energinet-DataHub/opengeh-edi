@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -37,16 +36,14 @@ using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Api;
 
-[SuppressMessage("Style", "VSTHRD200", Justification = "Test class")]
-[SuppressMessage("Naming", "CA1707", Justification = "Test class")]
 [IntegrationTest]
-public class WhenActorIsTryingToAuthenticate : TestBase
+public class WhenMarketActorAuthenticatorMiddlewareIsCalledTests : TestBase
 {
     private readonly NextSpy _nextSpy;
     private readonly FunctionExecutionDelegate _next;
     private readonly FunctionContextBuilder _functionContextBuilder;
 
-    public WhenActorIsTryingToAuthenticate(IntegrationTestFixture integrationTestFixture)
+    public WhenMarketActorAuthenticatorMiddlewareIsCalledTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
     {
         AuthenticatedActor.SetAuthenticatedActor(null);
@@ -214,6 +211,46 @@ public class WhenActorIsTryingToAuthenticate : TestBase
         Assert.True(_nextSpy.NextWasCalled);
     }
 
+    [Theory]
+    [InlineData(TriggerType.TimerTrigger)]
+    [InlineData(TriggerType.ServiceBusTrigger)]
+    public async Task When_calling_authentication_middleware_without_being_a_http_trigger_then_next_is_called(TriggerType triggerType)
+    {
+        // Arrange
+        var functionContext = _functionContextBuilder
+            .WithTriggeredBy(triggerType)
+            .Build();
+
+        var sut = CreateMarketActorAuthenticatorMiddleware();
+
+        // Act
+        await sut.Invoke(functionContext, _next);
+
+        // Assert
+        Assert.True(_nextSpy.NextWasCalled);
+    }
+
+    [Theory]
+    [InlineData("HealthCheck")]
+    [InlineData("RenderSwaggerUI")]
+    [InlineData("RenderSwaggerDocument")]
+    public async Task When_calling_authentication_middleware_with_specific_function_name_then_next_is_called(string functionName)
+    {
+        // Arrange
+        var functionContext = _functionContextBuilder
+            .TriggeredByHttp()
+            .WithFunctionName(functionName)
+            .Build();
+
+        var sut = CreateMarketActorAuthenticatorMiddleware();
+
+        // Act
+        await sut.Invoke(functionContext, _next);
+
+        // Assert
+        Assert.True(_nextSpy.NextWasCalled);
+    }
+
     private static MarketActorAuthenticatorMiddleware CreateMarketActorAuthenticatorMiddleware()
     {
         var stubLogger = new Logger<MarketActorAuthenticatorMiddleware>(NullLoggerFactory.Instance);
@@ -265,14 +302,5 @@ public class WhenActorIsTryingToAuthenticate : TestBase
             actorNumber = actorNumber.Value,
             externalId = externalId,
         });
-    }
-
-    private FunctionContextMock CreateMockFunctionContext(TriggerType triggerType, string? contentType = "application/json", string? bearerToken = null, X509Certificate2? certificate = null)
-    {
-        var certificateHexString = certificate?.GetRawCertDataString();
-
-        var mockFunctionContext = new FunctionContextMock(ServiceProvider, triggerType, contentType, bearerToken, certificateHexString);
-
-        return mockFunctionContext;
     }
 }
