@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.AcceptanceTests.Factories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Google.Protobuf;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
@@ -29,7 +30,23 @@ internal sealed class MarketParticipantDriver
     public async Task PublishActorActivatedAsync(string actorNumber, string b2CId)
     {
         await _integrationEventPublisher.PublishAsync(
-            "ActorActivated",
+            ActorActivated.EventName,
             ActorFactory.CreateActorActivated(actorNumber, b2CId).ToByteArray()).ConfigureAwait(false);
+    }
+
+    public async Task PublishActorCertificateCredentialsRemovedAsync(string actorNumber, string actorRole, string thumbprint)
+    {
+        await _integrationEventPublisher.PublishAsync(
+                ActorCertificateCredentialsRemoved.EventName,
+                ActorCertificateFactory.CreateActorCertificateCredentialsRemoved(actorNumber, actorRole, thumbprint).ToByteArray())
+            .ConfigureAwait(false);
+    }
+
+    public async Task PublishActorCertificateCredentialsAssignedAsync(string actorNumber, string actorRole, string thumbprint)
+    {
+        await _integrationEventPublisher.PublishAsync(
+                ActorCertificateCredentialsAssigned.EventName,
+                ActorCertificateFactory.CreateActorCertificateAssigned(actorNumber, actorRole, thumbprint).ToByteArray())
+            .ConfigureAwait(false);
     }
 }

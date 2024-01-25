@@ -38,4 +38,14 @@ internal sealed class ActorDsl
     {
         return await _ediActorDriver.ActorExistsAsync(actorNumber, b2CId).ConfigureAwait(false);
     }
+
+    public async Task PublishActorCertificateCredentialsRemovedForAsync(string actorNumber, string actorRole, string thumbprint)
+    {
+        await _marketParticipant.PublishActorCertificateCredentialsRemovedAsync(actorNumber, actorRole, thumbprint).ConfigureAwait(false);
+    }
+
+    public async Task ActorCertificateCredentialsAssignedAsync(string actorNumber, string actorRole, string thumbprint)
+    {
+        await _marketParticipant.PublishActorCertificateCredentialsAssignedAsync(actorNumber, actorRole, thumbprint).ConfigureAwait(false);
+    }
 }
