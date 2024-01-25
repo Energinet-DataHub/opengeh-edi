@@ -115,7 +115,7 @@ public class WheActorCertificateCredentialsRemovedEventIsReceived : TestBase
 
         Assert.Multiple(
             () => Assert.Equal(existingActorNumber, actorCertificates.Single().ActorNumber),
-            () => Assert.Equal(MarketRole.MeteredDataResponsible.Code, actorCertificates.Single().ActorRole),
+            () => Assert.Equal(ActorRole.MeteredDataResponsible.Code, actorCertificates.Single().ActorRole),
             () => Assert.Equal(existingCertificateThumbprint, actorCertificates.Single().Thumbprint));
     }
 
