@@ -58,8 +58,6 @@ public class DataLakeFileStorageClient : IFileStorageClient
         await streamWriter.WriteAsync(content).ConfigureAwait(false);
         await streamWriter.FlushAsync().ConfigureAwait(false);
 
-        memoryStream.Position = 0; // Make sure the stream is ready to be read
-
         await UploadAsync(reference, memoryStream).ConfigureAwait(false);
     }
 

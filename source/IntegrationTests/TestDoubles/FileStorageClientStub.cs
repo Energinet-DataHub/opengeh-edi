@@ -20,6 +20,11 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 
+/// <summary>
+/// A IFileStorageClient that avoids uploading a file to Azurite,
+/// used to be able to check a duplicate id database constraint
+/// (the normal implementation throwing a Azure.RequestFailedException when trying to add duplicate id in file storage)
+/// </summary>
 public class FileStorageClientStub : IFileStorageClient
 {
     public Task UploadAsync(FileStorageReference reference, Stream stream)
