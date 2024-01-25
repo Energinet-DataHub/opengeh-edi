@@ -25,9 +25,9 @@ internal static class JsonHeaderWriter
 {
     internal static void Write(OutgoingMessageHeader messageHeader, string documentType, string typeCode, string? reasonCode, Utf8JsonWriter writer)
     {
-        if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
-        if (documentType == null) throw new ArgumentNullException(nameof(documentType));
-        if (writer == null) throw new ArgumentNullException(nameof(writer));
+        ArgumentNullException.ThrowIfNull(messageHeader);
+        ArgumentNullException.ThrowIfNull(documentType);
+        ArgumentNullException.ThrowIfNull(writer);
 
         writer.WriteStartObject();
         writer.WritePropertyName(documentType);
@@ -50,7 +50,7 @@ internal static class JsonHeaderWriter
 
         writer.WriteObject(
             "receiver_MarketParticipant.marketRole.type",
-            new KeyValuePair<string, string>("value", CimCode.Of(EnumerationType.FromName<MarketRole>(messageHeader.ReceiverRole))));
+            new KeyValuePair<string, string>("value", CimCode.Of(ActorRole.FromCode(messageHeader.ReceiverRole))));
 
         writer.WriteObject(
             "sender_MarketParticipant.mRID",
@@ -59,7 +59,7 @@ internal static class JsonHeaderWriter
 
         writer.WriteObject(
             "sender_MarketParticipant.marketRole.type",
-            new KeyValuePair<string, string>("value", CimCode.Of(EnumerationType.FromName<MarketRole>(messageHeader.SenderRole))));
+            new KeyValuePair<string, string>("value", CimCode.Of(ActorRole.FromCode(messageHeader.SenderRole))));
 
         writer.WriteObject("type", new KeyValuePair<string, string>("value", typeCode));
     }

@@ -23,7 +23,7 @@ public sealed class SqlConnectionSource : IDisposable
 {
     public SqlConnectionSource(IOptions<SqlDatabaseConnectionOptions> options)
     {
-        if (options == null) throw new ArgumentNullException(nameof(options));
+        ArgumentNullException.ThrowIfNull(options);
         var builder = new SqlConnectionStringBuilder(options.Value.DB_CONNECTION_STRING)
         {
             Encrypt = true,

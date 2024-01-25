@@ -26,13 +26,14 @@ namespace Energinet.DataHub.EDI.Tests.Factories;
 public class TimeSeriesBuilder
 {
     private readonly List<Point> _points = new();
+    private readonly long _calculationResultVersion = 1;
     private string _messageId = Guid.NewGuid().ToString();
     private Instant _timeStamp = SystemClock.Instance.GetCurrentInstant();
     private BusinessReason _businessReason = BusinessReason.BalanceFixing;
     private string _receiverNumber = "1234567890123";
-    private MarketRole _receiverRole = MarketRole.MeteredDataResponsible;
+    private ActorRole _receiverRole = ActorRole.MeteredDataResponsible;
     private string _senderNumber = "1234567890321";
-    private MarketRole _senderRole = MarketRole.MeteringDataAdministrator;
+    private ActorRole _senderRole = ActorRole.MeteredDataAdministrator;
     private Guid _transactionId = Guid.NewGuid();
     private string _gridAreaCode = "870";
     private MeteringPointType _meteringPointType = MeteringPointType.Consumption;
@@ -64,17 +65,17 @@ public class TimeSeriesBuilder
         return this;
     }
 
-    public TimeSeriesBuilder WithReceiver(string receiverNumber, MarketRole marketRole)
+    public TimeSeriesBuilder WithReceiver(string receiverNumber, ActorRole actorRole)
     {
         _receiverNumber = receiverNumber;
-        _receiverRole = marketRole;
+        _receiverRole = actorRole;
         return this;
     }
 
-    public TimeSeriesBuilder WithSender(string senderNumber, MarketRole marketRole)
+    public TimeSeriesBuilder WithSender(string senderNumber, ActorRole actorRole)
     {
         _senderNumber = senderNumber;
-        _senderRole = marketRole;
+        _senderRole = actorRole;
         return this;
     }
 
@@ -161,9 +162,9 @@ public class TimeSeriesBuilder
         return new OutgoingMessageHeader(
             _businessReason.Name,
             _senderNumber,
-            _senderRole.Name,
+            _senderRole.Code,
             _receiverNumber,
-            _receiverRole.Name,
+            _receiverRole.Code,
             _messageId,
             _timeStamp);
     }
@@ -181,6 +182,7 @@ public class TimeSeriesBuilder
             _balanceResponsibleNumber,
             _period,
             _points,
+            _calculationResultVersion,
             _originalTransactionIdReference,
             _settlementVersion?.Name);
     }

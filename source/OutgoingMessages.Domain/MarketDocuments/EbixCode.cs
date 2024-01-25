@@ -99,24 +99,11 @@ public static class EbixCode
         throw NoCodeFoundFor(meteringPointType.Name);
     }
 
-    public static string Of(MarketRole marketRole)
+    public static string Of(ActorRole actorRole)
     {
-        ArgumentNullException.ThrowIfNull(marketRole);
+        ArgumentNullException.ThrowIfNull(actorRole);
 
-        if (marketRole == MarketRole.EnergySupplier)
-            return "DDQ";
-        if (marketRole == MarketRole.GridOperator)
-            return "DDM";
-        if (marketRole == MarketRole.MeteredDataResponsible)
-            return "MDR";
-        if (marketRole == MarketRole.MeteringDataAdministrator)
-            return "DGL";
-        if (marketRole == MarketRole.MeteringPointAdministrator)
-            return "DDZ";
-        if (marketRole == MarketRole.BalanceResponsibleParty)
-            return "DDK";
-
-        throw NoCodeFoundFor(marketRole.Name);
+        return actorRole.Code;
     }
 
     public static string Of(SettlementType settlementType)
@@ -179,12 +166,12 @@ public static class EbixCode
         throw NoCodeFoundFor(reasonCode.Name);
     }
 
-    private static Exception NoCodeFoundFor(string domainType)
+    private static InvalidOperationException NoCodeFoundFor(string domainType)
     {
         return new InvalidOperationException($"No code has been defined for {domainType}");
     }
 
-    private static Exception NoBusinessReasonFoundFor(string businessReasonCode)
+    private static InvalidOperationException NoBusinessReasonFoundFor(string businessReasonCode)
     {
         return new InvalidOperationException($"No business reason has been defined for {businessReasonCode}");
     }

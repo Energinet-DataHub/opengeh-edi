@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -40,7 +41,7 @@ public class RejectRequestAggregatedMeasureDataEbixDocumentWriter : EbixDocument
 
     public override bool HandlesType(DocumentType documentType)
     {
-        if (documentType == null) throw new ArgumentNullException(nameof(documentType));
+        ArgumentNullException.ThrowIfNull(documentType);
         return DocumentType.RejectRequestAggregatedMeasureData == documentType;
     }
 
@@ -66,7 +67,7 @@ public class RejectRequestAggregatedMeasureDataEbixDocumentWriter : EbixDocument
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "ResponseReasonType", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
-            await writer.WriteStringAsync(rejectedTimeSerie.RejectReasons[0].ErrorCode).ConfigureAwait(false);
+            await writer.WriteStringAsync(rejectedTimeSerie.RejectReasons.First().ErrorCode).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "OriginalBusinessDocument", null, rejectedTimeSerie.OriginalTransactionIdReference).ConfigureAwait(false);

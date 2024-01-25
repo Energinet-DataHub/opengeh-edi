@@ -27,9 +27,9 @@ public class OutgoingMessageDto
         ActorNumber receiverId,
         Guid processId,
         string businessReason,
-        MarketRole receiverRole,
+        ActorRole receiverRole,
         ActorNumber senderId,
-        MarketRole senderRole,
+        ActorRole senderRole,
         string messageRecord)
     {
         DocumentType = documentType;
@@ -50,11 +50,11 @@ public class OutgoingMessageDto
 
     public string BusinessReason { get; }
 
-    public MarketRole ReceiverRole { get; }
+    public ActorRole ReceiverRole { get; }
 
     public ActorNumber SenderId { get; }
 
-    public MarketRole SenderRole { get; }
+    public ActorRole SenderRole { get; }
 
     public string MessageRecord { get; }
 }

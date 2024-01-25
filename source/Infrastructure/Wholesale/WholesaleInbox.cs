@@ -31,8 +31,8 @@ public class WholesaleInbox : IWholesaleInbox
         IServiceBusSenderFactory serviceBusSenderFactory,
         IOptions<ServiceBusClientOptions> options)
     {
-        if (serviceBusSenderFactory == null) throw new ArgumentNullException(nameof(serviceBusSenderFactory));
-        if (options == null) throw new ArgumentNullException(nameof(options));
+        ArgumentNullException.ThrowIfNull(serviceBusSenderFactory);
+        ArgumentNullException.ThrowIfNull(options);
 
         _senderCreator = serviceBusSenderFactory.GetSender(options.Value.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME);
     }

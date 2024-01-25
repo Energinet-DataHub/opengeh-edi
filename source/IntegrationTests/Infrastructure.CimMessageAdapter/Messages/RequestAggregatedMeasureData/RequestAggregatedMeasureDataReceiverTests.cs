@@ -46,7 +46,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         _processContext = GetService<ProcessContext>();
 
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234567890123"), restriction: Restriction.None,  MarketRole.FromCode("DDQ")));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234567890123"), restriction: Restriction.None,  ActorRole.FromCode("DDQ")));
 
         _requestAggregatedMeasureDataValidator = GetService<RequestAggregatedMeasureDataValidator>();
     }
@@ -54,9 +54,9 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     public static IEnumerable<object[]> AllowedActorRoles =>
         new List<object[]>
         {
-            new object[] { MarketRole.EnergySupplier.Code },
-            new object[] { MarketRole.MeteredDataResponsible.Code },
-            new object[] { MarketRole.BalanceResponsibleParty.Code },
+            new object[] { ActorRole.EnergySupplier.Code },
+            new object[] { ActorRole.MeteredDataResponsible.Code },
+            new object[] { ActorRole.BalanceResponsibleParty.Code },
         };
 
     public async Task InitializeAsync()
@@ -409,9 +409,9 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     public async Task Multiple_activity_records_are_committed_as_processes()
     {
         var knownReceiverId = "5790001330552";
-        var knownReceiverRole = MarketRole.CalculationResponsibleRole.Code;
+        var knownReceiverRole = ActorRole.MeteredDataAdministrator.Code;
         var knownSenderId = "5790001330554";
-        var knownSenderRole = MarketRole.EnergySupplier.Code;
+        var knownSenderRole = ActorRole.EnergySupplier.Code;
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
             .DuplicateSeriesRecords()
@@ -505,7 +505,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
     private RequestAggregatedMeasureDataDto CreateMarketMessageWithAuthentication(RequestAggregatedMeasureDataDto dto, string knownSenderId, string knownSenderRole)
     {
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create(knownSenderId), restriction: Restriction.None,  MarketRole.FromCode(knownSenderRole)));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create(knownSenderId), restriction: Restriction.None,  ActorRole.FromCode(knownSenderRole)));
 
         return new RequestAggregatedMeasureDataDto(
             dto.SenderNumber,

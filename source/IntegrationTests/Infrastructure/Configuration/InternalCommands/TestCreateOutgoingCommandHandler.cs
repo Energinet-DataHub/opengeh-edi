@@ -34,10 +34,18 @@ public class TestCreateOutgoingCommandHandler : IRequestHandler<TestCreateOutgoi
 
     public async Task<Unit> Handle(TestCreateOutgoingMessageCommand request, CancellationToken cancellationToken)
     {
-        if (request == null) throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
         for (int i = 0; i < request.NumberOfOutgoingMessages; i++)
         {
-            var message = new OutgoingMessageDto(DocumentType.NotifyAggregatedMeasureData, ActorNumber.Create("1234567891234"), ProcessId.New().Id, BusinessReason.BalanceFixing.Name, MarketRole.EnergySupplier, ActorNumber.Create("1234567891234"), MarketRole.MeteringDataAdministrator, "data");
+            var message = new OutgoingMessageDto(
+                DocumentType.NotifyAggregatedMeasureData,
+                ActorNumber.Create("1234567891234"),
+                ProcessId.New().Id,
+                BusinessReason.BalanceFixing.Name,
+                ActorRole.EnergySupplier,
+                ActorNumber.Create("1234567891234"),
+                ActorRole.MeteredDataAdministrator,
+                "data");
 
             await _mediator.Publish(new EnqueueMessageEvent(message), cancellationToken).ConfigureAwait(false);
         }

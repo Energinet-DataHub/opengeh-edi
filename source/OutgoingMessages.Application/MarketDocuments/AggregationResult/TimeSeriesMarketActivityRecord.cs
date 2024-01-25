@@ -28,7 +28,8 @@ public record TimeSeriesMarketActivityRecord(
     string? EnergySupplierNumber,
     string? BalanceResponsibleNumber,
     Period Period,
-    IReadOnlyList<Point> Point,
+    IReadOnlyCollection<Point> Point,
+    long? CalculationResultVersion = null,
     string? OriginalTransactionIdReference = null,
     string? SettlementVersion = null);
 

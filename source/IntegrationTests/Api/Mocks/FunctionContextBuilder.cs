@@ -29,6 +29,7 @@ internal sealed class FunctionContextBuilder
     private string? _contentType = "application/json";
     private string? _bearerToken;
     private X509Certificate2? _certificate;
+    private string? _functionName;
 
     public FunctionContextBuilder(IServiceProvider serviceProvider)
     {
@@ -41,7 +42,7 @@ internal sealed class FunctionContextBuilder
     /// <param name="withContentType">Sets the mock HTTP request content type to the specified value</param>
     /// <param name="withToken">If not null, sets the mock HTTP request's Authorization header to the specified bearer token</param>
     /// <param name="withCertificate">If not null, sets the mock HTTP request's ClientCert header to a raw hex string representing the certificate</param>
-    public FunctionContextBuilder TriggeredByHttp(string? withContentType, string? withToken = null, X509Certificate2? withCertificate = null)
+    public FunctionContextBuilder TriggeredByHttp(string? withContentType = null, string? withToken = null, X509Certificate2? withCertificate = null)
     {
         _triggerType = TriggerType.HttpTrigger;
         _contentType = withContentType;
@@ -51,11 +52,32 @@ internal sealed class FunctionContextBuilder
         return this;
     }
 
+    /// <summary>
+    /// Set the function context to be triggered by the given type, to simulate an Azure function that uses the given trigger type
+    /// </summary>
+    public FunctionContextBuilder WithTriggeredBy(TriggerType triggerType)
+    {
+        _triggerType = triggerType;
+
+        return this;
+    }
+
+    /// <summary>
+    /// Set the function name, which simulates the name given to the Azure Function (ie. PeekRequestListener, HealthCheck, TenSecondsHasPassed etc.)
+    /// </summary>
+    public FunctionContextBuilder WithFunctionName(string functionName)
+    {
+        _functionName = functionName;
+
+        return this;
+    }
+
     internal FunctionContextMock Build()
     {
         return new FunctionContextMock(
             _serviceProvider,
             _triggerType,
+            _functionName,
             _contentType,
             _bearerToken,
             _certificate?.GetRawCertDataString());

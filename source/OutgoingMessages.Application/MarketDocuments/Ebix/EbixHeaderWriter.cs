@@ -26,9 +26,9 @@ internal static class EbixHeaderWriter
 {
     internal static async Task WriteAsync(XmlWriter writer, OutgoingMessageHeader messageHeader, DocumentDetails documentDetails, string? reasonCode, SettlementVersion? settlementVersion)
     {
-        if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
-        if (writer == null) throw new ArgumentNullException(nameof(writer));
-        if (documentDetails == null) throw new ArgumentNullException(nameof(documentDetails));
+        ArgumentNullException.ThrowIfNull(messageHeader);
+        ArgumentNullException.ThrowIfNull(writer);
+        ArgumentNullException.ThrowIfNull(documentDetails);
 
         await writer.WriteStartDocumentAsync().ConfigureAwait(false);
 
@@ -78,7 +78,7 @@ internal static class EbixHeaderWriter
 
         await writer.WriteStartElementAsync(documentDetails.Prefix, "EnergyBusinessProcessRole", null).ConfigureAwait(false);
         await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
-        writer.WriteValue(EbixCode.Of(EnumerationType.FromName<MarketRole>(messageHeader.ReceiverRole)));
+        writer.WriteValue(EbixCode.Of(ActorRole.FromCode(messageHeader.ReceiverRole)));
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 
         await writer.WriteStartElementAsync(documentDetails.Prefix, "EnergyIndustryClassification", null).ConfigureAwait(false);

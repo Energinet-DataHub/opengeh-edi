@@ -28,9 +28,9 @@ public class OutgoingMessageDtoBuilder
     private const string GridAreaCode = "805";
     private static readonly Guid _processId = ProcessId.Create(Guid.NewGuid()).Id;
     private static readonly BusinessReason _businessReason = BusinessReason.BalanceFixing;
-    private static readonly IReadOnlyList<Point> _points = new List<Point>();
+    private static readonly IReadOnlyCollection<Point> _points = new List<Point>();
     private static ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
-    private static MarketRole _receiverRole = MarketRole.MeteringDataAdministrator;
+    private static ActorRole _receiverRole = ActorRole.MeteredDataAdministrator;
 
 #pragma warning disable CA1822
     public OutgoingMessageDto Build()
@@ -49,7 +49,8 @@ public class OutgoingMessageDtoBuilder
             "1234567891911",
             new Period(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant()),
             _points,
-            _businessReason.Name);
+            _businessReason.Name,
+            1);
     }
 
     public OutgoingMessageDtoBuilder WithReceiverNumber(string receiverNumber)
@@ -58,11 +59,9 @@ public class OutgoingMessageDtoBuilder
         return this;
     }
 
-    public OutgoingMessageDtoBuilder WithReceiverRole(MarketRole marketRole)
+    public OutgoingMessageDtoBuilder WithReceiverRole(ActorRole actorRole)
     {
-        _receiverRole = marketRole;
+        _receiverRole = actorRole;
         return this;
     }
 }
-
-internal sealed record MessageRecordStub();

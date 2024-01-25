@@ -45,7 +45,7 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
         public async Task EnqueueAsync<TCommand>(TCommand command)
             where TCommand : InternalCommand
         {
-            if (command == null) throw new ArgumentNullException(nameof(command));
+            ArgumentNullException.ThrowIfNull(command);
 
             var data = _serializer.Serialize(command);
             var commandMetadata = _internalCommandMapper.GetByType(command.GetType());

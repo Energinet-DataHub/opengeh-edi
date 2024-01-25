@@ -61,13 +61,13 @@ public class IncomingMessageClient : IIncomingMessageClient
         CancellationToken cancellationToken,
         DocumentFormat responseFormat = null!)
     {
-        if (message == null) throw new ArgumentNullException(nameof(message));
+        ArgumentNullException.ThrowIfNull(message);
 
         var requestAggregatedMeasureDataMarketMessageParserResult =
             await _marketMessageParser.ParseAsync(message, documentFormat, documentType, cancellationToken)
                 .ConfigureAwait(false);
 
-        if (requestAggregatedMeasureDataMarketMessageParserResult.Errors.Any() && requestAggregatedMeasureDataMarketMessageParserResult.Dto == null)
+        if (requestAggregatedMeasureDataMarketMessageParserResult.Errors.Count != 0 && requestAggregatedMeasureDataMarketMessageParserResult.Dto == null)
         {
             var res = Result.Failure(requestAggregatedMeasureDataMarketMessageParserResult.Errors.ToArray());
             _logger.LogInformation("Failed to parse incoming message. Errors: {Errors}", res.Errors);

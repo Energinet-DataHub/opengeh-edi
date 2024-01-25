@@ -164,7 +164,7 @@ public class MessageParserTests
         Assert.Contains(result.Errors, error => error.GetType().Name == expectedError);
     }
 
-    private static Stream CreateBaseXmlMessage(string fileName)
+    private static MemoryStream CreateBaseXmlMessage(string fileName)
     {
         var xmlDocument = XDocument.Load(
             $"{PathToMessages}xml{SubPath}{fileName}");
@@ -175,7 +175,7 @@ public class MessageParserTests
         return stream;
     }
 
-    private static Stream CreateBaseJsonMessages(string fileName, int addSeriesUntilMbSize = 0)
+    private static MemoryStream CreateBaseJsonMessages(string fileName, int addSeriesUntilMbSize = 0)
     {
         return ReadTextFile($"{PathToMessages}json{SubPath}{fileName}", addSeriesUntilMbSize);
     }
@@ -235,7 +235,7 @@ public class MessageParserTests
             "5799999933318",
             "DDK",
             DataHubDetails.DataHubActorNumber.Value,
-            MarketRole.CalculationResponsibleRole.Code,
+            ActorRole.MeteredDataAdministrator.Code,
             "D05",
             "E74",
             "123564789123564789123564789123564789",

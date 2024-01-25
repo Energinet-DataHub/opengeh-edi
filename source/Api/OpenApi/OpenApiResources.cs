@@ -12,23 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+namespace Energinet.DataHub.EDI.Api.OpenApi;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Exceptions;
-
-public class DBTransactionNotInitializedException : Exception
+public static class OpenApiResources
 {
-    public DBTransactionNotInitializedException()
-    {
-    }
-
-    public DBTransactionNotInitializedException(string message)
-        : base(message)
-    {
-    }
-
-    public DBTransactionNotInitializedException(string message, Exception innerException)
-        : base(message, innerException)
-    {
-    }
+    public const string OpenApiOperationTag = "http";
+    public const string OpenApiSecuritySchemaName = "http";
+    public const string OpenApiSecurityName = "Authorization";
+    public const string OpenApiSecurityDescription = "Description";
+    public const string OpenApiSecurityBearerFormat = "\"Authorization: Bearer {token}\"";
 }

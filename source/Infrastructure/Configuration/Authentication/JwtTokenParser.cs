@@ -32,7 +32,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication
 
         public Result ParseFrom(HttpHeaders requestHeaders)
         {
-            if (requestHeaders == null) throw new ArgumentNullException(nameof(requestHeaders));
+            ArgumentNullException.ThrowIfNull(requestHeaders);
             if (requestHeaders.TryGetValues("authorization", out var authorizationHeaderValues) == false)
             {
                 return Result.Failed(new NoAuthenticationHeaderSet());
@@ -49,13 +49,13 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication
 
         private static string ParseBearerToken(string authorizationHeaderValue)
         {
-            if (authorizationHeaderValue == null) throw new ArgumentNullException(nameof(authorizationHeaderValue));
+            ArgumentNullException.ThrowIfNull(authorizationHeaderValue);
             return authorizationHeaderValue.Substring(7);
         }
 
         private static bool IsBearer(string authorizationHeaderValue)
         {
-            if (authorizationHeaderValue == null) throw new ArgumentNullException(nameof(authorizationHeaderValue));
+            ArgumentNullException.ThrowIfNull(authorizationHeaderValue);
             return authorizationHeaderValue.StartsWith("bearer", StringComparison.OrdinalIgnoreCase) && authorizationHeaderValue.Length > 7;
         }
 

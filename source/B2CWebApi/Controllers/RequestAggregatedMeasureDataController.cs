@@ -81,7 +81,7 @@ public class RequestAggregatedMeasureDataController : ControllerBase
         return Ok(responseMessage.MessageBody);
     }
 
-    private static Stream GenerateStreamFromString(string jsonString)
+    private static MemoryStream GenerateStreamFromString(string jsonString)
     {
         var encoding = Encoding.UTF8;
         var byteArray = encoding.GetBytes(jsonString);

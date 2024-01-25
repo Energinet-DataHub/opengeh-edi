@@ -22,8 +22,8 @@ namespace IncomingMessages.Infrastructure.DocumentValidation.Xml
     {
         public static async Task<ValidationResult> ValidateAsync(Stream message, XmlSchema schema)
         {
-            if (message == null) throw new ArgumentNullException(nameof(message));
-            if (schema == null) throw new ArgumentNullException(nameof(schema));
+            ArgumentNullException.ThrowIfNull(message);
+            ArgumentNullException.ThrowIfNull(schema);
 
             var validationErrors = new List<string>();
             var settings = CreateXmlReaderSettings(schema);

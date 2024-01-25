@@ -99,7 +99,7 @@ public class WhenAnInboxEventIsReceivedTests : TestBase
     private async Task EventIsRegisteredWithInbox(string eventId, int expectedNumberOfRegisteredEvents = 1)
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-        var numberOfRegisteredEvents = connection.ExecuteScalar<int>($"SELECT COUNT(*) FROM dbo.ReceivedInboxEvents WHERE Id = @EventId", new { EventId = eventId, });
+        var numberOfRegisteredEvents = await connection.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM dbo.ReceivedInboxEvents WHERE Id = @EventId", new { EventId = eventId, });
         Assert.Equal(expectedNumberOfRegisteredEvents, numberOfRegisteredEvents);
     }
 }

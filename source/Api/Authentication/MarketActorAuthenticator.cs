@@ -44,7 +44,7 @@ namespace Energinet.DataHub.EDI.Api.Authentication
 
         public virtual async Task<bool> AuthenticateAsync(ClaimsPrincipal claimsPrincipal, CancellationToken cancellationToken)
         {
-            if (claimsPrincipal == null) throw new ArgumentNullException(nameof(claimsPrincipal));
+            ArgumentNullException.ThrowIfNull(claimsPrincipal);
             _logger.LogDebug("claimsPrincipal: {ClaimsPrincipal}", string.Join(",", claimsPrincipal.Claims));
             var rolesFromClaims = GetClaimValuesFrom(claimsPrincipal, ClaimTypes.Role);
             var role = ParseRole(rolesFromClaims);
@@ -59,7 +59,7 @@ namespace Energinet.DataHub.EDI.Api.Authentication
             return Authenticate(actorNumber, role);
         }
 
-        public bool Authenticate(ActorNumber? actorNumber, MarketRole? marketRole)
+        public bool Authenticate(ActorNumber? actorNumber, ActorRole? marketRole)
         {
             if (actorNumber is null)
             {
@@ -92,10 +92,10 @@ namespace Energinet.DataHub.EDI.Api.Authentication
                 .Select(claim => claim.Value);
         }
 
-        private static MarketRole? ParseRole(IEnumerable<string> roles)
+        private static ActorRole? ParseRole(IEnumerable<string> roles)
         {
             var roleList = roles.ToList();
-            if (!roleList.Any() || roleList.Count > 1)
+            if (roleList.Count == 0 || roleList.Count > 1)
             {
                 return null;
             }

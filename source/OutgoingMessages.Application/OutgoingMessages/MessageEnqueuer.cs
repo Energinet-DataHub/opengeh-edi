@@ -45,7 +45,7 @@ public class MessageEnqueuer
 
     public async Task<OutgoingMessageId> EnqueueAsync(OutgoingMessageDto messageToEnqueue)
     {
-        if (messageToEnqueue == null) throw new ArgumentNullException(nameof(messageToEnqueue));
+        ArgumentNullException.ThrowIfNull(messageToEnqueue);
 
         var outgoingMessage = new OutgoingMessage(
             messageToEnqueue.DocumentType,

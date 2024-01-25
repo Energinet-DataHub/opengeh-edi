@@ -31,7 +31,7 @@ internal sealed class WholesaleDriver
         _integrationEventPublisher = integrationEventPublisher;
     }
 
-    internal Task PublishAggregationResultAsync(string gridAreaCode, MarketRole? marketRole = null, string? actorNumber = null)
+    internal Task PublishAggregationResultAsync(string gridAreaCode, ActorRole? marketRole = null, string? actorNumber = null)
     {
         var aggregation = marketRole?.Code switch
         {
@@ -68,6 +68,7 @@ internal sealed class WholesaleDriver
                     QuantityQualities = { QuantityQuality.Measured },
                 },
             },
+            CalculationResultVersion = 404,
         };
         return processCompletedEvent;
     }

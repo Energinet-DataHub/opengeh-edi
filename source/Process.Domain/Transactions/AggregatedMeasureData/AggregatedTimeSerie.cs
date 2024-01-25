@@ -21,11 +21,12 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
 
 [Serializable]
 public record AggregatedTimeSerie(
-    IReadOnlyList<Point> Points,
+    IReadOnlyCollection<Point> Points,
     string MeteringPointType,
     string UnitType,
     string Resolution,
-    GridAreaDetails GridAreaDetails);
+    GridAreaDetails GridAreaDetails,
+    long? CalculationResultVersion);
 
 [Serializable]
 public record Point(int Position, decimal? Quantity, CalculatedQuantityQuality QuantityQuality, string SampleTime);

@@ -22,7 +22,7 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
     {
         public void Configure(EntityTypeBuilder<QueuedInternalCommand> builder)
         {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            ArgumentNullException.ThrowIfNull(builder);
 
             builder.ToTable("QueuedInternalCommands", "dbo");
             builder.HasKey(x => x.Id);

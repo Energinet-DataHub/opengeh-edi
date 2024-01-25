@@ -31,7 +31,7 @@ public interface IActorCertificateRepository
     /// <summary>
     /// Get actor certificate from the actor and role combination. Returns null if no actor certificate was found for the given combination.
     /// </summary>
-    Task<ActorCertificate?> GetFromActorRoleAsync(ActorNumber actorNumber, MarketRole actorRole);
+    Task<ActorCertificate?> GetFromActorRoleAsync(ActorNumber actorNumber, ActorRole actorRole);
 
     /// <summary>
     /// Add the actor certificate to storage

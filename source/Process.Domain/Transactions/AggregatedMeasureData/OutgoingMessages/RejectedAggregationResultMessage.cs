@@ -26,7 +26,7 @@ public class RejectedAggregationResultMessage : OutgoingMessageDto
         ActorNumber receiverId,
         Guid processId,
         string businessReason,
-        MarketRole receiverRole,
+        ActorRole receiverRole,
         RejectedTimeSerie series)
         : base(
             DocumentType.RejectRequestAggregatedMeasureData,
@@ -35,7 +35,7 @@ public class RejectedAggregationResultMessage : OutgoingMessageDto
             businessReason,
             receiverRole,
             DataHubDetails.DataHubActorNumber,
-            MarketRole.MeteringDataAdministrator,
+            ActorRole.MeteredDataAdministrator,
             new Serializer().Serialize(series))
     {
         Series = series;
@@ -52,7 +52,7 @@ public class RejectedAggregationResultMessage : OutgoingMessageDto
 
 public record RejectedTimeSerie(
     Guid TransactionId,
-    IReadOnlyList<RejectReason> RejectReasons,
+    IReadOnlyCollection<RejectReason> RejectReasons,
     string OriginalTransactionIdReference);
 
 public record RejectReason(string ErrorCode, string ErrorMessage);

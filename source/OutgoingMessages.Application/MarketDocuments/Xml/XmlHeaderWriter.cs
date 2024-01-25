@@ -25,9 +25,9 @@ internal static class XmlHeaderWriter
 {
     internal static async Task WriteAsync(XmlWriter writer, OutgoingMessageHeader messageHeader, DocumentDetails documentDetails, string? reasonCode)
     {
-        if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
-        if (writer == null) throw new ArgumentNullException(nameof(writer));
-        if (documentDetails == null) throw new ArgumentNullException(nameof(documentDetails));
+        ArgumentNullException.ThrowIfNull(messageHeader);
+        ArgumentNullException.ThrowIfNull(writer);
+        ArgumentNullException.ThrowIfNull(documentDetails);
 
         await writer.WriteStartDocumentAsync().ConfigureAwait(false);
         await writer.WriteStartElementAsync(
@@ -53,7 +53,11 @@ internal static class XmlHeaderWriter
         writer.WriteValue(messageHeader.SenderId);
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-        await writer.WriteElementStringAsync(documentDetails.Prefix, "sender_MarketParticipant.marketRole.type", null, CimCode.Of(EnumerationType.FromName<MarketRole>(messageHeader.SenderRole)))
+        await writer.WriteElementStringAsync(
+                documentDetails.Prefix,
+                "sender_MarketParticipant.marketRole.type",
+                null,
+                CimCode.Of(ActorRole.FromCode(messageHeader.SenderRole)))
             .ConfigureAwait(false);
 
         await writer.WriteStartElementAsync(documentDetails.Prefix, "receiver_MarketParticipant.mRID", null).ConfigureAwait(false);
@@ -62,7 +66,7 @@ internal static class XmlHeaderWriter
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 
         await writer
-            .WriteElementStringAsync(documentDetails.Prefix, "receiver_MarketParticipant.marketRole.type", null, CimCode.Of(EnumerationType.FromName<MarketRole>(messageHeader.ReceiverRole)))
+            .WriteElementStringAsync(documentDetails.Prefix, "receiver_MarketParticipant.marketRole.type", null, CimCode.Of(ActorRole.FromCode(messageHeader.ReceiverRole)))
             .ConfigureAwait(false);
         await writer.WriteElementStringAsync(documentDetails.Prefix, "createdDateTime", null, messageHeader.TimeStamp.ToString()).ConfigureAwait(false);
         if (reasonCode is not null)

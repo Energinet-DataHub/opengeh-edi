@@ -70,8 +70,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
         {
             var claims = new List<Claim>()
             {
-                ClaimsMap.RoleFrom(MarketRole.EnergySupplier),
-                ClaimsMap.RoleFrom(MarketRole.GridOperator),
+                ClaimsMap.RoleFrom(ActorRole.EnergySupplier),
+                ClaimsMap.RoleFrom(ActorRole.GridOperator),
             };
             var claimsPrincipal = CreateIdentity(claims);
 
@@ -87,7 +87,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
             var claims = new List<Claim>()
             {
                 new(ClaimsMap.UserId, SampleData.StsAssignedUserId),
-                ClaimsMap.RoleFrom(MarketRole.EnergySupplier),
+                ClaimsMap.RoleFrom(ActorRole.EnergySupplier),
             };
             var claimsPrincipal = CreateIdentity(claims);
 
@@ -95,7 +95,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
 
             Assert.True(authenticated);
             Assert.Equal(_authenticatedActor.CurrentActorIdentity.ActorNumber.Value, SampleData.ActorNumber);
-            Assert.True(_authenticatedActor.CurrentActorIdentity.HasRole(MarketRole.EnergySupplier));
+            Assert.True(_authenticatedActor.CurrentActorIdentity.HasRole(ActorRole.EnergySupplier));
         }
 
         private static ClaimsPrincipal CreateIdentity(List<Claim>? claims = null)
@@ -103,8 +103,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
             var validClaims = new List<Claim>()
             {
                 new(ClaimsMap.UserId, Guid.NewGuid().ToString()),
-                ClaimsMap.RoleFrom(MarketRole.GridOperator),
-                ClaimsMap.RoleFrom(MarketRole.EnergySupplier),
+                ClaimsMap.RoleFrom(ActorRole.GridOperator),
+                ClaimsMap.RoleFrom(ActorRole.EnergySupplier),
             };
 
             var identity = new ClaimsIdentity(claims ?? validClaims);

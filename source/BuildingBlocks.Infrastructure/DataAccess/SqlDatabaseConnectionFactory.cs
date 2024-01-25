@@ -28,7 +28,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess
 
         public SqlDatabaseConnectionFactory(IOptions<SqlDatabaseConnectionOptions> options)
         {
-            if (options == null) throw new ArgumentNullException(nameof(options));
+            ArgumentNullException.ThrowIfNull(options);
             _options = options.Value;
         }
 

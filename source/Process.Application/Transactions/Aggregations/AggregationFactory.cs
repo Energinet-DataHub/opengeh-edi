@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -48,10 +49,15 @@ public class AggregationFactory
         AggregatedMeasureDataProcess aggregatedMeasureDataProcess,
         AggregatedTimeSerie aggregatedTimeSerie)
     {
-        if (aggregatedMeasureDataProcess == null) throw new ArgumentNullException(nameof(aggregatedMeasureDataProcess));
-        if (aggregatedTimeSerie == null) throw new ArgumentNullException(nameof(aggregatedTimeSerie));
+        ArgumentNullException.ThrowIfNull(aggregatedMeasureDataProcess);
+        ArgumentNullException.ThrowIfNull(aggregatedTimeSerie);
 
-        if ((aggregatedMeasureDataProcess.MeteringPointType != null ? MeteringPointType.FromCode(aggregatedMeasureDataProcess.MeteringPointType).Name : null) != aggregatedTimeSerie.MeteringPointType) throw new ArgumentException("aggregatedTimeSerie.MeteringPointType isn't equal to aggregatedMeasureDataProcess.MeteringPointType", nameof(aggregatedTimeSerie));
+        if ((aggregatedMeasureDataProcess.MeteringPointType != null
+                ? MeteringPointType.FromCode(aggregatedMeasureDataProcess.MeteringPointType).Name
+                : null) != aggregatedTimeSerie.MeteringPointType)
+        {
+            throw new ArgumentException("AggregatedTimeSerie.MeteringPointType isn't equal to aggregatedMeasureDataProcess.MeteringPointType", nameof(aggregatedTimeSerie));
+        }
 
         return new Aggregation(
             MapPoints(aggregatedTimeSerie.Points),
@@ -63,6 +69,7 @@ public class AggregationFactory
             aggregatedMeasureDataProcess.BusinessReason.Name,
             MapActorGrouping(aggregatedMeasureDataProcess),
             MapGridAreaDetails(aggregatedTimeSerie.GridAreaDetails),
+            aggregatedTimeSerie.CalculationResultVersion,
             aggregatedMeasureDataProcess.BusinessTransactionId.Id,
             aggregatedMeasureDataProcess.RequestedByActorId.Value,
             MapReceiverRole(aggregatedMeasureDataProcess),
@@ -73,7 +80,7 @@ public class AggregationFactory
         EnergyResultProducedV2 integrationEvent,
         CancellationToken cancellationToken)
     {
-        if (integrationEvent == null) throw new ArgumentNullException(nameof(integrationEvent));
+        ArgumentNullException.ThrowIfNull(integrationEvent);
 
         return new Aggregation(
             MapPoints(integrationEvent.TimeSeriesPoints),
@@ -85,6 +92,7 @@ public class AggregationFactory
             MapCalculationType(integrationEvent.CalculationType),
             MapActorGrouping(integrationEvent),
             await GetGridAreaDetailsAsync(integrationEvent, cancellationToken).ConfigureAwait(false),
+            integrationEvent.CalculationResultVersion,
             SettlementVersion: MapSettlementVersion(integrationEvent.CalculationType));
     }
 
@@ -110,17 +118,17 @@ public class AggregationFactory
 
     private static string MapReceiverRole(AggregatedMeasureDataProcess process)
     {
-        return MarketRole.FromCode(process.RequestedByActorRoleCode).Name;
+        return ActorRole.FromCode(process.RequestedByActorRoleCode).Name;
     }
 
     private static ActorGrouping MapActorGrouping(AggregatedMeasureDataProcess process)
     {
-        if (process.RequestedByActorRoleCode == MarketRole.BalanceResponsibleParty.Code)
+        if (process.RequestedByActorRoleCode == ActorRole.BalanceResponsibleParty.Code)
         {
             return new ActorGrouping(null, process.BalanceResponsibleId);
         }
 
-        if (process.RequestedByActorRoleCode == MarketRole.EnergySupplier.Code)
+        if (process.RequestedByActorRoleCode == ActorRole.EnergySupplier.Code)
         {
             return new ActorGrouping(process.EnergySupplierId, null);
         }
@@ -240,7 +248,7 @@ public class AggregationFactory
         return new Period(integrationEvent.PeriodStartUtc.ToInstant(), integrationEvent.PeriodEndUtc.ToInstant());
     }
 
-    private static IReadOnlyList<Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
+    private static ReadOnlyCollection<Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
     {
         var points = new List<Point>();
 
