@@ -13,14 +13,12 @@
 // limitations under the License.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.Core.App.FunctionApp;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
@@ -37,16 +35,14 @@ using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Api;
 
-[SuppressMessage("Style", "VSTHRD200", Justification = "Test class")]
-[SuppressMessage("Naming", "CA1707", Justification = "Test class")]
 [IntegrationTest]
-public class WhenActorIsTryingToAuthenticate : TestBase
+public class WhenActorIsTryingToAuthenticateTests : TestBase
 {
     private readonly NextSpy _nextSpy;
     private readonly FunctionExecutionDelegate _next;
     private readonly FunctionContextBuilder _functionContextBuilder;
 
-    public WhenActorIsTryingToAuthenticate(IntegrationTestFixture integrationTestFixture)
+    public WhenActorIsTryingToAuthenticateTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
     {
         AuthenticatedActor.SetAuthenticatedActor(null);
@@ -265,14 +261,5 @@ public class WhenActorIsTryingToAuthenticate : TestBase
             actorNumber = actorNumber.Value,
             externalId = externalId,
         });
-    }
-
-    private FunctionContextMock CreateMockFunctionContext(TriggerType triggerType, string? contentType = "application/json", string? bearerToken = null, X509Certificate2? certificate = null)
-    {
-        var certificateHexString = certificate?.GetRawCertDataString();
-
-        var mockFunctionContext = new FunctionContextMock(ServiceProvider, triggerType, contentType, bearerToken, certificateHexString);
-
-        return mockFunctionContext;
     }
 }
