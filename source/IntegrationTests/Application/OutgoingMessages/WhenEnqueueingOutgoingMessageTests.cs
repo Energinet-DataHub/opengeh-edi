@@ -180,11 +180,11 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         // Assert
         var fileStorageReference = await GetOutgoingMessageFileStorageReferenceFromDatabase(createdId);
 
-        var fileContent = await GetFileFromFileStorage(fileStorageReference);
+        var fileContent = await GetFileFromFileStorageAsync("outgoing", fileStorageReference);
 
         fileContent.HasValue.Should().BeTrue();
 
-        var fileContentAsString = await GetStreamContentAsString(fileContent.Value.Content);
+        var fileContentAsString = await GetStreamContentAsStringAsync(fileContent.Value.Content);
         fileContentAsString.Should().Be(message.MessageRecord);
     }
 
@@ -210,26 +210,6 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     {
         _context.Dispose();
         base.Dispose(disposing);
-    }
-
-    private static async Task<string> GetStreamContentAsString(Stream stream)
-    {
-        using var streamReader = new StreamReader(stream, Encoding.UTF8);
-        var stringContent = await streamReader.ReadToEndAsync();
-
-        return stringContent;
-    }
-
-    private static async Task<Response<BlobDownloadInfo>> GetFileFromFileStorage(string fileStorageReference)
-    {
-        var azuriteBlobConnectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING");
-        var blobServiceClient = new BlobServiceClient(azuriteBlobConnectionString);
-
-        var container = blobServiceClient.GetBlobContainerClient("outgoing");
-        var blob = container.GetBlobClient(fileStorageReference);
-
-        var blobContent = await blob.DownloadAsync();
-        return blobContent;
     }
 
     private async Task<string> GetOutgoingMessageFileStorageReferenceFromDatabase(OutgoingMessageId id)

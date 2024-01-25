@@ -43,6 +43,7 @@ public class DataLakeFileStorageClient : IFileStorageClient
 
         stream.Position = 0; // Make sure we read the entire stream
         await container.UploadBlobAsync(reference.Value, stream).ConfigureAwait(false);
+        stream.Position = 0; // Reset stream position so it can be read again
     }
 
     public async Task UploadAsync(FileStorageReference reference, string content)

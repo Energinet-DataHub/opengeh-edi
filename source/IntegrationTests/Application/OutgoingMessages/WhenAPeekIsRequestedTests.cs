@@ -13,19 +13,15 @@
 // limitations under the License.
 
 using System;
-using System.IO;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -93,7 +89,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     }
 
     [Fact]
-    public async Task The_generated_document_is_archived()
+    public async Task The_generated_document_is_archived_with_correct_content()
     {
         var message = _outgoingMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
@@ -103,7 +99,12 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         var result = await PeekMessage(MessageCategory.Aggregations);
 
-        await AssertMessageIsArchived(result.MessageId);
+        var fileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(result.MessageId!.Value);
+
+        var fileContent = await GetFileFromFileStorageAsync("archived", fileStorageReference);
+
+        var fileContentAsString = await GetStreamContentAsStringAsync(fileContent.Value.Content);
+        fileContentAsString.Should().Be(message.MessageRecord);
     }
 
     [Fact]
@@ -134,16 +135,6 @@ public class WhenAPeekIsRequestedTests : TestBase
     private Task<PeekResultDto> PeekMessage(MessageCategory category)
     {
         return _outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, ActorRole.EnergySupplier, DocumentFormat.Xml), CancellationToken.None);
-    }
-
-    private async Task AssertMessageIsArchived(Guid? messageId)
-    {
-        var sqlStatement =
-            $"SELECT COUNT(*) FROM [dbo].[ArchivedMessages] WHERE MessageId = '{messageId}'";
-        using var connection =
-            await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-        var found = await connection.ExecuteScalarAsync<bool>(sqlStatement);
-        Assert.True(found);
     }
 
     private async Task<bool> MarketDocumentExists(Guid marketDocumentBundleId)
