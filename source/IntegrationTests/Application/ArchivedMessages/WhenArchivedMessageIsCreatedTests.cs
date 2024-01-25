@@ -69,7 +69,6 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
         await using var result = await _archivedMessagesClient.GetAsync(id, CancellationToken.None);
 
         // Assert
-        using var assertionScope = new AssertionScope();
         result.Should().NotBeNull();
         using var streamReader = new StreamReader(result!);
         var actualDocumentContent = await streamReader.ReadToEndAsync();

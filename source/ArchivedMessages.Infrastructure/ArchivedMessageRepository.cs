@@ -76,20 +76,16 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
     public async Task<Stream?> GetAsync(string id, CancellationToken cancellationToken)
     {
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
-        using var command = CreateCommand(
-            $"SELECT FileStorageReference FROM dbo.[ArchivedMessages] WHERE Id = @Id",
-            new List<KeyValuePair<string, object?>>
-            {
-                new("@Id", id),
-            },
-            connection);
 
-        var fileStorageReferenceAsString = (string)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+        var fileStorageReferenceString = await connection.ExecuteScalarAsync<string>(
+                $"SELECT FileStorageReference FROM dbo.[ArchivedMessages] WHERE Id = @Id",
+                new { Id = id })
+            .ConfigureAwait(false);
 
-        if (fileStorageReferenceAsString == null)
+        if (fileStorageReferenceString == null)
             return null;
 
-        var fileStorageReference = new FileStorageReference(ArchivedMessage.FileStorageCategory, fileStorageReferenceAsString);
+        var fileStorageReference = new FileStorageReference(ArchivedMessage.FileStorageCategory, fileStorageReferenceString);
 
         var stream = await _fileStorageClient.DownloadAsync(fileStorageReference).ConfigureAwait(false);
 
@@ -107,21 +103,5 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
                     input.Parameters)
                 .ConfigureAwait(false);
         return new MessageSearchResult(archivedMessages.OrderBy(x => x.CreatedAt).ToList().AsReadOnly());
-    }
-
-    private static SqlCommand CreateCommand(
-        string sqlStatement, List<KeyValuePair<string, object?>> parameters, IDbConnection connection)
-    {
-        var command = connection.CreateCommand();
-
-        command.CommandText = sqlStatement;
-
-        foreach (var parameter in parameters)
-        {
-            var sqlParameter = new SqlParameter(parameter.Key, parameter.Value);
-            command.Parameters.Add(sqlParameter);
-        }
-
-        return (SqlCommand)command;
     }
 }
