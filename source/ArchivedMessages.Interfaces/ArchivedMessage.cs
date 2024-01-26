@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -24,7 +25,6 @@ public class ArchivedMessage
     public const string FileStorageCategory = "archived";
 
     public ArchivedMessage(
-        string id,
         string? messageId,
         string documentType,
         string senderNumber, // Doesn't use ActorNumber since we want to make sure to always create a ArchivedMessage
@@ -33,7 +33,7 @@ public class ArchivedMessage
         string? businessReason,
         Stream document)
     {
-        Id = id;
+        Id = ArchivedMessageId.Create();
         MessageId = messageId;
         DocumentType = documentType;
         SenderNumber = senderNumber;
@@ -42,10 +42,10 @@ public class ArchivedMessage
         BusinessReason = businessReason;
         Document = document;
 
-        FileStorageReference = FileStorageReference.Create(FileStorageCategory, ReceiverNumber, createdAt, Id);
+        FileStorageReference = FileStorageReference.Create(FileStorageCategory, ReceiverNumber, createdAt, Id.Value);
     }
 
-    public string Id { get; }
+    public ArchivedMessageId Id { get; }
 
     public string? MessageId { get; }
 

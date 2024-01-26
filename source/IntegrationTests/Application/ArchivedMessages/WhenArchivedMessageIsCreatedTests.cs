@@ -45,12 +45,12 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
     [Fact]
     public async Task Archived_document_can_be_retrieved_by_id()
     {
-        var id = Guid.NewGuid().ToString();
+        var correctArchivedMessage = CreateArchivedMessage();
         await ArchiveMessage(CreateArchivedMessage());
-        await ArchiveMessage(CreateArchivedMessage(id));
+        await ArchiveMessage(correctArchivedMessage);
         await ArchiveMessage(CreateArchivedMessage());
 
-        var result = await _archivedMessagesClient.GetAsync(id, CancellationToken.None);
+        var result = await _archivedMessagesClient.GetAsync(correctArchivedMessage.Id, CancellationToken.None);
 
         Assert.NotNull(result);
     }
@@ -59,14 +59,14 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
     public async Task Archived_document_can_be_retrieved_with_correct_content()
     {
         // Arrange
-        var id = Guid.NewGuid().ToString();
         var correctDocumentContent = "correct document content";
+        var correctArchivedMessage = CreateArchivedMessage(documentContent: correctDocumentContent);
         await ArchiveMessage(CreateArchivedMessage(documentContent: "incorrect document content"));
-        await ArchiveMessage(CreateArchivedMessage(id: id, documentContent: correctDocumentContent));
+        await ArchiveMessage(correctArchivedMessage);
         await ArchiveMessage(CreateArchivedMessage(documentContent: "incorrect document content"));
 
         // Act
-        await using var result = await _archivedMessagesClient.GetAsync(id, CancellationToken.None);
+        await using var result = await _archivedMessagesClient.GetAsync(correctArchivedMessage.Id, CancellationToken.None);
 
         // Assert
         result.Should().NotBeNull();
@@ -78,34 +78,33 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
     [Fact]
     public async Task Archived_document_is_saved_at_correct_path()
     {
-        var id = Guid.NewGuid();
         var messageId = Guid.NewGuid();
         var receiverNumber = "1122334455667788";
-        var timestamp = Instant.FromUtc(2024, 01, 25, 0, 0);
-
-        var timestampInUtc = timestamp.ToDateTimeUtc();
-        var expectedFileStorageReference = $"{receiverNumber}/{timestampInUtc.Year:000}/{timestampInUtc.Month:00}/{timestampInUtc.Day:00}/{id}";
-
-        await ArchiveMessage(CreateArchivedMessage(
-            id: id.ToString(),
+        int year = 2024,
+            month = 01,
+            date = 25;
+        var archivedMessage = CreateArchivedMessage(
             messageId: messageId.ToString(),
             receiverNumber: receiverNumber,
-            timestamp: timestamp));
+            timestamp: Instant.FromUtc(year, month, date, 0, 0));
+        var expectedFileStorageReference = $"{receiverNumber}/{year:000}/{month:00}/{date:00}/{archivedMessage.Id.Value:N}";
 
-        var fileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageId);
+        await ArchiveMessage(archivedMessage);
 
-        fileStorageReference.Should().Be(expectedFileStorageReference);
+        var actualFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageId);
+
+        actualFileStorageReference.Should().Be(expectedFileStorageReference);
     }
 
     [Fact]
     public async Task Id_has_to_be_unique_in_database()
     {
-        var id = Guid.NewGuid().ToString();
+        var archivedMessage = CreateArchivedMessage();
         var serviceProviderWithoutFileStorage = BuildServiceProviderWithoutFileStorage();
         var clientWithoutFileStorage = serviceProviderWithoutFileStorage.GetRequiredService<IArchivedMessagesClient>();
 
-        await clientWithoutFileStorage.CreateAsync(CreateArchivedMessage(id), CancellationToken.None);
-        var createDuplicateArchivedMessage = new Func<Task>(() => clientWithoutFileStorage.CreateAsync(CreateArchivedMessage(id), CancellationToken.None));
+        await clientWithoutFileStorage.CreateAsync(archivedMessage, CancellationToken.None);
+        var createDuplicateArchivedMessage = new Func<Task>(() => clientWithoutFileStorage.CreateAsync(archivedMessage, CancellationToken.None));
 
         await createDuplicateArchivedMessage.Should().ThrowAsync<SqlException>();
     }
@@ -113,10 +112,10 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
     [Fact]
     public async Task Id_has_to_be_unique_in_file_storage()
     {
-        var id = Guid.NewGuid().ToString();
+        var archivedMessage = CreateArchivedMessage();
 
-        await ArchiveMessage(CreateArchivedMessage(id));
-        var createDuplicateArchivedMessage = () => ArchiveMessage(CreateArchivedMessage(id));
+        await ArchiveMessage(archivedMessage);
+        var createDuplicateArchivedMessage = () => ArchiveMessage(archivedMessage);
 
         await createDuplicateArchivedMessage.Should().ThrowAsync<Azure.RequestFailedException>();
     }
@@ -124,14 +123,15 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
     [Fact]
     public async Task Adding_archived_message_with_existing_message_id_creates_new_archived_message()
     {
-        var id1 = Guid.NewGuid().ToString();
-        var id2 = Guid.NewGuid().ToString();
         var messageId = "MessageId";
-        await ArchiveMessage(CreateArchivedMessage(id1, messageId));
+        var archivedMessage1 = CreateArchivedMessage(messageId: messageId);
+        var archivedMessage2 = CreateArchivedMessage(messageId: messageId);
+
+        await ArchiveMessage(archivedMessage1);
 
         try
         {
-            await ArchiveMessage(CreateArchivedMessage(id2, messageId));
+            await ArchiveMessage(archivedMessage2);
         }
 #pragma warning disable CA1031  // We want to catch all exceptions
         catch
@@ -147,7 +147,7 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
         Assert.Equal(messageId, result.Messages[1].MessageId);
     }
 
-    private static ArchivedMessage CreateArchivedMessage(string? id = null, string? messageId = null, string? documentContent = null, string? receiverNumber = null, Instant? timestamp = null)
+    private static ArchivedMessage CreateArchivedMessage(string? messageId = null, string? documentContent = null, string? receiverNumber = null, Instant? timestamp = null)
     {
         var documentStream = new MemoryStream();
 
@@ -162,7 +162,6 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
         }
 
         return new ArchivedMessage(
-            string.IsNullOrWhiteSpace(id) ? Guid.NewGuid().ToString() : id,
             string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
             DocumentType.NotifyAggregatedMeasureData.Name,
             "1234512345123",

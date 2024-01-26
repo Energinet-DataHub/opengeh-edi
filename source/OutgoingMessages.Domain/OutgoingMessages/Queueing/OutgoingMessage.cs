@@ -38,7 +38,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             SenderId = senderId;
             SenderRole = senderRole;
             _messageRecord = messageRecord;
-            FileStorageReference = CreateFileStorageReference(Id, ReceiverId, timestamp);
+            FileStorageReference = CreateFileStorageReference(ReceiverId, timestamp, Id);
         }
 
         // ReSharper disable once UnusedMember.Local -- Used by Entity Framework
@@ -105,9 +105,9 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             return _messageRecord;
         }
 
-        private static FileStorageReference CreateFileStorageReference(OutgoingMessageId id, ActorNumber receiverActorNumber, Instant timestamp)
+        private static FileStorageReference CreateFileStorageReference(ActorNumber receiverActorNumber, Instant timestamp, OutgoingMessageId outgoingMessageId)
         {
-            return FileStorageReference.Create(FileStorageCategory, receiverActorNumber.Value, timestamp, id.Value.ToString("N"));
+            return FileStorageReference.Create(FileStorageCategory, receiverActorNumber.Value, timestamp, outgoingMessageId.Value);
         }
     }
 }

@@ -60,26 +60,28 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
 
         var parameters = new
         {
-            message.Id,
+            Id = message.Id.Value.ToString(),
             message.DocumentType,
             message.ReceiverNumber,
             message.SenderNumber,
             message.CreatedAt,
             message.BusinessReason,
-            FileStorageReference = message.FileStorageReference.Value,
+            FileStorageReference = message.FileStorageReference.Path,
             message.MessageId,
         };
 
         await connection.ExecuteAsync(sql, parameters).ConfigureAwait(false);
     }
 
-    public async Task<Stream?> GetAsync(string id, CancellationToken cancellationToken)
+    public async Task<Stream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(id);
+
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
 
         var fileStorageReferenceString = await connection.ExecuteScalarAsync<string>(
                 $"SELECT FileStorageReference FROM dbo.[ArchivedMessages] WHERE Id = @Id",
-                new { Id = id })
+                new { Id = id.Value.ToString() })
             .ConfigureAwait(false);
 
         if (fileStorageReferenceString == null)

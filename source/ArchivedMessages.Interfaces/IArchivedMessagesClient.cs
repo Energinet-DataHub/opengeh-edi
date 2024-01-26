@@ -33,10 +33,10 @@ public interface IArchivedMessagesClient
     /// <summary>
     /// Get a document from the database
     /// </summary>
-    /// <param name="messageId"></param>
+    /// <param name="id"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
-    Task<Stream?> GetAsync(string messageId, CancellationToken cancellationToken);
+    Task<Stream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken);
 
     /// <summary>
     /// Search for messages in the database

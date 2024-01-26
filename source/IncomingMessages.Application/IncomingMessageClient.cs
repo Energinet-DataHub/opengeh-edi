@@ -74,7 +74,7 @@ public class IncomingMessageClient : IIncomingMessageClient
             return _responseFactory.From(res, responseFormat ?? documentFormat);
         }
 
-        await ArchivedIncomingMessageAsync(message, requestAggregatedMeasureDataMarketMessageParserResult, cancellationToken)
+        await ArchiveIncomingMessageAsync(message, requestAggregatedMeasureDataMarketMessageParserResult, cancellationToken)
             .ConfigureAwait(false);
 
         var validationResult = await _aggregatedMeasureDataMarketMessageValidator
@@ -106,14 +106,13 @@ public class IncomingMessageClient : IIncomingMessageClient
         return _responseFactory.From(result, responseFormat ?? documentFormat);
     }
 
-    private async Task ArchivedIncomingMessageAsync(
+    private async Task ArchiveIncomingMessageAsync(
         Stream message,
         RequestAggregatedMeasureDataMarketMessageParserResult requestAggregatedMeasureDataMarketMessageParserResult,
         CancellationToken cancellationToken)
     {
         await _archivedMessagesClient.CreateAsync(
             new ArchivedMessage(
-                Guid.NewGuid().ToString(),
                 requestAggregatedMeasureDataMarketMessageParserResult.Dto!.MessageId,
                 IncomingDocumentType.RequestAggregatedMeasureData.Name,
                 requestAggregatedMeasureDataMarketMessageParserResult.Dto!.SenderNumber,

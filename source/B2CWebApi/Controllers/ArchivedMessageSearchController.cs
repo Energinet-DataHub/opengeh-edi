@@ -53,7 +53,7 @@ public class ArchivedMessageSearchController : ControllerBase
         var result = await _archivedMessagesClient.SearchAsync(query, cancellationToken).ConfigureAwait(false);
 
         return Ok(result.Messages.Select(x => new ArchivedMessageResult(
-            x.Id,
+            x.Id.ToString(),
             x.MessageId,
             x.DocumentType,
             x.SenderNumber,

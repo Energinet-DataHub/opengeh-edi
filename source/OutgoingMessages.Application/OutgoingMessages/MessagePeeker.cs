@@ -80,7 +80,6 @@ public class MessagePeeker
 
             await _archivedMessageClient.CreateAsync(
                 new ArchivedMessage(
-                   Guid.NewGuid().ToString(),
                    peekResult.BundleId.Id.ToString(),
                    outgoingMessageBundle.DocumentType.ToString(),
                    outgoingMessageBundle.SenderId.Value,

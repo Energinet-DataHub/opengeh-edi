@@ -42,7 +42,7 @@ public class DataLakeFileStorageClient : IFileStorageClient
             await container.CreateAsync().ConfigureAwait(false);
 
         stream.Position = 0; // Make sure we read the entire stream
-        await container.UploadBlobAsync(reference.Value, stream).ConfigureAwait(false);
+        await container.UploadBlobAsync(reference.Path, stream).ConfigureAwait(false);
         stream.Position = 0; // Reset stream position so it can be read again
     }
 
@@ -67,7 +67,7 @@ public class DataLakeFileStorageClient : IFileStorageClient
 
         var container = _blobServiceClient.GetBlobContainerClient(reference.Category);
 
-        var blob = container.GetBlobClient(reference.Value);
+        var blob = container.GetBlobClient(reference.Path);
 
         var stream = new MemoryStream();
         await blob.DownloadToAsync(stream).ConfigureAwait(false);

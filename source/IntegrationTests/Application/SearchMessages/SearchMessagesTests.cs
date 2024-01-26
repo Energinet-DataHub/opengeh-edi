@@ -49,12 +49,12 @@ public class SearchMessagesTests : TestBase
 
         var result = await _archivedMessagesClient.SearchAsync(new GetMessagesQuery(), CancellationToken.None);
 
-        var messageInfo = result.Messages.FirstOrDefault(message => message.Id == archivedMessage.Id);
+        var messageInfo = result.Messages.FirstOrDefault(message => message.Id == archivedMessage.Id.Value.ToString());
         Assert.NotNull(messageInfo);
         Assert.Equal(archivedMessage.DocumentType, messageInfo.DocumentType);
         Assert.Equal(archivedMessage.SenderNumber, messageInfo.SenderNumber);
         Assert.Equal(archivedMessage.ReceiverNumber, messageInfo.ReceiverNumber);
-        Assert.Equal(archivedMessage.CreatedAt.ToDateTimeUtc().ToShortTimeString(), messageInfo.CreatedAt.ToDateTimeUtc().ToShortTimeString()); //TODO: LRN help me!
+        Assert.Equal(archivedMessage.CreatedAt.ToDateTimeUtc().ToString("u"), messageInfo.CreatedAt.ToDateTimeUtc().ToString("u")); // "u" is the "yyyy-mm-dd hh:MM:ssZ" format
         Assert.Equal(archivedMessage.MessageId, messageInfo.MessageId);
     }
 
@@ -248,7 +248,6 @@ public class SearchMessagesTests : TestBase
 
     private ArchivedMessage CreateArchivedMessage(
         Instant? createdAt = null,
-        string? id = null,
         string? senderNumber = null,
         string? receiverNumber = null,
         string? documentType = null,
@@ -256,7 +255,6 @@ public class SearchMessagesTests : TestBase
         string? messageId = null)
     {
         return new ArchivedMessage(
-            string.IsNullOrWhiteSpace(id) ? Guid.NewGuid().ToString() : id,
             messageId ?? "MessageId",
             documentType ?? DocumentType.NotifyAggregatedMeasureData.Name,
             senderNumber ?? "1234512345123",
