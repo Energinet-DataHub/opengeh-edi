@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 
+[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Need to redirect output to capture logging for test")]
 public class BaseTestClass
 {
     protected BaseTestClass(ITestOutputHelper output, AcceptanceTestFixture fixture)
@@ -26,9 +28,7 @@ public class BaseTestClass
 
         Output = output;
         BaseTestFixture = fixture;
-#pragma warning disable CA2000
         Console.SetOut(new ConsoleWriter(output));
-#pragma warning restore CA2000
         AggregationRequest = new AggregatedMeasureDataRequestDsl(
             new EdiDriver(
                 fixture.B2BEnergySupplierAuthorizedHttpClient));
