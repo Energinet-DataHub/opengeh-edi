@@ -27,12 +27,10 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 public sealed class EdiB2CDriver : IDisposable
 {
-    private readonly ITestOutputHelper _output;
     private readonly AsyncLazy<HttpClient> _httpClient;
 
-    public EdiB2CDriver(ITestOutputHelper output, AsyncLazy<HttpClient> b2CHttpClient)
+    public EdiB2CDriver(AsyncLazy<HttpClient> b2CHttpClient)
     {
-        _output = output;
         _httpClient = b2CHttpClient;
     }
 
@@ -50,8 +48,6 @@ public sealed class EdiB2CDriver : IDisposable
         var response = await b2cClient.SendAsync(request).ConfigureAwait(false);
         var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-        _output.WriteLine("ArchivedMessageSearch response string: {0}", responseString);
-
         var archivedMessageResponse = JsonConvert.DeserializeObject<List<ArchivedMessageSearchResponse>>(responseString) ?? throw new InvalidOperationException("Did not receive valid response");
 
         return archivedMessageResponse;
@@ -65,8 +61,6 @@ public sealed class EdiB2CDriver : IDisposable
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/xml");
         var response = await b2cClient.SendAsync(request).ConfigureAwait(false);
         var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-        _output.WriteLine("ArchivedMessageGetDocument response string: {0}", responseString);
 
         return responseString;
     }

@@ -37,7 +37,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
         Debug.Assert(fixture != null, nameof(fixture) + " != null");
         _fixture = fixture;
         _archivedMessage = new ArchivedMessageDsl(
-            new EdiB2CDriver(output, fixture.B2CAuthorizedHttpClient));
+            new EdiB2CDriver(fixture.B2CAuthorizedHttpClient));
         _aggregationResult = new AggregationResultDsl(
             new EdiDriver(
                 _fixture.B2BEnergySupplierAuthorizedHttpClient),
