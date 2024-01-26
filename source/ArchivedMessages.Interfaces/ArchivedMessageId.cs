@@ -13,15 +13,10 @@
 // limitations under the License.
 
 using System;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
-public record MessageInfo(
-    Guid Id,
-    string? MessageId,
-    string DocumentType,
-    string SenderNumber,
-    string ReceiverNumber,
-    Instant CreatedAt,
-    string? BusinessReason);
+public record ArchivedMessageId(Guid Value)
+{
+    public static ArchivedMessageId Create() => new(Guid.NewGuid());
+}

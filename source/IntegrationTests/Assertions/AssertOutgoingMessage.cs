@@ -56,7 +56,7 @@ public class AssertOutgoingMessage
         Assert.NotNull(message);
         Assert.NotNull(message.FileStorageReference);
 
-        var messageRecordStream = await fileStorageClient.DownloadAsync("outgoing", new FileStorageReference(message.FileStorageReference));
+        var messageRecordStream = await fileStorageClient.DownloadAsync(new FileStorageReference("outgoing", message.FileStorageReference));
 
         messageRecordStream.Position = 0;
         using var streamReader = new StreamReader(messageRecordStream);

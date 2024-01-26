@@ -29,6 +29,7 @@ using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -179,11 +180,11 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         // Assert
         var fileStorageReference = await GetOutgoingMessageFileStorageReferenceFromDatabase(createdId);
 
-        var fileContent = await GetFileFromFileStorage(fileStorageReference);
+        var fileContent = await GetFileFromFileStorageAsync("outgoing", fileStorageReference);
 
         fileContent.HasValue.Should().BeTrue();
 
-        var fileContentAsString = await GetStreamContentAsString(fileContent.Value.Content);
+        var fileContentAsString = await GetStreamContentAsStringAsync(fileContent.Value.Content);
         fileContentAsString.Should().Be(message.MessageRecord);
     }
 
@@ -198,7 +199,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         // Act
         var createdId = await EnqueueAndCommitAsync(message);
         var fileStorageReference = await GetOutgoingMessageFileStorageReferenceFromDatabase(createdId);
-        var uploadDuplicateFile = async () => await _fileStorageClient.UploadAsync("outgoing", new FileStorageReference(fileStorageReference), new MemoryStream(new byte[] { 0x20 }));
+        var uploadDuplicateFile = async () => await _fileStorageClient.UploadAsync(new FileStorageReference(OutgoingMessage.FileStorageCategory, fileStorageReference), new MemoryStream(new byte[] { 0x20 }));
 
         // Assert
         (await uploadDuplicateFile.Should().ThrowAsync<RequestFailedException>())
@@ -209,26 +210,6 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     {
         _context.Dispose();
         base.Dispose(disposing);
-    }
-
-    private static async Task<string> GetStreamContentAsString(Stream stream)
-    {
-        using var streamReader = new StreamReader(stream, Encoding.UTF8);
-        var stringContent = await streamReader.ReadToEndAsync();
-
-        return stringContent;
-    }
-
-    private static async Task<Response<BlobDownloadInfo>> GetFileFromFileStorage(string fileStorageReference)
-    {
-        var azuriteBlobConnectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING");
-        var blobServiceClient = new BlobServiceClient(azuriteBlobConnectionString);
-
-        var container = blobServiceClient.GetBlobContainerClient("outgoing");
-        var blob = container.GetBlobClient(fileStorageReference);
-
-        var blobContent = await blob.DownloadAsync();
-        return blobContent;
     }
 
     private async Task<string> GetOutgoingMessageFileStorageReferenceFromDatabase(OutgoingMessageId id)

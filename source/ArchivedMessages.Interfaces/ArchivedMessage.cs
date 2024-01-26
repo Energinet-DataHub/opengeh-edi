@@ -12,17 +12,54 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
-public record ArchivedMessage(
-    string Id,
-    string? MessageId,
-    string DocumentType,
-    string? SenderNumber,
-    string? ReceiverNumber,
-    Instant CreatedAt,
-    string? BusinessReason,
-    Stream Document);
+public class ArchivedMessage
+{
+    public const string FileStorageCategory = "archived";
+
+    public ArchivedMessage(
+        string? messageId,
+        string documentType,
+        string senderNumber, // Doesn't use ActorNumber since we want to make sure to always create a ArchivedMessage
+        string receiverNumber, // Doesn't use ActorNumber since we want to make sure to always create a ArchivedMessage
+        Instant createdAt,
+        string? businessReason,
+        Stream document)
+    {
+        Id = ArchivedMessageId.Create();
+        MessageId = messageId;
+        DocumentType = documentType;
+        SenderNumber = senderNumber;
+        ReceiverNumber = receiverNumber;
+        CreatedAt = createdAt;
+        BusinessReason = businessReason;
+        Document = document;
+
+        FileStorageReference = FileStorageReference.Create(FileStorageCategory, ReceiverNumber, createdAt, Id.Value);
+    }
+
+    public ArchivedMessageId Id { get; }
+
+    public string? MessageId { get; }
+
+    public string DocumentType { get; }
+
+    public string SenderNumber { get; }
+
+    public string ReceiverNumber { get; }
+
+    public Instant CreatedAt { get; }
+
+    public string? BusinessReason { get; }
+
+    public FileStorageReference FileStorageReference { get; }
+
+    public Stream Document { get; }
+}

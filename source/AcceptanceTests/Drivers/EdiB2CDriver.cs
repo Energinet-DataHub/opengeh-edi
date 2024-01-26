@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.AcceptanceTests.Responses.json;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Nito.AsyncEx;
+using Xunit.Abstractions;
 using Xunit.Sdk;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;

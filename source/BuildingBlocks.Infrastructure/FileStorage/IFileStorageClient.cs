@@ -27,15 +27,20 @@ public interface IFileStorageClient
     /// <summary>
     /// Upload a stream using the reference parameter as a unique representation
     /// </summary>
-    /// <param name="rootFolder">The root folder for the file. If using Azure Blob Storage this is the container name</param>
     /// <param name="reference">A unique string representing the file, which can have any string value. If a file already exists with the given reference, a <see cref="RequestFailedException" /> will be thrown</param>
     /// <param name="stream">A stream which contains the binary file</param>
-    Task UploadAsync(string rootFolder, FileStorageReference reference, Stream stream);
+    Task UploadAsync(FileStorageReference reference, Stream stream);
+
+    /// <summary>
+    /// Upload a stream using the reference parameter as a unique representation
+    /// </summary>
+    /// <param name="reference">A unique string representing the file, which can have any string value. If a file already exists with the given reference, a <see cref="RequestFailedException" /> will be thrown</param>
+    /// <param name="content">A string which is written as content to the file storage</param>
+    Task UploadAsync(FileStorageReference reference, string content);
 
     /// <summary>
     /// Downloads a file as a stream, found by the given reference string
     /// </summary>
-    /// <param name="rootFolder">The root folder for the file. If using Azure Blob Storage this is the container name</param>
     /// <param name="reference">The reference string is used to determine which file to download</param>
-    Task<Stream> DownloadAsync(string rootFolder, FileStorageReference reference);
+    Task<Stream> DownloadAsync(FileStorageReference reference);
 }

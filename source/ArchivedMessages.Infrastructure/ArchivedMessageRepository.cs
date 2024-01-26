@@ -22,7 +22,9 @@ using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Microsoft.Data.SqlClient;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
@@ -31,69 +33,65 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
 {
     private readonly IDatabaseConnectionFactory _connectionFactory;
     private readonly AuthenticatedActor _authenticatedActor;
+    private readonly IFileStorageClient _fileStorageClient;
 
     public ArchivedMessageRepository(
         IDatabaseConnectionFactory connectionFactory,
-        AuthenticatedActor authenticatedActor)
+        AuthenticatedActor authenticatedActor,
+        IFileStorageClient fileStorageClient)
     {
         _connectionFactory = connectionFactory;
         _authenticatedActor = authenticatedActor;
+        _fileStorageClient = fileStorageClient;
     }
 
     public async Task AddAsync(ArchivedMessage message, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(message);
-        RewindStream(message.Document);
+
+        await _fileStorageClient.UploadAsync(message.FileStorageReference, message.Document).ConfigureAwait(false);
+
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
-        // Read the content of the stream into a byte array
-        byte[] documentBytes;
-        using (var memoryStream = new MemoryStream())
-        {
-            await message.Document.CopyToAsync(memoryStream, cancellationToken).ConfigureAwait(false);
-            documentBytes = memoryStream.ToArray();
-            message.Document.Position = 0;
-        }
 
-        string sql = @"INSERT INTO [dbo].[ArchivedMessages]
-                       ([Id], [DocumentType], [ReceiverNumber], [SenderNumber], [CreatedAt], [BusinessReason], [Document], [MessageId])
+        var sql = @"INSERT INTO [dbo].[ArchivedMessages]
+                       ([Id], [DocumentType], [ReceiverNumber], [SenderNumber], [CreatedAt], [BusinessReason], [FileStorageReference], [MessageId])
                        VALUES
-                       (@Id, @DocumentType, @ReceiverNumber, @SenderNumber, @CreatedAt, @BusinessReason, @Document, @MessageId)";
+                       (@Id, @DocumentType, @ReceiverNumber, @SenderNumber, @CreatedAt, @BusinessReason, @FileStorageReference, @MessageId)";
 
-        // Create a new object with the stream replaced by the byte array
         var parameters = new
         {
-            message.Id,
+            Id = message.Id.Value.ToString(),
             message.DocumentType,
             message.ReceiverNumber,
             message.SenderNumber,
             message.CreatedAt,
             message.BusinessReason,
-            Document = documentBytes,
+            FileStorageReference = message.FileStorageReference.Path,
             message.MessageId,
         };
 
         await connection.ExecuteAsync(sql, parameters).ConfigureAwait(false);
     }
 
-    public async Task<Stream?> GetAsync(string id, CancellationToken cancellationToken)
+    public async Task<Stream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(id);
+
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
-        using var command = CreateCommand(
-            $"SELECT Document FROM dbo.[ArchivedMessages] WHERE Id = @Id",
-            new List<KeyValuePair<string, object?>>
-            {
-                new("@Id", id),
-            },
-            connection);
 
-        using var reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
-        await reader.ReadAsync(cancellationToken).ConfigureAwait(false);
-        if (reader.HasRows == false)
-        {
+        var fileStorageReferenceString = await connection.ExecuteScalarAsync<string>(
+                $"SELECT FileStorageReference FROM dbo.[ArchivedMessages] WHERE Id = @Id",
+                new { Id = id.Value.ToString() })
+            .ConfigureAwait(false);
+
+        if (fileStorageReferenceString == null)
             return null;
-        }
 
-        return reader.GetStream(0);
+        var fileStorageReference = new FileStorageReference(ArchivedMessage.FileStorageCategory, fileStorageReferenceString);
+
+        var stream = await _fileStorageClient.DownloadAsync(fileStorageReference).ConfigureAwait(false);
+
+        return stream;
     }
 
     public async Task<MessageSearchResult> SearchAsync(GetMessagesQuery queryInput, CancellationToken cancellationToken)
@@ -107,26 +105,5 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
                     input.Parameters)
                 .ConfigureAwait(false);
         return new MessageSearchResult(archivedMessages.OrderBy(x => x.CreatedAt).ToList().AsReadOnly());
-    }
-
-    private static SqlCommand CreateCommand(
-        string sqlStatement, List<KeyValuePair<string, object?>> parameters, IDbConnection connection)
-    {
-        var command = connection.CreateCommand();
-
-        command.CommandText = sqlStatement;
-
-        foreach (var parameter in parameters)
-        {
-            var sqlParameter = new SqlParameter(parameter.Key, parameter.Value);
-            command.Parameters.Add(sqlParameter);
-        }
-
-        return (SqlCommand)command;
-    }
-
-    private static void RewindStream(Stream message)
-    {
-        message.Seek(0, SeekOrigin.Begin);
     }
 }

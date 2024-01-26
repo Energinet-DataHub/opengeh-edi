@@ -23,6 +23,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 {
     public class OutgoingMessage
     {
+        public const string FileStorageCategory = "outgoing";
+
         private string _messageRecord;
 
         public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, Guid processId, string businessReason, ActorRole receiverRole, ActorNumber senderId, ActorRole senderRole, string messageRecord, Instant timestamp)
@@ -36,7 +38,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             SenderId = senderId;
             SenderRole = senderRole;
             _messageRecord = messageRecord;
-            FileStorageReference = CreateFileStorageReference(Id, ReceiverId, timestamp);
+            FileStorageReference = CreateFileStorageReference(ReceiverId, timestamp, Id);
         }
 
         // ReSharper disable once UnusedMember.Local -- Used by Entity Framework
@@ -103,13 +105,9 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             return _messageRecord;
         }
 
-        private static FileStorageReference CreateFileStorageReference(OutgoingMessageId id, ActorNumber receiverActorNumber, Instant timestamp)
+        private static FileStorageReference CreateFileStorageReference(ActorNumber receiverActorNumber, Instant timestamp, OutgoingMessageId outgoingMessageId)
         {
-            var dateTimeUtc = timestamp.ToDateTimeUtc();
-
-            var referenceString = $"{receiverActorNumber.Value}/{dateTimeUtc.Year:0000}/{dateTimeUtc.Month:00}/{dateTimeUtc.Day:00}/{id.Value:N}";
-
-            return new FileStorageReference(referenceString);
+            return FileStorageReference.Create(FileStorageCategory, receiverActorNumber.Value, timestamp, outgoingMessageId.Value);
         }
     }
 }
