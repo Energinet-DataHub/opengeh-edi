@@ -49,7 +49,7 @@ public class SearchMessagesTests : TestBase
 
         var result = await _archivedMessagesClient.SearchAsync(new GetMessagesQuery(), CancellationToken.None);
 
-        var messageInfo = result.Messages.FirstOrDefault(message => message.Id == archivedMessage.Id.Value.ToString());
+        var messageInfo = result.Messages.FirstOrDefault(message => message.Id == archivedMessage.Id.Value);
         Assert.NotNull(messageInfo);
         Assert.Equal(archivedMessage.DocumentType, messageInfo.DocumentType);
         Assert.Equal(archivedMessage.SenderNumber, messageInfo.SenderNumber);

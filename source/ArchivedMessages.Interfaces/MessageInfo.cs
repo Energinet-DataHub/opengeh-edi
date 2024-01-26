@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
 public record MessageInfo(
-    string Id,
+    Guid Id,
     string? MessageId,
     string DocumentType,
     string SenderNumber,
