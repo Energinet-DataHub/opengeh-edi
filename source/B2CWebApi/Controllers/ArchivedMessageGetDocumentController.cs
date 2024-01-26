@@ -31,11 +31,12 @@ public class ArchivedMessageGetDocumentController : ControllerBase
     [HttpPost]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [Produces("text/plain")]
-    public async Task<ActionResult> RequestAsync(string id, CancellationToken cancellationToken)
+    public async Task<ActionResult> RequestAsync(Guid id, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(id);
 
-        var result = await _archivedMessagesClient.GetAsync(id, cancellationToken).ConfigureAwait(false);
+        var archivedMessageId = new ArchivedMessageId(id);
+        var result = await _archivedMessagesClient.GetAsync(archivedMessageId, cancellationToken).ConfigureAwait(false);
 
         return result is null ? NoContent() : Ok(result);
     }

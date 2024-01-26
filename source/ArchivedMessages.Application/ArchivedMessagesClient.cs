@@ -36,10 +36,10 @@ public class ArchivedMessagesClient : IArchivedMessagesClient
         await _archivedMessageRepository.AddAsync(message, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<Stream?> GetAsync(string messageId, CancellationToken cancellationToken)
+    public async Task<Stream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(messageId);
-        return await _archivedMessageRepository.GetAsync(messageId, cancellationToken).ConfigureAwait(false);
+        ArgumentNullException.ThrowIfNull(id);
+        return await _archivedMessageRepository.GetAsync(id, cancellationToken).ConfigureAwait(false);
     }
 
     public Task<MessageSearchResult> SearchAsync(GetMessagesQuery queryInput, CancellationToken cancellationToken)

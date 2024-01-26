@@ -13,16 +13,23 @@
 // limitations under the License.
 
 using System;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using BuildingBlocks.Application.Configuration;
+using Dapper;
 using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Api.Authentication;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
@@ -48,6 +55,7 @@ using IncomingMessages.Infrastructure.Configuration.DataAccess;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Xunit;
 using IIntegrationEventHandler = Energinet.DataHub.Core.Messaging.Communication.Subscriber.IIntegrationEventHandler;
@@ -82,11 +90,11 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
         protected AuthenticatedActor AuthenticatedActor { get; }
 
-        protected IServiceProvider ServiceProvider { get; private set; } = null!;
+        protected ServiceProvider ServiceProvider { get; private set; } = null!;
 
-        protected TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
+        private TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
 
-        protected TestNotificationHandlerSpy InboxEventNotificationHandler { get; }
+        private TestNotificationHandlerSpy InboxEventNotificationHandler { get; }
 
         public void Dispose()
         {
@@ -94,15 +102,43 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             GC.SuppressFinalize(this);
         }
 
-        public T GetService<T>()
+        protected static async Task<Response<BlobDownloadInfo>> GetFileFromFileStorageAsync(string container, string fileStorageReference)
+        {
+            var azuriteBlobConnectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING");
+            var blobServiceClient = new BlobServiceClient(azuriteBlobConnectionString); // Uses new client to avoid some form of caching or similar
+
+            var containerClient = blobServiceClient.GetBlobContainerClient(container);
+            var blobClient = containerClient.GetBlobClient(fileStorageReference);
+
+            var blobContent = await blobClient.DownloadAsync();
+            return blobContent;
+        }
+
+        protected static async Task<string> GetStreamContentAsStringAsync(Stream stream)
+        {
+            using var streamReader = new StreamReader(stream, Encoding.UTF8);
+            var stringContent = await streamReader.ReadToEndAsync();
+
+            return stringContent;
+        }
+
+        protected async Task<string> GetArchivedMessageFileStorageReferenceFromDatabaseAsync(Guid messageId)
+        {
+            using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+            var fileStorageReference = await connection.ExecuteScalarAsync<string>($"SELECT FileStorageReference FROM [dbo].[ArchivedMessages] WHERE MessageId = '{messageId}'");
+
+            return fileStorageReference;
+        }
+
+        protected T GetService<T>()
             where T : notnull
         {
-            return ServiceProvider!.GetRequiredService<T>();
+            return ServiceProvider.GetRequiredService<T>();
         }
 
         protected virtual void Dispose(bool disposing)
         {
-            if (_disposed == true)
+            if (_disposed)
             {
                 return;
             }
@@ -111,8 +147,17 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             _processContext.Dispose();
             _incomingMessagesContext.Dispose();
             _serviceBusSenderFactoryStub.Dispose();
-            ((ServiceProvider)ServiceProvider!).Dispose();
+            ServiceProvider.Dispose();
             _disposed = true;
+        }
+
+        protected IServiceCollection GetServiceCollectionClone()
+        {
+            if (_services == null) throw new InvalidOperationException("ServiceCollection is not yet initialized");
+
+            var serviceCollectionClone = new ServiceCollection { _services };
+
+            return serviceCollectionClone;
         }
 
         protected Task<TResult> InvokeCommandAsync<TResult>(ICommand<TResult> command)
@@ -138,7 +183,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             await ProcessInternalCommandsAsync().ConfigureAwait(false);
         }
 
-        protected Task ProcessReceivedInboxEventsAsync()
+        private Task ProcessReceivedInboxEventsAsync()
         {
             return ProcessBackgroundTasksAsync();
         }
@@ -191,7 +236,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
             CompositionRoot.Initialize(_services)
                 .AddRemoteBusinessService<DummyRequest, DummyReply>(
-                    sp => new RemoteBusinessServiceRequestSenderSpy<DummyRequest>("Dummy"), "Dummy")
+                    _ => new RemoteBusinessServiceRequestSenderSpy<DummyRequest>("Dummy"), "Dummy")
                 .AddSystemClock(new SystemDateTimeProviderStub())
                 .AddCorrelationContext(_ =>
                 {
