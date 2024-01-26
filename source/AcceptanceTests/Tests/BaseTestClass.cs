@@ -26,6 +26,9 @@ public class BaseTestClass
 
         Output = output;
         BaseTestFixture = fixture;
+#pragma warning disable CA2000
+        Console.SetOut(new ConsoleWriter(output));
+#pragma warning restore CA2000
         AggregationRequest = new AggregatedMeasureDataRequestDsl(
             new EdiDriver(
                 fixture.B2BEnergySupplierAuthorizedHttpClient));
@@ -36,4 +39,19 @@ public class BaseTestClass
     protected AggregatedMeasureDataRequestDsl AggregationRequest { get; }
 
     protected AcceptanceTestFixture BaseTestFixture { get; }
+
+    private sealed class ConsoleWriter : StringWriter
+    {
+        private readonly ITestOutputHelper _output;
+
+        public ConsoleWriter(ITestOutputHelper output)
+        {
+            _output = output;
+        }
+
+        public override void WriteLine(string? value)
+        {
+            _output.WriteLine(value);
+        }
+    }
 }

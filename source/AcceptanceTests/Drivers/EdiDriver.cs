@@ -178,6 +178,7 @@ internal sealed class EdiDriver : IDisposable
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/xml");
         var response = await b2bClient.SendAsync(request).ConfigureAwait(false);
         var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        Console.WriteLine(response.StatusCode.GetHashCode() + " " + response.StatusCode);
 
         return responseString;
     }
