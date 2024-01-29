@@ -23,6 +23,7 @@ using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.Api.Authentication;
 using Energinet.DataHub.EDI.Api.Authentication.Certificate;
+using Energinet.DataHub.EDI.Api.Configuration;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
@@ -38,7 +39,6 @@ using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Configuration;
 using Energinet.DataHub.EDI.Process.Application.Configuration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
-using Energinet.DataHub.Wholesale.Contracts.Events;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf.Reflection;
 using Microsoft.ApplicationInsights.Extensibility;
@@ -96,6 +96,7 @@ namespace Energinet.DataHub.EDI.Api
                 {
                     worker.UseMiddleware<UnHandledExceptionMiddleware>();
                     worker.UseMiddleware<CorrelationIdMiddleware>();
+                    worker.UseMiddleware<ServiceBusExceptionLoggerMiddleware>();
                     ConfigureAuthenticationMiddleware(worker);
                 },
                     option =>
