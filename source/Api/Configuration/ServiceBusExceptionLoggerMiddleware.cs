@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Api.Configuration.Middleware;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
@@ -35,7 +36,7 @@ public class ServiceBusExceptionLoggerMiddleware : IFunctionsWorkerMiddleware
         ArgumentNullException.ThrowIfNull(next);
 
         // Check if the trigger is a Service Bus trigger
-        if (context.BindingContext.BindingData.ContainsKey("DeliveryCount"))
+        if (context.Is(FunctionContextExtensions.TriggerType.ServiceBusTrigger))
         {
             try
             {
