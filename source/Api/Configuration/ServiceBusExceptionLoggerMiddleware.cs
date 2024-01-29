@@ -35,7 +35,6 @@ public class ServiceBusExceptionLoggerMiddleware : IFunctionsWorkerMiddleware
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(next);
 
-        // Check if the trigger is a Service Bus trigger
         if (context.Is(FunctionContextExtensions.TriggerType.ServiceBusTrigger))
         {
             try
@@ -46,7 +45,7 @@ public class ServiceBusExceptionLoggerMiddleware : IFunctionsWorkerMiddleware
             catch (Exception e)
 #pragma warning restore CA1031
             {
-                if (context.RetryContext.RetryCount == 0)
+                if (context.RetryContext.RetryCount != context.RetryContext.MaxRetryCount)
                 {
                     _logger.LogWarning(
                         "Service bus message processing failed with exception {Exception}",
