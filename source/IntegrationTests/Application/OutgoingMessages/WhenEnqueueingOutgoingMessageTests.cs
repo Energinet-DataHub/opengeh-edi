@@ -201,12 +201,8 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         // Assert
         var fileStorageReference = await GetOutgoingMessageFileStorageReferenceFromDatabase(createdId);
 
-        var fileContent = await GetFileFromFileStorageAsync("outgoing", fileStorageReference);
-
-        fileContent.HasValue.Should().BeTrue();
-
-        var fileContentAsString = await GetStreamContentAsStringAsync(fileContent.Value.Content);
-        fileContentAsString.Should().Be(message.MessageRecord);
+        var fileContent = await GetFileContentFromFileStorageAsync("outgoing", fileStorageReference);
+        fileContent.Should().Be(message.MessageRecord);
     }
 
     [Fact]

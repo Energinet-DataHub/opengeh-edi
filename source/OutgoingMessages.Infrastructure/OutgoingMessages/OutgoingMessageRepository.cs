@@ -39,13 +39,13 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
     {
         ArgumentNullException.ThrowIfNull(message);
 
-        _context.OutgoingMessages.Add(message);
-
-        // Must await here instead of returning the Task, since messageRecordStream gets disposed when returning from function
+        // Must await here to make sure the file is uploaded correctly before adding the outgoing message to the db context
         await _fileStorageClient.UploadAsync(
                 message.FileStorageReference,
                 message.GetMessageRecord())
             .ConfigureAwait(false);
+
+        _context.OutgoingMessages.Add(message);
     }
 
     public async Task<OutgoingMessageBundle> GetAsync(BundleId bundleId)

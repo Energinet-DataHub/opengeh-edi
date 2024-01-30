@@ -30,6 +30,7 @@ using Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
@@ -53,6 +54,7 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Google.Protobuf;
 using IncomingMessages.Infrastructure.Configuration.DataAccess;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -102,7 +104,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             GC.SuppressFinalize(this);
         }
 
-        protected static async Task<Response<BlobDownloadInfo>> GetFileFromFileStorageAsync(string container, string fileStorageReference)
+        protected static async Task<string> GetFileContentFromFileStorageAsync(string container, string fileStorageReference)
         {
             var azuriteBlobConnectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING");
             var blobServiceClient = new BlobServiceClient(azuriteBlobConnectionString); // Uses new client to avoid some form of caching or similar
@@ -111,7 +113,11 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             var blobClient = containerClient.GetBlobClient(fileStorageReference);
 
             var blobContent = await blobClient.DownloadAsync();
-            return blobContent;
+
+            if (!blobContent.HasValue) throw new InvalidOperationException($"Couldn't get file content from file storage (container: {container}, blob: {fileStorageReference})");
+
+            var fileStringContent = await GetStreamContentAsStringAsync(blobContent.Value.Content);
+            return fileStringContent;
         }
 
         protected static async Task<string> GetStreamContentAsStringAsync(Stream stream)
@@ -130,10 +136,30 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return fileStorageReference;
         }
 
+        protected async Task<string> GetMarketDocumentFileStorageReferenceFromDatabaseAsync(Guid bundleId)
+        {
+            using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+            var fileStorageReference = await connection.ExecuteScalarAsync<string>($"SELECT FileStorageReference FROM [dbo].[MarketDocuments] WHERE BundleId = '{bundleId}'");
+
+            return fileStorageReference;
+        }
+
         protected T GetService<T>()
             where T : notnull
         {
             return ServiceProvider.GetRequiredService<T>();
+        }
+
+        protected void ClearDbContextCaches()
+        {
+            if (_services == null) throw new InvalidOperationException("ServiceCollection is not yet initialized");
+
+            var dbContextServices = _services
+                .Where(s => s.ServiceType.IsSubclassOf(typeof(DbContext)) || s.ServiceType == typeof(DbContext))
+                .Select(s => (DbContext)ServiceProvider.GetService(s.ServiceType)!);
+
+            foreach (var dbContext in dbContextServices)
+                dbContext.ChangeTracker.Clear();
         }
 
         protected virtual void Dispose(bool disposing)

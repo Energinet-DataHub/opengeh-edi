@@ -81,6 +81,8 @@ public class WhenAPeekIsRequestedTests : TestBase
         await EnqueueMessage(message);
 
         var firstPeekResult = await PeekMessage(MessageCategory.Aggregations);
+
+        ClearDbContextCaches(); // Else the MarketDocument is cached in Entity Framework
         var secondPeekResult = await PeekMessage(MessageCategory.Aggregations);
 
         Assert.NotNull(firstPeekResult.MessageId);
@@ -92,7 +94,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     }
 
     [Fact]
-    public async Task The_generated_document_is_archived_with_correct_content()
+    public async Task A_market_document_is_archived_with_correct_content()
     {
         var message = _outgoingMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
@@ -100,19 +102,18 @@ public class WhenAPeekIsRequestedTests : TestBase
             .Build();
         await EnqueueMessage(message);
 
-        var result = await PeekMessage(MessageCategory.Aggregations);
+        var peekResult = await PeekMessage(MessageCategory.Aggregations);
 
-        result.Bundle.Should().NotBeNull();
-        var generatedDocumentContent = await GetStreamContentAsStringAsync(result.Bundle!);
+        peekResult.Bundle.Should().NotBeNull();
+        var peekResultFileContent = await GetStreamContentAsStringAsync(peekResult.Bundle!);
 
-        var fileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(result.MessageId!.Value);
-        var fileContent = await GetFileFromFileStorageAsync("archived", fileStorageReference);
-        var archivedMessageFileContent = await GetStreamContentAsStringAsync(fileContent.Value.Content);
-        archivedMessageFileContent.Should().Be(generatedDocumentContent);
+        var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value);
+        var archivedMessageFileContent = await GetFileContentFromFileStorageAsync("archived", archivedMessageFileStorageReference);
+        archivedMessageFileContent.Should().Be(peekResultFileContent);
     }
 
     [Fact]
-    public async Task The_generated_market_document_is_added_to_database()
+    public async Task A_market_document_is_added_to_database()
     {
         var message = _outgoingMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
@@ -126,6 +127,23 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         var marketDocumentExists = await MarketDocumentExists(result.MessageId!.Value);
         marketDocumentExists.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task The_created_market_document_uses_the_archived_message_file_reference()
+    {
+        var message = _outgoingMessageDtoBuilder
+            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            .WithReceiverRole(ActorRole.EnergySupplier)
+            .Build();
+        await EnqueueMessage(message);
+
+        var peekResult = await PeekMessage(MessageCategory.Aggregations);
+
+        var marketDocumentFileStorageReference = await GetMarketDocumentFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value);
+        var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value);
+
+        marketDocumentFileStorageReference.Should().Be(archivedMessageFileStorageReference);
     }
 
     private async Task<bool> BundleIsRegistered()
