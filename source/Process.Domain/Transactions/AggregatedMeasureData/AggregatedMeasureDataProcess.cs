@@ -21,11 +21,13 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.Ou
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
+using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData
 {
     public class AggregatedMeasureDataProcess : Entity
     {
+        private static readonly RejectReason _noDataAvailable = new("Ingen data tilgængelig / No data available", "E0H");
         private State _state = State.Initialized;
 
         public AggregatedMeasureDataProcess(
@@ -49,6 +51,8 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             MeteringPointType = meteringPointType;
             SettlementMethod = settlementMethod;
             StartOfPeriod = startOfPeriod;
+            if (string.IsNullOrEmpty(endOfPeriod)) // Throw exception since our end period is nullable in our schema contract, but we validate for it in Wholesale
+                throw new ArgumentException("End of period shouldn't be able to be null, since validation in Wholesale rejects the request if it isn't set", nameof(endOfPeriod));
             EndOfPeriod = endOfPeriod;
             MeteringGridAreaDomainId = meteringGridAreaDomainId;
             EnergySupplierId = energySupplierId;
@@ -100,7 +104,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
 
         public string StartOfPeriod { get; }
 
-        public string? EndOfPeriod { get; }
+        public string EndOfPeriod { get; }
 
         public string? MeteringGridAreaDomainId { get; }
 
@@ -128,6 +132,17 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
 
             if (_state == State.Sent)
             {
+                if (aggregations.Min(x => x.Period.Start) != InstantPattern.General.Parse(StartOfPeriod).Value
+                    && aggregations.Max(x => x.Period.End) != InstantPattern.General.Parse(EndOfPeriod).Value)
+                {
+                    IsRejected(new RejectedAggregatedMeasureDataRequest(
+                        new List<RejectReason>()
+                        {
+                            _noDataAvailable,
+                        },
+                        BusinessReason));
+                }
+
                 foreach (var aggregation in aggregations)
                 {
                     AddDomainEvent(new EnqueueMessageEvent(AggregationResultMessageFactory.CreateMessage(aggregation, ProcessId)));

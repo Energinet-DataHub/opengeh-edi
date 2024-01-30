@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -29,10 +31,12 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMes
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf;
-using Google.Protobuf.WellKnownTypes;
+using NodaTime.Serialization.Protobuf;
+using NodaTime.Text;
 using Xunit;
 using Xunit.Categories;
 using DecimalValue = Energinet.DataHub.Edi.Responses.DecimalValue;
+using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point;
 using QuantityQuality = Energinet.DataHub.Edi.Responses.QuantityQuality;
 using QuantityUnit = Energinet.DataHub.Edi.Responses.QuantityUnit;
 using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
@@ -76,6 +80,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasReceiverRole(process.RequestedByActorRoleCode)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
+            .HasPointsInCorrectOrder<TimeSeries, decimal?>(timeSerie => timeSerie.Point.Select(x => x.Quantity).ToList(), acceptedEvent.Series.SelectMany(x => x.TimeSeriesPoints).OrderBy(x => x.Time).ToList())
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1);
@@ -83,6 +88,33 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
     [Fact]
     public async Task Received_2_accepted_events_for_same_aggregated_measure_data_process()
+    {
+        // Arrange
+        await _gridAreaBuilder
+            .WithGridAreaCode(SampleData.GridAreaCode)
+            .StoreAsync(GetService<IMasterDataClient>());
+
+        var process = BuildProcess();
+        var acceptedEvent = GetAcceptedEvent(process);
+
+        // Act
+        await AddInboxEvent(process, acceptedEvent);
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id);
+
+        // Assert
+        var outgoingMessage = await OutgoingMessageAsync(ActorRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
+
+        outgoingMessage
+            .HasBusinessReason(process.BusinessReason)
+            .HasReceiverId(process.RequestedByActorId.Value)
+            .HasReceiverRole(process.RequestedByActorRoleCode)
+            .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
+            .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
+            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1);
+    }
+
+    [Fact]
+    public async Task Received_accepted_events_with_multiple_point_ensure_ordering_is_correct()
     {
         // Arrange
         await _gridAreaBuilder
@@ -121,24 +153,31 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
     private static AggregatedTimeSeriesRequestAccepted CreateAggregation(AggregatedMeasureDataProcess aggregatedMeasureDataProcess)
     {
-        var quantity = new DecimalValue() { Units = 12345, Nanos = 123450000, };
-        var point = new TimeSeriesPoint()
+        List<TimeSeriesPoint> timeSeriesPoints = new();
+        var currentTime = InstantPattern.General.Parse(aggregatedMeasureDataProcess.StartOfPeriod).Value;
+        while (currentTime < InstantPattern.General.Parse(aggregatedMeasureDataProcess.EndOfPeriod).Value)
         {
-            Quantity = quantity,
-            Time = new Timestamp() { Seconds = 1, },
-        };
-        point.QuantityQualities.Add(QuantityQuality.Estimated);
+            var quantity = new DecimalValue() { Units = currentTime.ToUnixTimeSeconds(), Nanos = 123450000, };
+            timeSeriesPoints.Add(new TimeSeriesPoint(new TimeSeriesPoint()
+            {
+                Quantity = quantity,
+                Time = currentTime.ToTimestamp(),
+                QuantityQualities = { QuantityQuality.Calculated },
+            }));
+            currentTime = currentTime.Plus(NodaTime.Duration.FromMinutes(15));
+        }
 
         var series = new Series
         {
             GridArea = aggregatedMeasureDataProcess.MeteringGridAreaDomainId,
             QuantityUnit = QuantityUnit.Kwh,
-            TimeSeriesPoints = { point },
             TimeSeriesType = TimeSeriesType.Production,
             Resolution = Resolution.Pt15M,
             CalculationResultVersion = 1,
+            StartOfPeriod = InstantPattern.General.Parse(aggregatedMeasureDataProcess.StartOfPeriod).Value.ToTimestamp(),
+            EndOfPeriod = InstantPattern.General.Parse(aggregatedMeasureDataProcess.EndOfPeriod).Value.ToTimestamp(),
         };
-
+        series.TimeSeriesPoints.AddRange(timeSeriesPoints.OrderBy(_ => Guid.NewGuid()));
         var aggregatedTimeSerie = new AggregatedTimeSeriesRequestAccepted();
         aggregatedTimeSerie.Series.Add(series);
 
