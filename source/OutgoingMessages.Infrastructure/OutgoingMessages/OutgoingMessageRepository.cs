@@ -86,9 +86,9 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
 
     private async Task DownloadAndSetMessageRecordAsync(OutgoingMessage outgoingMessage)
     {
-        var messageRecordStream = await _fileStorageClient.DownloadAsync(outgoingMessage.FileStorageReference).ConfigureAwait(false);
+        var downloadedFile = await _fileStorageClient.DownloadAsync(outgoingMessage.FileStorageReference).ConfigureAwait(false);
 
-        var messageRecord = await ConvertToStringAsync(messageRecordStream).ConfigureAwait(false);
+        var messageRecord = await ConvertToStringAsync(downloadedFile.Stream).ConfigureAwait(false);
 
         outgoingMessage.SetMessageRecord(messageRecord);
     }

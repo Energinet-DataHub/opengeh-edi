@@ -17,13 +17,12 @@ using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using NodaTime;
-using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing
 {
     public class OutgoingMessage
     {
-        public const string FileStorageCategory = "outgoing";
+        public static readonly FileStorageCategory FileStorageCategory = FileStorageCategory.OutgoingMessage();
 
         private string _messageRecord;
 
@@ -41,6 +40,9 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             FileStorageReference = CreateFileStorageReference(ReceiverId, timestamp, Id);
         }
 
+        /// <summary>
+        /// Should only be used by Entity Framework
+        /// </summary>
         // ReSharper disable once UnusedMember.Local -- Used by Entity Framework
         private OutgoingMessage(
             DocumentType documentType,

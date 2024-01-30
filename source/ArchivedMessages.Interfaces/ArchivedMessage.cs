@@ -22,7 +22,7 @@ namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
 public class ArchivedMessage
 {
-    public const string FileStorageCategory = "archived";
+    public static readonly FileStorageCategory FileStorageCategory = ArchivedFile.FileStorageCategory;
 
     public ArchivedMessage(
         string? messageId,

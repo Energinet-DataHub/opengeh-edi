@@ -89,9 +89,9 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
 
         var fileStorageReference = new FileStorageReference(ArchivedMessage.FileStorageCategory, fileStorageReferenceString);
 
-        var stream = await _fileStorageClient.DownloadAsync(fileStorageReference).ConfigureAwait(false);
+        var downloadedFile = await _fileStorageClient.DownloadAsync(fileStorageReference).ConfigureAwait(false);
 
-        return stream;
+        return downloadedFile.Stream;
     }
 
     public async Task<MessageSearchResult> SearchAsync(GetMessagesQuery queryInput, CancellationToken cancellationToken)

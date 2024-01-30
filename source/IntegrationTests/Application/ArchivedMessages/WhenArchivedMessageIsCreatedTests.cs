@@ -93,6 +93,8 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
 
         var actualFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageId);
 
+        using var assertionScope = new AssertionScope();
+        archivedMessage.FileStorageReference.Category.Value.Should().Be("archived");
         actualFileStorageReference.Should().Be(expectedFileStorageReference);
     }
 

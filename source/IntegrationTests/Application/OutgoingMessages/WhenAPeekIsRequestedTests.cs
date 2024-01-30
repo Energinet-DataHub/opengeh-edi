@@ -85,7 +85,10 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         Assert.NotNull(firstPeekResult.MessageId);
         Assert.NotNull(secondPeekResult.MessageId);
-        Assert.Equal(firstPeekResult.Bundle!, secondPeekResult.Bundle!);
+
+        var firstPeekContent = await GetStreamContentAsStringAsync(firstPeekResult.Bundle!);
+        var secondPeekContent = await GetStreamContentAsStringAsync(secondPeekResult.Bundle!);
+        Assert.Equal(firstPeekContent, secondPeekContent);
     }
 
     [Fact]

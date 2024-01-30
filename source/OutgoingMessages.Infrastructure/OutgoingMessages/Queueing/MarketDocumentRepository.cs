@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -22,15 +23,25 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages
 public class MarketDocumentRepository : IMarketDocumentRepository
 {
     private readonly ActorMessageQueueContext _actorMessageQueueContext;
+    private readonly IFileStorageClient _fileStorageClient;
 
-    public MarketDocumentRepository(ActorMessageQueueContext actorMessageQueueContext)
+    public MarketDocumentRepository(ActorMessageQueueContext actorMessageQueueContext, IFileStorageClient fileStorageClient)
     {
         _actorMessageQueueContext = actorMessageQueueContext;
+        _fileStorageClient = fileStorageClient;
     }
 
     public async Task<MarketDocument?> GetAsync(BundleId bundleId)
     {
-        return await _actorMessageQueueContext.MarketDocuments.FirstOrDefaultAsync(x => x.BundleId == bundleId).ConfigureAwait(false);
+        var marketDocument = await _actorMessageQueueContext.MarketDocuments.FirstOrDefaultAsync(x => x.BundleId == bundleId).ConfigureAwait(false);
+
+        if (marketDocument != null)
+        {
+            var document = await _fileStorageClient.DownloadAsync(marketDocument.FileStorageReference).ConfigureAwait(false);
+            marketDocument.SetDocument(document.Stream);
+        }
+
+        return marketDocument;
     }
 
     public void Add(MarketDocument marketDocument)

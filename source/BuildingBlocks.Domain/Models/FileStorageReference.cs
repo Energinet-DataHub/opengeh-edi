@@ -24,9 +24,9 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 /// </summary>
 public record FileStorageReference
 {
-    public FileStorageReference(string category, string path)
+    public FileStorageReference(FileStorageCategory category, string path)
     {
-        ArgumentException.ThrowIfNullOrEmpty(category);
+        ArgumentNullException.ThrowIfNull(category);
         ArgumentException.ThrowIfNullOrEmpty(path);
 
         Category = category;
@@ -39,9 +39,9 @@ public record FileStorageReference
     public string Path { get; }
 
     /// <summary>
-    /// The file category (examples could be "archived", "outgoing" etc.). In Azure Blob Storage this references where which container the blob is stored inside.
+    /// The file's category. In Azure Blob Storage this references where which container the blob is stored inside.
     /// </summary>
-    public string Category { get; }
+    public FileStorageCategory Category { get; }
 
     /// <summary>
     /// Create a new FileStorageReference, with a path like "{actorNumber}/{year:0000}/{month:00}/{day:00}/{id}"
@@ -50,7 +50,7 @@ public record FileStorageReference
     /// <param name="actorNumber">The actor number related to the file, used to determine the path the file is stored in.</param>
     /// <param name="timeStamp">The timestamp related to the file, used to determine the path the file is stored in.</param>
     /// <param name="id">A guid representing the blob, used to determine the path the file is stored in. Is converted to a only contain letters and numbers, to ensure maximum compatibility with file systems</param>
-    public static FileStorageReference Create(string category, string actorNumber, Instant timeStamp, Guid id)
+    public static FileStorageReference Create(FileStorageCategory category, string actorNumber, Instant timeStamp, Guid id)
     {
         ArgumentNullException.ThrowIfNull(actorNumber);
 
@@ -62,4 +62,24 @@ public record FileStorageReference
 
         return new FileStorageReference(category, reference);
     }
+}
+
+/// <summary>
+/// The file category ("archived", "outgoing" etc.). In Azure Blob Storage this references where which container the blob is stored inside.
+/// </summary>
+public record FileStorageCategory
+{
+    private const string ArchivedMessageCategory = "archived";
+    private const string OutgoingMessageCategory = "outgoing";
+
+    private FileStorageCategory(string value)
+    {
+        Value = value;
+    }
+
+    public string Value { get; }
+
+    public static FileStorageCategory ArchivedMessage() => new(ArchivedMessageCategory);
+
+    public static FileStorageCategory OutgoingMessage() => new(OutgoingMessageCategory);
 }

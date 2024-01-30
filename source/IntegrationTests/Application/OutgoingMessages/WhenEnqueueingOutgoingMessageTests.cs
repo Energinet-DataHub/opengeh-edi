@@ -36,6 +36,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit;
 
@@ -167,6 +168,26 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     }
 
     [Fact]
+    public async Task Outgoing_messages_for_same_actor_is_added_to_existing_bundle()
+    {
+        // Arrange
+        var actorMessageQueueId = Guid.NewGuid();
+        var existingBundleId = Guid.NewGuid();
+        var message = _outgoingMessageDtoBuilder
+            .Build();
+        await CreateActorMessageQueueInDatabase(actorMessageQueueId, message.ReceiverId, message.ReceiverRole);
+        await CreateBundleInDatabase(existingBundleId, actorMessageQueueId, message.DocumentType, message.BusinessReason);
+
+        // Act
+        var createdId = await EnqueueAndCommitAsync(message);
+
+        // Assert
+        var actualBundleId = await GetOutgoingMessageBundleIdFromDatabase(createdId);
+
+        actualBundleId.Should().Be(existingBundleId);
+    }
+
+    [Fact]
     public async Task Outgoing_message_record_is_added_to_file_storage_with_correct_content()
     {
         // Arrange
@@ -214,12 +235,20 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
 
     private async Task<string> GetOutgoingMessageFileStorageReferenceFromDatabase(OutgoingMessageId id)
     {
-        using var connection =
-            await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
 
         var fileStorageReference = await connection.ExecuteScalarAsync<string>($"SELECT FileStorageReference FROM [dbo].[OutgoingMessages] WHERE Id = '{id.Value}'");
 
         return fileStorageReference;
+    }
+
+    private async Task<Guid> GetOutgoingMessageBundleIdFromDatabase(OutgoingMessageId id)
+    {
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+
+        var assignedBundleId = await connection.ExecuteScalarAsync<Guid>($"SELECT AssignedBundleId FROM [dbo].[OutgoingMessages] WHERE Id = '{id.Value}'");
+
+        return assignedBundleId;
     }
 
     private async Task<OutgoingMessageId> EnqueueAndCommitAsync(OutgoingMessageDto message)
@@ -228,5 +257,41 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         await _context.SaveChangesAsync();
 
         return outgoingMessageId;
+    }
+
+    private async Task CreateActorMessageQueueInDatabase(Guid id, ActorNumber actorNumber, ActorRole actorRole)
+    {
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+
+        await connection.ExecuteAsync(
+            @"INSERT INTO [dbo].[ActorMessageQueues] (Id, ActorNumber, ActorRole)
+                    VALUES (@Id, @ActorNumber, @ActorRole)",
+            new
+            {
+                Id = id,
+                ActorNumber = actorNumber.Value,
+                ActorRole = actorRole.Code,
+            });
+    }
+
+    private async Task CreateBundleInDatabase(Guid id, Guid actorMessageQueueId, DocumentType documentType, string businessReason)
+    {
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+
+        await connection.ExecuteAsync(
+            @"INSERT INTO [dbo].[Bundles] (Id, ActorMessageQueueId, DocumentTypeInBundle, IsDequeued, IsClosed, MessageCount, MaxMessageCount, BusinessReason, Created)
+                    VALUES (@Id, @ActorMessageQueueId, @DocumentTypeInBundle, @IsDequeued, @IsClosed, @MessageCount, @MaxMessageCount, @BusinessReason, @Created)",
+            new
+            {
+                Id = id,
+                ActorMessageQueueId = actorMessageQueueId,
+                DocumentTypeInBundle = documentType.Name,
+                IsDequeued = false,
+                IsClosed = false,
+                MessageCount = 0,
+                MaxMessageCount = 1,
+                BusinessReason = businessReason,
+                Created = new DateTime(2022, 2, 2),
+            });
     }
 }
