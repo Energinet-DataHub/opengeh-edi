@@ -41,6 +41,9 @@ public static class HealthCheckRegistration
         services.AddHealthChecks().AddAzureBlobStorage(storageAccountUri, new DefaultAzureCredential(), name: name);
     }
 
+    /// <summary>
+    /// Used for Service Bus queues where the app have peek (receiver) permissions
+    /// </summary>
     public static void AddExternalDomainServiceBusQueuesHealthCheck(this IServiceCollection services, string serviceBusConnectionString, [NotNull] params string[] queueNames)
     {
         foreach (var name in queueNames)
@@ -50,6 +53,22 @@ public static class HealthCheckRegistration
                     name: name + "Exists",
                     connectionString: serviceBusConnectionString,
                     queueName: name);
+        }
+    }
+
+    /// <summary>
+    /// Used for Service Bus queues where the app doesn't have peek permissions (the app only has sender permissions)
+    /// </summary>
+    public static void AddExternalDomainServiceBusQueuesSenderHealthCheck(this IServiceCollection services, string serviceBusConnectionString, [NotNull] params string[] queueNames)
+    {
+        foreach (var name in queueNames)
+        {
+            services.AddHealthChecks()
+                .AddAzureServiceBusQueue(
+                    name: name + "Exists",
+                    connectionString: serviceBusConnectionString,
+                    queueName: name,
+                    configure: o => o.UsePeekMode = false);
         }
     }
 

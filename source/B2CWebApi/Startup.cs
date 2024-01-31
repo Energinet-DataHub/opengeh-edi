@@ -92,7 +92,7 @@ public class Startup
             .AddHttpClient();
 
         serviceCollection.AddLiveHealthCheck();
-        serviceCollection.AddExternalDomainServiceBusQueuesHealthCheck(
+        serviceCollection.AddExternalDomainServiceBusQueuesSenderHealthCheck(
             Configuration["SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND"]!,
             Configuration["INCOMING_MESSAGES_QUEUE_NAME"]!);
         serviceCollection.AddSqlServerHealthCheck(Configuration["DB_CONNECTION_STRING"]!);
