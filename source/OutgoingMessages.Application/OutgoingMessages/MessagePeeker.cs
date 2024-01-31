@@ -80,13 +80,14 @@ public class MessagePeeker
 
             await _archivedMessageClient.CreateAsync(
                 new ArchivedMessage(
-                   peekResult.BundleId.Id.ToString(),
-                   outgoingMessageBundle.DocumentType.ToString(),
-                   outgoingMessageBundle.SenderId.Value,
-                   outgoingMessageBundle.Receiver.Number.Value,
-                   timestamp,
-                   outgoingMessageBundle.BusinessReason,
-                   result),
+                    peekResult.BundleId.Id.ToString(),
+                    outgoingMessageBundle.DocumentType.ToString(),
+                    outgoingMessageBundle.SenderId.Value,
+                    outgoingMessageBundle.Receiver.Number.Value,
+                    timestamp,
+                    outgoingMessageBundle.BusinessReason,
+                    ArchivedMessageType.OutgoingMessage,
+                    result),
                 cancellationToken).ConfigureAwait(false);
 
             document = new MarketDocument(result, peekResult.BundleId);
