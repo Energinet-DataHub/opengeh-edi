@@ -48,7 +48,7 @@ namespace Energinet.DataHub.EDI.Api
         public string? AzureWebJobsStorage =>
             GetEnvironmentVariable(nameof(AzureWebJobsStorage));
 
-        public Uri? AZURE_STORAGE_ACCOUNT_URL
+        public virtual Uri? AZURE_STORAGE_ACCOUNT_URL
         {
             get
             {
