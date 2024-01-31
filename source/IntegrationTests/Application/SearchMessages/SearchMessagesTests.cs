@@ -252,7 +252,8 @@ public class SearchMessagesTests : TestBase
         string? receiverNumber = null,
         string? documentType = null,
         string? businessReason = null,
-        string? messageId = null)
+        string? messageId = null,
+        ArchivedMessageType? archivedMessageType = null)
     {
         return new ArchivedMessage(
             messageId ?? "MessageId",
@@ -261,6 +262,7 @@ public class SearchMessagesTests : TestBase
             receiverNumber ?? "1234512345128",
             createdAt.GetValueOrDefault(_systemDateTimeProvider.Now()),
             businessReason ?? BusinessReason.BalanceFixing.Name,
+            archivedMessageType ?? ArchivedMessageType.OutgoingMessage,
             new MemoryStream());
     }
 

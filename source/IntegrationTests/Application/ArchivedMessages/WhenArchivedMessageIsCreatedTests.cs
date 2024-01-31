@@ -75,19 +75,26 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
         actualDocumentContent.Should().Be(correctDocumentContent);
     }
 
-    [Fact]
-    public async Task Archived_document_is_saved_at_correct_path()
+    [Theory]
+    [InlineData(ArchivedMessageType.IncomingMessage)]
+    [InlineData(ArchivedMessageType.OutgoingMessage)]
+    public async Task Archived_document_is_saved_at_correct_path(ArchivedMessageType archivedMessageType)
     {
         var messageId = Guid.NewGuid();
-        var receiverNumber = "1122334455667788";
+        var senderNumber = "1122334455667788";
+        var receiverNumber = "8877665544332211";
         int year = 2024,
             month = 01,
             date = 25;
         var archivedMessage = CreateArchivedMessage(
+            archivedMessageType: archivedMessageType,
             messageId: messageId.ToString(),
+            senderNumber: senderNumber,
             receiverNumber: receiverNumber,
             timestamp: Instant.FromUtc(year, month, date, 0, 0));
-        var expectedFileStorageReference = $"{receiverNumber}/{year:000}/{month:00}/{date:00}/{archivedMessage.Id.Value:N}";
+
+        var expectedActorNumber = archivedMessageType == ArchivedMessageType.IncomingMessage ? senderNumber : receiverNumber;
+        var expectedFileStorageReference = $"{expectedActorNumber}/{year:000}/{month:00}/{date:00}/{archivedMessage.Id.Value:N}";
 
         await ArchiveMessage(archivedMessage);
 
@@ -147,7 +154,7 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
         Assert.Equal(messageId, result.Messages[1].MessageId);
     }
 
-    private static ArchivedMessage CreateArchivedMessage(string? messageId = null, string? documentContent = null, string? receiverNumber = null, Instant? timestamp = null)
+    private static ArchivedMessage CreateArchivedMessage(ArchivedMessageType? archivedMessageType = null, string? messageId = null, string? documentContent = null, string? senderNumber = null, string? receiverNumber = null, Instant? timestamp = null)
     {
         var documentStream = new MemoryStream();
 
@@ -164,10 +171,11 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
         return new ArchivedMessage(
             string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
             DocumentType.NotifyAggregatedMeasureData.Name,
-            "1234512345123",
+            senderNumber ?? "1234512345123",
             receiverNumber ?? "1234512345128",
             timestamp ?? Instant.FromUtc(2023, 01, 01, 0, 0),
             BusinessReason.BalanceFixing.Name,
+            archivedMessageType ?? ArchivedMessageType.OutgoingMessage,
             documentStream);
     }
 

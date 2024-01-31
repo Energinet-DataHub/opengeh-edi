@@ -19,6 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using IncomingMessages.Infrastructure;
 using IncomingMessages.Infrastructure.Messages;
@@ -37,6 +38,7 @@ public class IncomingMessageClient : IIncomingMessageClient
     private readonly IArchivedMessagesClient _archivedMessagesClient;
     private readonly ILogger<IncomingMessageClient> _logger;
     private readonly IRequestAggregatedMeasureDataReceiver _requestAggregatedMeasureDataReceiver;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
     public IncomingMessageClient(
         MarketMessageParser marketMessageParser,
@@ -44,7 +46,8 @@ public class IncomingMessageClient : IIncomingMessageClient
         ResponseFactory responseFactory,
         IArchivedMessagesClient archivedMessagesClient,
         ILogger<IncomingMessageClient> logger,
-        IRequestAggregatedMeasureDataReceiver requestAggregatedMeasureDataReceiver)
+        IRequestAggregatedMeasureDataReceiver requestAggregatedMeasureDataReceiver,
+        ISystemDateTimeProvider systemDateTimeProvider)
     {
         _marketMessageParser = marketMessageParser;
         _aggregatedMeasureDataMarketMessageValidator = aggregatedMeasureDataMarketMessageValidator;
@@ -52,6 +55,7 @@ public class IncomingMessageClient : IIncomingMessageClient
         _archivedMessagesClient = archivedMessagesClient;
         _logger = logger;
         _requestAggregatedMeasureDataReceiver = requestAggregatedMeasureDataReceiver;
+        _systemDateTimeProvider = systemDateTimeProvider;
     }
 
     public async Task<ResponseMessage> RegisterAndSendAsync(
@@ -117,8 +121,9 @@ public class IncomingMessageClient : IIncomingMessageClient
                 IncomingDocumentType.RequestAggregatedMeasureData.Name,
                 requestAggregatedMeasureDataMarketMessageParserResult.Dto!.SenderNumber,
                 requestAggregatedMeasureDataMarketMessageParserResult.Dto!.ReceiverNumber,
-                SystemClock.Instance.GetCurrentInstant(),
+                _systemDateTimeProvider.Now(),
                 requestAggregatedMeasureDataMarketMessageParserResult.Dto!.BusinessReason,
+                ArchivedMessageType.IncomingMessage,
                 message),
             cancellationToken).ConfigureAwait(false);
     }
