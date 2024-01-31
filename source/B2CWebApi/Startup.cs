@@ -25,6 +25,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Configuration;
+using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.OpenApi.Models;
 
@@ -72,7 +73,6 @@ public class Startup
         serviceCollection.AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>();
         serviceCollection.AddControllers()
             .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-        serviceCollection.AddHealthChecks();
         serviceCollection.AddHttpContextAccessor();
 
         serviceCollection.AddOptions<JwtOptions>().Bind(Configuration);
@@ -90,6 +90,15 @@ public class Startup
         serviceCollection.AddDateTimeConfiguration(Configuration);
         serviceCollection
             .AddHttpClient();
+
+        serviceCollection.AddLiveHealthCheck();
+        serviceCollection.AddExternalDomainServiceBusQueuesHealthCheck(
+            Configuration["SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND"]!,
+            Configuration["INCOMING_MESSAGES_QUEUE_NAME"]!);
+        serviceCollection.AddSqlServerHealthCheck(Configuration["DB_CONNECTION_STRING"]!);
+
+        var blobStorageUrl = Configuration["AZURE_STORAGE_ACCOUNT_URL"];
+        serviceCollection.AddBlobStorageHealthCheck("Documents storage", blobStorageUrl != null ? new Uri(blobStorageUrl) : null!); // Send in null to not fail launching when running locally
     }
 
     public void Configure(IApplicationBuilder app)

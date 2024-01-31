@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Diagnostics.CodeAnalysis;
+using Azure.Identity;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,9 +31,14 @@ public static class HealthCheckRegistration
                 connectionString: dbConnectionString);
     }
 
-    public static void AddBlobStorageHealthCheck(this IServiceCollection services,  string blobConnectionString)
+    public static void AddBlobStorageHealthCheck(this IServiceCollection services, string name, string blobConnectionString)
     {
-        services.AddHealthChecks().AddAzureBlobStorage(blobConnectionString);
+        services.AddHealthChecks().AddAzureBlobStorage(blobConnectionString, name: name);
+    }
+
+    public static void AddBlobStorageHealthCheck(this IServiceCollection services, string name, Uri storageAccountUri)
+    {
+        services.AddHealthChecks().AddAzureBlobStorage(storageAccountUri, new DefaultAzureCredential(), name: name);
     }
 
     public static void AddExternalDomainServiceBusQueuesHealthCheck(this IServiceCollection services, string serviceBusConnectionString, [NotNull] params string[] queueNames)
