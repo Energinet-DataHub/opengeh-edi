@@ -135,6 +135,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return fileStorageReference;
         }
 
+        protected async Task<Guid> GetArchivedMessageIdFromDatabaseAsync(string messageId)
+        {
+            using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+            var id = await connection.ExecuteScalarAsync<Guid>($"SELECT Id FROM [dbo].[ArchivedMessages] WHERE MessageId = '{messageId}'");
+
+            return id;
+        }
+
         protected Task<string> GetArchivedMessageFileStorageReferenceFromDatabaseAsync(Guid messageId) => GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageId.ToString());
 
         protected T GetService<T>()

@@ -308,12 +308,4 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var results = await connection.QueryAsync<dynamic>(sql);
         return results.ToList();
     }
-
-    private async Task<Guid> GetArchivedMessageIdFromDatabaseAsync(string messageId)
-    {
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-        var id = await connection.ExecuteScalarAsync<Guid>($"SELECT Id FROM [dbo].[ArchivedMessages] WHERE MessageId = '{messageId}'");
-
-        return id;
-    }
 }
