@@ -36,6 +36,7 @@ using NodaTime.Text;
 using Xunit;
 using Xunit.Categories;
 using DecimalValue = Energinet.DataHub.Edi.Responses.DecimalValue;
+using Period = Energinet.DataHub.Edi.Responses.Period;
 using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point;
 using QuantityQuality = Energinet.DataHub.Edi.Responses.QuantityQuality;
 using QuantityUnit = Energinet.DataHub.Edi.Responses.QuantityUnit;
@@ -155,7 +156,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     {
         List<TimeSeriesPoint> timeSeriesPoints = new();
         var currentTime = InstantPattern.General.Parse(aggregatedMeasureDataProcess.StartOfPeriod).Value;
-        while (currentTime < InstantPattern.General.Parse(aggregatedMeasureDataProcess.EndOfPeriod).Value)
+        while (currentTime < InstantPattern.General.Parse(aggregatedMeasureDataProcess.EndOfPeriod!).Value)
         {
             var quantity = new DecimalValue() { Units = currentTime.ToUnixTimeSeconds(), Nanos = 123450000, };
             timeSeriesPoints.Add(new TimeSeriesPoint(new TimeSeriesPoint()
@@ -174,8 +175,11 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             TimeSeriesType = TimeSeriesType.Production,
             Resolution = Resolution.Pt15M,
             CalculationResultVersion = 1,
-            StartOfPeriod = InstantPattern.General.Parse(aggregatedMeasureDataProcess.StartOfPeriod).Value.ToTimestamp(),
-            EndOfPeriod = InstantPattern.General.Parse(aggregatedMeasureDataProcess.EndOfPeriod).Value.ToTimestamp(),
+            Period = new Period()
+            {
+                StartOfPeriod = InstantPattern.General.Parse(aggregatedMeasureDataProcess.StartOfPeriod).Value.ToTimestamp(),
+                EndOfPeriod = InstantPattern.General.Parse(aggregatedMeasureDataProcess.EndOfPeriod!).Value.ToTimestamp(),
+            },
         };
         series.TimeSeriesPoints.AddRange(timeSeriesPoints.OrderBy(_ => Guid.NewGuid()));
         var aggregatedTimeSerie = new AggregatedTimeSeriesRequestAccepted();

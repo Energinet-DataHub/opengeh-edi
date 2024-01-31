@@ -55,7 +55,7 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
         process!.WasSentToWholesale();
-        var acceptedAggregation = CreateAcceptedAggregation(process.StartOfPeriod, process.EndOfPeriod);
+        var acceptedAggregation = CreateAcceptedAggregation(process.StartOfPeriod, process.EndOfPeriod!);
 
         // Act
         process.IsAccepted(new List<Aggregation> { acceptedAggregation });
@@ -72,7 +72,7 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
         process!.WasSentToWholesale();
-        var acceptedAggregation = CreateAcceptedAggregation(process.StartOfPeriod, process.EndOfPeriod);
+        var acceptedAggregation = CreateAcceptedAggregation(process.StartOfPeriod, process.EndOfPeriod!);
 
         // Act
         process.IsAccepted(new List<Aggregation> { acceptedAggregation, acceptedAggregation });
@@ -93,7 +93,7 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
         process!.WasSentToWholesale();
-        var acceptedAggregation = CreateAcceptedAggregation(process.StartOfPeriod, process.EndOfPeriod);
+        var acceptedAggregation = CreateAcceptedAggregation(process.StartOfPeriod, process.EndOfPeriod!);
 
         // Act
         process.IsAccepted(new List<Aggregation> { acceptedAggregation });

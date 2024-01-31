@@ -58,8 +58,8 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
                 MapResolution(aggregation.Resolution),
                 await MapGridAreaDetailsAsync(aggregation.GridArea, cancellationToken).ConfigureAwait(false),
                 aggregation.CalculationResultVersion,
-                aggregation.StartOfPeriod.ToInstant(),
-                aggregation.EndOfPeriod.ToInstant()));
+                aggregation.Period.StartOfPeriod.ToInstant(),
+                aggregation.Period.EndOfPeriod.ToInstant()));
         }
 
         return new AggregatedTimeSerieRequestWasAccepted(

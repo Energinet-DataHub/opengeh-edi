@@ -80,8 +80,11 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
             TimeSeriesType = TimeSeriesType.Production,
             Resolution = Resolution.Pt15M,
             CalculationResultVersion = 1,
-            StartOfPeriod = Timestamp.FromDateTimeOffset(DateTimeOffset.Now),
-            EndOfPeriod = Timestamp.FromDateTimeOffset(DateTimeOffset.Now.Add(TimeSpan.FromDays(5))),
+            Period = new Period()
+            {
+                StartOfPeriod = Timestamp.FromDateTimeOffset(DateTimeOffset.Now),
+                EndOfPeriod = Timestamp.FromDateTimeOffset(DateTimeOffset.Now.Add(TimeSpan.FromDays(5))),
+            },
         };
 
         var timeSerie = new AggregatedTimeSeriesRequestAccepted();
