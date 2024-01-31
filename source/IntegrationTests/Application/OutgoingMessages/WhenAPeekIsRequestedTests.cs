@@ -121,7 +121,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     }
 
     [Fact]
-    public async Task The_market_document_is_archived_with_correct_file_storage_reference()
+    public async Task A_market_document_is_archived_with_correct_file_storage_reference()
     {
         // Arrange
         int year = 2024,
