@@ -122,13 +122,18 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
         protected static async Task<string> GetStreamContentAsStringAsync(Stream stream)
         {
+            ArgumentNullException.ThrowIfNull(stream);
+
+            if (stream.CanSeek && stream.Position != 0)
+                stream.Position = 0;
+
             using var streamReader = new StreamReader(stream, Encoding.UTF8);
             var stringContent = await streamReader.ReadToEndAsync();
 
             return stringContent;
         }
 
-        protected async Task<string> GetArchivedMessageFileStorageReferenceFromDatabaseAsync(Guid messageId)
+        protected async Task<string> GetArchivedMessageFileStorageReferenceFromDatabaseAsync(string messageId)
         {
             using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
             var fileStorageReference = await connection.ExecuteScalarAsync<string>($"SELECT FileStorageReference FROM [dbo].[ArchivedMessages] WHERE MessageId = '{messageId}'");
@@ -143,6 +148,16 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
             return fileStorageReference;
         }
+
+        protected async Task<Guid> GetArchivedMessageIdFromDatabaseAsync(string messageId)
+        {
+            using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+            var id = await connection.ExecuteScalarAsync<Guid>($"SELECT Id FROM [dbo].[ArchivedMessages] WHERE MessageId = '{messageId}'");
+
+            return id;
+        }
+
+        protected Task<string> GetArchivedMessageFileStorageReferenceFromDatabaseAsync(Guid messageId) => GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageId.ToString());
 
         protected T GetService<T>()
             where T : notnull

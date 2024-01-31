@@ -19,13 +19,16 @@ using System.Xml.Linq;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
+using NodaTime;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
@@ -34,12 +37,14 @@ public class WhenAPeekIsRequestedTests : TestBase
 {
     private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
+    private readonly SystemDateTimeProviderStub _dateTimeProvider;
 
     public WhenAPeekIsRequestedTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
     {
         _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
+        _dateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
     }
 
     [Fact]
@@ -96,20 +101,49 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task A_market_document_is_archived_with_correct_content()
     {
+        // Arrange
         var message = _outgoingMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
             .WithReceiverRole(ActorRole.EnergySupplier)
             .Build();
         await EnqueueMessage(message);
 
+        // Act
         var peekResult = await PeekMessage(MessageCategory.Aggregations);
 
+        // Assert
         peekResult.Bundle.Should().NotBeNull();
-        var peekResultFileContent = await GetStreamContentAsStringAsync(peekResult.Bundle!);
 
+        var peekResultFileContent = await GetStreamContentAsStringAsync(peekResult.Bundle!);
         var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value);
         var archivedMessageFileContent = await GetFileContentFromFileStorageAsync("archived", archivedMessageFileStorageReference);
         archivedMessageFileContent.Should().Be(peekResultFileContent);
+    }
+
+    [Fact]
+    public async Task The_market_document_is_archived_with_correct_file_storage_reference()
+    {
+        // Arrange
+        int year = 2024,
+            month = 01,
+            date = 02;
+        _dateTimeProvider.SetNow(Instant.FromUtc(year, month, date, 11, 07));
+        var receiverNumber = SampleData.NewEnergySupplierNumber;
+        var message = _outgoingMessageDtoBuilder
+            .WithReceiverNumber(receiverNumber)
+            .WithReceiverRole(ActorRole.EnergySupplier)
+            .Build();
+        await EnqueueMessage(message);
+
+        // Act
+        var result = await PeekMessage(MessageCategory.Aggregations);
+
+        // Assert
+        result.Bundle.Should().NotBeNull();
+
+        var archivedMessageId = await GetArchivedMessageIdFromDatabaseAsync(result.MessageId!.Value.ToString());
+        var fileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(result.MessageId!.Value);
+        fileStorageReference.Should().Be($"{receiverNumber}/{year:0000}/{month:00}/{date:00}/{archivedMessageId:N}");
     }
 
     [Fact]

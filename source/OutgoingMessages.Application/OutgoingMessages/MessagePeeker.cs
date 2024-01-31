@@ -86,6 +86,7 @@ public class MessagePeeker
                 outgoingMessageBundle.Receiver.Number.Value,
                 timestamp,
                 outgoingMessageBundle.BusinessReason,
+                ArchivedMessageType.OutgoingMessage,
                 result);
             var archivedFile = await _archivedMessageClient.CreateAsync(archivedMessageToCreate, cancellationToken).ConfigureAwait(false);
 

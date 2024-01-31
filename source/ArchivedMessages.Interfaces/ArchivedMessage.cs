@@ -31,6 +31,7 @@ public class ArchivedMessage
         string receiverNumber, // Doesn't use ActorNumber since we want to make sure to always create a ArchivedMessage
         Instant createdAt,
         string? businessReason,
+        ArchivedMessageType archivedMessageType,
         Stream document)
     {
         Id = ArchivedMessageId.Create();
@@ -42,7 +43,8 @@ public class ArchivedMessage
         BusinessReason = businessReason;
         Document = document;
 
-        FileStorageReference = FileStorageReference.Create(FileStorageCategory, ReceiverNumber, createdAt, Id.Value);
+        var actorNumberForFileStorage = GetActorNumberForFileStoragePlacement(archivedMessageType, senderNumber, receiverNumber);
+        FileStorageReference = FileStorageReference.Create(FileStorageCategory, actorNumberForFileStorage, createdAt, Id.Value);
     }
 
     public ArchivedMessageId Id { get; }
@@ -62,4 +64,14 @@ public class ArchivedMessage
     public FileStorageReference FileStorageReference { get; }
 
     public Stream Document { get; }
+
+    private string GetActorNumberForFileStoragePlacement(ArchivedMessageType archivedMessageType, string senderActorNumber, string receiverActorNumber)
+    {
+        return archivedMessageType switch
+        {
+            ArchivedMessageType.IncomingMessage => SenderNumber,
+            ArchivedMessageType.OutgoingMessage => ReceiverNumber,
+            _ => throw new ArgumentOutOfRangeException(nameof(archivedMessageType), archivedMessageType, "Unknown ArchivedMessageType"),
+        };
+    }
 }
