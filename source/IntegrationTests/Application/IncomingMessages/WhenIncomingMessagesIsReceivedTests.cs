@@ -238,11 +238,10 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             CancellationToken.None);
 
         // Assert
-        var generatedDocumentContent = await GetStreamContentAsStringAsync(messageStream);
-        var fileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageIdFromFile);
-        var fileContent = await GetFileFromFileStorageAsync("archived", fileStorageReference);
-        var archivedMessageFileContent = await GetStreamContentAsStringAsync(fileContent.Value.Content);
-        archivedMessageFileContent.Should().Be(generatedDocumentContent);
+        var incomingMessageContent = await GetStreamContentAsStringAsync(messageStream);
+        var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageIdFromFile);
+        var archivedMessageFileContent = await GetFileContentFromFileStorageAsync("archived", archivedMessageFileStorageReference);
+        archivedMessageFileContent.Should().Be(incomingMessageContent);
     }
 
     [Fact]
@@ -268,8 +267,8 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
 
         // Assert
         var archivedMessageId = await GetArchivedMessageIdFromDatabaseAsync(messageIdFromFile);
-        var fileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageIdFromFile);
-        fileStorageReference.Should().Be($"{senderActorNumber.Value}/{year:0000}/{month:00}/{date:00}/{archivedMessageId:N}");
+        var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageIdFromFile);
+        archivedMessageFileStorageReference.Should().Be($"{senderActorNumber.Value}/{year:0000}/{month:00}/{date:00}/{archivedMessageId:N}");
     }
 
     protected override void Dispose(bool disposing)
