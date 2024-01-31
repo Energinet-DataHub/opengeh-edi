@@ -119,6 +119,7 @@ public class IncomingMessageClient : IIncomingMessageClient
                 requestAggregatedMeasureDataMarketMessageParserResult.Dto!.ReceiverNumber,
                 SystemClock.Instance.GetCurrentInstant(),
                 requestAggregatedMeasureDataMarketMessageParserResult.Dto!.BusinessReason,
+                ArchivedMessageType.IncomingMessage,
                 message),
             cancellationToken).ConfigureAwait(false);
     }
