@@ -9,8 +9,8 @@
     <ItemGroup>
       <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.16.1" />
       <PackageReference Include="Microsoft.ApplicationInsights" Version="2.22.0" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
-      <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
     </ItemGroup>
 
     <ItemGroup>
