@@ -27,7 +27,7 @@ public static class HealthCheckRegistration
     {
         services.AddHealthChecks()
             .AddSqlServer(
-                name: "EdiSqlDB",
+                name: "edi-sql-db",
                 connectionString: dbConnectionString);
     }
 

@@ -98,7 +98,7 @@ public class Startup
         serviceCollection.AddSqlServerHealthCheck(Configuration["DB_CONNECTION_STRING"]!);
 
         var blobStorageUrl = Configuration["AZURE_STORAGE_ACCOUNT_URL"];
-        serviceCollection.AddBlobStorageHealthCheck("Documents storage", blobStorageUrl != null ? new Uri(blobStorageUrl) : null!); // Send in null to not fail launching when running locally
+        serviceCollection.AddBlobStorageHealthCheck("edi-documents-storage", blobStorageUrl != null ? new Uri(blobStorageUrl) : null!); // Send in null to not fail launching when running locally
     }
 
     public void Configure(IApplicationBuilder app)
