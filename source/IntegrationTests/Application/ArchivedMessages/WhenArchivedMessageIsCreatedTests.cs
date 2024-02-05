@@ -70,7 +70,7 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
 
         // Assert
         result.Should().NotBeNull();
-        using var streamReader = new StreamReader(result!);
+        using var streamReader = new StreamReader(result!.Stream);
         var actualDocumentContent = await streamReader.ReadToEndAsync();
         actualDocumentContent.Should().Be(correctDocumentContent);
     }

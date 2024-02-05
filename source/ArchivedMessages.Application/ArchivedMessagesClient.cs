@@ -39,7 +39,7 @@ public class ArchivedMessagesClient : IArchivedMessagesClient
         return new ArchivedFile(message.FileStorageReference, message.Document);
     }
 
-    public async Task<Stream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken)
+    public async Task<ArchivedMessageStream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(id);
         return await _archivedMessageRepository.GetAsync(id, cancellationToken).ConfigureAwait(false);

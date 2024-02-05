@@ -74,7 +74,7 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
         await connection.ExecuteAsync(sql, parameters).ConfigureAwait(false);
     }
 
-    public async Task<Stream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken)
+    public async Task<ArchivedMessageStream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(id);
 
@@ -90,9 +90,9 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
 
         var fileStorageReference = new FileStorageReference(ArchivedMessage.FileStorageCategory, fileStorageReferenceString);
 
-        var downloadedFile = await _fileStorageClient.DownloadAsync(fileStorageReference).ConfigureAwait(false);
+        var fileStorageFile = await _fileStorageClient.DownloadAsync(fileStorageReference).ConfigureAwait(false);
 
-        return downloadedFile.Stream;
+        return new ArchivedMessageStream(fileStorageFile);
     }
 
     public async Task<MessageSearchResult> SearchAsync(GetMessagesQuery queryInput, CancellationToken cancellationToken)
