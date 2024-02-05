@@ -100,7 +100,7 @@ public class RequestAggregatedMeasureMessageReceiver
 
         var responseMessage = await _incomingMessageClient
             .RegisterAndSendAsync(
-                request.Body,
+                new IncomingMessageStream(request.Body),
                 documentFormat,
                 IncomingDocumentType.RequestAggregatedMeasureData,
                 cancellationToken)

@@ -36,5 +36,5 @@ public interface IMessageParser
     /// Parse from stream
     /// </summary>
     Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(
-        Stream message, CancellationToken cancellationToken);
+        IIncomingMessageStream incomingMessageStream, CancellationToken cancellationToken);
 }

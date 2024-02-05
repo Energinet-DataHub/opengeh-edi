@@ -238,7 +238,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             CancellationToken.None);
 
         // Assert
-        var incomingMessageContent = await GetStreamContentAsStringAsync(messageStream);
+        var incomingMessageContent = await GetStreamContentAsStringAsync(messageStream.Stream);
         var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageIdFromFile);
         var archivedMessageFileContent = await GetFileContentFromFileStorageAsync("archived", archivedMessageFileStorageReference);
         archivedMessageFileContent.Should().Be(incomingMessageContent);
@@ -279,7 +279,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         base.Dispose(disposing);
     }
 
-    private static MemoryStream ReadJsonFile(string path)
+    private static IncomingMessageStream ReadJsonFile(string path)
     {
         var jsonDoc = File.ReadAllText(path);
 
@@ -289,7 +289,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         writer.Flush();
         stream.Position = 0;
 
-        return stream;
+        return new IncomingMessageStream(stream);
     }
 
     private async Task<List<dynamic>> GetTransactionIdsAsync(ActorNumber senderNumber)
