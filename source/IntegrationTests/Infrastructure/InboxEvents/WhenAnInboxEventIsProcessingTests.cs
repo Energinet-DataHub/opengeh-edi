@@ -19,9 +19,9 @@ using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Common.DateTime;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Xunit;
@@ -104,7 +104,7 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
 
     private void RegisterInboxEvent()
     {
-        var context = GetService<B2BContext>();
+        var context = GetService<ProcessContext>();
         context.ReceivedInboxEvents.Add(new ReceivedInboxEvent(
             _eventId,
             _eventType,

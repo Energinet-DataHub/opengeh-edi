@@ -12,21 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
+using MediatR;
 
-namespace Energinet.DataHub.EDI.Application.Wholesale;
+namespace Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 
 /// <summary>
-/// Interface for wholesale inbox
+/// Maps from an inbox event to a notification
 /// </summary>
-public interface IWholesaleInbox
+public interface IInboxEventMapper
 {
     /// <summary>
-    /// Send <paramref name="request"/> to wholesale
+    /// Map payload to a notification
     /// </summary>
-    /// <param name="request"></param>
+    /// <param name="payload"></param>
+    /// <param name="referenceId"></param>
     /// <param name="cancellationToken"></param>
-    Task SendAsync(ServiceBusMessage request, CancellationToken cancellationToken);
+    /// <returns><see cref="INotification"/></returns>
+    Task<INotification> MapFromAsync(byte[] payload, Guid referenceId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Determines whether the specified event type can be handled by the mapper
+    /// </summary>
+    /// <param name="eventType"></param>
+    bool CanHandle(string eventType);
 }

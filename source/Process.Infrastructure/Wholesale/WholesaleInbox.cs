@@ -16,12 +16,12 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.EDI.Application.Wholesale;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
+using Energinet.DataHub.EDI.Process.Domain.Wholesale;
 using Microsoft.Extensions.Options;
 using ServiceBusClientOptions = Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options.ServiceBusClientOptions;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Wholesale;
+namespace Energinet.DataHub.EDI.Process.Infrastructure.Wholesale;
 
 public class WholesaleInbox : IWholesaleInbox
 {

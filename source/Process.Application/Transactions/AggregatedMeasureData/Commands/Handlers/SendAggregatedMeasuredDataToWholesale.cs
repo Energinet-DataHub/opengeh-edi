@@ -15,9 +15,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Infrastructure.Wholesale;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands.Handlers;
