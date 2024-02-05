@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
@@ -43,7 +42,7 @@ public class ArchivedMessage
         BusinessReason = businessReason;
         Document = document;
 
-        var actorNumberForFileStorage = GetActorNumberForFileStoragePlacement(archivedMessageType, senderNumber, receiverNumber);
+        var actorNumberForFileStorage = GetActorNumberForFileStoragePlacement(archivedMessageType);
         FileStorageReference = FileStorageReference.Create(FileStorageCategory, actorNumberForFileStorage, createdAt, Id.Value);
     }
 
@@ -65,7 +64,7 @@ public class ArchivedMessage
 
     public Stream Document { get; }
 
-    private string GetActorNumberForFileStoragePlacement(ArchivedMessageType archivedMessageType, string senderActorNumber, string receiverActorNumber)
+    private string GetActorNumberForFileStoragePlacement(ArchivedMessageType archivedMessageType)
     {
         return archivedMessageType switch
         {

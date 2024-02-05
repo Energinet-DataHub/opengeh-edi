@@ -16,7 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Factories;
 using Energinet.DataHub.EDI.AcceptanceTests.Responses.xml;
 using Energinet.DataHub.EDI.AcceptanceTests.TestData;
-using Energinet.DataHub.EDI.AcceptanceTests.Tests.Asserters;
+using Energinet.DataHub.EDI.AcceptanceTests.Tests.B2BErrors.Asserters;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.B2BErrors;

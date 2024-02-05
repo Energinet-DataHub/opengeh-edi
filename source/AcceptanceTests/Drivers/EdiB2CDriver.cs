@@ -13,15 +13,11 @@
 // limitations under the License.
 
 using System.Net.Http.Headers;
-using System.Runtime.InteropServices.JavaScript;
 using System.Text;
-using System.Text.Json.Nodes;
 using Energinet.DataHub.EDI.AcceptanceTests.Responses.json;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Nito.AsyncEx;
-using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
