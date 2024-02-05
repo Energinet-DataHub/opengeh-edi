@@ -23,7 +23,7 @@ public class MarketDocument
 {
     public static readonly FileStorageCategory FileStorageCategory = ArchivedFile.FileStorageCategory; // Market Document uses the ArchivedMessage's file in file storage
 
-    private MarketDocumentStream _marketDocumentStream;
+    private MarketDocumentStream? _marketDocumentStream;
 
     /// <summary>
     /// Create a market document from a bundleId and an archived file. <see cref="IArchivedFile"/> should be created/retrieved by an IArchivedMessagesClient in our ArchivedMessages module
@@ -49,7 +49,7 @@ public class MarketDocument
     {
         BundleId = bundleId;
         FileStorageReference = fileStorageReference;
-        _marketDocumentStream = null!; // Set later in MarketDocumentRepository, by getting the document from File Storage
+        // _marketDocumentStream is set later in MarketDocumentRepository, by getting the document from File Storage
     }
 
     public Guid Id { get; }
@@ -64,5 +64,11 @@ public class MarketDocument
     }
 
     [SuppressMessage("Design", "CA1024:Use properties where appropriate", Justification = "Can cause error as a property because of serialization and message record maybe being null at the time")]
-    public MarketDocumentStream GetMarketDocumentStream() => _marketDocumentStream;
+    public MarketDocumentStream GetMarketDocumentStream()
+    {
+        if (_marketDocumentStream == null)
+            throw new InvalidOperationException($"{nameof(MarketDocument)}.{nameof(_marketDocumentStream)} is null which shouldn't be possible. Make sure the {nameof(MarketDocument)} is retrieved by a {nameof(IMarketDocumentRepository)}, which sets the {nameof(_marketDocumentStream)} field");
+
+        return _marketDocumentStream;
+    }
 }

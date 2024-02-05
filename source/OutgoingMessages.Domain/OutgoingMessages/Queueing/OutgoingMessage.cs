@@ -24,7 +24,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
     {
         public static readonly FileStorageCategory FileStorageCategory = FileStorageCategory.OutgoingMessage();
 
-        private string _messageRecord;
+        private string? _messageRecord;
 
         public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, Guid processId, string businessReason, ActorRole receiverRole, ActorNumber senderId, ActorRole senderRole, string messageRecord, Instant timestamp)
         {
@@ -63,8 +63,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             SenderId = senderId;
             SenderRole = senderRole;
             FileStorageReference = fileStorageReference;
-
-            _messageRecord = null!; // Message record is set later from FileStorage
+            // _messageRecord is set later in OutgoingMessageRepository, by getting the message from File Storage
         }
 
         public OutgoingMessageId Id { get; }
@@ -104,6 +103,9 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
         [SuppressMessage("Design", "CA1024:Use properties where appropriate", Justification = "Can cause error as a property because of serialization and message record maybe being null at the time")]
         public string GetMessageRecord()
         {
+            if (_messageRecord == null)
+                throw new InvalidOperationException($"{nameof(OutgoingMessage)}.{nameof(_messageRecord)} is null which shouldn't be possible. Make sure the {nameof(OutgoingMessage)} is retrieved by a {nameof(IOutgoingMessageRepository)}, which sets the {nameof(_messageRecord)} field");
+
             return _messageRecord;
         }
 
