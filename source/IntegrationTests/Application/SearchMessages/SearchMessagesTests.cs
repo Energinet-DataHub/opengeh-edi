@@ -23,6 +23,8 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using NodaTime;
 using NodaTime.Text;
 using Xunit;
@@ -263,7 +265,9 @@ public class SearchMessagesTests : TestBase
             createdAt.GetValueOrDefault(_systemDateTimeProvider.Now()),
             businessReason ?? BusinessReason.BalanceFixing.Name,
             archivedMessageType ?? ArchivedMessageType.OutgoingMessage,
-            new MemoryStream());
+#pragma warning disable CA2000 // Do not dispose here
+            new MarketDocumentStream(new MarketDocumentWriterMemoryStream()));
+#pragma warning restore CA2000
     }
 
     private async Task ArchiveMessage(ArchivedMessage archivedMessage)

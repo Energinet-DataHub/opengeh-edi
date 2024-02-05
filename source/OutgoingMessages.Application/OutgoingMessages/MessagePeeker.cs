@@ -70,14 +70,14 @@ public class MessagePeeker
         if (peekResult.BundleId == null)
             return new PeekResultDto(null);
 
-        var document = await _marketDocumentRepository.GetAsync(peekResult.BundleId).ConfigureAwait(false);
+        var marketDocument = await _marketDocumentRepository.GetAsync(peekResult.BundleId).ConfigureAwait(false);
 
-        if (document == null)
+        if (marketDocument == null)
         {
             var timestamp = _systemDateTimeProvider.Now();
 
             var outgoingMessageBundle = await _outgoingMessageRepository.GetAsync(peekResult.BundleId).ConfigureAwait(false);
-            var result = await _documentFactory.CreateFromAsync(outgoingMessageBundle, request.DocumentFormat, timestamp).ConfigureAwait(false);
+            var marketDocumentStream = await _documentFactory.CreateFromAsync(outgoingMessageBundle, request.DocumentFormat, timestamp).ConfigureAwait(false);
 
             var archivedMessageToCreate = new ArchivedMessage(
                 peekResult.BundleId.Id.ToString(),
@@ -87,14 +87,14 @@ public class MessagePeeker
                 timestamp,
                 outgoingMessageBundle.BusinessReason,
                 ArchivedMessageType.OutgoingMessage,
-                result);
+                marketDocumentStream);
             var archivedFile = await _archivedMessageClient.CreateAsync(archivedMessageToCreate, cancellationToken).ConfigureAwait(false);
 
-            document = new MarketDocument(peekResult.BundleId, archivedFile);
-            _marketDocumentRepository.Add(document);
+            marketDocument = new MarketDocument(peekResult.BundleId, archivedFile);
+            _marketDocumentRepository.Add(marketDocument);
         }
 
-        return new PeekResultDto(document.GetDocument(), document.BundleId.Id);
+        return new PeekResultDto(marketDocument.GetMarketDocumentStream().Stream, marketDocument.BundleId.Id);
     }
 
     private async Task PeekAndCommitToEnsureBundleIsClosedAsync(PeekRequestDto request)

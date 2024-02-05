@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
@@ -46,11 +47,11 @@ public class RejectRequestAggregatedMeasureDataResultDocumentWriterTests : IClas
     [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Can_create_document(string documentFormat)
     {
-        var document = await CreateDocument(
+        var marketDocumentStream = await CreateDocument(
                 _rejectedTimeSeries,
                 DocumentFormat.From(documentFormat));
 
-        await AssertDocument(document, DocumentFormat.From(documentFormat))
+        await AssertDocument(marketDocumentStream.Stream, DocumentFormat.From(documentFormat))
             .HasMessageId(SampleData.MessageId)
             .HasSenderId(SampleData.SenderId)
             .HasReceiverId(SampleData.ReceiverId)
@@ -64,7 +65,7 @@ public class RejectRequestAggregatedMeasureDataResultDocumentWriterTests : IClas
             .DocumentIsValidAsync();
     }
 
-    private Task<Stream> CreateDocument(RejectedTimeSeriesBuilder resultBuilder, DocumentFormat documentFormat)
+    private Task<MarketDocumentStream> CreateDocument(RejectedTimeSeriesBuilder resultBuilder, DocumentFormat documentFormat)
     {
         var documentHeader = resultBuilder.BuildHeader();
         var records = _parser.From(resultBuilder.BuildRejectedTimeSerie());

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
@@ -37,8 +38,10 @@ public class MarketDocumentRepository : IMarketDocumentRepository
 
         if (marketDocument != null)
         {
-            var document = await _fileStorageClient.DownloadAsync(marketDocument.FileStorageReference).ConfigureAwait(false);
-            marketDocument.SetDocument(document.Stream);
+            var fileStorageFile = await _fileStorageClient.DownloadAsync(marketDocument.FileStorageReference).ConfigureAwait(false);
+
+            var marketDocumentStream = new MarketDocumentStream(fileStorageFile);
+            marketDocument.SetMarketDocumentStream(marketDocumentStream);
         }
 
         return marketDocument;
