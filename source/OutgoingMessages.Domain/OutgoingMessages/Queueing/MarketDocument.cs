@@ -26,7 +26,7 @@ public class MarketDocument
     private MarketDocumentStream _marketDocumentStream;
 
     /// <summary>
-    /// Create a market document from a bundle and an archived file. <see cref="IArchivedFile"/> should be created/retrieved by an IArchivedMessagesClient in our ArchivedMessages module
+    /// Create a market document from a bundleId and an archived file. <see cref="IArchivedFile"/> should be created/retrieved by an IArchivedMessagesClient in our ArchivedMessages module
     /// </summary>
     /// <param name="bundleId">The <see cref="BundleId"/> is the bundle id from an <seealso cref="ActorMessageQueue"/></param>
     /// <param name="archivedFile">An archived file created/retrieved by an IArchivedMessagesClient in our ArchivedMessages module</param>
