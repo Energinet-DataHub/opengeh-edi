@@ -12,10 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.IO;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-#pragma warning disable CA1711 // Is a "stream" value object
-public record IncomingMessageStream(Stream Stream) : StreamValueObject(Stream), IIncomingMessageStream;
+public abstract record StreamValueObject
+{
+    private readonly Stream _stream;
+
+    protected StreamValueObject(Stream? stream)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+        _stream = stream;
+    }
+
+    public Stream Stream
+    {
+        get
+        {
+            _stream.Position = 0;
+            return _stream;
+        }
+    }
+}

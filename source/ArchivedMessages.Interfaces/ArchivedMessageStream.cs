@@ -12,58 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.IO;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
 #pragma warning disable CA1711 // Is a "Stream" value type
-public sealed record ArchivedMessageStream : IArchivedMessageStream, IDisposable, IAsyncDisposable
+public sealed record ArchivedMessageStream : StreamValueObject, IArchivedMessageStream
 {
-    private readonly Stream _stream;
-
     public ArchivedMessageStream(FileStorageFile fileStorageFile)
-        : this(fileStorageFile?.Stream) { }
+        : base(fileStorageFile?.Stream) { }
 
     public ArchivedMessageStream(IMarketDocumentStream marketDocumentStream)
-        : this(marketDocumentStream?.Stream) { }
+        : base(marketDocumentStream?.Stream) { }
 
     public ArchivedMessageStream(IIncomingMessageStream incomingMessageStream)
-        : this(incomingMessageStream?.Stream) { }
-
-    private ArchivedMessageStream(Stream? stream)
-    {
-        ArgumentNullException.ThrowIfNull(stream);
-
-        _stream = stream;
-    }
-
-    public Stream Stream
-    {
-        get
-        {
-            _stream.Position = 0;
-            return _stream;
-        }
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    private void Dispose(bool disposing)
-    {
-        if (disposing)
-            _stream.Dispose();
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await _stream.DisposeAsync().ConfigureAwait(false);
-        GC.SuppressFinalize(this);
-    }
+        : base(incomingMessageStream?.Stream) { }
 }

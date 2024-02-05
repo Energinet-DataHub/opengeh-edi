@@ -67,7 +67,7 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
         await ArchiveMessage(CreateArchivedMessage(documentContent: "incorrect document content"));
 
         // Act
-        await using var result = await _archivedMessagesClient.GetAsync(correctArchivedMessage.Id, CancellationToken.None);
+        var result = await _archivedMessagesClient.GetAsync(correctArchivedMessage.Id, CancellationToken.None);
 
         // Assert
         result.Should().NotBeNull();
