@@ -23,7 +23,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 public interface IMarketDocumentStream
 {
     /// <summary>
-    /// The Stream containing the MarketDocument
+    /// A stream containing the MarketDocument content
     /// </summary>
     Stream Stream { get; }
 }

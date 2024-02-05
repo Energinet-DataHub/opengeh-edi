@@ -18,12 +18,12 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 #pragma warning disable CA1711 // Is a "stream" value object
 /// <summary>
-/// A MarketDocumentStream created by the OutgoingMessages module
+/// An IncomingMessageStream created from an incoming request
 /// </summary>
 public interface IIncomingMessageStream
 {
     /// <summary>
-    /// The Stream containing the MarketDocument
+    /// A stream containing the IncomingMessage content
     /// </summary>
     Stream Stream { get; }
 }
