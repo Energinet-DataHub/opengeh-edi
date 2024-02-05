@@ -130,9 +130,11 @@ namespace Energinet.DataHub.EDI.Api
                     services.AddExternalDomainServiceBusQueuesHealthCheck(
                         runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
                         runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!,
-                        runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!);
+                        runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!,
+                        runtime.INCOMING_MESSAGES_QUEUE_NAME!);
                     services.AddSqlServerHealthCheck(runtime.DB_CONNECTION_STRING!);
-                    services.AddBlobStorageHealthCheck(runtime.AzureWebJobsStorage!);
+                    services.AddBlobStorageHealthCheck("edi-web-jobs-storage", runtime.AzureWebJobsStorage!);
+                    services.AddBlobStorageHealthCheck("edi-documents-storage", runtime.AZURE_STORAGE_ACCOUNT_URL!);
 
                     var integrationEventDescriptors = new List<MessageDescriptor>
                     {
