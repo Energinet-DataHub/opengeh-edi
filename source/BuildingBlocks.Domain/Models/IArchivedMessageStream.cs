@@ -16,7 +16,14 @@ using System.IO;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public record ArchivedFile(FileStorageReference FileStorageReference, IArchivedMessageStream Document) : IArchivedFile
+#pragma warning disable CA1711 // Is a "stream" value object
+/// <summary>
+/// A MarketDocumentStream created by the OutgoingMessages module
+/// </summary>
+public interface IArchivedMessageStream
 {
-    public static readonly FileStorageCategory FileStorageCategory = FileStorageCategory.ArchivedMessage();
+    /// <summary>
+    /// The Stream containing the MarketDocument
+    /// </summary>
+    Stream Stream { get; }
 }

@@ -29,5 +29,5 @@ public interface IArchivedFile
     /// <summary>
     /// A <see cref="Stream"/> with the archived file content. Is used to contain the actual file when peeking.
     /// </summary>
-    Stream Document { get; }
+    IArchivedMessageStream Document { get; }
 }

@@ -20,15 +20,24 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
 #pragma warning disable CA1711 // Is a "Stream" value type
-public sealed record ArchivedMessageStream : IDisposable, IAsyncDisposable
+public sealed record ArchivedMessageStream : IArchivedMessageStream, IDisposable, IAsyncDisposable
 {
     private readonly Stream _stream;
 
     public ArchivedMessageStream(FileStorageFile fileStorageFile)
-    {
-        ArgumentNullException.ThrowIfNull(fileStorageFile);
+        : this(fileStorageFile?.Stream) { }
 
-        _stream = fileStorageFile.Stream;
+    public ArchivedMessageStream(IMarketDocumentStream marketDocumentStream)
+        : this(marketDocumentStream?.Stream) { }
+
+    public ArchivedMessageStream(IIncomingMessageStream incomingMessageStream)
+        : this(incomingMessageStream?.Stream) { }
+
+    private ArchivedMessageStream(Stream? stream)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+
+        _stream = stream;
     }
 
     public Stream Stream

@@ -50,7 +50,7 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
         ArgumentNullException.ThrowIfNull(message);
 
         // Must upload to file storage before adding to database, to ensure the file cannot be added to the db without the file existing in file storage
-        await _fileStorageClient.UploadAsync(message.FileStorageReference, message.Document).ConfigureAwait(false);
+        await _fileStorageClient.UploadAsync(message.FileStorageReference, message.ArchivedMessageStream.Stream).ConfigureAwait(false);
 
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
 
