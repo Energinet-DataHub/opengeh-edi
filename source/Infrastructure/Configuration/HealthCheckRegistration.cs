@@ -56,22 +56,6 @@ public static class HealthCheckRegistration
         }
     }
 
-    /// <summary>
-    /// Used for Service Bus queues where the app doesn't have peek permissions (the app only has sender permissions)
-    /// </summary>
-    public static void AddExternalDomainServiceBusQueuesSenderHealthCheck(this IServiceCollection services, string serviceBusConnectionString, [NotNull] params string[] queueNames)
-    {
-        foreach (var name in queueNames)
-        {
-            services.AddHealthChecks()
-                .AddAzureServiceBusQueue(
-                    name: name + "Exists",
-                    connectionString: serviceBusConnectionString,
-                    queueName: name,
-                    configure: o => o.UsePeekMode = false);
-        }
-    }
-
     public static void AddExternalServiceBusSubscriptionsHealthCheck(
         this IServiceCollection services,
         string serviceBusConnectionString,
