@@ -74,21 +74,11 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
             outgoingMessages);
     }
 
-    private static async Task<string> ConvertToStringAsync(Stream stream)
-    {
-        using var streamReader = new StreamReader(stream);
-
-        stream.Position = 0; // Make sure we read the entire stream
-        var convertedToString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
-
-        return convertedToString;
-    }
-
     private async Task DownloadAndSetMessageRecordAsync(OutgoingMessage outgoingMessage)
     {
-        var downloadedFile = await _fileStorageClient.DownloadAsync(outgoingMessage.FileStorageReference).ConfigureAwait(false);
+        var fileStorageFile = await _fileStorageClient.DownloadAsync(outgoingMessage.FileStorageReference).ConfigureAwait(false);
 
-        var messageRecord = await ConvertToStringAsync(downloadedFile.Stream).ConfigureAwait(false);
+        var messageRecord = await fileStorageFile.ReadAsStringAsync().ConfigureAwait(false);
 
         outgoingMessage.SetMessageRecord(messageRecord);
     }

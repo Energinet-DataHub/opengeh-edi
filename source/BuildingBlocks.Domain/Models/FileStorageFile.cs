@@ -16,24 +16,19 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 /// <summary>
-/// A file downloaded from File Storage, using a <see cref="IFileStorageClient"/>
+/// A file downloaded from File Storage, using a IFileStorageClient/>
 /// </summary>
-public sealed record DownloadedFile : IDisposable
+public sealed record FileStorageFile(Stream Stream) : IDisposable
 {
     private string? _contentAsString;
 
-    internal DownloadedFile(Stream stream)
-    {
-        Stream = stream;
-    }
-
     /// <summary>
-    /// The <see cref="Stream"/> contains the downloaded file content. If using <see cref="DataLakeFileStorageClient"/> the file is downloaded the first time this stream is read.
+    /// The <see cref="Stream"/> contains the stream from file storage. If using a DataLakeFileStorageClient the file is downloaded the first time this stream is read.
     /// </summary>
-    public Stream Stream { get; }
+    public Stream Stream { get; } = Stream;
 
     /// <summary>
     /// Reads and caches the underlying stream into a string

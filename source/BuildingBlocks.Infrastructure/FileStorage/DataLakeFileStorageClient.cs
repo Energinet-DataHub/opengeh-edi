@@ -63,7 +63,7 @@ public class DataLakeFileStorageClient : IFileStorageClient
         await UploadAsync(reference, memoryStream).ConfigureAwait(false);
     }
 
-    public async Task<DownloadedFile> DownloadAsync(FileStorageReference reference)
+    public async Task<FileStorageFile> DownloadAsync(FileStorageReference reference)
     {
         ArgumentNullException.ThrowIfNull(reference);
 
@@ -74,6 +74,6 @@ public class DataLakeFileStorageClient : IFileStorageClient
         // OpenReadAsync() returns a stream for the file, and the file is downloaded the first time the stream is read
         var downloadStream = await blob.OpenReadAsync().ConfigureAwait(false);
 
-        return new DownloadedFile(downloadStream);
+        return new FileStorageFile(downloadStream);
     }
 }
