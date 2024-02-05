@@ -18,17 +18,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
-using Energinet.DataHub.EDI.Api.OpenApi;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using IncomingMessages.Infrastructure;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
-using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
 using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
 
 namespace Energinet.DataHub.EDI.Api.IncomingMessages;
 
@@ -48,36 +44,6 @@ public class RequestAggregatedMeasureMessageReceiver
         _correlationContext = correlationContext;
     }
 
-    [OpenApiOperation(
-        "RequestAggregatedMeasureData",
-        "DataHub3",
-        Description = "Is the endpoint for requesting previously aggregated measured data",
-        Visibility = OpenApiVisibilityType.Important)]
-    [OpenApiSecurity(
-        OpenApiResources.OpenApiSecuritySchemaName,
-        SecuritySchemeType.Http,
-        Name = OpenApiResources.OpenApiSecurityName,
-        In = OpenApiSecurityLocationType.Header,
-        Description = OpenApiResources.OpenApiSecurityDescription,
-        Scheme = OpenApiSecuritySchemeType.Bearer,
-        BearerFormat = OpenApiResources.OpenApiSecurityBearerFormat)]
-    [OpenApiParameter(
-        "Content-Type",
-        In = ParameterLocation.Header,
-        Required = true,
-        Type = typeof(string),
-        Summary = "Request",
-        Description = "Content type for requested response")]
-    [OpenApiRequestBody(
-        "application/json",
-        typeof(string),
-        Description = "Must be supplied a valid RSM-016 request message")]
-    [OpenApiResponseWithoutBody(HttpStatusCode.Accepted, Description = "Request accepted")]
-    [OpenApiResponseWithBody(
-        HttpStatusCode.BadRequest,
-        "application/json",
-        typeof(string),
-        Description = "Request validation failed, response contains error message")]
     [Function(nameof(RequestAggregatedMeasureMessageReceiver))]
     public async Task<HttpResponseData> RunAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")]

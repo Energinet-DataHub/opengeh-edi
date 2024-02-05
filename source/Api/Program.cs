@@ -43,9 +43,6 @@ using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf.Reflection;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Abstractions;
-using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Configurations;
-using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -53,7 +50,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 
 namespace Energinet.DataHub.EDI.Api
 {
@@ -108,21 +104,6 @@ namespace Energinet.DataHub.EDI.Api
                     services.AddApplicationInsights();
                     services.ConfigureFunctionsApplicationInsights();
                     services.AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>();
-                    services.AddSingleton<IOpenApiConfigurationOptions>(
-                        _ =>
-                        {
-                            var options = new OpenApiConfigurationOptions
-                            {
-                                Info = new OpenApiInfo
-                                {
-                                    Version = "1.0",
-                                    Title = "DataHub 3 EDI API",
-                                    Description = "Endpoints for communicating with DataHub 3",
-                                },
-                                OpenApiVersion = OpenApiVersionType.V3,
-                            };
-                            return options;
-                        });
                     services.AddAuthentication(sp =>
                     {
                         return new MarketActorAuthenticator(
@@ -149,9 +130,11 @@ namespace Energinet.DataHub.EDI.Api
                     services.AddExternalDomainServiceBusQueuesHealthCheck(
                         runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
                         runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!,
-                        runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!);
+                        runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!,
+                        runtime.INCOMING_MESSAGES_QUEUE_NAME!);
                     services.AddSqlServerHealthCheck(runtime.DB_CONNECTION_STRING!);
-                    services.AddBlobStorageHealthCheck(runtime.AzureWebJobsStorage!);
+                    services.AddBlobStorageHealthCheck("edi-web-jobs-storage", runtime.AzureWebJobsStorage!);
+                    services.AddBlobStorageHealthCheck("edi-documents-storage", runtime.AZURE_STORAGE_ACCOUNT_URL!);
 
                     var integrationEventDescriptors = new List<MessageDescriptor>
                     {
