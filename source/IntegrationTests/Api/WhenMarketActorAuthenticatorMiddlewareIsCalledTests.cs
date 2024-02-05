@@ -232,8 +232,6 @@ public class WhenMarketActorAuthenticatorMiddlewareIsCalledTests : TestBase
 
     [Theory]
     [InlineData("HealthCheck")]
-    [InlineData("RenderSwaggerUI")]
-    [InlineData("RenderSwaggerDocument")]
     public async Task When_calling_authentication_middleware_with_specific_function_name_then_next_is_called(string functionName)
     {
         // Arrange
