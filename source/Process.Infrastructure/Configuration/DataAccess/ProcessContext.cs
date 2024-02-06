@@ -14,6 +14,7 @@
 
 using System;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
 using Microsoft.EntityFrameworkCore;
@@ -36,12 +37,15 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess
 
         public DbSet<QueuedInternalCommand> QueuedInternalCommands { get; private set; }
 
+        public DbSet<ReceivedInboxEvent> ReceivedInboxEvents { get; private set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             ArgumentNullException.ThrowIfNull(modelBuilder);
 
             modelBuilder.ApplyConfiguration(new AggregatedMeasureDataProcessEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QueuedInternalCommandEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new ReceivedInboxEventEntityConfiguration());
         }
     }
 }

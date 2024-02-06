@@ -20,9 +20,9 @@ using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Common.DateTime;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
@@ -40,7 +40,7 @@ public class WhenAnInboxEventIsReceivedTests : TestBase
      : base(integrationTestFixture)
     {
         _receiver = new InboxEventReceiver(
-            GetService<B2BContext>(),
+            GetService<ProcessContext>(),
             GetService<ISystemDateTimeProvider>(),
             new IInboxEventMapper[]
         {
@@ -65,7 +65,10 @@ public class WhenAnInboxEventIsReceivedTests : TestBase
     {
         // Arrange
         var noIntegrationEventMappers = new List<IInboxEventMapper>();
-        _receiver = new InboxEventReceiver(GetService<B2BContext>(), GetService<ISystemDateTimeProvider>(), noIntegrationEventMappers);
+        _receiver = new InboxEventReceiver(
+            GetService<ProcessContext>(),
+            GetService<ISystemDateTimeProvider>(),
+            noIntegrationEventMappers);
 
         // Act
         await EventIsReceived(_eventId);

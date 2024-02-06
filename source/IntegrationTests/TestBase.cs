@@ -38,7 +38,6 @@ using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
@@ -51,6 +50,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application.Configuration;
 using Energinet.DataHub.EDI.Process.Application.Configuration;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Google.Protobuf;
 using IncomingMessages.Infrastructure.Configuration.DataAccess;
 using MediatR;
@@ -68,7 +68,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
     public class TestBase : IDisposable
     {
         private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
-        private readonly B2BContext _b2BContext;
         private readonly ProcessContext _processContext;
         private readonly IncomingMessagesContext _incomingMessagesContext;
         private ServiceCollection? _services;
@@ -83,7 +82,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
             InboxEventNotificationHandler = new TestNotificationHandlerSpy();
             BuildServices(integrationTestFixture.AzuriteManager.BlobStorageConnectionString);
-            _b2BContext = GetService<B2BContext>();
             _processContext = GetService<ProcessContext>();
             _incomingMessagesContext = GetService<IncomingMessagesContext>();
             AuthenticatedActor = GetService<AuthenticatedActor>();
@@ -184,7 +182,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 return;
             }
 
-            _b2BContext.Dispose();
             _processContext.Dispose();
             _incomingMessagesContext.Dispose();
             _serviceBusSenderFactoryStub.Dispose();
@@ -266,6 +263,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             _services.AddTransient<IRequestHandler<TestCommand, Unit>, TestCommandHandler>();
             _services.AddTransient<IRequestHandler<TestCreateOutgoingMessageCommand, Unit>, TestCreateOutgoingCommandHandler>();
 
+            _services.AddScopedSqlDbContext<ProcessContext>(config);
             _services.AddScopedSqlDbContext<B2BContext>(config);
 
             _services.AddTransient<IIntegrationEventHandler, IntegrationEventHandler>();

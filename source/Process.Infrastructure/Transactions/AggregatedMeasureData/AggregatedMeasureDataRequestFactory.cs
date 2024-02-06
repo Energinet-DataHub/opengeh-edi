@@ -18,7 +18,7 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.Edi.Requests;
 using Google.Protobuf;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
 
 public static class AggregatedMeasureDataRequestFactory
 {
@@ -34,7 +34,6 @@ public static class AggregatedMeasureDataRequestFactory
             Subject = body.GetType().Name,
             MessageId = process.ProcessId.Id.ToString(),
         };
-
         message.ApplicationProperties.Add("ReferenceId", process.ProcessId.Id.ToString());
         return message;
     }

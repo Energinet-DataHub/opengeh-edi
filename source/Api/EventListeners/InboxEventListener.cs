@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Configuration;
 using Energinet.DataHub.EDI.Common.Serialization;
-using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
+using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.EDI.Api.EventListeners;

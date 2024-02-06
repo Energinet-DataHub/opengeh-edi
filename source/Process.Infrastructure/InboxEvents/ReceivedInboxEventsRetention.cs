@@ -22,7 +22,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.Infrastructure.InboxEvents;
+namespace Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 
 public class ReceivedInboxEventsRetention : IDataRetention
 {
