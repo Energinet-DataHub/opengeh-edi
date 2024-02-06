@@ -17,18 +17,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Common.DateTime;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 
-namespace Energinet.DataHub.EDI.Infrastructure.InboxEvents;
+namespace Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 
 public class InboxEventReceiver
 {
-    private readonly B2BContext _context;
+    private readonly ProcessContext _context;
     private readonly ISystemDateTimeProvider _dateTimeProvider;
     private readonly IEnumerable<IInboxEventMapper> _mappers;
 
     public InboxEventReceiver(
-        B2BContext context,
+        ProcessContext context,
         ISystemDateTimeProvider dateTimeProvider,
         IEnumerable<IInboxEventMapper> mappers)
     {
