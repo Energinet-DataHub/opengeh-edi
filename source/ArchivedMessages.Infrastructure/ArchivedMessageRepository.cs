@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -25,7 +23,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
-using Microsoft.Data.SqlClient;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 
