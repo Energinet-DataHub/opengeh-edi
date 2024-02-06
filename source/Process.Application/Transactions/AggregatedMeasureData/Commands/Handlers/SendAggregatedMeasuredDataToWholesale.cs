@@ -15,9 +15,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Infrastructure.Wholesale;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Infrastructure.Wholesale;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands.Handlers;
@@ -43,8 +43,7 @@ public class SendAggregatedMeasuredDataToWholesale : IRequestHandler<SendAggrega
 
         var process = await _aggregatedMeasureDataProcessRepository
             .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
-        var serviceBusMessage = AggregatedMeasureDataRequestFactory.CreateServiceBusMessage(process);
-        await _wholesaleInbox.SendAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
+        await _wholesaleInbox.SendProcessAsync(process, cancellationToken).ConfigureAwait(false);
 
         process.WasSentToWholesale();
 

@@ -16,12 +16,16 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.EDI.Application.Wholesale;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
+using Energinet.DataHub.EDI.Process.Domain.Transactions;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
+using Energinet.DataHub.EDI.Process.Domain.Wholesale;
+using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
 using Microsoft.Extensions.Options;
 using ServiceBusClientOptions = Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options.ServiceBusClientOptions;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Wholesale;
+namespace Energinet.DataHub.EDI.Process.Infrastructure.Wholesale;
 
 public class WholesaleInbox : IWholesaleInbox
 {
@@ -37,10 +41,12 @@ public class WholesaleInbox : IWholesaleInbox
         _senderCreator = serviceBusSenderFactory.GetSender(options.Value.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME);
     }
 
-    public async Task SendAsync(
-        ServiceBusMessage request,
+    public async Task SendProcessAsync(
+        AggregatedMeasureDataProcess aggregatedMeasureDataProcess,
         CancellationToken cancellationToken)
     {
-        await _senderCreator.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        ArgumentNullException.ThrowIfNull(aggregatedMeasureDataProcess);
+        var serviceBusMessage = AggregatedMeasureDataRequestFactory.CreateServiceBusMessage(aggregatedMeasureDataProcess);
+        await _senderCreator.SendAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
     }
 }

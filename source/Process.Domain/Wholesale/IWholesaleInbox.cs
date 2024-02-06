@@ -12,30 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 
-namespace Energinet.DataHub.EDI.Infrastructure.InboxEvents;
+namespace Energinet.DataHub.EDI.Process.Domain.Wholesale;
 
 /// <summary>
-/// Maps from an inbox event to a notification
+/// Interface for wholesale inbox
 /// </summary>
-public interface IInboxEventMapper
+public interface IWholesaleInbox
 {
     /// <summary>
-    /// Map payload to a notification
+    /// Send <paramref name="aggregatedMeasureDataProcess"/> to wholesale
     /// </summary>
-    /// <param name="payload"></param>
-    /// <param name="referenceId"></param>
+    /// <param name="aggregatedMeasureDataProcess"></param>
     /// <param name="cancellationToken"></param>
-    /// <returns><see cref="INotification"/></returns>
-    Task<INotification> MapFromAsync(byte[] payload, Guid referenceId, CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Determines whether the specified event type can be handled by the mapper
-    /// </summary>
-    /// <param name="eventType"></param>
-    bool CanHandle(string eventType);
+    Task SendProcessAsync(AggregatedMeasureDataProcess aggregatedMeasureDataProcess, CancellationToken cancellationToken);
 }
