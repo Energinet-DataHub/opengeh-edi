@@ -24,9 +24,9 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
     {
         public static readonly FileStorageCategory FileStorageCategory = FileStorageCategory.OutgoingMessage();
 
-        private string? _messageRecord;
+        private string? _serializedContent;
 
-        public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, Guid processId, string businessReason, ActorRole receiverRole, ActorNumber senderId, ActorRole senderRole, string messageRecord, Instant timestamp)
+        public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, Guid processId, string businessReason, ActorRole receiverRole, ActorNumber senderId, ActorRole senderRole, string serializedContent, Instant timestamp)
         {
             Id = OutgoingMessageId.New();
             DocumentType = documentType;
@@ -36,7 +36,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             ReceiverRole = receiverRole;
             SenderId = senderId;
             SenderRole = senderRole;
-            _messageRecord = messageRecord;
+            _serializedContent = serializedContent;
             FileStorageReference = CreateFileStorageReference(ReceiverId, timestamp, Id);
         }
 
@@ -63,7 +63,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             SenderId = senderId;
             SenderRole = senderRole;
             FileStorageReference = fileStorageReference;
-            // _messageRecord is set later in OutgoingMessageRepository, by getting the message from File Storage
+            // _serializedContent is set later in OutgoingMessageRepository, by getting the message from File Storage
         }
 
         public OutgoingMessageId Id { get; }
@@ -95,18 +95,18 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             AssignedBundleId = bundleId;
         }
 
-        public void SetMessageRecord(string messageRecord)
+        public void SetSerializedContent(string serializedMessageContent)
         {
-            _messageRecord = messageRecord;
+            _serializedContent = serializedMessageContent;
         }
 
         [SuppressMessage("Design", "CA1024:Use properties where appropriate", Justification = "Can cause error as a property because of serialization and message record maybe being null at the time")]
-        public string GetMessageRecord()
+        public string GetSerializedContent()
         {
-            if (_messageRecord == null)
-                throw new InvalidOperationException($"{nameof(OutgoingMessage)}.{nameof(_messageRecord)} is null which shouldn't be possible. Make sure the {nameof(OutgoingMessage)} is retrieved by a {nameof(IOutgoingMessageRepository)}, which sets the {nameof(_messageRecord)} field");
+            if (_serializedContent == null)
+                throw new InvalidOperationException($"{nameof(OutgoingMessage)}.{nameof(_serializedContent)} is null which shouldn't be possible. Make sure the {nameof(OutgoingMessage)} is retrieved by a {nameof(IOutgoingMessageRepository)}, which sets the {nameof(_serializedContent)} field");
 
-            return _messageRecord;
+            return _serializedContent;
         }
 
         private static FileStorageReference CreateFileStorageReference(ActorNumber receiverActorNumber, Instant timestamp, OutgoingMessageId outgoingMessageId)

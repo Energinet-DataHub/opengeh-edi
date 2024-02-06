@@ -42,7 +42,7 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
         // Must await here to make sure the file is uploaded correctly before adding the outgoing message to the db context
         await _fileStorageClient.UploadAsync(
                 message.FileStorageReference,
-                message.GetMessageRecord())
+                message.GetSerializedContent())
             .ConfigureAwait(false);
 
         _context.OutgoingMessages.Add(message);
@@ -80,6 +80,6 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
 
         var messageRecord = await fileStorageFile.ReadAsStringAsync().ConfigureAwait(false);
 
-        outgoingMessage.SetMessageRecord(messageRecord);
+        outgoingMessage.SetSerializedContent(messageRecord);
     }
 }

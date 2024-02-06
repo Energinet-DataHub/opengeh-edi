@@ -202,7 +202,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var fileStorageReference = await GetOutgoingMessageFileStorageReferenceFromDatabase(createdId);
 
         var fileContent = await GetFileContentFromFileStorageAsync("outgoing", fileStorageReference);
-        fileContent.Should().Be(message.MessageRecord);
+        fileContent.Should().Be(message.SerializedContent);
     }
 
     [Fact]
