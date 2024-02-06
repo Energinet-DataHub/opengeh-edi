@@ -43,8 +43,7 @@ public class SendAggregatedMeasuredDataToWholesale : IRequestHandler<SendAggrega
 
         var process = await _aggregatedMeasureDataProcessRepository
             .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
-        var serviceBusMessage = AggregatedMeasureDataRequestFactory.CreateServiceBusMessage(process);
-        await _wholesaleInbox.SendAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
+        await _wholesaleInbox.SendProcessAsync(process, cancellationToken).ConfigureAwait(false);
 
         process.WasSentToWholesale();
 
