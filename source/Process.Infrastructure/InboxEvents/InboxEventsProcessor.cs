@@ -23,7 +23,7 @@ using Energinet.DataHub.EDI.Common.DateTime;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.EDI.Infrastructure.InboxEvents;
+namespace Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 
 public class InboxEventsProcessor
 {
@@ -69,7 +69,7 @@ public class InboxEventsProcessor
             catch (Exception e)
             {
                 await MarkAsFailedAsync(inboxEvent, e, cancellationToken).ConfigureAwait(false);
-                _logger.LogError(e, "Failed to process inbox event. Id: {id}, EventType: {@Event}", inboxEvent.Id, inboxEvent.EventType);
+                _logger.LogError(e, $"Failed to process inbox event. Id: {inboxEvent.Id}, EventType: {inboxEvent.EventType}");
             }
         }
     }

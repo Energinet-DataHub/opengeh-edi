@@ -13,16 +13,16 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
+using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.Collections;
 using MediatR;
+using RejectReason = Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.RejectReason;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 
@@ -46,10 +46,10 @@ public class AggregatedTimeSeriesRequestRejectedMapper : IInboxEventMapper
         return eventType.Equals(nameof(AggregatedTimeSeriesRequestRejected), StringComparison.OrdinalIgnoreCase);
     }
 
-    private static ReadOnlyCollection<Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.RejectReason> MapRejectReasons(RepeatedField<RejectReason> rejectReasons)
+    private static ReadOnlyCollection<RejectReason> MapRejectReasons(RepeatedField<Edi.Responses.RejectReason> rejectReasons)
     {
         return rejectReasons
-            .Select(reason => new Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.RejectReason(
+            .Select(reason => new RejectReason(
                 reason.ErrorCode,
                 reason.ErrorMessage))
             .ToList()
