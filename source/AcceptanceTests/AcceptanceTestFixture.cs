@@ -27,7 +27,6 @@ public class AcceptanceTestFixture : IAsyncLifetime
     internal const string CimActorGridArea = "804";
 
     internal const string ActorNumber = "5790000610976"; // Corresponds to the "Mosaic 03" actor in the UI.
-    internal const string ActorGridArea = "543";
     internal const string ActorRole = "metereddataresponsible";
 
     private readonly Uri _azureEntraB2CTenantUrl;

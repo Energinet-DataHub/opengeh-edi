@@ -15,7 +15,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Responses.xml;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.Asserters;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.B2BErrors.Asserters;
 
 [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Test code should not configure await")]
 public static class ErrorAsserter

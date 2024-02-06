@@ -15,7 +15,6 @@
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.TestData;
-using Energinet.DataHub.EDI.AcceptanceTests.Tests.Asserters;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 

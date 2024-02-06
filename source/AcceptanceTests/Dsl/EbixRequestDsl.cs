@@ -13,12 +13,10 @@
 // limitations under the License.
 
 using System.Net;
-using System.ServiceModel;
 using System.ServiceModel.Security;
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
-using Energinet.DataHub.EDI.AcceptanceTests.TestData;
 using FluentAssertions;
 using FluentAssertions.Execution;
 
