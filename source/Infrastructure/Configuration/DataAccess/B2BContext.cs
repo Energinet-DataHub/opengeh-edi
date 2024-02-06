@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.EDI.Infrastructure.InboxEvents;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
@@ -30,13 +29,9 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
         {
         }
 
-        public DbSet<ReceivedInboxEvent> ReceivedInboxEvents { get; private set; }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             ArgumentNullException.ThrowIfNull(modelBuilder);
-
-            modelBuilder.ApplyConfiguration(new ReceivedInboxEventEntityConfiguration());
         }
     }
 }
