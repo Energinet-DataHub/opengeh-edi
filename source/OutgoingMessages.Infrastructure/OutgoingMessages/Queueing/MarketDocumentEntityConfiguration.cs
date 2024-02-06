@@ -14,6 +14,7 @@
 
 using System;
 using System.IO;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -26,16 +27,17 @@ public class MarketDocumentEntityConfiguration : IEntityTypeConfiguration<Market
     {
         ArgumentNullException.ThrowIfNull(builder);
         builder.ToTable("MarketDocuments", "dbo");
-        builder.HasKey("_id");
+        builder.HasKey(x => x.Id);
 
-        builder.Property<Guid>("_id").HasColumnName("Id");
+        builder.Property(x => x.Id)
+            .ValueGeneratedNever();
 
         builder.Property(md => md.BundleId)
             .HasConversion(toDbValue => toDbValue.Id, fromDbValue => BundleId.Create(fromDbValue));
 
-        builder.Property(entity => entity.Payload)
+        builder.Property(entity => entity.FileStorageReference)
             .HasConversion(
-                toDbValue => ((MemoryStream)toDbValue).ToArray(),
-                fromDbValue => new MemoryStream(fromDbValue));
+                fileStorageReference => fileStorageReference.Path,
+                dbValue => new FileStorageReference(MarketDocument.FileStorageCategory, dbValue));
     }
 }

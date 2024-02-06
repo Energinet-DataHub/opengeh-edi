@@ -17,6 +17,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 
@@ -42,5 +43,5 @@ public interface IDocumentWriter
     /// </summary>
     /// <param name="header"></param>
     /// <param name="marketActivityRecords"></param>
-    Task<Stream> WriteAsync(OutgoingMessageHeader header, IReadOnlyCollection<string> marketActivityRecords);
+    Task<MarketDocumentStream> WriteAsync(OutgoingMessageHeader header, IReadOnlyCollection<string> marketActivityRecords);
 }

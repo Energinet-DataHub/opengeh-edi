@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Json;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
 
@@ -48,9 +49,9 @@ public class RejectRequestAggregatedMeasureDataJsonDocumentWriter : IDocumentWri
         return documentType == DocumentType.RejectRequestAggregatedMeasureData;
     }
 
-    public async Task<Stream> WriteAsync(OutgoingMessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
+    public async Task<MarketDocumentStream> WriteAsync(OutgoingMessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
     {
-        var stream = new MemoryStream();
+        var stream = new MarketDocumentWriterMemoryStream();
         var options = new JsonWriterOptions() { Indented = true };
         using var writer = new Utf8JsonWriter(stream, options);
 
@@ -59,7 +60,7 @@ public class RejectRequestAggregatedMeasureDataJsonDocumentWriter : IDocumentWri
         writer.WriteEndObject();
         await writer.FlushAsync().ConfigureAwait(false);
         stream.Position = 0;
-        return stream;
+        return new MarketDocumentStream(stream);
     }
 
     private void WriteSeries(IReadOnlyCollection<string> marketActivityRecords, Utf8JsonWriter writer)

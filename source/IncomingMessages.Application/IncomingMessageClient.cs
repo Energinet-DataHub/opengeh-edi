@@ -59,16 +59,16 @@ public class IncomingMessageClient : IIncomingMessageClient
     }
 
     public async Task<ResponseMessage> RegisterAndSendAsync(
-        Stream message,
+        IIncomingMessageStream incomingMessageStream,
         DocumentFormat documentFormat,
         IncomingDocumentType documentType,
         CancellationToken cancellationToken,
         DocumentFormat responseFormat = null!)
     {
-        ArgumentNullException.ThrowIfNull(message);
+        ArgumentNullException.ThrowIfNull(incomingMessageStream);
 
         var requestAggregatedMeasureDataMarketMessageParserResult =
-            await _marketMessageParser.ParseAsync(message, documentFormat, documentType, cancellationToken)
+            await _marketMessageParser.ParseAsync(incomingMessageStream, documentFormat, documentType, cancellationToken)
                 .ConfigureAwait(false);
 
         if (requestAggregatedMeasureDataMarketMessageParserResult.Errors.Count != 0 && requestAggregatedMeasureDataMarketMessageParserResult.Dto == null)
@@ -78,7 +78,7 @@ public class IncomingMessageClient : IIncomingMessageClient
             return _responseFactory.From(res, responseFormat ?? documentFormat);
         }
 
-        await ArchiveIncomingMessageAsync(message, requestAggregatedMeasureDataMarketMessageParserResult, cancellationToken)
+        await ArchiveIncomingMessageAsync(incomingMessageStream, requestAggregatedMeasureDataMarketMessageParserResult, cancellationToken)
             .ConfigureAwait(false);
 
         var validationResult = await _aggregatedMeasureDataMarketMessageValidator
@@ -111,7 +111,7 @@ public class IncomingMessageClient : IIncomingMessageClient
     }
 
     private async Task ArchiveIncomingMessageAsync(
-        Stream message,
+        IIncomingMessageStream incomingMessageStream,
         RequestAggregatedMeasureDataMarketMessageParserResult requestAggregatedMeasureDataMarketMessageParserResult,
         CancellationToken cancellationToken)
     {
@@ -124,7 +124,7 @@ public class IncomingMessageClient : IIncomingMessageClient
                 _systemDateTimeProvider.Now(),
                 requestAggregatedMeasureDataMarketMessageParserResult.Dto!.BusinessReason,
                 ArchivedMessageType.IncomingMessage,
-                message),
+                incomingMessageStream),
             cancellationToken).ConfigureAwait(false);
     }
 }

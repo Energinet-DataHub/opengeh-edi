@@ -15,7 +15,9 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Azure;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
@@ -34,7 +36,7 @@ public class DataLakeFileStorageClient : IFileStorageClient
         ArgumentNullException.ThrowIfNull(stream);
         ArgumentNullException.ThrowIfNull(reference);
 
-        var container = _blobServiceClient.GetBlobContainerClient(reference.Category);
+        var container = _blobServiceClient.GetBlobContainerClient(reference.Category.Value);
 
         var containerExists = await container.ExistsAsync().ConfigureAwait(false);
 
@@ -61,18 +63,17 @@ public class DataLakeFileStorageClient : IFileStorageClient
         await UploadAsync(reference, memoryStream).ConfigureAwait(false);
     }
 
-    public async Task<Stream> DownloadAsync(FileStorageReference reference)
+    public async Task<FileStorageFile> DownloadAsync(FileStorageReference reference)
     {
         ArgumentNullException.ThrowIfNull(reference);
 
-        var container = _blobServiceClient.GetBlobContainerClient(reference.Category);
+        var container = _blobServiceClient.GetBlobContainerClient(reference.Category.Value);
 
         var blob = container.GetBlobClient(reference.Path);
 
-        var stream = new MemoryStream();
-        await blob.DownloadToAsync(stream).ConfigureAwait(false);
+        // OpenReadAsync() returns a stream for the file, and the file is downloaded the first time the stream is read
+        var downloadStream = await blob.OpenReadAsync().ConfigureAwait(false);
 
-        stream.Position = 0; // Make sure stream is ready to be read
-        return stream;
+        return new FileStorageFile(downloadStream);
     }
 }

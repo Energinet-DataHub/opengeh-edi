@@ -12,15 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 
-#pragma warning disable SA1600
-public interface IIncomingMessageClient
+#pragma warning disable CA1711 // Is a "Stream" value object
+public record MarketDocumentStream : StreamValueObject, IMarketDocumentStream
 {
-    Task<ResponseMessage> RegisterAndSendAsync(IIncomingMessageStream incomingMessageStream, DocumentFormat documentFormat, IncomingDocumentType documentType, CancellationToken cancellationToken, DocumentFormat responseFormat = null!);
+    public MarketDocumentStream(IArchivedFile archivedFile)
+        : base(archivedFile?.Document.Stream)
+    { }
+
+    public MarketDocumentStream(FileStorageFile fileStorageFile)
+        : base(fileStorageFile?.Stream) { }
+
+    public MarketDocumentStream(MarketDocumentWriterMemoryStream stream)
+        : base(stream)
+    { }
 }

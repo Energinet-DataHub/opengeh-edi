@@ -37,7 +37,7 @@ public interface IArchivedMessageRepository
     /// <param name="id"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>Stream</returns>
-    Task<Stream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken);
+    Task<ArchivedMessageStream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken);
 
     /// <summary>
     /// Search for messages in the database

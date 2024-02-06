@@ -30,7 +30,7 @@ public class OutgoingMessageDto
         ActorRole receiverRole,
         ActorNumber senderId,
         ActorRole senderRole,
-        string messageRecord)
+        string serializedContent)
     {
         DocumentType = documentType;
         ReceiverId = receiverId;
@@ -39,7 +39,7 @@ public class OutgoingMessageDto
         ReceiverRole = receiverRole;
         SenderId = senderId;
         SenderRole = senderRole;
-        MessageRecord = messageRecord;
+        SerializedContent = serializedContent;
     }
 
     public DocumentType DocumentType { get; set; }
@@ -56,5 +56,5 @@ public class OutgoingMessageDto
 
     public ActorRole SenderRole { get; }
 
-    public string MessageRecord { get; }
+    public string SerializedContent { get; }
 }

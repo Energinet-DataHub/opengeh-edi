@@ -32,12 +32,6 @@ public abstract class JsonParserBase
         _schemaProvider = schemaProvider;
     }
 
-    public static void ResetMessagePosition(Stream message)
-    {
-        if (message is { CanRead: true } && message.Position > 0)
-            message.Position = 0;
-    }
-
     protected static RequestAggregatedMeasureDataMarketMessageParserResult InvalidJsonFailure(
         Exception exception)
     {
@@ -66,16 +60,16 @@ public abstract class JsonParserBase
         return _schemaProvider.GetSchemaAsync<JsonSchema>(documentName.ToUpper(CultureInfo.InvariantCulture), "0", cancellationToken);
     }
 
-    protected async Task<List<ValidationError>> ValidateMessageAsync(JsonSchema schema, Stream message)
+    protected async Task<List<ValidationError>> ValidateMessageAsync(JsonSchema schema, IIncomingMessageStream message)
     {
-        var jsonDocument = await JsonDocument.ParseAsync(message).ConfigureAwait(false);
+        ArgumentNullException.ThrowIfNull(message);
+
+        var jsonDocument = await JsonDocument.ParseAsync(message.Stream).ConfigureAwait(false);
 
         if (IsValid(jsonDocument, schema) == false)
         {
             ExtractValidationErrors(jsonDocument, schema);
         }
-
-        ResetMessagePosition(message);
 
         return _errors.DistinctBy(x => x.Message).ToList();
     }
