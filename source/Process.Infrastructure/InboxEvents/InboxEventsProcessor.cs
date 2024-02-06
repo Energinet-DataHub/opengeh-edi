@@ -69,9 +69,7 @@ public class InboxEventsProcessor
             catch (Exception e)
             {
                 await MarkAsFailedAsync(inboxEvent, e, cancellationToken).ConfigureAwait(false);
-#pragma warning disable CA1727
-                _logger.LogError(e, "Failed to process inbox event. Id: {id}, EventType: {@Event}", inboxEvent.Id, inboxEvent.EventType);
-#pragma warning restore CA1727
+                _logger.LogError(e, $"Failed to process inbox event. Id: {inboxEvent.Id}, EventType: {inboxEvent.EventType}");
             }
         }
     }
