@@ -46,7 +46,8 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
     {
         ArgumentNullException.ThrowIfNull(message);
 
-        await _fileStorageClient.UploadAsync(message.FileStorageReference, message.Document).ConfigureAwait(false);
+        // Must upload to file storage before adding to database, to ensure the file cannot be added to the db without the file existing in file storage
+        await _fileStorageClient.UploadAsync(message.FileStorageReference, message.ArchivedMessageStream.Stream).ConfigureAwait(false);
 
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
 
@@ -70,7 +71,7 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
         await connection.ExecuteAsync(sql, parameters).ConfigureAwait(false);
     }
 
-    public async Task<Stream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken)
+    public async Task<ArchivedMessageStream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(id);
 
@@ -86,9 +87,9 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
 
         var fileStorageReference = new FileStorageReference(ArchivedMessage.FileStorageCategory, fileStorageReferenceString);
 
-        var stream = await _fileStorageClient.DownloadAsync(fileStorageReference).ConfigureAwait(false);
+        var fileStorageFile = await _fileStorageClient.DownloadAsync(fileStorageReference).ConfigureAwait(false);
 
-        return stream;
+        return new ArchivedMessageStream(fileStorageFile);
     }
 
     public async Task<MessageSearchResult> SearchAsync(GetMessagesQuery queryInput, CancellationToken cancellationToken)

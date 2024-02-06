@@ -37,7 +37,7 @@ public class FileStorageClientStub : IFileStorageClient
         return Task.CompletedTask;
     }
 
-    public Task<Stream> DownloadAsync(FileStorageReference reference)
+    public Task<FileStorageFile> DownloadAsync(FileStorageReference reference)
     {
         throw new NotImplementedException();
     }

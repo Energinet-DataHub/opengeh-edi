@@ -13,14 +13,7 @@
 // limitations under the License.
 
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 
-#pragma warning disable SA1600
-public interface IIncomingMessageClient
-{
-    Task<ResponseMessage> RegisterAndSendAsync(IIncomingMessageStream incomingMessageStream, DocumentFormat documentFormat, IncomingDocumentType documentType, CancellationToken cancellationToken, DocumentFormat responseFormat = null!);
-}
+public class MarketDocumentWriterMemoryStream : MemoryStream { }

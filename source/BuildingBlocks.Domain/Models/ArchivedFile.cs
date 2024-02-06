@@ -13,14 +13,10 @@
 // limitations under the License.
 
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-#pragma warning disable SA1600
-public interface IIncomingMessageClient
+public record ArchivedFile(FileStorageReference FileStorageReference, IArchivedMessageStream Document) : IArchivedFile
 {
-    Task<ResponseMessage> RegisterAndSendAsync(IIncomingMessageStream incomingMessageStream, DocumentFormat documentFormat, IncomingDocumentType documentType, CancellationToken cancellationToken, DocumentFormat responseFormat = null!);
+    public static readonly FileStorageCategory FileStorageCategory = FileStorageCategory.ArchivedMessage();
 }

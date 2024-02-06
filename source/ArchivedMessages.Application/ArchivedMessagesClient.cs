@@ -18,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Application;
 
@@ -30,13 +31,15 @@ public class ArchivedMessagesClient : IArchivedMessagesClient
         _archivedMessageRepository = archivedMessageRepository;
     }
 
-    public async Task CreateAsync(ArchivedMessage message, CancellationToken cancellationToken)
+    public async Task<IArchivedFile> CreateAsync(ArchivedMessage message, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(message);
         await _archivedMessageRepository.AddAsync(message, cancellationToken).ConfigureAwait(false);
+
+        return new ArchivedFile(message.FileStorageReference, message.ArchivedMessageStream);
     }
 
-    public async Task<Stream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken)
+    public async Task<ArchivedMessageStream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(id);
         return await _archivedMessageRepository.GetAsync(id, cancellationToken).ConfigureAwait(false);

@@ -17,17 +17,16 @@ using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using NodaTime;
-using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing
 {
     public class OutgoingMessage
     {
-        public const string FileStorageCategory = "outgoing";
+        public static readonly FileStorageCategory FileStorageCategory = FileStorageCategory.OutgoingMessage();
 
-        private string _messageRecord;
+        private string? _serializedContent;
 
-        public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, Guid processId, string businessReason, ActorRole receiverRole, ActorNumber senderId, ActorRole senderRole, string messageRecord, Instant timestamp)
+        public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, Guid processId, string businessReason, ActorRole receiverRole, ActorNumber senderId, ActorRole senderRole, string serializedContent, Instant timestamp)
         {
             Id = OutgoingMessageId.New();
             DocumentType = documentType;
@@ -37,10 +36,13 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             ReceiverRole = receiverRole;
             SenderId = senderId;
             SenderRole = senderRole;
-            _messageRecord = messageRecord;
+            _serializedContent = serializedContent;
             FileStorageReference = CreateFileStorageReference(ReceiverId, timestamp, Id);
         }
 
+        /// <summary>
+        /// Should only be used by Entity Framework
+        /// </summary>
         // ReSharper disable once UnusedMember.Local -- Used by Entity Framework
         private OutgoingMessage(
             DocumentType documentType,
@@ -61,8 +63,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             SenderId = senderId;
             SenderRole = senderRole;
             FileStorageReference = fileStorageReference;
-
-            _messageRecord = null!; // Message record is set later from FileStorage
+            // _serializedContent is set later in OutgoingMessageRepository, by getting the message from File Storage
         }
 
         public OutgoingMessageId Id { get; }
@@ -94,15 +95,18 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             AssignedBundleId = bundleId;
         }
 
-        public void SetMessageRecord(string messageRecord)
+        public void SetSerializedContent(string serializedMessageContent)
         {
-            _messageRecord = messageRecord;
+            _serializedContent = serializedMessageContent;
         }
 
         [SuppressMessage("Design", "CA1024:Use properties where appropriate", Justification = "Can cause error as a property because of serialization and message record maybe being null at the time")]
-        public string GetMessageRecord()
+        public string GetSerializedContent()
         {
-            return _messageRecord;
+            if (_serializedContent == null)
+                throw new InvalidOperationException($"{nameof(OutgoingMessage)}.{nameof(_serializedContent)} is null which shouldn't be possible. Make sure the {nameof(OutgoingMessage)} is retrieved by a {nameof(IOutgoingMessageRepository)}, which sets the {nameof(_serializedContent)} field");
+
+            return _serializedContent;
         }
 
         private static FileStorageReference CreateFileStorageReference(ActorNumber receiverActorNumber, Instant timestamp, OutgoingMessageId outgoingMessageId)

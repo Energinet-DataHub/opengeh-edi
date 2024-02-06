@@ -21,7 +21,7 @@ namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
 public class ArchivedMessage
 {
-    public const string FileStorageCategory = "archived";
+    public static readonly FileStorageCategory FileStorageCategory = ArchivedFile.FileStorageCategory;
 
     public ArchivedMessage(
         string? messageId,
@@ -31,7 +31,29 @@ public class ArchivedMessage
         Instant createdAt,
         string? businessReason,
         ArchivedMessageType archivedMessageType,
-        Stream document)
+        IMarketDocumentStream marketDocumentStream)
+        : this(messageId, documentType, senderNumber, receiverNumber, createdAt, businessReason, archivedMessageType, new ArchivedMessageStream(marketDocumentStream)) { }
+
+    public ArchivedMessage(
+        string? messageId,
+        string documentType,
+        string senderNumber, // Doesn't use ActorNumber since we want to make sure to always create a ArchivedMessage
+        string receiverNumber, // Doesn't use ActorNumber since we want to make sure to always create a ArchivedMessage
+        Instant createdAt,
+        string? businessReason,
+        ArchivedMessageType archivedMessageType,
+        IIncomingMessageStream incomingMessageStream)
+        : this(messageId, documentType, senderNumber, receiverNumber, createdAt, businessReason, archivedMessageType, new ArchivedMessageStream(incomingMessageStream)) { }
+
+    private ArchivedMessage(
+        string? messageId,
+        string documentType,
+        string senderNumber, // Doesn't use ActorNumber since we want to make sure to always create a ArchivedMessage
+        string receiverNumber, // Doesn't use ActorNumber since we want to make sure to always create a ArchivedMessage
+        Instant createdAt,
+        string? businessReason,
+        ArchivedMessageType archivedMessageType,
+        ArchivedMessageStream archivedMessageStream)
     {
         Id = ArchivedMessageId.Create();
         MessageId = messageId;
@@ -40,7 +62,7 @@ public class ArchivedMessage
         ReceiverNumber = receiverNumber;
         CreatedAt = createdAt;
         BusinessReason = businessReason;
-        Document = document;
+        ArchivedMessageStream = archivedMessageStream;
 
         var actorNumberForFileStorage = GetActorNumberForFileStoragePlacement(archivedMessageType, senderNumber, receiverNumber);
         FileStorageReference = FileStorageReference.Create(FileStorageCategory, actorNumberForFileStorage, createdAt, Id.Value);
@@ -62,14 +84,14 @@ public class ArchivedMessage
 
     public FileStorageReference FileStorageReference { get; }
 
-    public Stream Document { get; }
+    public ArchivedMessageStream ArchivedMessageStream { get; }
 
-    private string GetActorNumberForFileStoragePlacement(ArchivedMessageType archivedMessageType, string senderActorNumber, string receiverActorNumber)
+    private static string GetActorNumberForFileStoragePlacement(ArchivedMessageType archivedMessageType, string senderActorNumber, string receiverActorNumber)
     {
         return archivedMessageType switch
         {
-            ArchivedMessageType.IncomingMessage => SenderNumber,
-            ArchivedMessageType.OutgoingMessage => ReceiverNumber,
+            ArchivedMessageType.IncomingMessage => senderActorNumber,
+            ArchivedMessageType.OutgoingMessage => receiverActorNumber,
             _ => throw new ArgumentOutOfRangeException(nameof(archivedMessageType), archivedMessageType, "Unknown ArchivedMessageType"),
         };
     }

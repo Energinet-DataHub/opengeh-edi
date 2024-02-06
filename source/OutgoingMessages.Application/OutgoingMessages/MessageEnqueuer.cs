@@ -55,7 +55,7 @@ public class MessageEnqueuer
             messageToEnqueue.ReceiverRole,
             messageToEnqueue.SenderId,
             messageToEnqueue.SenderRole,
-            messageToEnqueue.MessageRecord,
+            messageToEnqueue.SerializedContent,
             _systemDateTimeProvider.Now());
 
         var addToRepositoryTask = _outgoingMessageRepository.AddAsync(outgoingMessage);

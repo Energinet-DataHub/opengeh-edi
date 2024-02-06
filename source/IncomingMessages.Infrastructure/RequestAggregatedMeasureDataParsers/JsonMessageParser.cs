@@ -23,8 +23,7 @@ using IncomingMessages.Infrastructure.ValidationErrors;
 
 namespace IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 
-public class JsonMessageParser : JsonParserBase,
-    IMessageParser
+public class JsonMessageParser : JsonParserBase, IMessageParser
 {
     private const string SeriesElementName = "Series";
     private const string HeaderElementName = "RequestAggregatedMeasureData_MarketDocument";
@@ -40,10 +39,10 @@ public class JsonMessageParser : JsonParserBase,
     public IncomingDocumentType DocumentType => IncomingDocumentType.RequestAggregatedMeasureData;
 
     public async Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(
-        Stream message,
+        IIncomingMessageStream incomingMessageStream,
         CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(message);
+        ArgumentNullException.ThrowIfNull(incomingMessageStream);
 
         var schema = await GetSchemaAsync(DocumentName, cancellationToken).ConfigureAwait(false);
         if (schema is null)
@@ -52,9 +51,7 @@ public class JsonMessageParser : JsonParserBase,
                 new InvalidBusinessReasonOrVersion(DocumentName, "0"));
         }
 
-        ResetMessagePosition(message);
-
-        var errors = await ValidateMessageAsync(schema, message).ConfigureAwait(false);
+        var errors = await ValidateMessageAsync(schema, incomingMessageStream).ConfigureAwait(false);
 
         if (errors.Count > 0)
         {
@@ -63,11 +60,11 @@ public class JsonMessageParser : JsonParserBase,
 
         try
         {
-            using var document = await JsonDocument.ParseAsync(message, cancellationToken: cancellationToken)
+            using var document = await JsonDocument.ParseAsync(incomingMessageStream.Stream, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
-            JsonElement header = document.RootElement.GetProperty(HeaderElementName);
-            JsonElement seriesJson = header.GetProperty(SeriesElementName);
+            var header = document.RootElement.GetProperty(HeaderElementName);
+            var seriesJson = header.GetProperty(SeriesElementName);
 
             return ParseJsonData(MessageHeaderFrom(header), seriesJson);
         }

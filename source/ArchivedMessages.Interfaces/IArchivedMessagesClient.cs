@@ -15,6 +15,7 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
@@ -28,7 +29,7 @@ public interface IArchivedMessagesClient
     /// </summary>
     /// <param name="message"></param>
     /// <param name="cancellationToken"></param>
-    Task CreateAsync(ArchivedMessage message, CancellationToken cancellationToken);
+    Task<IArchivedFile> CreateAsync(ArchivedMessage message, CancellationToken cancellationToken);
 
     /// <summary>
     /// Get a document from the database
@@ -36,7 +37,7 @@ public interface IArchivedMessagesClient
     /// <param name="id"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
-    Task<Stream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken);
+    Task<ArchivedMessageStream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken);
 
     /// <summary>
     /// Search for messages in the database
