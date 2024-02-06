@@ -45,7 +45,8 @@ public class ServiceBusExceptionLoggerMiddleware : IFunctionsWorkerMiddleware
             catch (Exception e)
 #pragma warning restore CA1031
             {
-                if (context.RetryContext.RetryCount != context.RetryContext.MaxRetryCount)
+                // The RetryContext is potentially null!
+                if (context.RetryContext?.RetryCount != context.RetryContext?.MaxRetryCount)
                 {
                     _logger.LogWarning(
                         "Service bus message processing failed with exception {Exception}",
