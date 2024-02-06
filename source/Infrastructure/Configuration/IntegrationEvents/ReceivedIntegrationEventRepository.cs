@@ -14,10 +14,8 @@
 
 using System;
 using System.Data;
-using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Microsoft.Data.SqlClient;
 

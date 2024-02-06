@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
