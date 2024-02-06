@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -25,6 +26,7 @@ using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.Collections;
 using MediatR;
+using NodaTime.Serialization.Protobuf;
 using GridAreaDetails = Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.GridAreaDetails;
 using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
 
@@ -55,7 +57,9 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
                 MapUnitType(aggregation.QuantityUnit),
                 MapResolution(aggregation.Resolution),
                 await MapGridAreaDetailsAsync(aggregation.GridArea, cancellationToken).ConfigureAwait(false),
-                aggregation.CalculationResultVersion));
+                aggregation.CalculationResultVersion,
+                aggregation.Period.StartOfPeriod.ToInstant(),
+                aggregation.Period.EndOfPeriod.ToInstant()));
         }
 
         return new AggregatedTimeSerieRequestWasAccepted(
@@ -89,7 +93,7 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
         var points = new List<Point>();
 
         var pointPosition = 1;
-        foreach (var point in timeSeriesPoints)
+        foreach (var point in timeSeriesPoints.OrderBy(x => x.Time))
         {
             points.Add(new Point(
                 pointPosition,
