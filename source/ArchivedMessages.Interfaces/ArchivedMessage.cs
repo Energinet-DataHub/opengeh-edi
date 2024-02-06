@@ -42,7 +42,7 @@ public class ArchivedMessage
         BusinessReason = businessReason;
         Document = document;
 
-        var actorNumberForFileStorage = GetActorNumberForFileStoragePlacement(archivedMessageType);
+        var actorNumberForFileStorage = GetActorNumberForFileStoragePlacement(archivedMessageType, senderNumber, receiverNumber);
         FileStorageReference = FileStorageReference.Create(FileStorageCategory, actorNumberForFileStorage, createdAt, Id.Value);
     }
 
@@ -64,7 +64,7 @@ public class ArchivedMessage
 
     public Stream Document { get; }
 
-    private string GetActorNumberForFileStoragePlacement(ArchivedMessageType archivedMessageType)
+    private string GetActorNumberForFileStoragePlacement(ArchivedMessageType archivedMessageType, string senderActorNumber, string receiverActorNumber)
     {
         return archivedMessageType switch
         {
