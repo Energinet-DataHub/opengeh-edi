@@ -36,8 +36,8 @@ public class ArchivedMessageGetDocumentController : ControllerBase
         ArgumentNullException.ThrowIfNull(id);
 
         var archivedMessageId = new ArchivedMessageId(id);
-        var result = await _archivedMessagesClient.GetAsync(archivedMessageId, cancellationToken).ConfigureAwait(false);
+        var archivedMessageStream = await _archivedMessagesClient.GetAsync(archivedMessageId, cancellationToken).ConfigureAwait(false);
 
-        return result is null ? NoContent() : Ok(result);
+        return archivedMessageStream is null ? NoContent() : Ok(archivedMessageStream.Stream);
     }
 }

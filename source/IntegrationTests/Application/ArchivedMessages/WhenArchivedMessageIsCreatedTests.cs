@@ -19,9 +19,10 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
-using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Data.SqlClient;
@@ -66,11 +67,11 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
         await ArchiveMessage(CreateArchivedMessage(documentContent: "incorrect document content"));
 
         // Act
-        await using var result = await _archivedMessagesClient.GetAsync(correctArchivedMessage.Id, CancellationToken.None);
+        var result = await _archivedMessagesClient.GetAsync(correctArchivedMessage.Id, CancellationToken.None);
 
         // Assert
         result.Should().NotBeNull();
-        using var streamReader = new StreamReader(result!);
+        using var streamReader = new StreamReader(result!.Stream);
         var actualDocumentContent = await streamReader.ReadToEndAsync();
         actualDocumentContent.Should().Be(correctDocumentContent);
     }
@@ -100,6 +101,8 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
 
         var actualFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageId);
 
+        using var assertionScope = new AssertionScope();
+        archivedMessage.FileStorageReference.Category.Value.Should().Be("archived");
         actualFileStorageReference.Should().Be(expectedFileStorageReference);
     }
 
@@ -156,7 +159,9 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
 
     private static ArchivedMessage CreateArchivedMessage(ArchivedMessageType? archivedMessageType = null, string? messageId = null, string? documentContent = null, string? senderNumber = null, string? receiverNumber = null, Instant? timestamp = null)
     {
-        var documentStream = new MemoryStream();
+#pragma warning disable CA2000 // Don't dispose stream
+        var documentStream = new MarketDocumentWriterMemoryStream();
+#pragma warning restore CA2000
 
         if (!string.IsNullOrEmpty(documentContent))
         {
@@ -176,7 +181,7 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
             timestamp ?? Instant.FromUtc(2023, 01, 01, 0, 0),
             BusinessReason.BalanceFixing.Name,
             archivedMessageType ?? ArchivedMessageType.OutgoingMessage,
-            documentStream);
+            new MarketDocumentStream(documentStream));
     }
 
     private async Task ArchiveMessage(ArchivedMessage archivedMessage)

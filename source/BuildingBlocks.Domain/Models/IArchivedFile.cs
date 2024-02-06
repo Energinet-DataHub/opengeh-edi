@@ -13,14 +13,21 @@
 // limitations under the License.
 
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-#pragma warning disable SA1600
-public interface IIncomingMessageClient
+/// <summary>
+/// Represents a file that has already been archived
+/// </summary>
+public interface IArchivedFile
 {
-    Task<ResponseMessage> RegisterAndSendAsync(IIncomingMessageStream incomingMessageStream, DocumentFormat documentFormat, IncomingDocumentType documentType, CancellationToken cancellationToken, DocumentFormat responseFormat = null!);
+    /// <summary>
+    /// A <see cref="FileStorageReference"/> to the archived file. Is used by market document to reference the existing archived file
+    /// </summary>
+    FileStorageReference FileStorageReference { get; }
+
+    /// <summary>
+    /// A <see cref="Stream"/> with the archived file content. Is used to contain the actual file when peeking.
+    /// </summary>
+    IArchivedMessageStream Document { get; }
 }

@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Xml;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Ebix;
 
@@ -40,17 +41,17 @@ public abstract class EbixDocumentWriter : IDocumentWriter
 
     protected DocumentDetails DocumentDetails => _documentDetails;
 
-    public virtual async Task<Stream> WriteAsync(OutgoingMessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
+    public virtual async Task<MarketDocumentStream> WriteAsync(OutgoingMessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
     {
         var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = new UTF8Encoding(false), Async = true, Indent = true };
-        var stream = new MemoryStream();
+        var stream = new MarketDocumentWriterMemoryStream();
         using var writer = XmlWriter.Create(stream, settings);
         var settlementVersion = ExtractSettlementVersion(marketActivityRecords);
         await WriteHeaderAsync(header, _documentDetails, writer, settlementVersion).ConfigureAwait(false);
         await WriteMarketActivityRecordsAsync(marketActivityRecords, writer).ConfigureAwait(false);
         await WriteEndAsync(writer).ConfigureAwait(false);
         stream.Position = 0;
-        return stream;
+        return new MarketDocumentStream(stream);
     }
 
     public abstract bool HandlesType(DocumentType documentType);

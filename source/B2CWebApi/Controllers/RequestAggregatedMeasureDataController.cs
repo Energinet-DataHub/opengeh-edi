@@ -81,11 +81,11 @@ public class RequestAggregatedMeasureDataController : ControllerBase
         return Ok(responseMessage.MessageBody);
     }
 
-    private static MemoryStream GenerateStreamFromString(string jsonString)
+    private static IncomingMessageStream GenerateStreamFromString(string jsonString)
     {
         var encoding = Encoding.UTF8;
         var byteArray = encoding.GetBytes(jsonString);
         var memoryStream = new MemoryStream(byteArray);
-        return memoryStream;
+        return new IncomingMessageStream(memoryStream);
     }
 }

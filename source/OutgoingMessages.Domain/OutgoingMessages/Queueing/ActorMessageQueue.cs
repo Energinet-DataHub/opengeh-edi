@@ -52,12 +52,12 @@ public class ActorMessageQueue
 
         var currentBundle = CurrentBundleOf(BusinessReason.FromName(outgoingMessage.BusinessReason), outgoingMessage.DocumentType) ??
                             CreateBundleOf(BusinessReason.FromName(outgoingMessage.BusinessReason), outgoingMessage.DocumentType,
-                                SetMaxNumberOfMessagesInABundle(maxNumberOfMessagesInABundle, outgoingMessage.DocumentType), timeStamp);
+                                GetMaxNumberOfMessagesInABundle(maxNumberOfMessagesInABundle, outgoingMessage.DocumentType), timeStamp);
 
         currentBundle.Add(outgoingMessage);
     }
 
-    private int SetMaxNumberOfMessagesInABundle(int? maxNumberOfMessagesInABundle, DocumentType documentType)
+    private int GetMaxNumberOfMessagesInABundle(int? maxNumberOfMessagesInABundle, DocumentType documentType)
     {
         if (maxNumberOfMessagesInABundle != null)
             return maxNumberOfMessagesInABundle.Value;

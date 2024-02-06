@@ -35,16 +35,16 @@ public class XmlMessageParser : IMessageParser
 
     public IncomingDocumentType DocumentType => IncomingDocumentType.RequestAggregatedMeasureData;
 
-    public async Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(Stream message, CancellationToken cancellationToken)
+    public async Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(IIncomingMessageStream incomingMessageStream, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(message);
+        ArgumentNullException.ThrowIfNull(incomingMessageStream);
 
         string version;
         string businessProcessType;
         try
         {
-            version = GetVersion(message);
-            businessProcessType = GetBusinessReason(message);
+            version = GetVersion(incomingMessageStream);
+            businessProcessType = GetBusinessReason(incomingMessageStream);
         }
         catch (XmlException exception)
         {
@@ -63,8 +63,7 @@ public class XmlMessageParser : IMessageParser
                 new InvalidBusinessReasonOrVersion(businessProcessType, version));
         }
 
-        ResetMessagePosition(message);
-        using var reader = XmlReader.Create(message, CreateXmlReaderSettings(xmlSchema));
+        using var reader = XmlReader.Create(incomingMessageStream.Stream, CreateXmlReaderSettings(xmlSchema));
         if (_errors.Count > 0)
         {
             return new RequestAggregatedMeasureDataMarketMessageParserResult(_errors.ToArray());
@@ -98,7 +97,7 @@ public class XmlMessageParser : IMessageParser
             InvalidMessageStructure.From(exception));
     }
 
-    private static string GetBusinessReason(Stream message)
+    private static string GetBusinessReason(IIncomingMessageStream message)
     {
         ArgumentNullException.ThrowIfNull(message);
         var split = SplitNamespace(message);
@@ -106,12 +105,11 @@ public class XmlMessageParser : IMessageParser
         return businessReason;
     }
 
-    private static string[] SplitNamespace(Stream message)
+    private static string[] SplitNamespace(IIncomingMessageStream message)
     {
         ArgumentNullException.ThrowIfNull(message);
 
-        ResetMessagePosition(message);
-        using var reader = XmlReader.Create(message);
+        using var reader = XmlReader.Create(message.Stream);
 
         var split = Array.Empty<string>();
         while (reader.Read())
@@ -125,13 +123,7 @@ public class XmlMessageParser : IMessageParser
         return split;
     }
 
-    private static void ResetMessagePosition(Stream message)
-    {
-        if (message.CanRead && message.Position > 0)
-            message.Position = 0;
-    }
-
-    private static string GetVersion(Stream message)
+    private static string GetVersion(IIncomingMessageStream message)
     {
         ArgumentNullException.ThrowIfNull(message);
         var split = SplitNamespace(message);

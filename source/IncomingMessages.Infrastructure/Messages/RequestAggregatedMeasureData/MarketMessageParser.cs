@@ -26,7 +26,7 @@ public class MarketMessageParser
     }
 
     public Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(
-        Stream message, DocumentFormat documentFormat, IncomingDocumentType documentType, CancellationToken cancellationToken)
+        IIncomingMessageStream message, DocumentFormat documentFormat, IncomingDocumentType documentType, CancellationToken cancellationToken)
     {
         var parser = _parsers.FirstOrDefault(parser =>
             parser.HandledFormat.Equals(documentFormat) && parser.DocumentType.Equals(documentType));

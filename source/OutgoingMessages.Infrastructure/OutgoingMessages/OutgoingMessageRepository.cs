@@ -39,13 +39,13 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
     {
         ArgumentNullException.ThrowIfNull(message);
 
-        _context.OutgoingMessages.Add(message);
-
-        // Must await here instead of returning the Task, since messageRecordStream gets disposed when returning from function
+        // Must await here to make sure the file is uploaded correctly before adding the outgoing message to the db context
         await _fileStorageClient.UploadAsync(
                 message.FileStorageReference,
-                message.GetMessageRecord())
+                message.GetSerializedContent())
             .ConfigureAwait(false);
+
+        _context.OutgoingMessages.Add(message);
     }
 
     public async Task<OutgoingMessageBundle> GetAsync(BundleId bundleId)
@@ -74,22 +74,12 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
             outgoingMessages);
     }
 
-    private static async Task<string> ConvertToStringAsync(Stream stream)
-    {
-        using var streamReader = new StreamReader(stream);
-
-        stream.Position = 0; // Make sure we read the entire stream
-        var convertedToString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
-
-        return convertedToString;
-    }
-
     private async Task DownloadAndSetMessageRecordAsync(OutgoingMessage outgoingMessage)
     {
-        var messageRecordStream = await _fileStorageClient.DownloadAsync(outgoingMessage.FileStorageReference).ConfigureAwait(false);
+        var fileStorageFile = await _fileStorageClient.DownloadAsync(outgoingMessage.FileStorageReference).ConfigureAwait(false);
 
-        var messageRecord = await ConvertToStringAsync(messageRecordStream).ConfigureAwait(false);
+        var messageRecord = await fileStorageFile.ReadAsStringAsync().ConfigureAwait(false);
 
-        outgoingMessage.SetMessageRecord(messageRecord);
+        outgoingMessage.SetSerializedContent(messageRecord);
     }
 }

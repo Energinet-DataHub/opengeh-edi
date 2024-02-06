@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Exceptions;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
@@ -34,7 +35,7 @@ public class DocumentFactory
         _documentWriters = documentWriters.ToList();
     }
 
-    public Task<Stream> CreateFromAsync(OutgoingMessageBundle bundle, DocumentFormat documentFormat, Instant timestamp)
+    public Task<MarketDocumentStream> CreateFromAsync(OutgoingMessageBundle bundle, DocumentFormat documentFormat, Instant timestamp)
     {
         ArgumentNullException.ThrowIfNull(documentFormat);
         ArgumentNullException.ThrowIfNull(bundle);
@@ -54,6 +55,6 @@ public class DocumentFactory
                 bundle.Receiver.ActorRole.Code,
                 bundle.AssignedBundleId.Id.ToString(),
                 timestamp),
-            bundle.OutgoingMessages.Select(message => message.GetMessageRecord()).ToList());
+            bundle.OutgoingMessages.Select(message => message.GetSerializedContent()).ToList());
     }
 }

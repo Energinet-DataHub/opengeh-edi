@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
@@ -272,7 +273,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .DocumentIsValidAsync();
     }
 
-    private Task<Stream> CreateDocument(TimeSeriesBuilder resultBuilder, DocumentFormat documentFormat)
+    private Task<MarketDocumentStream> CreateDocument(TimeSeriesBuilder resultBuilder, DocumentFormat documentFormat)
     {
         var documentHeader = resultBuilder.BuildHeader();
         var records = _parser.From(resultBuilder.BuildTimeSeries());
@@ -295,6 +296,8 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
                 new[] { records, });
         }
     }
+
+    private IAssertAggregationResultDocument AssertDocument(MarketDocumentStream document, DocumentFormat documentFormat) => AssertDocument(document.Stream, documentFormat);
 
     private IAssertAggregationResultDocument AssertDocument(Stream document, DocumentFormat documentFormat)
     {

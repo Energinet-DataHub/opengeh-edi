@@ -36,10 +36,12 @@ public class B2CJsonMessageParser : IMessageParser
     public IncomingDocumentType DocumentType => IncomingDocumentType.B2CRequestAggregatedMeasureData;
 
     public async Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(
-        Stream message,
+        IIncomingMessageStream incomingMessageStream,
         CancellationToken cancellationToken)
     {
-        var requestAggregatedMeasureData = await _serializer.DeserializeAsync<RequestAggregatedMeasureDataDto>(message, cancellationToken).ConfigureAwait(false);
+        ArgumentNullException.ThrowIfNull(incomingMessageStream);
+
+        var requestAggregatedMeasureData = await _serializer.DeserializeAsync<RequestAggregatedMeasureDataDto>(incomingMessageStream.Stream, cancellationToken).ConfigureAwait(false);
         return new RequestAggregatedMeasureDataMarketMessageParserResult(requestAggregatedMeasureData);
     }
 }
