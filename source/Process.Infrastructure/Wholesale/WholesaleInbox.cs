@@ -29,15 +29,12 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.Wholesale;
 
 public class WholesaleInbox : IWholesaleInbox
 {
-    private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
     private readonly IServiceBusSenderAdapter _senderCreator;
 
     public WholesaleInbox(
         IServiceBusSenderFactory serviceBusSenderFactory,
-        IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository,
         IOptions<ServiceBusClientOptions> options)
     {
-        _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
         ArgumentNullException.ThrowIfNull(serviceBusSenderFactory);
         ArgumentNullException.ThrowIfNull(options);
 
@@ -49,10 +46,7 @@ public class WholesaleInbox : IWholesaleInbox
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(aggregatedMeasureDataProcess);
-
-        var process = await _aggregatedMeasureDataProcessRepository
-            .GetAsync(ProcessId.Create(aggregatedMeasureDataProcess.ProcessId.Id), cancellationToken).ConfigureAwait(false);
-        var serviceBusMessage = AggregatedMeasureDataRequestFactory.CreateServiceBusMessage(process);
+        var serviceBusMessage = AggregatedMeasureDataRequestFactory.CreateServiceBusMessage(aggregatedMeasureDataProcess);
         await _senderCreator.SendAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
     }
 }
