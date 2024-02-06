@@ -12,13 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Api.OpenApi;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
-public static class OpenApiResources
+public enum ArchivedMessageType
 {
-    public const string OpenApiOperationTag = "http";
-    public const string OpenApiSecuritySchemaName = "http";
-    public const string OpenApiSecurityName = "Authorization";
-    public const string OpenApiSecurityDescription = "Description";
-    public const string OpenApiSecurityBearerFormat = "\"Authorization: Bearer {token}\"";
+    IncomingMessage,
+    OutgoingMessage,
 }

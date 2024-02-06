@@ -26,12 +26,15 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
+using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+using FluentAssertions;
 using IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using NodaTime;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
@@ -42,6 +45,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
     private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
     private readonly ServiceBusSenderSpy _senderSpy;
     private readonly IncomingMessagesContext _incomingMessageContext;
+    private readonly SystemDateTimeProviderStub _dateTimeProvider;
 
     public WhenIncomingMessagesIsReceivedTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
@@ -51,6 +55,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
         _incomingMessagesRequest = GetService<IIncomingMessageClient>();
         _incomingMessageContext = GetService<IncomingMessagesContext>();
+        _dateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
     }
 
     [Fact]
@@ -214,6 +219,57 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             () => Assert.Null(message),
             () => Assert.Empty(transactionIds),
             () => Assert.Empty(messageIds));
+    }
+
+    [Fact]
+    public async Task Incoming_message_is_archived_with_correct_content()
+    {
+        // Assert
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        var senderActorNumber = ActorNumber.Create("5799999933318");
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
+        var messageStream = ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json");
+        var messageIdFromFile = "123564789123564789123564789123564789";
+        // Act
+        await _incomingMessagesRequest.RegisterAndSendAsync(
+            messageStream,
+            DocumentFormat.Json,
+            IncomingDocumentType.RequestAggregatedMeasureData,
+            CancellationToken.None);
+
+        // Assert
+        var generatedDocumentContent = await GetStreamContentAsStringAsync(messageStream);
+        var fileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageIdFromFile);
+        var fileContent = await GetFileFromFileStorageAsync("archived", fileStorageReference);
+        var archivedMessageFileContent = await GetStreamContentAsStringAsync(fileContent.Value.Content);
+        archivedMessageFileContent.Should().Be(generatedDocumentContent);
+    }
+
+    [Fact]
+    public async Task Incoming_message_is_archived_with_correct_file_storage_reference()
+    {
+        // Assert
+        int year = 2024,
+            month = 01,
+            date = 05;
+        _dateTimeProvider.SetNow(Instant.FromUtc(year, month, date, 04, 23));
+
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        var senderActorNumber = ActorNumber.Create("5799999933318");
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
+        var messageStream = ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json");
+        var messageIdFromFile = "123564789123564789123564789123564789";
+        // Act
+        await _incomingMessagesRequest.RegisterAndSendAsync(
+            messageStream,
+            DocumentFormat.Json,
+            IncomingDocumentType.RequestAggregatedMeasureData,
+            CancellationToken.None);
+
+        // Assert
+        var archivedMessageId = await GetArchivedMessageIdFromDatabaseAsync(messageIdFromFile);
+        var fileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageIdFromFile);
+        fileStorageReference.Should().Be($"{senderActorNumber.Value}/{year:0000}/{month:00}/{date:00}/{archivedMessageId:N}");
     }
 
     protected override void Dispose(bool disposing)
