@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,6 +23,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.Common.Serialization;
+using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using Xunit;
 
@@ -129,6 +132,23 @@ public class AssertOutgoingMessage
 
         var sut = _serializer.Deserialize<TMessageRecord>(_messageRecord);
         assertion(propertySelector(sut));
+        return this;
+    }
+
+    public AssertOutgoingMessage HasPointsInCorrectOrder<TMessageRecord, TType>(
+        Func<TMessageRecord, List<TType>> propertySelector,
+        IList<TimeSeriesPoint> expectedPointsInRightOrder)
+    {
+        ArgumentNullException.ThrowIfNull(propertySelector);
+        ArgumentNullException.ThrowIfNull(expectedPointsInRightOrder);
+
+        var sut = _serializer.Deserialize<TMessageRecord>(_messageRecord);
+        for (var i = 0; i < expectedPointsInRightOrder.Count; i++)
+        {
+            propertySelector(sut)[i].Should()
+                .Be(decimal.Parse($"{expectedPointsInRightOrder[i].Quantity.Units}.{expectedPointsInRightOrder[i].Quantity.Nanos}", CultureInfo.InvariantCulture));
+        }
+
         return this;
     }
 }

@@ -25,7 +25,9 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using NodaTime;
 using NodaTime.Extensions;
+using NodaTime.Text;
 using Xunit;
 using Xunit.Categories;
 using GridAreaDetails = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.GridAreaDetails;
@@ -53,7 +55,7 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
         process!.WasSentToWholesale();
-        var acceptedAggregation = CreateAcceptedAggregation();
+        var acceptedAggregation = CreateAcceptedAggregation(process.StartOfPeriod, process.EndOfPeriod!);
 
         // Act
         process.IsAccepted(new List<Aggregation> { acceptedAggregation });
@@ -70,7 +72,7 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
         process!.WasSentToWholesale();
-        var acceptedAggregation = CreateAcceptedAggregation();
+        var acceptedAggregation = CreateAcceptedAggregation(process.StartOfPeriod, process.EndOfPeriod!);
 
         // Act
         process.IsAccepted(new List<Aggregation> { acceptedAggregation, acceptedAggregation });
@@ -91,7 +93,7 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
         process!.WasSentToWholesale();
-        var acceptedAggregation = CreateAcceptedAggregation();
+        var acceptedAggregation = CreateAcceptedAggregation(process.StartOfPeriod, process.EndOfPeriod!);
 
         // Act
         process.IsAccepted(new List<Aggregation> { acceptedAggregation });
@@ -150,16 +152,20 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         return new RequestAggregatedMeasureDataMarketDocumentBuilder();
     }
 
-    private static Aggregation CreateAcceptedAggregation()
+    private static Aggregation CreateAcceptedAggregation(string start, string end)
     {
-        var points = Array.Empty<Point>();
+        var points = new List<Point>()
+        {
+            new(1, 2, CalculatedQuantityQuality.Calculated, start.ToString()),
+            new(2, 3, CalculatedQuantityQuality.Calculated, end.ToString()),
+        };
 
         return new Aggregation(
             points,
             MeteringPointType.Consumption.Name,
             MeasurementUnit.Kwh.Name,
             Resolution.Hourly.Name,
-            new Period(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant()),
+            new Period(InstantPattern.General.Parse(start).Value, InstantPattern.General.Parse(end).Value),
             SettlementType.NonProfiled.Name,
             BusinessReason.BalanceFixing.Name,
             new ActorGrouping("1234567891911", null),

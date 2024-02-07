@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 
@@ -26,13 +27,12 @@ public record AggregatedTimeSerie(
     string UnitType,
     string Resolution,
     GridAreaDetails GridAreaDetails,
-    long? CalculationResultVersion);
+    long CalculationResultVersion,
+    Instant StartOfPeriod,
+    Instant EndOfPeriod);
 
 [Serializable]
 public record Point(int Position, decimal? Quantity, CalculatedQuantityQuality QuantityQuality, string SampleTime);
 
 [Serializable]
 public record GridAreaDetails(string GridAreaCode, string OperatorNumber);
-
-[Serializable]
-public record Period(Instant Start, Instant End);

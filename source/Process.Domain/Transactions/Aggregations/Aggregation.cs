@@ -27,7 +27,7 @@ public record Aggregation(
     string BusinessReason,
     ActorGrouping ActorGrouping,
     GridAreaDetails GridAreaDetails,
-    long? CalculationResultVersion,
+    long CalculationResultVersion,
     string? OriginalTransactionIdReference = null,
     string? Receiver = null,
     string? ReceiverRole = null,

@@ -25,8 +25,8 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Exceptions;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf.Collections;
+using NodaTime;
 using NodaTime.Serialization.Protobuf;
-using NodaTime.Text;
 using static Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.EnergyResultProducedV2.Types;
 using DecimalValue = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue;
 using GridAreaDetails = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.GridAreaDetails;
@@ -64,7 +64,7 @@ public class AggregationFactory
             aggregatedTimeSerie.MeteringPointType,
             aggregatedTimeSerie.UnitType,
             aggregatedTimeSerie.Resolution,
-            MapPeriod(aggregatedMeasureDataProcess.StartOfPeriod, aggregatedMeasureDataProcess.EndOfPeriod),
+            MapPeriod(aggregatedTimeSerie.StartOfPeriod, aggregatedTimeSerie.EndOfPeriod),
             MapSettlementMethod(aggregatedMeasureDataProcess),
             aggregatedMeasureDataProcess.BusinessReason.Name,
             MapActorGrouping(aggregatedMeasureDataProcess),
@@ -96,12 +96,9 @@ public class AggregationFactory
             SettlementVersion: MapSettlementVersion(integrationEvent.CalculationType));
     }
 
-    private static Period MapPeriod(string startOfPeriod, string? endOfPeriod)
+    private static Period MapPeriod(Instant startOfPeriod, Instant endOfPeriod)
     {
-        if (string.IsNullOrEmpty(endOfPeriod)) // Throw exception since our end period is nullable in our schema contract, but we validate for it in Wholesale
-            throw new ArgumentException("End of period shouldn't be able to be null, since validation in Wholesale rejects the request if it isn't set", nameof(endOfPeriod));
-
-        return new Period(InstantPattern.General.Parse(startOfPeriod).Value, InstantPattern.General.Parse(endOfPeriod).Value);
+        return new Period(startOfPeriod, endOfPeriod);
     }
 
     private static GridAreaDetails MapGridAreaDetails(Domain.Transactions.AggregatedMeasureData.GridAreaDetails timeSerieGridAreaDetails)
