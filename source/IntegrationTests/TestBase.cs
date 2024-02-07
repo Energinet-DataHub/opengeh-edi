@@ -22,6 +22,7 @@ using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using BuildingBlocks.Application.Configuration;
+using BuildingBlocks.Application.FeatureFlag;
 using Dapper;
 using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Api.Authentication;
@@ -87,6 +88,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             AuthenticatedActor = GetService<AuthenticatedActor>();
             AuthenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None));
         }
+
+        protected FeatureFlagManagerStub FeatureFlagManagerStub { get; } = new();
 
         protected AuthenticatedActor AuthenticatedActor { get; }
 
@@ -253,6 +256,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             var config = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
                 .Build();
+
             _services = new ServiceCollection();
 
             _services.AddTransient<InboxEventsProcessor>();
@@ -294,6 +298,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             // Replace the services with stub implementations.
             // - Building blocks
             _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
+            _services.AddTransient<IFeatureFlagManager>((x) => FeatureFlagManagerStub);
 
             ServiceProvider = _services.BuildServiceProvider();
         }
