@@ -15,137 +15,60 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Exceptions;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf.Collections;
-using NodaTime;
 using NodaTime.Serialization.Protobuf;
 using static Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.EnergyResultProducedV2.Types;
 using DecimalValue = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue;
-using GridAreaDetails = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.GridAreaDetails;
-using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
-using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Point;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 
-public class AggregationFactory
+public class AggregationResultMessageFactory
 {
     private readonly IMasterDataClient _masterDataClient;
 
-    public AggregationFactory(IMasterDataClient masterDataClient)
+    public AggregationResultMessageFactory(IMasterDataClient masterDataClient)
     {
         _masterDataClient = masterDataClient;
     }
 
-    public static Aggregation Create(
-        AggregatedMeasureDataProcess aggregatedMeasureDataProcess,
-        AggregatedTimeSerie aggregatedTimeSerie)
-    {
-        ArgumentNullException.ThrowIfNull(aggregatedMeasureDataProcess);
-        ArgumentNullException.ThrowIfNull(aggregatedTimeSerie);
-
-        if ((aggregatedMeasureDataProcess.MeteringPointType != null
-                ? MeteringPointType.FromCode(aggregatedMeasureDataProcess.MeteringPointType).Name
-                : null) != aggregatedTimeSerie.MeteringPointType)
-        {
-            throw new ArgumentException("AggregatedTimeSerie.MeteringPointType isn't equal to aggregatedMeasureDataProcess.MeteringPointType", nameof(aggregatedTimeSerie));
-        }
-
-        return new Aggregation(
-            MapPoints(aggregatedTimeSerie.Points),
-            aggregatedTimeSerie.MeteringPointType,
-            aggregatedTimeSerie.UnitType,
-            aggregatedTimeSerie.Resolution,
-            MapPeriod(aggregatedTimeSerie.StartOfPeriod, aggregatedTimeSerie.EndOfPeriod),
-            MapSettlementMethod(aggregatedMeasureDataProcess),
-            aggregatedMeasureDataProcess.BusinessReason.Name,
-            MapActorGrouping(aggregatedMeasureDataProcess),
-            MapGridAreaDetails(aggregatedTimeSerie.GridAreaDetails),
-            aggregatedTimeSerie.CalculationResultVersion,
-            aggregatedMeasureDataProcess.BusinessTransactionId.Id,
-            aggregatedMeasureDataProcess.RequestedByActorId.Value,
-            MapReceiverRole(aggregatedMeasureDataProcess),
-            aggregatedMeasureDataProcess.SettlementVersion?.Name);
-    }
-
-    public async Task<Aggregation> CreateAsync(
+    public async Task<AggregationResultMessage> CreateAsync(
         EnergyResultProducedV2 integrationEvent,
+        ProcessId processId,
         CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(processId);
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        return new Aggregation(
-            MapPoints(integrationEvent.TimeSeriesPoints),
+        var gridAreaDetails = await GetGridAreaDetailsAsync(integrationEvent, cancellationToken).ConfigureAwait(false);
+        var receiverRole = GetReceiverRole(integrationEvent.AggregationLevelCase);
+        var energySupplierNumber = GetEnergySupplierNumber(integrationEvent);
+        var balanceResponsibleNumber = GetBalanceResponsibleNumber(integrationEvent);
+        return AggregationResultMessage.Create(
+            ActorNumber.Create(balanceResponsibleNumber ?? energySupplierNumber ?? gridAreaDetails.OperatorNumber),
+            receiverRole,
+            processId.Id,
+            gridAreaDetails,
             MapMeteringPointType(integrationEvent.TimeSeriesType),
+            MapSettlementType(integrationEvent.TimeSeriesType),
             MapQuantityUnit(integrationEvent.QuantityUnit),
             MapResolution(integrationEvent.Resolution),
+            energySupplierNumber,
+            balanceResponsibleNumber,
             MapPeriod(integrationEvent),
-            MapSettlementType(integrationEvent.TimeSeriesType),
+            MapPoints(integrationEvent.TimeSeriesPoints),
             MapCalculationType(integrationEvent.CalculationType),
-            MapActorGrouping(integrationEvent),
-            await GetGridAreaDetailsAsync(integrationEvent, cancellationToken).ConfigureAwait(false),
             integrationEvent.CalculationResultVersion,
-            SettlementVersion: MapSettlementVersion(integrationEvent.CalculationType));
-    }
-
-    private static Period MapPeriod(Instant startOfPeriod, Instant endOfPeriod)
-    {
-        return new Period(startOfPeriod, endOfPeriod);
-    }
-
-    private static GridAreaDetails MapGridAreaDetails(Domain.Transactions.AggregatedMeasureData.GridAreaDetails timeSerieGridAreaDetails)
-    {
-        return new GridAreaDetails(timeSerieGridAreaDetails.GridAreaCode, timeSerieGridAreaDetails.OperatorNumber);
-    }
-
-    private static List<Point> MapPoints(IEnumerable<Domain.Transactions.AggregatedMeasureData.Point> points)
-    {
-        return points
-            .Select(point => new Point(point.Position, point.Quantity, point.QuantityQuality, point.SampleTime))
-            .ToList();
-    }
-
-    private static string MapReceiverRole(AggregatedMeasureDataProcess process)
-    {
-        return ActorRole.FromCode(process.RequestedByActorRoleCode).Name;
-    }
-
-    private static ActorGrouping MapActorGrouping(AggregatedMeasureDataProcess process)
-    {
-        if (process.RequestedByActorRoleCode == ActorRole.BalanceResponsibleParty.Code)
-        {
-            return new ActorGrouping(null, process.BalanceResponsibleId);
-        }
-
-        if (process.RequestedByActorRoleCode == ActorRole.EnergySupplier.Code)
-        {
-            return new ActorGrouping(process.EnergySupplierId, null);
-        }
-
-        return new ActorGrouping(null, null);
-    }
-
-    private static string? MapSettlementMethod(AggregatedMeasureDataProcess process)
-    {
-        var settlementTypeName = null as string;
-        try
-        {
-            settlementTypeName = SettlementType.From(process.SettlementMethod ?? string.Empty).Name;
-        }
-        catch (InvalidCastException)
-        {
-            // Settlement type for Production is set to null.
-        }
-
-        return settlementTypeName;
+            settlementVersion: MapSettlementVersion(integrationEvent.CalculationType));
     }
 
     private static string MapCalculationType(CalculationType processType)
@@ -205,27 +128,55 @@ public class AggregationFactory
         };
     }
 
-    private static ActorGrouping MapActorGrouping(EnergyResultProducedV2 integrationEvent)
+    private static ActorRole GetReceiverRole(EnergyResultProducedV2.AggregationLevelOneofCase aggregationLevelCase)
+    {
+        return aggregationLevelCase switch
+        {
+            EnergyResultProducedV2.AggregationLevelOneofCase
+                .AggregationPerGridarea => ActorRole.MeteredDataResponsible,
+            EnergyResultProducedV2.AggregationLevelOneofCase
+                .AggregationPerEnergysupplierPerGridarea => ActorRole.EnergySupplier,
+            EnergyResultProducedV2.AggregationLevelOneofCase
+                .AggregationPerBalanceresponsiblepartyPerGridarea => ActorRole.BalanceResponsibleParty,
+            EnergyResultProducedV2.AggregationLevelOneofCase
+                    .AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea => ActorRole.BalanceResponsibleParty,
+            EnergyResultProducedV2.AggregationLevelOneofCase.None =>
+                throw new InvalidOperationException("Aggregation level is not specified"),
+            _ => throw new InvalidOperationException("Aggregation level is unknown"),
+        };
+    }
+
+    private static string? GetEnergySupplierNumber(EnergyResultProducedV2 integrationEvent)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
         return integrationEvent.AggregationLevelCase switch
         {
-            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerGridarea => new ActorGrouping(null, null),
-            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerBalanceresponsiblepartyPerGridarea =>
-                new ActorGrouping(
-                    null,
-                    integrationEvent.AggregationPerBalanceresponsiblepartyPerGridarea.BalanceResponsibleId),
             EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerEnergysupplierPerGridarea =>
-                new ActorGrouping(integrationEvent.AggregationPerEnergysupplierPerGridarea.EnergySupplierId, null),
+                integrationEvent.AggregationPerEnergysupplierPerGridarea.EnergySupplierId,
             EnergyResultProducedV2.AggregationLevelOneofCase
                     .AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea =>
-                new ActorGrouping(
-                    integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.EnergySupplierId,
-                    integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.BalanceResponsibleId),
+                integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.EnergySupplierId,
             EnergyResultProducedV2.AggregationLevelOneofCase.None =>
                 throw new InvalidOperationException("Aggregation level is not specified"),
-            _ => throw new InvalidOperationException("Aggregation level is unknown"),
+            _ => null,
+        };
+    }
+
+    private static string? GetBalanceResponsibleNumber(EnergyResultProducedV2 integrationEvent)
+    {
+        ArgumentNullException.ThrowIfNull(integrationEvent);
+
+        return integrationEvent.AggregationLevelCase switch
+        {
+            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerBalanceresponsiblepartyPerGridarea =>
+                    integrationEvent.AggregationPerBalanceresponsiblepartyPerGridarea.BalanceResponsibleId,
+            EnergyResultProducedV2.AggregationLevelOneofCase
+                    .AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea =>
+                    integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.BalanceResponsibleId,
+            EnergyResultProducedV2.AggregationLevelOneofCase.None =>
+                throw new InvalidOperationException("Aggregation level is not specified"),
+            _ => null,
         };
     }
 
@@ -245,15 +196,15 @@ public class AggregationFactory
         return new Period(integrationEvent.PeriodStartUtc.ToInstant(), integrationEvent.PeriodEndUtc.ToInstant());
     }
 
-    private static ReadOnlyCollection<Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
+    private static ReadOnlyCollection<Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
     {
-        var points = new List<Point>();
+        var points = new List<Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point>();
 
         var pointPosition = 1;
         foreach (var point in timeSeriesPoints)
         {
             points.Add(
-                new Point(
+                new Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point(
                     pointPosition,
                     Parse(point.Quantity),
                     CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(point.QuantityQualities),

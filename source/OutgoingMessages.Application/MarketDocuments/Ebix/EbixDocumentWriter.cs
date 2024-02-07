@@ -76,7 +76,7 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         var marketActivityRecords = new List<TMarketActivityRecord>();
         foreach (var payload in payloads)
         {
-            marketActivityRecords.Add(_parser.From<TMarketActivityRecord>(payload));
+            marketActivityRecords.AddRange(_parser.From<IList<TMarketActivityRecord>>(payload));
         }
 
         return marketActivityRecords;
