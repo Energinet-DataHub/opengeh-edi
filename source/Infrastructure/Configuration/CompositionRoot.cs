@@ -23,7 +23,6 @@ using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.FeatureFlag;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 using Energinet.DataHub.EDI.Infrastructure.DataRetention;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
@@ -44,7 +43,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
             services.AddSingleton<HttpClient>();
             services.AddSingleton<ISerializer, Serializer>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IFeatureFlagProvider, FeatureFlagProviderProvider>();
 
             AddMediatR();
             services.AddLogging();
