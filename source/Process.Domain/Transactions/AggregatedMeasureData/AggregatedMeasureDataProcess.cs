@@ -122,15 +122,25 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             }
         }
 
-        public void IsAccepted(IReadOnlyCollection<Aggregation> aggregations)
+        public void IsAccepted(IReadOnlyCollection<AggregatedTimeSerie> aggregations)
         {
             ArgumentNullException.ThrowIfNull(aggregations);
 
             if (_state == State.Sent)
             {
-                foreach (var aggregation in aggregations)
+                foreach (var aggregation in aggregations.GroupBy(x => x.GridAreaDetails.GridAreaCode))
                 {
-                    AddDomainEvent(new EnqueueMessageEvent(AggregationResultMessageFactory.CreateMessage(aggregation, ProcessId)));
+                    AddDomainEvent(new EnqueueMessageEvent(AggregationResultMessage.Create(
+                        ProcessId,
+                        RequestedByActorId,
+                        ActorRole.FromCode(RequestedByActorRoleCode),
+                        BusinessReason,
+                        BusinessTransactionId,
+                        SettlementMethod != null ? SettlementType.From(SettlementMethod) : null,
+                        EnergySupplierId != null ? ActorNumber.Create(EnergySupplierId) : null,
+                        BalanceResponsibleId != null ? ActorNumber.Create(BalanceResponsibleId) : null,
+                        SettlementVersion,
+                        aggregation.ToList())));
                 }
 
                 _state = State.Accepted;

@@ -17,9 +17,11 @@ using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using NodaTime.Extensions;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
+using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
@@ -40,7 +42,7 @@ public class OutgoingMessageDtoBuilder
             _receiverNumber,
             _receiverRole,
             _processId,
-            GridAreaCode,
+            new GridAreaDetails(GridAreaCode, _receiverNumber.Value),
             MeteringPointType.Consumption.Name,
             SettlementType.NonProfiled.Name,
             MeasurementUnit.Kwh.Name,

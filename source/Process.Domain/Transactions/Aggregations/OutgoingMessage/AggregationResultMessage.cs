@@ -18,23 +18,18 @@ using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 
 public class AggregationResultMessage : OutgoingMessageDto
 {
-    // private AggregationResultMessage(ActorNumber receiverId, Guid processId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
-    //     : base(DocumentType.NotifyAggregatedMeasureData, receiverId, processId, businessReason, receiverRole, senderId, senderRole, messageRecord)
-    // {
-    //     Series = new Serializer().Deserialize<TimeSeries>(messageRecord)!;
-    // }
-
     private AggregationResultMessage(
         ActorNumber receiverId,
         Guid processId,
         string businessReason,
         ActorRole receiverRole,
-        TimeSeries series)
+        IReadOnlyCollection<TimeSeries> series)
         : base(
             DocumentType.NotifyAggregatedMeasureData,
             receiverId,
@@ -48,13 +43,13 @@ public class AggregationResultMessage : OutgoingMessageDto
         Series = series;
     }
 
-    public TimeSeries Series { get; }
+    public IReadOnlyCollection<TimeSeries> Series { get; }
 
     public static AggregationResultMessage Create(
         ActorNumber receiverNumber,
         ActorRole receiverRole,
         Guid processId,
-        string gridAreaCode,
+        GridAreaDetails gridAreaDetails,
         string meteringPointType,
         string? settlementType,
         string measureUnitType,
@@ -68,9 +63,11 @@ public class AggregationResultMessage : OutgoingMessageDto
         string? originalTransactionIdReference = null,
         string? settlementVersion = null)
     {
+        ArgumentNullException.ThrowIfNull(gridAreaDetails);
+
         var series = new TimeSeries(
             processId,
-            gridAreaCode,
+            gridAreaDetails.GridAreaCode,
             meteringPointType,
             settlementType,
             measureUnitType,
@@ -87,7 +84,51 @@ public class AggregationResultMessage : OutgoingMessageDto
             processId,
             businessReasonName,
             receiverRole,
-            series);
+            new List<TimeSeries>() { series });
+    }
+
+    public static AggregationResultMessage Create(
+        ProcessId processId,
+        ActorNumber receiverNumber,
+        ActorRole receiverRole,
+        BusinessReason businessReason,
+        BusinessTransactionId transactionIdReference,
+        SettlementType? settlementType,
+        ActorNumber? energySupplierNumber,
+        ActorNumber? balanceResponsibleNumber,
+        SettlementVersion? settlementVersion,
+        IReadOnlyCollection<AggregatedTimeSerie> series)
+    {
+        ArgumentNullException.ThrowIfNull(series);
+        ArgumentNullException.ThrowIfNull(transactionIdReference);
+        ArgumentNullException.ThrowIfNull(processId);
+        ArgumentNullException.ThrowIfNull(businessReason);
+
+        var timeSeries = new List<TimeSeries>();
+        foreach (var aggregatedTimeSeries in series)
+        {
+            timeSeries.Add(new TimeSeries(
+                processId.Id,
+                aggregatedTimeSeries.GridAreaDetails.GridAreaCode,
+                aggregatedTimeSeries.MeteringPointType,
+                settlementType?.Code,
+                aggregatedTimeSeries.UnitType,
+                aggregatedTimeSeries.Resolution,
+                energySupplierNumber?.Value,
+                balanceResponsibleNumber?.Value,
+                new Period(aggregatedTimeSeries.StartOfPeriod, aggregatedTimeSeries.EndOfPeriod),
+                aggregatedTimeSeries.Points.Select(p => new Point(p.Position, p.Quantity, p.QuantityQuality, p.SampleTime)).ToList(),
+                aggregatedTimeSeries.CalculationResultVersion,
+                transactionIdReference.Id,
+                settlementVersion?.Code));
+        }
+
+        return new AggregationResultMessage(
+            receiverNumber,
+            processId.Id,
+            businessReason.Name,
+            receiverRole,
+            timeSeries.ToList());
     }
 }
 

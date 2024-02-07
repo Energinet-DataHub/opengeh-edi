@@ -139,7 +139,7 @@ public class CalculationResultCompletedEventMapperTests
 
     private static MethodInfo GetMethod(string name)
     {
-        var method = typeof(AggregationFactory).GetMethod(
+        var method = typeof(AggregationResultMessageFactory).GetMethod(
             name,
             BindingFlags.Static | BindingFlags.NonPublic)!;
         return method;

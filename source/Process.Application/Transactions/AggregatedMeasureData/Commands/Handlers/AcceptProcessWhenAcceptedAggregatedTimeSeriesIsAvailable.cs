@@ -41,13 +41,7 @@ public class AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable : IRequest
         var process = await _aggregatedMeasureDataProcessRepository
             .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
-        var aggregations = new List<Aggregation>();
-        foreach (var aggregatedTimeSerie in request.AggregatedTimeSeries)
-        {
-            aggregations.Add(AggregationFactory.Create(process, aggregatedTimeSerie));
-        }
-
-        process.IsAccepted(aggregations);
+        process.IsAccepted(request.AggregatedTimeSeries);
 
         return Unit.Value;
     }

@@ -63,7 +63,7 @@ public static class ProcessConfiguration
         services.AddTransient<INotificationHandler<EnqueueMessageEvent>, EnqueueMessageHandler>();
 
         //AggregationsConfiguration
-        services.AddScoped<AggregationFactory>();
+        services.AddScoped<AggregationResultMessageFactory>();
 
         // RequestedAggregatedMeasureDataConfiguration
         services.AddTransient<IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>, SendAggregatedMeasuredDataToWholesale>();

@@ -81,10 +81,10 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasReceiverRole(process.RequestedByActorRoleCode)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
-            .HasPointsInCorrectOrder<TimeSeries, decimal?>(timeSerie => timeSerie.Point.Select(x => x.Quantity).ToList(), acceptedEvent.Series.SelectMany(x => x.TimeSeriesPoints).OrderBy(x => x.Time).ToList())
-            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
-            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId)
-            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1);
+            .HasPointsInCorrectOrder<List<TimeSeries>, decimal?>(timeSerie => timeSerie.First().Point.Select(x => x.Quantity).ToList(), acceptedEvent.Series.SelectMany(x => x.TimeSeriesPoints).OrderBy(x => x.Time).ToList())
+            .HasMessageRecordValue<List<TimeSeries>>(timeSerie => timeSerie.First().BalanceResponsibleNumber, process.BalanceResponsibleId)
+            .HasMessageRecordValue<List<TimeSeries>>(timeSerie => timeSerie.First().EnergySupplierNumber, process.EnergySupplierId)
+            .HasMessageRecordValue<List<TimeSeries>>(timeSerie => timeSerie.First().CalculationResultVersion, 1);
     }
 
     [Fact]
@@ -111,7 +111,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasReceiverRole(process.RequestedByActorRoleCode)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
-            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1);
+            .HasMessageRecordValue<List<TimeSeries>>(timeSerie => timeSerie.First().CalculationResultVersion, 1);
     }
 
     [Fact]
@@ -138,7 +138,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasReceiverRole(process.RequestedByActorRoleCode)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
-            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1);
+            .HasMessageRecordValue<List<TimeSeries>>(timeSerie => timeSerie.First().CalculationResultVersion, 1);
     }
 
     protected override void Dispose(bool disposing)

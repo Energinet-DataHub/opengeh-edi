@@ -29,16 +29,16 @@ namespace Energinet.DataHub.EDI.Process.Application.IntegrationEvents;
 
 public sealed class EnergyResultProducedV2Processor : IIntegrationEventProcessor
 {
-    private readonly AggregationFactory _aggregationFactory;
+    private readonly AggregationResultMessageFactory _aggregationResultMessageFactory;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ILogger<EnergyResultProducedV2Processor> _logger;
 
     public EnergyResultProducedV2Processor(
-        AggregationFactory aggregationFactory,
+        AggregationResultMessageFactory aggregationResultMessageFactory,
         IOutgoingMessagesClient outgoingMessagesClient,
         ILogger<EnergyResultProducedV2Processor> logger)
     {
-        _aggregationFactory = aggregationFactory;
+        _aggregationResultMessageFactory = aggregationResultMessageFactory;
         _outgoingMessagesClient = outgoingMessagesClient;
         _logger = logger;
     }
@@ -59,11 +59,8 @@ public sealed class EnergyResultProducedV2Processor : IIntegrationEventProcessor
             return;
         }
 
-        var aggregation = await _aggregationFactory
-            .CreateAsync(energyResultProducedV2, CancellationToken.None)
-            .ConfigureAwait(false);
-
-        var message = AggregationResultMessageFactory.CreateMessage(aggregation, ProcessId.New());
+        var message = await _aggregationResultMessageFactory
+            .CreateAsync(energyResultProducedV2, ProcessId.New(), cancellationToken).ConfigureAwait(false);
 
         await _outgoingMessagesClient.EnqueueAndCommitAsync(message, cancellationToken).ConfigureAwait(false);
     }
