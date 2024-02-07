@@ -61,8 +61,8 @@ public class WholesaleCalculationMessageFactory
                 monthlyAmountPerChargeResultProducedV1.ChargeCode,
                 monthlyAmountPerChargeResultProducedV1.IsTax,
                 MapQuantity(monthlyAmountPerChargeResultProducedV1.Amount),
-                MapEnergySupplier(monthlyAmountPerChargeResultProducedV1.EnergySupplierId),
-                MapChargeOwner(monthlyAmountPerChargeResultProducedV1.ChargeOwnerId), // this is an assumption
+                ActorNumber.Create(monthlyAmountPerChargeResultProducedV1.EnergySupplierId),
+                ActorNumber.Create(monthlyAmountPerChargeResultProducedV1.ChargeOwnerId), // this is an assumption
                 MapPeriod(
                     monthlyAmountPerChargeResultProducedV1.PeriodStartUtc,
                     monthlyAmountPerChargeResultProducedV1.PeriodEndUtc),
@@ -83,16 +83,6 @@ public class WholesaleCalculationMessageFactory
 
         const decimal nanoFactor = 1_000_000_000;
         return amount.Units + (amount.Nanos / nanoFactor);
-    }
-
-    private static ActorNumber MapEnergySupplier(string energySupplierId)
-    {
-        return ActorNumber.Create(energySupplierId);
-    }
-
-    private static ActorNumber MapChargeOwner(string chargeOwnerId)
-    {
-        return ActorNumber.Create(chargeOwnerId);
     }
 
     private static Period MapPeriod(MonthlyAmountPerChargeResultProducedV1 monthlyAmountPerChargeResultProducedV1)

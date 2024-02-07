@@ -15,12 +15,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleCalculations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Microsoft.Extensions.Logging;
 
@@ -31,15 +31,18 @@ public class MonthlyAmountPerChargeResultProducedV1Processor : IIntegrationEvent
     private readonly WholesaleCalculationMessageFactory _wholesaleFactory;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ILogger<MonthlyAmountPerChargeResultProducedV1Processor> _logger;
+    private readonly IFeatureFlagManager _featureManager;
 
     public MonthlyAmountPerChargeResultProducedV1Processor(
         WholesaleCalculationMessageFactory wholesaleFactory,
         IOutgoingMessagesClient outgoingMessagesClient,
-        ILogger<MonthlyAmountPerChargeResultProducedV1Processor> logger)
+        ILogger<MonthlyAmountPerChargeResultProducedV1Processor> logger,
+        IFeatureFlagManager featureManager)
     {
         _wholesaleFactory = wholesaleFactory;
         _outgoingMessagesClient = outgoingMessagesClient;
         _logger = logger;
+        _featureManager = featureManager;
     }
 
     public string EventTypeToHandle => MonthlyAmountPerChargeResultProducedV1.EventName;
@@ -51,6 +54,11 @@ public class MonthlyAmountPerChargeResultProducedV1Processor : IIntegrationEvent
         var monthlyAmountPerChargeResultProducedV1 = (MonthlyAmountPerChargeResultProducedV1)integrationEvent.Message;
 
         var message = _wholesaleFactory.CreateMessage(monthlyAmountPerChargeResultProducedV1, ProcessId.New(), cancellationToken);
-        await _outgoingMessagesClient.EnqueueAndCommitAsync(message!, cancellationToken).ConfigureAwait(false);
+
+        // TODO: Remove this, when we are ready to release the feature
+        if (await _featureManager.UseMonthlyAmountPerChargeResultProduced.ConfigureAwait(false))
+        {
+            await _outgoingMessagesClient.EnqueueAndCommitAsync(message!, cancellationToken).ConfigureAwait(false);
+        }
     }
 }
