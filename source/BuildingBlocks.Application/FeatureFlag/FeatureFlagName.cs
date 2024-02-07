@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.FeatureFlag;
+namespace BuildingBlocks.Application.FeatureFlag;
 
-#pragma warning disable
-public interface IFeatureFlagProvider
+/// <summary>
+/// List of all Feature Flags that exists in the system. A Feature Flag name must correspond to a value found in the app configuration as "FeatureManagement__NameOfFeatureFlag"
+/// </summary>
+public enum FeatureFlagName
 {
-    bool IsActorMessageQueueEnabled { get; }
-
-    bool IsPeekDequeuePerformanceTestEnabled { get; }
+    UseExampleFeatureFlag,
+    UseMonthlyAmountPerChargeResultProduced,
 }

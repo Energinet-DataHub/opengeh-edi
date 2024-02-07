@@ -32,8 +32,11 @@ using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
+using NodaTime.Serialization.Protobuf;
+using NodaTime.Text;
 using Xunit;
 using Enum = System.Enum;
+using Period = Energinet.DataHub.Edi.Responses.Period;
 using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point;
 using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
 
@@ -341,6 +344,11 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
             TimeSeriesType = TimeSeriesType.Production,
             QuantityUnit = QuantityUnit.Kwh,
             Resolution = Resolution.Pt1H,
+            Period = new Period()
+            {
+                StartOfPeriod = InstantPattern.General.Parse(SampleData.StartOfPeriod).Value.ToTimestamp(),
+                EndOfPeriod = InstantPattern.General.Parse(SampleData.EndOfPeriod).Value.ToTimestamp(),
+            },
         };
         series.TimeSeriesPoints.Add(timeSeriesPoint);
 
