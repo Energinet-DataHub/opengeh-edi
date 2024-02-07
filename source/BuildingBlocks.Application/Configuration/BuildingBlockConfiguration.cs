@@ -15,6 +15,9 @@
 using Azure.Identity;
 using Azure.Messaging.ServiceBus;
 using Azure.Storage.Blobs;
+using BuildingBlocks.Application.FeatureFlag;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
@@ -22,6 +25,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.FeatureManagement;
 using EdiServiceBusClientOptions = BuildingBlocks.Application.Configuration.Options.ServiceBusClientOptions;
 
 namespace BuildingBlocks.Application.Configuration;
@@ -30,14 +34,18 @@ public static class BuildingBlockConfiguration
 {
     public static void AddBuildingBlocks(this IServiceCollection services, IConfiguration configuration)
     {
+        AddServiceBus(services, configuration);
+        AddDatabase(services, configuration);
+        AddFileStorage(services, configuration);
+        AddFeatureFlags(services);
+    }
+
+    private static void AddServiceBus(IServiceCollection services, IConfiguration configuration)
+    {
         services
             .AddOptions<EdiServiceBusClientOptions>()
             .Bind(configuration)
             .Validate(o => !string.IsNullOrEmpty(o.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND), "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND must be set");
-        services
-            .AddOptions<SqlDatabaseConnectionOptions>()
-            .Bind(configuration)
-            .Validate(o => !string.IsNullOrEmpty(o.DB_CONNECTION_STRING), "DB_CONNECTION_STRING must be set");
 
         services.AddSingleton<ServiceBusClient>(provider => new ServiceBusClient(
             provider.GetRequiredService<IOptions<EdiServiceBusClientOptions>>().Value.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND,
@@ -46,9 +54,21 @@ public static class BuildingBlockConfiguration
                 TransportType = ServiceBusTransportType.AmqpWebSockets,
             }));
 
-        services.AddSingleton<IDatabaseConnectionFactory, SqlDatabaseConnectionFactory>();
         services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactory>();
+    }
 
+    private static void AddDatabase(IServiceCollection services, IConfiguration configuration)
+    {
+        services
+            .AddOptions<SqlDatabaseConnectionOptions>()
+            .Bind(configuration)
+            .Validate(o => !string.IsNullOrEmpty(o.DB_CONNECTION_STRING), "DB_CONNECTION_STRING must be set");
+
+        services.AddSingleton<IDatabaseConnectionFactory, SqlDatabaseConnectionFactory>();
+    }
+
+    private static void AddFileStorage(IServiceCollection services, IConfiguration configuration)
+    {
         services
             .AddOptions<BlobServiceClientConnectionOptions>()
             .Bind(configuration)
@@ -66,5 +86,11 @@ public static class BuildingBlockConfiguration
             });
 
         services.AddTransient<IFileStorageClient, DataLakeFileStorageClient>();
+    }
+
+    private static void AddFeatureFlags(IServiceCollection services)
+    {
+        services.AddFeatureManagement();
+        services.AddScoped<IFeatureFlagManager, MicrosoftFeatureFlagManager>();
     }
 }
