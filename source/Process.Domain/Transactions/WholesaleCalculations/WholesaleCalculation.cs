@@ -1,4 +1,4 @@
-﻿// Copyright 2020 Energinet DataHub A/S
+﻿// // Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculation;
+namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
 
-public record WholesaleCalculation(
+public record WholesaleCalculationSeries(
     string GridAreaCode,
     string ChargeCode,
     bool IsTax,

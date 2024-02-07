@@ -13,49 +13,68 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.EDI.Process.Domain.Transactions;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf.WellKnownTypes;
 using NodaTime.Serialization.Protobuf;
-using DecimalValue = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleCalculation;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleCalculations;
 
-public class WholesaleCalculationFactory
+public class WholesaleCalculationMessageFactory
 {
-    private readonly IMasterDataClient _masterDataClient;
-
-    public WholesaleCalculationFactory(IMasterDataClient masterDataClient)
+#pragma warning disable CA1822
+    public WholesaleCalculationResultMessage CreateMessage(
+        MonthlyAmountPerChargeResultProducedV1 message,
+        ProcessId processId,
+        CancellationToken cancellationToken)
+#pragma warning restore CA1822
     {
-        _masterDataClient = masterDataClient;
+        ArgumentNullException.ThrowIfNull(message);
+        ArgumentNullException.ThrowIfNull(processId);
+
+        var wholesaleCalculations = CreateWholesaleCalculation(message);
+
+        var firstWholesaleCalculation = wholesaleCalculations.First();
+
+        return WholesaleCalculationResultMessage.Create(
+            receiverNumber: firstWholesaleCalculation.EnergySupplier,
+            receiverRole: ActorRole.EnergySupplier,
+            processId: processId,
+            businessReason: firstWholesaleCalculation.BusinessReason,
+            wholesaleSeries: wholesaleCalculations);
     }
 
-    public static Domain.Transactions.WholesaleCalculation.WholesaleCalculation Create(
-        MonthlyAmountPerChargeResultProducedV1 monthlyAmountPerChargeResultProducedV1,
-        CancellationToken cancellationToken)
+    private static List<WholesaleCalculationSeries> CreateWholesaleCalculation(
+        MonthlyAmountPerChargeResultProducedV1 monthlyAmountPerChargeResultProducedV1)
     {
         ArgumentNullException.ThrowIfNull(monthlyAmountPerChargeResultProducedV1);
 
-        return new Domain.Transactions.WholesaleCalculation.WholesaleCalculation(
-            monthlyAmountPerChargeResultProducedV1.GridAreaCode,
-            monthlyAmountPerChargeResultProducedV1.ChargeCode,
-            monthlyAmountPerChargeResultProducedV1.IsTax,
-            MapQuantity(monthlyAmountPerChargeResultProducedV1.Amount),
-            MapEnergySupplier(monthlyAmountPerChargeResultProducedV1.EnergySupplierId),
-            MapChargeOwner(monthlyAmountPerChargeResultProducedV1.ChargeOwnerId), // this is an assumption
-            MapPeriod(
+        return new List<WholesaleCalculationSeries>
+        {
+            new WholesaleCalculationSeries(
+                monthlyAmountPerChargeResultProducedV1.GridAreaCode,
+                monthlyAmountPerChargeResultProducedV1.ChargeCode,
+                monthlyAmountPerChargeResultProducedV1.IsTax,
+                MapQuantity(monthlyAmountPerChargeResultProducedV1.Amount),
+                MapEnergySupplier(monthlyAmountPerChargeResultProducedV1.EnergySupplierId),
+                MapChargeOwner(monthlyAmountPerChargeResultProducedV1.ChargeOwnerId), // this is an assumption
+                MapPeriod(
                     monthlyAmountPerChargeResultProducedV1.PeriodStartUtc,
                     monthlyAmountPerChargeResultProducedV1.PeriodEndUtc),
-            MapCalculationType(monthlyAmountPerChargeResultProducedV1.CalculationType),
-            MapSettlementVersion(monthlyAmountPerChargeResultProducedV1.CalculationType),
-            MapQuantityUnit(monthlyAmountPerChargeResultProducedV1.QuantityUnit),
-            MapCurrency(monthlyAmountPerChargeResultProducedV1.Currency),
-            MapChargeType(monthlyAmountPerChargeResultProducedV1.ChargeType));
+                MapCalculationType(monthlyAmountPerChargeResultProducedV1.CalculationType),
+                MapSettlementVersion(monthlyAmountPerChargeResultProducedV1.CalculationType),
+                MapQuantityUnit(monthlyAmountPerChargeResultProducedV1.QuantityUnit),
+                MapCurrency(monthlyAmountPerChargeResultProducedV1.Currency),
+                MapChargeType(monthlyAmountPerChargeResultProducedV1.ChargeType)),
+        };
     }
 
-    private static decimal? MapQuantity(DecimalValue? amount)
+    private static decimal? MapQuantity(Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue? amount)
     {
         if (amount is null)
         {
