@@ -16,6 +16,7 @@ namespace BuildingBlocks.Application.FeatureFlag;
 
 /// <summary>
 /// Manage feature flags in the application. If using <see cref="MicrosoftFeatureFlagManager"/> then the feature flags are managed through the app configuration, and the name of a feature flag configuration must be prefixed with "FeatureManagement__", ie. "FeatureManagement__UseMonthlyAmountPerChargeResultProduced"
+/// The "Feature Flags in EDI" documentation page in confluence should be kept up-to-date: https://energinet.atlassian.net/wiki/spaces/D3/pages/677412898/Feature+Flags+in+EDI
 /// </summary>
 public interface IFeatureFlagManager
 {
