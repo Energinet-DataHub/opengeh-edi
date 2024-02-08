@@ -77,14 +77,7 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
             writer.WriteStartObject();
 
             writer.WriteProperty("mRID", series.TransactionId.ToString());
-            if (series.CalculationResultVersion.HasValue)
-            {
-                writer.WriteProperty("version", series.CalculationResultVersion.Value.ToString(NumberFormatInfo.InvariantInfo));
-            }
-            else
-            {
-                writer.WriteProperty("version", "1");
-            }
+            writer.WriteProperty("version", series.CalculationResultVersion.ToString(NumberFormatInfo.InvariantInfo));
 
             writer.WriteObject(
                 "meteringGridArea_Domain.mRID",
