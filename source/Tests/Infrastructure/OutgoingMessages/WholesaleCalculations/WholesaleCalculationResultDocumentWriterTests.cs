@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Tests.Fixtures;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.AggregationResult;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 
@@ -23,19 +22,20 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
     [InlineData(nameof(DocumentFormat.Xml))]
     public async Task Can_ceate_document(string documentFormat)
     {
-        var document = null!;
+        var document = Stream.Null;
 
         // Assert
-        await AssertDocument(document, DocumentFormat.From(documentFormat))
+        AssertDocument(document, DocumentFormat.From(documentFormat));
     }
 
     private IAssertWholesaleCalculationResultDocument AssertDocument(Stream document, DocumentFormat documentFormat)
     {
          if (documentFormat == DocumentFormat.Xml)
-        {
-            var assertXmlDocument = AssertXmlDocument.Document(document, "cim", _documentValidation.Validator);
-            return new AssertAggregationResultXmlDocument(assertXmlDocument);
-        }
-        throw new NotSupportedException($"Document format '{documentFormat}' is not supported");
+         {
+             var assertXmlDocument = AssertXmlDocument.Document(document, "cim", _documentValidation.Validator);
+             return new AssertWholesaleCalculationResultXmlDocument(assertXmlDocument);
+         }
+
+         throw new NotSupportedException($"Document format '{documentFormat}' is not supported");
     }
 }
