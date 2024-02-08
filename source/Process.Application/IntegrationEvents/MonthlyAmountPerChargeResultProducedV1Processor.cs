@@ -28,13 +28,13 @@ namespace Energinet.DataHub.EDI.Process.Application.IntegrationEvents;
 
 public class MonthlyAmountPerChargeResultProducedV1Processor : IIntegrationEventProcessor
 {
-    private readonly WholesaleCalculationMessageFactory _wholesaleFactory;
+    private readonly WholesaleCalculationResultMessageFactory _wholesaleFactory;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ILogger<MonthlyAmountPerChargeResultProducedV1Processor> _logger;
     private readonly IFeatureFlagManager _featureManager;
 
     public MonthlyAmountPerChargeResultProducedV1Processor(
-        WholesaleCalculationMessageFactory wholesaleFactory,
+        WholesaleCalculationResultMessageFactory wholesaleFactory,
         IOutgoingMessagesClient outgoingMessagesClient,
         ILogger<MonthlyAmountPerChargeResultProducedV1Processor> logger,
         IFeatureFlagManager featureManager)
@@ -58,7 +58,7 @@ public class MonthlyAmountPerChargeResultProducedV1Processor : IIntegrationEvent
         // TODO: Remove this, when we are ready to release the feature
         if (await _featureManager.UseMonthlyAmountPerChargeResultProduced.ConfigureAwait(false))
         {
-            await _outgoingMessagesClient.EnqueueAndCommitAsync(message!, cancellationToken).ConfigureAwait(false);
+            await _outgoingMessagesClient.EnqueueAndCommitAsync(message, cancellationToken).ConfigureAwait(false);
         }
     }
 }

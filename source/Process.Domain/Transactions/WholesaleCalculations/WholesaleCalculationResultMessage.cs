@@ -27,28 +27,28 @@ public class WholesaleCalculationResultMessage : OutgoingMessageDto
         Guid processId,
         BusinessReason businessReason,
         ActorRole receiverRole,
-        IReadOnlyCollection<WholesaleCalculationSeries> wholesaleSeries)
+        WholesaleCalculationSeries series)
         : base(
             DocumentType.NotifyWholesaleService,
             receiverId,
             processId,
-            businessReason.Code, // TODO: is this the code?
+            businessReason.Name, // TODO: is this the code?
             receiverRole,
             DataHubDetails.DataHubActorNumber,
             ActorRole.MeteredDataAdministrator,
-            new Serializer().Serialize(wholesaleSeries))
+            new Serializer().Serialize(series))
     {
-        WholesaleSeries = wholesaleSeries;
+        Series = series;
     }
 
-    public IReadOnlyCollection<WholesaleCalculationSeries> WholesaleSeries { get; }
+    public WholesaleCalculationSeries Series { get; }
 
     public static WholesaleCalculationResultMessage Create(
         ActorNumber receiverNumber,
         ActorRole receiverRole,
         ProcessId processId,
         BusinessReason businessReason,
-        IReadOnlyCollection<WholesaleCalculationSeries> wholesaleSeries)
+        WholesaleCalculationSeries wholesaleSeries)
     {
         ArgumentNullException.ThrowIfNull(processId);
         ArgumentNullException.ThrowIfNull(businessReason);
@@ -58,6 +58,6 @@ public class WholesaleCalculationResultMessage : OutgoingMessageDto
             receiverRole: receiverRole,
             processId: processId.Id,
             businessReason: businessReason,
-            wholesaleSeries: wholesaleSeries);
+            series: wholesaleSeries);
     }
 }
