@@ -25,7 +25,7 @@ public class DocumentFactoryTests
     : TestBase
 {
     private readonly IEnumerable<IDocumentWriter> _documentWriters;
-    private readonly List<DocumentType> _notSupportedDocumentType = new() { DocumentType.NotifyWholesaleService };
+    private readonly List<DocumentType> _notSupportedDocumentType = new() { DocumentType.NotifyWholesaleServices };
 
     public DocumentFactoryTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)

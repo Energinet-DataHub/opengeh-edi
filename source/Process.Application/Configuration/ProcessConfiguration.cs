@@ -67,7 +67,7 @@ public static class ProcessConfiguration
         //AggregationsConfiguration
         services.AddScoped<AggregationFactory>();
 
-        //WholesaleCalculationConfiguration
+        //Wholesale Calculation setup
         services.AddScoped<WholesaleCalculationResultMessageFactory>();
 
         // RequestedAggregatedMeasureDataConfiguration

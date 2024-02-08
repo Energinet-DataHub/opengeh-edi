@@ -45,15 +45,15 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
     }
 
     [Fact]
-    public async Task MonthlyAmountPerChargeResultProducedV1Processor_does_commit_when_feature_is_enabled()
+    public async Task MonthlyAmountPerChargeResultProducedV1Processor_creates_outgoing_message_when_feature_is_enabled()
     {
         var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder.Build();
         await HandleIntegrationEventAsync(monthlyPerChargeEvent);
-        var result = await WholesaleCalculationResultMessageAsync();
+        await AssertOutgoingMessageAsync();
     }
 
     [Fact]
-    public async Task MonthlyAmountPerChargeResultProducedV1Processor_does_not_commit_when_feature_is_disabled()
+    public async Task MonthlyAmountPerChargeResultProducedV1Processor_does_not_create_outgoing_message_when_feature_is_disabled()
     {
         var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder
             .WithCalculationType(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing)
@@ -62,11 +62,7 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
         FeatureFlagManagerStub.UseMonthlyAmountPerChargeResultProduced = Task.FromResult(false);
 
         await HandleIntegrationEventAsync(monthlyPerChargeEvent);
-        await AssertOutgoingMessage.OutgoingMessageIsNullAsync(
-            messageType: DocumentType.NotifyWholesaleService.Name,
-            SampleData.BusinessReason.Name,
-            SampleData.ReceiverRole,
-            _databaseConnectionFactory);
+        await AssertOutgoingMessageIsNull(BusinessReason.WholesaleFixing);
     }
 
     private async Task HandleIntegrationEventAsync(MonthlyAmountPerChargeResultProducedV1 @event)
@@ -79,15 +75,24 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
         await _integrationEventHandler.HandleAsync(integrationEvent);
     }
 
-    private async Task<AssertOutgoingMessage> WholesaleCalculationResultMessageAsync(
+    private async Task<AssertOutgoingMessage> AssertOutgoingMessageAsync(
         ActorRole? receiverRole = null,
         BusinessReason? businessReason = null)
     {
         return await AssertOutgoingMessage.OutgoingMessageAsync(
-            DocumentType.NotifyWholesaleService.Name,
-            businessReason?.Name ?? SampleData.BusinessReason.Name,
-            receiverRole ?? SampleData.ReceiverRole,
+            DocumentType.NotifyWholesaleServices.Name,
+            businessReason?.Name ?? BusinessReason.WholesaleFixing.Name,
+            receiverRole ?? ActorRole.EnergySupplier,
             _databaseConnectionFactory,
             _fileStorageClient);
+    }
+
+    private async Task AssertOutgoingMessageIsNull(BusinessReason? businessReason = null)
+    {
+        await AssertOutgoingMessage.OutgoingMessageIsNullAsync(
+            messageType: DocumentType.NotifyWholesaleServices.Name,
+            businessReason: businessReason?.Name ?? BusinessReason.WholesaleFixing.Name,
+            ActorRole.EnergySupplier,
+            _databaseConnectionFactory);
     }
 }

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -29,7 +28,7 @@ public class WholesaleCalculationResultMessage : OutgoingMessageDto
         ActorRole receiverRole,
         WholesaleCalculationSeries series)
         : base(
-            DocumentType.NotifyWholesaleService,
+            DocumentType.NotifyWholesaleServices,
             receiverId,
             processId,
             businessReason.Name,
@@ -38,10 +37,7 @@ public class WholesaleCalculationResultMessage : OutgoingMessageDto
             ActorRole.MeteredDataAdministrator,
             new Serializer().Serialize(series))
     {
-        Series = series;
     }
-
-    public WholesaleCalculationSeries Series { get; }
 
     public static WholesaleCalculationResultMessage Create(
         ActorNumber receiverNumber,

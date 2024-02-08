@@ -22,7 +22,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleCalculations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
-using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.Process.Application.IntegrationEvents;
 
@@ -30,18 +29,15 @@ public class MonthlyAmountPerChargeResultProducedV1Processor : IIntegrationEvent
 {
     private readonly WholesaleCalculationResultMessageFactory _wholesaleFactory;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
-    private readonly ILogger<MonthlyAmountPerChargeResultProducedV1Processor> _logger;
     private readonly IFeatureFlagManager _featureManager;
 
     public MonthlyAmountPerChargeResultProducedV1Processor(
         WholesaleCalculationResultMessageFactory wholesaleFactory,
         IOutgoingMessagesClient outgoingMessagesClient,
-        ILogger<MonthlyAmountPerChargeResultProducedV1Processor> logger,
         IFeatureFlagManager featureManager)
     {
         _wholesaleFactory = wholesaleFactory;
         _outgoingMessagesClient = outgoingMessagesClient;
-        _logger = logger;
         _featureManager = featureManager;
     }
 
@@ -53,9 +49,8 @@ public class MonthlyAmountPerChargeResultProducedV1Processor : IIntegrationEvent
 
         var monthlyAmountPerChargeResultProducedV1 = (MonthlyAmountPerChargeResultProducedV1)integrationEvent.Message;
 
-        var message = _wholesaleFactory.CreateMessage(monthlyAmountPerChargeResultProducedV1, ProcessId.New(), cancellationToken);
+        var message = _wholesaleFactory.CreateMessage(monthlyAmountPerChargeResultProducedV1, ProcessId.New());
 
-        // TODO: Remove this, when we are ready to release the feature
         if (await _featureManager.UseMonthlyAmountPerChargeResultProduced.ConfigureAwait(false))
         {
             await _outgoingMessagesClient.EnqueueAndCommitAsync(message, cancellationToken).ConfigureAwait(false);

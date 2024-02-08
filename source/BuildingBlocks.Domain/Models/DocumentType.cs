@@ -18,7 +18,7 @@ public class DocumentType : EnumerationType
 {
     public static readonly DocumentType NotifyAggregatedMeasureData = new(7, nameof(NotifyAggregatedMeasureData), MessageCategory.Aggregations);
     public static readonly DocumentType RejectRequestAggregatedMeasureData = new(8, nameof(RejectRequestAggregatedMeasureData), MessageCategory.Aggregations);
-    public static readonly DocumentType NotifyWholesaleService = new(9, nameof(NotifyWholesaleService), MessageCategory.Aggregations); //TODO: Is this the right message category?
+    public static readonly DocumentType NotifyWholesaleServices = new(9, nameof(NotifyWholesaleServices), MessageCategory.Aggregations);
 
     protected DocumentType(int id, string name, MessageCategory category)
         : base(id, name)

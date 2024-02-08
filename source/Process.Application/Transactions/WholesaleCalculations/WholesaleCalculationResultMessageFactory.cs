@@ -28,8 +28,7 @@ public class WholesaleCalculationResultMessageFactory
 #pragma warning disable CA1822
     public WholesaleCalculationResultMessage CreateMessage(
         MonthlyAmountPerChargeResultProducedV1 message,
-        ProcessId processId,
-        CancellationToken cancellationToken)
+        ProcessId processId)
 #pragma warning restore CA1822
     {
         ArgumentNullException.ThrowIfNull(message);
@@ -48,8 +47,6 @@ public class WholesaleCalculationResultMessageFactory
     private static WholesaleCalculationSeries CreateWholesaleCalculation(
         MonthlyAmountPerChargeResultProducedV1 monthlyAmountPerChargeResultProducedV1)
     {
-        ArgumentNullException.ThrowIfNull(monthlyAmountPerChargeResultProducedV1);
-
         return new WholesaleCalculationSeries(
             monthlyAmountPerChargeResultProducedV1.GridAreaCode,
             monthlyAmountPerChargeResultProducedV1.ChargeCode,
