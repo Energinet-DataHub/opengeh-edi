@@ -17,12 +17,13 @@ using System.Linq;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public class MeasurementUnit : EnumerationType
+public class ChargeType : EnumerationType
 {
-    public static readonly MeasurementUnit Kwh = new(0, nameof(Kwh), "KWH");
-    public static readonly MeasurementUnit Pieces = new(0, nameof(Pieces), "Pieces"); // TODO: WHAT
+    public static readonly ChargeType Fee = new(0, nameof(Fee), "Fee");
+    public static readonly ChargeType Tariff = new(0, nameof(Tariff), "Tariff");
+    public static readonly ChargeType Subscription = new(0, nameof(Subscription), "Subscription");
 
-    private MeasurementUnit(int id, string name, string code)
+    public ChargeType(int id, string name, string code)
         : base(id, name)
     {
         Code = code;
@@ -30,10 +31,10 @@ public class MeasurementUnit : EnumerationType
 
     public string Code { get; }
 
-    public static MeasurementUnit From(string value)
+    public static Currency From(string value)
     {
-        return GetAll<MeasurementUnit>().First(type =>
-            type.Code.Equals(value, StringComparison.OrdinalIgnoreCase) ||
-            type.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
+        return GetAll<Currency>().First(chargeType =>
+            chargeType.Code.Equals(value, StringComparison.OrdinalIgnoreCase) ||
+            chargeType.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
     }
 }
