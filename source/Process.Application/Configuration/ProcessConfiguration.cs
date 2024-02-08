@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureDa
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleCalculations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
@@ -51,6 +52,7 @@ public static class ProcessConfiguration
         //EventsConfiguration
         //TODO: can we move them out and delete ref to Infrastructure?
         services.AddTransient<IIntegrationEventProcessor, EnergyResultProducedV2Processor>();
+        services.AddTransient<IIntegrationEventProcessor, MonthlyAmountPerChargeResultProducedV1Processor>();
         services.AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestAcceptedEventMapper>();
         services.AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestRejectedMapper>();
 
@@ -64,6 +66,9 @@ public static class ProcessConfiguration
 
         //AggregationsConfiguration
         services.AddScoped<AggregationFactory>();
+
+        //Wholesale Calculation setup
+        services.AddScoped<WholesaleCalculationResultMessageFactory>();
 
         // RequestedAggregatedMeasureDataConfiguration
         services.AddTransient<IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>, SendAggregatedMeasuredDataToWholesale>();

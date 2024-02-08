@@ -130,7 +130,7 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
 
     [Theory]
     [MemberData(nameof(QuantityQualityPowerSet))]
-    public async Task EnergyResultProducedV2_with_power_set_values_of_quantity_quality_produces_Aggregation(
+    public async Task AggregatedTimeSeriesRequestAccepted_with_power_set_values_of_quantity_quality_produces_Aggregation(
         QuantityQuality[] quantityQualities)
     {
         var result = await AggregatedTimeSeriesRequestAcceptedWithQuantityQualityToOutgoingMessage(quantityQualities);

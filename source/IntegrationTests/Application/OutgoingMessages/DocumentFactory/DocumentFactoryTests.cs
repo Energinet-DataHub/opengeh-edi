@@ -25,6 +25,7 @@ public class DocumentFactoryTests
     : TestBase
 {
     private readonly IEnumerable<IDocumentWriter> _documentWriters;
+    private readonly List<DocumentType> _notSupportedDocumentType = new() { DocumentType.NotifyWholesaleServices };
 
     public DocumentFactoryTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
@@ -44,6 +45,11 @@ public class DocumentFactoryTests
     {
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Xml));
+        if (_notSupportedDocumentType.Contains(documentType))
+        {
+            Assert.Null(writer);
+            return;
+        }
 
         Assert.NotNull(writer);
     }
@@ -54,6 +60,11 @@ public class DocumentFactoryTests
     {
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Json));
+        if (_notSupportedDocumentType.Contains(documentType))
+        {
+            Assert.Null(writer);
+            return;
+        }
 
         Assert.NotNull(writer);
     }
@@ -64,6 +75,11 @@ public class DocumentFactoryTests
     {
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Ebix));
+        if (_notSupportedDocumentType.Contains(documentType))
+        {
+            Assert.Null(writer);
+            return;
+        }
 
         Assert.NotNull(writer);
     }
