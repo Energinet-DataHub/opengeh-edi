@@ -45,7 +45,7 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
     }
 
     [Fact]
-    public async Task Can_handle_event()
+    public async Task MonthlyAmountPerChargeResultProducedV1Processor_does_commit_when_feature_is_enabled()
     {
         var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder.Build();
         await HandleIntegrationEventAsync(monthlyPerChargeEvent);

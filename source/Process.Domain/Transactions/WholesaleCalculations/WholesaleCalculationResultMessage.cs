@@ -32,7 +32,7 @@ public class WholesaleCalculationResultMessage : OutgoingMessageDto
             DocumentType.NotifyWholesaleService,
             receiverId,
             processId,
-            businessReason.Name, // TODO: is this the code?
+            businessReason.Name,
             receiverRole,
             DataHubDetails.DataHubActorNumber,
             ActorRole.MeteredDataAdministrator,
