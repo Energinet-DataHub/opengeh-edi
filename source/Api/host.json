@@ -7,5 +7,10 @@
                 "excludedTypes": "Request;Exception"
             }
         }
-    }
+    },
+    "retry": {
+      "maxRetryCount": 10,
+      "strategy": "fixedDelay",
+      "delayInterval": "00:00:15"
+  }
 }
