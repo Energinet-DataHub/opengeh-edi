@@ -19,7 +19,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData
@@ -122,15 +121,15 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             }
         }
 
-        public void IsAccepted(IReadOnlyCollection<Aggregation> aggregations)
+        public void IsAccepted(IReadOnlyCollection<AggregationResultMessage> aggregationResultMessages)
         {
-            ArgumentNullException.ThrowIfNull(aggregations);
+            ArgumentNullException.ThrowIfNull(aggregationResultMessages);
 
             if (_state == State.Sent)
             {
-                foreach (var aggregation in aggregations)
+                foreach (var aggregationResultMessage in aggregationResultMessages)
                 {
-                    AddDomainEvent(new EnqueueMessageEvent(AggregationResultMessageFactory.CreateMessage(aggregation, ProcessId)));
+                    AddDomainEvent(new EnqueueMessageEvent(aggregationResultMessage));
                 }
 
                 _state = State.Accepted;

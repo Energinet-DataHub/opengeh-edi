@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -23,16 +22,11 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
-using NodaTime;
-using NodaTime.Extensions;
 using NodaTime.Text;
 using Xunit;
 using Xunit.Categories;
-using GridAreaDetails = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.GridAreaDetails;
-using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
-using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Point;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
@@ -55,10 +49,10 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
         process!.WasSentToWholesale();
-        var acceptedAggregation = CreateAcceptedAggregation(process.StartOfPeriod, process.EndOfPeriod!);
+        var aggregationResultMessage = CreateAggregationResultMessage(process);
 
         // Act
-        process.IsAccepted(new List<Aggregation> { acceptedAggregation });
+        process.IsAccepted(new List<AggregationResultMessage> { aggregationResultMessage });
 
         // Assert
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);
@@ -72,10 +66,11 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
         process!.WasSentToWholesale();
-        var acceptedAggregation = CreateAcceptedAggregation(process.StartOfPeriod, process.EndOfPeriod!);
+        var firstAggregationResultMessage = CreateAggregationResultMessage(process);
+        var secondAggregationResultMessage = CreateAggregationResultMessage(process, gridarea: "808");
 
         // Act
-        process.IsAccepted(new List<Aggregation> { acceptedAggregation, acceptedAggregation });
+        process.IsAccepted(new List<AggregationResultMessage> { firstAggregationResultMessage, secondAggregationResultMessage });
 
         // Assert
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);
@@ -93,11 +88,11 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
         process!.WasSentToWholesale();
-        var acceptedAggregation = CreateAcceptedAggregation(process.StartOfPeriod, process.EndOfPeriod!);
+        var aggregationResultMessage = CreateAggregationResultMessage(process);
 
         // Act
-        process.IsAccepted(new List<Aggregation> { acceptedAggregation });
-        process.IsAccepted(new List<Aggregation> { acceptedAggregation });
+        process.IsAccepted(new List<AggregationResultMessage> { aggregationResultMessage });
+        process.IsAccepted(new List<AggregationResultMessage> { aggregationResultMessage });
 
         // Assert
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);
@@ -152,25 +147,34 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         return new RequestAggregatedMeasureDataMarketDocumentBuilder();
     }
 
-    private static Aggregation CreateAcceptedAggregation(string start, string end)
+    private static AggregationResultMessage CreateAggregationResultMessage(
+        AggregatedMeasureDataProcess process,
+        string gridarea = "805")
     {
-        var points = new List<Point>()
+        var points = new List<Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point>()
         {
-            new(1, 2, CalculatedQuantityQuality.Calculated, start.ToString()),
-            new(2, 3, CalculatedQuantityQuality.Calculated, end.ToString()),
+            new(1, 2, CalculatedQuantityQuality.Calculated, process.StartOfPeriod),
+            new(2, 3, CalculatedQuantityQuality.Calculated, process.EndOfPeriod!),
         };
 
-        return new Aggregation(
-            points,
-            MeteringPointType.Consumption.Name,
+        return AggregationResultMessage.Create(
+            process.RequestedByActorId,
+            ActorRole.FromCode(process.RequestedByActorRoleCode),
+            process.ProcessId.Id,
+            gridarea,
+            MeteringPointType.Production.Name,
+            process.SettlementMethod,
             MeasurementUnit.Kwh.Name,
-            Resolution.Hourly.Name,
-            new Period(InstantPattern.General.Parse(start).Value, InstantPattern.General.Parse(end).Value),
-            SettlementType.NonProfiled.Name,
-            BusinessReason.BalanceFixing.Name,
-            new ActorGrouping("1234567891911", null),
-            new GridAreaDetails("805", "1234567891045"),
-            1);
+            Resolution.QuarterHourly.Name,
+            process.EnergySupplierId,
+            process.BalanceResponsibleId,
+            new Period(
+                InstantPattern.General.Parse(process.StartOfPeriod).Value,
+                InstantPattern.General.Parse(process.EndOfPeriod!).Value),
+            points.ToList().AsReadOnly(),
+            process.BusinessReason.Name,
+            1,
+            settlementVersion: process.SettlementVersion?.Name);
     }
 
     private static RejectedAggregatedMeasureDataRequest CreateRejectRequest()

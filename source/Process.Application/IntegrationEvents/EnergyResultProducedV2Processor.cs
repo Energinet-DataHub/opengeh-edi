@@ -20,8 +20,6 @@ using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
-using Energinet.DataHub.EDI.Process.Domain.Transactions;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Microsoft.Extensions.Logging;
 
@@ -29,16 +27,16 @@ namespace Energinet.DataHub.EDI.Process.Application.IntegrationEvents;
 
 public sealed class EnergyResultProducedV2Processor : IIntegrationEventProcessor
 {
-    private readonly AggregationFactory _aggregationFactory;
+    private readonly AggregationMessageResultFactory _aggregationMessageResultFactory;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ILogger<EnergyResultProducedV2Processor> _logger;
 
     public EnergyResultProducedV2Processor(
-        AggregationFactory aggregationFactory,
+        AggregationMessageResultFactory aggregationMessageResultFactory,
         IOutgoingMessagesClient outgoingMessagesClient,
         ILogger<EnergyResultProducedV2Processor> logger)
     {
-        _aggregationFactory = aggregationFactory;
+        _aggregationMessageResultFactory = aggregationMessageResultFactory;
         _outgoingMessagesClient = outgoingMessagesClient;
         _logger = logger;
     }
@@ -59,11 +57,9 @@ public sealed class EnergyResultProducedV2Processor : IIntegrationEventProcessor
             return;
         }
 
-        var aggregation = await _aggregationFactory
+        var message = await _aggregationMessageResultFactory
             .CreateAsync(energyResultProducedV2, CancellationToken.None)
             .ConfigureAwait(false);
-
-        var message = AggregationResultMessageFactory.CreateMessage(aggregation, ProcessId.New());
 
         await _outgoingMessagesClient.EnqueueAndCommitAsync(message, cancellationToken).ConfigureAwait(false);
     }
