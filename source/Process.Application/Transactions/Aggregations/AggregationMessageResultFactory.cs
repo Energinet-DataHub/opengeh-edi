@@ -20,13 +20,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Exceptions;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf.Collections;
-using NodaTime;
 using NodaTime.Serialization.Protobuf;
 using static Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.EnergyResultProducedV2.Types;
 using DecimalValue = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue;
@@ -94,14 +94,9 @@ public class AggregationMessageResultFactory
             balanceResponsibleNumber,
             MapPeriod(integrationEvent),
             MapPoints(integrationEvent.TimeSeriesPoints),
-            MapCalculationType(integrationEvent.CalculationType),
+            CalculationTypeMapper.MapCalculationType(integrationEvent.CalculationType),
             integrationEvent.CalculationResultVersion,
             settlementVersion: MapSettlementVersion(integrationEvent.CalculationType));
-    }
-
-    private static Period MapPeriod(Instant startOfPeriod, Instant endOfPeriod)
-    {
-        return new Period(startOfPeriod, endOfPeriod);
     }
 
     private static ActorRole GetReceiverRole(EnergyResultProducedV2.AggregationLevelOneofCase aggregationLevelCase)
@@ -153,22 +148,6 @@ public class AggregationMessageResultFactory
             EnergyResultProducedV2.AggregationLevelOneofCase.None =>
                 throw new InvalidOperationException("Aggregation level is not specified"),
             _ => null,
-        };
-    }
-
-    private static string MapCalculationType(CalculationType processType)
-    {
-        return processType switch
-        {
-            CalculationType.Aggregation => BusinessReason.PreliminaryAggregation.Name,
-            CalculationType.BalanceFixing => BusinessReason.BalanceFixing.Name,
-            CalculationType.WholesaleFixing => BusinessReason.WholesaleFixing.Name,
-            CalculationType.FirstCorrectionSettlement => BusinessReason.Correction.Name,
-            CalculationType.SecondCorrectionSettlement => BusinessReason.Correction.Name,
-            CalculationType.ThirdCorrectionSettlement => BusinessReason.Correction.Name,
-            CalculationType.Unspecified => throw new InvalidOperationException(
-                "Process type is not specified from Wholesales"),
-            _ => throw new InvalidOperationException("Unknown process type from Wholesales"),
         };
     }
 

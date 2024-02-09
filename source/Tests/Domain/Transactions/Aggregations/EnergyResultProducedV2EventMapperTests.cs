@@ -24,14 +24,6 @@ namespace Energinet.DataHub.EDI.Tests.Domain.Transactions.Aggregations;
 
 public class EnergyResultProducedV2EventMapperTests
 {
-    public static IEnumerable<object[]> ProcessTypes()
-    {
-        foreach (var number in Enum.GetValues(typeof(ProcessType)))
-        {
-            yield return new[] { number };
-        }
-    }
-
     public static IEnumerable<object[]> Resolutions()
     {
         foreach (var number in Enum.GetValues(typeof(Resolution)))
@@ -53,23 +45,6 @@ public class EnergyResultProducedV2EventMapperTests
         foreach (var number in Enum.GetValues(typeof(TimeSeriesType)))
         {
             yield return new[] { number };
-        }
-    }
-
-    [Theory]
-    [MemberData(nameof(ProcessTypes))]
-    public void Ensure_handling_all_process_types(ProcessType processType)
-    {
-        var method = GetMethod("MapCalculationType");
-
-        // Act
-        if (processType != ProcessType.Unspecified)
-        {
-            method.Invoke(obj: null, parameters: new object[] { processType });
-        }
-        else
-        {
-            AssertException<InvalidOperationException>(processType, method);
         }
     }
 
