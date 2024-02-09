@@ -49,23 +49,6 @@ public class EnergyResultProducedV2EventMapperTests
     }
 
     [Theory]
-    [MemberData(nameof(Resolutions))]
-    public void Ensure_handling_all_resolutions(Resolution resolution)
-    {
-        var method = GetMethod("MapResolution");
-
-        // Act
-        if (resolution != Resolution.Unspecified)
-        {
-            method.Invoke(obj: null, parameters: new object[] { resolution });
-        }
-        else
-        {
-            AssertException<InvalidOperationException>(resolution, method);
-        }
-    }
-
-    [Theory]
     [MemberData(nameof(QuantityUnits))]
     public void Ensure_handling_all_quantity_units(QuantityUnit quantityUnit)
     {

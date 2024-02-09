@@ -89,7 +89,7 @@ public class AggregationMessageResultFactory
             MapMeteringPointType(integrationEvent.TimeSeriesType),
             MapSettlementType(integrationEvent.TimeSeriesType),
             MapQuantityUnit(integrationEvent.QuantityUnit),
-            MapResolution(integrationEvent.Resolution),
+            ResolutionMapper.MapResolution(integrationEvent.Resolution),
             energySupplierNumber,
             balanceResponsibleNumber,
             MapPeriod(integrationEvent),
@@ -148,17 +148,6 @@ public class AggregationMessageResultFactory
             EnergyResultProducedV2.AggregationLevelOneofCase.None =>
                 throw new InvalidOperationException("Aggregation level is not specified"),
             _ => null,
-        };
-    }
-
-    private static string MapResolution(EnergyResultProducedV2.Types.Resolution resolution)
-    {
-        return resolution switch
-        {
-            EnergyResultProducedV2.Types.Resolution.Quarter => Resolution.QuarterHourly.Name,
-            EnergyResultProducedV2.Types.Resolution.Unspecified => throw new InvalidOperationException(
-                "Could not map resolution type"),
-            _ => throw new InvalidOperationException("Unknown resolution type"),
         };
     }
 

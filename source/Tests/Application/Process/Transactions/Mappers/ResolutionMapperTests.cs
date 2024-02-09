@@ -21,25 +21,25 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Application.Process.Transactions.Mappers;
 
-public class CalculationTypeMapperTests
+public class ResolutionMapperTests
 {
-    public static IEnumerable<object[]> CalculationTypes()
+    public static IEnumerable<object[]> ResolutionTypes()
     {
-        foreach (var calculationType in Enum.GetValues(typeof(EnergyResultProducedV2.Types.CalculationType)))
+        foreach (var resolution in Enum.GetValues(typeof(EnergyResultProducedV2.Types.Resolution)))
         {
-            yield return new[] { calculationType };
+            yield return new[] { resolution };
         }
     }
 
     [Theory]
-    [MemberData(nameof(CalculationTypes))]
-    public void Ensure_handling_all_calculation_types(EnergyResultProducedV2.Types.CalculationType calculationType)
+    [MemberData(nameof(ResolutionTypes))]
+    public void Ensure_handling_all_process_types(EnergyResultProducedV2.Types.Resolution resolutionType)
     {
         // Act
-        var actual = () => CalculationTypeMapper.MapCalculationType(calculationType);
+        var actual = () => ResolutionMapper.MapResolution(resolutionType);
 
         // Assert
-        if (calculationType != EnergyResultProducedV2.Types.CalculationType.Unspecified)
+        if (resolutionType != EnergyResultProducedV2.Types.Resolution.Unspecified)
         {
             actual.Should().NotThrow();
         }
