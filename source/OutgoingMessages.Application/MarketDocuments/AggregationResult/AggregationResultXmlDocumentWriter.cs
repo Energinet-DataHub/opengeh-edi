@@ -47,14 +47,7 @@ public class AggregationResultXmlDocumentWriter : DocumentWriter
         {
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Series", null).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, timeSeries.TransactionId.ToString()).ConfigureAwait(false);
-            if (timeSeries.CalculationResultVersion.HasValue)
-            {
-                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "version", null, timeSeries.CalculationResultVersion.Value.ToString(NumberFormatInfo.InvariantInfo)).ConfigureAwait(false);
-            }
-            else
-            {
-                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "version", null, "1").ConfigureAwait(false);
-            }
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "version", null, timeSeries.CalculationResultVersion.ToString(NumberFormatInfo.InvariantInfo)).ConfigureAwait(false);
 
             await WriteElementIfHasValueAsync("settlement_Series.version", timeSeries.SettlementVersion is null ? null : CimCode.Of(SettlementVersion.FromName(timeSeries.SettlementVersion)), writer).ConfigureAwait(false);
             await WriteElementIfHasValueAsync("originalTransactionIDReference_Series.mRID", timeSeries.OriginalTransactionIdReference, writer).ConfigureAwait(false);
