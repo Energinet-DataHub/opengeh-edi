@@ -32,11 +32,15 @@ public class ServiceBusExceptionLoggerMiddleware : IFunctionsWorkerMiddleware
 
     public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
     {
+        _logger.LogWarning("ServiceBusExceptionLoggerMiddleware invoked");
+
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(next);
 
         if (context.Is(FunctionContextExtensions.TriggerType.ServiceBusTrigger))
         {
+            _logger.LogWarning("ServiceBusExceptionLoggerMiddleware is processing a ServiceBus message");
+
             try
             {
                 await next(context).ConfigureAwait(false);
@@ -45,6 +49,13 @@ public class ServiceBusExceptionLoggerMiddleware : IFunctionsWorkerMiddleware
             catch (Exception e)
 #pragma warning restore CA1031
             {
+                var logStatement = "Service bus message processing failed with: ";
+                logStatement += context.RetryContext is null
+                    ? "No retry context available."
+                    : $"Retry count {context.RetryContext.RetryCount} of {context.RetryContext.MaxRetryCount}.";
+
+                _logger.LogWarning(logStatement);
+
                 // The RetryContext is potentially null!
                 if (context.RetryContext?.RetryCount != context.RetryContext?.MaxRetryCount)
                 {
