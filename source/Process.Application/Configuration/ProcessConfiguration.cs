@@ -65,7 +65,7 @@ public static class ProcessConfiguration
         services.AddTransient<INotificationHandler<EnqueueMessageEvent>, EnqueueMessageHandler>();
 
         //AggregationsConfiguration
-        services.AddScoped<AggregationFactory>();
+        services.AddScoped<AggregationMessageResultFactory>();
 
         //Wholesale Calculation setup
         services.AddScoped<WholesaleCalculationResultMessageFactory>();
