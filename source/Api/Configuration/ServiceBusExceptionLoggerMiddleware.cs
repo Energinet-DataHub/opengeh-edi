@@ -32,8 +32,6 @@ public class ServiceBusExceptionLoggerMiddleware : IFunctionsWorkerMiddleware
 
     public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
     {
-        _logger.LogWarning("ServiceBusExceptionLoggerMiddleware invoked");
-
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(next);
 
