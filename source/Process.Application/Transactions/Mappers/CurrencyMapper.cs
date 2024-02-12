@@ -26,7 +26,7 @@ public static class CurrencyMapper
         {
             MonthlyAmountPerChargeResultProducedV1.Types.Currency.Dkk => Currency.DanishCrowns,
             MonthlyAmountPerChargeResultProducedV1.Types.Currency.Unspecified => throw new InvalidOperationException("Currency is not specified from Wholesale"),
-            _ => throw new InvalidOperationException($"Unknown currency: {currency}"),
+            _ => throw new ArgumentOutOfRangeException(nameof(currency), currency, "Unknown currency from Wholesale"),
         };
     }
 }
