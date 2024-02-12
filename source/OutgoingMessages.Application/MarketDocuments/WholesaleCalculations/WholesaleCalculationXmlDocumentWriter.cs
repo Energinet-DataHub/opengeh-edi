@@ -51,7 +51,7 @@ public class WholesaleCalculationXmlDocumentWriter : DocumentWriter
 
             await WriteElementIfHasValueAsync("settlement_Series.version", wholesaleCalculationSeries.SettlementVersion?.Code, writer).ConfigureAwait(false);
             //await WriteElementIfHasValueAsync("originalTransactionIDReference_Series.mRID", wholesaleCalculationSeries.OriginalTransactionIdReference, writer).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "marketEvaluationPoint.type", null, "E17").ConfigureAwait(false);  //TODO: CHANGE THIS
+            //await writer.WriteElementStringAsync(DocumentDetails.Prefix, "marketEvaluationPoint.type", null, "E17").ConfigureAwait(false);
             //await WriteElementIfHasValueAsync("marketEvaluationPoint.settlementMethod", wholesaleCalculationSeries.SettlementType is null ? null : CimCode.Of(SettlementType.From(wholesaleCalculationSeries.SettlementType)), writer).ConfigureAwait(false);
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "chargeType.mRID", null, wholesaleCalculationSeries.ChargeCode).ConfigureAwait(false); // TODO: is this the code???
@@ -111,8 +111,6 @@ public class WholesaleCalculationXmlDocumentWriter : DocumentWriter
 
             // tabbed content
             await WriteElementAsync("position", "1", writer).ConfigureAwait(false); // TODO: FIX HARDCODING
-            await WriteElementAsync("energy_Quantity.quantity", "999", writer).ConfigureAwait(false); // TODO: FIX HARDCODING
-            await WriteElementAsync("price.amount", "000", writer).ConfigureAwait(false); // TODO: FIX HARDCODING
             await WriteElementAsync("energySum_Quantity.quantity", wholesaleCalculationSeries.Quantity?.ToString(NumberFormatInfo.InvariantInfo) ?? "0", writer).ConfigureAwait(false);
 
             // tab removed

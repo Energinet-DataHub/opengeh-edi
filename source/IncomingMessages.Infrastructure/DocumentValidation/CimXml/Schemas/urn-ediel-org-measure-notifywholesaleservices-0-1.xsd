@@ -102,7 +102,7 @@
 			<xs:element name="version" type="xs:string" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#TimeSeries.version"/>
 			<xs:element name="settlement_Series.version" type="cim:ProcessVariantKind_String" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#TimeSeries.version"/>
 			<xs:element name="originalTransactionIDReference_Series.mRID" type="xs:string" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#IdentifiedObject.mRID"/>
-			<xs:element name="marketEvaluationPoint.type" type="cim:MarketEvaluationPointKind_String" minOccurs="1" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#Ext_MarketEvaluationPoint.type"/>
+			<xs:element name="marketEvaluationPoint.type" type="cim:MarketEvaluationPointKind_String" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#Ext_MarketEvaluationPoint.type"/>
 			<xs:element name="marketEvaluationPoint.settlementMethod" type="cim:SettlementMethodKind_String" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#Ext_MarketEvaluationPoint.settlementMethod"/>
 			<xs:element name="asset_MktPSRType.psrType" type="cim:PsrType_String" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#MktPSRType.psrType"/>
 			<xs:element name="registration_DateAndOrTime.dateTime" type="xs:dateTime" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#DateAndOrTime.dateTime"/>
