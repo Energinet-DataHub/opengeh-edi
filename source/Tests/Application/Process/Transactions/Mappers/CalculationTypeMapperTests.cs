@@ -22,9 +22,17 @@ public class CalculationTypeMapperTests : BaseEnumMapperTests
 {
     [Theory]
     [MemberData(nameof(GetEnumValues), typeof(EnergyResultProducedV2.Types.CalculationType))]
-    public void Ensure_handling_all_calculation_types(EnergyResultProducedV2.Types.CalculationType value)
+    public void Ensure_handling_energy_result_produced(EnergyResultProducedV2.Types.CalculationType value)
         => EnsureCanMapOrThrows(
             () => CalculationTypeMapper.MapCalculationType(value),
             value,
             invalidValues: EnergyResultProducedV2.Types.CalculationType.Unspecified);
+
+    [Theory]
+    [MemberData(nameof(GetEnumValues), typeof(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType))]
+    public void Ensure_handling_monthly_amount_per_charge_result_produced(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType value)
+        => EnsureCanMapOrThrows(
+            () => CalculationTypeMapper.MapCalculationType(value),
+            value,
+            invalidValues: MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.Unspecified);
 }

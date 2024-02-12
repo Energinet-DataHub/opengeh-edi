@@ -36,7 +36,10 @@ public abstract class BaseEnumMapperTests
         yield return new object[] { InvalidEnumNumber }; // Test with invalid enum value
     }
 
-    protected static void EnsureCanMapOrThrows<TInputEnum>(Action performMapping, TInputEnum value, params TInputEnum[] invalidValues)
+    protected static void EnsureCanMapOrThrows<TInputEnum>(
+        Action performMapping,
+        TInputEnum value,
+        params TInputEnum[] invalidValues)
         where TInputEnum : Enum
     {
         // Act
@@ -47,13 +50,20 @@ public abstract class BaseEnumMapperTests
         {
             act.Should().NotThrow();
         }
-        else
+        else if (invalidValues.Contains(value))
         {
             act.Should().Throw<InvalidOperationException>();
         }
+        else
+        {
+            act.Should().Throw<ArgumentOutOfRangeException>();
+        }
     }
 
-    protected static void EnsureCanMapOrReturnsNull<TEnumInput, TEnumResult>(Func<TEnumResult?> performMapping, TEnumInput value, params TEnumInput[] invalidValues)
+    protected static void EnsureCanMapOrReturnsNull<TEnumInput, TEnumResult>(
+        Func<TEnumResult?> performMapping,
+        TEnumInput value,
+        params TEnumInput[] invalidValues)
         where TEnumInput : Enum
     {
         ArgumentNullException.ThrowIfNull(performMapping);

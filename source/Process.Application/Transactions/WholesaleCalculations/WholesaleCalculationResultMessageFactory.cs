@@ -15,6 +15,7 @@
 using System;
 using System.Threading;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
@@ -34,37 +35,29 @@ public class WholesaleCalculationResultMessageFactory
         ArgumentNullException.ThrowIfNull(message);
         ArgumentNullException.ThrowIfNull(processId);
 
-        var wholesaleCalculation = CreateWholesaleCalculation(message);
+        var wholesaleCalculationSeries = new WholesaleCalculationSeries(
+            GridAreaCode: message.GridAreaCode,
+            ChargeCode: message.ChargeCode,
+            IsTax: message.IsTax,
+            Quantity: CalculateQuantity(message.Amount),
+            EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
+            ChargeOwner: ActorNumber.Create(message.ChargeOwnerId), // this is an assumption
+            Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),
+            BusinessReason: CalculationTypeMapper.MapCalculationType(message.CalculationType),
+            SettlementVersion: MapSettlementVersion(message.CalculationType),
+            QuantityUnit: MapQuantityUnit(message.QuantityUnit),
+            Currency: MapCurrency(message.Currency),
+            ChargeType: MapChargeType(message.ChargeType));
 
         return WholesaleCalculationResultMessage.Create(
-            receiverNumber: wholesaleCalculation.EnergySupplier,
+            receiverNumber: wholesaleCalculationSeries.EnergySupplier,
             receiverRole: ActorRole.EnergySupplier,
             processId: processId,
-            businessReason: wholesaleCalculation.BusinessReason,
-            wholesaleSeries: wholesaleCalculation);
+            businessReason: wholesaleCalculationSeries.BusinessReason,
+            wholesaleSeries: wholesaleCalculationSeries);
     }
 
-    private static WholesaleCalculationSeries CreateWholesaleCalculation(
-        MonthlyAmountPerChargeResultProducedV1 monthlyAmountPerChargeResultProducedV1)
-    {
-        return new WholesaleCalculationSeries(
-            monthlyAmountPerChargeResultProducedV1.GridAreaCode,
-            monthlyAmountPerChargeResultProducedV1.ChargeCode,
-            monthlyAmountPerChargeResultProducedV1.IsTax,
-            MapQuantity(monthlyAmountPerChargeResultProducedV1.Amount),
-            ActorNumber.Create(monthlyAmountPerChargeResultProducedV1.EnergySupplierId),
-            ActorNumber.Create(monthlyAmountPerChargeResultProducedV1.ChargeOwnerId), // this is an assumption
-            MapPeriod(
-                monthlyAmountPerChargeResultProducedV1.PeriodStartUtc,
-                monthlyAmountPerChargeResultProducedV1.PeriodEndUtc),
-            MapCalculationType(monthlyAmountPerChargeResultProducedV1.CalculationType),
-            MapSettlementVersion(monthlyAmountPerChargeResultProducedV1.CalculationType),
-            MapQuantityUnit(monthlyAmountPerChargeResultProducedV1.QuantityUnit),
-            MapCurrency(monthlyAmountPerChargeResultProducedV1.Currency),
-            MapChargeType(monthlyAmountPerChargeResultProducedV1.ChargeType));
-    }
-
-    private static decimal? MapQuantity(Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue? amount)
+    private static decimal? CalculateQuantity(Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue? amount)
     {
         if (amount is null)
         {
@@ -73,18 +66,6 @@ public class WholesaleCalculationResultMessageFactory
 
         const decimal nanoFactor = 1_000_000_000;
         return amount.Units + (amount.Nanos / nanoFactor);
-    }
-
-    private static Period MapPeriod(MonthlyAmountPerChargeResultProducedV1 monthlyAmountPerChargeResultProducedV1)
-    {
-        return new Period(
-            monthlyAmountPerChargeResultProducedV1.PeriodStartUtc.ToInstant(),
-            monthlyAmountPerChargeResultProducedV1.PeriodEndUtc.ToInstant());
-    }
-
-    private static Period MapPeriod(Timestamp start, Timestamp end)
-    {
-        return new Period(start.ToInstant(), end.ToInstant());
     }
 
     private static BusinessReason MapCalculationType(

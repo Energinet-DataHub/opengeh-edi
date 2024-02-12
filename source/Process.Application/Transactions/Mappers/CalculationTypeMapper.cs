@@ -20,9 +20,9 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 
 public static class CalculationTypeMapper
 {
-    public static BusinessReason MapCalculationType(EnergyResultProducedV2.Types.CalculationType processType)
+    public static BusinessReason MapCalculationType(EnergyResultProducedV2.Types.CalculationType calculationType)
     {
-        return processType switch
+        return calculationType switch
         {
             EnergyResultProducedV2.Types.CalculationType.Aggregation => BusinessReason.PreliminaryAggregation,
             EnergyResultProducedV2.Types.CalculationType.BalanceFixing => BusinessReason.BalanceFixing,
@@ -30,9 +30,21 @@ public static class CalculationTypeMapper
             EnergyResultProducedV2.Types.CalculationType.FirstCorrectionSettlement => BusinessReason.Correction,
             EnergyResultProducedV2.Types.CalculationType.SecondCorrectionSettlement => BusinessReason.Correction,
             EnergyResultProducedV2.Types.CalculationType.ThirdCorrectionSettlement => BusinessReason.Correction,
-            EnergyResultProducedV2.Types.CalculationType.Unspecified => throw new InvalidOperationException(
-                "Process type is not specified from Wholesales"),
-            _ => throw new InvalidOperationException("Unknown process type from Wholesales"),
+            EnergyResultProducedV2.Types.CalculationType.Unspecified => throw new InvalidOperationException("Calculation type is not specified from Wholesale"),
+            _ => throw new ArgumentOutOfRangeException(nameof(calculationType), calculationType, "Unknown calculation type from Wholesale"),
+        };
+    }
+
+    public static BusinessReason MapCalculationType(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType calculationType)
+    {
+        return calculationType switch
+        {
+            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing => BusinessReason.WholesaleFixing,
+            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.FirstCorrectionSettlement => BusinessReason.Correction,
+            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.SecondCorrectionSettlement => BusinessReason.Correction,
+            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.ThirdCorrectionSettlement => BusinessReason.Correction,
+            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.Unspecified => throw new InvalidOperationException("Calculation type is not specified from Wholesale"),
+            _ => throw new ArgumentOutOfRangeException(nameof(calculationType), calculationType, "Unknown calculation type from Wholesale"),
         };
     }
 }
