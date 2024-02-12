@@ -14,6 +14,7 @@
 
 using System;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -22,6 +23,7 @@ public class MeasurementUnit : EnumerationType
     public static readonly MeasurementUnit Kwh = new(0, nameof(Kwh), "KWH");
     public static readonly MeasurementUnit Pieces = new(0, nameof(Pieces), "Pieces"); // TODO: WHAT
 
+    [JsonConstructor]
     private MeasurementUnit(int id, string name, string code)
         : base(id, name)
     {

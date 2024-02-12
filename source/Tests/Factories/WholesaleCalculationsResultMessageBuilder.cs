@@ -178,6 +178,7 @@ public class WholesaleCalculationsResultMessageBuilder
     public WholesaleCalculationSeries BuildWholesaleCalculation()
     {
         return new WholesaleCalculationSeries(
+            TransactionId: _transactionId,
             GridAreaCode: _gridAreaCode,
             ChargeCode: "123",
             IsTax: false,

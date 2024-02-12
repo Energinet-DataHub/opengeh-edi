@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
@@ -89,7 +90,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
 
         if (documentFormat == DocumentFormat.Xml)
         {
-            return new AggregationResultXmlDocumentWriter(_parser).WriteAsync(
+            return new WholesaleCalculationXmlDocumentWriter(_parser).WriteAsync(
                 documentHeader,
                 new[] { records, });
         }

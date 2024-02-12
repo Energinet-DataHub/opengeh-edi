@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions;
@@ -22,6 +23,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions;
 /// </summary>
 public class ProcessId : ValueObject
 {
+    [JsonConstructor]
     private ProcessId(Guid id)
     {
         Id = id;

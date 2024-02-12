@@ -19,9 +19,10 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public class ChargeType : EnumerationType
 {
-    public static readonly ChargeType Fee = new(0, nameof(Fee), "Fee");
-    public static readonly ChargeType Tariff = new(0, nameof(Tariff), "Tariff");
-    public static readonly ChargeType Subscription = new(0, nameof(Subscription), "Subscription");
+    //TODO: Align the codes with PO
+    public static readonly ChargeType Fee = new(0, nameof(Fee), "D01");
+    public static readonly ChargeType Tariff = new(0, nameof(Tariff), "D02");
+    public static readonly ChargeType Subscription = new(0, nameof(Subscription), "D03");
 
     public ChargeType(int id, string name, string code)
         : base(id, name)
