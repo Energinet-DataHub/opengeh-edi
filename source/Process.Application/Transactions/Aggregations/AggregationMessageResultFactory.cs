@@ -95,20 +95,21 @@ public class AggregationMessageResultFactory
 
     private static ActorRole GetReceiverRole(EnergyResultProducedV2.AggregationLevelOneofCase aggregationLevelCase)
     {
-        return aggregationLevelCase switch
+        switch (aggregationLevelCase)
         {
-            EnergyResultProducedV2.AggregationLevelOneofCase
-                .AggregationPerGridarea => ActorRole.MeteredDataResponsible,
-            EnergyResultProducedV2.AggregationLevelOneofCase
-                .AggregationPerEnergysupplierPerGridarea => ActorRole.EnergySupplier,
-            EnergyResultProducedV2.AggregationLevelOneofCase
-                .AggregationPerBalanceresponsiblepartyPerGridarea => ActorRole.BalanceResponsibleParty,
-            EnergyResultProducedV2.AggregationLevelOneofCase
-                    .AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea => ActorRole.BalanceResponsibleParty,
-            EnergyResultProducedV2.AggregationLevelOneofCase.None =>
-                throw new InvalidOperationException("Aggregation level is not specified"),
-            _ => throw new InvalidOperationException("Aggregation level is unknown"),
-        };
+            case EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerGridarea:
+                return ActorRole.MeteredDataResponsible;
+            case EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerEnergysupplierPerGridarea:
+                return ActorRole.EnergySupplier;
+            case EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerBalanceresponsiblepartyPerGridarea:
+            case EnergyResultProducedV2.AggregationLevelOneofCase
+                .AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea:
+                return ActorRole.BalanceResponsibleParty;
+            case EnergyResultProducedV2.AggregationLevelOneofCase.None:
+                throw new InvalidOperationException("Aggregation level is not specified");
+            default:
+                throw new InvalidOperationException("Aggregation level is unknown");
+        }
     }
 
     private static string? GetEnergySupplierNumber(EnergyResultProducedV2 integrationEvent)
