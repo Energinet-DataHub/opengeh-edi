@@ -36,21 +36,22 @@ public abstract class BaseEnumMapperTests
         yield return new object[] { InvalidEnumNumber }; // Test with invalid enum value
     }
 
-    protected static void EnsureCanMapOrThrows<TInputEnum>(
+    protected static void EnsureCanMapOrThrows<TEnum>(
         Action performMapping,
-        TInputEnum value,
-        params TInputEnum[] invalidValues)
-        where TInputEnum : Enum
+        TEnum value,
+        TEnum unspecifiedValue,
+        params TEnum[] invalidValues)
+        where TEnum : Enum
     {
         // Act
         var act = performMapping;
 
         // Assert
-        if (ValueIsValid(value, invalidValues))
+        if (ValueIsValid(value, unspecifiedValue, invalidValues))
         {
             act.Should().NotThrow();
         }
-        else if (invalidValues.Contains(value))
+        else if (invalidValues.Contains(value) || value.Equals(unspecifiedValue))
         {
             act.Should().Throw<InvalidOperationException>();
         }
@@ -63,6 +64,7 @@ public abstract class BaseEnumMapperTests
     protected static void EnsureCanMapOrReturnsNull<TEnumInput, TEnumResult>(
         Func<TEnumResult?> performMapping,
         TEnumInput value,
+        TEnumInput unspecifiedValue,
         params TEnumInput[] invalidValues)
         where TEnumInput : Enum
     {
@@ -72,22 +74,30 @@ public abstract class BaseEnumMapperTests
         var act = performMapping;
 
         // Assert
-        if (ValueIsValid(value, invalidValues))
+        if (ValueIsValid(value, unspecifiedValue, invalidValues))
         {
             var result = act.Should().NotThrow().Subject;
             result.Should().NotBeNull();
         }
-        else
+        else if (invalidValues.Contains(value))
         {
             var result = act();
             result.Should().BeNull();
         }
+        else if (value.Equals(unspecifiedValue))
+        {
+            act.Should().Throw<InvalidOperationException>();
+        }
+        else
+        {
+            act.Should().Throw<ArgumentOutOfRangeException>();
+        }
     }
 
-    private static bool ValueIsValid<TEnum>(TEnum value, params TEnum[] invalidValues)
+    private static bool ValueIsValid<TEnum>(TEnum value, TEnum unspecifiedValue, params TEnum[] invalidValues)
         where TEnum : Enum
     {
-        var valid = (int)(object)value != InvalidEnumNumber && !invalidValues.Contains(value);
+        var valid = (int)(object)value != InvalidEnumNumber && !value.Equals(unspecifiedValue) && !invalidValues.Contains(value);
 
         return valid;
     }

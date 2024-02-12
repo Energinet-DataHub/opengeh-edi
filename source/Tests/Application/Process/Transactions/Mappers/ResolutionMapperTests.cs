@@ -22,9 +22,9 @@ public class ResolutionMapperTests : BaseEnumMapperTests
 {
     [Theory]
     [MemberData(nameof(GetEnumValues), typeof(EnergyResultProducedV2.Types.Resolution))]
-    public void Ensure_handling_all_resolutions(EnergyResultProducedV2.Types.Resolution value) =>
+    public void Ensure_handling_energy_result_produced(EnergyResultProducedV2.Types.Resolution value) =>
         EnsureCanMapOrThrows(
             () => ResolutionMapper.MapResolution(value),
             value,
-            invalidValues: EnergyResultProducedV2.Types.Resolution.Unspecified);
+            unspecifiedValue: EnergyResultProducedV2.Types.Resolution.Unspecified);
 }

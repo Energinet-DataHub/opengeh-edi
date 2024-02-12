@@ -30,26 +30,16 @@ public class MeteringPointTypeMapperTests : BaseEnumMapperTests
         EnergyResultProducedV2.Types.TimeSeriesType.NegativeGridLoss,
         EnergyResultProducedV2.Types.TimeSeriesType.PositiveGridLoss,
         EnergyResultProducedV2.Types.TimeSeriesType.TempFlexConsumption,
-        EnergyResultProducedV2.Types.TimeSeriesType.Unspecified,
     };
 
     [Theory]
     [MemberData(nameof(GetEnumValues), typeof(EnergyResultProducedV2.Types.TimeSeriesType))]
-    public void Ensure_handling_all_time_series_types(EnergyResultProducedV2.Types.TimeSeriesType value)
+    public void Ensure_handling_energy_result_produced(EnergyResultProducedV2.Types.TimeSeriesType value)
         => EnsureCanMapOrThrows(
             () => MeteringPointTypeMapper.MapMeteringPointType(value),
             value,
+            unspecifiedValue: EnergyResultProducedV2.Types.TimeSeriesType.Unspecified,
             invalidValues: _invalidValues);
-
-    [Theory]
-    [InlineData(EnergyResultProducedV2.Types.TimeSeriesType.Unspecified)]
-    [InlineData((EnergyResultProducedV2.Types.TimeSeriesType)InvalidEnumNumber)]
-    public void Ensure_throws_invalid_operation_exception(EnergyResultProducedV2.Types.TimeSeriesType value)
-    {
-        var act = () => MeteringPointTypeMapper.MapMeteringPointType(value);
-
-        act.Should().ThrowExactly<InvalidOperationException>();
-    }
 
     [Theory]
     [InlineData(EnergyResultProducedV2.Types.TimeSeriesType.GridLoss)]

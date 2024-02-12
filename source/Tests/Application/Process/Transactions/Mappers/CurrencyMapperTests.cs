@@ -18,21 +18,13 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Application.Process.Transactions.Mappers;
 
-public class MeasurementUnitMapperTests : BaseEnumMapperTests
+public class CurrencyMapperTests : BaseEnumMapperTests
 {
     [Theory]
-    [MemberData(nameof(GetEnumValues), typeof(EnergyResultProducedV2.Types.QuantityUnit))]
-    public void Ensure_handling_energy_result_produced(EnergyResultProducedV2.Types.QuantityUnit value)
+    [MemberData(nameof(GetEnumValues), typeof(MonthlyAmountPerChargeResultProducedV1.Types.Currency))]
+    public void Ensure_handling_monthly_amount_per_charge_result_produced(MonthlyAmountPerChargeResultProducedV1.Types.Currency value)
         => EnsureCanMapOrThrows(
-            () => MeasurementUnitMapper.MapQuantityUnit(value),
+            () => CurrencyMapper.MapCurrency(value),
             value,
-            unspecifiedValue: EnergyResultProducedV2.Types.QuantityUnit.Unspecified);
-
-    [Theory]
-    [MemberData(nameof(GetEnumValues), typeof(MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit))]
-    public void Ensure_handling_monthly_amount_per_charge_result_produced(MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit value)
-        => EnsureCanMapOrThrows(
-            () => MeasurementUnitMapper.MapQuantityUnit(value),
-            value,
-            unspecifiedValue: MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit.Unspecified);
+            unspecifiedValue: MonthlyAmountPerChargeResultProducedV1.Types.Currency.Unspecified);
 }

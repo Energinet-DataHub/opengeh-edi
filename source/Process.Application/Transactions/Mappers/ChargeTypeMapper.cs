@@ -18,16 +18,17 @@ using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 
-public static class ResolutionMapper
+public static class ChargeTypeMapper
 {
-    public static Resolution MapResolution(EnergyResultProducedV2.Types.Resolution resolution)
+    public static ChargeType MapChargeType(MonthlyAmountPerChargeResultProducedV1.Types.ChargeType chargeType)
     {
-        return resolution switch
+        return chargeType switch
         {
-            EnergyResultProducedV2.Types.Resolution.Quarter => Resolution.QuarterHourly,
-            EnergyResultProducedV2.Types.Resolution.Unspecified => throw new InvalidOperationException(
-                "Could not map resolution type"),
-            _ => throw new ArgumentOutOfRangeException(nameof(resolution), resolution, "Unknown resolution from Wholesale"),
+            MonthlyAmountPerChargeResultProducedV1.Types.ChargeType.Fee => ChargeType.Fee,
+            MonthlyAmountPerChargeResultProducedV1.Types.ChargeType.Tariff => ChargeType.Tariff,
+            MonthlyAmountPerChargeResultProducedV1.Types.ChargeType.Subscription => ChargeType.Subscription,
+            MonthlyAmountPerChargeResultProducedV1.Types.ChargeType.Unspecified => throw new InvalidOperationException("Charge type is not specified from Wholesale"),
+            _ => throw new ArgumentOutOfRangeException(nameof(chargeType), chargeType, "Unknown charge type from Wholesale"),
         };
     }
 }

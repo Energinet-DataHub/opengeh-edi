@@ -20,19 +20,33 @@ namespace Energinet.DataHub.EDI.Tests.Application.Process.Transactions.Mappers;
 
 public class SettlementVersionMapperTests : BaseEnumMapperTests
 {
-    private readonly EnergyResultProducedV2.Types.CalculationType[] _invalidValues =
+    private readonly EnergyResultProducedV2.Types.CalculationType[] _energyResultProducedInvalidValues =
     {
         EnergyResultProducedV2.Types.CalculationType.Aggregation,
         EnergyResultProducedV2.Types.CalculationType.BalanceFixing,
         EnergyResultProducedV2.Types.CalculationType.WholesaleFixing,
-        EnergyResultProducedV2.Types.CalculationType.Unspecified,
+    };
+
+    private readonly MonthlyAmountPerChargeResultProducedV1.Types.CalculationType[] _monthlyAmountPerChargeResultInvalidValues =
+    {
+        MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing,
     };
 
     [Theory]
     [MemberData(nameof(GetEnumValues), typeof(EnergyResultProducedV2.Types.CalculationType))]
-    public void Ensure_handling_all_calculation_types(EnergyResultProducedV2.Types.CalculationType value)
+    public void Ensure_handling_energy_result_produced(EnergyResultProducedV2.Types.CalculationType value)
         => EnsureCanMapOrReturnsNull(
             () => SettlementVersionMapper.MapSettlementVersion(value),
             value,
-            invalidValues: _invalidValues);
+            unspecifiedValue: EnergyResultProducedV2.Types.CalculationType.Unspecified,
+            invalidValues: _energyResultProducedInvalidValues);
+
+    [Theory]
+    [MemberData(nameof(GetEnumValues), typeof(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType))]
+    public void Ensure_handling_monthly_amount_per_charge_result_produced(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType value)
+        => EnsureCanMapOrReturnsNull(
+            () => SettlementVersionMapper.MapSettlementVersion(value),
+            value,
+            unspecifiedValue: MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.Unspecified,
+            invalidValues: _monthlyAmountPerChargeResultInvalidValues);
 }

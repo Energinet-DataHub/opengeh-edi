@@ -25,8 +25,19 @@ public static class MeasurementUnitMapper
         return quantityUnit switch
         {
             EnergyResultProducedV2.Types.QuantityUnit.Kwh => MeasurementUnit.Kwh,
-            EnergyResultProducedV2.Types.QuantityUnit.Unspecified => throw new InvalidOperationException("Could not map unit type"),
-            _ => throw new InvalidOperationException("Unknown unit type"),
+            EnergyResultProducedV2.Types.QuantityUnit.Unspecified => throw new InvalidOperationException("Quantity unit is not specified from Wholesale"),
+            _ => throw new ArgumentOutOfRangeException(nameof(quantityUnit), quantityUnit, "Unknown quantity unit from Wholesale"),
+        };
+    }
+
+    public static MeasurementUnit MapQuantityUnit(MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit quantityUnit)
+    {
+        return quantityUnit switch
+        {
+            MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit.Kwh => MeasurementUnit.Kwh,
+            MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit.Pieces => MeasurementUnit.Pieces,
+            MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit.Unspecified => throw new InvalidOperationException("Quantity unit is not specified from Wholesale"),
+            _ => throw new ArgumentOutOfRangeException(nameof(quantityUnit), quantityUnit, "Unknown quantity unit from Wholesale"),
         };
     }
 }

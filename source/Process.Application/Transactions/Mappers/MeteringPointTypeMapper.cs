@@ -37,7 +37,7 @@ public static class MeteringPointTypeMapper
             EnergyResultProducedV2.Types.TimeSeriesType.PositiveGridLoss => throw new NotSupportedTimeSeriesTypeException("PositiveGridLoss is not a supported TimeSeriesType"),
             EnergyResultProducedV2.Types.TimeSeriesType.TempFlexConsumption => throw new NotSupportedTimeSeriesTypeException("TempFlexConsumption is not a supported TimeSeriesType"),
             EnergyResultProducedV2.Types.TimeSeriesType.Unspecified => throw new InvalidOperationException("Unknown metering point type"),
-            _ => throw new InvalidOperationException("Could not determine metering point type"),
+            _ => throw new ArgumentOutOfRangeException(nameof(timeSeriesType), timeSeriesType, "Unknown time series type unit from Wholesale"),
         };
     }
 }

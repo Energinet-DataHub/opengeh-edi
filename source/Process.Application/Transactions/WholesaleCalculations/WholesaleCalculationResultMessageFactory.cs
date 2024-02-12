@@ -44,10 +44,10 @@ public class WholesaleCalculationResultMessageFactory
             ChargeOwner: ActorNumber.Create(message.ChargeOwnerId), // this is an assumption
             Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),
             BusinessReason: CalculationTypeMapper.MapCalculationType(message.CalculationType),
-            SettlementVersion: MapSettlementVersion(message.CalculationType),
-            QuantityUnit: MapQuantityUnit(message.QuantityUnit),
-            Currency: MapCurrency(message.Currency),
-            ChargeType: MapChargeType(message.ChargeType));
+            SettlementVersion: SettlementVersionMapper.MapSettlementVersion(message.CalculationType),
+            QuantityUnit: MeasurementUnitMapper.MapQuantityUnit(message.QuantityUnit),
+            Currency: CurrencyMapper.MapCurrency(message.Currency),
+            ChargeType: ChargeTypeMapper.MapChargeType(message.ChargeType));
 
         return WholesaleCalculationResultMessage.Create(
             receiverNumber: wholesaleCalculationSeries.EnergySupplier,
@@ -66,60 +66,5 @@ public class WholesaleCalculationResultMessageFactory
 
         const decimal nanoFactor = 1_000_000_000;
         return amount.Units + (amount.Nanos / nanoFactor);
-    }
-
-    private static BusinessReason MapCalculationType(
-        MonthlyAmountPerChargeResultProducedV1.Types.CalculationType processType) // matches the name of aggregationFactory
-    {
-        return processType switch
-        {
-            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing => BusinessReason.WholesaleFixing,
-            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.FirstCorrectionSettlement => BusinessReason.Correction,
-            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.SecondCorrectionSettlement => BusinessReason.Correction,
-            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.ThirdCorrectionSettlement => BusinessReason.Correction,
-            _ => throw new ArgumentOutOfRangeException(nameof(processType), processType, null),
-        };
-    }
-
-    private static SettlementVersion? MapSettlementVersion(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType calculationType)
-    {
-        return calculationType switch
-        {
-            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing => null,
-            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.FirstCorrectionSettlement => SettlementVersion.FirstCorrection,
-            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.SecondCorrectionSettlement => SettlementVersion.SecondCorrection,
-            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.ThirdCorrectionSettlement => SettlementVersion.ThirdCorrection,
-            _ => throw new ArgumentOutOfRangeException(nameof(calculationType), calculationType, null),
-        };
-    }
-
-    private static MeasurementUnit MapQuantityUnit(MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit quantityUnit)
-    {
-        return quantityUnit switch
-        {
-            MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit.Kwh => MeasurementUnit.Kwh,
-            MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit.Pieces => MeasurementUnit.Pieces,
-            _ => throw new InvalidOperationException($"Unknown quantity unit: {quantityUnit}"),
-        };
-    }
-
-    private static Currency MapCurrency(MonthlyAmountPerChargeResultProducedV1.Types.Currency currency)
-    {
-        return currency switch
-        {
-            MonthlyAmountPerChargeResultProducedV1.Types.Currency.Dkk => Currency.DanishCrowns,
-            _ => throw new InvalidOperationException($"Unknown currency: {currency}"),
-        };
-    }
-
-    private static ChargeType MapChargeType(MonthlyAmountPerChargeResultProducedV1.Types.ChargeType chargeType)
-    {
-        return chargeType switch
-        {
-            MonthlyAmountPerChargeResultProducedV1.Types.ChargeType.Fee => ChargeType.Fee,
-            MonthlyAmountPerChargeResultProducedV1.Types.ChargeType.Tariff => ChargeType.Tariff,
-            MonthlyAmountPerChargeResultProducedV1.Types.ChargeType.Subscription => ChargeType.Subscription,
-            _ => throw new InvalidOperationException($"Unknown charge type: {chargeType}"),
-        };
     }
 }

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 
@@ -23,10 +24,27 @@ public static class SettlementVersionMapper
     {
         return calculationType switch
         {
+            EnergyResultProducedV2.Types.CalculationType.BalanceFixing or
+            EnergyResultProducedV2.Types.CalculationType.Aggregation or
+            EnergyResultProducedV2.Types.CalculationType.WholesaleFixing => null,
             EnergyResultProducedV2.Types.CalculationType.FirstCorrectionSettlement => SettlementVersion.FirstCorrection,
             EnergyResultProducedV2.Types.CalculationType.SecondCorrectionSettlement => SettlementVersion.SecondCorrection,
             EnergyResultProducedV2.Types.CalculationType.ThirdCorrectionSettlement => SettlementVersion.ThirdCorrection,
-            _ => null,
+            EnergyResultProducedV2.Types.CalculationType.Unspecified => throw new InvalidOperationException("Calculation type is not specified from Wholesale"),
+            _ => throw new ArgumentOutOfRangeException(nameof(calculationType), calculationType, "Unknown calculation type from Wholesale"),
+        };
+    }
+
+    public static SettlementVersion? MapSettlementVersion(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType calculationType)
+    {
+        return calculationType switch
+        {
+            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing => null,
+            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.FirstCorrectionSettlement => SettlementVersion.FirstCorrection,
+            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.SecondCorrectionSettlement => SettlementVersion.SecondCorrection,
+            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.ThirdCorrectionSettlement => SettlementVersion.ThirdCorrection,
+            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.Unspecified => throw new InvalidOperationException("Calculation type is not specified from Wholesale"),
+            _ => throw new ArgumentOutOfRangeException(nameof(calculationType), calculationType, "Unknown calculation type from Wholesale"),
         };
     }
 }

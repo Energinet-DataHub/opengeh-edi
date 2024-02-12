@@ -22,7 +22,6 @@ public class SettlementTypeMapperTests : BaseEnumMapperTests
 {
     private readonly EnergyResultProducedV2.Types.TimeSeriesType[] _invalidValues =
     {
-        EnergyResultProducedV2.Types.TimeSeriesType.Unspecified,
         EnergyResultProducedV2.Types.TimeSeriesType.Production,
         EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerGa,
         EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerNeighboringGa,
@@ -36,9 +35,10 @@ public class SettlementTypeMapperTests : BaseEnumMapperTests
 
     [Theory]
     [MemberData(nameof(GetEnumValues), typeof(EnergyResultProducedV2.Types.TimeSeriesType))]
-    public void Ensure_handling_all_time_series_types(EnergyResultProducedV2.Types.TimeSeriesType value)
+    public void Ensure_handling_energy_result_produced(EnergyResultProducedV2.Types.TimeSeriesType value)
         => EnsureCanMapOrReturnsNull(
             () => SettlementTypeMapper.MapSettlementType(value),
             value,
+            unspecifiedValue: EnergyResultProducedV2.Types.TimeSeriesType.Unspecified,
             invalidValues: _invalidValues);
 }

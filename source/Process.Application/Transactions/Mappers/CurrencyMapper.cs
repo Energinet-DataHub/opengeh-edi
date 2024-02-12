@@ -18,16 +18,15 @@ using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 
-public static class ResolutionMapper
+public static class CurrencyMapper
 {
-    public static Resolution MapResolution(EnergyResultProducedV2.Types.Resolution resolution)
+    public static Currency MapCurrency(MonthlyAmountPerChargeResultProducedV1.Types.Currency currency)
     {
-        return resolution switch
+        return currency switch
         {
-            EnergyResultProducedV2.Types.Resolution.Quarter => Resolution.QuarterHourly,
-            EnergyResultProducedV2.Types.Resolution.Unspecified => throw new InvalidOperationException(
-                "Could not map resolution type"),
-            _ => throw new ArgumentOutOfRangeException(nameof(resolution), resolution, "Unknown resolution from Wholesale"),
+            MonthlyAmountPerChargeResultProducedV1.Types.Currency.Dkk => Currency.DanishCrowns,
+            MonthlyAmountPerChargeResultProducedV1.Types.Currency.Unspecified => throw new InvalidOperationException("Currency is not specified from Wholesale"),
+            _ => throw new InvalidOperationException($"Unknown currency: {currency}"),
         };
     }
 }
