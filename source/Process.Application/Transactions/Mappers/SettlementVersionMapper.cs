@@ -12,22 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 
-public static class ResolutionMapper
+public static class SettlementVersionMapper
 {
-    public static Resolution MapResolution(EnergyResultProducedV2.Types.Resolution resolution)
+    public static SettlementVersion? MapSettlementVersion(EnergyResultProducedV2.Types.CalculationType calculationType)
     {
-        return resolution switch
+        return calculationType switch
         {
-            EnergyResultProducedV2.Types.Resolution.Quarter => Resolution.QuarterHourly,
-            EnergyResultProducedV2.Types.Resolution.Unspecified => throw new InvalidOperationException(
-                "Could not map resolution type"),
-            _ => throw new InvalidOperationException("Unknown resolution type"),
+            EnergyResultProducedV2.Types.CalculationType.FirstCorrectionSettlement => SettlementVersion.FirstCorrection,
+            EnergyResultProducedV2.Types.CalculationType.SecondCorrectionSettlement => SettlementVersion.SecondCorrection,
+            EnergyResultProducedV2.Types.CalculationType.ThirdCorrectionSettlement => SettlementVersion.ThirdCorrection,
+            _ => null,
         };
     }
 }

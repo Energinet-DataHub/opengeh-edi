@@ -18,13 +18,13 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Application.Process.Transactions.Mappers;
 
-public class CalculationTypeMapperTests : BaseEnumMapperTests
+public class MeasurementUnitMapperTests : BaseEnumMapperTests
 {
     [Theory]
-    [MemberData(nameof(GetEnumValues), typeof(EnergyResultProducedV2.Types.CalculationType))]
-    public void Ensure_handling_all_calculation_types(EnergyResultProducedV2.Types.CalculationType value)
+    [MemberData(nameof(GetEnumValues), typeof(EnergyResultProducedV2.Types.QuantityUnit))]
+    public void Ensure_handling_all_quantity_units(EnergyResultProducedV2.Types.QuantityUnit value)
         => EnsureCanMapOrThrows(
-            () => CalculationTypeMapper.MapCalculationType(value),
+            () => MeasurementUnitMapper.MapQuantityUnit(value),
             value,
-            invalidValues: EnergyResultProducedV2.Types.CalculationType.Unspecified);
+            invalidValues: EnergyResultProducedV2.Types.QuantityUnit.Unspecified);
 }

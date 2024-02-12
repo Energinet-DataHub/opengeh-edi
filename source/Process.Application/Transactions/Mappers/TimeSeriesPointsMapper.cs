@@ -29,26 +29,24 @@ public static class TimeSeriesPointsMapper
     public static ReadOnlyCollection<Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point> MapPoints(RepeatedField<EnergyResultProducedV2.Types.TimeSeriesPoint> timeSeriesPoints)
     {
         ArgumentNullException.ThrowIfNull(timeSeriesPoints);
-        var points = new List<Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point>();
 
-        var pointPosition = 1;
-        foreach (var point in timeSeriesPoints)
-        {
-            points.Add(
-                new Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point(
-                    pointPosition,
-                    Parse(point.Quantity),
-                    CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(point.QuantityQualities),
-                    point.Time.ToString()));
-            pointPosition++;
-        }
+        var points = timeSeriesPoints
+            .Select(
+                (p, index) => new Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point(
+                    index + 1, // Position starts at 1, so position = index + 1
+                    Parse(p.Quantity),
+                    CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(p.QuantityQualities),
+                    p.Time.ToString()))
+            .ToList()
+            .AsReadOnly();
 
-        return points.AsReadOnly();
+        return points;
     }
 
     public static ReadOnlyCollection<Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point> MapPoints(IReadOnlyCollection<Domain.Transactions.AggregatedMeasureData.Point> points)
     {
-        return points.Select(p => new Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point(p.Position, p.Quantity, p.QuantityQuality, p.SampleTime))
+        return points
+            .Select(p => new Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point(p.Position, p.Quantity, p.QuantityQuality, p.SampleTime))
             .ToList()
             .AsReadOnly();
     }

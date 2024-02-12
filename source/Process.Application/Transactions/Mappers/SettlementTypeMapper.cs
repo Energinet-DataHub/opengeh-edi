@@ -12,19 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
-using Xunit;
 
-namespace Energinet.DataHub.EDI.Tests.Application.Process.Transactions.Mappers;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 
-public class CalculationTypeMapperTests : BaseEnumMapperTests
+public static class SettlementTypeMapper
 {
-    [Theory]
-    [MemberData(nameof(GetEnumValues), typeof(EnergyResultProducedV2.Types.CalculationType))]
-    public void Ensure_handling_all_calculation_types(EnergyResultProducedV2.Types.CalculationType value)
-        => EnsureCanMapOrThrows(
-            () => CalculationTypeMapper.MapCalculationType(value),
-            value,
-            invalidValues: EnergyResultProducedV2.Types.CalculationType.Unspecified);
+    public static SettlementType? MapSettlementType(EnergyResultProducedV2.Types.TimeSeriesType timeSeriesType)
+    {
+        return timeSeriesType switch
+        {
+            EnergyResultProducedV2.Types.TimeSeriesType.FlexConsumption => SettlementType.Flex,
+            EnergyResultProducedV2.Types.TimeSeriesType.NonProfiledConsumption => SettlementType.NonProfiled,
+            _ => null,
+        };
+    }
 }

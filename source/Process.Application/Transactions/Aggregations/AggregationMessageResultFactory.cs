@@ -38,30 +38,28 @@ public class AggregationMessageResultFactory
         _masterDataClient = masterDataClient;
     }
 
-    public async Task<AggregationResultMessage> CreateAsync(
+    public static AggregationResultMessage Create(
         AggregatedMeasureDataProcess aggregatedMeasureDataProcess,
-        AggregatedTimeSerie aggregatedTimeSerie,
-        CancellationToken cancellationToken)
+        AggregatedTimeSerie aggregatedTimeSerie)
     {
         ArgumentNullException.ThrowIfNull(aggregatedMeasureDataProcess);
         ArgumentNullException.ThrowIfNull(aggregatedTimeSerie);
 
-        var gridAreaDetails = await GetGridAreaDetailsAsync(aggregatedTimeSerie.GridAreaDetails.GridAreaCode, cancellationToken).ConfigureAwait(false);
         return AggregationResultMessage.Create(
-            aggregatedMeasureDataProcess.RequestedByActorId,
-            ActorRole.FromCode(aggregatedMeasureDataProcess.RequestedByActorRoleCode),
-            aggregatedMeasureDataProcess.ProcessId.Id,
-            gridAreaDetails.GridAreaCode,
-            aggregatedTimeSerie.MeteringPointType,
-            aggregatedMeasureDataProcess.SettlementMethod,
-            aggregatedTimeSerie.UnitType,
-            aggregatedTimeSerie.Resolution,
-            aggregatedMeasureDataProcess.EnergySupplierId,
-            aggregatedMeasureDataProcess.BalanceResponsibleId,
-            MapPeriod(aggregatedTimeSerie),
-            TimeSeriesPointsMapper.MapPoints(aggregatedTimeSerie.Points),
-            aggregatedMeasureDataProcess.BusinessReason.Name,
-            aggregatedTimeSerie.CalculationResultVersion,
+            receiverNumber: aggregatedMeasureDataProcess.RequestedByActorId,
+            receiverRole: ActorRole.FromCode(aggregatedMeasureDataProcess.RequestedByActorRoleCode),
+            processId: aggregatedMeasureDataProcess.ProcessId.Id,
+            gridAreaCode: aggregatedTimeSerie.GridAreaDetails.GridAreaCode,
+            meteringPointType: aggregatedTimeSerie.MeteringPointType,
+            settlementType: aggregatedMeasureDataProcess.SettlementMethod,
+            measureUnitType: aggregatedTimeSerie.UnitType,
+            resolution: aggregatedTimeSerie.Resolution,
+            energySupplierNumber: aggregatedMeasureDataProcess.EnergySupplierId,
+            balanceResponsibleNumber: aggregatedMeasureDataProcess.BalanceResponsibleId,
+            period: new Period(aggregatedTimeSerie.StartOfPeriod, aggregatedTimeSerie.EndOfPeriod),
+            points: TimeSeriesPointsMapper.MapPoints(aggregatedTimeSerie.Points),
+            businessReasonName: aggregatedMeasureDataProcess.BusinessReason.Name,
+            calculationResultVersion: aggregatedTimeSerie.CalculationResultVersion,
             settlementVersion: aggregatedMeasureDataProcess.SettlementVersion?.Name);
     }
 
@@ -71,29 +69,44 @@ public class AggregationMessageResultFactory
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        var gridAreaDetails = await GetGridAreaDetailsAsync(integrationEvent, cancellationToken).ConfigureAwait(false);
-        var receiverRole = GetReceiverRole(integrationEvent.AggregationLevelCase);
-        var energySupplierNumber = GetEnergySupplierNumber(integrationEvent);
-        var balanceResponsibleNumber = GetBalanceResponsibleNumber(integrationEvent);
+        var balanceResponsibleNumber = GetBalanceResponsibleNumberForAggregationLevel(integrationEvent);
+        var energySupplierNumber = GetEnergySupplierNumberForAggregationLevel(integrationEvent);
+        var gridAreaCode = GetGridAreaCodeForAggregationLevel(integrationEvent);
+
+        var receiverRole = GetReceiverRoleForAggregationLevel(integrationEvent.AggregationLevelCase);
+        var receiverNumber =
+            balanceResponsibleNumber != null ? ActorNumber.Create(balanceResponsibleNumber)
+            : energySupplierNumber != null ? ActorNumber.Create(energySupplierNumber)
+            : await GetGridAreaOperatorNumberAsync(gridAreaCode, cancellationToken).ConfigureAwait(false);
+
+        var aggregationData =
+            await GetAggregationLevelDataAsync(integrationEvent, cancellationToken).ConfigureAwait(false);
+
+        if (aggregationData.BalanceResponsibleNumber != balanceResponsibleNumber) throw new InvalidOperationException("BalanceResponsibleNumber");
+        if (aggregationData.EnergySupplierNumber != energySupplierNumber) throw new InvalidOperationException("EnergySupplierNumber");
+        if (aggregationData.GridAreaCode != gridAreaCode) throw new InvalidOperationException("GridAreaCode");
+        if (aggregationData.ReceiverRole != receiverRole) throw new InvalidOperationException("ReceiverRole");
+        if (aggregationData.ReceiverNumber != receiverNumber) throw new InvalidOperationException("ReceiverNumber");
+
         return AggregationResultMessage.Create(
-            ActorNumber.Create(balanceResponsibleNumber ?? energySupplierNumber ?? gridAreaDetails.OperatorNumber),
-            receiverRole,
-            ProcessId.New().Id,
-            gridAreaDetails.GridAreaCode,
-            MapMeteringPointType(integrationEvent.TimeSeriesType),
-            MapSettlementType(integrationEvent.TimeSeriesType),
-            MapQuantityUnit(integrationEvent.QuantityUnit),
-            ResolutionMapper.MapResolution(integrationEvent.Resolution),
-            energySupplierNumber,
-            balanceResponsibleNumber,
-            MapPeriod(integrationEvent),
-            TimeSeriesPointsMapper.MapPoints(integrationEvent.TimeSeriesPoints),
-            CalculationTypeMapper.MapCalculationType(integrationEvent.CalculationType),
-            integrationEvent.CalculationResultVersion,
-            settlementVersion: MapSettlementVersion(integrationEvent.CalculationType));
+            receiverNumber: aggregationData.ReceiverNumber,
+            receiverRole: aggregationData.ReceiverRole,
+            processId: ProcessId.New().Id,
+            gridAreaCode: aggregationData.GridAreaCode,
+            meteringPointType: MeteringPointTypeMapper.MapMeteringPointType(integrationEvent.TimeSeriesType).Name,
+            settlementType: SettlementTypeMapper.MapSettlementType(integrationEvent.TimeSeriesType)?.Name,
+            measureUnitType: MeasurementUnitMapper.MapQuantityUnit(integrationEvent.QuantityUnit).Name,
+            resolution: ResolutionMapper.MapResolution(integrationEvent.Resolution).Name,
+            energySupplierNumber: aggregationData.EnergySupplierNumber,
+            balanceResponsibleNumber: aggregationData.BalanceResponsibleNumber,
+            period: new Period(integrationEvent.PeriodStartUtc.ToInstant(), integrationEvent.PeriodEndUtc.ToInstant()),
+            points: TimeSeriesPointsMapper.MapPoints(integrationEvent.TimeSeriesPoints),
+            businessReasonName: CalculationTypeMapper.MapCalculationType(integrationEvent.CalculationType).Name,
+            calculationResultVersion: integrationEvent.CalculationResultVersion,
+            settlementVersion: SettlementVersionMapper.MapSettlementVersion(integrationEvent.CalculationType)?.Name);
     }
 
-    private static ActorRole GetReceiverRole(EnergyResultProducedV2.AggregationLevelOneofCase aggregationLevelCase)
+    private static ActorRole GetReceiverRoleForAggregationLevel(EnergyResultProducedV2.AggregationLevelOneofCase aggregationLevelCase)
     {
         switch (aggregationLevelCase)
         {
@@ -102,8 +115,7 @@ public class AggregationMessageResultFactory
             case EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerEnergysupplierPerGridarea:
                 return ActorRole.EnergySupplier;
             case EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerBalanceresponsiblepartyPerGridarea:
-            case EnergyResultProducedV2.AggregationLevelOneofCase
-                .AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea:
+            case EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea:
                 return ActorRole.BalanceResponsibleParty;
             case EnergyResultProducedV2.AggregationLevelOneofCase.None:
                 throw new InvalidOperationException("Aggregation level is not specified");
@@ -112,133 +124,97 @@ public class AggregationMessageResultFactory
         }
     }
 
-    private static string? GetEnergySupplierNumber(EnergyResultProducedV2 integrationEvent)
+    private static string? GetEnergySupplierNumberForAggregationLevel(EnergyResultProducedV2 integrationEvent)
     {
-        ArgumentNullException.ThrowIfNull(integrationEvent);
-
         return integrationEvent.AggregationLevelCase switch
         {
-            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerEnergysupplierPerGridarea =>
-                integrationEvent.AggregationPerEnergysupplierPerGridarea.EnergySupplierId,
-            EnergyResultProducedV2.AggregationLevelOneofCase
-                    .AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea =>
-                integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.EnergySupplierId,
-            EnergyResultProducedV2.AggregationLevelOneofCase.None =>
-                throw new InvalidOperationException("Aggregation level is not specified"),
+            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerEnergysupplierPerGridarea => integrationEvent.AggregationPerEnergysupplierPerGridarea.EnergySupplierId,
+            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea => integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.EnergySupplierId,
+            EnergyResultProducedV2.AggregationLevelOneofCase.None => throw new InvalidOperationException("Aggregation level is not specified"),
             _ => null,
         };
     }
 
-    private static string? GetBalanceResponsibleNumber(EnergyResultProducedV2 integrationEvent)
+    private static string? GetBalanceResponsibleNumberForAggregationLevel(EnergyResultProducedV2 integrationEvent)
     {
-        ArgumentNullException.ThrowIfNull(integrationEvent);
-
         return integrationEvent.AggregationLevelCase switch
         {
-            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerBalanceresponsiblepartyPerGridarea =>
-                    integrationEvent.AggregationPerBalanceresponsiblepartyPerGridarea.BalanceResponsibleId,
-            EnergyResultProducedV2.AggregationLevelOneofCase
-                    .AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea =>
-                    integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.BalanceResponsibleId,
-            EnergyResultProducedV2.AggregationLevelOneofCase.None =>
-                throw new InvalidOperationException("Aggregation level is not specified"),
+            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerBalanceresponsiblepartyPerGridarea => integrationEvent.AggregationPerBalanceresponsiblepartyPerGridarea.BalanceResponsibleId,
+            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea => integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.BalanceResponsibleId,
+            EnergyResultProducedV2.AggregationLevelOneofCase.None => throw new InvalidOperationException("Aggregation level is not specified"),
             _ => null,
         };
     }
 
-    private static string MapQuantityUnit(QuantityUnit quantityUnit)
-    {
-        return quantityUnit switch
-        {
-            QuantityUnit.Kwh => MeasurementUnit.Kwh.Name,
-            QuantityUnit.Unspecified => throw new InvalidOperationException("Could not map unit type"),
-            _ => throw new InvalidOperationException("Unknown unit type"),
-        };
-    }
-
-    private static string MapMeteringPointType(TimeSeriesType timeSeriesType)
-    {
-        return timeSeriesType switch
-        {
-            TimeSeriesType.Production => MeteringPointType.Production.Name,
-            TimeSeriesType.FlexConsumption => MeteringPointType.Consumption.Name,
-            TimeSeriesType.NonProfiledConsumption => MeteringPointType.Consumption.Name,
-            TimeSeriesType.NetExchangePerGa => MeteringPointType.Exchange.Name,
-            TimeSeriesType.NetExchangePerNeighboringGa => MeteringPointType.Exchange.Name,
-            TimeSeriesType.TotalConsumption => MeteringPointType.Consumption.Name,
-            TimeSeriesType.GridLoss => throw new NotSupportedTimeSeriesTypeException("GridLoss is not a supported TimeSeriesType"),
-            TimeSeriesType.TempProduction => throw new NotSupportedTimeSeriesTypeException("TempProduction is not a supported TimeSeriesType"),
-            TimeSeriesType.NegativeGridLoss => throw new NotSupportedTimeSeriesTypeException("NegativeGridLoss is not a supported TimeSeriesType"),
-            TimeSeriesType.PositiveGridLoss => throw new NotSupportedTimeSeriesTypeException("PositiveGridLoss is not a supported TimeSeriesType"),
-            TimeSeriesType.TempFlexConsumption => throw new NotSupportedTimeSeriesTypeException("TempFlexConsumption is not a supported TimeSeriesType"),
-            TimeSeriesType.Unspecified => throw new InvalidOperationException("Unknown metering point type"),
-            _ => throw new InvalidOperationException("Could not determine metering point type"),
-        };
-    }
-
-    private static string? MapSettlementType(TimeSeriesType timeSeriesType)
-    {
-        return timeSeriesType switch
-        {
-            TimeSeriesType.Production => null,
-            TimeSeriesType.FlexConsumption => SettlementType.Flex.Name,
-            TimeSeriesType.NonProfiledConsumption => SettlementType.NonProfiled.Name,
-            _ => null,
-        };
-    }
-
-    private static Period MapPeriod(EnergyResultProducedV2 integrationEvent)
-    {
-        return new Period(integrationEvent.PeriodStartUtc.ToInstant(), integrationEvent.PeriodEndUtc.ToInstant());
-    }
-
-    private static Period MapPeriod(AggregatedTimeSerie aggregatedTimeSerie)
-    {
-        return new Period(aggregatedTimeSerie.StartOfPeriod, aggregatedTimeSerie.EndOfPeriod);
-    }
-
-    private static string? MapSettlementVersion(CalculationType calculationType)
-    {
-        return calculationType switch
-        {
-            CalculationType.FirstCorrectionSettlement => SettlementVersion.FirstCorrection.Name,
-            CalculationType.SecondCorrectionSettlement => SettlementVersion.SecondCorrection.Name,
-            CalculationType.ThirdCorrectionSettlement => SettlementVersion.ThirdCorrection.Name,
-            _ => null,
-        };
-    }
-
-    private async Task<GridAreaDetails> GetGridAreaDetailsAsync(
-        EnergyResultProducedV2 integrationEvent,
-        CancellationToken cancellationToken)
+    private static string GetGridAreaCodeForAggregationLevel(EnergyResultProducedV2 integrationEvent)
     {
         var gridAreaCode = integrationEvent.AggregationLevelCase switch
         {
-            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerGridarea => integrationEvent
-                .AggregationPerGridarea.GridAreaCode,
-            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerBalanceresponsiblepartyPerGridarea =>
-                integrationEvent.AggregationPerBalanceresponsiblepartyPerGridarea.GridAreaCode,
-            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerEnergysupplierPerGridarea => integrationEvent
-                .AggregationPerEnergysupplierPerGridarea.GridAreaCode,
-            EnergyResultProducedV2.AggregationLevelOneofCase
-                .AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea => integrationEvent
-                .AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.GridAreaCode,
+            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerGridarea => integrationEvent.AggregationPerGridarea.GridAreaCode,
+            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerBalanceresponsiblepartyPerGridarea => integrationEvent.AggregationPerBalanceresponsiblepartyPerGridarea.GridAreaCode,
+            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerEnergysupplierPerGridarea => integrationEvent.AggregationPerEnergysupplierPerGridarea.GridAreaCode,
+            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea => integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.GridAreaCode,
             EnergyResultProducedV2.AggregationLevelOneofCase.None => throw new InvalidOperationException(
                 "Aggregation level was not specified"),
             _ => throw new InvalidOperationException("Unknown aggregation level"),
         };
 
-        return await GetGridAreaDetailsAsync(gridAreaCode, cancellationToken).ConfigureAwait(false);
+        return gridAreaCode;
     }
 
-    private async Task<GridAreaDetails> GetGridAreaDetailsAsync(
+    private async Task<(string? EnergySupplierNumber, string? BalanceResponsibleNumber, string GridAreaCode, ActorRole ReceiverRole, ActorNumber ReceiverNumber)> GetAggregationLevelDataAsync(EnergyResultProducedV2 integrationEvent, CancellationToken cancellationToken)
+    {
+        string? energySupplierNumber;
+        string? balanceResponsibleNumber;
+        string gridAreaCode;
+        ActorRole receiverRole;
+        ActorNumber receiverNumber;
+
+        switch (integrationEvent.AggregationLevelCase)
+        {
+            case EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerGridarea:
+                energySupplierNumber = null;
+                balanceResponsibleNumber = null;
+                gridAreaCode = integrationEvent.AggregationPerGridarea.GridAreaCode;
+                receiverRole = ActorRole.MeteredDataResponsible;
+                receiverNumber = await GetGridAreaOperatorNumberAsync(gridAreaCode, cancellationToken).ConfigureAwait(false);
+                break;
+            case EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerEnergysupplierPerGridarea:
+                energySupplierNumber = integrationEvent.AggregationPerEnergysupplierPerGridarea.EnergySupplierId;
+                balanceResponsibleNumber = null;
+                gridAreaCode = integrationEvent.AggregationPerEnergysupplierPerGridarea.GridAreaCode;
+                receiverRole = ActorRole.EnergySupplier;
+                receiverNumber = ActorNumber.Create(energySupplierNumber);
+                break;
+            case EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerBalanceresponsiblepartyPerGridarea:
+                energySupplierNumber = null;
+                balanceResponsibleNumber = integrationEvent.AggregationPerBalanceresponsiblepartyPerGridarea.BalanceResponsibleId;
+                gridAreaCode = integrationEvent.AggregationPerBalanceresponsiblepartyPerGridarea.GridAreaCode;
+                receiverRole = ActorRole.BalanceResponsibleParty;
+                receiverNumber = ActorNumber.Create(balanceResponsibleNumber);
+                break;
+            case EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea:
+                energySupplierNumber = integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.EnergySupplierId;
+                balanceResponsibleNumber = integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.BalanceResponsibleId;
+                gridAreaCode = integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.GridAreaCode;
+                receiverRole = ActorRole.BalanceResponsibleParty;
+                receiverNumber = ActorNumber.Create(balanceResponsibleNumber);
+                break;
+            case EnergyResultProducedV2.AggregationLevelOneofCase.None:
+                throw new InvalidOperationException("Aggregation level is not specified");
+            default:
+                throw new InvalidOperationException("Aggregation level is unknown");
+        }
+
+        return (energySupplierNumber, balanceResponsibleNumber, gridAreaCode, receiverRole, receiverNumber);
+    }
+
+    private async Task<ActorNumber> GetGridAreaOperatorNumberAsync(
         string gridAreaCode,
         CancellationToken cancellationToken)
     {
-        var gridOperatorNumber = await _masterDataClient
+        return await _masterDataClient
             .GetGridOwnerForGridAreaCodeAsync(gridAreaCode, cancellationToken)
             .ConfigureAwait(false);
-
-        return new GridAreaDetails(gridAreaCode, gridOperatorNumber.Value);
     }
 }

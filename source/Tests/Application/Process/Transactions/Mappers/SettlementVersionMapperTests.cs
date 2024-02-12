@@ -18,13 +18,21 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Application.Process.Transactions.Mappers;
 
-public class CalculationTypeMapperTests : BaseEnumMapperTests
+public class SettlementVersionMapperTests : BaseEnumMapperTests
 {
+    private readonly EnergyResultProducedV2.Types.CalculationType[] _invalidValues =
+    {
+        EnergyResultProducedV2.Types.CalculationType.Aggregation,
+        EnergyResultProducedV2.Types.CalculationType.BalanceFixing,
+        EnergyResultProducedV2.Types.CalculationType.WholesaleFixing,
+        EnergyResultProducedV2.Types.CalculationType.Unspecified,
+    };
+
     [Theory]
     [MemberData(nameof(GetEnumValues), typeof(EnergyResultProducedV2.Types.CalculationType))]
     public void Ensure_handling_all_calculation_types(EnergyResultProducedV2.Types.CalculationType value)
-        => EnsureCanMapOrThrows(
-            () => CalculationTypeMapper.MapCalculationType(value),
+        => EnsureCanMapOrReturnsNull(
+            () => SettlementVersionMapper.MapSettlementVersion(value),
             value,
-            invalidValues: EnergyResultProducedV2.Types.CalculationType.Unspecified);
+            invalidValues: _invalidValues);
 }

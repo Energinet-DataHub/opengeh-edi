@@ -12,40 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
-using FluentAssertions;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Application.Process.Transactions.Mappers;
 
-public class ResolutionMapperTests
+public class ResolutionMapperTests : BaseEnumMapperTests
 {
-    public static IEnumerable<object[]> ResolutionTypes()
-    {
-        foreach (var resolution in Enum.GetValues(typeof(EnergyResultProducedV2.Types.Resolution)))
-        {
-            yield return new[] { resolution };
-        }
-    }
-
     [Theory]
-    [MemberData(nameof(ResolutionTypes))]
-    public void Ensure_handling_all_resolution_types(EnergyResultProducedV2.Types.Resolution resolutionType)
-    {
-        // Act
-        var actual = () => ResolutionMapper.MapResolution(resolutionType);
-
-        // Assert
-        if (resolutionType != EnergyResultProducedV2.Types.Resolution.Unspecified)
-        {
-            actual.Should().NotThrow();
-        }
-        else
-        {
-            actual.Should().Throw<InvalidOperationException>();
-        }
-    }
+    [MemberData(nameof(GetEnumValues), typeof(EnergyResultProducedV2.Types.Resolution))]
+    public void Ensure_handling_all_resolutions(EnergyResultProducedV2.Types.Resolution value) =>
+        EnsureCanMapOrThrows(
+            () => ResolutionMapper.MapResolution(value),
+            value,
+            invalidValues: EnergyResultProducedV2.Types.Resolution.Unspecified);
 }

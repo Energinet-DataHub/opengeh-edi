@@ -20,16 +20,16 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 
 public static class CalculationTypeMapper
 {
-    public static string MapCalculationType(EnergyResultProducedV2.Types.CalculationType processType)
+    public static BusinessReason MapCalculationType(EnergyResultProducedV2.Types.CalculationType processType)
     {
         return processType switch
         {
-            EnergyResultProducedV2.Types.CalculationType.Aggregation => BusinessReason.PreliminaryAggregation.Name,
-            EnergyResultProducedV2.Types.CalculationType.BalanceFixing => BusinessReason.BalanceFixing.Name,
-            EnergyResultProducedV2.Types.CalculationType.WholesaleFixing => BusinessReason.WholesaleFixing.Name,
-            EnergyResultProducedV2.Types.CalculationType.FirstCorrectionSettlement => BusinessReason.Correction.Name,
-            EnergyResultProducedV2.Types.CalculationType.SecondCorrectionSettlement => BusinessReason.Correction.Name,
-            EnergyResultProducedV2.Types.CalculationType.ThirdCorrectionSettlement => BusinessReason.Correction.Name,
+            EnergyResultProducedV2.Types.CalculationType.Aggregation => BusinessReason.PreliminaryAggregation,
+            EnergyResultProducedV2.Types.CalculationType.BalanceFixing => BusinessReason.BalanceFixing,
+            EnergyResultProducedV2.Types.CalculationType.WholesaleFixing => BusinessReason.WholesaleFixing,
+            EnergyResultProducedV2.Types.CalculationType.FirstCorrectionSettlement => BusinessReason.Correction,
+            EnergyResultProducedV2.Types.CalculationType.SecondCorrectionSettlement => BusinessReason.Correction,
+            EnergyResultProducedV2.Types.CalculationType.ThirdCorrectionSettlement => BusinessReason.Correction,
             EnergyResultProducedV2.Types.CalculationType.Unspecified => throw new InvalidOperationException(
                 "Process type is not specified from Wholesales"),
             _ => throw new InvalidOperationException("Unknown process type from Wholesales"),
