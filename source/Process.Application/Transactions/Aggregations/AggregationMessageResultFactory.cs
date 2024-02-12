@@ -13,9 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -26,12 +23,9 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Exceptions;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
-using Google.Protobuf.Collections;
 using NodaTime.Serialization.Protobuf;
 using static Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.EnergyResultProducedV2.Types;
-using DecimalValue = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
-using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 
@@ -65,7 +59,7 @@ public class AggregationMessageResultFactory
             aggregatedMeasureDataProcess.EnergySupplierId,
             aggregatedMeasureDataProcess.BalanceResponsibleId,
             MapPeriod(aggregatedTimeSerie),
-            MapPoints(aggregatedTimeSerie.Points),
+            TimeSeriesPointsMapper.MapPoints(aggregatedTimeSerie.Points),
             aggregatedMeasureDataProcess.BusinessReason.Name,
             aggregatedTimeSerie.CalculationResultVersion,
             settlementVersion: aggregatedMeasureDataProcess.SettlementVersion?.Name);
@@ -93,7 +87,7 @@ public class AggregationMessageResultFactory
             energySupplierNumber,
             balanceResponsibleNumber,
             MapPeriod(integrationEvent),
-            MapPoints(integrationEvent.TimeSeriesPoints),
+            TimeSeriesPointsMapper.MapPoints(integrationEvent.TimeSeriesPoints),
             CalculationTypeMapper.MapCalculationType(integrationEvent.CalculationType),
             integrationEvent.CalculationResultVersion,
             settlementVersion: MapSettlementVersion(integrationEvent.CalculationType));
@@ -202,32 +196,6 @@ public class AggregationMessageResultFactory
         return new Period(aggregatedTimeSerie.StartOfPeriod, aggregatedTimeSerie.EndOfPeriod);
     }
 
-    private static ReadOnlyCollection<Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point> MapPoints(RepeatedField<TimeSeriesPoint> timeSeriesPoints)
-    {
-        var points = new List<Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point>();
-
-        var pointPosition = 1;
-        foreach (var point in timeSeriesPoints)
-        {
-            points.Add(
-                new Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point(
-                    pointPosition,
-                    Parse(point.Quantity),
-                    CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(point.QuantityQualities),
-                    point.Time.ToString()));
-            pointPosition++;
-        }
-
-        return points.AsReadOnly();
-    }
-
-    private static ReadOnlyCollection<Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point> MapPoints(IReadOnlyCollection<Domain.Transactions.AggregatedMeasureData.Point> points)
-    {
-        return points.Select(p => new Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point(p.Position, p.Quantity, p.QuantityQuality, p.SampleTime))
-            .ToList()
-            .AsReadOnly();
-    }
-
     private static string? MapSettlementVersion(CalculationType calculationType)
     {
         return calculationType switch
@@ -237,17 +205,6 @@ public class AggregationMessageResultFactory
             CalculationType.ThirdCorrectionSettlement => SettlementVersion.ThirdCorrection.Name,
             _ => null,
         };
-    }
-
-    private static decimal? Parse(DecimalValue? input)
-    {
-        if (input is null)
-        {
-            return null;
-        }
-
-        const decimal nanoFactor = 1_000_000_000;
-        return input.Units + (input.Nanos / nanoFactor);
     }
 
     private async Task<GridAreaDetails> GetGridAreaDetailsAsync(

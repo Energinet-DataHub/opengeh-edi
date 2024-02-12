@@ -33,7 +33,7 @@ public class ResolutionMapperTests
 
     [Theory]
     [MemberData(nameof(ResolutionTypes))]
-    public void Ensure_handling_all_process_types(EnergyResultProducedV2.Types.Resolution resolutionType)
+    public void Ensure_handling_all_resolution_types(EnergyResultProducedV2.Types.Resolution resolutionType)
     {
         // Act
         var actual = () => ResolutionMapper.MapResolution(resolutionType);

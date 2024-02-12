@@ -1,0 +1,61 @@
+﻿// Copyright 2020 Energinet DataHub A/S
+//
+// Licensed under the Apache License, Version 2.0 (the "License2");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
+using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
+using Google.Protobuf.Collections;
+using DecimalValue = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue;
+
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
+
+public static class TimeSeriesPointsMapper
+{
+    public static ReadOnlyCollection<Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point> MapPoints(RepeatedField<EnergyResultProducedV2.Types.TimeSeriesPoint> timeSeriesPoints)
+    {
+        ArgumentNullException.ThrowIfNull(timeSeriesPoints);
+        var points = new List<Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point>();
+
+        var pointPosition = 1;
+        foreach (var point in timeSeriesPoints)
+        {
+            points.Add(
+                new Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point(
+                    pointPosition,
+                    Parse(point.Quantity),
+                    CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(point.QuantityQualities),
+                    point.Time.ToString()));
+            pointPosition++;
+        }
+
+        return points.AsReadOnly();
+    }
+
+    public static ReadOnlyCollection<Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point> MapPoints(IReadOnlyCollection<Domain.Transactions.AggregatedMeasureData.Point> points)
+    {
+        return points.Select(p => new Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point(p.Position, p.Quantity, p.QuantityQuality, p.SampleTime))
+            .ToList()
+            .AsReadOnly();
+    }
+
+    private static decimal? Parse(DecimalValue input)
+    {
+        const decimal nanoFactor = 1_000_000_000;
+        return input.Units + (input.Nanos / nanoFactor);
+    }
+}
