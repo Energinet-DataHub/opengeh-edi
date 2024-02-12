@@ -22,7 +22,7 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Domain.Transactions.Aggregations;
 
-public class CalculationResultCompletedEventMapperTests
+public class EnergyResultProducedV2EventMapperTests
 {
     public static IEnumerable<object[]> ProcessTypes()
     {
@@ -139,7 +139,7 @@ public class CalculationResultCompletedEventMapperTests
 
     private static MethodInfo GetMethod(string name)
     {
-        var method = typeof(AggregationFactory).GetMethod(
+        var method = typeof(AggregationMessageResultFactory).GetMethod(
             name,
             BindingFlags.Static | BindingFlags.NonPublic)!;
         return method;
