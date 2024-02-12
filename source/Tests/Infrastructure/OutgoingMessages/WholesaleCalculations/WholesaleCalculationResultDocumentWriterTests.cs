@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using FluentAssertions.Execution;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.WholesaleCalculations;
@@ -50,15 +51,35 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
                 .WithTimestamp(SampleData.Timestamp)
                 .WithSender(SampleData.SenderId, ActorRole.EnergySupplier)
                 .WithReceiver(SampleData.ReceiverId, ActorRole.MeteredDataAdministrator) // TODO: Unsure about this
+
                 .WithTransactionId(SampleData.TransactionId)
                 .WithGridArea(SampleData.GridAreaCode)
                 .WithEnergySupplierNumber(SampleData.EnergySupplier)
-                .WithPeriod(SampleData.PeriodStartUtc, SampleData.PeriodEndUtc),
+                .WithPeriod(SampleData.PeriodStartUtc, SampleData.PeriodEndUtc)
+                .WithCurrency(SampleData.Currency)
+                .WithMeasurementUnit(SampleData.MeasurementUnit)
+                .WithBusinessReason(SampleData.BusinessReason),
             DocumentFormat.From(documentFormat));
 
         // Assert
+        using var assertionScope = new AssertionScope();
         await AssertDocument(document, DocumentFormat.From(documentFormat))
-            .DocumentIsValidAsync();
+                .HasMessageId(SampleData.MessageId.ToString())
+                .HasBusinessReason(SampleData.BusinessReason)
+                .HasSenderId(SampleData.SenderId)
+                .HasSenderRole(ActorRole.EnergySupplier)
+                .HasReceiverId(SampleData.ReceiverId)
+                .HasReceiverRole(ActorRole.MeteredDataAdministrator)
+                .HasTimestamp(SampleData.Timestamp)
+
+                .HasTransactionId(SampleData.TransactionId)
+                .HasGridAreaCode(SampleData.GridAreaCode)
+                .HasEnergySupplierNumber(SampleData.EnergySupplier)
+                .HasPeriod(new Period(SampleData.PeriodStartUtc, SampleData.PeriodEndUtc))
+                .HasCurrency(SampleData.Currency)
+                .HasMeasurementUnit(SampleData.MeasurementUnit)
+            .DocumentIsValidAsync()
+            ;
     }
 
     private Task<MarketDocumentStream> CreateDocument(WholesaleCalculationsResultMessageBuilder resultBuilder, DocumentFormat documentFormat)

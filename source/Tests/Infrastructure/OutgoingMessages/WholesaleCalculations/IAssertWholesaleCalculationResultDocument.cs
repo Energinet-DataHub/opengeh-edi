@@ -46,25 +46,25 @@ public interface IAssertWholesaleCalculationResultDocument
     /// Assert sender id in header
     /// </summary>
     /// <param name="expectedSenderId"></param>
-    IAssertWholesaleCalculationResultDocument HasSenderId(string expectedSenderId);
+    IAssertWholesaleCalculationResultDocument HasSenderId(ActorNumber expectedSenderId);
 
     /// <summary>
     /// Assert sender role in header
     /// </summary>
     /// <param name="expectedSenderRole"></param>
-    IAssertWholesaleCalculationResultDocument HasSenderRole(string expectedSenderRole);
+    IAssertWholesaleCalculationResultDocument HasSenderRole(ActorRole expectedSenderRole);
 
     /// <summary>
     /// Asserts receiver id in header
     /// </summary>
     /// <param name="expectedReceiverId"></param>
-    IAssertWholesaleCalculationResultDocument HasReceiverId(string expectedReceiverId);
+    IAssertWholesaleCalculationResultDocument HasReceiverId(ActorNumber expectedReceiverId);
 
     /// <summary>
     /// Assert sender role in header
     /// </summary>
     /// <param name="expectedReceiverRole"></param>
-    IAssertWholesaleCalculationResultDocument HasReceiverRole(string expectedReceiverRole);
+    IAssertWholesaleCalculationResultDocument HasReceiverRole(ActorRole expectedReceiverRole);
 
     /// <summary>
     /// Asserts time stamp in header
@@ -139,7 +139,7 @@ public interface IAssertWholesaleCalculationResultDocument
     /// Asserts energy supplier number of the first series element
     /// </summary>
     /// <param name="expectedEnergySupplierNumber"></param>
-    IAssertWholesaleCalculationResultDocument HasEnergySupplierNumber(string expectedEnergySupplierNumber);
+    IAssertWholesaleCalculationResultDocument HasEnergySupplierNumber(ActorNumber expectedEnergySupplierNumber);
 
     /// <summary>
     /// Assets the product of the first series element
@@ -150,7 +150,7 @@ public interface IAssertWholesaleCalculationResultDocument
     /// Asserts the measure unit of the first series element
     /// </summary>
     /// <param name="expectedMeasurementUnit"></param>
-    IAssertWholesaleCalculationResultDocument HasMeasurementUnit(string expectedMeasurementUnit);
+    IAssertWholesaleCalculationResultDocument HasMeasurementUnit(MeasurementUnit expectedMeasurementUnit);
 
     /// <summary>
     /// Asserts the price measure unit of the first series element
@@ -162,7 +162,7 @@ public interface IAssertWholesaleCalculationResultDocument
     /// Asserts the currency of the first series element
     /// </summary>
     /// <param name="expectedPriceUnit"></param>
-    IAssertWholesaleCalculationResultDocument HasCurrency(string expectedPriceUnit);
+    IAssertWholesaleCalculationResultDocument HasCurrency(Currency expectedPriceUnit);
 
     /// <summary>
     /// Asserts period of the first series element

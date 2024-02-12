@@ -27,7 +27,7 @@ internal static class SampleData
 
     public static ActorNumber SenderId => ActorNumber.Create("5790000000000");
 
-    public static ActorNumber ReceiverId => ActorNumber.Create("579000004444");
+    public static ActorNumber ReceiverId => ActorNumber.Create("5790000044444444");
 
     public static string Timestamp => "2022-12-20T23:00:00Z";
 
@@ -45,13 +45,13 @@ internal static class SampleData
 
     public static ActorNumber ChargeOwner => ActorNumber.Create("5790000000111");
 
-    public static MonthlyAmountPerChargeResultProducedV1.Types.ChargeType ChargeType => MonthlyAmountPerChargeResultProducedV1.Types.ChargeType.Tariff;
+    public static ChargeType ChargeType => ChargeType.Tariff;
 
-    public static MonthlyAmountPerChargeResultProducedV1.Types.CalculationType CalculationType => MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing;
+    public static BusinessReason BusinessReason => BusinessReason.WholesaleFixing;
 
-    public static MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit QuantityUnit => MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit.Kwh;
+    public static MeasurementUnit MeasurementUnit => MeasurementUnit.Kwh;
 
-    public static MonthlyAmountPerChargeResultProducedV1.Types.Currency Currency => MonthlyAmountPerChargeResultProducedV1.Types.Currency.Dkk;
+    public static Currency Currency => Currency.DanishCrowns;
 
     public static string ChargeCode => "123456";
 

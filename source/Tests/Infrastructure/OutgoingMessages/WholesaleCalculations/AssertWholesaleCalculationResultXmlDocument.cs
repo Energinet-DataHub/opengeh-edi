@@ -50,27 +50,31 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasSenderId(string expectedSenderId)
+    public IAssertWholesaleCalculationResultDocument HasSenderId(ActorNumber expectedSenderId)
     {
-        _documentAsserter.HasValue("sender_MarketParticipant.mRID", expectedSenderId);
+        ArgumentNullException.ThrowIfNull(expectedSenderId);
+        _documentAsserter.HasValue("sender_MarketParticipant.mRID", expectedSenderId.Value);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasSenderRole(string expectedSenderRole)
+    public IAssertWholesaleCalculationResultDocument HasSenderRole(ActorRole expectedSenderRole)
     {
-        _documentAsserter.HasValue("sender_MarketParticipant.marketRole.type", expectedSenderRole);
+        ArgumentNullException.ThrowIfNull(expectedSenderRole);
+        _documentAsserter.HasValue("sender_MarketParticipant.marketRole.type", expectedSenderRole.Code);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasReceiverId(string expectedReceiverId)
+    public IAssertWholesaleCalculationResultDocument HasReceiverId(ActorNumber expectedReceiverId)
     {
-        _documentAsserter.HasValue("receiver_MarketParticipant.mRID", expectedReceiverId);
+        ArgumentNullException.ThrowIfNull(expectedReceiverId);
+        _documentAsserter.HasValue("receiver_MarketParticipant.mRID", expectedReceiverId.Value);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasReceiverRole(string expectedReceiverRole)
+    public IAssertWholesaleCalculationResultDocument HasReceiverRole(ActorRole expectedReceiverRole)
     {
-        _documentAsserter.HasValue("receiver_MarketParticipant.marketRole.type", expectedReceiverRole);
+        ArgumentNullException.ThrowIfNull(expectedReceiverRole);
+        _documentAsserter.HasValue("receiver_MarketParticipant.marketRole.type", expectedReceiverRole.Code);
         return this;
     }
 
@@ -142,9 +146,10 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasEnergySupplierNumber(string expectedEnergySupplierNumber)
+    public IAssertWholesaleCalculationResultDocument HasEnergySupplierNumber(ActorNumber expectedEnergySupplierNumber)
     {
-        _documentAsserter.HasValue("Series[1]/energySupplier_MarketParticipant.mRID", expectedEnergySupplierNumber);
+        ArgumentNullException.ThrowIfNull(expectedEnergySupplierNumber);
+        _documentAsserter.HasValue("Series[1]/energySupplier_MarketParticipant.mRID", expectedEnergySupplierNumber.Value);
         return this;
     }
 
@@ -154,9 +159,10 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasMeasurementUnit(string expectedMeasurementUnit)
+    public IAssertWholesaleCalculationResultDocument HasMeasurementUnit(MeasurementUnit expectedMeasurementUnit)
     {
-        _documentAsserter.HasValue("Series[1]/quantity_Measure_Unit.name", expectedMeasurementUnit);
+        ArgumentNullException.ThrowIfNull(expectedMeasurementUnit);
+        _documentAsserter.HasValue("Series[1]/quantity_Measure_Unit.name", expectedMeasurementUnit.Code);
         return this;
     }
 
@@ -166,9 +172,10 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasCurrency(string expectedPriceUnit)
+    public IAssertWholesaleCalculationResultDocument HasCurrency(Currency expectedPriceUnit)
     {
-        _documentAsserter.HasValue("Series[1]/currency_Unit.name", expectedPriceUnit);
+        ArgumentNullException.ThrowIfNull(expectedPriceUnit);
+        _documentAsserter.HasValue("Series[1]/currency_Unit.name", expectedPriceUnit.Code);
         return this;
     }
 

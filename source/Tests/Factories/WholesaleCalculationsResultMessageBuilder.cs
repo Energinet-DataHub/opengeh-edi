@@ -24,7 +24,7 @@ namespace Energinet.DataHub.EDI.Tests.Factories;
 
 public class WholesaleCalculationsResultMessageBuilder
 {
-    //private readonly long _calculationResultVersion = 1;
+    private long _calculationResultVersion = 1;
     private string _messageId = Guid.NewGuid().ToString();
     private Instant _timeStamp = SystemClock.Instance.GetCurrentInstant();
     private BusinessReason _businessReason = BusinessReason.BalanceFixing;
@@ -154,6 +154,12 @@ public class WholesaleCalculationsResultMessageBuilder
     public WholesaleCalculationsResultMessageBuilder WithCurrency(Currency currency)
     {
         _currency = currency;
+        return this;
+    }
+
+    public WholesaleCalculationsResultMessageBuilder WithCalculationVersion(long version)
+    {
+        _calculationResultVersion = version;
         return this;
     }
 
