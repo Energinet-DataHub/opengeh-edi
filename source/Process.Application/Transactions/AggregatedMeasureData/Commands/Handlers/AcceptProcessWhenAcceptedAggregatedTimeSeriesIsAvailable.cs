@@ -19,18 +19,21 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands.Handlers;
 
 public class AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable : IRequestHandler<AcceptedAggregatedTimeSerie, Unit>
 {
+    private readonly AggregationMessageResultFactory _aggregationMessageResultFactory;
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
 
     public AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable(
+        AggregationMessageResultFactory aggregationMessageResultFactory,
         IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
+        _aggregationMessageResultFactory = aggregationMessageResultFactory;
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
     }
 
@@ -41,13 +44,15 @@ public class AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable : IRequest
         var process = await _aggregatedMeasureDataProcessRepository
             .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
-        var aggregations = new List<Aggregation>();
+        var aggregationResultMessages = new List<AggregationResultMessage>();
         foreach (var aggregatedTimeSerie in request.AggregatedTimeSeries)
         {
-            aggregations.Add(AggregationFactory.Create(process, aggregatedTimeSerie));
+            var message = await _aggregationMessageResultFactory
+                .CreateAsync(process, aggregatedTimeSerie, cancellationToken).ConfigureAwait(false);
+            aggregationResultMessages.Add(message);
         }
 
-        process.IsAccepted(aggregations);
+        process.IsAccepted(aggregationResultMessages);
 
         return Unit.Value;
     }
