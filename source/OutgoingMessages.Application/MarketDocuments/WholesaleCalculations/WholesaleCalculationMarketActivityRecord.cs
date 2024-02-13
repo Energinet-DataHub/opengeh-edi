@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations;
 
-public record WholesaleCalculationSeries(
+public record WholesaleCalculationMarketActivityRecord(
+    Guid TransactionId,
+    int CalculationVersion,
     string GridAreaCode,
     string ChargeCode,
     bool IsTax,
@@ -27,5 +30,7 @@ public record WholesaleCalculationSeries(
     BusinessReason BusinessReason,
     SettlementVersion? SettlementVersion,
     MeasurementUnit QuantityUnit,
+    MeasurementUnit PriceMeasureUnit,
     Currency Currency,
-    ChargeType ChargeType);
+    ChargeType ChargeType,
+    Resolution Resolution);

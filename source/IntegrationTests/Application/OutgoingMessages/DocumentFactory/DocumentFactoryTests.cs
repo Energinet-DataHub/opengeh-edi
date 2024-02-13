@@ -45,11 +45,6 @@ public class DocumentFactoryTests
     {
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Xml));
-        if (_notSupportedDocumentType.Contains(documentType))
-        {
-            Assert.Null(writer);
-            return;
-        }
 
         Assert.NotNull(writer);
     }
