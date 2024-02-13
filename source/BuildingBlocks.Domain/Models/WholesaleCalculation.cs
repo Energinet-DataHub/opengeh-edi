@@ -18,6 +18,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public record WholesaleCalculationSeries(
     Guid TransactionId,
+    int CalculationVersion,
     string GridAreaCode,
     string ChargeCode,
     bool IsTax,

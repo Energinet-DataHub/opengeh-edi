@@ -49,6 +49,7 @@ public class WholesaleCalculationResultMessageFactory
     {
         return new WholesaleCalculationSeries(
             TransactionId: ProcessId.New().Id,
+            CalculationVersion: 1, // TODO: We should get this info from wholesale, but is currently not available
             GridAreaCode: monthlyAmountPerChargeResultProducedV1.GridAreaCode,
             ChargeCode: monthlyAmountPerChargeResultProducedV1.ChargeCode,
             IsTax: monthlyAmountPerChargeResultProducedV1.IsTax,

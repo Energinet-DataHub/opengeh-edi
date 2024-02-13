@@ -32,7 +32,7 @@ public class WholesaleCalculationsResultMessageBuilder
     private ActorRole _senderRole = ActorRole.MeteredDataAdministrator;
 
     private Guid _transactionId = Guid.NewGuid();
-    private long _calculationResultVersion = 1;
+    private int _calculationResultVersion = 1;
     private string _gridAreaCode = "870";
     private MeteringPointType _meteringPointType = MeteringPointType.Consumption;
     private SettlementType? _settlementMethod = SettlementType.NonProfiled;
@@ -184,7 +184,7 @@ public class WholesaleCalculationsResultMessageBuilder
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithCalculationVersion(long version)
+    public WholesaleCalculationsResultMessageBuilder WithCalculationVersion(int version)
     {
         _calculationResultVersion = version;
         return this;
@@ -206,6 +206,7 @@ public class WholesaleCalculationsResultMessageBuilder
     {
         return new WholesaleCalculationSeries(
             TransactionId: _transactionId,
+            CalculationVersion: _calculationResultVersion,
             GridAreaCode: _gridAreaCode,
             ChargeCode: _chargeCode,
             IsTax: false,

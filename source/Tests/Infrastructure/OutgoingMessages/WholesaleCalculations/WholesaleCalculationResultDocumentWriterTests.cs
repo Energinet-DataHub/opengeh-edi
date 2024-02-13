@@ -81,7 +81,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
                 .HasTimestamp(SampleData.Timestamp)
 
                 .HasTransactionId(SampleData.TransactionId)
-                //.HasCalculationVersion(SampleData.Version)
+                .HasCalculationVersion(SampleData.Version)
                 .HasChargeCode(SampleData.ChargeCode)
                 .HasChargeType(SampleData.ChargeType)
                 .HasChargeTypeOwner(SampleData.ChargeOwner)

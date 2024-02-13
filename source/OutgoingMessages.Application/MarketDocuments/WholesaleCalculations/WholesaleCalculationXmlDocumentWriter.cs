@@ -47,7 +47,7 @@ public class WholesaleCalculationXmlDocumentWriter : DocumentWriter
         {
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Series", null).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, wholesaleCalculationSeries.TransactionId.ToString()).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "version", null, "+++++++++++++").ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "version", null, wholesaleCalculationSeries.CalculationVersion.ToString(NumberFormatInfo.InvariantInfo)).ConfigureAwait(false);
 
             await WriteElementIfHasValueAsync("settlement_Series.version", wholesaleCalculationSeries.SettlementVersion?.Code, writer).ConfigureAwait(false);
             //await WriteElementIfHasValueAsync("originalTransactionIDReference_Series.mRID", wholesaleCalculationSeries.OriginalTransactionIdReference, writer).ConfigureAwait(false);
