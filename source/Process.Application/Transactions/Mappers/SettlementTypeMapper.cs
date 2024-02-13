@@ -24,6 +24,7 @@ public static class SettlementTypeMapper
     {
         return timeSeriesType switch
         {
+            // There exist no corresponding SettlementType for these TimeSeriesTypes
             EnergyResultProducedV2.Types.TimeSeriesType.Production or
             EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerGa or
             EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerNeighboringGa or
@@ -33,6 +34,7 @@ public static class SettlementTypeMapper
             EnergyResultProducedV2.Types.TimeSeriesType.TotalConsumption or
             EnergyResultProducedV2.Types.TimeSeriesType.TempFlexConsumption or
             EnergyResultProducedV2.Types.TimeSeriesType.TempProduction => null,
+
             EnergyResultProducedV2.Types.TimeSeriesType.FlexConsumption => SettlementType.Flex,
             EnergyResultProducedV2.Types.TimeSeriesType.NonProfiledConsumption => SettlementType.NonProfiled,
             EnergyResultProducedV2.Types.TimeSeriesType.Unspecified => throw new InvalidOperationException("Could not map time series type"),
