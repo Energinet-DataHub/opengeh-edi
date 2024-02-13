@@ -60,7 +60,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
                 .WithChargeType(SampleData.ChargeType)
                 .WithChargeOwner(SampleData.ChargeOwner)
                 .WithGridArea(SampleData.GridAreaCode)
-                .WithEnergySupplierNumber(SampleData.EnergySupplier)
+                .WithEnergySupplier(SampleData.EnergySupplier)
                 .WithPeriod(SampleData.PeriodStartUtc, SampleData.PeriodEndUtc)
                 .WithCurrency(SampleData.Currency)
                 .WithMeasurementUnit(SampleData.MeasurementUnit)
@@ -93,8 +93,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
                 .HasPriceMeasurementUnit(SampleData.PriceMeasureUnit)
                 .HasResolution(SampleData.Resolution)
                 .HasPositionAndQuantity(1, SampleData.Quantity)
-            .DocumentIsValidAsync()
-            ;
+            .DocumentIsValidAsync();
     }
 
     [Theory]

@@ -81,7 +81,6 @@ public class WholesaleCalculationXmlDocumentWriter : DocumentWriter
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Period", null).ConfigureAwait(false);
 
             // tabbed content
-
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "resolution", null, wholesaleCalculationSeries.Resolution.Code).ConfigureAwait(false);
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "timeInterval", null).ConfigureAwait(false);
 
@@ -112,6 +111,8 @@ public class WholesaleCalculationXmlDocumentWriter : DocumentWriter
 
             // tabbed content
             await WriteElementAsync("position", "1", writer).ConfigureAwait(false); // TODO: FIX HARDCODING
+
+            // energySum_Quantity.quantity is nullable according to the schema, but as of right now. Things do not make sense if it is not present
             await WriteElementAsync("energySum_Quantity.quantity", wholesaleCalculationSeries.Quantity?.ToString(NumberFormatInfo.InvariantInfo) ?? "0", writer).ConfigureAwait(false);
 
             // tab removed

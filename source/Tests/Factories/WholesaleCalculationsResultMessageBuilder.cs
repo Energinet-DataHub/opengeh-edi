@@ -27,10 +27,10 @@ public class WholesaleCalculationsResultMessageBuilder
     private string _messageId = Guid.NewGuid().ToString();
     private Instant _timeStamp = SystemClock.Instance.GetCurrentInstant();
     private BusinessReason _businessReason = BusinessReason.BalanceFixing;
-    private ActorNumber _receiverNumber = ActorNumber.Create("1234567890123");
-    private ActorRole _receiverRole = ActorRole.MeteredDataResponsible;
-    private ActorNumber _senderNumber = ActorNumber.Create("1234567890321");
-    private ActorRole _senderRole = ActorRole.MeteredDataAdministrator;
+    private ActorNumber _receiverActorNumber = ActorNumber.Create("1234567890123");
+    private ActorRole _receiverActorRole = ActorRole.MeteredDataResponsible;
+    private ActorNumber _senderActorNumber = ActorNumber.Create("1234567890321");
+    private ActorRole _senderActorRole = ActorRole.MeteredDataAdministrator;
 
     private Guid _transactionId = Guid.NewGuid();
     private int _calculationResultVersion = 1;
@@ -51,11 +51,6 @@ public class WholesaleCalculationsResultMessageBuilder
     private Currency _currency = Currency.DanishCrowns;
     private Period _period = new(Instant.FromUtc(2023, 11, 1, 0, 0), Instant.FromUtc(2023, 12, 1, 0, 0));
 
-    public static WholesaleCalculationsResultMessageBuilder AggregationResult()
-    {
-        return new WholesaleCalculationsResultMessageBuilder();
-    }
-
     public WholesaleCalculationsResultMessageBuilder WithBusinessReason(BusinessReason? businessReason)
     {
         ArgumentNullException.ThrowIfNull(businessReason);
@@ -63,17 +58,29 @@ public class WholesaleCalculationsResultMessageBuilder
         return this;
     }
 
+    public WholesaleCalculationsResultMessageBuilder WithMessageId(string messageId)
+    {
+        _messageId = messageId;
+        return this;
+    }
+
+    public WholesaleCalculationsResultMessageBuilder WithTimestamp(string timestamp)
+    {
+        _timeStamp = ParseTimeStamp(timestamp);
+        return this;
+    }
+
     public WholesaleCalculationsResultMessageBuilder WithReceiver(ActorNumber receiverActorNumber, ActorRole actorRole)
     {
-        _receiverNumber = receiverActorNumber;
-        _receiverRole = actorRole;
+        _receiverActorNumber = receiverActorNumber;
+        _receiverActorRole = actorRole;
         return this;
     }
 
     public WholesaleCalculationsResultMessageBuilder WithSender(ActorNumber senderActorNumber, ActorRole actorRole)
     {
-        _senderNumber = senderActorNumber;
-        _senderRole = actorRole;
+        _senderActorNumber = senderActorNumber;
+        _senderActorRole = actorRole;
         return this;
     }
 
@@ -86,18 +93,6 @@ public class WholesaleCalculationsResultMessageBuilder
     public WholesaleCalculationsResultMessageBuilder WithGridArea(string gridAreaCode)
     {
         _gridAreaCode = gridAreaCode;
-        return this;
-    }
-
-    public WholesaleCalculationsResultMessageBuilder WithMeteringPointType(MeteringPointType meteringPointType)
-    {
-        _meteringPointType = meteringPointType;
-        return this;
-    }
-
-    public WholesaleCalculationsResultMessageBuilder WithSettlementMethod(SettlementType? settlementType)
-    {
-        _settlementMethod = settlementType;
         return this;
     }
 
@@ -119,7 +114,7 @@ public class WholesaleCalculationsResultMessageBuilder
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithEnergySupplierNumber(ActorNumber energySupplierActorNumber)
+    public WholesaleCalculationsResultMessageBuilder WithEnergySupplier(ActorNumber energySupplierActorNumber)
     {
         _energySupplierActorNumber = energySupplierActorNumber;
         return this;
@@ -155,21 +150,21 @@ public class WholesaleCalculationsResultMessageBuilder
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithMessageId(string messageId)
-    {
-        _messageId = messageId;
-        return this;
-    }
-
-    public WholesaleCalculationsResultMessageBuilder WithTimestamp(string timestamp)
-    {
-        _timeStamp = ParseTimeStamp(timestamp);
-        return this;
-    }
-
     public WholesaleCalculationsResultMessageBuilder WithOriginalTransactionIdReference(string originalTransactionIdReference)
     {
         _originalTransactionIdReference = originalTransactionIdReference;
+        return this;
+    }
+
+    public WholesaleCalculationsResultMessageBuilder WithMeteringPointType(MeteringPointType meteringPointType)
+    {
+        _meteringPointType = meteringPointType;
+        return this;
+    }
+
+    public WholesaleCalculationsResultMessageBuilder WithSettlementMethod(SettlementType? settlementType)
+    {
+        _settlementMethod = settlementType;
         return this;
     }
 
@@ -195,10 +190,10 @@ public class WholesaleCalculationsResultMessageBuilder
     {
         return new OutgoingMessageHeader(
             _businessReason.Name,
-            _senderNumber.Value,
-            _senderRole.Code,
-            _receiverNumber.Value,
-            _receiverRole.Code,
+            _senderActorNumber.Value,
+            _senderActorRole.Code,
+            _receiverActorNumber.Value,
+            _receiverActorRole.Code,
             _messageId,
             _timeStamp);
     }
