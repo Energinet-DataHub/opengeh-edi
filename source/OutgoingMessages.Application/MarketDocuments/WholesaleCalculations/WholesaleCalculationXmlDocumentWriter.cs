@@ -54,7 +54,7 @@ public class WholesaleCalculationXmlDocumentWriter : DocumentWriter
             //await writer.WriteElementStringAsync(DocumentDetails.Prefix, "marketEvaluationPoint.type", null, "E17").ConfigureAwait(false);
             //await WriteElementIfHasValueAsync("marketEvaluationPoint.settlementMethod", wholesaleCalculationSeries.SettlementType is null ? null : CimCode.Of(SettlementType.From(wholesaleCalculationSeries.SettlementType)), writer).ConfigureAwait(false);
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "chargeType.mRID", null, wholesaleCalculationSeries.ChargeCode).ConfigureAwait(false); // TODO: is this the code???
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "chargeType.mRID", null, wholesaleCalculationSeries.ChargeCode).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "chargeType.type", null, wholesaleCalculationSeries.ChargeType.Code).ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "chargeType.chargeTypeOwner_MarketParticipant.mRID", null).ConfigureAwait(false);

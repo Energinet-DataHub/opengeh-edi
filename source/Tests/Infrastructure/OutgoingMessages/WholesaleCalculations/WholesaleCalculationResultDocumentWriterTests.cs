@@ -52,7 +52,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
                 .WithBusinessReason(SampleData.BusinessReason)
                 .WithTimestamp(SampleData.Timestamp)
                 .WithSender(SampleData.SenderId, ActorRole.EnergySupplier)
-                .WithReceiver(SampleData.ReceiverId, ActorRole.MeteredDataAdministrator) // TODO: Unsure about this
+                .WithReceiver(SampleData.ReceiverId, ActorRole.MeteredDataAdministrator)
 
                 .WithTransactionId(SampleData.TransactionId)
                 .WithCalculationVersion(SampleData.Version)
