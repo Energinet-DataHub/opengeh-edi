@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 
 public static class ChargeTypeMapper
 {
-    public static ChargeType MapChargeType(MonthlyAmountPerChargeResultProducedV1.Types.ChargeType chargeType)
+    public static ChargeType Map(MonthlyAmountPerChargeResultProducedV1.Types.ChargeType chargeType)
     {
         return chargeType switch
         {

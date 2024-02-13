@@ -24,7 +24,7 @@ public class ResolutionMapperTests : BaseEnumMapperTests
     [MemberData(nameof(GetEnumValues), typeof(EnergyResultProducedV2.Types.Resolution))]
     public void Ensure_handling_energy_result_produced(EnergyResultProducedV2.Types.Resolution value) =>
         EnsureCanMapOrThrows(
-            () => ResolutionMapper.MapResolution(value),
+            () => ResolutionMapper.Map(value),
             value,
             unspecifiedValue: EnergyResultProducedV2.Types.Resolution.Unspecified);
 }

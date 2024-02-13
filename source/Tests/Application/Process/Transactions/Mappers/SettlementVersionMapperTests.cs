@@ -36,7 +36,7 @@ public class SettlementVersionMapperTests : BaseEnumMapperTests
     [MemberData(nameof(GetEnumValues), typeof(EnergyResultProducedV2.Types.CalculationType))]
     public void Ensure_handling_energy_result_produced(EnergyResultProducedV2.Types.CalculationType value)
         => EnsureCanMapOrReturnsNull(
-            () => SettlementVersionMapper.MapSettlementVersion(value),
+            () => SettlementVersionMapper.Map(value),
             value,
             unspecifiedValue: EnergyResultProducedV2.Types.CalculationType.Unspecified,
             invalidValues: _energyResultProducedInvalidValues);
@@ -45,7 +45,7 @@ public class SettlementVersionMapperTests : BaseEnumMapperTests
     [MemberData(nameof(GetEnumValues), typeof(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType))]
     public void Ensure_handling_monthly_amount_per_charge_result_produced(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType value)
         => EnsureCanMapOrReturnsNull(
-            () => SettlementVersionMapper.MapSettlementVersion(value),
+            () => SettlementVersionMapper.Map(value),
             value,
             unspecifiedValue: MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.Unspecified,
             invalidValues: _monthlyAmountPerChargeResultInvalidValues);

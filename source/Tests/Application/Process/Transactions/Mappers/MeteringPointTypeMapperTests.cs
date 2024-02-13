@@ -36,7 +36,7 @@ public class MeteringPointTypeMapperTests : BaseEnumMapperTests
     [MemberData(nameof(GetEnumValues), typeof(EnergyResultProducedV2.Types.TimeSeriesType))]
     public void Ensure_handling_energy_result_produced(EnergyResultProducedV2.Types.TimeSeriesType value)
         => EnsureCanMapOrThrows(
-            () => MeteringPointTypeMapper.MapMeteringPointType(value),
+            () => MeteringPointTypeMapper.Map(value),
             value,
             unspecifiedValue: EnergyResultProducedV2.Types.TimeSeriesType.Unspecified,
             invalidValues: _invalidValues);
@@ -49,7 +49,7 @@ public class MeteringPointTypeMapperTests : BaseEnumMapperTests
     [InlineData(EnergyResultProducedV2.Types.TimeSeriesType.TempFlexConsumption)]
     public void Ensure_throws_domain_exception(EnergyResultProducedV2.Types.TimeSeriesType value)
     {
-        var act = () => MeteringPointTypeMapper.MapMeteringPointType(value);
+        var act = () => MeteringPointTypeMapper.Map(value);
 
         act.Should().ThrowExactly<NotSupportedTimeSeriesTypeException>();
     }

@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 
 public static class ResolutionMapper
 {
-    public static Resolution MapResolution(EnergyResultProducedV2.Types.Resolution resolution)
+    public static Resolution Map(EnergyResultProducedV2.Types.Resolution resolution)
     {
         return resolution switch
         {

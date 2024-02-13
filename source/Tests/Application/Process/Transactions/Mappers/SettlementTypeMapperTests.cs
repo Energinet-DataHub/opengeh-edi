@@ -37,7 +37,7 @@ public class SettlementTypeMapperTests : BaseEnumMapperTests
     [MemberData(nameof(GetEnumValues), typeof(EnergyResultProducedV2.Types.TimeSeriesType))]
     public void Ensure_handling_energy_result_produced(EnergyResultProducedV2.Types.TimeSeriesType value)
         => EnsureCanMapOrReturnsNull(
-            () => SettlementTypeMapper.MapSettlementType(value),
+            () => SettlementTypeMapper.Map(value),
             value,
             unspecifiedValue: EnergyResultProducedV2.Types.TimeSeriesType.Unspecified,
             invalidValues: _invalidValues);

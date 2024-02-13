@@ -24,7 +24,7 @@ public class CurrencyMapperTests : BaseEnumMapperTests
     [MemberData(nameof(GetEnumValues), typeof(MonthlyAmountPerChargeResultProducedV1.Types.Currency))]
     public void Ensure_handling_monthly_amount_per_charge_result_produced(MonthlyAmountPerChargeResultProducedV1.Types.Currency value)
         => EnsureCanMapOrThrows(
-            () => CurrencyMapper.MapCurrency(value),
+            () => CurrencyMapper.Map(value),
             value,
             unspecifiedValue: MonthlyAmountPerChargeResultProducedV1.Types.Currency.Unspecified);
 }

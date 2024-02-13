@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 
 public static class SettlementTypeMapper
 {
-    public static SettlementType? MapSettlementType(EnergyResultProducedV2.Types.TimeSeriesType timeSeriesType)
+    public static SettlementType? Map(EnergyResultProducedV2.Types.TimeSeriesType timeSeriesType)
     {
         return timeSeriesType switch
         {

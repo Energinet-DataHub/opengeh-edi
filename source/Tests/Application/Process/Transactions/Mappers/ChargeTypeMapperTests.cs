@@ -24,7 +24,7 @@ public class ChargeTypeMapperTests : BaseEnumMapperTests
     [MemberData(nameof(GetEnumValues), typeof(MonthlyAmountPerChargeResultProducedV1.Types.ChargeType))]
     public void Ensure_handling_monthly_amount_per_charge_result_produced(MonthlyAmountPerChargeResultProducedV1.Types.ChargeType value)
         => EnsureCanMapOrThrows(
-            () => ChargeTypeMapper.MapChargeType(value),
+            () => ChargeTypeMapper.Map(value),
             value,
             unspecifiedValue: MonthlyAmountPerChargeResultProducedV1.Types.ChargeType.Unspecified);
 }

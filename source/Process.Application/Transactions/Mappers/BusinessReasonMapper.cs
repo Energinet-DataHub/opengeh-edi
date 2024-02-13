@@ -18,9 +18,9 @@ using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 
-public static class CalculationTypeMapper
+public static class BusinessReasonMapper
 {
-    public static BusinessReason MapCalculationType(EnergyResultProducedV2.Types.CalculationType calculationType)
+    public static BusinessReason Map(EnergyResultProducedV2.Types.CalculationType calculationType)
     {
         return calculationType switch
         {
@@ -35,7 +35,7 @@ public static class CalculationTypeMapper
         };
     }
 
-    public static BusinessReason MapCalculationType(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType calculationType)
+    public static BusinessReason Map(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType calculationType)
     {
         return calculationType switch
         {

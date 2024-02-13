@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 
 public static class SettlementVersionMapper
 {
-    public static SettlementVersion? MapSettlementVersion(EnergyResultProducedV2.Types.CalculationType calculationType)
+    public static SettlementVersion? Map(EnergyResultProducedV2.Types.CalculationType calculationType)
     {
         return calculationType switch
         {
@@ -35,7 +35,7 @@ public static class SettlementVersionMapper
         };
     }
 
-    public static SettlementVersion? MapSettlementVersion(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType calculationType)
+    public static SettlementVersion? Map(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType calculationType)
     {
         return calculationType switch
         {

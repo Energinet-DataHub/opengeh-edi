@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 
 public static class MeasurementUnitMapper
 {
-    public static MeasurementUnit MapQuantityUnit(EnergyResultProducedV2.Types.QuantityUnit quantityUnit)
+    public static MeasurementUnit Map(EnergyResultProducedV2.Types.QuantityUnit quantityUnit)
     {
         return quantityUnit switch
         {
@@ -30,7 +30,7 @@ public static class MeasurementUnitMapper
         };
     }
 
-    public static MeasurementUnit MapQuantityUnit(MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit quantityUnit)
+    public static MeasurementUnit Map(MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit quantityUnit)
     {
         return quantityUnit switch
         {

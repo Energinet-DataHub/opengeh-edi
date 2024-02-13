@@ -18,13 +18,13 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Application.Process.Transactions.Mappers;
 
-public class CalculationTypeMapperTests : BaseEnumMapperTests
+public class BusinessReasonMapperTests : BaseEnumMapperTests
 {
     [Theory]
     [MemberData(nameof(GetEnumValues), typeof(EnergyResultProducedV2.Types.CalculationType))]
     public void Ensure_handling_energy_result_produced(EnergyResultProducedV2.Types.CalculationType value)
         => EnsureCanMapOrThrows(
-            () => CalculationTypeMapper.MapCalculationType(value),
+            () => BusinessReasonMapper.Map(value),
             value,
             unspecifiedValue: EnergyResultProducedV2.Types.CalculationType.Unspecified);
 
@@ -32,7 +32,7 @@ public class CalculationTypeMapperTests : BaseEnumMapperTests
     [MemberData(nameof(GetEnumValues), typeof(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType))]
     public void Ensure_handling_monthly_amount_per_charge_result_produced(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType value)
         => EnsureCanMapOrThrows(
-            () => CalculationTypeMapper.MapCalculationType(value),
+            () => BusinessReasonMapper.Map(value),
             value,
             unspecifiedValue: MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.Unspecified);
 }

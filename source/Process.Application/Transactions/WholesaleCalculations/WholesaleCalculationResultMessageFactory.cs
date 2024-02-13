@@ -39,15 +39,15 @@ public class WholesaleCalculationResultMessageFactory
             GridAreaCode: message.GridAreaCode,
             ChargeCode: message.ChargeCode,
             IsTax: message.IsTax,
-            Quantity: DecimalValueMapper.Parse(message.Amount),
+            Quantity: DecimalValueMapper.Map(message.Amount),
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
             ChargeOwner: ActorNumber.Create(message.ChargeOwnerId), // this is an assumption
             Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),
-            BusinessReason: CalculationTypeMapper.MapCalculationType(message.CalculationType),
-            SettlementVersion: SettlementVersionMapper.MapSettlementVersion(message.CalculationType),
-            QuantityUnit: MeasurementUnitMapper.MapQuantityUnit(message.QuantityUnit),
-            Currency: CurrencyMapper.MapCurrency(message.Currency),
-            ChargeType: ChargeTypeMapper.MapChargeType(message.ChargeType));
+            BusinessReason: BusinessReasonMapper.Map(message.CalculationType),
+            SettlementVersion: SettlementVersionMapper.Map(message.CalculationType),
+            QuantityUnit: MeasurementUnitMapper.Map(message.QuantityUnit),
+            Currency: CurrencyMapper.Map(message.Currency),
+            ChargeType: ChargeTypeMapper.Map(message.ChargeType));
 
         return WholesaleCalculationResultMessage.Create(
             receiverNumber: wholesaleCalculationSeries.EnergySupplier,

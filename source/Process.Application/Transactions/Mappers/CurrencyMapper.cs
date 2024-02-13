@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 
 public static class CurrencyMapper
 {
-    public static Currency MapCurrency(MonthlyAmountPerChargeResultProducedV1.Types.Currency currency)
+    public static Currency Map(MonthlyAmountPerChargeResultProducedV1.Types.Currency currency)
     {
         return currency switch
         {

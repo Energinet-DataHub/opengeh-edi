@@ -77,17 +77,17 @@ public class AggregationMessageResultFactory
             receiverRole: aggregationData.ReceiverRole,
             processId: ProcessId.New().Id,
             gridAreaCode: aggregationData.GridAreaCode,
-            meteringPointType: MeteringPointTypeMapper.MapMeteringPointType(integrationEvent.TimeSeriesType).Name,
-            settlementType: SettlementTypeMapper.MapSettlementType(integrationEvent.TimeSeriesType)?.Name,
-            measureUnitType: MeasurementUnitMapper.MapQuantityUnit(integrationEvent.QuantityUnit).Name,
-            resolution: ResolutionMapper.MapResolution(integrationEvent.Resolution).Name,
+            meteringPointType: MeteringPointTypeMapper.Map(integrationEvent.TimeSeriesType).Name,
+            settlementType: SettlementTypeMapper.Map(integrationEvent.TimeSeriesType)?.Name,
+            measureUnitType: MeasurementUnitMapper.Map(integrationEvent.QuantityUnit).Name,
+            resolution: ResolutionMapper.Map(integrationEvent.Resolution).Name,
             energySupplierNumber: aggregationData.EnergySupplierNumber,
             balanceResponsibleNumber: aggregationData.BalanceResponsibleNumber,
             period: new Period(integrationEvent.PeriodStartUtc.ToInstant(), integrationEvent.PeriodEndUtc.ToInstant()),
             points: TimeSeriesPointsMapper.MapPoints(integrationEvent.TimeSeriesPoints),
-            businessReasonName: CalculationTypeMapper.MapCalculationType(integrationEvent.CalculationType).Name,
+            businessReasonName: BusinessReasonMapper.Map(integrationEvent.CalculationType).Name,
             calculationResultVersion: integrationEvent.CalculationResultVersion,
-            settlementVersion: SettlementVersionMapper.MapSettlementVersion(integrationEvent.CalculationType)?.Name);
+            settlementVersion: SettlementVersionMapper.Map(integrationEvent.CalculationType)?.Name);
     }
 
     private async Task<(string? EnergySupplierNumber, string? BalanceResponsibleNumber, string GridAreaCode, ActorRole ReceiverRole, ActorNumber ReceiverNumber)> GetAggregationLevelDataAsync(EnergyResultProducedV2 integrationEvent, CancellationToken cancellationToken)

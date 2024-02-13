@@ -24,7 +24,7 @@ public class MeasurementUnitMapperTests : BaseEnumMapperTests
     [MemberData(nameof(GetEnumValues), typeof(EnergyResultProducedV2.Types.QuantityUnit))]
     public void Ensure_handling_energy_result_produced(EnergyResultProducedV2.Types.QuantityUnit value)
         => EnsureCanMapOrThrows(
-            () => MeasurementUnitMapper.MapQuantityUnit(value),
+            () => MeasurementUnitMapper.Map(value),
             value,
             unspecifiedValue: EnergyResultProducedV2.Types.QuantityUnit.Unspecified);
 
@@ -32,7 +32,7 @@ public class MeasurementUnitMapperTests : BaseEnumMapperTests
     [MemberData(nameof(GetEnumValues), typeof(MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit))]
     public void Ensure_handling_monthly_amount_per_charge_result_produced(MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit value)
         => EnsureCanMapOrThrows(
-            () => MeasurementUnitMapper.MapQuantityUnit(value),
+            () => MeasurementUnitMapper.Map(value),
             value,
             unspecifiedValue: MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit.Unspecified);
 }

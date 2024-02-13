@@ -21,7 +21,7 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 
 public static class MeteringPointTypeMapper
 {
-    public static MeteringPointType MapMeteringPointType(EnergyResultProducedV2.Types.TimeSeriesType timeSeriesType)
+    public static MeteringPointType Map(EnergyResultProducedV2.Types.TimeSeriesType timeSeriesType)
     {
         return timeSeriesType switch
         {
