@@ -93,6 +93,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
                 .HasPriceMeasurementUnit(SampleData.PriceMeasureUnit)
                 .HasResolution(SampleData.Resolution)
                 .HasPositionAndQuantity(1, SampleData.Quantity)
+                .SettlementVersionIsNotPresent()
             .DocumentIsValidAsync();
     }
 
