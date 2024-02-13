@@ -43,7 +43,7 @@ public class WholesaleCalculationXmlDocumentWriter : DocumentWriter
         ArgumentNullException.ThrowIfNull(marketActivityPayloads);
         ArgumentNullException.ThrowIfNull(writer);
 
-        foreach (var wholesaleCalculationSeries in ParseFrom<WholesaleCalculationSeries>(marketActivityPayloads))
+        foreach (var wholesaleCalculationSeries in ParseFrom<WholesaleCalculationMarketActivityRecord>(marketActivityPayloads))
         {
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Series", null).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, wholesaleCalculationSeries.TransactionId.ToString()).ConfigureAwait(false);

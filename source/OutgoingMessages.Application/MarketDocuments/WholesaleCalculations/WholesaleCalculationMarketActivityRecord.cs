@@ -13,10 +13,11 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations;
 
-public record WholesaleCalculationSeries(
+public record WholesaleCalculationMarketActivityRecord(
     Guid TransactionId,
     int CalculationVersion,
     string GridAreaCode,
