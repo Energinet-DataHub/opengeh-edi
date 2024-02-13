@@ -14,6 +14,7 @@
 
 using System;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -32,6 +33,7 @@ public class SettlementVersion : EnumerationType
     public static readonly SettlementVersion NinthCorrection = new(9, nameof(NinthCorrection), "D09");
     public static readonly SettlementVersion TenthCorrection = new(10, nameof(TenthCorrection), "D10");
 
+    [JsonConstructor]
     private SettlementVersion(int id, string name, string code)
         : base(id, name)
     {

@@ -112,6 +112,22 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
             .HasPositionAndQuantity(1, 0);
     }
 
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    public async Task Can_create_notifyWholesaleServices_document_with_settlement_version(string documentFormat)
+    {
+        // Arrange
+        var document = await CreateDocument(
+            _wholesaleCalculationsResultMessageBuilder
+                .WithSettlementVersion(SettlementVersion.FirstCorrection),
+            DocumentFormat.From(documentFormat));
+
+        // Assert
+        using var assertionScope = new AssertionScope();
+        AssertDocument(document, DocumentFormat.From(documentFormat))
+            .HasSettlementVersion(SettlementVersion.FirstCorrection);
+    }
+
     private Task<MarketDocumentStream> CreateDocument(WholesaleCalculationsResultMessageBuilder resultBuilder, DocumentFormat documentFormat)
     {
         var documentHeader = resultBuilder.BuildHeader();

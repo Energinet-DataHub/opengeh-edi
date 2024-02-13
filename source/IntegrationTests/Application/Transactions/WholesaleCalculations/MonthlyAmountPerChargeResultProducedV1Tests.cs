@@ -118,6 +118,7 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.ChargeOwner, ActorNumber.Create(chargeOwner))
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.Period.Start, startOfPeriod)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.Period.End, endOfPeriod)
+            .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.SettlementVersion, null)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.QuantityUnit, MeasurementUnit.Kwh)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.PriceMeasureUnit, MeasurementUnit.Kwh)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.Currency, Currency.DanishCrowns)
@@ -126,10 +127,11 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
     }
 
     [Fact]
-    public async Task MonthlyAmountPerChargeResultProducedV1Processor_creates_outgoingMessage_with_no_amount()
+    public async Task MonthlyAmountPerChargeResultProducedV1Processor_creates_outgoingMessage_with_no_amount_first_correction()
     {
         // Arrange
         var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder
+            .WithCalculationType(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.FirstCorrectionSettlement)
             .WithAmount(null)
             .Build();
 
@@ -137,8 +139,10 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
         await HandleIntegrationEventAsync(monthlyPerChargeEvent);
 
         // Assert
-        var message = await AssertOutgoingMessageAsync();
-        message.HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.Quantity, null);
+        var message = await AssertOutgoingMessageAsync(businessReason: BusinessReason.Correction);
+        message
+            .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.Quantity, null)
+            .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.SettlementVersion, SettlementVersion.FirstCorrection);
     }
 
     private async Task HandleIntegrationEventAsync(MonthlyAmountPerChargeResultProducedV1 @event)
