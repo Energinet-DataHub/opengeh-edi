@@ -34,7 +34,7 @@ public class MonthlyAmountPerChargeResultProducedV1EventBuilder
     private MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit _quantityUnit = MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit.Kwh;
     private bool _isTax;
     private MonthlyAmountPerChargeResultProducedV1.Types.Currency _currency = MonthlyAmountPerChargeResultProducedV1.Types.Currency.Dkk;
-    private Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue? _amount = new Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue { Units = 123, Nanos = 1200000 };
+    private Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue? _amount;
 
     internal MonthlyAmountPerChargeResultProducedV1 Build()
     {
@@ -125,7 +125,7 @@ public class MonthlyAmountPerChargeResultProducedV1EventBuilder
         return this;
     }
 
-    internal MonthlyAmountPerChargeResultProducedV1EventBuilder WithAmount(Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue amount)
+    internal MonthlyAmountPerChargeResultProducedV1EventBuilder WithAmount(Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue? amount)
     {
         _amount = amount;
         return this;
