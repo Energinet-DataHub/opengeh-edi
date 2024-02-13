@@ -45,20 +45,28 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
     [InlineData(nameof(DocumentFormat.Xml))]
     public async Task Can_create_notifyWholesaleServices_document(string documentFormat)
     {
+        // Arrange
         var document = await CreateDocument(
             _wholesaleCalculationsResultMessageBuilder
                 .WithMessageId(SampleData.MessageId.ToString())
+                .WithBusinessReason(SampleData.BusinessReason)
                 .WithTimestamp(SampleData.Timestamp)
                 .WithSender(SampleData.SenderId, ActorRole.EnergySupplier)
                 .WithReceiver(SampleData.ReceiverId, ActorRole.MeteredDataAdministrator) // TODO: Unsure about this
 
                 .WithTransactionId(SampleData.TransactionId)
+                .WithCalculationVersion(SampleData.Version)
+                .WithChargeCode(SampleData.ChargeCode)
+                .WithChargeType(SampleData.ChargeType)
+                .WithChargeOwner(SampleData.ChargeOwner)
                 .WithGridArea(SampleData.GridAreaCode)
                 .WithEnergySupplierNumber(SampleData.EnergySupplier)
                 .WithPeriod(SampleData.PeriodStartUtc, SampleData.PeriodEndUtc)
                 .WithCurrency(SampleData.Currency)
                 .WithMeasurementUnit(SampleData.MeasurementUnit)
-                .WithBusinessReason(SampleData.BusinessReason),
+                .WithPriceMeasurementUnit(SampleData.PriceMeasureUnit)
+                .WithResolution(SampleData.Resolution)
+                .WithQuantity(SampleData.Quantity),
             DocumentFormat.From(documentFormat));
 
         // Assert
@@ -73,13 +81,36 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
                 .HasTimestamp(SampleData.Timestamp)
 
                 .HasTransactionId(SampleData.TransactionId)
+                //.HasCalculationVersion(SampleData.Version)
+                .HasChargeCode(SampleData.ChargeCode)
+                .HasChargeType(SampleData.ChargeType)
+                .HasChargeTypeOwner(SampleData.ChargeOwner)
                 .HasGridAreaCode(SampleData.GridAreaCode)
                 .HasEnergySupplierNumber(SampleData.EnergySupplier)
                 .HasPeriod(new Period(SampleData.PeriodStartUtc, SampleData.PeriodEndUtc))
                 .HasCurrency(SampleData.Currency)
                 .HasMeasurementUnit(SampleData.MeasurementUnit)
+                .HasPriceMeasurementUnit(SampleData.PriceMeasureUnit)
+                .HasResolution(SampleData.Resolution)
+                .HasPositionAndQuantity(1, SampleData.Quantity)
             .DocumentIsValidAsync()
             ;
+    }
+
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    public async Task Can_create_notifyWholesaleServices_document_without_quantity(string documentFormat)
+    {
+        // Arrange
+        var document = await CreateDocument(
+            _wholesaleCalculationsResultMessageBuilder
+                .WithQuantity(null),
+            DocumentFormat.From(documentFormat));
+
+        // Assert
+        using var assertionScope = new AssertionScope();
+        AssertDocument(document, DocumentFormat.From(documentFormat))
+            .HasPositionAndQuantity(1, 0);
     }
 
     private Task<MarketDocumentStream> CreateDocument(WholesaleCalculationsResultMessageBuilder resultBuilder, DocumentFormat documentFormat)

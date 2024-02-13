@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf.WellKnownTypes;
 using NodaTime.Serialization.Protobuf;
+using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleCalculations;
 
@@ -60,8 +61,10 @@ public class WholesaleCalculationResultMessageFactory
             BusinessReason: MapBusinessReason(monthlyAmountPerChargeResultProducedV1.CalculationType),
             SettlementVersion: MapSettlementVersion(monthlyAmountPerChargeResultProducedV1.CalculationType),
             QuantityUnit: MapQuantityUnit(monthlyAmountPerChargeResultProducedV1.QuantityUnit),
+            PriceMeasureUnit: MeasurementUnit.Kwh,  // TODO: We should get this info from wholesale, but is currently not available
             Currency: MapCurrency(monthlyAmountPerChargeResultProducedV1.Currency),
-            ChargeType: MapChargeType(monthlyAmountPerChargeResultProducedV1.ChargeType));
+            ChargeType: MapChargeType(monthlyAmountPerChargeResultProducedV1.ChargeType),
+            Resolution: BuildingBlocks.Domain.Models.Resolution.Monthly);
     }
 
     private static decimal? MapQuantity(Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue? amount)

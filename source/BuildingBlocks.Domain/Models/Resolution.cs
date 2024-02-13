@@ -14,6 +14,7 @@
 
 using System;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -21,8 +22,9 @@ public class Resolution : EnumerationType
 {
     public static readonly Resolution Hourly = new(0, nameof(Hourly), "PT1H");
     public static readonly Resolution QuarterHourly = new(1, nameof(QuarterHourly), "XXXX");
-    public static readonly Resolution Monthly = new(1, nameof(Monthly), "PT1M");
+    public static readonly Resolution Monthly = new(1, nameof(Monthly), "P1M");
 
+    [JsonConstructor]
     private Resolution(int id, string name, string code)
         : base(id, name)
     {

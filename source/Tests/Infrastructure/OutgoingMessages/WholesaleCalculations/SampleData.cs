@@ -14,7 +14,6 @@
 
 using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.WholesaleCalculations;
@@ -51,9 +50,15 @@ internal static class SampleData
 
     public static MeasurementUnit MeasurementUnit => MeasurementUnit.Kwh;
 
+    public static MeasurementUnit PriceMeasureUnit => MeasurementUnit.Kwh;
+
     public static Currency Currency => Currency.DanishCrowns;
 
     public static string ChargeCode => "123456";
+
+    public static Resolution Resolution => Resolution.Monthly;
+
+    public static int Quantity => 100;
 
     public static Instant PeriodStartUtc => Instant.FromUtc(2022, 1, 1, 0, 0);
 

@@ -75,13 +75,14 @@ public class WholesaleCalculationXmlDocumentWriter : DocumentWriter
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, GeneralValues.ProductCode).ConfigureAwait(false);
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, wholesaleCalculationSeries.QuantityUnit.Code).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "price_Measure_Unit.name", null, wholesaleCalculationSeries.PriceMeasureUnit.Code).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "currency_Unit.name", null, wholesaleCalculationSeries.Currency.Code).ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Period", null).ConfigureAwait(false);
 
             // tabbed content
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "resolution", null, Resolution.Monthly.Code).ConfigureAwait(false); // TODO: FIX HARDCODING
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "resolution", null, wholesaleCalculationSeries.Resolution.Code).ConfigureAwait(false);
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "timeInterval", null).ConfigureAwait(false);
 
             // tabbed content

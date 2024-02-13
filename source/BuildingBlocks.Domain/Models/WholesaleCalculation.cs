@@ -28,5 +28,7 @@ public record WholesaleCalculationSeries(
     BusinessReason BusinessReason,
     SettlementVersion? SettlementVersion,
     MeasurementUnit QuantityUnit,
+    MeasurementUnit PriceMeasureUnit,
     Currency Currency,
-    ChargeType ChargeType);
+    ChargeType ChargeType,
+    Resolution Resolution);

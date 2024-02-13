@@ -92,7 +92,7 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasVersion(int expectedVersion)
+    public IAssertWholesaleCalculationResultDocument HasCalculationVersion(int expectedVersion)
     {
         _documentAsserter.HasValue($"Series[1]/version", expectedVersion.ToString(CultureInfo.InvariantCulture));
         return this;
@@ -122,21 +122,23 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasChargeTypeNumber(string expectedChargeTypeNumber)
+    public IAssertWholesaleCalculationResultDocument HasChargeCode(string expectedChargeTypeNumber)
     {
         _documentAsserter.HasValue("Series[1]/chargeType.mRID", expectedChargeTypeNumber);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasChargeType(string expectedChargeType)
+    public IAssertWholesaleCalculationResultDocument HasChargeType(ChargeType expectedChargeType)
     {
-        _documentAsserter.HasValue("Series[1]/chargeType.type", expectedChargeType);
+        ArgumentNullException.ThrowIfNull(expectedChargeType);
+        _documentAsserter.HasValue("Series[1]/chargeType.type", expectedChargeType.Code);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasChargeTypeOwner(string expectedChargeTypeOwner)
+    public IAssertWholesaleCalculationResultDocument HasChargeTypeOwner(ActorNumber expectedChargeTypeOwner)
     {
-        _documentAsserter.HasValue("Series[1]/chargeType.chargeTypeOwner_MarketParticipant.mRID", expectedChargeTypeOwner);
+        ArgumentNullException.ThrowIfNull(expectedChargeTypeOwner);
+        _documentAsserter.HasValue("Series[1]/chargeType.chargeTypeOwner_MarketParticipant.mRID", expectedChargeTypeOwner.Value);
         return this;
     }
 
@@ -166,9 +168,10 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasPriceMeasurementUnit(string expectedPriceMeasurementUnit)
+    public IAssertWholesaleCalculationResultDocument HasPriceMeasurementUnit(MeasurementUnit expectedPriceMeasurementUnit)
     {
-        _documentAsserter.HasValue("Series[1]/price_Measure_Unit.name", expectedPriceMeasurementUnit);
+        ArgumentNullException.ThrowIfNull(expectedPriceMeasurementUnit);
+        _documentAsserter.HasValue("Series[1]/price_Measure_Unit.name", expectedPriceMeasurementUnit.Code);
         return this;
     }
 
@@ -188,11 +191,18 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasPoint(int expectedPosition, int expectedQuantity)
+    public IAssertWholesaleCalculationResultDocument HasResolution(Resolution resolution)
+    {
+        ArgumentNullException.ThrowIfNull(resolution);
+        _documentAsserter.HasValue("Series[1]/Period/resolution", resolution.Code);
+        return this;
+    }
+
+    public IAssertWholesaleCalculationResultDocument HasPositionAndQuantity(int expectedPosition, int expectedQuantity)
     {
         _documentAsserter
             .HasValue("Series[1]/Period/Point[1]/position", expectedPosition.ToString(CultureInfo.InvariantCulture))
-            .HasValue("Series[1]/Period/Point[1]/quantity", expectedQuantity.ToString(CultureInfo.InvariantCulture));
+            .HasValue("Series[1]/Period/Point[1]/energySum_Quantity.quantity", expectedQuantity.ToString(CultureInfo.InvariantCulture));
         return this;
     }
 

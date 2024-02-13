@@ -15,7 +15,6 @@
 using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
 using NodaTime;
 using NodaTime.Text;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
@@ -24,7 +23,6 @@ namespace Energinet.DataHub.EDI.Tests.Factories;
 
 public class WholesaleCalculationsResultMessageBuilder
 {
-    private long _calculationResultVersion = 1;
     private string _messageId = Guid.NewGuid().ToString();
     private Instant _timeStamp = SystemClock.Instance.GetCurrentInstant();
     private BusinessReason _businessReason = BusinessReason.BalanceFixing;
@@ -34,15 +32,20 @@ public class WholesaleCalculationsResultMessageBuilder
     private ActorRole _senderRole = ActorRole.MeteredDataAdministrator;
 
     private Guid _transactionId = Guid.NewGuid();
+    private long _calculationResultVersion = 1;
     private string _gridAreaCode = "870";
     private MeteringPointType _meteringPointType = MeteringPointType.Consumption;
     private SettlementType? _settlementMethod = SettlementType.NonProfiled;
     private MeasurementUnit _measurementUnit = MeasurementUnit.Kwh;
+    private MeasurementUnit _priceMeasureUnit = MeasurementUnit.Kwh;
     private Resolution _resolution = Resolution.Monthly;
     private ActorNumber _energySupplierActorNumber = ActorNumber.Create("1234567894444");
+    private string _chargeCode = "123";
+    private ChargeType _chargeType = ChargeType.Fee;
     private ActorNumber _chargeOwner = ActorNumber.Create("1234567897777");
     private string? _originalTransactionIdReference;
     private SettlementVersion? _settlementVersion;
+    private int? _quantity;
 
     private Currency _currency = Currency.DanishCrowns;
     private Period _period = new(Instant.FromUtc(2023, 11, 1, 0, 0), Instant.FromUtc(2023, 12, 1, 0, 0));
@@ -103,6 +106,12 @@ public class WholesaleCalculationsResultMessageBuilder
         return this;
     }
 
+    public WholesaleCalculationsResultMessageBuilder WithPriceMeasurementUnit(MeasurementUnit priceMeasurementUnit)
+    {
+        _priceMeasureUnit = priceMeasurementUnit;
+        return this;
+    }
+
     public WholesaleCalculationsResultMessageBuilder WithResolution(Resolution resolution)
     {
         _resolution = resolution;
@@ -115,6 +124,18 @@ public class WholesaleCalculationsResultMessageBuilder
         return this;
     }
 
+    public WholesaleCalculationsResultMessageBuilder WithChargeCode(string chargeCode)
+    {
+        _chargeCode = chargeCode;
+        return this;
+    }
+
+    public WholesaleCalculationsResultMessageBuilder WithChargeType(ChargeType chargeType)
+    {
+        _chargeType = chargeType;
+        return this;
+    }
+
     public WholesaleCalculationsResultMessageBuilder WithChargeOwner(ActorNumber chargeOwnerActorNumber)
     {
         _chargeOwner = chargeOwnerActorNumber;
@@ -124,6 +145,12 @@ public class WholesaleCalculationsResultMessageBuilder
     public WholesaleCalculationsResultMessageBuilder WithPeriod(Instant startOfPeriod, Instant endOfPeriod)
     {
         _period = new Period(startOfPeriod, endOfPeriod);
+        return this;
+    }
+
+    public WholesaleCalculationsResultMessageBuilder WithQuantity(int? quantity)
+    {
+        _quantity = quantity;
         return this;
     }
 
@@ -180,17 +207,19 @@ public class WholesaleCalculationsResultMessageBuilder
         return new WholesaleCalculationSeries(
             TransactionId: _transactionId,
             GridAreaCode: _gridAreaCode,
-            ChargeCode: "123",
+            ChargeCode: _chargeCode,
             IsTax: false,
-            Quantity: 100,
+            Quantity: _quantity,
             EnergySupplier: _energySupplierActorNumber,
             ChargeOwner: _chargeOwner,
             Period: _period,
             BusinessReason: _businessReason,
             SettlementVersion: _settlementVersion,
             QuantityUnit: _measurementUnit,
+            PriceMeasureUnit: _priceMeasureUnit,
             Currency: _currency,
-            ChargeType: ChargeType.Fee);
+            ChargeType: _chargeType,
+            Resolution: _resolution);
     }
 
     private static Instant ParseTimeStamp(string timestamp)

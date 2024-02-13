@@ -85,7 +85,7 @@ public interface IAssertWholesaleCalculationResultDocument
     /// Asserts the version of the first series element
     /// </summary>
     /// <param name="expectedVersion"></param>
-    IAssertWholesaleCalculationResultDocument HasVersion(int expectedVersion);
+    IAssertWholesaleCalculationResultDocument HasCalculationVersion(int expectedVersion);
 
     /// <summary>
     /// Asserts the settlement version of the first series element
@@ -115,19 +115,19 @@ public interface IAssertWholesaleCalculationResultDocument
     /// Asserts the charge type number of the first series element
     /// </summary>
     /// <param name="expectedChargeTypeNumber"></param>
-    IAssertWholesaleCalculationResultDocument HasChargeTypeNumber(string expectedChargeTypeNumber);
+    IAssertWholesaleCalculationResultDocument HasChargeCode(string expectedChargeTypeNumber);
 
     /// <summary>
     /// Asserts the charge type of the first series element
     /// </summary>
     /// <param name="expectedChargeType"></param>
-    IAssertWholesaleCalculationResultDocument HasChargeType(string expectedChargeType);
+    IAssertWholesaleCalculationResultDocument HasChargeType(ChargeType expectedChargeType);
 
     /// <summary>
     /// Asserts the charge type owner of the first series element
     /// </summary>
     /// <param name="expectedChargeTypeOwner"></param>
-    IAssertWholesaleCalculationResultDocument HasChargeTypeOwner(string expectedChargeTypeOwner);
+    IAssertWholesaleCalculationResultDocument HasChargeTypeOwner(ActorNumber expectedChargeTypeOwner);
 
     /// <summary>
     /// Asserts grid area code of the first series element
@@ -156,7 +156,7 @@ public interface IAssertWholesaleCalculationResultDocument
     /// Asserts the price measure unit of the first series element
     /// </summary>
     /// <param name="expectedPriceMeasurementUnit"></param>
-    IAssertWholesaleCalculationResultDocument HasPriceMeasurementUnit(string expectedPriceMeasurementUnit);
+    IAssertWholesaleCalculationResultDocument HasPriceMeasurementUnit(MeasurementUnit expectedPriceMeasurementUnit);
 
     /// <summary>
     /// Asserts the currency of the first series element
@@ -171,11 +171,17 @@ public interface IAssertWholesaleCalculationResultDocument
     IAssertWholesaleCalculationResultDocument HasPeriod(Period expectedPeriod);
 
     /// <summary>
+    /// Asserts the resulution of the first series element
+    /// </summary>
+    /// <param name="resolution"></param>
+    IAssertWholesaleCalculationResultDocument HasResolution(Resolution resolution);
+
+    /// <summary>
     /// Asserts a point of the first series element
     /// </summary>
     /// <param name="expectedPosition"></param>
     /// <param name="expectedQuantity"></param>
-    IAssertWholesaleCalculationResultDocument HasPoint(int expectedPosition, int expectedQuantity);
+    IAssertWholesaleCalculationResultDocument HasPositionAndQuantity(int expectedPosition, int expectedQuantity);
 
     /// <summary>
     /// Asserts the quality is present with the given code
