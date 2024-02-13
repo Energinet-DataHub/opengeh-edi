@@ -91,25 +91,9 @@ public class WholesaleCalculationXmlDocumentWriter : DocumentWriter
             // tab removed
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-            /*
-            foreach (var point in wholesaleCalculationSeries.Point)
-            {
-                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Point", null).ConfigureAwait(false);
-                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "position", null, point.Position.ToString(NumberFormatInfo.InvariantInfo)).ConfigureAwait(false);
-                if (point.Quantity is not null)
-                {
-                    await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity", null, point.Quantity.Value.ToString(NumberFormatInfo.InvariantInfo)!).ConfigureAwait(false);
-                }
-
-                await WriteQualityIfRequiredAsync(writer, point).ConfigureAwait(false);
-
-                await writer.WriteEndElementAsync().ConfigureAwait(false);
-            }*/
-
-            // TODO: the next 3 lines should iterate over a list of points
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Point", null).ConfigureAwait(false);
 
-            // tabbed content
+            // tabbed content TODO: the next 2 lines should iterate over a list of points
             await WriteElementAsync("position", "1", writer).ConfigureAwait(false); // TODO: FIX HARDCODING
 
             // energySum_Quantity.quantity is nullable according to the schema, but as of right now. Things do not make sense if it is not present
