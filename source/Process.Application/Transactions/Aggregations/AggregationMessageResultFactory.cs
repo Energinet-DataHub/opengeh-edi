@@ -69,24 +69,8 @@ public class AggregationMessageResultFactory
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        var balanceResponsibleNumber = GetBalanceResponsibleNumberForAggregationLevel(integrationEvent);
-        var energySupplierNumber = GetEnergySupplierNumberForAggregationLevel(integrationEvent);
-        var gridAreaCode = GetGridAreaCodeForAggregationLevel(integrationEvent);
-
-        var receiverRole = GetReceiverRoleForAggregationLevel(integrationEvent.AggregationLevelCase);
-        var receiverNumber =
-            balanceResponsibleNumber != null ? ActorNumber.Create(balanceResponsibleNumber)
-            : energySupplierNumber != null ? ActorNumber.Create(energySupplierNumber)
-            : await GetGridAreaOperatorNumberAsync(gridAreaCode, cancellationToken).ConfigureAwait(false);
-
         var aggregationData =
             await GetAggregationLevelDataAsync(integrationEvent, cancellationToken).ConfigureAwait(false);
-
-        if (aggregationData.BalanceResponsibleNumber != balanceResponsibleNumber) throw new InvalidOperationException("BalanceResponsibleNumber");
-        if (aggregationData.EnergySupplierNumber != energySupplierNumber) throw new InvalidOperationException("EnergySupplierNumber");
-        if (aggregationData.GridAreaCode != gridAreaCode) throw new InvalidOperationException("GridAreaCode");
-        if (aggregationData.ReceiverRole != receiverRole) throw new InvalidOperationException("ReceiverRole");
-        if (aggregationData.ReceiverNumber != receiverNumber) throw new InvalidOperationException("ReceiverNumber");
 
         return AggregationResultMessage.Create(
             receiverNumber: aggregationData.ReceiverNumber,
@@ -104,62 +88,6 @@ public class AggregationMessageResultFactory
             businessReasonName: CalculationTypeMapper.MapCalculationType(integrationEvent.CalculationType).Name,
             calculationResultVersion: integrationEvent.CalculationResultVersion,
             settlementVersion: SettlementVersionMapper.MapSettlementVersion(integrationEvent.CalculationType)?.Name);
-    }
-
-    private static ActorRole GetReceiverRoleForAggregationLevel(EnergyResultProducedV2.AggregationLevelOneofCase aggregationLevelCase)
-    {
-        switch (aggregationLevelCase)
-        {
-            case EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerGridarea:
-                return ActorRole.MeteredDataResponsible;
-            case EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerEnergysupplierPerGridarea:
-                return ActorRole.EnergySupplier;
-            case EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerBalanceresponsiblepartyPerGridarea:
-            case EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea:
-                return ActorRole.BalanceResponsibleParty;
-            case EnergyResultProducedV2.AggregationLevelOneofCase.None:
-                throw new InvalidOperationException("Aggregation level is not specified");
-            default:
-                throw new InvalidOperationException("Aggregation level is unknown");
-        }
-    }
-
-    private static string? GetEnergySupplierNumberForAggregationLevel(EnergyResultProducedV2 integrationEvent)
-    {
-        return integrationEvent.AggregationLevelCase switch
-        {
-            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerEnergysupplierPerGridarea => integrationEvent.AggregationPerEnergysupplierPerGridarea.EnergySupplierId,
-            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea => integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.EnergySupplierId,
-            EnergyResultProducedV2.AggregationLevelOneofCase.None => throw new InvalidOperationException("Aggregation level is not specified"),
-            _ => null,
-        };
-    }
-
-    private static string? GetBalanceResponsibleNumberForAggregationLevel(EnergyResultProducedV2 integrationEvent)
-    {
-        return integrationEvent.AggregationLevelCase switch
-        {
-            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerBalanceresponsiblepartyPerGridarea => integrationEvent.AggregationPerBalanceresponsiblepartyPerGridarea.BalanceResponsibleId,
-            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea => integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.BalanceResponsibleId,
-            EnergyResultProducedV2.AggregationLevelOneofCase.None => throw new InvalidOperationException("Aggregation level is not specified"),
-            _ => null,
-        };
-    }
-
-    private static string GetGridAreaCodeForAggregationLevel(EnergyResultProducedV2 integrationEvent)
-    {
-        var gridAreaCode = integrationEvent.AggregationLevelCase switch
-        {
-            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerGridarea => integrationEvent.AggregationPerGridarea.GridAreaCode,
-            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerBalanceresponsiblepartyPerGridarea => integrationEvent.AggregationPerBalanceresponsiblepartyPerGridarea.GridAreaCode,
-            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerEnergysupplierPerGridarea => integrationEvent.AggregationPerEnergysupplierPerGridarea.GridAreaCode,
-            EnergyResultProducedV2.AggregationLevelOneofCase.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea => integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.GridAreaCode,
-            EnergyResultProducedV2.AggregationLevelOneofCase.None => throw new InvalidOperationException(
-                "Aggregation level was not specified"),
-            _ => throw new InvalidOperationException("Unknown aggregation level"),
-        };
-
-        return gridAreaCode;
     }
 
     private async Task<(string? EnergySupplierNumber, string? BalanceResponsibleNumber, string GridAreaCode, ActorRole ReceiverRole, ActorNumber ReceiverNumber)> GetAggregationLevelDataAsync(EnergyResultProducedV2 integrationEvent, CancellationToken cancellationToken)
