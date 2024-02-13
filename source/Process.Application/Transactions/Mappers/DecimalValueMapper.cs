@@ -13,22 +13,19 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common;
 
-namespace Energinet.DataHub.EDI.Process.Domain.Transactions.Exceptions;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 
-public class NotSupportedTimeSeriesTypeException : InvalidOperationException
+/// <summary>
+/// This implementation is taken from https://learn.microsoft.com/en-us/dotnet/architecture/grpc-for-wcf-developers/protobuf-data-types#decimals
+/// </summary>
+public static class DecimalValueMapper
 {
-    public NotSupportedTimeSeriesTypeException()
+    public static decimal? Map(DecimalValue input)
     {
-    }
-
-    public NotSupportedTimeSeriesTypeException(string message)
-        : base(message)
-    {
-    }
-
-    public NotSupportedTimeSeriesTypeException(string message, Exception innerException)
-        : base(message, innerException)
-    {
+        ArgumentNullException.ThrowIfNull(input);
+        const decimal nanoFactor = 1_000_000_000;
+        return input.Units + (input.Nanos / nanoFactor);
     }
 }

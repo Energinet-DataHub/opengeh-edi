@@ -14,12 +14,11 @@
 
 using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
-using Google.Protobuf.WellKnownTypes;
 using NodaTime.Serialization.Protobuf;
-using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleCalculations;
 
@@ -34,108 +33,29 @@ public class WholesaleCalculationResultMessageFactory
         ArgumentNullException.ThrowIfNull(message);
         ArgumentNullException.ThrowIfNull(processId);
 
-        var wholesaleCalculation = CreateWholesaleCalculation(message);
-
-        return WholesaleCalculationResultMessage.Create(
-            receiverNumber: wholesaleCalculation.EnergySupplier,
-            receiverRole: ActorRole.EnergySupplier,
-            processId: processId,
-            businessReason: wholesaleCalculation.BusinessReason,
-            wholesaleSeries: wholesaleCalculation);
-    }
-
-    private static WholesaleCalculationSeries CreateWholesaleCalculation(
-        MonthlyAmountPerChargeResultProducedV1 monthlyAmountPerChargeResultProducedV1)
-    {
-        return new WholesaleCalculationSeries(
+        var wholesaleCalculationSeries = new WholesaleCalculationSeries(
             TransactionId: ProcessId.New().Id,
             CalculationVersion: 1, // TODO: We should get this info from wholesale, but is currently not available
-            GridAreaCode: monthlyAmountPerChargeResultProducedV1.GridAreaCode,
-            ChargeCode: monthlyAmountPerChargeResultProducedV1.ChargeCode,
-            IsTax: monthlyAmountPerChargeResultProducedV1.IsTax,
-            Quantity: MapQuantity(monthlyAmountPerChargeResultProducedV1.Amount),
-            EnergySupplier: ActorNumber.Create(monthlyAmountPerChargeResultProducedV1.EnergySupplierId),
-            ChargeOwner: ActorNumber.Create(monthlyAmountPerChargeResultProducedV1.ChargeOwnerId), // this is an assumption
-            Period: MapPeriod(
-                monthlyAmountPerChargeResultProducedV1.PeriodStartUtc,
-                monthlyAmountPerChargeResultProducedV1.PeriodEndUtc),
-            BusinessReason: MapBusinessReason(monthlyAmountPerChargeResultProducedV1.CalculationType),
-            SettlementVersion: MapSettlementVersion(monthlyAmountPerChargeResultProducedV1.CalculationType),
-            QuantityUnit: MapQuantityUnit(monthlyAmountPerChargeResultProducedV1.QuantityUnit),
+            GridAreaCode: message.GridAreaCode,
+            ChargeCode: message.ChargeCode,
+            IsTax: message.IsTax,
+            Quantity: DecimalValueMapper.Map(message.Amount),
+            EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
+            ChargeOwner: ActorNumber.Create(message.ChargeOwnerId), // this is an assumption
+            Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),
+            BusinessReason: BusinessReasonMapper.Map(message.CalculationType),
+            SettlementVersion: SettlementVersionMapper.Map(message.CalculationType),
+            QuantityUnit: MeasurementUnitMapper.Map(message.QuantityUnit),
             PriceMeasureUnit: MeasurementUnit.Kwh,  // TODO: We should get this info from wholesale, but is currently not available
-            Currency: MapCurrency(monthlyAmountPerChargeResultProducedV1.Currency),
-            ChargeType: MapChargeType(monthlyAmountPerChargeResultProducedV1.ChargeType),
+            Currency: CurrencyMapper.Map(message.Currency),
+            ChargeType: ChargeTypeMapper.Map(message.ChargeType),
             Resolution: BuildingBlocks.Domain.Models.Resolution.Monthly);
-    }
 
-    private static decimal? MapQuantity(Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue? amount)
-    {
-        if (amount is null)
-        {
-            return null;
-        }
-
-        const decimal nanoFactor = 1_000_000_000;
-        return amount.Units + (amount.Nanos / nanoFactor);
-    }
-
-    private static Period MapPeriod(Timestamp start, Timestamp end)
-    {
-        return new Period(start.ToInstant(), end.ToInstant());
-    }
-
-    private static BusinessReason MapBusinessReason(
-        MonthlyAmountPerChargeResultProducedV1.Types.CalculationType calculationType)
-    {
-        return calculationType switch
-        {
-            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing => BusinessReason.WholesaleFixing,
-            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.FirstCorrectionSettlement => BusinessReason.Correction,
-            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.SecondCorrectionSettlement => BusinessReason.Correction,
-            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.ThirdCorrectionSettlement => BusinessReason.Correction,
-            _ => throw new ArgumentOutOfRangeException(nameof(calculationType), calculationType, null),
-        };
-    }
-
-    private static SettlementVersion? MapSettlementVersion(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType calculationType)
-    {
-        return calculationType switch
-        {
-            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing => null,
-            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.FirstCorrectionSettlement => SettlementVersion.FirstCorrection,
-            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.SecondCorrectionSettlement => SettlementVersion.SecondCorrection,
-            MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.ThirdCorrectionSettlement => SettlementVersion.ThirdCorrection,
-            _ => throw new ArgumentOutOfRangeException(nameof(calculationType), calculationType, null),
-        };
-    }
-
-    private static MeasurementUnit MapQuantityUnit(MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit quantityUnit)
-    {
-        return quantityUnit switch
-        {
-            MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit.Kwh => MeasurementUnit.Kwh,
-            MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit.Pieces => MeasurementUnit.Pieces,
-            _ => throw new InvalidOperationException($"Unknown quantity unit: {quantityUnit}"),
-        };
-    }
-
-    private static Currency MapCurrency(MonthlyAmountPerChargeResultProducedV1.Types.Currency currency)
-    {
-        return currency switch
-        {
-            MonthlyAmountPerChargeResultProducedV1.Types.Currency.Dkk => Currency.DanishCrowns,
-            _ => throw new InvalidOperationException($"Unknown currency: {currency}"),
-        };
-    }
-
-    private static ChargeType MapChargeType(MonthlyAmountPerChargeResultProducedV1.Types.ChargeType chargeType)
-    {
-        return chargeType switch
-        {
-            MonthlyAmountPerChargeResultProducedV1.Types.ChargeType.Fee => ChargeType.Fee,
-            MonthlyAmountPerChargeResultProducedV1.Types.ChargeType.Tariff => ChargeType.Tariff,
-            MonthlyAmountPerChargeResultProducedV1.Types.ChargeType.Subscription => ChargeType.Subscription,
-            _ => throw new InvalidOperationException($"Unknown charge type: {chargeType}"),
-        };
+        return WholesaleCalculationResultMessage.Create(
+            receiverNumber: wholesaleCalculationSeries.EnergySupplier,
+            receiverRole: ActorRole.EnergySupplier,
+            processId: processId,
+            businessReason: wholesaleCalculationSeries.BusinessReason,
+            wholesaleSeries: wholesaleCalculationSeries);
     }
 }
