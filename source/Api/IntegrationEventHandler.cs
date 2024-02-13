@@ -21,6 +21,8 @@ using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Logging;
 using IIntegrationEventHandler = Energinet.DataHub.Core.Messaging.Communication.Subscriber.IIntegrationEventHandler;
 
@@ -76,7 +78,9 @@ public sealed class IntegrationEventHandler : IIntegrationEventHandler
                     integrationEvent.EventName,
                     addResult.ToString(),
                     stopWatch.ElapsedMilliseconds);
-
+                using var config = TelemetryConfiguration.CreateDefault();
+                var client = new TelemetryClient(config);
+                client.TrackEvent("EventIsAlreadyRegistered");
                 return;
             }
 
