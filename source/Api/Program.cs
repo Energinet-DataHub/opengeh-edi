@@ -92,7 +92,7 @@ namespace Energinet.DataHub.EDI.Api
                 {
                     worker.UseMiddleware<UnHandledExceptionMiddleware>();
                     worker.UseMiddleware<CorrelationIdMiddleware>();
-                    worker.UseMiddleware<ServiceBusExceptionLoggerMiddleware>();
+                    //worker.UseMiddleware<ServiceBusExceptionLoggerMiddleware>();
                     ConfigureAuthenticationMiddleware(worker);
                 },
                     option =>
