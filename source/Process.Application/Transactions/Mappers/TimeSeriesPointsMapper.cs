@@ -34,7 +34,7 @@ public static class TimeSeriesPointsMapper
             .Select(
                 (p, index) => new Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point(
                     index + 1, // Position starts at 1, so position = index + 1
-                    Parse(p.Quantity),
+                    DecimalValueMapper.Parse(p.Quantity),
                     CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(p.QuantityQualities),
                     p.Time.ToString()))
             .ToList()
@@ -49,11 +49,5 @@ public static class TimeSeriesPointsMapper
             .Select(p => new Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point(p.Position, p.Quantity, p.QuantityQuality, p.SampleTime))
             .ToList()
             .AsReadOnly();
-    }
-
-    private static decimal? Parse(DecimalValue input)
-    {
-        const decimal nanoFactor = 1_000_000_000;
-        return input.Units + (input.Nanos / nanoFactor);
     }
 }

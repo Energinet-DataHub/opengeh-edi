@@ -39,7 +39,7 @@ public class WholesaleCalculationResultMessageFactory
             GridAreaCode: message.GridAreaCode,
             ChargeCode: message.ChargeCode,
             IsTax: message.IsTax,
-            Quantity: CalculateQuantity(message.Amount),
+            Quantity: DecimalValueMapper.Parse(message.Amount),
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
             ChargeOwner: ActorNumber.Create(message.ChargeOwnerId), // this is an assumption
             Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),
@@ -55,16 +55,5 @@ public class WholesaleCalculationResultMessageFactory
             processId: processId,
             businessReason: wholesaleCalculationSeries.BusinessReason,
             wholesaleSeries: wholesaleCalculationSeries);
-    }
-
-    private static decimal? CalculateQuantity(Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue? amount)
-    {
-        if (amount is null)
-        {
-            return null;
-        }
-
-        const decimal nanoFactor = 1_000_000_000;
-        return amount.Units + (amount.Nanos / nanoFactor);
     }
 }
