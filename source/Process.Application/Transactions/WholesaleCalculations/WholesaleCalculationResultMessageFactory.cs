@@ -39,7 +39,7 @@ public class WholesaleCalculationResultMessageFactory
             GridAreaCode: message.GridAreaCode,
             ChargeCode: message.ChargeCode,
             IsTax: message.IsTax,
-            Quantity: DecimalValueMapper.Map(message.Amount),
+            Quantity: message.Amount != null ? DecimalValueMapper.Map(message.Amount) : null,
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
             ChargeOwner: ActorNumber.Create(message.ChargeOwnerId), // this is an assumption
             Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),
@@ -49,7 +49,7 @@ public class WholesaleCalculationResultMessageFactory
             PriceMeasureUnit: MeasurementUnit.Kwh,  // TODO: We should get this info from wholesale, but is currently not available
             Currency: CurrencyMapper.Map(message.Currency),
             ChargeType: ChargeTypeMapper.Map(message.ChargeType),
-            Resolution: BuildingBlocks.Domain.Models.Resolution.Monthly);
+            Resolution: Resolution.Monthly);
 
         return WholesaleCalculationResultMessage.Create(
             receiverNumber: wholesaleCalculationSeries.EnergySupplier,

@@ -22,7 +22,7 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 /// </summary>
 public static class DecimalValueMapper
 {
-    public static decimal? Map(DecimalValue input)
+    public static decimal Map(DecimalValue input)
     {
         ArgumentNullException.ThrowIfNull(input);
         const decimal nanoFactor = 1_000_000_000;
