@@ -13,13 +13,11 @@
 // limitations under the License.
 
 using System;
-using System.Threading;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
-using Google.Protobuf.WellKnownTypes;
 using NodaTime.Serialization.Protobuf;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleCalculations;
@@ -36,24 +34,27 @@ public class WholesaleCalculationResultMessageFactory
         ArgumentNullException.ThrowIfNull(processId);
 
         var wholesaleCalculationSeries = new WholesaleCalculationSeries(
+            TransactionId: ProcessId.New().Id,
+            CalculationVersion: message.CalculationResultVersion,
             GridAreaCode: message.GridAreaCode,
             ChargeCode: message.ChargeCode,
             IsTax: message.IsTax,
-            Quantity: DecimalValueMapper.Map(message.Amount),
+            Quantity: message.Amount != null ? DecimalParser.Parse(message.Amount) : null,
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
             ChargeOwner: ActorNumber.Create(message.ChargeOwnerId), // this is an assumption
             Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),
-            BusinessReason: BusinessReasonMapper.Map(message.CalculationType),
             SettlementVersion: SettlementVersionMapper.Map(message.CalculationType),
             QuantityUnit: MeasurementUnitMapper.Map(message.QuantityUnit),
+            PriceMeasureUnit: MeasurementUnit.Kwh,
             Currency: CurrencyMapper.Map(message.Currency),
-            ChargeType: ChargeTypeMapper.Map(message.ChargeType));
+            ChargeType: ChargeTypeMapper.Map(message.ChargeType),
+            Resolution: Resolution.Monthly);
 
         return WholesaleCalculationResultMessage.Create(
             receiverNumber: wholesaleCalculationSeries.EnergySupplier,
             receiverRole: ActorRole.EnergySupplier,
             processId: processId,
-            businessReason: wholesaleCalculationSeries.BusinessReason,
+            businessReason: BusinessReasonMapper.Map(message.CalculationType),
             wholesaleSeries: wholesaleCalculationSeries);
     }
 }

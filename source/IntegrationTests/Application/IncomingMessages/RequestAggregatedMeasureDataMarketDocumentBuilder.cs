@@ -132,8 +132,6 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
             _receiverId.Value,
             _receiverRole.Code,
             _createdAt,
-            _businessType,
-            _senderId,
-            _senderRole);
+            _businessType);
     }
 }
