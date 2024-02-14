@@ -32,7 +32,7 @@ public static class TimeSeriesPointsMapper
             .Select(
                 (p, index) => new Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point(
                     index + 1, // Position starts at 1, so position = index + 1
-                    DecimalParser.Map(p.Quantity),
+                    DecimalParser.Parse(p.Quantity),
                     CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(p.QuantityQualities),
                     p.Time.ToString()))
             .ToList()

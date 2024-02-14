@@ -15,14 +15,14 @@
 using System;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions;
 
 /// <summary>
 /// This implementation is taken from https://learn.microsoft.com/en-us/dotnet/architecture/grpc-for-wcf-developers/protobuf-data-types#decimals
 /// </summary>
 public static class DecimalParser
 {
-    public static decimal Map(DecimalValue input)
+    public static decimal Parse(DecimalValue input)
     {
         ArgumentNullException.ThrowIfNull(input);
         const decimal nanoFactor = 1_000_000_000;
