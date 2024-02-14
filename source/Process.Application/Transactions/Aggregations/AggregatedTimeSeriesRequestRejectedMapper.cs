@@ -22,7 +22,7 @@ using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.Collections;
 using MediatR;
-using RejectReason = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.RejectReason;
+using RejectReason = Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages.RejectReason;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 

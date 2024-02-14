@@ -24,13 +24,11 @@ public class WholesaleCalculationModelTests
     [Fact]
     public void WholesaleCalculationSeries_has_the_same_attributes_as_WholesaleCalculationMarketActivityRecord()
     {
-        var keysOfWholesaleCalculationSeries = typeof(WholesaleCalculationSeries).GetProperties().Select(p => new PropertyInfo(p.Name, p.PropertyType.ToString())).ToList();
-        var keysOfWholesaleCalculationMarketActivityRecord = typeof(WholesaleCalculationMarketActivityRecord).GetProperties().Select(p => new PropertyInfo(p.Name, p.PropertyType.ToString())).ToList();
+        var keysOfWholesaleCalculationSeries = typeof(WholesaleCalculationSeries).GetProperties().Select(p => new { Name = p.Name, PropertyType = p.PropertyType.ToString() }).ToList();
+        var keysOfWholesaleCalculationMarketActivityRecord = typeof(WholesaleCalculationMarketActivityRecord).GetProperties().Select(p => new { Name = p.Name, PropertyType = p.PropertyType.ToString() }).ToList();
 
         Assert.All(keysOfWholesaleCalculationSeries, property =>
             Assert.Contains(keysOfWholesaleCalculationMarketActivityRecord, element =>
                 element.Name == property.Name && element.PropertyType == property.PropertyType));
     }
-
-    private sealed record PropertyInfo(string Name, string PropertyType);
 }

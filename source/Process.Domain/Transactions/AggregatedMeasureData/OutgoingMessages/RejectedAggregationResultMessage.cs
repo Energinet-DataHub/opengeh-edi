@@ -54,3 +54,5 @@ public record RejectedTimeSerie(
     Guid TransactionId,
     IReadOnlyCollection<RejectReason> RejectReasons,
     string OriginalTransactionIdReference);
+
+public record RejectReason(string ErrorCode, string ErrorMessage);

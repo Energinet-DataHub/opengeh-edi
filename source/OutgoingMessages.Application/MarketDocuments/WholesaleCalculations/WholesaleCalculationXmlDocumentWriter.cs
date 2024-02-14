@@ -50,6 +50,8 @@ public class WholesaleCalculationXmlDocumentWriter : DocumentWriter
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "version", null, wholesaleCalculationSeries.CalculationVersion.ToString(NumberFormatInfo.InvariantInfo)).ConfigureAwait(false);
 
             await WriteElementIfHasValueAsync("settlement_Series.version", wholesaleCalculationSeries.SettlementVersion?.Code, writer).ConfigureAwait(false);
+
+            // These are there for later use, but are not used as of right now
             //await WriteElementIfHasValueAsync("originalTransactionIDReference_Series.mRID", wholesaleCalculationSeries.OriginalTransactionIdReference, writer).ConfigureAwait(false);
             //await writer.WriteElementStringAsync(DocumentDetails.Prefix, "marketEvaluationPoint.type", null, "E17").ConfigureAwait(false);
             //await WriteElementIfHasValueAsync("marketEvaluationPoint.settlementMethod", wholesaleCalculationSeries.SettlementType is null ? null : CimCode.Of(SettlementType.From(wholesaleCalculationSeries.SettlementType)), writer).ConfigureAwait(false);

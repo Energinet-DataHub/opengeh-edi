@@ -20,8 +20,11 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public class MeasurementUnit : EnumerationType
 {
+    // Tariffs are measured in Kwh
     public static readonly MeasurementUnit Kwh = new(0, nameof(Kwh), "KWH");
-    public static readonly MeasurementUnit Pieces = new(1, nameof(Pieces), "Pieces"); // TODO: WHAT
+
+    // Subscription and Fees are measured in pieces
+    public static readonly MeasurementUnit Pieces = new(1, nameof(Pieces), "H87");
 
     [JsonConstructor]
     private MeasurementUnit(int id, string name, string code)

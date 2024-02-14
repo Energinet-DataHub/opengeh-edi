@@ -19,7 +19,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 using NodaTime;
-using RejectReason = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.RejectReason;
 
 namespace Energinet.DataHub.EDI.Tests.Factories;
 

@@ -45,7 +45,7 @@ public class WholesaleCalculationResultMessageFactory
             Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),
             SettlementVersion: SettlementVersionMapper.Map(message.CalculationType),
             QuantityUnit: MeasurementUnitMapper.Map(message.QuantityUnit),
-            PriceMeasureUnit: MeasurementUnit.Kwh,  // TODO: We should get this info from wholesale, but is currently not available
+            PriceMeasureUnit: MeasurementUnit.Kwh,
             Currency: CurrencyMapper.Map(message.Currency),
             ChargeType: ChargeTypeMapper.Map(message.ChargeType),
             Resolution: Resolution.Monthly);
