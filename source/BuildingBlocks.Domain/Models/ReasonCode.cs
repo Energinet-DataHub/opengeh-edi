@@ -19,11 +19,11 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public class ReasonCode : EnumerationType
 {
-    public static readonly ReasonCode FullyAccepted = new(0, nameof(FullyAccepted), "A01");
-    public static readonly ReasonCode FullyRejected = new(1, nameof(FullyRejected), "A02");
+    public static readonly ReasonCode FullyAccepted = new(nameof(FullyAccepted), "A01");
+    public static readonly ReasonCode FullyRejected = new(nameof(FullyRejected), "A02");
 
-    public ReasonCode(int id, string name, string code)
-        : base(id, name)
+    public ReasonCode(string name, string code)
+        : base(name)
     {
         Code = code;
     }

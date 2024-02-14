@@ -19,11 +19,11 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public class Resolution : EnumerationType
 {
-    public static readonly Resolution Hourly = new(0, nameof(Hourly), "PT1H");
-    public static readonly Resolution QuarterHourly = new(1, nameof(QuarterHourly), "XXXX");
+    public static readonly Resolution Hourly = new(nameof(Hourly), "PT1H");
+    public static readonly Resolution QuarterHourly = new(nameof(QuarterHourly), "XXXX");
 
-    private Resolution(int id, string name, string code)
-        : base(id, name)
+    private Resolution(string name, string code)
+        : base(name)
     {
         Code = code;
     }
