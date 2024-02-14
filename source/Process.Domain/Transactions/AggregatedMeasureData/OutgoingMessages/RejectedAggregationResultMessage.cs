@@ -41,12 +41,6 @@ public class RejectedAggregationResultMessage : OutgoingMessageDto
         Series = series;
     }
 
-    // private RejectedAggregationResultMessage(ActorNumber receiverId, Guid processId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
-    //     : base(receiverId, processId, businessReason, receiverRole, senderId, senderRole, messageRecord)
-    // {
-    //     Series = new Serializer().Deserialize<RejectedTimeSerie>(messageRecord)!;
-    // }
-
     public RejectedTimeSerie Series { get; }
 }
 
