@@ -39,11 +39,10 @@ public class WholesaleCalculationResultMessageFactory
             GridAreaCode: message.GridAreaCode,
             ChargeCode: message.ChargeCode,
             IsTax: message.IsTax,
-            Quantity: message.Amount != null ? DecimalValueMapper.Map(message.Amount) : null,
+            Quantity: message.Amount != null ? DecimalParser.Map(message.Amount) : null,
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
             ChargeOwner: ActorNumber.Create(message.ChargeOwnerId), // this is an assumption
             Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),
-            BusinessReason: BusinessReasonMapper.Map(message.CalculationType),
             SettlementVersion: SettlementVersionMapper.Map(message.CalculationType),
             QuantityUnit: MeasurementUnitMapper.Map(message.QuantityUnit),
             PriceMeasureUnit: MeasurementUnit.Kwh,  // TODO: We should get this info from wholesale, but is currently not available
@@ -55,7 +54,7 @@ public class WholesaleCalculationResultMessageFactory
             receiverNumber: wholesaleCalculationSeries.EnergySupplier,
             receiverRole: ActorRole.EnergySupplier,
             processId: processId,
-            businessReason: wholesaleCalculationSeries.BusinessReason,
+            businessReason: BusinessReasonMapper.Map(message.CalculationType),
             wholesaleSeries: wholesaleCalculationSeries);
     }
 }

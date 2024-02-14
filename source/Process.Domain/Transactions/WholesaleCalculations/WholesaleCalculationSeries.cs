@@ -27,7 +27,6 @@ public record WholesaleCalculationSeries(
     ActorNumber EnergySupplier,
     ActorNumber ChargeOwner,
     Period Period,
-    BusinessReason BusinessReason,
     SettlementVersion? SettlementVersion,
     MeasurementUnit QuantityUnit,
     MeasurementUnit PriceMeasureUnit,

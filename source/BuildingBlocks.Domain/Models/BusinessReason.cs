@@ -420,7 +420,6 @@ public sealed class BusinessReason : EnumerationType
     // ReSharper restore InconsistentNaming
     #pragma warning restore IDE1006
 
-    [JsonConstructor]
     private BusinessReason(int id, string name, string code)
      : base(id, name)
     {

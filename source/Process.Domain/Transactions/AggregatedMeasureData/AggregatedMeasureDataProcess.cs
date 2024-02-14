@@ -153,7 +153,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             var rejectedTimeSerie = new RejectedTimeSerie(
                 ProcessId.Id,
                 rejectedAggregatedMeasureDataRequest.RejectReasons.Select(reason =>
-                        new Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages.RejectReason(
+                        new RejectReason(
                             reason.ErrorCode,
                             reason.ErrorMessage))
                     .ToList(),

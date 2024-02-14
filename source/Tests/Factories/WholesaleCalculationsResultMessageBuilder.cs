@@ -210,7 +210,6 @@ public class WholesaleCalculationsResultMessageBuilder
             EnergySupplier: _energySupplierActorNumber,
             ChargeOwner: _chargeOwner,
             Period: _period,
-            BusinessReason: _businessReason,
             SettlementVersion: _settlementVersion,
             QuantityUnit: _measurementUnit,
             PriceMeasureUnit: _priceMeasureUnit,

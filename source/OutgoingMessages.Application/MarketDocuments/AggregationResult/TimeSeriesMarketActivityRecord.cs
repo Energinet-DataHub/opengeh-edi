@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
 
+// This is a copy of TimeSeries defined in the process module
 public record TimeSeriesMarketActivityRecord(
     Guid TransactionId,
     string GridAreaCode,

@@ -16,6 +16,8 @@ using System.Linq;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using Xunit;
+using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point;
+using PointOutgoing = Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult.Point;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Models;
 
@@ -24,9 +26,29 @@ public class TimeSeriesModelTests
     [Fact]
     public void TimeSeries_has_the_same_attributes_as_TimeSeriesMarketActivityRecord()
     {
-        var keysOfTimeSeries = typeof(TimeSeries).GetProperties().Select(p => p.Name).ToList();
-        var keysOfTimeSeriesMarketActivityRecord = typeof(TimeSeriesMarketActivityRecord).GetProperties().Select(p => p.Name).ToList();
+        var pointAttributeName = "Point";
+        var propertyInfosOfTimeSeries = typeof(TimeSeries).GetProperties().Select(p => new PropertyInfo(p.Name, p.PropertyType.ToString())).ToList();
+        var propertyInfosOfTimeSeriesMarketActivityRecord = typeof(TimeSeriesMarketActivityRecord).GetProperties().Select(p => new PropertyInfo(p.Name, p.PropertyType.ToString())).ToList();
 
-        Assert.Equal(keysOfTimeSeries, keysOfTimeSeriesMarketActivityRecord);
+        // Points are currently not a building block, hence we ignore them in the comparison of timeseries and timeseriesmarketactivityrecord
+        var propertyInfosOfTimeSeriesWithoutPointAttribute = propertyInfosOfTimeSeries.Where(p => p.Name != pointAttributeName).ToList();
+        var propertyInfosOfTimeSeriesMarketActivityRecordWithoutPointAttribute = propertyInfosOfTimeSeriesMarketActivityRecord.Where(p => p.Name != pointAttributeName).ToList();
+
+        // We have to compare the point attributes separately
+        var pointOfTimeSeries = propertyInfosOfTimeSeries.Single(p => p.Name == pointAttributeName);
+        var pointOfTimeSeriesTimeSeriesMarketActivityRecord = propertyInfosOfTimeSeriesMarketActivityRecord.Single(p => p.Name == pointAttributeName);
+        var pointTypeOfTimeSeries = typeof(Point).GetProperties().Select(p => new PropertyInfo(p.Name, p.PropertyType.ToString())).ToList();
+        var pointTypeOfTimeSeriesMarketActivityRecord = typeof(PointOutgoing).GetProperties().Select(p => new PropertyInfo(p.Name, p.PropertyType.ToString())).ToList();
+
+        // Assert that the non-point attributes are the same
+        Assert.All(propertyInfosOfTimeSeriesWithoutPointAttribute, property =>
+            Assert.Contains(propertyInfosOfTimeSeriesMarketActivityRecordWithoutPointAttribute, element =>
+                element.Name == property.Name && element.PropertyType == property.PropertyType));
+
+        // Assert that the point attributes are the same and that the points are not the same class
+        Assert.NotEqual(pointOfTimeSeries.PropertyType, pointOfTimeSeriesTimeSeriesMarketActivityRecord.PropertyType);
+        Assert.Equal(pointTypeOfTimeSeries, pointTypeOfTimeSeriesMarketActivityRecord);
     }
+
+    private sealed record PropertyInfo(string Name, string PropertyType);
 }

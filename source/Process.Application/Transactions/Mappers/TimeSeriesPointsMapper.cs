@@ -16,11 +16,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf.Collections;
-using DecimalValue = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 
@@ -34,7 +32,7 @@ public static class TimeSeriesPointsMapper
             .Select(
                 (p, index) => new Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point(
                     index + 1, // Position starts at 1, so position = index + 1
-                    DecimalValueMapper.Map(p.Quantity),
+                    DecimalParser.Map(p.Quantity),
                     CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(p.QuantityQualities),
                     p.Time.ToString()))
             .ToList()

@@ -77,7 +77,7 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
         var endOfPeriod = Instant.FromUtc(2023, 1, 1, 0, 0);
         var energySupplier = "8200000007743";
         var gridAreaCode = "805";
-        var chargeCode = "IDontKow";
+        var chargeCode = "ESP-C-F-04";
         var chargeOwner = "9876543216543";
         var isTax = false;
         var amount = new DecimalValue { Units = 100, Nanos = 0 };

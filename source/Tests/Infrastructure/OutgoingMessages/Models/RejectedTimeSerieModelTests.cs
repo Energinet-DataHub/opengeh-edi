@@ -24,9 +24,13 @@ public class RejectedTimeSerieModelTests
     [Fact]
     public void RejectedTimeSerie_has_the_same_attributes_as_RejectedTimeSerieMarketActivityRecord()
     {
-        var keysOfRejectedTimeSerie = typeof(RejectedTimeSerie).GetProperties().Select(p => p.Name).ToList();
-        var keysOfRejectedTimeSerieMarketActivityRecord = typeof(RejectedTimeSerieMarketActivityRecord).GetProperties().Select(p => p.Name).ToList();
+        var keysOfRejectedTimeSerie = typeof(RejectedTimeSerie).GetProperties().Select(p => new PropertyInfo(p.Name, p.PropertyType.ToString())).ToList();
+        var keysOfRejectedTimeSerieMarketActivityRecord = typeof(RejectedTimeSerieMarketActivityRecord).GetProperties().Select(p => new PropertyInfo(p.Name, p.PropertyType.ToString())).ToList();
 
-        Assert.Equal(keysOfRejectedTimeSerie, keysOfRejectedTimeSerieMarketActivityRecord);
+        Assert.All(keysOfRejectedTimeSerie, property =>
+            Assert.Contains(keysOfRejectedTimeSerieMarketActivityRecord, element =>
+                element.Name == property.Name && element.PropertyType == property.PropertyType));
     }
+
+    private sealed record PropertyInfo(string Name, string PropertyType);
 }

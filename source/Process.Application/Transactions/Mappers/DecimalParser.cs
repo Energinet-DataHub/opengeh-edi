@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 /// <summary>
 /// This implementation is taken from https://learn.microsoft.com/en-us/dotnet/architecture/grpc-for-wcf-developers/protobuf-data-types#decimals
 /// </summary>
-public static class DecimalValueMapper
+public static class DecimalParser
 {
     public static decimal Map(DecimalValue input)
     {

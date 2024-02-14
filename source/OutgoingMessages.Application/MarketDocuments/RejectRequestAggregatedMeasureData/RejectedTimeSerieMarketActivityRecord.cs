@@ -14,12 +14,12 @@
 
 using System;
 using System.Collections.Generic;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
 
+// This is a copy of RejectedTimeSerie defined in the process module
 public record RejectedTimeSerieMarketActivityRecord(
     Guid TransactionId,
     IReadOnlyCollection<RejectReason> RejectReasons,
     string OriginalTransactionIdReference);
-
-public record RejectReason(string ErrorCode, string ErrorMessage);

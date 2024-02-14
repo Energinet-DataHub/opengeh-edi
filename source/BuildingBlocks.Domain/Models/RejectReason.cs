@@ -12,6 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public record RejectReason(string ErrorCode, string ErrorMessage);

@@ -28,7 +28,7 @@ public class MonthlyAmountPerChargeResultProducedV1EventBuilder
     private Timestamp _periodEndUtc = Instant.FromUtc(2023, 10, 2, 0, 0, 0).ToTimestamp();
     private string _gridAreaCode = "805";
     private string _energySupplier = "8200000007743";
-    private string _chargeCode = "IDontKow";
+    private string _chargeCode = "ESP-C-F-04";
     private MonthlyAmountPerChargeResultProducedV1.Types.ChargeType _chargeType = MonthlyAmountPerChargeResultProducedV1.Types.ChargeType.Fee;
     private string _chargeOwner = "8200000007740";
     private MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit _quantityUnit = MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit.Kwh;

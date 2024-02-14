@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations;
 
+// This is a copy of WholesaleCalculationSeries defined in the process module
 public record WholesaleCalculationMarketActivityRecord(
     Guid TransactionId,
     int CalculationVersion,
@@ -27,7 +28,6 @@ public record WholesaleCalculationMarketActivityRecord(
     ActorNumber EnergySupplier,
     ActorNumber ChargeOwner,
     Period Period,
-    BusinessReason BusinessReason,
     SettlementVersion? SettlementVersion,
     MeasurementUnit QuantityUnit,
     MeasurementUnit PriceMeasureUnit,
