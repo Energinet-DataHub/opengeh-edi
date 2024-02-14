@@ -33,7 +33,7 @@ limitations under the License.
     <PackageReference Include="Energinet.DataHub.MarketParticipant.Client" Version="2.32.6" />
     <PackageReference Include="Energinet.DataHub.MeteringPoints.IntegrationEvents" Version="1.0.4" />
     <PackageReference Include="Energinet.DataHub.MeteringPoints.RequestResponse" Version="1.0.4" />
-    <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="7.1.0" />
+    <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="8.1.0" />
     <PackageReference Include="MediatR" Version="12.1.1" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.1" />

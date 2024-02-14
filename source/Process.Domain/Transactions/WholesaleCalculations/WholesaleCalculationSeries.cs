@@ -1,4 +1,4 @@
-﻿// Copyright 2020 Energinet DataHub A/S
+﻿// // Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -12,10 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages;
 
-namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
 
-public record RejectedAggregatedMeasureDataRequest(IReadOnlyCollection<RejectReason> RejectReasons, BusinessReason BusinessReason);
+public record WholesaleCalculationSeries(
+    Guid TransactionId,
+    long CalculationVersion,
+    string GridAreaCode,
+    string ChargeCode,
+    bool IsTax,
+    decimal? Quantity,
+    ActorNumber EnergySupplier,
+    ActorNumber ChargeOwner,
+    Period Period,
+    SettlementVersion? SettlementVersion,
+    MeasurementUnit QuantityUnit,
+    MeasurementUnit PriceMeasureUnit,
+    Currency Currency,
+    ChargeType ChargeType,
+    Resolution Resolution);

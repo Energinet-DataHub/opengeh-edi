@@ -14,14 +14,19 @@
 
 using System;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public class MeasurementUnit : EnumerationType
 {
+    // Tariffs are measured in Kwh
     public static readonly MeasurementUnit Kwh = new(nameof(Kwh), "KWH");
-    public static readonly MeasurementUnit Pieces = new(nameof(Pieces), "Pieces"); // TODO: WHAT
 
+    // Subscription and Fees are measured in pieces
+    public static readonly MeasurementUnit Pieces = new(nameof(Pieces), "H87");
+
+    [JsonConstructor]
     private MeasurementUnit(string name, string code)
         : base(name)
     {

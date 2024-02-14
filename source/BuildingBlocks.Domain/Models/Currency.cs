@@ -14,6 +14,7 @@
 
 using System;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -21,6 +22,7 @@ public class Currency : EnumerationType
 {
     public static readonly Currency DanishCrowns = new(nameof(DanishCrowns), "DKK");
 
+    [JsonConstructor]
     private Currency(string name, string code)
         : base(name)
     {
