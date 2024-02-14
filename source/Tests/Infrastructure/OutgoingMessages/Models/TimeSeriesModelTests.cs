@@ -30,7 +30,7 @@ public class TimeSeriesModelTests
         var propertyInfosOfTimeSeries = typeof(TimeSeries).GetProperties().Select(p => new { Name = p.Name, PropertyType = p.PropertyType.ToString() }).ToList();
         var propertyInfosOfTimeSeriesMarketActivityRecord = typeof(TimeSeriesMarketActivityRecord).GetProperties().Select(p => new { Name = p.Name, PropertyType = p.PropertyType.ToString() }).ToList();
 
-        // Points are currently not a building block, hence we ignore them in the comparison of timeseries and timeseriesmarketactivityrecord
+        // Points are duplicated, hence we ignore them in the comparison of timeseries and timeseriesmarketactivityrecord
         var propertyInfosOfTimeSeriesWithoutPointAttribute = propertyInfosOfTimeSeries.Where(p => p.Name != pointAttributeName).ToList();
         var propertyInfosOfTimeSeriesMarketActivityRecordWithoutPointAttribute = propertyInfosOfTimeSeriesMarketActivityRecord.Where(p => p.Name != pointAttributeName).ToList();
 

@@ -129,6 +129,21 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
             .HasSettlementVersion(SettlementVersion.FirstCorrection);
     }
 
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    public async Task Can_create_notifyWholesaleServices_document_with_measurement_unit_pieces(string documentFormat)
+    {
+        // Arrange
+        var document = await CreateDocument(
+            _wholesaleCalculationsResultMessageBuilder
+                .WithMeasurementUnit(MeasurementUnit.Pieces),
+            DocumentFormat.From(documentFormat));
+
+        // Assert
+        AssertDocument(document, DocumentFormat.From(documentFormat))
+            .HasMeasurementUnit(MeasurementUnit.Pieces);
+    }
+
     private Task<MarketDocumentStream> CreateDocument(WholesaleCalculationsResultMessageBuilder resultBuilder, DocumentFormat documentFormat)
     {
         var documentHeader = resultBuilder.BuildHeader();

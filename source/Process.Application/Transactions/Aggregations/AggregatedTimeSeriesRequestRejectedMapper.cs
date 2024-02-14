@@ -22,7 +22,6 @@ using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.Collections;
 using MediatR;
-using RejectReason = Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages.RejectReason;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 
@@ -46,10 +45,10 @@ public class AggregatedTimeSeriesRequestRejectedMapper : IInboxEventMapper
         return eventType.Equals(nameof(AggregatedTimeSeriesRequestRejected), StringComparison.OrdinalIgnoreCase);
     }
 
-    private static ReadOnlyCollection<RejectReason> MapRejectReasons(RepeatedField<Edi.Responses.RejectReason> rejectReasons)
+    private static ReadOnlyCollection<Domain.Transactions.AggregatedMeasureData.RejectReason> MapRejectReasons(RepeatedField<Edi.Responses.RejectReason> rejectReasons)
     {
         return rejectReasons
-            .Select(reason => new RejectReason(
+            .Select(reason => new Domain.Transactions.AggregatedMeasureData.RejectReason(
                 reason.ErrorCode,
                 reason.ErrorMessage))
             .ToList()
