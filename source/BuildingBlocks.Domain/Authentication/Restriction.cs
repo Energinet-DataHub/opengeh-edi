@@ -21,15 +21,15 @@ public class Restriction : EnumerationType
     /// <summary>
     /// No restrictions can see all data.
     /// </summary>
-    public static readonly Restriction None = new(0, nameof(None));
+    public static readonly Restriction None = new(nameof(None));
 
     /// <summary>
     /// Restricted to only see own data.
     /// </summary>
-    public static readonly Restriction Owned = new(1, nameof(Owned));
+    public static readonly Restriction Owned = new(nameof(Owned));
 
-    private Restriction(int id, string name)
-        : base(id, name)
+    private Restriction(string name)
+        : base(name)
     {
     }
 }
