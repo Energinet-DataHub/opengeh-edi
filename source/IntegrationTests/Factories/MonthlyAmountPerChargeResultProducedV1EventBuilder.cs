@@ -35,6 +35,7 @@ public class MonthlyAmountPerChargeResultProducedV1EventBuilder
     private bool _isTax;
     private MonthlyAmountPerChargeResultProducedV1.Types.Currency _currency = MonthlyAmountPerChargeResultProducedV1.Types.Currency.Dkk;
     private Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue? _amount;
+    private long _calculationVersion = 1;
 
     internal MonthlyAmountPerChargeResultProducedV1 Build()
     {
@@ -52,6 +53,7 @@ public class MonthlyAmountPerChargeResultProducedV1EventBuilder
             QuantityUnit = _quantityUnit,
             IsTax = _isTax,
             Currency = _currency,
+            CalculationResultVersion = _calculationVersion,
         };
         if (_amount != null)
             @event.Amount = _amount;
@@ -62,6 +64,12 @@ public class MonthlyAmountPerChargeResultProducedV1EventBuilder
     internal MonthlyAmountPerChargeResultProducedV1EventBuilder WithCalculationType(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType calculationType)
     {
         _calculationType = calculationType;
+        return this;
+    }
+
+    internal MonthlyAmountPerChargeResultProducedV1EventBuilder WithCalculationVersion(long calculationVersion)
+    {
+        _calculationVersion = calculationVersion;
         return this;
     }
 

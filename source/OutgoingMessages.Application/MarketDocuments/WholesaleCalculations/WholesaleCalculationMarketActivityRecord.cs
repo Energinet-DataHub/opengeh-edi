@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Who
 // This is a copy of WholesaleCalculationSeries defined in the process module
 public record WholesaleCalculationMarketActivityRecord(
     Guid TransactionId,
-    int CalculationVersion,
+    long CalculationVersion,
     string GridAreaCode,
     string ChargeCode,
     bool IsTax,

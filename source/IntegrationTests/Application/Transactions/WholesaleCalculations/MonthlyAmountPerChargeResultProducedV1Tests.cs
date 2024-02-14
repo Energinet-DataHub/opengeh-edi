@@ -81,6 +81,7 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
         var chargeCode = "ESP-C-F-04";
         var chargeOwner = "9876543216543";
         var isTax = false;
+        var calculationVersion = 3;
         var amount = new DecimalValue { Units = 100, Nanos = 0 };
 
         // Arrange
@@ -97,6 +98,7 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
             .WithIsTax(isTax)
             .WithCurrency(MonthlyAmountPerChargeResultProducedV1.Types.Currency.Dkk)
             .WithAmount(amount)
+            .WithCalculationVersion(calculationVersion)
             .Build();
 
         // Act
@@ -110,7 +112,7 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
             .HasReceiverRole(ActorRole.EnergySupplier.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
-            .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.CalculationVersion, 1)
+            .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.CalculationVersion, calculationVersion)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.GridAreaCode, gridAreaCode)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.ChargeCode, chargeCode)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.IsTax, isTax)

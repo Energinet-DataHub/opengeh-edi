@@ -35,7 +35,7 @@ public class WholesaleCalculationResultMessageFactory
 
         var wholesaleCalculationSeries = new WholesaleCalculationSeries(
             TransactionId: ProcessId.New().Id,
-            CalculationVersion: 1, // TODO: We should get this info from wholesale, but is currently not available
+            CalculationVersion: message.CalculationResultVersion,
             GridAreaCode: message.GridAreaCode,
             ChargeCode: message.ChargeCode,
             IsTax: message.IsTax,
