@@ -19,12 +19,12 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public class DocumentFormat : EnumerationType
 {
-    public static readonly DocumentFormat Xml = new(0, nameof(Xml));
-    public static readonly DocumentFormat Json = new(1, nameof(Json));
-    public static readonly DocumentFormat Ebix = new(2, nameof(Ebix));
+    public static readonly DocumentFormat Xml = new(nameof(Xml));
+    public static readonly DocumentFormat Json = new(nameof(Json));
+    public static readonly DocumentFormat Ebix = new(nameof(Ebix));
 
-    private DocumentFormat(int id, string name)
-        : base(id, name)
+    private DocumentFormat(string name)
+        : base(name)
     {
     }
 

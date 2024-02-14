@@ -21,15 +21,12 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models
 {
     public abstract class EnumerationType : IComparable
     {
-        protected EnumerationType(int id, string name)
+        protected EnumerationType(string name)
         {
-            Id = id;
             Name = name;
         }
 
         public string Name { get;  }
-
-        public int Id { get; }
 
         public static bool operator ==(EnumerationType? left, EnumerationType? right)
         {
@@ -67,27 +64,11 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models
         }
 
         public static IEnumerable<T> GetAll<T>()
-                   where T : EnumerationType
+            where T : EnumerationType
         {
             var fields = typeof(T).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
             return fields.Select(f => f.GetValue(null)).Cast<T>();
-        }
-
-        public static int AbsoluteDifference(EnumerationType firstValue, EnumerationType secondValue)
-        {
-            ArgumentNullException.ThrowIfNull(firstValue);
-            ArgumentNullException.ThrowIfNull(secondValue);
-
-            var absoluteDifference = Math.Abs(firstValue.Id - secondValue.Id);
-            return absoluteDifference;
-        }
-
-        public static T FromValue<T>(int value)
-            where T : EnumerationType
-        {
-            var matchingItem = Parse<T, int>(value, "value", item => item.Id == value);
-            return matchingItem;
         }
 
         public static T FromName<T>(string name)
@@ -112,18 +93,21 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models
             }
 
             var typeMatches = GetType() == obj.GetType();
-            var valueMatches = Id.Equals(otherValue.Id);
+            var valueMatches = Name.Equals(otherValue.Name, StringComparison.OrdinalIgnoreCase);
 
             return typeMatches && valueMatches;
         }
 
-        public override int GetHashCode() => Id.GetHashCode();
+        public override int GetHashCode()
+        {
+            return Name.GetHashCode(StringComparison.OrdinalIgnoreCase);
+        }
 
         public int CompareTo(object? obj)
         {
             ArgumentNullException.ThrowIfNull(obj);
 
-            return Id.CompareTo(((EnumerationType)obj).Id);
+            return string.Compare(Name, ((EnumerationType)obj).Name, StringComparison.OrdinalIgnoreCase);
         }
 
         private static T Parse<T, TValue>(TValue value, string description, Func<T, bool> predicate)
