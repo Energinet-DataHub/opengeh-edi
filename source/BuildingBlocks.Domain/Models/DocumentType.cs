@@ -16,12 +16,12 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public class DocumentType : EnumerationType
 {
-    public static readonly DocumentType NotifyAggregatedMeasureData = new(7, nameof(NotifyAggregatedMeasureData), MessageCategory.Aggregations);
-    public static readonly DocumentType RejectRequestAggregatedMeasureData = new(8, nameof(RejectRequestAggregatedMeasureData), MessageCategory.Aggregations);
-    public static readonly DocumentType NotifyWholesaleServices = new(9, nameof(NotifyWholesaleServices), MessageCategory.Aggregations);
+    public static readonly DocumentType NotifyAggregatedMeasureData = new(nameof(NotifyAggregatedMeasureData), MessageCategory.Aggregations);
+    public static readonly DocumentType RejectRequestAggregatedMeasureData = new(nameof(RejectRequestAggregatedMeasureData), MessageCategory.Aggregations);
+    public static readonly DocumentType NotifyWholesaleServices = new(nameof(NotifyWholesaleServices), MessageCategory.Aggregations);
 
-    protected DocumentType(int id, string name, MessageCategory category)
-        : base(id, name)
+    protected DocumentType(string name, MessageCategory category)
+        : base(name)
     {
         Category = category;
     }

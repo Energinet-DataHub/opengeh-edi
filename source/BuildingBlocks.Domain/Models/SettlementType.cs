@@ -20,13 +20,13 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 public class SettlementType : EnumerationType
 {
     // Customer with more than ~100.000 kwH per year
-    public static readonly SettlementType NonProfiled = new(0, nameof(NonProfiled), "E02");
+    public static readonly SettlementType NonProfiled = new(nameof(NonProfiled), "E02");
 
     // Customer with less than ~100.000 kwH per year
-    public static readonly SettlementType Flex = new(1, nameof(Flex), "D01");
+    public static readonly SettlementType Flex = new(nameof(Flex), "D01");
 
-    private SettlementType(int id, string name, string code)
-        : base(id, name)
+    private SettlementType(string name, string code)
+        : base(name)
     {
         Code = code;
     }

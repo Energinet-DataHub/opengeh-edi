@@ -16,13 +16,13 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public class MessageCategory : EnumerationType
 {
-    public static readonly MessageCategory None = new(0, nameof(None));
-    public static readonly MessageCategory Aggregations = new(1, nameof(Aggregations));
+    public static readonly MessageCategory None = new(nameof(None));
+    public static readonly MessageCategory Aggregations = new(nameof(Aggregations));
 
     // Message category can not be peeked
 
-    private MessageCategory(int id, string name)
-        : base(id, name)
+    private MessageCategory(string name)
+        : base(name)
     {
     }
 }
