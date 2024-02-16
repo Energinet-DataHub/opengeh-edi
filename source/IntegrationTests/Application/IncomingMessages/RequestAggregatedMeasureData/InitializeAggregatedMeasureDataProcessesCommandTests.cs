@@ -29,6 +29,9 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Requests;
+using FluentAssertions;
+using FluentAssertions.Equivalency;
+using FluentAssertions.Execution;
 using Xunit;
 using Xunit.Categories;
 
@@ -54,20 +57,26 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
     }
 
-    [Fact]
-    public async Task Aggregated_measure_data_process_is_created_and_has_correct_data()
+    [Theory]
+    [InlineData("E17")]
+    [InlineData(null)]
+    public async Task Aggregated_measure_data_process_is_created_and_has_correct_data(string? marketEvaluationPointType)
     {
         // Arrange
-        var marketMessage = MessageBuilder().Build();
+        var marketMessage = MessageBuilder()
+            .SetMarketEvaluationPointType(marketEvaluationPointType)
+            .Build();
 
         // Act
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
 
         // Assert
         var process = GetProcess(marketMessage.SenderNumber);
-        Assert.Equal(marketMessage.Series.First().Id, process!.BusinessTransactionId.Id);
+        process.Should().NotBeNull();
+        marketMessage.Series.Should().NotBeEmpty();
+        process!.BusinessTransactionId.Id.Should().Be(marketMessage.Series.First().Id);
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Initialized);
-        AssertProcessValues(process, marketMessage);
+        process.Should().BeEquivalentTo(marketMessage, opt => opt.Using(new ProcessAndRequestComparer()));
     }
 
     [Fact]
@@ -125,54 +134,6 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         _serviceBusClientSenderFactory.Dispose();
     }
 
-    private static void AssertProcessValues(AggregatedMeasureDataProcess process, RequestAggregatedMeasureDataDto dto)
-    {
-        var marketMessageSerie = dto.Series.Single();
-
-        Assert.NotEqual(Guid.Empty, process.ProcessId.Id);
-        Assert.Equal(marketMessageSerie.Id, process.BusinessTransactionId.Id);
-        Assert.Equal(dto.SenderNumber, process.RequestedByActorId.Value);
-        Assert.Equal(dto.SenderRoleCode, process.RequestedByActorRoleCode);
-        Assert.Equal(dto.BusinessReason, process.BusinessReason.Code);
-        Assert.Equal(marketMessageSerie.MarketEvaluationPointType, process.MeteringPointType);
-        Assert.Equal(marketMessageSerie.MarketEvaluationSettlementMethod, process.SettlementMethod);
-        Assert.Equal(marketMessageSerie.StartDateAndOrTimeDateTime, process.StartOfPeriod);
-        Assert.Equal(marketMessageSerie.EndDateAndOrTimeDateTime, process.EndOfPeriod);
-        Assert.Equal(marketMessageSerie.MeteringGridAreaDomainId, process.MeteringGridAreaDomainId);
-        Assert.Equal(marketMessageSerie.EnergySupplierMarketParticipantId, process.EnergySupplierId);
-        Assert.Equal(marketMessageSerie.BalanceResponsiblePartyMarketParticipantId, process.BalanceResponsibleId);
-        Assert.Equal(marketMessageSerie.SettlementSeriesVersion, process.SettlementVersion?.Code);
-
-        // Assert makes sure we have tests for alle expected properties - this fails if we add another property to our process without testing it & adding it to the array below
-        var assertedProperties = new[]
-        {
-            nameof(process.ProcessId),
-            nameof(process.BusinessTransactionId),
-            nameof(process.RequestedByActorId),
-            nameof(process.RequestedByActorRoleCode),
-            nameof(process.BusinessReason),
-            nameof(process.MeteringPointType),
-            nameof(process.SettlementMethod),
-            nameof(process.StartOfPeriod),
-            nameof(process.EndOfPeriod),
-            nameof(process.MeteringGridAreaDomainId),
-            nameof(process.EnergySupplierId),
-            nameof(process.BalanceResponsibleId),
-            nameof(process.SettlementVersion),
-        };
-
-        var ignoredProperties = new[]
-        {
-            nameof(AggregatedMeasureDataProcess.DomainEvents),
-        };
-
-        foreach (var propertyInfo in process.GetType().GetProperties())
-        {
-            if (!ignoredProperties.Contains(propertyInfo.Name))
-                Assert.Contains(propertyInfo.Name, assertedProperties);
-        }
-    }
-
     private static RequestAggregatedMeasureDataMarketDocumentBuilder MessageBuilder()
     {
         return new RequestAggregatedMeasureDataMarketDocumentBuilder();
@@ -201,10 +162,104 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
             .FirstOrDefault(x => x.RequestedByActorId.Value == senderNumber);
     }
 
-    private IEnumerable<AggregatedMeasureDataProcess> GetProcesses(string senderNumber)
+    private sealed class ProcessAndRequestComparer : IEquivalencyStep
     {
-        return _processContext.AggregatedMeasureDataProcesses
-            .ToList()
-            .Where(x => x.RequestedByActorId.Value == senderNumber);
+        private readonly
+            IReadOnlyDictionary<string, Action<AggregatedMeasureDataProcess, RequestAggregatedMeasureDataDto, Serie>>
+            _assertionMap =
+                new Dictionary<string, Action<AggregatedMeasureDataProcess, RequestAggregatedMeasureDataDto, Serie>>
+                {
+                    {
+                        nameof(AggregatedMeasureDataProcess.ProcessId),
+                        (p, r, s) => p.ProcessId.Id.Should().NotBeEmpty()
+                    },
+                    {
+                        nameof(AggregatedMeasureDataProcess.BusinessTransactionId),
+                        (p, r, s) => p.BusinessTransactionId.Id.Should().Be(s.Id)
+                    },
+                    {
+                        nameof(AggregatedMeasureDataProcess.RequestedByActorId),
+                        (p, r, s) => p.RequestedByActorId.Value.Should().Be(r.SenderNumber)
+                    },
+                    {
+                        nameof(AggregatedMeasureDataProcess.RequestedByActorRoleCode),
+                        (p, r, s) => p.RequestedByActorRoleCode.Should().Be(r.SenderRoleCode)
+                    },
+                    {
+                        nameof(AggregatedMeasureDataProcess.BusinessReason),
+                        (p, r, s) => p.BusinessReason.Code.Should().Be(r.BusinessReason)
+                    },
+                    {
+                        nameof(AggregatedMeasureDataProcess.MeteringPointType),
+                        (p, r, s) => p.MeteringPointType.Should().Be(s.MarketEvaluationPointType)
+                    },
+                    {
+                        nameof(AggregatedMeasureDataProcess.SettlementMethod),
+                        (p, r, s) => p.SettlementMethod.Should().Be(s.MarketEvaluationSettlementMethod)
+                    },
+                    {
+                        nameof(AggregatedMeasureDataProcess.StartOfPeriod),
+                        (p, r, s) => p.StartOfPeriod.Should().Be(s.StartDateAndOrTimeDateTime)
+                    },
+                    {
+                        nameof(AggregatedMeasureDataProcess.EndOfPeriod),
+                        (p, r, s) => p.EndOfPeriod.Should().Be(s.EndDateAndOrTimeDateTime)
+                    },
+                    {
+                        nameof(AggregatedMeasureDataProcess.MeteringGridAreaDomainId),
+                        (p, r, s) => p.MeteringGridAreaDomainId.Should().Be(s.MeteringGridAreaDomainId)
+                    },
+                    {
+                        nameof(AggregatedMeasureDataProcess.EnergySupplierId),
+                        (p, r, s) => p.EnergySupplierId.Should().Be(s.EnergySupplierMarketParticipantId)
+                    },
+                    {
+                        nameof(AggregatedMeasureDataProcess.BalanceResponsibleId),
+                        (p, r, s) => p.BalanceResponsibleId.Should().Be(s.BalanceResponsiblePartyMarketParticipantId)
+                    },
+                    {
+                        nameof(AggregatedMeasureDataProcess.SettlementVersion), (p, r, s) =>
+                        {
+                            if (p.SettlementVersion is not null)
+                            {
+                                p.SettlementVersion.Code.Should().Be(s.SettlementSeriesVersion);
+                            }
+                            else
+                            {
+                                p.SettlementVersion.Should().BeNull();
+                                p.SettlementVersion.Should().Be(s.SettlementSeriesVersion);
+                            }
+                        }
+                    },
+                };
+
+        public EquivalencyResult Handle(
+            Comparands comparands,
+            IEquivalencyValidationContext context,
+            IEquivalencyValidator nestedValidator)
+        {
+            if (comparands is not
+                { Subject: AggregatedMeasureDataProcess p, Expectation: RequestAggregatedMeasureDataDto r })
+            {
+                return EquivalencyResult.ContinueWithNext;
+            }
+
+            var ignoredProperties = new[] { nameof(AggregatedMeasureDataProcess.DomainEvents) };
+
+            r.Series.Should().ContainSingle();
+
+            using (new AssertionScope())
+            {
+                foreach (var propertyInfo in p.GetType()
+                             .GetProperties()
+                             .Where(propertyInfo => !ignoredProperties.Contains(propertyInfo.Name)))
+                {
+                    _assertionMap.Keys.Should().Contain(propertyInfo.Name);
+                    _assertionMap[propertyInfo.Name](p, r, r.Series.First());
+                }
+            }
+
+            return EquivalencyResult.AssertionCompleted;
+        }
     }
 }
