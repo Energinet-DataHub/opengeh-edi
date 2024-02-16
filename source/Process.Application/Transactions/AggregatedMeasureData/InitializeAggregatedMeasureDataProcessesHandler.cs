@@ -64,6 +64,7 @@ public class InitializeAggregatedMeasureDataProcessesHandler : IRequestHandler<I
                     actorSenderNumber,
                     dto.SenderRoleCode,
                     businessReason,
+                    MessageId.Create(dto.MessageId),
                     serie.MarketEvaluationPointType,
                     serie.MarketEvaluationSettlementMethod,
                     serie.StartDateAndOrTimeDateTime,

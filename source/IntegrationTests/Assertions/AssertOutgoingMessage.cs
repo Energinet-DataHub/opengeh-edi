@@ -111,6 +111,12 @@ public class AssertOutgoingMessage
         return this;
     }
 
+    public AssertOutgoingMessage HasRelatedToId(MessageId? relatedToMessageWithMessageId)
+    {
+        Assert.Equal(relatedToMessageWithMessageId?.Value, _message.RelatedToMessageWithMessageId);
+        return this;
+    }
+
     public AssertOutgoingMessage HasMessageRecordValue<TMessageRecord>(
         Func<TMessageRecord, object?> propertySelector,
         object? expectedValue)
