@@ -15,12 +15,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure;
-using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
@@ -34,9 +31,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAc
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
-using FluentAssertions.Execution;
 using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit;
 
