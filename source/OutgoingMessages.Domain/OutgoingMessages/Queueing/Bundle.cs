@@ -28,13 +28,14 @@ public sealed class Bundle
     {
     }
 
-    internal Bundle(BundleId id, BusinessReason businessReason, DocumentType documentTypeInBundle, int maxNumberOfMessagesInABundle, Instant created)
+    internal Bundle(BundleId id, BusinessReason businessReason, DocumentType documentTypeInBundle, int maxNumberOfMessagesInABundle, Instant created, MessageId? documentsHasAReferenceToMessageId)
     {
         _maxNumberOfMessagesInABundle = maxNumberOfMessagesInABundle;
         Id = id;
         BusinessReason = businessReason;
         DocumentTypeInBundle = documentTypeInBundle;
         Created = created;
+        DocumentsHasAReferenceToMessageId = documentsHasAReferenceToMessageId;
     }
 
     internal DocumentType DocumentTypeInBundle { get; }
@@ -48,6 +49,9 @@ public sealed class Bundle
     public bool IsDequeued { get; private set; }
 
     public Instant Created { get; private set; }
+
+    // If this attribute is set, then the messages in the bundle are responses to a request from an actor
+    public MessageId? DocumentsHasAReferenceToMessageId { get; private set; }
 
     internal void Add(OutgoingMessage outgoingMessage)
     {

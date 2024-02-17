@@ -16,6 +16,7 @@ using System;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
+// TODO: Is this just a messageId now?
 public record OutgoingMessageId
 {
     private OutgoingMessageId(Guid value)

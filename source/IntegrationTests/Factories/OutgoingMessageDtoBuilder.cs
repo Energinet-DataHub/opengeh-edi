@@ -31,6 +31,7 @@ public class OutgoingMessageDtoBuilder
     private static readonly IReadOnlyCollection<Point> _points = new List<Point>();
     private static ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
     private static ActorRole _receiverRole = ActorRole.MeteredDataAdministrator;
+    private static MessageId? _messageId;
 
 #pragma warning disable CA1822
     public OutgoingMessageDto Build()
@@ -50,7 +51,8 @@ public class OutgoingMessageDtoBuilder
             new Period(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant()),
             _points,
             _businessReason.Name,
-            1);
+            1,
+            relatedToMessageWithMessageId: _messageId);
     }
 
     public OutgoingMessageDtoBuilder WithReceiverNumber(string receiverNumber)
@@ -62,6 +64,12 @@ public class OutgoingMessageDtoBuilder
     public OutgoingMessageDtoBuilder WithReceiverRole(ActorRole actorRole)
     {
         _receiverRole = actorRole;
+        return this;
+    }
+
+    public OutgoingMessageDtoBuilder WithRelationTo(MessageId? messageId = null)
+    {
+        _messageId = messageId;
         return this;
     }
 }

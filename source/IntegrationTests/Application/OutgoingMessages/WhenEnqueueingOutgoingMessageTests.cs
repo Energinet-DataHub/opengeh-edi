@@ -61,6 +61,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         // Arrange
         var message = _outgoingMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            .WithRelationTo(null)
             .Build();
 
         var createdAtTimestamp = Instant.FromUtc(2024, 1, 1, 0, 0);
@@ -219,6 +220,83 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             .And.ErrorCode.Should().Be("BlobAlreadyExists");
     }
 
+    [Fact]
+    public async Task Outgoing_messages_with_different_reference_ids_are_assigned_to_different_bundles()
+    {
+        // Arrange
+        var actorMessageQueueId = Guid.NewGuid();
+        var existingBundleId = Guid.NewGuid();
+        var receiverId = ActorNumber.Create("1234567891912");
+        var receiverRole = ActorRole.MeteredDataAdministrator;
+        var maxMessageCount = 2;
+        var messageReferenceId = MessageId.New();
+
+        var message1 = _outgoingMessageDtoBuilder
+            .WithReceiverNumber(receiverId.Value)
+            .WithReceiverRole(receiverRole)
+            .WithRelationTo(null)
+            .Build();
+        var message2 = _outgoingMessageDtoBuilder
+            .WithReceiverNumber(receiverId.Value)
+            .WithReceiverRole(receiverRole)
+            .WithRelationTo(messageReferenceId)
+            .Build();
+
+        // We have to manually create the queue and bundle to ensure that the bundle has a maxMessageCount
+        // such that we do not close the bundle when we enqueue the first message
+        await CreateActorMessageQueueInDatabase(actorMessageQueueId, receiverId, receiverRole);
+        await CreateBundleInDatabase(existingBundleId, actorMessageQueueId, message1.DocumentType, message1.BusinessReason, maxMessageCount);
+
+        // Act
+        var createdIdMessage1 = await EnqueueAndCommitAsync(message1);
+        var createdIdMessage2 = await EnqueueAndCommitAsync(message2);
+        var bundleIdForMessage1 = await GetOutgoingMessageBundleIdFromDatabase(createdIdMessage1);
+        var bundleIdForMessage2 = await GetOutgoingMessageBundleIdFromDatabase(createdIdMessage2);
+
+        // Assert
+        Assert.Equal(bundleIdForMessage1, existingBundleId);
+        Assert.NotEqual(bundleIdForMessage1, bundleIdForMessage2);
+    }
+
+    [Fact]
+    public async Task Outgoing_messages_with_same_reference_ids_are_assigned_to_same_bundles()
+    {
+        // Arrange
+        var actorMessageQueueId = Guid.NewGuid();
+        var existingBundleId = Guid.NewGuid();
+        var receiverId = ActorNumber.Create("1234567891912");
+        var receiverRole = ActorRole.MeteredDataAdministrator;
+        var maxMessageCount = 2;
+        var messageReferenceId = MessageId.New();
+
+        var message1 = _outgoingMessageDtoBuilder
+            .WithReceiverNumber(receiverId.Value)
+            .WithReceiverRole(receiverRole)
+            .WithRelationTo(messageReferenceId)
+            .Build();
+
+        // We have to manually create the queue and bundle to ensure that the bundle has a maxMessageCount
+        // such that we do not close the bundle when we enqueue the first message
+        await CreateActorMessageQueueInDatabase(actorMessageQueueId, receiverId, receiverRole);
+        await CreateBundleInDatabase(
+            existingBundleId,
+            actorMessageQueueId,
+            message1.DocumentType,
+            message1.BusinessReason,
+            maxMessageCount,
+            messageReferenceId);
+
+        // Act
+        var createdIdMessage1 = await EnqueueAndCommitAsync(message1);
+        var createdIdMessage2 = await EnqueueAndCommitAsync(message1);
+        var bundleIdForMessage1 = await GetOutgoingMessageBundleIdFromDatabase(createdIdMessage1);
+        var bundleIdForMessage2 = await GetOutgoingMessageBundleIdFromDatabase(createdIdMessage2);
+
+        // Assert
+        Assert.Equal(bundleIdForMessage1, existingBundleId);
+        Assert.Equal(bundleIdForMessage1, bundleIdForMessage2);
+    }
+
     protected override void Dispose(bool disposing)
     {
         _context.Dispose();
@@ -266,13 +344,13 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             });
     }
 
-    private async Task CreateBundleInDatabase(Guid id, Guid actorMessageQueueId, DocumentType documentType, string businessReason)
+    private async Task CreateBundleInDatabase(Guid id, Guid actorMessageQueueId, DocumentType documentType, string businessReason, int? maxMessageCount = null, MessageId? documentsHasAReferenceToMessageId = null)
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
 
         await connection.ExecuteAsync(
-            @"INSERT INTO [dbo].[Bundles] (Id, ActorMessageQueueId, DocumentTypeInBundle, IsDequeued, IsClosed, MessageCount, MaxMessageCount, BusinessReason, Created)
-                    VALUES (@Id, @ActorMessageQueueId, @DocumentTypeInBundle, @IsDequeued, @IsClosed, @MessageCount, @MaxMessageCount, @BusinessReason, @Created)",
+            @"INSERT INTO [dbo].[Bundles] (Id, ActorMessageQueueId, DocumentTypeInBundle, IsDequeued, IsClosed, MessageCount, MaxMessageCount, BusinessReason, Created, DocumentsHasAReferenceToMessageId)
+                    VALUES (@Id, @ActorMessageQueueId, @DocumentTypeInBundle, @IsDequeued, @IsClosed, @MessageCount, @MaxMessageCount, @BusinessReason, @Created, @DocumentsHasAReferenceToMessageId)",
             new
             {
                 Id = id,
@@ -281,9 +359,10 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
                 IsDequeued = false,
                 IsClosed = false,
                 MessageCount = 0,
-                MaxMessageCount = 1,
+                MaxMessageCount = maxMessageCount ?? 1,
                 BusinessReason = businessReason,
                 Created = new DateTime(2022, 2, 2),
+                DocumentsHasAReferenceToMessageId = documentsHasAReferenceToMessageId?.Value,
             });
     }
 }
