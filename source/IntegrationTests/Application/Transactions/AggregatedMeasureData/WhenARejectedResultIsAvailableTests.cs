@@ -70,7 +70,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
             .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(process.RequestedByActorRoleCode)
-            .HasRelatedToId(process.InitiatedByMessageId)
+            .HasRelationTo(process.InitiatedByMessageId)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons.First().ErrorCode, rejectReason.ErrorCode)

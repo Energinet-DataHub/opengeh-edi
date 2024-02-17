@@ -18,7 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Exceptions;
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 /// <summary>
-/// Represent a message id which used in communication between EDI and actors.
+/// Represents a message id which used in communication between EDI and actors.
 /// </summary>
 public class MessageId
 {

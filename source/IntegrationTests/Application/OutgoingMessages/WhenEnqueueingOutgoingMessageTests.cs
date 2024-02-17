@@ -269,7 +269,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var maxMessageCount = 2;
         var messageReferenceId = MessageId.New();
 
-        var message1 = _outgoingMessageDtoBuilder
+        var message = _outgoingMessageDtoBuilder
             .WithReceiverNumber(receiverId.Value)
             .WithReceiverRole(receiverRole)
             .WithRelationTo(messageReferenceId)
@@ -281,14 +281,14 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         await CreateBundleInDatabase(
             existingBundleId,
             actorMessageQueueId,
-            message1.DocumentType,
-            message1.BusinessReason,
+            message.DocumentType,
+            message.BusinessReason,
             maxMessageCount,
             messageReferenceId);
 
         // Act
-        var createdIdMessage1 = await EnqueueAndCommitAsync(message1);
-        var createdIdMessage2 = await EnqueueAndCommitAsync(message1);
+        var createdIdMessage1 = await EnqueueAndCommitAsync(message);
+        var createdIdMessage2 = await EnqueueAndCommitAsync(message);
         var bundleIdForMessage1 = await GetOutgoingMessageBundleIdFromDatabase(createdIdMessage1);
         var bundleIdForMessage2 = await GetOutgoingMessageBundleIdFromDatabase(createdIdMessage2);
 
