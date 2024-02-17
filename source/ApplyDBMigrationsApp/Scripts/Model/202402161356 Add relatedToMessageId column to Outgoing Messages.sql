@@ -1,3 +1,3 @@
 ALTER TABLE [dbo].[OutgoingMessages] 
-    Add [relatedToMessageId] [nvarchar](36) NULL;
+    Add [RelatedToMessageId] [nvarchar](36) NULL;
 

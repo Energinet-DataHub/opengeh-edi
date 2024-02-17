@@ -100,6 +100,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             () => Assert.Equal("OutgoingMessage", result.Discriminator),
             () => Assert.False(result.IsPublished),
             () => Assert.NotNull(result.AssignedBundleId),
+            () => Assert.Null(result.RelatedToMessageId),
         };
 
         Assert.Multiple(propertyAssertions);
