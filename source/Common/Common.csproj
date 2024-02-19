@@ -8,6 +8,7 @@
       <PackageReference Include="MediatR.Contracts" Version="2.0.1" />
       <PackageReference Include="NodaTime" Version="3.1.9" />
       <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.1.2" />
+      <PackageReference Include="System.Text.Json" Version="6.0.9" />
     </ItemGroup>
     <ItemGroup>
       <Reference Include="Microsoft.Extensions.Configuration.Abstractions">

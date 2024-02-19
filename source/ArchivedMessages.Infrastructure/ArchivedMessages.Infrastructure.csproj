@@ -9,6 +9,7 @@
     <PackageReference Include="Dapper-NodaTime" Version="0.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.13" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.13" />
+    <PackageReference Include="System.Text.Json" Version="6.0.9" />
   </ItemGroup>
 
   <ItemGroup>

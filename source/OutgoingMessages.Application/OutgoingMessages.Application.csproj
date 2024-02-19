@@ -9,6 +9,7 @@
     <PackageReference Include="MediatR" Version="12.1.1"/>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
     <PackageReference Include="SimplerSoftware.EntityFrameworkCore.SqlServer.NodaTime" Version="7.1.0"/>
+    <PackageReference Include="System.Text.Json" Version="6.0.9" />
   </ItemGroup>
 
   <ItemGroup>

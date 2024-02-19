@@ -9,4 +9,7 @@
     <ProjectReference Include="..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj"/>
     <ProjectReference Include="..\MasterData.Domain\MasterData.Domain.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="6.0.9" />
+  </ItemGroup>
 </Project>

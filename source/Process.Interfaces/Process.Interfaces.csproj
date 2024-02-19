@@ -5,6 +5,10 @@
     <RootNamespace>Energinet.DataHub.EDI.Process.Interfaces</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="6.0.9" />
+  </ItemGroup>
+
   <ItemDefinitionGroup>
     <ProjectReference>
       <PrivateAssets>all</PrivateAssets>
