@@ -17,6 +17,7 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.Edi.Requests;
 using Google.Protobuf;
+using Period = Energinet.DataHub.Edi.Requests.Period;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
 
@@ -38,9 +39,9 @@ public static class AggregatedMeasureDataRequestFactory
         return message;
     }
 
-    private static Edi.Requests.Period MapPeriod(AggregatedMeasureDataProcess process)
+    private static Period MapPeriod(AggregatedMeasureDataProcess process)
     {
-        var period = new Edi.Requests.Period
+        var period = new Period
         {
             Start = process.StartOfPeriod,
         };
@@ -56,11 +57,15 @@ public static class AggregatedMeasureDataRequestFactory
         var request = new AggregatedTimeSeriesRequest()
         {
             Period = MapPeriod(process),
-            MeteringPointType = process.MeteringPointType,
             RequestedByActorId = process.RequestedByActorId.Value,
             RequestedByActorRole = process.RequestedByActorRoleCode,
             BusinessReason = process.BusinessReason.Code,
         };
+
+        if (process.MeteringPointType != null)
+        {
+            request.MeteringPointType = process.MeteringPointType;
+        }
 
         if (process.SettlementMethod != null)
             request.SettlementMethod = process.SettlementMethod;
