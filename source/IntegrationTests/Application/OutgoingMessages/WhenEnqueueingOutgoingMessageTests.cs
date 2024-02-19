@@ -61,7 +61,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         // Arrange
         var message = _outgoingMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
-            .WithRelationTo(null)
+            .WithRelationTo(MessageId.New())
             .Build();
 
         var createdAtTimestamp = Instant.FromUtc(2024, 1, 1, 0, 0);
@@ -94,9 +94,9 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             () => Assert.Equal(message.BusinessReason, result.BusinessReason),
             () => Assert.Equal(expectedFileStorageReference, result.FileStorageReference),
             () => Assert.Equal("OutgoingMessage", result.Discriminator),
+            () => Assert.Equal(message.RelatedToMessageId!.Value, result.RelatedToMessageId),
             () => Assert.False(result.IsPublished),
             () => Assert.NotNull(result.AssignedBundleId),
-            () => Assert.Null(result.RelatedToMessageId),
         };
 
         Assert.Multiple(propertyAssertions);
