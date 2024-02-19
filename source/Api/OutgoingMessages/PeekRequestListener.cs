@@ -58,12 +58,19 @@ public class PeekRequestListener
         ArgumentNullException.ThrowIfNull(request);
 
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);
-        var contentType = request.Headers.GetContentType();
+        var contentType = request.Headers.TryGetContentType();
+        if (contentType is null)
+        {
+            _logger.LogInformation(
+                "Could not parse desired format from Content-Type header, support values are: application/xml, application/json, application/ebix");
+            return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
+        }
+
         var desiredDocumentFormat = DocumentFormatParser.ParseFromContentTypeHeaderValue(contentType);
         if (desiredDocumentFormat is null)
         {
             _logger.LogInformation(
-                "Could not parse desired CIM format from Content-Type header value: {ContentType}",
+                "Could not parse desired document format from Content-Type header value: {ContentType}",
                 contentType);
             return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
         }
