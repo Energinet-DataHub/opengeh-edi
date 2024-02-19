@@ -52,7 +52,7 @@ public class OutgoingMessageDtoBuilder
             _points,
             _businessReason.Name,
             1,
-            relatedMessageId: _messageId);
+            relatedToMessageId: _messageId);
     }
 
     public OutgoingMessageDtoBuilder WithReceiverNumber(string receiverNumber)
