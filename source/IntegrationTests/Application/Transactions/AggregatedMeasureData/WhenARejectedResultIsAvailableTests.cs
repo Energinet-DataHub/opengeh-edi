@@ -70,6 +70,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
             .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(process.RequestedByActorRoleCode)
+            .HasRelationTo(process.InitiatedByMessageId)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons.First().ErrorCode, rejectReason.ErrorCode)
@@ -102,6 +103,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
           SampleData.ReceiverNumber,
           SampleData.BalanceResponsibleParty.Code,
           BusinessReason.BalanceFixing,
+          MessageId.New(),
           null,
           null,
           SampleData.StartOfPeriod,

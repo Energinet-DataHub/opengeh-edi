@@ -51,7 +51,7 @@ public class AssertOutgoingMessage
         using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var message = await connection.QuerySingleAsync(
             $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.ProcessId, m.BusinessReason," +
-            $"m.ReceiverRole, m.SenderId, m.SenderRole, m.FileStorageReference " +
+            $"m.ReceiverRole, m.SenderId, m.SenderRole, m.FileStorageReference, m.RelatedToMessageId " +
             $" FROM [dbo].[OutgoingMessages] m" +
             $" WHERE m.DocumentType = '{messageType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Code}'");
 
@@ -108,6 +108,12 @@ public class AssertOutgoingMessage
         ArgumentNullException.ThrowIfNull(businessReason);
 
         Assert.Equal(businessReason.Name, _message.BusinessReason);
+        return this;
+    }
+
+    public AssertOutgoingMessage HasRelationTo(MessageId? relatedToMessageId)
+    {
+        Assert.Equal(relatedToMessageId?.Value, _message.RelatedToMessageId);
         return this;
     }
 

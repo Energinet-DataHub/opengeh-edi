@@ -231,6 +231,10 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                             }
                         }
                     },
+                    {
+                        nameof(AggregatedMeasureDataProcess.InitiatedByMessageId),
+                        (p, r, s) => p.InitiatedByMessageId.Value.Should().Be(r.MessageId)
+                    },
                 };
 
         public EquivalencyResult Handle(

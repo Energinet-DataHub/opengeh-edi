@@ -415,6 +415,7 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
             SampleData.ReceiverNumber,
             SampleData.BalanceResponsibleParty.Code,
             BusinessReason.BalanceFixing,
+            MessageId.New(),
             MeteringPointType.Production.Code,
             null,
             SampleData.StartOfPeriod,

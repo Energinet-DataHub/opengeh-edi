@@ -13,12 +13,10 @@
 // limitations under the License.
 
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Extensions.Logging;
 
@@ -56,7 +54,8 @@ public class MessageEnqueuer
             messageToEnqueue.SenderId,
             messageToEnqueue.SenderRole,
             messageToEnqueue.SerializedContent,
-            _systemDateTimeProvider.Now());
+            _systemDateTimeProvider.Now(),
+            messageToEnqueue.RelatedToMessageId);
 
         var addToRepositoryTask = _outgoingMessageRepository.AddAsync(outgoingMessage);
         var addToActorMessageQueueTask = AddToActorMessageQueueAsync(outgoingMessage);

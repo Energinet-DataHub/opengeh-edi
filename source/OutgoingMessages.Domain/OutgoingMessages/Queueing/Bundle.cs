@@ -28,13 +28,14 @@ public sealed class Bundle
     {
     }
 
-    internal Bundle(BundleId id, BusinessReason businessReason, DocumentType documentTypeInBundle, int maxNumberOfMessagesInABundle, Instant created)
+    internal Bundle(BundleId id, BusinessReason businessReason, DocumentType documentTypeInBundle, int maxNumberOfMessagesInABundle, Instant created, MessageId? relatedToMessageId)
     {
         _maxNumberOfMessagesInABundle = maxNumberOfMessagesInABundle;
         Id = id;
         BusinessReason = businessReason;
         DocumentTypeInBundle = documentTypeInBundle;
         Created = created;
+        RelatedToMessageId = relatedToMessageId;
     }
 
     internal DocumentType DocumentTypeInBundle { get; }
@@ -48,6 +49,12 @@ public sealed class Bundle
     public bool IsDequeued { get; private set; }
 
     public Instant Created { get; private set; }
+
+    /// <summary>
+    /// If this attribute has a value, then it is used to store the message id of a request from an actor.
+    /// Giving us the possibility to track the request and the response.
+    /// </summary>
+    public MessageId? RelatedToMessageId { get; private set; }
 
     internal void Add(OutgoingMessage outgoingMessage)
     {
