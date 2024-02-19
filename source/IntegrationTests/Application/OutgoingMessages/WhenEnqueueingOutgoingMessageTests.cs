@@ -344,7 +344,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             });
     }
 
-    private async Task CreateBundleInDatabase(Guid id, Guid actorMessageQueueId, DocumentType documentType, string businessReason, int? maxMessageCount = null, MessageId? documentsHasAReferenceToMessageId = null)
+    private async Task CreateBundleInDatabase(Guid id, Guid actorMessageQueueId, DocumentType documentType, string businessReason, int? maxMessageCount = null, MessageId? relatedToMessageId = null)
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
 
@@ -362,7 +362,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
                 MaxMessageCount = maxMessageCount ?? 1,
                 BusinessReason = businessReason,
                 Created = new DateTime(2022, 2, 2),
-                DocumentsHasAReferenceToMessageId = documentsHasAReferenceToMessageId?.Value,
+                RelatedToMessageId = relatedToMessageId?.Value,
             });
     }
 }

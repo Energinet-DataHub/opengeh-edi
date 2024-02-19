@@ -111,9 +111,9 @@ public class AssertOutgoingMessage
         return this;
     }
 
-    public AssertOutgoingMessage HasRelationTo(MessageId? relatedToMessageWithMessageId)
+    public AssertOutgoingMessage HasRelationTo(MessageId? relatedToMessageId)
     {
-        Assert.Equal(relatedToMessageWithMessageId?.Value, _message.RelatedToMessageId);
+        Assert.Equal(relatedToMessageId?.Value, _message.RelatedToMessageId);
         return this;
     }
 
