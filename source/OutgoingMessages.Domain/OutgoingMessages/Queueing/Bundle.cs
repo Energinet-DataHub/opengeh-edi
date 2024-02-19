@@ -50,7 +50,10 @@ public sealed class Bundle
 
     public Instant Created { get; private set; }
 
-    // If this attribute is set, then the messages in the bundle are responses to a request from an actor
+    /// <summary>
+    /// If this attribute has a value, then it is used to store the message id of a request from an actor.
+    /// Giving us the possibility to track the request and the response.
+    /// </summary>
     public MessageId? DocumentsHasAReferenceToMessageId { get; private set; }
 
     internal void Add(OutgoingMessage outgoingMessage)

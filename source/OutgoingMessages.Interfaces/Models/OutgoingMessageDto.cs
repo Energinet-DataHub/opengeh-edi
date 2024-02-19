@@ -60,5 +60,9 @@ public class OutgoingMessageDto
 
     public string SerializedContent { get; }
 
+    /// <summary>
+    /// If this attribute has a value, then it is used to store the message id of a request from an actor.
+    /// Giving us the possibility to track the request and the response.
+    /// </summary>
     public MessageId? RelatedToMessageId { get; }
 }
