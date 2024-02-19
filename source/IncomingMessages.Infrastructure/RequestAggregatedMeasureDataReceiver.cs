@@ -49,24 +49,32 @@ public class RequestAggregatedMeasureDataReceiver : IRequestAggregatedMeasureDat
         await AddMessageIdAndTransactionIdAsync(requestAggregatedMeasureDataDto, cancellationToken)
             .ConfigureAwait(false);
 
-        using var transaction = await _incomingMessagesContext.Database.BeginTransactionAsync(cancellationToken)
-            .ConfigureAwait(false);
-
-        var result = await SaveMessageIdAndTransactionIdAsync(
-            requestAggregatedMeasureDataDto,
-            cancellationToken).ConfigureAwait(false);
-
-        if (result.Success)
+        // Use of an EF Core resiliency strategy
+        // within an explicit BeginTransaction():
+        // https://learn.microsoft.com/ef/core/miscellaneous/connection-resiliency
+        var strategy = _incomingMessagesContext.Database.CreateExecutionStrategy();
+        return await strategy.ExecuteAsync(async () =>
         {
-            await _incomingRequestAggregatedMeasuredDataSender.SendAsync(
+            using var transaction =
+                await _incomingMessagesContext.Database.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
+
+            var result = await SaveMessageIdAndTransactionIdAsync(
                     requestAggregatedMeasureDataDto,
                     cancellationToken)
                 .ConfigureAwait(false);
 
-            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-        }
+            if (result.Success)
+            {
+                await _incomingRequestAggregatedMeasuredDataSender.SendAsync(
+                        requestAggregatedMeasureDataDto,
+                        cancellationToken)
+                    .ConfigureAwait(false);
 
-        return result;
+                await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+            }
+
+            return result;
+        }).ConfigureAwait(false);
     }
 
     private async Task<Result> SaveMessageIdAndTransactionIdAsync(
