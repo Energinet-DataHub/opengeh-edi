@@ -23,18 +23,13 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.Outgoin
 
 public class AggregationResultMessage : OutgoingMessageDto
 {
-    // private AggregationResultMessage(ActorNumber receiverId, Guid processId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
-    //     : base(DocumentType.NotifyAggregatedMeasureData, receiverId, processId, businessReason, receiverRole, senderId, senderRole, messageRecord)
-    // {
-    //     Series = new Serializer().Deserialize<TimeSeries>(messageRecord)!;
-    // }
-
     private AggregationResultMessage(
         ActorNumber receiverId,
         Guid processId,
         string businessReason,
         ActorRole receiverRole,
-        TimeSeries series)
+        TimeSeries series,
+        MessageId? relatedToMessageId = null)
         : base(
             DocumentType.NotifyAggregatedMeasureData,
             receiverId,
@@ -43,7 +38,8 @@ public class AggregationResultMessage : OutgoingMessageDto
             receiverRole,
             DataHubDetails.DataHubActorNumber,
             ActorRole.MeteredDataAdministrator,
-            new Serializer().Serialize(series))
+            new Serializer().Serialize(series),
+            relatedToMessageId)
     {
         Series = series;
     }
@@ -66,7 +62,8 @@ public class AggregationResultMessage : OutgoingMessageDto
         string businessReasonName,
         long calculationResultVersion,
         string? originalTransactionIdReference = null,
-        string? settlementVersion = null)
+        string? settlementVersion = null,
+        MessageId? relatedToMessageId = null)
     {
         var series = new TimeSeries(
             processId,
@@ -87,7 +84,8 @@ public class AggregationResultMessage : OutgoingMessageDto
             processId,
             businessReasonName,
             receiverRole,
-            series);
+            series,
+            relatedToMessageId);
     }
 }
 

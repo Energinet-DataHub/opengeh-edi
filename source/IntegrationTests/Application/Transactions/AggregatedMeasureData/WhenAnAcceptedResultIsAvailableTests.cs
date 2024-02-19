@@ -222,6 +222,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
           SampleData.ReceiverNumber,
           receiverRole.Code,
           BusinessReason.BalanceFixing,
+          MessageId.New(),
           MeteringPointType.Production.Code,
           null,
           SampleData.StartOfPeriod,

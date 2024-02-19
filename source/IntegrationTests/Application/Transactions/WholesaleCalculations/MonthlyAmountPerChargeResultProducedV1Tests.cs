@@ -24,7 +24,6 @@ using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.Process.Application.Transactions;
-using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using NodaTime;
@@ -113,6 +112,7 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
             .HasReceiverRole(ActorRole.EnergySupplier.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
+            .HasRelationTo(null)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.CalculationVersion, calculationVersion)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.GridAreaCode, gridAreaCode)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.ChargeCode, chargeCode)

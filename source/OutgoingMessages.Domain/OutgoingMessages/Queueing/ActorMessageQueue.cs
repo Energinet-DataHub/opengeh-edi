@@ -50,9 +50,9 @@ public class ActorMessageQueue
         ArgumentNullException.ThrowIfNull(outgoingMessage);
         EnsureApplicable(outgoingMessage);
 
-        var currentBundle = CurrentBundleOf(BusinessReason.FromName(outgoingMessage.BusinessReason), outgoingMessage.DocumentType) ??
+        var currentBundle = CurrentBundleOf(BusinessReason.FromName(outgoingMessage.BusinessReason), outgoingMessage.DocumentType, outgoingMessage.RelatedToMessageId) ??
                             CreateBundleOf(BusinessReason.FromName(outgoingMessage.BusinessReason), outgoingMessage.DocumentType,
-                                GetMaxNumberOfMessagesInABundle(maxNumberOfMessagesInABundle, outgoingMessage.DocumentType), timeStamp);
+                                GetMaxNumberOfMessagesInABundle(maxNumberOfMessagesInABundle, outgoingMessage.DocumentType), timeStamp, outgoingMessage.RelatedToMessageId);
 
         currentBundle.Add(outgoingMessage);
     }
@@ -95,17 +95,18 @@ public class ActorMessageQueue
         }
     }
 
-    private Bundle? CurrentBundleOf(BusinessReason businessReason, DocumentType messageType)
+    private Bundle? CurrentBundleOf(BusinessReason businessReason, DocumentType messageType, MessageId? relatedToMessageId = null)
     {
         return _bundles.FirstOrDefault(bundle =>
             bundle.IsClosed == false
             && bundle.DocumentTypeInBundle == messageType
-            && bundle.BusinessReason == businessReason);
+            && bundle.BusinessReason == businessReason
+            && bundle.RelatedToMessageId?.Value == relatedToMessageId?.Value);
     }
 
-    private Bundle CreateBundleOf(BusinessReason businessReason, DocumentType messageType, int maxNumberOfMessagesInABundle, Instant created)
+    private Bundle CreateBundleOf(BusinessReason businessReason, DocumentType messageType, int maxNumberOfMessagesInABundle, Instant created, MessageId? relatedToMessageId = null)
     {
-        var bundle = new Bundle(BundleId.New(), businessReason, messageType, maxNumberOfMessagesInABundle, created);
+        var bundle = new Bundle(BundleId.New(), businessReason, messageType, maxNumberOfMessagesInABundle, created, relatedToMessageId);
         _bundles.Add(bundle);
         return bundle;
     }
