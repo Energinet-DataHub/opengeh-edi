@@ -221,7 +221,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     }
 
     [Fact]
-    public async Task Outgoing_messages_with_different_reference_ids_are_assigned_to_different_bundles()
+    public async Task Outgoing_messages_with_different_relatedTo_ids_are_assigned_to_different_bundles()
     {
         // Arrange
         var actorMessageQueueId = Guid.NewGuid();
@@ -229,37 +229,56 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var receiverId = ActorNumber.Create("1234567891912");
         var receiverRole = ActorRole.MeteredDataAdministrator;
         var maxMessageCount = 2;
-        var messageReferenceId = MessageId.New();
+        MessageId? message1RelatedTo = null;
+        var message2RelatedTo = MessageId.New();
+        var message3RelatedTo = MessageId.New();
 
         var message1 = _outgoingMessageDtoBuilder
             .WithReceiverNumber(receiverId.Value)
             .WithReceiverRole(receiverRole)
-            .WithRelationTo(null)
+            .WithRelationTo(message1RelatedTo)
             .Build();
         var message2 = _outgoingMessageDtoBuilder
             .WithReceiverNumber(receiverId.Value)
             .WithReceiverRole(receiverRole)
-            .WithRelationTo(messageReferenceId)
+            .WithRelationTo(message2RelatedTo)
+            .Build();
+        var message3 = _outgoingMessageDtoBuilder
+            .WithReceiverNumber(receiverId.Value)
+            .WithReceiverRole(receiverRole)
+            .WithRelationTo(message3RelatedTo)
             .Build();
 
         // We have to manually create the queue and bundle to ensure that the bundle has a maxMessageCount
         // such that we do not close the bundle when we enqueue the first message
         await CreateActorMessageQueueInDatabase(actorMessageQueueId, receiverId, receiverRole);
-        await CreateBundleInDatabase(existingBundleId, actorMessageQueueId, message1.DocumentType, message1.BusinessReason, maxMessageCount);
+        await CreateBundleInDatabase(
+            existingBundleId,
+            actorMessageQueueId,
+            message1.DocumentType,
+            message1.BusinessReason,
+            maxMessageCount,
+            message1RelatedTo);
 
         // Act
         var createdIdMessage1 = await EnqueueAndCommitAsync(message1);
         var createdIdMessage2 = await EnqueueAndCommitAsync(message2);
-        var bundleIdForMessage1 = await GetOutgoingMessageBundleIdFromDatabase(createdIdMessage1);
-        var bundleIdForMessage2 = await GetOutgoingMessageBundleIdFromDatabase(createdIdMessage2);
+        var createdIdMessage3 = await EnqueueAndCommitAsync(message3);
 
         // Assert
-        Assert.Equal(bundleIdForMessage1, existingBundleId);
-        Assert.NotEqual(bundleIdForMessage1, bundleIdForMessage2);
+        var bundleIdForMessage1 = await GetOutgoingMessageBundleIdFromDatabase(createdIdMessage1);
+        var bundleIdForMessage2 = await GetOutgoingMessageBundleIdFromDatabase(createdIdMessage2);
+        var bundleIdForMessage3 = await GetOutgoingMessageBundleIdFromDatabase(createdIdMessage3);
+
+        Assert.Equal(existingBundleId, bundleIdForMessage1);
+        Assert.NotEqual(existingBundleId, bundleIdForMessage2);
+        Assert.NotEqual(existingBundleId, bundleIdForMessage3);
+
+        Assert.NotEqual(bundleIdForMessage2, bundleIdForMessage3);
     }
 
     [Fact]
-    public async Task Outgoing_messages_with_same_reference_ids_are_assigned_to_same_bundles()
+    public async Task Outgoing_messages_with_same_relatedTo_ids_are_assigned_to_same_bundles()
     {
         // Arrange
         var actorMessageQueueId = Guid.NewGuid();
@@ -267,12 +286,12 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var receiverId = ActorNumber.Create("1234567891912");
         var receiverRole = ActorRole.MeteredDataAdministrator;
         var maxMessageCount = 2;
-        var messageReferenceId = MessageId.New();
+        var messageRelatedTo = MessageId.New();
 
         var message = _outgoingMessageDtoBuilder
             .WithReceiverNumber(receiverId.Value)
             .WithReceiverRole(receiverRole)
-            .WithRelationTo(messageReferenceId)
+            .WithRelationTo(messageRelatedTo)
             .Build();
 
         // We have to manually create the queue and bundle to ensure that the bundle has a maxMessageCount
@@ -284,17 +303,18 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             message.DocumentType,
             message.BusinessReason,
             maxMessageCount,
-            messageReferenceId);
+            messageRelatedTo);
 
         // Act
         var createdIdMessage1 = await EnqueueAndCommitAsync(message);
         var createdIdMessage2 = await EnqueueAndCommitAsync(message);
+
+        // Assert
         var bundleIdForMessage1 = await GetOutgoingMessageBundleIdFromDatabase(createdIdMessage1);
         var bundleIdForMessage2 = await GetOutgoingMessageBundleIdFromDatabase(createdIdMessage2);
 
-        // Assert
-        Assert.Equal(bundleIdForMessage1, existingBundleId);
-        Assert.Equal(bundleIdForMessage1, bundleIdForMessage2);
+        Assert.Equal(existingBundleId, bundleIdForMessage1);
+        Assert.Equal(existingBundleId, bundleIdForMessage2);
     }
 
     protected override void Dispose(bool disposing)

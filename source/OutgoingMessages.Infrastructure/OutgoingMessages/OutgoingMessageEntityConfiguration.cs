@@ -79,9 +79,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages
                     dbValue => new FileStorageReference(OutgoingMessage.FileStorageCategory, dbValue));
             builder.Property(x => x.RelatedToMessageId)
                 .HasConversion(
-#pragma warning disable IDE0031
-                    toDbValue => toDbValue == null ? null : toDbValue.Value,
-#pragma warning restore IDE0031
+                    toDbValue => toDbValue != null ? toDbValue.Value : null,
                     fromDbValue => fromDbValue != null ? MessageId.Create(fromDbValue) : null);
         }
     }

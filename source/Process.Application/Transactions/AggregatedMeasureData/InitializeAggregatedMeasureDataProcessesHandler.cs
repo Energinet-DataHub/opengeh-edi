@@ -50,6 +50,7 @@ public class InitializeAggregatedMeasureDataProcessesHandler : IRequestHandler<I
     {
         var actorSenderNumber = ActorNumber.Create(dto.SenderNumber);
         var businessReason = BusinessReason.FromCode(dto.BusinessReason);
+        var messageId = MessageId.Create(dto.MessageId);
 
         foreach (var serie in dto.Series)
         {
@@ -64,7 +65,7 @@ public class InitializeAggregatedMeasureDataProcessesHandler : IRequestHandler<I
                     actorSenderNumber,
                     dto.SenderRoleCode,
                     businessReason,
-                    MessageId.Create(dto.MessageId),
+                    messageId,
                     serie.MarketEvaluationPointType,
                     serie.MarketEvaluationSettlementMethod,
                     serie.StartDateAndOrTimeDateTime,
