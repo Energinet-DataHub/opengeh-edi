@@ -23,6 +23,7 @@ public sealed record GetMessagesQuery(
     string? SenderNumber = null,
     string? ReceiverNumber = null,
     IReadOnlyCollection<string>? DocumentTypes = null,
-    IReadOnlyCollection<string>? BusinessReasons = null);
+    IReadOnlyCollection<string>? BusinessReasons = null,
+    bool IncludeRelatedMessage = false);
 
 public record MessageCreationPeriod(Instant DateToSearchFrom, Instant DateToSearchTo);

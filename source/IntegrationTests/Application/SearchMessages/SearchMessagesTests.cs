@@ -203,6 +203,51 @@ public class SearchMessagesTests : TestBase
     }
 
     [Fact]
+    public async Task Include_related_messages()
+    {
+        // Arrange
+        var messageIdOfMessage1 = MessageId.New();
+        var archivedMessage1 = CreateArchivedMessage(_systemDateTimeProvider.Now(), messageId: messageIdOfMessage1.Value);
+        var archivedMessage11 = CreateArchivedMessage(_systemDateTimeProvider.Now(), relatedToMessageId: messageIdOfMessage1, messageId: Guid.NewGuid().ToString());
+        var archivedMessage12 = CreateArchivedMessage(_systemDateTimeProvider.Now(), relatedToMessageId: messageIdOfMessage1, messageId: Guid.NewGuid().ToString());
+        await ArchiveMessage(archivedMessage1);
+        await ArchiveMessage(archivedMessage11);
+        await ArchiveMessage(archivedMessage12);
+
+        var messageIdOfMessage2 = MessageId.New();
+        var archivedMessage2 = CreateArchivedMessage(_systemDateTimeProvider.Now(), messageId: messageIdOfMessage2.Value);
+        var archivedMessage21 = CreateArchivedMessage(_systemDateTimeProvider.Now(), relatedToMessageId: messageIdOfMessage2, messageId: Guid.NewGuid().ToString());
+        await ArchiveMessage(archivedMessage2);
+        await ArchiveMessage(archivedMessage21);
+
+        var messageIdOfMessage3 = MessageId.New();
+        var archivedMessage3 = CreateArchivedMessage(_systemDateTimeProvider.Now(), messageId: messageIdOfMessage3.Value);
+        await ArchiveMessage(archivedMessage3);
+
+        // Act
+        var resultForMessageId1 = await _archivedMessagesClient.SearchAsync(
+            new GetMessagesQuery(
+                MessageId: messageIdOfMessage1.Value,
+                IncludeRelatedMessage: true),
+            CancellationToken.None);
+        var resultForMessageId2 = await _archivedMessagesClient.SearchAsync(
+            new GetMessagesQuery(
+                MessageId: messageIdOfMessage2.Value,
+                IncludeRelatedMessage: true),
+            CancellationToken.None);
+        var resultForMessageId3 = await _archivedMessagesClient.SearchAsync(
+            new GetMessagesQuery(
+                MessageId: messageIdOfMessage3.Value,
+                IncludeRelatedMessage: true),
+            CancellationToken.None);
+
+        // Assert
+        Assert.Equal(3, resultForMessageId1.Messages.Count);
+        Assert.Equal(2, resultForMessageId2.Messages.Count);
+        Assert.Single(resultForMessageId3.Messages);
+    }
+
+    [Fact]
     public async Task Actor_identity_with_owned_restriction_can_only_fetch_own_messages()
     {
         var ownActorNumber = ActorNumber.Create("1234512345888");
@@ -254,7 +299,8 @@ public class SearchMessagesTests : TestBase
         string? documentType = null,
         string? businessReason = null,
         string? messageId = null,
-        ArchivedMessageType? archivedMessageType = null)
+        ArchivedMessageType? archivedMessageType = null,
+        MessageId? relatedToMessageId = null)
     {
         return new ArchivedMessage(
             messageId ?? "MessageId",
@@ -265,8 +311,9 @@ public class SearchMessagesTests : TestBase
             businessReason ?? BusinessReason.BalanceFixing.Name,
             archivedMessageType ?? ArchivedMessageType.OutgoingMessage,
 #pragma warning disable CA2000 // Do not dispose here
-            new MarketDocumentStream(new MarketDocumentWriterMemoryStream()));
+            new MarketDocumentStream(new MarketDocumentWriterMemoryStream()),
 #pragma warning restore CA2000
+            relatedToMessageId);
     }
 
     private async Task ArchiveMessage(ArchivedMessage archivedMessage)

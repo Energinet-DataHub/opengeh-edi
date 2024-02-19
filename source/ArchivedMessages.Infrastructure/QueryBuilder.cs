@@ -44,7 +44,7 @@ internal sealed class QueryBuilder
         if (request.MessageId is not null)
         {
             AddFilter(
-                "MessageId=@MessageId",
+                request.IncludeRelatedMessage ? "(MessageId=@MessageId or RelatedToMessageId = @MessageId)" : "MessageId=@MessageId",
                 new KeyValuePair<string, object>("MessageId", request.MessageId));
         }
 
@@ -90,16 +90,17 @@ internal sealed class QueryBuilder
         return new QueryInput(BuildStatement(), _queryParameters);
     }
 
-    private string BuildStatement()
+    public string BuildStatement()
     {
-        var selectStatement = "SELECT Id, MessageId, DocumentType, SenderNumber, ReceiverNumber, CreatedAt, BusinessReason FROM dbo.ArchivedMessages";
+        var whereClause = _statement.Count > 0 ? $" WHERE {string.Join(" AND ", _statement)}" : string.Empty;
+        var sqlStatement =
+            "SELECT DISTINCT t1.Id, t1.MessageId, t1.DocumentType, t1.SenderNumber, t1.ReceiverNumber, t1.CreatedAt, t1.BusinessReason " +
+            "FROM ( " +
+            $"    SELECT * FROM dbo.ArchivedMessages {whereClause} ) AS t1 " +
+            "LEFT JOIN dbo.ArchivedMessages as t2 " +
+            "ON t1.MessageId = t2.RelatedToMessageId OR t1.RelatedToMessageId = t2.MessageId";
 
-        if (_statement.Count > 0)
-        {
-            selectStatement += " WHERE " + string.Join(" AND ", _statement);
-        }
-
-        return selectStatement;
+        return sqlStatement;
     }
 
     private void AddFilter(string whereStatement, params KeyValuePair<string, object>[] queryParameters)

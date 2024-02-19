@@ -30,8 +30,9 @@ public class ArchivedMessage
         Instant createdAt,
         string? businessReason,
         ArchivedMessageType archivedMessageType,
-        IMarketDocumentStream marketDocumentStream)
-        : this(messageId, documentType, senderNumber, receiverNumber, createdAt, businessReason, archivedMessageType, new ArchivedMessageStream(marketDocumentStream)) { }
+        IMarketDocumentStream marketDocumentStream,
+        MessageId? relatedToMessageId = null)
+        : this(messageId, documentType, senderNumber, receiverNumber, createdAt, businessReason, archivedMessageType, new ArchivedMessageStream(marketDocumentStream), relatedToMessageId) { }
 
     public ArchivedMessage(
         string? messageId,
@@ -52,7 +53,8 @@ public class ArchivedMessage
         Instant createdAt,
         string? businessReason,
         ArchivedMessageType archivedMessageType,
-        ArchivedMessageStream archivedMessageStream)
+        ArchivedMessageStream archivedMessageStream,
+        MessageId? relatedToMessageId = null)
     {
         Id = ArchivedMessageId.Create();
         MessageId = messageId;
@@ -61,6 +63,7 @@ public class ArchivedMessage
         ReceiverNumber = receiverNumber;
         CreatedAt = createdAt;
         BusinessReason = businessReason;
+        RelatedToMessageId = relatedToMessageId;
         ArchivedMessageStream = archivedMessageStream;
 
         var actorNumberForFileStorage = GetActorNumberForFileStoragePlacement(archivedMessageType, senderNumber, receiverNumber);
@@ -80,6 +83,8 @@ public class ArchivedMessage
     public Instant CreatedAt { get; }
 
     public string? BusinessReason { get; }
+
+    public MessageId? RelatedToMessageId { get; private set; }
 
     public FileStorageReference FileStorageReference { get; }
 
