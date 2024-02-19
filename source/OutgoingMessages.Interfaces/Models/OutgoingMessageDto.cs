@@ -30,7 +30,8 @@ public class OutgoingMessageDto
         ActorRole receiverRole,
         ActorNumber senderId,
         ActorRole senderRole,
-        string serializedContent)
+        string serializedContent,
+        MessageId? relatedToMessageId = null)
     {
         DocumentType = documentType;
         ReceiverId = receiverId;
@@ -40,6 +41,7 @@ public class OutgoingMessageDto
         SenderId = senderId;
         SenderRole = senderRole;
         SerializedContent = serializedContent;
+        RelatedToMessageId = relatedToMessageId;
     }
 
     public DocumentType DocumentType { get; set; }
@@ -57,4 +59,10 @@ public class OutgoingMessageDto
     public ActorRole SenderRole { get; }
 
     public string SerializedContent { get; }
+
+    /// <summary>
+    /// If this attribute has a value, then it is used to store the message id of a request from an actor.
+    /// Giving us the possibility to track the request and the response.
+    /// </summary>
+    public MessageId? RelatedToMessageId { get; }
 }

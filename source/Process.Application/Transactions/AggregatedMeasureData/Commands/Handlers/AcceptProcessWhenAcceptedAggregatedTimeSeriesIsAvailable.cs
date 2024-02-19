@@ -26,14 +26,11 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasu
 
 public class AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable : IRequestHandler<AcceptedAggregatedTimeSerie, Unit>
 {
-    private readonly AggregationMessageResultFactory _aggregationMessageResultFactory;
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
 
     public AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable(
-        AggregationMessageResultFactory aggregationMessageResultFactory,
         IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
-        _aggregationMessageResultFactory = aggregationMessageResultFactory;
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
     }
 
@@ -47,8 +44,8 @@ public class AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable : IRequest
         var aggregationResultMessages = new List<AggregationResultMessage>();
         foreach (var aggregatedTimeSerie in request.AggregatedTimeSeries)
         {
-            var message = await _aggregationMessageResultFactory
-                .CreateAsync(process, aggregatedTimeSerie, cancellationToken).ConfigureAwait(false);
+            var message = AggregationMessageResultFactory
+                .Create(process, aggregatedTimeSerie);
             aggregationResultMessages.Add(message);
         }
 

@@ -16,7 +16,7 @@ using System;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.Exceptions;
 
-public class NotSupportedTimeSeriesTypeException : Exception
+public class NotSupportedTimeSeriesTypeException : InvalidOperationException
 {
     public NotSupportedTimeSeriesTypeException()
     {

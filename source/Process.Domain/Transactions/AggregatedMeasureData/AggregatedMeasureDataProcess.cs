@@ -33,6 +33,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             ActorNumber requestedByActorId,
             string requestedByActorRoleCode,
             BusinessReason businessReason,
+            MessageId initiatedByMessageId,
             string? meteringPointType,
             string? settlementMethod,
             string startOfPeriod,
@@ -45,6 +46,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             ProcessId = processId;
             BusinessTransactionId = businessTransactionId;
             BusinessReason = businessReason;
+            InitiatedByMessageId = initiatedByMessageId;
             MeteringPointType = meteringPointType;
             SettlementMethod = settlementMethod;
             StartOfPeriod = startOfPeriod;
@@ -86,6 +88,11 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
         public BusinessTransactionId BusinessTransactionId { get; }
 
         public BusinessReason BusinessReason { get; }
+
+        /// <summary>
+        /// Message id of the request staring the process(s)
+        /// </summary>
+        public MessageId InitiatedByMessageId { get; }
 
         /// <summary>
         /// Represent consumption types or production.
@@ -153,7 +160,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             var rejectedTimeSerie = new RejectedTimeSerie(
                 ProcessId.Id,
                 rejectedAggregatedMeasureDataRequest.RejectReasons.Select(reason =>
-                        new Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages.RejectReason(
+                        new RejectReason(
                             reason.ErrorCode,
                             reason.ErrorMessage))
                     .ToList(),
@@ -164,6 +171,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
                 ProcessId.Id,
                 rejectedAggregatedMeasureDataRequest.BusinessReason.Name,
                 ActorRole.FromCode(RequestedByActorRoleCode),
+                InitiatedByMessageId,
                 rejectedTimeSerie);
         }
     }

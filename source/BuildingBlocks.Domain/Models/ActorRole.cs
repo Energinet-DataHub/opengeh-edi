@@ -19,25 +19,25 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public class ActorRole : EnumerationType
 {
-    public static readonly ActorRole MeteringPointAdministrator = new(0, "MeteringPointAdministrator", "DDZ");
-    public static readonly ActorRole EnergySupplier = new(1, "EnergySupplier", "DDQ");
+    public static readonly ActorRole MeteringPointAdministrator = new("MeteringPointAdministrator", "DDZ");
+    public static readonly ActorRole EnergySupplier = new("EnergySupplier", "DDQ");
 
     // A grid operator has two roles.
     // GridOperator (DDM) when creating a new metering point
-    public static readonly ActorRole GridOperator = new(2, "GridOperator", "DDM");
-    public static readonly ActorRole MeteredDataAdministrator = new(3, "MeteredDataAdministrator", "DGL");
+    public static readonly ActorRole GridOperator = new("GridOperator", "DDM");
+    public static readonly ActorRole MeteredDataAdministrator = new("MeteredDataAdministrator", "DGL");
 
     // A grid operator has two roles.
     // MeteredDataResponsible (MDR) when requesting data from DataHub
-    public static readonly ActorRole MeteredDataResponsible = new(4, "MeteredDataResponsible", "MDR");
-    public static readonly ActorRole BalanceResponsibleParty = new(5, "BalanceResponsibleParty", "DDK");
+    public static readonly ActorRole MeteredDataResponsible = new("MeteredDataResponsible", "MDR");
+    public static readonly ActorRole BalanceResponsibleParty = new("BalanceResponsibleParty", "DDK");
 
-    public static readonly ActorRole ImbalanceSettlementResponsible = new(6, "ImbalanceSettlementResponsible", "DDX");
-    public static readonly ActorRole SystemOperator = new(7, "SystemOperator", "EZ");
-    public static readonly ActorRole DanishEnergyAgency = new(8, "DanishEnergyAgency", "STS");
+    public static readonly ActorRole ImbalanceSettlementResponsible = new("ImbalanceSettlementResponsible", "DDX");
+    public static readonly ActorRole SystemOperator = new("SystemOperator", "EZ");
+    public static readonly ActorRole DanishEnergyAgency = new("DanishEnergyAgency", "STS");
 
-    private ActorRole(int id, string name, string code)
-        : base(id, name)
+    private ActorRole(string name, string code)
+        : base(name)
     {
         Code = code;
     }

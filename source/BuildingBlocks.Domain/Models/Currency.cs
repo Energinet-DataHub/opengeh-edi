@@ -14,15 +14,17 @@
 
 using System;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public class Currency : EnumerationType
 {
-    public static readonly Currency DanishCrowns = new(0, nameof(DanishCrowns), "DKK");
+    public static readonly Currency DanishCrowns = new(nameof(DanishCrowns), "DKK");
 
-    private Currency(int id, string name, string code)
-        : base(id, name)
+    [JsonConstructor]
+    private Currency(string name, string code)
+        : base(name)
     {
         Code = code;
     }

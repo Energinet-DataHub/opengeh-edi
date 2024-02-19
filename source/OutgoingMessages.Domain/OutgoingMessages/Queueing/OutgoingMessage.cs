@@ -26,7 +26,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
         private string? _serializedContent;
 
-        public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, Guid processId, string businessReason, ActorRole receiverRole, ActorNumber senderId, ActorRole senderRole, string serializedContent, Instant timestamp)
+        public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, Guid processId, string businessReason, ActorRole receiverRole, ActorNumber senderId, ActorRole senderRole, string serializedContent, Instant timestamp, MessageId? relatedToMessageId = null)
         {
             Id = OutgoingMessageId.New();
             DocumentType = documentType;
@@ -38,6 +38,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             SenderRole = senderRole;
             _serializedContent = serializedContent;
             FileStorageReference = CreateFileStorageReference(ReceiverId, timestamp, Id);
+            RelatedToMessageId = relatedToMessageId;
         }
 
         /// <summary>
@@ -89,6 +90,12 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
         public BundleId? AssignedBundleId { get; private set; }
 
         public FileStorageReference FileStorageReference { get; private set; }
+
+        /// <summary>
+        /// If this attribute has a value, then it is used to store the message id of a request from an actor.
+        /// Giving us the possibility to track the request and the response.
+        /// </summary>
+        public MessageId? RelatedToMessageId { get; set; }
 
         public void AssignToBundle(BundleId bundleId)
         {
