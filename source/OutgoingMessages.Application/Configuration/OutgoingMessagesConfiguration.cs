@@ -17,11 +17,11 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages.Queueing;
@@ -47,6 +47,7 @@ public static class OutgoingMessagesConfiguration
         services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataXmlDocumentWriter>();
         services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataJsonDocumentWriter>();
         services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataEbixDocumentWriter>();
+        services.AddScoped<IDocumentWriter, WholesaleCalculationXmlDocumentWriter>();
         services.AddScoped<IMessageRecordParser, MessageRecordParser>();
 
         //MessageEnqueueingConfiguration

@@ -19,12 +19,12 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public class MeteringPointType : EnumerationType
 {
-    public static readonly MeteringPointType Consumption = new(0, nameof(Consumption), "E17");
-    public static readonly MeteringPointType Production = new(1, nameof(Production), "E18");
-    public static readonly MeteringPointType Exchange = new(2, nameof(Exchange), "E20");
+    public static readonly MeteringPointType Consumption = new(nameof(Consumption), "E17");
+    public static readonly MeteringPointType Production = new(nameof(Production), "E18");
+    public static readonly MeteringPointType Exchange = new(nameof(Exchange), "E20");
 
-    private MeteringPointType(int id, string name, string code)
-        : base(id, name)
+    private MeteringPointType(string name, string code)
+        : base(name)
     {
         Code = code;
     }

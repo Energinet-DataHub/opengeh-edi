@@ -16,11 +16,11 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public class IncomingDocumentType : EnumerationType
 {
-    public static readonly IncomingDocumentType RequestAggregatedMeasureData = new(0, nameof(RequestAggregatedMeasureData));
-    public static readonly IncomingDocumentType B2CRequestAggregatedMeasureData = new(1, nameof(B2CRequestAggregatedMeasureData));
+    public static readonly IncomingDocumentType RequestAggregatedMeasureData = new(nameof(RequestAggregatedMeasureData));
+    public static readonly IncomingDocumentType B2CRequestAggregatedMeasureData = new(nameof(B2CRequestAggregatedMeasureData));
 
-    public IncomingDocumentType(int id, string name)
-        : base(id, name)
+    public IncomingDocumentType(string name)
+        : base(name)
     {
     }
 }

@@ -13,15 +13,17 @@
 // limitations under the License.
 
 using System;
+using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Exceptions;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public class ActorNumber : ValueObject
 {
-    private ActorNumber(string actorNumber)
+    [JsonConstructor]
+    private ActorNumber(string value)
     {
-        Value = actorNumber;
+        Value = value;
     }
 
     public string Value { get; }

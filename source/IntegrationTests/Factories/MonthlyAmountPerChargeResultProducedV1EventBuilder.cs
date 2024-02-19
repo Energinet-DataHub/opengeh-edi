@@ -28,13 +28,14 @@ public class MonthlyAmountPerChargeResultProducedV1EventBuilder
     private Timestamp _periodEndUtc = Instant.FromUtc(2023, 10, 2, 0, 0, 0).ToTimestamp();
     private string _gridAreaCode = "805";
     private string _energySupplier = "8200000007743";
-    private string _chargeCode = "IDontKow";
+    private string _chargeCode = "ESP-C-F-04";
     private MonthlyAmountPerChargeResultProducedV1.Types.ChargeType _chargeType = MonthlyAmountPerChargeResultProducedV1.Types.ChargeType.Fee;
     private string _chargeOwner = "8200000007740";
     private MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit _quantityUnit = MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit.Kwh;
     private bool _isTax;
     private MonthlyAmountPerChargeResultProducedV1.Types.Currency _currency = MonthlyAmountPerChargeResultProducedV1.Types.Currency.Dkk;
-    private Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue? _amount = new Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue { Units = 123, Nanos = 1200000 };
+    private Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue? _amount;
+    private long _calculationVersion = 1;
 
     internal MonthlyAmountPerChargeResultProducedV1 Build()
     {
@@ -52,6 +53,7 @@ public class MonthlyAmountPerChargeResultProducedV1EventBuilder
             QuantityUnit = _quantityUnit,
             IsTax = _isTax,
             Currency = _currency,
+            CalculationResultVersion = _calculationVersion,
         };
         if (_amount != null)
             @event.Amount = _amount;
@@ -62,6 +64,12 @@ public class MonthlyAmountPerChargeResultProducedV1EventBuilder
     internal MonthlyAmountPerChargeResultProducedV1EventBuilder WithCalculationType(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType calculationType)
     {
         _calculationType = calculationType;
+        return this;
+    }
+
+    internal MonthlyAmountPerChargeResultProducedV1EventBuilder WithCalculationVersion(long calculationVersion)
+    {
+        _calculationVersion = calculationVersion;
         return this;
     }
 
@@ -125,7 +133,7 @@ public class MonthlyAmountPerChargeResultProducedV1EventBuilder
         return this;
     }
 
-    internal MonthlyAmountPerChargeResultProducedV1EventBuilder WithAmount(Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue amount)
+    internal MonthlyAmountPerChargeResultProducedV1EventBuilder WithAmount(Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue? amount)
     {
         _amount = amount;
         return this;
