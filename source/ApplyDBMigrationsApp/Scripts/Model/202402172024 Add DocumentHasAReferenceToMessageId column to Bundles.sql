@@ -1,3 +1,3 @@
 ALTER TABLE [dbo].[Bundles] 
-    Add [DocumentsHasAReferenceToMessageId] [nvarchar](36) NULL;
+    Add [RelatedToMessageId] [nvarchar](36) NULL;
 

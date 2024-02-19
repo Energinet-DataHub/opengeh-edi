@@ -349,8 +349,8 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
 
         await connection.ExecuteAsync(
-            @"INSERT INTO [dbo].[Bundles] (Id, ActorMessageQueueId, DocumentTypeInBundle, IsDequeued, IsClosed, MessageCount, MaxMessageCount, BusinessReason, Created, DocumentsHasAReferenceToMessageId)
-                    VALUES (@Id, @ActorMessageQueueId, @DocumentTypeInBundle, @IsDequeued, @IsClosed, @MessageCount, @MaxMessageCount, @BusinessReason, @Created, @DocumentsHasAReferenceToMessageId)",
+            @"INSERT INTO [dbo].[Bundles] (Id, ActorMessageQueueId, DocumentTypeInBundle, IsDequeued, IsClosed, MessageCount, MaxMessageCount, BusinessReason, Created, RelatedToMessageId)
+                    VALUES (@Id, @ActorMessageQueueId, @DocumentTypeInBundle, @IsDequeued, @IsClosed, @MessageCount, @MaxMessageCount, @BusinessReason, @Created, @RelatedToMessageId)",
             new
             {
                 Id = id,

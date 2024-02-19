@@ -101,7 +101,7 @@ public class ActorMessageQueue
             bundle.IsClosed == false
             && bundle.DocumentTypeInBundle == messageType
             && bundle.BusinessReason == businessReason
-            && bundle.DocumentsHasAReferenceToMessageId?.Value == relatedToMessageId?.Value);
+            && bundle.RelatedToMessageId?.Value == relatedToMessageId?.Value);
     }
 
     private Bundle CreateBundleOf(BusinessReason businessReason, DocumentType messageType, int maxNumberOfMessagesInABundle, Instant created, MessageId? relatedToMessageId = null)

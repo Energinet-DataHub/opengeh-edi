@@ -29,7 +29,7 @@ public class AggregationResultMessage : OutgoingMessageDto
         string businessReason,
         ActorRole receiverRole,
         TimeSeries series,
-        MessageId? relatedToMessageWithMessageId = null)
+        MessageId? relatedMessageId = null)
         : base(
             DocumentType.NotifyAggregatedMeasureData,
             receiverId,
@@ -39,7 +39,7 @@ public class AggregationResultMessage : OutgoingMessageDto
             DataHubDetails.DataHubActorNumber,
             ActorRole.MeteredDataAdministrator,
             new Serializer().Serialize(series),
-            relatedToMessageWithMessageId)
+            relatedMessageId)
     {
         Series = series;
     }
@@ -63,7 +63,7 @@ public class AggregationResultMessage : OutgoingMessageDto
         long calculationResultVersion,
         string? originalTransactionIdReference = null,
         string? settlementVersion = null,
-        MessageId? relatedToMessageWithMessageId = null)
+        MessageId? relatedMessageId = null)
     {
         var series = new TimeSeries(
             processId,
@@ -85,7 +85,7 @@ public class AggregationResultMessage : OutgoingMessageDto
             businessReasonName,
             receiverRole,
             series,
-            relatedToMessageWithMessageId);
+            relatedMessageId);
     }
 }
 
