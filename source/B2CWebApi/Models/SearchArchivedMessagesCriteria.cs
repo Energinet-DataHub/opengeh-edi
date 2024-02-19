@@ -21,4 +21,5 @@ public record SearchArchivedMessagesCriteria(
     string? SenderNumber,
     string? ReceiverNumber,
     IReadOnlyCollection<string>? DocumentTypes,
-    IReadOnlyCollection<string>? BusinessReasons);
+    IReadOnlyCollection<string>? BusinessReasons,
+    bool IncludeRelatedMessage = false);
