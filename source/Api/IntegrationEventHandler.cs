@@ -78,9 +78,6 @@ public sealed class IntegrationEventHandler : IIntegrationEventHandler
                     integrationEvent.EventName,
                     addResult.ToString(),
                     stopWatch.ElapsedMilliseconds);
-                using var config = TelemetryConfiguration.CreateDefault();
-                var client = new TelemetryClient(config);
-                client.TrackEvent("EventIsAlreadyRegistered");
                 return;
             }
 
