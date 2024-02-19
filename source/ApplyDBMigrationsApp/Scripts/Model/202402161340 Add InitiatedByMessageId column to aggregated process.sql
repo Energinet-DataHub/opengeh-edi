@@ -4,7 +4,7 @@ ALTER TABLE [dbo].[AggregatedMeasureDataProcesses]
 go
 
 UPDATE [dbo].[AggregatedMeasureDataProcesses]
-SET [InitiatedByMessageId] = NEWID()
+SET [InitiatedByMessageId] = '111111111111111111111111111111111111'
 WHERE [InitiatedByMessageId] IS NULL;
 
 go

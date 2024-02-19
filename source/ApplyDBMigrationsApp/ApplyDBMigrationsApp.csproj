@@ -153,7 +153,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202401251000 Clear ArchivedMessages table and change Document columnn to FileStorageReference.sql" />
     <EmbeddedResource Include="Scripts\Model\202402081408 Clear MarketDocuments, Bundles and ActorMessageQueues tables.sql" />
     <EmbeddedResource Include="Scripts\Model\202402161340 Add InitiatedByMessageId column to aggregated process.sql" />
-    <EmbeddedResource Include="Scripts\Model\202402172024 Add DocumentHasAReferenceToMessageId column to Bundles.sql" />
+    <EmbeddedResource Include="Scripts\Model\202402172024 Add RelatedToMessageId column to Bundles.sql" />
     <EmbeddedResource Include="Scripts\Model\202402161356 Add relatedToMessageId column to Outgoing Messages.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
