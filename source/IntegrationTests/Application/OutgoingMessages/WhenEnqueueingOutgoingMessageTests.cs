@@ -228,7 +228,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var existingBundleId = Guid.NewGuid();
         var receiverId = ActorNumber.Create("1234567891912");
         var receiverRole = ActorRole.MeteredDataAdministrator;
-        var maxMessageCount = 2;
+        var maxMessageCount = 3;
         MessageId? message1RelatedTo = null;
         var message2RelatedTo = MessageId.New();
         var message3RelatedTo = MessageId.New();
