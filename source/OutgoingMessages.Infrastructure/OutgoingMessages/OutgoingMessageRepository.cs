@@ -70,7 +70,8 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
             firstMessage.SenderRole,
             firstMessage.IsPublished,
             bundleId,
-            outgoingMessages);
+            outgoingMessages,
+            firstMessage.RelatedToMessageId);
     }
 
     private async Task DownloadAndSetMessageRecordAsync(OutgoingMessage outgoingMessage)
