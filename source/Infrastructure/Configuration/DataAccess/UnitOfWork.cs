@@ -44,9 +44,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 
         public async Task CommitTransactionAsync()
         {
-            // Use of an EF Core resiliency strategy when using multiple DbContexts
-            // within an explicit BeginTransaction():
-            // https://learn.microsoft.com/ef/core/miscellaneous/connection-resiliency
             await ResilientTransaction.New(_processContext).SaveChangesAsync(new DbContext[]
             {
                 _b2BContext, _processContext, _actorMessageQueueContext, _incomingMessagesContext,

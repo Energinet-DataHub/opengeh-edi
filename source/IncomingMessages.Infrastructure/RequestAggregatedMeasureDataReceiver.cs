@@ -50,33 +50,17 @@ public class RequestAggregatedMeasureDataReceiver : IRequestAggregatedMeasureDat
         await AddMessageIdAndTransactionIdAsync(requestAggregatedMeasureDataDto, cancellationToken)
             .ConfigureAwait(false);
 
-        var result = await SaveMessageIdAndTransactionIdAsync(
-                    requestAggregatedMeasureDataDto,
-                    cancellationToken)
-                .ConfigureAwait(false);
-
-        if (result.Success)
-        {
-            await _incomingRequestAggregatedMeasuredDataSender.SendAsync(
-                    requestAggregatedMeasureDataDto,
-                    cancellationToken)
-                .ConfigureAwait(false);
-
-            await ResilientTransaction.New(_incomingMessagesContext)
-                .SaveChangesAsync(new DbContext[] { _incomingMessagesContext, })
-                .ConfigureAwait(false);
-        }
-
-        return result;
-    }
-
-    private async Task<Result> SaveMessageIdAndTransactionIdAsync(
-        RequestAggregatedMeasureDataDto requestAggregatedMeasureDataDto,
-        CancellationToken cancellationToken)
-    {
         try
         {
-            await _incomingMessagesContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            await ResilientTransaction.New(_incomingMessagesContext, async () =>
+                {
+                    await _incomingRequestAggregatedMeasuredDataSender.SendAsync(
+                            requestAggregatedMeasureDataDto,
+                            cancellationToken)
+                        .ConfigureAwait(false);
+                })
+                .SaveChangesAsync(new DbContext[] { _incomingMessagesContext, })
+                .ConfigureAwait(false);
         }
         catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlException
                                            && sqlException.Message.Contains(
