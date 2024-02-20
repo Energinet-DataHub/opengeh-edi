@@ -74,7 +74,7 @@ public class WholesaleCalculationXmlDocumentWriter : DocumentWriter
             await writer.WriteStringAsync(wholesaleCalculationSeries.EnergySupplier.Value).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, GeneralValues.ProductCode).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, ProductType.Tariff.Code).ConfigureAwait(false);
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, wholesaleCalculationSeries.QuantityUnit.Code).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "price_Measure_Unit.name", null, wholesaleCalculationSeries.PriceMeasureUnit.Code).ConfigureAwait(false);
