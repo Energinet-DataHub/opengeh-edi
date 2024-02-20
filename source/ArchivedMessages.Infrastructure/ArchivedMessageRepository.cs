@@ -52,9 +52,9 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
 
         var sql = @"INSERT INTO [dbo].[ArchivedMessages]
-                       ([Id], [DocumentType], [ReceiverNumber], [SenderNumber], [CreatedAt], [BusinessReason], [FileStorageReference], [MessageId])
+                       ([Id], [DocumentType], [ReceiverNumber], [SenderNumber], [CreatedAt], [BusinessReason], [FileStorageReference], [MessageId], [RelatedToMessageId])
                        VALUES
-                       (@Id, @DocumentType, @ReceiverNumber, @SenderNumber, @CreatedAt, @BusinessReason, @FileStorageReference, @MessageId)";
+                       (@Id, @DocumentType, @ReceiverNumber, @SenderNumber, @CreatedAt, @BusinessReason, @FileStorageReference, @MessageId, @RelatedToMessageId)";
 
         var parameters = new
         {
@@ -66,6 +66,7 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
             message.BusinessReason,
             FileStorageReference = message.FileStorageReference.Path,
             message.MessageId,
+            RelatedToMessageId = message.RelatedToMessageId?.Value,
         };
 
         await connection.ExecuteAsync(sql, parameters).ConfigureAwait(false);
