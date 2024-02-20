@@ -76,7 +76,6 @@ public sealed class IntegrationEventHandler : IIntegrationEventHandler
                     integrationEvent.EventName,
                     addResult.ToString(),
                     stopWatch.ElapsedMilliseconds);
-
                 return;
             }
 
