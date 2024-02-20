@@ -26,7 +26,12 @@ public interface IFeatureFlagManager
     Task<bool> UseExampleFeatureFlag { get; }
 
     /// <summary>
-    /// Whether to allow sending MonthlyAmountPerChargeResultProduced outgoing events
+    /// Whether to allow handling MonthlyAmountPerChargeResultProduced events
     /// </summary>
     Task<bool> UseMonthlyAmountPerChargeResultProduced { get; }
+
+    /// <summary>
+    /// Whether to allow handling AmountPerChargeResultProduced events
+    /// </summary>
+    Task<bool> UseAmountPerChargeResultProduced { get; }
 }

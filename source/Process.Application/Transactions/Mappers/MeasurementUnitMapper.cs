@@ -40,4 +40,15 @@ public static class MeasurementUnitMapper
             _ => throw new ArgumentOutOfRangeException(nameof(quantityUnit), quantityUnit, "Unknown quantity unit from Wholesale"),
         };
     }
+
+    public static MeasurementUnit Map(AmountPerChargeResultProducedV1.Types.QuantityUnit quantityUnit)
+    {
+        return quantityUnit switch
+        {
+            AmountPerChargeResultProducedV1.Types.QuantityUnit.Kwh => MeasurementUnit.Kwh,
+            AmountPerChargeResultProducedV1.Types.QuantityUnit.Pieces => MeasurementUnit.Pieces,
+            AmountPerChargeResultProducedV1.Types.QuantityUnit.Unspecified => throw new InvalidOperationException("Quantity unit is not specified from Wholesale"),
+            _ => throw new ArgumentOutOfRangeException(nameof(quantityUnit), quantityUnit, "Unknown quantity unit from Wholesale"),
+        };
+    }
 }
