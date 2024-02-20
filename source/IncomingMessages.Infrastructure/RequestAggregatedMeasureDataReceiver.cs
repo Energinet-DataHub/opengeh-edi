@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using IncomingMessages.Infrastructure.Configuration.DataAccess;
 using IncomingMessages.Infrastructure.Messages;
@@ -49,32 +50,24 @@ public class RequestAggregatedMeasureDataReceiver : IRequestAggregatedMeasureDat
         await AddMessageIdAndTransactionIdAsync(requestAggregatedMeasureDataDto, cancellationToken)
             .ConfigureAwait(false);
 
-        // Use of an EF Core resiliency strategy
-        // within an explicit BeginTransaction():
-        // https://learn.microsoft.com/ef/core/miscellaneous/connection-resiliency
-        var strategy = _incomingMessagesContext.Database.CreateExecutionStrategy();
-        return await strategy.ExecuteAsync(async () =>
-        {
-            using var transaction =
-                await _incomingMessagesContext.Database.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
-
-            var result = await SaveMessageIdAndTransactionIdAsync(
+        var result = await SaveMessageIdAndTransactionIdAsync(
                     requestAggregatedMeasureDataDto,
                     cancellationToken)
                 .ConfigureAwait(false);
 
-            if (result.Success)
-            {
-                await _incomingRequestAggregatedMeasuredDataSender.SendAsync(
-                        requestAggregatedMeasureDataDto,
-                        cancellationToken)
-                    .ConfigureAwait(false);
+        if (result.Success)
+        {
+            await _incomingRequestAggregatedMeasuredDataSender.SendAsync(
+                    requestAggregatedMeasureDataDto,
+                    cancellationToken)
+                .ConfigureAwait(false);
 
-                await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-            }
+            await ResilientTransaction.New(_incomingMessagesContext)
+                .SaveChangesAsync(new DbContext[] { _incomingMessagesContext, })
+                .ConfigureAwait(false);
+        }
 
-            return result;
-        }).ConfigureAwait(false);
+        return result;
     }
 
     private async Task<Result> SaveMessageIdAndTransactionIdAsync(

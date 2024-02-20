@@ -17,8 +17,12 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 
+/// <summary>
+/// This responsible managing resilient database transactions using Entity Framework Core.
+/// It uses the execution strategy from a DbContext instance to handle retries for transient failures.
+/// </summary>
 public class ResilientTransaction
 {
     private readonly DbContext _context;
@@ -28,11 +32,13 @@ public class ResilientTransaction
 
     public static ResilientTransaction New(DbContext context) => new(context);
 
+    /// <summary>
+    /// This method initiates a transaction across multiple DbContext instances, committing all changes atomically.
+    /// If any operation fails, the transaction is rolled back and retried according to the execution strategy.
+    /// </summary>
+    /// <param name="contexts"></param>
     public async Task SaveChangesAsync(DbContext[] contexts)
     {
-        // Use of an EF Core resiliency strategy when using multiple DbContexts
-        // within an explicit BeginTransaction():
-        // https://learn.microsoft.com/ef/core/miscellaneous/connection-resiliency
         var strategy = _context.Database.CreateExecutionStrategy();
         await strategy.ExecuteAsync(async () =>
         {
