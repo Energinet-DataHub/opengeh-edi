@@ -30,7 +30,7 @@ namespace Energinet.DataHub.EDI.Tests.Application.Process.Transactions.Mappers;
 public class TimeSeriesPointsMapperTests
 {
     [Fact]
-    public void Ensure_time_series_points_is_mapped()
+    public void Ensure_energy_result_produced_v2_time_series_points_is_mapped()
     {
         // Arrange
         var protoPoint = new EnergyResultProducedV2.Types.TimeSeriesPoint()
@@ -50,5 +50,27 @@ public class TimeSeriesPointsMapperTests
         actual.First().Position.Should().BeGreaterThan(0);
         actual.First().QuantityQuality.Should().Be(CalculatedQuantityQuality.Calculated);
         actual.First().SampleTime.Should().Be(protoPoint.Time.ToString());
+    }
+
+    [Fact]
+    public void Ensure_amount_per_charge_result_produced_v1_time_series_points_is_mapped()
+    {
+        // Arrange
+        var protoPoint = new AmountPerChargeResultProducedV1.Types.TimeSeriesPoint()
+        {
+            Time = new Timestamp { Seconds = 100000 },
+            Quantity = new DecimalValue { Units = 123, Nanos = 1200000 },
+            QuantityQualities = { AmountPerChargeResultProducedV1.Types.QuantityQuality.Calculated },
+        };
+
+        // Act
+        var actual = TimeSeriesPointsMapper
+            .MapPoints(new RepeatedField<AmountPerChargeResultProducedV1.Types.TimeSeriesPoint>() { protoPoint });
+
+        // Assert
+        actual.Should().ContainSingle();
+        actual.First().Quantity.Should().Be(protoPoint.Quantity.Units + (protoPoint.Quantity.Nanos / 1_000_000_000M));
+        actual.First().Position.Should().BeGreaterThan(0);
+        actual.First().QuantityQuality.Should().Be(CalculatedQuantityQuality.Calculated);
     }
 }

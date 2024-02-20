@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf.Collections;
 
@@ -47,5 +48,21 @@ public static class TimeSeriesPointsMapper
             .Select(p => new Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point(p.Position, p.Quantity, p.QuantityQuality, p.SampleTime))
             .ToList()
             .AsReadOnly();
+    }
+
+    public static IReadOnlyCollection<Point> MapPoints(RepeatedField<AmountPerChargeResultProducedV1.Types.TimeSeriesPoint> timeSeriesPoints)
+    {
+        var points = timeSeriesPoints
+            .Select(
+                (p, index) => new Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations.Point(
+                    index + 1, // Position starts at 1, so position = index + 1
+                    DecimalParser.Parse(p.Quantity),
+                    p.Price == null ? null : DecimalParser.Parse(p.Price),
+                    p.Amount == null ? null : DecimalParser.Parse(p.Amount),
+                    CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(p.QuantityQualities)))
+            .ToList()
+            .AsReadOnly();
+
+        return points;
     }
 }

@@ -373,4 +373,176 @@ public sealed class CalculatedQuantityQualityMapperTests
             CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(new[] { quantityQuality });
         }
     }
+
+    public sealed class AmountPerChargeResultProducedV1Tests
+    {
+        public static IEnumerable<object[]> QuantityQualityMappingData()
+        {
+            // Example mappings from the documentation at https://energinet.atlassian.net/wiki/spaces/D3/pages/529989633/QuantityQuality.
+            // Only available to Energinet employees.
+            /*
+             * | Combination QQ from RSM-012       | Calculated quantity quality |
+             * |-----------------------------------+-----------------------------|
+             * | Missing + Missing                 | Missing                     |
+             * | Missing + Estimated               | Incomplete                  |
+             * | Missing + Measured                | Incomplete                  |
+             * | Missing + Estimated + Measured    | Incomplete                  |
+             * | Estimated + Measured              | Estimated                   |
+             * | Estimated + Estimated             | Estimated                   |
+             * | Measured + Measured               | Measured                    |
+             * | Calculated + Calculated           | Calculated                  |
+             * | Missing + Calculated              | Incomplete                  |
+             * | Estimated + Calculated            | Estimated                   |
+             * | Measured + Estimated + Calculated | Estimated                   |
+             */
+
+            // The following test cases are defined as an input array of quantity qualities and a singular expected output.
+            yield return new object[]
+            {
+                new[] { AmountPerChargeResultProducedV1.Types.QuantityQuality.Missing }, CalculatedQuantityQuality.Missing,
+            };
+
+            yield return new object[]
+            {
+                new[]
+                {
+                    AmountPerChargeResultProducedV1.Types.QuantityQuality.Missing,
+                    AmountPerChargeResultProducedV1.Types.QuantityQuality.Estimated,
+                },
+                CalculatedQuantityQuality.Incomplete,
+            };
+
+            yield return new object[]
+            {
+                new[]
+                {
+                    AmountPerChargeResultProducedV1.Types.QuantityQuality.Missing,
+                    AmountPerChargeResultProducedV1.Types.QuantityQuality.Measured,
+                },
+                CalculatedQuantityQuality.Incomplete,
+            };
+
+            yield return new object[]
+            {
+                new[]
+                {
+                    AmountPerChargeResultProducedV1.Types.QuantityQuality.Missing,
+                    AmountPerChargeResultProducedV1.Types.QuantityQuality.Estimated,
+                    AmountPerChargeResultProducedV1.Types.QuantityQuality.Measured,
+                },
+                CalculatedQuantityQuality.Incomplete,
+            };
+
+            yield return new object[]
+            {
+                new[]
+                {
+                    AmountPerChargeResultProducedV1.Types.QuantityQuality.Estimated,
+                    AmountPerChargeResultProducedV1.Types.QuantityQuality.Measured,
+                },
+                CalculatedQuantityQuality.Estimated,
+            };
+
+            yield return new object[]
+            {
+                new[] { AmountPerChargeResultProducedV1.Types.QuantityQuality.Estimated }, CalculatedQuantityQuality.Estimated,
+            };
+
+            yield return new object[]
+            {
+                new[] { AmountPerChargeResultProducedV1.Types.QuantityQuality.Measured }, CalculatedQuantityQuality.Measured,
+            };
+
+            yield return new object[]
+            {
+                new[] { AmountPerChargeResultProducedV1.Types.QuantityQuality.Calculated }, CalculatedQuantityQuality.Calculated,
+            };
+
+            yield return new object[]
+            {
+                new[]
+                {
+                    AmountPerChargeResultProducedV1.Types.QuantityQuality.Missing,
+                    AmountPerChargeResultProducedV1.Types.QuantityQuality.Calculated,
+                },
+                CalculatedQuantityQuality.Incomplete,
+            };
+
+            yield return new object[]
+            {
+                new[]
+                {
+                    AmountPerChargeResultProducedV1.Types.QuantityQuality.Estimated,
+                    AmountPerChargeResultProducedV1.Types.QuantityQuality.Calculated,
+                },
+                CalculatedQuantityQuality.Estimated,
+            };
+
+            yield return new object[]
+            {
+                new[]
+                {
+                    AmountPerChargeResultProducedV1.Types.QuantityQuality.Estimated,
+                    AmountPerChargeResultProducedV1.Types.QuantityQuality.Calculated,
+                    AmountPerChargeResultProducedV1.Types.QuantityQuality.Measured,
+                },
+                CalculatedQuantityQuality.Estimated,
+            };
+
+            // The empty set is undefined.
+            yield return new object[]
+            {
+                new List<AmountPerChargeResultProducedV1.Types.QuantityQuality>(), CalculatedQuantityQuality.NotAvailable,
+            };
+
+            // Additional test cases not based on examples from the documentation.
+            yield return new object[]
+            {
+                new[]
+                {
+                    AmountPerChargeResultProducedV1.Types.QuantityQuality.Measured,
+                    AmountPerChargeResultProducedV1.Types.QuantityQuality.Measured,
+                    AmountPerChargeResultProducedV1.Types.QuantityQuality.Calculated,
+                },
+                CalculatedQuantityQuality.Measured,
+            };
+        }
+
+        public static IEnumerable<object[]> QuantityQualityValues()
+        {
+            return Enum.GetValues<AmountPerChargeResultProducedV1.Types.QuantityQuality>().Select(qq => new[] { (object)qq });
+        }
+
+        [Fact]
+        public void When_null_collection_throws_argument_null_exception()
+        {
+            // Arrange
+            ICollection<AmountPerChargeResultProducedV1.Types.QuantityQuality>? quality = null;
+
+            // Act & Assert
+            var act = () => CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(quality);
+            act.Should().ThrowExactly<ArgumentNullException>();
+        }
+
+        [Theory]
+        [MemberData(nameof(QuantityQualityMappingData))]
+        public void Maps_quantity_quality_to_edi_quality_in_accordance_with_the_rules(
+            ICollection<AmountPerChargeResultProducedV1.Types.QuantityQuality> qualitySetFromWholesale,
+            CalculatedQuantityQuality expectedCalculatedQuantityQuality)
+        {
+            // Act
+            var actual = CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(qualitySetFromWholesale);
+
+            // Assert
+            actual.Should().Be(expectedCalculatedQuantityQuality);
+        }
+
+        [Theory]
+        [MemberData(nameof(QuantityQualityValues))]
+        public void Can_handle_all_quantity_qualities(AmountPerChargeResultProducedV1.Types.QuantityQuality quantityQuality)
+        {
+            // Act
+            CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(new[] { quantityQuality });
+        }
+    }
 }

@@ -39,6 +39,7 @@ public static class WholesaleCalculationResultMessageFactory
             ChargeCode: message.ChargeCode,
             IsTax: message.IsTax,
             Quantity: message.Amount != null ? DecimalParser.Parse(message.Amount) : null,
+            Points: null,
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
             ChargeOwner: ActorNumber.Create(message.ChargeOwnerId), // this is an assumption
             Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),
@@ -69,6 +70,7 @@ public static class WholesaleCalculationResultMessageFactory
             ChargeCode: message.ChargeCode,
             IsTax: message.IsTax,
             Quantity: null,
+            Points: TimeSeriesPointsMapper.MapPoints(message.TimeSeriesPoints),
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
             ChargeOwner: ActorNumber.Create(message.ChargeOwnerId), // this is an assumption
             Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),

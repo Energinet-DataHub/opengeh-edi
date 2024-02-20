@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
@@ -24,6 +25,7 @@ public record WholesaleCalculationSeries(
     string ChargeCode,
     bool IsTax,
     decimal? Quantity,
+    IReadOnlyCollection<Point>? Points,
     ActorNumber EnergySupplier,
     ActorNumber ChargeOwner,
     Period Period,
@@ -33,3 +35,5 @@ public record WholesaleCalculationSeries(
     Currency Currency,
     ChargeType ChargeType,
     Resolution Resolution);
+
+public record Point(int Position, decimal Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality QuantityQuality);
