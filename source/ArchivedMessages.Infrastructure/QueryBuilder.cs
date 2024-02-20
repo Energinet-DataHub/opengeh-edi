@@ -87,18 +87,26 @@ internal sealed class QueryBuilder
             throw new InvalidRestrictionException($"Invalid restriction for fetching archived messages. Must be either {nameof(Restriction.Owned)} or {nameof(Restriction.None)}. ActorNumber: {_actorIdentity.ActorNumber.Value}; Restriction: {_actorIdentity.Restriction.Name}");
         }
 
-        return new QueryInput(BuildStatement(), _queryParameters);
+        return new QueryInput(BuildStatement(request.IncludeRelatedMessage, request.MessageId), _queryParameters);
     }
 
-    public string BuildStatement()
+    public string BuildStatement(bool includeRelatedMessage, string? messageId = null)
     {
         var whereClause = _statement.Count > 0 ? $" WHERE {string.Join(" AND ", _statement)}" : string.Empty;
-        var sqlStatement =
-            "SELECT DISTINCT t1.Id, t1.MessageId, t1.DocumentType, t1.SenderNumber, t1.ReceiverNumber, t1.CreatedAt, t1.BusinessReason " +
-            "FROM ( " +
-            $"    SELECT * FROM dbo.ArchivedMessages {whereClause} ) AS t1 " +
-            "LEFT JOIN dbo.ArchivedMessages as t2 " +
-            "ON t1.MessageId = t2.RelatedToMessageId OR t1.RelatedToMessageId = t2.MessageId";
+        string sqlStatement;
+
+        if (includeRelatedMessage == true && messageId is not null)
+        {
+            sqlStatement = "SELECT DISTINCT t2.Id, t2.MessageId, t2.DocumentType, t2.SenderNumber, t2.ReceiverNumber, t2.CreatedAt, t2.BusinessReason " +
+                           "FROM ( SELECT * FROM dbo.ArchivedMessages {whereClause} ) AS t1 " +
+                           "INNER JOIN dbo.ArchivedMessages as t2 " +
+                           "ON t1.RelatedToMessageId = t2.RelatedToMessageId OR t1.RelatedToMessageId = t2.MessageId OR t1.MessageId= t2.MessageId";
+        }
+        else
+        {
+            var selectStatement = "SELECT Id, MessageId, DocumentType, SenderNumber, ReceiverNumber, CreatedAt, BusinessReason FROM dbo.ArchivedMessages";
+            sqlStatement = selectStatement + whereClause;
+        }
 
         return sqlStatement;
     }
