@@ -110,7 +110,7 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "IncludedProductCharacteristic", null).ConfigureAwait(false);
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Identification", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "9").ConfigureAwait(false);
-            await writer.WriteStringAsync(GeneralValues.ProductCode).ConfigureAwait(false);
+            await writer.WriteStringAsync(ProductType.EnergyActive.Code).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             await WriteEbixCodeWithAttributesAsync("UnitType", EbixCode.Of(MeasurementUnit.From(timeSeries.MeasureUnitType)), writer).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);

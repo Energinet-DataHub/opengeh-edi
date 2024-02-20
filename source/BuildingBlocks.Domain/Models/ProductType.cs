@@ -12,9 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-internal sealed class GeneralValues
+public class ProductType : EnumerationType
 {
-    internal static string SectorTypeCode => "23";
+    public static readonly ProductType EnergyActive = new(nameof(EnergyActive), "8716867000030");
+    public static readonly ProductType Tariff = new(nameof(Tariff), "5790001330590");
+
+    protected ProductType(string name, string code)
+        : base(name)
+    {
+        Code = code;
+    }
+
+    public string Code { get; }
+
+    public override string ToString()
+    {
+        return Name;
+    }
 }
