@@ -16,8 +16,9 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
-using static Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.EnergyResultProducedV2.Types;
 using DecimalValue = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue;
+using ERP = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.EnergyResultProducedV2.Types;
+using MAPCRP = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.MonthlyAmountPerChargeResultProducedV1.Types;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
@@ -44,16 +45,29 @@ internal sealed class WholesaleDriver
             aggregation.ToByteArray());
     }
 
+    internal Task PublishMonthlyAmountPerChargeResultAsync(
+        string gridAreaCode,
+        string energySupplierId,
+        string chargeOwnerId)
+    {
+        var monthlyAmountPerChargeResultProduced =
+            CreateMonthlyAmountPerChargeResultProduced(gridAreaCode, energySupplierId, chargeOwnerId);
+
+        return _integrationEventPublisher.PublishAsync(
+            MonthlyAmountPerChargeResultProducedV1.EventName,
+            monthlyAmountPerChargeResultProduced.ToByteArray());
+    }
+
     private static EnergyResultProducedV2 CreateAggregationResultAvailableEventFor(string gridAreaCode)
     {
         var processCompletedEvent = new EnergyResultProducedV2
         {
-            Resolution = EnergyResultProducedV2.Types.Resolution.Quarter,
-            QuantityUnit = QuantityUnit.Kwh,
-            CalculationType = CalculationType.BalanceFixing,
-            TimeSeriesType = TimeSeriesType.Production,
+            Resolution = ERP.Resolution.Quarter,
+            QuantityUnit = ERP.QuantityUnit.Kwh,
+            CalculationType = ERP.CalculationType.BalanceFixing,
+            TimeSeriesType = ERP.TimeSeriesType.Production,
             CalculationId = Guid.NewGuid().ToString(),
-            AggregationPerGridarea = new AggregationPerGridArea()
+            AggregationPerGridarea = new ERP.AggregationPerGridArea
             {
                 GridAreaCode = gridAreaCode,
             },
@@ -61,11 +75,11 @@ internal sealed class WholesaleDriver
             PeriodStartUtc = DateTime.UtcNow.ToTimestamp(),
             TimeSeriesPoints =
             {
-                new TimeSeriesPoint
+                new ERP.TimeSeriesPoint
                 {
                     Time = new Timestamp { Seconds = 100000 },
                     Quantity = new DecimalValue { Units = 123, Nanos = 1200000 },
-                    QuantityQualities = { QuantityQuality.Measured },
+                    QuantityQualities = { ERP.QuantityQuality.Measured },
                 },
             },
             CalculationResultVersion = 404,
@@ -79,12 +93,12 @@ internal sealed class WholesaleDriver
     {
         var processCompletedEvent = new EnergyResultProducedV2
         {
-            Resolution = EnergyResultProducedV2.Types.Resolution.Quarter,
-            QuantityUnit = QuantityUnit.Kwh,
-            CalculationType = CalculationType.BalanceFixing,
-            TimeSeriesType = TimeSeriesType.Production,
+            Resolution = ERP.Resolution.Quarter,
+            QuantityUnit = ERP.QuantityUnit.Kwh,
+            CalculationType = ERP.CalculationType.BalanceFixing,
+            TimeSeriesType = ERP.TimeSeriesType.Production,
             CalculationId = Guid.NewGuid().ToString(),
-            AggregationPerBalanceresponsiblepartyPerGridarea = new AggregationPerBalanceResponsiblePartyPerGridArea
+            AggregationPerBalanceresponsiblepartyPerGridarea = new ERP.AggregationPerBalanceResponsiblePartyPerGridArea
             {
                 GridAreaCode = gridAreaCode, BalanceResponsibleId = actorNumber,
             },
@@ -92,14 +106,40 @@ internal sealed class WholesaleDriver
             PeriodStartUtc = DateTime.UtcNow.ToTimestamp(),
             TimeSeriesPoints =
             {
-                new TimeSeriesPoint
+                new ERP.TimeSeriesPoint
                 {
                     Time = new Timestamp { Seconds = 100000 },
                     Quantity = new DecimalValue { Units = 123, Nanos = 1200000 },
-                    QuantityQualities = { QuantityQuality.Measured },
+                    QuantityQualities = { ERP.QuantityQuality.Measured },
                 },
             },
         };
         return processCompletedEvent;
+    }
+
+    private static MonthlyAmountPerChargeResultProducedV1 CreateMonthlyAmountPerChargeResultProduced(
+        string gridAreaCode,
+        string energySupplierId,
+        string chargeOwnerId)
+    {
+        var monthlyAmountPerChargeResultProduced = new MonthlyAmountPerChargeResultProducedV1
+        {
+            CalculationId = Guid.NewGuid().ToString(),
+            CalculationType = MAPCRP.CalculationType.WholesaleFixing,
+            PeriodStartUtc = DateTime.UtcNow.ToTimestamp(),
+            PeriodEndUtc = DateTime.UtcNow.ToTimestamp(),
+            GridAreaCode = gridAreaCode,
+            EnergySupplierId = energySupplierId,
+            ChargeCode = "ChargeCodeGoesBrrr",
+            ChargeType = MAPCRP.ChargeType.Fee,
+            ChargeOwnerId = chargeOwnerId,
+            QuantityUnit = MAPCRP.QuantityUnit.Kwh,
+            IsTax = false,
+            Currency = MAPCRP.Currency.Dkk,
+            Amount = new DecimalValue { Nanos = 1234, Units = 1234 },
+            CalculationResultVersion = 42,
+        };
+
+        return monthlyAmountPerChargeResultProduced;
     }
 }

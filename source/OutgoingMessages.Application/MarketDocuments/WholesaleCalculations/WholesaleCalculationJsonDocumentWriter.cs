@@ -29,7 +29,6 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Who
 
 public sealed class WholesaleCalculationJsonDocumentWriter : IDocumentWriter
 {
-    // TODO: FIX THIS!
     private const string DocumentTypeName = "NotifyWholesaleServices_MarketDocument";
     private const string TypeCode = "E31";
     private readonly IMessageRecordParser _parser;

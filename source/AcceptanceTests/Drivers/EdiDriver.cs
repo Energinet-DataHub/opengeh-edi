@@ -63,7 +63,7 @@ internal sealed class EdiDriver : IDisposable
         var stopWatch = Stopwatch.StartNew();
         while (stopWatch.ElapsedMilliseconds < 600000)
         {
-            var peekResponse = await PeekAsync()
+            var peekResponse = await PeekAggregationsAsync()
                 .ConfigureAwait(false);
             if (peekResponse.StatusCode == HttpStatusCode.OK)
             {
@@ -85,7 +85,7 @@ internal sealed class EdiDriver : IDisposable
 
     public async Task EmptyQueueAsync()
     {
-        var peekResponse = await PeekAsync()
+        var peekResponse = await PeekAggregationsAsync()
                 .ConfigureAwait(false);
         if (peekResponse.StatusCode == HttpStatusCode.OK)
         {
@@ -217,7 +217,7 @@ internal sealed class EdiDriver : IDisposable
         return jsonContent;
     }
 
-    private async Task<HttpResponseMessage> PeekAsync()
+    private async Task<HttpResponseMessage> PeekAggregationsAsync()
     {
         var b2bClient = await _httpClient;
         using var request = new HttpRequestMessage(HttpMethod.Get, "v1.0/cim/aggregations");

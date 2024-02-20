@@ -19,15 +19,17 @@ using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 
-[SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
-
+[SuppressMessage(
+    "Usage",
+    "CA2007",
+    Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 [IntegrationTest]
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
-public sealed class WhenAggregationResultIsPublishedTests
+public sealed class WhenMonthlyAmountPerChargeResultResultIsPublishedTests
 {
     private readonly AggregationResultDsl _aggregations;
 
-    public WhenAggregationResultIsPublishedTests(AcceptanceTestFixture fixture)
+    public WhenMonthlyAmountPerChargeResultResultIsPublishedTests(AcceptanceTestFixture fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
 
@@ -42,7 +44,10 @@ public sealed class WhenAggregationResultIsPublishedTests
     {
         await _aggregations.EmptyQueueForActor();
 
-        await _aggregations.PublishAggregationResultFor(AcceptanceTestFixture.CimActorGridArea);
+        await _aggregations.PublishMonthlyChargeResultFor(
+            AcceptanceTestFixture.CimActorGridArea,
+            AcceptanceTestFixture.ActorNumber,
+            "SomeLuckyOwner");
 
         await _aggregations.ConfirmResultIsAvailableFor();
     }
