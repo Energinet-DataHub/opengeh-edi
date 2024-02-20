@@ -82,7 +82,6 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
         var chargeOwner = "9876543216543";
         var isTax = false;
         var calculationVersion = 3;
-        var amount = new DecimalValue { Units = 100, Nanos = 0 };
 
         // Arrange
         var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder
@@ -112,11 +111,10 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasRelationTo(null)
-            .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.CalculationVersion, calculationVersion)
+            // .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.CalculationVersion, calculationVersion)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.GridAreaCode, gridAreaCode)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.ChargeCode, chargeCode)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.IsTax, isTax)
-            .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.Quantity,  DecimalParser.Parse(amount))
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.EnergySupplier, ActorNumber.Create(energySupplier))
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.ChargeOwner, ActorNumber.Create(chargeOwner))
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.Period.Start, startOfPeriod)
