@@ -14,6 +14,7 @@
 
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using IncomingMessages.Infrastructure.Configuration.DataAccess;
@@ -43,22 +44,10 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 
         public async Task CommitTransactionAsync()
         {
-            using var transaction = await BeginTransactionAsync().ConfigureAwait(false);
-            await _b2BContext.SaveChangesAsync().ConfigureAwait(false);
-            await _processContext.SaveChangesAsync().ConfigureAwait(false);
-            await _actorMessageQueueContext.SaveChangesAsync().ConfigureAwait(false);
-            await _incomingMessagesContext.SaveChangesAsync().ConfigureAwait(false);
-            await transaction.CommitAsync().ConfigureAwait(false);
-        }
-
-        private async Task<IDbContextTransaction> BeginTransactionAsync()
-        {
-            var dbContextTransaction = await _processContext.Database.BeginTransactionAsync().ConfigureAwait(false);
-            await _b2BContext.Database.UseTransactionAsync(dbContextTransaction.GetDbTransaction()).ConfigureAwait(false);
-            await _actorMessageQueueContext.Database.UseTransactionAsync(dbContextTransaction.GetDbTransaction()).ConfigureAwait(false);
-            await _incomingMessagesContext.Database.UseTransactionAsync(dbContextTransaction.GetDbTransaction()).ConfigureAwait(false);
-
-            return dbContextTransaction;
+            await ResilientTransaction.New(_processContext).SaveChangesAsync(new DbContext[]
+            {
+                _b2BContext, _processContext, _actorMessageQueueContext, _incomingMessagesContext,
+            }).ConfigureAwait(false);
         }
     }
 }
