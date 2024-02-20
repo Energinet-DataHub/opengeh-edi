@@ -90,13 +90,24 @@ internal sealed class QueryBuilder
         return new QueryInput(BuildStatement(request.IncludeRelatedMessage, request.MessageId), _queryParameters);
     }
 
-    public string BuildStatement(bool includeRelatedMessage, string? messageId = null)
+    private string BuildStatement(bool includeRelatedMessage, string? messageId)
     {
         var whereClause = _statement.Count > 0 ? $" WHERE {string.Join(" AND ", _statement)}" : string.Empty;
         string sqlStatement;
 
         if (includeRelatedMessage == true && messageId is not null)
         {
+            // Messages may be related in different ways, hence we have the following 3 cases:
+            // 1. The message is related to other messages (Searching for a request with responses)
+            // 2. The message is related to a message that is related to another message (Searching for a response with a request, where the request has multiple responses)
+            // 3. The message is not related to any other messages
+            // Case 1 and 2 may be solve by joining every request onto a response (t1.RelatedToMessageId = t2.MessageId)
+            // and every response onto another response (t1.RelatedToMessageId = t2.RelatedToMessageId)
+            // Hence, if we were in case 1: Table 2 would consist of all responses to the request and the request itself (containing duplications)
+            // For case 2: Table 2 would consists of the response you searched for, all other responses which has a reference to the same request and the request itself (containing duplications)
+
+            // Case 3 is solved by joining every message onto itself (t1.MessageId = t2.MessageId)
+            // Since table 2 would be empty without it, hence we would not get anything when we do our inner join
             sqlStatement = "SELECT DISTINCT t2.Id, t2.MessageId, t2.DocumentType, t2.SenderNumber, t2.ReceiverNumber, t2.CreatedAt, t2.BusinessReason " +
                            $"FROM ( SELECT * FROM dbo.ArchivedMessages {whereClause} ) AS t1 " +
                            "INNER JOIN dbo.ArchivedMessages as t2 " +
