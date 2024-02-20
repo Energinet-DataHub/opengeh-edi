@@ -62,17 +62,17 @@ public class PeekRequestListener
         if (contentType is null)
         {
             _logger.LogInformation(
-                "Could not parse desired format from Content-Type header, support values are: application/xml, application/json, application/ebix");
-            return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
+                "Could not get Content-Type from request header.");
+            return await request.CreateMissingContentTypeResponseAsync(cancellationToken).ConfigureAwait(false);
         }
 
         var desiredDocumentFormat = DocumentFormatParser.ParseFromContentTypeHeaderValue(contentType);
         if (desiredDocumentFormat is null)
         {
             _logger.LogInformation(
-                "Could not parse desired document format from Content-Type header value: {ContentType}",
+                "Could not parse desired document format from Content-Type header value: {ContentType}.",
                 contentType);
-            return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
+            return await request.CreateInvalidContentTypeResponseAsync(cancellationToken).ConfigureAwait(false);
         }
 
         var parsedMessageCategory = messageCategory != null && desiredDocumentFormat != DocumentFormat.Ebix

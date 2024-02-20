@@ -20,11 +20,6 @@ namespace Energinet.DataHub.EDI.Api.Common;
 
 internal static class HttpHeadersExtensions
 {
-    internal static string GetContentType(this HttpHeaders headers)
-    {
-        return TryGetContentType(headers) ?? throw new InvalidOperationException("No Content-Type found in request headers");
-    }
-
     internal static string? TryGetContentType(this HttpHeaders headers)
     {
         headers.TryGetValues("Content-Type", out var contentTypes);
