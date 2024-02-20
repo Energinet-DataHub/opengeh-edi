@@ -237,11 +237,15 @@ public class SearchMessagesTests : TestBase
 
         // Assert
         resultForMessageId3.Messages.Should().HaveCount(3);
-        resultForMessageId3.Messages.Should()
-            .OnlyContain(
-                message => message.MessageId == archivedMessage3.MessageId
-                           || message.MessageId == archivedMessage31.MessageId
-                           || message.MessageId == archivedMessage32.MessageId);
+        resultForMessageId3.Messages.Select(m => m.MessageId)
+            .Should()
+            .BeEquivalentTo(
+                new[]
+                {
+                    archivedMessage3.MessageId,
+                    archivedMessage31.MessageId,
+                    archivedMessage32.MessageId,
+                });
     }
 
     [Fact]
@@ -277,10 +281,14 @@ public class SearchMessagesTests : TestBase
 
         // Assert
         resultForMessageId2.Messages.Should().HaveCount(2);
-        resultForMessageId2.Messages.Should()
-            .OnlyContain(
-                message => message.MessageId == archivedMessage2.MessageId
-                           || message.MessageId == archivedMessage21.MessageId);
+        resultForMessageId2.Messages.Select(m => m.MessageId)
+            .Should()
+            .BeEquivalentTo(
+                new[]
+                    {
+                        archivedMessage2.MessageId,
+                        archivedMessage21.MessageId,
+                    });
     }
 
     [Fact]
