@@ -53,15 +53,21 @@ public class RequestAggregatedMeasureMessageReceiver
         ArgumentNullException.ThrowIfNull(request);
 
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);
+        var contentType = request.Headers.TryGetContentType();
+        if (contentType is null)
+        {
+            _logger.LogInformation(
+                "Could not get Content-Type from request header.");
+            return await request.CreateMissingContentTypeResponseAsync(cancellationToken).ConfigureAwait(false);
+        }
 
-        var contentType = request.Headers.GetContentType();
         var documentFormat = DocumentFormatParser.ParseFromContentTypeHeaderValue(contentType);
         if (documentFormat is null)
         {
             _logger.LogInformation(
-                "Could not parse desired document format from Content-Type header value: {ContentType}",
+                "Could not parse desired document format from Content-Type header value: {ContentType}.",
                 contentType);
-            return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
+            return await request.CreateInvalidContentTypeResponseAsync(cancellationToken).ConfigureAwait(false);
         }
 
         var responseMessage = await _incomingMessageClient
