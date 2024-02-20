@@ -98,7 +98,7 @@ internal sealed class QueryBuilder
         if (includeRelatedMessage == true && messageId is not null)
         {
             sqlStatement = "SELECT DISTINCT t2.Id, t2.MessageId, t2.DocumentType, t2.SenderNumber, t2.ReceiverNumber, t2.CreatedAt, t2.BusinessReason " +
-                           "FROM ( SELECT * FROM dbo.ArchivedMessages {whereClause} ) AS t1 " +
+                           $"FROM ( SELECT * FROM dbo.ArchivedMessages {whereClause} ) AS t1 " +
                            "INNER JOIN dbo.ArchivedMessages as t2 " +
                            "ON t1.RelatedToMessageId = t2.RelatedToMessageId OR t1.RelatedToMessageId = t2.MessageId OR t1.MessageId= t2.MessageId";
         }

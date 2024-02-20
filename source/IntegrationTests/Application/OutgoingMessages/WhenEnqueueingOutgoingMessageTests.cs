@@ -97,7 +97,6 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             () => Assert.Equal(message.RelatedToMessageId!.Value, result.RelatedToMessageId),
             () => Assert.False(result.IsPublished),
             () => Assert.NotNull(result.AssignedBundleId),
-            () => Assert.Null(result.RelatedToMessageId),
         };
 
         Assert.Multiple(propertyAssertions);
