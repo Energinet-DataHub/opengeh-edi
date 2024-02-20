@@ -95,9 +95,7 @@ public sealed class WholesaleCalculationJsonDocumentWriter : IDocumentWriter
                     //await writer.WriteElementStringAsync(DocumentDetails.Prefix, "marketEvaluationPoint.type", null, "E17").ConfigureAwait(false);
                     //await WriteElementIfHasValueAsync("marketEvaluationPoint.settlementMethod", wholesaleCalculationSeries.SettlementType is null ? null : CimCode.Of(SettlementType.From(wholesaleCalculationSeries.SettlementType)), writer).ConfigureAwait(false);
 
-                    writer.WriteObject(
-                        "chargeType.mRID",
-                        KeyValuePair.Create("value", series.ChargeCode));
+                    writer.WriteProperty("chargeType.mRID", series.ChargeCode);
 
                     writer.WriteObject(
                         "chargeType.type",
@@ -157,12 +155,10 @@ public sealed class WholesaleCalculationJsonDocumentWriter : IDocumentWriter
                             {
                                 writer.WriteObject(
                                     "position",
-                                    KeyValuePair.Create("value", "1"));
-                                writer.WriteObject(
+                                    KeyValuePair.Create("value", 1));
+                                writer.WriteProperty(
                                     "energySum_Quantity.quantity",
-                                    KeyValuePair.Create(
-                                        "value",
-                                        series.Quantity?.ToString(NumberFormatInfo.InvariantInfo) ?? "0"));
+                                    series.Quantity ?? 0);
                             }
 
                             writer.WriteEndObject();

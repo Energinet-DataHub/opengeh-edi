@@ -51,8 +51,10 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
         var validationOptions = new EvaluationOptions { OutputFormat = OutputFormat.List };
         var validationResult = schema!.Evaluate(_document, validationOptions);
         var errors = validationResult.Details.Where(detail => detail.HasErrors)
-            .Select(x => x.Errors)
-            .SelectMany(e => e!.Values);
+            .Select(x => (x.InstanceLocation, x.EvaluationPath, x.Errors))
+            .SelectMany(
+                p => p.Errors!.Values.Select(
+                    e => $"==> '{p.InstanceLocation}' does not adhere to '{p.EvaluationPath}' with error: {e}\n"));
 
         validationResult.IsValid.Should().BeTrue(string.Join("\n", errors));
 
@@ -198,7 +200,6 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
     {
         FirstTimeSeriesElement()
             .GetProperty("chargeType.mRID")
-            .GetProperty("value")
             .GetString()
             .Should()
             .Be(expectedChargeTypeNumber);
@@ -351,16 +352,15 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
         point
             .GetProperty("position")
             .GetProperty("value")
-            .GetString()
+            .GetInt32()
             .Should()
-            .Be(expectedPosition.ToString(CultureInfo.InvariantCulture));
+            .Be(expectedPosition);
 
         point
             .GetProperty("energySum_Quantity.quantity")
-            .GetProperty("value")
-            .GetString()
+            .GetDecimal()
             .Should()
-            .Be(expectedQuantity.ToString(CultureInfo.InvariantCulture));
+            .Be(expectedQuantity);
 
         return this;
     }
