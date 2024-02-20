@@ -58,17 +58,16 @@ public class RequestAggregatedMeasureMessageReceiver
         {
             _logger.LogInformation(
                 "Could not get Content-Type from request header.");
-            return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
+            return await request.CreateMissingContentTypeResponseAsync(cancellationToken).ConfigureAwait(false);
         }
 
         var documentFormat = DocumentFormatParser.ParseFromContentTypeHeaderValue(contentType);
         if (documentFormat is null)
         {
             _logger.LogInformation(
-                "Could not parse desired document format from Content-Type header value: {ContentType}," +
-                        "supported values are: application/xml, application/json, application/ebix",
+                "Could not parse desired document format from Content-Type header value: {ContentType}.",
                 contentType);
-            return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
+            return await request.CreateInvalidContentTypeResponseAsync(cancellationToken).ConfigureAwait(false);
         }
 
         var responseMessage = await _incomingMessageClient
