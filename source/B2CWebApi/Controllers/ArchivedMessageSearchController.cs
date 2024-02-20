@@ -49,6 +49,7 @@ public class ArchivedMessageSearchController : ControllerBase
             ReceiverNumber = request.ReceiverNumber,
             DocumentTypes = request.DocumentTypes,
             BusinessReasons = request.BusinessReasons,
+            IncludeRelatedMessages = request.IncludeRelatedMessages,
         };
         var result = await _archivedMessagesClient.SearchAsync(query, cancellationToken).ConfigureAwait(false);
 
