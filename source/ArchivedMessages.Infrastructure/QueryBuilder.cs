@@ -44,7 +44,7 @@ internal sealed class QueryBuilder
         if (request.MessageId is not null)
         {
             AddFilter(
-                request.IncludeRelatedMessage ? "(MessageId=@MessageId or RelatedToMessageId = @MessageId)" : "MessageId=@MessageId",
+                request.IncludeRelatedMessages ? "(MessageId=@MessageId or RelatedToMessageId = @MessageId)" : "MessageId=@MessageId",
                 new KeyValuePair<string, object>("MessageId", request.MessageId));
         }
 
@@ -87,15 +87,15 @@ internal sealed class QueryBuilder
             throw new InvalidRestrictionException($"Invalid restriction for fetching archived messages. Must be either {nameof(Restriction.Owned)} or {nameof(Restriction.None)}. ActorNumber: {_actorIdentity.ActorNumber.Value}; Restriction: {_actorIdentity.Restriction.Name}");
         }
 
-        return new QueryInput(BuildStatement(request.IncludeRelatedMessage, request.MessageId), _queryParameters);
+        return new QueryInput(BuildStatement(request.IncludeRelatedMessages, request.MessageId), _queryParameters);
     }
 
-    private string BuildStatement(bool includeRelatedMessage, string? messageId)
+    private string BuildStatement(bool includeRelatedMessages, string? messageId)
     {
         var whereClause = _statement.Count > 0 ? $" WHERE {string.Join(" AND ", _statement)}" : string.Empty;
         string sqlStatement;
 
-        if (includeRelatedMessage == true && messageId is not null)
+        if (includeRelatedMessages == true && messageId is not null)
         {
             // Messages may be related in different ways, hence we have the following 3 cases:
             // 1. The message is related to other messages (Searching for a request with responses)

@@ -232,7 +232,7 @@ public class SearchMessagesTests : TestBase
         var resultForMessageId3 = await _archivedMessagesClient.SearchAsync(
             new GetMessagesQuery(
                 MessageId: messageIdOfMessage31.Value,
-                IncludeRelatedMessage: true),
+                IncludeRelatedMessages: true),
             CancellationToken.None);
 
         // Assert
@@ -272,7 +272,7 @@ public class SearchMessagesTests : TestBase
         var resultForMessageId2 = await _archivedMessagesClient.SearchAsync(
             new GetMessagesQuery(
                 MessageId: messageIdOfMessage2.Value,
-                IncludeRelatedMessage: true),
+                IncludeRelatedMessages: true),
             CancellationToken.None);
 
         // Assert
@@ -311,7 +311,7 @@ public class SearchMessagesTests : TestBase
         var resultForMessageId1 = await _archivedMessagesClient.SearchAsync(
             new GetMessagesQuery(
                 MessageId: messageIdOfMessage1.Value,
-                IncludeRelatedMessage: true),
+                IncludeRelatedMessages: true),
             CancellationToken.None);
 
         // Assert
@@ -319,7 +319,7 @@ public class SearchMessagesTests : TestBase
     }
 
     [Fact]
-    public async Task Related_messages_are_not_included_when_IncludeRelatedMessage_is_false()
+    public async Task Related_messages_are_not_included_when_IncludeRelatedMessages_is_false()
     {
         // Arrange
         var messageId = MessageId.New();
@@ -331,7 +331,7 @@ public class SearchMessagesTests : TestBase
         var resultForMessageId = await _archivedMessagesClient.SearchAsync(
             new GetMessagesQuery(
                 MessageId: messageId.Value,
-                IncludeRelatedMessage: false),
+                IncludeRelatedMessages: false),
             CancellationToken.None);
 
         resultForMessageId.Messages.Should().ContainSingle().Which.MessageId.Should().Be(archivedMessage1.MessageId);

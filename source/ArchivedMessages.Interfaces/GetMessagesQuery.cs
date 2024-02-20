@@ -24,6 +24,6 @@ public sealed record GetMessagesQuery(
     string? ReceiverNumber = null,
     IReadOnlyCollection<string>? DocumentTypes = null,
     IReadOnlyCollection<string>? BusinessReasons = null,
-    bool IncludeRelatedMessage = false);
+    bool IncludeRelatedMessages = false);
 
 public record MessageCreationPeriod(Instant DateToSearchFrom, Instant DateToSearchTo);

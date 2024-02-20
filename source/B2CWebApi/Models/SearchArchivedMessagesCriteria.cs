@@ -22,4 +22,4 @@ public record SearchArchivedMessagesCriteria(
     string? ReceiverNumber,
     IReadOnlyCollection<string>? DocumentTypes,
     IReadOnlyCollection<string>? BusinessReasons,
-    bool IncludeRelatedMessage = false);
+    bool IncludeRelatedMessages = false);
