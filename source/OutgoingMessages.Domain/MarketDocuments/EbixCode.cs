@@ -136,6 +136,8 @@ public static class EbixCode
             return "PT15M";
         if (resolution == Resolution.Hourly)
             return "PT1H";
+        if (resolution == Resolution.Monthly)
+            return "PT1M";
 
         throw NoCodeFoundFor(resolution.Name);
     }

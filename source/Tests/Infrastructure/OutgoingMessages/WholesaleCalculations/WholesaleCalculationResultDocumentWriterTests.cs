@@ -17,8 +17,12 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
@@ -43,31 +47,32 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
 
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Can_create_notifyWholesaleServices_document(string documentFormat)
     {
         // Arrange
-        var document = await CreateDocument(
-            _wholesaleCalculationsResultMessageBuilder
-                .WithMessageId(SampleData.MessageId.ToString())
-                .WithBusinessReason(SampleData.BusinessReason)
-                .WithTimestamp(SampleData.Timestamp)
-                .WithSender(SampleData.SenderId, ActorRole.EnergySupplier)
-                .WithReceiver(SampleData.ReceiverId, ActorRole.MeteredDataAdministrator)
+        var messageBuilder = _wholesaleCalculationsResultMessageBuilder
+            .WithMessageId(SampleData.MessageId.ToString())
+            .WithBusinessReason(SampleData.BusinessReason)
+            .WithTimestamp(SampleData.Timestamp)
+            .WithSender(SampleData.SenderId, ActorRole.EnergySupplier)
+            .WithReceiver(SampleData.ReceiverId, ActorRole.MeteredDataAdministrator)
+            .WithTransactionId(SampleData.TransactionId)
+            .WithCalculationVersion(SampleData.Version)
+            .WithChargeCode(SampleData.ChargeCode)
+            .WithChargeType(SampleData.ChargeType)
+            .WithChargeOwner(SampleData.ChargeOwner)
+            .WithGridArea(SampleData.GridAreaCode)
+            .WithEnergySupplier(SampleData.EnergySupplier)
+            .WithPeriod(SampleData.PeriodStartUtc, SampleData.PeriodEndUtc)
+            .WithCurrency(SampleData.Currency)
+            .WithMeasurementUnit(SampleData.MeasurementUnit)
+            .WithPriceMeasurementUnit(SampleData.PriceMeasureUnit)
+            .WithResolution(SampleData.Resolution)
+            .WithQuantity(SampleData.Quantity);
 
-                .WithTransactionId(SampleData.TransactionId)
-                .WithCalculationVersion(SampleData.Version)
-                .WithChargeCode(SampleData.ChargeCode)
-                .WithChargeType(SampleData.ChargeType)
-                .WithChargeOwner(SampleData.ChargeOwner)
-                .WithGridArea(SampleData.GridAreaCode)
-                .WithEnergySupplier(SampleData.EnergySupplier)
-                .WithPeriod(SampleData.PeriodStartUtc, SampleData.PeriodEndUtc)
-                .WithCurrency(SampleData.Currency)
-                .WithMeasurementUnit(SampleData.MeasurementUnit)
-                .WithPriceMeasurementUnit(SampleData.PriceMeasureUnit)
-                .WithResolution(SampleData.Resolution)
-                .WithQuantity(SampleData.Quantity),
-            DocumentFormat.From(documentFormat));
+        // Act
+        var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
 
         // Assert
         using var assertionScope = new AssertionScope();
@@ -79,7 +84,6 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
                 .HasReceiverId(SampleData.ReceiverId)
                 .HasReceiverRole(ActorRole.MeteredDataAdministrator)
                 .HasTimestamp(SampleData.Timestamp)
-
                 .HasTransactionId(SampleData.TransactionId)
                 .HasCalculationVersion(SampleData.Version)
                 .HasChargeCode(SampleData.ChargeCode)
@@ -99,13 +103,15 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
 
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Can_create_notifyWholesaleServices_document_without_quantity(string documentFormat)
     {
         // Arrange
-        var document = await CreateDocument(
-            _wholesaleCalculationsResultMessageBuilder
-                .WithQuantity(null),
-            DocumentFormat.From(documentFormat));
+        var messageBuilder = _wholesaleCalculationsResultMessageBuilder
+            .WithQuantity(null);
+
+        // Act
+        var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
 
         // Assert
         using var assertionScope = new AssertionScope();
@@ -115,13 +121,15 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
 
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Can_create_notifyWholesaleServices_document_with_settlement_version(string documentFormat)
     {
         // Arrange
-        var document = await CreateDocument(
-            _wholesaleCalculationsResultMessageBuilder
-                .WithSettlementVersion(SettlementVersion.FirstCorrection),
-            DocumentFormat.From(documentFormat));
+        var messageBuilder = _wholesaleCalculationsResultMessageBuilder
+            .WithSettlementVersion(SettlementVersion.FirstCorrection);
+
+        // Act
+        var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
 
         // Assert
         using var assertionScope = new AssertionScope();
@@ -131,41 +139,50 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
 
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Can_create_notifyWholesaleServices_document_with_measurement_unit_pieces(string documentFormat)
     {
         // Arrange
-        var document = await CreateDocument(
-            _wholesaleCalculationsResultMessageBuilder
-                .WithMeasurementUnit(MeasurementUnit.Pieces),
-            DocumentFormat.From(documentFormat));
+        var messageBuilder = _wholesaleCalculationsResultMessageBuilder
+            .WithMeasurementUnit(MeasurementUnit.Pieces);
+
+        // Act
+        var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
 
         // Assert
         AssertDocument(document, DocumentFormat.From(documentFormat))
             .HasMeasurementUnit(MeasurementUnit.Pieces);
     }
 
-    private Task<MarketDocumentStream> CreateDocument(WholesaleCalculationsResultMessageBuilder resultBuilder, DocumentFormat documentFormat)
+    private Task<MarketDocumentStream> WriteDocument(OutgoingMessageHeader header, WholesaleCalculationSeries wholesaleCalculationSeries, DocumentFormat documentFormat)
     {
-        var documentHeader = resultBuilder.BuildHeader();
-        var records = _parser.From(resultBuilder.BuildWholesaleCalculation());
+        var records = _parser.From(wholesaleCalculationSeries);
 
+        IDocumentWriter documentWriter;
         if (documentFormat == DocumentFormat.Xml)
-        {
-            return new WholesaleCalculationXmlDocumentWriter(_parser).WriteAsync(
-                documentHeader,
-                new[] { records, });
-        }
+            documentWriter = new WholesaleCalculationXmlDocumentWriter(_parser);
+        else if (documentFormat == DocumentFormat.Ebix)
+            documentWriter = new WholesaleCalculationResultEbixDocumentWriter(_parser);
+        else
+            throw new NotImplementedException();
 
-        throw new NotImplementedException();
+        return documentWriter.WriteAsync(
+            header,
+            new[] { records, });
     }
 
-    // IAssertWholesaleCalculationResultDocument
-    private AssertWholesaleCalculationResultXmlDocument AssertDocument(MarketDocumentStream document, DocumentFormat documentFormat)
+    private IAssertWholesaleCalculationResultDocument AssertDocument(MarketDocumentStream document, DocumentFormat documentFormat)
     {
          if (documentFormat == DocumentFormat.Xml)
          {
              var assertXmlDocument = AssertXmlDocument.Document(document.Stream, "cim", _documentValidation.Validator);
              return new AssertWholesaleCalculationResultXmlDocument(assertXmlDocument);
+         }
+
+         if (documentFormat == DocumentFormat.Ebix)
+         {
+             var assertEbixDocument = AssertEbixDocument.Document(document.Stream, "ns0", _documentValidation.Validator);
+             return new AssertWholesaleCalculationResultEbixDocument(assertEbixDocument);
          }
 
          throw new NotSupportedException($"Document format '{documentFormat}' is not supported");
