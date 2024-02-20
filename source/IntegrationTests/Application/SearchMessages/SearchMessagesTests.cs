@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
+using FluentAssertions;
 using NodaTime;
 using NodaTime.Text;
 using Xunit;
@@ -203,6 +204,148 @@ public class SearchMessagesTests : TestBase
     }
 
     [Fact]
+    public async Task Include_related_messages_when_searching_for_a_message_which_has_a_relation_to_more_than_one_message()
+    {
+        // Arrange
+        var messageIdOfMessage3 = MessageId.New();
+        var messageIdOfMessage31 = MessageId.New();
+        var messageIdOfMessage32 = MessageId.New();
+        var archivedMessage3 = CreateArchivedMessage(_systemDateTimeProvider.Now(), messageId: messageIdOfMessage3.Value);
+        var archivedMessage31 = CreateArchivedMessage(_systemDateTimeProvider.Now(), relatedToMessageId: messageIdOfMessage3, messageId: messageIdOfMessage31.Value);
+        var archivedMessage32 = CreateArchivedMessage(_systemDateTimeProvider.Now(), relatedToMessageId: messageIdOfMessage3, messageId: messageIdOfMessage32.Value);
+        await ArchiveMessage(archivedMessage3);
+        await ArchiveMessage(archivedMessage31);
+        await ArchiveMessage(archivedMessage32);
+
+        var messageIdOfMessage2 = MessageId.New();
+        var archivedMessage2 = CreateArchivedMessage(_systemDateTimeProvider.Now(), messageId: messageIdOfMessage2.Value);
+        var archivedMessage21 = CreateArchivedMessage(_systemDateTimeProvider.Now(), relatedToMessageId: messageIdOfMessage2, messageId: Guid.NewGuid().ToString());
+        await ArchiveMessage(archivedMessage2);
+        await ArchiveMessage(archivedMessage21);
+
+        var messageIdOfMessage1 = MessageId.New();
+        var archivedMessage1 = CreateArchivedMessage(_systemDateTimeProvider.Now(), messageId: messageIdOfMessage1.Value);
+        await ArchiveMessage(archivedMessage1);
+
+        // Act
+        // This could simulate a search for a message, where it is a response to a request with more than one response
+        var resultForMessageId3 = await _archivedMessagesClient.SearchAsync(
+            new GetMessagesQuery(
+                MessageId: messageIdOfMessage31.Value,
+                IncludeRelatedMessages: true),
+            CancellationToken.None);
+
+        // Assert
+        resultForMessageId3.Messages.Should().HaveCount(3);
+        resultForMessageId3.Messages.Select(m => m.MessageId)
+            .Should()
+            .BeEquivalentTo(
+                new[]
+                {
+                    archivedMessage3.MessageId,
+                    archivedMessage31.MessageId,
+                    archivedMessage32.MessageId,
+                });
+    }
+
+    [Fact]
+    public async Task Include_related_messages_when_searching_for_a_message_which_has_a_relation_to_one_message()
+    {
+        // Arrange
+        var messageIdOfMessage3 = MessageId.New();
+        var messageIdOfMessage33 = MessageId.New();
+        var archivedMessage3 = CreateArchivedMessage(_systemDateTimeProvider.Now(), messageId: messageIdOfMessage3.Value);
+        var archivedMessage31 = CreateArchivedMessage(_systemDateTimeProvider.Now(), relatedToMessageId: messageIdOfMessage3, messageId: messageIdOfMessage33.Value);
+        var archivedMessage32 = CreateArchivedMessage(_systemDateTimeProvider.Now(), relatedToMessageId: messageIdOfMessage3, messageId: Guid.NewGuid().ToString());
+        await ArchiveMessage(archivedMessage3);
+        await ArchiveMessage(archivedMessage31);
+        await ArchiveMessage(archivedMessage32);
+
+        var messageIdOfMessage2 = MessageId.New();
+        var archivedMessage2 = CreateArchivedMessage(_systemDateTimeProvider.Now(), messageId: messageIdOfMessage2.Value);
+        var archivedMessage21 = CreateArchivedMessage(_systemDateTimeProvider.Now(), relatedToMessageId: messageIdOfMessage2, messageId: Guid.NewGuid().ToString());
+        await ArchiveMessage(archivedMessage2);
+        await ArchiveMessage(archivedMessage21);
+
+        var messageIdOfMessage1 = MessageId.New();
+        var archivedMessage1 = CreateArchivedMessage(_systemDateTimeProvider.Now(), messageId: messageIdOfMessage1.Value);
+        await ArchiveMessage(archivedMessage1);
+
+        // Act
+        // This could simulate a search for a message, where it is a request with one response
+        var resultForMessageId2 = await _archivedMessagesClient.SearchAsync(
+            new GetMessagesQuery(
+                MessageId: messageIdOfMessage2.Value,
+                IncludeRelatedMessages: true),
+            CancellationToken.None);
+
+        // Assert
+        resultForMessageId2.Messages.Should().HaveCount(2);
+        resultForMessageId2.Messages.Select(m => m.MessageId)
+            .Should()
+            .BeEquivalentTo(
+                new[]
+                    {
+                        archivedMessage2.MessageId,
+                        archivedMessage21.MessageId,
+                    });
+    }
+
+    [Fact]
+    public async Task Include_related_messages_when_searching_for_a_message_which_has_a_no_relation()
+    {
+        // Arrange
+        var messageIdOfMessage3 = MessageId.New();
+        var messageIdOfMessage33 = MessageId.New();
+        var archivedMessage3 = CreateArchivedMessage(_systemDateTimeProvider.Now(), messageId: messageIdOfMessage3.Value);
+        var archivedMessage31 = CreateArchivedMessage(_systemDateTimeProvider.Now(), relatedToMessageId: messageIdOfMessage3, messageId: messageIdOfMessage33.Value);
+        var archivedMessage32 = CreateArchivedMessage(_systemDateTimeProvider.Now(), relatedToMessageId: messageIdOfMessage3, messageId: Guid.NewGuid().ToString());
+        await ArchiveMessage(archivedMessage3);
+        await ArchiveMessage(archivedMessage31);
+        await ArchiveMessage(archivedMessage32);
+
+        var messageIdOfMessage2 = MessageId.New();
+        var archivedMessage2 = CreateArchivedMessage(_systemDateTimeProvider.Now(), messageId: messageIdOfMessage2.Value);
+        var archivedMessage21 = CreateArchivedMessage(_systemDateTimeProvider.Now(), relatedToMessageId: messageIdOfMessage2, messageId: Guid.NewGuid().ToString());
+        await ArchiveMessage(archivedMessage2);
+        await ArchiveMessage(archivedMessage21);
+
+        var messageIdOfMessage1 = MessageId.New();
+        var archivedMessage1 = CreateArchivedMessage(_systemDateTimeProvider.Now(), messageId: messageIdOfMessage1.Value);
+        await ArchiveMessage(archivedMessage1);
+
+        // Act
+        // This could simulate a search for a message, where it is a request with one response
+        var resultForMessageId1 = await _archivedMessagesClient.SearchAsync(
+            new GetMessagesQuery(
+                MessageId: messageIdOfMessage1.Value,
+                IncludeRelatedMessages: true),
+            CancellationToken.None);
+
+        // Assert
+        resultForMessageId1.Messages.Should().ContainSingle().Which.MessageId.Should().Be(archivedMessage1.MessageId);
+    }
+
+    [Fact]
+    public async Task Related_messages_are_not_included_when_IncludeRelatedMessages_is_false()
+    {
+        // Arrange
+        var messageId = MessageId.New();
+        var archivedMessage1 = CreateArchivedMessage(_systemDateTimeProvider.Now(), messageId: messageId.Value);
+        var archivedMessage2 = CreateArchivedMessage(_systemDateTimeProvider.Now(), relatedToMessageId: messageId, messageId: MessageId.New().Value);
+        await ArchiveMessage(archivedMessage1);
+        await ArchiveMessage(archivedMessage2);
+
+        var resultForMessageId = await _archivedMessagesClient.SearchAsync(
+            new GetMessagesQuery(
+                MessageId: messageId.Value,
+                IncludeRelatedMessages: false),
+            CancellationToken.None);
+
+        resultForMessageId.Messages.Should().ContainSingle().Which.MessageId.Should().Be(archivedMessage1.MessageId);
+    }
+
+    [Fact]
     public async Task Actor_identity_with_owned_restriction_can_only_fetch_own_messages()
     {
         var ownActorNumber = ActorNumber.Create("1234512345888");
@@ -254,7 +397,8 @@ public class SearchMessagesTests : TestBase
         string? documentType = null,
         string? businessReason = null,
         string? messageId = null,
-        ArchivedMessageType? archivedMessageType = null)
+        ArchivedMessageType? archivedMessageType = null,
+        MessageId? relatedToMessageId = null)
     {
         return new ArchivedMessage(
             messageId ?? "MessageId",
@@ -265,8 +409,9 @@ public class SearchMessagesTests : TestBase
             businessReason ?? BusinessReason.BalanceFixing.Name,
             archivedMessageType ?? ArchivedMessageType.OutgoingMessage,
 #pragma warning disable CA2000 // Do not dispose here
-            new MarketDocumentStream(new MarketDocumentWriterMemoryStream()));
+            new MarketDocumentStream(new MarketDocumentWriterMemoryStream()),
 #pragma warning restore CA2000
+            relatedToMessageId);
     }
 
     private async Task ArchiveMessage(ArchivedMessage archivedMessage)
