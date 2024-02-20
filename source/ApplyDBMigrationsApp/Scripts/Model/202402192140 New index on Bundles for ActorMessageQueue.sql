@@ -1,0 +1,1 @@
+﻿CREATE NONCLUSTERED INDEX IX_Bundles_ActorMessageQueue ON [dbo].[Bundles] ([ActorMessageQueueId]) INCLUDE ([BusinessReason], [Created], [DocumentTypeInBundle], [Id], [IsClosed], [IsDequeued], [MaxMessageCount], [MessageCount])
