@@ -51,15 +51,15 @@ public class JsonMessageParser : JsonParserBase, IMessageParser
                 new InvalidBusinessReasonOrVersion(DocumentName, "0"));
         }
 
-        var errors = await ValidateMessageAsync(schema, incomingMessageStream).ConfigureAwait(false);
-
-        if (errors.Count > 0)
-        {
-            return new RequestAggregatedMeasureDataMarketMessageParserResult(errors.ToArray());
-        }
-
         try
         {
+            var errors = await ValidateMessageAsync(schema, incomingMessageStream).ConfigureAwait(false);
+
+            if (errors.Count > 0)
+            {
+                return new RequestAggregatedMeasureDataMarketMessageParserResult(errors.ToArray());
+            }
+
             using var document = await JsonDocument.ParseAsync(incomingMessageStream.Stream, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
