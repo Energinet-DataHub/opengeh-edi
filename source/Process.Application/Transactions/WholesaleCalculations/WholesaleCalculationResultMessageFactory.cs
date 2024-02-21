@@ -41,7 +41,7 @@ public static class WholesaleCalculationResultMessageFactory
             Quantity: message.Amount != null ? DecimalParser.Parse(message.Amount) : null,
             Points: new[]
             {
-                new Point(1, 1, null, message.Amount != null ? DecimalParser.Parse(message.Amount) : null, null),
+                new Point(1, null, null, message.Amount != null ? DecimalParser.Parse(message.Amount) : null, null),
             },
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
             ChargeOwner: ActorNumber.Create(message.ChargeOwnerId), // this is an assumption
