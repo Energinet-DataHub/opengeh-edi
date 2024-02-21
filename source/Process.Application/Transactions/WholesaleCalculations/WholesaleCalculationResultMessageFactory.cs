@@ -69,7 +69,7 @@ public static class WholesaleCalculationResultMessageFactory
 
         var wholesaleCalculationSeries = new WholesaleCalculationSeries(
             TransactionId: ProcessId.New().Id,
-            CalculationVersion: 1, //message.CalculationResultVersion,
+            CalculationVersion: message.CalculationResultVersion,
             GridAreaCode: message.GridAreaCode,
             ChargeCode: message.ChargeCode,
             IsTax: message.IsTax,
