@@ -34,7 +34,7 @@ internal static class JsonHeaderWriter
         writer.WriteStartObject();
 
         writer.WriteProperty("mRID", messageHeader.MessageId);
-        writer.WriteObject("businessSector.type", new KeyValuePair<string, string>("value", GeneralValues.SectorTypeCode));
+        writer.WriteObject("businessSector.type", new KeyValuePair<string, string>("value", DocumentGeneralValues.SectorTypeCode));
         writer.WriteProperty("createdDateTime", messageHeader.TimeStamp.ToString());
         writer.WriteObject("process.processType", new KeyValuePair<string, string>("value", CimCode.Of(BusinessReason.FromName(messageHeader.BusinessReason))));
 

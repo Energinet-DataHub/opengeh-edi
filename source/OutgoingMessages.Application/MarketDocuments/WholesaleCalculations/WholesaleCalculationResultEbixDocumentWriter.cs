@@ -121,7 +121,7 @@ public class WholesaleCalculationResultEbixDocumentWriter : EbixDocumentWriter
                     // <Identification />
                     await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Identification", null).ConfigureAwait(false);
                     await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "9").ConfigureAwait(false);
-                    await writer.WriteStringAsync(GeneralValues.ProductCode).ConfigureAwait(false);
+                    await writer.WriteStringAsync(DocumentGeneralValues.ProductCodeA).ConfigureAwait(false);
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
 
                     // <UnitType />

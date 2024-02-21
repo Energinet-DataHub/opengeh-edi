@@ -74,7 +74,7 @@ public class AggregationResultXmlDocumentWriter : DocumentWriter
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
             }
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, GeneralValues.ProductCode).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, DocumentGeneralValues.ProductCodeA).ConfigureAwait(false);
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, CimCode.Of(MeasurementUnit.From(timeSeries.MeasureUnitType))).ConfigureAwait(false);
 
