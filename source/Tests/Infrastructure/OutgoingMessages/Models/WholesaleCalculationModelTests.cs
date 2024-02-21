@@ -43,11 +43,15 @@ public class WholesaleCalculationModelTests
     [Fact]
     public void WholesaleCalculationSeries_point_has_the_same_attributes_as_WholesaleCalculationMarketActivityRecord_point()
     {
-        var keysOfWholesaleCalculationSeries = typeof(Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations.Point).GetProperties().Select(p => new { Name = p.Name, PropertyType = p.PropertyType.ToString(), IsClass = p.PropertyType.IsClass }).ToList();
-        var keysOfWholesaleCalculationMarketActivityRecord = typeof(Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations.Point).GetProperties().Select(p => new { Name = p.Name, PropertyType = p.PropertyType.ToString(), IsClass = p.PropertyType.IsClass }).ToList();
+        var keysOfWholesaleCalculationSeries = typeof(Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations.Point).GetProperties()
+            .Select(p => new { Name = p.Name, PropertyType = p.PropertyType }).ToList();
+        var keysOfWholesaleCalculationMarketActivityRecord = typeof(Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations.Point).GetProperties()
+            .Select(p => new { Name = p.Name, PropertyType = p.PropertyType }).ToList();
 
         Assert.All(keysOfWholesaleCalculationSeries, property =>
             Assert.Contains(keysOfWholesaleCalculationMarketActivityRecord, element =>
-                element.Name == property.Name && (element.PropertyType == property.PropertyType || element.IsClass == property.IsClass)));
+                element.Name == property.Name
+                && element.PropertyType == property.PropertyType
+                && Nullable.GetUnderlyingType(element.PropertyType) == Nullable.GetUnderlyingType(property.PropertyType)));
     }
 }

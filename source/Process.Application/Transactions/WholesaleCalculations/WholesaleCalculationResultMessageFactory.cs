@@ -75,7 +75,7 @@ public static class WholesaleCalculationResultMessageFactory
             Quantity: null,
             Points: TimeSeriesPointsMapper.MapPoints(message.TimeSeriesPoints),
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
-            ChargeOwner: ActorNumber.Create(message.ChargeOwnerId), // this is an assumption
+            ChargeOwner: ActorNumber.Create(message.ChargeOwnerId),
             Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),
             SettlementVersion: SettlementVersionMapper.Map(message.CalculationType),
             QuantityUnit: MeasurementUnitMapper.Map(message.QuantityUnit),
