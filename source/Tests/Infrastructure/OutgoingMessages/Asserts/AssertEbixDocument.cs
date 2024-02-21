@@ -45,8 +45,6 @@ public class AssertEbixDocument
 
         _originalMessage = XDocument.Load(reader);
 
-        var asString = _originalMessage.ToString();
-
         var elm = _originalMessage.Root!.Descendants().Single(x => x.Name.LocalName == "Payload").Descendants().First();
         _document = XDocument.Parse(elm.ToString());
 
