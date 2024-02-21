@@ -122,6 +122,26 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
+    public IAssertWholesaleCalculationResultDocument PriceAmountIsPresentForPointIndex(int pointPosition, string? expectedPrice)
+    {
+        if (pointPosition == 0)
+        {
+            _documentAsserter.HasValue($"Series[1]/Period/Point/price.amount", expectedPrice ?? "0");
+        }
+        else
+        {
+            _documentAsserter.HasValue($"Series[1]/Period/Point[{pointPosition}]/price.amount", expectedPrice ?? "0");
+        }
+
+        return this;
+    }
+
+    public IAssertWholesaleCalculationResultDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType)
+    {
+        _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.type", CimCode.Of(expectedMeteringPointType));
+        return this;
+    }
+
     public IAssertWholesaleCalculationResultDocument HasChargeCode(string expectedChargeTypeNumber)
     {
         _documentAsserter.HasValue("Series[1]/chargeType.mRID", expectedChargeTypeNumber);

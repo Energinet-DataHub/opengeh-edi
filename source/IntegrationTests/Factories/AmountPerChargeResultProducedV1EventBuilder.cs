@@ -56,7 +56,7 @@ public class AmountPerChargeResultProducedV1EventBuilder
             Currency = _currency,
             MeteringPointType = _meteringPointType,
             SettlementMethod = _settlementMethod,
-            // CalculationResultVersion = _calculationVersion,
+            CalculationResultVersion = _calculationVersion,
         };
 
         return @event;

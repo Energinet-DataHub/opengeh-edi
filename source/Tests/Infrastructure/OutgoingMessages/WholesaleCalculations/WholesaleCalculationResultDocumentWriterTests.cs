@@ -13,6 +13,10 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.Serialization;
@@ -24,6 +28,7 @@ using Energinet.DataHub.EDI.Tests.Fixtures;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions.Execution;
 using Xunit;
+using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations.Point;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.WholesaleCalculations;
 
@@ -53,7 +58,6 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
                 .WithTimestamp(SampleData.Timestamp)
                 .WithSender(SampleData.SenderId, ActorRole.EnergySupplier)
                 .WithReceiver(SampleData.ReceiverId, ActorRole.MeteredDataAdministrator)
-
                 .WithTransactionId(SampleData.TransactionId)
                 .WithCalculationVersion(SampleData.Version)
                 .WithChargeCode(SampleData.ChargeCode)
@@ -142,6 +146,32 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
         // Assert
         AssertDocument(document, DocumentFormat.From(documentFormat))
             .HasMeasurementUnit(MeasurementUnit.Pieces);
+    }
+
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    public async Task Can_create_notifyWholesaleServices_document_with_calculated_hourly_tariff_amounts_for_flex_consumption(string documentFormat)
+    {
+        // Arrange
+        var firstPoint = new Point(1, 1, 100, 100, null);
+        var secondPoint = new Point(2, 1, 200, 100, null);
+        var document = await CreateDocument(
+            _wholesaleCalculationsResultMessageBuilder
+                .WithSettlementMethod(SettlementType.Flex)
+                .WithMeteringPointType(MeteringPointType.Consumption)
+                .WithCalculatedHourlyTariffAmounts(new()
+                {
+                    firstPoint,
+                    secondPoint,
+                }),
+            DocumentFormat.From(documentFormat));
+
+        // Assert
+        AssertDocument(document, DocumentFormat.From(documentFormat))
+            .HasSettlementMethod(SettlementType.Flex)
+            .HasMeteringPointType(MeteringPointType.Consumption)
+            .PriceAmountIsPresentForPointIndex(0, firstPoint.Amount?.ToString(NumberFormatInfo.InvariantInfo))
+            .PriceAmountIsPresentForPointIndex(1, secondPoint.Amount?.ToString(NumberFormatInfo.InvariantInfo));
     }
 
     private Task<MarketDocumentStream> CreateDocument(WholesaleCalculationsResultMessageBuilder resultBuilder, DocumentFormat documentFormat)

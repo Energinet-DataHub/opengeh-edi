@@ -14,6 +14,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
@@ -47,7 +49,7 @@ public class WholesaleCalculationsResultMessageBuilder
     private ActorNumber _chargeOwner = ActorNumber.Create("1234567897777");
     private string? _originalTransactionIdReference;
     private SettlementVersion? _settlementVersion;
-    private int? _amount;
+    private List<Point> _points = new() { new(1, 100, 100, 100, null) };
 
     private Currency _currency = Currency.DanishCrowns;
     private Period _period = new(Instant.FromUtc(2023, 11, 1, 0, 0), Instant.FromUtc(2023, 12, 1, 0, 0));
@@ -147,7 +149,7 @@ public class WholesaleCalculationsResultMessageBuilder
 
     public WholesaleCalculationsResultMessageBuilder WithAmount(int? amount)
     {
-        _amount = amount;
+        _points = new List<Point>() { new(1, 100, 100, amount, null) };
         return this;
     }
 
@@ -187,6 +189,12 @@ public class WholesaleCalculationsResultMessageBuilder
         return this;
     }
 
+    public WholesaleCalculationsResultMessageBuilder WithCalculatedHourlyTariffAmounts(Collection<Point> points)
+    {
+        _points = points.ToList();
+        return this;
+    }
+
     public OutgoingMessageHeader BuildHeader()
     {
         return new OutgoingMessageHeader(
@@ -207,7 +215,7 @@ public class WholesaleCalculationsResultMessageBuilder
             GridAreaCode: _gridAreaCode,
             ChargeCode: _chargeCode,
             IsTax: false,
-            Points: new List<Point>() { new(1, 100, 100, _amount, null) },
+            Points: _points,
             EnergySupplier: _energySupplierActorNumber,
             ChargeOwner: _chargeOwner,
             Period: _period,
@@ -217,8 +225,8 @@ public class WholesaleCalculationsResultMessageBuilder
             Currency: _currency,
             ChargeType: _chargeType,
             Resolution: _resolution,
-            null,
-            null);
+            _meteringPointType,
+            _settlementMethod);
     }
 
     private static Instant ParseTimeStamp(string timestamp)

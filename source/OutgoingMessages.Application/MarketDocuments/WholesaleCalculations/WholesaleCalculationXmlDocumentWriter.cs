@@ -93,10 +93,10 @@ public class WholesaleCalculationXmlDocumentWriter : DocumentWriter
             // tab removed
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Point", null).ConfigureAwait(false);
-
             foreach (var point in wholesaleCalculationSeries.Points)
             {
+                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Point", null).ConfigureAwait(false);
+
                 await WriteElementAsync("position", point.Position.ToString(NumberFormatInfo.InvariantInfo), writer).ConfigureAwait(false);
 
                 await WriteElementIfHasValueAsync("energy_Quantity.quantity", point.Quantity?.ToString(NumberFormatInfo.InvariantInfo), writer).ConfigureAwait(false);
@@ -107,10 +107,10 @@ public class WholesaleCalculationXmlDocumentWriter : DocumentWriter
                 await WriteElementAsync("energySum_Quantity.quantity", point.Amount?.ToString(NumberFormatInfo.InvariantInfo) ?? "0", writer).ConfigureAwait(false);
 
                 await WriteElementIfHasValueAsync("quality", point.QuantityQuality?.ToString(), writer).ConfigureAwait(false);
-            }
 
-            // tab removed
-            await writer.WriteEndElementAsync().ConfigureAwait(false);
+                // tab removed
+                await writer.WriteEndElementAsync().ConfigureAwait(false);
+            }
 
             // tab removed
             await writer.WriteEndElementAsync().ConfigureAwait(false);
