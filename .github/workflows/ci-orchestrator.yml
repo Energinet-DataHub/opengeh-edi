@@ -20,12 +20,12 @@ on:
 
 jobs:
   #
-  # License and Markdown Check.
+  # License and Markdown Check
   #
   ci_base:
     uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@v13
     secrets:
-      pat_token: ${{ secrets.internal_github_pat }}
+      dh3serviceaccount_privatekey: ${{ secrets.dh3serviceaccount_privatekey }}
 
   #
   # CodeQL Check
