@@ -17,6 +17,4 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
 internal static class GeneralValues
 {
     internal static string SectorTypeCode => "23";
-
-    internal static string ProductCode => "8716867000030";
 }

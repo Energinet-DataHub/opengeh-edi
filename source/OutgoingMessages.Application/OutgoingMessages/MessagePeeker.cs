@@ -87,7 +87,8 @@ public class MessagePeeker
                 timestamp,
                 outgoingMessageBundle.BusinessReason,
                 ArchivedMessageType.OutgoingMessage,
-                marketDocumentStream);
+                marketDocumentStream,
+                outgoingMessageBundle.RelatedToMessageId);
             var archivedFile = await _archivedMessageClient.CreateAsync(archivedMessageToCreate, cancellationToken).ConfigureAwait(false);
 
             marketDocument = new MarketDocument(peekResult.BundleId, archivedFile);

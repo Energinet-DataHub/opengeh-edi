@@ -12,17 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
-using System.Net.Http.Headers;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.Api.Common;
-
-internal static class HttpHeadersExtensions
+public class ProductType : EnumerationType
 {
-    internal static string? TryGetContentType(this HttpHeaders headers)
+    public static readonly ProductType EnergyActive = new(nameof(EnergyActive), "8716867000030");
+    public static readonly ProductType Tariff = new(nameof(Tariff), "5790001330590");
+
+    protected ProductType(string name, string code)
+        : base(name)
     {
-        headers.TryGetValues("Content-Type", out var contentTypes);
-        return contentTypes?.FirstOrDefault() ?? null;
+        Code = code;
+    }
+
+    public string Code { get; }
+
+    public override string ToString()
+    {
+        return Name;
     }
 }

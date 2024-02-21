@@ -37,7 +37,7 @@ public static class SqlExtensions
         services.AddDbContext<TDbContext>((sp, o) =>
         {
             var source = sp.GetRequiredService<SqlConnectionSource>();
-            o.UseSqlServer(source.Connection, y => y.UseNodaTime());
+            o.UseSqlServer(source.Connection, y => y.UseNodaTime().EnableRetryOnFailure());
         });
     }
 }

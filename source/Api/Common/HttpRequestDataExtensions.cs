@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Worker.Http;
 
 namespace Energinet.DataHub.EDI.Api.Common;
@@ -31,5 +33,35 @@ public static class HttpRequestDataExtensions
 
         var cancellationToken = cancellationTokenSource.Token;
         return cancellationToken;
+    }
+
+    public static async Task<HttpResponseData> CreateMissingContentTypeResponseAsync(this HttpRequestData request,  CancellationToken cancellationToken)
+    {
+        return await GetContentTypeErrorResponseAsync(
+            request,
+            "Could not get Content-Type from request header. The supported values are: application/xml, application/json, application/ebix",
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    public static async Task<HttpResponseData> CreateInvalidContentTypeResponseAsync(this HttpRequestData request,  CancellationToken cancellationToken)
+    {
+        return await GetContentTypeErrorResponseAsync(
+            request,
+            "Could not parse desired document format from Content-Type in request header. The supported values are: application/xml, application/json, application/ebix",
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    private static async Task<HttpResponseData> GetContentTypeErrorResponseAsync(
+        HttpRequestData request,
+        string message,
+        CancellationToken cancellationToken)
+    {
+        var missingContentTypeResponse = request.CreateResponse(
+            HttpStatusCode.UnsupportedMediaType);
+        await missingContentTypeResponse.WriteStringAsync(
+                message,
+                cancellationToken)
+            .ConfigureAwait(false);
+        return missingContentTypeResponse;
     }
 }

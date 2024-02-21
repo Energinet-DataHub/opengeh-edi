@@ -84,6 +84,7 @@ public class MessageParserTests
         {
                 new object[] { DocumentFormat.Xml, CreateBaseXmlMessage("BadVersionRequestAggregatedMeasureData.xml"), nameof(InvalidBusinessReasonOrVersion) },
                 new object[] { DocumentFormat.Json, CreateBaseJsonMessages("FailSchemeValidationAggregatedMeasureData.json"), nameof(InvalidMessageStructure) },
+                new object[] { DocumentFormat.Json, CreateBaseJsonMessages("InvalidJsonAggregatedMeasureData.json"), nameof(InvalidMessageStructure) },
         };
     }
 
