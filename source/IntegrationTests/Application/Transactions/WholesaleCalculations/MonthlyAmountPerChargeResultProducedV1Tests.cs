@@ -117,7 +117,9 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.GridAreaCode, gridAreaCode)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.ChargeCode, chargeCode)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.IsTax, isTax)
+#pragma warning disable CS0618 // Type or member is obsolete
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.Quantity,  DecimalParser.Parse(amount))
+#pragma warning restore CS0618 // Type or member is obsolete
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.EnergySupplier, ActorNumber.Create(energySupplier))
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.ChargeOwner, ActorNumber.Create(chargeOwner))
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.Period.Start, startOfPeriod)
@@ -145,7 +147,9 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
         // Assert
         var message = await AssertOutgoingMessageAsync(businessReason: BusinessReason.Correction);
         message
+#pragma warning disable CS0618 // Type or member is obsolete
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.Quantity, null)
+#pragma warning restore CS0618 // Type or member is obsolete
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.SettlementVersion, SettlementVersion.FirstCorrection);
     }
 
