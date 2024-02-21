@@ -52,7 +52,7 @@ jobs:
       structurizr_workspace_filename: views
       included_model_filename: model
     secrets:
-      pat_token_retrigger_workflow: ${{ secrets.internal_github_pat }}
+      dh3serviceaccount_privatekey: ${{ secrets.dh3serviceaccount_privatekey }}
 
   #
   # Branch policy status check
