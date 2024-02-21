@@ -66,7 +66,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
                 .WithMeasurementUnit(SampleData.MeasurementUnit)
                 .WithPriceMeasurementUnit(SampleData.PriceMeasureUnit)
                 .WithResolution(SampleData.Resolution)
-                .WithQuantity(SampleData.Quantity),
+                .WithAmount(SampleData.Quantity),
             DocumentFormat.From(documentFormat));
 
         // Assert
@@ -104,7 +104,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
         // Arrange
         var document = await CreateDocument(
             _wholesaleCalculationsResultMessageBuilder
-                .WithQuantity(null),
+                .WithAmount(null),
             DocumentFormat.From(documentFormat));
 
         // Assert

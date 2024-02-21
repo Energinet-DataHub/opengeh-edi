@@ -39,7 +39,7 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
     private readonly IFileStorageClient _fileStorageClient;
 
-    private readonly AmountPerChargeResultProducedV1EventBuilder _monthlyPerChargeEventBuilder = new();
+    private readonly AmountPerChargeResultProducedV1EventBuilder _amountPerChargeEventBuilder = new();
 
     public AmountPerChargeResultProducedV1Tests(
         IntegrationTestFixture integrationTestFixture)
@@ -53,7 +53,7 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
     [Fact]
     public async Task AmountPerChargeResultProducedV1Processor_creates_outgoing_message_when_feature_is_enabled()
     {
-        var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder.Build();
+        var monthlyPerChargeEvent = _amountPerChargeEventBuilder.Build();
         await HandleIntegrationEventAsync(monthlyPerChargeEvent);
         await AssertOutgoingMessageAsync();
     }
@@ -61,7 +61,7 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
     [Fact]
     public async Task AmountPerChargeResultProducedV1Processor_does_not_create_outgoing_message_when_feature_is_disabled()
     {
-        var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder
+        var monthlyPerChargeEvent = _amountPerChargeEventBuilder
             .WithCalculationType(AmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing)
             .Build();
 
@@ -84,7 +84,7 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
         var calculationVersion = 3;
 
         // Arrange
-        var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder
+        var monthlyPerChargeEvent = _amountPerChargeEventBuilder
             .WithCalculationType(AmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing)
             .WithStartOfPeriod(startOfPeriod.ToTimestamp())
             .WithEndOfPeriod(endOfPeriod.ToTimestamp())
@@ -124,6 +124,8 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.PriceMeasureUnit, MeasurementUnit.Kwh)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.Currency, Currency.DanishCrowns)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.ChargeType, ChargeType.Fee)
+            .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.SettlementType, SettlementType.Flex)
+            .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.MeteringPointType, MeteringPointType.Production)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.Resolution, Resolution.Monthly);
     }
 

@@ -22,6 +22,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
 public class AmountPerChargeResultProducedV1EventBuilder
 {
+    private readonly AmountPerChargeResultProducedV1.Types.MeteringPointType _meteringPointType = AmountPerChargeResultProducedV1.Types.MeteringPointType.Production;
+    private readonly AmountPerChargeResultProducedV1.Types.SettlementMethod _settlementMethod = AmountPerChargeResultProducedV1.Types.SettlementMethod.Flex;
     private Guid _calculationId = Guid.NewGuid();
     private AmountPerChargeResultProducedV1.Types.CalculationType _calculationType = AmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing;
     private Timestamp _periodStartUtc = Instant.FromUtc(2023, 10, 1, 0, 0, 0).ToTimestamp();
@@ -52,6 +54,8 @@ public class AmountPerChargeResultProducedV1EventBuilder
             QuantityUnit = _quantityUnit,
             IsTax = _isTax,
             Currency = _currency,
+            MeteringPointType = _meteringPointType,
+            SettlementMethod = _settlementMethod,
             // CalculationResultVersion = _calculationVersion,
         };
 
