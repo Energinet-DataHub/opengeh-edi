@@ -83,7 +83,7 @@ internal static class EbixHeaderWriter
 
         await writer.WriteStartElementAsync(documentDetails.Prefix, "EnergyIndustryClassification", null).ConfigureAwait(false);
         await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "6").ConfigureAwait(false);
-        writer.WriteValue(DocumentGeneralValues.SectorTypeCode);
+        writer.WriteValue(GeneralValues.SectorTypeCode);
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 
         if (settlementVersion is not null)

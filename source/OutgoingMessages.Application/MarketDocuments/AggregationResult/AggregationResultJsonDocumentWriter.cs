@@ -112,7 +112,7 @@ public class AggregationResultJsonDocumentWriter : IDocumentWriter
             }
 
             writer.WriteObject("marketEvaluationPoint.type", new KeyValuePair<string, string>("value", CimCode.Of(MeteringPointType.From(series.MeteringPointType))));
-            writer.WriteProperty("product", DocumentGeneralValues.ProductCodeA);
+            writer.WriteProperty("product", GeneralValues.ProductCode);
             writer.WriteObject("quantity_Measure_Unit.name", new KeyValuePair<string, string>("value", CimCode.Of(MeasurementUnit.From(series.MeasureUnitType))));
 
             if (series.SettlementVersion is not null)
