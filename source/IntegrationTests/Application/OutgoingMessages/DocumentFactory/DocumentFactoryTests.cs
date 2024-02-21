@@ -17,7 +17,6 @@ using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
-using FluentAssertions;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.DocumentFactory;
@@ -27,7 +26,7 @@ public class DocumentFactoryTests
 {
     private readonly IEnumerable<IDocumentWriter> _documentWriters;
     private readonly List<DocumentType> _notSupportedJsonDocumentTypes = new() { DocumentType.NotifyWholesaleServices };
-    private readonly List<DocumentType> _notSupportedEbixDocumentTypes = new() { };
+    private readonly List<DocumentType> _notSupportedEbixDocumentTypes = new() { }; // All documents are now supported by ebIX
 
     public DocumentFactoryTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
