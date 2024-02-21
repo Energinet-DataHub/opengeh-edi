@@ -22,6 +22,8 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using FluentAssertions;
+using FluentAssertions.Execution;
 using IncomingMessages.Infrastructure.DocumentValidation;
 using Xunit;
 
@@ -42,6 +44,8 @@ public class AssertEbixDocument
         using var reader = XmlReader.Create(stream);
 
         _originalMessage = XDocument.Load(reader);
+
+        var asString = _originalMessage.ToString();
 
         var elm = _originalMessage.Root!.Descendants().Single(x => x.Name.LocalName == "Payload").Descendants().First();
         _document = XDocument.Parse(elm.ToString());
@@ -92,7 +96,11 @@ public class AssertEbixDocument
         Assert.NotNull(_originalMessage.Root!.Elements().Single(x => x.Name.LocalName == "DocumentType"));
         Assert.NotNull(_originalMessage.Root!.Elements().Single(x => x.Name.LocalName == "MessageType"));
         var validationResult = await _documentValidator!.ValidateAsync(_stream, DocumentFormat.Ebix, type, CancellationToken.None, version).ConfigureAwait(false);
-        Assert.True(validationResult.IsValid);
+
+        using var scope = new AssertionScope();
+        validationResult.IsValid.Should().BeTrue();
+        validationResult.ValidationErrors.Should().BeEmpty();
+
         return this;
     }
 

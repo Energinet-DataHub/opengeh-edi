@@ -52,11 +52,11 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
     {
         // Arrange
         var messageBuilder = _wholesaleCalculationsResultMessageBuilder
-            .WithMessageId(SampleData.MessageId.ToString())
+            .WithMessageId(SampleData.MessageId)
             .WithBusinessReason(SampleData.BusinessReason)
             .WithTimestamp(SampleData.Timestamp)
             .WithSender(SampleData.SenderId, ActorRole.EnergySupplier)
-            .WithReceiver(SampleData.ReceiverId, ActorRole.MeteredDataAdministrator)
+            .WithReceiver(SampleData.ReceiverId, ActorRole.MeteredDataResponsible)
             .WithTransactionId(SampleData.TransactionId)
             .WithCalculationVersion(SampleData.Version)
             .WithChargeCode(SampleData.ChargeCode)
@@ -77,12 +77,12 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
         // Assert
         using var assertionScope = new AssertionScope();
         await AssertDocument(document, DocumentFormat.From(documentFormat))
-                .HasMessageId(SampleData.MessageId.ToString())
+                .HasMessageId(SampleData.MessageId)
                 .HasBusinessReason(SampleData.BusinessReason)
                 .HasSenderId(SampleData.SenderId)
                 .HasSenderRole(ActorRole.EnergySupplier)
                 .HasReceiverId(SampleData.ReceiverId)
-                .HasReceiverRole(ActorRole.MeteredDataAdministrator)
+                .HasReceiverRole(ActorRole.MeteredDataResponsible)
                 .HasTimestamp(SampleData.Timestamp)
                 .HasTransactionId(SampleData.TransactionId)
                 .HasCalculationVersion(SampleData.Version)
@@ -168,7 +168,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
 
         return documentWriter.WriteAsync(
             header,
-            new[] { records, });
+            new[] { records });
     }
 
     private IAssertWholesaleCalculationResultDocument AssertDocument(MarketDocumentStream document, DocumentFormat documentFormat)

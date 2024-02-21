@@ -17,6 +17,7 @@ using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
+using FluentAssertions;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.DocumentFactory;
@@ -25,7 +26,8 @@ public class DocumentFactoryTests
     : TestBase
 {
     private readonly IEnumerable<IDocumentWriter> _documentWriters;
-    private readonly List<DocumentType> _notSupportedDocumentType = new() { DocumentType.NotifyWholesaleServices };
+    private readonly List<DocumentType> _notSupportedJsonDocumentTypes = new() { DocumentType.NotifyWholesaleServices };
+    private readonly List<DocumentType> _notSupportedEbixDocumentTypes = new() { };
 
     public DocumentFactoryTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
@@ -55,7 +57,7 @@ public class DocumentFactoryTests
     {
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Json));
-        if (_notSupportedDocumentType.Contains(documentType))
+        if (_notSupportedJsonDocumentTypes.Contains(documentType))
         {
             Assert.Null(writer);
             return;
@@ -70,7 +72,7 @@ public class DocumentFactoryTests
     {
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Ebix));
-        if (_notSupportedDocumentType.Contains(documentType))
+        if (_notSupportedEbixDocumentTypes.Contains(documentType))
         {
             Assert.Null(writer);
             return;

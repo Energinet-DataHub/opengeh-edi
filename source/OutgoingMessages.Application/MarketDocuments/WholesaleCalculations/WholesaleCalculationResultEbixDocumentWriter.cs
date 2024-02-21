@@ -33,7 +33,7 @@ public class WholesaleCalculationResultEbixDocumentWriter : EbixDocumentWriter
             new DocumentDetails(
             "DK_NotifyAggregatedWholesaleServices",
             string.Empty,
-            "un:unece:260:data:EEM-DK_NotifyAggregatedWholesaleServices:v2",
+            "un:unece:260:data:EEM-DK_NotifyAggregatedWholesaleServices",
             "ns0",
             "E31"),
             parser,
@@ -73,45 +73,116 @@ public class WholesaleCalculationResultEbixDocumentWriter : EbixDocumentWriter
         {
             // Begin PayloadEnergyTimeSeries
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "PayloadEnergyTimeSeries", null).ConfigureAwait(false);
+            {
+                // <Identification />
+                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Identification", null, series.TransactionId.ToString("N")).ConfigureAwait(false);
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Identification", null, series.TransactionId.ToString("N")).ConfigureAwait(false);
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Function", null).ConfigureAwait(false);
-            await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "6").ConfigureAwait(false);
-            await writer.WriteStringAsync("9").ConfigureAwait(false);
-            await writer.WriteEndElementAsync().ConfigureAwait(false);
+                // <Function />
+                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Function", null).ConfigureAwait(false);
+                await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "6").ConfigureAwait(false);
+                await writer.WriteStringAsync("9").ConfigureAwait(false);
+                await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-            // Begin ObservationTimeSeriesPeriod
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "ObservationTimeSeriesPeriod", null).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "ResolutionDuration", null, EbixCode.Of(series.Resolution)).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Start", null, series.Period.StartToEbixString()).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "End", null, series.Period.EndToEbixString()).ConfigureAwait(false);
-            await writer.WriteEndElementAsync().ConfigureAwait(false);
-            // End ObservationTimeSeriesPeriod
+                // <Currency />
+                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Currency", null).ConfigureAwait(false);
+                await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
+                await writer.WriteStringAsync(EbixCode.Of(series.Currency)).ConfigureAwait(false);
+                await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-            // Begin IncludedProductCharacteristic
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "IncludedProductCharacteristic", null).ConfigureAwait(false);
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Identification", null).ConfigureAwait(false);
-            await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "9").ConfigureAwait(false);
-            await writer.WriteStringAsync(GeneralValues.ProductCode).ConfigureAwait(false);
-            await writer.WriteEndElementAsync().ConfigureAwait(false);
-            await WriteEbixCodeWithAttributesAsync("UnitType", EbixCode.Of(series.PriceMeasureUnit), writer).ConfigureAwait(false);
-            await writer.WriteEndElementAsync().ConfigureAwait(false);
-            // End IncludedProductCharacteristic
+                // Begin <ObservationTimeSeriesPeriod>
+                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "ObservationTimeSeriesPeriod", null).ConfigureAwait(false);
+                {
+                    // <ResolutionDuration />
+                    await writer.WriteElementStringAsync(DocumentDetails.Prefix, "ResolutionDuration", null, EbixCode.Of(series.Resolution)).ConfigureAwait(false);
 
-            // Begin MeteringGridAreaUsedDomainLocation
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "MeteringGridAreaUsedDomainLocation", null).ConfigureAwait(false);
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Identification", null).ConfigureAwait(false);
-            await writer.WriteAttributeStringAsync(null, "schemeIdentifier", null, "DK").ConfigureAwait(false);
-            await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, "260").ConfigureAwait(false);
-            await writer.WriteStringAsync(series.GridAreaCode).ConfigureAwait(false);
-            await writer.WriteEndElementAsync().ConfigureAwait(false);
-            await writer.WriteEndElementAsync().ConfigureAwait(false);
-            // End MeteringGridAreaUsedDomainLocation
+                    // <Start />
+                    await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Start", null, series.Period.StartToEbixString()).ConfigureAwait(false);
 
-            await WriteElementIfHasValueAsync("Version", series.CalculationVersion.ToString(NumberFormatInfo.InvariantInfo), writer).ConfigureAwait(false);
+                    // <End />
+                    await writer.WriteElementStringAsync(DocumentDetails.Prefix, "End", null, series.Period.EndToEbixString()).ConfigureAwait(false);
 
-            await writer.WriteEndElementAsync().ConfigureAwait(false);
-            // End PayloadEnergyTimeSeries
+                    await writer.WriteEndElementAsync().ConfigureAwait(false);
+                } // End </ObservationTimeSeriesPeriod>
+
+                // Begin <BalanceSupplierEnergyParty>
+                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "BalanceSupplierEnergyParty", null).ConfigureAwait(false);
+                {
+                    // <Identification />
+                    await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Identification", null).ConfigureAwait(false);
+                    await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, "9").ConfigureAwait(false);
+                    await writer.WriteStringAsync(series.EnergySupplier.Value).ConfigureAwait(false);
+                    await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+                    await writer.WriteEndElementAsync().ConfigureAwait(false);
+                } // End </BalanceSupplierEnergyParty>
+
+                // Begin <IncludedProductCharacteristic>
+                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "IncludedProductCharacteristic", null).ConfigureAwait(false);
+                {
+                    // <Identification />
+                    await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Identification", null).ConfigureAwait(false);
+                    await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "9").ConfigureAwait(false);
+                    await writer.WriteStringAsync(GeneralValues.ProductCode).ConfigureAwait(false);
+                    await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+                    // <UnitType />
+                    await WriteEbixCodeWithAttributesAsync("UnitType", EbixCode.Of(series.QuantityUnit), writer).ConfigureAwait(false);
+
+                    await writer.WriteEndElementAsync().ConfigureAwait(false);
+                } // End </IncludedProductCharacteristic>
+
+                // Begin <MeteringGridAreaUsedDomainLocation>
+                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "MeteringGridAreaUsedDomainLocation", null).ConfigureAwait(false);
+                {
+                    // <Identification />
+                    await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Identification", null).ConfigureAwait(false);
+                    await writer.WriteAttributeStringAsync(null, "schemeIdentifier", null, "DK").ConfigureAwait(false);
+                    await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, "260").ConfigureAwait(false);
+                    await writer.WriteStringAsync(series.GridAreaCode).ConfigureAwait(false);
+                    await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+                    await writer.WriteEndElementAsync().ConfigureAwait(false);
+                } // End </MeteringGridAreaUsedDomainLocation>
+
+                // Begin <IntervalEnergyObservation>
+                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "IntervalEnergyObservation", null).ConfigureAwait(false);
+                {
+                    // <Position />
+                    await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Position", null, "1").ConfigureAwait(false);
+
+                    // <EnergySum />
+                    await writer.WriteElementStringAsync(DocumentDetails.Prefix, "EnergySum", null, series.Quantity?.ToString(NumberFormatInfo.InvariantInfo) ?? "0").ConfigureAwait(false);
+
+                    await writer.WriteEndElementAsync().ConfigureAwait(false);
+                } // End </IntervalEnergyObservation>
+
+                // <ChargeType />
+                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "ChargeType", null).ConfigureAwait(false);
+                await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
+                await writer.WriteAttributeStringAsync(null, "listIdentifier", null, "DK").ConfigureAwait(false);
+                await writer.WriteStringAsync(EbixCode.Of(series.ChargeType)).ConfigureAwait(false);
+                await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+                // <PartyChargeTypeID />
+                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "PartyChargeTypeID", null, series.ChargeCode).ConfigureAwait(false);
+
+                // Begin <ChargeTypeOwnerEnergyParty>
+                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "ChargeTypeOwnerEnergyParty", null).ConfigureAwait(false);
+                {
+                    // <Identification />
+                    await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Identification", null).ConfigureAwait(false);
+                    await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, "9").ConfigureAwait(false);
+                    await writer.WriteStringAsync(series.ChargeOwner.Value).ConfigureAwait(false);
+                    await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+                    await writer.WriteEndElementAsync().ConfigureAwait(false);
+                } // End </ChargeTypeOwnerEnergyParty>
+
+                // <Version />
+                await WriteElementIfHasValueAsync("Version", series.CalculationVersion.ToString(NumberFormatInfo.InvariantInfo), writer).ConfigureAwait(false);
+
+                await writer.WriteEndElementAsync().ConfigureAwait(false);
+            } // End PayloadEnergyTimeSeries
         }
     }
 }
