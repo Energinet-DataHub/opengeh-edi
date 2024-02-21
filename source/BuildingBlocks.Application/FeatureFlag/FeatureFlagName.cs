@@ -21,4 +21,5 @@ public enum FeatureFlagName
 {
     UseExampleFeatureFlag,
     UseMonthlyAmountPerChargeResultProduced,
+    UseAmountPerChargeResultProduced,
 }

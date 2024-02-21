@@ -143,6 +143,7 @@ namespace Energinet.DataHub.EDI.Api
                         ActorCertificateCredentialsRemoved.Descriptor,
                         ActorCertificateCredentialsAssigned.Descriptor,
                         MonthlyAmountPerChargeResultProducedV1.Descriptor,
+                        AmountPerChargeResultProducedV1.Descriptor,
                     };
                     services.AddSubscriber<IntegrationEventHandler>(integrationEventDescriptors);
 

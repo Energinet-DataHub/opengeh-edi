@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
+using Google.Protobuf.Collections;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 
@@ -102,6 +103,25 @@ public static class CalculatedQuantityQualityMapper
                 estimated: quantityQualities.Contains(QuantityQuality.Estimated),
                 measured: quantityQualities.Contains(QuantityQuality.Measured),
                 calculated: quantityQualities.Contains(QuantityQuality.Calculated)) switch
+            {
+                (missing: true, estimated: false, measured: false, calculated: false) => CalculatedQuantityQuality.Missing,
+                (missing: true, _, _, _) => CalculatedQuantityQuality.Incomplete,
+                (_, estimated: true, _, _) => CalculatedQuantityQuality.Estimated,
+                (_, _, measured: true, _) => CalculatedQuantityQuality.Measured,
+                (_, _, _, calculated: true) => CalculatedQuantityQuality.Calculated,
+                _ => CalculatedQuantityQuality.NotAvailable,
+            };
+    }
+
+    public static CalculatedQuantityQuality QuantityQualityCollectionToEdiQuality(
+        ICollection<AmountPerChargeResultProducedV1.Types.QuantityQuality> quantityQualities)
+    {
+        ArgumentNullException.ThrowIfNull(quantityQualities);
+
+        return (missing: quantityQualities.Contains(AmountPerChargeResultProducedV1.Types.QuantityQuality.Missing),
+                estimated: quantityQualities.Contains(AmountPerChargeResultProducedV1.Types.QuantityQuality.Estimated),
+                measured: quantityQualities.Contains(AmountPerChargeResultProducedV1.Types.QuantityQuality.Measured),
+                calculated: quantityQualities.Contains(AmountPerChargeResultProducedV1.Types.QuantityQuality.Calculated)) switch
             {
                 (missing: true, estimated: false, measured: false, calculated: false) => CalculatedQuantityQuality.Missing,
                 (missing: true, _, _, _) => CalculatedQuantityQuality.Incomplete,

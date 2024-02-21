@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations;
@@ -24,7 +25,8 @@ public record WholesaleCalculationMarketActivityRecord(
     string GridAreaCode,
     string ChargeCode,
     bool IsTax,
-    decimal? Quantity,
+    [property: Obsolete("Delete when all references are removed. Use Points instead.")] decimal? Quantity,
+    IReadOnlyCollection<Point>? Points,
     ActorNumber EnergySupplier,
     ActorNumber ChargeOwner,
     Period Period,
@@ -34,3 +36,5 @@ public record WholesaleCalculationMarketActivityRecord(
     Currency Currency,
     ChargeType ChargeType,
     Resolution Resolution);
+
+public record Point(int Position, decimal? Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality? QuantityQuality);

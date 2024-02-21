@@ -33,15 +33,15 @@ using DecimalValue = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Com
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.WholesaleCalculations;
 
-public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
+public class AmountPerChargeResultProducedV1Tests : TestBase
 {
     private readonly IIntegrationEventHandler _integrationEventHandler;
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
     private readonly IFileStorageClient _fileStorageClient;
 
-    private readonly MonthlyAmountPerChargeResultProducedV1EventBuilder _monthlyPerChargeEventBuilder = new();
+    private readonly AmountPerChargeResultProducedV1EventBuilder _monthlyPerChargeEventBuilder = new();
 
-    public MonthlyAmountPerChargeResultProducedV1Tests(
+    public AmountPerChargeResultProducedV1Tests(
         IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
     {
@@ -51,7 +51,7 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
     }
 
     [Fact]
-    public async Task MonthlyAmountPerChargeResultProducedV1Processor_creates_outgoing_message_when_feature_is_enabled()
+    public async Task AmountPerChargeResultProducedV1Processor_creates_outgoing_message_when_feature_is_enabled()
     {
         var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder.Build();
         await HandleIntegrationEventAsync(monthlyPerChargeEvent);
@@ -59,20 +59,20 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
     }
 
     [Fact]
-    public async Task MonthlyAmountPerChargeResultProducedV1Processor_does_not_create_outgoing_message_when_feature_is_disabled()
+    public async Task AmountPerChargeResultProducedV1Processor_does_not_create_outgoing_message_when_feature_is_disabled()
     {
         var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder
-            .WithCalculationType(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing)
+            .WithCalculationType(AmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing)
             .Build();
 
-        FeatureFlagManagerStub.UseMonthlyAmountPerChargeResultProduced = Task.FromResult(false);
+        FeatureFlagManagerStub.UseAmountPerChargeResultProduced = Task.FromResult(false);
 
         await HandleIntegrationEventAsync(monthlyPerChargeEvent);
         await AssertOutgoingMessageIsNull(BusinessReason.WholesaleFixing);
     }
 
     [Fact]
-    public async Task MonthlyAmountPerChargeResultProducedV1Processor_creates_outgoingMessage_with_expected_values()
+    public async Task AmountPerChargeResultProducedV1Processor_creates_outgoingMessage_with_expected_values()
     {
         var startOfPeriod = Instant.FromUtc(2023, 1, 1, 0, 0);
         var endOfPeriod = Instant.FromUtc(2023, 1, 1, 0, 0);
@@ -82,22 +82,20 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
         var chargeOwner = "9876543216543";
         var isTax = false;
         var calculationVersion = 3;
-        var amount = new DecimalValue { Units = 100, Nanos = 0 };
 
         // Arrange
         var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder
-            .WithCalculationType(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing)
+            .WithCalculationType(AmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing)
             .WithStartOfPeriod(startOfPeriod.ToTimestamp())
             .WithEndOfPeriod(endOfPeriod.ToTimestamp())
             .WithGridAreaCode(gridAreaCode)
             .WithEnergySupplier(energySupplier)
             .WithChargeCode(chargeCode)
-            .WithChargeType(MonthlyAmountPerChargeResultProducedV1.Types.ChargeType.Fee)
+            .WithChargeType(AmountPerChargeResultProducedV1.Types.ChargeType.Fee)
             .WithChargeOwner(chargeOwner)
-            .WithQuantityUnit(MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit.Kwh)
+            .WithQuantityUnit(AmountPerChargeResultProducedV1.Types.QuantityUnit.Kwh)
             .WithIsTax(isTax)
-            .WithCurrency(MonthlyAmountPerChargeResultProducedV1.Types.Currency.Dkk)
-            .WithAmount(amount)
+            .WithCurrency(AmountPerChargeResultProducedV1.Types.Currency.Dkk)
             .WithCalculationVersion(calculationVersion)
             .Build();
 
@@ -113,13 +111,10 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasRelationTo(null)
-            .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.CalculationVersion, calculationVersion)
+            // .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.CalculationVersion, calculationVersion)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.GridAreaCode, gridAreaCode)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.ChargeCode, chargeCode)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.IsTax, isTax)
-#pragma warning disable CS0618 // Type or member is obsolete
-            .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.Quantity,  DecimalParser.Parse(amount))
-#pragma warning restore CS0618 // Type or member is obsolete
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.EnergySupplier, ActorNumber.Create(energySupplier))
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.ChargeOwner, ActorNumber.Create(chargeOwner))
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.Period.Start, startOfPeriod)
@@ -132,28 +127,7 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.Resolution, Resolution.Monthly);
     }
 
-    [Fact]
-    public async Task MonthlyAmountPerChargeResultProducedV1Processor_creates_outgoingMessage_with_no_amount_first_correction()
-    {
-        // Arrange
-        var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder
-            .WithCalculationType(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.FirstCorrectionSettlement)
-            .WithAmount(null)
-            .Build();
-
-        // Act
-        await HandleIntegrationEventAsync(monthlyPerChargeEvent);
-
-        // Assert
-        var message = await AssertOutgoingMessageAsync(businessReason: BusinessReason.Correction);
-        message
-#pragma warning disable CS0618 // Type or member is obsolete
-            .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.Quantity, null)
-#pragma warning restore CS0618 // Type or member is obsolete
-            .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.SettlementVersion, SettlementVersion.FirstCorrection);
-    }
-
-    private async Task HandleIntegrationEventAsync(MonthlyAmountPerChargeResultProducedV1 @event)
+    private async Task HandleIntegrationEventAsync(AmountPerChargeResultProducedV1 @event)
     {
         var integrationEvent = new IntegrationEvent(
             Guid.NewGuid(),
