@@ -53,6 +53,7 @@ public static class ProcessConfiguration
         //TODO: can we move them out and delete ref to Infrastructure?
         services.AddTransient<IIntegrationEventProcessor, EnergyResultProducedV2Processor>();
         services.AddTransient<IIntegrationEventProcessor, MonthlyAmountPerChargeResultProducedV1Processor>();
+        services.AddTransient<IIntegrationEventProcessor, AmountPerChargeResultProducedV1Processor>();
         services.AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestAcceptedEventMapper>();
         services.AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestRejectedMapper>();
 
@@ -66,9 +67,6 @@ public static class ProcessConfiguration
 
         //AggregationsConfiguration
         services.AddScoped<AggregationMessageResultFactory>();
-
-        //Wholesale Calculation setup
-        services.AddScoped<WholesaleCalculationResultMessageFactory>();
 
         // RequestedAggregatedMeasureDataConfiguration
         services.AddTransient<IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>, SendAggregatedMeasuredDataToWholesale>();
