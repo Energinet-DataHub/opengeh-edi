@@ -31,4 +31,16 @@ public static class ChargeTypeMapper
             _ => throw new ArgumentOutOfRangeException(nameof(chargeType), chargeType, "Unknown charge type from Wholesale"),
         };
     }
+
+    public static ChargeType Map(AmountPerChargeResultProducedV1.Types.ChargeType chargeType)
+    {
+        return chargeType switch
+        {
+            AmountPerChargeResultProducedV1.Types.ChargeType.Fee => ChargeType.Fee,
+            AmountPerChargeResultProducedV1.Types.ChargeType.Tariff => ChargeType.Tariff,
+            AmountPerChargeResultProducedV1.Types.ChargeType.Subscription => ChargeType.Subscription,
+            AmountPerChargeResultProducedV1.Types.ChargeType.Unspecified => throw new InvalidOperationException("Charge type is not specified from Wholesale"),
+            _ => throw new ArgumentOutOfRangeException(nameof(chargeType), chargeType, "Unknown charge type from Wholesale"),
+        };
+    }
 }

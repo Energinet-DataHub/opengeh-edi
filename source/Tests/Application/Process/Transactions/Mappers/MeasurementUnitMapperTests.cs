@@ -35,4 +35,12 @@ public class MeasurementUnitMapperTests : BaseEnumMapperTests
             () => MeasurementUnitMapper.Map(value),
             value,
             unspecifiedValue: MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit.Unspecified);
+
+    [Theory]
+    [MemberData(nameof(GetEnumValues), typeof(AmountPerChargeResultProducedV1.Types.QuantityUnit))]
+    public void Ensure_handling_amount_per_charge_result_produced(AmountPerChargeResultProducedV1.Types.QuantityUnit value)
+        => EnsureCanMapOrThrows(
+            () => MeasurementUnitMapper.Map(value),
+            value,
+            unspecifiedValue: AmountPerChargeResultProducedV1.Types.QuantityUnit.Unspecified);
 }

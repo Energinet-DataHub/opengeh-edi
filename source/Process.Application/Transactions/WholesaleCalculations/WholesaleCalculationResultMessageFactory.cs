@@ -14,6 +14,7 @@
 
 using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
@@ -22,13 +23,11 @@ using NodaTime.Serialization.Protobuf;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleCalculations;
 
-public class WholesaleCalculationResultMessageFactory
+public static class WholesaleCalculationResultMessageFactory
 {
-#pragma warning disable CA1822
-    public WholesaleCalculationResultMessage CreateMessage(
+    public static WholesaleCalculationResultMessage CreateMessage(
         MonthlyAmountPerChargeResultProducedV1 message,
         ProcessId processId)
-#pragma warning restore CA1822
     {
         ArgumentNullException.ThrowIfNull(message);
         ArgumentNullException.ThrowIfNull(processId);
@@ -40,8 +39,43 @@ public class WholesaleCalculationResultMessageFactory
             ChargeCode: message.ChargeCode,
             IsTax: message.IsTax,
             Quantity: message.Amount != null ? DecimalParser.Parse(message.Amount) : null,
+            Points: new[]
+            {
+                new Point(1, null, null, message.Amount != null ? DecimalParser.Parse(message.Amount) : null, null),
+            },
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
-            ChargeOwner: ActorNumber.Create(message.ChargeOwnerId), // this is an assumption
+            ChargeOwner: ActorNumber.Create(message.ChargeOwnerId),
+            Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),
+            SettlementVersion: SettlementVersionMapper.Map(message.CalculationType),
+            QuantityUnit: MeasurementUnitMapper.Map(message.QuantityUnit),
+            PriceMeasureUnit: MeasurementUnit.Kwh,
+            Currency: CurrencyMapper.Map(message.Currency),
+            ChargeType: ChargeTypeMapper.Map(message.ChargeType),
+            Resolution: Resolution.Monthly);
+
+        return WholesaleCalculationResultMessage.Create(
+            receiverNumber: wholesaleCalculationSeries.EnergySupplier,
+            receiverRole: ActorRole.EnergySupplier,
+            processId: processId,
+            businessReason: BusinessReasonMapper.Map(message.CalculationType),
+            wholesaleSeries: wholesaleCalculationSeries);
+    }
+
+    public static WholesaleCalculationResultMessage CreateMessage(AmountPerChargeResultProducedV1 message, ProcessId processId)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+        ArgumentNullException.ThrowIfNull(processId);
+
+        var wholesaleCalculationSeries = new WholesaleCalculationSeries(
+            TransactionId: ProcessId.New().Id,
+            CalculationVersion: 1, //message.CalculationResultVersion,
+            GridAreaCode: message.GridAreaCode,
+            ChargeCode: message.ChargeCode,
+            IsTax: message.IsTax,
+            Quantity: null,
+            Points: TimeSeriesPointsMapper.MapPoints(message.TimeSeriesPoints),
+            EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
+            ChargeOwner: ActorNumber.Create(message.ChargeOwnerId),
             Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),
             SettlementVersion: SettlementVersionMapper.Map(message.CalculationType),
             QuantityUnit: MeasurementUnitMapper.Map(message.QuantityUnit),
