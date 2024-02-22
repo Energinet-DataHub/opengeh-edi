@@ -13,10 +13,7 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.Serialization;
@@ -169,6 +166,58 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
         // Assert
         AssertDocument(document, DocumentFormat.From(documentFormat))
             .HasSettlementMethod(SettlementType.Flex)
+            .HasMeteringPointType(MeteringPointType.Consumption)
+            .PriceAmountIsPresentForPointIndex(0, firstPoint.Amount?.ToString(NumberFormatInfo.InvariantInfo))
+            .PriceAmountIsPresentForPointIndex(1, secondPoint.Amount?.ToString(NumberFormatInfo.InvariantInfo));
+    }
+
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    public async Task Can_create_notifyWholesaleServices_document_with_calculated_hourly_tariff_amounts_for_production(string documentFormat)
+    {
+        // Arrange
+        var firstPoint = new Point(1, 1, 100, 100, null);
+        var secondPoint = new Point(2, 1, 200, 100, null);
+        var document = await CreateDocument(
+            _wholesaleCalculationsResultMessageBuilder
+                .WithSettlementMethod(null)
+                .WithMeteringPointType(MeteringPointType.Production)
+                .WithCalculatedHourlyTariffAmounts(new()
+                {
+                    firstPoint,
+                    secondPoint,
+                }),
+            DocumentFormat.From(documentFormat));
+
+        // Assert
+        AssertDocument(document, DocumentFormat.From(documentFormat))
+            .SettlementMethodIsNotPresent()
+            .HasMeteringPointType(MeteringPointType.Production)
+            .PriceAmountIsPresentForPointIndex(0, firstPoint.Amount?.ToString(NumberFormatInfo.InvariantInfo))
+            .PriceAmountIsPresentForPointIndex(1, secondPoint.Amount?.ToString(NumberFormatInfo.InvariantInfo));
+    }
+
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    public async Task Can_create_notifyWholesaleServices_document_with_calculated_hourly_tariff_amounts_for_consumption(string documentFormat)
+    {
+        // Arrange
+        var firstPoint = new Point(1, 1, 100, 100, null);
+        var secondPoint = new Point(2, 1, 200, 100, null);
+        var document = await CreateDocument(
+            _wholesaleCalculationsResultMessageBuilder
+                .WithSettlementMethod(SettlementType.NonProfiled)
+                .WithMeteringPointType(MeteringPointType.Consumption)
+                .WithCalculatedHourlyTariffAmounts(new()
+                {
+                    firstPoint,
+                    secondPoint,
+                }),
+            DocumentFormat.From(documentFormat));
+
+        // Assert
+        AssertDocument(document, DocumentFormat.From(documentFormat))
+            .HasSettlementMethod(SettlementType.NonProfiled)
             .HasMeteringPointType(MeteringPointType.Consumption)
             .PriceAmountIsPresentForPointIndex(0, firstPoint.Amount?.ToString(NumberFormatInfo.InvariantInfo))
             .PriceAmountIsPresentForPointIndex(1, secondPoint.Amount?.ToString(NumberFormatInfo.InvariantInfo));

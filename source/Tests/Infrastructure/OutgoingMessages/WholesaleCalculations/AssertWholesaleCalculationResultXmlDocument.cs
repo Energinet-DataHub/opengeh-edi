@@ -46,7 +46,8 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
 
     public IAssertWholesaleCalculationResultDocument HasBusinessReason(BusinessReason expectedBusinessReason)
     {
-        _documentAsserter.HasValue("process.processType", CimCode.Of(expectedBusinessReason));
+        ArgumentNullException.ThrowIfNull(expectedBusinessReason);
+        _documentAsserter.HasValue("process.processType", expectedBusinessReason.Code);
         return this;
     }
 
@@ -100,7 +101,8 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
 
     public IAssertWholesaleCalculationResultDocument HasSettlementVersion(SettlementVersion expectedSettlementVersion)
     {
-        _documentAsserter.HasValue("Series[1]/settlement_Series.version", CimCode.Of(expectedSettlementVersion));
+        ArgumentNullException.ThrowIfNull(expectedSettlementVersion);
+        _documentAsserter.HasValue("Series[1]/settlement_Series.version", expectedSettlementVersion.Code);
         return this;
     }
 
@@ -118,7 +120,8 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
 
     public IAssertWholesaleCalculationResultDocument HasSettlementMethod(SettlementType expectedSettlementMethod)
     {
-        _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.settlementMethod", CimCode.Of(expectedSettlementMethod));
+        ArgumentNullException.ThrowIfNull(expectedSettlementMethod);
+        _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.settlementMethod", expectedSettlementMethod.Code);
         return this;
     }
 
@@ -138,7 +141,8 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
 
     public IAssertWholesaleCalculationResultDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType)
     {
-        _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.type", CimCode.Of(expectedMeteringPointType));
+        ArgumentNullException.ThrowIfNull(expectedMeteringPointType);
+        _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.type", expectedMeteringPointType.Code);
         return this;
     }
 
