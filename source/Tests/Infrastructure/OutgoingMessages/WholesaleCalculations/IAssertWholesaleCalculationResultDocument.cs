@@ -40,7 +40,8 @@ public interface IAssertWholesaleCalculationResultDocument
     /// Asserts the process type in header
     /// </summary>
     /// <param name="expectedBusinessReason"></param>
-    IAssertWholesaleCalculationResultDocument HasBusinessReason(BusinessReason expectedBusinessReason);
+    /// <param name="codeListType"></param>
+    IAssertWholesaleCalculationResultDocument HasBusinessReason(BusinessReason expectedBusinessReason, CodeListType codeListType);
 
     /// <summary>
     /// Assert sender id in header

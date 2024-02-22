@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -74,8 +75,18 @@ public class AssertEbixDocument
 
     public AssertEbixDocument HasValue(string xpath, string expectedValue)
     {
+        return HasValueWithAttributes(xpath, expectedValue);
+    }
+
+    public AssertEbixDocument HasValueWithAttributes(string xpath, string expectedValue, params AttributeNameAndValue[] attributes)
+    {
         ArgumentNullException.ThrowIfNull(xpath);
+        ArgumentNullException.ThrowIfNull(attributes);
         Assert.Equal(expectedValue, _document.Root?.XPathSelectElement(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager)?.Value);
+
+        foreach (var (name, value) in attributes)
+            Assert.Equal(value, _document.Root?.XPathSelectElement(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager)?.Attribute(name)?.Value);
+
         return this;
     }
 
@@ -121,3 +132,5 @@ public class AssertEbixDocument
         return xpathBuilder.ToString();
     }
 }
+
+public record AttributeNameAndValue(string Name, string Value);

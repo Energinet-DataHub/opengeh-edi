@@ -44,7 +44,9 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasBusinessReason(BusinessReason expectedBusinessReason)
+    public IAssertWholesaleCalculationResultDocument HasBusinessReason(
+        BusinessReason expectedBusinessReason,
+        CodeListType codeListType)
     {
         _documentAsserter.HasValue("process.processType", CimCode.Of(expectedBusinessReason));
         return this;

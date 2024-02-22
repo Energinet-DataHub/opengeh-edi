@@ -17,7 +17,6 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
@@ -77,27 +76,28 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
         // Assert
         using var assertionScope = new AssertionScope();
         await AssertDocument(document, DocumentFormat.From(documentFormat))
-                .HasMessageId(SampleData.MessageId)
-                .HasBusinessReason(SampleData.BusinessReason)
-                .HasSenderId(SampleData.SenderId)
-                .HasSenderRole(ActorRole.EnergySupplier)
-                .HasReceiverId(SampleData.ReceiverId)
-                .HasReceiverRole(ActorRole.MeteredDataResponsible)
-                .HasTimestamp(SampleData.Timestamp)
-                .HasTransactionId(SampleData.TransactionId)
-                .HasCalculationVersion(SampleData.Version)
-                .HasChargeCode(SampleData.ChargeCode)
-                .HasChargeType(SampleData.ChargeType)
-                .HasChargeTypeOwner(SampleData.ChargeOwner)
-                .HasGridAreaCode(SampleData.GridAreaCode)
-                .HasEnergySupplierNumber(SampleData.EnergySupplier)
-                .HasPeriod(new Period(SampleData.PeriodStartUtc, SampleData.PeriodEndUtc))
-                .HasCurrency(SampleData.Currency)
-                .HasMeasurementUnit(SampleData.MeasurementUnit)
-                .HasPriceMeasurementUnit(SampleData.PriceMeasureUnit)
-                .HasResolution(SampleData.Resolution)
-                .HasPositionAndQuantity(1, SampleData.Quantity)
-                .SettlementVersionIsNotPresent()
+            .HasMessageId(SampleData.MessageId)
+            .HasBusinessReason(SampleData.BusinessReason, CodeListType.EbixDenmark)
+            .HasSenderId(SampleData.SenderId)
+            .HasSenderRole(ActorRole.EnergySupplier)
+            .HasReceiverId(SampleData.ReceiverId)
+            .HasReceiverRole(ActorRole.MeteredDataResponsible)
+            .HasTimestamp(SampleData.Timestamp)
+            .HasTransactionId(SampleData.TransactionId)
+            .HasCalculationVersion(SampleData.Version)
+            .HasChargeCode(SampleData.ChargeCode)
+            .HasChargeType(SampleData.ChargeType)
+            .HasChargeTypeOwner(SampleData.ChargeOwner)
+            .HasGridAreaCode(SampleData.GridAreaCode)
+            .HasEnergySupplierNumber(SampleData.EnergySupplier)
+            .HasPeriod(new Period(SampleData.PeriodStartUtc, SampleData.PeriodEndUtc))
+            .HasCurrency(SampleData.Currency)
+            .HasMeasurementUnit(SampleData.MeasurementUnit)
+            .HasPriceMeasurementUnit(SampleData.PriceMeasureUnit)
+            .HasResolution(SampleData.Resolution)
+            .HasPositionAndQuantity(1, SampleData.Quantity)
+            .HasProductCode(ProductType.Tariff.Code)
+            .SettlementVersionIsNotPresent()
             .DocumentIsValidAsync();
     }
 

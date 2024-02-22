@@ -13,9 +13,11 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Ebix;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 
@@ -32,7 +34,10 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
     public AssertWholesaleCalculationResultEbixDocument(AssertEbixDocument documentAsserter)
     {
         _documentAsserter = documentAsserter;
-        _documentAsserter.HasValue("HeaderEnergyDocument/DocumentType", "E31");
+        _documentAsserter.HasValueWithAttributes(
+            "HeaderEnergyDocument/DocumentType",
+            "E31",
+            CreateRequiredListAttributes(CodeListType.Ebix));
     }
 
     #region header validation
@@ -43,15 +48,27 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasBusinessReason(BusinessReason businessReason)
+    public IAssertWholesaleCalculationResultDocument HasBusinessReason(
+        BusinessReason businessReason,
+        CodeListType codeListType)
     {
-        _documentAsserter.HasValue($"{ProcessEnergyContext}/EnergyBusinessProcess", EbixCode.Of(businessReason));
+        _documentAsserter.HasValueWithAttributes(
+            $"{ProcessEnergyContext}/EnergyBusinessProcess",
+            EbixCode.Of(businessReason),
+            CreateRequiredListAttributes(codeListType));
+
         return this;
     }
 
     public IAssertWholesaleCalculationResultDocument HasSenderId(ActorNumber expectedSenderId)
     {
-        _documentAsserter.HasValue($"{HeaderEnergyDocument}/SenderEnergyParty/Identification", expectedSenderId.Value);
+        CreateRequiredSchemeAttribute(expectedSenderId);
+
+        _documentAsserter.HasValueWithAttributes(
+            $"{HeaderEnergyDocument}/SenderEnergyParty/Identification",
+            expectedSenderId.Value,
+            CreateRequiredSchemeAttribute(expectedSenderId));
+
         return this;
     }
 
@@ -63,14 +80,21 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
 
     public IAssertWholesaleCalculationResultDocument HasReceiverId(ActorNumber expectedReceiverId)
     {
-        _documentAsserter.HasValue($"{HeaderEnergyDocument}/RecipientEnergyParty/Identification", expectedReceiverId.Value);
+        _documentAsserter.HasValueWithAttributes(
+            $"{HeaderEnergyDocument}/RecipientEnergyParty/Identification",
+            expectedReceiverId.Value,
+            CreateRequiredSchemeAttribute(expectedReceiverId));
+
         return this;
     }
 
-    // TODO: Where to find this in the ebIX document?
     public IAssertWholesaleCalculationResultDocument HasReceiverRole(ActorRole expectedReceiverRole)
     {
-        _documentAsserter.HasValue($"{ProcessEnergyContext}/EnergyBusinessProcessRole", EbixCode.Of(expectedReceiverRole));
+        _documentAsserter.HasValueWithAttributes(
+            $"{ProcessEnergyContext}/EnergyBusinessProcessRole",
+            EbixCode.Of(expectedReceiverRole),
+            CreateRequiredListAttributes(CodeListType.EbixDenmark));
+
         return this;
     }
 
@@ -98,59 +122,80 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
 
     public IAssertWholesaleCalculationResultDocument HasChargeTypeOwner(ActorNumber expectedChargeTypeOwner)
     {
-        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/ChargeTypeOwnerEnergyParty/Identification", expectedChargeTypeOwner.Value);
+        _documentAsserter.HasValueWithAttributes(
+            $"{PayloadEnergyTimeSeries}[1]/ChargeTypeOwnerEnergyParty/Identification",
+            expectedChargeTypeOwner.Value,
+            CreateRequiredSchemeAttribute(expectedChargeTypeOwner));
         return this;
     }
 
-    // TODO: Where to find this in the ebIX document?
     public IAssertWholesaleCalculationResultDocument HasChargeCode(string expectedChargeTypeNumber)
     {
         _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/PartyChargeTypeID", expectedChargeTypeNumber);
         return this;
     }
 
-    // TODO: Where to find this in the ebIX document?
     public IAssertWholesaleCalculationResultDocument HasChargeType(ChargeType expectedChargeType)
     {
-        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/ChargeType",  EbixCode.Of(expectedChargeType));
+        _documentAsserter.HasValueWithAttributes(
+            $"{PayloadEnergyTimeSeries}[1]/ChargeType",
+            EbixCode.Of(expectedChargeType),
+            CreateRequiredListAttributes(CodeListType.EbixDenmark));
+
         return this;
     }
 
     public IAssertWholesaleCalculationResultDocument HasGridAreaCode(string expectedGridAreaCode)
     {
-        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/MeteringGridAreaUsedDomainLocation/Identification", expectedGridAreaCode);
+        _documentAsserter.HasValueWithAttributes(
+            $"{PayloadEnergyTimeSeries}[1]/MeteringGridAreaUsedDomainLocation/Identification",
+            expectedGridAreaCode,
+            new AttributeNameAndValue("schemeAgencyIdentifier", EbixDocumentWriter.EbixCodeList),
+            new AttributeNameAndValue("schemeIdentifier", EbixDocumentWriter.CountryCodeDenmark));
+
         return this;
     }
 
     public IAssertWholesaleCalculationResultDocument HasEnergySupplierNumber(ActorNumber expectedEnergySupplierNumber)
     {
-        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/BalanceSupplierEnergyParty/Identification", expectedEnergySupplierNumber.Value);
+        _documentAsserter.HasValueWithAttributes(
+            $"{PayloadEnergyTimeSeries}[1]/BalanceSupplierEnergyParty/Identification",
+            expectedEnergySupplierNumber.Value,
+            CreateRequiredSchemeAttribute(expectedEnergySupplierNumber));
         return this;
     }
 
     public IAssertWholesaleCalculationResultDocument HasProductCode(string expectedProductCode)
     {
-        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/IncludedProductCharacteristic/Identification", expectedProductCode);
+        _documentAsserter.HasValueWithAttributes(
+            $"{PayloadEnergyTimeSeries}[1]/IncludedProductCharacteristic/Identification",
+            expectedProductCode,
+            new AttributeNameAndValue("listAgencyIdentifier", "9"));
+
         return this;
     }
 
-    // TODO: Where to find this in the ebIX document?
     public IAssertWholesaleCalculationResultDocument HasMeasurementUnit(MeasurementUnit expectedMeasurementUnit)
     {
-        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/IncludedProductCharacteristic/UnitType", EbixCode.Of(expectedMeasurementUnit));
+        _documentAsserter.HasValueWithAttributes(
+            $"{PayloadEnergyTimeSeries}[1]/IncludedProductCharacteristic/UnitType",
+            EbixCode.Of(expectedMeasurementUnit),
+            CreateRequiredListAttributes(CodeListType.Ebix));
         return this;
     }
 
-    // TODO: Where to find this in the ebIX document?
     public IAssertWholesaleCalculationResultDocument HasPriceMeasurementUnit(MeasurementUnit expectedPriceMeasurementUnit)
     {
-        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/IncludedProductCharacteristic/UnitType", EbixCode.Of(expectedPriceMeasurementUnit));
+        // Is not used in ebIX document
         return this;
     }
 
     public IAssertWholesaleCalculationResultDocument HasCurrency(Currency expectedPriceUnit)
     {
-        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/Currency", EbixCode.Of(expectedPriceUnit));
+        _documentAsserter.HasValueWithAttributes(
+            $"{PayloadEnergyTimeSeries}[1]/Currency",
+            EbixCode.Of(expectedPriceUnit),
+            CreateRequiredListAttributes(CodeListType.Ebix));
         return this;
     }
 
@@ -182,10 +227,9 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
-    // TODO: Where to find this in the ebIX document?
     public IAssertWholesaleCalculationResultDocument SettlementMethodIsNotPresent()
     {
-        _documentAsserter.IsNotPresent($"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod");
+        // TODO: Not used in monthly (månedssum), implement later
         return this;
     }
 
@@ -202,35 +246,72 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
 
     public IAssertWholesaleCalculationResultDocument HasSettlementVersion(SettlementVersion settlementVersion)
     {
-        _documentAsserter.HasValue($"{ProcessEnergyContext}/ProcessVariant", EbixCode.Of(settlementVersion));
+        // TODO: Not used in monthly (månedssum), implement later
         return this;
     }
 
     public IAssertWholesaleCalculationResultDocument SettlementVersionIsNotPresent()
     {
-        _documentAsserter.IsNotPresent($"{ProcessEnergyContext}/ProcessVariant");
+        // TODO: Not used in monthly (månedssum), implement later
         return this;
     }
 
-    // TODO: Where to find this in the ebIX document?
     public IAssertWholesaleCalculationResultDocument HasOriginalTransactionIdReference(string originalTransactionIdReference)
     {
-        _documentAsserter.HasValue("PayloadEnergyTimeSeries[1]/OriginalBusinessDocument", originalTransactionIdReference);
+        // Not supported in ebIX, since ebIX has no requests (anmodning)
         return this;
     }
 
-    // TODO: Where to find this in the ebIX document?
     public IAssertWholesaleCalculationResultDocument HasEvaluationType(string expectedMarketEvaluationType)
     {
-        throw new NotImplementedException();
+        // TODO: Not used in monthly (månedssum), implement later
+        return this;
     }
 
-    // TODO: Where to find this in the ebIX document?
     public IAssertWholesaleCalculationResultDocument HasSettlementMethod(SettlementType settlementMethod)
     {
-        _documentAsserter.HasValue("PayloadEnergyTimeSeries[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod", EbixCode.Of(settlementMethod));
+        // TODO: Not used in monthly (månedssum), implement later
         return this;
     }
 
     #endregion
+
+    private static AttributeNameAndValue[] CreateRequiredListAttributes(CodeListType codeListType)
+    {
+        var (codeList, countryCode) = GetCodeListConstant(codeListType);
+
+        var requiredAttributes = new List<AttributeNameAndValue>
+        {
+            new("listAgencyIdentifier", codeList),
+        };
+
+        if (!string.IsNullOrEmpty(countryCode))
+            requiredAttributes.Add(new("listIdentifier", countryCode));
+
+        return requiredAttributes.ToArray();
+    }
+
+    private static (string CodeList, string? CountryCode) GetCodeListConstant(CodeListType codeListType) =>
+        codeListType switch
+        {
+            CodeListType.UnitedNations => (EbixDocumentWriter.UnitedNationsCodeList, null),
+            CodeListType.Ebix => (EbixDocumentWriter.EbixCodeList, null),
+            CodeListType.EbixDenmark => (EbixDocumentWriter.EbixCodeList, EbixDocumentWriter.CountryCodeDenmark),
+            _ => throw new ArgumentOutOfRangeException(nameof(codeListType), codeListType, "Invalid CodeListType"),
+        };
+
+    private static AttributeNameAndValue CreateRequiredSchemeAttribute(ActorNumber actorNumber)
+    {
+        var codeOwner = GetActorNumberOwner(ActorNumber.IsGlnNumber(actorNumber.Value) ? ActorNumberType.Gln : ActorNumberType.Eic);
+        var requiredAttribute = new AttributeNameAndValue("schemeAgencyIdentifier", codeOwner);
+
+        return requiredAttribute;
+    }
+
+    private static string GetActorNumberOwner(ActorNumberType actorNumberType) => actorNumberType switch
+    {
+        ActorNumberType.Gln => EbixDocumentWriter.Gs1Code,
+        ActorNumberType.Eic => EbixDocumentWriter.EicCode,
+        _ => throw new ArgumentOutOfRangeException(nameof(actorNumberType), actorNumberType, "Invalid ActorNumberType"),
+    };
 }
