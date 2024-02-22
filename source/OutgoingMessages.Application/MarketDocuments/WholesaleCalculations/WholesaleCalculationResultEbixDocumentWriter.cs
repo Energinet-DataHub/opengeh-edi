@@ -77,12 +77,9 @@ public class WholesaleCalculationResultEbixDocumentWriter : EbixDocumentWriter
                 await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Identification", null, series.TransactionId.ToString("N")).ConfigureAwait(false);
 
                 // <Function />
-                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Function", null).ConfigureAwait(false);
-                await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "6").ConfigureAwait(false);
-                await writer.WriteStringAsync("9").ConfigureAwait(false);
-                await writer.WriteEndElementAsync().ConfigureAwait(false);
+                await WriteCodeWithCodeListReferenceAttributesAsync("Function", "9", writer).ConfigureAwait(false);
 
-                // <Currency />
+                // <Currency /> -- Currency is hardcoded to listAgencyIdentifier = ebIX list (260), without country code
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Currency", null).ConfigureAwait(false);
                 await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
                 await writer.WriteStringAsync(EbixCode.Of(series.Currency)).ConfigureAwait(false);
@@ -107,10 +104,7 @@ public class WholesaleCalculationResultEbixDocumentWriter : EbixDocumentWriter
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "BalanceSupplierEnergyParty", null).ConfigureAwait(false);
                 {
                     // <Identification />
-                    await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Identification", null).ConfigureAwait(false);
-                    await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, "9").ConfigureAwait(false);
-                    await writer.WriteStringAsync(series.EnergySupplier.Value).ConfigureAwait(false);
-                    await writer.WriteEndElementAsync().ConfigureAwait(false);
+                    await WriteGlnOrEicCodeWithAttributesAsync("Identification", series.EnergySupplier.Value, writer).ConfigureAwait(false);
 
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
                 } // End </BalanceSupplierEnergyParty>
@@ -118,14 +112,14 @@ public class WholesaleCalculationResultEbixDocumentWriter : EbixDocumentWriter
                 // Begin <IncludedProductCharacteristic>
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "IncludedProductCharacteristic", null).ConfigureAwait(false);
                 {
-                    // <Identification />
+                    // <Identification />, product attribute "listAgencyIdentifier" must be hardcoded to 9
                     await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Identification", null).ConfigureAwait(false);
                     await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "9").ConfigureAwait(false);
                     await writer.WriteStringAsync(ProductType.Tariff.Code).ConfigureAwait(false);
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
 
                     // <UnitType />
-                    await WriteEbixCodeWithAttributesAsync("UnitType", EbixCode.Of(series.QuantityUnit), writer).ConfigureAwait(false);
+                    await WriteCodeWithCodeListReferenceAttributesAsync("UnitType", EbixCode.Of(series.QuantityUnit), writer).ConfigureAwait(false);
 
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
                 } // End </IncludedProductCharacteristic>
@@ -133,7 +127,7 @@ public class WholesaleCalculationResultEbixDocumentWriter : EbixDocumentWriter
                 // Begin <MeteringGridAreaUsedDomainLocation>
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "MeteringGridAreaUsedDomainLocation", null).ConfigureAwait(false);
                 {
-                    // <Identification />
+                    // <Identification /> (GridAreaCode) attributes "schemeAgencyIdentifier" must be hardcoded to 260, and "schemeIdentifier" to DK
                     await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Identification", null).ConfigureAwait(false);
                     await writer.WriteAttributeStringAsync(null, "schemeIdentifier", null, "DK").ConfigureAwait(false);
                     await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, "260").ConfigureAwait(false);
@@ -156,11 +150,7 @@ public class WholesaleCalculationResultEbixDocumentWriter : EbixDocumentWriter
                 } // End </IntervalEnergyObservation>
 
                 // <ChargeType />
-                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "ChargeType", null).ConfigureAwait(false);
-                await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
-                await writer.WriteAttributeStringAsync(null, "listIdentifier", null, "DK").ConfigureAwait(false);
-                await writer.WriteStringAsync(EbixCode.Of(series.ChargeType)).ConfigureAwait(false);
-                await writer.WriteEndElementAsync().ConfigureAwait(false);
+                await WriteCodeWithCodeListReferenceAttributesAsync("ChargeType", EbixCode.Of(series.ChargeType), writer).ConfigureAwait(false);
 
                 // <PartyChargeTypeID />
                 await writer.WriteElementStringAsync(DocumentDetails.Prefix, "PartyChargeTypeID", null, series.ChargeCode).ConfigureAwait(false);
@@ -169,10 +159,7 @@ public class WholesaleCalculationResultEbixDocumentWriter : EbixDocumentWriter
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "ChargeTypeOwnerEnergyParty", null).ConfigureAwait(false);
                 {
                     // <Identification />
-                    await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Identification", null).ConfigureAwait(false);
-                    await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, "9").ConfigureAwait(false);
-                    await writer.WriteStringAsync(series.ChargeOwner.Value).ConfigureAwait(false);
-                    await writer.WriteEndElementAsync().ConfigureAwait(false);
+                    await WriteGlnOrEicCodeWithAttributesAsync("Identification", series.ChargeOwner.Value, writer).ConfigureAwait(false);
 
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
                 } // End </ChargeTypeOwnerEnergyParty>
