@@ -115,7 +115,7 @@ public sealed class WholesaleCalculationJsonDocumentWriter : IDocumentWriter
                         new KeyValuePair<string, string>("codingScheme", CimCode.CodingSchemeOf(series.EnergySupplier)),
                         new KeyValuePair<string, string>("value", series.EnergySupplier.Value));
 
-                    writer.WriteProperty("product", GeneralValues.ProductCode);
+                    writer.WriteProperty("product", ProductType.Tariff.Code);
 
                     writer.WriteObject(
                         "quantity_Measure_Unit.name",
