@@ -29,7 +29,7 @@ internal sealed class AggregationResultDsl
         _wholesale = wholesaleDriver;
     }
 
-    internal Task PublishAggregationResultFor(string gridAreaCode)
+    internal Task PublishResultFor(string gridAreaCode)
     {
         return _wholesale.PublishAggregationResultAsync(gridAreaCode);
     }

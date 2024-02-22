@@ -42,7 +42,7 @@ public sealed class WhenAggregationResultIsPublishedTests
     {
         await _aggregations.EmptyQueueForActor();
 
-        await _aggregations.PublishAggregationResultFor(AcceptanceTestFixture.CimActorGridArea);
+        await _aggregations.PublishResultFor(AcceptanceTestFixture.CimActorGridArea);
 
         await _aggregations.ConfirmResultIsAvailableFor();
     }
