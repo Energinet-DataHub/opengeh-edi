@@ -59,6 +59,15 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
     }
 
     [Fact]
+    public async Task MonthlyAmountPerChargeResultProducedV1Processor_creates_outgoing_message_to_energy_supplier_and_charge_owner()
+    {
+        var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder.Build();
+        await HandleIntegrationEventAsync(monthlyPerChargeEvent);
+        await AssertOutgoingMessageAsync(ActorRole.EnergySupplier);
+        await AssertOutgoingMessageAsync(ActorRole.GridOperator);
+    }
+
+    [Fact]
     public async Task MonthlyAmountPerChargeResultProducedV1Processor_does_not_create_outgoing_message_when_feature_is_disabled()
     {
         var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder
