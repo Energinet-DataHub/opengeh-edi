@@ -34,8 +34,7 @@ public sealed class WhenMonthlyAmountPerChargeResultResultIsPublishedTests
         ArgumentNullException.ThrowIfNull(fixture);
 
         _aggregations = new AggregationResultDsl(
-            new EdiDriver(
-                fixture.B2BMeteredDataResponsibleAuthorizedHttpClient),
+            new EdiDriver(fixture.B2BEnergySupplierAuthorizedHttpClient),
             new WholesaleDriver(fixture.EventPublisher));
     }
 
@@ -46,7 +45,7 @@ public sealed class WhenMonthlyAmountPerChargeResultResultIsPublishedTests
 
         await _aggregations.PublishMonthlyChargeResultFor(
             AcceptanceTestFixture.CimActorGridArea,
-            AcceptanceTestFixture.ActorNumber,
+            "5790000392551",
             AcceptanceTestFixture.ActorNumber);
 
         await _aggregations.ConfirmResultIsAvailableFor();
