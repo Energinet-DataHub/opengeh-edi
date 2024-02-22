@@ -17,6 +17,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleCalculations;
@@ -46,13 +48,23 @@ public class AmountPerChargeResultProducedV1Processor : IIntegrationEventProcess
 
         var amountPerChargeResultProducedV1 = (AmountPerChargeResultProducedV1)integrationEvent.Message;
 
-        var messageForEnergySupplier = WholesaleCalculationResultMessageFactory.CreateMessageForEnergySupplier(amountPerChargeResultProducedV1, ProcessId.New());
-        var messageForChargeOwner = WholesaleCalculationResultMessageFactory.CreateMessageForChargeOwner(amountPerChargeResultProducedV1, ProcessId.New());
+        var messageForEnergySupplier = WholesaleCalculationResultMessageFactory.CreateMessage(amountPerChargeResultProducedV1, ActorRole.EnergySupplier, ProcessId.New());
+        var messageForChargeOwner = WholesaleCalculationResultMessageFactory.CreateMessage(amountPerChargeResultProducedV1, GetChargeOwner(amountPerChargeResultProducedV1.ChargeOwnerId), ProcessId.New());
 
         if (await _featureManager.UseAmountPerChargeResultProduced.ConfigureAwait(false))
         {
             await _outgoingMessagesClient.EnqueueAndCommitAsync(messageForEnergySupplier, cancellationToken).ConfigureAwait(false);
             await _outgoingMessagesClient.EnqueueAndCommitAsync(messageForChargeOwner, cancellationToken).ConfigureAwait(false);
         }
+    }
+
+    private static ActorRole GetChargeOwner(string chargeOwnerId)
+    {
+        if (chargeOwnerId == DataHubDetails.DataHubActorNumber.Value)
+        {
+            return ActorRole.SystemOperator;
+        }
+
+        return ActorRole.GridOperator;
     }
 }

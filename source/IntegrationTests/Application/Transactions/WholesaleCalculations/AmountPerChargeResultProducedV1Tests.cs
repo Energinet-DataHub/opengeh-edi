@@ -68,6 +68,17 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
     }
 
     [Fact]
+    public async Task AmountPerChargeResultProducedV1Processor_creates_outgoing_message_to_energy_supplier_and_energinet_as_charge_owner()
+    {
+        var amountPerChargeEvent = _amountPerChargeEventBuilder
+            .WithChargeOwner(DataHubDetails.DataHubActorNumber.Value)
+            .Build();
+        await HandleIntegrationEventAsync(amountPerChargeEvent);
+        await AssertOutgoingMessageAsync(ActorRole.EnergySupplier);
+        await AssertOutgoingMessageAsync(ActorRole.SystemOperator);
+    }
+
+    [Fact]
     public async Task AmountPerChargeResultProducedV1Processor_does_not_create_outgoing_message_when_feature_is_disabled()
     {
         var amountPerChargeEvent = _amountPerChargeEventBuilder
