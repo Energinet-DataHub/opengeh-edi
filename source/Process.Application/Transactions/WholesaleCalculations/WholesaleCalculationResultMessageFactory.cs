@@ -40,7 +40,7 @@ public static class WholesaleCalculationResultMessageFactory
             IsTax: message.IsTax,
             Points: new[]
             {
-                new Point(1, null, null,  message.Amount != null ? DecimalParser.Parse(message.Amount) : null, null),
+                new Point(1, null, null, message.Amount != null ? DecimalParser.Parse(message.Amount) : null, null),
             },
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
             ChargeOwner: ActorNumber.Create(message.ChargeOwnerId),
