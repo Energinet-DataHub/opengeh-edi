@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Linq;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
@@ -24,11 +25,33 @@ public class WholesaleCalculationModelTests
     [Fact]
     public void WholesaleCalculationSeries_has_the_same_attributes_as_WholesaleCalculationMarketActivityRecord()
     {
-        var keysOfWholesaleCalculationSeries = typeof(WholesaleCalculationSeries).GetProperties().Select(p => new { Name = p.Name, PropertyType = p.PropertyType.ToString() }).ToList();
-        var keysOfWholesaleCalculationMarketActivityRecord = typeof(WholesaleCalculationMarketActivityRecord).GetProperties().Select(p => new { Name = p.Name, PropertyType = p.PropertyType.ToString() }).ToList();
+        var pointsAttributeName = "Points";
+        var keysOfWholesaleCalculationSeries = typeof(WholesaleCalculationSeries).GetProperties()
+            .Select(p => new { Name = p.Name, PropertyType = p.PropertyType })
+            .Where(p => p.Name != pointsAttributeName).ToList();
+        var keysOfWholesaleCalculationMarketActivityRecord = typeof(WholesaleCalculationMarketActivityRecord).GetProperties()
+            .Select(p => new { Name = p.Name, PropertyType = p.PropertyType })
+            .Where(p => p.Name != pointsAttributeName).ToList();
 
         Assert.All(keysOfWholesaleCalculationSeries, property =>
             Assert.Contains(keysOfWholesaleCalculationMarketActivityRecord, element =>
-                element.Name == property.Name && element.PropertyType == property.PropertyType));
+                element.Name == property.Name
+                && element.PropertyType == property.PropertyType
+                && Nullable.GetUnderlyingType(element.PropertyType) == Nullable.GetUnderlyingType(property.PropertyType)));
+    }
+
+    [Fact]
+    public void WholesaleCalculationSeries_point_has_the_same_attributes_as_WholesaleCalculationMarketActivityRecord_point()
+    {
+        var keysOfWholesaleCalculationSeries = typeof(Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations.Point).GetProperties()
+            .Select(p => new { Name = p.Name, PropertyType = p.PropertyType }).ToList();
+        var keysOfWholesaleCalculationMarketActivityRecord = typeof(Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations.Point).GetProperties()
+            .Select(p => new { Name = p.Name, PropertyType = p.PropertyType }).ToList();
+
+        Assert.All(keysOfWholesaleCalculationSeries, property =>
+            Assert.Contains(keysOfWholesaleCalculationMarketActivityRecord, element =>
+                element.Name == property.Name
+                && element.PropertyType == property.PropertyType
+                && Nullable.GetUnderlyingType(element.PropertyType) == Nullable.GetUnderlyingType(property.PropertyType)));
     }
 }

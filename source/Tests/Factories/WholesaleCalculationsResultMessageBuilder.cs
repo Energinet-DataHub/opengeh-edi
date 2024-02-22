@@ -207,6 +207,7 @@ public class WholesaleCalculationsResultMessageBuilder
             ChargeCode: _chargeCode,
             IsTax: false,
             Quantity: _quantity,
+            Points: null,
             EnergySupplier: _energySupplierActorNumber,
             ChargeOwner: _chargeOwner,
             Period: _period,

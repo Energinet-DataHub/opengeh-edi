@@ -32,6 +32,11 @@ public class SettlementVersionMapperTests : BaseEnumMapperTests
         MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing,
     };
 
+    private readonly AmountPerChargeResultProducedV1.Types.CalculationType[] _amountPerChargeResultInvalidValues =
+    {
+        AmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing,
+    };
+
     [Theory]
     [MemberData(nameof(GetEnumValues), typeof(EnergyResultProducedV2.Types.CalculationType))]
     public void Ensure_handling_energy_result_produced(EnergyResultProducedV2.Types.CalculationType value)
@@ -49,4 +54,13 @@ public class SettlementVersionMapperTests : BaseEnumMapperTests
             value,
             unspecifiedValue: MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.Unspecified,
             invalidValues: _monthlyAmountPerChargeResultInvalidValues);
+
+    [Theory]
+    [MemberData(nameof(GetEnumValues), typeof(AmountPerChargeResultProducedV1.Types.CalculationType))]
+    public void Ensure_handling__amount_per_charge_result_produced(AmountPerChargeResultProducedV1.Types.CalculationType value)
+        => EnsureCanMapOrReturnsNull(
+            () => SettlementVersionMapper.Map(value),
+            value,
+            unspecifiedValue: AmountPerChargeResultProducedV1.Types.CalculationType.Unspecified,
+            invalidValues: _amountPerChargeResultInvalidValues);
 }

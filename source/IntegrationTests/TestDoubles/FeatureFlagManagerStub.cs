@@ -25,4 +25,6 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
     public Task<bool> UseExampleFeatureFlag { get; set; } = Task.FromResult(true);
 
     public Task<bool> UseMonthlyAmountPerChargeResultProduced { get; set; } = Task.FromResult(true);
+
+    public Task<bool> UseAmountPerChargeResultProduced { get; set; } = Task.FromResult(true);
 }
