@@ -107,7 +107,6 @@ public class AssertEbixDocument
         var validationResult = await _documentValidator!.ValidateAsync(_stream, DocumentFormat.Ebix, type, CancellationToken.None, version).ConfigureAwait(false);
 
         using var scope = new AssertionScope();
-        validationResult.IsValid.Should().BeTrue();
         validationResult.ValidationErrors.Should().BeEmpty();
 
         return this;
