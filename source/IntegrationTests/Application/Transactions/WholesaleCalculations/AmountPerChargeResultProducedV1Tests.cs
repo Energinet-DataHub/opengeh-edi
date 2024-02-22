@@ -53,21 +53,21 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
     [Fact]
     public async Task AmountPerChargeResultProducedV1Processor_creates_outgoing_message_when_feature_is_enabled()
     {
-        var monthlyPerChargeEvent = _amountPerChargeEventBuilder.Build();
-        await HandleIntegrationEventAsync(monthlyPerChargeEvent);
+        var amountPerChargeEvent = _amountPerChargeEventBuilder.Build();
+        await HandleIntegrationEventAsync(amountPerChargeEvent);
         await AssertOutgoingMessageAsync();
     }
 
     [Fact]
     public async Task AmountPerChargeResultProducedV1Processor_does_not_create_outgoing_message_when_feature_is_disabled()
     {
-        var monthlyPerChargeEvent = _amountPerChargeEventBuilder
+        var amountPerChargeEvent = _amountPerChargeEventBuilder
             .WithCalculationType(AmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing)
             .Build();
 
         FeatureFlagManagerStub.UseAmountPerChargeResultProduced = Task.FromResult(false);
 
-        await HandleIntegrationEventAsync(monthlyPerChargeEvent);
+        await HandleIntegrationEventAsync(amountPerChargeEvent);
         await AssertOutgoingMessageIsNull(BusinessReason.WholesaleFixing);
     }
 
@@ -84,7 +84,7 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
         var calculationVersion = 3;
 
         // Arrange
-        var monthlyPerChargeEvent = _amountPerChargeEventBuilder
+        var amountPerChargeEvent = _amountPerChargeEventBuilder
             .WithCalculationType(AmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing)
             .WithStartOfPeriod(startOfPeriod.ToTimestamp())
             .WithEndOfPeriod(endOfPeriod.ToTimestamp())
@@ -100,7 +100,7 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
             .Build();
 
         // Act
-        await HandleIntegrationEventAsync(monthlyPerChargeEvent);
+        await HandleIntegrationEventAsync(amountPerChargeEvent);
 
         // Assert
         var message = await AssertOutgoingMessageAsync(businessReason: BusinessReason.WholesaleFixing);

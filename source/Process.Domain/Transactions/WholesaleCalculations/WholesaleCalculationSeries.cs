@@ -24,7 +24,7 @@ public record WholesaleCalculationSeries(
     string GridAreaCode,
     string ChargeCode,
     bool IsTax,
-    IReadOnlyCollection<Point>? Points,
+    IReadOnlyCollection<Point> Points,
     ActorNumber EnergySupplier,
     ActorNumber ChargeOwner,
     Period Period,
