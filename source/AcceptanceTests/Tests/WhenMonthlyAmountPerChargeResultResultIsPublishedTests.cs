@@ -47,7 +47,7 @@ public sealed class WhenMonthlyAmountPerChargeResultResultIsPublishedTests
         await _aggregations.PublishMonthlyChargeResultFor(
             AcceptanceTestFixture.CimActorGridArea,
             AcceptanceTestFixture.ActorNumber,
-            "SomeLuckyOwner");
+            AcceptanceTestFixture.ActorNumber);
 
         await _aggregations.ConfirmResultIsAvailableFor();
     }

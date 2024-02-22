@@ -130,7 +130,7 @@ internal sealed class WholesaleDriver
             PeriodEndUtc = DateTime.UtcNow.ToTimestamp(),
             GridAreaCode = gridAreaCode,
             EnergySupplierId = energySupplierId,
-            ChargeCode = "ChargeCodeGoesBrrr",
+            ChargeCode = "ESP-C-F-04",
             ChargeType = MAPCRP.ChargeType.Fee,
             ChargeOwnerId = chargeOwnerId,
             QuantityUnit = MAPCRP.QuantityUnit.Kwh,
