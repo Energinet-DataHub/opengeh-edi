@@ -77,11 +77,11 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
         using var assertionScope = new AssertionScope();
         await AssertDocument(document, DocumentFormat.From(documentFormat))
             .HasMessageId(SampleData.MessageId)
-            .HasBusinessReason(SampleData.BusinessReason, CodeListType.EbixDenmark)
+            .HasBusinessReason(SampleData.BusinessReason, CodeListType.EbixDenmark) // "D05" (WholesaleFixing) is from CodeListType.EbixDenmark
             .HasSenderId(SampleData.SenderId)
             .HasSenderRole(ActorRole.EnergySupplier)
             .HasReceiverId(SampleData.ReceiverId)
-            .HasReceiverRole(ActorRole.MeteredDataResponsible)
+            .HasReceiverRole(ActorRole.MeteredDataResponsible, CodeListType.Ebix) // MDR is from CodeListType.Ebix
             .HasTimestamp(SampleData.Timestamp)
             .HasTransactionId(SampleData.TransactionId)
             .HasCalculationVersion(SampleData.Version)

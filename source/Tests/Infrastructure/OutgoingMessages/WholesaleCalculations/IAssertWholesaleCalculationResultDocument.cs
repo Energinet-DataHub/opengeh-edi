@@ -65,7 +65,8 @@ public interface IAssertWholesaleCalculationResultDocument
     /// Assert sender role in header
     /// </summary>
     /// <param name="expectedReceiverRole"></param>
-    IAssertWholesaleCalculationResultDocument HasReceiverRole(ActorRole expectedReceiverRole);
+    /// <param name="codeListType"></param>
+    IAssertWholesaleCalculationResultDocument HasReceiverRole(ActorRole expectedReceiverRole, CodeListType codeListType);
 
     /// <summary>
     /// Asserts time stamp in header

@@ -88,12 +88,12 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasReceiverRole(ActorRole expectedReceiverRole)
+    public IAssertWholesaleCalculationResultDocument HasReceiverRole(ActorRole expectedReceiverRole, CodeListType codeListType)
     {
         _documentAsserter.HasValueWithAttributes(
             $"{ProcessEnergyContext}/EnergyBusinessProcessRole",
             EbixCode.Of(expectedReceiverRole),
-            CreateRequiredListAttributes(CodeListType.EbixDenmark));
+            CreateRequiredListAttributes(codeListType));
 
         return this;
     }
