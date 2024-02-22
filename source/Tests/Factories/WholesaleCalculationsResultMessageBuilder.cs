@@ -147,12 +147,6 @@ public class WholesaleCalculationsResultMessageBuilder
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithAmount(int? amount)
-    {
-        _points = new List<Point>() { new(1, 100, 100, amount, null) };
-        return this;
-    }
-
     public WholesaleCalculationsResultMessageBuilder WithOriginalTransactionIdReference(string originalTransactionIdReference)
     {
         _originalTransactionIdReference = originalTransactionIdReference;
@@ -225,8 +219,8 @@ public class WholesaleCalculationsResultMessageBuilder
             Currency: _currency,
             ChargeType: _chargeType,
             Resolution: _resolution,
-            _meteringPointType,
-            _settlementMethod);
+            MeteringPointType: _meteringPointType,
+            SettlementType: _settlementMethod);
     }
 
     private static Instant ParseTimeStamp(string timestamp)

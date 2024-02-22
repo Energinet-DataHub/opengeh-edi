@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -67,7 +68,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
                 .WithMeasurementUnit(SampleData.MeasurementUnit)
                 .WithPriceMeasurementUnit(SampleData.PriceMeasureUnit)
                 .WithResolution(SampleData.Resolution)
-                .WithAmount(SampleData.Quantity),
+                .WithCalculatedHourlyTariffAmounts(new Collection<Point>() { new Point(1, 1, 1, SampleData.Quantity, null) }),
             DocumentFormat.From(documentFormat));
 
         // Assert
@@ -105,7 +106,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
         // Arrange
         var document = await CreateDocument(
             _wholesaleCalculationsResultMessageBuilder
-                .WithAmount(null),
+                .WithCalculatedHourlyTariffAmounts(new Collection<Point>() { new Point(1, 1, 1, null, null) }),
             DocumentFormat.From(documentFormat));
 
         // Assert
