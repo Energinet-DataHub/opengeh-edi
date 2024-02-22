@@ -23,15 +23,15 @@ jobs:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v13
     with:
       solution_file_path: source/EDI.sln
-      dotnet_version: 8.0.101
+      dotnet_version: 8.0.200
 
   # Run all tests in 'IntegrationTests.dll'
   integration_tests:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v13
     with:
       tests_dll_file_path: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
-      download_attempt_limit: 20    # 20 retries with 15 seconds delay = 5 minutes wait before timeout
-      dotnet_version: 8.0.101
+      download_attempt_limit: 20 # 20 retries with 15 seconds delay = 5 minutes wait before timeout
+      dotnet_version: 8.0.200
       use_azure_functions_tools: true
 
   # Run all tests in 'ArchitectureTests.dll'
@@ -39,13 +39,13 @@ jobs:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v13
     with:
       tests_dll_file_path: \source\ArchitectureTests\bin\Release\net8.0\Energinet.DataHub.EDI.ArchitectureTests.dll
-      download_attempt_limit: 20    # 20 retries with 15 seconds delay = 5 minutes wait before timeout
-      dotnet_version: 8.0.101
+      download_attempt_limit: 20 # 20 retries with 15 seconds delay = 5 minutes wait before timeout
+      dotnet_version: 8.0.200
 
   # Run all tests in 'Tests.dll'
   tests:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v13
     with:
       tests_dll_file_path: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.Tests.dll
-      download_attempt_limit: 20    # 20 retries with 15 seconds delay = 5 minutes wait before timeout
-      dotnet_version: 8.0.101
+      download_attempt_limit: 20 # 20 retries with 15 seconds delay = 5 minutes wait before timeout
+      dotnet_version: 8.0.200
