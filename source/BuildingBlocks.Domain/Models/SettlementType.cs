@@ -14,6 +14,7 @@
 
 using System;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -25,6 +26,7 @@ public class SettlementType : EnumerationType
     // Customer with less than ~100.000 kwH per year
     public static readonly SettlementType Flex = new(nameof(Flex), "D01");
 
+    [JsonConstructor]
     private SettlementType(string name, string code)
         : base(name)
     {

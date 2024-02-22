@@ -39,7 +39,7 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
     private readonly IFileStorageClient _fileStorageClient;
 
-    private readonly AmountPerChargeResultProducedV1EventBuilder _monthlyPerChargeEventBuilder = new();
+    private readonly AmountPerChargeResultProducedV1EventBuilder _amountPerChargeEventBuilder = new();
 
     public AmountPerChargeResultProducedV1Tests(
         IntegrationTestFixture integrationTestFixture)
@@ -53,21 +53,21 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
     [Fact]
     public async Task AmountPerChargeResultProducedV1Processor_creates_outgoing_message_when_feature_is_enabled()
     {
-        var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder.Build();
-        await HandleIntegrationEventAsync(monthlyPerChargeEvent);
+        var amountPerChargeEvent = _amountPerChargeEventBuilder.Build();
+        await HandleIntegrationEventAsync(amountPerChargeEvent);
         await AssertOutgoingMessageAsync();
     }
 
     [Fact]
     public async Task AmountPerChargeResultProducedV1Processor_does_not_create_outgoing_message_when_feature_is_disabled()
     {
-        var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder
+        var amountPerChargeEvent = _amountPerChargeEventBuilder
             .WithCalculationType(AmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing)
             .Build();
 
         FeatureFlagManagerStub.UseAmountPerChargeResultProduced = Task.FromResult(false);
 
-        await HandleIntegrationEventAsync(monthlyPerChargeEvent);
+        await HandleIntegrationEventAsync(amountPerChargeEvent);
         await AssertOutgoingMessageIsNull(BusinessReason.WholesaleFixing);
     }
 
@@ -84,7 +84,7 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
         var calculationVersion = 3;
 
         // Arrange
-        var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder
+        var amountPerChargeEvent = _amountPerChargeEventBuilder
             .WithCalculationType(AmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing)
             .WithStartOfPeriod(startOfPeriod.ToTimestamp())
             .WithEndOfPeriod(endOfPeriod.ToTimestamp())
@@ -100,7 +100,7 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
             .Build();
 
         // Act
-        await HandleIntegrationEventAsync(monthlyPerChargeEvent);
+        await HandleIntegrationEventAsync(amountPerChargeEvent);
 
         // Assert
         var message = await AssertOutgoingMessageAsync(businessReason: BusinessReason.WholesaleFixing);
@@ -111,7 +111,7 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasRelationTo(null)
-            // .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.CalculationVersion, calculationVersion)
+            .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.CalculationVersion, calculationVersion)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.GridAreaCode, gridAreaCode)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.ChargeCode, chargeCode)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.IsTax, isTax)
@@ -124,6 +124,8 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.PriceMeasureUnit, MeasurementUnit.Kwh)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.Currency, Currency.DanishCrowns)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.ChargeType, ChargeType.Fee)
+            .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.SettlementType, SettlementType.Flex)
+            .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.MeteringPointType, MeteringPointType.Production)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.Resolution, Resolution.Monthly);
     }
 

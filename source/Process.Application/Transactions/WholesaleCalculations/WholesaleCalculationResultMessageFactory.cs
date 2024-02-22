@@ -38,10 +38,9 @@ public static class WholesaleCalculationResultMessageFactory
             GridAreaCode: message.GridAreaCode,
             ChargeCode: message.ChargeCode,
             IsTax: message.IsTax,
-            Quantity: message.Amount != null ? DecimalParser.Parse(message.Amount) : null,
             Points: new[]
             {
-                new Point(1, null, null, message.Amount != null ? DecimalParser.Parse(message.Amount) : null, null),
+                new Point(1, null, null,  message.Amount != null ? DecimalParser.Parse(message.Amount) : null, null),
             },
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
             ChargeOwner: ActorNumber.Create(message.ChargeOwnerId),
@@ -51,7 +50,9 @@ public static class WholesaleCalculationResultMessageFactory
             PriceMeasureUnit: MeasurementUnit.Kwh,
             Currency: CurrencyMapper.Map(message.Currency),
             ChargeType: ChargeTypeMapper.Map(message.ChargeType),
-            Resolution: Resolution.Monthly);
+            Resolution: Resolution.Monthly,
+            null,
+            null);
 
         return WholesaleCalculationResultMessage.Create(
             receiverNumber: wholesaleCalculationSeries.EnergySupplier,
@@ -68,11 +69,10 @@ public static class WholesaleCalculationResultMessageFactory
 
         var wholesaleCalculationSeries = new WholesaleCalculationSeries(
             TransactionId: ProcessId.New().Id,
-            CalculationVersion: 1, //message.CalculationResultVersion,
+            CalculationVersion: message.CalculationResultVersion,
             GridAreaCode: message.GridAreaCode,
             ChargeCode: message.ChargeCode,
             IsTax: message.IsTax,
-            Quantity: null,
             Points: TimeSeriesPointsMapper.MapPoints(message.TimeSeriesPoints),
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
             ChargeOwner: ActorNumber.Create(message.ChargeOwnerId),
@@ -82,7 +82,9 @@ public static class WholesaleCalculationResultMessageFactory
             PriceMeasureUnit: MeasurementUnit.Kwh,
             Currency: CurrencyMapper.Map(message.Currency),
             ChargeType: ChargeTypeMapper.Map(message.ChargeType),
-            Resolution: Resolution.Monthly);
+            Resolution: Resolution.Monthly,
+            MeteringPointType: MeteringPointTypeMapper.Map(message.MeteringPointType),
+            SettlementType: SettlementTypeMapper.Map(message.SettlementMethod));
 
         return WholesaleCalculationResultMessage.Create(
             receiverNumber: wholesaleCalculationSeries.EnergySupplier,
