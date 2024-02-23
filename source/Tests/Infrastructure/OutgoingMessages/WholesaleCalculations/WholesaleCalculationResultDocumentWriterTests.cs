@@ -43,6 +43,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
 
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
     public async Task Can_create_notifyWholesaleServices_document(string documentFormat)
     {
         // Arrange
@@ -99,6 +100,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
 
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
     public async Task Can_create_notifyWholesaleServices_document_without_quantity(string documentFormat)
     {
         // Arrange
@@ -115,6 +117,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
 
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
     public async Task Can_create_notifyWholesaleServices_document_with_settlement_version(string documentFormat)
     {
         // Arrange
@@ -131,6 +134,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
 
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
     public async Task Can_create_notifyWholesaleServices_document_with_measurement_unit_pieces(string documentFormat)
     {
         // Arrange
@@ -156,16 +160,34 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
                 new[] { records, });
         }
 
+        if (documentFormat == DocumentFormat.Json)
+        {
+            return new WholesaleCalculationJsonDocumentWriter(_parser).WriteAsync(
+                documentHeader,
+                new[] { records });
+        }
+
         throw new NotImplementedException();
     }
 
-    // IAssertWholesaleCalculationResultDocument
-    private AssertWholesaleCalculationResultXmlDocument AssertDocument(MarketDocumentStream document, DocumentFormat documentFormat)
+    private IAssertWholesaleCalculationResultDocument AssertDocument(
+        MarketDocumentStream document,
+        DocumentFormat documentFormat)
     {
          if (documentFormat == DocumentFormat.Xml)
          {
              var assertXmlDocument = AssertXmlDocument.Document(document.Stream, "cim", _documentValidation.Validator);
              return new AssertWholesaleCalculationResultXmlDocument(assertXmlDocument);
+         }
+
+         if (documentFormat == DocumentFormat.Json)
+         {
+             return new AssertWholesaleCalculationResultJsonDocument(document.Stream);
+         }
+
+         if (documentFormat == DocumentFormat.Ebix)
+         {
+             throw new NotImplementedException();
          }
 
          throw new NotSupportedException($"Document format '{documentFormat}' is not supported");

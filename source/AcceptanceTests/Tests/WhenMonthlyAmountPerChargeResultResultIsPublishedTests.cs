@@ -19,30 +19,34 @@ using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 
-[SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
-
+[SuppressMessage(
+    "Usage",
+    "CA2007",
+    Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 [IntegrationTest]
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
-public sealed class WhenAggregationResultIsPublishedTests
+public sealed class WhenMonthlyAmountPerChargeResultResultIsPublishedTests
 {
     private readonly AggregationResultDsl _aggregations;
 
-    public WhenAggregationResultIsPublishedTests(AcceptanceTestFixture fixture)
+    public WhenMonthlyAmountPerChargeResultResultIsPublishedTests(AcceptanceTestFixture fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
 
         _aggregations = new AggregationResultDsl(
-            new EdiDriver(
-                fixture.B2BMeteredDataResponsibleAuthorizedHttpClient),
+            new EdiDriver(fixture.B2BEnergySupplierAuthorizedHttpClient),
             new WholesaleDriver(fixture.EventPublisher));
     }
 
     [Fact]
-    public async Task Actor_can_peek_and_dequeue_aggregation_result()
+    public async Task Actor_can_peek_and_dequeue_monthly_charge_result()
     {
         await _aggregations.EmptyQueueForActor();
 
-        await _aggregations.PublishResultFor(AcceptanceTestFixture.CimActorGridArea);
+        await _aggregations.PublishMonthlyChargeResultFor(
+            AcceptanceTestFixture.CimActorGridArea,
+            AcceptanceTestFixture.EdiSubsystemTestCimActorNumber,
+            AcceptanceTestFixture.ActorNumber);
 
         await _aggregations.ConfirmResultIsAvailableFor();
     }
