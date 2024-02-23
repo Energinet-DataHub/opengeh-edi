@@ -84,7 +84,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasPointsInCorrectOrder<TimeSeries, decimal?>(timeSerie => timeSerie.Point.Select(x => x.Quantity).ToList(), acceptedEvent.Series.SelectMany(x => x.TimeSeriesPoints).OrderBy(x => x.Time).ToList())
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
             .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId)
-            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1);
+            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1)
+            .HasMessageRecordValue<TimeSeries>(timeSerie => timeSerie.OriginalTransactionIdReference, process.BusinessTransactionId.Id);
     }
 
     [Fact]
