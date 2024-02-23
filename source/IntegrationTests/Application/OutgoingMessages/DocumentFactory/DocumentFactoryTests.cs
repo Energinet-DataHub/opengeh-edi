@@ -55,11 +55,6 @@ public class DocumentFactoryTests
     {
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Json));
-        if (_notSupportedDocumentType.Contains(documentType))
-        {
-            Assert.Null(writer);
-            return;
-        }
 
         Assert.NotNull(writer);
     }
