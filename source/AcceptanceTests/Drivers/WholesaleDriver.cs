@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.AcceptanceTests.Drivers.MessageFactories;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf;
-using Google.Protobuf.WellKnownTypes;
-using static Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.EnergyResultProducedV2.Types;
-using DecimalValue = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
@@ -35,8 +33,11 @@ internal sealed class WholesaleDriver
     {
         var aggregation = marketRole?.Code switch
         {
-            BalanceResponsiblePartyMarketRoleCode => CreateAggregationResultAvailableEventForBalanceResponsible(gridAreaCode, actorNumber ?? throw new ArgumentNullException(nameof(actorNumber))),
-            _ => CreateAggregationResultAvailableEventFor(gridAreaCode),
+            BalanceResponsiblePartyMarketRoleCode => EnergyResultProducedV2Factory
+                .CreateAggregationResultAvailableEventForBalanceResponsible(
+                    gridAreaCode,
+                    actorNumber ?? throw new ArgumentNullException(nameof(actorNumber))),
+            _ => EnergyResultProducedV2Factory.CreateAggregationResultAvailableEventFor(gridAreaCode),
         };
 
         return _integrationEventPublisher.PublishAsync(
@@ -44,62 +45,19 @@ internal sealed class WholesaleDriver
             aggregation.ToByteArray());
     }
 
-    private static EnergyResultProducedV2 CreateAggregationResultAvailableEventFor(string gridAreaCode)
-    {
-        var processCompletedEvent = new EnergyResultProducedV2
-        {
-            Resolution = EnergyResultProducedV2.Types.Resolution.Quarter,
-            QuantityUnit = QuantityUnit.Kwh,
-            CalculationType = CalculationType.BalanceFixing,
-            TimeSeriesType = TimeSeriesType.Production,
-            CalculationId = Guid.NewGuid().ToString(),
-            AggregationPerGridarea = new AggregationPerGridArea()
-            {
-                GridAreaCode = gridAreaCode,
-            },
-            PeriodEndUtc = DateTime.UtcNow.ToTimestamp(),
-            PeriodStartUtc = DateTime.UtcNow.ToTimestamp(),
-            TimeSeriesPoints =
-            {
-                new TimeSeriesPoint
-                {
-                    Time = new Timestamp { Seconds = 100000 },
-                    Quantity = new DecimalValue { Units = 123, Nanos = 1200000 },
-                    QuantityQualities = { QuantityQuality.Measured },
-                },
-            },
-            CalculationResultVersion = 404,
-        };
-        return processCompletedEvent;
-    }
-
-    private static EnergyResultProducedV2 CreateAggregationResultAvailableEventForBalanceResponsible(
+    internal Task PublishMonthlyAmountPerChargeResultAsync(
         string gridAreaCode,
-        string actorNumber)
+        string energySupplierId,
+        string chargeOwnerId)
     {
-        var processCompletedEvent = new EnergyResultProducedV2
-        {
-            Resolution = EnergyResultProducedV2.Types.Resolution.Quarter,
-            QuantityUnit = QuantityUnit.Kwh,
-            CalculationType = CalculationType.BalanceFixing,
-            TimeSeriesType = TimeSeriesType.Production,
-            CalculationId = Guid.NewGuid().ToString(),
-            AggregationPerBalanceresponsiblepartyPerGridarea = new AggregationPerBalanceResponsiblePartyPerGridArea
-            {
-                GridAreaCode = gridAreaCode, BalanceResponsibleId = actorNumber,
-            },
-            PeriodEndUtc = DateTime.UtcNow.ToTimestamp(),
-            PeriodStartUtc = DateTime.UtcNow.ToTimestamp(),
-            TimeSeriesPoints =
-            {
-                new TimeSeriesPoint
-                {
-                    Time = new Timestamp { Seconds = 100000 },
-                    Quantity = new DecimalValue { Units = 123, Nanos = 1200000 },
-                    QuantityQualities = { QuantityQuality.Measured },
-                },
-            },
-        };
-        return processCompletedEvent;
+        var monthlyAmountPerChargeResultProduced =
+            MonthlyAmountPerChargeResultProducedV1Factory.CreateMonthlyAmountPerChargeResultProduced(
+                gridAreaCode,
+                energySupplierId,
+                chargeOwnerId);
+
+        return _integrationEventPublisher.PublishAsync(
+            MonthlyAmountPerChargeResultProducedV1.EventName,
+            monthlyAmountPerChargeResultProduced.ToByteArray());
     }
 }
