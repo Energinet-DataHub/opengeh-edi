@@ -129,6 +129,12 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
+    public IAssertWholesaleCalculationResultDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType)
+    {
+        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/TypeOfMeteringPoint", expectedMeteringPointType.Code);
+        return this;
+    }
+
     public IAssertWholesaleCalculationResultDocument HasChargeCode(string expectedChargeTypeNumber)
     {
         _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/PartyChargeTypeID", expectedChargeTypeNumber);
@@ -229,7 +235,7 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
 
     public IAssertWholesaleCalculationResultDocument SettlementMethodIsNotPresent()
     {
-        // TODO: Not used in monthly (månedssum), implement later
+        _documentAsserter.IsNotPresent("PayloadEnergyTimeSeries[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod");
         return this;
     }
 
@@ -246,13 +252,13 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
 
     public IAssertWholesaleCalculationResultDocument HasSettlementVersion(SettlementVersion settlementVersion)
     {
-        // TODO: Not used in monthly (månedssum), implement later
+        _documentAsserter.HasValue("ProcessEnergyContext/ProcessVariant", EbixCode.Of(settlementVersion));
         return this;
     }
 
     public IAssertWholesaleCalculationResultDocument SettlementVersionIsNotPresent()
     {
-        // TODO: Not used in monthly (månedssum), implement later
+        _documentAsserter.IsNotPresent("ProcessEnergyContext/ProcessVariant");
         return this;
     }
 
@@ -262,15 +268,15 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasEvaluationType(string expectedMarketEvaluationType)
+    public IAssertWholesaleCalculationResultDocument HasSettlementMethod(SettlementType settlementMethod)
     {
-        // TODO: Not used in monthly (månedssum), implement later
+        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod", settlementMethod.Code);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasSettlementMethod(SettlementType settlementMethod)
+    public IAssertWholesaleCalculationResultDocument PriceAmountIsPresentForPointIndex(int pointIndex, string? expectedPrice)
     {
-        // TODO: Not used in monthly (månedssum), implement later
+        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{pointIndex + 1}]/EnergyPrice", expectedPrice ?? "0");
         return this;
     }
 

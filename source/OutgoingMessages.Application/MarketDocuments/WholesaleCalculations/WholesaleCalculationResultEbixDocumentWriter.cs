@@ -123,6 +123,25 @@ public class WholesaleCalculationResultEbixDocumentWriter : EbixDocumentWriter
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
                 } // End </IncludedProductCharacteristic>
 
+                if (series.MeteringPointType != null || series.SettlementType != null)
+                {
+                    // Begin DetailMeasurementMeteringPointCharacteristic
+                    await writer.WriteStartElementAsync(DocumentDetails.Prefix, "DetailMeasurementMeteringPointCharacteristic", null).ConfigureAwait(false);
+                    if (series.MeteringPointType != null)
+                    {
+                        await WriteCodeWithCodeListReferenceAttributesAsync("TypeOfMeteringPoint", series.MeteringPointType.Code, writer).ConfigureAwait(false);
+                    }
+
+                    if (series.SettlementType != null)
+                    {
+                        await WriteCodeWithCodeListReferenceAttributesAsync("SettlementMethod", series.SettlementType.Code, writer).ConfigureAwait(false);
+                    }
+
+                    await writer.WriteEndElementAsync().ConfigureAwait(false);
+                }
+
+                // End DetailMeasurementMeteringPointCharacteristic
+
                 // Begin <MeteringGridAreaUsedDomainLocation>
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "MeteringGridAreaUsedDomainLocation", null).ConfigureAwait(false);
                 {
@@ -136,17 +155,55 @@ public class WholesaleCalculationResultEbixDocumentWriter : EbixDocumentWriter
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
                 } // End </MeteringGridAreaUsedDomainLocation>
 
-                // Begin <IntervalEnergyObservation>
-                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "IntervalEnergyObservation", null).ConfigureAwait(false);
+                foreach (var point in series.Points)
                 {
-                    // <Position />
-                    await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Position", null, "1").ConfigureAwait(false);
+                    // Begin <IntervalEnergyObservation>
+                    await writer.WriteStartElementAsync(DocumentDetails.Prefix, "IntervalEnergyObservation", null)
+                        .ConfigureAwait(false);
+                    {
+                        // <Position />
+                        await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Position", null, point.Position.ToString(NumberFormatInfo.InvariantInfo))
+                            .ConfigureAwait(false);
 
-                    // <EnergySum />
-                    await writer.WriteElementStringAsync(DocumentDetails.Prefix, "EnergySum", null, series.Quantity?.ToString(NumberFormatInfo.InvariantInfo) ?? "0").ConfigureAwait(false);
+                        // <EnergyQuantity />
+                        if (point.Quantity != null)
+                        {
+                            await writer.WriteElementStringAsync(
+                                    DocumentDetails.Prefix,
+                                    "EnergyQuantity",
+                                    null,
+                                    point.Quantity.Value.ToString(NumberFormatInfo.InvariantInfo))
+                                .ConfigureAwait(false);
+                        }
 
-                    await writer.WriteEndElementAsync().ConfigureAwait(false);
-                } // End </IntervalEnergyObservation>
+                        // <EnergyPrice />
+                        if (point.Price != null)
+                        {
+                            await writer.WriteElementStringAsync(
+                                    DocumentDetails.Prefix,
+                                    "EnergyPrice",
+                                    null,
+                                    point.Price.Value.ToString(NumberFormatInfo.InvariantInfo))
+                                .ConfigureAwait(false);
+                        }
+
+                        // <QuantityQuality />
+                        if (point.QuantityQuality != null)
+                        {
+                            await WriteCodeWithCodeListReferenceAttributesAsync("QuantityQuality", point.QuantityQuality.Value.ToString(), writer).ConfigureAwait(false);
+                        }
+
+                        // <EnergySum />
+                        await writer.WriteElementStringAsync(
+                                DocumentDetails.Prefix,
+                                "EnergySum",
+                                null,
+                                point.Amount?.ToString(NumberFormatInfo.InvariantInfo) ?? "0")
+                            .ConfigureAwait(false);
+
+                        await writer.WriteEndElementAsync().ConfigureAwait(false);
+                    } // End </IntervalEnergyObservation>
+                }
 
                 // <ChargeType />
                 await WriteCodeWithCodeListReferenceAttributesAsync("ChargeType", EbixCode.Of(series.ChargeType), writer).ConfigureAwait(false);

@@ -178,17 +178,6 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasEvaluationType(string expectedMarketEvaluationType)
-    {
-        FirstTimeSeriesElement()
-            .GetProperty("marketEvaluationPoint.type")
-            .GetProperty("value")
-            .GetString()
-            .Should()
-            .Be(expectedMarketEvaluationType);
-        return this;
-    }
-
     public IAssertWholesaleCalculationResultDocument HasSettlementMethod(SettlementType expectedSettlementMethod)
     {
         ArgumentNullException.ThrowIfNull(expectedSettlementMethod);
@@ -200,6 +189,34 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
             .Should()
             .Be(expectedSettlementMethod.Code);
 
+        return this;
+    }
+
+    public IAssertWholesaleCalculationResultDocument PriceAmountIsPresentForPointIndex(int pointIndex, string? expectedPrice)
+    {
+        FirstTimeSeriesElement()
+            .GetProperty("Period")
+            .GetProperty("Point")
+            .EnumerateArray()
+            .ToList()[pointIndex]
+            .GetProperty("price.amount")
+            .GetProperty("value")
+            .GetDecimal()
+            .ToString(NumberFormatInfo.InvariantInfo)
+            .Should()
+            .Be(expectedPrice);
+        return this;
+    }
+
+    public IAssertWholesaleCalculationResultDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType)
+    {
+        ArgumentNullException.ThrowIfNull(expectedMeteringPointType);
+        FirstTimeSeriesElement()
+            .GetProperty("marketEvaluationPoint.type")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(expectedMeteringPointType.Code);
         return this;
     }
 
@@ -403,7 +420,7 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
 
     public IAssertWholesaleCalculationResultDocument SettlementVersionIsNotPresent()
     {
-        var act = () => _root.GetProperty("Series[1]")
+        var act = () => FirstTimeSeriesElement()
             .GetProperty("settlement_Series.version");
 
         act.Should()

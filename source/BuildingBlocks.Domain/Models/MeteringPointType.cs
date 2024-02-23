@@ -14,6 +14,7 @@
 
 using System;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -23,6 +24,7 @@ public class MeteringPointType : EnumerationType
     public static readonly MeteringPointType Production = new(nameof(Production), "E18");
     public static readonly MeteringPointType Exchange = new(nameof(Exchange), "E20");
 
+    [JsonConstructor]
     private MeteringPointType(string name, string code)
         : base(name)
     {

@@ -25,8 +25,7 @@ public record WholesaleCalculationMarketActivityRecord(
     string GridAreaCode,
     string ChargeCode,
     bool IsTax,
-    [property: Obsolete("Delete when all references are removed. Use Points instead.")] decimal? Quantity,
-    IReadOnlyCollection<Point>? Points,
+    IReadOnlyCollection<Point> Points,
     ActorNumber EnergySupplier,
     ActorNumber ChargeOwner,
     Period Period,
@@ -35,6 +34,8 @@ public record WholesaleCalculationMarketActivityRecord(
     MeasurementUnit PriceMeasureUnit,
     Currency Currency,
     ChargeType ChargeType,
-    Resolution Resolution);
+    Resolution Resolution,
+    MeteringPointType? MeteringPointType,
+    SettlementType? SettlementType);
 
 public record Point(int Position, decimal? Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality? QuantityQuality);

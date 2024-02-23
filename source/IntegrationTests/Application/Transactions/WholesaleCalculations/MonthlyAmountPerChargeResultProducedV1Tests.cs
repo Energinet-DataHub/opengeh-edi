@@ -59,6 +59,26 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
     }
 
     [Fact]
+    public async Task MonthlyAmountPerChargeResultProducedV1Processor_creates_outgoing_message_to_energy_supplier_and_charge_owner()
+    {
+        var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder.Build();
+        await HandleIntegrationEventAsync(monthlyPerChargeEvent);
+        await AssertOutgoingMessageAsync(ActorRole.EnergySupplier);
+        await AssertOutgoingMessageAsync(ActorRole.GridOperator);
+    }
+
+    [Fact]
+    public async Task MonthlyAmountPerChargeResultProducedV1Processor_creates_outgoing_message_to_energy_supplier_and_energinet_as_charge_owner()
+    {
+        var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder
+            .WithChargeOwner(DataHubDetails.DataHubActorNumber.Value)
+            .Build();
+        await HandleIntegrationEventAsync(monthlyPerChargeEvent);
+        await AssertOutgoingMessageAsync(ActorRole.EnergySupplier);
+        await AssertOutgoingMessageAsync(ActorRole.SystemOperator);
+    }
+
+    [Fact]
     public async Task MonthlyAmountPerChargeResultProducedV1Processor_does_not_create_outgoing_message_when_feature_is_disabled()
     {
         var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder
@@ -117,9 +137,6 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.GridAreaCode, gridAreaCode)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.ChargeCode, chargeCode)
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.IsTax, isTax)
-#pragma warning disable CS0618 // Type or member is obsolete
-            .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.Quantity,  DecimalParser.Parse(amount))
-#pragma warning restore CS0618 // Type or member is obsolete
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.EnergySupplier, ActorNumber.Create(energySupplier))
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.ChargeOwner, ActorNumber.Create(chargeOwner))
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.Period.Start, startOfPeriod)
@@ -147,9 +164,6 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
         // Assert
         var message = await AssertOutgoingMessageAsync(businessReason: BusinessReason.Correction);
         message
-#pragma warning disable CS0618 // Type or member is obsolete
-            .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.Quantity, null)
-#pragma warning restore CS0618 // Type or member is obsolete
             .HasMessageRecordValue<WholesaleCalculationSeries>(wholesaleCalculation => wholesaleCalculation.SettlementVersion, SettlementVersion.FirstCorrection);
     }
 

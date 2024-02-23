@@ -47,6 +47,20 @@ internal static class JsonWriterHelper
         writer.WriteEndObject();
     }
 
+    internal static void WriteObject(this Utf8JsonWriter writer, string name, params KeyValuePair<string, decimal>[] values)
+    {
+        writer.WritePropertyName(name);
+        writer.WriteStartObject();
+
+        foreach (var value in values)
+        {
+            writer.WritePropertyName(value.Key);
+            writer.WriteNumberValue(value.Value);
+        }
+
+        writer.WriteEndObject();
+    }
+
     internal static void WriteProperty(this Utf8JsonWriter writer, string name, string value)
     {
         writer.WritePropertyName(name);

@@ -16,7 +16,6 @@ using System;
 using System.Globalization;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.WholesaleCalculations;
@@ -48,7 +47,8 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         BusinessReason expectedBusinessReason,
         CodeListType codeListType)
     {
-        _documentAsserter.HasValue("process.processType", CimCode.Of(expectedBusinessReason));
+        ArgumentNullException.ThrowIfNull(expectedBusinessReason);
+        _documentAsserter.HasValue("process.processType", expectedBusinessReason.Code);
         return this;
     }
 
@@ -102,7 +102,8 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
 
     public IAssertWholesaleCalculationResultDocument HasSettlementVersion(SettlementVersion expectedSettlementVersion)
     {
-        _documentAsserter.HasValue("Series[1]/settlement_Series.version", CimCode.Of(expectedSettlementVersion));
+        ArgumentNullException.ThrowIfNull(expectedSettlementVersion);
+        _documentAsserter.HasValue("Series[1]/settlement_Series.version", expectedSettlementVersion.Code);
         return this;
     }
 
@@ -112,15 +113,23 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasEvaluationType(string expectedMarketEvaluationType)
+    public IAssertWholesaleCalculationResultDocument HasSettlementMethod(SettlementType expectedSettlementMethod)
     {
-        _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.type", expectedMarketEvaluationType);
+        ArgumentNullException.ThrowIfNull(expectedSettlementMethod);
+        _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.settlementMethod", expectedSettlementMethod.Code);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasSettlementMethod(SettlementType expectedSettlementMethod)
+    public IAssertWholesaleCalculationResultDocument PriceAmountIsPresentForPointIndex(int pointIndex, string? expectedPrice)
     {
-        _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.settlementMethod", CimCode.Of(expectedSettlementMethod));
+        _documentAsserter.HasValue($"Series[1]/Period/Point[{pointIndex + 1}]/price.amount", expectedPrice ?? "0");
+        return this;
+    }
+
+    public IAssertWholesaleCalculationResultDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType)
+    {
+        ArgumentNullException.ThrowIfNull(expectedMeteringPointType);
+        _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.type", expectedMeteringPointType.Code);
         return this;
     }
 
