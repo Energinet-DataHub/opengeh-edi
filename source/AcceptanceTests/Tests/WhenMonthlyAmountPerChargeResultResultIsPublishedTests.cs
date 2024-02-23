@@ -47,8 +47,8 @@ public sealed class WhenMonthlyAmountPerChargeResultResultIsPublishedTests
 
         await _aggregations.PublishMonthlyChargeResultFor(
             AcceptanceTestFixture.CimActorGridArea,
-            _fixture.EnergySupplierId,
-            _fixture.MeteredDataResponsibleId);
+            _fixture.CimEnergySupplierId,
+            _fixture.CimMeteredDataResponsibleId);
 
         await _aggregations.ConfirmResultIsAvailableFor();
     }

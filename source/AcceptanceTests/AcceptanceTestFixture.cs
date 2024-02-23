@@ -28,7 +28,8 @@ public class AcceptanceTestFixture : IAsyncLifetime
     internal const string EbixActorGridArea = "543";
     internal const string CimActorGridArea = "804";
 
-    internal const string ActorRole = "metereddataresponsible";
+    internal const string EbixActorNumber = "5790000610976"; // Corresponds to the "Mosaic 03" actor in the UI.
+    internal const string EbixActorRole = "metereddataresponsible";
 
     private readonly Uri _azureEntraB2CTenantUrl;
     private readonly string _azureEntraFrontendAppId;
@@ -61,7 +62,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
         var azureEntraBackendAppId = root.GetValue<string>("backend-b2b-app-id") ?? throw new InvalidOperationException("backend-b2b-app-id is not set in configuration");
         ApiManagementUri = new Uri(root.GetValue<string>("apim-gateway-url") ?? throw new InvalidOperationException("apim-gateway-url secret is not set in configuration"));
 
-        MeteredDataResponsibleId = root.GetValue<string>("METERED_DATA_RESPONSIBLE_CLIENT_ID")
+        CimMeteredDataResponsibleId = root.GetValue<string>("METERED_DATA_RESPONSIBLE_CLIENT_ID")
                                    ?? throw new InvalidOperationException(
                                        "METERED_DATA_RESPONSIBLE_CLIENT_ID is not set in configuration");
 
@@ -70,11 +71,11 @@ public class AcceptanceTestFixture : IAsyncLifetime
             () => CreateB2BMeteredDataResponsibleAuthorizedHttpClientAsync(
                 azureB2CTenantId,
                 azureEntraBackendAppId,
-                MeteredDataResponsibleId,
+                CimMeteredDataResponsibleId,
                 meteredDataResponsibleSecret,
                 ApiManagementUri));
 
-        EnergySupplierId = root.GetValue<string>("ENERGY_SUPPLIER_CLIENT_ID")
+        CimEnergySupplierId = root.GetValue<string>("ENERGY_SUPPLIER_CLIENT_ID")
                            ?? throw new InvalidOperationException(
                                "ENERGY_SUPPLIER_CLIENT_ID is not set in configuration");
 
@@ -83,7 +84,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
             () => CreateB2BEnergySupplierAuthorizedHttpClientAsync(
                 azureB2CTenantId,
                 azureEntraBackendAppId,
-                EnergySupplierId,
+                CimEnergySupplierId,
                 energySupplierSecret,
                 ApiManagementUri));
 
@@ -117,9 +118,9 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
     internal AsyncLazy<HttpClient> B2BEnergySupplierAuthorizedHttpClient { get; }
 
-    internal string MeteredDataResponsibleId { get; }
+    internal string CimMeteredDataResponsibleId { get; }
 
-    internal string EnergySupplierId { get; }
+    internal string CimEnergySupplierId { get; }
 
     public Task InitializeAsync()
     {
