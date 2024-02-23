@@ -29,6 +29,8 @@ public class AcceptanceTestFixture : IAsyncLifetime
     internal const string ActorNumber = "5790000610976"; // Corresponds to the "Mosaic 03" actor in the UI.
     internal const string ActorRole = "metereddataresponsible";
 
+    internal const string EdiSubsystemTestCimActorNumber = "5790000392551"; // Corresponds to the "EDI - SUBSYSTEM TEST CIM" in the UI.
+
     private readonly Uri _azureEntraB2CTenantUrl;
     private readonly string _azureEntraFrontendAppId;
     private readonly string _azureEntraBackendBffScope;
