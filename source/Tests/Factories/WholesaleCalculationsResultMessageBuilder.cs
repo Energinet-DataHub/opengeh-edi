@@ -183,7 +183,7 @@ public class WholesaleCalculationsResultMessageBuilder
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithCalculatedHourlyTariffAmounts(Collection<Point> points)
+    public WholesaleCalculationsResultMessageBuilder WithPoints(Collection<Point> points)
     {
         _points = points.ToList();
         return this;
