@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,8 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using FluentAssertions;
+using FluentAssertions.Execution;
 using IncomingMessages.Infrastructure.DocumentValidation;
 using Xunit;
 
@@ -72,8 +75,18 @@ public class AssertEbixDocument
 
     public AssertEbixDocument HasValue(string xpath, string expectedValue)
     {
+        return HasValueWithAttributes(xpath, expectedValue);
+    }
+
+    public AssertEbixDocument HasValueWithAttributes(string xpath, string expectedValue, params AttributeNameAndValue[] attributes)
+    {
         ArgumentNullException.ThrowIfNull(xpath);
+        ArgumentNullException.ThrowIfNull(attributes);
         Assert.Equal(expectedValue, _document.Root?.XPathSelectElement(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager)?.Value);
+
+        foreach (var (name, value) in attributes)
+            Assert.Equal(value, _document.Root?.XPathSelectElement(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager)?.Attribute(name)?.Value);
+
         return this;
     }
 
@@ -92,7 +105,10 @@ public class AssertEbixDocument
         Assert.NotNull(_originalMessage.Root!.Elements().Single(x => x.Name.LocalName == "DocumentType"));
         Assert.NotNull(_originalMessage.Root!.Elements().Single(x => x.Name.LocalName == "MessageType"));
         var validationResult = await _documentValidator!.ValidateAsync(_stream, DocumentFormat.Ebix, type, CancellationToken.None, version).ConfigureAwait(false);
-        Assert.True(validationResult.IsValid);
+
+        using var scope = new AssertionScope();
+        validationResult.ValidationErrors.Should().BeEmpty();
+
         return this;
     }
 
@@ -115,3 +131,5 @@ public class AssertEbixDocument
         return xpathBuilder.ToString();
     }
 }
+
+public record AttributeNameAndValue(string Name, string Value);
