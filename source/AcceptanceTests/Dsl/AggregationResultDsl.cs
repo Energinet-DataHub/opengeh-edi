@@ -34,6 +34,11 @@ internal sealed class AggregationResultDsl
         return _wholesale.PublishAggregationResultAsync(gridAreaCode);
     }
 
+    internal Task PublishMonthlyChargeResultFor(string gridAreaCode, string energySupplierId, string chargeOwnerId)
+    {
+        return _wholesale.PublishMonthlyAmountPerChargeResultAsync(gridAreaCode, energySupplierId, chargeOwnerId);
+    }
+
     internal Task ConfirmResultIsAvailableFor()
     {
         return _edi.PeekMessageAsync();

@@ -46,6 +46,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
 
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
     [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Can_create_notifyWholesaleServices_document(string documentFormat)
     {
@@ -103,6 +104,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
 
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
     [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Can_create_notifyWholesaleServices_document_without_quantity(string documentFormat)
     {
@@ -121,6 +123,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
 
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
     [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Can_create_notifyWholesaleServices_document_with_settlement_version(string documentFormat)
     {
@@ -139,6 +142,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
 
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
     [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Can_create_notifyWholesaleServices_document_with_measurement_unit_pieces(string documentFormat)
     {
@@ -165,6 +169,13 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
             documentWriter = new WholesaleCalculationResultEbixDocumentWriter(_parser);
         else
             throw new NotImplementedException();
+        if (documentFormat == DocumentFormat.Json)
+        {
+            return new WholesaleCalculationJsonDocumentWriter(_parser).WriteAsync(
+                documentHeader,
+                new[] { records });
+        }
+
 
         return documentWriter.WriteAsync(
             header,
@@ -177,6 +188,16 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
          {
              var assertXmlDocument = AssertXmlDocument.Document(document.Stream, "cim", _documentValidation.Validator);
              return new AssertWholesaleCalculationResultXmlDocument(assertXmlDocument);
+         }
+
+         if (documentFormat == DocumentFormat.Json)
+         {
+             return new AssertWholesaleCalculationResultJsonDocument(document.Stream);
+         }
+
+         if (documentFormat == DocumentFormat.Ebix)
+         {
+             throw new NotImplementedException();
          }
 
          if (documentFormat == DocumentFormat.Ebix)
