@@ -59,7 +59,8 @@ public class AggregationMessageResultFactory
             businessReasonName: aggregatedMeasureDataProcess.BusinessReason.Name,
             calculationResultVersion: aggregatedTimeSerie.CalculationResultVersion,
             settlementVersion: aggregatedMeasureDataProcess.SettlementVersion?.Name,
-            relatedToMessageId: aggregatedMeasureDataProcess.InitiatedByMessageId);
+            relatedToMessageId: aggregatedMeasureDataProcess.InitiatedByMessageId,
+            originalTransactionIdReference: aggregatedMeasureDataProcess.BusinessTransactionId.Id);
     }
 
     public async Task<AggregationResultMessage> CreateAsync(
