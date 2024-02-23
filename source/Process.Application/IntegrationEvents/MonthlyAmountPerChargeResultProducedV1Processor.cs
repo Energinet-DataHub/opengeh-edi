@@ -17,8 +17,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.Core.Messaging.Communication;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleCalculations;
@@ -48,13 +46,11 @@ public class MonthlyAmountPerChargeResultProducedV1Processor : IIntegrationEvent
 
         var monthlyAmountPerChargeResultProducedV1 = (MonthlyAmountPerChargeResultProducedV1)integrationEvent.Message;
 
-        var messageForEnergySupplier = WholesaleCalculationResultMessageFactory.CreateMessage(
+        var messageForEnergySupplier = WholesaleCalculationResultMessageFactory.CreateMessageForEnergySupplier(
             monthlyAmountPerChargeResultProducedV1,
-            ActorRole.EnergySupplier,
             ProcessId.New());
-        var messageForChargeOwner = WholesaleCalculationResultMessageFactory.CreateMessage(
+        var messageForChargeOwner = WholesaleCalculationResultMessageFactory.CreateMessageForChargeOwner(
             monthlyAmountPerChargeResultProducedV1,
-            GetChargeOwner(monthlyAmountPerChargeResultProducedV1.ChargeOwnerId),
             ProcessId.New());
 
         if (await _featureManager.UseMonthlyAmountPerChargeResultProduced.ConfigureAwait(false))
@@ -62,15 +58,5 @@ public class MonthlyAmountPerChargeResultProducedV1Processor : IIntegrationEvent
             await _outgoingMessagesClient.EnqueueAndCommitAsync(messageForEnergySupplier, cancellationToken).ConfigureAwait(false);
             await _outgoingMessagesClient.EnqueueAndCommitAsync(messageForChargeOwner, cancellationToken).ConfigureAwait(false);
         }
-    }
-
-    private static ActorRole GetChargeOwner(string chargeOwnerId)
-    {
-        if (chargeOwnerId == DataHubDetails.DataHubActorNumber.Value)
-        {
-            return ActorRole.SystemOperator;
-        }
-
-        return ActorRole.GridOperator;
     }
 }
