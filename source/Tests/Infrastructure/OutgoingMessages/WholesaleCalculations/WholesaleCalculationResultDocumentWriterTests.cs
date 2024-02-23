@@ -69,7 +69,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
                 .WithMeasurementUnit(SampleData.MeasurementUnit)
                 .WithPriceMeasurementUnit(SampleData.PriceMeasureUnit)
                 .WithResolution(SampleData.Resolution)
-                .WithCalculatedHourlyTariffAmounts(new Collection<Point>() { new Point(1, 1, 1, SampleData.Quantity, null) }),
+                .WithPoints(new Collection<Point>() { new(1, 1, 1, SampleData.Quantity, null) }),
             DocumentFormat.From(documentFormat));
 
         // Assert
@@ -108,7 +108,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
         // Arrange
         var document = await CreateDocument(
             _wholesaleCalculationsResultMessageBuilder
-                .WithCalculatedHourlyTariffAmounts(new Collection<Point>() { new Point(1, 1, 1, null, null) }),
+                .WithPoints(new Collection<Point>() { new Point(1, 1, 1, null, null) }),
             DocumentFormat.From(documentFormat));
 
         // Assert
@@ -161,7 +161,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
             _wholesaleCalculationsResultMessageBuilder
                 .WithSettlementMethod(SettlementType.Flex)
                 .WithMeteringPointType(MeteringPointType.Consumption)
-                .WithCalculatedHourlyTariffAmounts(new()
+                .WithPoints(new()
                 {
                     firstPoint,
                     secondPoint,
@@ -187,7 +187,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
             _wholesaleCalculationsResultMessageBuilder
                 .WithSettlementMethod(null)
                 .WithMeteringPointType(MeteringPointType.Production)
-                .WithCalculatedHourlyTariffAmounts(new()
+                .WithPoints(new()
                 {
                     firstPoint,
                     secondPoint,
@@ -213,7 +213,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
             _wholesaleCalculationsResultMessageBuilder
                 .WithSettlementMethod(SettlementType.NonProfiled)
                 .WithMeteringPointType(MeteringPointType.Consumption)
-                .WithCalculatedHourlyTariffAmounts(new()
+                .WithPoints(new()
                 {
                     firstPoint,
                     secondPoint,
