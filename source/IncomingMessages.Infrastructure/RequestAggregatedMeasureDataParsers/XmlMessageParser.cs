@@ -53,6 +53,10 @@ public class XmlMessageParser : IMessageParser
         {
             return InvalidXmlFailure(generalException);
         }
+        catch (IndexOutOfRangeException indexOutOfRangeException)
+        {
+            return InvalidXmlFailure(indexOutOfRangeException);
+        }
 
         var xmlSchema = await _schemaProvider.GetSchemaAsync<XmlSchema>(businessProcessType, version, cancellationToken)
             .ConfigureAwait(true);
