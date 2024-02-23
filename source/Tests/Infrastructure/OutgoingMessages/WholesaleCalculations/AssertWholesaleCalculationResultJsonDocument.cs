@@ -201,6 +201,33 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
         return this;
     }
 
+    public IAssertWholesaleCalculationResultDocument PriceAmountIsPresentForPointIndex(int pointIndex, string? expectedPrice)
+    {
+        FirstTimeSeriesElement()
+            .GetProperty("Period")
+            .GetProperty("Point")
+            .EnumerateArray()
+            .ToList()[pointIndex]
+            .GetProperty("price.amount")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(expectedPrice);
+        return this;
+    }
+
+    public IAssertWholesaleCalculationResultDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType)
+    {
+        ArgumentNullException.ThrowIfNull(expectedMeteringPointType);
+        FirstTimeSeriesElement()
+            .GetProperty("marketEvaluationPoint.type")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(expectedMeteringPointType.Code);
+        return this;
+    }
+
     public IAssertWholesaleCalculationResultDocument HasChargeCode(string expectedChargeTypeNumber)
     {
         FirstTimeSeriesElement()
@@ -401,7 +428,7 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
 
     public IAssertWholesaleCalculationResultDocument SettlementVersionIsNotPresent()
     {
-        var act = () => _root.GetProperty("Series[1]")
+        var act = () => FirstTimeSeriesElement()
             .GetProperty("settlement_Series.version");
 
         act.Should()

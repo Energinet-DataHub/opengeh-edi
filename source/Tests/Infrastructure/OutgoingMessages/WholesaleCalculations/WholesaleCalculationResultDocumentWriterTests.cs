@@ -82,7 +82,6 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
                 .HasReceiverId(SampleData.ReceiverId)
                 .HasReceiverRole(ActorRole.MeteredDataAdministrator)
                 .HasTimestamp(SampleData.Timestamp)
-
                 .HasTransactionId(SampleData.TransactionId)
                 .HasCalculationVersion(SampleData.Version)
                 .HasChargeCode(SampleData.ChargeCode)
@@ -103,7 +102,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
-    public async Task Can_create_notifyWholesaleServices_document_without_quantity(string documentFormat)
+    public async Task Can_create_notifyWholesaleServices_document_without_energySum_quantity(string documentFormat)
     {
         // Arrange
         var document = await CreateDocument(

@@ -16,7 +16,6 @@ using System;
 using System.Globalization;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.WholesaleCalculations;
@@ -125,15 +124,15 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument PriceAmountIsPresentForPointIndex(int pointPosition, string? expectedPrice)
+    public IAssertWholesaleCalculationResultDocument PriceAmountIsPresentForPointIndex(int pointIndex, string? expectedPrice)
     {
-        if (pointPosition == 0)
+        if (pointIndex == 0)
         {
             _documentAsserter.HasValue($"Series[1]/Period/Point/price.amount", expectedPrice ?? "0");
         }
         else
         {
-            _documentAsserter.HasValue($"Series[1]/Period/Point[{pointPosition}]/price.amount", expectedPrice ?? "0");
+            _documentAsserter.HasValue($"Series[1]/Period/Point[{pointIndex}]/price.amount", expectedPrice ?? "0");
         }
 
         return this;

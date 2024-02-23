@@ -116,9 +116,9 @@ public interface IAssertWholesaleCalculationResultDocument
     /// <summary>
     /// Asserts the amount sum of the points of the first series element
     /// </summary>
-    /// <param name="pointPosition"></param>
+    /// <param name="pointIndex"></param>
     /// <param name="expectedPrice"></param>
-    IAssertWholesaleCalculationResultDocument PriceAmountIsPresentForPointIndex(int pointPosition, string? expectedPrice);
+    IAssertWholesaleCalculationResultDocument PriceAmountIsPresentForPointIndex(int pointIndex, string? expectedPrice);
 
     /// <summary>
     /// Asserts the metering point type of the first series element
