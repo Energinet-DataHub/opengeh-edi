@@ -12,13 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.AcceptanceTests.Drivers.MessageFactories;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf;
-using Google.Protobuf.WellKnownTypes;
-using DecimalValue = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue;
-using ERP = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.EnergyResultProducedV2.Types;
-using MAPCRP = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.MonthlyAmountPerChargeResultProducedV1.Types;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
@@ -36,8 +33,11 @@ internal sealed class WholesaleDriver
     {
         var aggregation = marketRole?.Code switch
         {
-            BalanceResponsiblePartyMarketRoleCode => CreateAggregationResultAvailableEventForBalanceResponsible(gridAreaCode, actorNumber ?? throw new ArgumentNullException(nameof(actorNumber))),
-            _ => CreateAggregationResultAvailableEventFor(gridAreaCode),
+            BalanceResponsiblePartyMarketRoleCode => EnergyResultProducedV2Factory
+                .CreateAggregationResultAvailableEventForBalanceResponsible(
+                    gridAreaCode,
+                    actorNumber ?? throw new ArgumentNullException(nameof(actorNumber))),
+            _ => EnergyResultProducedV2Factory.CreateAggregationResultAvailableEventFor(gridAreaCode),
         };
 
         return _integrationEventPublisher.PublishAsync(
@@ -51,95 +51,13 @@ internal sealed class WholesaleDriver
         string chargeOwnerId)
     {
         var monthlyAmountPerChargeResultProduced =
-            CreateMonthlyAmountPerChargeResultProduced(gridAreaCode, energySupplierId, chargeOwnerId);
+            MonthlyAmountPerChargeResultProducedV1Factory.CreateMonthlyAmountPerChargeResultProduced(
+                gridAreaCode,
+                energySupplierId,
+                chargeOwnerId);
 
         return _integrationEventPublisher.PublishAsync(
             MonthlyAmountPerChargeResultProducedV1.EventName,
             monthlyAmountPerChargeResultProduced.ToByteArray());
-    }
-
-    private static EnergyResultProducedV2 CreateAggregationResultAvailableEventFor(string gridAreaCode)
-    {
-        var processCompletedEvent = new EnergyResultProducedV2
-        {
-            Resolution = ERP.Resolution.Quarter,
-            QuantityUnit = ERP.QuantityUnit.Kwh,
-            CalculationType = ERP.CalculationType.BalanceFixing,
-            TimeSeriesType = ERP.TimeSeriesType.Production,
-            CalculationId = Guid.NewGuid().ToString(),
-            AggregationPerGridarea = new ERP.AggregationPerGridArea
-            {
-                GridAreaCode = gridAreaCode,
-            },
-            PeriodEndUtc = DateTime.UtcNow.ToTimestamp(),
-            PeriodStartUtc = DateTime.UtcNow.ToTimestamp(),
-            TimeSeriesPoints =
-            {
-                new ERP.TimeSeriesPoint
-                {
-                    Time = new Timestamp { Seconds = 100000 },
-                    Quantity = new DecimalValue { Units = 123, Nanos = 1200000 },
-                    QuantityQualities = { ERP.QuantityQuality.Measured },
-                },
-            },
-            CalculationResultVersion = 404,
-        };
-        return processCompletedEvent;
-    }
-
-    private static EnergyResultProducedV2 CreateAggregationResultAvailableEventForBalanceResponsible(
-        string gridAreaCode,
-        string actorNumber)
-    {
-        var processCompletedEvent = new EnergyResultProducedV2
-        {
-            Resolution = ERP.Resolution.Quarter,
-            QuantityUnit = ERP.QuantityUnit.Kwh,
-            CalculationType = ERP.CalculationType.BalanceFixing,
-            TimeSeriesType = ERP.TimeSeriesType.Production,
-            CalculationId = Guid.NewGuid().ToString(),
-            AggregationPerBalanceresponsiblepartyPerGridarea = new ERP.AggregationPerBalanceResponsiblePartyPerGridArea
-            {
-                GridAreaCode = gridAreaCode, BalanceResponsibleId = actorNumber,
-            },
-            PeriodEndUtc = DateTime.UtcNow.ToTimestamp(),
-            PeriodStartUtc = DateTime.UtcNow.ToTimestamp(),
-            TimeSeriesPoints =
-            {
-                new ERP.TimeSeriesPoint
-                {
-                    Time = new Timestamp { Seconds = 100000 },
-                    Quantity = new DecimalValue { Units = 123, Nanos = 1200000 },
-                    QuantityQualities = { ERP.QuantityQuality.Measured },
-                },
-            },
-        };
-        return processCompletedEvent;
-    }
-
-    private static MonthlyAmountPerChargeResultProducedV1 CreateMonthlyAmountPerChargeResultProduced(
-        string gridAreaCode,
-        string energySupplierId,
-        string chargeOwnerId)
-    {
-        var monthlyAmountPerChargeResultProduced = new MonthlyAmountPerChargeResultProducedV1
-        {
-            CalculationId = Guid.NewGuid().ToString(),
-            CalculationType = MAPCRP.CalculationType.WholesaleFixing,
-            PeriodStartUtc = DateTime.UtcNow.ToTimestamp(),
-            PeriodEndUtc = DateTime.UtcNow.ToTimestamp(),
-            GridAreaCode = gridAreaCode,
-            EnergySupplierId = energySupplierId,
-            ChargeCode = "ESP-C-F-04",
-            ChargeType = MAPCRP.ChargeType.Fee,
-            ChargeOwnerId = chargeOwnerId,
-            QuantityUnit = MAPCRP.QuantityUnit.Kwh,
-            IsTax = false,
-            Currency = MAPCRP.Currency.Dkk,
-            Amount = new DecimalValue { Nanos = 1234, Units = 1234 },
-            CalculationResultVersion = 42,
-        };
-
-        return monthlyAmountPerChargeResultProduced;
     }
 }

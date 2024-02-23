@@ -180,6 +180,7 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
     {
         FirstTimeSeriesElement()
             .GetProperty("marketEvaluationPoint.type")
+            .GetProperty("value")
             .GetString()
             .Should()
             .Be(expectedMarketEvaluationType);
@@ -188,11 +189,15 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
 
     public IAssertWholesaleCalculationResultDocument HasSettlementMethod(SettlementType expectedSettlementMethod)
     {
+        ArgumentNullException.ThrowIfNull(expectedSettlementMethod);
+
         FirstTimeSeriesElement()
             .GetProperty("marketEvaluationPoint.settlementMethod")
+            .GetProperty("value")
             .GetString()
             .Should()
-            .Be(CimCode.Of(expectedSettlementMethod));
+            .Be(expectedSettlementMethod.Code);
+
         return this;
     }
 
@@ -367,11 +372,13 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
 
     public IAssertWholesaleCalculationResultDocument SettlementMethodIsNotPresent()
     {
-        FirstTimeSeriesElement()
-            .GetProperty("marketEvaluationPoint.settlementMethod")
-            .ValueKind.Should()
-            .Be(JsonValueKind.Undefined);
-        // _documentAsserter.IsNotPresent("Series[1]/marketEvaluationPoint.settlementMethod");
+        var act = () => FirstTimeSeriesElement()
+            .GetProperty("marketEvaluationPoint.settlementMethod");
+
+        act.Should()
+            .ThrowExactly<KeyNotFoundException>()
+            .WithMessage("The given key was not present in the dictionary.");
+
         return this;
     }
 
@@ -401,7 +408,6 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
             .ThrowExactly<KeyNotFoundException>()
             .WithMessage("The given key was not present in the dictionary.");
 
-        // _documentAsserter.IsNotPresent("Series[1]/settlement_Series.version");
         return this;
     }
 
