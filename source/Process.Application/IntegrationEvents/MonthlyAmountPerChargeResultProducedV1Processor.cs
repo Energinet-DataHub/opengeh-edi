@@ -19,6 +19,7 @@ using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleCalculations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
@@ -46,11 +47,16 @@ public class MonthlyAmountPerChargeResultProducedV1Processor : IIntegrationEvent
 
         var monthlyAmountPerChargeResultProducedV1 = (MonthlyAmountPerChargeResultProducedV1)integrationEvent.Message;
 
+        var message = WholesaleCalculationResultMessageFactory.CreateWholesaleCalculationSeries(monthlyAmountPerChargeResultProducedV1);
+
         var messageForEnergySupplier = WholesaleCalculationResultMessageFactory.CreateMessageForEnergySupplier(
-            monthlyAmountPerChargeResultProducedV1,
+            message,
+            BusinessReasonMapper.Map(monthlyAmountPerChargeResultProducedV1.CalculationType),
             ProcessId.New());
+
         var messageForChargeOwner = WholesaleCalculationResultMessageFactory.CreateMessageForChargeOwner(
-            monthlyAmountPerChargeResultProducedV1,
+            message,
+            BusinessReasonMapper.Map(monthlyAmountPerChargeResultProducedV1.CalculationType),
             ProcessId.New());
 
         if (await _featureManager.UseMonthlyAmountPerChargeResultProduced.ConfigureAwait(false))
