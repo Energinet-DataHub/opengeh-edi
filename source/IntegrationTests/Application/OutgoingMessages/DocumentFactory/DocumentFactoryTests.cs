@@ -25,8 +25,6 @@ public class DocumentFactoryTests
     : TestBase
 {
     private readonly IEnumerable<IDocumentWriter> _documentWriters;
-    private readonly List<DocumentType> _notSupportedJsonDocumentTypes = new() { DocumentType.NotifyWholesaleServices };
-    private readonly List<DocumentType> _notSupportedEbixDocumentTypes = new() { }; // All documents are now supported by ebIX
 
     public DocumentFactoryTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
@@ -52,15 +50,10 @@ public class DocumentFactoryTests
 
     [Theory]
     [MemberData(nameof(GetDocumentTypes))]
-    public void Ensure_that_all_document_writers_but_listed_support_json(DocumentType documentType)
+    public void Ensure_that_all_document_writers_support_json(DocumentType documentType)
     {
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Json));
-        if (_notSupportedJsonDocumentTypes.Contains(documentType))
-        {
-            Assert.Null(writer);
-            return;
-        }
 
         Assert.NotNull(writer);
     }
@@ -71,11 +64,6 @@ public class DocumentFactoryTests
     {
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Ebix));
-        if (_notSupportedEbixDocumentTypes.Contains(documentType))
-        {
-            Assert.Null(writer);
-            return;
-        }
 
         Assert.NotNull(writer);
     }

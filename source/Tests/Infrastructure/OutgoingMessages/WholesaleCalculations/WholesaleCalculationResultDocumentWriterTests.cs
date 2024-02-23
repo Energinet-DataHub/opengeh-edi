@@ -162,24 +162,22 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
     {
         var records = _parser.From(wholesaleCalculationSeries);
 
-        IDocumentWriter documentWriter;
         if (documentFormat == DocumentFormat.Xml)
-            documentWriter = new WholesaleCalculationXmlDocumentWriter(_parser);
+        {
+            return new WholesaleCalculationXmlDocumentWriter(_parser).WriteAsync(header, new[] { records });
+        }
         else if (documentFormat == DocumentFormat.Ebix)
-            documentWriter = new WholesaleCalculationResultEbixDocumentWriter(_parser);
-        else
-            throw new NotImplementedException();
-        if (documentFormat == DocumentFormat.Json)
+        {
+            return new WholesaleCalculationResultEbixDocumentWriter(_parser).WriteAsync(header, new[] { records });
+        }
+        else if (documentFormat == DocumentFormat.Json)
         {
             return new WholesaleCalculationJsonDocumentWriter(_parser).WriteAsync(
-                documentHeader,
+                header,
                 new[] { records });
         }
 
-
-        return documentWriter.WriteAsync(
-            header,
-            new[] { records });
+        throw new NotImplementedException();
     }
 
     private IAssertWholesaleCalculationResultDocument AssertDocument(MarketDocumentStream document, DocumentFormat documentFormat)
@@ -193,11 +191,6 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
          if (documentFormat == DocumentFormat.Json)
          {
              return new AssertWholesaleCalculationResultJsonDocument(document.Stream);
-         }
-
-         if (documentFormat == DocumentFormat.Ebix)
-         {
-             throw new NotImplementedException();
          }
 
          if (documentFormat == DocumentFormat.Ebix)
