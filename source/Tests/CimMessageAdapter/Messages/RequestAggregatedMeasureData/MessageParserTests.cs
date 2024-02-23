@@ -83,6 +83,7 @@ public class MessageParserTests
         return new List<object[]>
         {
                 new object[] { DocumentFormat.Xml, CreateBaseXmlMessage("BadVersionRequestAggregatedMeasureData.xml"), nameof(InvalidBusinessReasonOrVersion) },
+                new object[] { DocumentFormat.Xml, CreateBaseXmlMessage("VersionIndexOutOfRangeRequestAggregatedMeasureData.xml"), nameof(InvalidMessageStructure) },
                 new object[] { DocumentFormat.Json, CreateBaseJsonMessages("FailSchemeValidationAggregatedMeasureData.json"), nameof(InvalidMessageStructure) },
                 new object[] { DocumentFormat.Json, CreateBaseJsonMessages("InvalidJsonAggregatedMeasureData.json"), nameof(InvalidMessageStructure) },
         };

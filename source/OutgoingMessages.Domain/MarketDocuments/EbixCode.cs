@@ -45,28 +45,6 @@ public static class EbixCode
         throw NoCodeFoundFor(businessReason.Name);
     }
 
-    public static BusinessReason To(string businessReasonCode)
-    {
-        ArgumentNullException.ThrowIfNull(businessReasonCode);
-
-        if (businessReasonCode == "D04")
-            return BusinessReason.BalanceFixing;
-
-        if (businessReasonCode == "E65")
-            return BusinessReason.MoveIn;
-
-        if (businessReasonCode == "D03")
-            return BusinessReason.PreliminaryAggregation;
-
-        if (businessReasonCode == "D05")
-            return BusinessReason.WholesaleFixing;
-
-        if (businessReasonCode == "D32")
-            return BusinessReason.Correction;
-
-        throw NoBusinessReasonFoundFor(businessReasonCode);
-    }
-
     public static string Of(SettlementVersion settlementVersion)
     {
         ArgumentNullException.ThrowIfNull(settlementVersion);
@@ -124,6 +102,8 @@ public static class EbixCode
 
         if (measurementUnit == MeasurementUnit.Kwh)
             return "KWH";
+        if (measurementUnit == MeasurementUnit.Pieces)
+            return "H87";
 
         throw NoCodeFoundFor(measurementUnit.Name);
     }
@@ -136,6 +116,8 @@ public static class EbixCode
             return "PT15M";
         if (resolution == Resolution.Hourly)
             return "PT1H";
+        if (resolution == Resolution.Monthly)
+            return "P1M";
 
         throw NoCodeFoundFor(resolution.Name);
     }
@@ -164,6 +146,30 @@ public static class EbixCode
             return "41";
 
         throw NoCodeFoundFor(reasonCode.Name);
+    }
+
+    public static string Of(Currency currency)
+    {
+        ArgumentNullException.ThrowIfNull(currency);
+
+        if (currency == Currency.DanishCrowns)
+            return "DKK";
+
+        throw NoCodeFoundFor(currency.Name);
+    }
+
+    public static string Of(ChargeType chargeType)
+    {
+        ArgumentNullException.ThrowIfNull(chargeType);
+
+        if (chargeType == ChargeType.Subscription)
+            return "D01";
+        if (chargeType == ChargeType.Fee)
+            return "D02";
+        if (chargeType == ChargeType.Tariff)
+            return "D03";
+
+        throw NoCodeFoundFor(chargeType.Name);
     }
 
     private static InvalidOperationException NoCodeFoundFor(string domainType)

@@ -68,11 +68,7 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
             return (T)(object)cached;
 
         using var reader = new XmlTextReader(location);
-        var xmlSchema = XmlSchema.Read(reader, null);
-        if (xmlSchema is null)
-        {
-            throw new XmlSchemaException($"Could not read schema at {location}");
-        }
+        var xmlSchema = XmlSchema.Read(reader, null) ?? throw new XmlSchemaException($"Could not read schema at {location}");
 
         _schemaCache.Add(location, xmlSchema);
 
@@ -103,6 +99,9 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
             return "DK_AggregatedMeteredDataTimeSeries";
         if (document == DocumentType.RejectRequestAggregatedMeasureData)
             return "DK_RejectRequestMeteredDataAggregated";
+        if (document == DocumentType.NotifyWholesaleServices)
+            return "DK_NotifyAggregatedWholesaleServices";
+
         throw new InvalidOperationException("Unknown document type");
     }
 }

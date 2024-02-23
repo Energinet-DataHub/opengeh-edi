@@ -49,6 +49,7 @@ public static class OutgoingMessagesConfiguration
         services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataEbixDocumentWriter>();
         services.AddScoped<IDocumentWriter, WholesaleCalculationXmlDocumentWriter>();
         services.AddScoped<IDocumentWriter, WholesaleCalculationJsonDocumentWriter>();
+        services.AddScoped<IDocumentWriter, WholesaleCalculationResultEbixDocumentWriter>();
         services.AddScoped<IMessageRecordParser, MessageRecordParser>();
 
         //MessageEnqueueingConfiguration
