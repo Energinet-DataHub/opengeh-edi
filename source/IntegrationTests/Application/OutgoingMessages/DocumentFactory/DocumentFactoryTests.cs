@@ -25,7 +25,6 @@ public class DocumentFactoryTests
     : TestBase
 {
     private readonly IEnumerable<IDocumentWriter> _documentWriters;
-    private readonly List<DocumentType> _notSupportedDocumentType = new() { DocumentType.NotifyWholesaleServices };
 
     public DocumentFactoryTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
@@ -41,7 +40,7 @@ public class DocumentFactoryTests
 
     [Theory]
     [MemberData(nameof(GetDocumentTypes))]
-    public void Ensure_that_all_document_writers_support_xml(DocumentType documentType)
+    public void Ensure_that_all_document_support_xml(DocumentType documentType)
     {
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Xml));
@@ -51,7 +50,7 @@ public class DocumentFactoryTests
 
     [Theory]
     [MemberData(nameof(GetDocumentTypes))]
-    public void Ensure_that_all_document_writers_but_listed_support_json(DocumentType documentType)
+    public void Ensure_that_all_document_support_json(DocumentType documentType)
     {
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Json));
@@ -61,15 +60,10 @@ public class DocumentFactoryTests
 
     [Theory]
     [MemberData(nameof(GetDocumentTypes))]
-    public void Ensure_that_all_document_writers_but_listed_support_ebix(DocumentType documentType)
+    public void Ensure_that_all_document_support_ebix(DocumentType documentType)
     {
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Ebix));
-        if (_notSupportedDocumentType.Contains(documentType))
-        {
-            Assert.Null(writer);
-            return;
-        }
 
         Assert.NotNull(writer);
     }

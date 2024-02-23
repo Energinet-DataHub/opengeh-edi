@@ -34,8 +34,7 @@ public class RejectRequestAggregatedMeasureDataEbixDocumentWriter : EbixDocument
             "un:unece:260:data:EEM-DK_RejectRequestMeteredDataAggregated:v3",
             "ns0",
             "ERR"),
-            parser,
-            EbixCode.Of(ReasonCode.FullyRejected))
+            parser)
     {
     }
 

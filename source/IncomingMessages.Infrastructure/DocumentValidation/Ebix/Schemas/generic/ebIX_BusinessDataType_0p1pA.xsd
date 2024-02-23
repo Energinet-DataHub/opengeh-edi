@@ -1,0 +1,924 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =============================================================================== -->
+<!-- ==== Business Data Type XML Schema Module                                  ==== -->
+<!-- =============================================================================== -->
+<!--
+Schema agency:     Energinet.dk
+Schema version:    0.1.A
+Schema date:       December 19, 2019
+
+Copyright (C) ebIX (2010). All Rights Reserved.
+Copyright (C) Energinet.dk (2014). All Rights Reserved.
+
+This document and translations of it may be copied and furnished to others,
+and derivative works that comment on or otherwise explain it or assist in
+its implementation may be prepared, copied, published and distributed, in
+whole or in part, without restriction of any kind, provided that the above
+copyright notice and this paragraph are included on all such copies and
+derivative works. However, this document itself may not be modified in any
+way, such as by removing the copyright notice or references to ebIX, except
+as needed for the purpose of developing ebIX specifications, in which case
+the procedures for copyrights defined in the UN/CEFACT Intellectual Property
+Rights document must be followed, or as required to translate it into
+languages other than English.
+The limited permissions granted above are perpetual and will not be revoked
+by ebIX or its successors or assigns.
+This document and the information contained herein is provided on an "AS IS"
+basis and ebIX DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT
+NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT
+INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS
+FOR A PARTICULAR PURPOSE.
+-->
+<xsd:schema
+   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+   xmlns:bdt="un:unece:260:data:EEM"
+   xmlns:ccts="urn:un:unece:uncefact:documentation:common:3:standard:CoreComponentsTechnicalSpecification:3"
+   xmlns:xbt="urn:un:unece:uncefact:data:common:1:draft"
+   targetNamespace="un:unece:260:data:EEM"
+   elementFormDefault="qualified"
+   attributeFormDefault="unqualified"
+   version="0.1.A">
+   <!-- =============================================================================== -->
+   <!-- ==== Imports                                                               ==== -->
+   <!-- =============================================================================== -->
+
+   <!-- =============================================================================== -->
+   <!-- ==== Import of Code Lists                                                  ==== -->
+   <!-- =============================================================================== -->
+   <!-- =============================================================================== -->
+   <!-- ==== Inclusions                                                            ==== -->
+   <!-- =============================================================================== -->
+   <!-- =============================================================================== -->
+   <!-- ==== Inclusion of Code Lists                                               ==== -->
+   <!-- =============================================================================== -->
+   <xsd:include schemaLocation="260_000014_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000017_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000018_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000019_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000023_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000024_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000028_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000029_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000032_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000034_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000034_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000040_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000041_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000045_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000046_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000052_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000052_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000052_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000052_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000052_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000052_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000056_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000057_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000058_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000059_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000060_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000062_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000064_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000066_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000067_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000069_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000075_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000077_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000078_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000080_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000081_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000082_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000083_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000085_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000088_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000092_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000095_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000110_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000112_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_000157_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_201308142016_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_201308142031_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_DK2013071602_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_DK201308142005_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_DK201812171008_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260_DK201812171009_0p1pA.xsd"/>
+   <xsd:include schemaLocation="260__0p1pA.xsd"/>
+   <xsd:include schemaLocation="DK_000087_0p1pA.xsd"/>
+   <xsd:include schemaLocation="DK_DK0003_0p1pA.xsd"/>
+   <xsd:include schemaLocation="DK_DK2013090302_0p1pA.xsd"/>
+   <!-- =============================================================================== -->
+   <!-- ==== Business Data Type Definitions                                        ==== -->
+   <!-- =============================================================================== -->
+   <!-- =============================================================================== -->
+   <!-- ==== AgreementTypeCodeType Type                                            ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="AgreementTypeCodeType_000131">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledAgreementTypeCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== BusinessDomainCodeType Type                                           ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="BusinessDomainCodeType_000132">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledBusinessDomainCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== BusinessProcessTypeCodeType Type                                      ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="BusinessProcessTypeCodeType_000133">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledBusinessProcessTypeCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== BusinessReasonCodeType Type                                           ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="BusinessReasonCodeType_000115">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledBusinessReasonCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== BusinessRoleCodeType Type                                             ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="BusinessRoleCodeType_000113">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledBusinessRoleCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== BusinessTypeCodeType Type                                             ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="BusinessTypeCodeType_000134">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledBusinessTypeCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== CountryIdentifierType Type                                            ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="CountryIdentifierType_000135">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledCountryIdentifierContentType">
+				<xsd:attribute name="schemeIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="schemeAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== CurrencyIdentificationCodeType Type                                   ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="CurrencyIdentificationCodeType_000117">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledCurrencyIdentificationCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== DocumentFunctionCodeType Type                                         ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="DocumentFunctionCodeType_000118">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledDocumentFunctionCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="optional"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== DocumentNameCodeType Type                                             ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="DocumentNameCodeType_000098">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledDocumentNameCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== EnergyProductIdentificationCodeType Type                              ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="EnergyProductIdentificationCodeType_000120">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledEnergyProductIdentificationCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== GridAgreementTypeDescriptionCodeType Type                             ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="GridAgreementTypeDescriptionCodeType_000136">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledGridAgreementTypeDescriptionCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== MeasurementUnitCommonCodeType Type                                    ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="MeasurementUnitCommonCodeType_000121">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledMeasurementUnitCommonCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="optional"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== MeteringMethodCodeType Type                                           ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="MeteringMethodCodeType_000137">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledMeteringMethodCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== MeteringPointTypeCodeType Type                                        ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="MeteringPointTypeCodeType_000138">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledMeteringPointTypeCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== MeterReadingOriginCodeType Type                                       ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="MeterReadingOriginCodeType_000139">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledMeterReadingOriginCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== MeterTimeFrameCodeType Type                                           ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="MeterTimeFrameCodeType_000126">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledMeterTimeFrameCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== PaymentAgreementTypeCodeType Type                                     ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="PaymentAgreementTypeCodeType_000140">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledPaymentAgreementTypeDescriptionCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="optional"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== PhysicalStatusCodeType Type                                           ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="PhysicalStatusCodeType_000141">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledPhysicalStatusCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== PressureLevelCodeType Type                                            ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="PressureLevelCodeType_000142">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledPressureLevelCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== PriceTypeCodeType Type                                                ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="PriceTypeCodeType_000143">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledPriceTypeCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="optional"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== QuantityQualityCodeType Type                                          ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="QuantityQualityCodeType_000125">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledQuantityQualityCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="optional"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== ResponseConditionCodeType Type                                        ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="ResponseConditionCodeType_000130">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledResponseConditionCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="optional"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== ResponseReasonDescriptionCodeType Type                                ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="ResponseReasonDescriptionCodeType_000129">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledResponseReasonDescriptionCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== ResponseTypeCodeType Type                                             ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="ResponseTypeCodeType_000144">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledResponseTypeCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="optional"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== SectorAreaIdentificationCodeType Type                                 ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="SectorAreaIdentificationCodeType_000116">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledSectorAreaIdentificationCodeContentType">
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="optional"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== SettlementMethodCodeType Type                                         ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="SettlementMethodCodeType_000145">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledSettlementMethodCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== StandardLoadProfileCodeType Type                                      ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="StandardLoadProfileCodeType_000146">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledStandardLoadProfileCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== StatusDescriptionCodeType Type                                        ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="StatusDescriptionCodeType_000147">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledStatusDescriptionCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="optional"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== SupplyAgreementTypeCodeType Type                                      ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="SupplyAgreementTypeCodeType_000148">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledSupplyAgreementTypeDescriptionCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="optional"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== TransactionTypeCodeType Type                                          ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="TransactionTypeCodeType_000149">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledTransactionTypeCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="optional"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== VoltageLevelCodeType Type                                             ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="VoltageLevelCodeType_000150">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledVoltageLevelCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== DomainIdentifierType Type                                             ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="DomainIdentifierType_000122">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute name="schemeIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="schemeAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== PartyIdentifierType Type                                              ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="PartyIdentifierType_000112">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute name="schemeIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="schemeAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== IntegerQuantityType Type                                              ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="IntegerQuantityType_000119">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:integer">
+				<xsd:attribute name="unitCode" type="bdt:AssembledMeasurementUnitCommonCodeContentType" use="optional"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== AmountType Type                                                       ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="AmountType_000124">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:decimal">
+				<xsd:attribute name="currencyCode" type="bdt:AssembledCurrencyIdentificationCodeContentType" use="optional"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== DateTimeType Type                                                     ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="DateTimeType_000111">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:dateTime">
+				<xsd:attribute name="timeZoneCode" type="xsd:string" use="optional"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== IndicatorType Type                                                    ==== -->
+   <!-- =============================================================================== -->
+	<xsd:simpleType name="IndicatorType_000099">
+		<xsd:restriction base="xsd:boolean"/>
+	</xsd:simpleType>
+   <!-- =============================================================================== -->
+   <!-- ==== IdentifierType Type                                                   ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="IdentifierType_000110">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute name="schemeIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="schemeVersionIdentifier" use="optional">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:maxLength value="3"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+				<xsd:attribute name="schemeAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="optional"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== TextType Type                                                         ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="TextType_000114">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute name="languageCode" use="optional">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:maxLength value="3"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== CodeType Type                                                         ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="CodeType_000128">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== OrdinalType Type                                                      ==== -->
+   <!-- =============================================================================== -->
+	<xsd:simpleType name="OrdinalType_000123">
+		<xsd:restriction base="xsd:integer">
+			<xsd:totalDigits value="10"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+   <!-- =============================================================================== -->
+   <!-- ==== MeasureType Type                                                      ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="MeasureType_000152">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:decimal">
+				<xsd:attribute name="unitCode" type="bdt:AssembledMeasurementUnitCommonCodeContentType" use="optional"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== FrequencyQuantityType Type                                            ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="FrequencyQuantityType_000127">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:integer">
+				<xsd:attribute name="unitCode" type="bdt:AssembledMeasurementUnitCommonCodeContentType" use="optional"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== ResolutionQuantityType Type                                           ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="ResolutionQuantityType_000151">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:integer">
+				<xsd:attribute name="unitCode" type="bdt:AssembledMeasurementUnitCommonCodeContentType" use="optional"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== MPReadingCharacteristicsCodeType Type                                 ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="MPReadingCharacteristicsCodeType_DK0006">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledMPReadingCharacteristicsCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== TimeDuration Type                                                     ==== -->
+   <!-- =============================================================================== -->
+	<xsd:simpleType name="TimeDuration_000111">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+   <!-- =============================================================================== -->
+   <!-- ==== DecimalQuantityType Type                                              ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="DecimalQuantityType_000119">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:decimal">
+				<xsd:attribute name="unitCode" type="bdt:AssembledMeasurementUnitCommonCodeContentType" use="optional"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== ReasonTextType Type                                                   ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="ReasonTextType_000114">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute name="languageCode" use="optional">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:maxLength value="3"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== PaymentConditionCodeType Type                                         ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="PaymentConditionCodeType_DK2013071601">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledPaymentConditionCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== MPRelationTypeCodeType Type                                           ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="MPRelationTypeCodeType_DK2013071606">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledMPRelationTypeCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== VATClassCodeType Type                                                 ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="VATClassCodeType_DK0004">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledVATClassContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== MeterReadingTypeCodeType Type                                         ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="MeterReadingTypeCodeType_000137">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledMeterReadingTypeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== ChargeTypeCodeType Type                                               ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="ChargeTypeCodeType_000134">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledChargeTypeCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== ServiceRequestCodeType Type                                           ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="ServiceRequestCodeType_">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledRequestServiceCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== StringType Type                                                       ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="StringType_20130913-1">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute name="languageCode" use="optional">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:maxLength value="3"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== MeteringPointSubTypeCodeType Type                                     ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="MeteringPointSubTypeCodeType_000153">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledMeteringPointSubTypeCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== FuelTypeCodeType Type                                                 ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="FuelTypeCodeType_">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledFuelTypeCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== DataRequestCodeType Type                                              ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="DataRequestCodeType_000153">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledDataRequestTypeCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== DisconnectionTypeCodeType Type                                        ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="DisconnectionTypeCodeType_000154">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledDisconnectionTypeCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== MPAddressWashIstructionTypeCodeCodeType Type                          ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="MPAddressWashIstructionTypeCodeCodeType_000156">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledMPAddressWashIstructionTypeCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== MPConnectionTypeCodeCodeType Type                                     ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="MPConnectionTypeCodeCodeType_000155">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledMPConnectionTypeCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== ProcessVariantCodeType Type                                           ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="ProcessVariantCodeType_DK0005">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledProcessVariantCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== AssetTypeCodeType Type                                                ==== -->
+   <!-- =============================================================================== -->
+	<xsd:complexType name="AssetTypeCodeType_DK0002">
+		<xsd:simpleContent>
+			<xsd:extension base="bdt:AssembledAssetTypeCodeContentType">
+				<xsd:attribute name="listIdentifier" type="bdt:AssembledCodeListIdentificationCodeContentType" use="optional"/>
+				<xsd:attribute name="listAgencyIdentifier" type="bdt:AssembledCodeListResponsibleAgencyCodeContentType" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== UUIDType Type                                                         ==== -->
+   <!-- =============================================================================== -->
+	<xsd:simpleType name="UUIDType_20190104-12">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="36"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>  
