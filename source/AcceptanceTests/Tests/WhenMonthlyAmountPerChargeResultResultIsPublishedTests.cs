@@ -28,10 +28,12 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 public sealed class WhenMonthlyAmountPerChargeResultResultIsPublishedTests
 {
     private readonly AggregationResultDsl _aggregations;
+    private readonly AcceptanceTestFixture _fixture;
 
     public WhenMonthlyAmountPerChargeResultResultIsPublishedTests(AcceptanceTestFixture fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
+        _fixture = fixture;
 
         _aggregations = new AggregationResultDsl(
             new EdiDriver(fixture.B2BEnergySupplierAuthorizedHttpClient),
@@ -45,8 +47,8 @@ public sealed class WhenMonthlyAmountPerChargeResultResultIsPublishedTests
 
         await _aggregations.PublishMonthlyChargeResultFor(
             AcceptanceTestFixture.CimActorGridArea,
-            AcceptanceTestFixture.EdiSubsystemTestCimActorNumber,
-            AcceptanceTestFixture.ActorNumber);
+            _fixture.CimEnergySupplierId,
+            _fixture.CimMeteredDataResponsibleId);
 
         await _aggregations.ConfirmResultIsAvailableFor();
     }

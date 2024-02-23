@@ -13,10 +13,12 @@
 // limitations under the License.
 
 using System.Net.Http.Headers;
-using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration; // DO NOT REMOVE THIS! use in debug mode
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Microsoft.Extensions.Configuration;
 using Nito.AsyncEx;
+
+// DO NOT REMOVE THIS! use in debug mode
 
 namespace Energinet.DataHub.EDI.AcceptanceTests;
 
@@ -26,10 +28,8 @@ public class AcceptanceTestFixture : IAsyncLifetime
     internal const string EbixActorGridArea = "543";
     internal const string CimActorGridArea = "804";
 
-    internal const string ActorNumber = "5790000610976"; // Corresponds to the "Mosaic 03" actor in the UI.
-    internal const string ActorRole = "metereddataresponsible";
-
-    internal const string EdiSubsystemTestCimActorNumber = "5790000392551"; // Corresponds to the "EDI - SUBSYSTEM TEST CIM" in the UI.
+    internal const string EbixActorNumber = "5790000610976"; // Corresponds to the "Mosaic 03" actor in the UI.
+    internal const string EbixActorRole = "metereddataresponsible";
 
     private readonly Uri _azureEntraB2CTenantUrl;
     private readonly string _azureEntraFrontendAppId;
@@ -62,13 +62,31 @@ public class AcceptanceTestFixture : IAsyncLifetime
         var azureEntraBackendAppId = root.GetValue<string>("backend-b2b-app-id") ?? throw new InvalidOperationException("backend-b2b-app-id is not set in configuration");
         ApiManagementUri = new Uri(root.GetValue<string>("apim-gateway-url") ?? throw new InvalidOperationException("apim-gateway-url secret is not set in configuration"));
 
-        var meteredDataResponsibleId = root.GetValue<string>("METERED_DATA_RESPONSIBLE_CLIENT_ID") ?? throw new InvalidOperationException("METERED_DATA_RESPONSIBLE_CLIENT_ID is not set in configuration");
-        var meteredDataResponsibleSecret = root.GetValue<string>("METERED_DATA_RESPONSIBLE_CLIENT_SECRET") ?? throw new InvalidOperationException("METERED_DATA_RESPONSIBLE_CLIENT_SECRET is not set in configuration");
-        B2BMeteredDataResponsibleAuthorizedHttpClient = new AsyncLazy<HttpClient>(() => CreateB2BMeteredDataResponsibleAuthorizedHttpClientAsync(azureB2CTenantId, azureEntraBackendAppId, meteredDataResponsibleId, meteredDataResponsibleSecret, ApiManagementUri));
+        CimMeteredDataResponsibleId = root.GetValue<string>("METERED_DATA_RESPONSIBLE_CLIENT_ID")
+                                   ?? throw new InvalidOperationException(
+                                       "METERED_DATA_RESPONSIBLE_CLIENT_ID is not set in configuration");
 
-        var energySupplierId = root.GetValue<string>("ENERGY_SUPPLIER_CLIENT_ID") ?? throw new InvalidOperationException("ENERGY_SUPPLIER_CLIENT_ID is not set in configuration");
+        var meteredDataResponsibleSecret = root.GetValue<string>("METERED_DATA_RESPONSIBLE_CLIENT_SECRET") ?? throw new InvalidOperationException("METERED_DATA_RESPONSIBLE_CLIENT_SECRET is not set in configuration");
+        B2BMeteredDataResponsibleAuthorizedHttpClient = new AsyncLazy<HttpClient>(
+            () => CreateB2BMeteredDataResponsibleAuthorizedHttpClientAsync(
+                azureB2CTenantId,
+                azureEntraBackendAppId,
+                CimMeteredDataResponsibleId,
+                meteredDataResponsibleSecret,
+                ApiManagementUri));
+
+        CimEnergySupplierId = root.GetValue<string>("ENERGY_SUPPLIER_CLIENT_ID")
+                           ?? throw new InvalidOperationException(
+                               "ENERGY_SUPPLIER_CLIENT_ID is not set in configuration");
+
         var energySupplierSecret = root.GetValue<string>("ENERGY_SUPPLIER_CLIENT_SECRET") ?? throw new InvalidOperationException("ENERGY_SUPPLIER_CLIENT_SECRET is not set in configuration");
-        B2BEnergySupplierAuthorizedHttpClient = new AsyncLazy<HttpClient>(() => CreateB2BEnergySupplierAuthorizedHttpClientAsync(azureB2CTenantId, azureEntraBackendAppId, energySupplierId, energySupplierSecret, ApiManagementUri));
+        B2BEnergySupplierAuthorizedHttpClient = new AsyncLazy<HttpClient>(
+            () => CreateB2BEnergySupplierAuthorizedHttpClientAsync(
+                azureB2CTenantId,
+                azureEntraBackendAppId,
+                CimEnergySupplierId,
+                energySupplierSecret,
+                ApiManagementUri));
 
         EbixCertificateThumbprint = root.GetValue<string>("EBIX_CERTIFICATE_THUMBPRINT") ?? "39D64F012A19C6F6FDFB0EA91D417873599D3325";
         EbixCertificatePassword = root.GetValue<string>("EBIX_CERTIFICATE_PASSWORD") ?? throw new InvalidOperationException("EBIX_CERTIFICATE_PASSWORD is not set in configuration");
@@ -99,6 +117,10 @@ public class AcceptanceTestFixture : IAsyncLifetime
     internal AsyncLazy<HttpClient> B2BMeteredDataResponsibleAuthorizedHttpClient { get; }
 
     internal AsyncLazy<HttpClient> B2BEnergySupplierAuthorizedHttpClient { get; }
+
+    internal string CimMeteredDataResponsibleId { get; }
+
+    internal string CimEnergySupplierId { get; }
 
     public Task InitializeAsync()
     {
