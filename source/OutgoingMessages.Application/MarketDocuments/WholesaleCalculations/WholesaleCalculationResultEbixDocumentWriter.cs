@@ -35,8 +35,7 @@ public class WholesaleCalculationResultEbixDocumentWriter : EbixDocumentWriter
             "un:unece:260:data:EEM-DK_NotifyAggregatedWholesaleServices",
             "ns0",
             "E31"),
-            parser,
-            null)
+            parser)
     {
     }
 

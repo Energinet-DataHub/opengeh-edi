@@ -35,8 +35,7 @@ public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
             "un:unece:260:data:EEM-DK_AggregatedMeteredDataTimeSeries:v3",
             "ns0",
             "E31"),
-            parser,
-            null)
+            parser)
     {
     }
 

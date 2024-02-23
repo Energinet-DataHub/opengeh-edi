@@ -72,9 +72,9 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
-    // TODO: Where to find this in the ebIX document?
     public IAssertWholesaleCalculationResultDocument HasSenderRole(ActorRole expectedSenderRole)
     {
+        // SenderRole does not exist in the Ebix format
         return this;
     }
 

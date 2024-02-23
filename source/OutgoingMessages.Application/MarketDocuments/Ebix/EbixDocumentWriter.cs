@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -37,13 +36,11 @@ public abstract class EbixDocumentWriter : IDocumentWriter
 
     private readonly DocumentDetails _documentDetails;
     private readonly IMessageRecordParser _parser;
-    private readonly string? _reasonCode;
 
-    protected EbixDocumentWriter(DocumentDetails documentDetails, IMessageRecordParser parser, string? reasonCode = null)
+    protected EbixDocumentWriter(DocumentDetails documentDetails, IMessageRecordParser parser)
     {
         _documentDetails = documentDetails;
         _parser = parser;
-        _reasonCode = reasonCode;
     }
 
     protected DocumentDetails DocumentDetails => _documentDetails;
@@ -227,10 +224,6 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         await writer.WriteStartElementAsync(documentDetails.Prefix, "HeaderEnergyDocument", null).ConfigureAwait(false);
         await writer.WriteElementStringAsync(documentDetails.Prefix, "Identification", null, header.MessageId)
             .ConfigureAwait(false);
-        // await writer.WriteStartElementAsync(documentDetails.Prefix, "DocumentType", null).ConfigureAwait(false);
-        // await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
-        // writer.WriteValue(documentDetails.TypeCode);
-        // await writer.WriteEndElementAsync().ConfigureAwait(false);
         await WriteCodeWithCodeListReferenceAttributesAsync("DocumentType", documentDetails.TypeCode, writer).ConfigureAwait(false);
 
         await writer.WriteElementStringAsync(
@@ -250,10 +243,7 @@ public abstract class EbixDocumentWriter : IDocumentWriter
 
         await writer.WriteStartElementAsync(documentDetails.Prefix, "RecipientEnergyParty", null).ConfigureAwait(false);
         await WriteGlnOrEicCodeWithAttributesAsync("Identification", header.ReceiverId, writer).ConfigureAwait(false);
-        // await writer.WriteStartElementAsync(documentDetails.Prefix, "Identification", null).ConfigureAwait(false);
-        // await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, "9").ConfigureAwait(false);
-        // writer.WriteValue(header.ReceiverId);
-        // await writer.WriteEndElementAsync().ConfigureAwait(false);
+
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 
         await writer.WriteEndElementAsync().ConfigureAwait(false);
