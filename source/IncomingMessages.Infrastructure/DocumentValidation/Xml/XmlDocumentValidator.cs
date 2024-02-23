@@ -29,7 +29,7 @@ namespace IncomingMessages.Infrastructure.DocumentValidation.Xml
             var settings = CreateXmlReaderSettings(schema);
             settings.ValidationEventHandler += (sender, arguments) =>
             {
-                validationErrors.Add($"{arguments.Exception.LineNumber}, position {arguments.Exception.LinePosition}: {arguments.Message}");
+                validationErrors.Add($"Line {arguments.Exception.LineNumber}, position {arguments.Exception.LinePosition}: {arguments.Message}");
             };
 
             using (var reader = XmlReader.Create(message, settings))

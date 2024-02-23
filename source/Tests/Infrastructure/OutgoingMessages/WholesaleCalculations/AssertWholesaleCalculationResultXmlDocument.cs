@@ -43,7 +43,9 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasBusinessReason(BusinessReason expectedBusinessReason)
+    public IAssertWholesaleCalculationResultDocument HasBusinessReason(
+        BusinessReason expectedBusinessReason,
+        CodeListType codeListType)
     {
         ArgumentNullException.ThrowIfNull(expectedBusinessReason);
         _documentAsserter.HasValue("process.processType", expectedBusinessReason.Code);
@@ -71,7 +73,7 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasReceiverRole(ActorRole expectedReceiverRole)
+    public IAssertWholesaleCalculationResultDocument HasReceiverRole(ActorRole expectedReceiverRole, CodeListType codeListType)
     {
         ArgumentNullException.ThrowIfNull(expectedReceiverRole);
         _documentAsserter.HasValue("receiver_MarketParticipant.marketRole.type", expectedReceiverRole.Code);
@@ -111,12 +113,6 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasEvaluationType(string expectedMarketEvaluationType)
-    {
-        _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.type", expectedMarketEvaluationType);
-        return this;
-    }
-
     public IAssertWholesaleCalculationResultDocument HasSettlementMethod(SettlementType expectedSettlementMethod)
     {
         ArgumentNullException.ThrowIfNull(expectedSettlementMethod);
@@ -126,15 +122,7 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
 
     public IAssertWholesaleCalculationResultDocument PriceAmountIsPresentForPointIndex(int pointIndex, string? expectedPrice)
     {
-        if (pointIndex == 0)
-        {
-            _documentAsserter.HasValue($"Series[1]/Period/Point/price.amount", expectedPrice ?? "0");
-        }
-        else
-        {
-            _documentAsserter.HasValue($"Series[1]/Period/Point[{pointIndex}]/price.amount", expectedPrice ?? "0");
-        }
-
+        _documentAsserter.HasValue($"Series[1]/Period/Point[{pointIndex + 1}]/price.amount", expectedPrice ?? "0");
         return this;
     }
 

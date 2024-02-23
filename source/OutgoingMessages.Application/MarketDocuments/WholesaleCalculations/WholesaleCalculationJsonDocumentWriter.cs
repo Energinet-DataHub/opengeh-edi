@@ -196,9 +196,9 @@ public sealed class WholesaleCalculationJsonDocumentWriter : IDocumentWriter
                                                 point.QuantityQuality.GetValueOrDefault().ToString()));
                                     }
                                 }
-                            }
 
-                            writer.WriteEndObject();
+                                writer.WriteEndObject();
+                            }
                         }
 
                         writer.WriteEndArray();

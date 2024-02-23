@@ -69,7 +69,9 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasBusinessReason(BusinessReason expectedBusinessReason)
+    public IAssertWholesaleCalculationResultDocument HasBusinessReason(
+        BusinessReason expectedBusinessReason,
+        CodeListType codeListType)
     {
         _root.GetProperty("process.processType")
             .GetProperty("value")
@@ -116,7 +118,7 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasReceiverRole(ActorRole expectedReceiverRole)
+    public IAssertWholesaleCalculationResultDocument HasReceiverRole(ActorRole expectedReceiverRole, CodeListType codeListType)
     {
         ArgumentNullException.ThrowIfNull(expectedReceiverRole);
         _root.GetProperty("receiver_MarketParticipant.marketRole.type")
@@ -176,17 +178,6 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasEvaluationType(string expectedMarketEvaluationType)
-    {
-        FirstTimeSeriesElement()
-            .GetProperty("marketEvaluationPoint.type")
-            .GetProperty("value")
-            .GetString()
-            .Should()
-            .Be(expectedMarketEvaluationType);
-        return this;
-    }
-
     public IAssertWholesaleCalculationResultDocument HasSettlementMethod(SettlementType expectedSettlementMethod)
     {
         ArgumentNullException.ThrowIfNull(expectedSettlementMethod);
@@ -210,7 +201,8 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
             .ToList()[pointIndex]
             .GetProperty("price.amount")
             .GetProperty("value")
-            .GetString()
+            .GetDecimal()
+            .ToString(NumberFormatInfo.InvariantInfo)
             .Should()
             .Be(expectedPrice);
         return this;
