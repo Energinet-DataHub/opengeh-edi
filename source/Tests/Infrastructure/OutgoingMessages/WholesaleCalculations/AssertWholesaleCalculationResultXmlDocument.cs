@@ -44,7 +44,9 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasBusinessReason(BusinessReason expectedBusinessReason)
+    public IAssertWholesaleCalculationResultDocument HasBusinessReason(
+        BusinessReason expectedBusinessReason,
+        CodeListType codeListType)
     {
         _documentAsserter.HasValue("process.processType", CimCode.Of(expectedBusinessReason));
         return this;
@@ -71,7 +73,7 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasReceiverRole(ActorRole expectedReceiverRole)
+    public IAssertWholesaleCalculationResultDocument HasReceiverRole(ActorRole expectedReceiverRole, CodeListType codeListType)
     {
         ArgumentNullException.ThrowIfNull(expectedReceiverRole);
         _documentAsserter.HasValue("receiver_MarketParticipant.marketRole.type", expectedReceiverRole.Code);

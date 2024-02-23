@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -28,15 +27,20 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Ebi
 
 public abstract class EbixDocumentWriter : IDocumentWriter
 {
+    public const string UnitedNationsCodeList = "6";
+    public const string EbixCodeList = "260";
+    public const string CountryCodeDenmark = "DK";
+
+    public const string Gs1Code = "9";
+    public const string EicCode = "305";
+
     private readonly DocumentDetails _documentDetails;
     private readonly IMessageRecordParser _parser;
-    private readonly string? _reasonCode;
 
-    protected EbixDocumentWriter(DocumentDetails documentDetails, IMessageRecordParser parser, string? reasonCode = null)
+    protected EbixDocumentWriter(DocumentDetails documentDetails, IMessageRecordParser parser)
     {
         _documentDetails = documentDetails;
         _parser = parser;
-        _reasonCode = reasonCode;
     }
 
     protected DocumentDetails DocumentDetails => _documentDetails;
@@ -88,28 +92,34 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         return writer.WriteElementStringAsync(DocumentDetails.Prefix, name, null, value);
     }
 
-    protected async Task WriteEbixCodeWithAttributesAsync(string name, string ebixCode, XmlWriter writer)
+    /// <summary>
+    /// Used to write codes that references an ebIX or UN/CEFACT codelist using listAgencyIdentifier (and listIdentifier if the codelist is country specific)
+    /// </summary>
+    protected async Task WriteCodeWithCodeListReferenceAttributesAsync(string name, string ebixCode, XmlWriter writer)
     {
         ArgumentNullException.ThrowIfNull(name);
         ArgumentNullException.ThrowIfNull(ebixCode);
         ArgumentNullException.ThrowIfNull(writer);
 
         await writer.WriteStartElementAsync(DocumentDetails.Prefix, name, null).ConfigureAwait(false);
-        if (long.TryParse(ebixCode, out _))
+
+        var isUnitedNationsCodeList = long.TryParse(ebixCode, out _);
+        var isDanishEbixCode = ebixCode.StartsWith('D') && ebixCode.Length == 3;
+        if (isUnitedNationsCodeList)
         {
-            // UN/CEFACT codelist
-            await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "6").ConfigureAwait(false);
+            // UN/CEFACT code list
+            await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, UnitedNationsCodeList).ConfigureAwait(false);
         }
-        else if (ebixCode.StartsWith('D') && ebixCode.Length == 3)
+        else if (isDanishEbixCode)
         {
-            // Danish codelist
-            await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
-            await writer.WriteAttributeStringAsync(null, "listIdentifier", null, "DK").ConfigureAwait(false);
+            // Danish ebIX code list
+            await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, EbixCodeList).ConfigureAwait(false);
+            await writer.WriteAttributeStringAsync(null, "listIdentifier", null, CountryCodeDenmark).ConfigureAwait(false);
         }
         else
         {
-            // ebIX codelist
-            await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
+            // ebIX code list
+            await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, EbixCodeList).ConfigureAwait(false);
         }
 
         await writer.WriteStringAsync(ebixCode).ConfigureAwait(false);
@@ -120,38 +130,40 @@ public abstract class EbixDocumentWriter : IDocumentWriter
     /// Will write the ebIX xmlnode with the schemeAgencyIdentifier attribute for a GLN number, EIC code or a GSRN number
     /// </summary>
     /// <param name="name">Name of the xmlnode</param>
-    /// <param name="ebixSchemeCode">GLN number, EIC code or a GSRN number</param>
+    /// <param name="glnOrEicCode">GLN number, EIC code or a GSRN number</param>
     /// <param name="writer">The XmlWriter</param>
-    protected async Task WriteEbixSchemeCodeWithAttributesAsync(string name, string ebixSchemeCode, XmlWriter writer)
+    protected async Task WriteGlnOrEicCodeWithAttributesAsync(string name, string glnOrEicCode, XmlWriter writer)
     {
         ArgumentNullException.ThrowIfNull(name);
-        ArgumentNullException.ThrowIfNull(ebixSchemeCode);
+        ArgumentNullException.ThrowIfNull(glnOrEicCode);
         ArgumentNullException.ThrowIfNull(writer);
 
         await writer.WriteStartElementAsync(DocumentDetails.Prefix, name, null).ConfigureAwait(false);
-        if (long.TryParse(ebixSchemeCode, out _))
+        if (long.TryParse(glnOrEicCode, out _))
         {
-            if (ebixSchemeCode.Length == 13 || ebixSchemeCode.Length == 18)
+            var isGlnNumber = glnOrEicCode.Length == 13 || glnOrEicCode.Length == 18;
+            var isEicCode = glnOrEicCode.Length == 16;
+            if (isGlnNumber)
             {
                 // GLN or GSNR number from GS1
-                await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, "9").ConfigureAwait(false);
+                await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, Gs1Code).ConfigureAwait(false);
             }
-            else if (ebixSchemeCode.Length == 16)
+            else if (isEicCode)
             {
                 // EIC code
-                await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, "305").ConfigureAwait(false);
+                await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, EicCode).ConfigureAwait(false);
             }
             else
             {
-                throw new InvalidOperationException($"Invalid schemecode '{ebixSchemeCode}'");
+                throw new InvalidOperationException($"Invalid schemecode '{glnOrEicCode}'");
             }
         }
         else
         {
-            throw new InvalidOperationException($"Invalid schemecode '{ebixSchemeCode}'");
+            throw new InvalidOperationException($"Invalid schemecode '{glnOrEicCode}'");
         }
 
-        await writer.WriteStringAsync(ebixSchemeCode).ConfigureAwait(false);
+        await writer.WriteStringAsync(glnOrEicCode).ConfigureAwait(false);
         await writer.WriteEndElementAsync().ConfigureAwait(false);
     }
 
@@ -174,8 +186,97 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         writer.Close();
     }
 
-    private Task WriteHeaderAsync(OutgoingMessageHeader header, DocumentDetails documentDetails, XmlWriter writer, SettlementVersion? settlementVersion)
+    private async Task WriteHeaderAsync(
+        OutgoingMessageHeader header,
+        DocumentDetails documentDetails,
+        XmlWriter writer,
+        SettlementVersion? settlementVersion)
     {
-        return EbixHeaderWriter.WriteAsync(writer, header, documentDetails, _reasonCode, settlementVersion);
+        ArgumentNullException.ThrowIfNull(header);
+        ArgumentNullException.ThrowIfNull(writer);
+        ArgumentNullException.ThrowIfNull(documentDetails);
+
+        await writer.WriteStartDocumentAsync().ConfigureAwait(false);
+
+        // Write Messageconatiner
+        await writer.WriteStartElementAsync(null, "MessageContainer", null).ConfigureAwait(false);
+        await writer.WriteElementStringAsync(
+                null,
+                "MessageReference",
+                "urn:www:datahub:dk:b2b:v01",
+                $"ENDK_{Guid.NewGuid():N}")
+            .ConfigureAwait(false);
+
+        await writer.WriteElementStringAsync(
+                null,
+                "DocumentType",
+                "urn:www:datahub:dk:b2b:v01",
+                $"{documentDetails.Type.Replace("DK_", string.Empty, StringComparison.InvariantCultureIgnoreCase)}")
+            .ConfigureAwait(false);
+
+        await writer.WriteElementStringAsync(null, "MessageType", "urn:www:datahub:dk:b2b:v01", "XML")
+            .ConfigureAwait(false);
+        await writer.WriteStartElementAsync(null, "Payload", "urn:www:datahub:dk:b2b:v01").ConfigureAwait(false);
+        await writer.WriteStartElementAsync(documentDetails.Prefix, documentDetails.Type, documentDetails.XmlNamespace)
+            .ConfigureAwait(false);
+
+        // Begin HeaderEnergyDocument
+        await writer.WriteStartElementAsync(documentDetails.Prefix, "HeaderEnergyDocument", null).ConfigureAwait(false);
+        await writer.WriteElementStringAsync(documentDetails.Prefix, "Identification", null, header.MessageId)
+            .ConfigureAwait(false);
+        await WriteCodeWithCodeListReferenceAttributesAsync("DocumentType", documentDetails.TypeCode, writer).ConfigureAwait(false);
+
+        await writer.WriteElementStringAsync(
+                documentDetails.Prefix,
+                "Creation",
+                null,
+                header.TimeStamp.ToString())
+            .ConfigureAwait(false);
+
+        await writer.WriteStartElementAsync(documentDetails.Prefix, "SenderEnergyParty", null).ConfigureAwait(false);
+
+        await writer.WriteStartElementAsync(documentDetails.Prefix, "Identification", null).ConfigureAwait(false);
+        await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, "9").ConfigureAwait(false);
+        writer.WriteValue(header.SenderId);
+        await writer.WriteEndElementAsync().ConfigureAwait(false);
+        await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+        await writer.WriteStartElementAsync(documentDetails.Prefix, "RecipientEnergyParty", null).ConfigureAwait(false);
+        await WriteGlnOrEicCodeWithAttributesAsync("Identification", header.ReceiverId, writer).ConfigureAwait(false);
+
+        await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+        await writer.WriteEndElementAsync().ConfigureAwait(false);
+        // End HeaderEnergyDocument
+
+        // Begin ProcessEnergyContext
+        await writer.WriteStartElementAsync(documentDetails.Prefix, "ProcessEnergyContext", null).ConfigureAwait(false);
+
+        await writer.WriteStartElementAsync(documentDetails.Prefix, "EnergyBusinessProcess", null)
+            .ConfigureAwait(false);
+        await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
+        await writer.WriteAttributeStringAsync(null, "listIdentifier", null, "DK").ConfigureAwait(false);
+        writer.WriteValue(EbixCode.Of(BusinessReason.FromName(header.BusinessReason)));
+        await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+        await WriteCodeWithCodeListReferenceAttributesAsync("EnergyBusinessProcessRole", EbixCode.Of(ActorRole.FromCode(header.ReceiverRole)), writer).ConfigureAwait(false);
+
+        await writer.WriteStartElementAsync(documentDetails.Prefix, "EnergyIndustryClassification", null)
+            .ConfigureAwait(false);
+        await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "6").ConfigureAwait(false);
+        writer.WriteValue(GeneralValues.SectorTypeCode);
+        await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+        if (settlementVersion is not null)
+        {
+            await writer.WriteStartElementAsync(documentDetails.Prefix, "ProcessVariant", null).ConfigureAwait(false);
+            await writer.WriteAttributeStringAsync(null, "listIdentifier", null, "DK").ConfigureAwait(false);
+            await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
+            writer.WriteValue(EbixCode.Of(settlementVersion));
+            await writer.WriteEndElementAsync().ConfigureAwait(false);
+        }
+
+        await writer.WriteEndElementAsync().ConfigureAwait(false);
+        // End ProcessEnergyContext
     }
 }

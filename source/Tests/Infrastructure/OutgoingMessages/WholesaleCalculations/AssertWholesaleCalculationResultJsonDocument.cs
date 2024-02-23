@@ -69,7 +69,9 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasBusinessReason(BusinessReason expectedBusinessReason)
+    public IAssertWholesaleCalculationResultDocument HasBusinessReason(
+        BusinessReason expectedBusinessReason,
+        CodeListType codeListType)
     {
         _root.GetProperty("process.processType")
             .GetProperty("value")
@@ -116,7 +118,7 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasReceiverRole(ActorRole expectedReceiverRole)
+    public IAssertWholesaleCalculationResultDocument HasReceiverRole(ActorRole expectedReceiverRole, CodeListType codeListType)
     {
         ArgumentNullException.ThrowIfNull(expectedReceiverRole);
         _root.GetProperty("receiver_MarketParticipant.marketRole.type")

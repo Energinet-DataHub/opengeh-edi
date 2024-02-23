@@ -1,0 +1,771 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =============================================================================== -->
+<!-- ==== Aggregated Business Information Entities XML Schema Module            ==== -->
+<!-- =============================================================================== -->
+<!--
+Schema agency:     Energinet.dk
+Schema version:    0.1.A
+Schema date:       December 19, 2019
+
+Copyright (C) ebIX (2010). All Rights Reserved.
+Copyright (C) Energinet.dk (2014). All Rights Reserved.
+
+This document and translations of it may be copied and furnished to others,
+and derivative works that comment on or otherwise explain it or assist in
+its implementation may be prepared, copied, published and distributed, in
+whole or in part, without restriction of any kind, provided that the above
+copyright notice and this paragraph are included on all such copies and
+derivative works. However, this document itself may not be modified in any
+way, such as by removing the copyright notice or references to ebIX, except
+as needed for the purpose of developing ebIX specifications, in which case
+the procedures for copyrights defined in the UN/CEFACT Intellectual Property
+Rights document must be followed, or as required to translate it into
+languages other than English.
+The limited permissions granted above are perpetual and will not be revoked
+by ebIX or its successors or assigns.
+This document and the information contained herein is provided on an "AS IS"
+basis and ebIX DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT
+NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT
+INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS
+FOR A PARTICULAR PURPOSE.
+-->
+<xsd:schema
+   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+   xmlns:bie="un:unece:260:data:EEM"
+   xmlns:ccts="urn:un:unece:uncefact:documentation:common:3:standard:CoreComponentsTechnicalSpecification:3"
+   xmlns:xbt="urn:un:unece:uncefact:data:common:1:draft"
+   targetNamespace="un:unece:260:data:EEM"
+   elementFormDefault="qualified"
+   attributeFormDefault="unqualified"
+   version="0.1.A">
+   <!-- =============================================================================== -->
+   <!-- ==== Imports                                                               ==== -->
+   <!-- =============================================================================== -->
+
+   <!-- =============================================================================== -->
+   <!-- ==== Inclusions                                                            ==== -->
+   <!-- =============================================================================== -->
+   <!-- =============================================================================== -->
+   <!-- ==== Inclusion of Business Data Types                                      ==== -->
+   <!-- =============================================================================== -->
+   <xsd:include schemaLocation="ebIX_BusinessDataType_0p1pA.xsd"/>
+   <!-- =============================================================================== -->
+   <!-- ==== Aggregated Business Information Entities Definitions                  ==== -->
+   <!-- =============================================================================== -->
+   <!-- =============================================================================== -->
+   <!-- ==== TimeSeriesPeriod Type                                                 ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="TimeSeriesPeriod">
+      <xsd:sequence>
+        <xsd:element name="ResolutionDuration" type="bie:TimeDuration_000111" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Start" type="bie:DateTimeType_000111" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="End" type="bie:DateTimeType_000111" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Continuous" type="bie:IndicatorType_000099" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="ObservationTimeSeriesPeriod" type="bie:TimeSeriesPeriod"/>
+   <xsd:element name="SearchPeriodTimeSeriesPeriod" type="bie:TimeSeriesPeriod"/>
+   <!-- =============================================================================== -->
+   <!-- ==== ProductCharacteristic Type                                            ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="ProductCharacteristic">
+      <xsd:sequence>
+        <xsd:element name="Identification" type="bie:EnergyProductIdentificationCodeType_000120" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="UnitType" type="bie:MeasurementUnitCommonCodeType_000121" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MeasureUnitPriceType" type="bie:MeasurementUnitCommonCodeType_000121" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="IncludedProductCharacteristic" type="bie:ProductCharacteristic"/>
+   <xsd:element name="ProductIncludedProductCharacteristic" type="bie:ProductCharacteristic"/>
+   <!-- =============================================================================== -->
+   <!-- ==== RequestChargeInformation Type                                         ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="RequestChargeInformation">
+      <xsd:sequence>
+        <xsd:element ref="bie:ObservationTimeSeriesPeriod" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element name="Identification" type="bie:IdentifierType_000110" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="PartyChargeTypeID" type="bie:IdentifierType_000110" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteringGridAreaUsedDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:PartyResponsibleForChargeEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="ChargeType" type="bie:ChargeTypeCodeType_000134" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:BalanceSupplierEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MonthlyAggregations" type="bie:IndicatorType_000099" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== NonContinuousEnergyTimeSeries Type                                    ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="NonContinuousEnergyTimeSeries">
+      <xsd:sequence>
+        <xsd:element name="Identification" type="bie:IdentifierType_000110" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="Function" type="bie:DocumentFunctionCodeType_000118" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:BalanceSupplierEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:DetailMeasurementMeteringPointCharacteristic" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteringPointDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteringInstallationMeterFacility" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:DurationProfiledPeriod" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:IntervalNonContinuousEnergyObservation" minOccurs="1" maxOccurs="unbounded"/>
+        <xsd:element ref="bie:IncludedProductCharacteristic" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="OriginalBusinessDocument" type="bie:IdentifierType_000110" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== EnergyParty Type                                                      ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="EnergyParty">
+      <xsd:sequence>
+        <xsd:element name="Identification" type="bie:PartyIdentifierType_000112" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Role" type="bie:BusinessRoleCodeType_000113" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Name" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="PartyResponsibleForChargeEnergyParty" type="bie:EnergyParty"/>
+   <xsd:element name="BalanceSupplierEnergyParty" type="bie:EnergyParty"/>
+   <xsd:element name="BalanceResponsibleEnergyParty" type="bie:EnergyParty"/>
+   <xsd:element name="ChargeTypeOwnerEnergyParty" type="bie:EnergyParty"/>
+   <xsd:element name="SenderEnergyParty" type="bie:EnergyParty"/>
+   <xsd:element name="RecipientEnergyParty" type="bie:EnergyParty"/>
+   <xsd:element name="BalanceResponsiblePartyEnergyParty" type="bie:EnergyParty"/>
+   <xsd:element name="TransportCapacityResponsibleEnergyParty" type="bie:EnergyParty"/>
+   <xsd:element name="MeteredDataResponsibleEnergyParty" type="bie:EnergyParty"/>
+   <xsd:element name="GridAccessProviderEnergyParty" type="bie:EnergyParty"/>
+   <xsd:element name="MeteredDataCollectorEnergyParty" type="bie:EnergyParty"/>
+   <!-- =============================================================================== -->
+   <!-- ==== DomainLocation Type                                                   ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="DomainLocation">
+      <xsd:sequence>
+        <xsd:element name="Identification" type="bie:DomainIdentifierType_000122" minOccurs="1" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="MeteringGridAreaUsedDomainLocation" type="bie:DomainLocation"/>
+   <xsd:element name="MeteringPointDomainLocation" type="bie:DomainLocation"/>
+   <xsd:element name="InAreaUsedDomainLocation" type="bie:DomainLocation"/>
+   <xsd:element name="OutAreaUsedDomainLocation" type="bie:DomainLocation"/>
+   <xsd:element name="BalanceGroupUsedDomainLocation" type="bie:DomainLocation"/>
+   <xsd:element name="MarketBalanceAreaUsedDomainLocation" type="bie:DomainLocation"/>
+   <xsd:element name="MeteringGridAreaUsedDomainLocation" type="bie:DomainLocation"/>
+   <xsd:element name="ToGridDomainLocation" type="bie:DomainLocation"/>
+   <xsd:element name="FromGridDomainLocation" type="bie:DomainLocation"/>
+   <xsd:element name="PowerPlantDomainLocation" type="bie:DomainLocation"/>
+   <xsd:element name="IdentificationDomainLocation" type="bie:DomainLocation"/>
+   <!-- =============================================================================== -->
+   <!-- ==== EnergyTimeSeries Type                                                 ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="EnergyTimeSeries">
+      <xsd:sequence>
+        <xsd:element name="Identification" type="bie:IdentifierType_000110" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="Function" type="bie:DocumentFunctionCodeType_000118" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="RegistrationDateTime" type="bie:DateTimeType_000111" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MeterReadingOriginType" type="bie:MeterReadingOriginCodeType_000139" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="LatestUpdateDate" type="bie:DateTimeType_000111" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Currency" type="bie:CurrencyIdentificationCodeType_000117" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:ObservationTimeSeriesPeriod" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:BalanceResponsibleEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:BalanceSupplierEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:IncludedProductCharacteristic" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:DetailMeasurementMeteringPointCharacteristic" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteringPointDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteringGridAreaUsedDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:InAreaUsedDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:OutAreaUsedDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:BalanceGroupUsedDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteringInstallationMeterFacility" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:IntervalEnergyObservation" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="bie:DurationProfiledPeriod" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MarketBalanceAreaUsedDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="ChargeType" type="bie:ChargeTypeCodeType_000134" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="PartyChargeTypeID" type="bie:IdentifierType_000110" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MeasureUnitPriceType" type="bie:MeasurementUnitCommonCodeType_000121" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="UnitType" type="bie:MeasurementUnitCommonCodeType_000121" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="OriginalBusinessDocument" type="bie:IdentifierType_000110" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:ChargeTypeOwnerEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Version" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== EnergyObservation Type                                                ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="EnergyObservation">
+      <xsd:sequence>
+        <xsd:element name="Position" type="bie:OrdinalType_000123" minOccurs="0" maxOccurs="1"/>
+        <xsd:choice minOccurs="0">
+           <xsd:element name="EnergyQuantity" type="bie:DecimalQuantityType_000119" minOccurs="0" maxOccurs="unbounded"/>
+           <xsd:element name="QuantityMissing" type="bie:IndicatorType_000099" fixed="true" minOccurs="0" maxOccurs="1"/>
+        </xsd:choice>
+        <xsd:choice minOccurs="0">
+           <xsd:element name="EnergyPrice" type="bie:AmountType_000124" minOccurs="0" maxOccurs="unbounded"/>
+           <xsd:element name="PriceMissing" type="bie:IndicatorType_000099" fixed="true" minOccurs="0" maxOccurs="1"/>
+        </xsd:choice>
+        <xsd:element name="QuantityQuality" type="bie:QuantityQualityCodeType_000125" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MeterReadingOriginType" type="bie:MeterReadingOriginCodeType_000139" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MeterTimeFrameType" type="bie:MeterTimeFrameCodeType_000126" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element name="EnergySum" type="bie:AmountType_000124" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="IntervalEnergyObservation" type="bie:EnergyObservation"/>
+   <xsd:element name="VolumeEnergyObservation" type="bie:EnergyObservation"/>
+   <!-- =============================================================================== -->
+   <!-- ==== EnergyDocument Type                                                   ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="EnergyDocument">
+      <xsd:sequence>
+        <xsd:element name="Identification" type="bie:IdentifierType_000110" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="DocumentType" type="bie:DocumentNameCodeType_000098" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="Creation" type="bie:DateTimeType_000111" minOccurs="1" maxOccurs="1"/>
+        <xsd:element ref="bie:SenderEnergyParty" minOccurs="1" maxOccurs="1"/>
+        <xsd:element ref="bie:RecipientEnergyParty" minOccurs="1" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== MeterFacility Type                                                    ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="MeterFacility">
+      <xsd:sequence>
+        <xsd:element name="MeterIdentification" type="bie:IdentifierType_000110" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="RegisterIdentification" type="bie:IdentifierType_000110" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="MeteringInstallationMeterFacility" type="bie:MeterFacility"/>
+   <!-- =============================================================================== -->
+   <!-- ==== EnergyContext Type                                                    ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="EnergyContext">
+      <xsd:sequence>
+        <xsd:element name="EnergyBusinessProcess" type="bie:BusinessReasonCodeType_000115" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="EnergyBusinessProcessRole" type="bie:BusinessRoleCodeType_000113" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="EnergyIndustryClassification" type="bie:SectorAreaIdentificationCodeType_000116" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="OriginalBusinessMessage" type="bie:IdentifierType_000110" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="ProcessVariant" type="bie:ProcessVariantCodeType_DK0005" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== MPEvent Type                                                          ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="MPEvent">
+      <xsd:sequence>
+        <xsd:element name="Identification" type="bie:IdentifierType_000110" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="StartOfOccurrence" type="bie:DateTimeType_000111" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="EndOfOccurrence" type="bie:DateTimeType_000111" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteringPointDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:BalanceSupplierEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:BalanceResponsiblePartyEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:TransportCapacityResponsibleEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteredDataResponsibleEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:CustomerReferenceIdentity" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:BusinessProcessReferenceIdentity" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:ConsumerConsumerParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Function" type="bie:DocumentFunctionCodeType_000118" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:VolumeEnergyObservation" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="bie:ProductIncludedProductCharacteristic" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="OriginalBusinessDocument" type="bie:IdentifierType_000110" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Occurrence" type="bie:DateTimeType_000111" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== ReferenceIdentity Type                                                ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="ReferenceIdentity">
+      <xsd:sequence>
+        <xsd:element name="Identification" type="bie:IdentifierType_000110" minOccurs="1" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="CustomerReferenceIdentity" type="bie:ReferenceIdentity"/>
+   <xsd:element name="BusinessProcessReferenceIdentity" type="bie:ReferenceIdentity"/>
+   <xsd:element name="OriginalBusinessMessageReferenceIdentity" type="bie:ReferenceIdentity"/>
+   <xsd:element name="RequestReferenceReferenceIdentity" type="bie:ReferenceIdentity"/>
+   <!-- =============================================================================== -->
+   <!-- ==== ResponseEvent Type                                                    ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="ResponseEvent">
+      <xsd:sequence>
+        <xsd:element name="Identification" type="bie:IdentifierType_000110" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="StatusType" type="bie:ResponseConditionCodeType_000130" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="ResponseReasonType" type="bie:ResponseReasonDescriptionCodeType_000129" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="bie:BusinessProcessReferenceIdentity" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteringPointDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:CustomerReferenceIdentity" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:OriginalBusinessMessageReferenceIdentity" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="ReasonText" type="bie:ReasonTextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Function" type="bie:DocumentFunctionCodeType_000118" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="OriginalBusinessDocument" type="bie:IdentifierType_000110" minOccurs="1" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== MeteringPointCharacteristic Type                                      ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="MeteringPointCharacteristic">
+      <xsd:sequence>
+        <xsd:element name="EstimatedAnnualVolume" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="SettlementMethod" type="bie:SettlementMethodCodeType_000145" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="PhysicalStatusOfMeteringPoint" type="bie:PhysicalStatusCodeType_000141" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="ScheduledMeterReadingDate" type="bie:TextType_000114" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element name="MPReadingCharacteristics" type="bie:MPReadingCharacteristicsCodeType_DK0006" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="TypeOfMeteringPoint" type="bie:MeteringPointTypeCodeType_000138" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="SubTypeOfMeteringPoint" type="bie:MeteringPointSubTypeCodeType_000153" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MeteringMethod" type="bie:MeteringMethodCodeType_000137" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="GridConnectionContract" type="bie:GridAgreementTypeDescriptionCodeType_000136" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="TaxCategory" type="bie:CodeType_000128" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MeterReadingFrequency" type="bie:FrequencyQuantityType_000127" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MeteringPointElectricityVoltageLevel" type="bie:VoltageLevelCodeType_000150" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="AdministrativeStatusOfMeteringPoint" type="bie:PhysicalStatusCodeType_000141" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="ContractedConnectionCapacityQuantity" type="bie:IntegerQuantityType_000119" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="ContractedConnectionCapacityProductType" type="bie:EnergyProductIdentificationCodeType_000120" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="GasPressureLevel" type="bie:PressureLevelCodeType_000142" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="StandardLoadProfile" type="bie:StandardLoadProfileCodeType_000146" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="ConsumerCategory" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="WebAccessCode" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MeterReadingOccurrence" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="HourlyTimeSeries" type="bie:IndicatorType_000099" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="NetSettlementGroup" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="SupplyStart" type="bie:DateTimeType_000111" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:LimitationContractedCapacityCharacteristics" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="bie:MeteringPointContractedCapacityCharacteristics" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteringGridAreaUsedDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:ToGridDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:FromGridDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeterInstallationMeterCharacteristic" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="ProductionObligation" type="bie:IndicatorType_000099" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:PowerPlantDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="LocationDescription" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="FuelType" type="bie:FuelTypeCodeType_" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:BalanceResponsibleEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:BalanceSupplierEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:IncludedProductCharacteristic" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="DisconnectionType" type="bie:DisconnectionTypeCodeType_000154" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MPConnectionType" type="bie:MPConnectionTypeCodeCodeType_000155" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MPCapacity" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="AssetType" type="bie:AssetTypeCodeType_DK0002" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="DetailMeteringPointCharacteristic" type="bie:MeteringPointCharacteristic"/>
+   <!-- =============================================================================== -->
+   <!-- ==== MeteringPointGeographicalCoordinate Type                              ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="MeteringPointGeographicalCoordinate">
+      <xsd:sequence>
+        <xsd:element name="Altitude" type="bie:MeasureType_000152" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Latitude" type="bie:MeasureType_000152" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Longitude" type="bie:MeasureType_000152" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="System" type="bie:CodeType_000128" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="PositionMeteringPointGeographicalCoordinate" type="bie:MeteringPointGeographicalCoordinate"/>
+   <xsd:element name="MPPositionMeteringPointGeographicalCoordinate" type="bie:MeteringPointGeographicalCoordinate"/>
+   <!-- =============================================================================== -->
+   <!-- ==== EstimatedVolume Type                                                  ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="EstimatedVolume">
+      <xsd:sequence>
+        <xsd:element name="Quantity" type="bie:IntegerQuantityType_000119" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="MeterTimeFrameType" type="bie:MeterTimeFrameCodeType_000126" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="AnnualEstimatedVolume" type="bie:EstimatedVolume"/>
+   <!-- =============================================================================== -->
+   <!-- ==== MeteringPointAddress Type                                             ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="MeteringPointAddress">
+      <xsd:sequence>
+        <xsd:element name="Identification" type="bie:IdentifierType_000110" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element name="PostOfficeBox" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="BuildingNumber" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="FloorIdentification" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="StreetName" type="bie:TextType_000114" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element name="CityName" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="RoomIdentification" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="CountryName" type="bie:TextType_000114" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element name="Postcode" type="bie:TextType_000114" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== ReconciliationCharacteristic Type                                     ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="ReconciliationCharacteristic">
+      <xsd:sequence>
+        <xsd:element name="ProductType" type="bie:EnergyProductIdentificationCodeType_000120" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="MeasureUnitType" type="bie:MeasurementUnitCommonCodeType_000121" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="StandardLoadProfileType" type="bie:StandardLoadProfileCodeType_000146" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:AnnualEstimatedVolume" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="ReconciliationReconciliationCharacteristic" type="bie:ReconciliationCharacteristic"/>
+   <!-- =============================================================================== -->
+   <!-- ==== MasterDataMPEvent Type                                                ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="MasterDataMPEvent">
+      <xsd:sequence>
+        <xsd:element ref="bie:BusinessProcessReferenceIdentity" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteringPointDomainLocation" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="Identification" type="bie:IdentifierType_000110" minOccurs="1" maxOccurs="1"/>
+        <xsd:element ref="bie:CustomerReferenceIdentity" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:BalanceSupplierEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:BalanceResponsiblePartyEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:TransportCapacityResponsibleEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteredDataResponsibleEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:GridAccessProviderEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteredDataCollectorEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:DetailMeteringPointCharacteristic" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:PositionMeteringPointGeographicalCoordinate" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:ReconciliationReconciliationCharacteristic" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Occurrence" type="bie:DateTimeType_000111" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:InstallationLocationAddress" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:FirstConsumerConsumerParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:SecondConsumerConsumerParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:ConsumerLocationAddress" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="OriginalBusinessDocument" type="bie:IdentifierType_000110" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteringInstallationMeterFacility" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:ChildRelatedMeteringPoint" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="bie:ParentRelatedMeteringPoint" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeterInstallationMeterCharacteristic" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Function" type="bie:DocumentFunctionCodeType_000118" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== MeasurementMeteringPointCharacteristic Type                           ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="MeasurementMeteringPointCharacteristic">
+      <xsd:sequence>
+        <xsd:element name="TypeOfMeteringPoint" type="bie:MeteringPointTypeCodeType_000138" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MeteringMethod" type="bie:MeteringMethodCodeType_000137" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="SettlementMethod" type="bie:SettlementMethodCodeType_000145" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="ScheduledMeterReadingDate" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MeterReadingFrequency" type="bie:FrequencyQuantityType_000127" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MeteringPointElectricityVoltageLevel" type="bie:VoltageLevelCodeType_000150" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="StandardLoadProfile" type="bie:StandardLoadProfileCodeType_000146" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="DetailMeasurementMeteringPointCharacteristic" type="bie:MeasurementMeteringPointCharacteristic"/>
+   <!-- =============================================================================== -->
+   <!-- ==== MeasuredDataRequest Type                                              ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="MeasuredDataRequest">
+      <xsd:sequence>
+        <xsd:element name="Identification" type="bie:IdentifierType_000110" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="Function" type="bie:DocumentFunctionCodeType_000118" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MeterReadingOriginType" type="bie:MeterReadingOriginCodeType_000139" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:ObservationTimeSeriesPeriod" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:BalanceResponsibleEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:BalanceSupplierEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:IncludedProductCharacteristic" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteringPointDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteringGridAreaUsedDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:InAreaUsedDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:OutAreaUsedDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:BalanceGroupUsedDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:DetailMeasurementMeteringPointCharacteristic" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteringInstallationMeterFacility" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MarketBalanceAreaUsedDomainLocation" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== EnergyTimeSeries02 Type                                               ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="EnergyTimeSeries02">
+      <xsd:sequence>
+        <xsd:element name="Identification" type="bie:IdentifierType_000110" minOccurs="1" maxOccurs="1"/>
+        <xsd:element ref="bie:RequestReferenceReferenceIdentity" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Function" type="bie:DocumentFunctionCodeType_000118" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="RegistrationDateTime" type="bie:DateTimeType_000111" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MeterReadingOriginType" type="bie:MeterReadingOriginCodeType_000139" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="LatestUpdateDate" type="bie:DateTimeType_000111" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Currency" type="bie:CurrencyIdentificationCodeType_000117" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:ObservationTimeSeriesPeriod" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:BalanceResponsibleEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:BalanceSupplierEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:IncludedProductCharacteristic" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:DetailMeasurementMeteringPointCharacteristic" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteringPointDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteringGridAreaUsedDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:InAreaUsedDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:OutAreaUsedDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:BalanceGroupUsedDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteringInstallationMeterFacility" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="bie:GenerationInstallationGenerationFacility" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="bie:IntervalEnergyObservation02" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== EnergyObservation02 Type                                              ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="EnergyObservation02">
+      <xsd:sequence>
+        <xsd:element name="Position" type="bie:OrdinalType_000123" minOccurs="0" maxOccurs="1"/>
+        <xsd:choice minOccurs="0">
+           <xsd:element name="EnergyQuantity" type="bie:IntegerQuantityType_000119" minOccurs="0" maxOccurs="1"/>
+           <xsd:element name="QuantityMissing" type="bie:IndicatorType_000099" fixed="true" minOccurs="0" maxOccurs="1"/>
+        </xsd:choice>
+        <xsd:choice minOccurs="0">
+           <xsd:element name="EnergyPrice" type="bie:AmountType_000124" minOccurs="0" maxOccurs="unbounded"/>
+           <xsd:element name="PriceMissing" type="bie:IndicatorType_000099" fixed="true" minOccurs="0" maxOccurs="1"/>
+        </xsd:choice>
+        <xsd:element name="QuantityQuality" type="bie:QuantityQualityCodeType_000125" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MeterReadingOriginType" type="bie:MeterReadingOriginCodeType_000139" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MeterTimeFrameType" type="bie:MeterTimeFrameCodeType_000126" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element name="GeneratedEnergyQuantity" type="bie:IntegerQuantityType_000119" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="IntervalEnergyObservation02" type="bie:EnergyObservation02"/>
+   <!-- =============================================================================== -->
+   <!-- ==== GenerationFacility Type                                               ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="GenerationFacility">
+      <xsd:sequence>
+        <xsd:element name="Identification" type="bie:IdentifierType_000110" minOccurs="1" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="GenerationInstallationGenerationFacility" type="bie:GenerationFacility"/>
+   <!-- =============================================================================== -->
+   <!-- ==== LocationAddress Type                                                  ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="LocationAddress">
+      <xsd:sequence>
+        <xsd:element name="StreetName" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="StreetCode" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="BuildingNumber" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="FloorIdentification" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="RoomIdentification" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="PostOfficeBox" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="CitySubDivisionName" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Postcode" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="CityName" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MunicipalityCode" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="CountryName" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MPPositionMeteringPointGeographicalCoordinate" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Phone" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Mobile" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Email" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MPAddressWashInstructions" type="bie:MPAddressWashIstructionTypeCodeCodeType_000156" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="DARReference" type="bie:UUIDType_20190104-12" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="InstallationLocationAddress" type="bie:LocationAddress"/>
+   <xsd:element name="ConsumerLocationAddress" type="bie:LocationAddress"/>
+   <xsd:element name="AdministrativePartyAddressLocationAddress" type="bie:LocationAddress"/>
+   <!-- =============================================================================== -->
+   <!-- ==== ConsumerParty Type                                                    ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="ConsumerParty">
+      <xsd:sequence>
+        <xsd:element name="Identification" type="bie:IdentifierType_000110" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Role" type="bie:BusinessRoleCodeType_000113" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Name" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:choice minOccurs="0">
+           <xsd:element name="CPR" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+           <xsd:element name="CVR" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        </xsd:choice>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="ConsumerConsumerParty" type="bie:ConsumerParty"/>
+   <xsd:element name="FirstConsumerConsumerParty" type="bie:ConsumerParty"/>
+   <xsd:element name="SecondConsumerConsumerParty" type="bie:ConsumerParty"/>
+   <!-- =============================================================================== -->
+   <!-- ==== ProfiledPeriod Type                                                   ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="ProfiledPeriod">
+      <xsd:sequence>
+        <xsd:element name="Start" type="bie:DateTimeType_000111" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="End" type="bie:DateTimeType_000111" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="DurationProfiledPeriod" type="bie:ProfiledPeriod"/>
+   <!-- =============================================================================== -->
+   <!-- ==== ChargeInformation Type                                                ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="ChargeInformation">
+      <xsd:sequence>
+        <xsd:element name="ChargeType" type="bie:ChargeTypeCodeType_000134" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="PartyChargeTypeID" type="bie:IdentifierType_000110" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="Description" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="LongDescription" type="bie:StringType_20130913-1" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="ChargeOccurrences" type="bie:IntegerQuantityType_000119" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="VATClass" type="bie:VATClassCodeType_DK0004" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="TransparentInvoicing" type="bie:IndicatorType_000099" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="TaxIndicator" type="bie:IndicatorType_000099" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="OriginalBusinessDocumentReference" type="bie:IdentifierType_000110" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:IntervalEnergyObservation" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="bie:ObservationTimeSeriesPeriod" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="bie:ChargeTypeOwnerEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Occurrence" type="bie:DateTimeType_000111" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Function" type="bie:DocumentFunctionCodeType_000118" minOccurs="1" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="RelatedChargeChargeInformation" type="bie:ChargeInformation"/>
+   <!-- =============================================================================== -->
+   <!-- ==== ChargeEvent Type                                                      ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="ChargeEvent">
+      <xsd:sequence>
+        <xsd:element name="Identification" type="bie:IdentifierType_000110" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="Occurrence" type="bie:DateTimeType_000111" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="OriginalBusinessDocument" type="bie:IdentifierType_000110" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="StatusType" type="bie:ResponseConditionCodeType_000130" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="ResponseReasonType" type="bie:ResponseReasonDescriptionCodeType_000129" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Function" type="bie:DocumentFunctionCodeType_000118" minOccurs="1" maxOccurs="1"/>
+        <xsd:element ref="bie:RelatedChargeChargeInformation" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="bie:MeteringPointDomainLocation" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== MeterEvent Type                                                       ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="MeterEvent">
+      <xsd:sequence>
+        <xsd:element name="Identification" type="bie:IdentifierType_000110" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="Occurrence" type="bie:DateTimeType_000111" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeterDetailMeterCharacteristic" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteringPointDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="OriginalBusinessDocument" type="bie:IdentifierType_000110" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="StatusType" type="bie:ResponseConditionCodeType_000130" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="ResponseReasonType" type="bie:ResponseReasonDescriptionCodeType_000129" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteringInstallationMeterFacility" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Function" type="bie:DocumentFunctionCodeType_000118" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:SearchPeriodTimeSeriesPeriod" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="IncludeChildMeteringPoints" type="bie:IndicatorType_000099" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== MeterCharacteristic Type                                              ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="MeterCharacteristic">
+      <xsd:sequence>
+        <xsd:element name="NumberOfDigits" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="ConversionFactor" type="bie:DecimalQuantityType_000119" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="UnitType" type="bie:MeasurementUnitCommonCodeType_000121" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MeterReadingType" type="bie:MeterReadingTypeCodeType_000137" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="MeterInstallationMeterCharacteristic" type="bie:MeterCharacteristic"/>
+   <xsd:element name="MeterInstallationMeterCharacteristic" type="bie:MeterCharacteristic"/>
+   <xsd:element name="MeterDetailMeterCharacteristic" type="bie:MeterCharacteristic"/>
+   <!-- =============================================================================== -->
+   <!-- ==== MeteringPointPartyCharacteristic Type                                 ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="MeteringPointPartyCharacteristic">
+      <xsd:sequence>
+        <xsd:element name="PaymentCondition" type="bie:PaymentConditionCodeType_DK2013071601" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="ElectricalHeating" type="bie:IndicatorType_000099" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="ElectricalHeatingDate" type="bie:DateTimeType_000111" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="WebAccessCode" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="ConsumerCategory" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:BalanceResponsiblePartyEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:BalanceSupplierEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:AdministrativePartyMPAdministrativeParty" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="bie:FirstConsumerConsumerParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:SecondConsumerConsumerParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="HasBalanceSupplier" type="bie:IndicatorType_000099" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="SupplyStart" type="bie:DateTimeType_000111" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="ProtectedName" type="bie:IndicatorType_000099" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="MeteringPointPartyDetailMeteringPointPartyCharacteristic" type="bie:MeteringPointPartyCharacteristic"/>
+   <!-- =============================================================================== -->
+   <!-- ==== MasterDataMeteringPointPartyEvent Type                                ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="MasterDataMeteringPointPartyEvent">
+      <xsd:sequence>
+        <xsd:element name="Identification" type="bie:IdentifierType_000110" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="Function" type="bie:DocumentFunctionCodeType_000118" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="Occurrence" type="bie:DateTimeType_000111" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteringPointPartyDetailMeteringPointPartyCharacteristic" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="OriginalBusinessDocument" type="bie:IdentifierType_000110" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteringPointDomainLocation" minOccurs="1" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== ContractedCapacityCharacteristics Type                                ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="ContractedCapacityCharacteristics">
+      <xsd:sequence>
+        <xsd:element name="MaximumCurrent" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MaximumPower" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="LimitationContractedCapacityCharacteristics" type="bie:ContractedCapacityCharacteristics"/>
+   <xsd:element name="MeteringPointContractedCapacityCharacteristics" type="bie:ContractedCapacityCharacteristics"/>
+   <!-- =============================================================================== -->
+   <!-- ==== MPAdministrativeParty Type                                            ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="MPAdministrativeParty">
+      <xsd:sequence>
+        <xsd:element name="Name1" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Attention" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="MPRelationType" type="bie:MPRelationTypeCodeType_DK2013071606" minOccurs="1" maxOccurs="1"/>
+        <xsd:element ref="bie:AdministrativePartyAddressLocationAddress" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="SameAsMPAddress" type="bie:IndicatorType_000099" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="Phone" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Mobile" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Email" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="ProtectedAddress" type="bie:IndicatorType_000099" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="AdministrativePartyMPAdministrativeParty" type="bie:MPAdministrativeParty"/>
+   <!-- =============================================================================== -->
+   <!-- ==== NonContinuousEnergyObservation Type                                   ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="NonContinuousEnergyObservation">
+      <xsd:sequence>
+        <xsd:element name="EnergyQuantity" type="bie:DecimalQuantityType_000119" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element name="QuantityQuality" type="bie:QuantityQualityCodeType_000125" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="EstimatedAnnualVolume" type="bie:DecimalQuantityType_000119" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element name="MeterReading" type="bie:DecimalQuantityType_000119" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="bie:PeriodNonContinuousTimeSeriesPeriod" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Position" type="bie:OrdinalType_000123" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="IntervalNonContinuousEnergyObservation" type="bie:NonContinuousEnergyObservation"/>
+   <!-- =============================================================================== -->
+   <!-- ==== NonContinuousTimeSeriesPeriod Type                                    ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="NonContinuousTimeSeriesPeriod">
+      <xsd:sequence>
+        <xsd:element name="Start" type="bie:DateTimeType_000111" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="End" type="bie:DateTimeType_000111" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="PeriodNonContinuousTimeSeriesPeriod" type="bie:NonContinuousTimeSeriesPeriod"/>
+   <!-- =============================================================================== -->
+   <!-- ==== MPServiceEvent Type                                                   ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="MPServiceEvent">
+      <xsd:sequence>
+        <xsd:element name="Identification" type="bie:IdentifierType_000110" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="StartOfOccurrence" type="bie:DateTimeType_000111" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteringPointDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:CustomerReferenceIdentity" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="OriginalBusinessDocument" type="bie:IdentifierType_000110" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Function" type="bie:DocumentFunctionCodeType_000118" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="ServiceRequest" type="bie:ServiceRequestCodeType_" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="DefaultSupplier" type="bie:IndicatorType_000099" minOccurs="1" maxOccurs="1"/>
+        <xsd:element name="RelatedParty" type="bie:IdentifierType_000110" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="ContactName" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="ContactEmail" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="ContactPhone" type="bie:TextType_000114" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:BalanceSupplierEnergyParty" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="ReasonText" type="bie:ReasonTextType_000114" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <!-- =============================================================================== -->
+   <!-- ==== RelatedMeteringPoint Type                                             ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="RelatedMeteringPoint">
+      <xsd:sequence>
+        <xsd:element ref="bie:IdentificationDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="Type" type="bie:MeteringPointTypeCodeType_000138" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="ChildRelatedMeteringPoint" type="bie:RelatedMeteringPoint"/>
+   <xsd:element name="ParentRelatedMeteringPoint" type="bie:RelatedMeteringPoint"/>
+   <!-- =============================================================================== -->
+   <!-- ==== MissingDataRequest Type                                               ==== -->
+   <!-- =============================================================================== -->
+   <xsd:complexType name="MissingDataRequest">
+      <xsd:sequence>
+        <xsd:element name="Identification" type="bie:IdentifierType_000110" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="EventCode" type="bie:DataRequestCodeType_000153" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="RequestPeriod" type="bie:DateTimeType_000111" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bie:MeteringPointDomainLocation" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="NumberOfReminders" type="bie:IntegerQuantityType_000119" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+   </xsd:complexType>
+</xsd:schema>  
