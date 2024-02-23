@@ -74,7 +74,8 @@ public class WhenARejectedResultIsAvailableTests : TestBase
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons.First().ErrorCode, rejectReason.ErrorCode)
-            .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons.Last().ErrorCode, rejectReason2.ErrorCode);
+            .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons.Last().ErrorCode, rejectReason2.ErrorCode)
+            .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.OriginalTransactionIdReference, process.BusinessTransactionId.Id);
     }
 
     protected override void Dispose(bool disposing)
