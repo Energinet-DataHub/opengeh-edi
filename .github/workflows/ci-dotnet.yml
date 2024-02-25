@@ -20,7 +20,7 @@ on:
 jobs:
   # Build all projects within solution
   dotnet_ci_build:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v13
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@dbj/replace-marvinpinto
     with:
       solution_file_path: source/EDI.sln
       dotnet_version: 8.0.200
