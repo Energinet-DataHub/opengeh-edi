@@ -41,4 +41,12 @@ public class SettlementTypeMapperTests : BaseEnumMapperTests
             value,
             unspecifiedValue: EnergyResultProducedV2.Types.TimeSeriesType.Unspecified,
             invalidValues: _invalidValues);
+
+    [Theory]
+    [MemberData(nameof(GetEnumValues), typeof(AmountPerChargeResultProducedV1.Types.SettlementMethod))]
+    public void Ensure_handling_settlement_method_from_amount_per_charge_result_produced(AmountPerChargeResultProducedV1.Types.SettlementMethod value)
+        => EnsureCanMapOrReturnsNull(
+            () => SettlementTypeMapper.Map(value),
+            value,
+            unspecifiedValue: AmountPerChargeResultProducedV1.Types.SettlementMethod.Unspecified);
 }

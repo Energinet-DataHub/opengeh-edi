@@ -53,4 +53,12 @@ public class MeteringPointTypeMapperTests : BaseEnumMapperTests
 
         act.Should().ThrowExactly<NotSupportedTimeSeriesTypeException>();
     }
+
+    [Theory]
+    [MemberData(nameof(GetEnumValues), typeof(AmountPerChargeResultProducedV1.Types.MeteringPointType))]
+    public void Ensure_handling_metering_point_type_from_amount_per_charge_result_produced(AmountPerChargeResultProducedV1.Types.MeteringPointType value)
+        => EnsureCanMapOrThrows(
+            () => MeteringPointTypeMapper.Map(value),
+            value,
+            unspecifiedValue: AmountPerChargeResultProducedV1.Types.MeteringPointType.Unspecified);
 }

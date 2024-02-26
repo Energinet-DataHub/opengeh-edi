@@ -91,8 +91,19 @@ public sealed class WholesaleCalculationJsonDocumentWriter : IDocumentWriter
                     // TODO (MWO): These lines have to be converted from xml to json when the time comes
                     // TODO (MWO): These are there for later use, but are not used as of right now
                     //await WriteElementIfHasValueAsync("originalTransactionIDReference_Series.mRID", wholesaleCalculationSeries.OriginalTransactionIdReference, writer).ConfigureAwait(false);
-                    //await writer.WriteElementStringAsync(DocumentDetails.Prefix, "marketEvaluationPoint.type", null, "E17").ConfigureAwait(false);
-                    //await WriteElementIfHasValueAsync("marketEvaluationPoint.settlementMethod", wholesaleCalculationSeries.SettlementType is null ? null : CimCode.Of(SettlementType.From(wholesaleCalculationSeries.SettlementType)), writer).ConfigureAwait(false);
+                    if (series.MeteringPointType is not null)
+                    {
+                        writer.WriteObject(
+                            "marketEvaluationPoint.type",
+                            KeyValuePair.Create("value", series.MeteringPointType.Code));
+                    }
+
+                    if (series.SettlementType is not null)
+                    {
+                        writer.WriteObject(
+                            "marketEvaluationPoint.settlementMethod",
+                            KeyValuePair.Create("value", series.SettlementType.Code));
+                    }
 
                     writer.WriteProperty("chargeType.mRID", series.ChargeCode);
 
@@ -150,17 +161,44 @@ public sealed class WholesaleCalculationJsonDocumentWriter : IDocumentWriter
                         writer.WritePropertyName("Point");
                         writer.WriteStartArray();
                         {
-                            writer.WriteStartObject();
+                            foreach (var point in series.Points)
                             {
-                                writer.WriteObject(
-                                    "position",
-                                    KeyValuePair.Create("value", 1));
-                                writer.WriteProperty(
-                                    "energySum_Quantity.quantity",
-                                    series.Quantity ?? 0);
-                            }
+                                writer.WriteStartObject();
+                                {
+                                    writer.WritePropertyName("energySum_Quantity.quantity");
+                                    writer.WriteNumberValue(point.Amount ?? 0);
 
-                            writer.WriteEndObject();
+                                    if (point.Quantity is not null)
+                                    {
+                                        writer.WritePropertyName("energy_Quantity.quantity");
+                                        writer.WriteNumberValue(point.Quantity.GetValueOrDefault());
+                                    }
+
+                                    writer.WriteObject(
+                                        "position",
+                                        KeyValuePair.Create("value", point.Position));
+
+                                    if (point.Price is not null)
+                                    {
+                                        writer.WriteObject(
+                                            "price.amount",
+                                            KeyValuePair.Create(
+                                                    "value",
+                                                    point.Price.GetValueOrDefault()));
+                                    }
+
+                                    if (point.QuantityQuality is not null)
+                                    {
+                                        writer.WriteObject(
+                                            "quality",
+                                            KeyValuePair.Create(
+                                                "value",
+                                                point.QuantityQuality.GetValueOrDefault().ToString()));
+                                    }
+                                }
+
+                                writer.WriteEndObject();
+                            }
                         }
 
                         writer.WriteEndArray();

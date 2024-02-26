@@ -54,7 +54,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         return peekResult;
     }
 
-    public Task<OutgoingMessageId> EnqueueAsync(OutgoingMessageDto outgoingMessage)
+    public virtual Task<OutgoingMessageId> EnqueueAsync(OutgoingMessageDto outgoingMessage)
     {
         return _messageEnqueuer.EnqueueAsync(outgoingMessage);
     }

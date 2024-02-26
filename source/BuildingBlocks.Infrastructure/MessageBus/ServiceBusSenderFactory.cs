@@ -54,10 +54,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus
         {
             foreach (var serviceBusSenderAdapter in _adapters)
             {
-                if (serviceBusSenderAdapter.Value != null)
-                {
-                    await serviceBusSenderAdapter.Value.DisposeAsync().ConfigureAwait(false);
-                }
+                await serviceBusSenderAdapter.Value.DisposeAsync().ConfigureAwait(false);
             }
 
             GC.SuppressFinalize(this);
@@ -67,10 +64,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus
         {
             foreach (var serviceBusSenderAdapter in _adapters)
             {
-                if (serviceBusSenderAdapter.Value != null)
-                {
-                    serviceBusSenderAdapter.Value.Dispose();
-                }
+                serviceBusSenderAdapter.Value.Dispose();
             }
         }
     }
