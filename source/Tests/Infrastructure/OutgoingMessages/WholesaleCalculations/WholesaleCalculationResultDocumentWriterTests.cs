@@ -81,7 +81,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
         await AssertDocument(document, DocumentFormat.From(documentFormat))
             .HasMessageId(SampleData.MessageId)
             .HasBusinessReason(SampleData.BusinessReason, CodeListType.EbixDenmark) // "D05" (WholesaleFixing) is from CodeListType.EbixDenmark
-            .HasSenderId(SampleData.SenderId)
+            .HasSenderId(SampleData.SenderId, "A10")
             .HasSenderRole(ActorRole.EnergySupplier)
             .HasReceiverId(SampleData.ReceiverId)
             .HasReceiverRole(ActorRole.MeteredDataResponsible, CodeListType.Ebix) // MDR is from CodeListType.Ebix
@@ -90,9 +90,9 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
             .HasCalculationVersion(SampleData.Version)
             .HasChargeCode(SampleData.ChargeCode)
             .HasChargeType(SampleData.ChargeType)
-            .HasChargeTypeOwner(SampleData.ChargeOwner)
-            .HasGridAreaCode(SampleData.GridAreaCode)
-            .HasEnergySupplierNumber(SampleData.EnergySupplier)
+            .HasChargeTypeOwner(SampleData.ChargeOwner, "A01")
+            .HasGridAreaCode(SampleData.GridAreaCode, "NDK")
+            .HasEnergySupplierNumber(SampleData.EnergySupplier, "A10")
             .HasPeriod(new Period(SampleData.PeriodStartUtc, SampleData.PeriodEndUtc))
             .HasCurrency(SampleData.Currency)
             .HasMeasurementUnit(SampleData.MeasurementUnit)
