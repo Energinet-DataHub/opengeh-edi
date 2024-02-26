@@ -94,4 +94,14 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
 
         await _actor.ActorCertificateCredentialsAssignedAsync(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _fixture.EbixCertificateThumbprint);
     }
+
+    [Fact]
+    public async Task Actor_can_peek_and_dequeue_monthly_sum_pr_charge_in_ebIX_format()
+    {
+        await _ebix.EmptyQueueForActor();
+
+        await _ebix.PublishAmountPerChargeResultFor(AcceptanceTestFixture.EbixActorGridArea, AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ChargeOwnerId);
+
+        await _ebix.ConfirmWholesaleResultIsAvailableForActor();
+    }
 }

@@ -53,4 +53,12 @@ internal sealed class AggregationResultDsl
     {
         await _edi.EmptyQueueAsync().ConfigureAwait(false);
     }
+
+    internal Task PublishAmountPerChargeResultFor(
+        string gridAreaCode,
+        string energySupplierId,
+        string chargeOwnerId)
+    {
+        return _wholesale.PublishAmountPerChargeResultAsync(gridAreaCode, energySupplierId, chargeOwnerId);
+    }
 }

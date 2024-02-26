@@ -60,4 +60,20 @@ internal sealed class WholesaleDriver
             MonthlyAmountPerChargeResultProducedV1.EventName,
             monthlyAmountPerChargeResultProduced.ToByteArray());
     }
+
+    internal Task PublishAmountPerChargeResultAsync(
+        string gridAreaCode,
+        string energySupplierId,
+        string chargeOwnerId)
+    {
+        var amountPerChargeResultProduced =
+            AmountPerChargeResultProducedV1Factory.CreateMonthlyAmountPerChargeResultProduced(
+                gridAreaCode,
+                energySupplierId,
+                chargeOwnerId);
+
+        return _integrationEventPublisher.PublishAsync(
+            AmountPerChargeResultProducedV1.EventName,
+            amountPerChargeResultProduced.ToByteArray());
+    }
 }

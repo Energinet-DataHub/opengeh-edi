@@ -104,6 +104,22 @@ internal sealed class EbixRequestDsl
              () => Assert.Contains("Certificate rejected", response.ReasonPhrase, StringComparison.InvariantCultureIgnoreCase));
     }
 
+    internal Task PublishAmountPerChargeResultFor(string gridArea, string energySupplierId, string chargeOwnerId)
+    {
+        return _wholesale.PublishAmountPerChargeResultAsync(gridArea, energySupplierId, chargeOwnerId);
+    }
+
+    internal async Task ConfirmWholesaleResultIsAvailableForActor()
+    {
+        var response = await _ebix.PeekMessageAsync().ConfigureAwait(false);
+
+        await _ebix.DequeueMessageAsync(GetMessageId(response!)).ConfigureAwait(false);
+
+        Assert.Multiple(
+            () => Assert.NotNull(response?.MessageContainer?.Payload),
+            () => Assert.Equal("NotifyWholesaleServices", response?.MessageContainer?.DocumentType));
+    }
+
     internal async Task ConfirmDequeueWithRemovedCertificateIsNotAllowed()
     {
         var act = async () => await _ebix.DequeueMessageAsync("irrelevant-message-id").ConfigureAwait(false);
