@@ -59,7 +59,8 @@ public class AssertXmlDocument
     public AssertXmlDocument HasValue(string xpath, string expectedValue)
     {
         ArgumentNullException.ThrowIfNull(xpath);
-        Assert.Equal(expectedValue, _document.Root?.XPathSelectElement(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager)?.Value);
+        var pathSelectElement = _document.Root?.XPathSelectElement(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager);
+        Assert.Equal(expectedValue, pathSelectElement?.Value);
         return this;
     }
 

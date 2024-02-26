@@ -40,4 +40,15 @@ public static class MeteringPointTypeMapper
             _ => throw new ArgumentOutOfRangeException(nameof(timeSeriesType), timeSeriesType, "Unknown time series type unit from Wholesale"),
         };
     }
+
+    public static MeteringPointType Map(AmountPerChargeResultProducedV1.Types.MeteringPointType meteringPointType)
+    {
+        return meteringPointType switch
+        {
+            AmountPerChargeResultProducedV1.Types.MeteringPointType.Production => MeteringPointType.Production,
+            AmountPerChargeResultProducedV1.Types.MeteringPointType.Consumption => MeteringPointType.Consumption,
+            AmountPerChargeResultProducedV1.Types.MeteringPointType.Unspecified => throw new InvalidOperationException("Unknown metering point type"),
+            _ => throw new ArgumentOutOfRangeException(nameof(meteringPointType), meteringPointType, "Unknown time series type unit from Wholesale"),
+        };
+    }
 }
