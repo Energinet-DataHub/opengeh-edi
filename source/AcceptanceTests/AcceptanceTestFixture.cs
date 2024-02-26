@@ -30,7 +30,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
     internal const string ActorRole = "metereddataresponsible";
 
     internal const string EdiSubsystemTestCimActorNumber = "5790000392551"; // Corresponds to the "EDI - SUBSYSTEM TEST CIM" in the UI.
-    internal const string ChargeOwnerId = "5790000391919"; // For now is a dummy value, but when we support multiple receivers, this will be the receiver's real GLN.
+    internal const string ChargeOwnerId = "5790000391919"; // For now is a dummy value, but when we support multiple receivers, this will be the charge owners GLN.
 
     private readonly Uri _azureEntraB2CTenantUrl;
     private readonly string _azureEntraFrontendAppId;
@@ -72,7 +72,8 @@ public class AcceptanceTestFixture : IAsyncLifetime
         B2BEnergySupplierAuthorizedHttpClient = new AsyncLazy<HttpClient>(() => CreateB2BEnergySupplierAuthorizedHttpClientAsync(azureB2CTenantId, azureEntraBackendAppId, energySupplierId, energySupplierSecret, ApiManagementUri));
 
         EbixCertificateThumbprint = root.GetValue<string>("EBIX_CERTIFICATE_THUMBPRINT") ?? "39D64F012A19C6F6FDFB0EA91D417873599D3325";
-        EbixCertificatePassword = root.GetValue<string>("EBIX_CERTIFICATE_PASSWORD") ?? throw new InvalidOperationException("EBIX_CERTIFICATE_PASSWORD is not set in configuration");
+        EbixCertificatePasswordForMeterDataResponsible = root.GetValue<string>("EBIX_CERTIFICATE_PASSWORD_MDR") ?? throw new InvalidOperationException("EBIX_CERTIFICATE_PASSWORD_MDR is not set in configuration");
+        EbixCertificatePasswordForEnergySupplier = root.GetValue<string>("EBIX_CERTIFICATE_PASSWORD_ES") ?? throw new InvalidOperationException("EBIX_CERTIFICATE_PASSWORD_ES is not set in configuration");
         _azureEntraB2CTenantUrl = new Uri(root.GetValue<string>("AZURE_B2C_TENANT_URL") ?? "https://devdatahubb2c.b2clogin.com/tfp/devdatahubb2c.onmicrosoft.com/B2C_1_ROPC_Auth/oauth2/v2.0/token");
         _azureEntraFrontendAppId = root.GetValue<string>("AZURE_ENTRA_FRONTEND_APP_ID") ?? "bf76fc24-cfec-498f-8979-ab4123792472";
         _azureEntraBackendBffScope = root.GetValue<string>("AZURE_ENTRA_BACKEND_BFF_SCOPE") ?? "https://devDataHubB2C.onmicrosoft.com/backend-bff/api";
@@ -83,7 +84,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
         B2CAuthorizedHttpClient = new AsyncLazy<HttpClient>(CreateB2CAuthorizedHttpClientAsync);
     }
 
-    internal Uri MarketParticipantUri { get; set; }
+    internal Uri MarketParticipantUri { get; }
 
     internal IntegrationEventPublisher EventPublisher { get; }
 
@@ -91,7 +92,9 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
     internal Uri ApiManagementUri { get; }
 
-    internal string EbixCertificatePassword { get; }
+    internal string EbixCertificatePasswordForMeterDataResponsible { get; }
+
+    internal string EbixCertificatePasswordForEnergySupplier { get; }
 
     internal string EbixCertificateThumbprint { get; }
 

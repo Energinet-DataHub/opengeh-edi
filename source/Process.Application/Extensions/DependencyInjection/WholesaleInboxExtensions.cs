@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
-using MediatR;
+using Energinet.DataHub.EDI.Process.Domain.Wholesale;
+using Energinet.DataHub.EDI.Process.Infrastructure.Wholesale;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.Infrastructure.DataRetention;
+namespace Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
 
-public static class DataRetentionConfiguration
+public static class WholesaleInboxExtensions
 {
-    public static void Configure(IServiceCollection services)
+    public static IServiceCollection AddWholesaleInbox(this IServiceCollection services)
     {
-        services.AddTransient<INotificationHandler<ADayHasPassed>,
-            ExecuteDataRetentionsWhenADayHasPassed>();
+       services.AddTransient<IWholesaleInbox, WholesaleInbox>();
+
+       return services;
     }
 }

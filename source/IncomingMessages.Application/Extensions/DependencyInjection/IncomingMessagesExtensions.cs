@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using BuildingBlocks.Application.Configuration;
+using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using IncomingMessages.Infrastructure;
 using IncomingMessages.Infrastructure.Configuration.DataAccess;
@@ -26,11 +27,11 @@ using IncomingMessages.Infrastructure.Response;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Application.Configuration;
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 
-public static class IncomingMessagesConfiguration
+public static class IncomingMessagesExtensions
 {
-    public static void AddIncomingMessagesModule(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddIncomingMessagesModule(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddOptions<ServiceBusClientOptions>()
             .Bind(configuration)
@@ -64,5 +65,7 @@ public static class IncomingMessagesConfiguration
         services.AddSingleton<JsonSchemaProvider>();
 
         services.AddBuildingBlocks(configuration);
+
+        return services;
     }
 }

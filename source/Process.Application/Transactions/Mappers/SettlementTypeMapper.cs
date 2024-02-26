@@ -42,13 +42,13 @@ public static class SettlementTypeMapper
         };
     }
 
-    public static SettlementType Map(AmountPerChargeResultProducedV1.Types.SettlementMethod settlementMethod)
+    public static SettlementType? Map(AmountPerChargeResultProducedV1.Types.SettlementMethod settlementMethod)
     {
         return settlementMethod switch
         {
             AmountPerChargeResultProducedV1.Types.SettlementMethod.Flex => SettlementType.Flex,
             AmountPerChargeResultProducedV1.Types.SettlementMethod.NonProfiled => SettlementType.NonProfiled,
-            AmountPerChargeResultProducedV1.Types.SettlementMethod.Unspecified => throw new InvalidOperationException("Could not map time series type"),
+            AmountPerChargeResultProducedV1.Types.SettlementMethod.Unspecified => null,
             _ => throw new ArgumentOutOfRangeException(nameof(settlementMethod), settlementMethod, "Unknown time series type from Wholesale"),
         };
     }
