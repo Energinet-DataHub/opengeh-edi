@@ -12,38 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
-using IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
+namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
+
+public sealed class UnitOfWork : IUnitOfWork
 {
-    public class UnitOfWork : IUnitOfWork
+    private readonly DbContext[] _contexts;
+
+    public UnitOfWork(params DbContext[] contexts)
     {
-        private readonly ProcessContext _processContext;
-        private readonly ActorMessageQueueContext _actorMessageQueueContext;
-        private readonly IncomingMessagesContext _incomingMessagesContext;
+        ArgumentNullException.ThrowIfNull(contexts);
 
-        public UnitOfWork(
-            ProcessContext processContext,
-            ActorMessageQueueContext actorMessageQueueContext,
-            IncomingMessagesContext incomingMessagesContext)
+        if (contexts.Length < 1)
         {
-            _processContext = processContext;
-            _actorMessageQueueContext = actorMessageQueueContext;
-            _incomingMessagesContext = incomingMessagesContext;
+            throw new ArgumentException("At least one context must be provided", nameof(contexts));
         }
 
-        public async Task CommitTransactionAsync()
-        {
-            await ResilientTransaction.New(_processContext).SaveChangesAsync(new DbContext[]
-            {
-                _processContext, _actorMessageQueueContext, _incomingMessagesContext,
-            }).ConfigureAwait(false);
-        }
+        _contexts = contexts;
+    }
+
+    public async Task CommitTransactionAsync()
+    {
+        await ResilientTransaction.New(_contexts[0]).SaveChangesAsync(_contexts).ConfigureAwait(false);
     }
 }

@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace IncomingMessages.Infrastructure.Configuration.DataAccess
 {
-    public class IncomingMessagesContext : DbContext
+    public class IncomingMessagesContext : UnitOfWorkContext
     {
         #nullable disable
         public IncomingMessagesContext(DbContextOptions<IncomingMessagesContext> options)
