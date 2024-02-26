@@ -26,86 +26,78 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleCalcul
 public static class WholesaleCalculationResultMessageFactory
 {
     public static WholesaleCalculationResultMessage CreateMessageForEnergySupplier(
-        MonthlyAmountPerChargeResultProducedV1 message,
+        AmountPerChargeResultProducedV1 eventMessage,
         ProcessId processId)
     {
-        ArgumentNullException.ThrowIfNull(message);
+        ArgumentNullException.ThrowIfNull(eventMessage);
         ArgumentNullException.ThrowIfNull(processId);
 
-        var wholesaleCalculationSeries = CreateWholesaleCalculationSeries(message);
+        var message = CreateWholesaleCalculationSeries(eventMessage);
 
         return WholesaleCalculationResultMessage.Create(
-            receiverNumber: wholesaleCalculationSeries.EnergySupplier,
+            receiverNumber: message.EnergySupplier,
             receiverRole: ActorRole.EnergySupplier,
             processId: processId,
-            businessReason: BusinessReasonMapper.Map(message.CalculationType),
-            wholesaleSeries: wholesaleCalculationSeries);
+            businessReason: BusinessReasonMapper.Map(eventMessage.CalculationType),
+            wholesaleSeries: message);
     }
 
     public static WholesaleCalculationResultMessage CreateMessageForChargeOwner(
-        MonthlyAmountPerChargeResultProducedV1 message,
+        AmountPerChargeResultProducedV1 eventMessage,
         ProcessId processId)
     {
-        ArgumentNullException.ThrowIfNull(message);
+        ArgumentNullException.ThrowIfNull(eventMessage);
         ArgumentNullException.ThrowIfNull(processId);
 
-        var wholesaleCalculationSeries = CreateWholesaleCalculationSeries(message);
+        var message = CreateWholesaleCalculationSeries(eventMessage);
 
         return WholesaleCalculationResultMessage.Create(
-            receiverNumber: wholesaleCalculationSeries.ChargeOwner,
-            receiverRole: GetChargeOwner(wholesaleCalculationSeries.ChargeOwner),
+            receiverNumber: message.ChargeOwner,
+            receiverRole: GetChargeOwner(message.ChargeOwner),
             processId: processId,
-            businessReason: BusinessReasonMapper.Map(message.CalculationType),
-            wholesaleSeries: wholesaleCalculationSeries);
+            businessReason: BusinessReasonMapper.Map(eventMessage.CalculationType),
+            wholesaleSeries: message);
     }
 
     public static WholesaleCalculationResultMessage CreateMessageForEnergySupplier(
-        AmountPerChargeResultProducedV1 message,
+        MonthlyAmountPerChargeResultProducedV1 eventMessage,
         ProcessId processId)
     {
-        ArgumentNullException.ThrowIfNull(message);
+        ArgumentNullException.ThrowIfNull(eventMessage);
         ArgumentNullException.ThrowIfNull(processId);
 
-        var wholesaleCalculationSeries = CreateWholesaleCalculationSeries(message);
+        var message = CreateWholesaleCalculationSeries(eventMessage);
 
         return WholesaleCalculationResultMessage.Create(
-            receiverNumber: wholesaleCalculationSeries.EnergySupplier,
+            receiverNumber: message.EnergySupplier,
             receiverRole: ActorRole.EnergySupplier,
             processId: processId,
-            businessReason: BusinessReasonMapper.Map(message.CalculationType),
-            wholesaleSeries: wholesaleCalculationSeries);
+            businessReason: BusinessReasonMapper.Map(eventMessage.CalculationType),
+            wholesaleSeries: message);
     }
 
     public static WholesaleCalculationResultMessage CreateMessageForChargeOwner(
-        AmountPerChargeResultProducedV1 message,
+        MonthlyAmountPerChargeResultProducedV1 eventMessage,
         ProcessId processId)
     {
-        ArgumentNullException.ThrowIfNull(message);
+        ArgumentNullException.ThrowIfNull(eventMessage);
         ArgumentNullException.ThrowIfNull(processId);
 
-        var wholesaleCalculationSeries = CreateWholesaleCalculationSeries(message);
+        var message = CreateWholesaleCalculationSeries(eventMessage);
 
         return WholesaleCalculationResultMessage.Create(
-            receiverNumber: wholesaleCalculationSeries.ChargeOwner,
-            receiverRole: GetChargeOwner(wholesaleCalculationSeries.ChargeOwner),
+            receiverNumber: message.ChargeOwner,
+            receiverRole: GetChargeOwner(message.ChargeOwner),
             processId: processId,
-            businessReason: BusinessReasonMapper.Map(message.CalculationType),
-            wholesaleSeries: wholesaleCalculationSeries);
-    }
-
-    private static ActorRole GetChargeOwner(ActorNumber chargeOwnerId)
-    {
-        if (chargeOwnerId == DataHubDetails.DataHubActorNumber)
-        {
-            return ActorRole.SystemOperator;
-        }
-
-        return ActorRole.GridOperator;
+            businessReason: BusinessReasonMapper.Map(eventMessage.CalculationType),
+            wholesaleSeries: message);
     }
 
     private static WholesaleCalculationSeries CreateWholesaleCalculationSeries(
         MonthlyAmountPerChargeResultProducedV1 message)
     {
+        ArgumentNullException.ThrowIfNull(message);
+
         var wholesaleCalculationSeries = new WholesaleCalculationSeries(
             TransactionId: ProcessId.New().Id,
             CalculationVersion: message.CalculationResultVersion,
@@ -130,8 +122,11 @@ public static class WholesaleCalculationResultMessageFactory
         return wholesaleCalculationSeries;
     }
 
-    private static WholesaleCalculationSeries CreateWholesaleCalculationSeries(AmountPerChargeResultProducedV1 message)
+    private static WholesaleCalculationSeries CreateWholesaleCalculationSeries(
+        AmountPerChargeResultProducedV1 message)
     {
+        ArgumentNullException.ThrowIfNull(message);
+
         var wholesaleCalculationSeries = new WholesaleCalculationSeries(
             TransactionId: ProcessId.New().Id,
             CalculationVersion: message.CalculationResultVersion,
@@ -151,5 +146,15 @@ public static class WholesaleCalculationResultMessageFactory
             MeteringPointType: MeteringPointTypeMapper.Map(message.MeteringPointType),
             SettlementType: SettlementTypeMapper.Map(message.SettlementMethod));
         return wholesaleCalculationSeries;
+    }
+
+    private static ActorRole GetChargeOwner(ActorNumber chargeOwnerId)
+    {
+        if (chargeOwnerId == DataHubDetails.DataHubActorNumber)
+        {
+            return ActorRole.SystemOperator;
+        }
+
+        return ActorRole.GridOperator;
     }
 }

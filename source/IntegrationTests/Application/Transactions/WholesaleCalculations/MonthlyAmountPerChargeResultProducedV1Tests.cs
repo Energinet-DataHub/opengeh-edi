@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
@@ -23,9 +24,12 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.Process.Application.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using NodaTime;
 using NodaTime.Serialization.Protobuf;
 using Xunit;
@@ -35,11 +39,11 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.Wholes
 
 public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
 {
-    private readonly IIntegrationEventHandler _integrationEventHandler;
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
     private readonly IFileStorageClient _fileStorageClient;
 
     private readonly MonthlyAmountPerChargeResultProducedV1EventBuilder _monthlyPerChargeEventBuilder = new();
+    private IIntegrationEventHandler _integrationEventHandler;
 
     public MonthlyAmountPerChargeResultProducedV1Tests(
         IntegrationTestFixture integrationTestFixture)
@@ -68,6 +72,26 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
     }
 
     [Fact]
+    public async Task MonthlyAmountPerChargeResultProducedV1Processor_rollback_both_outgoing_messages_when_a_message_fails()
+    {
+        var serviceProviderWithCorruptedOutgoingMessagesClient = BuildServiceProviderWithCorruptedOutgoingMessagesClient();
+        _integrationEventHandler = serviceProviderWithCorruptedOutgoingMessagesClient.GetRequiredService<IIntegrationEventHandler>();
+        var amountPerChargeEvent = _monthlyPerChargeEventBuilder
+            .Build();
+        try
+        {
+            await HandleIntegrationEventAsync(amountPerChargeEvent);
+        }
+        catch (InvalidDataException)
+        {
+            // ignored
+        }
+
+        await AssertOutgoingMessageIsNull(ActorRole.EnergySupplier);
+        await AssertOutgoingMessageIsNull(ActorRole.GridOperator);
+    }
+
+    [Fact]
     public async Task MonthlyAmountPerChargeResultProducedV1Processor_creates_outgoing_message_to_energy_supplier_and_energinet_as_charge_owner()
     {
         var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder
@@ -88,7 +112,7 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
         FeatureFlagManagerStub.UseMonthlyAmountPerChargeResultProduced = Task.FromResult(false);
 
         await HandleIntegrationEventAsync(monthlyPerChargeEvent);
-        await AssertOutgoingMessageIsNull(BusinessReason.WholesaleFixing);
+        await AssertOutgoingMessageIsNull(businessReason: BusinessReason.WholesaleFixing);
     }
 
     [Fact]
@@ -189,12 +213,24 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
             _fileStorageClient);
     }
 
-    private async Task AssertOutgoingMessageIsNull(BusinessReason? businessReason = null)
+    private async Task AssertOutgoingMessageIsNull(
+        ActorRole? receiverRole = null,
+        BusinessReason? businessReason = null)
     {
         await AssertOutgoingMessage.OutgoingMessageIsNullAsync(
             messageType: DocumentType.NotifyWholesaleServices.Name,
             businessReason: businessReason?.Name ?? BusinessReason.WholesaleFixing.Name,
-            ActorRole.EnergySupplier,
+            receiverRole ?? ActorRole.EnergySupplier,
             _databaseConnectionFactory);
+    }
+
+    private ServiceProvider BuildServiceProviderWithCorruptedOutgoingMessagesClient()
+    {
+        var serviceCollection = GetServiceCollectionClone();
+        serviceCollection.RemoveAll<IOutgoingMessagesClient>();
+        serviceCollection.AddScoped<IOutgoingMessagesClient, OutgoingMessageExceptionSimulator>();
+
+        var dependenciesWithoutFileStorage = serviceCollection.BuildServiceProvider();
+        return dependenciesWithoutFileStorage;
     }
 }
