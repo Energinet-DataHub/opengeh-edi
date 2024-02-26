@@ -54,7 +54,7 @@ internal sealed class EbixRequestDsl
     {
         var response = await _ebix.PeekMessageAsync().ConfigureAwait(false);
 
-        await _ebix.DequeueMessageAsync(GetMessageIdForAggregatedMeteredDataTimeSeries(response!)).ConfigureAwait(false);
+        await _ebix.DequeueMessageAsync(GetMessageIdForAggregatedMeasuredDataTimeSeries(response!)).ConfigureAwait(false);
 
         Assert.Multiple(
             () => Assert.NotNull(response?.MessageContainer?.Payload),
@@ -127,7 +127,7 @@ internal sealed class EbixRequestDsl
         await Assert.ThrowsAsync<MessageSecurityException>(act).ConfigureAwait(false);
     }
 
-    private static string GetMessageIdForAggregatedMeteredDataTimeSeries(peekMessageResponse response)
+    private static string GetMessageIdForAggregatedMeasuredDataTimeSeries(peekMessageResponse response)
     {
         var nsmgr = new XmlNamespaceManager(new NameTable());
         nsmgr.AddNamespace("ns0", "un:unece:260:data:EEM-DK_AggregatedMeteredDataTimeSeries:v3");
