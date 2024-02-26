@@ -94,10 +94,45 @@ public abstract class BaseEnumMapperTests
         }
     }
 
-    private static bool ValueIsValid<TEnum>(TEnum value, TEnum unspecifiedValue, params TEnum[] invalidValues)
+    protected static void EnsureCanMapOrReturnsNull<TEnumInput, TEnumResult>(
+        Func<TEnumResult?> performMapping,
+        TEnumInput value,
+        params TEnumInput[] invalidValues)
+        where TEnumInput : Enum
+    {
+        ArgumentNullException.ThrowIfNull(performMapping);
+
+        // Act
+        var act = performMapping;
+
+        // Assert
+        if (ValueIsValid(value, invalidValues))
+        {
+            act.Should().NotThrow();
+        }
+        else if (invalidValues.Contains(value))
+        {
+            var result = act();
+            result.Should().BeNull();
+        }
+        else
+        {
+            act.Should().Throw<ArgumentOutOfRangeException>();
+        }
+    }
+
+    private static bool ValueIsValid<TEnum>(TEnum value, TEnum? unspecifiedValue, params TEnum[] invalidValues)
         where TEnum : Enum
     {
         var valid = (int)(object)value != InvalidEnumNumber && !value.Equals(unspecifiedValue) && !invalidValues.Contains(value);
+
+        return valid;
+    }
+
+    private static bool ValueIsValid<TEnum>(TEnum value, params TEnum[] invalidValues)
+        where TEnum : Enum
+    {
+        var valid = (int)(object)value != InvalidEnumNumber && !invalidValues.Contains(value);
 
         return valid;
     }
