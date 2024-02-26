@@ -29,7 +29,7 @@ public class WholesaleCalculationModelTests
         var keysOfWholesaleCalculationSeries = typeof(WholesaleCalculationSeries).GetProperties()
             .Select(p => new { Name = p.Name, PropertyType = p.PropertyType })
             .Where(p => p.Name != pointsAttributeName).ToList();
-        var keysOfWholesaleCalculationMarketActivityRecord = typeof(WholesaleCalculationMarketActivityRecord).GetProperties()
+        var keysOfWholesaleCalculationMarketActivityRecord = typeof(NotifyWholesaleServicesMarketActivityRecord).GetProperties()
             .Select(p => new { Name = p.Name, PropertyType = p.PropertyType })
             .Where(p => p.Name != pointsAttributeName).ToList();
 

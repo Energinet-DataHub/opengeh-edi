@@ -256,15 +256,15 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
 
         if (documentFormat == DocumentFormat.Xml)
         {
-            return new WholesaleCalculationXmlDocumentWriter(_parser).WriteAsync(header, new[] { records });
+            return new NotifyWholesaleServicesXmlDocumentWriter(_parser).WriteAsync(header, new[] { records });
         }
         else if (documentFormat == DocumentFormat.Ebix)
         {
-            return new WholesaleCalculationResultEbixDocumentWriter(_parser).WriteAsync(header, new[] { records });
+            return new NotifyWholesaleServicesEbixDocumentWriter(_parser).WriteAsync(header, new[] { records });
         }
         else if (documentFormat == DocumentFormat.Json)
         {
-            return new WholesaleCalculationJsonDocumentWriter(_parser).WriteAsync(
+            return new NotifyWholesaleServicesJsonDocumentWriter(_parser).WriteAsync(
                 header,
                 new[] { records });
         }

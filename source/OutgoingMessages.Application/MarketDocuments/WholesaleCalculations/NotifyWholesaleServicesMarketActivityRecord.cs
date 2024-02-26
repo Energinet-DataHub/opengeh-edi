@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations;
 
 // This is a copy of WholesaleCalculationSeries defined in the process module
-public record WholesaleCalculationMarketActivityRecord(
+public record NotifyWholesaleServicesMarketActivityRecord(
     Guid TransactionId,
     long CalculationVersion,
     string GridAreaCode,

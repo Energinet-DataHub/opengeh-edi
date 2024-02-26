@@ -27,13 +27,13 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations;
 
-public sealed class WholesaleCalculationJsonDocumentWriter : IDocumentWriter
+public sealed class NotifyWholesaleServicesJsonDocumentWriter : IDocumentWriter
 {
     private const string DocumentTypeName = "NotifyWholesaleServices_MarketDocument";
     private const string TypeCode = "E31";
     private readonly IMessageRecordParser _parser;
 
-    public WholesaleCalculationJsonDocumentWriter(IMessageRecordParser parser)
+    public NotifyWholesaleServicesJsonDocumentWriter(IMessageRecordParser parser)
     {
         _parser = parser;
     }
@@ -214,12 +214,12 @@ public sealed class WholesaleCalculationJsonDocumentWriter : IDocumentWriter
         writer.WriteEndArray();
     }
 
-    private ReadOnlyCollection<WholesaleCalculationMarketActivityRecord> ParseFrom(IReadOnlyCollection<string> payloads)
+    private ReadOnlyCollection<NotifyWholesaleServicesMarketActivityRecord> ParseFrom(IReadOnlyCollection<string> payloads)
     {
         ArgumentNullException.ThrowIfNull(payloads);
 
         return payloads
-            .Select(payload => _parser.From<WholesaleCalculationMarketActivityRecord>(payload))
+            .Select(payload => _parser.From<NotifyWholesaleServicesMarketActivityRecord>(payload))
             .ToList()
             .AsReadOnly();
     }

@@ -25,9 +25,9 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations;
 
-public class WholesaleCalculationResultEbixDocumentWriter : EbixDocumentWriter
+public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
 {
-    public WholesaleCalculationResultEbixDocumentWriter(IMessageRecordParser parser)
+    public NotifyWholesaleServicesEbixDocumentWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
             "DK_NotifyAggregatedWholesaleServices",
@@ -47,7 +47,7 @@ public class WholesaleCalculationResultEbixDocumentWriter : EbixDocumentWriter
 
     protected override SettlementVersion? ExtractSettlementVersion(IReadOnlyCollection<string> marketActivityPayloads)
     {
-        var payloads = ParseFrom<WholesaleCalculationMarketActivityRecord>(marketActivityPayloads);
+        var payloads = ParseFrom<NotifyWholesaleServicesMarketActivityRecord>(marketActivityPayloads);
         var settlementVersions = payloads
             .Where(ts => ts.SettlementVersion is not null)
             .Select(ts => ts.SettlementVersion)
@@ -67,7 +67,7 @@ public class WholesaleCalculationResultEbixDocumentWriter : EbixDocumentWriter
         ArgumentNullException.ThrowIfNull(marketActivityPayloads);
         ArgumentNullException.ThrowIfNull(writer);
 
-        foreach (var series in ParseFrom<WholesaleCalculationMarketActivityRecord>(marketActivityPayloads))
+        foreach (var series in ParseFrom<NotifyWholesaleServicesMarketActivityRecord>(marketActivityPayloads))
         {
             // Begin PayloadEnergyTimeSeries
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "PayloadEnergyTimeSeries", null).ConfigureAwait(false);

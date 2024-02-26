@@ -23,9 +23,9 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations;
 
-public class WholesaleCalculationXmlDocumentWriter : DocumentWriter
+public class NotifyWholesaleServicesXmlDocumentWriter : DocumentWriter
 {
-    public WholesaleCalculationXmlDocumentWriter(IMessageRecordParser parser)
+    public NotifyWholesaleServicesXmlDocumentWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
                 "NotifyWholesaleServices_MarketDocument",
@@ -43,7 +43,7 @@ public class WholesaleCalculationXmlDocumentWriter : DocumentWriter
         ArgumentNullException.ThrowIfNull(marketActivityPayloads);
         ArgumentNullException.ThrowIfNull(writer);
 
-        foreach (var wholesaleCalculationSeries in ParseFrom<WholesaleCalculationMarketActivityRecord>(marketActivityPayloads))
+        foreach (var wholesaleCalculationSeries in ParseFrom<NotifyWholesaleServicesMarketActivityRecord>(marketActivityPayloads))
         {
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Series", null).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, wholesaleCalculationSeries.TransactionId.ToString()).ConfigureAwait(false);

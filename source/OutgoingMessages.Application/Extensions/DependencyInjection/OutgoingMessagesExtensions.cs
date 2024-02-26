@@ -42,13 +42,13 @@ public static class OutgoingMessagesExtensions
         services.AddScoped<DocumentFactory>()
             .AddScoped<IDocumentWriter, AggregationResultXmlDocumentWriter>()
             .AddScoped<IDocumentWriter, AggregationResultJsonDocumentWriter>()
-            .AddScoped<IDocumentWriter, AggregationResultEbixDocumentWriter>()
+            .AddScoped<IDocumentWriter, NotifyWholesaleServicesEbixDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataXmlDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataJsonDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataEbixDocumentWriter>()
-            .AddScoped<IDocumentWriter, WholesaleCalculationXmlDocumentWriter>()
-            .AddScoped<IDocumentWriter, WholesaleCalculationJsonDocumentWriter>()
-            .AddScoped<IDocumentWriter, WholesaleCalculationResultEbixDocumentWriter>()
+            .AddScoped<IDocumentWriter, NotifyWholesaleServicesXmlDocumentWriter>()
+            .AddScoped<IDocumentWriter, NotifyWholesaleServicesJsonDocumentWriter>()
+            .AddScoped<IDocumentWriter, NotifyWholesaleServicesEbixDocumentWriter>()
             .AddScoped<IMessageRecordParser, MessageRecordParser>();
 
         //MessageEnqueueingConfiguration
