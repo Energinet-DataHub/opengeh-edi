@@ -15,6 +15,7 @@
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
@@ -28,6 +29,7 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
     private readonly EbixRequestDsl _ebix;
     private readonly AcceptanceTestFixture _fixture;
     private readonly ActorDsl _actor;
+    private readonly EbixRequestDsl _ebixEs;
 
     public WhenEbixPeekRequestIsReceivedTests(AcceptanceTestFixture fixture)
     {
@@ -36,7 +38,10 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
 
         _ebix = new EbixRequestDsl(
             new WholesaleDriver(fixture.EventPublisher),
-            new EbixDriver(new Uri(fixture.ApiManagementUri, "/ebix"), fixture.EbixCertificatePassword));
+            new EbixDriver(new Uri(fixture.ApiManagementUri, "/ebix"), fixture.EbixCertificatePassword, ActorRole.MeteredDataAdministrator));
+        _ebixEs = new EbixRequestDsl(
+            new WholesaleDriver(fixture.EventPublisher),
+            new EbixDriver(new Uri(fixture.ApiManagementUri, "/ebix"), fixture.EbixCertificatePassword2, ActorRole.EnergySupplier));
         _actor = new ActorDsl(new MarketParticipantDriver(fixture.EventPublisher), new EdiActorDriver(
             fixture.ConnectionString));
     }
@@ -58,7 +63,7 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
 
         await _ebix.PublishMonthlySumPrChargeFor(AcceptanceTestFixture.EbixActorGridArea, AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ChargeOwnerId);
 
-        await _ebix.ConfirmWholesaleResultIsAvailableForActor();
+        await _ebixEs.ConfirmWholesaleResultIsAvailableForActor();
     }
 
     [Fact]

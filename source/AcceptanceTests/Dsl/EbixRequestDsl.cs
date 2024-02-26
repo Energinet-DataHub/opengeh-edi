@@ -65,11 +65,11 @@ internal sealed class EbixRequestDsl
     {
         var response = await _ebix.PeekMessageAsync().ConfigureAwait(false);
 
-        await _ebix.DequeueMessageAsync(GetMessageId(response!)).ConfigureAwait(false);
+        await _ebix.DequeueMessageAsync(GetMessageId2(response!)).ConfigureAwait(false);
 
         Assert.Multiple(
             () => Assert.NotNull(response?.MessageContainer?.Payload),
-            () => Assert.Equal("NotifyWholesaleServices", response?.MessageContainer?.DocumentType));
+            () => Assert.Equal("NotifyAggregatedWholesaleServices", response?.MessageContainer?.DocumentType));
     }
 
     internal async Task ConfirmPeekWithoutCertificateIsNotAllowed()
@@ -131,6 +131,15 @@ internal sealed class EbixRequestDsl
     {
         var nsmgr = new XmlNamespaceManager(new NameTable());
         nsmgr.AddNamespace("ns0", "un:unece:260:data:EEM-DK_AggregatedMeteredDataTimeSeries:v3");
+        var query = "/ns0:HeaderEnergyDocument/ns0:Identification";
+        var node = response.MessageContainer.Payload.SelectSingleNode(query, nsmgr);
+        return node!.InnerText;
+    }
+
+    private static string GetMessageId2(peekMessageResponse response)
+    {
+        var nsmgr = new XmlNamespaceManager(new NameTable());
+        nsmgr.AddNamespace("ns0", "un:unece:260:data:EEM-DK_NotifyAggregatedWholesaleServices");
         var query = "/ns0:HeaderEnergyDocument/ns0:Identification";
         var node = response.MessageContainer.Payload.SelectSingleNode(query, nsmgr);
         return node!.InnerText;

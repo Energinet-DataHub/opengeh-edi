@@ -15,6 +15,9 @@
       <None Update="Drivers\Ebix\DH3-test-mosaik-1-private-and-public.pfx">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="Drivers\Ebix\DH3-test-mosaik-energysupplier-private-and-public.pfx">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
