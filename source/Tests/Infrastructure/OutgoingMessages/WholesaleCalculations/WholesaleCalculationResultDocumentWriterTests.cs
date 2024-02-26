@@ -87,7 +87,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
             .HasCalculationVersion(SampleData.Version)
             .HasChargeCode(SampleData.ChargeCode)
             .HasChargeType(SampleData.ChargeType)
-            .HasChargeTypeOwner(SampleData.ChargeOwner)
+            .HasChargeTypeOwner(SampleData.ChargeOwner, "A10")
             .HasGridAreaCode(SampleData.GridAreaCode, "NDK")
             .HasEnergySupplierNumber(SampleData.EnergySupplier, "A10")
             .HasPeriod(new Period(SampleData.PeriodStartUtc, SampleData.PeriodEndUtc))

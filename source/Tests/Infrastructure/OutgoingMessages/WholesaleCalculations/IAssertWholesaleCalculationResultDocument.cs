@@ -127,8 +127,9 @@ public interface IAssertWholesaleCalculationResultDocument
     /// <summary>
     /// Asserts the charge type owner of the first series element
     /// </summary>
-    /// <param name="expectedChargeTypeOwner"></param>
-    IAssertWholesaleCalculationResultDocument HasChargeTypeOwner(ActorNumber expectedChargeTypeOwner);
+    IAssertWholesaleCalculationResultDocument HasChargeTypeOwner(
+        ActorNumber expectedChargeTypeOwner,
+        string codingScheme);
 
     /// <summary>
     /// Asserts grid area code of the first series element

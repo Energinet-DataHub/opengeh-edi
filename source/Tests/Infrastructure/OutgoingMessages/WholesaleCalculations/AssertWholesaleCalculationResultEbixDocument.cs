@@ -120,7 +120,7 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasChargeTypeOwner(ActorNumber expectedChargeTypeOwner)
+    public IAssertWholesaleCalculationResultDocument HasChargeTypeOwner(ActorNumber expectedChargeTypeOwner, string codingScheme)
     {
         _documentAsserter.HasValueWithAttributes(
             $"{PayloadEnergyTimeSeries}[1]/ChargeTypeOwnerEnergyParty/Identification",

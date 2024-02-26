@@ -141,10 +141,17 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasChargeTypeOwner(ActorNumber expectedChargeTypeOwner)
+    public IAssertWholesaleCalculationResultDocument HasChargeTypeOwner(
+        ActorNumber expectedChargeTypeOwner,
+        string codingScheme)
     {
         ArgumentNullException.ThrowIfNull(expectedChargeTypeOwner);
         _documentAsserter.HasValue("Series[1]/chargeType.chargeTypeOwner_MarketParticipant.mRID", expectedChargeTypeOwner.Value);
+        _documentAsserter.HasAttribute(
+            "Series[1]/chargeType.chargeTypeOwner_MarketParticipant.mRID",
+            "codingScheme",
+            codingScheme);
+
         return this;
     }
 
