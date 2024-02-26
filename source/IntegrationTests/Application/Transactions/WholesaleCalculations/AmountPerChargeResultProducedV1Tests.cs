@@ -65,15 +65,6 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
     }
 
     [Fact]
-    public async Task AmountPerChargeResultProducedV1Processor_creates_outgoing_messages_to_energy_supplier_and_charge_owner()
-    {
-        var amountPerChargeEvent = _amountPerChargeEventBuilder.Build();
-        await HandleIntegrationEventAsync(amountPerChargeEvent);
-        await AssertOutgoingMessageAsync(ActorRole.EnergySupplier);
-        await AssertOutgoingMessageAsync(ActorRole.GridOperator);
-    }
-
-    [Fact]
     public async Task AmountPerChargeResultProducedV1Processor_rollback_both_outgoing_messages_when_a_message_fails()
     {
         var serviceProviderWithCorruptedOutgoingMessagesClient = BuildServiceProviderWithCorruptedOutgoingMessagesClient();
@@ -91,6 +82,15 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
 
         await AssertOutgoingMessageIsNull(ActorRole.EnergySupplier);
         await AssertOutgoingMessageIsNull(ActorRole.GridOperator);
+    }
+
+    [Fact]
+    public async Task AmountPerChargeResultProducedV1Processor_creates_outgoing_messages_to_energy_supplier_and_charge_owner()
+    {
+        var amountPerChargeEvent = _amountPerChargeEventBuilder.Build();
+        await HandleIntegrationEventAsync(amountPerChargeEvent);
+        await AssertOutgoingMessageAsync(ActorRole.EnergySupplier);
+        await AssertOutgoingMessageAsync(ActorRole.GridOperator);
     }
 
     [Fact]

@@ -25,7 +25,6 @@ using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-using Energinet.DataHub.EDI.Process.Application.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Microsoft.Extensions.DependencyInjection;
@@ -63,15 +62,6 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
     }
 
     [Fact]
-    public async Task MonthlyAmountPerChargeResultProducedV1Processor_creates_outgoing_message_to_energy_supplier_and_charge_owner()
-    {
-        var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder.Build();
-        await HandleIntegrationEventAsync(monthlyPerChargeEvent);
-        await AssertOutgoingMessageAsync(ActorRole.EnergySupplier);
-        await AssertOutgoingMessageAsync(ActorRole.GridOperator);
-    }
-
-    [Fact]
     public async Task MonthlyAmountPerChargeResultProducedV1Processor_rollback_both_outgoing_messages_when_a_message_fails()
     {
         var serviceProviderWithCorruptedOutgoingMessagesClient = BuildServiceProviderWithCorruptedOutgoingMessagesClient();
@@ -89,6 +79,15 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
 
         await AssertOutgoingMessageIsNull(ActorRole.EnergySupplier);
         await AssertOutgoingMessageIsNull(ActorRole.GridOperator);
+    }
+
+    [Fact]
+    public async Task MonthlyAmountPerChargeResultProducedV1Processor_creates_outgoing_message_to_energy_supplier_and_charge_owner()
+    {
+        var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder.Build();
+        await HandleIntegrationEventAsync(monthlyPerChargeEvent);
+        await AssertOutgoingMessageAsync(ActorRole.EnergySupplier);
+        await AssertOutgoingMessageAsync(ActorRole.GridOperator);
     }
 
     [Fact]
