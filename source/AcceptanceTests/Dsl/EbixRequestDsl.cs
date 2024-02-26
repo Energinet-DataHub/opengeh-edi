@@ -45,15 +45,31 @@ internal sealed class EbixRequestDsl
         return _wholesale.PublishAggregationResultAsync(gridArea);
     }
 
-    internal async Task ConfirmEbixResultIsAvailableForActor()
+    internal Task PublishMonthlySumPrChargeFor(string gridArea, string energySupplierId, string chargeOwnerId)
+    {
+        return _wholesale.PublishMonthlyAmountPerChargeResultAsync(gridArea, energySupplierId, chargeOwnerId);
+    }
+
+    internal async Task ConfirmEnergyResultIsAvailableForActor()
     {
         var response = await _ebix.PeekMessageAsync().ConfigureAwait(false);
 
-        await _ebix.DequeueMessageAsync(GetMessageId(response!)).ConfigureAwait(false);
+        await _ebix.DequeueMessageAsync(GetMessageIdForAggregatedMeasuredDataTimeSeries(response!)).ConfigureAwait(false);
 
         Assert.Multiple(
             () => Assert.NotNull(response?.MessageContainer?.Payload),
             () => Assert.Equal("AggregatedMeteredDataTimeSeries", response?.MessageContainer?.DocumentType));
+    }
+
+    internal async Task ConfirmWholesaleResultIsAvailableForActor()
+    {
+        var response = await _ebix.PeekMessageAsync().ConfigureAwait(false);
+
+        await _ebix.DequeueMessageAsync(GetMessageIdForNotifyAggregatedWholesaleServices(response!)).ConfigureAwait(false);
+
+        Assert.Multiple(
+            () => Assert.NotNull(response?.MessageContainer?.Payload),
+            () => Assert.Equal("NotifyAggregatedWholesaleServices", response?.MessageContainer?.DocumentType));
     }
 
     internal async Task ConfirmPeekWithoutCertificateIsNotAllowed()
@@ -111,10 +127,19 @@ internal sealed class EbixRequestDsl
         await Assert.ThrowsAsync<MessageSecurityException>(act).ConfigureAwait(false);
     }
 
-    private static string GetMessageId(peekMessageResponse response)
+    private static string GetMessageIdForAggregatedMeasuredDataTimeSeries(peekMessageResponse response)
     {
         var nsmgr = new XmlNamespaceManager(new NameTable());
         nsmgr.AddNamespace("ns0", "un:unece:260:data:EEM-DK_AggregatedMeteredDataTimeSeries:v3");
+        var query = "/ns0:HeaderEnergyDocument/ns0:Identification";
+        var node = response.MessageContainer.Payload.SelectSingleNode(query, nsmgr);
+        return node!.InnerText;
+    }
+
+    private static string GetMessageIdForNotifyAggregatedWholesaleServices(peekMessageResponse response)
+    {
+        var nsmgr = new XmlNamespaceManager(new NameTable());
+        nsmgr.AddNamespace("ns0", "un:unece:260:data:EEM-DK_NotifyAggregatedWholesaleServices");
         var query = "/ns0:HeaderEnergyDocument/ns0:Identification";
         var node = response.MessageContainer.Payload.SelectSingleNode(query, nsmgr);
         return node!.InnerText;

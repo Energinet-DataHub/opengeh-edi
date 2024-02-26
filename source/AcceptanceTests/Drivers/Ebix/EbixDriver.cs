@@ -17,6 +17,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Xml;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
 
@@ -28,7 +29,7 @@ internal sealed class EbixDriver : IDisposable
     private readonly HttpClient _httpClientWithCertificate;
     private readonly HttpClientHandler _certificateHttpClientHandler;
 
-    public EbixDriver(Uri dataHubUrlEbixUrl, string ebixCertificatePassword)
+    public EbixDriver(Uri dataHubUrlEbixUrl, string ebixCertificatePassword, ActorRole actorRole)
     {
         // Create a binding using Transport and a certificate.
         var binding = new BasicHttpBinding
@@ -49,9 +50,18 @@ internal sealed class EbixDriver : IDisposable
 
         _ebixServiceClient = new marketMessagingB2BServiceV01PortTypeClient(binding, endpoint);
 
-        var certificateRaw = File.ReadAllBytes("./Drivers/Ebix/DH3-test-mosaik-1-private-and-public.pfx");
-        _certificate = new X509Certificate2(certificateRaw, ebixCertificatePassword);
-        _ebixServiceClient.ClientCredentials.ClientCertificate.Certificate = _certificate;
+        if (actorRole == ActorRole.EnergySupplier)
+        {
+            _certificate = _ebixServiceClient.ClientCredentials.ClientCertificate.Certificate = new X509Certificate2(
+                "./Drivers/Ebix/DH3-test-mosaik-energysupplier-private-and-public.pfx",
+                ebixCertificatePassword);
+        }
+        else
+        {
+            _certificate = _ebixServiceClient.ClientCredentials.ClientCertificate.Certificate = new X509Certificate2(
+                "./Drivers/Ebix/DH3-test-mosaik-1-private-and-public.pfx",
+                ebixCertificatePassword);
+        }
 
         _unauthorizedHttpClient = new HttpClient
         {
@@ -173,6 +183,14 @@ internal sealed class EbixDriver : IDisposable
         nsmgr.AddNamespace("ns0", "un:unece:260:data:EEM-DK_AggregatedMeteredDataTimeSeries:v3");
         var query = "/ns0:HeaderEnergyDocument/ns0:Identification";
         var node = response.MessageContainer.Payload.SelectSingleNode(query, nsmgr);
+        if (node == null)
+        {
+            nsmgr = new XmlNamespaceManager(new NameTable());
+            nsmgr.AddNamespace("ns0", "un:unece:260:data:EEM-DK_NotifyAggregatedWholesaleServices");
+            query = "/ns0:HeaderEnergyDocument/ns0:Identification";
+            node = response.MessageContainer.Payload.SelectSingleNode(query, nsmgr);
+        }
+
         return node!.InnerText;
     }
 
