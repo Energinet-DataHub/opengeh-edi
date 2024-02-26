@@ -12,20 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
-using MediatR;
+using Dapper;
+using Dapper.NodaTime;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
+namespace Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection;
 
-public static class InboxEventsConfiguration
+internal static class QueryHandlingExtensions
 {
-    public static void Configure(IServiceCollection services)
+    internal static IServiceCollection AddDapper(this IServiceCollection services)
     {
-        services.AddTransient<INotificationHandler<TenSecondsHasHasPassed>, ProcessInboxEventsOnTenSecondsHasPassed>();
-        services.AddTransient<IDataRetention, ReceivedInboxEventsRetention>();
-        services.AddTransient<InboxEventReceiver>();
-        services.AddTransient<InboxEventsProcessor>();
+        ConfigureDapper();
+
+        return services;
+    }
+
+    private static void ConfigureDapper()
+    {
+        SqlMapper.AddTypeHandler(InstantHandler.Default);
     }
 }

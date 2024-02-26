@@ -19,9 +19,9 @@ using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration;
+namespace Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection;
 
-public static class HealthCheckRegistration
+public static class HealthCheckExtensions
 {
     public static void AddSqlServerHealthCheck(this IServiceCollection services,  string dbConnectionString)
     {

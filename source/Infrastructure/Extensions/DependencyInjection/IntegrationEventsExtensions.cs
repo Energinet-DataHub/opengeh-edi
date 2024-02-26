@@ -15,25 +15,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
+namespace Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection;
 
-public static class IntegrationEventsConfiguration
+public static class IntegrationEventsExtensions
 {
-    public static void Configure(IServiceCollection services)
+    public static IServiceCollection AddIntegrationEvents(this IServiceCollection services)
     {
-        services.AddTransient<IDataRetention, ReceivedIntegrationEventsRetention>();
-        services.AddTransient<IReceivedIntegrationEventRepository, ReceivedIntegrationEventRepository>();
-
-        services.AddTransient<IIntegrationEventProcessor, ActorActivatedIntegrationEventProcessor>();
-        services.AddTransient<IIntegrationEventProcessor, GridAreaOwnershipAssignedIntegrationEventProcessor>();
-        services.AddTransient<IIntegrationEventProcessor, ActorCertificateCredentialsAssignedEventProcessor>();
-        services.AddTransient<IIntegrationEventProcessor, ActorCertificateCredentialsRemovedEventProcessor>();
-
-        services.AddTransient<IReadOnlyDictionary<string, IIntegrationEventProcessor>>(
+        services.AddTransient<IDataRetention, ReceivedIntegrationEventsRetention>()
+        .AddTransient<IReceivedIntegrationEventRepository, ReceivedIntegrationEventRepository>()
+        .AddTransient<IIntegrationEventProcessor, ActorActivatedIntegrationEventProcessor>()
+        .AddTransient<IIntegrationEventProcessor, GridAreaOwnershipAssignedIntegrationEventProcessor>()
+        .AddTransient<IIntegrationEventProcessor, ActorCertificateCredentialsAssignedEventProcessor>()
+        .AddTransient<IIntegrationEventProcessor, ActorCertificateCredentialsRemovedEventProcessor>()
+        .AddTransient<IReadOnlyDictionary<string, IIntegrationEventProcessor>>(
             sp => sp.GetServices<IIntegrationEventProcessor>()
                 .ToDictionary(m => m.EventTypeToHandle, m => m));
+
+        return services;
     }
 }

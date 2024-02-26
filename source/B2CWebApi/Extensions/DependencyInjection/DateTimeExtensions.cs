@@ -15,19 +15,21 @@
 using Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Configuration;
+namespace Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
 
-public static class DateTimeConfiguration
+public static class DateTimeExtensions
 {
-    public static void AddDateTimeConfiguration(
-        this IServiceCollection serviceCollection,
+    public static IServiceCollection AddDateTime(
+        this IServiceCollection services,
         IConfiguration configuration)
     {
         var options = configuration.Get<DateTimeOptions>()!;
-        serviceCollection.AddSingleton<DateTimeZone>(_ =>
+        services.AddSingleton<DateTimeZone>(_ =>
         {
             var dateTimeZoneId = options.TIME_ZONE;
             return DateTimeZoneProviders.Tzdb.GetZoneOrNull(dateTimeZoneId)!;
         });
+
+        return services;
     }
 }

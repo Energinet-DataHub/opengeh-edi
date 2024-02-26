@@ -12,25 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
+using Energinet.DataHub.EDI.Infrastructure.DataRetention;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
+namespace Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection;
 
-/// <summary>
-/// Azure Service Bus Client sender adapter
-/// </summary>
-public interface IRemoteBusinessServiceRequestSenderAdapter<TRequest> : IAsyncDisposable, IDisposable
+public static class DataRetentionExtensions
 {
-    /// <summary>
-    /// Topic name
-    /// </summary>
-    string QueueName { get; }
+    public static IServiceCollection AddDataRetention(this IServiceCollection services)
+    {
+        services.AddTransient<INotificationHandler<ADayHasPassed>,
+            ExecuteDataRetentionsWhenADayHasPassed>();
 
-    /// <summary>
-    /// Send integration event to topic
-    /// </summary>
-    /// <param name="message"></param>
-    Task SendAsync(ServiceBusMessage message);
+        return services;
+    }
 }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using BuildingBlocks.Application.Configuration;
+using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
@@ -29,42 +29,44 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.Configuration;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
 
-public static class OutgoingMessagesConfiguration
+public static class OutgoingMessagesExtensions
 {
-    public static void AddOutgoingMessagesModule(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddOutgoingMessagesModule(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddBuildingBlocks(configuration);
-
-        services.AddScopedSqlDbContext<ActorMessageQueueContext>(configuration);
+        services.AddBuildingBlocks(configuration)
+            .AddScopedSqlDbContext<ActorMessageQueueContext>(configuration);
 
         //AddMessageGenerationServices
-        services.AddScoped<DocumentFactory>();
-        services.AddScoped<IDocumentWriter, AggregationResultXmlDocumentWriter>();
-        services.AddScoped<IDocumentWriter, AggregationResultJsonDocumentWriter>();
-        services.AddScoped<IDocumentWriter, AggregationResultEbixDocumentWriter>();
-        services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataXmlDocumentWriter>();
-        services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataJsonDocumentWriter>();
-        services.AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataEbixDocumentWriter>();
-        services.AddScoped<IDocumentWriter, WholesaleCalculationXmlDocumentWriter>();
-        services.AddScoped<IDocumentWriter, WholesaleCalculationJsonDocumentWriter>();
-        services.AddScoped<IDocumentWriter, WholesaleCalculationResultEbixDocumentWriter>();
-        services.AddScoped<IMessageRecordParser, MessageRecordParser>();
+        services.AddScoped<DocumentFactory>()
+            .AddScoped<IDocumentWriter, AggregationResultXmlDocumentWriter>()
+            .AddScoped<IDocumentWriter, AggregationResultJsonDocumentWriter>()
+            .AddScoped<IDocumentWriter, AggregationResultEbixDocumentWriter>()
+            .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataXmlDocumentWriter>()
+            .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataJsonDocumentWriter>()
+            .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataEbixDocumentWriter>()
+            .AddScoped<IDocumentWriter, WholesaleCalculationXmlDocumentWriter>()
+            .AddScoped<IDocumentWriter, WholesaleCalculationJsonDocumentWriter>()
+            .AddScoped<IDocumentWriter, WholesaleCalculationResultEbixDocumentWriter>()
+            .AddScoped<IMessageRecordParser, MessageRecordParser>();
 
         //MessageEnqueueingConfiguration
-        services.AddTransient<MessageEnqueuer>();
-        services.AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>();
+        services.AddTransient<MessageEnqueuer>()
+            .AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>()
+            .AddTransient<IOutgoingMessagesClient, OutgoingMessagesClient>();
 
         //PeekConfiguration
-        services.AddScoped<IActorMessageQueueRepository, ActorMessageQueueRepository>();
-        services.AddScoped<IMarketDocumentRepository, MarketDocumentRepository>();
-        services.AddTransient<MessagePeeker>();
+        services.AddScoped<IActorMessageQueueRepository, ActorMessageQueueRepository>()
+            .AddScoped<IMarketDocumentRepository, MarketDocumentRepository>()
+            .AddTransient<MessagePeeker>();
 
         //DequeConfiguration
         services.AddTransient<MessageDequeuer>();
+
+        //DataRetentionConfiguration
         services.AddTransient<IDataRetention, DequeuedBundlesRetention>();
 
-        services.AddTransient<IOutgoingMessagesClient, OutgoingMessagesClient>();
+        return services;
     }
 }

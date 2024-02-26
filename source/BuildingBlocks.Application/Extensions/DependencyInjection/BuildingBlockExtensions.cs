@@ -26,19 +26,20 @@ using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
 using EdiServiceBusClientOptions = BuildingBlocks.Application.Configuration.Options.ServiceBusClientOptions;
 
-namespace BuildingBlocks.Application.Configuration;
+namespace BuildingBlocks.Application.Extensions.DependencyInjection;
 
-public static class BuildingBlockConfiguration
+public static class BuildingBlockExtensions
 {
-    public static void AddBuildingBlocks(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddBuildingBlocks(this IServiceCollection services, IConfiguration configuration)
     {
-        AddServiceBus(services, configuration);
-        AddDatabase(services, configuration);
-        AddFileStorage(services, configuration);
-        AddFeatureFlags(services);
+        services.AddServiceBus(configuration)
+            .AddDatabase(configuration)
+            .AddFileStorage(configuration)
+            .AddFeatureFlags();
+        return services;
     }
 
-    private static void AddServiceBus(IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddServiceBus(this IServiceCollection services, IConfiguration configuration)
     {
         services
             .AddOptions<EdiServiceBusClientOptions>()
@@ -53,9 +54,11 @@ public static class BuildingBlockConfiguration
             }));
 
         services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactory>();
+
+        return services;
     }
 
-    private static void AddDatabase(IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
         services
             .AddOptions<SqlDatabaseConnectionOptions>()
@@ -63,9 +66,11 @@ public static class BuildingBlockConfiguration
             .Validate(o => !string.IsNullOrEmpty(o.DB_CONNECTION_STRING), "DB_CONNECTION_STRING must be set");
 
         services.AddSingleton<IDatabaseConnectionFactory, SqlDatabaseConnectionFactory>();
+
+        return services;
     }
 
-    private static void AddFileStorage(IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddFileStorage(this IServiceCollection services, IConfiguration configuration)
     {
         services
             .AddOptions<BlobServiceClientConnectionOptions>()
@@ -84,11 +89,15 @@ public static class BuildingBlockConfiguration
             });
 
         services.AddTransient<IFileStorageClient, DataLakeFileStorageClient>();
+
+        return services;
     }
 
-    private static void AddFeatureFlags(IServiceCollection services)
+    private static IServiceCollection AddFeatureFlags(this IServiceCollection services)
     {
         services.AddFeatureManagement();
         services.AddScoped<IFeatureFlagManager, MicrosoftFeatureFlagManager>();
+
+        return services;
     }
 }
