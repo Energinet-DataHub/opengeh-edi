@@ -45,7 +45,12 @@ internal sealed class EbixRequestDsl
         return _wholesale.PublishAggregationResultAsync(gridArea);
     }
 
-    internal async Task ConfirmEbixResultIsAvailableForActor()
+    internal Task PublishMonthlySumPrChargeFor(string gridArea, string energySupplierId, string chargeOwnerId)
+    {
+        return _wholesale.PublishMonthlyAmountPerChargeResultAsync(gridArea, energySupplierId, chargeOwnerId);
+    }
+
+    internal async Task ConfirmEnergyResultIsAvailableForActor()
     {
         var response = await _ebix.PeekMessageAsync().ConfigureAwait(false);
 
@@ -54,6 +59,17 @@ internal sealed class EbixRequestDsl
         Assert.Multiple(
             () => Assert.NotNull(response?.MessageContainer?.Payload),
             () => Assert.Equal("AggregatedMeteredDataTimeSeries", response?.MessageContainer?.DocumentType));
+    }
+
+    internal async Task ConfirmWholesaleResultIsAvailableForActor()
+    {
+        var response = await _ebix.PeekMessageAsync().ConfigureAwait(false);
+
+        await _ebix.DequeueMessageAsync(GetMessageId(response!)).ConfigureAwait(false);
+
+        Assert.Multiple(
+            () => Assert.NotNull(response?.MessageContainer?.Payload),
+            () => Assert.Equal("NotifyWholesaleServices", response?.MessageContainer?.DocumentType));
     }
 
     internal async Task ConfirmPeekWithoutCertificateIsNotAllowed()

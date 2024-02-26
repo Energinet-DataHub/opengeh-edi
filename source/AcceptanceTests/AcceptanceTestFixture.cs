@@ -30,6 +30,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
     internal const string ActorRole = "metereddataresponsible";
 
     internal const string EdiSubsystemTestCimActorNumber = "5790000392551"; // Corresponds to the "EDI - SUBSYSTEM TEST CIM" in the UI.
+    internal const string ChargeOwnerId = "5790000391919"; // For now is a dummy value, but when we support multiple receivers, this will be the receiver's real GSRN.
 
     private readonly Uri _azureEntraB2CTenantUrl;
     private readonly string _azureEntraFrontendAppId;
