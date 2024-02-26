@@ -12,15 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Process.Domain.Wholesale;
-using Microsoft.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
+using NodaTime;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.Wholesale;
+namespace Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
 
-public static class WholesaleInboxConfiguration
+public static class DateTimeExtensions
 {
-    public static void Configure(IServiceCollection services)
+    public static IServiceCollection AddDateTime(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
-       services.AddTransient<IWholesaleInbox, WholesaleInbox>();
+        var options = configuration.Get<DateTimeOptions>()!;
+        services.AddSingleton<DateTimeZone>(_ =>
+        {
+            var dateTimeZoneId = options.TIME_ZONE;
+            return DateTimeZoneProviders.Tzdb.GetZoneOrNull(dateTimeZoneId)!;
+        });
+
+        return services;
     }
 }

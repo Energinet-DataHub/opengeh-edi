@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using BuildingBlocks.Application.Configuration;
+using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.MasterData.Domain.ActorCertificates;
 using Energinet.DataHub.EDI.MasterData.Domain.Actors;
@@ -25,22 +25,25 @@ using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.MasterData.Application.Configuration;
+namespace Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
 
-public static class MasterDataConfiguration
+public static class MasterDataExtensions
 {
-    public static void AddMasterDataModule(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddMasterDataModule(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScopedSqlDbContext<MasterDataContext>(configuration);
 
         // Grid area
-        services.AddTransient<IGridAreaRepository, GridAreaRepository>();
-        services.AddTransient<IDataRetention, GridAreaOwnerRetention>();
+        services
+            .AddTransient<IGridAreaRepository, GridAreaRepository>()
+            .AddTransient<IDataRetention, GridAreaOwnerRetention>();
 
         // Actors
-        services.AddTransient<IActorRepository, ActorRepository>();
-        services.AddTransient<IActorCertificateRepository, ActorCertificateRepository>();
+        services
+            .AddTransient<IActorRepository, ActorRepository>()
+            .AddTransient<IActorCertificateRepository, ActorCertificateRepository>()
+            .AddTransient<IMasterDataClient, MasterDataClient>();
 
-        services.AddTransient<IMasterDataClient, MasterDataClient>();
+        return services;
     }
 }

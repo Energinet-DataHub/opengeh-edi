@@ -23,15 +23,11 @@ using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents;
-using Energinet.DataHub.EDI.Infrastructure.DataRetention;
-using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
-using Energinet.DataHub.EDI.Process.Infrastructure.Wholesale;
 using MediatR.Registration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration
+namespace Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection
 {
     public class CompositionRoot
     {
@@ -40,18 +36,17 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
         private CompositionRoot(IServiceCollection services)
         {
             _services = services;
-            services.AddSingleton<HttpClient>();
-            services.AddSingleton<ISerializer, Serializer>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddSingleton<HttpClient>()
+                .AddSingleton<ISerializer, Serializer>()
+                .AddScoped<IUnitOfWork, UnitOfWork>();
 
             AddMediatR();
             services.AddLogging();
             AddAuthenticatedActor();
-            AddWholeSaleInBox();
-            IntegrationEventsConfiguration.Configure(services);
-            InboxEventsConfiguration.Configure(services);
-            QueryHandlingConfiguration.Configure(services);
-            DataRetentionConfiguration.Configure(services);
+            services
+                .AddIntegrationEvents()
+                .AddDapper()
+                .AddDataRetention();
         }
 
         public static CompositionRoot Initialize(IServiceCollection services)
@@ -116,11 +111,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration
         private void AddAuthenticatedActor()
         {
             _services.AddScoped<AuthenticatedActor>();
-        }
-
-        private void AddWholeSaleInBox()
-        {
-            WholesaleInboxConfiguration.Configure(_services);
         }
     }
 }

@@ -17,15 +17,15 @@ using BuildingBlocks.Application.Configuration.Logging;
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Logging.LoggingMiddleware;
-using Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
-using Energinet.DataHub.EDI.B2CWebApi.Configuration;
+using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
+using Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.Serialization;
-using Energinet.DataHub.EDI.IncomingMessages.Application.Configuration;
-using Energinet.DataHub.EDI.Infrastructure.Configuration;
+using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.OpenApi.Models;
 
@@ -83,11 +83,12 @@ public class Startup
         serviceCollection.AddSingleton<ISerializer, Serializer>();
         serviceCollection.AddScoped<AuthenticatedActor>();
 
-        serviceCollection.AddArchivedMessagesModule(Configuration);
         serviceCollection.AddIncomingMessagesModule(Configuration);
 
-        serviceCollection.AddJwtTokenSecurity(Configuration);
-        serviceCollection.AddDateTimeConfiguration(Configuration);
+        serviceCollection
+            .AddArchivedMessagesModule(Configuration)
+            .AddJwtTokenSecurity(Configuration)
+            .AddDateTime(Configuration);
         serviceCollection
             .AddHttpClient();
 

@@ -19,6 +19,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BuildingBlocks.Application.Configuration;
 using BuildingBlocks.Application.Configuration.Logging;
+using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.Api.Authentication;
@@ -27,17 +28,18 @@ using Energinet.DataHub.EDI.Api.Configuration;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
-using Energinet.DataHub.EDI.ArchivedMessages.Application.Configuration;
+using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.Common.DateTime;
-using Energinet.DataHub.EDI.IncomingMessages.Application.Configuration;
+using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.MasterData.Application.Configuration;
+using Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.Configuration;
-using Energinet.DataHub.EDI.Process.Application.Configuration;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf.Reflection;
@@ -145,13 +147,12 @@ namespace Energinet.DataHub.EDI.Api
                         MonthlyAmountPerChargeResultProducedV1.Descriptor,
                         AmountPerChargeResultProducedV1.Descriptor,
                     };
-                    services.AddSubscriber<IntegrationEventHandler>(integrationEventDescriptors);
-
-                    services.AddArchivedMessagesModule(configuration);
-                    services.AddIncomingMessagesModule(configuration);
-                    services.AddOutgoingMessagesModule(configuration);
-                    services.AddProcessModule(configuration);
-                    services.AddMasterDataModule(configuration);
+                    services.AddSubscriber<IntegrationEventHandler>(integrationEventDescriptors)
+                        .AddArchivedMessagesModule(configuration)
+                        .AddIncomingMessagesModule(configuration)
+                        .AddOutgoingMessagesModule(configuration)
+                        .AddProcessModule(configuration)
+                        .AddMasterDataModule(configuration);
                 })
                 .ConfigureLogging(logging =>
                 {

@@ -17,17 +17,19 @@ using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Configuration;
+namespace Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
 
-public static class JwtConfiguration
+public static class JwtExtensions
 {
-    public static void AddJwtTokenSecurity(
-        this IServiceCollection serviceCollection,
+    public static IServiceCollection AddJwtTokenSecurity(
+        this IServiceCollection services,
         IConfiguration configuration)
     {
         var options = configuration.Get<JwtOptions>()!;
-        serviceCollection.AddJwtBearerAuthentication(options.EXTERNAL_OPEN_ID_URL, options.INTERNAL_OPEN_ID_URL, options.BACKEND_BFF_APP_ID);
-        serviceCollection.AddUserAuthentication<FrontendUser, FrontendUserProvider>();
-        serviceCollection.AddPermissionAuthorization();
+        services.AddJwtBearerAuthentication(options.EXTERNAL_OPEN_ID_URL, options.INTERNAL_OPEN_ID_URL, options.BACKEND_BFF_APP_ID);
+        services.AddUserAuthentication<FrontendUser, FrontendUserProvider>();
+        services.AddPermissionAuthorization();
+
+        return services;
     }
 }

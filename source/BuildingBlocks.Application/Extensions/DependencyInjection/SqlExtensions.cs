@@ -18,11 +18,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BuildingBlocks.Application.Configuration;
+namespace BuildingBlocks.Application.Extensions.DependencyInjection;
 
 public static class SqlExtensions
 {
-    public static void AddScopedSqlDbContext<TDbContext>(
+    public static IServiceCollection AddScopedSqlDbContext<TDbContext>(
         this IServiceCollection services,
         IConfiguration configuration)
         where TDbContext : DbContext
@@ -32,12 +32,12 @@ public static class SqlExtensions
             .Bind(configuration)
             .Validate(o => !string.IsNullOrEmpty(o.DB_CONNECTION_STRING), "DB_CONNECTION_STRING must be set");
 
-        services.AddScoped<SqlConnectionSource>();
-
-        services.AddDbContext<TDbContext>((sp, o) =>
-        {
-            var source = sp.GetRequiredService<SqlConnectionSource>();
-            o.UseSqlServer(source.Connection, y => y.UseNodaTime().EnableRetryOnFailure());
-        });
+        services.AddScoped<SqlConnectionSource>()
+            .AddDbContext<TDbContext>((sp, o) =>
+            {
+                var source = sp.GetRequiredService<SqlConnectionSource>();
+                o.UseSqlServer(source.Connection, y => y.UseNodaTime().EnableRetryOnFailure());
+            });
+        return services;
     }
 }
