@@ -19,8 +19,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Ebix;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Xml;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Ebix;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Xml;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;

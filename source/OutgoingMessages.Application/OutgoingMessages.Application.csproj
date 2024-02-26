@@ -20,6 +20,10 @@
     <ProjectReference Include="..\Common\Common.csproj"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DocumentWriters\" />
+  </ItemGroup>
+
   <ItemDefinitionGroup>
     <ProjectReference>
       <PrivateAssets>all</PrivateAssets>
