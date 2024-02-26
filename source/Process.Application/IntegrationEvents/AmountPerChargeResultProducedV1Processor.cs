@@ -53,15 +53,11 @@ public class AmountPerChargeResultProducedV1Processor : IIntegrationEventProcess
 
         var amountPerChargeResultProducedV1 = (AmountPerChargeResultProducedV1)integrationEvent.Message;
 
-        var message = WholesaleCalculationResultMessageFactory.CreateWholesaleCalculationSeries(amountPerChargeResultProducedV1);
-
         var messageForEnergySupplier = WholesaleCalculationResultMessageFactory.CreateMessageForEnergySupplier(
-            message,
-            BusinessReasonMapper.Map(amountPerChargeResultProducedV1.CalculationType),
+            amountPerChargeResultProducedV1,
             ProcessId.New());
         var messageForChargeOwner = WholesaleCalculationResultMessageFactory.CreateMessageForChargeOwner(
-            message,
-            BusinessReasonMapper.Map(amountPerChargeResultProducedV1.CalculationType),
+            amountPerChargeResultProducedV1,
             ProcessId.New());
 
         if (await _featureManager.UseAmountPerChargeResultProduced.ConfigureAwait(false))

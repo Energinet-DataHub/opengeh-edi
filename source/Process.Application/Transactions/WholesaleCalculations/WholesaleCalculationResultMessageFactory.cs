@@ -26,40 +26,74 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleCalcul
 public static class WholesaleCalculationResultMessageFactory
 {
     public static WholesaleCalculationResultMessage CreateMessageForEnergySupplier(
-        WholesaleCalculationSeries message,
-        BusinessReason businessReason,
+        AmountPerChargeResultProducedV1 eventMessage,
         ProcessId processId)
     {
-        ArgumentNullException.ThrowIfNull(message);
-        ArgumentNullException.ThrowIfNull(businessReason);
+        ArgumentNullException.ThrowIfNull(eventMessage);
         ArgumentNullException.ThrowIfNull(processId);
+
+        var message = CreateWholesaleCalculationSeries(eventMessage);
 
         return WholesaleCalculationResultMessage.Create(
             receiverNumber: message.EnergySupplier,
             receiverRole: ActorRole.EnergySupplier,
             processId: processId,
-            businessReason: businessReason,
+            businessReason: BusinessReasonMapper.Map(eventMessage.CalculationType),
             wholesaleSeries: message);
     }
 
     public static WholesaleCalculationResultMessage CreateMessageForChargeOwner(
-        WholesaleCalculationSeries message,
-        BusinessReason businessReason,
+        AmountPerChargeResultProducedV1 eventMessage,
         ProcessId processId)
     {
-        ArgumentNullException.ThrowIfNull(message);
-        ArgumentNullException.ThrowIfNull(businessReason);
+        ArgumentNullException.ThrowIfNull(eventMessage);
         ArgumentNullException.ThrowIfNull(processId);
+
+        var message = CreateWholesaleCalculationSeries(eventMessage);
 
         return WholesaleCalculationResultMessage.Create(
             receiverNumber: message.ChargeOwner,
             receiverRole: GetChargeOwner(message.ChargeOwner),
             processId: processId,
-            businessReason: businessReason,
+            businessReason: BusinessReasonMapper.Map(eventMessage.CalculationType),
             wholesaleSeries: message);
     }
 
-    public static WholesaleCalculationSeries CreateWholesaleCalculationSeries(
+    public static WholesaleCalculationResultMessage CreateMessageForEnergySupplier(
+        MonthlyAmountPerChargeResultProducedV1 eventMessage,
+        ProcessId processId)
+    {
+        ArgumentNullException.ThrowIfNull(eventMessage);
+        ArgumentNullException.ThrowIfNull(processId);
+
+        var message = CreateWholesaleCalculationSeries(eventMessage);
+
+        return WholesaleCalculationResultMessage.Create(
+            receiverNumber: message.EnergySupplier,
+            receiverRole: ActorRole.EnergySupplier,
+            processId: processId,
+            businessReason: BusinessReasonMapper.Map(eventMessage.CalculationType),
+            wholesaleSeries: message);
+    }
+
+    public static WholesaleCalculationResultMessage CreateMessageForChargeOwner(
+        MonthlyAmountPerChargeResultProducedV1 eventMessage,
+        ProcessId processId)
+    {
+        ArgumentNullException.ThrowIfNull(eventMessage);
+        ArgumentNullException.ThrowIfNull(processId);
+
+        var message = CreateWholesaleCalculationSeries(eventMessage);
+
+        return WholesaleCalculationResultMessage.Create(
+            receiverNumber: message.ChargeOwner,
+            receiverRole: GetChargeOwner(message.ChargeOwner),
+            processId: processId,
+            businessReason: BusinessReasonMapper.Map(eventMessage.CalculationType),
+            wholesaleSeries: message);
+    }
+
+    private static WholesaleCalculationSeries CreateWholesaleCalculationSeries(
         MonthlyAmountPerChargeResultProducedV1 message)
     {
         ArgumentNullException.ThrowIfNull(message);
@@ -88,7 +122,7 @@ public static class WholesaleCalculationResultMessageFactory
         return wholesaleCalculationSeries;
     }
 
-    public static WholesaleCalculationSeries CreateWholesaleCalculationSeries(
+    private static WholesaleCalculationSeries CreateWholesaleCalculationSeries(
         AmountPerChargeResultProducedV1 message)
     {
         ArgumentNullException.ThrowIfNull(message);
