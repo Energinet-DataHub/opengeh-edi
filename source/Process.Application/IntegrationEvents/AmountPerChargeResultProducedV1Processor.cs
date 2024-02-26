@@ -21,7 +21,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleCalculations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
