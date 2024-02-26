@@ -23,7 +23,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Ebix;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Xml;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices;
 
 public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
 {
