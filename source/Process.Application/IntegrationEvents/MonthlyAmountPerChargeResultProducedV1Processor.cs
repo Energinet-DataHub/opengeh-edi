@@ -17,11 +17,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleCalculations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.Process.Application.IntegrationEvents;
 
@@ -29,13 +33,16 @@ public class MonthlyAmountPerChargeResultProducedV1Processor : IIntegrationEvent
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly IFeatureFlagManager _featureManager;
+    private readonly ActorMessageQueueContext _actorMessageQueueContext;
 
     public MonthlyAmountPerChargeResultProducedV1Processor(
         IOutgoingMessagesClient outgoingMessagesClient,
-        IFeatureFlagManager featureManager)
+        IFeatureFlagManager featureManager,
+        ActorMessageQueueContext actorMessageQueueContext)
     {
         _outgoingMessagesClient = outgoingMessagesClient;
         _featureManager = featureManager;
+        _actorMessageQueueContext = actorMessageQueueContext;
     }
 
     public string EventTypeToHandle => MonthlyAmountPerChargeResultProducedV1.EventName;
@@ -46,11 +53,23 @@ public class MonthlyAmountPerChargeResultProducedV1Processor : IIntegrationEvent
 
         var monthlyAmountPerChargeResultProducedV1 = (MonthlyAmountPerChargeResultProducedV1)integrationEvent.Message;
 
-        var message = WholesaleCalculationResultMessageFactory.CreateMessage(monthlyAmountPerChargeResultProducedV1, ProcessId.New());
+        var messageForEnergySupplier = WholesaleCalculationResultMessageFactory.CreateMessageForEnergySupplier(
+            monthlyAmountPerChargeResultProducedV1,
+            ProcessId.New());
+
+        var messageForChargeOwner = WholesaleCalculationResultMessageFactory.CreateMessageForChargeOwner(
+            monthlyAmountPerChargeResultProducedV1,
+            ProcessId.New());
 
         if (await _featureManager.UseMonthlyAmountPerChargeResultProduced.ConfigureAwait(false))
         {
-            await _outgoingMessagesClient.EnqueueAndCommitAsync(message, cancellationToken).ConfigureAwait(false);
+            await ResilientTransaction.New(_actorMessageQueueContext, async () =>
+                {
+                    await _outgoingMessagesClient.EnqueueAsync(messageForEnergySupplier).ConfigureAwait(false);
+                    await _outgoingMessagesClient.EnqueueAsync(messageForChargeOwner).ConfigureAwait(false);
+                })
+                .SaveChangesAsync(new DbContext[] { _actorMessageQueueContext, })
+                .ConfigureAwait(false);
         }
     }
 }

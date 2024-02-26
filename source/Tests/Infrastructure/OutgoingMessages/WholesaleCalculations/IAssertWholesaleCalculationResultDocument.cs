@@ -46,8 +46,7 @@ public interface IAssertWholesaleCalculationResultDocument
     /// <summary>
     /// Assert sender id in header
     /// </summary>
-    /// <param name="expectedSenderId"></param>
-    IAssertWholesaleCalculationResultDocument HasSenderId(ActorNumber expectedSenderId);
+    IAssertWholesaleCalculationResultDocument HasSenderId(ActorNumber expectedSenderId, string codingScheme);
 
     /// <summary>
     /// Assert sender role in header
@@ -73,6 +72,7 @@ public interface IAssertWholesaleCalculationResultDocument
     /// </summary>
     /// <param name="expectedTimestamp"></param>
     IAssertWholesaleCalculationResultDocument HasTimestamp(string expectedTimestamp);
+
     #endregion
 
     #region series validation
@@ -99,19 +99,27 @@ public interface IAssertWholesaleCalculationResultDocument
     /// Asserts the reference id of the first series element
     /// </summary>
     /// <param name="expectedOriginalTransactionIdReference"></param>
-    IAssertWholesaleCalculationResultDocument HasOriginalTransactionIdReference(string expectedOriginalTransactionIdReference);
-
-    /// <summary>
-    /// Asserts the evaluation type of the first series element
-    /// </summary>
-    /// <param name="expectedMarketEvaluationType"></param>
-    IAssertWholesaleCalculationResultDocument HasEvaluationType(string expectedMarketEvaluationType);
+    IAssertWholesaleCalculationResultDocument HasOriginalTransactionIdReference(
+        string expectedOriginalTransactionIdReference);
 
     /// <summary>
     /// Asserts the settlement method of the first series element
     /// </summary>
     /// <param name="expectedSettlementMethod"></param>
     IAssertWholesaleCalculationResultDocument HasSettlementMethod(SettlementType expectedSettlementMethod);
+
+    /// <summary>
+    /// Asserts the amount sum of the points of the first series element
+    /// </summary>
+    /// <param name="pointIndex"></param>
+    /// <param name="expectedPrice"></param>
+    IAssertWholesaleCalculationResultDocument PriceAmountIsPresentForPointIndex(int pointIndex, string? expectedPrice);
+
+    /// <summary>
+    /// Asserts the metering point type of the first series element
+    /// </summary>
+    /// <param name="expectedMeteringPointType"></param>
+    IAssertWholesaleCalculationResultDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType);
 
     /// <summary>
     /// Asserts the charge type number of the first series element
@@ -128,20 +136,21 @@ public interface IAssertWholesaleCalculationResultDocument
     /// <summary>
     /// Asserts the charge type owner of the first series element
     /// </summary>
-    /// <param name="expectedChargeTypeOwner"></param>
-    IAssertWholesaleCalculationResultDocument HasChargeTypeOwner(ActorNumber expectedChargeTypeOwner);
+    IAssertWholesaleCalculationResultDocument HasChargeTypeOwner(
+        ActorNumber expectedChargeTypeOwner,
+        string codingScheme);
 
     /// <summary>
     /// Asserts grid area code of the first series element
     /// </summary>
-    /// <param name="expectedGridAreaCode"></param>
-    IAssertWholesaleCalculationResultDocument HasGridAreaCode(string expectedGridAreaCode);
+    IAssertWholesaleCalculationResultDocument HasGridAreaCode(string expectedGridAreaCode, string codingScheme);
 
     /// <summary>
     /// Asserts energy supplier number of the first series element
     /// </summary>
-    /// <param name="expectedEnergySupplierNumber"></param>
-    IAssertWholesaleCalculationResultDocument HasEnergySupplierNumber(ActorNumber expectedEnergySupplierNumber);
+    IAssertWholesaleCalculationResultDocument HasEnergySupplierNumber(
+        ActorNumber expectedEnergySupplierNumber,
+        string codingScheme);
 
     /// <summary>
     /// Assets the product of the first series element
@@ -188,7 +197,9 @@ public interface IAssertWholesaleCalculationResultDocument
     /// <summary>
     /// Asserts the quality is present with the given code
     /// </summary>
-    IAssertWholesaleCalculationResultDocument QualityIsPresentForPosition(int expectedPosition, string expectedQuantityQualityCode);
+    IAssertWholesaleCalculationResultDocument QualityIsPresentForPosition(
+        int expectedPosition,
+        string expectedQuantityQualityCode);
 
     /// <summary>
     /// Asserts the settlement method is not present
@@ -199,5 +210,6 @@ public interface IAssertWholesaleCalculationResultDocument
     /// Asserts the settlement version is not present
     /// </summary>
     IAssertWholesaleCalculationResultDocument SettlementVersionIsNotPresent();
+
     #endregion
 }

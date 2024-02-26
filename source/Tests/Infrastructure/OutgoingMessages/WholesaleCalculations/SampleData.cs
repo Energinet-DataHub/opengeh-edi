@@ -42,7 +42,7 @@ internal static class SampleData
 
     public static ActorNumber EnergySupplier => ActorNumber.Create("5790000000000");
 
-    public static ActorNumber ChargeOwner => ActorNumber.Create("5790000000111");
+    public static ActorNumber ChargeOwner => ActorNumber.Create("5790000000111999");
 
     public static ChargeType ChargeType => ChargeType.Tariff;
 
