@@ -14,11 +14,9 @@
 
 using System;
 using System.Net.Http;
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus.RemoteBusinessServices;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
@@ -71,35 +69,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection
         {
             _services.AddScoped(action);
             return this;
-        }
-
-        public CompositionRoot AddRemoteBusinessService<TRequest, TReply>(string remoteRequestQueueName, string responseQueueName)
-            where TRequest : class
-            where TReply : class
-        {
-            _services.AddSingleton<IRemoteBusinessServiceRequestSenderAdapter<TRequest>>(provider =>
-                new RemoteBusinessServiceRequestSenderAdapter<TRequest>(provider.GetRequiredService<ServiceBusClient>(), remoteRequestQueueName));
-            AddRemoteBusinessService<TRequest, TReply>(responseQueueName);
-            return this;
-        }
-
-        public CompositionRoot AddRemoteBusinessService<TRequest, TReply>(Func<IServiceProvider, IRemoteBusinessServiceRequestSenderAdapter<TRequest>> adapterBuilder, string responseQueueName)
-            where TRequest : class
-            where TReply : class
-        {
-            _services.AddSingleton(adapterBuilder);
-            AddRemoteBusinessService<TRequest, TReply>(responseQueueName);
-            return this;
-        }
-
-        private void AddRemoteBusinessService<TRequest, TReply>(string responseQueueName)
-            where TRequest : class
-            where TReply : class
-        {
-            _services.AddSingleton(provider =>
-                new RemoteBusinessService<TRequest, TReply>(
-                    provider.GetRequiredService<IRemoteBusinessServiceRequestSenderAdapter<TRequest>>(),
-                    responseQueueName));
         }
 
         private void AddMediatR()
