@@ -39,7 +39,7 @@ public sealed class WhenAmountPerChargeResultResultIsPublishedTests
     }
 
     [Fact]
-    public async Task Actor_can_peek_and_dequeue_monthly_charge_result()
+    public async Task Actor_can_peek_and_dequeue_amount_charge_result()
     {
         await _aggregations.EmptyQueueForActor();
 
