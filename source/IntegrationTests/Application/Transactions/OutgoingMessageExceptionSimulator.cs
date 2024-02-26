@@ -43,7 +43,7 @@ internal sealed class OutgoingMessageExceptionSimulator : OutgoingMessagesClient
         ArgumentNullException.ThrowIfNull(outgoingMessage);
         if (outgoingMessage.ReceiverRole == ActorRole.EnergySupplier)
         {
-            throw new InvalidDataException("Simulated exception");
+            throw new InvalidDataException("Simulated exception.");
         }
 
         return base.EnqueueAsync(outgoingMessage);
