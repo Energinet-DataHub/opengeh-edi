@@ -58,7 +58,6 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
 
         await _ebix.PublishMonthlySumPrChargeFor(AcceptanceTestFixture.EbixActorGridArea, AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ChargeOwnerId);
 
-        // Bump
         await _ebix.ConfirmWholesaleResultIsAvailableForActor();
     }
 
