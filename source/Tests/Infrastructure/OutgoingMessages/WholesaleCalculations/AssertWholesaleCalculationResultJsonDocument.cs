@@ -82,14 +82,22 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasSenderId(ActorNumber expectedSenderId)
+    public IAssertWholesaleCalculationResultDocument HasSenderId(ActorNumber expectedSenderId, string codingScheme)
     {
         ArgumentNullException.ThrowIfNull(expectedSenderId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(codingScheme);
+
         _root.GetProperty("sender_MarketParticipant.mRID")
             .GetProperty("value")
             .GetString()
             .Should()
             .Be(expectedSenderId.Value);
+
+        _root.GetProperty("sender_MarketParticipant.mRID")
+            .GetProperty("codingScheme")
+            .GetString()
+            .Should()
+            .Be(codingScheme);
 
         return this;
     }
@@ -140,13 +148,13 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
 
     public IAssertWholesaleCalculationResultDocument HasTransactionId(Guid expectedTransactionId)
     {
-        FirstTimeSeriesElement().GetProperty("mRID").GetString().Should().Be(expectedTransactionId.ToString());
+        FirstWholesaleSeriesElement().GetProperty("mRID").GetString().Should().Be(expectedTransactionId.ToString());
         return this;
     }
 
     public IAssertWholesaleCalculationResultDocument HasCalculationVersion(int expectedVersion)
     {
-        FirstTimeSeriesElement()
+        FirstWholesaleSeriesElement()
             .GetProperty("version")
             .GetString()
             .Should()
@@ -157,7 +165,7 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
 
     public IAssertWholesaleCalculationResultDocument HasSettlementVersion(SettlementVersion expectedSettlementVersion)
     {
-        FirstTimeSeriesElement()
+        FirstWholesaleSeriesElement()
             .GetProperty("settlement_Series.version")
             .GetProperty("value")
             .GetString()
@@ -170,7 +178,7 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
     public IAssertWholesaleCalculationResultDocument HasOriginalTransactionIdReference(
         string expectedOriginalTransactionIdReference)
     {
-        FirstTimeSeriesElement()
+        FirstWholesaleSeriesElement()
             .GetProperty("originalTransactionIDReference_Series.mRID")
             .GetString()
             .Should()
@@ -180,7 +188,7 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
 
     public IAssertWholesaleCalculationResultDocument HasEvaluationType(string expectedMarketEvaluationType)
     {
-        FirstTimeSeriesElement()
+        FirstWholesaleSeriesElement()
             .GetProperty("marketEvaluationPoint.type")
             .GetProperty("value")
             .GetString()
@@ -193,7 +201,7 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
     {
         ArgumentNullException.ThrowIfNull(expectedSettlementMethod);
 
-        FirstTimeSeriesElement()
+        FirstWholesaleSeriesElement()
             .GetProperty("marketEvaluationPoint.settlementMethod")
             .GetProperty("value")
             .GetString()
@@ -205,7 +213,7 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
 
     public IAssertWholesaleCalculationResultDocument HasChargeCode(string expectedChargeTypeNumber)
     {
-        FirstTimeSeriesElement()
+        FirstWholesaleSeriesElement()
             .GetProperty("chargeType.mRID")
             .GetString()
             .Should()
@@ -217,7 +225,7 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
     public IAssertWholesaleCalculationResultDocument HasChargeType(ChargeType expectedChargeType)
     {
         ArgumentNullException.ThrowIfNull(expectedChargeType);
-        FirstTimeSeriesElement()
+        FirstWholesaleSeriesElement()
             .GetProperty("chargeType.type")
             .GetProperty("value")
             .GetString()
@@ -227,54 +235,80 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasChargeTypeOwner(ActorNumber expectedChargeTypeOwner)
+    public IAssertWholesaleCalculationResultDocument HasChargeTypeOwner(
+        ActorNumber expectedChargeTypeOwner,
+        string codingScheme)
     {
         ArgumentNullException.ThrowIfNull(expectedChargeTypeOwner);
-        FirstTimeSeriesElement()
+        FirstWholesaleSeriesElement()
             .GetProperty("chargeType.chargeTypeOwner_MarketParticipant.mRID")
             .GetProperty("value")
             .GetString()
             .Should()
             .Be(expectedChargeTypeOwner.Value);
 
+        FirstWholesaleSeriesElement()
+            .GetProperty("chargeType.chargeTypeOwner_MarketParticipant.mRID")
+            .GetProperty("codingScheme")
+            .GetString()
+            .Should()
+            .Be(codingScheme);
+
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasGridAreaCode(string expectedGridAreaCode)
+    public IAssertWholesaleCalculationResultDocument HasGridAreaCode(string expectedGridAreaCode, string codingScheme)
     {
-        FirstTimeSeriesElement()
+        FirstWholesaleSeriesElement()
             .GetProperty("meteringGridArea_Domain.mRID")
             .GetProperty("value")
             .GetString()
             .Should()
             .Be(expectedGridAreaCode);
 
+        FirstWholesaleSeriesElement()
+            .GetProperty("meteringGridArea_Domain.mRID")
+            .GetProperty("codingScheme")
+            .GetString()
+            .Should()
+            .Be(codingScheme);
+
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasEnergySupplierNumber(ActorNumber expectedEnergySupplierNumber)
+    public IAssertWholesaleCalculationResultDocument HasEnergySupplierNumber(
+        ActorNumber expectedEnergySupplierNumber,
+        string codingScheme)
     {
         ArgumentNullException.ThrowIfNull(expectedEnergySupplierNumber);
-        FirstTimeSeriesElement()
+
+        FirstWholesaleSeriesElement()
             .GetProperty("energySupplier_MarketParticipant.mRID")
             .GetProperty("value")
             .GetString()
             .Should()
             .Be(expectedEnergySupplierNumber.Value);
 
+        FirstWholesaleSeriesElement()
+            .GetProperty("energySupplier_MarketParticipant.mRID")
+            .GetProperty("codingScheme")
+            .GetString()
+            .Should()
+            .Be(codingScheme);
+
         return this;
     }
 
     public IAssertWholesaleCalculationResultDocument HasProductCode(string expectedProductCode)
     {
-        FirstTimeSeriesElement().GetProperty("product").GetString().Should().Be(expectedProductCode);
+        FirstWholesaleSeriesElement().GetProperty("product").GetString().Should().Be(expectedProductCode);
         return this;
     }
 
     public IAssertWholesaleCalculationResultDocument HasMeasurementUnit(MeasurementUnit expectedMeasurementUnit)
     {
         ArgumentNullException.ThrowIfNull(expectedMeasurementUnit);
-        FirstTimeSeriesElement()
+        FirstWholesaleSeriesElement()
             .GetProperty("quantity_Measure_Unit.name")
             .GetProperty("value")
             .GetString()
@@ -288,7 +322,7 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
         MeasurementUnit expectedPriceMeasurementUnit)
     {
         ArgumentNullException.ThrowIfNull(expectedPriceMeasurementUnit);
-        FirstTimeSeriesElement()
+        FirstWholesaleSeriesElement()
             .GetProperty("price_Measure_Unit.name")
             .GetProperty("value")
             .GetString()
@@ -301,7 +335,7 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
     public IAssertWholesaleCalculationResultDocument HasCurrency(Currency expectedPriceUnit)
     {
         ArgumentNullException.ThrowIfNull(expectedPriceUnit);
-        FirstTimeSeriesElement()
+        FirstWholesaleSeriesElement()
             .GetProperty("currency_Unit.name")
             .GetProperty("value")
             .GetString()
@@ -314,7 +348,7 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
     public IAssertWholesaleCalculationResultDocument HasPeriod(Period expectedPeriod)
     {
         ArgumentNullException.ThrowIfNull(expectedPeriod);
-        FirstTimeSeriesElement()
+        FirstWholesaleSeriesElement()
             .GetProperty("Period")
             .GetProperty("timeInterval")
             .GetProperty("start")
@@ -323,7 +357,7 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
             .Should()
             .Be(expectedPeriod.StartToString());
 
-        FirstTimeSeriesElement()
+        FirstWholesaleSeriesElement()
             .GetProperty("Period")
             .GetProperty("timeInterval")
             .GetProperty("end")
@@ -338,7 +372,7 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
     public IAssertWholesaleCalculationResultDocument HasResolution(Resolution resolution)
     {
         ArgumentNullException.ThrowIfNull(resolution);
-        FirstTimeSeriesElement()
+        FirstWholesaleSeriesElement()
             .GetProperty("Period")
             .GetProperty("resolution")
             .GetString()
@@ -350,7 +384,7 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
 
     public IAssertWholesaleCalculationResultDocument HasPositionAndQuantity(int expectedPosition, int expectedQuantity)
     {
-        var point = FirstTimeSeriesElement()
+        var point = FirstWholesaleSeriesElement()
             .GetProperty("Period")
             .GetProperty("Point")
             .EnumerateArray()
@@ -374,7 +408,7 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
 
     public IAssertWholesaleCalculationResultDocument SettlementMethodIsNotPresent()
     {
-        var act = () => FirstTimeSeriesElement()
+        var act = () => FirstWholesaleSeriesElement()
             .GetProperty("marketEvaluationPoint.settlementMethod");
 
         act.Should()
@@ -388,7 +422,7 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
         int expectedPosition,
         string expectedQuantityQualityCode)
     {
-        FirstTimeSeriesElement()
+        FirstWholesaleSeriesElement()
             .GetProperty("Period")
             .GetProperty("Point")
             .EnumerateArray()
@@ -413,8 +447,12 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
         return this;
     }
 
-    private JsonElement FirstTimeSeriesElement()
+    private JsonElement FirstWholesaleSeriesElement()
     {
-        return _root.GetProperty("Series").EnumerateArray().ToList()[0];
+        var wholesaleSeries = _root.GetProperty("Series").EnumerateArray().ToList();
+
+        wholesaleSeries.Should().NotBeEmpty();
+
+        return wholesaleSeries[0];
     }
 }
