@@ -12,17 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using BuildingBlocks.Application.Configuration;
+using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
 using Energinet.DataHub.EDI.Process.Application.IntegrationEvents;
-using Energinet.DataHub.EDI.Process.Application.InternalCommands;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands.Handlers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
-using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleCalculations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
@@ -35,11 +33,11 @@ using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.Process.Application.Configuration;
+namespace Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
 
-public static class ProcessConfiguration
+public static class ProcessExtensions
 {
-    public static void AddProcessModule(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddProcessModule(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddOptions<ServiceBusClientOptions>()
             .Bind(configuration)
@@ -51,16 +49,19 @@ public static class ProcessConfiguration
 
         //EventsConfiguration
         //TODO: can we move them out and delete ref to Infrastructure?
-        services.AddTransient<IIntegrationEventProcessor, EnergyResultProducedV2Processor>();
-        services.AddTransient<IIntegrationEventProcessor, MonthlyAmountPerChargeResultProducedV1Processor>();
-        services.AddTransient<IIntegrationEventProcessor, AmountPerChargeResultProducedV1Processor>();
-        services.AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestAcceptedEventMapper>();
-        services.AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestRejectedMapper>();
+        services.AddTransient<IIntegrationEventProcessor, EnergyResultProducedV2Processor>()
+            .AddTransient<IIntegrationEventProcessor, MonthlyAmountPerChargeResultProducedV1Processor>()
+            .AddTransient<IIntegrationEventProcessor, AmountPerChargeResultProducedV1Processor>()
+            .AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestAcceptedEventMapper>()
+            .AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestRejectedMapper>();
 
         //ProcessingConfiguration
-        services.AddScoped<DomainEventsAccessor>();
-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>));
-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RaiseDomainEventsBehaviour<,>));
+        services.AddScoped<DomainEventsAccessor>()
+            .AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>))
+            .AddTransient(typeof(IPipelineBehavior<,>), typeof(RaiseDomainEventsBehaviour<,>))
+            .AddInternalCommands()
+            .AddInboxEvents()
+            .AddWholesaleInbox();
 
         //EnqueueMessageConfiguration
         services.AddTransient<INotificationHandler<EnqueueMessageEvent>, EnqueueMessageHandler>();
@@ -69,16 +70,16 @@ public static class ProcessConfiguration
         services.AddScoped<AggregationMessageResultFactory>();
 
         // RequestedAggregatedMeasureDataConfiguration
-        services.AddTransient<IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>, SendAggregatedMeasuredDataToWholesale>();
-        services.AddTransient<IRequestHandler<AcceptedAggregatedTimeSerie, Unit>, AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable>();
-        services.AddTransient<IRequestHandler<RejectedAggregatedTimeSeries, Unit>, RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable>();
-        services.AddTransient<INotificationHandler<AggregatedMeasureProcessIsInitialized>, NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized>();
-        services.AddTransient<IRequestHandler<InitializeAggregatedMeasureDataProcessesCommand, Unit>, InitializeAggregatedMeasureDataProcessesHandler>();
-        services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>, WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable>();
-        services.AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasRejected>, WhenAnRejectedAggregatedTimeSeriesRequestIsAvailable>();
-        services.AddScoped<WholesaleInbox>();
-        services.AddScoped<IAggregatedMeasureDataProcessRepository, AggregatedMeasureDataProcessRepository>();
+        services.AddTransient<IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>, SendAggregatedMeasuredDataToWholesale>()
+            .AddTransient<IRequestHandler<AcceptedAggregatedTimeSerie, Unit>, AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable>()
+            .AddTransient<IRequestHandler<RejectedAggregatedTimeSeries, Unit>, RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable>()
+            .AddTransient<INotificationHandler<AggregatedMeasureProcessIsInitialized>, NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized>()
+            .AddTransient<IRequestHandler<InitializeAggregatedMeasureDataProcessesCommand, Unit>, InitializeAggregatedMeasureDataProcessesHandler>()
+            .AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>, WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable>()
+            .AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasRejected>, WhenAnRejectedAggregatedTimeSeriesRequestIsAvailable>()
+            .AddScoped<WholesaleInbox>()
+            .AddScoped<IAggregatedMeasureDataProcessRepository, AggregatedMeasureDataProcessRepository>();
 
-        InternalCommandConfiguration.Configure(services);
+        return services;
     }
 }

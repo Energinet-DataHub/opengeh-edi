@@ -16,26 +16,27 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
-using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.Process.Application.InternalCommands;
+namespace Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
 
-internal static class InternalCommandConfiguration
+internal static class InternalCommandExtensions
 {
-    internal static void Configure(IServiceCollection services)
+    internal static IServiceCollection AddInternalCommands(this IServiceCollection services)
     {
-        services.AddSingleton(CreateInternalCommandMap());
-        services.AddTransient<CommandExecutor>();
-        services.AddScoped<ICommandScheduler, CommandScheduler>();
-        services.AddScoped<CommandSchedulerFacade>();
-        services.AddTransient<InternalCommandAccessor>();
-        services.AddTransient<InternalCommandProcessor>();
-        services.AddTransient<INotificationHandler<TenSecondsHasHasPassed>, ProcessInternalCommandsOnTimeHasPassed>();
-        services.AddTransient<IDataRetention, InternalCommandsRetention>();
+        services.AddSingleton(CreateInternalCommandMap())
+            .AddTransient<CommandExecutor>()
+            .AddScoped<ICommandScheduler, CommandScheduler>()
+            .AddScoped<CommandSchedulerFacade>()
+            .AddTransient<InternalCommandAccessor>()
+            .AddTransient<InternalCommandProcessor>()
+            .AddTransient<INotificationHandler<TenSecondsHasHasPassed>, ProcessInternalCommandsOnTimeHasPassed>()
+            .AddTransient<IDataRetention, InternalCommandsRetention>();
+
+        return services;
     }
 
     private static InternalCommandMapper CreateInternalCommandMap()
