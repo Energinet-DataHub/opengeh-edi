@@ -13,12 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
@@ -27,6 +28,7 @@ using Energinet.DataHub.EDI.Tests.Fixtures;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions.Execution;
 using Xunit;
+using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations.Point;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.WholesaleCalculations;
 
@@ -69,7 +71,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
             .WithMeasurementUnit(SampleData.MeasurementUnit)
             .WithPriceMeasurementUnit(SampleData.PriceMeasureUnit)
             .WithResolution(SampleData.Resolution)
-            .WithQuantity(SampleData.Quantity);
+            .WithPoints(new Collection<Point>() { new(1, 1, 1, SampleData.Quantity, null) });
 
         // Act
         var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
@@ -79,7 +81,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
         await AssertDocument(document, DocumentFormat.From(documentFormat))
             .HasMessageId(SampleData.MessageId)
             .HasBusinessReason(SampleData.BusinessReason, CodeListType.EbixDenmark) // "D05" (WholesaleFixing) is from CodeListType.EbixDenmark
-            .HasSenderId(SampleData.SenderId)
+            .HasSenderId(SampleData.SenderId, "A10")
             .HasSenderRole(ActorRole.EnergySupplier)
             .HasReceiverId(SampleData.ReceiverId)
             .HasReceiverRole(ActorRole.MeteredDataResponsible, CodeListType.Ebix) // MDR is from CodeListType.Ebix
@@ -88,9 +90,9 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
             .HasCalculationVersion(SampleData.Version)
             .HasChargeCode(SampleData.ChargeCode)
             .HasChargeType(SampleData.ChargeType)
-            .HasChargeTypeOwner(SampleData.ChargeOwner)
-            .HasGridAreaCode(SampleData.GridAreaCode)
-            .HasEnergySupplierNumber(SampleData.EnergySupplier)
+            .HasChargeTypeOwner(SampleData.ChargeOwner, "A01")
+            .HasGridAreaCode(SampleData.GridAreaCode, "NDK")
+            .HasEnergySupplierNumber(SampleData.EnergySupplier, "A10")
             .HasPeriod(new Period(SampleData.PeriodStartUtc, SampleData.PeriodEndUtc))
             .HasCurrency(SampleData.Currency)
             .HasMeasurementUnit(SampleData.MeasurementUnit)
@@ -106,11 +108,11 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     [InlineData(nameof(DocumentFormat.Ebix))]
-    public async Task Can_create_notifyWholesaleServices_document_without_quantity(string documentFormat)
+    public async Task Can_create_notifyWholesaleServices_document_without_energySum_quantity(string documentFormat)
     {
         // Arrange
         var messageBuilder = _wholesaleCalculationsResultMessageBuilder
-            .WithQuantity(null);
+            .WithPoints(new Collection<Point>() { new Point(1, 1, 1, null, null) });
 
         // Act
         var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
@@ -156,6 +158,96 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
         // Assert
         AssertDocument(document, DocumentFormat.From(documentFormat))
             .HasMeasurementUnit(MeasurementUnit.Pieces);
+    }
+
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
+    [InlineData(nameof(DocumentFormat.Ebix))]
+    public async Task Can_create_notifyWholesaleServices_document_with_calculated_hourly_tariff_amounts_for_flex_consumption(string documentFormat)
+    {
+        // Arrange
+        var firstPoint = new Point(1, 1, 100, 100, null);
+        var secondPoint = new Point(2, 1, 200, 200, null);
+
+        var messageBuilder = _wholesaleCalculationsResultMessageBuilder
+            .WithSettlementMethod(SettlementType.Flex)
+            .WithMeteringPointType(MeteringPointType.Consumption)
+            .WithPoints(new()
+            {
+                firstPoint,
+                secondPoint,
+            });
+
+        // Act
+        var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
+
+        // Assert
+        AssertDocument(document, DocumentFormat.From(documentFormat))
+            .HasSettlementMethod(SettlementType.Flex)
+            .HasMeteringPointType(MeteringPointType.Consumption)
+            .PriceAmountIsPresentForPointIndex(0, firstPoint.Price?.ToString(NumberFormatInfo.InvariantInfo))
+            .PriceAmountIsPresentForPointIndex(1, secondPoint.Price?.ToString(NumberFormatInfo.InvariantInfo));
+    }
+
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
+    [InlineData(nameof(DocumentFormat.Ebix))]
+    public async Task Can_create_notifyWholesaleServices_document_with_calculated_hourly_tariff_amounts_for_production(string documentFormat)
+    {
+        // Arrange
+        var firstPoint = new Point(1, 1, 100, 100, null);
+        var secondPoint = new Point(2, 1, 200, 100, null);
+
+        var messageBuilder = _wholesaleCalculationsResultMessageBuilder
+                .WithSettlementMethod(null)
+                .WithMeteringPointType(MeteringPointType.Production)
+                .WithPoints(new()
+                {
+                    firstPoint,
+                    secondPoint,
+                });
+
+        // Act
+        var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
+
+        // Assert
+        AssertDocument(document, DocumentFormat.From(documentFormat))
+            .SettlementMethodIsNotPresent()
+            .HasMeteringPointType(MeteringPointType.Production)
+            .PriceAmountIsPresentForPointIndex(0, firstPoint.Price?.ToString(NumberFormatInfo.InvariantInfo))
+            .PriceAmountIsPresentForPointIndex(1, secondPoint.Price?.ToString(NumberFormatInfo.InvariantInfo));
+    }
+
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
+    [InlineData(nameof(DocumentFormat.Ebix))]
+    public async Task Can_create_notifyWholesaleServices_document_with_calculated_hourly_tariff_amounts_for_consumption(string documentFormat)
+    {
+        // Arrange
+        var firstPoint = new Point(1, 1, 100, 100, null);
+        var secondPoint = new Point(2, 1, 200, 200, null);
+
+        var messageBuilder = _wholesaleCalculationsResultMessageBuilder
+            .WithSettlementMethod(SettlementType.NonProfiled)
+            .WithMeteringPointType(MeteringPointType.Consumption)
+            .WithPoints(new()
+            {
+                firstPoint,
+                secondPoint,
+            });
+
+        // Act
+        var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
+
+        // Assert
+        AssertDocument(document, DocumentFormat.From(documentFormat))
+            .HasSettlementMethod(SettlementType.NonProfiled)
+            .HasMeteringPointType(MeteringPointType.Consumption)
+            .PriceAmountIsPresentForPointIndex(0, firstPoint.Price?.ToString(NumberFormatInfo.InvariantInfo))
+            .PriceAmountIsPresentForPointIndex(1, secondPoint.Price?.ToString(NumberFormatInfo.InvariantInfo));
     }
 
     private Task<MarketDocumentStream> WriteDocument(OutgoingMessageHeader header, WholesaleCalculationSeries wholesaleCalculationSeries, DocumentFormat documentFormat)

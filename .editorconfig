@@ -121,7 +121,7 @@ dotnet_style_prefer_conditional_expression_over_return = true:suggestion
 dotnet_style_prefer_compound_assignment = true:suggestion
 
 # Null-checking preferences
-dotnet_style_coalesce_expression = true:error
+dotnet_style_coalesce_expression = true:suggestion
 dotnet_style_null_propagation = true:error
 
 ###############################
