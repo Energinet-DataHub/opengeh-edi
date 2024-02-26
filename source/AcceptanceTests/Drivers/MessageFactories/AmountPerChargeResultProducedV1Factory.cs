@@ -21,7 +21,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.MessageFactories;
 
 internal static class AmountPerChargeResultProducedV1Factory
 {
-    public static AmountPerChargeResultProducedV1 CreateMonthlyAmountPerChargeResultProduced(
+    public static AmountPerChargeResultProducedV1 CreateAmountPerChargeResultProduced(
         string gridAreaCode,
         string energySupplierId,
         string chargeOwnerId)

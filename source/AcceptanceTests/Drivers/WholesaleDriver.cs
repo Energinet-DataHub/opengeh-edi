@@ -67,7 +67,7 @@ internal sealed class WholesaleDriver
         string chargeOwnerId)
     {
         var amountPerChargeResultProduced =
-            AmountPerChargeResultProducedV1Factory.CreateMonthlyAmountPerChargeResultProduced(
+            AmountPerChargeResultProducedV1Factory.CreateAmountPerChargeResultProduced(
                 gridAreaCode,
                 energySupplierId,
                 chargeOwnerId);
