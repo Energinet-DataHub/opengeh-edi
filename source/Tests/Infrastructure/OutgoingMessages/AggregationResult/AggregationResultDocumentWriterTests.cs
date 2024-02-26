@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Tests.Factories;
@@ -279,19 +279,19 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         var records = _parser.From(resultBuilder.BuildTimeSeries());
         if (documentFormat == DocumentFormat.Ebix)
         {
-            return new AggregationResultEbixDocumentWriter(_parser).WriteAsync(
+            return new NotifyAggregatedMeasureDataEbixDocumentWriter(_parser).WriteAsync(
                 documentHeader,
                 new[] { records, });
         }
         else if (documentFormat == DocumentFormat.Xml)
         {
-            return new AggregationResultXmlDocumentWriter(_parser).WriteAsync(
+            return new NotifyAggregatedMeasureDataXmlDocumentWriter(_parser).WriteAsync(
                 documentHeader,
                 new[] { records, });
         }
         else
         {
-            return new AggregationResultJsonDocumentWriter(_parser).WriteAsync(
+            return new NotifyAggregatedMeasureDataJsonDocumentWriter(_parser).WriteAsync(
                 documentHeader,
                 new[] { records, });
         }

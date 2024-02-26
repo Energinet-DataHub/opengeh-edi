@@ -24,15 +24,15 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
 
-public class AggregationResultJsonDocumentWriter : IDocumentWriter
+public class NotifyAggregatedMeasureDataJsonDocumentWriter : IDocumentWriter
 {
     private const string DocumentTypeName = "NotifyAggregatedMeasureData_MarketDocument";
     private const string TypeCode = "E31";
     private readonly IMessageRecordParser _parser;
 
-    public AggregationResultJsonDocumentWriter(IMessageRecordParser parser)
+    public NotifyAggregatedMeasureDataJsonDocumentWriter(IMessageRecordParser parser)
     {
         _parser = parser;
     }

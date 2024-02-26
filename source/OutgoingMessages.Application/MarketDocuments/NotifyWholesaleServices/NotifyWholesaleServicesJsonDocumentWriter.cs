@@ -214,12 +214,12 @@ public sealed class NotifyWholesaleServicesJsonDocumentWriter : IDocumentWriter
         writer.WriteEndArray();
     }
 
-    private ReadOnlyCollection<NotifyWholesaleServicesMarketActivityRecord> ParseFrom(IReadOnlyCollection<string> payloads)
+    private ReadOnlyCollection<WholesaleCalculationMarketActivityRecord> ParseFrom(IReadOnlyCollection<string> payloads)
     {
         ArgumentNullException.ThrowIfNull(payloads);
 
         return payloads
-            .Select(payload => _parser.From<NotifyWholesaleServicesMarketActivityRecord>(payload))
+            .Select(payload => _parser.From<WholesaleCalculationMarketActivityRecord>(payload))
             .ToList()
             .AsReadOnly();
     }

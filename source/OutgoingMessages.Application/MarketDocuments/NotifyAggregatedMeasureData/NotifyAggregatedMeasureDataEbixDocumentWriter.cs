@@ -23,11 +23,11 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Ebix;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Xml;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
 
-public class AggregationResultEbixDocumentWriter : EbixDocumentWriter
+public class NotifyAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
 {
-    public AggregationResultEbixDocumentWriter(IMessageRecordParser parser)
+    public NotifyAggregatedMeasureDataEbixDocumentWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
             "DK_AggregatedMeteredDataTimeSeries",

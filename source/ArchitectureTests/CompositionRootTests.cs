@@ -21,7 +21,7 @@ using System.Text;
 using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.B2CWebApi;
 using Energinet.DataHub.EDI.Infrastructure.Configuration;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Xml;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
@@ -60,7 +60,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
         public static IEnumerable<object[]> GetDocumentWriterRequirements()
         {
             var constructorDependencies = ReflectionHelper.FindAllConstructorDependenciesForType();
-            return typeof(AggregationResultXmlDocumentWriter).Assembly.GetTypes()
+            return typeof(NotifyAggregatedMeasureDataXmlDocumentWriter).Assembly.GetTypes()
                 .Where(t => t.IsSubclassOf(typeof(DocumentWriter)))
                 .Select(t => new object[] { new Requirement(t.Name, constructorDependencies(t), t) });
         }
@@ -78,7 +78,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
         public static IEnumerable<object[]> GetDocumentWritersRequirements()
             => ResolveTypesThatImplementType(
                 typeof(IDocumentWriter),
-                new[] { ApplicationAssemblies.Application, ApplicationAssemblies.Infrastructure, typeof(AggregationResultXmlDocumentWriter).Assembly });
+                new[] { ApplicationAssemblies.Application, ApplicationAssemblies.Infrastructure, typeof(NotifyAggregatedMeasureDataXmlDocumentWriter).Assembly });
 
         public static IEnumerable<object[]> GetFunctionRequirements()
         {

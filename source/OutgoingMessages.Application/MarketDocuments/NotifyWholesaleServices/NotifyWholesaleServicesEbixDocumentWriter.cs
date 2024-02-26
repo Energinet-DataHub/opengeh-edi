@@ -47,7 +47,7 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
 
     protected override SettlementVersion? ExtractSettlementVersion(IReadOnlyCollection<string> marketActivityPayloads)
     {
-        var payloads = ParseFrom<NotifyWholesaleServicesMarketActivityRecord>(marketActivityPayloads);
+        var payloads = ParseFrom<WholesaleCalculationMarketActivityRecord>(marketActivityPayloads);
         var settlementVersions = payloads
             .Where(ts => ts.SettlementVersion is not null)
             .Select(ts => ts.SettlementVersion)
@@ -67,7 +67,7 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
         ArgumentNullException.ThrowIfNull(marketActivityPayloads);
         ArgumentNullException.ThrowIfNull(writer);
 
-        foreach (var series in ParseFrom<NotifyWholesaleServicesMarketActivityRecord>(marketActivityPayloads))
+        foreach (var series in ParseFrom<WholesaleCalculationMarketActivityRecord>(marketActivityPayloads))
         {
             // Begin PayloadEnergyTimeSeries
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "PayloadEnergyTimeSeries", null).ConfigureAwait(false);

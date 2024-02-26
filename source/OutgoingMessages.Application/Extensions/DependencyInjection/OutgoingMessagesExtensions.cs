@@ -15,7 +15,7 @@
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
@@ -40,8 +40,8 @@ public static class OutgoingMessagesExtensions
 
         //AddMessageGenerationServices
         services.AddScoped<DocumentFactory>()
-            .AddScoped<IDocumentWriter, AggregationResultXmlDocumentWriter>()
-            .AddScoped<IDocumentWriter, AggregationResultJsonDocumentWriter>()
+            .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataXmlDocumentWriter>()
+            .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataJsonDocumentWriter>()
             .AddScoped<IDocumentWriter, NotifyWholesaleServicesEbixDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataXmlDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataJsonDocumentWriter>()
