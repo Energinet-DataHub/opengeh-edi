@@ -18,7 +18,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
@@ -79,7 +78,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
         await AssertDocument(document, DocumentFormat.From(documentFormat))
             .HasMessageId(SampleData.MessageId)
             .HasBusinessReason(SampleData.BusinessReason, CodeListType.EbixDenmark) // "D05" (WholesaleFixing) is from CodeListType.EbixDenmark
-            .HasSenderId(SampleData.SenderId)
+            .HasSenderId(SampleData.SenderId, "A10")
             .HasSenderRole(ActorRole.EnergySupplier)
             .HasReceiverId(SampleData.ReceiverId)
             .HasReceiverRole(ActorRole.MeteredDataResponsible, CodeListType.Ebix) // MDR is from CodeListType.Ebix
@@ -89,8 +88,8 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
             .HasChargeCode(SampleData.ChargeCode)
             .HasChargeType(SampleData.ChargeType)
             .HasChargeTypeOwner(SampleData.ChargeOwner)
-            .HasGridAreaCode(SampleData.GridAreaCode)
-            .HasEnergySupplierNumber(SampleData.EnergySupplier)
+            .HasGridAreaCode(SampleData.GridAreaCode, "NDK")
+            .HasEnergySupplierNumber(SampleData.EnergySupplier, "A10")
             .HasPeriod(new Period(SampleData.PeriodStartUtc, SampleData.PeriodEndUtc))
             .HasCurrency(SampleData.Currency)
             .HasMeasurementUnit(SampleData.MeasurementUnit)

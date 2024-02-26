@@ -52,10 +52,14 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasSenderId(ActorNumber expectedSenderId)
+    public IAssertWholesaleCalculationResultDocument HasSenderId(ActorNumber expectedSenderId, string codingScheme)
     {
         ArgumentNullException.ThrowIfNull(expectedSenderId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(codingScheme);
+
         _documentAsserter.HasValue("sender_MarketParticipant.mRID", expectedSenderId.Value);
+        _documentAsserter.HasAttribute("sender_MarketParticipant.mRID", "codingScheme", codingScheme);
+
         return this;
     }
 
@@ -144,16 +148,21 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasGridAreaCode(string expectedGridAreaCode)
+    public IAssertWholesaleCalculationResultDocument HasGridAreaCode(string expectedGridAreaCode, string codingScheme)
     {
         _documentAsserter.HasValue("Series[1]/meteringGridArea_Domain.mRID", expectedGridAreaCode);
+        _documentAsserter.HasAttribute("Series[1]/meteringGridArea_Domain.mRID", "codingScheme", codingScheme);
+
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasEnergySupplierNumber(ActorNumber expectedEnergySupplierNumber)
+    public IAssertWholesaleCalculationResultDocument HasEnergySupplierNumber(
+        ActorNumber expectedEnergySupplierNumber,
+        string codingScheme)
     {
         ArgumentNullException.ThrowIfNull(expectedEnergySupplierNumber);
         _documentAsserter.HasValue("Series[1]/energySupplier_MarketParticipant.mRID", expectedEnergySupplierNumber.Value);
+        _documentAsserter.HasAttribute("Series[1]/energySupplier_MarketParticipant.mRID", "codingScheme", codingScheme);
         return this;
     }
 

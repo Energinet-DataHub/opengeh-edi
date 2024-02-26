@@ -46,8 +46,7 @@ public interface IAssertWholesaleCalculationResultDocument
     /// <summary>
     /// Assert sender id in header
     /// </summary>
-    /// <param name="expectedSenderId"></param>
-    IAssertWholesaleCalculationResultDocument HasSenderId(ActorNumber expectedSenderId);
+    IAssertWholesaleCalculationResultDocument HasSenderId(ActorNumber expectedSenderId, string codingScheme);
 
     /// <summary>
     /// Assert sender role in header
@@ -134,14 +133,14 @@ public interface IAssertWholesaleCalculationResultDocument
     /// <summary>
     /// Asserts grid area code of the first series element
     /// </summary>
-    /// <param name="expectedGridAreaCode"></param>
-    IAssertWholesaleCalculationResultDocument HasGridAreaCode(string expectedGridAreaCode);
+    IAssertWholesaleCalculationResultDocument HasGridAreaCode(string expectedGridAreaCode, string codingScheme);
 
     /// <summary>
     /// Asserts energy supplier number of the first series element
     /// </summary>
-    /// <param name="expectedEnergySupplierNumber"></param>
-    IAssertWholesaleCalculationResultDocument HasEnergySupplierNumber(ActorNumber expectedEnergySupplierNumber);
+    IAssertWholesaleCalculationResultDocument HasEnergySupplierNumber(
+        ActorNumber expectedEnergySupplierNumber,
+        string codingScheme);
 
     /// <summary>
     /// Assets the product of the first series element

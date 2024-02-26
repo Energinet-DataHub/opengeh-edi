@@ -60,7 +60,7 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasSenderId(ActorNumber expectedSenderId)
+    public IAssertWholesaleCalculationResultDocument HasSenderId(ActorNumber expectedSenderId, string codingScheme)
     {
         CreateRequiredSchemeAttribute(expectedSenderId);
 
@@ -145,7 +145,7 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasGridAreaCode(string expectedGridAreaCode)
+    public IAssertWholesaleCalculationResultDocument HasGridAreaCode(string expectedGridAreaCode, string codingScheme)
     {
         _documentAsserter.HasValueWithAttributes(
             $"{PayloadEnergyTimeSeries}[1]/MeteringGridAreaUsedDomainLocation/Identification",
@@ -156,7 +156,9 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasEnergySupplierNumber(ActorNumber expectedEnergySupplierNumber)
+    public IAssertWholesaleCalculationResultDocument HasEnergySupplierNumber(
+        ActorNumber expectedEnergySupplierNumber,
+        string codingScheme)
     {
         _documentAsserter.HasValueWithAttributes(
             $"{PayloadEnergyTimeSeries}[1]/BalanceSupplierEnergyParty/Identification",

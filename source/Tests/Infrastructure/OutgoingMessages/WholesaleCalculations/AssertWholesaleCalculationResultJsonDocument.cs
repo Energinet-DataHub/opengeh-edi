@@ -82,14 +82,22 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasSenderId(ActorNumber expectedSenderId)
+    public IAssertWholesaleCalculationResultDocument HasSenderId(ActorNumber expectedSenderId, string codingScheme)
     {
         ArgumentNullException.ThrowIfNull(expectedSenderId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(codingScheme);
+
         _root.GetProperty("sender_MarketParticipant.mRID")
             .GetProperty("value")
             .GetString()
             .Should()
             .Be(expectedSenderId.Value);
+
+        _root.GetProperty("sender_MarketParticipant.mRID")
+            .GetProperty("codingScheme")
+            .GetString()
+            .Should()
+            .Be(codingScheme);
 
         return this;
     }
@@ -240,7 +248,7 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasGridAreaCode(string expectedGridAreaCode)
+    public IAssertWholesaleCalculationResultDocument HasGridAreaCode(string expectedGridAreaCode, string codingScheme)
     {
         FirstTimeSeriesElement()
             .GetProperty("meteringGridArea_Domain.mRID")
@@ -249,18 +257,35 @@ public sealed class AssertWholesaleCalculationResultJsonDocument : IAssertWholes
             .Should()
             .Be(expectedGridAreaCode);
 
+        FirstTimeSeriesElement()
+            .GetProperty("meteringGridArea_Domain.mRID")
+            .GetProperty("codingScheme")
+            .GetString()
+            .Should()
+            .Be(codingScheme);
+
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasEnergySupplierNumber(ActorNumber expectedEnergySupplierNumber)
+    public IAssertWholesaleCalculationResultDocument HasEnergySupplierNumber(
+        ActorNumber expectedEnergySupplierNumber,
+        string codingScheme)
     {
         ArgumentNullException.ThrowIfNull(expectedEnergySupplierNumber);
+
         FirstTimeSeriesElement()
             .GetProperty("energySupplier_MarketParticipant.mRID")
             .GetProperty("value")
             .GetString()
             .Should()
             .Be(expectedEnergySupplierNumber.Value);
+
+        FirstTimeSeriesElement()
+            .GetProperty("energySupplier_MarketParticipant.mRID")
+            .GetProperty("codingScheme")
+            .GetString()
+            .Should()
+            .Be(codingScheme);
 
         return this;
     }
