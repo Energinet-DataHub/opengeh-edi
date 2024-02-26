@@ -21,6 +21,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using FluentAssertions;
 using IncomingMessages.Infrastructure.DocumentValidation;
 using Xunit;
 
@@ -59,6 +60,18 @@ public class AssertXmlDocument
     {
         ArgumentNullException.ThrowIfNull(xpath);
         Assert.Equal(expectedValue, _document.Root?.XPathSelectElement(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager)?.Value);
+        return this;
+    }
+
+    public AssertXmlDocument HasAttribute(string xpath, string attribute, string expectedValue)
+    {
+        ArgumentNullException.ThrowIfNull(xpath);
+        (_document.Root?.XPathSelectElement(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager)
+                ?.Attribute(attribute)
+                ?.Value)
+            .Should()
+            .Be(expectedValue);
+
         return this;
     }
 
