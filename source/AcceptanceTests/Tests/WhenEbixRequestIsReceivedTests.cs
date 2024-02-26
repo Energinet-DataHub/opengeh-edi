@@ -26,7 +26,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
 public sealed class WhenEbixPeekRequestIsReceivedTests
 {
-    private readonly EbixRequestDsl _ebix;
+    private readonly EbixRequestDsl _ebixMDR;
     private readonly AcceptanceTestFixture _fixture;
     private readonly ActorDsl _actor;
     private readonly EbixRequestDsl _ebixEs;
@@ -36,32 +36,31 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
         ArgumentNullException.ThrowIfNull(fixture);
         _fixture = fixture;
 
-        _ebix = new EbixRequestDsl(
+        _ebixMDR = new EbixRequestDsl(
             new WholesaleDriver(fixture.EventPublisher),
-            new EbixDriver(new Uri(fixture.ApiManagementUri, "/ebix"), fixture.EbixCertificatePassword, ActorRole.MeteredDataAdministrator));
+            new EbixDriver(new Uri(fixture.ApiManagementUri, "/ebix"), fixture.EbixCertificatePasswordForMeterDataResponsible, ActorRole.MeteredDataAdministrator));
         _ebixEs = new EbixRequestDsl(
             new WholesaleDriver(fixture.EventPublisher),
-            new EbixDriver(new Uri(fixture.ApiManagementUri, "/ebix"), fixture.EbixCertificatePassword2, ActorRole.EnergySupplier));
-        _actor = new ActorDsl(new MarketParticipantDriver(fixture.EventPublisher), new EdiActorDriver(
-            fixture.ConnectionString));
+            new EbixDriver(new Uri(fixture.ApiManagementUri, "/ebix"), fixture.EbixCertificatePasswordForEnergySupplier, ActorRole.EnergySupplier));
+        _actor = new ActorDsl(new MarketParticipantDriver(fixture.EventPublisher), new EdiActorDriver(fixture.ConnectionString));
     }
 
     [Fact]
     public async Task Actor_can_peek_and_dequeue_aggregation_result_in_ebIX_format()
     {
-        await _ebix.EmptyQueueForActor();
+        await _ebixMDR.EmptyQueueForActor();
 
-        await _ebix.PublishAggregationResultFor(AcceptanceTestFixture.EbixActorGridArea);
+        await _ebixMDR.PublishAggregationResultFor(AcceptanceTestFixture.EbixActorGridArea);
 
-        await _ebix.ConfirmEnergyResultIsAvailableForActor();
+        await _ebixMDR.ConfirmEnergyResultIsAvailableForActor();
     }
 
     [Fact]
     public async Task Actor_can_peek_and_dequeue_monthly_sum_pr_charge_in_ebIX_format()
     {
-        await _ebix.EmptyQueueForActor();
+        await _ebixEs.EmptyQueueForActor();
 
-        await _ebix.PublishMonthlySumPrChargeFor(AcceptanceTestFixture.EbixActorGridArea, AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ChargeOwnerId);
+        await _ebixEs.PublishMonthlySumPrChargeFor(AcceptanceTestFixture.EbixActorGridArea, AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ChargeOwnerId);
 
         await _ebixEs.ConfirmWholesaleResultIsAvailableForActor();
     }
@@ -69,25 +68,25 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
     [Fact]
     public async Task Dequeue_request_without_content_gives_ebIX_error_B2B_900()
     {
-        await _ebix.ConfirmInvalidDequeueRequestGivesEbixError();
+        await _ebixMDR.ConfirmInvalidDequeueRequestGivesEbixError();
     }
 
     [Fact]
     public async Task Dequeue_request_with_incorrect_message_id_gives_ebIX_error_B2B_201()
     {
-        await _ebix.ConfirmDequeueWithIncorrectMessageIdGivesEbixError();
+        await _ebixMDR.ConfirmDequeueWithIncorrectMessageIdGivesEbixError();
     }
 
     [Fact]
     public async Task Actor_cannot_peek_ebix_api_without_certificate()
     {
-        await _ebix.ConfirmPeekWithoutCertificateIsNotAllowed();
+        await _ebixMDR.ConfirmPeekWithoutCertificateIsNotAllowed();
     }
 
     [Fact]
     public async Task Actor_cannot_dequeue_ebix_api_without_certificate()
     {
-        await _ebix.ConfirmDequeueWithoutCertificateIsNotAllowed();
+        await _ebixMDR.ConfirmDequeueWithoutCertificateIsNotAllowed();
     }
 
     [Fact]
@@ -95,7 +94,7 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
     {
         await _actor.PublishActorCertificateCredentialsRemovedForAsync(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _fixture.EbixCertificateThumbprint);
 
-        await _ebix.ConfirmPeekWithRemovedCertificateIsNotAllowed();
+        await _ebixMDR.ConfirmPeekWithRemovedCertificateIsNotAllowed();
 
         await _actor.ActorCertificateCredentialsAssignedAsync(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _fixture.EbixCertificateThumbprint);
     }
@@ -105,7 +104,7 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
     {
         await _actor.PublishActorCertificateCredentialsRemovedForAsync(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _fixture.EbixCertificateThumbprint);
 
-        await _ebix.ConfirmDequeueWithRemovedCertificateIsNotAllowed();
+        await _ebixMDR.ConfirmDequeueWithRemovedCertificateIsNotAllowed();
 
         await _actor.ActorCertificateCredentialsAssignedAsync(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _fixture.EbixCertificateThumbprint);
     }
