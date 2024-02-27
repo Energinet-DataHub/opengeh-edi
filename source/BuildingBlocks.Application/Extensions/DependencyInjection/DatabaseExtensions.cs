@@ -12,19 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BuildingBlocks.Application.Extensions.DependencyInjection;
 
-public static class BuildingBlockExtensions
+public static class DatabaseExtensions
 {
-    public static IServiceCollection AddBuildingBlocks(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddServiceBus(configuration)
-            .AddDatabase(configuration)
-            .AddFileStorage(configuration)
-            .AddFeatureFlags();
+        services
+            .AddOptions<SqlDatabaseConnectionOptions>()
+            .Bind(configuration)
+            .Validate(o => !string.IsNullOrEmpty(o.DB_CONNECTION_STRING), "DB_CONNECTION_STRING must be set");
+
+        services.AddSingleton<IDatabaseConnectionFactory, SqlDatabaseConnectionFactory>();
+
         return services;
     }
 }

@@ -280,7 +280,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 correlation.SetId(Guid.NewGuid().ToString());
                 return correlation;
             })
-            .AddIntegrationEventModule(config)
+            .AddIntegrationEventModule()
             .AddOutgoingMessagesModule(config)
             .AddProcessModule(config)
             .AddArchivedMessagesModule(config)

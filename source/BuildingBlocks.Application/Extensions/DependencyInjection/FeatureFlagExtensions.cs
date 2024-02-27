@@ -12,19 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.Extensions.Configuration;
+using BuildingBlocks.Application.FeatureFlag;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.FeatureManagement;
 
 namespace BuildingBlocks.Application.Extensions.DependencyInjection;
 
-public static class BuildingBlockExtensions
+public static class FeatureFlagExtensions
 {
-    public static IServiceCollection AddBuildingBlocks(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddFeatureFlags(this IServiceCollection services)
     {
-        services.AddServiceBus(configuration)
-            .AddDatabase(configuration)
-            .AddFileStorage(configuration)
-            .AddFeatureFlags();
+        services.AddFeatureManagement();
+        services.AddScoped<IFeatureFlagManager, MicrosoftFeatureFlagManager>();
+
         return services;
     }
 }

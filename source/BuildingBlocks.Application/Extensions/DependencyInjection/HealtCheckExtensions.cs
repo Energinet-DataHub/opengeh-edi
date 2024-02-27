@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BuildingBlocks.Application.Extensions.DependencyInjection;
@@ -34,8 +36,15 @@ public static class HealtCheckExtensions
         return services;
     }
 
-    public static IServiceCollection AddSqlServerHealthCheck(this IServiceCollection services,  string dbConnectionString)
+    public static IServiceCollection AddSqlServerHealthCheck(this IServiceCollection services,  IConfiguration configuration)
     {
+        services
+            .AddOptions<SqlDatabaseConnectionOptions>()
+            .Bind(configuration)
+            .Validate(o => !string.IsNullOrEmpty(o.DB_CONNECTION_STRING), "DB_CONNECTION_STRING must be set");
+
+        var dbConnectionString = configuration.GetConnectionString("DB_CONNECTION_STRING")!;
+
         services.AddHealthChecks()
             .AddSqlServer(
                 name: "edi-sql-db",

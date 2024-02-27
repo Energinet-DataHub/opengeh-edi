@@ -23,16 +23,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection;
 
 public static class HealthCheckExtensions
 {
-    public static IServiceCollection AddSqlServerHealthCheck(this IServiceCollection services,  string dbConnectionString)
-    {
-        services.AddHealthChecks()
-            .AddSqlServer(
-                name: "edi-sql-db",
-                connectionString: dbConnectionString);
-
-        return services;
-    }
-
     public static void AddBlobStorageHealthCheck(this IServiceCollection services, string name, string blobConnectionString)
     {
         services.AddHealthChecks().AddAzureBlobStorage(blobConnectionString, name: name);

@@ -39,7 +39,7 @@ public static class SqlExtensions
                 o.UseSqlServer(source.Connection, y => y.UseNodaTime().EnableRetryOnFailure());
             });
 
-        services.AddSqlServerHealthCheck(configuration.Get<SqlDatabaseConnectionOptions>()!.DB_CONNECTION_STRING!);
+        services.AddSqlServerHealthCheck(configuration);
         return services;
     }
 }

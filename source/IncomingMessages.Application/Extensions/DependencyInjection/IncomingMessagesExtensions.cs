@@ -41,10 +41,13 @@ public static class IncomingMessagesExtensions
                 o => !string.IsNullOrEmpty(o.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE),
                 "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE must be set");
 
-        var options = configuration.Get<ServiceBusClientOptions>()!;
-        services.AddExternalDomainServiceBusQueuesHealthCheck(
-                options.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
-                options.INCOMING_MESSAGES_QUEUE_NAME!)
+        var serviceBusOptions = configuration.Get<ServiceBusClientOptions>()!;
+        services
+            .AddServiceBus(configuration)
+            .AddExternalDomainServiceBusQueuesHealthCheck(
+                serviceBusOptions.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
+                serviceBusOptions.INCOMING_MESSAGES_QUEUE_NAME!)
+            .AddDatabase(configuration)
             .AddScopedSqlDbContext<IncomingMessagesContext>(configuration)
             .AddScoped<IIncomingMessageClient, IncomingMessageClient>()
             .AddScoped<ITransactionIdRepository, TransactionIdRepository>()
@@ -69,8 +72,6 @@ public static class IncomingMessagesExtensions
         services.AddSingleton<CimJsonSchemas>();
         services.AddSingleton<CimXmlSchemaProvider>();
         services.AddSingleton<JsonSchemaProvider>();
-
-        services.AddBuildingBlocks(configuration);
 
         return services;
     }
