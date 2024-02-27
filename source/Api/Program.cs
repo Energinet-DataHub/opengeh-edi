@@ -39,6 +39,7 @@ using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf.Reflection;
+using IntegrationEvents.Application.Configuration;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
@@ -132,17 +133,7 @@ namespace Energinet.DataHub.EDI.Api
                     services.AddBlobStorageHealthCheck("edi-web-jobs-storage", runtime.AzureWebJobsStorage!);
                     services.AddBlobStorageHealthCheck("edi-documents-storage", runtime.AZURE_STORAGE_ACCOUNT_URL!);
 
-                    var integrationEventDescriptors = new List<MessageDescriptor>
-                    {
-                        EnergyResultProducedV2.Descriptor,
-                        ActorActivated.Descriptor,
-                        GridAreaOwnershipAssigned.Descriptor,
-                        ActorCertificateCredentialsRemoved.Descriptor,
-                        ActorCertificateCredentialsAssigned.Descriptor,
-                        MonthlyAmountPerChargeResultProducedV1.Descriptor,
-                        AmountPerChargeResultProducedV1.Descriptor,
-                    };
-                    services.AddSubscriber<IntegrationEventHandler>(integrationEventDescriptors)
+                    services.AddIntegrationEventModule()
                         .AddArchivedMessagesModule(configuration)
                         .AddIncomingMessagesModule(configuration)
                         .AddOutgoingMessagesModule(configuration)

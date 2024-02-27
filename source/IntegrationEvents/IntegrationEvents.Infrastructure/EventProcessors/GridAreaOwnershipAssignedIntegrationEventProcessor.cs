@@ -12,38 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
+using NodaTime.Serialization.Protobuf;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
+namespace IntegrationEvents.Infrastructure.EventProcessors;
 
-public class ActorCertificateCredentialsRemovedEventProcessor : IIntegrationEventProcessor
+public sealed class GridAreaOwnershipAssignedIntegrationEventProcessor : IIntegrationEventProcessor
 {
     private readonly IMasterDataClient _masterDataClient;
 
-    public ActorCertificateCredentialsRemovedEventProcessor(IMasterDataClient masterDataClient)
+    public GridAreaOwnershipAssignedIntegrationEventProcessor(IMasterDataClient masterDataClient)
     {
         _masterDataClient = masterDataClient;
     }
 
-    public string EventTypeToHandle => ActorCertificateCredentialsRemoved.EventName;
+    public string EventTypeToHandle => GridAreaOwnershipAssigned.EventName;
 
-    public async Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    public Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        var message = (ActorCertificateCredentialsRemoved)integrationEvent.Message;
+        var gridAreaOwnershipAssignedEvent = (GridAreaOwnershipAssigned)integrationEvent.Message;
 
-        await _masterDataClient.DeleteActorCertificateAsync(
-            new ActorCertificateCredentialsRemovedDto(
-                ActorNumber.Create(message.ActorNumber),
-                new CertificateThumbprintDto(message.CertificateThumbprint)),
-            cancellationToken).ConfigureAwait(false);
+        return _masterDataClient.UpdateGridAreaOwnershipAsync(
+            new GridAreaOwnershipAssignedDto(
+                gridAreaOwnershipAssignedEvent.GridAreaCode,
+                gridAreaOwnershipAssignedEvent.ValidFrom.ToInstant(),
+                ActorNumber.Create(gridAreaOwnershipAssignedEvent.ActorNumber),
+                gridAreaOwnershipAssignedEvent.SequenceNumber),
+            cancellationToken);
     }
 }

@@ -12,24 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
-using System.Threading.Tasks;
-using Energinet.DataHub.Core.Messaging.Communication;
+using System.Data;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
+namespace IntegrationEvents.Infrastructure;
 
 /// <summary>
-/// Process specific type(s) of integration events
+/// Persists received integration event metadata
 /// </summary>
-public interface IIntegrationEventProcessor
+public interface IReceivedIntegrationEventRepository
 {
     /// <summary>
-    /// Event type the processor handles
+    /// Add a Received Integration Event to the database, if it doesn't already exists
     /// </summary>
-    public string EventTypeToHandle { get; }
-
-    /// <summary>
-    /// Process a single integration event
-    /// </summary>
-    public Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken);
+    /// <returns>Returns true if the event was added to the database, and false if the event wasn't added because it already exists</returns>
+    Task<AddReceivedIntegrationEventResult> AddIfNotExistsAsync(Guid eventId, string eventType, IDbConnection dbConnection, IDbTransaction dbTransaction);
 }

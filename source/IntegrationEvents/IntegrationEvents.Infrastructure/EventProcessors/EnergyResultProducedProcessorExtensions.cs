@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 
-namespace Energinet.DataHub.EDI.Process.Application.IntegrationEvents;
+namespace IntegrationEvents.Infrastructure.EventProcessors;
 
 public static class EnergyResultProducedProcessorExtensions
 {

@@ -12,40 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
+namespace IntegrationEvents.Infrastructure.EventProcessors;
 
-#pragma warning disable CA1711
-internal sealed class ActorActivatedIntegrationEventProcessor : IIntegrationEventProcessor
-#pragma warning restore CA1711
+public class ActorCertificateCredentialsRemovedEventProcessor : IIntegrationEventProcessor
 {
     private readonly IMasterDataClient _masterDataClient;
 
-    public ActorActivatedIntegrationEventProcessor(IMasterDataClient masterDataClient)
+    public ActorCertificateCredentialsRemovedEventProcessor(IMasterDataClient masterDataClient)
     {
         _masterDataClient = masterDataClient;
     }
 
-    public string EventTypeToHandle => ActorActivated.EventName;
+    public string EventTypeToHandle => ActorCertificateCredentialsRemoved.EventName;
 
-    public Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    public async Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        var actorActivatedEvent = (ActorActivated)integrationEvent.Message;
+        var message = (ActorCertificateCredentialsRemoved)integrationEvent.Message;
 
-        return _masterDataClient.CreateActorIfNotExistAsync(
-            new CreateActorDto(
-                actorActivatedEvent.ExternalActorId,
-                ActorNumber.Create(actorActivatedEvent.ActorNumber)),
-            cancellationToken);
+        await _masterDataClient.DeleteActorCertificateAsync(
+            new ActorCertificateCredentialsRemovedDto(
+                ActorNumber.Create(message.ActorNumber),
+                new CertificateThumbprintDto(message.CertificateThumbprint)),
+            cancellationToken).ConfigureAwait(false);
     }
 }

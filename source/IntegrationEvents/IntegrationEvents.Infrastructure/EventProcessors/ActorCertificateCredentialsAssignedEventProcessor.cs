@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
@@ -22,10 +19,10 @@ using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using NodaTime.Serialization.Protobuf;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
+namespace IntegrationEvents.Infrastructure.EventProcessors;
 
 #pragma warning disable CA1711
-internal sealed class ActorCertificateCredentialsAssignedEventProcessor : IIntegrationEventProcessor
+public sealed class ActorCertificateCredentialsAssignedEventProcessor : IIntegrationEventProcessor
 #pragma warning restore CA1711
 {
     private readonly IMasterDataClient _masterDataClient;

@@ -12,41 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
-using NodaTime.Serialization.Protobuf;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
+namespace IntegrationEvents.Infrastructure.EventProcessors;
 
-internal sealed class GridAreaOwnershipAssignedIntegrationEventProcessor : IIntegrationEventProcessor
+#pragma warning disable CA1711
+public sealed class ActorActivatedIntegrationEventProcessor : IIntegrationEventProcessor
+#pragma warning restore CA1711
 {
     private readonly IMasterDataClient _masterDataClient;
 
-    public GridAreaOwnershipAssignedIntegrationEventProcessor(IMasterDataClient masterDataClient)
+    public ActorActivatedIntegrationEventProcessor(IMasterDataClient masterDataClient)
     {
         _masterDataClient = masterDataClient;
     }
 
-    public string EventTypeToHandle => GridAreaOwnershipAssigned.EventName;
+    public string EventTypeToHandle => ActorActivated.EventName;
 
     public Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        var gridAreaOwnershipAssignedEvent = (GridAreaOwnershipAssigned)integrationEvent.Message;
+        var actorActivatedEvent = (ActorActivated)integrationEvent.Message;
 
-        return _masterDataClient.UpdateGridAreaOwnershipAsync(
-            new GridAreaOwnershipAssignedDto(
-                gridAreaOwnershipAssignedEvent.GridAreaCode,
-                gridAreaOwnershipAssignedEvent.ValidFrom.ToInstant(),
-                ActorNumber.Create(gridAreaOwnershipAssignedEvent.ActorNumber),
-                gridAreaOwnershipAssignedEvent.SequenceNumber),
+        return _masterDataClient.CreateActorIfNotExistAsync(
+            new CreateActorDto(
+                actorActivatedEvent.ExternalActorId,
+                ActorNumber.Create(actorActivatedEvent.ActorNumber)),
             cancellationToken);
     }
 }
