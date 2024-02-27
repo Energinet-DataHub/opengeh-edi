@@ -34,6 +34,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.IntegrationEvents.Application.Configuration;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
@@ -264,7 +265,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
             _services.AddScopedSqlDbContext<ProcessContext>(config);
 
-            _services.AddTransient<IIntegrationEventHandler, IntegrationEventHandler>();
             _services.AddAuthentication(
                 sp => new MarketActorAuthenticator(
                     sp.GetRequiredService<IMasterDataClient>(),
@@ -280,6 +280,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 correlation.SetId(Guid.NewGuid().ToString());
                 return correlation;
             })
+            .AddIntegrationEventModule(config)
             .AddOutgoingMessagesModule(config)
             .AddProcessModule(config)
             .AddArchivedMessagesModule(config)

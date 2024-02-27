@@ -176,7 +176,7 @@ public sealed class CalculatedQuantityQualityMapperTests
             ICollection<EnergyResultProducedV2.Types.QuantityQuality>? quality = null;
 
             // Act & Assert
-            var act = () => CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(quality);
+            var act = () => IntegrationEvents.Infrastructure.Factories.Mappers.CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(quality);
             act.Should().ThrowExactly<ArgumentNullException>();
         }
 
@@ -187,7 +187,7 @@ public sealed class CalculatedQuantityQualityMapperTests
             CalculatedQuantityQuality expectedCalculatedQuantityQuality)
         {
             // Act
-            var actual = CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(qualitySetFromWholesale);
+            var actual = IntegrationEvents.Infrastructure.Factories.Mappers.CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(qualitySetFromWholesale);
 
             // Assert
             actual.Should().Be(expectedCalculatedQuantityQuality);
@@ -198,7 +198,7 @@ public sealed class CalculatedQuantityQualityMapperTests
         public void Can_handle_all_quantity_qualities(EnergyResultProducedV2.Types.QuantityQuality quantityQuality)
         {
             // Act
-            CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(new[] { quantityQuality });
+            IntegrationEvents.Infrastructure.Factories.Mappers.CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(new[] { quantityQuality });
         }
     }
 
@@ -520,7 +520,7 @@ public sealed class CalculatedQuantityQualityMapperTests
             ICollection<AmountPerChargeResultProducedV1.Types.QuantityQuality>? quality = null;
 
             // Act & Assert
-            var act = () => CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(quality);
+            var act = () => IntegrationEvents.Infrastructure.Factories.Mappers.CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(quality);
             act.Should().ThrowExactly<ArgumentNullException>();
         }
 
@@ -531,7 +531,7 @@ public sealed class CalculatedQuantityQualityMapperTests
             CalculatedQuantityQuality expectedCalculatedQuantityQuality)
         {
             // Act
-            var actual = CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(qualitySetFromWholesale);
+            var actual = IntegrationEvents.Infrastructure.Factories.Mappers.CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(qualitySetFromWholesale);
 
             // Assert
             actual.Should().Be(expectedCalculatedQuantityQuality);
@@ -542,7 +542,7 @@ public sealed class CalculatedQuantityQualityMapperTests
         public void Can_handle_all_quantity_qualities(AmountPerChargeResultProducedV1.Types.QuantityQuality quantityQuality)
         {
             // Act
-            CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(new[] { quantityQuality });
+            IntegrationEvents.Infrastructure.Factories.Mappers.CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(new[] { quantityQuality });
         }
     }
 }
