@@ -120,6 +120,11 @@ internal sealed class EbixRequestDsl
              () => Assert.Contains("Certificate rejected", response.ReasonPhrase, StringComparison.InvariantCultureIgnoreCase));
     }
 
+    internal Task PublishAmountPerChargeResultFor(string gridArea, string energySupplierId, string chargeOwnerId)
+    {
+        return _wholesale.PublishAmountPerChargeResultAsync(gridArea, energySupplierId, chargeOwnerId);
+    }
+
     internal async Task ConfirmDequeueWithRemovedCertificateIsNotAllowed()
     {
         var act = async () => await _ebix.DequeueMessageAsync("irrelevant-message-id").ConfigureAwait(false);
