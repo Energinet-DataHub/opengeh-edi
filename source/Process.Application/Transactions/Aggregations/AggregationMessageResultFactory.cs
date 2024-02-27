@@ -27,7 +27,7 @@ using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 
-public abstract class AggregationMessageResultFactory
+public static class AggregationMessageResultFactory
 {
     public static AggregationResultMessage Create(
         AggregatedMeasureDataProcess aggregatedMeasureDataProcess,
