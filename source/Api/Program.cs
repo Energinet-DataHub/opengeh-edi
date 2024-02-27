@@ -109,22 +109,19 @@ namespace Energinet.DataHub.EDI.Api
 
                     CompositionRoot.Initialize(services)
                         .AddBearerAuthentication(tokenValidationParameters)
-                        .AddSystemClock(new SystemDateTimeProvider())
-                        .AddCorrelationContext(_ =>
+                        .AddSystemClock(new SystemDateTimeProvider());
+                    services.AddScoped(
+                        _ =>
                         {
-                            var correlationContext = new CorrelationContext();
-                            if (!runtime.IsRunningLocally()) return correlationContext;
-                            correlationContext.SetId(Guid.NewGuid().ToString());
-
-                            return correlationContext;
+                            var correlation = new CorrelationContext();
+                            correlation.SetId(Guid.NewGuid().ToString());
+                            return correlation;
                         });
                     services.AddLiveHealthCheck();
                     services.AddExternalDomainServiceBusQueuesHealthCheck(
                         runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
                         runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!,
-                        runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!,
-                        runtime.INCOMING_MESSAGES_QUEUE_NAME!);
-                    services.AddSqlServerHealthCheck(runtime.DB_CONNECTION_STRING!);
+                        runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!);
                     services.AddBlobStorageHealthCheck("edi-web-jobs-storage", runtime.AzureWebJobsStorage!);
                     services.AddBlobStorageHealthCheck("edi-documents-storage", runtime.AZURE_STORAGE_ACCOUNT_URL!);
 

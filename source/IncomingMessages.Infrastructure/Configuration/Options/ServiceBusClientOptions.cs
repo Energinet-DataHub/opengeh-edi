@@ -19,4 +19,6 @@ namespace IncomingMessages.Infrastructure.Configuration.Options;
 public class ServiceBusClientOptions
 {
     public string INCOMING_MESSAGES_QUEUE_NAME { get; set; } = string.Empty;
+
+    public string SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE { get; set; } = string.Empty;
 }

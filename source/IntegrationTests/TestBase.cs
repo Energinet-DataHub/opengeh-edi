@@ -273,19 +273,18 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
             CompositionRoot.Initialize(_services)
                 .AddSystemClock(new SystemDateTimeProviderStub())
-                .AddCorrelationContext(_ =>
-                {
-                    var correlation = new CorrelationContext();
-                    correlation.SetId(Guid.NewGuid().ToString());
-                    return correlation;
-                })
                 .AddBearerAuthentication(JwtTokenParserTests.DisableAllTokenValidations);
-
-            _services.AddOutgoingMessagesModule(config);
-            _services.AddProcessModule(config);
-            _services.AddArchivedMessagesModule(config);
-            _services.AddIncomingMessagesModule(config);
-            _services.AddMasterDataModule(config);
+            _services.AddScoped(_ =>
+            {
+                var correlation = new CorrelationContext();
+                correlation.SetId(Guid.NewGuid().ToString());
+                return correlation;
+            })
+            .AddOutgoingMessagesModule(config)
+            .AddProcessModule(config)
+            .AddArchivedMessagesModule(config)
+            .AddIncomingMessagesModule(config)
+            .AddMasterDataModule(config);
 
             // Replace the services with stub implementations.
             // - Building blocks

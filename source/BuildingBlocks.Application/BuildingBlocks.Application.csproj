@@ -7,6 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="AspNetCore.HealthChecks.AzureServiceBus" Version="8.0.0" />
+      <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="8.0.0" />
       <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.17.2" />
       <PackageReference Include="Microsoft.ApplicationInsights" Version="2.22.0" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />

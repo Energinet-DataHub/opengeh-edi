@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using BuildingBlocks.Application.Configuration;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using IncomingMessages.Infrastructure;
@@ -37,27 +36,34 @@ public static class IncomingMessagesExtensions
             .Bind(configuration)
             .Validate(
                 o => !string.IsNullOrEmpty(o.INCOMING_MESSAGES_QUEUE_NAME),
-                "INCOMING_MESSAGES_QUEUE_NAME must be set");
+                "INCOMING_MESSAGES_QUEUE_NAME must be set")
+            .Validate(
+                o => !string.IsNullOrEmpty(o.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE),
+                "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE must be set");
 
-        services.AddScopedSqlDbContext<IncomingMessagesContext>(configuration);
-        services.AddScoped<IIncomingMessageClient, IncomingMessageClient>();
-        services.AddScoped<ITransactionIdRepository, TransactionIdRepository>();
-        services.AddScoped<IMessageIdRepository, MessageIdRepository>();
-        services.AddScoped<IMessageParser, XmlMessageParser>();
-        services.AddScoped<IMessageParser, JsonMessageParser>();
-        services.AddScoped<IMessageParser, B2CJsonMessageParser>();
-        services.AddScoped<MarketMessageParser>();
-        services.AddTransient<SenderAuthorizer>();
-        services.AddTransient<IncomingRequestAggregatedMeasuredDataSender>();
-        services.AddTransient<RequestAggregatedMeasureDataValidator>();
-        services.AddScoped<ProcessTypeValidator>();
-        services.AddScoped<MessageTypeValidator>();
-        services.AddScoped<BusinessTypeValidator>();
-        services.AddScoped<CalculationResponsibleReceiverVerification>();
-        services.AddScoped<IRequestAggregatedMeasureDataReceiver, RequestAggregatedMeasureDataReceiver>();
-        services.AddSingleton<IResponseFactory, JsonResponseFactory>();
-        services.AddSingleton<IResponseFactory, XmlResponseFactory>();
-        services.AddSingleton<ResponseFactory>();
+        var options = configuration.Get<ServiceBusClientOptions>()!;
+        services.AddExternalDomainServiceBusQueuesHealthCheck(
+                options.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
+                options.INCOMING_MESSAGES_QUEUE_NAME!)
+            .AddScopedSqlDbContext<IncomingMessagesContext>(configuration)
+            .AddScoped<IIncomingMessageClient, IncomingMessageClient>()
+            .AddScoped<ITransactionIdRepository, TransactionIdRepository>()
+            .AddScoped<IMessageIdRepository, MessageIdRepository>()
+            .AddScoped<IMessageParser, XmlMessageParser>()
+            .AddScoped<IMessageParser, JsonMessageParser>()
+            .AddScoped<IMessageParser, B2CJsonMessageParser>()
+            .AddScoped<MarketMessageParser>()
+            .AddTransient<SenderAuthorizer>()
+            .AddTransient<IncomingRequestAggregatedMeasuredDataSender>()
+            .AddTransient<RequestAggregatedMeasureDataValidator>()
+            .AddScoped<ProcessTypeValidator>()
+            .AddScoped<MessageTypeValidator>()
+            .AddScoped<BusinessTypeValidator>()
+            .AddScoped<CalculationResponsibleReceiverVerification>()
+            .AddScoped<IRequestAggregatedMeasureDataReceiver, RequestAggregatedMeasureDataReceiver>()
+            .AddSingleton<IResponseFactory, JsonResponseFactory>()
+            .AddSingleton<IResponseFactory, XmlResponseFactory>()
+            .AddSingleton<ResponseFactory>();
 
         //RegisterSchemaProviders
         services.AddSingleton<CimJsonSchemas>();

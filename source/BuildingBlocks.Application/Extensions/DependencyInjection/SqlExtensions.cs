@@ -38,6 +38,8 @@ public static class SqlExtensions
                 var source = sp.GetRequiredService<SqlConnectionSource>();
                 o.UseSqlServer(source.Connection, y => y.UseNodaTime().EnableRetryOnFailure());
             });
+
+        services.AddSqlServerHealthCheck(configuration.Get<SqlDatabaseConnectionOptions>()!.DB_CONNECTION_STRING!);
         return services;
     }
 }

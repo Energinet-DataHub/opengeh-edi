@@ -77,11 +77,7 @@ builder.Services
     .AddJwtTokenSecurity(builder.Configuration)
     .AddDateTime(builder.Configuration)
     .AddHttpClient()
-    .AddLiveHealthCheck()
-    .AddExternalDomainServiceBusQueuesHealthCheck(
-        builder.Configuration["SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE"]!,
-        builder.Configuration["INCOMING_MESSAGES_QUEUE_NAME"]!)
-    .AddSqlServerHealthCheck(builder.Configuration["DB_CONNECTION_STRING"]!);
+    .AddLiveHealthCheck();
 
 var blobStorageUrl = builder.Configuration["AZURE_STORAGE_ACCOUNT_URL"];
 
@@ -123,6 +119,7 @@ app.MapReadyHealthChecks();
 
 app.Run();
 
+// This is needed in order to test the dependency injection
 public partial class Program
 {
 }
