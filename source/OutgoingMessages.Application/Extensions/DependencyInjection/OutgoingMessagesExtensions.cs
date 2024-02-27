@@ -41,7 +41,7 @@ public static class OutgoingMessagesExtensions
         services.AddScoped<DocumentFactory>()
             .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataXmlDocumentWriter>()
             .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataJsonDocumentWriter>()
-            .AddScoped<IDocumentWriter, NotifyWholesaleServicesEbixDocumentWriter>()
+            .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataEbixDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataXmlDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataJsonDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataEbixDocumentWriter>()
