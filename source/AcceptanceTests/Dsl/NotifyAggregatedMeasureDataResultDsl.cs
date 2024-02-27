@@ -34,11 +34,6 @@ internal sealed class NotifyAggregatedMeasureDataResultDsl
         return _wholesale.PublishAggregationResultAsync(gridAreaCode);
     }
 
-    internal Task PublishMonthlyChargeResultFor(string gridAreaCode, string energySupplierId, string chargeOwnerId)
-    {
-        return _wholesale.PublishMonthlyAmountPerChargeResultAsync(gridAreaCode, energySupplierId, chargeOwnerId);
-    }
-
     internal Task ConfirmResultIsAvailableFor()
     {
         return _edi.PeekMessageAsync();
@@ -52,13 +47,5 @@ internal sealed class NotifyAggregatedMeasureDataResultDsl
     internal async Task EmptyQueueForActor()
     {
         await _edi.EmptyQueueAsync().ConfigureAwait(false);
-    }
-
-    internal Task PublishAmountPerChargeResultFor(
-        string gridAreaCode,
-        string energySupplierId,
-        string chargeOwnerId)
-    {
-        return _wholesale.PublishAmountPerChargeResultAsync(gridAreaCode, energySupplierId, chargeOwnerId);
     }
 }
