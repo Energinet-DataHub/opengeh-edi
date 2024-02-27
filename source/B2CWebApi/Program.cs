@@ -126,3 +126,7 @@ app.MapLiveHealthChecks();
 app.MapReadyHealthChecks();
 
 app.Run();
+
+public partial class Program
+{
+}
