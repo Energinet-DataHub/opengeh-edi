@@ -17,8 +17,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
 using NodaTime;
 using NodaTime.Text;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
@@ -49,7 +49,7 @@ public class WholesaleCalculationsResultMessageBuilder
     private ActorNumber _chargeOwner = ActorNumber.Create("1234567897777");
     private string? _originalTransactionIdReference;
     private SettlementVersion? _settlementVersion;
-    private List<Point> _points = new() { new(1, 100, 100, 100, null) };
+    private List<WholesaleCalculationPoint> _points = new() { new(1, 100, 100, 100, null) };
 
     private Currency _currency = Currency.DanishCrowns;
     private Period _period = new(Instant.FromUtc(2023, 11, 1, 0, 0), Instant.FromUtc(2023, 12, 1, 0, 0));
@@ -183,7 +183,7 @@ public class WholesaleCalculationsResultMessageBuilder
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithPoints(Collection<Point> points)
+    public WholesaleCalculationsResultMessageBuilder WithPoints(Collection<WholesaleCalculationPoint> points)
     {
         _points = points.ToList();
         return this;
