@@ -12,26 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Microsoft.EntityFrameworkCore;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
+internal static class GeneralValues
 {
-    public class B2BContext : DbContext
-    {
-        #nullable disable
-        public B2BContext(DbContextOptions<B2BContext> options)
-            : base(options)
-        {
-        }
-
-        public B2BContext()
-        {
-        }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            ArgumentNullException.ThrowIfNull(modelBuilder);
-        }
-    }
+    internal static string SectorTypeCode => "23";
 }

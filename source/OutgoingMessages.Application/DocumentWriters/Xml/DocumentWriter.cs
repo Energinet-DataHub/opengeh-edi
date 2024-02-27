@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -23,7 +22,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Xml;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Xml;
 
 public abstract class DocumentWriter : IDocumentWriter
 {

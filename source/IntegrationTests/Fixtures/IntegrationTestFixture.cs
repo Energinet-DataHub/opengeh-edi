@@ -13,13 +13,12 @@
 // limitations under the License.
 
 using System;
+using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Xunit;
 
@@ -27,19 +26,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
 {
     public class IntegrationTestFixture : IDisposable, IAsyncLifetime
     {
-        private readonly B2BContext _b2bContext;
         private bool _disposed;
-
-        public IntegrationTestFixture()
-        {
-            var optionsBuilder = new DbContextOptionsBuilder<B2BContext>();
-            optionsBuilder
-                .UseSqlServer(DatabaseConnectionString, options => options.UseNodaTime());
-
-            _b2bContext = new B2BContext(optionsBuilder.Options);
-
-            AzuriteManager = new AzuriteManager(useOAuth: true);
-        }
 
         public static string DatabaseConnectionString
         {
@@ -65,26 +52,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
             }
         }
 
-        public AzuriteManager AzuriteManager { get; }
+        public AzuriteManager AzuriteManager { get; } = new(true);
 
-        public Task InitializeAsync()
-        {
-            CreateSchema();
-            CleanupDatabase();
-
-            AzuriteManager.StartAzurite();
-            CleanupFileStorage();
-
-            return Task.CompletedTask;
-        }
-
-        public Task DisposeAsync()
-        {
-            Dispose();
-            return Task.CompletedTask;
-        }
-
-        public void CleanupDatabase()
+        public static void CleanupDatabase()
         {
             var cleanupStatement =
                 $"DELETE FROM [dbo].[MoveInTransactions] " +
@@ -109,7 +79,32 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
                 $"DELETE FROM [dbo].[GridAreaOwner]" +
                 $"DELETE FROM [dbo].[ActorCertificate]";
 
-            _b2bContext.Database.ExecuteSqlRaw(cleanupStatement);
+            using var connection = new SqlConnection(DatabaseConnectionString);
+            connection.Open();
+
+            using (var command = new SqlCommand(cleanupStatement, connection))
+            {
+                command.ExecuteNonQuery();
+            }
+
+            connection.Close();
+        }
+
+        public Task InitializeAsync()
+        {
+            CreateSchema();
+            CleanupDatabase();
+
+            AzuriteManager.StartAzurite();
+            CleanupFileStorage();
+
+            return Task.CompletedTask;
+        }
+
+        public Task DisposeAsync()
+        {
+            Dispose();
+            return Task.CompletedTask;
         }
 
         public void CleanupFileStorage(bool disposing = false)
@@ -169,8 +164,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
             if (disposing)
             {
                 CleanupDatabase();
-                _b2bContext.Dispose();
-
                 CleanupFileStorage(true);
                 AzuriteManager.Dispose();
             }

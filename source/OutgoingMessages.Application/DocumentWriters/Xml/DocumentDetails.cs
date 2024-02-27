@@ -12,9 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Xml;
 
-internal static class GeneralValues
+public class DocumentDetails
 {
-    internal static string SectorTypeCode => "23";
+    public DocumentDetails(string type, string schemaLocation, string xmlNamespace, string prefix, string typeCode)
+    {
+        Type = type;
+        SchemaLocation = schemaLocation;
+        XmlNamespace = xmlNamespace;
+        Prefix = prefix;
+        TypeCode = typeCode;
+    }
+
+    public string Type { get; }
+
+    public string SchemaLocation { get; }
+
+    public string XmlNamespace { get; }
+
+    public string Prefix { get; }
+
+    public string TypeCode { get; }
 }

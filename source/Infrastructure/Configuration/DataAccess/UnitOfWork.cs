@@ -19,24 +19,20 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAc
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly B2BContext _b2BContext;
         private readonly ProcessContext _processContext;
         private readonly ActorMessageQueueContext _actorMessageQueueContext;
         private readonly IncomingMessagesContext _incomingMessagesContext;
 
         public UnitOfWork(
-            B2BContext b2BContext,
             ProcessContext processContext,
             ActorMessageQueueContext actorMessageQueueContext,
             IncomingMessagesContext incomingMessagesContext)
         {
-            _b2BContext = b2BContext;
             _processContext = processContext;
             _actorMessageQueueContext = actorMessageQueueContext;
             _incomingMessagesContext = incomingMessagesContext;
@@ -46,7 +42,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
         {
             await ResilientTransaction.New(_processContext).SaveChangesAsync(new DbContext[]
             {
-                _b2BContext, _processContext, _actorMessageQueueContext, _incomingMessagesContext,
+                _processContext, _actorMessageQueueContext, _incomingMessagesContext,
             }).ConfigureAwait(false);
         }
     }

@@ -15,7 +15,7 @@
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application
 {
     public class MessageRecordParser : IMessageRecordParser
     {
