@@ -23,12 +23,14 @@ namespace Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection;
 
 public static class HealthCheckExtensions
 {
-    public static void AddSqlServerHealthCheck(this IServiceCollection services,  string dbConnectionString)
+    public static IServiceCollection AddSqlServerHealthCheck(this IServiceCollection services,  string dbConnectionString)
     {
         services.AddHealthChecks()
             .AddSqlServer(
                 name: "edi-sql-db",
                 connectionString: dbConnectionString);
+
+        return services;
     }
 
     public static void AddBlobStorageHealthCheck(this IServiceCollection services, string name, string blobConnectionString)
@@ -36,15 +38,17 @@ public static class HealthCheckExtensions
         services.AddHealthChecks().AddAzureBlobStorage(blobConnectionString, name: name);
     }
 
-    public static void AddBlobStorageHealthCheck(this IServiceCollection services, string name, Uri storageAccountUri)
+    public static IServiceCollection AddBlobStorageHealthCheck(this IServiceCollection services, string name, Uri storageAccountUri)
     {
         services.AddHealthChecks().AddAzureBlobStorage(storageAccountUri, new DefaultAzureCredential(), name: name);
+
+        return services;
     }
 
     /// <summary>
     /// Used for Service Bus queues where the app have peek (receiver) permissions
     /// </summary>
-    public static void AddExternalDomainServiceBusQueuesHealthCheck(this IServiceCollection services, string serviceBusConnectionString, [NotNull] params string[] queueNames)
+    public static IServiceCollection AddExternalDomainServiceBusQueuesHealthCheck(this IServiceCollection services, string serviceBusConnectionString, [NotNull] params string[] queueNames)
     {
         foreach (var name in queueNames)
         {
@@ -54,9 +58,11 @@ public static class HealthCheckExtensions
                     connectionString: serviceBusConnectionString,
                     queueName: name);
         }
+
+        return services;
     }
 
-    public static void AddExternalServiceBusSubscriptionsHealthCheck(
+    public static IServiceCollection AddExternalServiceBusSubscriptionsHealthCheck(
         this IServiceCollection services,
         string serviceBusConnectionString,
         [NotNull] string topicName,
@@ -71,12 +77,16 @@ public static class HealthCheckExtensions
                     topicName: topicName,
                     subscriptionName: name);
         }
+
+        return services;
     }
 
-    public static void AddLiveHealthCheck(this IServiceCollection services)
+    public static IServiceCollection AddLiveHealthCheck(this IServiceCollection services)
     {
         services.AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>();
         services.AddHealthChecks()
             .AddLiveCheck();
+
+        return services;
     }
 }
