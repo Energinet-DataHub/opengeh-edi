@@ -1,6 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-      <AssemblyName>Energinet.DataHub.EDI.IntegrationEvents.Interfaces</AssemblyName>
-      <RootNamespace>Energinet.DataHub.EDI.IntegrationEvents.Interfaces</RootNamespace>
-    </PropertyGroup>
-</Project>
