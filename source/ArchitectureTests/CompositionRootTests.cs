@@ -27,7 +27,9 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyA
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using MediatR;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,7 +54,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
             var config = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
                 .Build();
-            _host = Program.ConfigureHost(Program.DevelopmentTokenValidationParameters(), testEnvironment, config);
+            _host = Api.Program.ConfigureHost(Api.Program.DevelopmentTokenValidationParameters(), testEnvironment, config);
         }
 
         #region Member data providers
@@ -86,7 +88,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
             var functionTypes = ReflectionHelper.FindAllFunctionTypes();
             var constructorDependencies = ReflectionHelper.FindAllConstructorDependenciesForType();
 
-            return functionTypes(allTypes(typeof(Program)))
+            return functionTypes(allTypes(typeof(Api.Program)))
                 .Select(f => new object[] { new Requirement(f.Name, constructorDependencies(f)) });
         }
 
@@ -97,7 +99,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
             var constructorDependencies = ReflectionHelper.FindAllConstructorDependenciesForType();
 
             return
-                middlewareTypes(typeof(IFunctionsWorkerMiddleware), allTypes(typeof(Program)))
+                middlewareTypes(typeof(IFunctionsWorkerMiddleware), allTypes(typeof(Api.Program)))
                     .Select(m => new object[] { new Requirement(m.Name, constructorDependencies(m)) });
         }
 
@@ -155,22 +157,22 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
         [Fact(DisplayName = nameof(All_dependencies_can_be_resolved_in_b2c_app))]
         public void All_dependencies_can_be_resolved_in_b2c_app()
         {
-            Host.CreateDefaultBuilder()
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder
-                        .UseDefaultServiceProvider((_, options) =>
-                        {
-                            // See https://learn.microsoft.com/en-us/aspnet/core/fundamentals/host/web-host?view=aspnetcore-7.0#scope-validation
-                            options.ValidateScopes = true;
-                            // Validate the service provider during build
-                            options.ValidateOnBuild = true;
-                        })
-                        // Add controllers as services to enable validation of controller dependencies
-                        // See https://andrewlock.net/new-in-asp-net-core-3-service-provider-validation/#1-controller-constructor-dependencies-aren-t-checked
-                        .ConfigureServices(collection => collection.AddControllers().AddControllersAsServices())
-                        .UseStartup<Startup>();
-                }).Build();
+#pragma warning disable CA2000
+            using var application = new WebApplicationFactory<global::Program>()
+#pragma warning restore CA2000
+                .WithWebHostBuilder(
+                    webBuilder =>
+                    {
+                        webBuilder.UseDefaultServiceProvider(
+                            (_, options) =>
+                            {
+                                // See https://learn.microsoft.com/en-us/aspnet/core/fundamentals/host/web-host?view=aspnetcore-7.0#scope-validation
+                                options.ValidateScopes = true;
+                                // Validate the service provider during build
+                                options.ValidateOnBuild = true;
+                            });
+                    })
+                .CreateClient(); // This will resolve the dependency injections, hence the test
         }
 
         private static IEnumerable<object[]> ResolveTypes(Type targetType, Assembly[] assemblies)
