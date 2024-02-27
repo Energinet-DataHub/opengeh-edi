@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
 
 internal static class GeneralValues
 {

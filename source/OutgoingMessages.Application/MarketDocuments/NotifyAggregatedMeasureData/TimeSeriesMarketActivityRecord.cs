@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
 
 // This is a copy of TimeSeries defined in the process module
 public record TimeSeriesMarketActivityRecord(

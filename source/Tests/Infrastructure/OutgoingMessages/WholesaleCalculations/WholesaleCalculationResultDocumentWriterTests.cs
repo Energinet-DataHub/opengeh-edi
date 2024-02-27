@@ -18,8 +18,9 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.Serialization;
+using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
@@ -256,15 +257,15 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
 
         if (documentFormat == DocumentFormat.Xml)
         {
-            return new WholesaleCalculationXmlDocumentWriter(_parser).WriteAsync(header, new[] { records });
+            return new NotifyWholesaleServicesXmlDocumentWriter(_parser).WriteAsync(header, new[] { records });
         }
         else if (documentFormat == DocumentFormat.Ebix)
         {
-            return new WholesaleCalculationResultEbixDocumentWriter(_parser).WriteAsync(header, new[] { records });
+            return new NotifyWholesaleServicesEbixDocumentWriter(_parser).WriteAsync(header, new[] { records });
         }
         else if (documentFormat == DocumentFormat.Json)
         {
-            return new WholesaleCalculationJsonDocumentWriter(_parser).WriteAsync(
+            return new NotifyWholesaleServicesJsonDocumentWriter(_parser).WriteAsync(
                 header,
                 new[] { records });
         }
