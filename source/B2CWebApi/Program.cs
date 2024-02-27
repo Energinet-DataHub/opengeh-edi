@@ -68,9 +68,6 @@ builder.Services.AddSwaggerGen(
 
 builder.Services
     .AddHttpContextAccessor()
-    .AddOptions<DateTimeOptions>()
-    .Bind(builder.Configuration)
-.Services
     .AddScoped<ISystemDateTimeProvider, SystemDateTimeProvider>()
     .AddHttpLoggingScope(domainName)
     .AddSingleton<ISerializer, Serializer>()

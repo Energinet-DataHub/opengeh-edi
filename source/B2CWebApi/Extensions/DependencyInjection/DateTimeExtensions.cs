@@ -23,6 +23,10 @@ public static class DateTimeExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        services
+            .AddOptions<DateTimeOptions>()
+            .Bind(configuration);
+
         var options = configuration.Get<DateTimeOptions>()!;
         services.AddSingleton<DateTimeZone>(_ =>
         {
