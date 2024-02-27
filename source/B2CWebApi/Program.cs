@@ -68,9 +68,6 @@ builder.Services.AddSwaggerGen(
 
 builder.Services
     .AddHttpContextAccessor()
-    .AddOptions<JwtOptions>()
-    .Bind(builder.Configuration)
-.Services
     .AddOptions<DateTimeOptions>()
     .Bind(builder.Configuration)
 .Services

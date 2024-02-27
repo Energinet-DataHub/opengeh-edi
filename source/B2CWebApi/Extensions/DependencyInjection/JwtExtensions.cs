@@ -25,6 +25,10 @@ public static class JwtExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        services
+            .AddOptions<JwtOptions>()
+            .Bind(configuration);
+
         var options = configuration.Get<JwtOptions>()!;
         services.AddJwtBearerAuthentication(options.EXTERNAL_OPEN_ID_URL, options.INTERNAL_OPEN_ID_URL, options.BACKEND_BFF_APP_ID);
         services.AddUserAuthentication<FrontendUser, FrontendUserProvider>();
