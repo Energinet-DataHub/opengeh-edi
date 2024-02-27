@@ -36,7 +36,9 @@ const string domainName = "EDI.B2CWebApi";
 
 const string securityProtocol = "Bearer";
 
-builder.Logging.ClearProviders().AddApplicationInsights();
+builder.Logging
+    .ClearProviders()
+    .AddApplicationInsights();
 
 builder.Services.AddSwaggerGen(
         config =>
