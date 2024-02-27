@@ -18,17 +18,17 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.Serialization;
+using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions.Execution;
 using Xunit;
-using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations.Point;
+using Point = Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations.Point;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.WholesaleCalculations;
 
@@ -71,7 +71,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
             .WithMeasurementUnit(SampleData.MeasurementUnit)
             .WithPriceMeasurementUnit(SampleData.PriceMeasureUnit)
             .WithResolution(SampleData.Resolution)
-            .WithPoints(new Collection<Point>() { new(1, 1, 1, SampleData.Quantity, null) });
+            .WithPoints(new Collection<WholesaleCalculationPoint>() { new(1, 1, 1, SampleData.Quantity, null) });
 
         // Act
         var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
@@ -112,7 +112,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
     {
         // Arrange
         var messageBuilder = _wholesaleCalculationsResultMessageBuilder
-            .WithPoints(new Collection<Point>() { new Point(1, 1, 1, null, null) });
+            .WithPoints(new Collection<WholesaleCalculationPoint>() { new(1, 1, 1, null, null) });
 
         // Act
         var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
@@ -167,8 +167,8 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
     public async Task Can_create_notifyWholesaleServices_document_with_calculated_hourly_tariff_amounts_for_flex_consumption(string documentFormat)
     {
         // Arrange
-        var firstPoint = new Point(1, 1, 100, 100, null);
-        var secondPoint = new Point(2, 1, 200, 200, null);
+        var firstPoint = new WholesaleCalculationPoint(1, 1, 100, 100, null);
+        var secondPoint = new WholesaleCalculationPoint(2, 1, 200, 200, null);
 
         var messageBuilder = _wholesaleCalculationsResultMessageBuilder
             .WithSettlementMethod(SettlementType.Flex)
@@ -197,8 +197,8 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
     public async Task Can_create_notifyWholesaleServices_document_with_calculated_hourly_tariff_amounts_for_production(string documentFormat)
     {
         // Arrange
-        var firstPoint = new Point(1, 1, 100, 100, null);
-        var secondPoint = new Point(2, 1, 200, 100, null);
+        var firstPoint = new WholesaleCalculationPoint(1, 1, 100, 100, null);
+        var secondPoint = new WholesaleCalculationPoint(2, 1, 200, 100, null);
 
         var messageBuilder = _wholesaleCalculationsResultMessageBuilder
                 .WithSettlementMethod(null)
@@ -227,8 +227,8 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
     public async Task Can_create_notifyWholesaleServices_document_with_calculated_hourly_tariff_amounts_for_consumption(string documentFormat)
     {
         // Arrange
-        var firstPoint = new Point(1, 1, 100, 100, null);
-        var secondPoint = new Point(2, 1, 200, 200, null);
+        var firstPoint = new WholesaleCalculationPoint(1, 1, 100, 100, null);
+        var secondPoint = new WholesaleCalculationPoint(2, 1, 200, 200, null);
 
         var messageBuilder = _wholesaleCalculationsResultMessageBuilder
             .WithSettlementMethod(SettlementType.NonProfiled)

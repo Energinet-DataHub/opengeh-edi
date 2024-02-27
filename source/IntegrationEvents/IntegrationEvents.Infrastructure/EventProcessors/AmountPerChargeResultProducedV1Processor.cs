@@ -12,14 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Microsoft.EntityFrameworkCore;
 
-namespace IntegrationEvents.Infrastructure.EventProcessors;
+namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
 
 public class AmountPerChargeResultProducedV1Processor : IIntegrationEventProcessor
 {
@@ -46,11 +51,9 @@ public class AmountPerChargeResultProducedV1Processor : IIntegrationEventProcess
         var amountPerChargeResultProducedV1 = (AmountPerChargeResultProducedV1)integrationEvent.Message;
 
         var messageForEnergySupplier = WholesaleCalculationResultMessageFactory.CreateMessageForEnergySupplier(
-            amountPerChargeResultProducedV1,
-            ProcessId.New());
+            amountPerChargeResultProducedV1);
         var messageForChargeOwner = WholesaleCalculationResultMessageFactory.CreateMessageForChargeOwner(
-            amountPerChargeResultProducedV1,
-            ProcessId.New());
+            amountPerChargeResultProducedV1);
 
         if (await _featureManager.UseAmountPerChargeResultProduced.ConfigureAwait(false))
         {

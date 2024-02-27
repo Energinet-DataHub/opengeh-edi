@@ -13,11 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
+namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.OutgoingMessages;
 
 public class WholesaleCalculationResultMessage : OutgoingMessageDto
 {
@@ -42,7 +44,7 @@ public class WholesaleCalculationResultMessage : OutgoingMessageDto
     public static WholesaleCalculationResultMessage Create(
         ActorNumber receiverNumber,
         ActorRole receiverRole,
-        ProcessId processId,
+        Guid processId,
         BusinessReason businessReason,
         WholesaleCalculationSeries wholesaleSeries)
     {
@@ -52,8 +54,29 @@ public class WholesaleCalculationResultMessage : OutgoingMessageDto
         return new WholesaleCalculationResultMessage(
             receiverId: receiverNumber,
             receiverRole: receiverRole,
-            processId: processId.Id,
+            processId: processId,
             businessReason: businessReason,
             series: wholesaleSeries);
     }
 }
+
+public record WholesaleCalculationSeries(
+    Guid TransactionId,
+    long CalculationVersion,
+    string GridAreaCode,
+    string ChargeCode,
+    bool IsTax,
+    IReadOnlyCollection<WholesaleCalculationPoint> Points,
+    ActorNumber EnergySupplier,
+    ActorNumber ChargeOwner,
+    Period Period,
+    SettlementVersion? SettlementVersion,
+    MeasurementUnit QuantityUnit,
+    MeasurementUnit PriceMeasureUnit,
+    Currency Currency,
+    ChargeType ChargeType,
+    Resolution Resolution,
+    MeteringPointType? MeteringPointType,
+    SettlementType? SettlementType);
+
+public record WholesaleCalculationPoint(int Position, decimal? Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality? QuantityQuality);

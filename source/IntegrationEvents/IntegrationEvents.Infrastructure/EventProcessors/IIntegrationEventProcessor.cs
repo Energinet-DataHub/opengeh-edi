@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 
-namespace IntegrationEvents.Infrastructure.EventProcessors;
+namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
 
 /// <summary>
 /// Process specific type(s) of integration events

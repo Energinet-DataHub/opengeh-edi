@@ -16,7 +16,7 @@ using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
+namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories.Mappers;
 
 public static class BusinessReasonMapper
 {

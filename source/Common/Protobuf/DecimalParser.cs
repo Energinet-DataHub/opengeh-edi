@@ -15,7 +15,7 @@
 using System;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions;
+namespace Energinet.DataHub.EDI.Common.Protobuf;
 
 /// <summary>
 /// This implementation is taken from https://learn.microsoft.com/en-us/dotnet/architecture/grpc-for-wcf-developers/protobuf-data-types#decimals

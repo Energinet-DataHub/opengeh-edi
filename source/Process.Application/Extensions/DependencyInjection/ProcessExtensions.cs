@@ -61,9 +61,6 @@ public static class ProcessExtensions
         //EnqueueMessageConfiguration
         services.AddTransient<INotificationHandler<EnqueueMessageEvent>, EnqueueMessageHandler>();
 
-        //AggregationsConfiguration
-        services.AddScoped<AggregationMessageResultFactory>();
-
         // RequestedAggregatedMeasureDataConfiguration
         services.AddTransient<IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>, SendAggregatedMeasuredDataToWholesale>()
             .AddTransient<IRequestHandler<AcceptedAggregatedTimeSerie, Unit>, AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable>()

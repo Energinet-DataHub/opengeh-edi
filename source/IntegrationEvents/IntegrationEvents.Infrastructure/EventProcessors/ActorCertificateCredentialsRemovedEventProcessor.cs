@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 
-namespace IntegrationEvents.Infrastructure.EventProcessors;
+namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
 
 public class ActorCertificateCredentialsRemovedEventProcessor : IIntegrationEventProcessor
 {

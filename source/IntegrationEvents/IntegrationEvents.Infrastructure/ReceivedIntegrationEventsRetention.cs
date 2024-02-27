@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System.Data.Common;
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Common.DateTime;
@@ -20,7 +22,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 
-namespace IntegrationEvents.Infrastructure;
+namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure;
 
 public class ReceivedIntegrationEventsRetention : IDataRetention
 {

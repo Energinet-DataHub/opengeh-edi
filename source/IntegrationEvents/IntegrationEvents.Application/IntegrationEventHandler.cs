@@ -12,15 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using IntegrationEvents.Infrastructure;
-using IntegrationEvents.Infrastructure.EventProcessors;
+using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure;
+using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
 using Microsoft.Extensions.Logging;
 using IIntegrationEventHandler = Energinet.DataHub.Core.Messaging.Communication.Subscriber.IIntegrationEventHandler;
 
-namespace IntegrationEvents.Application;
+namespace Energinet.DataHub.EDI.IntegrationEvents.Application;
 
 #pragma warning disable CA1711
 public sealed class IntegrationEventHandler : IIntegrationEventHandler

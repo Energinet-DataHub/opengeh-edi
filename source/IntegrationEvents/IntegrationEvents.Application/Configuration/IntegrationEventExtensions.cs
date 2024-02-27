@@ -12,16 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.Linq;
 using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
+using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure;
+using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
+using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf.Reflection;
-using IntegrationEvents.Infrastructure;
-using IntegrationEvents.Infrastructure.EventProcessors;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace IntegrationEvents.Application.Configuration;
+namespace Energinet.DataHub.EDI.IntegrationEvents.Application.Configuration;
 
 public static class IntegrationEventExtensions
 {
@@ -50,7 +54,9 @@ public static class IntegrationEventExtensions
         };
         services.AddSubscriber<IntegrationEventHandler>(integrationEventDescriptors);
         services.AddTransient<IDataRetention, ReceivedIntegrationEventsRetention>()
-            .AddTransient<IReceivedIntegrationEventRepository, ReceivedIntegrationEventRepository>();
+            .AddTransient<IReceivedIntegrationEventRepository, ReceivedIntegrationEventRepository>()
+            .AddTransient<EnergyResultMessageResultFactory>()
+            .AddTransient<IIntegrationEventHandler, IntegrationEventHandler>();
         return services;
     }
 }

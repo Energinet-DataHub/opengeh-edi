@@ -14,10 +14,10 @@
 
 using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Exceptions;
+using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Exceptions;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
+namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories.Mappers;
 
 public static class MeteringPointTypeMapper
 {

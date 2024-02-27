@@ -12,25 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Microsoft.Extensions.Logging;
 
-namespace IntegrationEvents.Infrastructure.EventProcessors;
+namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
 
 public sealed class EnergyResultProducedV2Processor : IIntegrationEventProcessor
 {
-    private readonly AggregationMessageResultFactory _aggregationMessageResultFactory;
+    private readonly EnergyResultMessageResultFactory _energyResultMessageResultFactory;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ILogger<EnergyResultProducedV2Processor> _logger;
 
     public EnergyResultProducedV2Processor(
-        AggregationMessageResultFactory aggregationMessageResultFactory,
+        EnergyResultMessageResultFactory energyResultMessageResultFactory,
         IOutgoingMessagesClient outgoingMessagesClient,
         ILogger<EnergyResultProducedV2Processor> logger)
     {
-        _aggregationMessageResultFactory = aggregationMessageResultFactory;
+        _energyResultMessageResultFactory = energyResultMessageResultFactory;
         _outgoingMessagesClient = outgoingMessagesClient;
         _logger = logger;
     }
@@ -51,7 +56,7 @@ public sealed class EnergyResultProducedV2Processor : IIntegrationEventProcessor
             return;
         }
 
-        var message = await _aggregationMessageResultFactory
+        var message = await _energyResultMessageResultFactory
             .CreateAsync(energyResultProducedV2, CancellationToken.None)
             .ConfigureAwait(false);
 
