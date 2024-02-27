@@ -18,14 +18,14 @@ using System.Globalization;
 using System.Threading.Tasks;
 using System.Xml;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Xml;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Xml;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices;
 
-public class WholesaleCalculationXmlDocumentWriter : DocumentWriter
+public class NotifyWholesaleServicesXmlDocumentWriter : DocumentWriter
 {
-    public WholesaleCalculationXmlDocumentWriter(IMessageRecordParser parser)
+    public NotifyWholesaleServicesXmlDocumentWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
                 "NotifyWholesaleServices_MarketDocument",

@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -24,7 +23,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Exceptions;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
 
 public class DocumentFactory
 {

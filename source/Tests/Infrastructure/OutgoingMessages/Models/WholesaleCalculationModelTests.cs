@@ -14,9 +14,10 @@
 
 using System;
 using System.Linq;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations;
 using Xunit;
+using Point = Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices.Point;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Models;
 
@@ -45,7 +46,7 @@ public class WholesaleCalculationModelTests
     {
         var keysOfWholesaleCalculationSeries = typeof(Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleCalculations.Point).GetProperties()
             .Select(p => new { Name = p.Name, PropertyType = p.PropertyType }).ToList();
-        var keysOfWholesaleCalculationMarketActivityRecord = typeof(Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations.Point).GetProperties()
+        var keysOfWholesaleCalculationMarketActivityRecord = typeof(Point).GetProperties()
             .Select(p => new { Name = p.Name, PropertyType = p.PropertyType }).ToList();
 
         Assert.All(keysOfWholesaleCalculationSeries, property =>

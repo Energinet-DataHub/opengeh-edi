@@ -20,20 +20,20 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.Json;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Json;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices;
 
-public sealed class WholesaleCalculationJsonDocumentWriter : IDocumentWriter
+public sealed class NotifyWholesaleServicesJsonDocumentWriter : IDocumentWriter
 {
     private const string DocumentTypeName = "NotifyWholesaleServices_MarketDocument";
     private const string TypeCode = "E31";
     private readonly IMessageRecordParser _parser;
 
-    public WholesaleCalculationJsonDocumentWriter(IMessageRecordParser parser)
+    public NotifyWholesaleServicesJsonDocumentWriter(IMessageRecordParser parser)
     {
         _parser = parser;
     }

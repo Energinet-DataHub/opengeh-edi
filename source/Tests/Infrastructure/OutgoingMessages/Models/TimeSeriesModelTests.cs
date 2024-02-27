@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using System.Linq;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using Xunit;
 using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point;
-using PointOutgoing = Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult.Point;
+using PointOutgoing = Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData.Point;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Models;
 
