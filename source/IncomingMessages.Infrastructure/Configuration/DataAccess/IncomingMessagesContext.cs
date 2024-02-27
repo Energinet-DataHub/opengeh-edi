@@ -17,7 +17,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IncomingMessages.Infrastructure.Configuration.DataAccess
 {
-    public class IncomingMessagesContext : UnitOfWorkContext
+    public class IncomingMessagesContext : UnitOfWorkDbContext
     {
         #nullable disable
         public IncomingMessagesContext(DbContextOptions<IncomingMessagesContext> options)

@@ -21,7 +21,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess
 {
-    public class ActorMessageQueueContext : UnitOfWorkContext
+    public class ActorMessageQueueContext : UnitOfWorkDbContext
     {
         #nullable disable
         public ActorMessageQueueContext(DbContextOptions<ActorMessageQueueContext> options)

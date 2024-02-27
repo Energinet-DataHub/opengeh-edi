@@ -16,14 +16,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 
-public abstract class UnitOfWorkContext : DbContext
+public abstract class UnitOfWorkDbContext : DbContext
 {
-    protected UnitOfWorkContext(DbContextOptions options)
+    protected UnitOfWorkDbContext(DbContextOptions options)
         : base(options)
     {
     }
 
-    protected UnitOfWorkContext()
+    protected UnitOfWorkDbContext()
     {
     }
 }

@@ -22,7 +22,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess
 {
-    public class ProcessContext : UnitOfWorkContext
+    public class ProcessContext : UnitOfWorkDbContext
     {
         #nullable disable
         public ProcessContext(DbContextOptions<ProcessContext> options)

@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
@@ -24,16 +26,16 @@ public sealed class UnitOfWork : IUnitOfWork
 {
     private readonly DbContext[] _contexts;
 
-    public UnitOfWork(params DbContext[] contexts)
+    public UnitOfWork(IEnumerable<UnitOfWorkDbContext> contexts)
     {
         ArgumentNullException.ThrowIfNull(contexts);
 
-        if (contexts.Length < 1)
+        _contexts = contexts.ToArray<DbContext>();
+
+        if (_contexts.Length < 1)
         {
             throw new ArgumentException("At least one context must be provided", nameof(contexts));
         }
-
-        _contexts = contexts;
     }
 
     public async Task CommitTransactionAsync()
