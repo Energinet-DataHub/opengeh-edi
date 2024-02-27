@@ -29,7 +29,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 {
     private readonly ArchivedMessageDsl _archivedMessage;
     private readonly AcceptanceTestFixture _fixture;
-    private readonly AggregationResultDsl _aggregationResult;
+    private readonly NotifyAggregatedMeasureDataResult _notifyAggregatedMeasureDataResult;
 
     public WhenArchivedMessageIsRequestedTests(ITestOutputHelper output, AcceptanceTestFixture fixture)
         : base(output, fixture)
@@ -38,7 +38,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
         _fixture = fixture;
         _archivedMessage = new ArchivedMessageDsl(
             new EdiB2CDriver(fixture.B2CAuthorizedHttpClient));
-        _aggregationResult = new AggregationResultDsl(
+        _notifyAggregatedMeasureDataResult = new NotifyAggregatedMeasureDataResult(
             new EdiDriver(
                 _fixture.B2BEnergySupplierAuthorizedHttpClient),
             new WholesaleDriver(fixture.EventPublisher));
@@ -62,7 +62,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
                 null!,
                 null!));
 
-        await _aggregationResult.ConfirmResultIsAvailableForToken();
+        await _notifyAggregatedMeasureDataResult.ConfirmResultIsAvailableForToken();
 
         Assert.NotNull(response[0].Id);
     }
@@ -76,7 +76,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 
         if (payload != null) await AggregationRequest.AggregatedMeasureDataWithXmlPayload(payload);
 
-        await _aggregationResult.ConfirmResultIsAvailableForToken();
+        await _notifyAggregatedMeasureDataResult.ConfirmResultIsAvailableForToken();
 
         var archivedRequestResponse = await _archivedMessage.RequestArchivedMessageSearchAsync(
             new Uri(_fixture.ApiManagementUri, "b2c/v1.0/ArchivedMessageSearch"),
@@ -112,7 +112,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 
         var archivedMessage = response[0];
 
-        await _aggregationResult.ConfirmResultIsAvailableForToken();
+        await _notifyAggregatedMeasureDataResult.ConfirmResultIsAvailableForToken();
 
         Assert.NotNull(archivedMessage.Id);
         Assert.NotNull(archivedMessage.MessageId);

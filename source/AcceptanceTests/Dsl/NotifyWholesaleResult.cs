@@ -16,42 +16,22 @@ using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
-internal sealed class AggregationResultDsl
+internal sealed class NotifyWholesaleResult
 {
     private readonly WholesaleDriver _wholesale;
     private readonly EdiDriver _edi;
 
     #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
 
-    internal AggregationResultDsl(EdiDriver ediDriver, WholesaleDriver wholesaleDriver)
+    internal NotifyWholesaleResult(EdiDriver ediDriver, WholesaleDriver wholesaleDriver)
     {
         _edi = ediDriver;
         _wholesale = wholesaleDriver;
     }
 
-    internal Task PublishResultFor(string gridAreaCode)
-    {
-        return _wholesale.PublishAggregationResultAsync(gridAreaCode);
-    }
-
     internal Task PublishMonthlyChargeResultFor(string gridAreaCode, string energySupplierId, string chargeOwnerId)
     {
         return _wholesale.PublishMonthlyAmountPerChargeResultAsync(gridAreaCode, energySupplierId, chargeOwnerId);
-    }
-
-    internal Task ConfirmResultIsAvailableFor()
-    {
-        return _edi.PeekMessageAsync();
-    }
-
-    internal Task ConfirmResultIsAvailableForToken()
-    {
-        return _edi.PeekMessageAsync();
-    }
-
-    internal async Task EmptyQueueForActor()
-    {
-        await _edi.EmptyQueueAsync().ConfigureAwait(false);
     }
 
     internal Task PublishAmountPerChargeResultFor(
@@ -60,5 +40,15 @@ internal sealed class AggregationResultDsl
         string chargeOwnerId)
     {
         return _wholesale.PublishAmountPerChargeResultAsync(gridAreaCode, energySupplierId, chargeOwnerId);
+    }
+
+    internal Task ConfirmResultIsAvailableFor()
+    {
+        return _edi.PeekMessageAsync();
+    }
+
+    internal async Task EmptyQueueForActor()
+    {
+        await _edi.EmptyQueueAsync().ConfigureAwait(false);
     }
 }
