@@ -25,13 +25,13 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
 public sealed class WhenAggregationResultIsPublishedTests
 {
-    private readonly NotifyAggregatedMeasureDataResult _notifyAggregatedMeasureDataResult;
+    private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureDataResultDsl;
 
     public WhenAggregationResultIsPublishedTests(AcceptanceTestFixture fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
 
-        _notifyAggregatedMeasureDataResult = new NotifyAggregatedMeasureDataResult(
+        _notifyAggregatedMeasureDataResultDsl = new NotifyAggregatedMeasureDataResultDsl(
             new EdiDriver(
                 fixture.B2BMeteredDataResponsibleAuthorizedHttpClient),
             new WholesaleDriver(fixture.EventPublisher));
@@ -40,10 +40,10 @@ public sealed class WhenAggregationResultIsPublishedTests
     [Fact]
     public async Task Actor_can_peek_and_dequeue_aggregation_result()
     {
-        await _notifyAggregatedMeasureDataResult.EmptyQueueForActor();
+        await _notifyAggregatedMeasureDataResultDsl.EmptyQueueForActor();
 
-        await _notifyAggregatedMeasureDataResult.PublishResultFor(AcceptanceTestFixture.CimActorGridArea);
+        await _notifyAggregatedMeasureDataResultDsl.PublishResultFor(AcceptanceTestFixture.CimActorGridArea);
 
-        await _notifyAggregatedMeasureDataResult.ConfirmResultIsAvailableFor();
+        await _notifyAggregatedMeasureDataResultDsl.ConfirmResultIsAvailableFor();
     }
 }
