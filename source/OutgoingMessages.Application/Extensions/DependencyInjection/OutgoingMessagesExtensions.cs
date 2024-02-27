@@ -15,10 +15,9 @@
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.AggregationResult;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.WholesaleCalculations;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
@@ -40,15 +39,15 @@ public static class OutgoingMessagesExtensions
 
         //AddMessageGenerationServices
         services.AddScoped<DocumentFactory>()
-            .AddScoped<IDocumentWriter, AggregationResultXmlDocumentWriter>()
-            .AddScoped<IDocumentWriter, AggregationResultJsonDocumentWriter>()
-            .AddScoped<IDocumentWriter, AggregationResultEbixDocumentWriter>()
+            .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataXmlDocumentWriter>()
+            .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataJsonDocumentWriter>()
+            .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataEbixDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataXmlDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataJsonDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataEbixDocumentWriter>()
-            .AddScoped<IDocumentWriter, WholesaleCalculationXmlDocumentWriter>()
-            .AddScoped<IDocumentWriter, WholesaleCalculationJsonDocumentWriter>()
-            .AddScoped<IDocumentWriter, WholesaleCalculationResultEbixDocumentWriter>()
+            .AddScoped<IDocumentWriter, NotifyWholesaleServicesXmlDocumentWriter>()
+            .AddScoped<IDocumentWriter, NotifyWholesaleServicesJsonDocumentWriter>()
+            .AddScoped<IDocumentWriter, NotifyWholesaleServicesEbixDocumentWriter>()
             .AddScoped<IMessageRecordParser, MessageRecordParser>();
 
         //MessageEnqueueingConfiguration

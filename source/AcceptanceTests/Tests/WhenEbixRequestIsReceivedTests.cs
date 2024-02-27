@@ -56,11 +56,27 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
     }
 
     [Fact]
-    public async Task Actor_can_peek_and_dequeue_monthly_sum_pr_charge_in_ebIX_format()
+    public async Task Actor_can_peek_and_dequeue_monthly_sum_per_charge_in_ebIX_format()
     {
         await _ebixEs.EmptyQueueForActor();
 
-        await _ebixEs.PublishMonthlySumPrChargeFor(AcceptanceTestFixture.EbixActorGridArea, AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ChargeOwnerId);
+        await _ebixEs.PublishMonthlySumPrChargeFor(
+            AcceptanceTestFixture.EbixActorGridArea,
+            AcceptanceTestFixture.ActorNumber,
+            AcceptanceTestFixture.ChargeOwnerId);
+
+        await _ebixEs.ConfirmWholesaleResultIsAvailableForActor();
+    }
+
+    [Fact]
+    public async Task Actor_can_peek_and_dequeue_amount_per_charge_in_ebIX_format()
+    {
+        await _ebixEs.EmptyQueueForActor();
+
+        await _ebixEs.PublishAmountPerChargeResultFor(
+            AcceptanceTestFixture.EbixActorGridArea,
+            AcceptanceTestFixture.ActorNumber,
+            AcceptanceTestFixture.ChargeOwnerId);
 
         await _ebixEs.ConfirmWholesaleResultIsAvailableForActor();
     }

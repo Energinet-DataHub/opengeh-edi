@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.OutgoingMessages;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
 
 public class MessageDequeuer
 {

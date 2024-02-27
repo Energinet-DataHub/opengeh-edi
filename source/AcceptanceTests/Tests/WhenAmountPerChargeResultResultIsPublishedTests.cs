@@ -19,31 +19,35 @@ using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 
-[SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
-
+[SuppressMessage(
+    "Usage",
+    "CA2007",
+    Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 [IntegrationTest]
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
-public sealed class WhenAggregationResultIsPublishedTests
+public sealed class WhenAmountPerChargeResultResultIsPublishedTests
 {
-    private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureDataResultDsl;
+    private readonly NotifyWholesaleResultDsl _notifyWholesaleResultDsl;
 
-    public WhenAggregationResultIsPublishedTests(AcceptanceTestFixture fixture)
+    public WhenAmountPerChargeResultResultIsPublishedTests(AcceptanceTestFixture fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
 
-        _notifyAggregatedMeasureDataResultDsl = new NotifyAggregatedMeasureDataResultDsl(
-            new EdiDriver(
-                fixture.B2BMeteredDataResponsibleAuthorizedHttpClient),
+        _notifyWholesaleResultDsl = new NotifyWholesaleResultDsl(
+            new EdiDriver(fixture.B2BEnergySupplierAuthorizedHttpClient),
             new WholesaleDriver(fixture.EventPublisher));
     }
 
     [Fact]
-    public async Task Actor_can_peek_and_dequeue_aggregation_result()
+    public async Task Actor_can_peek_and_dequeue_amount_charge_result()
     {
-        await _notifyAggregatedMeasureDataResultDsl.EmptyQueueForActor();
+        await _notifyWholesaleResultDsl.EmptyQueueForActor();
 
-        await _notifyAggregatedMeasureDataResultDsl.PublishResultFor(AcceptanceTestFixture.CimActorGridArea);
+        await _notifyWholesaleResultDsl.PublishAmountPerChargeResultFor(
+            AcceptanceTestFixture.CimActorGridArea,
+            AcceptanceTestFixture.EdiSubsystemTestCimActorNumber,
+            AcceptanceTestFixture.ActorNumber);
 
-        await _notifyAggregatedMeasureDataResultDsl.ConfirmResultIsAvailableFor();
+        await _notifyWholesaleResultDsl.ConfirmResultIsAvailableFor();
     }
 }

@@ -18,7 +18,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 using BuildingBlocks.Application.Configuration.Logging;
-using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.Api.Authentication;
@@ -30,7 +29,6 @@ using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyIn
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Configuration;
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
@@ -109,8 +107,6 @@ namespace Energinet.DataHub.EDI.Api
                             sp.GetRequiredService<AuthenticatedActor>(),
                             sp.GetRequiredService<ILogger<MarketActorAuthenticator>>());
                     });
-
-                    services.AddScopedSqlDbContext<B2BContext>(configuration);
 
                     CompositionRoot.Initialize(services)
                         .AddBearerAuthentication(tokenValidationParameters)

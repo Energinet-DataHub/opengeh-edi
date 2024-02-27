@@ -33,7 +33,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Configuration;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -74,7 +73,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
         protected TestBase(IntegrationTestFixture integrationTestFixture)
         {
             ArgumentNullException.ThrowIfNull(integrationTestFixture);
-            integrationTestFixture.CleanupDatabase();
+            IntegrationTestFixture.CleanupDatabase();
             integrationTestFixture.CleanupFileStorage();
             _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
             TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
@@ -265,7 +264,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             _services.AddTransient<IRequestHandler<TestCreateOutgoingMessageCommand, Unit>, TestCreateOutgoingCommandHandler>();
 
             _services.AddScopedSqlDbContext<ProcessContext>(config);
-            _services.AddScopedSqlDbContext<B2BContext>(config);
 
             _services.AddAuthentication(
                 sp => new MarketActorAuthenticator(
