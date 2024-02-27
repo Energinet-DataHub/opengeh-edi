@@ -69,9 +69,5 @@ limitations under the License.
       <ProjectReference Include="..\Process.Interfaces\Process.Interfaces.csproj" />
       <ProjectReference Include="..\RequestResponse\source\RequestResponse\RequestResponse.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Configuration\IntegrationEvents\IntegrationEventMappers\" />
-    </ItemGroup>
   
 </Project>
