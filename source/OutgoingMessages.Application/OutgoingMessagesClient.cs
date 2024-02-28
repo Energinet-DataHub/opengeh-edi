@@ -67,7 +67,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task EnqueueAndCommitAsync(WholesaleResultMessageDto wholesaleResultMessageDto, CancellationToken cancellationToken)
+    public virtual async Task EnqueueAndCommitAsync(WholesaleResultMessageDto wholesaleResultMessageDto, CancellationToken cancellationToken)
     {
         var messages = _outgoingMessageFactory.CreateMessages(wholesaleResultMessageDto);
         foreach (var message in messages)

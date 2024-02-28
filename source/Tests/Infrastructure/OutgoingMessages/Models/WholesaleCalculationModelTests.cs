@@ -14,8 +14,8 @@
 
 using System;
 using System.Linq;
-using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Models;

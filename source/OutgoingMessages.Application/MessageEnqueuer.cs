@@ -54,7 +54,7 @@ public class MessageEnqueuer
         return messageToEnqueue.Id;
     }
 
-    [ObsoleteAttribute("This method is obsolete, use the overload with OutgoingMessage instead", false)]
+    // This method is obsolete, use the overload with OutgoingMessage instead
     public async Task<OutgoingMessageId> EnqueueAsync(OutgoingMessageDto messageToEnqueue)
     {
         ArgumentNullException.ThrowIfNull(messageToEnqueue);
