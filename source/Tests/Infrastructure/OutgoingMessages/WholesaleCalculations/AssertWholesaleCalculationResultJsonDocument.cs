@@ -21,9 +21,9 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using FluentAssertions;
-using IncomingMessages.Infrastructure.DocumentValidation;
 using Json.Schema;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.WholesaleCalculations;

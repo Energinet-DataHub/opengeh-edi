@@ -14,14 +14,14 @@
 
 using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.BaseParsers;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 using Energinet.DataHub.EDI.Process.Interfaces;
-using IncomingMessages.Infrastructure.BaseParsers;
-using IncomingMessages.Infrastructure.DocumentValidation;
-using IncomingMessages.Infrastructure.Messages;
-using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
-using IncomingMessages.Infrastructure.ValidationErrors;
 
-namespace IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 
 public class JsonMessageParser : JsonParserBase, IMessageParser
 {

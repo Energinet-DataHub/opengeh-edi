@@ -20,11 +20,11 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.DateTime;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
-using IncomingMessages.Infrastructure;
-using IncomingMessages.Infrastructure.Messages;
-using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
-using IncomingMessages.Infrastructure.Response;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 

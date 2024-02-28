@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 
-namespace IncomingMessages.Infrastructure.Messages;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
 
 /// <summary>
 /// Parses CIM messages from a stream

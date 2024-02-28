@@ -15,8 +15,8 @@
 using System;
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using IncomingMessages.Infrastructure.Messages;
-using IncomingMessages.Infrastructure.Response;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 using Xunit;
 using Xunit.Categories;
 
