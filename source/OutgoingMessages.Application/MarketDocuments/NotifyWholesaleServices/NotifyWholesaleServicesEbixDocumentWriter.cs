@@ -81,7 +81,7 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
                 // <Currency /> -- Currency is hardcoded to listAgencyIdentifier = ebIX list (260), without country code
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Currency", null).ConfigureAwait(false);
                 await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
-                await writer.WriteStringAsync(EbixCode.Of(series.Currency)).ConfigureAwait(false);
+                await writer.WriteStringAsync(series.Currency.Code).ConfigureAwait(false);
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
 
                 // Begin <ObservationTimeSeriesPeriod>
@@ -155,58 +155,61 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
                 } // End </MeteringGridAreaUsedDomainLocation>
 
-                foreach (var point in series.Points)
+                if (series.Points.Count > 0)
                 {
-                    // Begin <IntervalEnergyObservation>
-                    await writer.WriteStartElementAsync(DocumentDetails.Prefix, "IntervalEnergyObservation", null)
-                        .ConfigureAwait(false);
+                    foreach (var point in series.Points)
                     {
-                        // <Position />
-                        await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Position", null, point.Position.ToString(NumberFormatInfo.InvariantInfo))
+                        // Begin <IntervalEnergyObservation>
+                        await writer.WriteStartElementAsync(DocumentDetails.Prefix, "IntervalEnergyObservation", null)
                             .ConfigureAwait(false);
-
-                        // <EnergyQuantity />
-                        if (point.Quantity != null)
                         {
+                            // <Position />
+                            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Position", null, point.Position.ToString(NumberFormatInfo.InvariantInfo))
+                                .ConfigureAwait(false);
+
+                            // <EnergyQuantity />
+                            if (point.Quantity != null)
+                            {
+                                await writer.WriteElementStringAsync(
+                                        DocumentDetails.Prefix,
+                                        "EnergyQuantity",
+                                        null,
+                                        point.Quantity.Value.ToString(NumberFormatInfo.InvariantInfo))
+                                    .ConfigureAwait(false);
+                            }
+
+                            // <EnergyPrice />
+                            if (point.Price != null)
+                            {
+                                await writer.WriteElementStringAsync(
+                                        DocumentDetails.Prefix,
+                                        "EnergyPrice",
+                                        null,
+                                        point.Price.Value.ToString(NumberFormatInfo.InvariantInfo))
+                                    .ConfigureAwait(false);
+                            }
+
+                            // <QuantityQuality />
+                            if (point.QuantityQuality != null)
+                            {
+                                await WriteCodeWithCodeListReferenceAttributesAsync("QuantityQuality", point.QuantityQuality.Value.ToString(), writer).ConfigureAwait(false);
+                            }
+
+                            // <EnergySum />
                             await writer.WriteElementStringAsync(
                                     DocumentDetails.Prefix,
-                                    "EnergyQuantity",
+                                    "EnergySum",
                                     null,
-                                    point.Quantity.Value.ToString(NumberFormatInfo.InvariantInfo))
+                                    point.Amount?.ToString(NumberFormatInfo.InvariantInfo) ?? "0")
                                 .ConfigureAwait(false);
-                        }
 
-                        // <EnergyPrice />
-                        if (point.Price != null)
-                        {
-                            await writer.WriteElementStringAsync(
-                                    DocumentDetails.Prefix,
-                                    "EnergyPrice",
-                                    null,
-                                    point.Price.Value.ToString(NumberFormatInfo.InvariantInfo))
-                                .ConfigureAwait(false);
-                        }
-
-                        // <QuantityQuality />
-                        if (point.QuantityQuality != null)
-                        {
-                            await WriteCodeWithCodeListReferenceAttributesAsync("QuantityQuality", point.QuantityQuality.Value.ToString(), writer).ConfigureAwait(false);
-                        }
-
-                        // <EnergySum />
-                        await writer.WriteElementStringAsync(
-                                DocumentDetails.Prefix,
-                                "EnergySum",
-                                null,
-                                point.Amount?.ToString(NumberFormatInfo.InvariantInfo) ?? "0")
-                            .ConfigureAwait(false);
-
-                        await writer.WriteEndElementAsync().ConfigureAwait(false);
-                    } // End </IntervalEnergyObservation>
+                            await writer.WriteEndElementAsync().ConfigureAwait(false);
+                        } // End </IntervalEnergyObservation>
+                    }
                 }
 
                 // <ChargeType />
-                await WriteCodeWithCodeListReferenceAttributesAsync("ChargeType", EbixCode.Of(series.ChargeType), writer).ConfigureAwait(false);
+                await WriteCodeWithCodeListReferenceAttributesAsync("ChargeType", series.ChargeType.Code, writer).ConfigureAwait(false);
 
                 // <PartyChargeTypeID />
                 await writer.WriteElementStringAsync(DocumentDetails.Prefix, "PartyChargeTypeID", null, series.ChargeCode).ConfigureAwait(false);
