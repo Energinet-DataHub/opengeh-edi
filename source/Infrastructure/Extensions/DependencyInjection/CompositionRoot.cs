@@ -14,7 +14,6 @@
 
 using System;
 using System.Net.Http;
-using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.Common.DateTime;
@@ -61,12 +60,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection
         public CompositionRoot AddBearerAuthentication(TokenValidationParameters tokenValidationParameters)
         {
             _services.AddScoped(sp => new JwtTokenParser(tokenValidationParameters));
-            return this;
-        }
-
-        public CompositionRoot AddCorrelationContext(Func<IServiceProvider, ICorrelationContext> action)
-        {
-            _services.AddScoped(action);
             return this;
         }
 
