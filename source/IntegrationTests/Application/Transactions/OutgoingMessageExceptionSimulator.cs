@@ -41,14 +41,14 @@ internal sealed class OutgoingMessageExceptionSimulator : OutgoingMessagesClient
     {
     }
 
-    public override Task EnqueueAndCommitAsync(WholesaleResultMessageDto wholesaleResultMessageDto, CancellationToken cancellationToken)
+    public override Task EnqueueAndCommitAsync(WholesaleResultMessageDto wholesaleResultMessage, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(wholesaleResultMessageDto);
-        if (wholesaleResultMessageDto.ReceiverRole == ActorRole.EnergySupplier)
+        ArgumentNullException.ThrowIfNull(wholesaleResultMessage);
+        if (wholesaleResultMessage.ReceiverRole == ActorRole.EnergySupplier)
         {
             throw new InvalidDataException("Simulated exception.");
         }
 
-        return base.EnqueueAndCommitAsync(wholesaleResultMessageDto, cancellationToken);
+        return base.EnqueueAndCommitAsync(wholesaleResultMessage, cancellationToken);
     }
 }
