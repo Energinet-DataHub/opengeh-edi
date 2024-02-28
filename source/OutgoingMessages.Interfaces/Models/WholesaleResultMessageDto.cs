@@ -17,17 +17,17 @@ using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.Serialization;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.OutgoingMessages;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-public class WholesaleCalculationResultMessage : OutgoingMessageDto
+public class WholesaleResultMessageDto : OutgoingMessageDto
 {
-    private WholesaleCalculationResultMessage(
+    private WholesaleResultMessageDto(
         ActorNumber receiverId,
         Guid processId,
         BusinessReason businessReason,
         ActorRole receiverRole,
+        ActorNumber chargeOwnerId,
         WholesaleCalculationSeries series)
         : base(
             DocumentType.NotifyWholesaleServices,
@@ -39,11 +39,15 @@ public class WholesaleCalculationResultMessage : OutgoingMessageDto
             ActorRole.MeteredDataAdministrator,
             new Serializer().Serialize(series))
     {
+        ChargeOwnerId = chargeOwnerId;
     }
 
-    public static WholesaleCalculationResultMessage Create(
+    public ActorNumber ChargeOwnerId { get; }
+
+    public static WholesaleResultMessageDto Create(
         ActorNumber receiverNumber,
         ActorRole receiverRole,
+        ActorNumber chargeOwnerId,
         Guid processId,
         BusinessReason businessReason,
         WholesaleCalculationSeries wholesaleSeries)
@@ -51,12 +55,13 @@ public class WholesaleCalculationResultMessage : OutgoingMessageDto
         ArgumentNullException.ThrowIfNull(processId);
         ArgumentNullException.ThrowIfNull(businessReason);
 
-        return new WholesaleCalculationResultMessage(
+        return new WholesaleResultMessageDto(
             receiverId: receiverNumber,
             receiverRole: receiverRole,
             processId: processId,
             businessReason: businessReason,
-            series: wholesaleSeries);
+            series: wholesaleSeries,
+            chargeOwnerId: chargeOwnerId);
     }
 }
 

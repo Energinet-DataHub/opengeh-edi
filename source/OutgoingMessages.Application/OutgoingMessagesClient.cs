@@ -26,17 +26,20 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     private readonly MessageDequeuer _messageDequeuer;
     private readonly MessageEnqueuer _messageEnqueuer;
     private readonly ActorMessageQueueContext _actorMessageQueueContext;
+    private readonly OutgoingMessageFactory _outgoingMessageFactory;
 
     public OutgoingMessagesClient(
         MessagePeeker messagePeeker,
         MessageDequeuer messageDequeuer,
         MessageEnqueuer messageEnqueuer,
-        ActorMessageQueueContext actorMessageQueueContext)
+        ActorMessageQueueContext actorMessageQueueContext,
+        OutgoingMessageFactory outgoingMessageFactory)
     {
         _messagePeeker = messagePeeker;
         _messageDequeuer = messageDequeuer;
         _messageEnqueuer = messageEnqueuer;
         _actorMessageQueueContext = actorMessageQueueContext;
+        _outgoingMessageFactory = outgoingMessageFactory;
     }
 
     public async Task<DequeueRequestResultDto> DequeueAndCommitAsync(DequeueRequestDto request, CancellationToken cancellationToken)
@@ -61,6 +64,17 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     public async Task EnqueueAndCommitAsync(OutgoingMessageDto outgoingMessage, CancellationToken cancellationToken)
     {
         await _messageEnqueuer.EnqueueAsync(outgoingMessage).ConfigureAwait(false);
+        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public virtual async Task EnqueueAndCommitAsync(WholesaleResultMessageDto wholesaleResultMessageDto, CancellationToken cancellationToken)
+    {
+        var messages = _outgoingMessageFactory.CreateMessages(wholesaleResultMessageDto);
+        foreach (var message in messages)
+        {
+            await _messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
+        }
+
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 }

@@ -14,8 +14,10 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -28,23 +30,25 @@ internal sealed class OutgoingMessageExceptionSimulator : OutgoingMessagesClient
         MessagePeeker messagePeeker,
         MessageDequeuer messageDequeuer,
         MessageEnqueuer messageEnqueuer,
-        ActorMessageQueueContext actorMessageQueueContext)
+        ActorMessageQueueContext actorMessageQueueContext,
+        OutgoingMessageFactory outgoingMessageFactory)
         : base(
             messagePeeker,
             messageDequeuer,
             messageEnqueuer,
-            actorMessageQueueContext)
+            actorMessageQueueContext,
+            outgoingMessageFactory)
     {
     }
 
-    public override Task<OutgoingMessageId> EnqueueAsync(OutgoingMessageDto outgoingMessage)
+    public override Task EnqueueAndCommitAsync(WholesaleResultMessageDto wholesaleResultMessageDto, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(outgoingMessage);
-        if (outgoingMessage.ReceiverRole == ActorRole.EnergySupplier)
+        ArgumentNullException.ThrowIfNull(wholesaleResultMessageDto);
+        if (wholesaleResultMessageDto.ReceiverRole == ActorRole.EnergySupplier)
         {
             throw new InvalidDataException("Simulated exception.");
         }
 
-        return base.EnqueueAsync(outgoingMessage);
+        return base.EnqueueAndCommitAsync(wholesaleResultMessageDto, cancellationToken);
     }
 }
