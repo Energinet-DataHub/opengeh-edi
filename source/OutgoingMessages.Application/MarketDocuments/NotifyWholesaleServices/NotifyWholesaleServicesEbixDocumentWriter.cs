@@ -155,7 +155,7 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
                 } // End </MeteringGridAreaUsedDomainLocation>
 
-                if (series.Points.Count > 0)
+                if (series.Points != null)
                 {
                     foreach (var point in series.Points)
                     {
