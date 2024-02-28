@@ -22,7 +22,7 @@ using NodaTime.Serialization.Protobuf;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories;
 
-public static class WholesaleCalculationResultMessageFactory
+public static class WholesaleMessageFactory
 {
     public static WholesaleMessageDto CreateMessage(AmountPerChargeResultProducedV1 amountPerChargeResultProducedV1)
     {
