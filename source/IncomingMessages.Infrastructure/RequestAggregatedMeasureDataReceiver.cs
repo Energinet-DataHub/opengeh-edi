@@ -13,14 +13,14 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 using Energinet.DataHub.EDI.Process.Interfaces;
-using IncomingMessages.Infrastructure.Configuration.DataAccess;
-using IncomingMessages.Infrastructure.Messages;
-using IncomingMessages.Infrastructure.ValidationErrors;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
-namespace IncomingMessages.Infrastructure;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 
 public class RequestAggregatedMeasureDataReceiver : IRequestAggregatedMeasureDataReceiver
 {

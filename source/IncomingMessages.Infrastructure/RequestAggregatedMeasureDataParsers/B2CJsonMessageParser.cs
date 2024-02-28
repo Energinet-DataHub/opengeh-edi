@@ -14,11 +14,11 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.Serialization;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Interfaces;
-using IncomingMessages.Infrastructure.Messages;
-using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 
-namespace IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 
 public class B2CJsonMessageParser : IMessageParser
 {

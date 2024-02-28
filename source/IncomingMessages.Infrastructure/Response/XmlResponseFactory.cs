@@ -15,10 +15,10 @@
 using System.Text;
 using System.Xml;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
-using IncomingMessages.Infrastructure.Messages;
 
-namespace IncomingMessages.Infrastructure.Response
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response
 {
     public class XmlResponseFactory : IResponseFactory
     {

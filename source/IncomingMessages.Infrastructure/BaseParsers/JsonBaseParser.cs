@@ -15,12 +15,12 @@
 using System.Globalization;
 using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using IncomingMessages.Infrastructure.DocumentValidation;
-using IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
-using IncomingMessages.Infrastructure.ValidationErrors;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 using Json.Schema;
 
-namespace IncomingMessages.Infrastructure.BaseParsers;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.BaseParsers;
 
 public abstract class JsonParserBase
 {

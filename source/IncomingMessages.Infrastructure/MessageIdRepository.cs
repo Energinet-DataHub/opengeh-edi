@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using IncomingMessages.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-namespace IncomingMessages.Infrastructure
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure
 {
     public class MessageIdRepository : IMessageIdRepository
     {

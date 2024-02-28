@@ -14,7 +14,7 @@
 
 using System.Xml;
 
-namespace IncomingMessages.Infrastructure;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 
 internal static class XmlReaderExtensions
 {
