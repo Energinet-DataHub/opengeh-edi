@@ -125,7 +125,7 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
 
                 if (series.MeteringPointType != null || series.SettlementType != null)
                 {
-                    // Begin DetailMeasurementMeteringPointCharacteristic
+                    // Begin <DetailMeasurementMeteringPointCharacteristic>
                     await writer.WriteStartElementAsync(DocumentDetails.Prefix, "DetailMeasurementMeteringPointCharacteristic", null).ConfigureAwait(false);
                     if (series.MeteringPointType != null)
                     {
@@ -140,7 +140,7 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
                 }
 
-                // End DetailMeasurementMeteringPointCharacteristic
+                // End </DetailMeasurementMeteringPointCharacteristic>
 
                 // Begin <MeteringGridAreaUsedDomainLocation>
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "MeteringGridAreaUsedDomainLocation", null).ConfigureAwait(false);
