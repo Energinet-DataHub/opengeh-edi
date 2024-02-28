@@ -25,6 +25,7 @@ using Dapper;
 using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Api.Authentication;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
+using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -273,20 +274,21 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
             CompositionRoot.Initialize(_services)
                 .AddSystemClock(new SystemDateTimeProviderStub())
-                .AddCorrelationContext(_ =>
-                {
-                    var correlation = new CorrelationContext();
-                    correlation.SetId(Guid.NewGuid().ToString());
-                    return correlation;
-                })
                 .AddBearerAuthentication(JwtTokenParserTests.DisableAllTokenValidations);
 
-            _services.AddIntegrationEventModule();
-            _services.AddOutgoingMessagesModule(config);
-            _services.AddProcessModule(config);
-            _services.AddArchivedMessagesModule(config);
-            _services.AddIncomingMessagesModule(config);
-            _services.AddMasterDataModule(config);
+            _services.AddScoped<ICorrelationContext>(
+                    _ =>
+                    {
+                        var correlation = new CorrelationContext();
+                        correlation.SetId(Guid.NewGuid().ToString());
+                        return correlation;
+                    })
+                .AddIntegrationEventModule()
+                .AddOutgoingMessagesModule(config)
+                .AddProcessModule(config)
+                .AddArchivedMessagesModule(config)
+                .AddIncomingMessagesModule(config)
+                .AddMasterDataModule(config);
 
             // Replace the services with stub implementations.
             // - Building blocks
