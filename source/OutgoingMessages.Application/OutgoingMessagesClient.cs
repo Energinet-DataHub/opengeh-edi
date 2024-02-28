@@ -61,7 +61,9 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         return _messageEnqueuer.EnqueueAsync(outgoingMessage);
     }
 
-    public async Task EnqueueAndCommitAsync(EnergyResultMessageDto energyResultMessage, CancellationToken cancellationToken)
+    public async Task EnqueueAndCommitAsync(
+        EnergyResultMessageDto energyResultMessage,
+        CancellationToken cancellationToken)
     {
         await _messageEnqueuer.EnqueueAsync(energyResultMessage).ConfigureAwait(false);
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
