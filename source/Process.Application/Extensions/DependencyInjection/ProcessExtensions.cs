@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using BuildingBlocks.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.IntegrationEvents.IntegrationEventMappers;
-using Energinet.DataHub.EDI.Process.Application.IntegrationEvents;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands.Handlers;
@@ -49,10 +47,7 @@ public static class ProcessExtensions
 
         //EventsConfiguration
         //TODO: can we move them out and delete ref to Infrastructure?
-        services.AddTransient<IIntegrationEventProcessor, EnergyResultProducedV2Processor>()
-            .AddTransient<IIntegrationEventProcessor, MonthlyAmountPerChargeResultProducedV1Processor>()
-            .AddTransient<IIntegrationEventProcessor, AmountPerChargeResultProducedV1Processor>()
-            .AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestAcceptedEventMapper>()
+        services.AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestAcceptedEventMapper>()
             .AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestRejectedMapper>();
 
         //ProcessingConfiguration
@@ -65,9 +60,6 @@ public static class ProcessExtensions
 
         //EnqueueMessageConfiguration
         services.AddTransient<INotificationHandler<EnqueueMessageEvent>, EnqueueMessageHandler>();
-
-        //AggregationsConfiguration
-        services.AddScoped<AggregationMessageResultFactory>();
 
         // RequestedAggregatedMeasureDataConfiguration
         services.AddTransient<IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>, SendAggregatedMeasuredDataToWholesale>()

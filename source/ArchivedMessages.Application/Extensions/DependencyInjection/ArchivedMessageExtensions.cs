@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using BuildingBlocks.Application.Configuration;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Dapper;
 using Dapper.NodaTime;

@@ -42,7 +42,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection
             services.AddLogging();
             AddAuthenticatedActor();
             services
-                .AddIntegrationEvents()
                 .AddDapper()
                 .AddDataRetention();
         }
