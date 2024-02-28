@@ -25,6 +25,7 @@ using Energinet.DataHub.EDI.Api.Authentication.Certificate;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
+using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.Common.DateTime;
@@ -110,8 +111,9 @@ namespace Energinet.DataHub.EDI.Api
 
                     CompositionRoot.Initialize(services)
                         .AddBearerAuthentication(tokenValidationParameters)
-                        .AddSystemClock(new SystemDateTimeProvider())
-                        .AddCorrelationContext(_ =>
+                        .AddSystemClock(new SystemDateTimeProvider());
+                    services.AddScoped<ICorrelationContext>(
+                        _ =>
                         {
                             var correlationContext = new CorrelationContext();
                             if (!runtime.IsRunningLocally()) return correlationContext;
