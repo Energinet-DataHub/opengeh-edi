@@ -30,16 +30,13 @@ public class MonthlyAmountPerChargeResultProducedV1Processor : IIntegrationEvent
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly IFeatureFlagManager _featureManager;
-    private readonly ActorMessageQueueContext _actorMessageQueueContext;
 
     public MonthlyAmountPerChargeResultProducedV1Processor(
         IOutgoingMessagesClient outgoingMessagesClient,
-        IFeatureFlagManager featureManager,
-        ActorMessageQueueContext actorMessageQueueContext)
+        IFeatureFlagManager featureManager)
     {
         _outgoingMessagesClient = outgoingMessagesClient;
         _featureManager = featureManager;
-        _actorMessageQueueContext = actorMessageQueueContext;
     }
 
     public string EventTypeToHandle => MonthlyAmountPerChargeResultProducedV1.EventName;
@@ -48,23 +45,14 @@ public class MonthlyAmountPerChargeResultProducedV1Processor : IIntegrationEvent
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        var monthlyAmountPerChargeResultProducedV1 = (MonthlyAmountPerChargeResultProducedV1)integrationEvent.Message;
-
-        var messageForEnergySupplier = WholesaleCalculationResultMessageFactory.CreateMessageForEnergySupplier(
-            monthlyAmountPerChargeResultProducedV1);
-
-        var messageForChargeOwner = WholesaleCalculationResultMessageFactory.CreateMessageForChargeOwner(
-            monthlyAmountPerChargeResultProducedV1);
-
-        if (await _featureManager.UseMonthlyAmountPerChargeResultProduced.ConfigureAwait(false))
+        if (!await _featureManager.UseMonthlyAmountPerChargeResultProduced.ConfigureAwait(false))
         {
-            await ResilientTransaction.New(_actorMessageQueueContext, async () =>
-                {
-                    await _outgoingMessagesClient.EnqueueAsync(messageForEnergySupplier).ConfigureAwait(false);
-                    await _outgoingMessagesClient.EnqueueAsync(messageForChargeOwner).ConfigureAwait(false);
-                })
-                .SaveChangesAsync(new DbContext[] { _actorMessageQueueContext, })
-                .ConfigureAwait(false);
+            return;
         }
+
+        var monthlyAmountPerChargeResultProducedV1 = (MonthlyAmountPerChargeResultProducedV1)integrationEvent.Message;
+        var message = WholesaleCalculationResultMessageFactory.CreateMessage(monthlyAmountPerChargeResultProducedV1);
+
+        await _outgoingMessagesClient.EnqueueAndCommitAsync(message, cancellationToken).ConfigureAwait(false);
     }
 }

@@ -17,12 +17,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.Core.Messaging.Communication;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
-using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
 
@@ -30,16 +28,13 @@ public class AmountPerChargeResultProducedV1Processor : IIntegrationEventProcess
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly IFeatureFlagManager _featureManager;
-    private readonly ActorMessageQueueContext _actorMessageQueueContext;
 
     public AmountPerChargeResultProducedV1Processor(
         IOutgoingMessagesClient outgoingMessagesClient,
-        IFeatureFlagManager featureManager,
-        ActorMessageQueueContext actorMessageQueueContext)
+        IFeatureFlagManager featureManager)
     {
         _outgoingMessagesClient = outgoingMessagesClient;
         _featureManager = featureManager;
-        _actorMessageQueueContext = actorMessageQueueContext;
     }
 
     public string EventTypeToHandle => AmountPerChargeResultProducedV1.EventName;
@@ -47,23 +42,14 @@ public class AmountPerChargeResultProducedV1Processor : IIntegrationEventProcess
     public async Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
+        if (!await _featureManager.UseAmountPerChargeResultProduced.ConfigureAwait(false))
+        {
+            return;
+        }
 
         var amountPerChargeResultProducedV1 = (AmountPerChargeResultProducedV1)integrationEvent.Message;
+        var message = WholesaleCalculationResultMessageFactory.CreateMessage(amountPerChargeResultProducedV1);
 
-        var messageForEnergySupplier = WholesaleCalculationResultMessageFactory.CreateMessageForEnergySupplier(
-            amountPerChargeResultProducedV1);
-        var messageForChargeOwner = WholesaleCalculationResultMessageFactory.CreateMessageForChargeOwner(
-            amountPerChargeResultProducedV1);
-
-        if (await _featureManager.UseAmountPerChargeResultProduced.ConfigureAwait(false))
-        {
-            await ResilientTransaction.New(_actorMessageQueueContext, async () =>
-                {
-                    await _outgoingMessagesClient.EnqueueAsync(messageForEnergySupplier).ConfigureAwait(false);
-                    await _outgoingMessagesClient.EnqueueAsync(messageForChargeOwner).ConfigureAwait(false);
-                })
-                .SaveChangesAsync(new DbContext[] { _actorMessageQueueContext, })
-                .ConfigureAwait(false);
-        }
+        await _outgoingMessagesClient.EnqueueAndCommitAsync((OutgoingMessageDto)message, cancellationToken).ConfigureAwait(false);
     }
 }
