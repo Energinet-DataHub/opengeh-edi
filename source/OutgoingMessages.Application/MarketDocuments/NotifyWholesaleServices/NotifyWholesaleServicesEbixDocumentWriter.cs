@@ -81,7 +81,7 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
                 // <Currency /> -- Currency is hardcoded to listAgencyIdentifier = ebIX list (260), without country code
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Currency", null).ConfigureAwait(false);
                 await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
-                await writer.WriteStringAsync(EbixCode.Of(series.Currency)).ConfigureAwait(false);
+                await writer.WriteStringAsync(series.Currency.Code).ConfigureAwait(false);
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
 
                 // Begin <ObservationTimeSeriesPeriod>
@@ -125,7 +125,7 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
 
                 if (series.MeteringPointType != null || series.SettlementType != null)
                 {
-                    // Begin DetailMeasurementMeteringPointCharacteristic
+                    // Begin <DetailMeasurementMeteringPointCharacteristic>
                     await writer.WriteStartElementAsync(DocumentDetails.Prefix, "DetailMeasurementMeteringPointCharacteristic", null).ConfigureAwait(false);
                     if (series.MeteringPointType != null)
                     {
@@ -140,7 +140,7 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
                 }
 
-                // End DetailMeasurementMeteringPointCharacteristic
+                // End </DetailMeasurementMeteringPointCharacteristic>
 
                 // Begin <MeteringGridAreaUsedDomainLocation>
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "MeteringGridAreaUsedDomainLocation", null).ConfigureAwait(false);
@@ -206,7 +206,7 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
                 }
 
                 // <ChargeType />
-                await WriteCodeWithCodeListReferenceAttributesAsync("ChargeType", EbixCode.Of(series.ChargeType), writer).ConfigureAwait(false);
+                await WriteCodeWithCodeListReferenceAttributesAsync("ChargeType", series.ChargeType.Code, writer).ConfigureAwait(false);
 
                 // <PartyChargeTypeID />
                 await writer.WriteElementStringAsync(DocumentDetails.Prefix, "PartyChargeTypeID", null, series.ChargeCode).ConfigureAwait(false);
