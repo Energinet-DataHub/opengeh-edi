@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
@@ -40,6 +41,8 @@ public sealed class UnitOfWork : IUnitOfWork
 
     public async Task CommitTransactionAsync()
     {
-        await ResilientTransaction.New(_contexts[0]).SaveChangesAsync(_contexts).ConfigureAwait(false);
+        await ResilientTransaction
+            .New(_contexts.Single(c => c.GetType() == typeof(ProcessContext)))
+            .SaveChangesAsync(_contexts).ConfigureAwait(false);
     }
 }
