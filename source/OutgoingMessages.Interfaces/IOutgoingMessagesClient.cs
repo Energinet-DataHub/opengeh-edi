@@ -49,7 +49,7 @@ public interface IOutgoingMessagesClient
     Task EnqueueAndCommitAsync(OutgoingMessageDto outgoingMessage, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Enqueue wholesale messages based on the dto.
+    ///     Enqueue wholesale messages, handles enqueuing messages to all appropriate parties (Receiver, ChargeOwner) in a single transaction.
     /// </summary>
     Task EnqueueAndCommitAsync(WholesaleResultMessageDto wholesaleResultMessageDto, CancellationToken cancellationToken);
 }

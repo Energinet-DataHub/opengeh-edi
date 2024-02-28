@@ -31,6 +31,10 @@ public class OutgoingMessageFactory
         _systemDateTimeProvider = systemDateTimeProvider;
     }
 
+    /// <summary>
+    /// This method creates two outgoing messages, one for the receiver and one for the charge owner, based on the wholesaleResultMessage.
+    /// </summary>
+    /// <param name="wholesaleResultMessageDto"></param>
     public IReadOnlyCollection<OutgoingMessage> CreateMessages(WholesaleResultMessageDto wholesaleResultMessageDto)
     {
         ArgumentNullException.ThrowIfNull(wholesaleResultMessageDto);
@@ -49,10 +53,10 @@ public class OutgoingMessageFactory
                 wholesaleResultMessageDto.RelatedToMessageId),
             new(
                 wholesaleResultMessageDto.DocumentType,
-                wholesaleResultMessageDto.ChargeOwner,
+                wholesaleResultMessageDto.ChargeOwnerId,
                 wholesaleResultMessageDto.ProcessId,
                 wholesaleResultMessageDto.BusinessReason,
-                GetChargeOwnerRole(wholesaleResultMessageDto.ChargeOwner),
+                GetChargeOwnerRole(wholesaleResultMessageDto.ChargeOwnerId),
                 wholesaleResultMessageDto.SenderId,
                 wholesaleResultMessageDto.SenderRole,
                 wholesaleResultMessageDto.SerializedContent,

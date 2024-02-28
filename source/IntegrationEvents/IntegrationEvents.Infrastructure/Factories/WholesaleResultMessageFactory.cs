@@ -33,7 +33,7 @@ public static class WholesaleResultMessageFactory
         return WholesaleResultMessageDto.Create(
             receiverNumber: message.EnergySupplier,
             receiverRole: ActorRole.EnergySupplier,
-            chargeOwner: message.ChargeOwner,
+            chargeOwnerId: message.ChargeOwner,
             processId: Guid.NewGuid(),
             businessReason: BusinessReasonMapper.Map(amountPerChargeResultProducedV1.CalculationType),
             wholesaleSeries: message);
@@ -48,7 +48,7 @@ public static class WholesaleResultMessageFactory
         return WholesaleResultMessageDto.Create(
             receiverNumber: message.EnergySupplier,
             receiverRole: ActorRole.EnergySupplier,
-            chargeOwner: message.ChargeOwner,
+            chargeOwnerId: message.ChargeOwner,
             processId: Guid.NewGuid(),
             businessReason: BusinessReasonMapper.Map(monthlyAmountPerChargeResultProducedV1.CalculationType),
             wholesaleSeries: message);

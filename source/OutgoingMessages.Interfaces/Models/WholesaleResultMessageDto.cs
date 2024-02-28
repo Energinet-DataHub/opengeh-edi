@@ -27,7 +27,7 @@ public class WholesaleResultMessageDto : OutgoingMessageDto
         Guid processId,
         BusinessReason businessReason,
         ActorRole receiverRole,
-        ActorNumber chargeOwner,
+        ActorNumber chargeOwnerId,
         WholesaleCalculationSeries series)
         : base(
             DocumentType.NotifyWholesaleServices,
@@ -39,15 +39,15 @@ public class WholesaleResultMessageDto : OutgoingMessageDto
             ActorRole.MeteredDataAdministrator,
             new Serializer().Serialize(series))
     {
-        ChargeOwner = chargeOwner;
+        ChargeOwnerId = chargeOwnerId;
     }
 
-    public ActorNumber ChargeOwner { get; }
+    public ActorNumber ChargeOwnerId { get; }
 
     public static WholesaleResultMessageDto Create(
         ActorNumber receiverNumber,
         ActorRole receiverRole,
-        ActorNumber chargeOwner,
+        ActorNumber chargeOwnerId,
         Guid processId,
         BusinessReason businessReason,
         WholesaleCalculationSeries wholesaleSeries)
@@ -61,7 +61,7 @@ public class WholesaleResultMessageDto : OutgoingMessageDto
             processId: processId,
             businessReason: businessReason,
             series: wholesaleSeries,
-            chargeOwner: chargeOwner);
+            chargeOwnerId: chargeOwnerId);
     }
 }
 
