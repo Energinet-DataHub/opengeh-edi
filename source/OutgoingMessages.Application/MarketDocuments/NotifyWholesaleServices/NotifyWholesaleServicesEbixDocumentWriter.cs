@@ -155,54 +155,57 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
                 } // End </MeteringGridAreaUsedDomainLocation>
 
-                foreach (var point in series.Points)
+                if (series.Points != null)
                 {
-                    // Begin <IntervalEnergyObservation>
-                    await writer.WriteStartElementAsync(DocumentDetails.Prefix, "IntervalEnergyObservation", null)
-                        .ConfigureAwait(false);
+                    foreach (var point in series.Points)
                     {
-                        // <Position />
-                        await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Position", null, point.Position.ToString(NumberFormatInfo.InvariantInfo))
+                        // Begin <IntervalEnergyObservation>
+                        await writer.WriteStartElementAsync(DocumentDetails.Prefix, "IntervalEnergyObservation", null)
                             .ConfigureAwait(false);
-
-                        // <EnergyQuantity />
-                        if (point.Quantity != null)
                         {
+                            // <Position />
+                            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Position", null, point.Position.ToString(NumberFormatInfo.InvariantInfo))
+                                .ConfigureAwait(false);
+
+                            // <EnergyQuantity />
+                            if (point.Quantity != null)
+                            {
+                                await writer.WriteElementStringAsync(
+                                        DocumentDetails.Prefix,
+                                        "EnergyQuantity",
+                                        null,
+                                        point.Quantity.Value.ToString(NumberFormatInfo.InvariantInfo))
+                                    .ConfigureAwait(false);
+                            }
+
+                            // <EnergyPrice />
+                            if (point.Price != null)
+                            {
+                                await writer.WriteElementStringAsync(
+                                        DocumentDetails.Prefix,
+                                        "EnergyPrice",
+                                        null,
+                                        point.Price.Value.ToString(NumberFormatInfo.InvariantInfo))
+                                    .ConfigureAwait(false);
+                            }
+
+                            // <QuantityQuality />
+                            if (point.QuantityQuality != null)
+                            {
+                                await WriteCodeWithCodeListReferenceAttributesAsync("QuantityQuality", point.QuantityQuality.Value.ToString(), writer).ConfigureAwait(false);
+                            }
+
+                            // <EnergySum />
                             await writer.WriteElementStringAsync(
                                     DocumentDetails.Prefix,
-                                    "EnergyQuantity",
+                                    "EnergySum",
                                     null,
-                                    point.Quantity.Value.ToString(NumberFormatInfo.InvariantInfo))
+                                    point.Amount?.ToString(NumberFormatInfo.InvariantInfo) ?? "0")
                                 .ConfigureAwait(false);
-                        }
 
-                        // <EnergyPrice />
-                        if (point.Price != null)
-                        {
-                            await writer.WriteElementStringAsync(
-                                    DocumentDetails.Prefix,
-                                    "EnergyPrice",
-                                    null,
-                                    point.Price.Value.ToString(NumberFormatInfo.InvariantInfo))
-                                .ConfigureAwait(false);
-                        }
-
-                        // <QuantityQuality />
-                        if (point.QuantityQuality != null)
-                        {
-                            await WriteCodeWithCodeListReferenceAttributesAsync("QuantityQuality", point.QuantityQuality.Value.ToString(), writer).ConfigureAwait(false);
-                        }
-
-                        // <EnergySum />
-                        await writer.WriteElementStringAsync(
-                                DocumentDetails.Prefix,
-                                "EnergySum",
-                                null,
-                                point.Amount?.ToString(NumberFormatInfo.InvariantInfo) ?? "0")
-                            .ConfigureAwait(false);
-
-                        await writer.WriteEndElementAsync().ConfigureAwait(false);
-                    } // End </IntervalEnergyObservation>
+                            await writer.WriteEndElementAsync().ConfigureAwait(false);
+                        } // End </IntervalEnergyObservation>
+                    }
                 }
 
                 // <ChargeType />
