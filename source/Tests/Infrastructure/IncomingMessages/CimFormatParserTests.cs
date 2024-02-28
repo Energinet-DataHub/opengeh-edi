@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using IncomingMessages.Infrastructure;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.IncomingMessages;

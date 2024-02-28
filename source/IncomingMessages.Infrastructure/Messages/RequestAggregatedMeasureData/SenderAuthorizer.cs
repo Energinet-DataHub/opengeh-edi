@@ -14,9 +14,9 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using IncomingMessages.Infrastructure.ValidationErrors;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 
-namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
 {
     public class SenderAuthorizer : ISenderAuthorizer
     {

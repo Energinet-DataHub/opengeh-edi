@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace IncomingMessages.Infrastructure.DocumentValidation.Ebix
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Ebix
 {
     public sealed class EbixSchemas : SchemaBase, ISchema
     {

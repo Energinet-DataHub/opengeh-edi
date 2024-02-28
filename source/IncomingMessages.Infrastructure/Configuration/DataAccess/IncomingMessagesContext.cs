@@ -14,7 +14,7 @@
 
 using Microsoft.EntityFrameworkCore;
 
-namespace IncomingMessages.Infrastructure.Configuration.DataAccess
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess
 {
     public class IncomingMessagesContext : DbContext
     {

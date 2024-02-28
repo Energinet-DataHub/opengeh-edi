@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace IncomingMessages.Infrastructure.Configuration.Options;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1707", Justification = "To match naming in other domains")]
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1056", Justification = "Nuget expects a string")]
