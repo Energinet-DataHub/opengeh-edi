@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace IncomingMessages.Infrastructure.Messages;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
 
 /// <summary>
 /// Responsible for verifying that the message contains the expected receiver

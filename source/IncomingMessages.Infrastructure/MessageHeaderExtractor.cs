@@ -15,7 +15,7 @@
 using System.Xml;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace IncomingMessages.Infrastructure;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 
 internal static class MessageHeaderExtractor
 {

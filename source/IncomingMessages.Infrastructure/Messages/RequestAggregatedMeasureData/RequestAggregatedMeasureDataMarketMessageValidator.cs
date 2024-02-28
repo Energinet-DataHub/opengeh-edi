@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Transactions;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 using Energinet.DataHub.EDI.Process.Interfaces;
-using IncomingMessages.Infrastructure.ValidationErrors;
 
-namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
 {
     public abstract class RequestAggregatedMeasureDataMarketMessageValidator
     {
