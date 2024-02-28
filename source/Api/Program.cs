@@ -112,6 +112,7 @@ namespace Energinet.DataHub.EDI.Api
                             var correlationContext = new CorrelationContext();
                             if (!runtime.IsRunningLocally()) return correlationContext;
                             correlationContext.SetId(Guid.NewGuid().ToString());
+
                             return correlationContext;
                         });
                     services.AddLiveHealthCheck();

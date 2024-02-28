@@ -28,7 +28,9 @@ public static class DatabaseExtensions
             .Bind(configuration)
             .Validate(o => !string.IsNullOrEmpty(o.DB_CONNECTION_STRING), "DB_CONNECTION_STRING must be set");
 
-        services.AddSingleton<IDatabaseConnectionFactory, SqlDatabaseConnectionFactory>();
+        services
+            .AddSingleton<IDatabaseConnectionFactory, SqlDatabaseConnectionFactory>()
+            .AddSqlServerHealthCheck(configuration);
 
         return services;
     }
