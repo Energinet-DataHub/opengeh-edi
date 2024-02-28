@@ -47,4 +47,9 @@ public interface IOutgoingMessagesClient
     ///     Enqueue a message, WITH commit. Currently ONLY used by the Process module wrt reception of events.
     /// </summary>
     Task EnqueueAndCommitAsync(OutgoingMessageDto outgoingMessage, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Enqueue wholesale messages, handles enqueuing messages to all appropriate parties (Receiver, ChargeOwner) in a single transaction.
+    /// </summary>
+    Task EnqueueAndCommitAsync(WholesaleResultMessageDto wholesaleResultMessageDto, CancellationToken cancellationToken);
 }

@@ -41,6 +41,20 @@ public class MessageEnqueuer
         _logger = logger;
     }
 
+    public async Task<OutgoingMessageId> EnqueueAsync(OutgoingMessage messageToEnqueue)
+    {
+        ArgumentNullException.ThrowIfNull(messageToEnqueue);
+
+        var addToRepositoryTask = _outgoingMessageRepository.AddAsync(messageToEnqueue);
+        var addToActorMessageQueueTask = AddToActorMessageQueueAsync(messageToEnqueue);
+
+        await Task.WhenAll(addToRepositoryTask, addToActorMessageQueueTask).ConfigureAwait(false);
+        _logger.LogInformation("Message enqueued: {Message} for Actor: {ActorNumber}", messageToEnqueue.Id, messageToEnqueue.Receiver.Number.Value);
+
+        return messageToEnqueue.Id;
+    }
+
+    // This method is obsolete, use the overload with OutgoingMessage instead
     public async Task<OutgoingMessageId> EnqueueAsync(OutgoingMessageDto messageToEnqueue)
     {
         ArgumentNullException.ThrowIfNull(messageToEnqueue);
