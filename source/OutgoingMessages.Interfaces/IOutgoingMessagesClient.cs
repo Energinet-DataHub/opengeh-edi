@@ -51,5 +51,5 @@ public interface IOutgoingMessagesClient
     /// <summary>
     ///     Enqueue wholesale messages based on the dto.
     /// </summary>
-    Task EnqueueAndCommitAsync(WholesaleMessageDto wholesaleMessageDto, CancellationToken cancellationToken);
+    Task EnqueueAndCommitAsync(WholesaleResultMessageDto wholesaleResultMessageDto, CancellationToken cancellationToken);
 }

@@ -48,7 +48,7 @@ public class AmountPerChargeResultProducedV1Processor : IIntegrationEventProcess
         }
 
         var amountPerChargeResultProducedV1 = (AmountPerChargeResultProducedV1)integrationEvent.Message;
-        var message = WholesaleMessageFactory.CreateMessage(amountPerChargeResultProducedV1);
+        var message = WholesaleResultMessageFactory.CreateMessage(amountPerChargeResultProducedV1);
 
         await _outgoingMessagesClient.EnqueueAndCommitAsync((OutgoingMessageDto)message, cancellationToken).ConfigureAwait(false);
     }

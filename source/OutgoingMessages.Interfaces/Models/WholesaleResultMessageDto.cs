@@ -20,9 +20,9 @@ using Energinet.DataHub.EDI.Common.Serialization;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-public class WholesaleMessageDto : OutgoingMessageDto
+public class WholesaleResultMessageDto : OutgoingMessageDto
 {
-    private WholesaleMessageDto(
+    private WholesaleResultMessageDto(
         ActorNumber receiverId,
         Guid processId,
         BusinessReason businessReason,
@@ -44,7 +44,7 @@ public class WholesaleMessageDto : OutgoingMessageDto
 
     public ActorNumber ChargeOwner { get; }
 
-    public static WholesaleMessageDto Create(
+    public static WholesaleResultMessageDto Create(
         ActorNumber receiverNumber,
         ActorRole receiverRole,
         ActorNumber chargeOwner,
@@ -55,7 +55,7 @@ public class WholesaleMessageDto : OutgoingMessageDto
         ArgumentNullException.ThrowIfNull(processId);
         ArgumentNullException.ThrowIfNull(businessReason);
 
-        return new WholesaleMessageDto(
+        return new WholesaleResultMessageDto(
             receiverId: receiverNumber,
             receiverRole: receiverRole,
             processId: processId,

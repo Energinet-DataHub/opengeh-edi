@@ -22,15 +22,15 @@ using NodaTime.Serialization.Protobuf;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories;
 
-public static class WholesaleMessageFactory
+public static class WholesaleResultMessageFactory
 {
-    public static WholesaleMessageDto CreateMessage(AmountPerChargeResultProducedV1 amountPerChargeResultProducedV1)
+    public static WholesaleResultMessageDto CreateMessage(AmountPerChargeResultProducedV1 amountPerChargeResultProducedV1)
     {
         ArgumentNullException.ThrowIfNull(amountPerChargeResultProducedV1);
 
-        var message = CreateWholesaleCalculationSeries(amountPerChargeResultProducedV1);
+        var message = CreateWholesaleResultSeries(amountPerChargeResultProducedV1);
 
-        return WholesaleMessageDto.Create(
+        return WholesaleResultMessageDto.Create(
             receiverNumber: message.EnergySupplier,
             receiverRole: ActorRole.EnergySupplier,
             chargeOwner: message.ChargeOwner,
@@ -39,13 +39,13 @@ public static class WholesaleMessageFactory
             wholesaleSeries: message);
     }
 
-    public static WholesaleMessageDto CreateMessage(MonthlyAmountPerChargeResultProducedV1 monthlyAmountPerChargeResultProducedV1)
+    public static WholesaleResultMessageDto CreateMessage(MonthlyAmountPerChargeResultProducedV1 monthlyAmountPerChargeResultProducedV1)
     {
         ArgumentNullException.ThrowIfNull(monthlyAmountPerChargeResultProducedV1);
 
-        var message = CreateWholesaleCalculationSeries(monthlyAmountPerChargeResultProducedV1);
+        var message = CreateWholesaleResultSeries(monthlyAmountPerChargeResultProducedV1);
 
-        return WholesaleMessageDto.Create(
+        return WholesaleResultMessageDto.Create(
             receiverNumber: message.EnergySupplier,
             receiverRole: ActorRole.EnergySupplier,
             chargeOwner: message.ChargeOwner,
@@ -54,7 +54,7 @@ public static class WholesaleMessageFactory
             wholesaleSeries: message);
     }
 
-    private static WholesaleCalculationSeries CreateWholesaleCalculationSeries(
+    private static WholesaleCalculationSeries CreateWholesaleResultSeries(
         MonthlyAmountPerChargeResultProducedV1 message)
     {
         ArgumentNullException.ThrowIfNull(message);
@@ -83,7 +83,7 @@ public static class WholesaleMessageFactory
         return wholesaleCalculationSeries;
     }
 
-    private static WholesaleCalculationSeries CreateWholesaleCalculationSeries(
+    private static WholesaleCalculationSeries CreateWholesaleResultSeries(
         AmountPerChargeResultProducedV1 message)
     {
         ArgumentNullException.ThrowIfNull(message);
