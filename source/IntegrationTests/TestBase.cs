@@ -13,13 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
-using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.FeatureFlag;
 using Dapper;
 using Energinet.DataHub.EDI.Api;
@@ -162,6 +162,12 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return ServiceProvider.GetRequiredService<T>();
         }
 
+        protected IReadOnlyCollection<T> GetServices<T>()
+            where T : notnull
+        {
+            return ServiceProvider.GetServices<T>().ToList().AsReadOnly();
+        }
+
         protected void ClearDbContextCaches()
         {
             if (_services == null) throw new InvalidOperationException("ServiceCollection is not yet initialized");
@@ -262,8 +268,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
             _services.AddTransient<IRequestHandler<TestCommand, Unit>, TestCommandHandler>();
             _services.AddTransient<IRequestHandler<TestCreateOutgoingMessageCommand, Unit>, TestCreateOutgoingCommandHandler>();
-
-            _services.AddScopedSqlDbContext<ProcessContext>(config);
 
             _services.AddAuthentication(
                 sp => new MarketActorAuthenticator(

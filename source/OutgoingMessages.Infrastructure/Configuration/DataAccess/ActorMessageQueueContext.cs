@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages.Queueing;
@@ -20,7 +21,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess
 {
-    public class ActorMessageQueueContext : DbContext
+    public class ActorMessageQueueContext : UnitOfWorkDbContext
     {
         #nullable disable
         public ActorMessageQueueContext(DbContextOptions<ActorMessageQueueContext> options)

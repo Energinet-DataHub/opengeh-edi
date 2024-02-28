@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
@@ -21,7 +22,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess
 {
-    public class ProcessContext : DbContext
+    public class ProcessContext : UnitOfWorkDbContext
     {
         #nullable disable
         public ProcessContext(DbContextOptions<ProcessContext> options)
