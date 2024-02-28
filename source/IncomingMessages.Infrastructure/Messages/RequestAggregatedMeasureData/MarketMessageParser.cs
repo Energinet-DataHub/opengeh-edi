@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 
 public class MarketMessageParser
 {

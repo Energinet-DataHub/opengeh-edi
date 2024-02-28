@@ -14,10 +14,10 @@
 
 using System.Linq;
 using System.Xml.Linq;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
-using IncomingMessages.Infrastructure.Messages;
-using IncomingMessages.Infrastructure.Response;
-using IncomingMessages.Infrastructure.ValidationErrors;
 using Xunit;
 using Xunit.Categories;
 

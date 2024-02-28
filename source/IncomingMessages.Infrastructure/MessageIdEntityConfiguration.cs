@@ -15,7 +15,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace IncomingMessages.Infrastructure;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 
 public class MessageIdEntityConfiguration : IEntityTypeConfiguration<MessageIdForSender>
 {

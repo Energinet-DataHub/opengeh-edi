@@ -17,9 +17,9 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Microsoft.Extensions.Options;
-using ServiceBusClientOptions = IncomingMessages.Infrastructure.Configuration.Options.ServiceBusClientOptions;
+using ServiceBusClientOptions = Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options.ServiceBusClientOptions;
 
-namespace IncomingMessages.Infrastructure;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 
 public class IncomingRequestAggregatedMeasuredDataSender
 {

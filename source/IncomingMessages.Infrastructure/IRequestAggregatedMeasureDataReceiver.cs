@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
 using Energinet.DataHub.EDI.Process.Interfaces;
-using IncomingMessages.Infrastructure.Messages;
 
-namespace IncomingMessages.Infrastructure;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 
 /// <summary>
 /// Responsible for receiving a incoming message.

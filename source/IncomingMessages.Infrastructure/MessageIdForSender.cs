@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace IncomingMessages.Infrastructure;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 
 public class MessageIdForSender
 {
