@@ -15,11 +15,15 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace BuildingBlocks.Application.Extensions.DependencyInjection;
 
 public static class HealtCheckExtensions
 {
+    private const string DatabaseName = "edi-sql-db";
+
     public static IServiceCollection AddExternalDomainServiceBusQueuesHealthCheck(this IServiceCollection services, string serviceBusConnectionString, params string[] queueNames)
     {
         ArgumentNullException.ThrowIfNull(serviceBusConnectionString);
@@ -38,6 +42,11 @@ public static class HealtCheckExtensions
 
     public static IServiceCollection AddSqlServerHealthCheck(this IServiceCollection services,  IConfiguration configuration)
     {
+        if (SqlServerHealthCheckIsAdded(services))
+        {
+            return services;
+        }
+
         services
             .AddOptions<SqlDatabaseConnectionOptions>()
             .Bind(configuration)
@@ -47,9 +56,21 @@ public static class HealtCheckExtensions
 
         services.AddHealthChecks()
             .AddSqlServer(
-                name: "edi-sql-db",
-                connectionString: dbConnectionString);
+                name: DatabaseName,
+                connectionString: dbConnectionString,
+                tags: new[] { $"{DatabaseName}" });
+
+        services.TryAddSingleton<SqlHealthCheckIsAdded>();
 
         return services;
+    }
+
+    private static bool SqlServerHealthCheckIsAdded(IServiceCollection services)
+    {
+        return services.Any(service => service.ServiceType == typeof(SqlHealthCheckIsAdded));
+    }
+
+    private sealed class SqlHealthCheckIsAdded
+    {
     }
 }

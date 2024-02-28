@@ -40,6 +40,7 @@ public static class SqlExtensions
             });
 
         services.AddSqlServerHealthCheck(configuration);
+
         return services;
     }
 }
