@@ -32,6 +32,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.Common.DateTime;
+using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection;
@@ -57,7 +58,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Xunit;
-using IIntegrationEventHandler = Energinet.DataHub.Core.Messaging.Communication.Subscriber.IIntegrationEventHandler;
 
 namespace Energinet.DataHub.EDI.IntegrationTests
 {
@@ -286,7 +286,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             .AddProcessModule(config)
             .AddArchivedMessagesModule(config)
             .AddIncomingMessagesModule(config)
-            .AddMasterDataModule(config);
+            .AddMasterDataModule(config)
+                .AddDataAccessModule(config);
 
             // Replace the services with stub implementations.
             // - Building blocks

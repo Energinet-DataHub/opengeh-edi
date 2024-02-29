@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System.Linq;
-using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Xunit;
 using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point;
 using PointOutgoing = Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData.Point;
@@ -55,7 +55,7 @@ public class TimeSeriesModelTests
     public void IntegrationEvents_TimeSeries_has_the_same_attributes_as_TimeSeriesMarketActivityRecord()
     {
         var pointAttributeName = "Point";
-        var propertyInfosOfTimeSeries = typeof(Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.OutgoingMessages.TimeSeries).GetProperties().Select(p => new { Name = p.Name, PropertyType = p.PropertyType.ToString() }).ToList();
+        var propertyInfosOfTimeSeries = typeof(TimeSeries).GetProperties().Select(p => new { Name = p.Name, PropertyType = p.PropertyType.ToString() }).ToList();
         var propertyInfosOfTimeSeriesMarketActivityRecord = typeof(TimeSeriesMarketActivityRecord).GetProperties().Select(p => new { Name = p.Name, PropertyType = p.PropertyType.ToString() }).ToList();
 
         // Points are duplicated, hence we ignore them in the comparison of timeseries and timeseriesmarketactivityrecord

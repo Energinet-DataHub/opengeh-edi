@@ -87,6 +87,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationEvents.Infrastru
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationEvents.Application", "IntegrationEvents\IntegrationEvents.Application\IntegrationEvents.Application.csproj", "{6C724147-25FB-40C6-9588-8D70BF743215}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataAccess", "DataAccess", "{1C6AE199-73AE-4355-B745-10EC6CE7BD85}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{A24ADE32-4199-4F73-B793-780BC944E21A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -225,6 +229,10 @@ Global
 		{6C724147-25FB-40C6-9588-8D70BF743215}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C724147-25FB-40C6-9588-8D70BF743215}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C724147-25FB-40C6-9588-8D70BF743215}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A24ADE32-4199-4F73-B793-780BC944E21A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A24ADE32-4199-4F73-B793-780BC944E21A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A24ADE32-4199-4F73-B793-780BC944E21A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A24ADE32-4199-4F73-B793-780BC944E21A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -260,6 +268,7 @@ Global
 		{FDD15418-B6A7-4157-B87A-4E48DAA94FEA} = {819E6A12-3F25-4639-BD1B-488921D60DC7}
 		{AC1B06B8-FAD7-4486-A397-1A07D2631A29} = {43960FA1-298B-474F-BA83-C317C4FD76E3}
 		{6C724147-25FB-40C6-9588-8D70BF743215} = {43960FA1-298B-474F-BA83-C317C4FD76E3}
+		{A24ADE32-4199-4F73-B793-780BC944E21A} = {1C6AE199-73AE-4355-B745-10EC6CE7BD85}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D7925810-FA85-4F9E-A124-72F36BAEB9F0}

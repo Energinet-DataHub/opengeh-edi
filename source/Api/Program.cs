@@ -27,6 +27,7 @@ using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.Common.DateTime;
+using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Configuration;
@@ -130,7 +131,8 @@ namespace Energinet.DataHub.EDI.Api
                         .AddIncomingMessagesModule(configuration)
                         .AddOutgoingMessagesModule(configuration)
                         .AddProcessModule(configuration)
-                        .AddMasterDataModule(configuration);
+                        .AddMasterDataModule(configuration)
+                        .AddDataAccessModule(configuration);
                 })
                 .ConfigureLogging(logging =>
                 {
