@@ -59,6 +59,23 @@ public static class HealtCheckExtensions
         return services;
     }
 
+    public static IServiceCollection AddSqlServerHealthCheck(this IServiceCollection services,  string connectionString)
+    {
+        if (SqlServerHealthCheckIsAdded(services))
+        {
+            return services;
+        }
+
+        services.AddHealthChecks()
+            .AddSqlServer(
+                name: DatabaseName,
+                connectionString: connectionString);
+
+        services.TryAddSingleton<SqlHealthCheckIsAdded>();
+
+        return services;
+    }
+
     public static IServiceCollection AddSqlServerHealthCheck(this IServiceCollection services,  IConfiguration configuration)
     {
         if (SqlServerHealthCheckIsAdded(services))
