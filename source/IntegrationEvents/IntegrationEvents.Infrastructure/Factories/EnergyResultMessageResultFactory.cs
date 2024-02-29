@@ -17,8 +17,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories.Mappers;
-using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using NodaTime.Serialization.Protobuf;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
@@ -34,7 +34,7 @@ public class EnergyResultMessageResultFactory
         _masterDataClient = masterDataClient;
     }
 
-    public async Task<EnergyResultMessage> CreateAsync(
+    public async Task<EnergyResultMessageDto> CreateAsync(
         EnergyResultProducedV2 integrationEvent,
         CancellationToken cancellationToken)
     {
@@ -43,7 +43,7 @@ public class EnergyResultMessageResultFactory
         var aggregationData =
             await GetAggregationLevelDataAsync(integrationEvent, cancellationToken).ConfigureAwait(false);
 
-        return EnergyResultMessage.Create(
+        return EnergyResultMessageDto.Create(
             receiverNumber: aggregationData.ReceiverNumber,
             receiverRole: aggregationData.ReceiverRole,
             processId: Guid.NewGuid(),

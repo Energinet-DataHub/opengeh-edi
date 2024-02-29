@@ -18,13 +18,12 @@ using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.Serialization;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.OutgoingMessages;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-public class EnergyResultMessage : OutgoingMessageDto
+public class EnergyResultMessageDto : OutgoingMessageDto
 {
-    private EnergyResultMessage(
+    private EnergyResultMessageDto(
         ActorNumber receiverId,
         Guid processId,
         string businessReason,
@@ -47,7 +46,7 @@ public class EnergyResultMessage : OutgoingMessageDto
 
     public TimeSeries Series { get; }
 
-    public static EnergyResultMessage Create(
+    public static EnergyResultMessageDto Create(
         ActorNumber receiverNumber,
         ActorRole receiverRole,
         Guid processId,
@@ -80,7 +79,7 @@ public class EnergyResultMessage : OutgoingMessageDto
             calculationResultVersion,
             originalTransactionIdReference,
             settlementVersion);
-        return new EnergyResultMessage(
+        return new EnergyResultMessageDto(
             receiverNumber,
             processId,
             businessReasonName,
