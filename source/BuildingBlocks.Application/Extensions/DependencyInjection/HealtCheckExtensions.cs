@@ -59,7 +59,6 @@ public static class HealtCheckExtensions
         return services;
     }
 
-    // wat
     public static IServiceCollection AddSqlServerHealthCheck(this IServiceCollection services,  IConfiguration configuration)
     {
         if (SqlServerHealthCheckIsAdded(services))
