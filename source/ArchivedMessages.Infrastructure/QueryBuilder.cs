@@ -48,6 +48,11 @@ internal sealed class QueryBuilder
                 new KeyValuePair<string, object>("MessageId", request.MessageId));
         }
 
+        if(request.SenderNumber is not null and request.ReceiverNumber is not null)
+        {
+
+        }
+
         if (request.SenderNumber is not null)
         {
             AddFilter(
