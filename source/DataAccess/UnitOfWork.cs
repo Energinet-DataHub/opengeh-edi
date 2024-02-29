@@ -20,30 +20,28 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAc
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess
+namespace Energinet.DataHub.EDI.DataAccess;
+
+public sealed class UnitOfWork : IUnitOfWork
 {
-    public class UnitOfWork : IUnitOfWork
+    private readonly ProcessContext _processContext;
+    private readonly ActorMessageQueueContext _actorMessageQueueContext;
+    private readonly IncomingMessagesContext _incomingMessagesContext;
+
+    public UnitOfWork(
+        ProcessContext processContext,
+        ActorMessageQueueContext actorMessageQueueContext,
+        IncomingMessagesContext incomingMessagesContext)
     {
-        private readonly ProcessContext _processContext;
-        private readonly ActorMessageQueueContext _actorMessageQueueContext;
-        private readonly IncomingMessagesContext _incomingMessagesContext;
+        _processContext = processContext;
+        _actorMessageQueueContext = actorMessageQueueContext;
+        _incomingMessagesContext = incomingMessagesContext;
+    }
 
-        public UnitOfWork(
-            ProcessContext processContext,
-            ActorMessageQueueContext actorMessageQueueContext,
-            IncomingMessagesContext incomingMessagesContext)
-        {
-            _processContext = processContext;
-            _actorMessageQueueContext = actorMessageQueueContext;
-            _incomingMessagesContext = incomingMessagesContext;
-        }
-
-        public async Task CommitTransactionAsync()
-        {
-            await ResilientTransaction.New(_processContext).SaveChangesAsync(new DbContext[]
-            {
-                _processContext, _actorMessageQueueContext, _incomingMessagesContext,
-            }).ConfigureAwait(false);
-        }
+    public async Task CommitTransactionAsync()
+    {
+        await ResilientTransaction.New(_processContext)
+            .SaveChangesAsync(new DbContext[] { _processContext, _actorMessageQueueContext, _incomingMessagesContext })
+            .ConfigureAwait(false);
     }
 }
