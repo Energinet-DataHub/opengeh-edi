@@ -40,7 +40,8 @@ internal static class AmountPerChargeResultProducedV1Factory
             QuantityUnit = AmountPerChargeResultProducedV1.Types.QuantityUnit.Kwh,
             IsTax = false,
             Currency = AmountPerChargeResultProducedV1.Types.Currency.Dkk,
-            MeteringPointType = AmountPerChargeResultProducedV1.Types.MeteringPointType.Production,
+            MeteringPointType = AmountPerChargeResultProducedV1.Types.MeteringPointType.Consumption,
+            SettlementMethod = AmountPerChargeResultProducedV1.Types.SettlementMethod.Flex,
             CalculationResultVersion = 42,
         };
 
