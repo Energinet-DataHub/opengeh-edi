@@ -14,12 +14,12 @@
 
 using System.Text.Json.Serialization;
 using BuildingBlocks.Application.Configuration.Logging;
+using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Logging.LoggingMiddleware;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
 using Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
@@ -28,39 +28,17 @@ using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection;
 using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 const string domainName = "EDI.B2CWebApi";
 
-const string securityProtocol = "Bearer";
-
 builder.Logging
     .ClearProviders()
     .AddApplicationInsights();
 
-builder.Services.AddSwaggerGen(
-        config =>
-        {
-            config.SwaggerDoc("v1", new OpenApiInfo { Title = "B2C web api for EDI", Version = "v1" });
-            var securitySchema = new OpenApiSecurityScheme
-            {
-                Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
-                Name = "Authorization",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.Http,
-                Scheme = "bearer",
-                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = securityProtocol, },
-            };
-
-            config.AddSecurityDefinition("Bearer", securitySchema);
-            config.SupportNonNullableReferenceTypes();
-            config.UseAllOfToExtendReferenceSchemas();
-            var securityRequirement = new OpenApiSecurityRequirement { { securitySchema, new string[] { $"{securityProtocol}" } } };
-
-            config.AddSecurityRequirement(securityRequirement);
-        })
+builder.Services
+    .AddSwaggerForApplication()
     .AddApplicationInsights()
     .AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>()
     .AddControllers()
@@ -68,12 +46,6 @@ builder.Services.AddSwaggerGen(
 
 builder.Services
     .AddHttpContextAccessor()
-    .AddOptions<JwtOptions>()
-    .Bind(builder.Configuration)
-.Services
-    .AddOptions<DateTimeOptions>()
-    .Bind(builder.Configuration)
-.Services
     .AddScoped<ISystemDateTimeProvider, SystemDateTimeProvider>()
     .AddHttpLoggingScope(domainName)
     .AddSingleton<ISerializer, Serializer>()
@@ -83,11 +55,7 @@ builder.Services
     .AddJwtTokenSecurity(builder.Configuration)
     .AddDateTime(builder.Configuration)
     .AddHttpClient()
-    .AddLiveHealthCheck()
-    .AddExternalDomainServiceBusQueuesHealthCheck(
-        builder.Configuration["SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE"]!,
-        builder.Configuration["INCOMING_MESSAGES_QUEUE_NAME"]!)
-    .AddSqlServerHealthCheck(builder.Configuration["DB_CONNECTION_STRING"]!);
+    .AddLiveHealthCheck();
 
 var blobStorageUrl = builder.Configuration["AZURE_STORAGE_ACCOUNT_URL"];
 
@@ -108,13 +76,7 @@ if (isDevelopment)
     app.UseDeveloperExceptionPage();
 
 app
-    .UseSwagger()
-    .UseSwaggerUI(
-        options =>
-        {
-            if (!isDevelopment) return;
-            options.EnableTryItOutByDefault();
-        })
+    .UseSwaggerUiForDevEnvironment()
     .UseLoggingScope()
     .UseHttpsRedirection()
     .UseAuthentication()
@@ -129,6 +91,7 @@ app.MapReadyHealthChecks();
 
 app.Run();
 
+// This is needed in order to test the dependency injection
 public partial class Program
 {
 }

@@ -15,11 +15,9 @@
 using System;
 using System.Net.Http;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.DataAccess;
 using MediatR.Registration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -34,8 +32,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection
         {
             _services = services;
             services.AddSingleton<HttpClient>()
-                .AddSingleton<ISerializer, Serializer>()
-                .AddScoped<IUnitOfWork, UnitOfWork>();
+                .AddSingleton<ISerializer, Serializer>();
 
             AddMediatR();
             services.AddLogging();

@@ -25,7 +25,6 @@ using Dapper;
 using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Api.Authentication;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
-using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -33,6 +32,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.Common.DateTime;
+using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection;
@@ -58,7 +58,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Xunit;
-using IIntegrationEventHandler = Energinet.DataHub.Core.Messaging.Communication.Subscriber.IIntegrationEventHandler;
 
 namespace Energinet.DataHub.EDI.IntegrationTests
 {
@@ -248,6 +247,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", IntegrationTestFixture.DatabaseConnectionString);
             Environment.SetEnvironmentVariable("WHOLESALE_INBOX_MESSAGE_QUEUE_NAME", "Fake");
             Environment.SetEnvironmentVariable("INCOMING_MESSAGES_QUEUE_NAME", "Fake");
+            Environment.SetEnvironmentVariable("SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE", "Fake");
             Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", fileStorageConnectionString);
 
             var config = new ConfigurationBuilder()
@@ -275,20 +275,19 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             CompositionRoot.Initialize(_services)
                 .AddSystemClock(new SystemDateTimeProviderStub())
                 .AddBearerAuthentication(JwtTokenParserTests.DisableAllTokenValidations);
-
-            _services.AddScoped<ICorrelationContext>(
-                    _ =>
-                    {
-                        var correlation = new CorrelationContext();
-                        correlation.SetId(Guid.NewGuid().ToString());
-                        return correlation;
-                    })
-                .AddIntegrationEventModule()
-                .AddOutgoingMessagesModule(config)
-                .AddProcessModule(config)
-                .AddArchivedMessagesModule(config)
-                .AddIncomingMessagesModule(config)
-                .AddMasterDataModule(config);
+            _services.AddScoped(_ =>
+            {
+                var correlation = new CorrelationContext();
+                correlation.SetId(Guid.NewGuid().ToString());
+                return correlation;
+            })
+            .AddIntegrationEventModule()
+            .AddOutgoingMessagesModule(config)
+            .AddProcessModule(config)
+            .AddArchivedMessagesModule(config)
+            .AddIncomingMessagesModule(config)
+            .AddMasterDataModule(config)
+                .AddDataAccessModule(config);
 
             // Replace the services with stub implementations.
             // - Building blocks

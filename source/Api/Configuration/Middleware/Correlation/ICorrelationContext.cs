@@ -11,4 +11,22 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-global using Xunit;
+
+namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation
+{
+    /// <summary>
+    /// Context for the current scope identified by a correlation id.
+    /// </summary>
+    public interface ICorrelationContext
+    {
+        /// <summary>
+        /// Get the current correlation id.
+        /// </summary>
+        string Id { get; }
+
+        /// <summary>
+        /// Set the current correlation/operation id.
+        /// </summary>
+        void SetId(string id);
+    }
+}

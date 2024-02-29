@@ -27,7 +27,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyA
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using MediatR;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Azure.Functions.Worker.Middleware;
@@ -35,7 +34,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Xunit;
-using Program = Energinet.DataHub.EDI.Api.Program;
 
 namespace Energinet.DataHub.EDI.ArchitectureTests
 {
@@ -47,6 +45,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
         {
             var testEnvironment = new TestEnvironment();
             Environment.SetEnvironmentVariable("SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND", TestEnvironment.CreateFakeServiceBusConnectionString());
+            Environment.SetEnvironmentVariable("SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE", TestEnvironment.CreateFakeServiceBusConnectionString());
             Environment.SetEnvironmentVariable("WHOLESALE_INBOX_MESSAGE_QUEUE_NAME", "FakeQueueName");
             Environment.SetEnvironmentVariable("INCOMING_MESSAGES_QUEUE_NAME", "FakeQueueName");
             Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", TestEnvironment.CreateConnectionString());

@@ -12,21 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Application.Configuration
-{
-    /// <summary>
-    /// Context for the current scope identified by a correlation id.
-    /// </summary>
-    public interface ICorrelationContext
-    {
-        /// <summary>
-        /// Get the current correlation id.
-        /// </summary>
-        string Id { get; }
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
-        /// <summary>
-        /// Set the current correlation/operation id.
-        /// </summary>
-        void SetId(string id);
+namespace Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
+
+public static class DataAccessExtensions
+{
+    public static IServiceCollection AddDataAccessModule(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        return services;
     }
 }

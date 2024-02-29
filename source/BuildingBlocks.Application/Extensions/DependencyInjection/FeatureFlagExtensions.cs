@@ -12,8 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EnergySupplying.IntegrationEvents;
+using BuildingBlocks.Application.FeatureFlag;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.FeatureManagement;
 
-internal class AssemblyInfo
+namespace BuildingBlocks.Application.Extensions.DependencyInjection;
+
+public static class FeatureFlagExtensions
 {
+    public static IServiceCollection AddFeatureFlags(this IServiceCollection services)
+    {
+        services.AddFeatureManagement();
+        services.AddSingleton<IFeatureFlagManager, MicrosoftFeatureFlagManager>();
+
+        return services;
+    }
 }
