@@ -12,13 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
-
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1707", Justification = "To match naming in other domains")]
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1056", Justification = "Nuget expects a string")]
-public class ServiceBusClientOptions
+namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation
 {
-    public string INCOMING_MESSAGES_QUEUE_NAME { get; set; } = string.Empty;
+    /// <summary>
+    /// Context for the current scope identified by a correlation id.
+    /// </summary>
+    public interface ICorrelationContext
+    {
+        /// <summary>
+        /// Get the current correlation id.
+        /// </summary>
+        string Id { get; }
 
-    public string SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE { get; set; } = string.Empty;
+        /// <summary>
+        /// Set the current correlation/operation id.
+        /// </summary>
+        void SetId(string id);
+    }
 }

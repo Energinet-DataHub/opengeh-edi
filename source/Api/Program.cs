@@ -17,13 +17,13 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 using BuildingBlocks.Application.Configuration.Logging;
+using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Api.Authentication;
 using Energinet.DataHub.EDI.Api.Authentication.Certificate;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
-using Energinet.DataHub.EDI.Application.Configuration;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.Common.DateTime;
@@ -117,13 +117,12 @@ namespace Energinet.DataHub.EDI.Api
 
                             return correlationContext;
                         });
-                    services.AddLiveHealthCheck();
-                    services.AddExternalDomainServiceBusQueuesHealthCheck(
-                        runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
-                        runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!,
-                        runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!,
-                        runtime.INCOMING_MESSAGES_QUEUE_NAME!);
-                    services.AddSqlServerHealthCheck(runtime.DB_CONNECTION_STRING!);
+                    services.AddLiveHealthCheck()
+                        .AddExternalDomainServiceBusQueuesHealthCheck(
+                            runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
+                            runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!,
+                            runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!)
+                        .AddSqlServerHealthCheck(configuration);
                     services.AddBlobStorageHealthCheck("edi-web-jobs-storage", runtime.AzureWebJobsStorage!);
                     services.AddBlobStorageHealthCheck("edi-documents-storage", runtime.AZURE_STORAGE_ACCOUNT_URL!);
 

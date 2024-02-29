@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.EDI.Application.Configuration;
 
 namespace Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation
 {

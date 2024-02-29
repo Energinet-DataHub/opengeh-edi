@@ -15,24 +15,12 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using Azure.Identity;
-using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
-using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection;
 
 public static class HealthCheckExtensions
 {
-    public static IServiceCollection AddSqlServerHealthCheck(this IServiceCollection services,  string dbConnectionString)
-    {
-        services.AddHealthChecks()
-            .AddSqlServer(
-                name: "edi-sql-db",
-                connectionString: dbConnectionString);
-
-        return services;
-    }
-
     public static void AddBlobStorageHealthCheck(this IServiceCollection services, string name, string blobConnectionString)
     {
         services.AddHealthChecks().AddAzureBlobStorage(blobConnectionString, name: name);
@@ -41,51 +29,6 @@ public static class HealthCheckExtensions
     public static IServiceCollection AddBlobStorageHealthCheck(this IServiceCollection services, string name, Uri storageAccountUri)
     {
         services.AddHealthChecks().AddAzureBlobStorage(storageAccountUri, new DefaultAzureCredential(), name: name);
-
-        return services;
-    }
-
-    /// <summary>
-    /// Used for Service Bus queues where the app have peek (receiver) permissions
-    /// </summary>
-    public static IServiceCollection AddExternalDomainServiceBusQueuesHealthCheck(this IServiceCollection services, string serviceBusConnectionString, [NotNull] params string[] queueNames)
-    {
-        foreach (var name in queueNames)
-        {
-            services.AddHealthChecks()
-                .AddAzureServiceBusQueue(
-                    name: name + "Exists",
-                    connectionString: serviceBusConnectionString,
-                    queueName: name);
-        }
-
-        return services;
-    }
-
-    public static IServiceCollection AddExternalServiceBusSubscriptionsHealthCheck(
-        this IServiceCollection services,
-        string serviceBusConnectionString,
-        [NotNull] string topicName,
-        [NotNull] params string[] subscriptionNames)
-    {
-        foreach (var name in subscriptionNames)
-        {
-            services.AddHealthChecks()
-                .AddAzureServiceBusSubscription(
-                    name: name + "Exists",
-                    connectionString: serviceBusConnectionString,
-                    topicName: topicName,
-                    subscriptionName: name);
-        }
-
-        return services;
-    }
-
-    public static IServiceCollection AddLiveHealthCheck(this IServiceCollection services)
-    {
-        services.AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>();
-        services.AddHealthChecks()
-            .AddLiveCheck();
 
         return services;
     }

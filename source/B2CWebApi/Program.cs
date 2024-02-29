@@ -14,12 +14,12 @@
 
 using System.Text.Json.Serialization;
 using BuildingBlocks.Application.Configuration.Logging;
+using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Logging.LoggingMiddleware;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
 using Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
@@ -68,12 +68,6 @@ builder.Services.AddSwaggerGen(
 
 builder.Services
     .AddHttpContextAccessor()
-    .AddOptions<JwtOptions>()
-    .Bind(builder.Configuration)
-.Services
-    .AddOptions<DateTimeOptions>()
-    .Bind(builder.Configuration)
-.Services
     .AddScoped<ISystemDateTimeProvider, SystemDateTimeProvider>()
     .AddHttpLoggingScope(domainName)
     .AddSingleton<ISerializer, Serializer>()
@@ -83,11 +77,7 @@ builder.Services
     .AddJwtTokenSecurity(builder.Configuration)
     .AddDateTime(builder.Configuration)
     .AddHttpClient()
-    .AddLiveHealthCheck()
-    .AddExternalDomainServiceBusQueuesHealthCheck(
-        builder.Configuration["SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE"]!,
-        builder.Configuration["INCOMING_MESSAGES_QUEUE_NAME"]!)
-    .AddSqlServerHealthCheck(builder.Configuration["DB_CONNECTION_STRING"]!);
+    .AddLiveHealthCheck();
 
 var blobStorageUrl = builder.Configuration["AZURE_STORAGE_ACCOUNT_URL"];
 
@@ -129,6 +119,7 @@ app.MapReadyHealthChecks();
 
 app.Run();
 
+// This is needed in order to test the dependency injection
 public partial class Program
 {
 }
