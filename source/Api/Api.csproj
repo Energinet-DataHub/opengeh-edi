@@ -65,6 +65,7 @@ limitations under the License.
     <ItemGroup>
       <ProjectReference Include="..\ArchivedMessages.Application\ArchivedMessages.Application.csproj" />
       <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
+      <ProjectReference Include="..\DataAccess\DataAccess.csproj"/>
       <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj" />
       <ProjectReference Include="..\IntegrationEvents\IntegrationEvents.Application\IntegrationEvents.Application.csproj" />
       <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj"/>
