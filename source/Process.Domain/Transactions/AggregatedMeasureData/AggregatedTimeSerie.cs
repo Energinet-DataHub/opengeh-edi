@@ -19,6 +19,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 
+// TODO: what is this?
 [Serializable]
 public record AggregatedTimeSerie(
     IReadOnlyCollection<Point> Points,

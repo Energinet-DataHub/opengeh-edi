@@ -59,7 +59,8 @@ public static class ProcessExtensions
             .AddWholesaleInbox();
 
         //EnqueueMessageConfiguration
-        services.AddTransient<INotificationHandler<EnqueueMessageEvent>, EnqueueMessageHandler>();
+        services.AddTransient<INotificationHandler<EnqueueAcceptedEnergyResultMessageEvent>, EnqueueAcceptedEnergyResultMessageHandler>();
+        services.AddTransient<INotificationHandler<EnqueueRejectedEnergyResultMessageEvent>, EnqueueRejectedEnergyResultMessageHandler>();
 
         // RequestedAggregatedMeasureDataConfiguration
         services.AddTransient<IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>, SendAggregatedMeasuredDataToWholesale>()

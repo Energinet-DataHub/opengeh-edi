@@ -22,6 +22,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 /// </summary>
 public class OutgoingMessageDto
 {
+    // TODO: Consider making an abstract class instead and move serialized content to the domain model instead.
     public OutgoingMessageDto(
         DocumentType documentType,
         ActorNumber receiverId,

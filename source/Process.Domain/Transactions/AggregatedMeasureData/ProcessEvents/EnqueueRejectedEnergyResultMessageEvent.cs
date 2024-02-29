@@ -18,14 +18,14 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 
 /// <summary>
-/// Event to raise when an OutGoingMessage should be enqueued
+/// Event to raise when an OutgoingMessage should be enqueued
 /// </summary>
-public class EnqueueMessageEvent : DomainEvent
+public class EnqueueRejectedEnergyResultMessageEvent : DomainEvent
 {
-    public EnqueueMessageEvent(OutgoingMessageDto outgoingMessageDto)
+    public EnqueueRejectedEnergyResultMessageEvent(RejectedEnergyResultMessageDto rejectedEnergyResultMessage)
     {
-        OutgoingMessageDto = outgoingMessageDto;
+        RejectedEnergyResultMessage = rejectedEnergyResultMessage;
     }
 
-    public OutgoingMessageDto OutgoingMessageDto { get; }
+    public RejectedEnergyResultMessageDto RejectedEnergyResultMessage { get; }
 }

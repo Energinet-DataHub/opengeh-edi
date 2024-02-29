@@ -16,16 +16,16 @@ using System;
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using NodaTime;
 using NodaTime.Text;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.Tests.Factories;
 
-public class TimeSeriesBuilder
+public class EnergyResultMessageTimeSeriesBuilder
 {
-    private readonly List<Point> _points = new();
+    private readonly List<EnergyResultMessagePoint> _points = new();
     private readonly long _calculationResultVersion = 1;
     private string _messageId = Guid.NewGuid().ToString();
     private Instant _timeStamp = SystemClock.Instance.GetCurrentInstant();
@@ -46,112 +46,112 @@ public class TimeSeriesBuilder
     private SettlementVersion? _settlementVersion;
     private Period _period = new(SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)), SystemClock.Instance.GetCurrentInstant());
 
-    public static TimeSeriesBuilder AggregationResult()
+    public static EnergyResultMessageTimeSeriesBuilder AggregationResult()
     {
-        return new TimeSeriesBuilder();
+        return new EnergyResultMessageTimeSeriesBuilder();
     }
 
-    public TimeSeriesBuilder WithPoint(Point point)
+    public EnergyResultMessageTimeSeriesBuilder WithPoint(EnergyResultMessagePoint point)
     {
         _points.Add(point);
 
         return this;
     }
 
-    public TimeSeriesBuilder WithBusinessReason(BusinessReason? businessReason)
+    public EnergyResultMessageTimeSeriesBuilder WithBusinessReason(BusinessReason? businessReason)
     {
         ArgumentNullException.ThrowIfNull(businessReason);
         _businessReason = businessReason;
         return this;
     }
 
-    public TimeSeriesBuilder WithReceiver(string receiverNumber, ActorRole actorRole)
+    public EnergyResultMessageTimeSeriesBuilder WithReceiver(string receiverNumber, ActorRole actorRole)
     {
         _receiverNumber = receiverNumber;
         _receiverRole = actorRole;
         return this;
     }
 
-    public TimeSeriesBuilder WithSender(string senderNumber, ActorRole actorRole)
+    public EnergyResultMessageTimeSeriesBuilder WithSender(string senderNumber, ActorRole actorRole)
     {
         _senderNumber = senderNumber;
         _senderRole = actorRole;
         return this;
     }
 
-    public TimeSeriesBuilder WithTransactionId(Guid transactionId)
+    public EnergyResultMessageTimeSeriesBuilder WithTransactionId(Guid transactionId)
     {
         _transactionId = transactionId;
         return this;
     }
 
-    public TimeSeriesBuilder WithGridArea(string gridAreaCode)
+    public EnergyResultMessageTimeSeriesBuilder WithGridArea(string gridAreaCode)
     {
         _gridAreaCode = gridAreaCode;
         return this;
     }
 
-    public TimeSeriesBuilder WithMeteringPointType(MeteringPointType meteringPointType)
+    public EnergyResultMessageTimeSeriesBuilder WithMeteringPointType(MeteringPointType meteringPointType)
     {
         _meteringPointType = meteringPointType;
         return this;
     }
 
-    public TimeSeriesBuilder WithSettlementMethod(SettlementType? settlementType)
+    public EnergyResultMessageTimeSeriesBuilder WithSettlementMethod(SettlementType? settlementType)
     {
         _settlementMethod = settlementType;
         return this;
     }
 
-    public TimeSeriesBuilder WithMeasurementUnit(MeasurementUnit measurementUnit)
+    public EnergyResultMessageTimeSeriesBuilder WithMeasurementUnit(MeasurementUnit measurementUnit)
     {
         _measurementUnit = measurementUnit;
         return this;
     }
 
-    public TimeSeriesBuilder WithResolution(Resolution resolution)
+    public EnergyResultMessageTimeSeriesBuilder WithResolution(Resolution resolution)
     {
         _resolution = resolution;
         return this;
     }
 
-    public TimeSeriesBuilder WithEnergySupplierNumber(string? balanceResponsibleNumber)
+    public EnergyResultMessageTimeSeriesBuilder WithEnergySupplierNumber(string? balanceResponsibleNumber)
     {
         _energySupplierNumber = balanceResponsibleNumber;
         return this;
     }
 
-    public TimeSeriesBuilder WithBalanceResponsibleNumber(string? balanceResponsibleNumber)
+    public EnergyResultMessageTimeSeriesBuilder WithBalanceResponsibleNumber(string? balanceResponsibleNumber)
     {
         _balanceResponsibleNumber = balanceResponsibleNumber;
         return this;
     }
 
-    public TimeSeriesBuilder WithPeriod(Instant startOfPeriod, Instant endOfPeriod)
+    public EnergyResultMessageTimeSeriesBuilder WithPeriod(Instant startOfPeriod, Instant endOfPeriod)
     {
         _period = new Period(startOfPeriod, endOfPeriod);
         return this;
     }
 
-    public TimeSeriesBuilder WithMessageId(string messageId)
+    public EnergyResultMessageTimeSeriesBuilder WithMessageId(string messageId)
     {
         _messageId = messageId;
         return this;
     }
 
-    public TimeSeriesBuilder WithTimestamp(string timestamp)
+    public EnergyResultMessageTimeSeriesBuilder WithTimestamp(string timestamp)
     {
         _timeStamp = ParseTimeStamp(timestamp);
         return this;
     }
 
-    public TimeSeriesBuilder WithOriginalTransactionIdReference(string originalTransactionIdReference)
+    public EnergyResultMessageTimeSeriesBuilder WithOriginalTransactionIdReference(string originalTransactionIdReference)
     {
         _originalTransactionIdReference = originalTransactionIdReference;
         return this;
     }
 
-    public TimeSeriesBuilder WithSettlementVersion(SettlementVersion? settlementVersion)
+    public EnergyResultMessageTimeSeriesBuilder WithSettlementVersion(SettlementVersion? settlementVersion)
     {
         _settlementVersion = settlementVersion;
         return this;
@@ -169,9 +169,9 @@ public class TimeSeriesBuilder
             _timeStamp);
     }
 
-    public TimeSeries BuildTimeSeries()
+    public EnergyResultMessageTimeSeries BuildTimeSeries()
     {
-        return new TimeSeries(
+        return new EnergyResultMessageTimeSeries(
             _transactionId,
             _gridAreaCode,
             _meteringPointType.Name,

@@ -27,7 +27,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Xunit;
 using static Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.EnergyResultProducedV2.Types;
@@ -35,12 +35,12 @@ using Resolution = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Energ
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.Aggregations;
 
-public class WhenAnAggregationResultIsAvailableTests : TestBase
+public class WhenAnEnergyResultIsAvailableTests : TestBase
 {
     private readonly EnergyResultProducedV2EventBuilder _eventBuilder = new();
     private readonly GridAreaBuilder _gridAreaBuilder = new();
 
-    public WhenAnAggregationResultIsAvailableTests(IntegrationTestFixture integrationTestFixture)
+    public WhenAnEnergyResultIsAvailableTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
     {
     }
@@ -81,10 +81,10 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasRelationTo(null)
-            .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.Period.Start, SampleData.StartOfPeriod)
-            .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.Period.End, SampleData.EndOfPeriod)
-            .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.GridAreaCode, SampleData.GridAreaCode)
-            .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.MeteringPointType, MeteringPointType.Consumption.Name);
+            .HasMessageRecordValue<EnergyResultMessageTimeSeries>(timeSeries => timeSeries.Period.Start, SampleData.StartOfPeriod)
+            .HasMessageRecordValue<EnergyResultMessageTimeSeries>(timeSeries => timeSeries.Period.End, SampleData.EndOfPeriod)
+            .HasMessageRecordValue<EnergyResultMessageTimeSeries>(timeSeries => timeSeries.GridAreaCode, SampleData.GridAreaCode)
+            .HasMessageRecordValue<EnergyResultMessageTimeSeries>(timeSeries => timeSeries.MeteringPointType, MeteringPointType.Consumption.Name);
     }
 
     [Fact]
@@ -111,8 +111,8 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .HasReceiverRole(ActorRole.MeteredDataResponsible.Code)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
-            .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, MeteringPointType.Consumption.Name)
-            .HasMessageRecordValue<TimeSeries>(property => property.SettlementType!, SettlementType.NonProfiled.Name);
+            .HasMessageRecordValue<EnergyResultMessageTimeSeries>(x => x.MeteringPointType, MeteringPointType.Consumption.Name)
+            .HasMessageRecordValue<EnergyResultMessageTimeSeries>(property => property.SettlementType!, SettlementType.NonProfiled.Name);
     }
 
     [Fact]
@@ -139,12 +139,12 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .HasReceiverRole(ActorRole.MeteredDataResponsible.Code)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
-            .HasMessageRecordValue<TimeSeries>(x => x.GridAreaCode, SampleData.GridAreaCode)
-            .HasMessageRecordValue<TimeSeries>(x => x.Resolution, BuildingBlocks.Domain.Models.Resolution.QuarterHourly.Name)
-            .HasMessageRecordValue<TimeSeries>(x => x.MeasureUnitType, MeasurementUnit.Kwh.Name)
-            .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, MeteringPointType.Production.Name)
-            .HasMessageRecordValue<TimeSeries>(x => x.Period.Start, SampleData.StartOfPeriod)
-            .HasMessageRecordValue<TimeSeries>(x => x.Period.End, SampleData.EndOfPeriod);
+            .HasMessageRecordValue<EnergyResultMessageTimeSeries>(x => x.GridAreaCode, SampleData.GridAreaCode)
+            .HasMessageRecordValue<EnergyResultMessageTimeSeries>(x => x.Resolution, BuildingBlocks.Domain.Models.Resolution.QuarterHourly.Name)
+            .HasMessageRecordValue<EnergyResultMessageTimeSeries>(x => x.MeasureUnitType, MeasurementUnit.Kwh.Name)
+            .HasMessageRecordValue<EnergyResultMessageTimeSeries>(x => x.MeteringPointType, MeteringPointType.Production.Name)
+            .HasMessageRecordValue<EnergyResultMessageTimeSeries>(x => x.Period.Start, SampleData.StartOfPeriod)
+            .HasMessageRecordValue<EnergyResultMessageTimeSeries>(x => x.Period.End, SampleData.EndOfPeriod);
     }
 
     [Fact]
@@ -173,10 +173,10 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .HasReceiverRole(ActorRole.BalanceResponsibleParty.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
-            .HasMessageRecordValue<TimeSeries>(
+            .HasMessageRecordValue<EnergyResultMessageTimeSeries>(
                 series => series.BalanceResponsibleNumber!,
                 SampleData.BalanceResponsibleNumber.Value)
-            .HasMessageRecordValue<TimeSeries>(
+            .HasMessageRecordValue<EnergyResultMessageTimeSeries>(
                 series => series.EnergySupplierNumber!,
                 SampleData.EnergySupplierNumber.Value);
     }
@@ -207,10 +207,10 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .HasReceiverRole(ActorRole.BalanceResponsibleParty.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
-            .HasMessageRecordValue<TimeSeries>(
+            .HasMessageRecordValue<EnergyResultMessageTimeSeries>(
                 series => series.BalanceResponsibleNumber!,
                 SampleData.BalanceResponsibleNumber.Value)
-            .HasMessageRecordValue<TimeSeries>(
+            .HasMessageRecordValue<EnergyResultMessageTimeSeries>(
                 series => series.EnergySupplierNumber!,
                 null!);
     }
@@ -244,7 +244,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasBusinessReason(businessReason)
-            .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, MeteringPointType.Exchange.Name);
+            .HasMessageRecordValue<EnergyResultMessageTimeSeries>(x => x.MeteringPointType, MeteringPointType.Exchange.Name);
     }
 
     [Theory]
@@ -274,7 +274,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasBusinessReason(businessReason)
-            .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, MeteringPointType.Consumption.Name);
+            .HasMessageRecordValue<EnergyResultMessageTimeSeries>(x => x.MeteringPointType, MeteringPointType.Consumption.Name);
     }
 
     [Theory(DisplayName = nameof(Message_is_created_for_supported_time_series_type))]

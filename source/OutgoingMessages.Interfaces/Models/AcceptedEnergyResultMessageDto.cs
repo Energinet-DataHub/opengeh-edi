@@ -17,18 +17,18 @@ using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.Common.Serialization;
 
-namespace Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-public class AggregationResultMessage : OutgoingMessageDto
+public class AcceptedEnergyResultMessageDto : OutgoingMessageDto
 {
-    private AggregationResultMessage(
+    private AcceptedEnergyResultMessageDto(
         ActorNumber receiverId,
         Guid processId,
         string businessReason,
         ActorRole receiverRole,
-        TimeSeries series,
+        AcceptedEnergyResultMessageTimeSeries series,
         MessageId? relatedToMessageId = null)
         : base(
             DocumentType.NotifyAggregatedMeasureData,
@@ -44,9 +44,9 @@ public class AggregationResultMessage : OutgoingMessageDto
         Series = series;
     }
 
-    public TimeSeries Series { get; }
+    public AcceptedEnergyResultMessageTimeSeries Series { get; }
 
-    public static AggregationResultMessage Create(
+    public static AcceptedEnergyResultMessageDto Create(
         ActorNumber receiverNumber,
         ActorRole receiverRole,
         Guid processId,
@@ -58,14 +58,14 @@ public class AggregationResultMessage : OutgoingMessageDto
         string? energySupplierNumber,
         string? balanceResponsibleNumber,
         Period period,
-        IReadOnlyCollection<Point> points,
+        IReadOnlyCollection<AcceptedEnergyResultMessagePoint> points,
         string businessReasonName,
         long calculationResultVersion,
         string? originalTransactionIdReference = null,
         string? settlementVersion = null,
         MessageId? relatedToMessageId = null)
     {
-        var series = new TimeSeries(
+        var series = new AcceptedEnergyResultMessageTimeSeries(
             processId,
             gridAreaCode,
             meteringPointType,
@@ -75,11 +75,11 @@ public class AggregationResultMessage : OutgoingMessageDto
             energySupplierNumber,
             balanceResponsibleNumber,
             period,
-            points.Select(p => new Point(p.Position, p.Quantity, p.QuantityQuality, p.SampleTime)).ToList(),
+            points.Select(p => new AcceptedEnergyResultMessagePoint(p.Position, p.Quantity, p.QuantityQuality, p.SampleTime)).ToList(),
             calculationResultVersion,
             originalTransactionIdReference,
             settlementVersion);
-        return new AggregationResultMessage(
+        return new AcceptedEnergyResultMessageDto(
             receiverNumber,
             processId,
             businessReasonName,
@@ -89,7 +89,7 @@ public class AggregationResultMessage : OutgoingMessageDto
     }
 }
 
-public record TimeSeries(
+public record AcceptedEnergyResultMessageTimeSeries(
     Guid TransactionId,
     string GridAreaCode,
     string MeteringPointType,
@@ -99,9 +99,9 @@ public record TimeSeries(
     string? EnergySupplierNumber,
     string? BalanceResponsibleNumber,
     Period Period,
-    IReadOnlyCollection<Point> Point,
+    IReadOnlyCollection<AcceptedEnergyResultMessagePoint> Point,
     long CalculationResultVersion,
     string? OriginalTransactionIdReference = null,
     string? SettlementVersion = null);
 
-public record Point(int Position, decimal? Quantity, CalculatedQuantityQuality QuantityQuality, string SampleTime);
+public record AcceptedEnergyResultMessagePoint(int Position, decimal? Quantity, CalculatedQuantityQuality QuantityQuality, string SampleTime);

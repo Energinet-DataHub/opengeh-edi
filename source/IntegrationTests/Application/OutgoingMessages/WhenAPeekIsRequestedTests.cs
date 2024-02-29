@@ -35,14 +35,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
 public class WhenAPeekIsRequestedTests : TestBase
 {
-    private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
+    private readonly EnergyResultMessageDtoBuilder _energyResultMessageDtoBuilder;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly SystemDateTimeProviderStub _dateTimeProvider;
 
     public WhenAPeekIsRequestedTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
     {
-        _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
+        _energyResultMessageDtoBuilder = new EnergyResultMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
         _dateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
     }
@@ -50,7 +50,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task When_no_messages_are_available_return_empty_result()
     {
-        var message = _outgoingMessageDtoBuilder.Build();
+        var message = _energyResultMessageDtoBuilder.Build();
         await EnqueueMessage(message);
 
         var result = await PeekMessage(MessageCategory.None);
@@ -62,7 +62,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task A_message_bundle_is_returned()
     {
-        var message = _outgoingMessageDtoBuilder
+        var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
             .WithReceiverRole(ActorRole.EnergySupplier)
             .Build();
@@ -79,7 +79,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task Ensure_same_bundle_is_returned_if_not_dequeued()
     {
-        var message = _outgoingMessageDtoBuilder
+        var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
             .WithReceiverRole(ActorRole.EnergySupplier)
             .Build();
@@ -102,7 +102,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     public async Task A_market_document_is_archived_with_correct_content()
     {
         // Arrange
-        var message = _outgoingMessageDtoBuilder
+        var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
             .WithReceiverRole(ActorRole.EnergySupplier)
             .Build();
@@ -129,7 +129,7 @@ public class WhenAPeekIsRequestedTests : TestBase
             date = 02;
         _dateTimeProvider.SetNow(Instant.FromUtc(year, month, date, 11, 07));
         var receiverNumber = SampleData.NewEnergySupplierNumber;
-        var message = _outgoingMessageDtoBuilder
+        var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(receiverNumber)
             .WithReceiverRole(ActorRole.EnergySupplier)
             .Build();
@@ -149,7 +149,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task A_market_document_is_added_to_database()
     {
-        var message = _outgoingMessageDtoBuilder
+        var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
             .WithReceiverRole(ActorRole.EnergySupplier)
             .Build();
@@ -166,7 +166,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task The_created_market_document_uses_the_archived_message_file_reference()
     {
-        var message = _outgoingMessageDtoBuilder
+        var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
             .WithReceiverRole(ActorRole.EnergySupplier)
             .Build();
@@ -204,9 +204,8 @@ public class WhenAPeekIsRequestedTests : TestBase
         return exists;
     }
 
-    private async Task EnqueueMessage(OutgoingMessageDto message)
+    private async Task EnqueueMessage(EnergyResultMessageDto message)
     {
-        await _outgoingMessagesClient.EnqueueAsync(message);
-        await GetService<ActorMessageQueueContext>().SaveChangesAsync();
+        await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
     }
 }

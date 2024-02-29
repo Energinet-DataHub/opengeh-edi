@@ -38,15 +38,19 @@ public interface IOutgoingMessagesClient
     Task<PeekResultDto> PeekAndCommitAsync(PeekRequestDto request, CancellationToken cancellationToken);
 
     /// <summary>
-    ///  Enqueue a message, no commit. Currently ONLY used by the Process module which handles the commit itself.
+    ///  Enqueue a accepted energy result message, no commit. Currently ONLY used by the Process module which handles the commit itself.
     /// </summary>
-    /// <param name="outgoingMessage"></param>
-    Task<OutgoingMessageId> EnqueueAsync(OutgoingMessageDto outgoingMessage);
+    Task<OutgoingMessageId> EnqueueAsync(AcceptedEnergyResultMessageDto acceptedEnergyResultMessage, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Enqueue a message, WITH commit. Currently ONLY used by the Process module wrt reception of events.
+    ///  Enqueue a rejected energy result message, no commit. Currently ONLY used by the Process module which handles the commit itself.
     /// </summary>
-    Task EnqueueAndCommitAsync(EnergyResultMessageDto energyResultMessage, CancellationToken cancellationToken);
+    Task<OutgoingMessageId> EnqueueAsync(RejectedEnergyResultMessageDto rejectedEnergyResultMessage, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Enqueue a energy result message, WITH commit. Currently ONLY used by the integration event.
+    /// </summary>
+    Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultMessageDto energyResultMessage, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Enqueue wholesale messages, handles enqueuing messages to all appropriate parties (Receiver, ChargeOwner) in a single transaction.

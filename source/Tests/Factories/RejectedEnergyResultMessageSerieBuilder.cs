@@ -16,14 +16,13 @@ using System;
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.Tests.Factories;
 
-public class RejectedTimeSeriesBuilder
+public class RejectedEnergyResultMessageSerieBuilder
 {
     private readonly string _receiverNumber = SampleData.ReceiverId;
     private readonly ActorRole _receiverRole = SampleData.ReceiverRole;
@@ -34,11 +33,11 @@ public class RejectedTimeSeriesBuilder
     private readonly Instant _creationDate = SampleData.CreationDate;
     private readonly Guid _transactionId = SampleData.TransactionId;
     private readonly string _originalTransactionIdReference = SampleData.OriginalTransactionId;
-    private readonly IReadOnlyCollection<RejectReason> _rejectReasons = new List<RejectReason> { new(SampleData.SerieReasonCode, SampleData.SerieReasonMessage) };
+    private readonly IReadOnlyCollection<RejectedEnergyResultMessageRejectReason> _rejectReasons = new List<RejectedEnergyResultMessageRejectReason> { new(SampleData.SerieReasonCode, SampleData.SerieReasonMessage) };
 
-    public static RejectedTimeSeriesBuilder RejectAggregatedMeasureDataResult()
+    public static RejectedEnergyResultMessageSerieBuilder RejectAggregatedMeasureDataResult()
     {
-        return new RejectedTimeSeriesBuilder();
+        return new RejectedEnergyResultMessageSerieBuilder();
     }
 
     public OutgoingMessageHeader BuildHeader()
@@ -53,9 +52,9 @@ public class RejectedTimeSeriesBuilder
             _creationDate);
     }
 
-    public RejectedTimeSerie BuildRejectedTimeSerie()
+    public RejectedEnergyResultMessageSerie BuildRejectedTimeSerie()
     {
-        return new RejectedTimeSerie(
+        return new RejectedEnergyResultMessageSerie(
             _transactionId,
             _rejectReasons,
             _originalTransactionIdReference);
