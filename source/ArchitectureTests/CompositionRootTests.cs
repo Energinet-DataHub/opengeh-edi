@@ -27,7 +27,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyA
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using MediatR;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Azure.Functions.Worker.Middleware;
@@ -35,7 +34,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Xunit;
-using Program = Energinet.DataHub.EDI.Api.Program;
 
 namespace Energinet.DataHub.EDI.ArchitectureTests
 {
