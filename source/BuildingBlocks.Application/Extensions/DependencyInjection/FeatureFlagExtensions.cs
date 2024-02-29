@@ -23,7 +23,7 @@ public static class FeatureFlagExtensions
     public static IServiceCollection AddFeatureFlags(this IServiceCollection services)
     {
         services.AddFeatureManagement();
-        services.AddScoped<IFeatureFlagManager, MicrosoftFeatureFlagManager>();
+        services.AddSingleton<IFeatureFlagManager, MicrosoftFeatureFlagManager>();
 
         return services;
     }

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
+using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +25,18 @@ public static class HealtCheckExtensions
 {
     private const string DatabaseName = "edi-sql-db";
 
+    public static IServiceCollection AddLiveHealthCheck(this IServiceCollection services)
+    {
+        services.AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>();
+        services.AddHealthChecks()
+            .AddLiveCheck();
+
+        return services;
+    }
+
+    /// <summary>
+    /// Used for Service Bus queues where the app have peek (receiver) permissions
+    /// </summary>
     public static IServiceCollection AddExternalDomainServiceBusQueuesHealthCheck(this IServiceCollection services, string serviceBusConnectionString, params string[] queueNames)
     {
         ArgumentNullException.ThrowIfNull(serviceBusConnectionString);
