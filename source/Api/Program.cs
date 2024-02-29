@@ -122,7 +122,7 @@ namespace Energinet.DataHub.EDI.Api
                             runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
                             runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!,
                             runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!)
-                        .AddSqlServerHealthCheck(runtime.DB_CONNECTION_STRING!);
+                        .AddSqlServerHealthCheck(configuration);
                     services.AddBlobStorageHealthCheck("edi-web-jobs-storage", runtime.AzureWebJobsStorage!);
                     services.AddBlobStorageHealthCheck("edi-documents-storage", runtime.AZURE_STORAGE_ACCOUNT_URL!);
 
