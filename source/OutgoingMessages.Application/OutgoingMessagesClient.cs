@@ -61,15 +61,19 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         return _messageEnqueuer.EnqueueAsync(outgoingMessage);
     }
 
-    public async Task EnqueueAndCommitAsync(OutgoingMessageDto outgoingMessage, CancellationToken cancellationToken)
+    public async Task EnqueueAndCommitAsync(
+        EnergyResultMessageDto energyResultMessage,
+        CancellationToken cancellationToken)
     {
-        await _messageEnqueuer.EnqueueAsync(outgoingMessage).ConfigureAwait(false);
+        await _messageEnqueuer.EnqueueAsync(energyResultMessage).ConfigureAwait(false);
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public virtual async Task EnqueueAndCommitAsync(WholesaleResultMessageDto wholesaleResultMessageDto, CancellationToken cancellationToken)
+    public virtual async Task EnqueueAndCommitAsync(
+        WholesaleResultMessageDto wholesaleResultMessage,
+        CancellationToken cancellationToken)
     {
-        var messages = _outgoingMessageFactory.CreateMessages(wholesaleResultMessageDto);
+        var messages = _outgoingMessageFactory.CreateMessages(wholesaleResultMessage);
         foreach (var message in messages)
         {
             await _messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
