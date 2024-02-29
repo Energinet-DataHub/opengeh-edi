@@ -28,39 +28,17 @@ using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection;
 using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 const string domainName = "EDI.B2CWebApi";
 
-const string securityProtocol = "Bearer";
-
 builder.Logging
     .ClearProviders()
     .AddApplicationInsights();
 
-builder.Services.AddSwaggerGen(
-        config =>
-        {
-            config.SwaggerDoc("v1", new OpenApiInfo { Title = "B2C web api for EDI", Version = "v1" });
-            var securitySchema = new OpenApiSecurityScheme
-            {
-                Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
-                Name = "Authorization",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.Http,
-                Scheme = "bearer",
-                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = securityProtocol, },
-            };
-
-            config.AddSecurityDefinition("Bearer", securitySchema);
-            config.SupportNonNullableReferenceTypes();
-            config.UseAllOfToExtendReferenceSchemas();
-            var securityRequirement = new OpenApiSecurityRequirement { { securitySchema, new string[] { $"{securityProtocol}" } } };
-
-            config.AddSecurityRequirement(securityRequirement);
-        })
+builder.Services
+    .AddSwaggerForApplication()
     .AddApplicationInsights()
     .AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>()
     .AddControllers()
@@ -98,13 +76,7 @@ if (isDevelopment)
     app.UseDeveloperExceptionPage();
 
 app
-    .UseSwagger()
-    .UseSwaggerUI(
-        options =>
-        {
-            if (!isDevelopment) return;
-            options.EnableTryItOutByDefault();
-        })
+    .UseSwaggerUiForDevEnvironment()
     .UseLoggingScope()
     .UseHttpsRedirection()
     .UseAuthentication()
