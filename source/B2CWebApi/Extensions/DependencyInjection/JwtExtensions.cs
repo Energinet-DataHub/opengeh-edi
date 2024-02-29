@@ -25,6 +25,19 @@ public static class JwtExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        services
+            .AddOptions<JwtOptions>()
+            .Bind(configuration)
+            .Validate(
+                o => !string.IsNullOrEmpty(o.EXTERNAL_OPEN_ID_URL),
+                "EXTERNAL_OPEN_ID_URL must be set")
+            .Validate(
+                o => !string.IsNullOrEmpty(o.INTERNAL_OPEN_ID_URL),
+                "INTERNAL_OPEN_ID_URL must be set")
+            .Validate(
+                o => !string.IsNullOrEmpty(o.BACKEND_BFF_APP_ID),
+                "BACKEND_BFF_APP_IDmust be set");
+
         var options = configuration.Get<JwtOptions>()!;
         services.AddJwtBearerAuthentication(options.EXTERNAL_OPEN_ID_URL, options.INTERNAL_OPEN_ID_URL, options.BACKEND_BFF_APP_ID);
         services.AddUserAuthentication<FrontendUser, FrontendUserProvider>();

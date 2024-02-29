@@ -12,21 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Application.Configuration
-{
-    /// <summary>
-    /// Context for the current scope identified by a correlation id.
-    /// </summary>
-    public interface ICorrelationContext
-    {
-        /// <summary>
-        /// Get the current correlation id.
-        /// </summary>
-        string Id { get; }
+using BuildingBlocks.Application.FeatureFlag;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.FeatureManagement;
 
-        /// <summary>
-        /// Set the current correlation/operation id.
-        /// </summary>
-        void SetId(string id);
+namespace BuildingBlocks.Application.Extensions.DependencyInjection;
+
+public static class FeatureFlagExtensions
+{
+    public static IServiceCollection AddFeatureFlags(this IServiceCollection services)
+    {
+        services.AddFeatureManagement();
+        services.AddSingleton<IFeatureFlagManager, MicrosoftFeatureFlagManager>();
+
+        return services;
     }
 }
