@@ -71,12 +71,12 @@ public static class HealtCheckExtensions
             .Bind(configuration)
             .Validate(o => !string.IsNullOrEmpty(o.DB_CONNECTION_STRING), "DB_CONNECTION_STRING must be set");
 
-        var dbConnectionString = configuration.GetConnectionString("DB_CONNECTION_STRING")!;
+        var database = configuration.Get<SqlDatabaseConnectionOptions>()!;
 
         services.AddHealthChecks()
             .AddSqlServer(
                 name: DatabaseName,
-                connectionString: dbConnectionString);
+                connectionString: database.DB_CONNECTION_STRING);
 
         services.TryAddSingleton<SqlHealthCheckIsAdded>();
 
