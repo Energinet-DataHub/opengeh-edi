@@ -14,7 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="3.2.0" />
+      <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="3.3.1" />
     </ItemGroup>
 
     <ItemGroup>
