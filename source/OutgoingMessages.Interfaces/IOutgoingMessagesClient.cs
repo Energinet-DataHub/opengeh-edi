@@ -24,7 +24,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 public interface IOutgoingMessagesClient
 {
     /// <summary>
-    /// Dequeues a message from the queue and commit.
+    ///  Dequeues a message from the queue and commit.
     /// </summary>
     /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
@@ -48,12 +48,12 @@ public interface IOutgoingMessagesClient
     Task<OutgoingMessageId> EnqueueAsync(RejectedEnergyResultMessageDto rejectedEnergyResultMessage, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Enqueue a energy result message, WITH commit. Currently ONLY used by the integration event.
+    ///  Enqueue a energy result message, WITH commit. Currently ONLY used by the integration event.
     /// </summary>
     Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultMessageDto energyResultMessage, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Enqueue wholesale messages, handles enqueuing messages to all appropriate parties (Receiver, ChargeOwner) in a single transaction.
+    ///  Enqueue wholesale messages, handles enqueuing messages to all appropriate parties (Receiver, ChargeOwner) in a single transaction.
     /// </summary>
     Task EnqueueAndCommitAsync(WholesaleResultMessageDto wholesaleResultMessage, CancellationToken cancellationToken);
 }

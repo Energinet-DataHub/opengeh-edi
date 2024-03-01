@@ -18,7 +18,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 
 /// <summary>
-/// Event to raise when an OutgoingMessage should be enqueued
+/// Event to raise when an response message to a rejected request of Energy Result
 /// </summary>
 public class EnqueueRejectedEnergyResultMessageEvent : DomainEvent
 {

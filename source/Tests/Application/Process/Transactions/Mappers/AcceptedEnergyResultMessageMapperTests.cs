@@ -38,7 +38,7 @@ public class AcceptedEnergyResultMessageMapperTests
         };
 
         // Act
-        var actual = EnergyResultMessagePointsMapper
+        var actual = PointsMapper
             .MapPoints(new RepeatedField<EnergyResultProducedV2.Types.TimeSeriesPoint>() { protoPoint });
 
         // Assert
@@ -61,7 +61,7 @@ public class AcceptedEnergyResultMessageMapperTests
         };
 
         // Act
-        var actual = EnergyResultMessagePointsMapper
+        var actual = PointsMapper
             .MapPoints(new RepeatedField<AmountPerChargeResultProducedV1.Types.TimeSeriesPoint>() { protoPoint });
 
         // Assert

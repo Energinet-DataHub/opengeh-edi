@@ -23,7 +23,7 @@ using Google.Protobuf.Collections;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories.Mappers;
 
-public static class EnergyResultMessagePointsMapper
+public static class PointsMapper
 {
     public static ReadOnlyCollection<EnergyResultMessagePoint> MapPoints(RepeatedField<EnergyResultProducedV2.Types.TimeSeriesPoint> timeSeriesPoints)
     {
