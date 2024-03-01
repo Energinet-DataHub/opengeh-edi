@@ -16,40 +16,40 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands.Handlers;
 
-public class AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable : IRequestHandler<AcceptedAggregatedTimeSerie, Unit>
+public class AcceptProcessWhenAcceptedEnergyResultTimeSeriesIsAvailable : IRequestHandler<AcceptedEnergyResultTimeSerieCommand, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
 
-    public AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable(
+    public AcceptProcessWhenAcceptedEnergyResultTimeSeriesIsAvailable(
         IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
     }
 
-    public async Task<Unit> Handle(AcceptedAggregatedTimeSerie request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(AcceptedEnergyResultTimeSerieCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         var process = await _aggregatedMeasureDataProcessRepository
             .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
-        var aggregationResultMessages = new List<AggregationResultMessage>();
+        var energyResultMessageDtos = new List<AcceptedEnergyResultMessageDto>();
         foreach (var aggregatedTimeSerie in request.AggregatedTimeSeries)
         {
-            var message = AggregationMessageResultFactory
+            var message = AcceptedEnergyResultMessageDtoFactory
                 .Create(process, aggregatedTimeSerie);
-            aggregationResultMessages.Add(message);
+            energyResultMessageDtos.Add(message);
         }
 
-        process.IsAccepted(aggregationResultMessages);
+        process.IsAccepted(energyResultMessageDtos);
 
         return Unit.Value;
     }

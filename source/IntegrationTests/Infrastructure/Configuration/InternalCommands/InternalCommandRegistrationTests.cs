@@ -40,7 +40,7 @@ public class InternalCommandRegistrationTests : TestBase
             .Application
             .GetTypes()
             .Concat(ApplicationAssemblies.Infrastructure.GetTypes())
-            .Concat(typeof(EnqueueMessageHandler).Assembly.GetTypes());
+            .Concat(typeof(EnqueueAcceptedEnergyResultMessageHandler).Assembly.GetTypes());
 
         return allTypes
             .Where(x => x.BaseType == typeof(InternalCommand))

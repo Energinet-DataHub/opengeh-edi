@@ -16,19 +16,19 @@ using System;
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.Common.Serialization;
 
-namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-public class RejectedAggregationResultMessage : OutgoingMessageDto
+public class RejectedEnergyResultMessageDto : OutgoingMessageDto
 {
-    public RejectedAggregationResultMessage(
+    public RejectedEnergyResultMessageDto(
         ActorNumber receiverId,
         Guid processId,
         string businessReason,
         ActorRole receiverRole,
         MessageId relatedToMessageId,
-        RejectedTimeSerie series)
+        RejectedEnergyResultMessageSerie series)
         : base(
             DocumentType.RejectRequestAggregatedMeasureData,
             receiverId,
@@ -43,10 +43,12 @@ public class RejectedAggregationResultMessage : OutgoingMessageDto
         Series = series;
     }
 
-    public RejectedTimeSerie Series { get; }
+    public RejectedEnergyResultMessageSerie Series { get; }
 }
 
-public record RejectedTimeSerie(
+public record RejectedEnergyResultMessageSerie(
     Guid TransactionId,
-    IReadOnlyCollection<RejectReason> RejectReasons,
+    IReadOnlyCollection<RejectedEnergyResultMessageRejectReason> RejectReasons,
     string OriginalTransactionIdReference);
+
+public record RejectedEnergyResultMessageRejectReason(string ErrorCode, string ErrorMessage);

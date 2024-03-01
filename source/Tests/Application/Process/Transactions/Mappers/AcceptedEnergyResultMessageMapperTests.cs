@@ -24,7 +24,7 @@ using DecimalValue = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Com
 
 namespace Energinet.DataHub.EDI.Tests.Application.Process.Transactions.Mappers;
 
-public class TimeSeriesPointsMapperTests
+public class AcceptedEnergyResultMessageMapperTests
 {
     [Fact]
     public void Ensure_energy_result_produced_v2_time_series_points_is_mapped()
@@ -38,7 +38,7 @@ public class TimeSeriesPointsMapperTests
         };
 
         // Act
-        var actual = TimeSeriesPointsMapper
+        var actual = PointsMapper
             .MapPoints(new RepeatedField<EnergyResultProducedV2.Types.TimeSeriesPoint>() { protoPoint });
 
         // Assert
@@ -61,7 +61,7 @@ public class TimeSeriesPointsMapperTests
         };
 
         // Act
-        var actual = TimeSeriesPointsMapper
+        var actual = PointsMapper
             .MapPoints(new RepeatedField<AmountPerChargeResultProducedV1.Types.TimeSeriesPoint>() { protoPoint });
 
         // Assert

@@ -21,18 +21,18 @@ using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers;
 
-public class EnqueueMessageHandler : INotificationHandler<EnqueueMessageEvent>
+public class EnqueueRejectedEnergyResultMessageHandler : INotificationHandler<EnqueueRejectedEnergyResultMessageEvent>
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
 
-    public EnqueueMessageHandler(IOutgoingMessagesClient outgoingMessagesClient)
+    public EnqueueRejectedEnergyResultMessageHandler(IOutgoingMessagesClient outgoingMessagesClient)
     {
         _outgoingMessagesClient = outgoingMessagesClient;
     }
 
-    public async Task Handle(EnqueueMessageEvent notification, CancellationToken cancellationToken)
+    public async Task Handle(EnqueueRejectedEnergyResultMessageEvent notification, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(notification);
-        await _outgoingMessagesClient.EnqueueAsync(notification.OutgoingMessageDto).ConfigureAwait(false);
+        await _outgoingMessagesClient.EnqueueAsync(notification.RejectedEnergyResultMessage, cancellationToken).ConfigureAwait(false);
     }
 }

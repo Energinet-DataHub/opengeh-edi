@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -20,6 +21,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using MediatR;
+using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 
@@ -37,17 +39,25 @@ public class TestCreateOutgoingCommandHandler : IRequestHandler<TestCreateOutgoi
         ArgumentNullException.ThrowIfNull(request);
         for (int i = 0; i < request.NumberOfOutgoingMessages; i++)
         {
-            var message = new OutgoingMessageDto(
-                DocumentType.NotifyAggregatedMeasureData,
+            var message = AcceptedEnergyResultMessageDto.Create(
                 ActorNumber.Create("1234567891234"),
-                ProcessId.New().Id,
-                BusinessReason.BalanceFixing.Name,
                 ActorRole.EnergySupplier,
-                ActorNumber.Create("1234567891234"),
-                ActorRole.MeteredDataAdministrator,
-                "data");
-
-            await _mediator.Publish(new EnqueueMessageEvent(message), cancellationToken).ConfigureAwait(false);
+                ProcessId.New().Id,
+                "1234",
+                MeteringPointType.Consumption.Name,
+                SettlementType.Flex.Name,
+                MeasurementUnit.Kwh.Name,
+                Resolution.QuarterHourly.Name,
+                "1234567891234",
+                null,
+                new Period(InstantPattern.ExtendedIso.Parse("2021-01-01T00:00:00Z").Value, InstantPattern.ExtendedIso.Parse("2021-01-01T00:15:00Z").Value),
+                new List<AcceptedEnergyResultMessagePoint>
+                {
+                    new(1, 1, CalculatedQuantityQuality.Incomplete, "2021-01-01T00:00:00Z"),
+                },
+                BusinessReason.BalanceFixing.Name,
+                1);
+            await _mediator.Publish(new EnqueueAcceptedEnergyResultMessageEvent(message), cancellationToken).ConfigureAwait(false);
         }
 
         return await Unit.Task;
