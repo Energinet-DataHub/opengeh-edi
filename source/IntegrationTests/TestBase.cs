@@ -26,6 +26,7 @@ using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.Api.Authentication;
 using Energinet.DataHub.EDI.Api.Configuration.Authentication;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
+using Energinet.DataHub.EDI.Api.DataRetention;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -268,6 +269,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             CompositionRoot.Initialize(_services)
                 .AddSystemClock(new SystemDateTimeProviderStub());
 
+            _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>();
             _services.AddScoped(_ => new JwtTokenParser(JwtTokenParserTests.DisableAllTokenValidations));
             _services.AddScoped(_ =>
             {

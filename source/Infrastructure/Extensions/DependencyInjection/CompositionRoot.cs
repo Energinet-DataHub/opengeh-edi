@@ -36,8 +36,7 @@ namespace Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection
             services.AddLogging();
             AddAuthenticatedActor();
             services
-                .AddDapper()
-                .AddDataRetention();
+                .AddDapper();
         }
 
         public static CompositionRoot Initialize(IServiceCollection services)
