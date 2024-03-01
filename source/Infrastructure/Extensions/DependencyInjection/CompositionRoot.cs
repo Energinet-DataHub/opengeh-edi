@@ -54,12 +54,6 @@ namespace Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection
             return this;
         }
 
-        public CompositionRoot AddBearerAuthentication(TokenValidationParameters tokenValidationParameters)
-        {
-            _services.AddScoped(sp => new JwtTokenParser(tokenValidationParameters));
-            return this;
-        }
-
         private void AddMediatR()
         {
             var configuration = new MediatRServiceConfiguration();

@@ -256,25 +256,16 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
             _services = new ServiceCollection();
 
-            _services.AddTransient<InboxEventsProcessor>();
-            _services.AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>>(_ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy);
-            _services.AddTransient<INotificationHandler<TestNotification>>(
-                _ => InboxEventNotificationHandler);
-
-            _services.AddTransient<IRequestHandler<TestCommand, Unit>, TestCommandHandler>();
-            _services.AddTransient<IRequestHandler<TestCreateOutgoingMessageCommand, Unit>, TestCreateOutgoingCommandHandler>();
-
-            _services.AddScopedSqlDbContext<ProcessContext>(config);
-
-            _services.AddAuthentication(
-                sp => new MarketActorAuthenticator(
-                    sp.GetRequiredService<IMasterDataClient>(),
-                    sp.GetRequiredService<AuthenticatedActor>(),
-                    sp.GetRequiredService<ILogger<MarketActorAuthenticator>>()));
+            _services.AddTransient<InboxEventsProcessor>()
+                .AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>>(_ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy)
+                .AddTransient<INotificationHandler<TestNotification>>(_ => InboxEventNotificationHandler)
+                .AddTransient<IRequestHandler<TestCommand, Unit>, TestCommandHandler>()
+                .AddTransient<IRequestHandler<TestCreateOutgoingMessageCommand, Unit>, TestCreateOutgoingCommandHandler>()
+                .AddScopedSqlDbContext<ProcessContext>(config)
+                .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations);
 
             CompositionRoot.Initialize(_services)
-                .AddSystemClock(new SystemDateTimeProviderStub())
-                .AddBearerAuthentication(JwtTokenParserTests.DisableAllTokenValidations);
+                .AddSystemClock(new SystemDateTimeProviderStub());
             _services.AddScoped(_ =>
             {
                 var correlation = new CorrelationContext();
@@ -287,7 +278,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             .AddArchivedMessagesModule(config)
             .AddIncomingMessagesModule(config)
             .AddMasterDataModule(config)
-                .AddDataAccessModule(config);
+            .AddDataAccessModule(config);
 
             // Replace the services with stub implementations.
             // - Building blocks
