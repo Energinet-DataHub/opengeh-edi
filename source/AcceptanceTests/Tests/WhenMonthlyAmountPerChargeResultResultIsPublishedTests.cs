@@ -27,13 +27,13 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
 public sealed class WhenMonthlyAmountPerChargeResultResultIsPublishedTests
 {
-    private readonly NotifyWholesaleResultDsl _notifyWholesaleResultDsl;
+    private readonly NotifyWholesaleServicesDsl _notifyWholesaleServicesDsl;
 
     public WhenMonthlyAmountPerChargeResultResultIsPublishedTests(AcceptanceTestFixture fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
 
-        _notifyWholesaleResultDsl = new NotifyWholesaleResultDsl(
+        _notifyWholesaleServicesDsl = new NotifyWholesaleServicesDsl(
             new EdiDriver(fixture.B2BEnergySupplierAuthorizedHttpClient),
             new WholesaleDriver(fixture.EventPublisher));
     }
@@ -41,13 +41,13 @@ public sealed class WhenMonthlyAmountPerChargeResultResultIsPublishedTests
     [Fact]
     public async Task Actor_can_peek_and_dequeue_monthly_charge_result()
     {
-        await _notifyWholesaleResultDsl.EmptyQueueForActor();
+        await _notifyWholesaleServicesDsl.EmptyQueueForActor();
 
-        await _notifyWholesaleResultDsl.PublishMonthlyChargeResultFor(
+        await _notifyWholesaleServicesDsl.PublishMonthlyChargeResultFor(
             AcceptanceTestFixture.CimActorGridArea,
             AcceptanceTestFixture.EdiSubsystemTestCimActorNumber,
             AcceptanceTestFixture.ActorNumber);
 
-        await _notifyWholesaleResultDsl.ConfirmResultIsAvailableFor();
+        await _notifyWholesaleServicesDsl.ConfirmResultIsAvailableFor();
     }
 }

@@ -35,14 +35,14 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
 {
     private readonly DocumentValidationFixture _documentValidation;
     private readonly MessageRecordParser _parser;
-    private readonly WholesaleCalculationsResultMessageBuilder _wholesaleCalculationsResultMessageBuilder;
+    private readonly WholesaleServicesSeriesBuilder _wholesaleServicesSeriesBuilder;
 
     public WholesaleCalculationResultDocumentWriterTests(
         DocumentValidationFixture documentValidation)
     {
         _documentValidation = documentValidation;
         _parser = new MessageRecordParser(new Serializer());
-        _wholesaleCalculationsResultMessageBuilder = new WholesaleCalculationsResultMessageBuilder();
+        _wholesaleServicesSeriesBuilder = new WholesaleServicesSeriesBuilder();
     }
 
     [Theory]
@@ -50,7 +50,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
     public async Task Can_create_notifyWholesaleServices_document(string documentFormat)
     {
         // Arrange
-        var messageBuilder = _wholesaleCalculationsResultMessageBuilder
+        var messageBuilder = _wholesaleServicesSeriesBuilder
             .WithMessageId(SampleData.MessageId)
             .WithBusinessReason(SampleData.BusinessReason)
             .WithTimestamp(SampleData.Timestamp)
@@ -68,7 +68,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
             .WithMeasurementUnit(SampleData.MeasurementUnit)
             .WithPriceMeasurementUnit(SampleData.PriceMeasureUnit)
             .WithResolution(SampleData.Resolution)
-            .WithPoints(new Collection<WholesaleCalculationPoint>() { new(1, 1, 1, SampleData.Quantity, null) });
+            .WithPoints(new Collection<WholesaleServicesPoint>() { new(1, 1, 1, SampleData.Quantity, null) });
 
         // Act
         var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
@@ -107,8 +107,8 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
     public async Task Can_create_notifyWholesaleServices_document_without_energySum_quantity(string documentFormat)
     {
         // Arrange
-        var messageBuilder = _wholesaleCalculationsResultMessageBuilder
-            .WithPoints(new Collection<WholesaleCalculationPoint>() { new(1, 1, 1, null, null) });
+        var messageBuilder = _wholesaleServicesSeriesBuilder
+            .WithPoints(new Collection<WholesaleServicesPoint>() { new(1, 1, 1, null, null) });
 
         // Act
         var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
@@ -126,7 +126,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
     public async Task Can_create_notifyWholesaleServices_document_with_settlement_version(string documentFormat)
     {
         // Arrange
-        var messageBuilder = _wholesaleCalculationsResultMessageBuilder
+        var messageBuilder = _wholesaleServicesSeriesBuilder
             .WithSettlementVersion(SettlementVersion.FirstCorrection);
 
         // Act
@@ -145,7 +145,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
     public async Task Can_create_notifyWholesaleServices_document_with_measurement_unit_pieces(string documentFormat)
     {
         // Arrange
-        var messageBuilder = _wholesaleCalculationsResultMessageBuilder
+        var messageBuilder = _wholesaleServicesSeriesBuilder
             .WithMeasurementUnit(MeasurementUnit.Pieces);
 
         // Act
@@ -163,10 +163,10 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
     public async Task Can_create_notifyWholesaleServices_document_with_calculated_hourly_tariff_amounts_for_flex_consumption(string documentFormat)
     {
         // Arrange
-        var firstPoint = new WholesaleCalculationPoint(1, 1, 100, 100, null);
-        var secondPoint = new WholesaleCalculationPoint(2, 1, 200, 200, null);
+        var firstPoint = new WholesaleServicesPoint(1, 1, 100, 100, null);
+        var secondPoint = new WholesaleServicesPoint(2, 1, 200, 200, null);
 
-        var messageBuilder = _wholesaleCalculationsResultMessageBuilder
+        var messageBuilder = _wholesaleServicesSeriesBuilder
             .WithSettlementMethod(SettlementType.Flex)
             .WithMeteringPointType(MeteringPointType.Consumption)
             .WithPoints(new()
@@ -193,10 +193,10 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
     public async Task Can_create_notifyWholesaleServices_document_with_calculated_hourly_tariff_amounts_for_production(string documentFormat)
     {
         // Arrange
-        var firstPoint = new WholesaleCalculationPoint(1, 1, 100, 100, null);
-        var secondPoint = new WholesaleCalculationPoint(2, 1, 200, 100, null);
+        var firstPoint = new WholesaleServicesPoint(1, 1, 100, 100, null);
+        var secondPoint = new WholesaleServicesPoint(2, 1, 200, 100, null);
 
-        var messageBuilder = _wholesaleCalculationsResultMessageBuilder
+        var messageBuilder = _wholesaleServicesSeriesBuilder
                 .WithSettlementMethod(null)
                 .WithMeteringPointType(MeteringPointType.Production)
                 .WithPoints(new()
@@ -223,10 +223,10 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
     public async Task Can_create_notifyWholesaleServices_document_with_calculated_hourly_tariff_amounts_for_consumption(string documentFormat)
     {
         // Arrange
-        var firstPoint = new WholesaleCalculationPoint(1, 1, 100, 100, null);
-        var secondPoint = new WholesaleCalculationPoint(2, 1, 200, 200, null);
+        var firstPoint = new WholesaleServicesPoint(1, 1, 100, 100, null);
+        var secondPoint = new WholesaleServicesPoint(2, 1, 200, 200, null);
 
-        var messageBuilder = _wholesaleCalculationsResultMessageBuilder
+        var messageBuilder = _wholesaleServicesSeriesBuilder
             .WithSettlementMethod(SettlementType.NonProfiled)
             .WithMeteringPointType(MeteringPointType.Consumption)
             .WithPoints(new()
@@ -246,9 +246,9 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
             .PriceAmountIsPresentForPointIndex(1, secondPoint.Price?.ToString(NumberFormatInfo.InvariantInfo));
     }
 
-    private Task<MarketDocumentStream> WriteDocument(OutgoingMessageHeader header, WholesaleCalculationSeries wholesaleCalculationSeries, DocumentFormat documentFormat)
+    private Task<MarketDocumentStream> WriteDocument(OutgoingMessageHeader header, WholesaleServicesSeries wholesaleServicesSeries, DocumentFormat documentFormat)
     {
-        var records = _parser.From(wholesaleCalculationSeries);
+        var records = _parser.From(wholesaleServicesSeries);
 
         if (documentFormat == DocumentFormat.Xml)
         {

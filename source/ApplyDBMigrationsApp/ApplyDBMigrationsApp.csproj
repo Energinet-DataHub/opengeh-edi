@@ -24,7 +24,6 @@ limitations under the License.
   <ItemGroup>
     <PackageReference Include="dbup-sqlserver" Version="5.0.8" />
     <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
     <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.6.40">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

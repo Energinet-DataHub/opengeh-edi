@@ -32,36 +32,96 @@ public class OutgoingMessageFactory
     }
 
     /// <summary>
+    /// This method create a single outgoing message, for the receiver, based on the energyResultMessage.
+    /// </summary>
+    /// <param name="energyResultMessage"></param>
+    public OutgoingMessage CreateMessage(EnergyResultMessageDto energyResultMessage)
+    {
+        ArgumentNullException.ThrowIfNull(energyResultMessage);
+        return new OutgoingMessage(
+            energyResultMessage.DocumentType,
+            energyResultMessage.ReceiverId,
+            energyResultMessage.ProcessId,
+            energyResultMessage.BusinessReason,
+            energyResultMessage.ReceiverRole,
+            energyResultMessage.SenderId,
+            energyResultMessage.SenderRole,
+            energyResultMessage.SerializedContent,
+            _systemDateTimeProvider.Now(),
+            energyResultMessage.RelatedToMessageId);
+    }
+
+    /// <summary>
+    /// This method create a single outgoing message, for the receiver, based on the accepted energyResultMessage.
+    /// </summary>
+    /// <param name="acceptedEnergyResultMessage"></param>
+    public OutgoingMessage CreateMessage(AcceptedEnergyResultMessageDto acceptedEnergyResultMessage)
+    {
+        ArgumentNullException.ThrowIfNull(acceptedEnergyResultMessage);
+        return new OutgoingMessage(
+            acceptedEnergyResultMessage.DocumentType,
+            acceptedEnergyResultMessage.ReceiverId,
+            acceptedEnergyResultMessage.ProcessId,
+            acceptedEnergyResultMessage.BusinessReason,
+            acceptedEnergyResultMessage.ReceiverRole,
+            acceptedEnergyResultMessage.SenderId,
+            acceptedEnergyResultMessage.SenderRole,
+            acceptedEnergyResultMessage.SerializedContent,
+            _systemDateTimeProvider.Now(),
+            acceptedEnergyResultMessage.RelatedToMessageId);
+    }
+
+    /// <summary>
+    /// This method create a single outgoing message, for the receiver, based on the rejected energyResultMessage.
+    /// </summary>
+    /// <param name="rejectedEnergyResultMessage"></param>
+    public OutgoingMessage CreateMessage(RejectedEnergyResultMessageDto rejectedEnergyResultMessage)
+    {
+        ArgumentNullException.ThrowIfNull(rejectedEnergyResultMessage);
+        return new OutgoingMessage(
+            rejectedEnergyResultMessage.DocumentType,
+            rejectedEnergyResultMessage.ReceiverId,
+            rejectedEnergyResultMessage.ProcessId,
+            rejectedEnergyResultMessage.BusinessReason,
+            rejectedEnergyResultMessage.ReceiverRole,
+            rejectedEnergyResultMessage.SenderId,
+            rejectedEnergyResultMessage.SenderRole,
+            rejectedEnergyResultMessage.SerializedContent,
+            _systemDateTimeProvider.Now(),
+            rejectedEnergyResultMessage.RelatedToMessageId);
+    }
+
+    /// <summary>
     /// This method creates two outgoing messages, one for the receiver and one for the charge owner, based on the wholesaleResultMessage.
     /// </summary>
-    /// <param name="wholesaleResultMessageDto"></param>
-    public IReadOnlyCollection<OutgoingMessage> CreateMessages(WholesaleResultMessageDto wholesaleResultMessageDto)
+    /// <param name="wholesaleServicesMessageDto"></param>
+    public IReadOnlyCollection<OutgoingMessage> CreateMessages(WholesaleServicesMessageDto wholesaleServicesMessageDto)
     {
-        ArgumentNullException.ThrowIfNull(wholesaleResultMessageDto);
+        ArgumentNullException.ThrowIfNull(wholesaleServicesMessageDto);
         return new List<OutgoingMessage>()
         {
             new(
-                wholesaleResultMessageDto.DocumentType,
-                wholesaleResultMessageDto.ReceiverId,
-                wholesaleResultMessageDto.ProcessId,
-                wholesaleResultMessageDto.BusinessReason,
-                wholesaleResultMessageDto.ReceiverRole,
-                wholesaleResultMessageDto.SenderId,
-                wholesaleResultMessageDto.SenderRole,
-                wholesaleResultMessageDto.SerializedContent,
+                wholesaleServicesMessageDto.DocumentType,
+                wholesaleServicesMessageDto.ReceiverId,
+                wholesaleServicesMessageDto.ProcessId,
+                wholesaleServicesMessageDto.BusinessReason,
+                wholesaleServicesMessageDto.ReceiverRole,
+                wholesaleServicesMessageDto.SenderId,
+                wholesaleServicesMessageDto.SenderRole,
+                wholesaleServicesMessageDto.SerializedContent,
                 _systemDateTimeProvider.Now(),
-                wholesaleResultMessageDto.RelatedToMessageId),
+                wholesaleServicesMessageDto.RelatedToMessageId),
             new(
-                wholesaleResultMessageDto.DocumentType,
-                wholesaleResultMessageDto.ChargeOwnerId,
-                wholesaleResultMessageDto.ProcessId,
-                wholesaleResultMessageDto.BusinessReason,
-                GetChargeOwnerRole(wholesaleResultMessageDto.ChargeOwnerId),
-                wholesaleResultMessageDto.SenderId,
-                wholesaleResultMessageDto.SenderRole,
-                wholesaleResultMessageDto.SerializedContent,
+                wholesaleServicesMessageDto.DocumentType,
+                wholesaleServicesMessageDto.ChargeOwnerId,
+                wholesaleServicesMessageDto.ProcessId,
+                wholesaleServicesMessageDto.BusinessReason,
+                GetChargeOwnerRole(wholesaleServicesMessageDto.ChargeOwnerId),
+                wholesaleServicesMessageDto.SenderId,
+                wholesaleServicesMessageDto.SenderRole,
+                wholesaleServicesMessageDto.SerializedContent,
                 _systemDateTimeProvider.Now(),
-                wholesaleResultMessageDto.RelatedToMessageId),
+                wholesaleServicesMessageDto.RelatedToMessageId),
         };
     }
 

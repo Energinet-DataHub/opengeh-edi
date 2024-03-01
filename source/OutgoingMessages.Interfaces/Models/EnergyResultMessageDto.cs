@@ -28,7 +28,7 @@ public class EnergyResultMessageDto : OutgoingMessageDto
         Guid processId,
         string businessReason,
         ActorRole receiverRole,
-        TimeSeries series,
+        EnergyResultMessageTimeSeries series,
         MessageId? relatedToMessageId = null)
         : base(
             DocumentType.NotifyAggregatedMeasureData,
@@ -44,7 +44,7 @@ public class EnergyResultMessageDto : OutgoingMessageDto
         Series = series;
     }
 
-    public TimeSeries Series { get; }
+    public EnergyResultMessageTimeSeries Series { get; }
 
     public static EnergyResultMessageDto Create(
         ActorNumber receiverNumber,
@@ -65,7 +65,7 @@ public class EnergyResultMessageDto : OutgoingMessageDto
         string? settlementVersion = null,
         MessageId? relatedToMessageId = null)
     {
-        var series = new TimeSeries(
+        var series = new EnergyResultMessageTimeSeries(
             processId,
             gridAreaCode,
             meteringPointType,
@@ -89,7 +89,7 @@ public class EnergyResultMessageDto : OutgoingMessageDto
     }
 }
 
-public record TimeSeries(
+public record EnergyResultMessageTimeSeries(
     Guid TransactionId,
     string GridAreaCode,
     string MeteringPointType,

@@ -29,7 +29,6 @@ limitations under the License.
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
-        <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.6.40" />
         <PackageReference Include="xunit" Version="2.6.2" />
         <PackageReference Include="xunit.categories" Version="2.0.8" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
@@ -55,15 +54,15 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj" />
+      <ProjectReference Include="..\IntegrationEvents\IntegrationEvents.Infrastructure\IntegrationEvents.Infrastructure.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Application\OutgoingMessages.Application.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Domain\OutgoingMessages.Domain.csproj" />
-      <ProjectReference Include="..\Api\Api.csproj" />
-      <ProjectReference Include="..\ApplyDBMigrationsApp\ApplyDBMigrationsApp.csproj" />
       <ProjectReference Include="..\B2CWebApi\B2CWebApi.csproj" />
-      <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
       <ProjectReference Include="..\Process.Application\Process.Application.csproj" />
       <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj" />
+      <ProjectReference Include="..\RequestResponse\source\RequestResponse\RequestResponse.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -98,15 +97,6 @@ limitations under the License.
       <None Remove="CimMessageAdapter\Messages\xml\RequestChangeAccountingPointCharacteristics.xml" />
       <None Remove="CimMessageAdapter\Messages\xml\RequestChangeCustomerCharacteristics.xml" />
       <None Remove="CimMessageAdapter\Messages\json\AggregatedMeasure\Request Aggregated Measure Data.json" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Remove="Domain\OutgoingMessages\BundleTests.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Domain\OutgoingMessages\Queueing\" />
-      <ProjectReference Include="..\Process.Application\Process.Application.csproj" />
     </ItemGroup>
 
 </Project>

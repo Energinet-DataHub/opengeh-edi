@@ -63,6 +63,7 @@ limitations under the License.
       <ProjectReference Include="..\ApplyDBMigrationsApp\ApplyDBMigrationsApp.csproj" />
       <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj"/>
       <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj" />
+      <ProjectReference Include="..\RequestResponse\source\RequestResponse\RequestResponse.csproj" />
     </ItemGroup>
 
     <ItemGroup>

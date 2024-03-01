@@ -21,9 +21,9 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.Edi.Responses;
 using Xunit;
@@ -73,9 +73,9 @@ public class WhenARejectedResultIsAvailableTests : TestBase
             .HasRelationTo(process.InitiatedByMessageId)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
-            .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons.First().ErrorCode, rejectReason.ErrorCode)
-            .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.RejectReasons.Last().ErrorCode, rejectReason2.ErrorCode)
-            .HasMessageRecordValue<RejectedTimeSerie>(timeSerie => timeSerie.OriginalTransactionIdReference, process.BusinessTransactionId.Id);
+            .HasMessageRecordValue<RejectedEnergyResultMessageSerie>(timeSerie => timeSerie.RejectReasons.First().ErrorCode, rejectReason.ErrorCode)
+            .HasMessageRecordValue<RejectedEnergyResultMessageSerie>(timeSerie => timeSerie.RejectReasons.Last().ErrorCode, rejectReason2.ErrorCode)
+            .HasMessageRecordValue<RejectedEnergyResultMessageSerie>(timeSerie => timeSerie.OriginalTransactionIdReference, process.BusinessTransactionId.Id);
     }
 
     protected override void Dispose(bool disposing)
