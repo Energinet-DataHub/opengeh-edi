@@ -14,25 +14,22 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using NodaTime;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 
-namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
 
-// TODO: what is this?
-[Serializable]
-public record AggregatedTimeSerie(
-    IReadOnlyCollection<Point> Points,
-    string MeteringPointType,
-    string UnitType,
-    string Resolution,
-    GridAreaDetails GridAreaDetails,
-    long CalculationResultVersion,
-    Instant StartOfPeriod,
-    Instant EndOfPeriod);
+public class AcceptedEnergyResultTimeSerieCommand : InternalCommand
+{
+    [JsonConstructor]
+    public AcceptedEnergyResultTimeSerieCommand(Guid processId, IReadOnlyCollection<AcceptedEnergyResultTimeSerie> aggregatedTimeSeries)
+    {
+        ProcessId = processId;
+        AggregatedTimeSeries = aggregatedTimeSeries;
+    }
 
-[Serializable]
-public record Point(int Position, decimal? Quantity, CalculatedQuantityQuality QuantityQuality, string SampleTime);
+    public Guid ProcessId { get; }
 
-[Serializable]
-public record GridAreaDetails(string GridAreaCode, string OperatorNumber);
+    public IReadOnlyCollection<AcceptedEnergyResultTimeSerie> AggregatedTimeSeries { get; }
+}

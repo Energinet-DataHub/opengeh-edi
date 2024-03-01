@@ -25,26 +25,26 @@ public static class AcceptedEnergyResultMessageDtoFactory
 {
     public static AcceptedEnergyResultMessageDto Create(
         AggregatedMeasureDataProcess aggregatedMeasureDataProcess,
-        AggregatedTimeSerie aggregatedTimeSerie)
+        AcceptedEnergyResultTimeSerie acceptedEnergyResultTimeSerie)
     {
         ArgumentNullException.ThrowIfNull(aggregatedMeasureDataProcess);
-        ArgumentNullException.ThrowIfNull(aggregatedTimeSerie);
+        ArgumentNullException.ThrowIfNull(acceptedEnergyResultTimeSerie);
 
         return AcceptedEnergyResultMessageDto.Create(
             receiverNumber: aggregatedMeasureDataProcess.RequestedByActorId,
             receiverRole: ActorRole.FromCode(aggregatedMeasureDataProcess.RequestedByActorRoleCode),
             processId: aggregatedMeasureDataProcess.ProcessId.Id,
-            gridAreaCode: aggregatedTimeSerie.GridAreaDetails.GridAreaCode,
-            meteringPointType: aggregatedTimeSerie.MeteringPointType,
+            gridAreaCode: acceptedEnergyResultTimeSerie.GridAreaDetails.GridAreaCode,
+            meteringPointType: acceptedEnergyResultTimeSerie.MeteringPointType,
             settlementType: aggregatedMeasureDataProcess.SettlementMethod,
-            measureUnitType: aggregatedTimeSerie.UnitType,
-            resolution: aggregatedTimeSerie.Resolution,
+            measureUnitType: acceptedEnergyResultTimeSerie.UnitType,
+            resolution: acceptedEnergyResultTimeSerie.Resolution,
             energySupplierNumber: aggregatedMeasureDataProcess.EnergySupplierId,
             balanceResponsibleNumber: aggregatedMeasureDataProcess.BalanceResponsibleId,
-            period: new Period(aggregatedTimeSerie.StartOfPeriod, aggregatedTimeSerie.EndOfPeriod),
-            points: AcceptedEnergyResultMessageMapper.MapPoints(aggregatedTimeSerie.Points),
+            period: new Period(acceptedEnergyResultTimeSerie.StartOfPeriod, acceptedEnergyResultTimeSerie.EndOfPeriod),
+            points: AcceptedEnergyResultMessageMapper.MapPoints(acceptedEnergyResultTimeSerie.Points),
             businessReasonName: aggregatedMeasureDataProcess.BusinessReason.Name,
-            calculationResultVersion: aggregatedTimeSerie.CalculationResultVersion,
+            calculationResultVersion: acceptedEnergyResultTimeSerie.CalculationResultVersion,
             settlementVersion: aggregatedMeasureDataProcess.SettlementVersion?.Name,
             relatedToMessageId: aggregatedMeasureDataProcess.InitiatedByMessageId,
             originalTransactionIdReference: aggregatedMeasureDataProcess.BusinessTransactionId.Id);

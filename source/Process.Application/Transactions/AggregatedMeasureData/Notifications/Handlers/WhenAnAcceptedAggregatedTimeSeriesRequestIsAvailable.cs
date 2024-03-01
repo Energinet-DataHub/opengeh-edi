@@ -33,6 +33,6 @@ public class WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable : INotificatio
     public Task Handle(AggregatedTimeSerieRequestWasAccepted notification, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(notification);
-        return _commandSchedulerFacade.EnqueueAsync(new AcceptedAggregatedTimeSerie(notification.ProcessId, notification.AggregatedTimeSeries));
+        return _commandSchedulerFacade.EnqueueAsync(new AcceptedEnergyResultTimeSerieCommand(notification.ProcessId, notification.AggregatedTimeSeries));
     }
 }

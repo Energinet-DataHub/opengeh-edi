@@ -48,10 +48,10 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
 
         ArgumentNullException.ThrowIfNull(aggregations);
 
-        var aggregatedTimeSeries = new List<AggregatedTimeSerie>();
+        var aggregatedTimeSeries = new List<AcceptedEnergyResultTimeSerie>();
         foreach (var aggregation in aggregations.Series)
         {
-            aggregatedTimeSeries.Add(new AggregatedTimeSerie(
+            aggregatedTimeSeries.Add(new AcceptedEnergyResultTimeSerie(
                 MapPoints(aggregation.TimeSeriesPoints),
                 MapMeteringPointType(aggregation.TimeSeriesType),
                 MapUnitType(aggregation.QuantityUnit),
