@@ -35,7 +35,7 @@ limitations under the License.
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Timer" Version="4.2.0" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.16.4" OutputItemType="Analyzer" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.20.1" />
-		<PackageReference Include="Energinet.DataHub.Core.Messaging" Version="3.2.0" />
+		<PackageReference Include="Energinet.DataHub.Core.Messaging" Version="3.3.1" />
 		        <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.6.40">
 		<PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
