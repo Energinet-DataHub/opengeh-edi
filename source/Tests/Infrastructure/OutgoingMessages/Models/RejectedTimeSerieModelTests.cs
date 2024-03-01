@@ -14,7 +14,7 @@
 
 using System.Linq;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Xunit;
 using RejectReasonOutgoing = Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestAggregatedMeasureData.RejectReason;
 
@@ -26,7 +26,7 @@ public class RejectedTimeSerieModelTests
     public void RejectedTimeSerie_has_the_same_attributes_as_RejectedTimeSerieMarketActivityRecord()
     {
         var rejectReasonsAttributeName = "RejectReasons";
-        var propertyInfOfRejectedTimeSerie = typeof(RejectedTimeSerie).GetProperties().Select(p => new { Name = p.Name, PropertyType = p.PropertyType.ToString() }).ToList();
+        var propertyInfOfRejectedTimeSerie = typeof(RejectedEnergyResultMessageSerie).GetProperties().Select(p => new { Name = p.Name, PropertyType = p.PropertyType.ToString() }).ToList();
         var propertyInfOfRejectedTimeSerieMarketActivityRecord = typeof(RejectedTimeSerieMarketActivityRecord).GetProperties().Select(p => new { Name = p.Name, PropertyType = p.PropertyType.ToString() }).ToList();
 
         // RejectReasons are duplicated, hence we ignore them in the comparison of rejectedtimeserie and rejectedtimeseremarketactivityrecord

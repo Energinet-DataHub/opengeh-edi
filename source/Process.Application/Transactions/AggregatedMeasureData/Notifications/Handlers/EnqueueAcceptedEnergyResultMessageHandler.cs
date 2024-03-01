@@ -15,24 +15,24 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
-using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers;
 
-public class WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable : INotificationHandler<AggregatedTimeSerieRequestWasAccepted>
+public class EnqueueAcceptedEnergyResultMessageHandler : INotificationHandler<EnqueueAcceptedEnergyResultMessageEvent>
 {
-    private readonly CommandSchedulerFacade _commandSchedulerFacade;
+    private readonly IOutgoingMessagesClient _outgoingMessagesClient;
 
-    public WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable(CommandSchedulerFacade commandSchedulerFacade)
+    public EnqueueAcceptedEnergyResultMessageHandler(IOutgoingMessagesClient outgoingMessagesClient)
     {
-        _commandSchedulerFacade = commandSchedulerFacade;
+        _outgoingMessagesClient = outgoingMessagesClient;
     }
 
-    public Task Handle(AggregatedTimeSerieRequestWasAccepted notification, CancellationToken cancellationToken)
+    public async Task Handle(EnqueueAcceptedEnergyResultMessageEvent notification, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(notification);
-        return _commandSchedulerFacade.EnqueueAsync(new AcceptedEnergyResultTimeSerieCommand(notification.ProcessId, notification.AggregatedTimeSeries));
+        await _outgoingMessagesClient.EnqueueAsync(notification.AcceptedEnergyResultMessage, cancellationToken).ConfigureAwait(false);
     }
 }

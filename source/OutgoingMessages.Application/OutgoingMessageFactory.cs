@@ -32,6 +32,66 @@ public class OutgoingMessageFactory
     }
 
     /// <summary>
+    /// This method create a single outgoing message, for the receiver, based on the energyResultMessage.
+    /// </summary>
+    /// <param name="energyResultMessage"></param>
+    public OutgoingMessage CreateMessage(EnergyResultMessageDto energyResultMessage)
+    {
+        ArgumentNullException.ThrowIfNull(energyResultMessage);
+        return new OutgoingMessage(
+            energyResultMessage.DocumentType,
+            energyResultMessage.ReceiverId,
+            energyResultMessage.ProcessId,
+            energyResultMessage.BusinessReason,
+            energyResultMessage.ReceiverRole,
+            energyResultMessage.SenderId,
+            energyResultMessage.SenderRole,
+            energyResultMessage.SerializedContent,
+            _systemDateTimeProvider.Now(),
+            energyResultMessage.RelatedToMessageId);
+    }
+
+    /// <summary>
+    /// This method create a single outgoing message, for the receiver, based on the accepted energyResultMessage.
+    /// </summary>
+    /// <param name="acceptedEnergyResultMessage"></param>
+    public OutgoingMessage CreateMessage(AcceptedEnergyResultMessageDto acceptedEnergyResultMessage)
+    {
+        ArgumentNullException.ThrowIfNull(acceptedEnergyResultMessage);
+        return new OutgoingMessage(
+            acceptedEnergyResultMessage.DocumentType,
+            acceptedEnergyResultMessage.ReceiverId,
+            acceptedEnergyResultMessage.ProcessId,
+            acceptedEnergyResultMessage.BusinessReason,
+            acceptedEnergyResultMessage.ReceiverRole,
+            acceptedEnergyResultMessage.SenderId,
+            acceptedEnergyResultMessage.SenderRole,
+            acceptedEnergyResultMessage.SerializedContent,
+            _systemDateTimeProvider.Now(),
+            acceptedEnergyResultMessage.RelatedToMessageId);
+    }
+
+    /// <summary>
+    /// This method create a single outgoing message, for the receiver, based on the rejected energyResultMessage.
+    /// </summary>
+    /// <param name="rejectedEnergyResultMessage"></param>
+    public OutgoingMessage CreateMessage(RejectedEnergyResultMessageDto rejectedEnergyResultMessage)
+    {
+        ArgumentNullException.ThrowIfNull(rejectedEnergyResultMessage);
+        return new OutgoingMessage(
+            rejectedEnergyResultMessage.DocumentType,
+            rejectedEnergyResultMessage.ReceiverId,
+            rejectedEnergyResultMessage.ProcessId,
+            rejectedEnergyResultMessage.BusinessReason,
+            rejectedEnergyResultMessage.ReceiverRole,
+            rejectedEnergyResultMessage.SenderId,
+            rejectedEnergyResultMessage.SenderRole,
+            rejectedEnergyResultMessage.SerializedContent,
+            _systemDateTimeProvider.Now(),
+            rejectedEnergyResultMessage.RelatedToMessageId);
+    }
+
+    /// <summary>
     /// This method creates two outgoing messages, one for the receiver and one for the charge owner, based on the wholesaleResultMessage.
     /// </summary>
     /// <param name="wholesaleResultMessageDto"></param>

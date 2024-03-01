@@ -19,24 +19,24 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using NodaTime.Text;
 using Xunit;
 using Xunit.Categories;
+using RejectReason = Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.RejectReason;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.AggregatedMeasureData;
 
 [IntegrationTest]
-public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
+public class EnergyResultResponseFromWholesaleTests : TestBase
 {
     private readonly ProcessContext _processContext;
 
-    public AggregatedMeasureDataResponseFromWholesaleTests(IntegrationTestFixture integrationTestFixture)
+    public EnergyResultResponseFromWholesaleTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
     {
         _processContext = GetService<ProcessContext>();
@@ -50,10 +50,10 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
         process!.WasSentToWholesale();
-        var aggregationResultMessage = CreateAggregationResultMessage(process);
+        var aggregationResultMessage = CreateAcceptedEnergyResultMessageDtoMessage(process);
 
         // Act
-        process.IsAccepted(new List<AggregationResultMessage> { aggregationResultMessage });
+        process.IsAccepted(new List<AcceptedEnergyResultMessageDto> { aggregationResultMessage });
 
         // Assert
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);
@@ -67,17 +67,17 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
         process!.WasSentToWholesale();
-        var firstAggregationResultMessage = CreateAggregationResultMessage(process);
-        var secondAggregationResultMessage = CreateAggregationResultMessage(process, gridarea: "808");
+        var firstAggregationResultMessage = CreateAcceptedEnergyResultMessageDtoMessage(process);
+        var secondAggregationResultMessage = CreateAcceptedEnergyResultMessageDtoMessage(process, gridarea: "808");
 
         // Act
-        process.IsAccepted(new List<AggregationResultMessage> { firstAggregationResultMessage, secondAggregationResultMessage });
+        process.IsAccepted(new List<AcceptedEnergyResultMessageDto> { firstAggregationResultMessage, secondAggregationResultMessage });
 
         // Assert
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);
-        Assert.Contains(process.DomainEvents, x => x is EnqueueMessageEvent);
+        Assert.Contains(process.DomainEvents, x => x is EnqueueAcceptedEnergyResultMessageEvent);
         Assert.All(process.DomainEvents, x
-            => Assert.Equal(typeof(EnqueueMessageEvent), x.GetType()));
+            => Assert.Equal(typeof(EnqueueAcceptedEnergyResultMessageEvent), x.GetType()));
         Assert.Equal(2, process.DomainEvents.Count);
     }
 
@@ -89,15 +89,15 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
         process!.WasSentToWholesale();
-        var aggregationResultMessage = CreateAggregationResultMessage(process);
+        var aggregationResultMessage = CreateAcceptedEnergyResultMessageDtoMessage(process);
 
         // Act
-        process.IsAccepted(new List<AggregationResultMessage> { aggregationResultMessage });
-        process.IsAccepted(new List<AggregationResultMessage> { aggregationResultMessage });
+        process.IsAccepted(new List<AcceptedEnergyResultMessageDto> { aggregationResultMessage });
+        process.IsAccepted(new List<AcceptedEnergyResultMessageDto> { aggregationResultMessage });
 
         // Assert
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);
-        Assert.Contains(process.DomainEvents, x => x is EnqueueMessageEvent);
+        Assert.Contains(process.DomainEvents, x => x is EnqueueAcceptedEnergyResultMessageEvent);
     }
 
     [Fact]
@@ -115,7 +115,7 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
 
         // Assert
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Rejected);
-        Assert.Contains(process.DomainEvents, x => x is EnqueueMessageEvent);
+        Assert.Contains(process.DomainEvents, x => x is EnqueueRejectedEnergyResultMessageEvent);
     }
 
     [Fact]
@@ -134,7 +134,7 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
 
         // Assert
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Rejected);
-        Assert.Contains(process.DomainEvents, x => x is EnqueueMessageEvent);
+        Assert.Contains(process.DomainEvents, x => x is EnqueueRejectedEnergyResultMessageEvent);
     }
 
     protected override void Dispose(bool disposing)
@@ -148,17 +148,17 @@ public class AggregatedMeasureDataResponseFromWholesaleTests : TestBase
         return new RequestAggregatedMeasureDataMarketDocumentBuilder();
     }
 
-    private static AggregationResultMessage CreateAggregationResultMessage(
+    private static AcceptedEnergyResultMessageDto CreateAcceptedEnergyResultMessageDtoMessage(
         AggregatedMeasureDataProcess process,
         string gridarea = "805")
     {
-        var points = new List<Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point>()
+        var points = new List<AcceptedEnergyResultMessagePoint>()
         {
             new(1, 2, CalculatedQuantityQuality.Calculated, process.StartOfPeriod),
             new(2, 3, CalculatedQuantityQuality.Calculated, process.EndOfPeriod!),
         };
 
-        return AggregationResultMessage.Create(
+        return AcceptedEnergyResultMessageDto.Create(
             process.RequestedByActorId,
             ActorRole.FromCode(process.RequestedByActorRoleCode),
             process.ProcessId.Id,

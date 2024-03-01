@@ -21,7 +21,7 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasu
 
 public class AggregatedTimeSerieRequestWasAccepted : INotification
 {
-    public AggregatedTimeSerieRequestWasAccepted(Guid processId, IReadOnlyCollection<AggregatedTimeSerie> aggregatedTimeSeries)
+    public AggregatedTimeSerieRequestWasAccepted(Guid processId, IReadOnlyCollection<AcceptedEnergyResultTimeSerie> aggregatedTimeSeries)
     {
         ProcessId = processId;
         AggregatedTimeSeries = aggregatedTimeSeries;
@@ -29,5 +29,5 @@ public class AggregatedTimeSerieRequestWasAccepted : INotification
 
     public Guid ProcessId { get; }
 
-    public IReadOnlyCollection<AggregatedTimeSerie> AggregatedTimeSeries { get; }
+    public IReadOnlyCollection<AcceptedEnergyResultTimeSerie> AggregatedTimeSeries { get; }
 }

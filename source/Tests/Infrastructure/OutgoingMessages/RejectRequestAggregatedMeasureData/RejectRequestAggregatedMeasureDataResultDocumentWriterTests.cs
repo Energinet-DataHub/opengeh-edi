@@ -31,13 +31,13 @@ public class RejectRequestAggregatedMeasureDataResultDocumentWriterTests : IClas
 {
     private readonly DocumentValidationFixture _documentValidation;
     private readonly MessageRecordParser _parser;
-    private readonly RejectedTimeSeriesBuilder _rejectedTimeSeries;
+    private readonly RejectedEnergyResultMessageSerieBuilder _rejectedEnergyResultMessageSerie;
 
     public RejectRequestAggregatedMeasureDataResultDocumentWriterTests(DocumentValidationFixture documentValidation)
     {
         _documentValidation = documentValidation;
         _parser = new MessageRecordParser(new Serializer());
-        _rejectedTimeSeries = RejectedTimeSeriesBuilder
+        _rejectedEnergyResultMessageSerie = RejectedEnergyResultMessageSerieBuilder
             .RejectAggregatedMeasureDataResult();
     }
 
@@ -48,7 +48,7 @@ public class RejectRequestAggregatedMeasureDataResultDocumentWriterTests : IClas
     public async Task Can_create_document(string documentFormat)
     {
         var marketDocumentStream = await CreateDocument(
-                _rejectedTimeSeries,
+                _rejectedEnergyResultMessageSerie,
                 DocumentFormat.From(documentFormat));
 
         await AssertDocument(marketDocumentStream.Stream, DocumentFormat.From(documentFormat))
@@ -65,7 +65,7 @@ public class RejectRequestAggregatedMeasureDataResultDocumentWriterTests : IClas
             .DocumentIsValidAsync();
     }
 
-    private Task<MarketDocumentStream> CreateDocument(RejectedTimeSeriesBuilder resultBuilder, DocumentFormat documentFormat)
+    private Task<MarketDocumentStream> CreateDocument(RejectedEnergyResultMessageSerieBuilder resultBuilder, DocumentFormat documentFormat)
     {
         var documentHeader = resultBuilder.BuildHeader();
         var records = _parser.From(resultBuilder.BuildRejectedTimeSerie());

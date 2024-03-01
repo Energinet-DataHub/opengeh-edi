@@ -20,7 +20,7 @@ using NodaTime;
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 
 [Serializable]
-public record AggregatedTimeSerie(
+public record AcceptedEnergyResultTimeSerie(
     IReadOnlyCollection<Point> Points,
     string MeteringPointType,
     string UnitType,

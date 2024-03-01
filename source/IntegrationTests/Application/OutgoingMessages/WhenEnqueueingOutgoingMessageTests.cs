@@ -39,7 +39,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
 public class WhenEnqueueingOutgoingMessageTests : TestBase
 {
-    private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
+    private readonly EnergyResultMessageDtoBuilder _energyResultMessageDtoBuilder;
     private readonly SystemDateTimeProviderStub _systemDateTimeProvider;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ActorMessageQueueContext _context;
@@ -48,7 +48,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     public WhenEnqueueingOutgoingMessageTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
     {
-        _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
+        _energyResultMessageDtoBuilder = new EnergyResultMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
         _fileStorageClient = GetService<IFileStorageClient>();
         _systemDateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
@@ -59,7 +59,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     public async Task Outgoing_message_is_added_to_database_with_correct_values()
     {
         // Arrange
-        var message = _outgoingMessageDtoBuilder
+        var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
             .WithRelationTo(MessageId.New())
             .Build();
@@ -110,7 +110,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     [Fact]
     public async Task Can_peek_message()
     {
-        var message = _outgoingMessageDtoBuilder.Build();
+        var message = _energyResultMessageDtoBuilder.Build();
         await EnqueueAndCommitAsync(message);
 
         var result = await _outgoingMessagesClient.PeekAndCommitAsync(
@@ -127,10 +127,10 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     [Fact]
     public async Task Can_peek_oldest_bundle()
     {
-        var message = _outgoingMessageDtoBuilder.Build();
+        var message = _energyResultMessageDtoBuilder.Build();
         await EnqueueAndCommitAsync(message);
         _systemDateTimeProvider.SetNow(_systemDateTimeProvider.Now().PlusSeconds(1));
-        var message2 = _outgoingMessageDtoBuilder.Build();
+        var message2 = _energyResultMessageDtoBuilder.Build();
         await EnqueueAndCommitAsync(message2);
 
         var result = await _outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(message.ReceiverId, message.DocumentType.Category, message.ReceiverRole, DocumentFormat.Ebix), CancellationToken.None);
@@ -146,7 +146,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     [Fact]
     public async Task Can_dequeue_bundle()
     {
-        var message = _outgoingMessageDtoBuilder.Build();
+        var message = _energyResultMessageDtoBuilder.Build();
         await EnqueueAndCommitAsync(message);
         var peekRequestDto = new PeekRequestDto(
             message.ReceiverId,
@@ -170,7 +170,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         // Arrange
         var actorMessageQueueId = Guid.NewGuid();
         var existingBundleId = Guid.NewGuid();
-        var message = _outgoingMessageDtoBuilder
+        var message = _energyResultMessageDtoBuilder
             .Build();
         await CreateActorMessageQueueInDatabase(actorMessageQueueId, message.ReceiverId, message.ReceiverRole);
         await CreateBundleInDatabase(existingBundleId, actorMessageQueueId, message.DocumentType, message.BusinessReason);
@@ -188,7 +188,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     public async Task Outgoing_message_record_is_added_to_file_storage_with_correct_content()
     {
         // Arrange
-        var message = _outgoingMessageDtoBuilder
+        var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
             .Build();
 
@@ -206,7 +206,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     public async Task Uploading_duplicate_outgoing_message_to_file_storage_throws_exception()
     {
         // Arrange
-        var message = _outgoingMessageDtoBuilder
+        var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
             .Build();
 
@@ -233,17 +233,17 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var message2RelatedTo = MessageId.New();
         var message3RelatedTo = MessageId.New();
 
-        var message1 = _outgoingMessageDtoBuilder
+        var message1 = _energyResultMessageDtoBuilder
             .WithReceiverNumber(receiverId.Value)
             .WithReceiverRole(receiverRole)
             .WithRelationTo(message1RelatedTo)
             .Build();
-        var message2 = _outgoingMessageDtoBuilder
+        var message2 = _energyResultMessageDtoBuilder
             .WithReceiverNumber(receiverId.Value)
             .WithReceiverRole(receiverRole)
             .WithRelationTo(message2RelatedTo)
             .Build();
-        var message3 = _outgoingMessageDtoBuilder
+        var message3 = _energyResultMessageDtoBuilder
             .WithReceiverNumber(receiverId.Value)
             .WithReceiverRole(receiverRole)
             .WithRelationTo(message3RelatedTo)
@@ -288,7 +288,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var maxMessageCount = 2;
         var messageRelatedTo = MessageId.New();
 
-        var message = _outgoingMessageDtoBuilder
+        var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(receiverId.Value)
             .WithReceiverRole(receiverRole)
             .WithRelationTo(messageRelatedTo)
@@ -341,12 +341,9 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         return assignedBundleId;
     }
 
-    private async Task<OutgoingMessageId> EnqueueAndCommitAsync(OutgoingMessageDto message)
+    private async Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultMessageDto message)
     {
-        var outgoingMessageId = await _outgoingMessagesClient.EnqueueAsync(message);
-        await _context.SaveChangesAsync();
-
-        return outgoingMessageId;
+        return await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
     }
 
     private async Task CreateActorMessageQueueInDatabase(Guid id, ActorNumber actorNumber, ActorRole actorRole)

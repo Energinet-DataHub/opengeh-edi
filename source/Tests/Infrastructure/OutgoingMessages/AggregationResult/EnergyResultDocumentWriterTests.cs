@@ -19,31 +19,30 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions;
 using Xunit;
-using Point = Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.AggregationResult;
 
-public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValidationFixture>
+public class EnergyResultDocumentWriterTests : IClassFixture<DocumentValidationFixture>
 {
     private readonly DocumentValidationFixture _documentValidation;
     private readonly MessageRecordParser _parser;
-    private readonly TimeSeriesBuilder _timeSeries;
+    private readonly EnergyResultMessageTimeSeriesBuilder _energyResultMessageTimeSeries;
 
-    public AggregationResultDocumentWriterTests(
+    public EnergyResultDocumentWriterTests(
         DocumentValidationFixture documentValidation)
     {
         _documentValidation = documentValidation;
         _parser = new MessageRecordParser(new Serializer());
-        _timeSeries = TimeSeriesBuilder
+        _energyResultMessageTimeSeries = EnergyResultMessageTimeSeriesBuilder
             .AggregationResult();
     }
 
@@ -54,7 +53,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     public async Task Can_create_document(string documentFormat)
     {
         var document = await CreateDocument(
-                _timeSeries
+                _energyResultMessageTimeSeries
                     .WithMessageId(SampleData.MessageId)
                     .WithTimestamp(SampleData.Timestamp)
                     .WithSender(SampleData.SenderId, SampleData.SenderRole)
@@ -64,7 +63,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
                     .WithBalanceResponsibleNumber(SampleData.BalanceResponsibleNumber)
                     .WithEnergySupplierNumber(SampleData.EnergySupplierNumber)
                     .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
-                    .WithPoint(new Point(1, 1m, CalculatedQuantityQuality.Calculated, "2022-12-12T23:00:00Z"))
+                    .WithPoint(new EnergyResultMessagePoint(1, 1m, CalculatedQuantityQuality.Calculated, "2022-12-12T23:00:00Z"))
                     .WithOriginalTransactionIdReference(SampleData.OriginalTransactionIdReference)
                     .WithSettlementMethod(SettlementType.NonProfiled),
                 DocumentFormat.From(documentFormat));
@@ -94,10 +93,10 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     [InlineData(nameof(DocumentFormat.Json))]
     public async Task Point_quantity_element_is_excluded_if_no_value(string documentFormat)
     {
-        _timeSeries
-            .WithPoint(new Point(1, null, CalculatedQuantityQuality.Missing, "2022-12-12T23:00:00Z"));
+        _energyResultMessageTimeSeries
+            .WithPoint(new EnergyResultMessagePoint(1, null, CalculatedQuantityQuality.Missing, "2022-12-12T23:00:00Z"));
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
+        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.From(documentFormat));
 
         AssertDocument(document, DocumentFormat.From(documentFormat))
             .QuantityIsNotPresentForPosition(1);
@@ -109,10 +108,10 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     public async Task Quality_element_is_excluded_if_edi_quantity_quality_is_measured(
         string documentFormat)
     {
-        _timeSeries
-            .WithPoint(new Point(1, 1, CalculatedQuantityQuality.Measured, "2022-12-12T23:00:00Z"));
+        _energyResultMessageTimeSeries
+            .WithPoint(new EnergyResultMessagePoint(1, 1, CalculatedQuantityQuality.Measured, "2022-12-12T23:00:00Z"));
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
+        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.From(documentFormat));
 
         AssertDocument(document, DocumentFormat.From(documentFormat))
             .QualityIsNotPresentForPosition(1);
@@ -127,12 +126,12 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .Cast<CalculatedQuantityQuality>()
             .Order()
             .Where(x => x != CalculatedQuantityQuality.Measured)
-            .Select((quality, index) => new Point(index, 1, quality, "2022-12-12T23:00:00Z"))
+            .Select((quality, index) => new EnergyResultMessagePoint(index, 1, quality, "2022-12-12T23:00:00Z"))
             .ToList();
 
-        points.ForEach(point => _timeSeries.WithPoint(point));
+        points.ForEach(point => _energyResultMessageTimeSeries.WithPoint(point));
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
+        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.From(documentFormat));
 
         // Assert
         points.Should().HaveCount(5);
@@ -149,13 +148,13 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     public async Task Quality_element_is_excluded_if_edi_quantity_quality_is_missing_or_not_available(
         string documentFormat)
     {
-        _timeSeries
-            .WithPoint(new Point(1, 1, CalculatedQuantityQuality.Missing, "2022-12-12T23:00:00Z"));
+        _energyResultMessageTimeSeries
+            .WithPoint(new EnergyResultMessagePoint(1, 1, CalculatedQuantityQuality.Missing, "2022-12-12T23:00:00Z"));
 
-        _timeSeries
-            .WithPoint(new Point(2, 1, CalculatedQuantityQuality.NotAvailable, "2022-12-12T23:01:00Z"));
+        _energyResultMessageTimeSeries
+            .WithPoint(new EnergyResultMessagePoint(2, 1, CalculatedQuantityQuality.NotAvailable, "2022-12-12T23:01:00Z"));
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
+        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.From(documentFormat));
 
         // Assert
         AssertDocument(document, DocumentFormat.From(documentFormat))
@@ -172,12 +171,12 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .Order()
             .Where(x => x != CalculatedQuantityQuality.Missing)
             .Where(x => x != CalculatedQuantityQuality.NotAvailable)
-            .Select((quality, index) => new Point(index, 1, quality, "2022-12-12T23:00:00Z"))
+            .Select((quality, index) => new EnergyResultMessagePoint(index, 1, quality, "2022-12-12T23:00:00Z"))
             .ToList();
 
-        points.ForEach(point => _timeSeries.WithPoint(point));
+        points.ForEach(point => _energyResultMessageTimeSeries.WithPoint(point));
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
+        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.From(documentFormat));
 
         // Assert
         points.Should().HaveCount(4);
@@ -194,11 +193,11 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     [InlineData(nameof(DocumentFormat.Json))]
     public async Task Settlement_method_is_excluded(string documentFormat)
     {
-        _timeSeries
+        _energyResultMessageTimeSeries
             .WithMeteringPointType(MeteringPointType.Production)
             .WithSettlementMethod(null);
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
+        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.From(documentFormat));
 
         AssertDocument(document, DocumentFormat.From(documentFormat))
             .SettlementMethodIsNotPresent();
@@ -210,10 +209,10 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     [InlineData(nameof(DocumentFormat.Json))]
     public async Task Energy_supplier_number_is_excluded(string documentFormat)
     {
-        _timeSeries
+        _energyResultMessageTimeSeries
             .WithEnergySupplierNumber(null);
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
+        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.From(documentFormat));
 
         AssertDocument(document, DocumentFormat.From(documentFormat))
             .EnergySupplierNumberIsNotPresent();
@@ -225,10 +224,10 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     [InlineData(nameof(DocumentFormat.Json))]
     public async Task Balance_responsible_number_is_excluded(string documentFormat)
     {
-        _timeSeries
+        _energyResultMessageTimeSeries
             .WithBalanceResponsibleNumber(null);
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
+        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.From(documentFormat));
 
         AssertDocument(document, DocumentFormat.From(documentFormat))
             .BalanceResponsibleNumberIsNotPresent();
@@ -243,9 +242,9 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     [InlineData(nameof(DocumentFormat.Json), nameof(BusinessReason.BalanceFixing))]
     public async Task Business_reason_is_translated(string documentFormat, string processType)
     {
-        _timeSeries.WithBusinessReason(BusinessReason.FromName(processType));
+        _energyResultMessageTimeSeries.WithBusinessReason(BusinessReason.FromName(processType));
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
+        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.From(documentFormat));
 
         AssertDocument(document, DocumentFormat.From(documentFormat))
             .HasBusinessReason(BusinessReason.FromName(processType))
@@ -258,15 +257,15 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     [InlineData(nameof(DocumentFormat.Json), nameof(BusinessReason.Correction), nameof(SettlementVersion.FirstCorrection))]
     public async Task Business_reason_and_settlement_version_is_translated(string documentFormat, string processType, string settlementVersion)
     {
-        _timeSeries
+        _energyResultMessageTimeSeries
             .WithMessageId(SampleData.MessageId)
             .WithTransactionId(SampleData.TransactionId)
             .WithBusinessReason(BusinessReason.FromName(processType))
             .WithSettlementVersion(SettlementVersion.FromName(settlementVersion))
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
-            .WithPoint(new Point(1, 1m, CalculatedQuantityQuality.Calculated, "2022-12-12T23:00:00Z"));
+            .WithPoint(new EnergyResultMessagePoint(1, 1m, CalculatedQuantityQuality.Calculated, "2022-12-12T23:00:00Z"));
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
+        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.From(documentFormat));
 
         await AssertDocument(document, DocumentFormat.From(documentFormat))
             .HasBusinessReason(BusinessReason.FromName(processType))
@@ -274,7 +273,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .DocumentIsValidAsync();
     }
 
-    private Task<MarketDocumentStream> CreateDocument(TimeSeriesBuilder resultBuilder, DocumentFormat documentFormat)
+    private Task<MarketDocumentStream> CreateDocument(EnergyResultMessageTimeSeriesBuilder resultBuilder, DocumentFormat documentFormat)
     {
         var documentHeader = resultBuilder.BuildHeader();
         var records = _parser.From(resultBuilder.BuildTimeSeries());

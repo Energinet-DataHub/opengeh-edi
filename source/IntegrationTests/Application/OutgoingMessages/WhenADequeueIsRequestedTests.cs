@@ -29,13 +29,13 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
 public class WhenADequeueIsRequestedTests : TestBase
 {
-    private readonly OutgoingMessageDtoBuilder _outgoingMessageDtoBuilder;
+    private readonly EnergyResultMessageDtoBuilder _energyResultMessageDtoBuilder;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
 
     public WhenADequeueIsRequestedTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
     {
-        _outgoingMessageDtoBuilder = new OutgoingMessageDtoBuilder();
+        _energyResultMessageDtoBuilder = new EnergyResultMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
     }
 
@@ -51,7 +51,7 @@ public class WhenADequeueIsRequestedTests : TestBase
     public async Task Dequeue_unknown_message_id_is_unsuccessful_when_actor_has_a_queue()
     {
         var unknownMessageId = Guid.NewGuid().ToString();
-        var enqueueMessageEvent = _outgoingMessageDtoBuilder
+        var enqueueMessageEvent = _energyResultMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
             .WithReceiverRole(ActorRole.EnergySupplier)
             .Build();
@@ -64,7 +64,7 @@ public class WhenADequeueIsRequestedTests : TestBase
     [Fact]
     public async Task Dequeue_is_Successful()
     {
-        var enqueueMessageEvent = _outgoingMessageDtoBuilder
+        var enqueueMessageEvent = _energyResultMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
             .WithReceiverRole(ActorRole.EnergySupplier)
             .Build();
@@ -86,9 +86,8 @@ public class WhenADequeueIsRequestedTests : TestBase
         Assert.True(found);
     }
 
-    private async Task EnqueueMessage(OutgoingMessageDto message)
+    private async Task EnqueueMessage(EnergyResultMessageDto message)
     {
-        await _outgoingMessagesClient.EnqueueAsync(message);
-        await GetService<ActorMessageQueueContext>().SaveChangesAsync();
+        await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
     }
 }
