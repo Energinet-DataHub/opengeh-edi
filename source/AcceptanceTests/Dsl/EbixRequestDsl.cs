@@ -144,7 +144,7 @@ internal sealed class EbixRequestDsl
     private static string GetMessageIdForNotifyAggregatedWholesaleServices(peekMessageResponse response)
     {
         var nsmgr = new XmlNamespaceManager(new NameTable());
-        nsmgr.AddNamespace("ns0", "un:unece:260:data:EEM-DK_NotifyAggregatedWholesaleServices:v3");
+        nsmgr.AddNamespace("ns0", "un:unece:260:data:EEM-DK_NotifyAggregatedWholesaleServices");
         var query = "/ns0:HeaderEnergyDocument/ns0:Identification";
         var node = response.MessageContainer.Payload.SelectSingleNode(query, nsmgr);
         return node!.InnerText;

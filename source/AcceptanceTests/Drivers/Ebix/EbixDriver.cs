@@ -186,7 +186,7 @@ internal sealed class EbixDriver : IDisposable
         if (node == null)
         {
             nsmgr = new XmlNamespaceManager(new NameTable());
-            nsmgr.AddNamespace("ns0", "un:unece:260:data:EEM-DK_NotifyAggregatedWholesaleServices:v3");
+            nsmgr.AddNamespace("ns0", "un:unece:260:data:EEM-DK_NotifyAggregatedWholesaleServices");
             query = "/ns0:HeaderEnergyDocument/ns0:Identification";
             node = response.MessageContainer.Payload.SelectSingleNode(query, nsmgr);
         }
