@@ -46,6 +46,8 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
     }
 
     [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
     [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Can_create_notifyWholesaleServices_document(string documentFormat)
     {
