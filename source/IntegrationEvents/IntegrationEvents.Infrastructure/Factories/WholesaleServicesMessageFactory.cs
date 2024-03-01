@@ -22,15 +22,15 @@ using NodaTime.Serialization.Protobuf;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories;
 
-public static class WholesaleResultMessageFactory
+public static class WholesaleServicesMessageFactory
 {
-    public static WholesaleResultMessageDto CreateMessage(AmountPerChargeResultProducedV1 amountPerChargeResultProducedV1)
+    public static WholesaleServicesMessageDto CreateMessage(AmountPerChargeResultProducedV1 amountPerChargeResultProducedV1)
     {
         ArgumentNullException.ThrowIfNull(amountPerChargeResultProducedV1);
 
         var message = CreateWholesaleResultSeries(amountPerChargeResultProducedV1);
 
-        return WholesaleResultMessageDto.Create(
+        return WholesaleServicesMessageDto.Create(
             receiverNumber: message.EnergySupplier,
             receiverRole: ActorRole.EnergySupplier,
             chargeOwnerId: message.ChargeOwner,
@@ -39,13 +39,13 @@ public static class WholesaleResultMessageFactory
             wholesaleSeries: message);
     }
 
-    public static WholesaleResultMessageDto CreateMessage(MonthlyAmountPerChargeResultProducedV1 monthlyAmountPerChargeResultProducedV1)
+    public static WholesaleServicesMessageDto CreateMessage(MonthlyAmountPerChargeResultProducedV1 monthlyAmountPerChargeResultProducedV1)
     {
         ArgumentNullException.ThrowIfNull(monthlyAmountPerChargeResultProducedV1);
 
         var message = CreateWholesaleResultSeries(monthlyAmountPerChargeResultProducedV1);
 
-        return WholesaleResultMessageDto.Create(
+        return WholesaleServicesMessageDto.Create(
             receiverNumber: message.EnergySupplier,
             receiverRole: ActorRole.EnergySupplier,
             chargeOwnerId: message.ChargeOwner,
@@ -54,12 +54,12 @@ public static class WholesaleResultMessageFactory
             wholesaleSeries: message);
     }
 
-    private static WholesaleCalculationSeries CreateWholesaleResultSeries(
+    private static WholesaleServicesSeries CreateWholesaleResultSeries(
         MonthlyAmountPerChargeResultProducedV1 message)
     {
         ArgumentNullException.ThrowIfNull(message);
 
-        var wholesaleCalculationSeries = new WholesaleCalculationSeries(
+        var wholesaleCalculationSeries = new WholesaleServicesSeries(
             TransactionId: Guid.NewGuid(),
             CalculationVersion: message.CalculationResultVersion,
             GridAreaCode: message.GridAreaCode,
@@ -67,7 +67,7 @@ public static class WholesaleResultMessageFactory
             IsTax: message.IsTax,
             Points: new[]
             {
-                new WholesaleCalculationPoint(1, null, null, message.Amount != null ? DecimalParser.Parse(message.Amount) : null, null),
+                new WholesaleServicesPoint(1, null, null, message.Amount != null ? DecimalParser.Parse(message.Amount) : null, null),
             },
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
             ChargeOwner: ActorNumber.Create(message.ChargeOwnerId),
@@ -83,12 +83,12 @@ public static class WholesaleResultMessageFactory
         return wholesaleCalculationSeries;
     }
 
-    private static WholesaleCalculationSeries CreateWholesaleResultSeries(
+    private static WholesaleServicesSeries CreateWholesaleResultSeries(
         AmountPerChargeResultProducedV1 message)
     {
         ArgumentNullException.ThrowIfNull(message);
 
-        var wholesaleCalculationSeries = new WholesaleCalculationSeries(
+        var wholesaleCalculationSeries = new WholesaleServicesSeries(
             TransactionId: Guid.NewGuid(),
             CalculationVersion: message.CalculationResultVersion,
             GridAreaCode: message.GridAreaCode,
