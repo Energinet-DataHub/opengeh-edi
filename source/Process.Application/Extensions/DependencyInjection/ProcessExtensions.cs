@@ -47,7 +47,7 @@ public static class ProcessExtensions
 
         //EventsConfiguration
         //TODO: can we move them out and delete ref to Infrastructure?
-        services.AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestAcceptedEventMapper>()
+        services.AddTransient<IInboxEventMapper, EnergyResultTimeSeriesRequestAcceptedEventMapper>()
             .AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestRejectedMapper>();
 
         //ProcessingConfiguration

@@ -32,11 +32,11 @@ using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 
-public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
+public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
 {
     private readonly IMasterDataClient _masterDataClient;
 
-    public AggregatedTimeSeriesRequestAcceptedEventMapper(IMasterDataClient masterDataClient)
+    public EnergyResultTimeSeriesRequestAcceptedEventMapper(IMasterDataClient masterDataClient)
     {
         _masterDataClient = masterDataClient;
     }
@@ -48,10 +48,10 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
 
         ArgumentNullException.ThrowIfNull(aggregations);
 
-        var aggregatedTimeSeries = new List<AcceptedEnergyResultTimeSerie>();
+        var acceptedEnergyResultTimeSeries = new List<AcceptedEnergyResultTimeSerie>();
         foreach (var aggregation in aggregations.Series)
         {
-            aggregatedTimeSeries.Add(new AcceptedEnergyResultTimeSerie(
+            acceptedEnergyResultTimeSeries.Add(new AcceptedEnergyResultTimeSerie(
                 MapPoints(aggregation.TimeSeriesPoints),
                 MapMeteringPointType(aggregation.TimeSeriesType),
                 MapUnitType(aggregation.QuantityUnit),
@@ -64,7 +64,7 @@ public class AggregatedTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
 
         return new AggregatedTimeSerieRequestWasAccepted(
             referenceId,
-            aggregatedTimeSeries);
+            acceptedEnergyResultTimeSeries);
     }
 
     public bool CanHandle(string eventType)
