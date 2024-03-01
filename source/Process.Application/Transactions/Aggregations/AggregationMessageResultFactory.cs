@@ -21,7 +21,6 @@ using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
-using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using NodaTime.Serialization.Protobuf;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
