@@ -32,7 +32,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Configuration;
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
