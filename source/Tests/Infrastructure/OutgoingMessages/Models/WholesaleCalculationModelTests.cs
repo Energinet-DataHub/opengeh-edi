@@ -26,7 +26,7 @@ public class WholesaleCalculationModelTests
     public void WholesaleCalculationSeries_has_the_same_attributes_as_WholesaleCalculationMarketActivityRecord()
     {
         var pointsAttributeName = "Points";
-        var keysOfWholesaleCalculationSeries = typeof(WholesaleCalculationSeries).GetProperties()
+        var keysOfWholesaleCalculationSeries = typeof(WholesaleServicesSeries).GetProperties()
             .Select(p => new { Name = p.Name, PropertyType = p.PropertyType })
             .Where(p => p.Name != pointsAttributeName).ToList();
         var keysOfWholesaleCalculationMarketActivityRecord = typeof(WholesaleCalculationMarketActivityRecord).GetProperties()
@@ -43,9 +43,9 @@ public class WholesaleCalculationModelTests
     [Fact]
     public void WholesaleCalculationSeries_point_has_the_same_attributes_as_WholesaleCalculationMarketActivityRecord_point()
     {
-        var keysOfWholesaleCalculationSeries = typeof(WholesaleCalculationPoint).GetProperties()
+        var keysOfWholesaleCalculationSeries = typeof(WholesaleServicesPoint).GetProperties()
             .Select(p => new { Name = p.Name, PropertyType = p.PropertyType }).ToList();
-        var keysOfWholesaleCalculationMarketActivityRecord = typeof(WholesaleCalculationPoint).GetProperties()
+        var keysOfWholesaleCalculationMarketActivityRecord = typeof(WholesaleServicesPoint).GetProperties()
             .Select(p => new { Name = p.Name, PropertyType = p.PropertyType }).ToList();
 
         Assert.All(keysOfWholesaleCalculationSeries, property =>

@@ -25,7 +25,7 @@ using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.Tests.Factories;
 
-public class WholesaleCalculationsResultMessageBuilder
+public class WholesaleServicesSeriesBuilder
 {
     private string _messageId = Guid.NewGuid().ToString();
     private Instant _timeStamp = SystemClock.Instance.GetCurrentInstant();
@@ -49,141 +49,141 @@ public class WholesaleCalculationsResultMessageBuilder
     private ActorNumber _chargeOwner = ActorNumber.Create("1234567897777");
     private string? _originalTransactionIdReference;
     private SettlementVersion? _settlementVersion;
-    private List<WholesaleCalculationPoint> _points = new() { new(1, 100, 100, 100, null) };
+    private List<WholesaleServicesPoint> _points = new() { new(1, 100, 100, 100, null) };
 
     private Currency _currency = Currency.DanishCrowns;
     private Period _period = new(Instant.FromUtc(2023, 11, 1, 0, 0), Instant.FromUtc(2023, 12, 1, 0, 0));
 
-    public WholesaleCalculationsResultMessageBuilder WithBusinessReason(BusinessReason? businessReason)
+    public WholesaleServicesSeriesBuilder WithBusinessReason(BusinessReason? businessReason)
     {
         ArgumentNullException.ThrowIfNull(businessReason);
         _businessReason = businessReason;
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithMessageId(string messageId)
+    public WholesaleServicesSeriesBuilder WithMessageId(string messageId)
     {
         _messageId = messageId;
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithTimestamp(string timestamp)
+    public WholesaleServicesSeriesBuilder WithTimestamp(string timestamp)
     {
         _timeStamp = ParseTimeStamp(timestamp);
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithReceiver(ActorNumber receiverActorNumber, ActorRole actorRole)
+    public WholesaleServicesSeriesBuilder WithReceiver(ActorNumber receiverActorNumber, ActorRole actorRole)
     {
         _receiverActorNumber = receiverActorNumber;
         _receiverActorRole = actorRole;
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithSender(ActorNumber senderActorNumber, ActorRole actorRole)
+    public WholesaleServicesSeriesBuilder WithSender(ActorNumber senderActorNumber, ActorRole actorRole)
     {
         _senderActorNumber = senderActorNumber;
         _senderActorRole = actorRole;
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithTransactionId(Guid transactionId)
+    public WholesaleServicesSeriesBuilder WithTransactionId(Guid transactionId)
     {
         _transactionId = transactionId;
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithGridArea(string gridAreaCode)
+    public WholesaleServicesSeriesBuilder WithGridArea(string gridAreaCode)
     {
         _gridAreaCode = gridAreaCode;
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithMeasurementUnit(MeasurementUnit measurementUnit)
+    public WholesaleServicesSeriesBuilder WithMeasurementUnit(MeasurementUnit measurementUnit)
     {
         _measurementUnit = measurementUnit;
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithPriceMeasurementUnit(MeasurementUnit priceMeasurementUnit)
+    public WholesaleServicesSeriesBuilder WithPriceMeasurementUnit(MeasurementUnit priceMeasurementUnit)
     {
         _priceMeasureUnit = priceMeasurementUnit;
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithResolution(Resolution resolution)
+    public WholesaleServicesSeriesBuilder WithResolution(Resolution resolution)
     {
         _resolution = resolution;
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithEnergySupplier(ActorNumber energySupplierActorNumber)
+    public WholesaleServicesSeriesBuilder WithEnergySupplier(ActorNumber energySupplierActorNumber)
     {
         _energySupplierActorNumber = energySupplierActorNumber;
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithChargeCode(string chargeCode)
+    public WholesaleServicesSeriesBuilder WithChargeCode(string chargeCode)
     {
         _chargeCode = chargeCode;
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithChargeType(ChargeType chargeType)
+    public WholesaleServicesSeriesBuilder WithChargeType(ChargeType chargeType)
     {
         _chargeType = chargeType;
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithChargeOwner(ActorNumber chargeOwnerActorNumber)
+    public WholesaleServicesSeriesBuilder WithChargeOwner(ActorNumber chargeOwnerActorNumber)
     {
         _chargeOwner = chargeOwnerActorNumber;
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithPeriod(Instant startOfPeriod, Instant endOfPeriod)
+    public WholesaleServicesSeriesBuilder WithPeriod(Instant startOfPeriod, Instant endOfPeriod)
     {
         _period = new Period(startOfPeriod, endOfPeriod);
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithOriginalTransactionIdReference(string originalTransactionIdReference)
+    public WholesaleServicesSeriesBuilder WithOriginalTransactionIdReference(string originalTransactionIdReference)
     {
         _originalTransactionIdReference = originalTransactionIdReference;
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithMeteringPointType(MeteringPointType meteringPointType)
+    public WholesaleServicesSeriesBuilder WithMeteringPointType(MeteringPointType meteringPointType)
     {
         _meteringPointType = meteringPointType;
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithSettlementMethod(SettlementType? settlementType)
+    public WholesaleServicesSeriesBuilder WithSettlementMethod(SettlementType? settlementType)
     {
         _settlementMethod = settlementType;
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithSettlementVersion(SettlementVersion? settlementVersion)
+    public WholesaleServicesSeriesBuilder WithSettlementVersion(SettlementVersion? settlementVersion)
     {
         _settlementVersion = settlementVersion;
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithCurrency(Currency currency)
+    public WholesaleServicesSeriesBuilder WithCurrency(Currency currency)
     {
         _currency = currency;
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithCalculationVersion(int version)
+    public WholesaleServicesSeriesBuilder WithCalculationVersion(int version)
     {
         _calculationResultVersion = version;
         return this;
     }
 
-    public WholesaleCalculationsResultMessageBuilder WithPoints(Collection<WholesaleCalculationPoint> points)
+    public WholesaleServicesSeriesBuilder WithPoints(Collection<WholesaleServicesPoint> points)
     {
         _points = points.ToList();
         return this;
@@ -201,9 +201,9 @@ public class WholesaleCalculationsResultMessageBuilder
             _timeStamp);
     }
 
-    public WholesaleCalculationSeries BuildWholesaleCalculation()
+    public WholesaleServicesSeries BuildWholesaleCalculation()
     {
-        return new WholesaleCalculationSeries(
+        return new WholesaleServicesSeries(
             TransactionId: _transactionId,
             CalculationVersion: _calculationResultVersion,
             GridAreaCode: _gridAreaCode,

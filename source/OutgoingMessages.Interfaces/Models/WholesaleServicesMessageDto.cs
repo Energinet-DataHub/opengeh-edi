@@ -20,15 +20,15 @@ using Energinet.DataHub.EDI.Common.Serialization;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-public class WholesaleResultMessageDto : OutgoingMessageDto
+public class WholesaleServicesMessageDto : OutgoingMessageDto
 {
-    private WholesaleResultMessageDto(
+    private WholesaleServicesMessageDto(
         ActorNumber receiverId,
         Guid processId,
         BusinessReason businessReason,
         ActorRole receiverRole,
         ActorNumber chargeOwnerId,
-        WholesaleCalculationSeries series)
+        WholesaleServicesSeries series)
         : base(
             DocumentType.NotifyWholesaleServices,
             receiverId,
@@ -44,18 +44,18 @@ public class WholesaleResultMessageDto : OutgoingMessageDto
 
     public ActorNumber ChargeOwnerId { get; }
 
-    public static WholesaleResultMessageDto Create(
+    public static WholesaleServicesMessageDto Create(
         ActorNumber receiverNumber,
         ActorRole receiverRole,
         ActorNumber chargeOwnerId,
         Guid processId,
         BusinessReason businessReason,
-        WholesaleCalculationSeries wholesaleSeries)
+        WholesaleServicesSeries wholesaleSeries)
     {
         ArgumentNullException.ThrowIfNull(processId);
         ArgumentNullException.ThrowIfNull(businessReason);
 
-        return new WholesaleResultMessageDto(
+        return new WholesaleServicesMessageDto(
             receiverId: receiverNumber,
             receiverRole: receiverRole,
             processId: processId,
@@ -65,13 +65,13 @@ public class WholesaleResultMessageDto : OutgoingMessageDto
     }
 }
 
-public record WholesaleCalculationSeries(
+public record WholesaleServicesSeries(
     Guid TransactionId,
     long CalculationVersion,
     string GridAreaCode,
     string ChargeCode,
     bool IsTax,
-    IReadOnlyCollection<WholesaleCalculationPoint> Points,
+    IReadOnlyCollection<WholesaleServicesPoint> Points,
     ActorNumber EnergySupplier,
     ActorNumber ChargeOwner,
     Period Period,
@@ -84,4 +84,4 @@ public record WholesaleCalculationSeries(
     MeteringPointType? MeteringPointType,
     SettlementType? SettlementType);
 
-public record WholesaleCalculationPoint(int Position, decimal? Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality? QuantityQuality);
+public record WholesaleServicesPoint(int Position, decimal? Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality? QuantityQuality);

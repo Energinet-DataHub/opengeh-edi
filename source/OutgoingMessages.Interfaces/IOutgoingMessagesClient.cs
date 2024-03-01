@@ -55,5 +55,5 @@ public interface IOutgoingMessagesClient
     /// <summary>
     ///  Enqueue wholesale messages, handles enqueuing messages to all appropriate parties (Receiver, ChargeOwner) in a single transaction.
     /// </summary>
-    Task EnqueueAndCommitAsync(WholesaleResultMessageDto wholesaleResultMessage, CancellationToken cancellationToken);
+    Task EnqueueAndCommitAsync(WholesaleServicesMessageDto wholesaleServicesMessage, CancellationToken cancellationToken);
 }

@@ -85,10 +85,10 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     }
 
     public virtual async Task EnqueueAndCommitAsync(
-        WholesaleResultMessageDto wholesaleResultMessage,
+        WholesaleServicesMessageDto wholesaleServicesMessage,
         CancellationToken cancellationToken)
     {
-        var messages = _outgoingMessageFactory.CreateMessages(wholesaleResultMessage);
+        var messages = _outgoingMessageFactory.CreateMessages(wholesaleServicesMessage);
         foreach (var message in messages)
         {
             await _messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);

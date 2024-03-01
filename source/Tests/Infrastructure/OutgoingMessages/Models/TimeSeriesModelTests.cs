@@ -55,7 +55,7 @@ public class TimeSeriesModelTests
     public void WholesaleMessage_TimeSeries_has_the_same_attributes_as_TimeSeriesMarketActivityRecord()
     {
         var pointAttributeName = "Points";
-        var propertyInfosOfTimeSeries = typeof(WholesaleCalculationSeries).GetProperties().Select(p => new { Name = p.Name, PropertyType = p.PropertyType.ToString() }).ToList();
+        var propertyInfosOfTimeSeries = typeof(WholesaleServicesSeries).GetProperties().Select(p => new { Name = p.Name, PropertyType = p.PropertyType.ToString() }).ToList();
         var propertyInfosOfTimeSeriesMarketActivityRecord = typeof(WholesaleCalculationMarketActivityRecord).GetProperties().Select(p => new { Name = p.Name, PropertyType = p.PropertyType.ToString() }).ToList();
 
         // Points are duplicated, hence we ignore them in the comparison of timeseries and timeseriesmarketactivityrecord
@@ -65,7 +65,7 @@ public class TimeSeriesModelTests
         // We have to compare the point attributes separately
         var pointOfTimeSeries = propertyInfosOfTimeSeries.Single(p => p.Name == pointAttributeName);
         var pointOfTimeSeriesTimeSeriesMarketActivityRecord = propertyInfosOfTimeSeriesMarketActivityRecord.Single(p => p.Name == pointAttributeName);
-        var pointTypeOfTimeSeries = typeof(WholesaleCalculationPoint).GetProperties().Select(p => new { Name = p.Name, PropertyType = p.PropertyType.ToString() }).ToList();
+        var pointTypeOfTimeSeries = typeof(WholesaleServicesPoint).GetProperties().Select(p => new { Name = p.Name, PropertyType = p.PropertyType.ToString() }).ToList();
         var pointTypeOfTimeSeriesMarketActivityRecord = typeof(Point).GetProperties().Select(p => new { Name = p.Name, PropertyType = p.PropertyType.ToString() }).ToList();
 
         // Assert that the non-point attributes are the same
