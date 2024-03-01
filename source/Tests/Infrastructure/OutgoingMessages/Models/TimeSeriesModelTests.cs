@@ -24,7 +24,6 @@ namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Models;
 
 public class TimeSeriesModelTests
 {
-    // TODO: consider testing the serialization of the messages instead
     [Fact]
     public void EnergyResultMessage_has_the_same_attributes_as_TimeSeriesMarketActivityRecord()
     {
