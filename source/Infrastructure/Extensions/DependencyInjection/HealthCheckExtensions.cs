@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using Azure.Identity;
 using Microsoft.Extensions.DependencyInjection;
 

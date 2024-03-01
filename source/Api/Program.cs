@@ -29,6 +29,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Configuration;
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
@@ -94,19 +95,12 @@ namespace Energinet.DataHub.EDI.Api
                 })
                 .ConfigureServices(services =>
                 {
-                    services.AddApplicationInsights();
-                    services.ConfigureFunctionsApplicationInsights();
-                    services.AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>();
-                    services.AddAuthentication(sp =>
-                    {
-                        return new MarketActorAuthenticator(
-                            sp.GetRequiredService<IMasterDataClient>(),
-                            sp.GetRequiredService<AuthenticatedActor>(),
-                            sp.GetRequiredService<ILogger<MarketActorAuthenticator>>());
-                    });
+                    services.AddApplicationInsights()
+                        .ConfigureFunctionsApplicationInsights()
+                        .AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>()
+                        .AddB2BAuthentication(tokenValidationParameters);
 
                     CompositionRoot.Initialize(services)
-                        .AddBearerAuthentication(tokenValidationParameters)
                         .AddSystemClock(new SystemDateTimeProvider());
                     services.AddScoped<ICorrelationContext>(
                         _ =>
@@ -149,21 +143,20 @@ namespace Energinet.DataHub.EDI.Api
                 .Build();
         }
 
-        public static void AddAuthentication(this IServiceCollection services, Func<IServiceProvider, IMarketActorAuthenticator>? authenticatorBuilder = null)
+        public static IServiceCollection AddB2BAuthentication(this IServiceCollection services, TokenValidationParameters tokenValidationParameters)
         {
-            services.AddTransient<IClientCertificateRetriever, HeaderClientCertificateRetriever>();
+            services.AddScoped(sp => new JwtTokenParser(tokenValidationParameters))
+                .AddTransient<IClientCertificateRetriever, HeaderClientCertificateRetriever>()
+                .AddTransient<IAuthenticationMethod, BearerTokenAuthenticationMethod>()
+                .AddTransient<IAuthenticationMethod, CertificateAuthenticationMethod>();
 
-            services.AddTransient<IAuthenticationMethod, BearerTokenAuthenticationMethod>();
-            services.AddTransient<IAuthenticationMethod, CertificateAuthenticationMethod>();
+            services.AddScoped<IMarketActorAuthenticator>(sp =>
+                new MarketActorAuthenticator(
+                sp.GetRequiredService<IMasterDataClient>(),
+                sp.GetRequiredService<AuthenticatedActor>(),
+                sp.GetRequiredService<ILogger<MarketActorAuthenticator>>()));
 
-            if (authenticatorBuilder is null)
-            {
-                services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
-            }
-            else
-            {
-                services.AddScoped(authenticatorBuilder);
-            }
+            return services;
         }
 
         private static void ConfigureAuthenticationMiddleware(IFunctionsWorkerApplicationBuilder worker)
