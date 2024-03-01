@@ -15,7 +15,6 @@
 using System.Text.Json.Serialization;
 using BuildingBlocks.Application.Configuration.Logging;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Logging.LoggingMiddleware;
@@ -39,7 +38,6 @@ builder.Logging
 
 builder.Services
     .AddSwaggerForApplication()
-    .AddApplicationInsights()
     .AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>()
     .AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
