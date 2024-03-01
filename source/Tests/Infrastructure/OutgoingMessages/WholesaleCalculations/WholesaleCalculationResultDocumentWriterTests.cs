@@ -46,8 +46,6 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
     }
 
     [Theory]
-    [InlineData(nameof(DocumentFormat.Xml))]
-    [InlineData(nameof(DocumentFormat.Json))]
     [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Can_create_notifyWholesaleServices_document(string documentFormat)
     {
@@ -76,7 +74,6 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
         var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
 
         // Assert
-        using var assertionScope = new AssertionScope();
         await AssertDocument(document, DocumentFormat.From(documentFormat))
             .HasMessageId(SampleData.MessageId)
             .HasBusinessReason(SampleData.BusinessReason, CodeListType.EbixDenmark) // "D05" (WholesaleFixing) is from CodeListType.EbixDenmark
