@@ -23,11 +23,11 @@ limitations under the License.
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.AzureServiceBus" Version="7.0.0" />
     <PackageReference Include="AspNetCore.HealthChecks.AzureStorage" Version="7.0.0" />
-    <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="6.0.2" />
+    <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="8.0.0" />
     <PackageReference Include="Dapper-NodaTime" Version="0.1.0" />
     <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="8.1.0" />
     <PackageReference Include="Energinet.DataHub.Core.Logging" Version="3.1.1" />
-    <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="3.2.0" />
+    <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="3.3.1" />
     <PackageReference Include="MediatR" Version="12.1.1" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.1" />
@@ -35,7 +35,7 @@ limitations under the License.
     <PackageReference Include="NodaTime.Serialization.Protobuf" Version="2.0.1" />
     <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.1.2" />
     <PackageReference Include="Polly" Version="8.1.0" />
-    <PackageReference Include="SimplerSoftware.EntityFrameworkCore.SqlServer.NodaTime" Version="7.1.0" />
+    <PackageReference Include="SimplerSoftware.EntityFrameworkCore.SqlServer.NodaTime" Version="8.0.0" />
     <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.6.40">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
