@@ -32,7 +32,7 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
             new DocumentDetails(
             "DK_NotifyAggregatedWholesaleServices",
             string.Empty,
-            "un:unece:260:data:EEM-DK_NotifyAggregatedWholesaleServices",
+            "un:unece:260:data:EEM-DK_NotifyAggregatedWholesaleServices:v3",
             "ns0",
             "E31"),
             parser)
