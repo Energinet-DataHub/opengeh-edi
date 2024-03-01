@@ -42,11 +42,11 @@ public static class PointsMapper
         return points;
     }
 
-    public static IReadOnlyCollection<WholesaleCalculationPoint> MapPoints(RepeatedField<AmountPerChargeResultProducedV1.Types.TimeSeriesPoint> timeSeriesPoints)
+    public static IReadOnlyCollection<WholesaleServicesPoint> MapPoints(RepeatedField<AmountPerChargeResultProducedV1.Types.TimeSeriesPoint> timeSeriesPoints)
     {
         var points = timeSeriesPoints
             .Select(
-                (p, index) => new WholesaleCalculationPoint(
+                (p, index) => new WholesaleServicesPoint(
                     index + 1, // Position starts at 1, so position = index + 1
                     DecimalParser.Parse(p.Quantity),
                     p.Price == null ? null : DecimalParser.Parse(p.Price),

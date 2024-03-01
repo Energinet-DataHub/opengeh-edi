@@ -94,34 +94,34 @@ public class OutgoingMessageFactory
     /// <summary>
     /// This method creates two outgoing messages, one for the receiver and one for the charge owner, based on the wholesaleResultMessage.
     /// </summary>
-    /// <param name="wholesaleResultMessageDto"></param>
-    public IReadOnlyCollection<OutgoingMessage> CreateMessages(WholesaleResultMessageDto wholesaleResultMessageDto)
+    /// <param name="wholesaleServicesMessageDto"></param>
+    public IReadOnlyCollection<OutgoingMessage> CreateMessages(WholesaleServicesMessageDto wholesaleServicesMessageDto)
     {
-        ArgumentNullException.ThrowIfNull(wholesaleResultMessageDto);
+        ArgumentNullException.ThrowIfNull(wholesaleServicesMessageDto);
         return new List<OutgoingMessage>()
         {
             new(
-                wholesaleResultMessageDto.DocumentType,
-                wholesaleResultMessageDto.ReceiverId,
-                wholesaleResultMessageDto.ProcessId,
-                wholesaleResultMessageDto.BusinessReason,
-                wholesaleResultMessageDto.ReceiverRole,
-                wholesaleResultMessageDto.SenderId,
-                wholesaleResultMessageDto.SenderRole,
-                wholesaleResultMessageDto.SerializedContent,
+                wholesaleServicesMessageDto.DocumentType,
+                wholesaleServicesMessageDto.ReceiverId,
+                wholesaleServicesMessageDto.ProcessId,
+                wholesaleServicesMessageDto.BusinessReason,
+                wholesaleServicesMessageDto.ReceiverRole,
+                wholesaleServicesMessageDto.SenderId,
+                wholesaleServicesMessageDto.SenderRole,
+                wholesaleServicesMessageDto.SerializedContent,
                 _systemDateTimeProvider.Now(),
-                wholesaleResultMessageDto.RelatedToMessageId),
+                wholesaleServicesMessageDto.RelatedToMessageId),
             new(
-                wholesaleResultMessageDto.DocumentType,
-                wholesaleResultMessageDto.ChargeOwnerId,
-                wholesaleResultMessageDto.ProcessId,
-                wholesaleResultMessageDto.BusinessReason,
-                GetChargeOwnerRole(wholesaleResultMessageDto.ChargeOwnerId),
-                wholesaleResultMessageDto.SenderId,
-                wholesaleResultMessageDto.SenderRole,
-                wholesaleResultMessageDto.SerializedContent,
+                wholesaleServicesMessageDto.DocumentType,
+                wholesaleServicesMessageDto.ChargeOwnerId,
+                wholesaleServicesMessageDto.ProcessId,
+                wholesaleServicesMessageDto.BusinessReason,
+                GetChargeOwnerRole(wholesaleServicesMessageDto.ChargeOwnerId),
+                wholesaleServicesMessageDto.SenderId,
+                wholesaleServicesMessageDto.SenderRole,
+                wholesaleServicesMessageDto.SerializedContent,
                 _systemDateTimeProvider.Now(),
-                wholesaleResultMessageDto.RelatedToMessageId),
+                wholesaleServicesMessageDto.RelatedToMessageId),
         };
     }
 

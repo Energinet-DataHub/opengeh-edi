@@ -49,7 +49,7 @@ public class MonthlyAmountPerChargeResultProducedV1Processor : IIntegrationEvent
         }
 
         var monthlyAmountPerChargeResultProducedV1 = (MonthlyAmountPerChargeResultProducedV1)integrationEvent.Message;
-        var message = WholesaleResultMessageFactory.CreateMessage(monthlyAmountPerChargeResultProducedV1);
+        var message = WholesaleServicesMessageFactory.CreateMessage(monthlyAmountPerChargeResultProducedV1);
 
         await _outgoingMessagesClient.EnqueueAndCommitAsync(message, cancellationToken).ConfigureAwait(false);
     }

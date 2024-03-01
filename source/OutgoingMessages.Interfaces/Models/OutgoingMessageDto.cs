@@ -20,10 +20,9 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 /// <summary>
 /// Contract for an outgoing message
 /// </summary>
-public class OutgoingMessageDto
+public abstract class OutgoingMessageDto
 {
-    // TODO: Consider making an abstract class instead and move serialized content to the domain model instead.
-    public OutgoingMessageDto(
+    protected OutgoingMessageDto(
         DocumentType documentType,
         ActorNumber receiverId,
         Guid processId,
