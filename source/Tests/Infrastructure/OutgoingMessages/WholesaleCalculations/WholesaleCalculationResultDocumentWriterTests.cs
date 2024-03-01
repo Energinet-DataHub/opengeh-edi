@@ -74,6 +74,7 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
         var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
 
         // Assert
+        using var assertionScope = new AssertionScope();
         await AssertDocument(document, DocumentFormat.From(documentFormat))
             .HasMessageId(SampleData.MessageId)
             .HasBusinessReason(SampleData.BusinessReason, CodeListType.EbixDenmark) // "D05" (WholesaleFixing) is from CodeListType.EbixDenmark
