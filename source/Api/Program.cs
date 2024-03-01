@@ -21,6 +21,7 @@ using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Api.Authentication;
 using Energinet.DataHub.EDI.Api.Authentication.Certificate;
+using Energinet.DataHub.EDI.Api.Configuration.Authentication;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
@@ -102,6 +103,8 @@ namespace Energinet.DataHub.EDI.Api
 
                     CompositionRoot.Initialize(services)
                         .AddSystemClock(new SystemDateTimeProvider());
+
+                    services.AddScoped(_ => new JwtTokenParser(tokenValidationParameters));
                     services.AddScoped<ICorrelationContext>(
                         _ =>
                         {

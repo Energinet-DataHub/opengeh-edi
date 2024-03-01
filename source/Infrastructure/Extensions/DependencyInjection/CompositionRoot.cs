@@ -17,10 +17,8 @@ using System.Net.Http;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.Serialization;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
 using MediatR.Registration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection
 {

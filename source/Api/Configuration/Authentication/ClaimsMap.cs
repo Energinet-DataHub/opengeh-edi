@@ -17,7 +17,7 @@ using System.Linq;
 using System.Security.Claims;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
+namespace Energinet.DataHub.EDI.Api.Configuration.Authentication;
 
 public static class ClaimsMap
 {

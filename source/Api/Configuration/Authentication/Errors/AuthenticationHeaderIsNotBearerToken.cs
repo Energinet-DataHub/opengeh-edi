@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication.Errors
+namespace Energinet.DataHub.EDI.Api.Configuration.Authentication.Errors
 {
-    public class NoAuthenticationHeaderSet : AuthenticationError
+    public class AuthenticationHeaderIsNotBearerToken : AuthenticationError
     {
-        public NoAuthenticationHeaderSet()
-        : base("No authorization header is set.")
+        public AuthenticationHeaderIsNotBearerToken()
+        : base("The value defined in authorization header is not start with 'bearer'.")
         {
         }
     }
