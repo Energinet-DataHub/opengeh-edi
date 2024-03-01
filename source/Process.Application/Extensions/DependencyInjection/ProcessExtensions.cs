@@ -47,7 +47,7 @@ public static class ProcessExtensions
 
         //EventsConfiguration
         //TODO: can we move them out and delete ref to Infrastructure?
-        services.AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestAcceptedEventMapper>()
+        services.AddTransient<IInboxEventMapper, EnergyResultTimeSeriesRequestAcceptedEventMapper>()
             .AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestRejectedMapper>();
 
         //ProcessingConfiguration
@@ -59,11 +59,12 @@ public static class ProcessExtensions
             .AddWholesaleInbox();
 
         //EnqueueMessageConfiguration
-        services.AddTransient<INotificationHandler<EnqueueMessageEvent>, EnqueueMessageHandler>();
+        services.AddTransient<INotificationHandler<EnqueueAcceptedEnergyResultMessageEvent>, EnqueueAcceptedEnergyResultMessageHandler>();
+        services.AddTransient<INotificationHandler<EnqueueRejectedEnergyResultMessageEvent>, EnqueueRejectedEnergyResultMessageHandler>();
 
         // RequestedAggregatedMeasureDataConfiguration
         services.AddTransient<IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>, SendAggregatedMeasuredDataToWholesale>()
-            .AddTransient<IRequestHandler<AcceptedAggregatedTimeSerie, Unit>, AcceptProcessWhenAcceptedAggregatedTimeSeriesIsAvailable>()
+            .AddTransient<IRequestHandler<AcceptedEnergyResultTimeSerieCommand, Unit>, AcceptProcessWhenAcceptedEnergyResultTimeSeriesIsAvailable>()
             .AddTransient<IRequestHandler<RejectedAggregatedTimeSeries, Unit>, RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable>()
             .AddTransient<INotificationHandler<AggregatedMeasureProcessIsInitialized>, NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized>()
             .AddTransient<IRequestHandler<InitializeAggregatedMeasureDataProcessesCommand, Unit>, InitializeAggregatedMeasureDataProcessesHandler>()

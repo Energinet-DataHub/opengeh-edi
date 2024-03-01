@@ -13,43 +13,38 @@
 // limitations under the License.
 
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
-using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
-using NodaTime.Serialization.Protobuf;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 
-public static class AggregationMessageResultFactory
+public static class AcceptedEnergyResultMessageDtoFactory
 {
-    public static AggregationResultMessage Create(
+    public static AcceptedEnergyResultMessageDto Create(
         AggregatedMeasureDataProcess aggregatedMeasureDataProcess,
-        AggregatedTimeSerie aggregatedTimeSerie)
+        AcceptedEnergyResultTimeSerie acceptedEnergyResultTimeSerie)
     {
         ArgumentNullException.ThrowIfNull(aggregatedMeasureDataProcess);
-        ArgumentNullException.ThrowIfNull(aggregatedTimeSerie);
+        ArgumentNullException.ThrowIfNull(acceptedEnergyResultTimeSerie);
 
-        return AggregationResultMessage.Create(
+        return AcceptedEnergyResultMessageDto.Create(
             receiverNumber: aggregatedMeasureDataProcess.RequestedByActorId,
             receiverRole: ActorRole.FromCode(aggregatedMeasureDataProcess.RequestedByActorRoleCode),
             processId: aggregatedMeasureDataProcess.ProcessId.Id,
-            gridAreaCode: aggregatedTimeSerie.GridAreaDetails.GridAreaCode,
-            meteringPointType: aggregatedTimeSerie.MeteringPointType,
+            gridAreaCode: acceptedEnergyResultTimeSerie.GridAreaDetails.GridAreaCode,
+            meteringPointType: acceptedEnergyResultTimeSerie.MeteringPointType,
             settlementType: aggregatedMeasureDataProcess.SettlementMethod,
-            measureUnitType: aggregatedTimeSerie.UnitType,
-            resolution: aggregatedTimeSerie.Resolution,
+            measureUnitType: acceptedEnergyResultTimeSerie.UnitType,
+            resolution: acceptedEnergyResultTimeSerie.Resolution,
             energySupplierNumber: aggregatedMeasureDataProcess.EnergySupplierId,
             balanceResponsibleNumber: aggregatedMeasureDataProcess.BalanceResponsibleId,
-            period: new Period(aggregatedTimeSerie.StartOfPeriod, aggregatedTimeSerie.EndOfPeriod),
-            points: TimeSeriesPointsMapper.MapPoints(aggregatedTimeSerie.Points),
+            period: new Period(acceptedEnergyResultTimeSerie.StartOfPeriod, acceptedEnergyResultTimeSerie.EndOfPeriod),
+            points: AcceptedEnergyResultMessageMapper.MapPoints(acceptedEnergyResultTimeSerie.Points),
             businessReasonName: aggregatedMeasureDataProcess.BusinessReason.Name,
-            calculationResultVersion: aggregatedTimeSerie.CalculationResultVersion,
+            calculationResultVersion: acceptedEnergyResultTimeSerie.CalculationResultVersion,
             settlementVersion: aggregatedMeasureDataProcess.SettlementVersion?.Name,
             relatedToMessageId: aggregatedMeasureDataProcess.InitiatedByMessageId,
             originalTransactionIdReference: aggregatedMeasureDataProcess.BusinessTransactionId.Id);

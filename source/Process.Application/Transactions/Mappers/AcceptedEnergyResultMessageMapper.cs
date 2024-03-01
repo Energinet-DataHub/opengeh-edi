@@ -15,15 +15,16 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 
-public static class TimeSeriesPointsMapper
+public static class AcceptedEnergyResultMessageMapper
 {
-    public static ReadOnlyCollection<Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point> MapPoints(IReadOnlyCollection<Domain.Transactions.AggregatedMeasureData.Point> points)
+    public static ReadOnlyCollection<AcceptedEnergyResultMessagePoint> MapPoints(IReadOnlyCollection<Domain.Transactions.AggregatedMeasureData.Point> points)
     {
         return points
-            .Select(p => new Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage.Point(p.Position, p.Quantity, p.QuantityQuality, p.SampleTime))
+            .Select(p => new AcceptedEnergyResultMessagePoint(p.Position, p.Quantity, p.QuantityQuality, p.SampleTime))
             .ToList()
             .AsReadOnly();
     }

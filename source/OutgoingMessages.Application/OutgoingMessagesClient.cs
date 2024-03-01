@@ -56,17 +56,32 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         return peekResult;
     }
 
-    public virtual Task<OutgoingMessageId> EnqueueAsync(OutgoingMessageDto outgoingMessage)
+    public async Task<OutgoingMessageId> EnqueueAsync(
+        AcceptedEnergyResultMessageDto acceptedEnergyResultMessage,
+        CancellationToken cancellationToken)
     {
-        return _messageEnqueuer.EnqueueAsync(outgoingMessage);
+        var message = _outgoingMessageFactory.CreateMessage(acceptedEnergyResultMessage);
+        var messageId = await _messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
+        return messageId;
     }
 
-    public async Task EnqueueAndCommitAsync(
+    public async Task<OutgoingMessageId> EnqueueAsync(
+        RejectedEnergyResultMessageDto rejectedEnergyResultMessage,
+        CancellationToken cancellationToken)
+    {
+        var message = _outgoingMessageFactory.CreateMessage(rejectedEnergyResultMessage);
+        var messageId = await _messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
+        return messageId;
+    }
+
+    public async Task<OutgoingMessageId> EnqueueAndCommitAsync(
         EnergyResultMessageDto energyResultMessage,
         CancellationToken cancellationToken)
     {
-        await _messageEnqueuer.EnqueueAsync(energyResultMessage).ConfigureAwait(false);
+        var message = _outgoingMessageFactory.CreateMessage(energyResultMessage);
+        var messageId = await _messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        return messageId;
     }
 
     public virtual async Task EnqueueAndCommitAsync(

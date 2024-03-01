@@ -20,10 +20,10 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
 
-public class AcceptedAggregatedTimeSerie : InternalCommand
+public class AcceptedEnergyResultTimeSerieCommand : InternalCommand
 {
     [JsonConstructor]
-    public AcceptedAggregatedTimeSerie(Guid processId, IReadOnlyCollection<AggregatedTimeSerie> aggregatedTimeSeries)
+    public AcceptedEnergyResultTimeSerieCommand(Guid processId, IReadOnlyCollection<AcceptedEnergyResultTimeSerie> aggregatedTimeSeries)
     {
         ProcessId = processId;
         AggregatedTimeSeries = aggregatedTimeSeries;
@@ -31,5 +31,5 @@ public class AcceptedAggregatedTimeSerie : InternalCommand
 
     public Guid ProcessId { get; }
 
-    public IReadOnlyCollection<AggregatedTimeSerie> AggregatedTimeSeries { get; }
+    public IReadOnlyCollection<AcceptedEnergyResultTimeSerie> AggregatedTimeSeries { get; }
 }

@@ -17,9 +17,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData
 {
@@ -128,15 +127,15 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             }
         }
 
-        public void IsAccepted(IReadOnlyCollection<AggregationResultMessage> aggregationResultMessages)
+        public void IsAccepted(IReadOnlyCollection<AcceptedEnergyResultMessageDto> acceptedEnergyResultMessages)
         {
-            ArgumentNullException.ThrowIfNull(aggregationResultMessages);
+            ArgumentNullException.ThrowIfNull(acceptedEnergyResultMessages);
 
             if (_state == State.Sent)
             {
-                foreach (var aggregationResultMessage in aggregationResultMessages)
+                foreach (var acceptedEnergyResultMessage in acceptedEnergyResultMessages)
                 {
-                    AddDomainEvent(new EnqueueMessageEvent(aggregationResultMessage));
+                    AddDomainEvent(new EnqueueAcceptedEnergyResultMessageEvent(acceptedEnergyResultMessage));
                 }
 
                 _state = State.Accepted;
@@ -149,24 +148,24 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
 
             if (_state == State.Sent)
             {
-                AddDomainEvent(new EnqueueMessageEvent(CreateRejectedAggregationResultMessage(rejectAggregatedMeasureDataRequest)));
+                AddDomainEvent(new EnqueueRejectedEnergyResultMessageEvent(CreateRejectedAggregationResultMessage(rejectAggregatedMeasureDataRequest)));
                 _state = State.Rejected;
             }
         }
 
-        private RejectedAggregationResultMessage CreateRejectedAggregationResultMessage(
+        private RejectedEnergyResultMessageDto CreateRejectedAggregationResultMessage(
             RejectedAggregatedMeasureDataRequest rejectedAggregatedMeasureDataRequest)
         {
-            var rejectedTimeSerie = new RejectedTimeSerie(
+            var rejectedTimeSerie = new RejectedEnergyResultMessageSerie(
                 ProcessId.Id,
                 rejectedAggregatedMeasureDataRequest.RejectReasons.Select(reason =>
-                        new RejectReason(
+                        new Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.RejectedEnergyResultMessageRejectReason(
                             reason.ErrorCode,
                             reason.ErrorMessage))
                     .ToList(),
                 BusinessTransactionId.Id);
 
-            return new RejectedAggregationResultMessage(
+            return new RejectedEnergyResultMessageDto(
                 RequestedByActorId,
                 ProcessId.Id,
                 rejectedAggregatedMeasureDataRequest.BusinessReason.Name,

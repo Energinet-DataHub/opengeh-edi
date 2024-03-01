@@ -17,27 +17,26 @@ using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.Aggregations.OutgoingMessage;
 using NodaTime.Extensions;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
-public class OutgoingMessageDtoBuilder
+public class EnergyResultMessageDtoBuilder
 {
     private const string GridAreaCode = "805";
     private static readonly Guid _processId = ProcessId.Create(Guid.NewGuid()).Id;
     private static readonly BusinessReason _businessReason = BusinessReason.BalanceFixing;
-    private static readonly IReadOnlyCollection<Point> _points = new List<Point>();
+    private static readonly IReadOnlyCollection<EnergyResultMessagePoint> _points = new List<EnergyResultMessagePoint>();
     private static ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
     private static ActorRole _receiverRole = ActorRole.MeteredDataAdministrator;
     private static MessageId? _messageId;
 
 #pragma warning disable CA1822
-    public OutgoingMessageDto Build()
+    public EnergyResultMessageDto Build()
 #pragma warning restore CA1822
     {
-        return AggregationResultMessage.Create(
+        return EnergyResultMessageDto.Create(
             _receiverNumber,
             _receiverRole,
             _processId,
@@ -55,19 +54,19 @@ public class OutgoingMessageDtoBuilder
             relatedToMessageId: _messageId);
     }
 
-    public OutgoingMessageDtoBuilder WithReceiverNumber(string receiverNumber)
+    public EnergyResultMessageDtoBuilder WithReceiverNumber(string receiverNumber)
     {
         _receiverNumber = ActorNumber.Create(receiverNumber);
         return this;
     }
 
-    public OutgoingMessageDtoBuilder WithReceiverRole(ActorRole actorRole)
+    public EnergyResultMessageDtoBuilder WithReceiverRole(ActorRole actorRole)
     {
         _receiverRole = actorRole;
         return this;
     }
 
-    public OutgoingMessageDtoBuilder WithRelationTo(MessageId? messageId = null)
+    public EnergyResultMessageDtoBuilder WithRelationTo(MessageId? messageId = null)
     {
         _messageId = messageId;
         return this;

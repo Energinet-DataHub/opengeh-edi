@@ -14,8 +14,9 @@
 
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.OutgoingMessages;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 
 public record RejectedAggregatedMeasureDataRequest(IReadOnlyCollection<RejectReason> RejectReasons, BusinessReason BusinessReason);
+
+public record RejectReason(string ErrorCode, string ErrorMessage);
