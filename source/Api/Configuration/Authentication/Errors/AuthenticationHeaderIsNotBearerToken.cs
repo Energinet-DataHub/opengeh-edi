@@ -12,23 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Dapper;
-using Dapper.NodaTime;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection;
-
-internal static class QueryHandlingExtensions
+namespace Energinet.DataHub.EDI.Api.Configuration.Authentication.Errors
 {
-    internal static IServiceCollection AddDapper(this IServiceCollection services)
+    public class AuthenticationHeaderIsNotBearerToken : AuthenticationError
     {
-        ConfigureDapper();
-
-        return services;
-    }
-
-    private static void ConfigureDapper()
-    {
-        SqlMapper.AddTypeHandler(InstantHandler.Default);
+        public AuthenticationHeaderIsNotBearerToken()
+        : base("The value defined in authorization header is not start with 'bearer'.")
+        {
+        }
     }
 }

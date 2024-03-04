@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Azure.Identity;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
@@ -79,6 +80,18 @@ public static class HealtCheckExtensions
                 connectionString: database.DB_CONNECTION_STRING);
 
         services.TryAddSingleton<SqlHealthCheckIsAdded>();
+
+        return services;
+    }
+
+    public static void AddBlobStorageHealthCheck(this IServiceCollection services, string name, string blobConnectionString)
+    {
+        services.AddHealthChecks().AddAzureBlobStorage(blobConnectionString, name: name);
+    }
+
+    public static IServiceCollection AddBlobStorageHealthCheck(this IServiceCollection services, string name, Uri storageAccountUri)
+    {
+        services.AddHealthChecks().AddAzureBlobStorage(storageAccountUri, new DefaultAzureCredential(), name: name);
 
         return services;
     }

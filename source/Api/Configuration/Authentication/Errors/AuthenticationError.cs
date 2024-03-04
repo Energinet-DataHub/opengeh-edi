@@ -12,20 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
-using Energinet.DataHub.EDI.Infrastructure.DataRetention;
-using MediatR;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection;
-
-public static class DataRetentionExtensions
+namespace Energinet.DataHub.EDI.Api.Configuration.Authentication.Errors
 {
-    public static IServiceCollection AddDataRetention(this IServiceCollection services)
+    public abstract class AuthenticationError
     {
-        services.AddTransient<INotificationHandler<ADayHasPassed>,
-            ExecuteDataRetentionsWhenADayHasPassed>();
+        protected AuthenticationError(string message)
+        {
+            Message = message;
+        }
 
-        return services;
+        public string Message { get; set; }
     }
 }
