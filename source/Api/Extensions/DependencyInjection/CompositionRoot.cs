@@ -13,10 +13,8 @@
 // limitations under the License.
 
 using System;
-using System.Net.Http;
 using Dapper;
 using Dapper.NodaTime;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.Serialization;
 using MediatR.Registration;
@@ -31,12 +29,10 @@ public class CompositionRoot
     private CompositionRoot(IServiceCollection services)
     {
         _services = services;
-        services.AddSingleton<HttpClient>()
-            .AddSingleton<ISerializer, Serializer>();
+        services.AddSingleton<ISerializer, Serializer>();
 
         AddMediatR();
         services.AddLogging();
-        AddAuthenticatedActor();
         AddDapper(services);
     }
 
@@ -68,10 +64,5 @@ public class CompositionRoot
     {
         var configuration = new MediatRServiceConfiguration();
         ServiceRegistrar.AddRequiredServices(_services, configuration);
-    }
-
-    private void AddAuthenticatedActor()
-    {
-        _services.AddScoped<AuthenticatedActor>();
     }
 }

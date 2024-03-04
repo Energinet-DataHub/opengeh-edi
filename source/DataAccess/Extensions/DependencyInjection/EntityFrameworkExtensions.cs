@@ -18,9 +18,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BuildingBlocks.Application.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 
-public static class SqlExtensions
+public static class EntityFrameworkExtensions
 {
     public static IServiceCollection AddScopedSqlDbContext<TDbContext>(
         this IServiceCollection services,

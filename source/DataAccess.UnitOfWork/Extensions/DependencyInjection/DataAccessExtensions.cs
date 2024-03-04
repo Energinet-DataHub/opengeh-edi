@@ -16,13 +16,15 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 
 public static class DataAccessExtensions
 {
-    public static IServiceCollection AddDataAccessModule(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddDataAccessUnitOfWorkModule(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IUnitOfWork, UnitOfWorkImpl>();
 
         return services;
     }

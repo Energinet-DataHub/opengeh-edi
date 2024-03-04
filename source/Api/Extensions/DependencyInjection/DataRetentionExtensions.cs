@@ -12,18 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.Extensions.Configuration;
+using Energinet.DataHub.EDI.Api.DataRetention;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BuildingBlocks.Application.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.Api.Extensions.DependencyInjection;
 
-public static class BuildingBlockExtensions
+public static class DataRetentionExtensions
 {
-    public static IServiceCollection AddBuildingBlocks(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddDataRetention(this IServiceCollection services)
     {
-        services.AddServiceBus(configuration)
-            .AddFileStorage(configuration)
-            .AddFeatureFlags();
+        services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>();
+
         return services;
     }
 }

@@ -36,6 +36,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Configuration;
@@ -271,19 +272,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
             _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>();
             _services.AddScoped(_ => new JwtTokenParser(JwtTokenParserTests.DisableAllTokenValidations));
-            _services.AddScoped(_ =>
-            {
-                var correlation = new CorrelationContext();
-                correlation.SetId(Guid.NewGuid().ToString());
-                return correlation;
-            })
+            _services.AddCorrelation(config)
             .AddIntegrationEventModule()
             .AddOutgoingMessagesModule(config)
             .AddProcessModule(config)
             .AddArchivedMessagesModule(config)
             .AddIncomingMessagesModule(config)
             .AddMasterDataModule(config)
-            .AddDataAccessModule(config);
+            .AddDataAccessUnitOfWorkModule(config);
 
             // Replace the services with stub implementations.
             // - Building blocks

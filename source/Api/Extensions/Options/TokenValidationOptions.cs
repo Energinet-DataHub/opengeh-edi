@@ -12,18 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.Api.Extensions.Options;
 
-namespace BuildingBlocks.Application.Extensions.DependencyInjection;
-
-public static class BuildingBlockExtensions
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1707", Justification = "To match naming in other domains")]
+public class TokenValidationOptions
 {
-    public static IServiceCollection AddBuildingBlocks(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddServiceBus(configuration)
-            .AddFileStorage(configuration)
-            .AddFeatureFlags();
-        return services;
-    }
+    public string B2C_TENANT_ID { get; set; } = string.Empty;
+
+    public string BACKEND_SERVICE_APP_ID { get; set; } = string.Empty;
 }

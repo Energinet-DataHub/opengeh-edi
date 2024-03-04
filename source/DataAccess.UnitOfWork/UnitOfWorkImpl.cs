@@ -20,15 +20,17 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAc
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.EDI.DataAccess;
+namespace Energinet.DataHub.EDI.DataAccess.UnitOfWork;
 
-public sealed class UnitOfWork : IUnitOfWork
+#pragma warning disable CA1711
+public sealed class UnitOfWorkImpl : IUnitOfWork
+#pragma warning restore CA1711
 {
     private readonly ProcessContext _processContext;
     private readonly ActorMessageQueueContext _actorMessageQueueContext;
     private readonly IncomingMessagesContext _incomingMessagesContext;
 
-    public UnitOfWork(
+    public UnitOfWorkImpl(
         ProcessContext processContext,
         ActorMessageQueueContext actorMessageQueueContext,
         IncomingMessagesContext incomingMessagesContext)

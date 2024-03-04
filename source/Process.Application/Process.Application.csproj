@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\DataAccess\DataAccess.csproj"/>
     <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj"/>
     <ProjectReference Include="..\OutgoingMessages.Interfaces\OutgoingMessages.Interfaces.csproj" />
     <ProjectReference Include="..\Process.Domain\Process.Domain.csproj" />

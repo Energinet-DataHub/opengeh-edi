@@ -14,7 +14,7 @@
 
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments;
+using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestAggregatedMeasureData;

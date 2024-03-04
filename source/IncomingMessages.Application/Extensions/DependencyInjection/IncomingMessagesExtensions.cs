@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using BuildingBlocks.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
@@ -47,7 +48,7 @@ public static class IncomingMessagesExtensions
             .AddExternalDomainServiceBusQueuesHealthCheck(
                 serviceBusOptions.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
                 serviceBusOptions.INCOMING_MESSAGES_QUEUE_NAME!)
-            .AddDatabase(configuration)
+            .AddDapperConnectionToDatabase(configuration)
             .AddScopedSqlDbContext<IncomingMessagesContext>(configuration)
             .AddScoped<IIncomingMessageClient, IncomingMessageClient>()
             .AddScoped<ITransactionIdRepository, TransactionIdRepository>()

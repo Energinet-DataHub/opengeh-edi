@@ -12,18 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.Api.Extensions.Options;
 
-namespace BuildingBlocks.Application.Extensions.DependencyInjection;
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1707", Justification = "To match naming in other domains")]
 
-public static class BuildingBlockExtensions
+public class EnvironmentOptions
 {
-    public static IServiceCollection AddBuildingBlocks(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddServiceBus(configuration)
-            .AddFileStorage(configuration)
-            .AddFeatureFlags();
-        return services;
-    }
+    public string AZURE_FUNCTIONS_ENVIRONMENT { get; set; } = string.Empty;
 }
