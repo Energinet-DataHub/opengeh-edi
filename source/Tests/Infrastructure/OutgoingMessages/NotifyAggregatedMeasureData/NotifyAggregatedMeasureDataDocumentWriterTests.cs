@@ -64,7 +64,6 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
                     .WithEnergySupplierNumber(SampleData.EnergySupplierNumber)
                     .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
                     .WithPoint(new EnergyResultMessagePoint(1, 1m, CalculatedQuantityQuality.Calculated, "2022-12-12T23:00:00Z"))
-                    .WithOriginalTransactionIdReference(SampleData.OriginalTransactionIdReference)
                     .WithSettlementMethod(SettlementType.NonProfiled),
                 DocumentFormat.From(documentFormat));
 
@@ -81,7 +80,6 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
             .HasPeriod(
                 new Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod))
             .HasPoint(1, 1)
-            .HasOriginalTransactionIdReference(SampleData.OriginalTransactionIdReference)
             .HasSettlementMethod(SettlementType.NonProfiled)
             .HasCalculationResultVersion(1)
             .DocumentIsValidAsync();

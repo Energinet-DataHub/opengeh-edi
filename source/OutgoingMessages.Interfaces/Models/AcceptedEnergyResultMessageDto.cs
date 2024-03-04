@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common.Serialization;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
@@ -38,7 +37,6 @@ public class AcceptedEnergyResultMessageDto : OutgoingMessageDto
             receiverRole,
             DataHubDetails.DataHubActorNumber,
             ActorRole.MeteredDataAdministrator,
-            new Serializer().Serialize(series),
             relatedToMessageId)
     {
         Series = series;
