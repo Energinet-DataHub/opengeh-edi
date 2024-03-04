@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 
-namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.AggregationResult;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 
 public class AssertNotifyAggregatedMeasureDataXmlDocument : IAssertNotifyAggregatedMeasureDataDocument
 {

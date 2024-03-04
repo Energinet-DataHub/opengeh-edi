@@ -21,7 +21,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Ebix;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 
-namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.WholesaleCalculations;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
 
 internal sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWholesaleServicesDocument
 {

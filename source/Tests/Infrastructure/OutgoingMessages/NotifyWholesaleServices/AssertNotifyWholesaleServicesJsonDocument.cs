@@ -26,7 +26,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using FluentAssertions;
 using Json.Schema;
 
-namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.WholesaleCalculations;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
 
 public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWholesaleServicesDocument
 {

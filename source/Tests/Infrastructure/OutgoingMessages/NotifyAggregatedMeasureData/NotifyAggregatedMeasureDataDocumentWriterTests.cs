@@ -29,7 +29,7 @@ using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions;
 using Xunit;
 
-namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.AggregationResult;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 
 public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<DocumentValidationFixture>
 {

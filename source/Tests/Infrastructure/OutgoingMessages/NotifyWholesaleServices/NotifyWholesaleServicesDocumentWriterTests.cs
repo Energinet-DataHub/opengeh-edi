@@ -29,7 +29,7 @@ using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions.Execution;
 using Xunit;
 
-namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.WholesaleCalculations;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
 
 public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<DocumentValidationFixture>
 {

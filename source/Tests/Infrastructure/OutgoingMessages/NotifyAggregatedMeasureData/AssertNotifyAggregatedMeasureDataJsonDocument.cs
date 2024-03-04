@@ -27,7 +27,7 @@ using FluentAssertions;
 using Json.Schema;
 using Xunit;
 
-namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.AggregationResult;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 
 internal sealed class AssertNotifyAggregatedMeasureDataJsonDocument : IAssertNotifyAggregatedMeasureDataDocument
 {
