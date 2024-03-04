@@ -30,7 +30,7 @@ public class RequestWholesaleSettlementReceiver
         _featureFlagManager = featureFlagManager;
     }
 
-    [Function(nameof(RequestAggregatedMeasureMessageReceiver))]
+    [Function(nameof(RequestWholesaleSettlementReceiver))]
     public async Task<HttpResponseData> RunAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
         HttpRequestData request,
