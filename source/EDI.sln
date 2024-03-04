@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api", "Api\Api.csproj", "{B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationTests", "IntegrationTests\IntegrationTests.csproj", "{76FA7684-27E1-4022-9FB3-F72811E45C60}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{8B1DCD6E-013F-4B45-B9EB-167F1D874793}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArchitectureTests", "ArchitectureTests\ArchitectureTests.csproj", "{D0C39286-C7BE-4714-8CA1-5654B68A9529}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{87BCDB76-76A4-46A3-9F67-571847541C90}"
@@ -105,10 +103,6 @@ Global
 		{76FA7684-27E1-4022-9FB3-F72811E45C60}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{76FA7684-27E1-4022-9FB3-F72811E45C60}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{76FA7684-27E1-4022-9FB3-F72811E45C60}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8B1DCD6E-013F-4B45-B9EB-167F1D874793}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8B1DCD6E-013F-4B45-B9EB-167F1D874793}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8B1DCD6E-013F-4B45-B9EB-167F1D874793}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8B1DCD6E-013F-4B45-B9EB-167F1D874793}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D0C39286-C7BE-4714-8CA1-5654B68A9529}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D0C39286-C7BE-4714-8CA1-5654B68A9529}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D0C39286-C7BE-4714-8CA1-5654B68A9529}.Release|Any CPU.ActiveCfg = Release|Any CPU

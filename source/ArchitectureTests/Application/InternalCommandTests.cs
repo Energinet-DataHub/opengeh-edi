@@ -18,7 +18,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers;
 using Xunit;
 
@@ -28,11 +27,7 @@ public class InternalCommandTests
 {
     public static IEnumerable<object[]> GetInternalCommands()
     {
-        var allTypes = ApplicationAssemblies
-            .Application
-            .GetTypes()
-            .Concat(ApplicationAssemblies.Infrastructure.GetTypes())
-            .Concat(typeof(EnqueueAcceptedEnergyResultMessageHandler).Assembly.GetTypes());
+        var allTypes = typeof(EnqueueAcceptedEnergyResultMessageHandler).Assembly.GetTypes();
 
         return allTypes
             .Where(t => t.IsSubclassOf(typeof(InternalCommand)))
