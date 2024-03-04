@@ -90,8 +90,6 @@ namespace Energinet.DataHub.EDI.Api
                 .ConfigureServices(
                     (context, services) =>
                     {
-                        CompositionRoot.Initialize(services);
-
                         services.AddApplicationInsights()
                             .ConfigureFunctionsApplicationInsights()
                             .AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>()
@@ -106,7 +104,8 @@ namespace Energinet.DataHub.EDI.Api
                             .AddSqlServerHealthCheck(configuration)
                             .AddB2BAuthentication(tokenValidationParameters)
                             .AddSystemClock()
-                            .AddSerializer();
+                            .AddSerializer()
+                            .AddLogging();
                         services.AddBlobStorageHealthCheck("edi-web-jobs-storage", runtime.AzureWebJobsStorage!);
                         services.AddBlobStorageHealthCheck("edi-documents-storage", runtime.AZURE_STORAGE_ACCOUNT_URL!);
 

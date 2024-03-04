@@ -266,9 +266,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 .AddScopedSqlDbContext<ProcessContext>(config)
                 .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)
                 .AddSerializer()
+                .AddLogging()
                 .AddScoped<ISystemDateTimeProvider>(_ => new SystemDateTimeProviderStub());
-
-            CompositionRoot.Initialize(_services);
 
             _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>();
             _services.AddScoped(_ => new JwtTokenParser(JwtTokenParserTests.DisableAllTokenValidations));
