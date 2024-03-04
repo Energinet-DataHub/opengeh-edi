@@ -86,6 +86,9 @@ limitations under the License.
       <Protobuf Update="IntegrationEvents\MarketParticipant\ActorCertificateCredentialsRemoved.proto">
         <OutputDir>obj\Debug\net8.0\</OutputDir>
       </Protobuf>
+      <Protobuf Update="Requests\WholesaleServicesRequest.proto">
+        <OutputDir>obj\Debug\net8.0\</OutputDir>
+      </Protobuf>
     </ItemGroup>
 
 </Project>
