@@ -145,7 +145,6 @@ public class AmountPerChargeResultProducedV1EventBuilder
     internal AmountPerChargeResultProducedV1EventBuilder WithResolution(AmountPerChargeResultProducedV1.Types.Resolution resolution)
     {
         _resolution = resolution;
-
         return this;
     }
 }
