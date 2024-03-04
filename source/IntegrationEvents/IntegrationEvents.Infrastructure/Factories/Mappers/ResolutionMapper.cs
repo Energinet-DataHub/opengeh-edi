@@ -32,13 +32,12 @@ public static class ResolutionMapper
 
     public static Resolution Map(AmountPerChargeResultProducedV1.Types.Resolution resolution)
     {
-        return Resolution.Monthly;
-        // return resolution switch
-        // {
-        //     AmountPerChargeResultProducedV1.Types.Resolution.Day => Resolution.Monthly,
-        //     AmountPerChargeResultProducedV1.Types.Resolution.Hour => Resolution.Monthly,
-        //     AmountPerChargeResultProducedV1.Types.Resolution.Unspecified => throw new InvalidOperationException("Could not map resolution type"),
-        //     _ => throw new ArgumentOutOfRangeException(nameof(resolution), resolution, "Unknown resolution from Wholesale"),
-        // };
+        return resolution switch
+        {
+            AmountPerChargeResultProducedV1.Types.Resolution.Day => Resolution.Daily,
+            AmountPerChargeResultProducedV1.Types.Resolution.Hour => Resolution.Hourly,
+            AmountPerChargeResultProducedV1.Types.Resolution.Unspecified => throw new InvalidOperationException("Could not map resolution type"),
+            _ => throw new ArgumentOutOfRangeException(nameof(resolution), resolution, "Unknown resolution from Wholesale"),
+        };
     }
 }
