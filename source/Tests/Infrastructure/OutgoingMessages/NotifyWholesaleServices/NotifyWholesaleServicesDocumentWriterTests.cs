@@ -31,13 +31,13 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.WholesaleCalculations;
 
-public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<DocumentValidationFixture>
+public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<DocumentValidationFixture>
 {
     private readonly DocumentValidationFixture _documentValidation;
     private readonly MessageRecordParser _parser;
     private readonly WholesaleServicesSeriesBuilder _wholesaleServicesSeriesBuilder;
 
-    public WholesaleCalculationResultDocumentWriterTests(
+    public NotifyWholesaleServicesDocumentWriterTests(
         DocumentValidationFixture documentValidation)
     {
         _documentValidation = documentValidation;
@@ -271,23 +271,23 @@ public class WholesaleCalculationResultDocumentWriterTests : IClassFixture<Docum
         throw new NotImplementedException();
     }
 
-    private IAssertWholesaleCalculationResultDocument AssertDocument(MarketDocumentStream document, DocumentFormat documentFormat)
+    private IAssertNotifyWholesaleServicesDocument AssertDocument(MarketDocumentStream document, DocumentFormat documentFormat)
     {
          if (documentFormat == DocumentFormat.Xml)
          {
              var assertXmlDocument = AssertXmlDocument.Document(document.Stream, "cim", _documentValidation.Validator);
-             return new AssertWholesaleCalculationResultXmlDocument(assertXmlDocument);
+             return new AssertNotifyWholesaleServicesXmlDocument(assertXmlDocument);
          }
 
          if (documentFormat == DocumentFormat.Json)
          {
-             return new AssertWholesaleCalculationResultJsonDocument(document.Stream);
+             return new AssertNotifyWholesaleServicesJsonDocument(document.Stream);
          }
 
          if (documentFormat == DocumentFormat.Ebix)
          {
              var assertEbixDocument = AssertEbixDocument.Document(document.Stream, "ns0", _documentValidation.Validator);
-             return new AssertWholesaleCalculationResultEbixDocument(assertEbixDocument);
+             return new AssertNotifyWholesaleServicesEbixDocument(assertEbixDocument);
          }
 
          throw new NotSupportedException($"Document format '{documentFormat}' is not supported");

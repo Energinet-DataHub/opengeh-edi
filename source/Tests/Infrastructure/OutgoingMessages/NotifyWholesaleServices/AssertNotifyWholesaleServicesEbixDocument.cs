@@ -23,7 +23,7 @@ using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.WholesaleCalculations;
 
-internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWholesaleCalculationResultDocument
+internal sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWholesaleServicesDocument
 {
     private const string HeaderEnergyDocument = "HeaderEnergyDocument";
     private const string ProcessEnergyContext = "ProcessEnergyContext";
@@ -31,7 +31,7 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
 
     private readonly AssertEbixDocument _documentAsserter;
 
-    public AssertWholesaleCalculationResultEbixDocument(AssertEbixDocument documentAsserter)
+    public AssertNotifyWholesaleServicesEbixDocument(AssertEbixDocument documentAsserter)
     {
         _documentAsserter = documentAsserter;
         _documentAsserter.HasValueWithAttributes(
@@ -42,13 +42,13 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
 
     #region header validation
 
-    public IAssertWholesaleCalculationResultDocument HasMessageId(string expectedMessageId)
+    public IAssertNotifyWholesaleServicesDocument HasMessageId(string expectedMessageId)
     {
         _documentAsserter.HasValue($"{HeaderEnergyDocument}/Identification", expectedMessageId);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasBusinessReason(
+    public IAssertNotifyWholesaleServicesDocument HasBusinessReason(
         BusinessReason businessReason,
         CodeListType codeListType)
     {
@@ -60,7 +60,7 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasSenderId(ActorNumber expectedSenderId, string codingScheme)
+    public IAssertNotifyWholesaleServicesDocument HasSenderId(ActorNumber expectedSenderId, string codingScheme)
     {
         CreateRequiredSchemeAttribute(expectedSenderId);
 
@@ -72,13 +72,13 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasSenderRole(ActorRole expectedSenderRole)
+    public IAssertNotifyWholesaleServicesDocument HasSenderRole(ActorRole expectedSenderRole)
     {
         // SenderRole does not exist in the Ebix format
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasReceiverId(ActorNumber expectedReceiverId)
+    public IAssertNotifyWholesaleServicesDocument HasReceiverId(ActorNumber expectedReceiverId)
     {
         _documentAsserter.HasValueWithAttributes(
             $"{HeaderEnergyDocument}/RecipientEnergyParty/Identification",
@@ -88,7 +88,7 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasReceiverRole(ActorRole expectedReceiverRole, CodeListType codeListType)
+    public IAssertNotifyWholesaleServicesDocument HasReceiverRole(ActorRole expectedReceiverRole, CodeListType codeListType)
     {
         _documentAsserter.HasValueWithAttributes(
             $"{ProcessEnergyContext}/EnergyBusinessProcessRole",
@@ -98,7 +98,7 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasTimestamp(string expectedTimestamp)
+    public IAssertNotifyWholesaleServicesDocument HasTimestamp(string expectedTimestamp)
     {
         _documentAsserter.HasValue($"{HeaderEnergyDocument}/Creation", expectedTimestamp);
         return this;
@@ -108,19 +108,19 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
 
     #region series validation
 
-    public IAssertWholesaleCalculationResultDocument HasTransactionId(Guid expectedTransactionId)
+    public IAssertNotifyWholesaleServicesDocument HasTransactionId(Guid expectedTransactionId)
     {
         _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/Identification", expectedTransactionId.ToString("N"));
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasCalculationVersion(int expectedVersion)
+    public IAssertNotifyWholesaleServicesDocument HasCalculationVersion(int expectedVersion)
     {
         _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/Version", expectedVersion.ToString(CultureInfo.InvariantCulture));
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasChargeTypeOwner(ActorNumber expectedChargeTypeOwner, string codingScheme)
+    public IAssertNotifyWholesaleServicesDocument HasChargeTypeOwner(ActorNumber expectedChargeTypeOwner, string codingScheme)
     {
         _documentAsserter.HasValueWithAttributes(
             $"{PayloadEnergyTimeSeries}[1]/ChargeTypeOwnerEnergyParty/Identification",
@@ -129,19 +129,19 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType)
+    public IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType)
     {
         _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/TypeOfMeteringPoint", expectedMeteringPointType.Code);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasChargeCode(string expectedChargeTypeNumber)
+    public IAssertNotifyWholesaleServicesDocument HasChargeCode(string expectedChargeTypeNumber)
     {
         _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/PartyChargeTypeID", expectedChargeTypeNumber);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasChargeType(ChargeType expectedChargeType)
+    public IAssertNotifyWholesaleServicesDocument HasChargeType(ChargeType expectedChargeType)
     {
         _documentAsserter.HasValueWithAttributes(
             $"{PayloadEnergyTimeSeries}[1]/ChargeType",
@@ -151,7 +151,7 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasGridAreaCode(string expectedGridAreaCode, string codingScheme)
+    public IAssertNotifyWholesaleServicesDocument HasGridAreaCode(string expectedGridAreaCode, string codingScheme)
     {
         _documentAsserter.HasValueWithAttributes(
             $"{PayloadEnergyTimeSeries}[1]/MeteringGridAreaUsedDomainLocation/Identification",
@@ -162,7 +162,7 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasEnergySupplierNumber(
+    public IAssertNotifyWholesaleServicesDocument HasEnergySupplierNumber(
         ActorNumber expectedEnergySupplierNumber,
         string codingScheme)
     {
@@ -173,7 +173,7 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasProductCode(string expectedProductCode)
+    public IAssertNotifyWholesaleServicesDocument HasProductCode(string expectedProductCode)
     {
         _documentAsserter.HasValueWithAttributes(
             $"{PayloadEnergyTimeSeries}[1]/IncludedProductCharacteristic/Identification",
@@ -183,7 +183,7 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasMeasurementUnit(MeasurementUnit expectedMeasurementUnit)
+    public IAssertNotifyWholesaleServicesDocument HasMeasurementUnit(MeasurementUnit expectedMeasurementUnit)
     {
         _documentAsserter.HasValueWithAttributes(
             $"{PayloadEnergyTimeSeries}[1]/IncludedProductCharacteristic/UnitType",
@@ -192,13 +192,13 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasPriceMeasurementUnit(MeasurementUnit expectedPriceMeasurementUnit)
+    public IAssertNotifyWholesaleServicesDocument HasPriceMeasurementUnit(MeasurementUnit expectedPriceMeasurementUnit)
     {
         // Is not used in ebIX document
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasCurrency(Currency expectedPriceUnit)
+    public IAssertNotifyWholesaleServicesDocument HasCurrency(Currency expectedPriceUnit)
     {
         _documentAsserter.HasValueWithAttributes(
             $"{PayloadEnergyTimeSeries}[1]/Currency",
@@ -207,7 +207,7 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasPeriod(Period expectedPeriod)
+    public IAssertNotifyWholesaleServicesDocument HasPeriod(Period expectedPeriod)
     {
         _documentAsserter
             .HasValue($"{PayloadEnergyTimeSeries}[1]/ObservationTimeSeriesPeriod/Start", expectedPeriod.StartToEbixString())
@@ -215,13 +215,13 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasResolution(Resolution resolution)
+    public IAssertNotifyWholesaleServicesDocument HasResolution(Resolution resolution)
     {
         _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/ObservationTimeSeriesPeriod/ResolutionDuration", EbixCode.Of(resolution));
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasPositionAndQuantity(int expectedPosition, int expectedQuantity)
+    public IAssertNotifyWholesaleServicesDocument HasPositionAndQuantity(int expectedPosition, int expectedQuantity)
     {
         _documentAsserter
             .HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[1]/Position", expectedPosition.ToString(CultureInfo.InvariantCulture))
@@ -229,19 +229,19 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
-    public async Task<IAssertWholesaleCalculationResultDocument> DocumentIsValidAsync()
+    public async Task<IAssertNotifyWholesaleServicesDocument> DocumentIsValidAsync()
     {
         await _documentAsserter.HasValidStructureAsync(DocumentType.NotifyWholesaleServices, "3").ConfigureAwait(false);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument SettlementMethodIsNotPresent()
+    public IAssertNotifyWholesaleServicesDocument SettlementMethodIsNotPresent()
     {
         _documentAsserter.IsNotPresent("PayloadEnergyTimeSeries[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod");
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument QualityIsPresentForPosition(
+    public IAssertNotifyWholesaleServicesDocument QualityIsPresentForPosition(
         int position,
         string quantityQualityCode)
     {
@@ -252,31 +252,31 @@ internal sealed class AssertWholesaleCalculationResultEbixDocument : IAssertWhol
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasSettlementVersion(SettlementVersion settlementVersion)
+    public IAssertNotifyWholesaleServicesDocument HasSettlementVersion(SettlementVersion settlementVersion)
     {
         _documentAsserter.HasValue("ProcessEnergyContext/ProcessVariant", EbixCode.Of(settlementVersion));
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument SettlementVersionIsNotPresent()
+    public IAssertNotifyWholesaleServicesDocument SettlementVersionIsNotPresent()
     {
         _documentAsserter.IsNotPresent("ProcessEnergyContext/ProcessVariant");
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasOriginalTransactionIdReference(string originalTransactionIdReference)
+    public IAssertNotifyWholesaleServicesDocument HasOriginalTransactionIdReference(string originalTransactionIdReference)
     {
         // Not supported in ebIX, since ebIX has no requests (anmodning)
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasSettlementMethod(SettlementType settlementMethod)
+    public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementType settlementMethod)
     {
         _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod", settlementMethod.Code);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument PriceAmountIsPresentForPointIndex(int pointIndex, string? expectedPrice)
+    public IAssertNotifyWholesaleServicesDocument PriceAmountIsPresentForPointIndex(int pointIndex, string? expectedPrice)
     {
         _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{pointIndex + 1}]/EnergyPrice", expectedPrice ?? "0");
         return this;
