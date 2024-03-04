@@ -27,52 +27,52 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 
-internal sealed class AssertRejectRequestAggregatedMeasureDataResultJsonDocument : IAssertRejectedAggregatedMeasureDataResultDocument
+internal sealed class AssertRejectRequestAggregatedMeasureDataJsonDocument : IAssertRejectRequestAggregatedMeasureDataDocument
 {
     private readonly JsonSchemaProvider _schemas = new(new CimJsonSchemas());
     private readonly JsonDocument _document;
     private readonly JsonElement _root;
 
-    public AssertRejectRequestAggregatedMeasureDataResultJsonDocument(Stream document)
+    public AssertRejectRequestAggregatedMeasureDataJsonDocument(Stream document)
     {
         _document = JsonDocument.Parse(document);
         _root = _document.RootElement.GetProperty("RejectRequestAggregatedMeasureData_MarketDocument");
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasMessageId(string expectedMessageId)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasMessageId(string expectedMessageId)
     {
         Assert.Equal(expectedMessageId, _root.GetProperty("mRID").ToString());
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasSenderId(string expectedSenderId)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasSenderId(string expectedSenderId)
     {
         Assert.Equal(expectedSenderId, _root.GetProperty("sender_MarketParticipant.mRID")
             .GetProperty("value").ToString());
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasReceiverId(string expectedReceiverId)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasReceiverId(string expectedReceiverId)
     {
         Assert.Equal(expectedReceiverId, _root.GetProperty("receiver_MarketParticipant.mRID")
             .GetProperty("value").ToString());
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasTimestamp(Instant expectedTimestamp)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasTimestamp(Instant expectedTimestamp)
     {
         Assert.Equal(expectedTimestamp.ToString(), _root.GetProperty("createdDateTime").ToString());
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasReasonCode(string reasonCode)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasReasonCode(string reasonCode)
     {
         Assert.Equal(reasonCode, _root.GetProperty("reason.code")
             .GetProperty("value").ToString());
         return this;
     }
 
-    public async Task<IAssertRejectedAggregatedMeasureDataResultDocument> DocumentIsValidAsync()
+    public async Task<IAssertRejectRequestAggregatedMeasureDataDocument> DocumentIsValidAsync()
     {
         var schema = await _schemas.GetSchemaAsync<JsonSchema>("RejectRequestAggregatedMeasureData", "0", CancellationToken.None).ConfigureAwait(false);
         var validationOptions = new EvaluationOptions()
@@ -86,31 +86,31 @@ internal sealed class AssertRejectRequestAggregatedMeasureDataResultJsonDocument
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasBusinessReason(BusinessReason businessReason)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasBusinessReason(BusinessReason businessReason)
     {
         Assert.Equal(CimCode.Of(businessReason), _root.GetProperty("process.processType").GetProperty("value").ToString());
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasTransactionId(Guid expectedTransactionId)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasTransactionId(Guid expectedTransactionId)
     {
         Assert.Equal(expectedTransactionId.ToString(), FirstSeriesElement().GetProperty("mRID").ToString());
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasSerieReasonCode(string expectedSerieReasonCode)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasSerieReasonCode(string expectedSerieReasonCode)
     {
         Assert.Equal(expectedSerieReasonCode, FirstReasonElement().GetProperty("code").GetProperty("value").ToString());
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasSerieReasonMessage(string expectedSerieReasonMessage)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasSerieReasonMessage(string expectedSerieReasonMessage)
     {
         Assert.Equal(expectedSerieReasonMessage, FirstReasonElement().GetProperty("text").ToString());
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasOriginalTransactionId(string expectedOriginalTransactionId)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasOriginalTransactionId(string expectedOriginalTransactionId)
     {
         Assert.Equal(expectedOriginalTransactionId, FirstSeriesElement().GetProperty("originalTransactionIDReference_Series.mRID").ToString());
         return this;

@@ -27,13 +27,13 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 
-public class RejectRequestAggregatedMeasureDataResultDocumentWriterTests : IClassFixture<DocumentValidationFixture>
+public class RejectRequestAggregatedMeasureDataDocumentWriterTests : IClassFixture<DocumentValidationFixture>
 {
     private readonly DocumentValidationFixture _documentValidation;
     private readonly MessageRecordParser _parser;
     private readonly RejectedEnergyResultMessageSerieBuilder _rejectedEnergyResultMessageSerie;
 
-    public RejectRequestAggregatedMeasureDataResultDocumentWriterTests(DocumentValidationFixture documentValidation)
+    public RejectRequestAggregatedMeasureDataDocumentWriterTests(DocumentValidationFixture documentValidation)
     {
         _documentValidation = documentValidation;
         _parser = new MessageRecordParser(new Serializer());
@@ -89,21 +89,21 @@ public class RejectRequestAggregatedMeasureDataResultDocumentWriterTests : IClas
         }
     }
 
-    private IAssertRejectedAggregatedMeasureDataResultDocument AssertDocument(Stream document, DocumentFormat documentFormat)
+    private IAssertRejectRequestAggregatedMeasureDataDocument AssertDocument(Stream document, DocumentFormat documentFormat)
     {
         if (documentFormat == DocumentFormat.Ebix)
         {
             var assertEbixDocument = AssertEbixDocument.Document(document, "ns0", _documentValidation.Validator);
-            return new AssertRejectedAggregatedMeasureDataResultEbixDocument(assertEbixDocument);
+            return new AssertRejectRequestAggregatedMeasureDataEbixDocument(assertEbixDocument);
         }
         else if (documentFormat == DocumentFormat.Xml)
         {
             var assertXmlDocument = AssertXmlDocument.Document(document, "cim", _documentValidation.Validator);
-            return new AssertRejectedAggregatedMeasureDataResultXmlDocument(assertXmlDocument);
+            return new AssertRejectRequestAggregatedMeasureDataXmlDocument(assertXmlDocument);
         }
         else
         {
-            return new AssertRejectRequestAggregatedMeasureDataResultJsonDocument(document);
+            return new AssertRejectRequestAggregatedMeasureDataJsonDocument(document);
         }
     }
 }
