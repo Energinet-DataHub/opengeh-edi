@@ -385,6 +385,27 @@ public class SearchMessagesTests : TestBase
         Assert.Equal(2, result.Messages.Count);
     }
 
+    [Fact]
+    public async Task Filter_messages_by_receiver_number_and_sender_number()
+    {
+        //Arrange
+        var expectedActorNumber = ActorNumber.Create("1234512345888").Value;
+        await ArchiveMessage(CreateArchivedMessage(senderNumber: expectedActorNumber));
+        await ArchiveMessage(CreateArchivedMessage(receiverNumber: expectedActorNumber));
+
+        //Act
+        var result = await _archivedMessagesClient.SearchAsync(
+            new GetMessagesQuery(ReceiverNumber: expectedActorNumber, SenderNumber: expectedActorNumber),
+            CancellationToken.None);
+
+        //Assert
+        var receiverAndSenderNumber = result.Messages.Select(m => m.ReceiverNumber).Intersect(result.Messages.Select(m => m.SenderNumber));
+        foreach (var actualActorNumber in receiverAndSenderNumber)
+        {
+            Assert.Equal(expectedActorNumber, actualActorNumber);
+        }
+    }
+
     private static Instant CreatedAt(string date)
     {
         return InstantPattern.General.Parse(date).Value;
