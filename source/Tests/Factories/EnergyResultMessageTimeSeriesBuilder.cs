@@ -42,7 +42,6 @@ public class EnergyResultMessageTimeSeriesBuilder
     private Resolution _resolution = Resolution.QuarterHourly;
     private string? _energySupplierNumber;
     private string? _balanceResponsibleNumber;
-    private string? _originalTransactionIdReference;
     private SettlementVersion? _settlementVersion;
     private Period _period = new(SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)), SystemClock.Instance.GetCurrentInstant());
 
@@ -145,12 +144,6 @@ public class EnergyResultMessageTimeSeriesBuilder
         return this;
     }
 
-    public EnergyResultMessageTimeSeriesBuilder WithOriginalTransactionIdReference(string originalTransactionIdReference)
-    {
-        _originalTransactionIdReference = originalTransactionIdReference;
-        return this;
-    }
-
     public EnergyResultMessageTimeSeriesBuilder WithSettlementVersion(SettlementVersion? settlementVersion)
     {
         _settlementVersion = settlementVersion;
@@ -183,7 +176,7 @@ public class EnergyResultMessageTimeSeriesBuilder
             _period,
             _points,
             _calculationResultVersion,
-            _originalTransactionIdReference,
+            null,
             _settlementVersion?.Name);
     }
 
