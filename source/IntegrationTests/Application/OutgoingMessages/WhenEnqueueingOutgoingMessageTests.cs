@@ -191,7 +191,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
             .Build();
-
+        var outgoingMessage = OutgoingMessage.CreateMessage(message, Instant.FromUtc(2024, 1, 1, 0, 0));
         // Act
         var createdId = await EnqueueAndCommitAsync(message);
 
@@ -199,7 +199,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var fileStorageReference = await GetOutgoingMessageFileStorageReferenceFromDatabase(createdId);
 
         var fileContent = await GetFileContentFromFileStorageAsync("outgoing", fileStorageReference);
-        fileContent.Should().Be(message.SerializedContent);
+        fileContent.Should().Be(outgoingMessage.GetSerializedContent());
     }
 
     [Fact]

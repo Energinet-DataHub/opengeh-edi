@@ -53,7 +53,6 @@ public static class OutgoingMessagesExtensions
         //MessageEnqueueingConfiguration
         services.AddTransient<MessageEnqueuer>()
             .AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>()
-            .AddScoped<OutgoingMessageFactory>()
             .AddTransient<IOutgoingMessagesClient, OutgoingMessagesClient>();
 
         //PeekConfiguration

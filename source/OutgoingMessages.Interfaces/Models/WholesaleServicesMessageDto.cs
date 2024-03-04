@@ -36,13 +36,15 @@ public class WholesaleServicesMessageDto : OutgoingMessageDto
             businessReason.Name,
             receiverRole,
             DataHubDetails.DataHubActorNumber,
-            ActorRole.MeteredDataAdministrator,
-            new Serializer().Serialize(series))
+            ActorRole.MeteredDataAdministrator)
     {
         ChargeOwnerId = chargeOwnerId;
+        Series = series;
     }
 
     public ActorNumber ChargeOwnerId { get; }
+
+    public WholesaleServicesSeries Series { get; }
 
     public static WholesaleServicesMessageDto Create(
         ActorNumber receiverNumber,

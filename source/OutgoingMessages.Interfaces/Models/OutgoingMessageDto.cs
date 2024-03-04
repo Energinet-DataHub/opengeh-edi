@@ -18,7 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
 /// <summary>
-/// Contract for an outgoing message
+/// Base contract for an outgoing message
 /// </summary>
 public abstract class OutgoingMessageDto
 {
@@ -30,7 +30,6 @@ public abstract class OutgoingMessageDto
         ActorRole receiverRole,
         ActorNumber senderId,
         ActorRole senderRole,
-        string serializedContent,
         MessageId? relatedToMessageId = null)
     {
         DocumentType = documentType;
@@ -40,7 +39,6 @@ public abstract class OutgoingMessageDto
         ReceiverRole = receiverRole;
         SenderId = senderId;
         SenderRole = senderRole;
-        SerializedContent = serializedContent;
         RelatedToMessageId = relatedToMessageId;
     }
 
@@ -57,8 +55,6 @@ public abstract class OutgoingMessageDto
     public ActorNumber SenderId { get; }
 
     public ActorRole SenderRole { get; }
-
-    public string SerializedContent { get; }
 
     /// <summary>
     /// If this attribute has a value, then it is used to store the message id of a request from an actor.

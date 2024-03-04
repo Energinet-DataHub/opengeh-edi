@@ -37,7 +37,6 @@ public class RejectedEnergyResultMessageDto : OutgoingMessageDto
             receiverRole,
             DataHubDetails.DataHubActorNumber,
             ActorRole.MeteredDataAdministrator,
-            new Serializer().Serialize(series),
             relatedToMessageId)
     {
         Series = series;
