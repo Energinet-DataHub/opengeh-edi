@@ -42,6 +42,7 @@ public class AmountPerChargeResultProducedV1Processor : IIntegrationEventProcess
     public async Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
+
         if (!await _featureManager.UseAmountPerChargeResultProduced.ConfigureAwait(false))
         {
             return;
