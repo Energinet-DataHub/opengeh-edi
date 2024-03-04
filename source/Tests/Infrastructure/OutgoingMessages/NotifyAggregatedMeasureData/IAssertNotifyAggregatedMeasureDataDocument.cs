@@ -21,142 +21,142 @@ namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Aggregatio
 /// <summary>
 /// Assertion helper for aggregation result documents
 /// </summary>
-public interface IAssertAggregationResultDocument
+public interface IAssertNotifyAggregatedMeasureDataDocument
 {
     /// <summary>
     /// Asserts message id
     /// </summary>
     /// <param name="expectedMessageId"></param>
-    IAssertAggregationResultDocument HasMessageId(string expectedMessageId);
+    IAssertNotifyAggregatedMeasureDataDocument HasMessageId(string expectedMessageId);
 
     /// <summary>
     /// Assert sender id
     /// </summary>
     /// <param name="expectedSenderId"></param>
-    IAssertAggregationResultDocument HasSenderId(string expectedSenderId);
+    IAssertNotifyAggregatedMeasureDataDocument HasSenderId(string expectedSenderId);
 
     /// <summary>
     /// Asserts receiver id
     /// </summary>
     /// <param name="expectedReceiverId"></param>
-    IAssertAggregationResultDocument HasReceiverId(string expectedReceiverId);
+    IAssertNotifyAggregatedMeasureDataDocument HasReceiverId(string expectedReceiverId);
 
     /// <summary>
     /// Asserts time stamp
     /// </summary>
     /// <param name="expectedTimestamp"></param>
-    IAssertAggregationResultDocument HasTimestamp(string expectedTimestamp);
+    IAssertNotifyAggregatedMeasureDataDocument HasTimestamp(string expectedTimestamp);
 
     /// <summary>
     /// Asserts transaction id
     /// </summary>
     /// <param name="expectedTransactionId"></param>
-    IAssertAggregationResultDocument HasTransactionId(Guid expectedTransactionId);
+    IAssertNotifyAggregatedMeasureDataDocument HasTransactionId(Guid expectedTransactionId);
 
     /// <summary>
     /// Asserts grid area code
     /// </summary>
     /// <param name="expectedGridAreaCode"></param>
-    IAssertAggregationResultDocument HasGridAreaCode(string expectedGridAreaCode);
+    IAssertNotifyAggregatedMeasureDataDocument HasGridAreaCode(string expectedGridAreaCode);
 
     /// <summary>
     /// Asserts balance supplier number
     /// </summary>
     /// <param name="expectedBalanceResponsibleNumber"></param>
-    IAssertAggregationResultDocument HasBalanceResponsibleNumber(string expectedBalanceResponsibleNumber);
+    IAssertNotifyAggregatedMeasureDataDocument HasBalanceResponsibleNumber(string expectedBalanceResponsibleNumber);
 
     /// <summary>
     /// Asserts energy supplier number
     /// </summary>
     /// <param name="expectedEnergySupplierNumber"></param>
-    IAssertAggregationResultDocument HasEnergySupplierNumber(string expectedEnergySupplierNumber);
+    IAssertNotifyAggregatedMeasureDataDocument HasEnergySupplierNumber(string expectedEnergySupplierNumber);
 
     /// <summary>
     /// Asserts product code
     /// </summary>
     /// <param name="expectedProductCode"></param>
-    IAssertAggregationResultDocument HasProductCode(string expectedProductCode);
+    IAssertNotifyAggregatedMeasureDataDocument HasProductCode(string expectedProductCode);
 
     /// <summary>
     /// Asserts period
     /// </summary>
     /// <param name="expectedPeriod"></param>
-    IAssertAggregationResultDocument HasPeriod(Period expectedPeriod);
+    IAssertNotifyAggregatedMeasureDataDocument HasPeriod(Period expectedPeriod);
 
     /// <summary>
     /// Asserts a point
     /// </summary>
     /// <param name="position"></param>
     /// <param name="quantity"></param>
-    IAssertAggregationResultDocument HasPoint(int position, int quantity);
+    IAssertNotifyAggregatedMeasureDataDocument HasPoint(int position, int quantity);
 
     /// <summary>
     /// Asserts document validity
     /// </summary>
-    Task<IAssertAggregationResultDocument> DocumentIsValidAsync();
+    Task<IAssertNotifyAggregatedMeasureDataDocument> DocumentIsValidAsync();
 
     /// <summary>
     /// Asserts the settlement method is not present
     /// </summary>
-    IAssertAggregationResultDocument SettlementMethodIsNotPresent();
+    IAssertNotifyAggregatedMeasureDataDocument SettlementMethodIsNotPresent();
 
     /// <summary>
     /// Asserts the settlement version is not present
     /// </summary>
-    IAssertAggregationResultDocument SettlementVersionIsNotPresent();
+    IAssertNotifyAggregatedMeasureDataDocument SettlementVersionIsNotPresent();
 
     /// <summary>
     /// Asserts the energy supplier number is not present
     /// </summary>
-    IAssertAggregationResultDocument EnergySupplierNumberIsNotPresent();
+    IAssertNotifyAggregatedMeasureDataDocument EnergySupplierNumberIsNotPresent();
 
     /// <summary>
     /// Asserts the balance responsible number is not present
     /// </summary>
-    IAssertAggregationResultDocument BalanceResponsibleNumberIsNotPresent();
+    IAssertNotifyAggregatedMeasureDataDocument BalanceResponsibleNumberIsNotPresent();
 
     /// <summary>
     /// Asserts the quantity is not present
     /// </summary>
     /// <param name="position"></param>
-    IAssertAggregationResultDocument QuantityIsNotPresentForPosition(int position);
+    IAssertNotifyAggregatedMeasureDataDocument QuantityIsNotPresentForPosition(int position);
 
     /// <summary>
     /// Asserts the quality is not present
     /// </summary>
     /// <param name="position"></param>
-    IAssertAggregationResultDocument QualityIsNotPresentForPosition(int position);
+    IAssertNotifyAggregatedMeasureDataDocument QualityIsNotPresentForPosition(int position);
 
     /// <summary>
     /// Asserts the process type.
     /// </summary>
     /// <param name="businessReason"></param>
-    IAssertAggregationResultDocument HasBusinessReason(BusinessReason businessReason);
+    IAssertNotifyAggregatedMeasureDataDocument HasBusinessReason(BusinessReason businessReason);
 
     /// <summary>
     /// Asserts the SettlementVersion
     /// </summary>
     /// <param name="settlementVersion"></param>
-    IAssertAggregationResultDocument HasSettlementVersion(SettlementVersion settlementVersion);
+    IAssertNotifyAggregatedMeasureDataDocument HasSettlementVersion(SettlementVersion settlementVersion);
 
     /// <summary>
     /// Asserts the OriginalTransactionIdReference
     /// </summary>
     /// <param name="originalTransactionIdReference"></param>
-    IAssertAggregationResultDocument HasOriginalTransactionIdReference(string originalTransactionIdReference);
+    IAssertNotifyAggregatedMeasureDataDocument HasOriginalTransactionIdReference(string originalTransactionIdReference);
 
     /// <summary>
     /// Asserts the settlement method
     /// </summary>
-    IAssertAggregationResultDocument HasSettlementMethod(SettlementType settlementMethod);
+    IAssertNotifyAggregatedMeasureDataDocument HasSettlementMethod(SettlementType settlementMethod);
 
     /// <summary>
     ///     Asserts the quality is present with the given code
     /// </summary>
-    IAssertAggregationResultDocument QualityIsPresentForPosition(int position, string quantityQualityCode);
+    IAssertNotifyAggregatedMeasureDataDocument QualityIsPresentForPosition(int position, string quantityQualityCode);
 
     /// <summary>
     ///     Asserts the calculation result version is present with the given number
     /// </summary>
-    IAssertAggregationResultDocument HasCalculationResultVersion(int version);
+    IAssertNotifyAggregatedMeasureDataDocument HasCalculationResultVersion(int version);
 }

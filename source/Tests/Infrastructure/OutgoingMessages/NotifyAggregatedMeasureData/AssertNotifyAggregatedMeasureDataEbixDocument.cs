@@ -21,71 +21,71 @@ using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.AggregationResult;
 
-public class AssertAggregationResultEbixDocument : IAssertAggregationResultDocument
+public class AssertNotifyAggregatedMeasureDataEbixDocument : IAssertNotifyAggregatedMeasureDataDocument
 {
     private readonly AssertEbixDocument _documentAsserter;
 
-    public AssertAggregationResultEbixDocument(AssertEbixDocument documentAsserter)
+    public AssertNotifyAggregatedMeasureDataEbixDocument(AssertEbixDocument documentAsserter)
     {
         _documentAsserter = documentAsserter;
         _documentAsserter.HasValue("HeaderEnergyDocument/DocumentType", "E31");
     }
 
-    public IAssertAggregationResultDocument HasMessageId(string expectedMessageId)
+    public IAssertNotifyAggregatedMeasureDataDocument HasMessageId(string expectedMessageId)
     {
         _documentAsserter.HasValue("HeaderEnergyDocument/Identification", expectedMessageId);
         return this;
     }
 
-    public IAssertAggregationResultDocument HasSenderId(string expectedSenderId)
+    public IAssertNotifyAggregatedMeasureDataDocument HasSenderId(string expectedSenderId)
     {
         _documentAsserter.HasValue("HeaderEnergyDocument/SenderEnergyParty/Identification", expectedSenderId);
         return this;
     }
 
-    public IAssertAggregationResultDocument HasReceiverId(string expectedReceiverId)
+    public IAssertNotifyAggregatedMeasureDataDocument HasReceiverId(string expectedReceiverId)
     {
         _documentAsserter.HasValue("HeaderEnergyDocument/RecipientEnergyParty/Identification", expectedReceiverId);
         return this;
     }
 
-    public IAssertAggregationResultDocument HasTimestamp(string expectedTimestamp)
+    public IAssertNotifyAggregatedMeasureDataDocument HasTimestamp(string expectedTimestamp)
     {
         _documentAsserter.HasValue("HeaderEnergyDocument/Creation", expectedTimestamp);
         return this;
     }
 
-    public IAssertAggregationResultDocument HasTransactionId(Guid expectedTransactionId)
+    public IAssertNotifyAggregatedMeasureDataDocument HasTransactionId(Guid expectedTransactionId)
     {
         _documentAsserter.HasValue($"PayloadEnergyTimeSeries[1]/Identification", expectedTransactionId.ToString("N"));
         return this;
     }
 
-    public IAssertAggregationResultDocument HasGridAreaCode(string expectedGridAreaCode)
+    public IAssertNotifyAggregatedMeasureDataDocument HasGridAreaCode(string expectedGridAreaCode)
     {
         _documentAsserter.HasValue("PayloadEnergyTimeSeries[1]/MeteringGridAreaUsedDomainLocation/Identification", expectedGridAreaCode);
         return this;
     }
 
-    public IAssertAggregationResultDocument HasBalanceResponsibleNumber(string expectedBalanceResponsibleNumber)
+    public IAssertNotifyAggregatedMeasureDataDocument HasBalanceResponsibleNumber(string expectedBalanceResponsibleNumber)
     {
         _documentAsserter.HasValue("PayloadEnergyTimeSeries[1]/BalanceResponsibleEnergyParty/Identification", expectedBalanceResponsibleNumber);
         return this;
     }
 
-    public IAssertAggregationResultDocument HasEnergySupplierNumber(string expectedEnergySupplierNumber)
+    public IAssertNotifyAggregatedMeasureDataDocument HasEnergySupplierNumber(string expectedEnergySupplierNumber)
     {
         _documentAsserter.HasValue("PayloadEnergyTimeSeries[1]/BalanceSupplierEnergyParty/Identification", expectedEnergySupplierNumber);
         return this;
     }
 
-    public IAssertAggregationResultDocument HasProductCode(string expectedProductCode)
+    public IAssertNotifyAggregatedMeasureDataDocument HasProductCode(string expectedProductCode)
     {
         _documentAsserter.HasValue("PayloadEnergyTimeSeries[1]/IncludedProductCharacteristic/Identification", expectedProductCode);
         return this;
     }
 
-    public IAssertAggregationResultDocument HasPeriod(Period expectedPeriod)
+    public IAssertNotifyAggregatedMeasureDataDocument HasPeriod(Period expectedPeriod)
     {
         ArgumentNullException.ThrowIfNull(expectedPeriod);
         _documentAsserter
@@ -94,7 +94,7 @@ public class AssertAggregationResultEbixDocument : IAssertAggregationResultDocum
         return this;
     }
 
-    public IAssertAggregationResultDocument HasPoint(int position, int quantity)
+    public IAssertNotifyAggregatedMeasureDataDocument HasPoint(int position, int quantity)
     {
         _documentAsserter
             .HasValue("PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[1]/Position", position.ToString(CultureInfo.InvariantCulture))
@@ -102,44 +102,44 @@ public class AssertAggregationResultEbixDocument : IAssertAggregationResultDocum
         return this;
     }
 
-    public async Task<IAssertAggregationResultDocument> DocumentIsValidAsync()
+    public async Task<IAssertNotifyAggregatedMeasureDataDocument> DocumentIsValidAsync()
     {
         await _documentAsserter.HasValidStructureAsync(DocumentType.NotifyAggregatedMeasureData, "3").ConfigureAwait(false);
         return this;
     }
 
-    public IAssertAggregationResultDocument SettlementMethodIsNotPresent()
+    public IAssertNotifyAggregatedMeasureDataDocument SettlementMethodIsNotPresent()
     {
         _documentAsserter.IsNotPresent("PayloadEnergyTimeSeries[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod");
         return this;
     }
 
-    public IAssertAggregationResultDocument EnergySupplierNumberIsNotPresent()
+    public IAssertNotifyAggregatedMeasureDataDocument EnergySupplierNumberIsNotPresent()
     {
         _documentAsserter.IsNotPresent("PayloadEnergyTimeSeries[1]/BalanceSupplierEnergyParty/Identification");
         return this;
     }
 
-    public IAssertAggregationResultDocument BalanceResponsibleNumberIsNotPresent()
+    public IAssertNotifyAggregatedMeasureDataDocument BalanceResponsibleNumberIsNotPresent()
     {
         _documentAsserter.IsNotPresent("PayloadEnergyTimeSeries[1]/BalanceResponsibleEnergyParty/Identification");
         return this;
     }
 
-    public IAssertAggregationResultDocument QuantityIsNotPresentForPosition(int position)
+    public IAssertNotifyAggregatedMeasureDataDocument QuantityIsNotPresentForPosition(int position)
     {
         _documentAsserter.IsNotPresent($"PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[{position}]/EnergyQuantity");
         return this;
     }
 
-    public IAssertAggregationResultDocument QualityIsNotPresentForPosition(int position)
+    public IAssertNotifyAggregatedMeasureDataDocument QualityIsNotPresentForPosition(int position)
     {
         _documentAsserter.IsNotPresent($"PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[{position}]/QuantityQuality");
         _documentAsserter.HasValue($"PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[{position}]/QuantityMissing", "true");
         return this;
     }
 
-    public IAssertAggregationResultDocument QualityIsPresentForPosition(
+    public IAssertNotifyAggregatedMeasureDataDocument QualityIsPresentForPosition(
         int position,
         string quantityQualityCode)
     {
@@ -150,37 +150,37 @@ public class AssertAggregationResultEbixDocument : IAssertAggregationResultDocum
         return this;
     }
 
-    public IAssertAggregationResultDocument HasCalculationResultVersion(int version)
+    public IAssertNotifyAggregatedMeasureDataDocument HasCalculationResultVersion(int version)
     {
         _documentAsserter.HasValue("PayloadEnergyTimeSeries[1]/Version", version.ToString(NumberFormatInfo.InvariantInfo));
         return this;
     }
 
-    public IAssertAggregationResultDocument HasBusinessReason(BusinessReason businessReason)
+    public IAssertNotifyAggregatedMeasureDataDocument HasBusinessReason(BusinessReason businessReason)
     {
         _documentAsserter.HasValue("ProcessEnergyContext/EnergyBusinessProcess", EbixCode.Of(businessReason));
         return this;
     }
 
-    public IAssertAggregationResultDocument HasSettlementVersion(SettlementVersion settlementVersion)
+    public IAssertNotifyAggregatedMeasureDataDocument HasSettlementVersion(SettlementVersion settlementVersion)
     {
         _documentAsserter.HasValue("ProcessEnergyContext/ProcessVariant", EbixCode.Of(settlementVersion));
         return this;
     }
 
-    public IAssertAggregationResultDocument SettlementVersionIsNotPresent()
+    public IAssertNotifyAggregatedMeasureDataDocument SettlementVersionIsNotPresent()
     {
         _documentAsserter.IsNotPresent("ProcessEnergyContext/ProcessVariant");
         return this;
     }
 
-    public IAssertAggregationResultDocument HasOriginalTransactionIdReference(string originalTransactionIdReference)
+    public IAssertNotifyAggregatedMeasureDataDocument HasOriginalTransactionIdReference(string originalTransactionIdReference)
     {
         _documentAsserter.HasValue("PayloadEnergyTimeSeries[1]/OriginalBusinessDocument", originalTransactionIdReference);
         return this;
     }
 
-    public IAssertAggregationResultDocument HasSettlementMethod(SettlementType settlementMethod)
+    public IAssertNotifyAggregatedMeasureDataDocument HasSettlementMethod(SettlementType settlementMethod)
     {
         _documentAsserter.HasValue("PayloadEnergyTimeSeries[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod", EbixCode.Of(settlementMethod));
         return this;
