@@ -14,9 +14,9 @@
 
 using System;
 using System.Security.Claims;
-using Energinet.DataHub.EDI.Api.Configuration.Authentication.Errors;
+using Energinet.DataHub.EDI.Api.Authentication.Errors;
 
-namespace Energinet.DataHub.EDI.Api.Configuration.Authentication
+namespace Energinet.DataHub.EDI.Api.Authentication
 {
     public class Result
     {

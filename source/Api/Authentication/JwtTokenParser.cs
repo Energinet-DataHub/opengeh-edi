@@ -16,10 +16,10 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http.Headers;
-using Energinet.DataHub.EDI.Api.Configuration.Authentication.Errors;
+using Energinet.DataHub.EDI.Api.Authentication.Errors;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Energinet.DataHub.EDI.Api.Configuration.Authentication
+namespace Energinet.DataHub.EDI.Api.Authentication
 {
     public class JwtTokenParser
     {

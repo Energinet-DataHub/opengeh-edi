@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Api.Configuration.Authentication.Errors
+namespace Energinet.DataHub.EDI.Api.Authentication.Errors
 {
-    public abstract class AuthenticationError
+    public class TokenValidationFailed : AuthenticationError
     {
-        protected AuthenticationError(string message)
+        public TokenValidationFailed(string message)
+         : base(message)
         {
-            Message = message;
         }
-
-        public string Message { get; set; }
     }
 }
