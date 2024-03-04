@@ -21,77 +21,77 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 
-public class AssertRejectedAggregatedMeasureDataResultXmlDocument : IAssertRejectedAggregatedMeasureDataResultDocument
+public class AssertRejectRequestAggregatedMeasureDataXmlDocument : IAssertRejectRequestAggregatedMeasureDataDocument
 {
     private readonly AssertXmlDocument _documentAsserter;
 
-    public AssertRejectedAggregatedMeasureDataResultXmlDocument(AssertXmlDocument documentAsserter)
+    public AssertRejectRequestAggregatedMeasureDataXmlDocument(AssertXmlDocument documentAsserter)
     {
         _documentAsserter = documentAsserter;
         _documentAsserter.HasValue("type", "ERR");
     }
 
-    public async Task<IAssertRejectedAggregatedMeasureDataResultDocument> DocumentIsValidAsync()
+    public async Task<IAssertRejectRequestAggregatedMeasureDataDocument> DocumentIsValidAsync()
     {
         await _documentAsserter.HasValidStructureAsync(DocumentType.RejectRequestAggregatedMeasureData).ConfigureAwait(false);
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasBusinessReason(BusinessReason businessReason)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasBusinessReason(BusinessReason businessReason)
     {
         _documentAsserter.HasValue("process.processType", CimCode.Of(businessReason));
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasReasonCode(string reasonCode)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasReasonCode(string reasonCode)
     {
         _documentAsserter.HasValue("reason.code", reasonCode);
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasMessageId(string expectedMessageId)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasMessageId(string expectedMessageId)
     {
         _documentAsserter.HasValue("mRID", expectedMessageId);
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasSenderId(string expectedSenderId)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasSenderId(string expectedSenderId)
     {
         _documentAsserter.HasValue("sender_MarketParticipant.mRID", expectedSenderId);
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasReceiverId(string expectedReceiverId)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasReceiverId(string expectedReceiverId)
     {
         _documentAsserter.HasValue("receiver_MarketParticipant.mRID", expectedReceiverId);
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasTimestamp(Instant expectedTimestamp)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasTimestamp(Instant expectedTimestamp)
     {
         _documentAsserter.HasValue("createdDateTime", expectedTimestamp.ToString());
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasTransactionId(Guid expectedTransactionId)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasTransactionId(Guid expectedTransactionId)
     {
         _documentAsserter.HasValue($"Series[1]/mRID", expectedTransactionId.ToString());
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasOriginalTransactionId(string expectedOriginalTransactionId)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasOriginalTransactionId(string expectedOriginalTransactionId)
     {
         _documentAsserter.HasValue($"Series[1]/originalTransactionIDReference_Series.mRID", expectedOriginalTransactionId);
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasSerieReasonCode(string expectedSerieReasonCode)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasSerieReasonCode(string expectedSerieReasonCode)
     {
         _documentAsserter.HasValue($"Series[1]/Reason[1]/code", expectedSerieReasonCode);
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasSerieReasonMessage(string expectedSerieReasonMessage)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasSerieReasonMessage(string expectedSerieReasonMessage)
     {
         _documentAsserter.HasValue($"Series[1]/Reason[1]/text", expectedSerieReasonMessage);
         return this;
