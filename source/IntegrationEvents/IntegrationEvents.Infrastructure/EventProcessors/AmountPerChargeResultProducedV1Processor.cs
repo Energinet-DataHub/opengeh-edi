@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
 
@@ -28,13 +29,16 @@ public class AmountPerChargeResultProducedV1Processor : IIntegrationEventProcess
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly IFeatureFlagManager _featureManager;
+    private readonly ILogger<AmountPerChargeResultProducedV1Processor> _logger;
 
     public AmountPerChargeResultProducedV1Processor(
         IOutgoingMessagesClient outgoingMessagesClient,
-        IFeatureFlagManager featureManager)
+        IFeatureFlagManager featureManager,
+        ILogger<AmountPerChargeResultProducedV1Processor> logger)
     {
         _outgoingMessagesClient = outgoingMessagesClient;
         _featureManager = featureManager;
+        _logger = logger;
     }
 
     public string EventTypeToHandle => AmountPerChargeResultProducedV1.EventName;
@@ -42,6 +46,9 @@ public class AmountPerChargeResultProducedV1Processor : IIntegrationEventProcess
     public async Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
+
+        var eventMessage = integrationEvent.ToString();
+        _logger.LogInformation("AmountPerChargeResultProducedV1 integration event: {event}", eventMessage);
 
         if (!await _featureManager.UseAmountPerChargeResultProduced.ConfigureAwait(false))
         {
