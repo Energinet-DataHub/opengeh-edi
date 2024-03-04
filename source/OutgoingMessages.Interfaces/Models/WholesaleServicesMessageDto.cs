@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common.Serialization;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
@@ -36,13 +35,15 @@ public class WholesaleServicesMessageDto : OutgoingMessageDto
             businessReason.Name,
             receiverRole,
             DataHubDetails.DataHubActorNumber,
-            ActorRole.MeteredDataAdministrator,
-            new Serializer().Serialize(series))
+            ActorRole.MeteredDataAdministrator)
     {
         ChargeOwnerId = chargeOwnerId;
+        Series = series;
     }
 
     public ActorNumber ChargeOwnerId { get; }
+
+    public WholesaleServicesSeries Series { get; }
 
     public static WholesaleServicesMessageDto Create(
         ActorNumber receiverNumber,

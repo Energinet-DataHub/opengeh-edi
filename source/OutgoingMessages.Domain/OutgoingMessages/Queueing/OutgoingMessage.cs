@@ -13,8 +13,11 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using NodaTime;
 
@@ -26,7 +29,17 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
         private string? _serializedContent;
 
-        public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, Guid processId, string businessReason, ActorRole receiverRole, ActorNumber senderId, ActorRole senderRole, string serializedContent, Instant timestamp, MessageId? relatedToMessageId = null)
+        public OutgoingMessage(
+            DocumentType documentType,
+            ActorNumber receiverId,
+            Guid processId,
+            string businessReason,
+            ActorRole receiverRole,
+            ActorNumber senderId,
+            ActorRole senderRole,
+            string serializedContent,
+            Instant timestamp,
+            MessageId? relatedToMessageId = null)
         {
             Id = OutgoingMessageId.New();
             DocumentType = documentType;
@@ -97,6 +110,112 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
         /// </summary>
         public MessageId? RelatedToMessageId { get; set; }
 
+        /// <summary>
+        /// This method create a single outgoing message, for the receiver, based on the accepted energyResultMessage.
+        /// </summary>
+        /// <param name="acceptedEnergyResultMessage"></param>
+        /// <param name="timestamp"></param>
+        public static OutgoingMessage CreateMessage(
+            AcceptedEnergyResultMessageDto acceptedEnergyResultMessage,
+            Instant timestamp)
+        {
+            ArgumentNullException.ThrowIfNull(acceptedEnergyResultMessage);
+            return new OutgoingMessage(
+                acceptedEnergyResultMessage.DocumentType,
+                acceptedEnergyResultMessage.ReceiverId,
+                acceptedEnergyResultMessage.ProcessId,
+                acceptedEnergyResultMessage.BusinessReason,
+                acceptedEnergyResultMessage.ReceiverRole,
+                acceptedEnergyResultMessage.SenderId,
+                acceptedEnergyResultMessage.SenderRole,
+                new Serializer().Serialize(acceptedEnergyResultMessage.Series),
+                timestamp,
+                acceptedEnergyResultMessage.RelatedToMessageId);
+        }
+
+        /// <summary>
+        /// This method create a single outgoing message, for the receiver, based on the rejected energyResultMessage.
+        /// </summary>
+        /// <param name="rejectedEnergyResultMessage"></param>
+        /// <param name="timestamp"></param>
+        public static OutgoingMessage CreateMessage(
+            RejectedEnergyResultMessageDto rejectedEnergyResultMessage,
+            Instant timestamp)
+        {
+            ArgumentNullException.ThrowIfNull(rejectedEnergyResultMessage);
+            return new OutgoingMessage(
+                rejectedEnergyResultMessage.DocumentType,
+                rejectedEnergyResultMessage.ReceiverId,
+                rejectedEnergyResultMessage.ProcessId,
+                rejectedEnergyResultMessage.BusinessReason,
+                rejectedEnergyResultMessage.ReceiverRole,
+                rejectedEnergyResultMessage.SenderId,
+                rejectedEnergyResultMessage.SenderRole,
+                new Serializer().Serialize(rejectedEnergyResultMessage.Series),
+                timestamp,
+                rejectedEnergyResultMessage.RelatedToMessageId);
+        }
+
+        /// <summary>
+        /// This method create a single outgoing message, for the receiver, based on the energyResultMessage.
+        /// </summary>
+        /// <param name="energyResultMessage"></param>
+        /// <param name="timestamp"></param>
+        public static OutgoingMessage CreateMessage(
+            EnergyResultMessageDto energyResultMessage,
+            Instant timestamp)
+        {
+            ArgumentNullException.ThrowIfNull(energyResultMessage);
+            return new OutgoingMessage(
+                energyResultMessage.DocumentType,
+                energyResultMessage.ReceiverId,
+                energyResultMessage.ProcessId,
+                energyResultMessage.BusinessReason,
+                energyResultMessage.ReceiverRole,
+                energyResultMessage.SenderId,
+                energyResultMessage.SenderRole,
+                new Serializer().Serialize(energyResultMessage.Series),
+                timestamp,
+                energyResultMessage.RelatedToMessageId);
+        }
+
+        /// <summary>
+        /// This method creates two outgoing messages, one for the receiver and one for the charge owner, based on the wholesaleResultMessage.
+        /// </summary>
+        /// <param name="wholesaleServicesMessageDto"></param>
+        /// <param name="timestamp"></param>
+        public static IReadOnlyCollection<OutgoingMessage> CreateMessages(
+            WholesaleServicesMessageDto wholesaleServicesMessageDto,
+            Instant timestamp)
+        {
+            ArgumentNullException.ThrowIfNull(wholesaleServicesMessageDto);
+            return new List<OutgoingMessage>()
+            {
+                new(
+                    wholesaleServicesMessageDto.DocumentType,
+                    wholesaleServicesMessageDto.ReceiverId,
+                    wholesaleServicesMessageDto.ProcessId,
+                    wholesaleServicesMessageDto.BusinessReason,
+                    wholesaleServicesMessageDto.ReceiverRole,
+                    wholesaleServicesMessageDto.SenderId,
+                    wholesaleServicesMessageDto.SenderRole,
+                    new Serializer().Serialize(wholesaleServicesMessageDto.Series),
+                    timestamp,
+                    wholesaleServicesMessageDto.RelatedToMessageId),
+                new(
+                    wholesaleServicesMessageDto.DocumentType,
+                    wholesaleServicesMessageDto.ChargeOwnerId,
+                    wholesaleServicesMessageDto.ProcessId,
+                    wholesaleServicesMessageDto.BusinessReason,
+                    GetChargeOwnerRole(wholesaleServicesMessageDto.ChargeOwnerId),
+                    wholesaleServicesMessageDto.SenderId,
+                    wholesaleServicesMessageDto.SenderRole,
+                    new Serializer().Serialize(wholesaleServicesMessageDto.Series),
+                    timestamp,
+                    wholesaleServicesMessageDto.RelatedToMessageId),
+            };
+        }
+
         public void AssignToBundle(BundleId bundleId)
         {
             AssignedBundleId = bundleId;
@@ -119,6 +238,16 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
         private static FileStorageReference CreateFileStorageReference(ActorNumber receiverActorNumber, Instant timestamp, OutgoingMessageId outgoingMessageId)
         {
             return FileStorageReference.Create(FileStorageCategory, receiverActorNumber.Value, timestamp, outgoingMessageId.Value);
+        }
+
+        private static ActorRole GetChargeOwnerRole(ActorNumber chargeOwnerId)
+        {
+            if (chargeOwnerId == DataHubDetails.DataHubActorNumber)
+            {
+                return ActorRole.SystemOperator;
+            }
+
+            return ActorRole.GridOperator;
         }
     }
 }
