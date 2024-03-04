@@ -15,8 +15,8 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BuildingBlocks.Application.DateTime;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
-using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using NodaTime;
 

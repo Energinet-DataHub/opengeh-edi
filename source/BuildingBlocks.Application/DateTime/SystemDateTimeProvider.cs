@@ -12,16 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using NodaTime;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models
+namespace BuildingBlocks.Application.DateTime
 {
-    #pragma warning disable CA1040
-    /// <summary>
-    /// CQRS command object
-    /// </summary>
-    public interface ICommand<out TResponse> : IRequest<TResponse>
+    public class SystemDateTimeProvider : ISystemDateTimeProvider
     {
+        public Instant Now() => SystemClock.Instance.GetCurrentInstant();
     }
-#pragma warning restore
 }

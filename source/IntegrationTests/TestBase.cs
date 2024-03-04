@@ -19,13 +19,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
-using BuildingBlocks.Application.Extensions.DependencyInjection;
+using BuildingBlocks.Application.DateTime;
 using BuildingBlocks.Application.FeatureFlag;
 using Dapper;
-using Energinet.DataHub.EDI.Api;
-using Energinet.DataHub.EDI.Api.Authentication;
 using Energinet.DataHub.EDI.Api.Configuration.Authentication;
-using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.Api.DataRetention;
 using Energinet.DataHub.EDI.Api.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
@@ -34,7 +31,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
-using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
@@ -51,6 +47,7 @@ using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
+using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Google.Protobuf;
@@ -59,7 +56,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests
@@ -260,15 +256,17 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             _services = new ServiceCollection();
 
             _services.AddTransient<InboxEventsProcessor>()
-                .AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>>(_ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy)
+                .AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>>(
+                    _ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy)
                 .AddTransient<INotificationHandler<TestNotification>>(_ => InboxEventNotificationHandler)
                 .AddTransient<IRequestHandler<TestCommand, Unit>, TestCommandHandler>()
-                .AddTransient<IRequestHandler<TestCreateOutgoingMessageCommand, Unit>, TestCreateOutgoingCommandHandler>()
+                .AddTransient<IRequestHandler<TestCreateOutgoingMessageCommand, Unit>,
+                    TestCreateOutgoingCommandHandler>()
                 .AddScopedSqlDbContext<ProcessContext>(config)
-                .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations);
+                .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)
+                .AddScoped<ISystemDateTimeProvider>(_ => new SystemDateTimeProviderStub());
 
-            CompositionRoot.Initialize(_services)
-                .AddSystemClock(new SystemDateTimeProviderStub());
+            CompositionRoot.Initialize(_services);
 
             _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>();
             _services.AddScoped(_ => new JwtTokenParser(JwtTokenParserTests.DisableAllTokenValidations));

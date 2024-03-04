@@ -19,7 +19,6 @@
     <ProjectReference Include="..\OutgoingMessages.Interfaces\OutgoingMessages.Interfaces.csproj"/>
     <ProjectReference Include="..\OutgoingMessages.Domain\OutgoingMessages.Domain.csproj"/>
     <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj"/>
-    <ProjectReference Include="..\Common\Common.csproj"/>
   </ItemGroup>
 
   <ItemGroup>

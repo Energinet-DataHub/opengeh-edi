@@ -15,6 +15,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Process.Domain.Commands;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 

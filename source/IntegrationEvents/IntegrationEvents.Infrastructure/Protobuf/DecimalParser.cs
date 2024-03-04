@@ -13,15 +13,19 @@
 // limitations under the License.
 
 using System;
-using MediatR;
-using NodaTime;
+using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain
+namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Protobuf;
+
+/// <summary>
+/// This implementation is taken from https://learn.microsoft.com/en-us/dotnet/architecture/grpc-for-wcf-developers/protobuf-data-types#decimals
+/// </summary>
+public static class DecimalParser
 {
-    public class DomainEvent : INotification
+    public static decimal Parse(DecimalValue input)
     {
-        public Guid Id { get; } = Guid.NewGuid();
-
-        public Instant OccurredOn { get; } = SystemClock.Instance.GetCurrentInstant();
+        ArgumentNullException.ThrowIfNull(input);
+        const decimal nanoFactor = 1_000_000_000;
+        return input.Units + (input.Nanos / nanoFactor);
     }
 }

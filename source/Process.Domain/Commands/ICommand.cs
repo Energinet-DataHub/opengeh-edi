@@ -12,19 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
+using MediatR;
 
-namespace Energinet.DataHub.EDI.Common.DateTime
+namespace Energinet.DataHub.EDI.Process.Domain.Commands
 {
+    #pragma warning disable CA1040
     /// <summary>
-    /// System time provider
+    /// CQRS command object
     /// </summary>
-    public interface ISystemDateTimeProvider
+    public interface ICommand<out TResponse> : IRequest<TResponse>
     {
-        /// <summary>
-        /// Return current date and time
-        /// </summary>
-        /// <returns><see cref="Instant"/></returns>
-        Instant Now();
     }
+#pragma warning restore
 }

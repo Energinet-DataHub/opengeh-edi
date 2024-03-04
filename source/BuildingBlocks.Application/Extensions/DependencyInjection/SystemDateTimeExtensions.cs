@@ -12,12 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
+using BuildingBlocks.Application.DateTime;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.Common.DateTime
+namespace BuildingBlocks.Application.Extensions.DependencyInjection;
+
+public static class SystemDateTimeExtensions
 {
-    public class SystemDateTimeProvider : ISystemDateTimeProvider
+    public static IServiceCollection AddSystemClock(this IServiceCollection services)
     {
-        public Instant Now() => SystemClock.Instance.GetCurrentInstant();
+        services.AddScoped<ISystemDateTimeProvider, SystemDateTimeProvider>();
+        return services;
     }
 }

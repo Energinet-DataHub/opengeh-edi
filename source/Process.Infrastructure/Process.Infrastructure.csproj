@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj"/>
     <ProjectReference Include="..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\Process.Domain\Process.Domain.csproj" />
     <ProjectReference Include="..\RequestResponse\source\RequestResponse\RequestResponse.csproj" />

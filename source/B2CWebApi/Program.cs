@@ -22,7 +22,6 @@ using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyIn
 using Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
-using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Microsoft.ApplicationInsights.Extensibility;
@@ -43,7 +42,7 @@ builder.Services
 
 builder.Services
     .AddHttpContextAccessor()
-    .AddScoped<ISystemDateTimeProvider, SystemDateTimeProvider>()
+    .AddSystemClock()
     .AddHttpLoggingScope(domainName)
     .AddSingleton<ISerializer, Serializer>()
     .AddScoped<AuthenticatedActor>()

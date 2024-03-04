@@ -24,7 +24,6 @@ using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.Api.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
@@ -91,8 +90,7 @@ namespace Energinet.DataHub.EDI.Api
                 .ConfigureServices(
                     (context, services) =>
                     {
-                        CompositionRoot.Initialize(services)
-                            .AddSystemClock(new SystemDateTimeProvider());
+                        CompositionRoot.Initialize(services);
 
                         services.AddApplicationInsights()
                             .ConfigureFunctionsApplicationInsights()
@@ -106,7 +104,8 @@ namespace Energinet.DataHub.EDI.Api
                                 runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!)
                             .AddSqlServerHealthCheck(context.Configuration)
                             .AddSqlServerHealthCheck(configuration)
-                            .AddB2BAuthentication(tokenValidationParameters);
+                            .AddB2BAuthentication(tokenValidationParameters)
+                            .AddSystemClock();
                         services.AddBlobStorageHealthCheck("edi-web-jobs-storage", runtime.AzureWebJobsStorage!);
                         services.AddBlobStorageHealthCheck("edi-documents-storage", runtime.AZURE_STORAGE_ACCOUNT_URL!);
 

@@ -13,12 +13,12 @@
 // limitations under the License.
 
 using System.Text;
+using BuildingBlocks.Application.DateTime;
 using Energinet.DataHub.Core.App.Common;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Microsoft.AspNetCore.Authorization;

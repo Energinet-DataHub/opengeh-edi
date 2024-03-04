@@ -12,24 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using MediatR;
+using NodaTime;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models
+namespace BuildingBlocks.Application.DateTime
 {
-    [Serializable]
-    public abstract class InternalCommand : ICommand<Unit>
+    /// <summary>
+    /// System time provider
+    /// </summary>
+    public interface ISystemDateTimeProvider
     {
-        protected InternalCommand()
-        {
-            Id = Guid.NewGuid();
-        }
-
-        protected InternalCommand(Guid id)
-        {
-            Id = id;
-        }
-
-        public Guid Id { get; }
+        /// <summary>
+        /// Return current date and time
+        /// </summary>
+        /// <returns><see cref="Instant"/></returns>
+        Instant Now();
     }
 }

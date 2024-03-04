@@ -12,24 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Common.Serialization;
-using Microsoft.Extensions.DependencyInjection;
+using System;
+using MediatR;
+using NodaTime;
 
-namespace Energinet.DataHub.EDI.Api.Extensions.DependencyInjection;
-
-public class CompositionRoot
+namespace Energinet.DataHub.EDI.Process.Domain
 {
-    private readonly IServiceCollection _services;
-
-    private CompositionRoot(IServiceCollection services)
+    public class DomainEvent : INotification
     {
-        _services = services;
-        services.AddSingleton<ISerializer, Serializer>();
-        services.AddLogging();
-    }
+        public Guid Id { get; } = Guid.NewGuid();
 
-    public static CompositionRoot Initialize(IServiceCollection services)
-    {
-        return new CompositionRoot(services);
+        public Instant OccurredOn { get; } = SystemClock.Instance.GetCurrentInstant();
     }
 }

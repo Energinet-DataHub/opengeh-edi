@@ -15,6 +15,7 @@
 using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.Serialization;
+using Energinet.DataHub.EDI.Process.Domain.Commands;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
