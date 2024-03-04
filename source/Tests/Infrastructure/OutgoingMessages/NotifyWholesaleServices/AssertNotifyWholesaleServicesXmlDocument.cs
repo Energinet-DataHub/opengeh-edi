@@ -18,32 +18,32 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 
-namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.WholesaleCalculations;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
 
-public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalculationResultDocument
+public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleServicesDocument
 {
     private readonly AssertXmlDocument _documentAsserter;
 
-    public AssertWholesaleCalculationResultXmlDocument(AssertXmlDocument documentAsserter)
+    public AssertNotifyWholesaleServicesXmlDocument(AssertXmlDocument documentAsserter)
     {
         _documentAsserter = documentAsserter;
         _documentAsserter.HasValue("type", "E31");
     }
 
-    public async Task<IAssertWholesaleCalculationResultDocument> DocumentIsValidAsync()
+    public async Task<IAssertNotifyWholesaleServicesDocument> DocumentIsValidAsync()
     {
         await _documentAsserter.HasValidStructureAsync(DocumentType.NotifyWholesaleServices).ConfigureAwait(false);
         return this;
     }
 
     #region header validation
-    public IAssertWholesaleCalculationResultDocument HasMessageId(string expectedMessageId)
+    public IAssertNotifyWholesaleServicesDocument HasMessageId(string expectedMessageId)
     {
         _documentAsserter.HasValue("mRID", expectedMessageId);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasBusinessReason(
+    public IAssertNotifyWholesaleServicesDocument HasBusinessReason(
         BusinessReason expectedBusinessReason,
         CodeListType codeListType)
     {
@@ -52,7 +52,7 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasSenderId(ActorNumber expectedSenderId, string codingScheme)
+    public IAssertNotifyWholesaleServicesDocument HasSenderId(ActorNumber expectedSenderId, string codingScheme)
     {
         ArgumentNullException.ThrowIfNull(expectedSenderId);
         ArgumentException.ThrowIfNullOrWhiteSpace(codingScheme);
@@ -63,28 +63,28 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasSenderRole(ActorRole expectedSenderRole)
+    public IAssertNotifyWholesaleServicesDocument HasSenderRole(ActorRole expectedSenderRole)
     {
         ArgumentNullException.ThrowIfNull(expectedSenderRole);
         _documentAsserter.HasValue("sender_MarketParticipant.marketRole.type", expectedSenderRole.Code);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasReceiverId(ActorNumber expectedReceiverId)
+    public IAssertNotifyWholesaleServicesDocument HasReceiverId(ActorNumber expectedReceiverId)
     {
         ArgumentNullException.ThrowIfNull(expectedReceiverId);
         _documentAsserter.HasValue("receiver_MarketParticipant.mRID", expectedReceiverId.Value);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasReceiverRole(ActorRole expectedReceiverRole, CodeListType codeListType)
+    public IAssertNotifyWholesaleServicesDocument HasReceiverRole(ActorRole expectedReceiverRole, CodeListType codeListType)
     {
         ArgumentNullException.ThrowIfNull(expectedReceiverRole);
         _documentAsserter.HasValue("receiver_MarketParticipant.marketRole.type", expectedReceiverRole.Code);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasTimestamp(string expectedTimestamp)
+    public IAssertNotifyWholesaleServicesDocument HasTimestamp(string expectedTimestamp)
     {
         _documentAsserter.HasValue("createdDateTime", expectedTimestamp);
         return this;
@@ -92,65 +92,65 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
 
     #endregion
 
-    public IAssertWholesaleCalculationResultDocument HasTransactionId(Guid expectedTransactionId)
+    public IAssertNotifyWholesaleServicesDocument HasTransactionId(Guid expectedTransactionId)
     {
         _documentAsserter.HasValue($"Series[1]/mRID", expectedTransactionId.ToString());
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasCalculationVersion(int expectedVersion)
+    public IAssertNotifyWholesaleServicesDocument HasCalculationVersion(int expectedVersion)
     {
         _documentAsserter.HasValue($"Series[1]/version", expectedVersion.ToString(CultureInfo.InvariantCulture));
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasSettlementVersion(SettlementVersion expectedSettlementVersion)
+    public IAssertNotifyWholesaleServicesDocument HasSettlementVersion(SettlementVersion expectedSettlementVersion)
     {
         ArgumentNullException.ThrowIfNull(expectedSettlementVersion);
         _documentAsserter.HasValue("Series[1]/settlement_Series.version", expectedSettlementVersion.Code);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasOriginalTransactionIdReference(string expectedOriginalTransactionIdReference)
+    public IAssertNotifyWholesaleServicesDocument HasOriginalTransactionIdReference(string expectedOriginalTransactionIdReference)
     {
         _documentAsserter.HasValue("Series[1]/originalTransactionIDReference_Series.mRID", expectedOriginalTransactionIdReference);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasSettlementMethod(SettlementType expectedSettlementMethod)
+    public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementType expectedSettlementMethod)
     {
         ArgumentNullException.ThrowIfNull(expectedSettlementMethod);
         _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.settlementMethod", expectedSettlementMethod.Code);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument PriceAmountIsPresentForPointIndex(int pointIndex, string? expectedPrice)
+    public IAssertNotifyWholesaleServicesDocument PriceAmountIsPresentForPointIndex(int pointIndex, string? expectedPrice)
     {
         _documentAsserter.HasValue($"Series[1]/Period/Point[{pointIndex + 1}]/price.amount", expectedPrice ?? "0");
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType)
+    public IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType)
     {
         ArgumentNullException.ThrowIfNull(expectedMeteringPointType);
         _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.type", expectedMeteringPointType.Code);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasChargeCode(string expectedChargeTypeNumber)
+    public IAssertNotifyWholesaleServicesDocument HasChargeCode(string expectedChargeTypeNumber)
     {
         _documentAsserter.HasValue("Series[1]/chargeType.mRID", expectedChargeTypeNumber);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasChargeType(ChargeType expectedChargeType)
+    public IAssertNotifyWholesaleServicesDocument HasChargeType(ChargeType expectedChargeType)
     {
         ArgumentNullException.ThrowIfNull(expectedChargeType);
         _documentAsserter.HasValue("Series[1]/chargeType.type", expectedChargeType.Code);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasChargeTypeOwner(
+    public IAssertNotifyWholesaleServicesDocument HasChargeTypeOwner(
         ActorNumber expectedChargeTypeOwner,
         string codingScheme)
     {
@@ -164,7 +164,7 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasGridAreaCode(string expectedGridAreaCode, string codingScheme)
+    public IAssertNotifyWholesaleServicesDocument HasGridAreaCode(string expectedGridAreaCode, string codingScheme)
     {
         _documentAsserter.HasValue("Series[1]/meteringGridArea_Domain.mRID", expectedGridAreaCode);
         _documentAsserter.HasAttribute("Series[1]/meteringGridArea_Domain.mRID", "codingScheme", codingScheme);
@@ -172,7 +172,7 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasEnergySupplierNumber(
+    public IAssertNotifyWholesaleServicesDocument HasEnergySupplierNumber(
         ActorNumber expectedEnergySupplierNumber,
         string codingScheme)
     {
@@ -182,34 +182,34 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasProductCode(string expectedProductCode)
+    public IAssertNotifyWholesaleServicesDocument HasProductCode(string expectedProductCode)
     {
         _documentAsserter.HasValue("Series[1]/product", expectedProductCode);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasMeasurementUnit(MeasurementUnit expectedMeasurementUnit)
+    public IAssertNotifyWholesaleServicesDocument HasMeasurementUnit(MeasurementUnit expectedMeasurementUnit)
     {
         ArgumentNullException.ThrowIfNull(expectedMeasurementUnit);
         _documentAsserter.HasValue("Series[1]/quantity_Measure_Unit.name", expectedMeasurementUnit.Code);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasPriceMeasurementUnit(MeasurementUnit expectedPriceMeasurementUnit)
+    public IAssertNotifyWholesaleServicesDocument HasPriceMeasurementUnit(MeasurementUnit expectedPriceMeasurementUnit)
     {
         ArgumentNullException.ThrowIfNull(expectedPriceMeasurementUnit);
         _documentAsserter.HasValue("Series[1]/price_Measure_Unit.name", expectedPriceMeasurementUnit.Code);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasCurrency(Currency expectedPriceUnit)
+    public IAssertNotifyWholesaleServicesDocument HasCurrency(Currency expectedPriceUnit)
     {
         ArgumentNullException.ThrowIfNull(expectedPriceUnit);
         _documentAsserter.HasValue("Series[1]/currency_Unit.name", expectedPriceUnit.Code);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasPeriod(Period expectedPeriod)
+    public IAssertNotifyWholesaleServicesDocument HasPeriod(Period expectedPeriod)
     {
         ArgumentNullException.ThrowIfNull(expectedPeriod);
         _documentAsserter
@@ -218,14 +218,14 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasResolution(Resolution resolution)
+    public IAssertNotifyWholesaleServicesDocument HasResolution(Resolution resolution)
     {
         ArgumentNullException.ThrowIfNull(resolution);
         _documentAsserter.HasValue("Series[1]/Period/resolution", resolution.Code);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument HasPositionAndQuantity(int expectedPosition, int expectedQuantity)
+    public IAssertNotifyWholesaleServicesDocument HasPositionAndQuantity(int expectedPosition, int expectedQuantity)
     {
         _documentAsserter
             .HasValue("Series[1]/Period/Point[1]/position", expectedPosition.ToString(CultureInfo.InvariantCulture))
@@ -233,19 +233,19 @@ public class AssertWholesaleCalculationResultXmlDocument : IAssertWholesaleCalcu
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument SettlementMethodIsNotPresent()
+    public IAssertNotifyWholesaleServicesDocument SettlementMethodIsNotPresent()
     {
         _documentAsserter.IsNotPresent("Series[1]/marketEvaluationPoint.settlementMethod");
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument QualityIsPresentForPosition(int expectedPosition, string expectedQuantityQualityCode)
+    public IAssertNotifyWholesaleServicesDocument QualityIsPresentForPosition(int expectedPosition, string expectedQuantityQualityCode)
     {
         _documentAsserter.HasValue($"Series[1]/Period/Point[{expectedPosition}]/quality", expectedQuantityQualityCode);
         return this;
     }
 
-    public IAssertWholesaleCalculationResultDocument SettlementVersionIsNotPresent()
+    public IAssertNotifyWholesaleServicesDocument SettlementVersionIsNotPresent()
     {
         _documentAsserter.IsNotPresent("Series[1]/settlement_Series.version");
         return this;

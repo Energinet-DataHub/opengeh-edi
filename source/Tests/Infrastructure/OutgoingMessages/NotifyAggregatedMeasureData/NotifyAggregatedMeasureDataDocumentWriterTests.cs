@@ -29,15 +29,15 @@ using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions;
 using Xunit;
 
-namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.AggregationResult;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 
-public class EnergyResultDocumentWriterTests : IClassFixture<DocumentValidationFixture>
+public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<DocumentValidationFixture>
 {
     private readonly DocumentValidationFixture _documentValidation;
     private readonly MessageRecordParser _parser;
     private readonly EnergyResultMessageTimeSeriesBuilder _energyResultMessageTimeSeries;
 
-    public EnergyResultDocumentWriterTests(
+    public NotifyAggregatedMeasureDataDocumentWriterTests(
         DocumentValidationFixture documentValidation)
     {
         _documentValidation = documentValidation;
@@ -295,23 +295,23 @@ public class EnergyResultDocumentWriterTests : IClassFixture<DocumentValidationF
         }
     }
 
-    private IAssertAggregationResultDocument AssertDocument(MarketDocumentStream document, DocumentFormat documentFormat) => AssertDocument(document.Stream, documentFormat);
+    private IAssertNotifyAggregatedMeasureDataDocument AssertDocument(MarketDocumentStream document, DocumentFormat documentFormat) => AssertDocument(document.Stream, documentFormat);
 
-    private IAssertAggregationResultDocument AssertDocument(Stream document, DocumentFormat documentFormat)
+    private IAssertNotifyAggregatedMeasureDataDocument AssertDocument(Stream document, DocumentFormat documentFormat)
     {
         if (documentFormat == DocumentFormat.Ebix)
         {
             var assertEbixDocument = AssertEbixDocument.Document(document, "ns0", _documentValidation.Validator);
-            return new AssertAggregationResultEbixDocument(assertEbixDocument);
+            return new AssertNotifyAggregatedMeasureDataEbixDocument(assertEbixDocument);
         }
         else if (documentFormat == DocumentFormat.Xml)
         {
             var assertXmlDocument = AssertXmlDocument.Document(document, "cim", _documentValidation.Validator);
-            return new AssertAggregationResultXmlDocument(assertXmlDocument);
+            return new AssertNotifyAggregatedMeasureDataXmlDocument(assertXmlDocument);
         }
         else
         {
-            return new AssertAggregationResultJsonDocument(document);
+            return new AssertNotifyAggregatedMeasureDataJsonDocument(document);
         }
     }
 }

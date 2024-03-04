@@ -17,7 +17,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 using NodaTime.Text;
 
-namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.AggregationResult;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 
 internal static class SampleData
 {

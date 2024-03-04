@@ -22,70 +22,70 @@ namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequ
 /// <summary>
 /// Assertion helper for aggregation result documents
 /// </summary>
-public interface IAssertRejectedAggregatedMeasureDataResultDocument
+public interface IAssertRejectRequestAggregatedMeasureDataDocument
 {
     /// <summary>
     /// Asserts message id
     /// </summary>
     /// <param name="expectedMessageId"></param>
-    IAssertRejectedAggregatedMeasureDataResultDocument HasMessageId(string expectedMessageId);
+    IAssertRejectRequestAggregatedMeasureDataDocument HasMessageId(string expectedMessageId);
 
     /// <summary>
     /// Assert sender id
     /// </summary>
     /// <param name="expectedSenderId"></param>
-    IAssertRejectedAggregatedMeasureDataResultDocument HasSenderId(string expectedSenderId);
+    IAssertRejectRequestAggregatedMeasureDataDocument HasSenderId(string expectedSenderId);
 
     /// <summary>
     /// Asserts receiver id
     /// </summary>
     /// <param name="expectedReceiverId"></param>
-    IAssertRejectedAggregatedMeasureDataResultDocument HasReceiverId(string expectedReceiverId);
+    IAssertRejectRequestAggregatedMeasureDataDocument HasReceiverId(string expectedReceiverId);
 
     /// <summary>
     /// Asserts time stamp
     /// </summary>
     /// <param name="expectedTimestamp"></param>
-    IAssertRejectedAggregatedMeasureDataResultDocument HasTimestamp(Instant expectedTimestamp);
+    IAssertRejectRequestAggregatedMeasureDataDocument HasTimestamp(Instant expectedTimestamp);
 
     /// <summary>
     /// Asserts reason code
     /// </summary>
     /// <param name="reasonCode"></param>
-    IAssertRejectedAggregatedMeasureDataResultDocument HasReasonCode(string reasonCode);
+    IAssertRejectRequestAggregatedMeasureDataDocument HasReasonCode(string reasonCode);
 
     /// <summary>
     /// Asserts document validity
     /// </summary>
-    Task<IAssertRejectedAggregatedMeasureDataResultDocument> DocumentIsValidAsync();
+    Task<IAssertRejectRequestAggregatedMeasureDataDocument> DocumentIsValidAsync();
 
     /// <summary>
     /// Asserts the business reason
     /// </summary>
     /// <param name="businessReason"></param>
-    IAssertRejectedAggregatedMeasureDataResultDocument HasBusinessReason(BusinessReason businessReason);
+    IAssertRejectRequestAggregatedMeasureDataDocument HasBusinessReason(BusinessReason businessReason);
 
     /// <summary>
     /// Asserts transaction id
     /// </summary>
     /// <param name="expectedTransactionId"></param>
-    IAssertRejectedAggregatedMeasureDataResultDocument HasTransactionId(Guid expectedTransactionId);
+    IAssertRejectRequestAggregatedMeasureDataDocument HasTransactionId(Guid expectedTransactionId);
 
     /// <summary>
     /// Asserts serie reason code
     /// </summary>
     /// <param name="expectedSerieReasonCode"></param>
-    IAssertRejectedAggregatedMeasureDataResultDocument HasSerieReasonCode(string expectedSerieReasonCode);
+    IAssertRejectRequestAggregatedMeasureDataDocument HasSerieReasonCode(string expectedSerieReasonCode);
 
     /// <summary>
     /// Asserts serie reason message
     /// </summary>
     /// <param name="expectedSerieReasonMessage"></param>
-    IAssertRejectedAggregatedMeasureDataResultDocument HasSerieReasonMessage(string expectedSerieReasonMessage);
+    IAssertRejectRequestAggregatedMeasureDataDocument HasSerieReasonMessage(string expectedSerieReasonMessage);
 
     /// <summary>
     /// Asserts original transaction id
     /// </summary>
     /// <param name="expectedOriginalTransactionId"></param>
-    IAssertRejectedAggregatedMeasureDataResultDocument HasOriginalTransactionId(string expectedOriginalTransactionId);
+    IAssertRejectRequestAggregatedMeasureDataDocument HasOriginalTransactionId(string expectedOriginalTransactionId);
 }

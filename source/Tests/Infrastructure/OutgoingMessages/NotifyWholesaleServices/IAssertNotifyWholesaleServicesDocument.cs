@@ -16,17 +16,17 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.WholesaleCalculations;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
 
 /// <summary>
 /// Assertion helper for aggregation result documents
 /// </summary>
-public interface IAssertWholesaleCalculationResultDocument
+public interface IAssertNotifyWholesaleServicesDocument
 {
     /// <summary>
     /// Asserts document validity
     /// </summary>
-    Task<IAssertWholesaleCalculationResultDocument> DocumentIsValidAsync();
+    Task<IAssertNotifyWholesaleServicesDocument> DocumentIsValidAsync();
 
     #region header validation
 
@@ -34,44 +34,44 @@ public interface IAssertWholesaleCalculationResultDocument
     /// Asserts message id in header
     /// </summary>
     /// <param name="expectedMessageId"></param>
-    IAssertWholesaleCalculationResultDocument HasMessageId(string expectedMessageId);
+    IAssertNotifyWholesaleServicesDocument HasMessageId(string expectedMessageId);
 
     /// <summary>
     /// Asserts the process type in header
     /// </summary>
     /// <param name="expectedBusinessReason"></param>
     /// <param name="codeListType"></param>
-    IAssertWholesaleCalculationResultDocument HasBusinessReason(BusinessReason expectedBusinessReason, CodeListType codeListType);
+    IAssertNotifyWholesaleServicesDocument HasBusinessReason(BusinessReason expectedBusinessReason, CodeListType codeListType);
 
     /// <summary>
     /// Assert sender id in header
     /// </summary>
-    IAssertWholesaleCalculationResultDocument HasSenderId(ActorNumber expectedSenderId, string codingScheme);
+    IAssertNotifyWholesaleServicesDocument HasSenderId(ActorNumber expectedSenderId, string codingScheme);
 
     /// <summary>
     /// Assert sender role in header
     /// </summary>
     /// <param name="expectedSenderRole"></param>
-    IAssertWholesaleCalculationResultDocument HasSenderRole(ActorRole expectedSenderRole);
+    IAssertNotifyWholesaleServicesDocument HasSenderRole(ActorRole expectedSenderRole);
 
     /// <summary>
     /// Asserts receiver id in header
     /// </summary>
     /// <param name="expectedReceiverId"></param>
-    IAssertWholesaleCalculationResultDocument HasReceiverId(ActorNumber expectedReceiverId);
+    IAssertNotifyWholesaleServicesDocument HasReceiverId(ActorNumber expectedReceiverId);
 
     /// <summary>
     /// Assert sender role in header
     /// </summary>
     /// <param name="expectedReceiverRole"></param>
     /// <param name="codeListType"></param>
-    IAssertWholesaleCalculationResultDocument HasReceiverRole(ActorRole expectedReceiverRole, CodeListType codeListType);
+    IAssertNotifyWholesaleServicesDocument HasReceiverRole(ActorRole expectedReceiverRole, CodeListType codeListType);
 
     /// <summary>
     /// Asserts time stamp in header
     /// </summary>
     /// <param name="expectedTimestamp"></param>
-    IAssertWholesaleCalculationResultDocument HasTimestamp(string expectedTimestamp);
+    IAssertNotifyWholesaleServicesDocument HasTimestamp(string expectedTimestamp);
 
     #endregion
 
@@ -81,135 +81,135 @@ public interface IAssertWholesaleCalculationResultDocument
     /// Asserts transaction id of the first series element
     /// </summary>
     /// <param name="expectedTransactionId"></param>
-    IAssertWholesaleCalculationResultDocument HasTransactionId(Guid expectedTransactionId);
+    IAssertNotifyWholesaleServicesDocument HasTransactionId(Guid expectedTransactionId);
 
     /// <summary>
     /// Asserts the version of the first series element
     /// </summary>
     /// <param name="expectedVersion"></param>
-    IAssertWholesaleCalculationResultDocument HasCalculationVersion(int expectedVersion);
+    IAssertNotifyWholesaleServicesDocument HasCalculationVersion(int expectedVersion);
 
     /// <summary>
     /// Asserts the settlement version of the first series element
     /// </summary>
     /// <param name="expectedSettlementVersion"></param>
-    IAssertWholesaleCalculationResultDocument HasSettlementVersion(SettlementVersion expectedSettlementVersion);
+    IAssertNotifyWholesaleServicesDocument HasSettlementVersion(SettlementVersion expectedSettlementVersion);
 
     /// <summary>
     /// Asserts the reference id of the first series element
     /// </summary>
     /// <param name="expectedOriginalTransactionIdReference"></param>
-    IAssertWholesaleCalculationResultDocument HasOriginalTransactionIdReference(
+    IAssertNotifyWholesaleServicesDocument HasOriginalTransactionIdReference(
         string expectedOriginalTransactionIdReference);
 
     /// <summary>
     /// Asserts the settlement method of the first series element
     /// </summary>
     /// <param name="expectedSettlementMethod"></param>
-    IAssertWholesaleCalculationResultDocument HasSettlementMethod(SettlementType expectedSettlementMethod);
+    IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementType expectedSettlementMethod);
 
     /// <summary>
     /// Asserts the amount sum of the points of the first series element
     /// </summary>
     /// <param name="pointIndex"></param>
     /// <param name="expectedPrice"></param>
-    IAssertWholesaleCalculationResultDocument PriceAmountIsPresentForPointIndex(int pointIndex, string? expectedPrice);
+    IAssertNotifyWholesaleServicesDocument PriceAmountIsPresentForPointIndex(int pointIndex, string? expectedPrice);
 
     /// <summary>
     /// Asserts the metering point type of the first series element
     /// </summary>
     /// <param name="expectedMeteringPointType"></param>
-    IAssertWholesaleCalculationResultDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType);
+    IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType);
 
     /// <summary>
     /// Asserts the charge type number of the first series element
     /// </summary>
     /// <param name="expectedChargeTypeNumber"></param>
-    IAssertWholesaleCalculationResultDocument HasChargeCode(string expectedChargeTypeNumber);
+    IAssertNotifyWholesaleServicesDocument HasChargeCode(string expectedChargeTypeNumber);
 
     /// <summary>
     /// Asserts the charge type of the first series element
     /// </summary>
     /// <param name="expectedChargeType"></param>
-    IAssertWholesaleCalculationResultDocument HasChargeType(ChargeType expectedChargeType);
+    IAssertNotifyWholesaleServicesDocument HasChargeType(ChargeType expectedChargeType);
 
     /// <summary>
     /// Asserts the charge type owner of the first series element
     /// </summary>
-    IAssertWholesaleCalculationResultDocument HasChargeTypeOwner(
+    IAssertNotifyWholesaleServicesDocument HasChargeTypeOwner(
         ActorNumber expectedChargeTypeOwner,
         string codingScheme);
 
     /// <summary>
     /// Asserts grid area code of the first series element
     /// </summary>
-    IAssertWholesaleCalculationResultDocument HasGridAreaCode(string expectedGridAreaCode, string codingScheme);
+    IAssertNotifyWholesaleServicesDocument HasGridAreaCode(string expectedGridAreaCode, string codingScheme);
 
     /// <summary>
     /// Asserts energy supplier number of the first series element
     /// </summary>
-    IAssertWholesaleCalculationResultDocument HasEnergySupplierNumber(
+    IAssertNotifyWholesaleServicesDocument HasEnergySupplierNumber(
         ActorNumber expectedEnergySupplierNumber,
         string codingScheme);
 
     /// <summary>
     /// Assets the product of the first series element
     /// </summary>
-    IAssertWholesaleCalculationResultDocument HasProductCode(string expectedProductCode);
+    IAssertNotifyWholesaleServicesDocument HasProductCode(string expectedProductCode);
 
     /// <summary>
     /// Asserts the measure unit of the first series element
     /// </summary>
     /// <param name="expectedMeasurementUnit"></param>
-    IAssertWholesaleCalculationResultDocument HasMeasurementUnit(MeasurementUnit expectedMeasurementUnit);
+    IAssertNotifyWholesaleServicesDocument HasMeasurementUnit(MeasurementUnit expectedMeasurementUnit);
 
     /// <summary>
     /// Asserts the price measure unit of the first series element
     /// </summary>
     /// <param name="expectedPriceMeasurementUnit"></param>
-    IAssertWholesaleCalculationResultDocument HasPriceMeasurementUnit(MeasurementUnit expectedPriceMeasurementUnit);
+    IAssertNotifyWholesaleServicesDocument HasPriceMeasurementUnit(MeasurementUnit expectedPriceMeasurementUnit);
 
     /// <summary>
     /// Asserts the currency of the first series element
     /// </summary>
     /// <param name="expectedPriceUnit"></param>
-    IAssertWholesaleCalculationResultDocument HasCurrency(Currency expectedPriceUnit);
+    IAssertNotifyWholesaleServicesDocument HasCurrency(Currency expectedPriceUnit);
 
     /// <summary>
     /// Asserts period of the first series element
     /// </summary>
     /// <param name="expectedPeriod"></param>
-    IAssertWholesaleCalculationResultDocument HasPeriod(Period expectedPeriod);
+    IAssertNotifyWholesaleServicesDocument HasPeriod(Period expectedPeriod);
 
     /// <summary>
     /// Asserts the resulution of the first series element
     /// </summary>
     /// <param name="resolution"></param>
-    IAssertWholesaleCalculationResultDocument HasResolution(Resolution resolution);
+    IAssertNotifyWholesaleServicesDocument HasResolution(Resolution resolution);
 
     /// <summary>
     /// Asserts a point of the first series element
     /// </summary>
     /// <param name="expectedPosition"></param>
     /// <param name="expectedQuantity"></param>
-    IAssertWholesaleCalculationResultDocument HasPositionAndQuantity(int expectedPosition, int expectedQuantity);
+    IAssertNotifyWholesaleServicesDocument HasPositionAndQuantity(int expectedPosition, int expectedQuantity);
 
     /// <summary>
     /// Asserts the quality is present with the given code
     /// </summary>
-    IAssertWholesaleCalculationResultDocument QualityIsPresentForPosition(
+    IAssertNotifyWholesaleServicesDocument QualityIsPresentForPosition(
         int expectedPosition,
         string expectedQuantityQualityCode);
 
     /// <summary>
     /// Asserts the settlement method is not present
     /// </summary>
-    IAssertWholesaleCalculationResultDocument SettlementMethodIsNotPresent();
+    IAssertNotifyWholesaleServicesDocument SettlementMethodIsNotPresent();
 
     /// <summary>
     /// Asserts the settlement version is not present
     /// </summary>
-    IAssertWholesaleCalculationResultDocument SettlementVersionIsNotPresent();
+    IAssertNotifyWholesaleServicesDocument SettlementVersionIsNotPresent();
 
     #endregion
 }

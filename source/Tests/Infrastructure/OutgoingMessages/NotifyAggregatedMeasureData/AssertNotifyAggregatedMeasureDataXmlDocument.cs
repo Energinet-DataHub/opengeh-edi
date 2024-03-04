@@ -19,73 +19,73 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 
-namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.AggregationResult;
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 
-public class AssertAggregationResultXmlDocument : IAssertAggregationResultDocument
+public class AssertNotifyAggregatedMeasureDataXmlDocument : IAssertNotifyAggregatedMeasureDataDocument
 {
     private readonly AssertXmlDocument _documentAsserter;
 
-    public AssertAggregationResultXmlDocument(AssertXmlDocument documentAsserter)
+    public AssertNotifyAggregatedMeasureDataXmlDocument(AssertXmlDocument documentAsserter)
     {
         _documentAsserter = documentAsserter;
         _documentAsserter.HasValue("type", "E31");
     }
 
-    public IAssertAggregationResultDocument HasMessageId(string expectedMessageId)
+    public IAssertNotifyAggregatedMeasureDataDocument HasMessageId(string expectedMessageId)
     {
         _documentAsserter.HasValue("mRID", expectedMessageId);
         return this;
     }
 
-    public IAssertAggregationResultDocument HasSenderId(string expectedSenderId)
+    public IAssertNotifyAggregatedMeasureDataDocument HasSenderId(string expectedSenderId)
     {
         _documentAsserter.HasValue("sender_MarketParticipant.mRID", expectedSenderId);
         return this;
     }
 
-    public IAssertAggregationResultDocument HasReceiverId(string expectedReceiverId)
+    public IAssertNotifyAggregatedMeasureDataDocument HasReceiverId(string expectedReceiverId)
     {
         _documentAsserter.HasValue("receiver_MarketParticipant.mRID", expectedReceiverId);
         return this;
     }
 
-    public IAssertAggregationResultDocument HasTimestamp(string expectedTimestamp)
+    public IAssertNotifyAggregatedMeasureDataDocument HasTimestamp(string expectedTimestamp)
     {
         _documentAsserter.HasValue("createdDateTime", expectedTimestamp);
         return this;
     }
 
-    public IAssertAggregationResultDocument HasTransactionId(Guid expectedTransactionId)
+    public IAssertNotifyAggregatedMeasureDataDocument HasTransactionId(Guid expectedTransactionId)
     {
         _documentAsserter.HasValue($"Series[1]/mRID", expectedTransactionId.ToString());
         return this;
     }
 
-    public IAssertAggregationResultDocument HasGridAreaCode(string expectedGridAreaCode)
+    public IAssertNotifyAggregatedMeasureDataDocument HasGridAreaCode(string expectedGridAreaCode)
     {
         _documentAsserter.HasValue("Series[1]/meteringGridArea_Domain.mRID", expectedGridAreaCode);
         return this;
     }
 
-    public IAssertAggregationResultDocument HasBalanceResponsibleNumber(string expectedBalanceResponsibleNumber)
+    public IAssertNotifyAggregatedMeasureDataDocument HasBalanceResponsibleNumber(string expectedBalanceResponsibleNumber)
     {
         _documentAsserter.HasValue("Series[1]/balanceResponsibleParty_MarketParticipant.mRID", expectedBalanceResponsibleNumber);
         return this;
     }
 
-    public IAssertAggregationResultDocument HasEnergySupplierNumber(string expectedEnergySupplierNumber)
+    public IAssertNotifyAggregatedMeasureDataDocument HasEnergySupplierNumber(string expectedEnergySupplierNumber)
     {
         _documentAsserter.HasValue("Series[1]/energySupplier_MarketParticipant.mRID", expectedEnergySupplierNumber);
         return this;
     }
 
-    public IAssertAggregationResultDocument HasProductCode(string expectedProductCode)
+    public IAssertNotifyAggregatedMeasureDataDocument HasProductCode(string expectedProductCode)
     {
         _documentAsserter.HasValue("Series[1]/product", expectedProductCode);
         return this;
     }
 
-    public IAssertAggregationResultDocument HasPeriod(Period expectedPeriod)
+    public IAssertNotifyAggregatedMeasureDataDocument HasPeriod(Period expectedPeriod)
     {
         ArgumentNullException.ThrowIfNull(expectedPeriod);
         _documentAsserter
@@ -94,7 +94,7 @@ public class AssertAggregationResultXmlDocument : IAssertAggregationResultDocume
         return this;
     }
 
-    public IAssertAggregationResultDocument HasPoint(int position, int quantity)
+    public IAssertNotifyAggregatedMeasureDataDocument HasPoint(int position, int quantity)
     {
         _documentAsserter
             .HasValue("Series[1]/Period/Point[1]/position", position.ToString(CultureInfo.InvariantCulture))
@@ -102,79 +102,79 @@ public class AssertAggregationResultXmlDocument : IAssertAggregationResultDocume
         return this;
     }
 
-    public async Task<IAssertAggregationResultDocument> DocumentIsValidAsync()
+    public async Task<IAssertNotifyAggregatedMeasureDataDocument> DocumentIsValidAsync()
     {
         await _documentAsserter.HasValidStructureAsync(DocumentType.NotifyAggregatedMeasureData).ConfigureAwait(false);
         return this;
     }
 
-    public IAssertAggregationResultDocument SettlementMethodIsNotPresent()
+    public IAssertNotifyAggregatedMeasureDataDocument SettlementMethodIsNotPresent()
     {
         _documentAsserter.IsNotPresent("Series[1]/marketEvaluationPoint.settlementMethod");
         return this;
     }
 
-    public IAssertAggregationResultDocument EnergySupplierNumberIsNotPresent()
+    public IAssertNotifyAggregatedMeasureDataDocument EnergySupplierNumberIsNotPresent()
     {
         _documentAsserter.IsNotPresent("Series[1]/energySupplier_MarketParticipant.mRID");
         return this;
     }
 
-    public IAssertAggregationResultDocument BalanceResponsibleNumberIsNotPresent()
+    public IAssertNotifyAggregatedMeasureDataDocument BalanceResponsibleNumberIsNotPresent()
     {
         _documentAsserter.IsNotPresent("Series[1]/balanceResponsibleParty_MarketParticipant.mRID");
         return this;
     }
 
-    public IAssertAggregationResultDocument QuantityIsNotPresentForPosition(int position)
+    public IAssertNotifyAggregatedMeasureDataDocument QuantityIsNotPresentForPosition(int position)
     {
         _documentAsserter.IsNotPresent($"Series[1]/Period/Point[{position}]/quantity");
         return this;
     }
 
-    public IAssertAggregationResultDocument QualityIsNotPresentForPosition(int position)
+    public IAssertNotifyAggregatedMeasureDataDocument QualityIsNotPresentForPosition(int position)
     {
         _documentAsserter.IsNotPresent($"Series[1]/Period/Point[{position}]/quality");
         return this;
     }
 
-    public IAssertAggregationResultDocument QualityIsPresentForPosition(int position, string quantityQualityCode)
+    public IAssertNotifyAggregatedMeasureDataDocument QualityIsPresentForPosition(int position, string quantityQualityCode)
     {
         _documentAsserter.HasValue($"Series[1]/Period/Point[{position}]/quality", quantityQualityCode);
         return this;
     }
 
-    public IAssertAggregationResultDocument HasCalculationResultVersion(int version)
+    public IAssertNotifyAggregatedMeasureDataDocument HasCalculationResultVersion(int version)
     {
         _documentAsserter.HasValue($"Series[1]/version", version.ToString(NumberFormatInfo.InvariantInfo));
         return this;
     }
 
-    public IAssertAggregationResultDocument HasBusinessReason(BusinessReason businessReason)
+    public IAssertNotifyAggregatedMeasureDataDocument HasBusinessReason(BusinessReason businessReason)
     {
         _documentAsserter.HasValue("process.processType", CimCode.Of(businessReason));
         return this;
     }
 
-    public IAssertAggregationResultDocument HasSettlementVersion(SettlementVersion settlementVersion)
+    public IAssertNotifyAggregatedMeasureDataDocument HasSettlementVersion(SettlementVersion settlementVersion)
     {
         _documentAsserter.HasValue("Series[1]/settlement_Series.version", CimCode.Of(settlementVersion));
         return this;
     }
 
-    public IAssertAggregationResultDocument SettlementVersionIsNotPresent()
+    public IAssertNotifyAggregatedMeasureDataDocument SettlementVersionIsNotPresent()
     {
         _documentAsserter.IsNotPresent("Series[1]/settlement_Series.version");
         return this;
     }
 
-    public IAssertAggregationResultDocument HasOriginalTransactionIdReference(string originalTransactionIdReference)
+    public IAssertNotifyAggregatedMeasureDataDocument HasOriginalTransactionIdReference(string originalTransactionIdReference)
     {
         _documentAsserter.HasValue("Series[1]/originalTransactionIDReference_Series.mRID", originalTransactionIdReference);
         return this;
     }
 
-    public IAssertAggregationResultDocument HasSettlementMethod(SettlementType settlementMethod)
+    public IAssertNotifyAggregatedMeasureDataDocument HasSettlementMethod(SettlementType settlementMethod)
     {
         _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.settlementMethod", CimCode.Of(settlementMethod));
         return this;

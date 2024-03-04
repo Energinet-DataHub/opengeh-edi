@@ -21,77 +21,77 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 
-public class AssertRejectedAggregatedMeasureDataResultEbixDocument : IAssertRejectedAggregatedMeasureDataResultDocument
+public class AssertRejectRequestAggregatedMeasureDataEbixDocument : IAssertRejectRequestAggregatedMeasureDataDocument
 {
     private readonly AssertEbixDocument _documentAsserter;
 
-    public AssertRejectedAggregatedMeasureDataResultEbixDocument(AssertEbixDocument documentAsserter)
+    public AssertRejectRequestAggregatedMeasureDataEbixDocument(AssertEbixDocument documentAsserter)
     {
         _documentAsserter = documentAsserter;
         _documentAsserter.HasValue("HeaderEnergyDocument/DocumentType", "ERR");
     }
 
-    public async Task<IAssertRejectedAggregatedMeasureDataResultDocument> DocumentIsValidAsync()
+    public async Task<IAssertRejectRequestAggregatedMeasureDataDocument> DocumentIsValidAsync()
     {
         await _documentAsserter.HasValidStructureAsync(DocumentType.RejectRequestAggregatedMeasureData, "3").ConfigureAwait(false);
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasBusinessReason(BusinessReason businessReason)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasBusinessReason(BusinessReason businessReason)
     {
         _documentAsserter.HasValue("ProcessEnergyContext/EnergyBusinessProcess", EbixCode.Of(businessReason));
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasReasonCode(string reasonCode)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasReasonCode(string reasonCode)
     {
         _documentAsserter.HasValue("PayloadResponseEvent[1]/StatusType", EbixCode.Of(ReasonCode.From(reasonCode)));
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasMessageId(string expectedMessageId)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasMessageId(string expectedMessageId)
     {
         _documentAsserter.HasValue("HeaderEnergyDocument/Identification", expectedMessageId);
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasSenderId(string expectedSenderId)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasSenderId(string expectedSenderId)
     {
         _documentAsserter.HasValue("HeaderEnergyDocument/SenderEnergyParty/Identification", expectedSenderId);
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasReceiverId(string expectedReceiverId)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasReceiverId(string expectedReceiverId)
     {
         _documentAsserter.HasValue("HeaderEnergyDocument/RecipientEnergyParty/Identification", expectedReceiverId);
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasTimestamp(Instant expectedTimestamp)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasTimestamp(Instant expectedTimestamp)
     {
         _documentAsserter.HasValue("HeaderEnergyDocument/Creation", expectedTimestamp.ToString());
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasTransactionId(Guid expectedTransactionId)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasTransactionId(Guid expectedTransactionId)
     {
         _documentAsserter.HasValue($"PayloadResponseEvent[1]/Identification", expectedTransactionId.ToString("N"));
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasOriginalTransactionId(string expectedOriginalTransactionId)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasOriginalTransactionId(string expectedOriginalTransactionId)
     {
         _documentAsserter.HasValue("PayloadResponseEvent[1]/OriginalBusinessDocument", expectedOriginalTransactionId);
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasSerieReasonCode(string expectedSerieReasonCode)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasSerieReasonCode(string expectedSerieReasonCode)
     {
         _documentAsserter.HasValue($"PayloadResponseEvent[1]/ResponseReasonType", expectedSerieReasonCode);
         return this;
     }
 
-    public IAssertRejectedAggregatedMeasureDataResultDocument HasSerieReasonMessage(string expectedSerieReasonMessage)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasSerieReasonMessage(string expectedSerieReasonMessage)
     {
         //In ebIX we don't have a field for text information meaning this method should always assert true
         return this;
