@@ -21,21 +21,24 @@ using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Api.Authentication;
 using Energinet.DataHub.EDI.Api.Authentication.Certificate;
+using Energinet.DataHub.EDI.Api.Configuration.Authentication;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
+using Energinet.DataHub.EDI.Api.DataRetention;
+using Energinet.DataHub.EDI.Api.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.Infrastructure.Configuration.Authentication;
-using Energinet.DataHub.EDI.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Configuration;
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
+using MediatR;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
@@ -102,6 +105,9 @@ namespace Energinet.DataHub.EDI.Api
 
                     CompositionRoot.Initialize(services)
                         .AddSystemClock(new SystemDateTimeProvider());
+
+                    services.AddScoped(_ => new JwtTokenParser(tokenValidationParameters));
+                    services.AddDataRetention();
                     services.AddScoped<ICorrelationContext>(
                         _ =>
                         {
@@ -162,6 +168,11 @@ namespace Energinet.DataHub.EDI.Api
         private static void ConfigureAuthenticationMiddleware(IFunctionsWorkerApplicationBuilder worker)
         {
             worker.UseMiddleware<MarketActorAuthenticatorMiddleware>();
+        }
+
+        private static void AddDataRetention(this IServiceCollection services)
+        {
+            services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>();
         }
 
         private static async Task<TokenValidationParameters> GetTokenValidationParametersAsync(RuntimeEnvironment runtime)

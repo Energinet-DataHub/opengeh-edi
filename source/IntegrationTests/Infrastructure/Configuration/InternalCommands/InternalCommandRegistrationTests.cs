@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
@@ -36,11 +35,7 @@ public class InternalCommandRegistrationTests : TestBase
 
     public static IEnumerable<object[]> GetInternalCommands()
     {
-        var allTypes = ApplicationAssemblies
-            .Application
-            .GetTypes()
-            .Concat(ApplicationAssemblies.Infrastructure.GetTypes())
-            .Concat(typeof(EnqueueAcceptedEnergyResultMessageHandler).Assembly.GetTypes());
+        var allTypes = typeof(EnqueueAcceptedEnergyResultMessageHandler).Assembly.GetTypes();
 
         return allTypes
             .Where(x => x.BaseType == typeof(InternalCommand))
