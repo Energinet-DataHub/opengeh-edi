@@ -19,16 +19,16 @@ option csharp_namespace = "Energinet.DataHub.Edi.Requests";
 
 message WholesaleServicesRequest {
   Period period = 1;
-  ChargeType charge_type = 2; // New field
+  repeated ChargeType charge_type = 2; // Can you create a request without specifying a charge type?
   optional string settlement_method = 3;
   optional string energy_supplier_id = 4;
-  string requested_by_actor_id = 5;
+  string requested_by_actor_id = 5; // The response if ONLY for this actor.
   string requested_by_actor_role = 6;
   optional string charge_owner_id = 7; // New field
   optional string settlement_series_version = 8;
   optional string grid_area_code = 9;
   string business_reason = 10; // Is this process type?
-  string resolution = 11; // New field
+  string resolution = 11; // Is this used for determining if they are requesting monthly sums or amount pr. charge?
 }
 
 message Period {
