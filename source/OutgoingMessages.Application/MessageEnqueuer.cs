@@ -54,32 +54,6 @@ public class MessageEnqueuer
         return messageToEnqueue.Id;
     }
 
-    // This method is obsolete, use the overload with OutgoingMessage instead
-    public async Task<OutgoingMessageId> EnqueueAsync(OutgoingMessageDto messageToEnqueue)
-    {
-        ArgumentNullException.ThrowIfNull(messageToEnqueue);
-
-        var outgoingMessage = new OutgoingMessage(
-            messageToEnqueue.DocumentType,
-            messageToEnqueue.ReceiverId,
-            messageToEnqueue.ProcessId,
-            messageToEnqueue.BusinessReason,
-            messageToEnqueue.ReceiverRole,
-            messageToEnqueue.SenderId,
-            messageToEnqueue.SenderRole,
-            messageToEnqueue.SerializedContent,
-            _systemDateTimeProvider.Now(),
-            messageToEnqueue.RelatedToMessageId);
-
-        var addToRepositoryTask = _outgoingMessageRepository.AddAsync(outgoingMessage);
-        var addToActorMessageQueueTask = AddToActorMessageQueueAsync(outgoingMessage);
-
-        await Task.WhenAll(addToRepositoryTask, addToActorMessageQueueTask).ConfigureAwait(false);
-        _logger.LogInformation("Message enqueued: {Message} for Actor: {ActorNumber}", outgoingMessage.Id, outgoingMessage.Receiver.Number.Value);
-
-        return outgoingMessage.Id;
-    }
-
     private async Task AddToActorMessageQueueAsync(OutgoingMessage outgoingMessage)
     {
         var outgoingMessageReceiver = Receiver.Create(outgoingMessage.ReceiverId, outgoingMessage.ReceiverRole);

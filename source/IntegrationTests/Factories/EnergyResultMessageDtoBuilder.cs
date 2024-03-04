@@ -30,7 +30,6 @@ public class EnergyResultMessageDtoBuilder
     private static readonly IReadOnlyCollection<EnergyResultMessagePoint> _points = new List<EnergyResultMessagePoint>();
     private static ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
     private static ActorRole _receiverRole = ActorRole.MeteredDataAdministrator;
-    private static MessageId? _messageId;
 
 #pragma warning disable CA1822
     public EnergyResultMessageDto Build()
@@ -50,8 +49,7 @@ public class EnergyResultMessageDtoBuilder
             new Period(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant()),
             _points,
             _businessReason.Name,
-            1,
-            relatedToMessageId: _messageId);
+            1);
     }
 
     public EnergyResultMessageDtoBuilder WithReceiverNumber(string receiverNumber)
@@ -63,12 +61,6 @@ public class EnergyResultMessageDtoBuilder
     public EnergyResultMessageDtoBuilder WithReceiverRole(ActorRole actorRole)
     {
         _receiverRole = actorRole;
-        return this;
-    }
-
-    public EnergyResultMessageDtoBuilder WithRelationTo(MessageId? messageId = null)
-    {
-        _messageId = messageId;
         return this;
     }
 }
