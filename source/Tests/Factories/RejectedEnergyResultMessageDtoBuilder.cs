@@ -22,7 +22,7 @@ namespace Energinet.DataHub.EDI.Tests.Factories;
 
 public static class RejectedEnergyResultMessageDtoBuilder
 {
-    private static readonly ActorNumber _receiverId = ActorNumber.Create("1234567890123");
+    private static readonly ActorNumber _receiverNumber = ActorNumber.Create("1234567890123");
     private static readonly Guid _processId = Guid.NewGuid();
     private static readonly string _businessReason = BusinessReason.BalanceFixing.Code;
     private static readonly ActorRole _receiverRole = ActorRole.MeteredDataResponsible;
@@ -35,7 +35,7 @@ public static class RejectedEnergyResultMessageDtoBuilder
     public static RejectedEnergyResultMessageDto Build()
     {
         return new RejectedEnergyResultMessageDto(
-            _receiverId,
+            _receiverNumber,
             _processId,
             _businessReason,
             _receiverRole,

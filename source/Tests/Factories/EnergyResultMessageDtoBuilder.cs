@@ -49,9 +49,7 @@ public static class EnergyResultMessageDtoBuilder
         };
 
     private static readonly string _businessReasonName = BusinessReason.BalanceFixing.Code;
-    private static readonly string? _originalTransactionIdReference = Guid.NewGuid().ToString();
     private static readonly string? _settlementVersion = SettlementVersion.FirstCorrection.Code;
-    private static readonly MessageId? _relatedToMessageId = MessageId.New();
 
     public static EnergyResultMessageDto Build()
     {
@@ -70,8 +68,6 @@ public static class EnergyResultMessageDtoBuilder
             _points,
             _businessReasonName,
             CalculationResultVersion,
-            _originalTransactionIdReference,
-            _settlementVersion,
-            _relatedToMessageId);
+            _settlementVersion);
     }
 }

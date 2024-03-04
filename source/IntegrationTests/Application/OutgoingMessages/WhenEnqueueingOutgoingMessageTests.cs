@@ -40,6 +40,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 public class WhenEnqueueingOutgoingMessageTests : TestBase
 {
     private readonly EnergyResultMessageDtoBuilder _energyResultMessageDtoBuilder;
+    private readonly RejectedEnergyResultMessageDtoBuilder _rejectedEnergyResultMessageDtoBuilder;
     private readonly SystemDateTimeProviderStub _systemDateTimeProvider;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ActorMessageQueueContext _context;
@@ -49,6 +50,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         : base(integrationTestFixture)
     {
         _energyResultMessageDtoBuilder = new EnergyResultMessageDtoBuilder();
+        _rejectedEnergyResultMessageDtoBuilder = new RejectedEnergyResultMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
         _fileStorageClient = GetService<IFileStorageClient>();
         _systemDateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
@@ -61,7 +63,6 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         // Arrange
         var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
-            .WithRelationTo(MessageId.New())
             .Build();
 
         var createdAtTimestamp = Instant.FromUtc(2024, 1, 1, 0, 0);
@@ -94,7 +95,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             () => Assert.Equal(message.BusinessReason, result.BusinessReason),
             () => Assert.Equal(expectedFileStorageReference, result.FileStorageReference),
             () => Assert.Equal("OutgoingMessage", result.Discriminator),
-            () => Assert.Equal(message.RelatedToMessageId!.Value, result.RelatedToMessageId),
+            () => Assert.Equal(message.RelatedToMessageId?.Value, result.RelatedToMessageId),
             () => Assert.False(result.IsPublished),
             () => Assert.NotNull(result.AssignedBundleId),
         };
@@ -229,21 +230,21 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var receiverId = ActorNumber.Create("1234567891912");
         var receiverRole = ActorRole.MeteredDataAdministrator;
         var maxMessageCount = 3;
-        MessageId? message1RelatedTo = null;
+        var message1RelatedTo = MessageId.New();
         var message2RelatedTo = MessageId.New();
         var message3RelatedTo = MessageId.New();
 
-        var message1 = _energyResultMessageDtoBuilder
+        var message1 = _rejectedEnergyResultMessageDtoBuilder
             .WithReceiverNumber(receiverId.Value)
             .WithReceiverRole(receiverRole)
             .WithRelationTo(message1RelatedTo)
             .Build();
-        var message2 = _energyResultMessageDtoBuilder
+        var message2 = _rejectedEnergyResultMessageDtoBuilder
             .WithReceiverNumber(receiverId.Value)
             .WithReceiverRole(receiverRole)
             .WithRelationTo(message2RelatedTo)
             .Build();
-        var message3 = _energyResultMessageDtoBuilder
+        var message3 = _rejectedEnergyResultMessageDtoBuilder
             .WithReceiverNumber(receiverId.Value)
             .WithReceiverRole(receiverRole)
             .WithRelationTo(message3RelatedTo)
@@ -288,7 +289,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var maxMessageCount = 2;
         var messageRelatedTo = MessageId.New();
 
-        var message = _energyResultMessageDtoBuilder
+        var message = _rejectedEnergyResultMessageDtoBuilder
             .WithReceiverNumber(receiverId.Value)
             .WithReceiverRole(receiverRole)
             .WithRelationTo(messageRelatedTo)
@@ -344,6 +345,14 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     private async Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultMessageDto message)
     {
         return await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
+    }
+
+    private async Task<OutgoingMessageId> EnqueueAndCommitAsync(RejectedEnergyResultMessageDto message)
+    {
+        var outgoingMessageId = await _outgoingMessagesClient.EnqueueAsync(message, CancellationToken.None);
+        var actorMessageQueueContext = GetService<ActorMessageQueueContext>();
+        await actorMessageQueueContext.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+        return outgoingMessageId;
     }
 
     private async Task CreateActorMessageQueueInDatabase(Guid id, ActorNumber actorNumber, ActorRole actorRole)

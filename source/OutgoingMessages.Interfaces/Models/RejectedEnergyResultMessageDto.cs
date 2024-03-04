@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common.Serialization;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 

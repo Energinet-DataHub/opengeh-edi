@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common.Serialization;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
@@ -60,9 +59,7 @@ public class EnergyResultMessageDto : OutgoingMessageDto
         IReadOnlyCollection<EnergyResultMessagePoint> points,
         string businessReasonName,
         long calculationResultVersion,
-        string? originalTransactionIdReference = null,
-        string? settlementVersion = null,
-        MessageId? relatedToMessageId = null)
+        string? settlementVersion = null)
     {
         var series = new EnergyResultMessageTimeSeries(
             processId,
@@ -76,15 +73,14 @@ public class EnergyResultMessageDto : OutgoingMessageDto
             period,
             points.Select(p => new EnergyResultMessagePoint(p.Position, p.Quantity, p.QuantityQuality, p.SampleTime)).ToList(),
             calculationResultVersion,
-            originalTransactionIdReference,
+            null,
             settlementVersion);
         return new EnergyResultMessageDto(
             receiverNumber,
             processId,
             businessReasonName,
             receiverRole,
-            series,
-            relatedToMessageId);
+            series);
     }
 }
 
