@@ -37,6 +37,7 @@ public class AmountPerChargeResultProducedV1EventBuilder
     private bool _isTax;
     private AmountPerChargeResultProducedV1.Types.Currency _currency = AmountPerChargeResultProducedV1.Types.Currency.Dkk;
     private long _calculationVersion = 1;
+    private AmountPerChargeResultProducedV1.Types.Resolution _resolution = AmountPerChargeResultProducedV1.Types.Resolution.Day;
 
     internal AmountPerChargeResultProducedV1 Build()
     {
@@ -57,6 +58,7 @@ public class AmountPerChargeResultProducedV1EventBuilder
             MeteringPointType = _meteringPointType,
             SettlementMethod = _settlementMethod,
             CalculationResultVersion = _calculationVersion,
+            Resolution = _resolution,
         };
 
         return @event;
@@ -137,6 +139,13 @@ public class AmountPerChargeResultProducedV1EventBuilder
     internal AmountPerChargeResultProducedV1EventBuilder WithCalculationId(Guid calculationId)
     {
         _calculationId = calculationId;
+        return this;
+    }
+
+    internal AmountPerChargeResultProducedV1EventBuilder WithResolution(AmountPerChargeResultProducedV1.Types.Resolution resolution)
+    {
+        _resolution = resolution;
+
         return this;
     }
 }
