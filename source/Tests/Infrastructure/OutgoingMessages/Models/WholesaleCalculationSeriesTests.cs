@@ -20,7 +20,7 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Models;
 
-public class WholesaleCalculationModelTests
+public class WholesaleCalculationSeriesTests
 {
     [Fact]
     public void WholesaleCalculationSeries_has_the_same_attributes_as_WholesaleCalculationMarketActivityRecord()
