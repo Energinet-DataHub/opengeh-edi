@@ -12,22 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using BuildingBlocks.Application.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.Api.Extensions.DependencyInjection;
+namespace BuildingBlocks.Application.Extensions.DependencyInjection;
 
-public class CompositionRoot
+public static class SerializerExtensions
 {
-    private readonly IServiceCollection _services;
-
-    private CompositionRoot(IServiceCollection services)
+    public static IServiceCollection AddSerializer(this IServiceCollection services)
     {
-        _services = services;
-        services.AddLogging();
-    }
+        services.AddSingleton<ISerializer, Serializer>();
 
-    public static CompositionRoot Initialize(IServiceCollection services)
-    {
-        return new CompositionRoot(services);
+        return services;
     }
 }

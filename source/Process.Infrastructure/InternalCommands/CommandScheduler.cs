@@ -15,7 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using BuildingBlocks.Application.DateTime;
-using Energinet.DataHub.EDI.Common.Serialization;
+using BuildingBlocks.Application.Serialization;
 using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 

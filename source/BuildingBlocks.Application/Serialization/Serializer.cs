@@ -12,15 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.IO;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Common.Serialization.Converters;
+using BuildingBlocks.Application.Serialization.Converters;
 using NodaTime.Serialization.SystemTextJson;
 
-namespace Energinet.DataHub.EDI.Common.Serialization
+namespace BuildingBlocks.Application.Serialization
 {
     /// <summary>
     /// JSON serializer that specifically support NodaTime's <see cref="NodaTime.Instant"/>.

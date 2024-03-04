@@ -105,7 +105,8 @@ namespace Energinet.DataHub.EDI.Api
                             .AddSqlServerHealthCheck(context.Configuration)
                             .AddSqlServerHealthCheck(configuration)
                             .AddB2BAuthentication(tokenValidationParameters)
-                            .AddSystemClock();
+                            .AddSystemClock()
+                            .AddSerializer();
                         services.AddBlobStorageHealthCheck("edi-web-jobs-storage", runtime.AzureWebJobsStorage!);
                         services.AddBlobStorageHealthCheck("edi-documents-storage", runtime.AZURE_STORAGE_ACCOUNT_URL!);
 

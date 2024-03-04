@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Energinet.DataHub.EDI.Common.Serialization.Converters
+namespace BuildingBlocks.Application.Serialization.Converters
 {
     /// <summary>
     /// Workaround for System.Type with System.Text.Json using converters

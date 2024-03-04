@@ -20,6 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using BuildingBlocks.Application.DateTime;
+using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.FeatureFlag;
 using Dapper;
 using Energinet.DataHub.EDI.Api.Configuration.Authentication;
@@ -264,6 +265,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                     TestCreateOutgoingCommandHandler>()
                 .AddScopedSqlDbContext<ProcessContext>(config)
                 .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)
+                .AddSerializer()
                 .AddScoped<ISystemDateTimeProvider>(_ => new SystemDateTimeProviderStub());
 
             CompositionRoot.Initialize(_services);
