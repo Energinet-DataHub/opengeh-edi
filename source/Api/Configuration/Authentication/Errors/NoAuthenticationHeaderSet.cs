@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Reflection;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-
-namespace Energinet.DataHub.EDI.Infrastructure.Configuration;
-
-public static class ApplicationAssemblies
+namespace Energinet.DataHub.EDI.Api.Configuration.Authentication.Errors
 {
-    public static Assembly Application => typeof(InternalCommand).Assembly;
-
-    public static Assembly Infrastructure => typeof(ApplicationAssemblies).Assembly;
+    public class NoAuthenticationHeaderSet : AuthenticationError
+    {
+        public NoAuthenticationHeaderSet()
+        : base("No authorization header is set.")
+        {
+        }
+    }
 }

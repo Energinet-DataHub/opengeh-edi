@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using Azure.Core;
 using Dapper;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
@@ -48,14 +49,20 @@ internal sealed class QueryBuilder
                 new KeyValuePair<string, object>("MessageId", request.MessageId));
         }
 
-        if (request.SenderNumber is not null)
+        if (request.SenderNumber is not null && request.ReceiverNumber is not null)
+        {
+            AddFilter(
+                "SenderNumber=@SenderNumber OR ReceiverNumber=@ReceiverNumber",
+                new KeyValuePair<string, object>("SenderNumber", request.SenderNumber),
+                new KeyValuePair<string, object>("ReceiverNumber", request.ReceiverNumber));
+        }
+        else if (request.SenderNumber is not null)
         {
             AddFilter(
                 "SenderNumber=@SenderNumber",
                 new KeyValuePair<string, object>("SenderNumber", request.SenderNumber));
         }
-
-        if (request.ReceiverNumber is not null)
+        else if (request.ReceiverNumber is not null)
         {
             AddFilter(
                 "ReceiverNumber=@ReceiverNumber",

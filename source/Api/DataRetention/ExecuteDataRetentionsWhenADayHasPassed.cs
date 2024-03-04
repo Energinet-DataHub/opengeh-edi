@@ -23,7 +23,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Polly;
 
-namespace Energinet.DataHub.EDI.Infrastructure.DataRetention;
+namespace Energinet.DataHub.EDI.Api.DataRetention;
 
 public class ExecuteDataRetentionsWhenADayHasPassed : INotificationHandler<ADayHasPassed>
 {

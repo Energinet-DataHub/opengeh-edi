@@ -19,8 +19,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Energinet.DataHub.EDI.Api;
-using Energinet.DataHub.EDI.B2CWebApi;
-using Energinet.DataHub.EDI.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Xml;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
@@ -74,12 +72,20 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
         public static IEnumerable<object[]> GetNotificationsHandlerRequirements()
             => ResolveTypes(
                 typeof(INotificationHandler<>),
-                new[] { ApplicationAssemblies.Application, ApplicationAssemblies.Infrastructure });
+                new[]
+                {
+                    typeof(Api.DataRetention.ExecuteDataRetentionsWhenADayHasPassed).Assembly,
+                    typeof(Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers.EnqueueAcceptedEnergyResultMessageHandler).Assembly,
+                    typeof(Process.Infrastructure.InboxEvents.ProcessInboxEventsOnTenSecondsHasPassed).Assembly,
+                });
 
         public static IEnumerable<object[]> GetDocumentWritersRequirements()
             => ResolveTypesThatImplementType(
                 typeof(IDocumentWriter),
-                new[] { ApplicationAssemblies.Application, ApplicationAssemblies.Infrastructure, typeof(NotifyAggregatedMeasureDataXmlDocumentWriter).Assembly });
+                new[]
+                {
+                    typeof(OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices.NotifyWholesaleServicesEbixDocumentWriter).Assembly,
+                });
 
         public static IEnumerable<object[]> GetFunctionRequirements()
         {
