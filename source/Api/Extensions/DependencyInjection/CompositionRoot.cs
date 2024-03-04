@@ -30,10 +30,7 @@ public class CompositionRoot
     {
         _services = services;
         services.AddSingleton<ISerializer, Serializer>();
-
-        AddMediatR();
         services.AddLogging();
-        AddDapper(services);
     }
 
     public static CompositionRoot Initialize(IServiceCollection services)
@@ -48,21 +45,4 @@ public class CompositionRoot
         return this;
     }
 
-    private static IServiceCollection AddDapper(IServiceCollection services)
-    {
-        ConfigureDapper();
-
-        return services;
-    }
-
-    private static void ConfigureDapper()
-    {
-        SqlMapper.AddTypeHandler(InstantHandler.Default);
-    }
-
-    private void AddMediatR()
-    {
-        var configuration = new MediatRServiceConfiguration();
-        ServiceRegistrar.AddRequiredServices(_services, configuration);
-    }
 }

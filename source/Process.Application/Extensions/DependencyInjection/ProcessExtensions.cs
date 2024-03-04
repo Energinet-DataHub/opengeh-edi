@@ -43,9 +43,11 @@ public static class ProcessExtensions
                 o => !string.IsNullOrEmpty(o.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME),
                 "WHOLESALE_INBOX_MESSAGE_QUEUE_NAME must be set");
 
-        services.AddScopedSqlDbContext<ProcessContext>(configuration);
+        services
+            .AddScopedSqlDbContext<ProcessContext>(configuration)
+            .AddMediatR();
 
-        //EventsConfiguration
+        //InboxEventsConfiguration
         //TODO: can we move them out and delete ref to Infrastructure?
         services.AddTransient<IInboxEventMapper, EnergyResultTimeSeriesRequestAcceptedEventMapper>()
             .AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestRejectedMapper>();
