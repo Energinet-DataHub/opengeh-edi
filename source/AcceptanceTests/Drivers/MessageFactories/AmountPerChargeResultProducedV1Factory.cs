@@ -42,6 +42,7 @@ internal static class AmountPerChargeResultProducedV1Factory
             Currency = AmountPerChargeResultProducedV1.Types.Currency.Dkk,
             MeteringPointType = AmountPerChargeResultProducedV1.Types.MeteringPointType.Production,
             CalculationResultVersion = 42,
+            Resolution = AmountPerChargeResultProducedV1.Types.Resolution.Hour,
         };
 
         amountPerChargeResultProduced.TimeSeriesPoints.Add(new RepeatedField<AmountPerChargeResultProducedV1.Types.TimeSeriesPoint>()

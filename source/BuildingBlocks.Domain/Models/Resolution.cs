@@ -20,8 +20,9 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public class Resolution : EnumerationType
 {
-    public static readonly Resolution Hourly = new(nameof(Hourly), "PT1H");
     public static readonly Resolution QuarterHourly = new(nameof(QuarterHourly), "PT15M");
+    public static readonly Resolution Hourly = new(nameof(Hourly), "PT1H");
+    public static readonly Resolution Daily = new(nameof(Daily), "P1D");
     public static readonly Resolution Monthly = new(nameof(Monthly), "P1M");
 
     [JsonConstructor]
