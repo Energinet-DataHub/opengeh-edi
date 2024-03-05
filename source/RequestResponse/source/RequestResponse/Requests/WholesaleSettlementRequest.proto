@@ -18,23 +18,22 @@ syntax = "proto3";
 option csharp_namespace = "Energinet.DataHub.Edi.Requests";
 
 message WholesaleSettlementRequest {
-  string requested_by_actor_id = 1; // GLN or EIC for the requesting party.
+  string requested_by_actor_id = 1; // GLN or EIC for the requesting party. This is the party that receives the settlement request.
   string requested_by_actor_role = 2; //The kind of market roles that can be played by parties for given domains within the electricity market. Eg. GridOperator, EnergySupplier etc.
-  string business_reason = 3; // ???
+  string business_reason = 3; // The requested business reason for the settlement request. eg. WholesaleFixing.
   string resolution = 6; // Is this used for determining if they are requesting monthly sums or amount pr. charge?
-  string period_start = 7;
-  optional string period_end = 8;
-  optional string energy_supplier_id = 9; //Perhaps this is always the same as the requested_by_actor_id?
+  string period_start = 7; // The start of the requested period.
+  optional string period_end = 8; // The end of the requested period.
+  optional string energy_supplier_id = 9; //Perhaps this is always the same as the requested_by_actor_id? - or is it used as a filter?
   optional string charge_owner_id = 10; // GLN or EIC for the party that owns the charge.
   optional string grid_area_code = 11; // The code for the grid area. eg. 870.
-  optional string settlement_method = 12; // ???
   optional string settlement_series_version = 13; // Is the version of the requested settlement series.
   repeated ChargeType charge_type = 14; // Can you create a request without specifying a charge type?
 }
 
 /*
  * Charge Type is the basic level configuration for settlement to process specific charges for invoicing purpose.
- * Examples such as: Day Ahead Spinning Reserve Default Invoice Interest Charge, etc.
+ * Examples such as: Day Ahead, Spinning Reserve, Default Invoice Interest, Charge, etc.
  */
 message ChargeType {
   string charge_type = 1; // is optional in schema - Utility-specific classification of this document eg. ??
