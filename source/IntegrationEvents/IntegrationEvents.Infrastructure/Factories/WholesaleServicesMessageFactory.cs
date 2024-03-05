@@ -103,7 +103,7 @@ public static class WholesaleServicesMessageFactory
             PriceMeasureUnit: MeasurementUnit.Kwh,
             Currency: CurrencyMapper.Map(message.Currency),
             ChargeType: ChargeTypeMapper.Map(message.ChargeType),
-            Resolution: Resolution.Monthly,
+            Resolution: ResolutionMapper.Map(message.Resolution),
             MeteringPointType: MeteringPointTypeMapper.Map(message.MeteringPointType),
             SettlementType: SettlementTypeMapper.Map(message.SettlementMethod));
         return wholesaleCalculationSeries;
