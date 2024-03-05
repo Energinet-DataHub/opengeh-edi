@@ -12,15 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 using Json.Schema;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.BaseParsers;
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.BaseParsers;
 
 public abstract class JsonParserBase
 {
@@ -32,10 +37,10 @@ public abstract class JsonParserBase
         _schemaProvider = schemaProvider;
     }
 
-    protected static RequestAggregatedMeasureDataMarketMessageParserResult InvalidJsonFailure(
+    protected static IncomingMarketMessageParserResult InvalidJsonFailure(
         Exception exception)
     {
-        return new RequestAggregatedMeasureDataMarketMessageParserResult(
+        return new IncomingMarketMessageParserResult(
             InvalidMessageStructure.From(exception));
     }
 

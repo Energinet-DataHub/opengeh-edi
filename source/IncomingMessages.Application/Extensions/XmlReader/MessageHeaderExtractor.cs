@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Xml;
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.XmlReader;
 
 internal static class MessageHeaderExtractor
 {
     public static async Task<MessageHeader> ExtractAsync(
-        XmlReader reader,
+        System.Xml.XmlReader reader,
         RootElement rootElement,
         string headerElementName,
         string marketActivityRecordElementName,

@@ -12,27 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
-using Energinet.DataHub.EDI.Process.Interfaces;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.Messages
 {
-    public class RequestAggregatedMeasureDataMarketMessageParserResult
+    public class IncomingMarketMessageParserResult
     {
-        public RequestAggregatedMeasureDataMarketMessageParserResult(params ValidationError[] errors)
+        public IncomingMarketMessageParserResult(params ValidationError[] errors)
         {
             Errors = errors;
         }
 
-        public RequestAggregatedMeasureDataMarketMessageParserResult(RequestAggregatedMeasureDataDto dto)
+        public IncomingMarketMessageParserResult(IncomingMessage incomingMessage)
         {
-            Dto = dto;
+            IncomingMessage = incomingMessage;
         }
 
         public IReadOnlyCollection<ValidationError> Errors { get; } = new List<ValidationError>();
 
         public bool Success => Errors.Count == 0;
 
-        public RequestAggregatedMeasureDataDto? Dto { get; }
+        public IncomingMessage? IncomingMessage { get; }
     }
 }

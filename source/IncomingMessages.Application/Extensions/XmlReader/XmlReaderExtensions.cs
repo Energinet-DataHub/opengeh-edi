@@ -12,18 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Threading.Tasks;
 using System.Xml;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.XmlReader;
 
 internal static class XmlReaderExtensions
 {
     public static Task<bool> MoveToNextElementByNameAsync(
-        this XmlReader reader,
+        this System.Xml.XmlReader reader,
         string elementName,
         string namespaceUri)
     {
-        bool Predicate(XmlReader internalReader)
+        bool Predicate(System.Xml.XmlReader internalReader)
         {
             return internalReader.LocalName == elementName
                    && internalReader.NodeType == XmlNodeType.Element
@@ -33,7 +35,7 @@ internal static class XmlReaderExtensions
         return reader.MoveToNextAsync(Predicate);
     }
 
-    public static async Task<bool> MoveToNextAsync(this XmlReader reader, Func<XmlReader, bool> predicate)
+    public static async Task<bool> MoveToNextAsync(this System.Xml.XmlReader reader, Func<System.Xml.XmlReader, bool> predicate)
     {
         while (await reader.ReadAsync().ConfigureAwait(false))
         {
@@ -44,7 +46,7 @@ internal static class XmlReaderExtensions
         return false;
     }
 
-    public static bool Is(this XmlReader reader, string localName, string ns, XmlNodeType xmlNodeType = XmlNodeType.Element)
+    public static bool Is(this System.Xml.XmlReader reader, string localName, string ns, XmlNodeType xmlNodeType = XmlNodeType.Element)
     {
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentNullException.ThrowIfNull(localName);
@@ -55,7 +57,7 @@ internal static class XmlReaderExtensions
                reader.NodeType == xmlNodeType;
     }
 
-    public static async ValueTask<RootElement> ReadRootElementAsync(this XmlReader reader)
+    public static async ValueTask<RootElement> ReadRootElementAsync(this System.Xml.XmlReader reader)
     {
         ArgumentNullException.ThrowIfNull(reader);
 
@@ -70,7 +72,7 @@ internal static class XmlReaderExtensions
         throw new InvalidOperationException("Reached end of xml without finding the root element!");
     }
 
-    public static async ValueTask<XmlReader> AdvanceToAsync(this XmlReader reader, string localName, string ns)
+    public static async ValueTask<System.Xml.XmlReader> AdvanceToAsync(this System.Xml.XmlReader reader, string localName, string ns)
     {
         do
         {
@@ -86,7 +88,7 @@ internal static class XmlReaderExtensions
         throw new XmlException("Xml node not found");
     }
 
-    public static async ValueTask ReadToEndAsync(this XmlReader reader)
+    public static async ValueTask ReadToEndAsync(this System.Xml.XmlReader reader)
     {
         ArgumentNullException.ThrowIfNull(reader);
         while (await reader.ReadAsync().ConfigureAwait(false))

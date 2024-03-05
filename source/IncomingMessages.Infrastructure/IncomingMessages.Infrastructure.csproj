@@ -910,4 +910,8 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="RequestAggregatedMeasureDataParsers\" />
+  </ItemGroup>
+
 </Project>

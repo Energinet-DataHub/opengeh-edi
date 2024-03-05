@@ -76,36 +76,48 @@ public class IncomingMessageReceiver
             return await request.CreateInvalidContentTypeResponseAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        var incomingDocumentType = EnumerationType.FromName<IncomingDocumentType>(incomingDocumentTypeName ?? "RequestAggregatedMeasureData");
-        if (incomingDocumentType == IncomingDocumentType.RequestWholesaleSettlement)
+        var incomingDocumentType = GetIncomingDocumentType(incomingDocumentTypeName);
+        if (incomingDocumentType == null) return request.CreateResponse(HttpStatusCode.NotFound);
+
+        if (incomingDocumentType == IncomingDocumentType.RequestWholesaleSettlement
+            && !await _featureFlagManager.UseRequestWholesaleSettlementReceiver.ConfigureAwait(false))
         {
-            if (!await _featureFlagManager.UseRequestWholesaleSettlementReceiver.ConfigureAwait(false))
-            {
-                return request.CreateResponse(HttpStatusCode.NotFound);
-            }
+            return request.CreateResponse(HttpStatusCode.NotFound);
         }
 
-        if (incomingDocumentType == IncomingDocumentType.RequestAggregatedMeasureData)
+        var responseMessage = await _incomingMessageClient
+            .RegisterAndSendAsync(
+                new IncomingMessageStream(request.Body),
+                documentFormat,
+                IncomingDocumentType.RequestAggregatedMeasureData,
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        if (responseMessage.IsErrorResponse)
         {
-            var responseMessage = await _incomingMessageClient
-                .RegisterAndSendAsync(
-                    new IncomingMessageStream(request.Body),
-                    documentFormat,
-                    IncomingDocumentType.RequestAggregatedMeasureData,
-                    cancellationToken)
-                .ConfigureAwait(false);
-
-            if (responseMessage.IsErrorResponse)
-            {
-                var httpErrorStatusCode = HttpStatusCode.BadRequest;
-                return CreateResponse(request, httpErrorStatusCode, responseMessage);
-            }
-
-            var httpStatusCode = !responseMessage.IsErrorResponse ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
-            return CreateResponse(request, httpStatusCode, responseMessage);
+            var httpErrorStatusCode = HttpStatusCode.BadRequest;
+            return CreateResponse(request, httpErrorStatusCode, responseMessage);
         }
 
-        return request.CreateResponse(HttpStatusCode.BadRequest);
+        var httpStatusCode = !responseMessage.IsErrorResponse ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
+        return CreateResponse(request, httpStatusCode, responseMessage);
+    }
+
+    private static IncomingDocumentType? GetIncomingDocumentType(string? incomingDocumentTypeName)
+    {
+        if (incomingDocumentTypeName is null)
+        {
+            return null;
+        }
+
+        try
+        {
+            return EnumerationType.FromName<IncomingDocumentType>(incomingDocumentTypeName);
+        }
+        catch (InvalidOperationException)
+        {
+            return null;
+        }
     }
 
     private HttpResponseData CreateResponse(
