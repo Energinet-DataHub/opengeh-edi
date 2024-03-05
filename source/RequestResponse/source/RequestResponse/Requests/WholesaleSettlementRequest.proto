@@ -21,12 +21,12 @@ message WholesaleSettlementRequest {
   Period period = 1; // The period for which the request is made.
   string requested_by_actor_id = 2; // GLN or EIC for the requesting party.
   string requested_by_actor_role = 3; //The kind of market roles that can be played by parties for given domains within the electricity market. Eg. GridOperator, EnergySupplier etc.
-  string business_reason = 4;
+  string business_reason = 4; // ???
   string resolution = 5; // Is this used for determining if they are requesting monthly sums or amount pr. charge?
   optional string energy_supplier_id = 6; //Perhaps this is always the same as the requested_by_actor_id?
   optional string charge_owner_id = 7; // GLN or EIC for the party that owns the charge.
   optional string grid_area_code = 8; // The code for the grid area. eg. 870.
-  optional string settlement_method = 9;
+  optional string settlement_method = 9; // ???
   optional string settlement_series_version = 10; // Is the version of the requested settlement series.
   repeated ChargeType charge_type = 11; // Can you create a request without specifying a charge type?
 }
