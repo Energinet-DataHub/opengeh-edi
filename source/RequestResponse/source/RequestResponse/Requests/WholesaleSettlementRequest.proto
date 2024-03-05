@@ -32,6 +32,6 @@ message WholesaleSettlementRequest {
 }
 
 message ChargeType {
-  optional string charge_type = 1; // The type of charge. eg. Tariff, Tax, Fee.
+  optional string charge_type = 1; // The type of charge. eg. Tariff, Subscription, Fee.
   optional string charge_id = 2; // The unique identifier for the charge in the context of the charge-owner?.
 }
