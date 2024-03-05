@@ -29,16 +29,13 @@ public class AmountPerChargeResultProducedV1Processor : IIntegrationEventProcess
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly IFeatureFlagManager _featureManager;
-    private readonly ILogger<AmountPerChargeResultProducedV1Processor> _logger;
 
     public AmountPerChargeResultProducedV1Processor(
         IOutgoingMessagesClient outgoingMessagesClient,
-        IFeatureFlagManager featureManager,
-        ILogger<AmountPerChargeResultProducedV1Processor> logger)
+        IFeatureFlagManager featureManager)
     {
         _outgoingMessagesClient = outgoingMessagesClient;
         _featureManager = featureManager;
-        _logger = logger;
     }
 
     public string EventTypeToHandle => AmountPerChargeResultProducedV1.EventName;
@@ -46,9 +43,6 @@ public class AmountPerChargeResultProducedV1Processor : IIntegrationEventProcess
     public async Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
-
-        var eventMessage = integrationEvent.ToString();
-        _logger.LogInformation("AmountPerChargeResultProducedV1 integration event: {event}", eventMessage);
 
         if (!await _featureManager.UseAmountPerChargeResultProduced.ConfigureAwait(false))
         {
