@@ -172,6 +172,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
         var messageBuilder = _wholesaleServicesSeriesBuilder
             .WithSettlementMethod(SettlementType.Flex)
             .WithMeteringPointType(MeteringPointType.Consumption)
+            .WithResolution(Resolution.Hourly)
             .WithPoints(new()
             {
                 firstPoint,
@@ -185,6 +186,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
         AssertDocument(document, DocumentFormat.From(documentFormat))
             .HasSettlementMethod(SettlementType.Flex)
             .HasMeteringPointType(MeteringPointType.Consumption)
+            .HasResolution(Resolution.Hourly)
             .PriceAmountIsPresentForPointIndex(0, firstPoint.Price?.ToString(NumberFormatInfo.InvariantInfo))
             .PriceAmountIsPresentForPointIndex(1, secondPoint.Price?.ToString(NumberFormatInfo.InvariantInfo));
     }
@@ -202,6 +204,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
         var messageBuilder = _wholesaleServicesSeriesBuilder
                 .WithSettlementMethod(null)
                 .WithMeteringPointType(MeteringPointType.Production)
+                .WithResolution(Resolution.Hourly)
                 .WithPoints(new()
                 {
                     firstPoint,
@@ -215,6 +218,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
         AssertDocument(document, DocumentFormat.From(documentFormat))
             .SettlementMethodIsNotPresent()
             .HasMeteringPointType(MeteringPointType.Production)
+            .HasResolution(Resolution.Hourly)
             .PriceAmountIsPresentForPointIndex(0, firstPoint.Price?.ToString(NumberFormatInfo.InvariantInfo))
             .PriceAmountIsPresentForPointIndex(1, secondPoint.Price?.ToString(NumberFormatInfo.InvariantInfo));
     }
@@ -232,6 +236,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
         var messageBuilder = _wholesaleServicesSeriesBuilder
             .WithSettlementMethod(SettlementType.NonProfiled)
             .WithMeteringPointType(MeteringPointType.Consumption)
+            .WithResolution(Resolution.Hourly)
             .WithPoints(new()
             {
                 firstPoint,
@@ -245,8 +250,45 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
         AssertDocument(document, DocumentFormat.From(documentFormat))
             .HasSettlementMethod(SettlementType.NonProfiled)
             .HasMeteringPointType(MeteringPointType.Consumption)
+            .HasResolution(Resolution.Hourly)
             .PriceAmountIsPresentForPointIndex(0, firstPoint.Price?.ToString(NumberFormatInfo.InvariantInfo))
             .PriceAmountIsPresentForPointIndex(1, secondPoint.Price?.ToString(NumberFormatInfo.InvariantInfo));
+    }
+
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
+    [InlineData(nameof(DocumentFormat.Ebix))]
+    public async Task Can_create_notifyWholesaleServices_document_with_hourly_resolution(string documentFormat)
+    {
+        // Arrange
+        var messageBuilder = _wholesaleServicesSeriesBuilder
+            .WithResolution(Resolution.Hourly);
+
+        // Act
+        var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
+
+        // Assert
+        AssertDocument(document, DocumentFormat.From(documentFormat))
+            .HasResolution(Resolution.Hourly);
+    }
+
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
+    [InlineData(nameof(DocumentFormat.Ebix))]
+    public async Task Can_create_notifyWholesaleServices_document_with_daily_resolution(string documentFormat)
+    {
+        // Arrange
+        var messageBuilder = _wholesaleServicesSeriesBuilder
+            .WithResolution(Resolution.Daily);
+
+        // Act
+        var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
+
+        // Assert
+        AssertDocument(document, DocumentFormat.From(documentFormat))
+            .HasResolution(Resolution.Daily);
     }
 
     private Task<MarketDocumentStream> WriteDocument(OutgoingMessageHeader header, WholesaleServicesSeries wholesaleServicesSeries, DocumentFormat documentFormat)

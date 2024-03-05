@@ -19,7 +19,6 @@ using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
@@ -42,6 +41,7 @@ public class AmountPerChargeResultProducedV1Processor : IIntegrationEventProcess
     public async Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
+
         if (!await _featureManager.UseAmountPerChargeResultProduced.ConfigureAwait(false))
         {
             return;
