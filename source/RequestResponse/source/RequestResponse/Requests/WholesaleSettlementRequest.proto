@@ -17,7 +17,7 @@ syntax = "proto3";
 
 option csharp_namespace = "Energinet.DataHub.Edi.Requests";
 
-message WholesaleServicesRequest {
+message WholesaleSettlementRequest {
   Period period = 1; // The period for which the request is made.
   string requested_by_actor_id = 2; // GLN or EIC for the requesting party.
   string requested_by_actor_role = 3; //The kind of market roles that can be played by parties for given domains within the electricity market. Eg. GridOperator, EnergySupplier etc.
