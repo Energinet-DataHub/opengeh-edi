@@ -17,6 +17,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -28,26 +29,30 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.Api.IncomingMessages;
 
-public class RequestAggregatedMeasureMessageReceiver
+public class IncomingMessageReceiver
 {
     private readonly ICorrelationContext _correlationContext;
+    private readonly IFeatureFlagManager _featureFlagManager;
     private readonly IIncomingMessageClient _incomingMessageClient;
-    private readonly ILogger<RequestAggregatedMeasureMessageReceiver> _logger;
+    private readonly ILogger<IncomingMessageReceiver> _logger;
 
-    public RequestAggregatedMeasureMessageReceiver(
-        ILogger<RequestAggregatedMeasureMessageReceiver> logger,
+    public IncomingMessageReceiver(
+        ILogger<IncomingMessageReceiver> logger,
         IIncomingMessageClient incomingMessageClient,
-        ICorrelationContext correlationContext)
+        ICorrelationContext correlationContext,
+        IFeatureFlagManager featureFlagManager)
     {
         _logger = logger;
         _incomingMessageClient = incomingMessageClient;
         _correlationContext = correlationContext;
+        _featureFlagManager = featureFlagManager;
     }
 
-    [Function(nameof(RequestAggregatedMeasureMessageReceiver))]
+    [Function(nameof(IncomingMessageReceiver))]
     public async Task<HttpResponseData> RunAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
         HttpRequestData request,
+        string incomingDocumentTypeName,
         CancellationToken hostCancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -70,22 +75,36 @@ public class RequestAggregatedMeasureMessageReceiver
             return await request.CreateInvalidContentTypeResponseAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        var responseMessage = await _incomingMessageClient
-            .RegisterAndSendAsync(
-                new IncomingMessageStream(request.Body),
-                documentFormat,
-                IncomingDocumentType.RequestAggregatedMeasureData,
-                cancellationToken)
-            .ConfigureAwait(false);
-
-        if (responseMessage.IsErrorResponse)
+        var incomingDocumentType = EnumerationType.FromName<IncomingDocumentType>(incomingDocumentTypeName);
+        if (incomingDocumentType == IncomingDocumentType.RequestWholesaleSettlement)
         {
-            var httpErrorStatusCode = HttpStatusCode.BadRequest;
-            return CreateResponse(request, httpErrorStatusCode, responseMessage);
+            if (!await _featureFlagManager.UseRequestWholesaleSettlementReceiver.ConfigureAwait(false))
+            {
+                return request.CreateResponse(HttpStatusCode.NotFound);
+            }
         }
 
-        var httpStatusCode = !responseMessage.IsErrorResponse ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
-        return CreateResponse(request, httpStatusCode, responseMessage);
+        if (incomingDocumentType == IncomingDocumentType.RequestAggregatedMeasureData)
+        {
+            var responseMessage = await _incomingMessageClient
+                .RegisterAndSendAsync(
+                    new IncomingMessageStream(request.Body),
+                    documentFormat,
+                    IncomingDocumentType.RequestAggregatedMeasureData,
+                    cancellationToken)
+                .ConfigureAwait(false);
+
+            if (responseMessage.IsErrorResponse)
+            {
+                var httpErrorStatusCode = HttpStatusCode.BadRequest;
+                return CreateResponse(request, httpErrorStatusCode, responseMessage);
+            }
+
+            var httpStatusCode = !responseMessage.IsErrorResponse ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
+            return CreateResponse(request, httpStatusCode, responseMessage);
+        }
+
+        return request.CreateResponse(HttpStatusCode.BadRequest);
     }
 
     private HttpResponseData CreateResponse(
