@@ -25,8 +25,18 @@ public static class ResolutionMapper
         return resolution switch
         {
             EnergyResultProducedV2.Types.Resolution.Quarter => Resolution.QuarterHourly,
-            EnergyResultProducedV2.Types.Resolution.Unspecified => throw new InvalidOperationException(
-                "Could not map resolution type"),
+            EnergyResultProducedV2.Types.Resolution.Unspecified => throw new InvalidOperationException("Could not map resolution type"),
+            _ => throw new ArgumentOutOfRangeException(nameof(resolution), resolution, "Unknown resolution from Wholesale"),
+        };
+    }
+
+    public static Resolution Map(AmountPerChargeResultProducedV1.Types.Resolution resolution)
+    {
+        return resolution switch
+        {
+            AmountPerChargeResultProducedV1.Types.Resolution.Day => Resolution.Daily,
+            AmountPerChargeResultProducedV1.Types.Resolution.Hour => Resolution.Hourly,
+            AmountPerChargeResultProducedV1.Types.Resolution.Unspecified => throw new InvalidOperationException("Could not map resolution type"),
             _ => throw new ArgumentOutOfRangeException(nameof(resolution), resolution, "Unknown resolution from Wholesale"),
         };
     }
