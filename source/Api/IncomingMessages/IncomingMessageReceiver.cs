@@ -52,6 +52,7 @@ public class IncomingMessageReceiver
     public async Task<HttpResponseData> RunAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "incomingMessages/{incomingDocumentTypeName}")]
         HttpRequestData request,
+        FunctionContext executionContext,
         string? incomingDocumentTypeName,
         CancellationToken hostCancellationToken)
     {
