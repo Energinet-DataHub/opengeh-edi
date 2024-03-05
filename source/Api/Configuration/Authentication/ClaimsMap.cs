@@ -27,6 +27,8 @@ public static class ClaimsMap
         { "gridaccessprovider", ActorRole.GridOperator },
         { "metereddataresponsible", ActorRole.MeteredDataResponsible },
         { "balanceresponsibleparty", ActorRole.BalanceResponsibleParty },
+        { "systemoperator", ActorRole.SystemOperator },
+        { "gridoperator", ActorRole.GridOperator },
     };
 
     public static string UserId => "azp";
