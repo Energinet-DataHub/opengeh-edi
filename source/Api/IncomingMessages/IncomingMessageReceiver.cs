@@ -50,9 +50,9 @@ public class IncomingMessageReceiver
 
     [Function(nameof(IncomingMessageReceiver))]
     public async Task<HttpResponseData> RunAsync(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "incoming-messages/{incomingDocumentTypeName}")]
         HttpRequestData request,
-        string incomingDocumentTypeName,
+        string? incomingDocumentTypeName,
         CancellationToken hostCancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -75,7 +75,7 @@ public class IncomingMessageReceiver
             return await request.CreateInvalidContentTypeResponseAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        var incomingDocumentType = EnumerationType.FromName<IncomingDocumentType>(incomingDocumentTypeName);
+        var incomingDocumentType = EnumerationType.FromName<IncomingDocumentType>(incomingDocumentTypeName ?? "RequestAggregatedMeasureData");
         if (incomingDocumentType == IncomingDocumentType.RequestWholesaleSettlement)
         {
             if (!await _featureFlagManager.UseRequestWholesaleSettlementReceiver.ConfigureAwait(false))
