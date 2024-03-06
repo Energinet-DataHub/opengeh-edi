@@ -24,9 +24,11 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
+using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NodaTime;
@@ -98,6 +100,69 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
         await HandleIntegrationEventAsync(amountPerChargeEvent);
         await AssertOutgoingMessageAsync(ActorRole.EnergySupplier);
         await AssertOutgoingMessageAsync(ActorRole.SystemOperator);
+    }
+
+    [Fact]
+    public async Task
+        AmountPerChargeResultProducedV1Processor_creates_outgoing_message_to_energy_supplier_and_grid_owner_if_tax_and_charge_owner_is_grid_owner()
+    {
+        await new GridAreaBuilder()
+            .WithGridAreaCode("805")
+            .WithActorNumber(ActorNumber.Create("8200000007740"))
+            .StoreAsync(GetService<IMasterDataClient>());
+
+        var amountPerChargeEvent = _amountPerChargeEventBuilder
+            .WithIsTax(true)
+            .WithChargeOwner("8200000007740")
+            .Build();
+
+        await HandleIntegrationEventAsync(amountPerChargeEvent);
+
+        var energySupplierMessage = await AssertOutgoingMessageAsync(ActorRole.EnergySupplier);
+        var gridOperatorMessage = await AssertOutgoingMessageAsync(ActorRole.GridOperator);
+
+        energySupplierMessage.HasReceiverId("8200000007743");
+        gridOperatorMessage.HasReceiverId("8200000007740");
+    }
+
+    [Fact]
+    public async Task
+        AmountPerChargeResultProducedV1Processor_creates_outgoing_message_to_energy_supplier_and_grid_owner_if_tax_and_charge_owner_is_tso()
+    {
+        await new GridAreaBuilder()
+            .WithGridAreaCode("805")
+            .WithActorNumber(ActorNumber.Create("8200000007740"))
+            .StoreAsync(GetService<IMasterDataClient>());
+
+        var amountPerChargeEvent = _amountPerChargeEventBuilder
+            .WithIsTax(true)
+            .WithChargeOwner(DataHubDetails.DataHubActorNumber.Value)
+            .Build();
+
+        await HandleIntegrationEventAsync(amountPerChargeEvent);
+
+        var energySupplierMessage = await AssertOutgoingMessageAsync(ActorRole.EnergySupplier);
+        var gridOperatorMessage = await AssertOutgoingMessageAsync(ActorRole.GridOperator);
+
+        energySupplierMessage.HasReceiverId("8200000007743");
+        gridOperatorMessage.HasReceiverId("8200000007740");
+    }
+
+    [Fact]
+    public async Task
+        AmountPerChargeResultProducedV1Processor_does_not_create_outgoing_messages_if_tax_and_grid_area_is_without_owner()
+    {
+        var amountPerChargeEvent = _amountPerChargeEventBuilder
+            .WithIsTax(true)
+            .WithChargeOwner(DataHubDetails.DataHubActorNumber.Value)
+            .Build();
+
+        // This shouldn't really happen, but now it is documented
+        var act = async () => await HandleIntegrationEventAsync(amountPerChargeEvent);
+
+        await act.Should()
+            .ThrowExactlyAsync<InvalidOperationException>()
+            .WithMessage("Sequence contains no elements.");
     }
 
     [Fact]

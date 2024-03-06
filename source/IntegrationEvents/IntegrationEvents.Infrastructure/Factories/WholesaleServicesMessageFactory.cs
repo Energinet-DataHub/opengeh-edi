@@ -13,22 +13,49 @@
 // limitations under the License.
 
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.Protobuf;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories.Mappers;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using NodaTime.Serialization.Protobuf;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories;
 
-public static class WholesaleServicesMessageFactory
+public sealed class WholesaleServicesMessageFactory
 {
-    public static WholesaleServicesMessageDto CreateMessage(AmountPerChargeResultProducedV1 amountPerChargeResultProducedV1)
+    private readonly IMasterDataClient _masterDataClient;
+
+    public WholesaleServicesMessageFactory(IMasterDataClient masterDataClient)
+    {
+        _masterDataClient = masterDataClient;
+    }
+
+    public static WholesaleServicesMessageDto CreateMessage(
+        MonthlyAmountPerChargeResultProducedV1 monthlyAmountPerChargeResultProducedV1)
+    {
+        ArgumentNullException.ThrowIfNull(monthlyAmountPerChargeResultProducedV1);
+
+        var message = CreateWholesaleResultSeries(monthlyAmountPerChargeResultProducedV1);
+
+        return WholesaleServicesMessageDto.Create(
+            message.EnergySupplier,
+            ActorRole.EnergySupplier,
+            message.ChargeOwner,
+            Guid.NewGuid(),
+            BusinessReasonMapper.Map(monthlyAmountPerChargeResultProducedV1.CalculationType),
+            message);
+    }
+
+    public async Task<WholesaleServicesMessageDto> CreateMessageAsync(
+        AmountPerChargeResultProducedV1 amountPerChargeResultProducedV1)
     {
         ArgumentNullException.ThrowIfNull(amountPerChargeResultProducedV1);
 
-        var message = CreateWholesaleResultSeries(amountPerChargeResultProducedV1);
+        var message = await CreateWholesaleResultSeriesAsync(amountPerChargeResultProducedV1).ConfigureAwait(false);
 
         return WholesaleServicesMessageDto.Create(
             receiverNumber: message.EnergySupplier,
@@ -36,21 +63,6 @@ public static class WholesaleServicesMessageFactory
             chargeOwnerId: message.ChargeOwner,
             processId: Guid.NewGuid(),
             businessReason: BusinessReasonMapper.Map(amountPerChargeResultProducedV1.CalculationType),
-            wholesaleSeries: message);
-    }
-
-    public static WholesaleServicesMessageDto CreateMessage(MonthlyAmountPerChargeResultProducedV1 monthlyAmountPerChargeResultProducedV1)
-    {
-        ArgumentNullException.ThrowIfNull(monthlyAmountPerChargeResultProducedV1);
-
-        var message = CreateWholesaleResultSeries(monthlyAmountPerChargeResultProducedV1);
-
-        return WholesaleServicesMessageDto.Create(
-            receiverNumber: message.EnergySupplier,
-            receiverRole: ActorRole.EnergySupplier,
-            chargeOwnerId: message.ChargeOwner,
-            processId: Guid.NewGuid(),
-            businessReason: BusinessReasonMapper.Map(monthlyAmountPerChargeResultProducedV1.CalculationType),
             wholesaleSeries: message);
     }
 
@@ -83,10 +95,16 @@ public static class WholesaleServicesMessageFactory
         return wholesaleCalculationSeries;
     }
 
-    private static WholesaleServicesSeries CreateWholesaleResultSeries(
+    private async Task<WholesaleServicesSeries> CreateWholesaleResultSeriesAsync(
         AmountPerChargeResultProducedV1 message)
     {
         ArgumentNullException.ThrowIfNull(message);
+
+        var chargeOwner = message.IsTax
+            ? await _masterDataClient
+                  .GetGridOwnerForGridAreaCodeAsync(message.GridAreaCode, CancellationToken.None)
+                  .ConfigureAwait(false)
+            : ActorNumber.Create(message.ChargeOwnerId);
 
         var wholesaleCalculationSeries = new WholesaleServicesSeries(
             TransactionId: Guid.NewGuid(),
@@ -96,7 +114,7 @@ public static class WholesaleServicesMessageFactory
             IsTax: message.IsTax,
             Points: PointsMapper.MapPoints(message.TimeSeriesPoints),
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
-            ChargeOwner: ActorNumber.Create(message.ChargeOwnerId),
+            chargeOwner,
             Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),
             SettlementVersion: SettlementVersionMapper.Map(message.CalculationType),
             QuantityUnit: MeasurementUnitMapper.Map(message.QuantityUnit),
@@ -106,6 +124,7 @@ public static class WholesaleServicesMessageFactory
             Resolution: ResolutionMapper.Map(message.Resolution),
             MeteringPointType: MeteringPointTypeMapper.Map(message.MeteringPointType),
             SettlementType: SettlementTypeMapper.Map(message.SettlementMethod));
+
         return wholesaleCalculationSeries;
     }
 }
