@@ -16,14 +16,13 @@ using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators;
+using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.IncomingMessages.Application.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -58,7 +57,7 @@ public static class IncomingMessagesExtensions
             .AddScoped<IMessageParser, JsonMessageParser>()
             .AddScoped<IMessageParser, B2CJsonMessageParser>()
             .AddScoped<MarketMessageParser>()
-            .AddScoped<ISenderAuthorizer, SenderAuthorizer>()
+            .AddScoped<ISenderValidator, SenderValidator>()
             .AddScoped<IncomingRequestAggregatedMeasuredDataSender>()
             .AddScoped<RequestAggregatedMeasureDataMessageValidator>()
             .AddSingleton<IProcessTypeValidator, ProcessTypeValidator>()

@@ -14,9 +14,9 @@
 
 using System.Linq;
 using System.Xml.Linq;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
+using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators;
+using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators.ValidationErrors;
+using Energinet.DataHub.EDI.IncomingMessages.Application.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Xunit;
 using Xunit.Categories;

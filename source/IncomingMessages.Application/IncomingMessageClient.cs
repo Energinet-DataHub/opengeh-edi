@@ -22,9 +22,10 @@ using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators;
+using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators.ValidationErrors;
+using Energinet.DataHub.EDI.IncomingMessages.Application.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Exceptions;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -133,19 +134,32 @@ public class IncomingMessageClient : IIncomingMessageClient
                     serie.BalanceResponsiblePartyMarketParticipantId,
                     serie.SettlementSeriesVersion)).ToList().AsReadOnly();
 
-        return await _requestAggregatedMeasureDataReceiver.ReceiveAsync(
-            new RequestAggregatedMeasureDataDto(
-                aggregatedMeasureDataRequestMessage.SenderNumber,
-                aggregatedMeasureDataRequestMessage.SenderRoleCode,
-                aggregatedMeasureDataRequestMessage.ReceiverNumber,
-                aggregatedMeasureDataRequestMessage.ReceiverRoleCode,
-                aggregatedMeasureDataRequestMessage.BusinessReason,
-                aggregatedMeasureDataRequestMessage.MessageType,
-                aggregatedMeasureDataRequestMessage.MessageId,
-                aggregatedMeasureDataRequestMessage.CreatedAt,
-                aggregatedMeasureDataRequestMessage.BusinessType,
-                series),
-            cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await _requestAggregatedMeasureDataReceiver.ReceiveAsync(
+                    new RequestAggregatedMeasureDataDto(
+                        aggregatedMeasureDataRequestMessage.SenderNumber,
+                        aggregatedMeasureDataRequestMessage.SenderRoleCode,
+                        aggregatedMeasureDataRequestMessage.ReceiverNumber,
+                        aggregatedMeasureDataRequestMessage.ReceiverRoleCode,
+                        aggregatedMeasureDataRequestMessage.BusinessReason,
+                        aggregatedMeasureDataRequestMessage.MessageType,
+                        aggregatedMeasureDataRequestMessage.MessageId,
+                        aggregatedMeasureDataRequestMessage.CreatedAt,
+                        aggregatedMeasureDataRequestMessage.BusinessType,
+                        series),
+                    cancellationToken)
+                .ConfigureAwait(false);
+            return Result.Succeeded();
+        }
+        catch (DuplicateTransactionIdDetectedException)
+        {
+            return Result.Failure(new DuplicateTransactionIdDetected());
+        }
+        catch (DuplicateMessageIdDetectedException)
+        {
+            return Result.Failure(new DuplicateMessageIdDetected(aggregatedMeasureDataRequestMessage.MessageId));
+        }
     }
 
     private async Task ArchiveIncomingMessageAsync(

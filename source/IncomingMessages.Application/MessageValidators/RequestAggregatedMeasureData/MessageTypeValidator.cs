@@ -13,26 +13,20 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators.ValidationErrors;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Application.Messages
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators.RequestAggregatedMeasureData;
+
+public class MessageTypeValidator : IMessageTypeValidator
 {
-    public class IncomingMarketMessageParserResult
+    private static readonly IReadOnlyCollection<string> _whiteList = new[] { "E74" };
+
+    public async Task<Result> ValidateAsync(string messageType, CancellationToken cancellationToken)
     {
-        public IncomingMarketMessageParserResult(params ValidationError[] errors)
-        {
-            Errors = errors;
-        }
-
-        public IncomingMarketMessageParserResult(IncomingMessage incomingMessage)
-        {
-            IncomingMessage = incomingMessage;
-        }
-
-        public IReadOnlyCollection<ValidationError> Errors { get; } = new List<ValidationError>();
-
-        public bool Success => Errors.Count == 0;
-
-        public IncomingMessage? IncomingMessage { get; }
+        return await Task.FromResult(_whiteList.Contains(messageType) ?
+             Result.Succeeded() : Result.Failure(new NotSupportedMessageType(messageType))).ConfigureAwait(false);
     }
 }

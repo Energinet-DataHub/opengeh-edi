@@ -21,8 +21,8 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.BaseParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers;
 

@@ -12,19 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Process.Interfaces;
-
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
-
-/// <summary>
-/// Responsible for receiving a incoming message.
-/// </summary>
-public interface IRequestAggregatedMeasureDataReceiver
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators.ValidationErrors
 {
-    /// <summary>
-    /// Responsible for receiving the incoming message.
-    /// </summary>
-    Task ReceiveAsync(
-        RequestAggregatedMeasureDataDto requestAggregatedMeasureDataDto,
-        CancellationToken cancellationToken);
+    public class InvalidBusinessReasonOrVersion : ValidationError
+    {
+        public InvalidBusinessReasonOrVersion(string businessReason, string version)
+            : base($"Schema version {version} for business process type {businessReason} does not exist", "00301")
+        {
+        }
+    }
 }

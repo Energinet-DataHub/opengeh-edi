@@ -12,19 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Process.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.Response;
 
 /// <summary>
-/// Responsible for receiving a incoming message.
+/// Factory responsible for creating B2B response messages
 /// </summary>
-public interface IRequestAggregatedMeasureDataReceiver
+public interface IResponseFactory
 {
     /// <summary>
-    /// Responsible for receiving the incoming message.
+    /// Specifies the handled CIM format
     /// </summary>
-    Task ReceiveAsync(
-        RequestAggregatedMeasureDataDto requestAggregatedMeasureDataDto,
-        CancellationToken cancellationToken);
+    public DocumentFormat HandledFormat { get; }
+
+    /// <summary>
+    /// Create response message
+    /// </summary>
+    /// <param name="result"></param>
+    /// <returns><see cref="ResponseMessage"/></returns>
+    public ResponseMessage From(Result result);
 }

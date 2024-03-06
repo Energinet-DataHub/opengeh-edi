@@ -21,8 +21,8 @@ using System.Xml.Schema;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.Xml;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers;
 
