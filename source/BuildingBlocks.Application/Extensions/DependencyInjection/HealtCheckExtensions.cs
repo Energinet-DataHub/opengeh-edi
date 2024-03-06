@@ -24,8 +24,9 @@ public static class HealtCheckExtensions
 {
     public static IServiceCollection AddLiveHealthCheck(this IServiceCollection services)
     {
-        services.AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>();
-        services.AddHealthChecks()
+        services
+            .AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>()
+            .AddHealthChecks()
             .AddLiveCheck();
 
         return services;

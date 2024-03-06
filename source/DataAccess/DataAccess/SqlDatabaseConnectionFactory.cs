@@ -17,10 +17,11 @@ using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess
+namespace Energinet.DataHub.EDI.DataAccess.DataAccess
 {
     public class SqlDatabaseConnectionFactory : IDatabaseConnectionFactory
     {
