@@ -16,35 +16,17 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
 
-public class RequestAggregatedMeasureDataMessage : IncomingMessage
-{
-    public RequestAggregatedMeasureDataMessage(
-        string senderNumber,
-        string senderRoleCode,
-        string receiverNumber,
-        string receiverRoleCode,
-        string businessReason,
-        string messageType,
-        string messageId,
-        string createdAt,
-        string? businessType,
-        IReadOnlyCollection<Serie> series)
-        : base(
-            messageId,
-            receiverNumber,
-            receiverRoleCode,
-            senderNumber,
-            senderRoleCode,
-            businessReason,
-            messageType,
-            createdAt,
-            businessType)
-    {
-        Series = series;
-    }
-
-    public IReadOnlyCollection<Serie> Series { get; }
-}
+public record RequestAggregatedMeasureDataMessage(
+    string SenderNumber,
+    string SenderRoleCode,
+    string ReceiverNumber,
+    string ReceiverRoleCode,
+    string BusinessReason,
+    string MessageType,
+    string MessageId,
+    string CreatedAt,
+    string? BusinessType,
+    IReadOnlyCollection<Serie> Series) : IIncomingMessage;
 
 public record Serie(
     string Id,

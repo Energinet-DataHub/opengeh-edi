@@ -164,7 +164,7 @@ public class IncomingMessageClient : IIncomingMessageClient
 
     private async Task ArchiveIncomingMessageAsync(
         IIncomingMessageStream incomingMessageStream,
-        IncomingMessage incomingMessage,
+        IIncomingMessage incomingMessage,
         CancellationToken cancellationToken)
     {
         await _archivedMessagesClient.CreateAsync(
