@@ -22,4 +22,5 @@ public enum FeatureFlagName
     UseExampleFeatureFlag,
     UseMonthlyAmountPerChargeResultProduced,
     UseAmountPerChargeResultProduced,
+    UseRequestWholesaleSettlementReceiver,
 }

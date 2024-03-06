@@ -139,6 +139,7 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
             .WithIsTax(isTax)
             .WithCurrency(AmountPerChargeResultProducedV1.Types.Currency.Dkk)
             .WithCalculationVersion(calculationVersion)
+            .WithResolution(AmountPerChargeResultProducedV1.Types.Resolution.Hour)
             .Build();
 
         // Act
@@ -168,7 +169,7 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.ChargeType, ChargeType.Fee)
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.SettlementType, SettlementType.Flex)
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.MeteringPointType, MeteringPointType.Production)
-            .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.Resolution, Resolution.Monthly);
+            .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.Resolution, Resolution.Hourly);
     }
 
     private async Task HandleIntegrationEventAsync(AmountPerChargeResultProducedV1 @event)
