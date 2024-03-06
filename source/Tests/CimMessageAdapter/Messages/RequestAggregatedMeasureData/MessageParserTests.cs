@@ -97,7 +97,7 @@ public class MessageParserTests
         var result = await _marketMessageParser.ParseAsync(new IncomingMessageStream(message), format, IncomingDocumentType.RequestAggregatedMeasureData, CancellationToken.None);
         using var assertionScope = new AssertionScope();
         Assert.True(result.Success);
-        var marketMessage = result!.IncomingMessage!;
+        var marketMessage = (RequestAggregatedMeasureDataMessage)result!.IncomingMessage!;
         Assert.True(marketMessage != null);
         Assert.Equal("123564789123564789123564789123564789", marketMessage.MessageId);
         Assert.Equal("D05", marketMessage.BusinessReason);
@@ -108,9 +108,7 @@ public class MessageParserTests
         //Assert.Equal("2022-12-17T09:30:47Z", marketMessage.CreatedAt);
         Assert.Equal("23", marketMessage.BusinessType);
 
-        var aggregatedMeasureDataRequestMessage = result!.IncomingMessage as AggregatedMeasureDataRequestMessage ??
-                                                  throw new InvalidOperationException();
-        foreach (var serie in aggregatedMeasureDataRequestMessage.Series)
+        foreach (var serie in marketMessage.Series)
         {
             Assert.True(serie != null);
             Assert.Equal("123353185", serie.Id);
@@ -132,7 +130,7 @@ public class MessageParserTests
         var result = await _marketMessageParser.ParseAsync(new IncomingMessageStream(message), format, IncomingDocumentType.B2CRequestAggregatedMeasureData, CancellationToken.None);
         using var assertionScope = new AssertionScope();
         Assert.True(result.Success);
-        var marketMessage = result!.IncomingMessage!;
+        var marketMessage = (RequestAggregatedMeasureDataMessage)result!.IncomingMessage!;
         Assert.True(marketMessage != null);
         Assert.Equal("123564789123564789123564789123564789", marketMessage.MessageId);
         Assert.Equal("D05", marketMessage.BusinessReason);
@@ -143,9 +141,7 @@ public class MessageParserTests
         //Assert.Equal("2022-12-17T09:30:47Z", marketMessage.CreatedAt);
         Assert.Equal("23", marketMessage.BusinessType);
 
-        var aggregatedMeasureDataRequestMessage = result!.IncomingMessage as AggregatedMeasureDataRequestMessage ??
-                                                  throw new InvalidOperationException();
-        foreach (var serie in aggregatedMeasureDataRequestMessage.Series)
+        foreach (var serie in marketMessage.Series)
         {
             Assert.True(serie != null);
             Assert.Equal("123353185", serie.Id);

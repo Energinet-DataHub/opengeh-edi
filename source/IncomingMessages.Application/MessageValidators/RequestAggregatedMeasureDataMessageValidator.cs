@@ -23,7 +23,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators
 {
-    public class AggregatedMeasureDataRequestMessageValidator
+    public class RequestAggregatedMeasureDataMessageValidator
     {
         private const int MessageIdLength = 36;
         private const int TransactionIdLength = 36;
@@ -36,7 +36,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators
         private readonly IReceiverValidator _receiverValidator;
         private readonly IBusinessTypeValidator _businessTypeValidator;
 
-        public AggregatedMeasureDataRequestMessageValidator(
+        public RequestAggregatedMeasureDataMessageValidator(
             IMessageIdRepository messageIdRepository,
             ITransactionIdRepository transactionIdRepository,
             ISenderAuthorizer senderAuthorizer,
@@ -55,7 +55,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators
         }
 
         public async Task<Result> ValidateAsync(
-            AggregatedMeasureDataRequestMessage requestAggregatedMeasureDataDto,
+            RequestAggregatedMeasureDataMessage requestAggregatedMeasureDataDto,
             CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(requestAggregatedMeasureDataDto);
@@ -164,13 +164,13 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators
             _errors.AddRange(result.Errors);
         }
 
-        private async Task AuthorizeSenderAsync(AggregatedMeasureDataRequestMessage message)
+        private async Task AuthorizeSenderAsync(RequestAggregatedMeasureDataMessage message)
         {
             var result = await _senderAuthorizer.AuthorizeAsync(message.SenderNumber, message.SenderRoleCode).ConfigureAwait(false);
             _errors.AddRange(result.Errors);
         }
 
-        private async Task VerifyReceiverAsync(AggregatedMeasureDataRequestMessage message)
+        private async Task VerifyReceiverAsync(RequestAggregatedMeasureDataMessage message)
         {
             var receiverVerification = await _receiverValidator.VerifyAsync(message.ReceiverNumber, message.ReceiverRoleCode).ConfigureAwait(false);
             _errors.AddRange(receiverVerification.Errors);

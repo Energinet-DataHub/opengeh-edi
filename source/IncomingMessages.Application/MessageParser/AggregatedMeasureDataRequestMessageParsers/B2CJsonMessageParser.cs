@@ -42,7 +42,7 @@ public class B2CJsonMessageParser : IMessageParser
     {
         ArgumentNullException.ThrowIfNull(incomingMessageStream);
 
-        var requestAggregatedMeasureData = await _serializer.DeserializeAsync<AggregatedMeasureDataRequestMessage>(incomingMessageStream.Stream, cancellationToken).ConfigureAwait(false);
+        var requestAggregatedMeasureData = await _serializer.DeserializeAsync<RequestAggregatedMeasureDataMessage>(incomingMessageStream.Stream, cancellationToken).ConfigureAwait(false);
         return new IncomingMarketMessageParserResult(requestAggregatedMeasureData);
     }
 }

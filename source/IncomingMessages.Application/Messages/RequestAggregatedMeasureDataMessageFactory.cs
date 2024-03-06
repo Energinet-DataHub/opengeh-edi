@@ -18,16 +18,16 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
 
-public static class AggregatedMeasureDataRequestMessageFactory
+public static class RequestAggregatedMeasureDataMessageFactory
 {
-    public static AggregatedMeasureDataRequestMessage Create(
+    public static RequestAggregatedMeasureDataMessage Create(
         MessageHeader header,
         ReadOnlyCollection<Serie> series)
     {
         ArgumentNullException.ThrowIfNull(header);
         ArgumentNullException.ThrowIfNull(series);
 
-        return new AggregatedMeasureDataRequestMessage(
+        return new RequestAggregatedMeasureDataMessage(
             header.SenderId,
             header.SenderRole,
             header.ReceiverId,

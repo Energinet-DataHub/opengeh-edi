@@ -20,8 +20,8 @@ using System.Threading.Tasks;
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
+using Energinet.DataHub.EDI.Api.Extensions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -76,7 +76,7 @@ public class IncomingMessageReceiver
             return await request.CreateInvalidContentTypeResponseAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        var incomingDocumentType = GetIncomingDocumentType(incomingDocumentTypeName);
+        var incomingDocumentType = DocumentTypeParser.ParseFromName(incomingDocumentTypeName);
         if (incomingDocumentType == null) return request.CreateResponse(HttpStatusCode.NotFound);
 
         if (incomingDocumentType == IncomingDocumentType.RequestWholesaleSettlement
@@ -101,23 +101,6 @@ public class IncomingMessageReceiver
 
         var httpStatusCode = !responseMessage.IsErrorResponse ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
         return CreateResponse(request, httpStatusCode, responseMessage);
-    }
-
-    private static IncomingDocumentType? GetIncomingDocumentType(string? incomingDocumentTypeName)
-    {
-        if (incomingDocumentTypeName is null)
-        {
-            return null;
-        }
-
-        try
-        {
-            return EnumerationType.FromName<IncomingDocumentType>(incomingDocumentTypeName);
-        }
-        catch (InvalidOperationException)
-        {
-            return null;
-        }
     }
 
     private HttpResponseData CreateResponse(

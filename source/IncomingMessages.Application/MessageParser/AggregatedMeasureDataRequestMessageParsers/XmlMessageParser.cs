@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.XmlReader;
+using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.Xml;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
@@ -142,7 +142,7 @@ public class XmlMessageParser : IMessageParser
     {
         var root = await reader.ReadRootElementAsync().ConfigureAwait(false);
         var messageHeader = await MessageHeaderExtractor
-            .ExtractAsync(reader, root, HeaderElementName, SeriesRecordElementName, cancellationToken)
+            .ExtractAsync(reader, root, HeaderElementName, SeriesRecordElementName)
             .ConfigureAwait(false);
 
         var series = new List<Serie>();
@@ -152,7 +152,7 @@ public class XmlMessageParser : IMessageParser
         }
 
         return new IncomingMarketMessageParserResult(
-            AggregatedMeasureDataRequestMessageFactory.Create(messageHeader, series.AsReadOnly()));
+            RequestAggregatedMeasureDataMessageFactory.Create(messageHeader, series.AsReadOnly()));
     }
 
     private static async IAsyncEnumerable<Serie> ParseSerieAsync(XmlReader reader, RootElement rootElement)

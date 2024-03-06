@@ -16,9 +16,9 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
 
-public class AggregatedMeasureDataRequestMessage : IncomingMessage
+public class RequestAggregatedMeasureDataMessage : IncomingMessage
 {
-    public AggregatedMeasureDataRequestMessage(
+    public RequestAggregatedMeasureDataMessage(
         string senderNumber,
         string senderRoleCode,
         string receiverNumber,

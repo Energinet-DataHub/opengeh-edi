@@ -39,7 +39,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application;
 public class IncomingMessageClient : IIncomingMessageClient
 {
     private readonly MarketMessageParser _marketMessageParser;
-    private readonly AggregatedMeasureDataRequestMessageValidator _aggregatedMeasureDataMarketMessageValidator;
+    private readonly RequestAggregatedMeasureDataMessageValidator _requestAggregatedMeasureDataMarketMessageValidator;
     private readonly ResponseFactory _responseFactory;
     private readonly IArchivedMessagesClient _archivedMessagesClient;
     private readonly ILogger<IncomingMessageClient> _logger;
@@ -48,7 +48,7 @@ public class IncomingMessageClient : IIncomingMessageClient
 
     public IncomingMessageClient(
         MarketMessageParser marketMessageParser,
-        AggregatedMeasureDataRequestMessageValidator aggregatedMeasureDataMarketMessageValidator,
+        RequestAggregatedMeasureDataMessageValidator requestAggregatedMeasureDataMarketMessageValidator,
         ResponseFactory responseFactory,
         IArchivedMessagesClient archivedMessagesClient,
         ILogger<IncomingMessageClient> logger,
@@ -56,7 +56,7 @@ public class IncomingMessageClient : IIncomingMessageClient
         ISystemDateTimeProvider systemDateTimeProvider)
     {
         _marketMessageParser = marketMessageParser;
-        _aggregatedMeasureDataMarketMessageValidator = aggregatedMeasureDataMarketMessageValidator;
+        _requestAggregatedMeasureDataMarketMessageValidator = requestAggregatedMeasureDataMarketMessageValidator;
         _responseFactory = responseFactory;
         _archivedMessagesClient = archivedMessagesClient;
         _logger = logger;
@@ -77,21 +77,21 @@ public class IncomingMessageClient : IIncomingMessageClient
             await _marketMessageParser.ParseAsync(incomingMessageStream, documentFormat, documentType, cancellationToken)
                 .ConfigureAwait(false);
 
-        if (incomingMarketMessageParserResult.Errors.Count != 0 && incomingMarketMessageParserResult.IncomingMessage == null)
+        if (incomingMarketMessageParserResult.Errors.Count != 0 || incomingMarketMessageParserResult.IncomingMessage == null)
         {
             var res = Result.Failure(incomingMarketMessageParserResult.Errors.ToArray());
             _logger.LogInformation("Failed to parse incoming message. Errors: {Errors}", res.Errors);
             return _responseFactory.From(res, responseFormat ?? documentFormat);
         }
 
-        await ArchiveIncomingMessageAsync(incomingMessageStream, incomingMarketMessageParserResult, cancellationToken)
+        await ArchiveIncomingMessageAsync(incomingMessageStream, incomingMarketMessageParserResult.IncomingMessage, cancellationToken)
             .ConfigureAwait(false);
 
         var validationResult =
             documentType == IncomingDocumentType.RequestWholesaleSettlement
                 ? Result.Succeeded()
-                : await _aggregatedMeasureDataMarketMessageValidator
-            .ValidateAsync(incomingMarketMessageParserResult.IncomingMessage as AggregatedMeasureDataRequestMessage ?? throw new InvalidOperationException(), cancellationToken)
+                : await _requestAggregatedMeasureDataMarketMessageValidator
+            .ValidateAsync(incomingMarketMessageParserResult.IncomingMessage as RequestAggregatedMeasureDataMessage ?? throw new InvalidOperationException(), cancellationToken)
             .ConfigureAwait(false);
 
         if (!validationResult.Success)
@@ -105,7 +105,7 @@ public class IncomingMessageClient : IIncomingMessageClient
 
         var result = documentType == IncomingDocumentType.RequestWholesaleSettlement
             ? Result.Failure()
-            : await ReceiveAggregatedMeasureDataRequestMessageAsync(incomingMarketMessageParserResult, cancellationToken)
+            : await ReceiveRequestAggregatedMeasureDataMessageAsync(incomingMarketMessageParserResult, cancellationToken)
                 .ConfigureAwait(false);
 
         if (result.Success)
@@ -120,9 +120,9 @@ public class IncomingMessageClient : IIncomingMessageClient
         return _responseFactory.From(result, responseFormat ?? documentFormat);
     }
 
-    private async Task<Result> ReceiveAggregatedMeasureDataRequestMessageAsync(IncomingMarketMessageParserResult incomingMarketMessageParserResult, CancellationToken cancellationToken)
+    private async Task<Result> ReceiveRequestAggregatedMeasureDataMessageAsync(IncomingMarketMessageParserResult incomingMarketMessageParserResult, CancellationToken cancellationToken)
     {
-        var aggregatedMeasureDataRequestMessage = incomingMarketMessageParserResult.IncomingMessage as AggregatedMeasureDataRequestMessage ??
+        var aggregatedMeasureDataRequestMessage = incomingMarketMessageParserResult.IncomingMessage as RequestAggregatedMeasureDataMessage ??
                                                   throw new InvalidOperationException();
         var series = aggregatedMeasureDataRequestMessage.Series
             .Select(
@@ -154,17 +154,17 @@ public class IncomingMessageClient : IIncomingMessageClient
 
     private async Task ArchiveIncomingMessageAsync(
         IIncomingMessageStream incomingMessageStream,
-        IncomingMarketMessageParserResult incomingMarketMessageParserResult,
+        IncomingMessage incomingMessage,
         CancellationToken cancellationToken)
     {
         await _archivedMessagesClient.CreateAsync(
             new ArchivedMessage(
-                incomingMarketMessageParserResult.IncomingMessage!.MessageId,
+                incomingMessage.MessageId,
                 IncomingDocumentType.RequestAggregatedMeasureData.Name,
-                incomingMarketMessageParserResult.IncomingMessage!.SenderNumber,
-                incomingMarketMessageParserResult.IncomingMessage!.ReceiverNumber,
+                incomingMessage.SenderNumber,
+                incomingMessage.ReceiverNumber,
                 _systemDateTimeProvider.Now(),
-                incomingMarketMessageParserResult.IncomingMessage!.BusinessReason,
+                incomingMessage.BusinessReason,
                 ArchivedMessageType.IncomingMessage,
                 incomingMessageStream),
             cancellationToken).ConfigureAwait(false);

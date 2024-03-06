@@ -116,6 +116,6 @@ public class JsonMessageParser : JsonParserBase, IMessageParser
         }
 
         return new IncomingMarketMessageParserResult(
-            AggregatedMeasureDataRequestMessageFactory.Create(header, series.AsReadOnly()));
+            RequestAggregatedMeasureDataMessageFactory.Create(header, series.AsReadOnly()));
     }
 }
