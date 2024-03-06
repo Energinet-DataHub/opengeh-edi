@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using BuildingBlocks.Application.DateTime;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DateTime;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;

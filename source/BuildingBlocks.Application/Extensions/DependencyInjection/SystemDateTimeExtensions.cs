@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using BuildingBlocks.Application.DateTime;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DateTime;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BuildingBlocks.Application.Extensions.DependencyInjection;

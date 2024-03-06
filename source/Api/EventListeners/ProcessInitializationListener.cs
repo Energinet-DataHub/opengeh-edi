@@ -14,7 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
-using BuildingBlocks.Application.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using MediatR;

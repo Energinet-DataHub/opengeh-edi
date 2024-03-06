@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using BuildingBlocks.Application.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BuildingBlocks.Application.Extensions.DependencyInjection;

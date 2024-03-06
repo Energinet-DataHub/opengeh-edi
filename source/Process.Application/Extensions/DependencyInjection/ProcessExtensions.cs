@@ -48,7 +48,6 @@ public static class ProcessExtensions
             .AddMediatR();
 
         //InboxEventsConfiguration
-        //TODO: can we move them out and delete ref to Infrastructure?
         services.AddTransient<IInboxEventMapper, EnergyResultTimeSeriesRequestAcceptedEventMapper>()
             .AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestRejectedMapper>();
 

@@ -14,17 +14,10 @@
 
 using NodaTime;
 
-namespace BuildingBlocks.Application.DateTime
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DateTime
 {
-    /// <summary>
-    /// System time provider
-    /// </summary>
-    public interface ISystemDateTimeProvider
+    public class SystemDateTimeProvider : ISystemDateTimeProvider
     {
-        /// <summary>
-        /// Return current date and time
-        /// </summary>
-        /// <returns><see cref="Instant"/></returns>
-        Instant Now();
+        public Instant Now() => SystemClock.Instance.GetCurrentInstant();
     }
 }

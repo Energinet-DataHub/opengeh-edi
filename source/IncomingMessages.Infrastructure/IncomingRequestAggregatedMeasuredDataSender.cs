@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using Azure.Messaging.ServiceBus;
-using BuildingBlocks.Application.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Microsoft.Extensions.Options;
 using ServiceBusClientOptions = Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options.ServiceBusClientOptions;
