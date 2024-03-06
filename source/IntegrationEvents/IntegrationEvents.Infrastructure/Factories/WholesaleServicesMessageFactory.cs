@@ -34,12 +34,13 @@ public sealed class WholesaleServicesMessageFactory
         _masterDataClient = masterDataClient;
     }
 
-    public static WholesaleServicesMessageDto CreateMessage(
+    public async Task<WholesaleServicesMessageDto> CreateMessageAsync(
         MonthlyAmountPerChargeResultProducedV1 monthlyAmountPerChargeResultProducedV1)
     {
         ArgumentNullException.ThrowIfNull(monthlyAmountPerChargeResultProducedV1);
 
-        var message = CreateWholesaleResultSeries(monthlyAmountPerChargeResultProducedV1);
+        var message = await CreateWholesaleResultSeriesAsync(monthlyAmountPerChargeResultProducedV1)
+            .ConfigureAwait(false);
 
         return WholesaleServicesMessageDto.Create(
             message.EnergySupplier,
@@ -66,10 +67,16 @@ public sealed class WholesaleServicesMessageFactory
             wholesaleSeries: message);
     }
 
-    private static WholesaleServicesSeries CreateWholesaleResultSeries(
+    private async Task<WholesaleServicesSeries> CreateWholesaleResultSeriesAsync(
         MonthlyAmountPerChargeResultProducedV1 message)
     {
         ArgumentNullException.ThrowIfNull(message);
+
+        var chargeOwner = message.IsTax
+            ? await _masterDataClient
+                .GetGridOwnerForGridAreaCodeAsync(message.GridAreaCode, CancellationToken.None)
+                .ConfigureAwait(false)
+            : ActorNumber.Create(message.ChargeOwnerId);
 
         var wholesaleCalculationSeries = new WholesaleServicesSeries(
             TransactionId: Guid.NewGuid(),
@@ -82,7 +89,7 @@ public sealed class WholesaleServicesMessageFactory
                 new WholesaleServicesPoint(1, null, null, message.Amount != null ? DecimalParser.Parse(message.Amount) : null, null),
             },
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
-            ChargeOwner: ActorNumber.Create(message.ChargeOwnerId),
+            chargeOwner,
             Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),
             SettlementVersion: SettlementVersionMapper.Map(message.CalculationType),
             QuantityUnit: MeasurementUnitMapper.Map(message.QuantityUnit),
