@@ -113,10 +113,10 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
             header.MessageId,
             header.CreatedAt,
             header.BusinessType,
-            new List<Serie> { CreateSerieCreateRecord() }.AsReadOnly());
+            new List<Serie> { CreateSerie() }.AsReadOnly());
     }
 
-    private Serie CreateSerieCreateRecord() =>
+    private Serie CreateSerie() =>
         new(
             _serieId,
             _marketEvaluationPointType,
