@@ -19,7 +19,7 @@ namespace BuildingBlocks.Application.Extensions.DependencyInjection;
 
 public static class SystemDateTimeExtensions
 {
-    public static IServiceCollection AddSystemClock(this IServiceCollection services)
+    public static IServiceCollection AddSystemTimer(this IServiceCollection services)
     {
         services.AddScoped<ISystemDateTimeProvider, SystemDateTimeProvider>();
         return services;

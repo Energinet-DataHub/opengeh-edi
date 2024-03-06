@@ -103,7 +103,7 @@ namespace Energinet.DataHub.EDI.Api
                                 runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!)
                             .AddSqlServerHealthCheck(context.Configuration)
                             .AddB2BAuthentication(tokenValidationParameters)
-                            .AddSystemClock()
+                            .AddSystemTimer()
                             .AddSerializer()
                             .AddLogging();
                         services.AddBlobStorageHealthCheck("edi-web-jobs-storage", runtime.AzureWebJobsStorage!);

@@ -41,7 +41,7 @@ builder.Services
 
 builder.Services
     .AddHttpContextAccessor()
-    .AddSystemClock()
+    .AddSystemTimer()
     .AddHttpLoggingScope(domainName)
     .AddSerializer()
     .AddScoped<AuthenticatedActor>()
