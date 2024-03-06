@@ -12,19 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Process.Interfaces;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Exceptions;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
-
-/// <summary>
-/// Responsible for receiving a incoming message.
-/// </summary>
-public interface IRequestAggregatedMeasureDataReceiver
+public class DuplicateMessageIdDetectedException : Exception
 {
-    /// <summary>
-    /// Responsible for receiving the incoming message.
-    /// </summary>
-    Task ReceiveAsync(
-        RequestAggregatedMeasureDataDto requestAggregatedMeasureDataDto,
-        CancellationToken cancellationToken);
+    public DuplicateMessageIdDetectedException(string message)
+        : base(message)
+    {
+    }
+
+    public DuplicateMessageIdDetectedException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+
+    public DuplicateMessageIdDetectedException()
+    {
+    }
 }

@@ -12,19 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Process.Interfaces;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators;
 
 /// <summary>
-/// Responsible for receiving a incoming message.
+/// Validation for Business Type
 /// </summary>
-public interface IRequestAggregatedMeasureDataReceiver
+public interface IBusinessTypeValidator
 {
     /// <summary>
-    /// Responsible for receiving the incoming message.
+    /// Validates Business Type
     /// </summary>
-    Task ReceiveAsync(
-        RequestAggregatedMeasureDataDto requestAggregatedMeasureDataDto,
-        CancellationToken cancellationToken);
+    public Task<Result> ValidateAsync(string? businessType, CancellationToken cancellationToken);
 }

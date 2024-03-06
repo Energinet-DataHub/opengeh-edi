@@ -12,19 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Process.Interfaces;
-
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
-
-/// <summary>
-/// Responsible for receiving a incoming message.
-/// </summary>
-public interface IRequestAggregatedMeasureDataReceiver
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators.ValidationErrors
 {
-    /// <summary>
-    /// Responsible for receiving the incoming message.
-    /// </summary>
-    Task ReceiveAsync(
-        RequestAggregatedMeasureDataDto requestAggregatedMeasureDataDto,
-        CancellationToken cancellationToken);
+    public class SenderRoleTypeIsNotAuthorized : ValidationError
+    {
+        public SenderRoleTypeIsNotAuthorized()
+            : base("Sender role type is not authorized to use this type of message", "00003", "SenderRole")
+        {
+        }
+    }
 }

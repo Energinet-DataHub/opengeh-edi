@@ -17,9 +17,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators
 {
@@ -30,7 +29,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators
         private readonly List<ValidationError> _errors = new();
         private readonly IMessageIdRepository _messageIdRepository;
         private readonly ITransactionIdRepository _transactionIdRepository;
-        private readonly ISenderAuthorizer _senderAuthorizer;
+        private readonly ISenderValidator _senderValidator;
         private readonly IProcessTypeValidator _processTypeValidator;
         private readonly IMessageTypeValidator _messageTypeValidator;
         private readonly IReceiverValidator _receiverValidator;
@@ -39,7 +38,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators
         public RequestAggregatedMeasureDataMessageValidator(
             IMessageIdRepository messageIdRepository,
             ITransactionIdRepository transactionIdRepository,
-            ISenderAuthorizer senderAuthorizer,
+            ISenderValidator senderValidator,
             IProcessTypeValidator processTypeValidator,
             IMessageTypeValidator messageTypeValidator,
             IReceiverValidator receiverValidator,
@@ -47,7 +46,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators
         {
             _messageIdRepository = messageIdRepository;
             _transactionIdRepository = transactionIdRepository;
-            _senderAuthorizer = senderAuthorizer;
+            _senderValidator = senderValidator;
             _processTypeValidator = processTypeValidator;
             _messageTypeValidator = messageTypeValidator;
             _receiverValidator = receiverValidator;
@@ -166,7 +165,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators
 
         private async Task AuthorizeSenderAsync(RequestAggregatedMeasureDataMessage message)
         {
-            var result = await _senderAuthorizer.AuthorizeAsync(message.SenderNumber, message.SenderRoleCode).ConfigureAwait(false);
+            var result = await _senderValidator.AuthorizeAsync(message.SenderNumber, message.SenderRoleCode).ConfigureAwait(false);
             _errors.AddRange(result.Errors);
         }
 

@@ -14,8 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Exceptions;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -41,7 +40,7 @@ public class RequestAggregatedMeasureDataReceiver : IRequestAggregatedMeasureDat
         _transactionIdRepository = transactionIdRepository;
     }
 
-    public async Task<Result> ReceiveAsync(
+    public async Task ReceiveAsync(
         RequestAggregatedMeasureDataDto requestAggregatedMeasureDataDto,
         CancellationToken cancellationToken)
     {
@@ -67,17 +66,15 @@ public class RequestAggregatedMeasureDataReceiver : IRequestAggregatedMeasureDat
                                                "Violation of PRIMARY KEY constraint 'PK_TransactionRegistry_TransactionIdAndSenderId'",
                                                StringComparison.OrdinalIgnoreCase))
         {
-            return Result.Failure(new DuplicateTransactionIdDetected());
+            throw new DuplicateTransactionIdDetectedException();
         }
         catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlException
                                            && sqlException.Message.Contains(
                                                "Violation of PRIMARY KEY constraint 'PK_MessageRegistry_MessageIdAndSenderId'",
                                                StringComparison.OrdinalIgnoreCase))
         {
-            return Result.Failure(new DuplicateMessageIdDetected(requestAggregatedMeasureDataDto.MessageId));
+            throw new DuplicateMessageIdDetectedException();
         }
-
-        return Result.Succeeded();
     }
 
     private async Task AddMessageIdAndTransactionIdAsync(

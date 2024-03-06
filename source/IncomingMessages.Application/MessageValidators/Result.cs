@@ -15,24 +15,31 @@
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators.ValidationErrors;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Application.Messages
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators
 {
-    public class IncomingMarketMessageParserResult
+    public class Result
     {
-        public IncomingMarketMessageParserResult(params ValidationError[] errors)
+        private Result()
+        {
+        }
+
+        private Result(IReadOnlyCollection<ValidationError> errors)
         {
             Errors = errors;
         }
 
-        public IncomingMarketMessageParserResult(IIncomingMessage incomingMessage)
-        {
-            IncomingMessage = incomingMessage;
-        }
+        public bool Success => Errors.Count == 0;
 
         public IReadOnlyCollection<ValidationError> Errors { get; } = new List<ValidationError>();
 
-        public bool Success => Errors.Count == 0;
+        public static Result Failure(params ValidationError[] errors)
+        {
+            return new Result(errors);
+        }
 
-        public IIncomingMessage? IncomingMessage { get; }
+        public static Result Succeeded()
+        {
+            return new Result();
+        }
     }
 }

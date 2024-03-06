@@ -13,26 +13,20 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators.ValidationErrors;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Application.Messages
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators.RequestAggregatedMeasureData;
+
+public class BusinessTypeValidator : IBusinessTypeValidator
 {
-    public class IncomingMarketMessageParserResult
+    private static readonly IReadOnlyCollection<string> _whiteList = new[] { "23" };
+
+    public async Task<Result> ValidateAsync(string? businessType, CancellationToken cancellationToken)
     {
-        public IncomingMarketMessageParserResult(params ValidationError[] errors)
-        {
-            Errors = errors;
-        }
-
-        public IncomingMarketMessageParserResult(IIncomingMessage incomingMessage)
-        {
-            IncomingMessage = incomingMessage;
-        }
-
-        public IReadOnlyCollection<ValidationError> Errors { get; } = new List<ValidationError>();
-
-        public bool Success => Errors.Count == 0;
-
-        public IIncomingMessage? IncomingMessage { get; }
+        return await Task.FromResult(_whiteList.Contains(businessType) ?
+            Result.Succeeded() : Result.Failure(new NotSupportedBusinessType(businessType))).ConfigureAwait(false);
     }
 }

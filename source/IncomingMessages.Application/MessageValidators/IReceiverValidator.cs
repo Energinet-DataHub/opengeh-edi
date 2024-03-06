@@ -12,19 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Process.Interfaces;
+using System.Threading.Tasks;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators;
 
 /// <summary>
-/// Responsible for receiving a incoming message.
+/// Responsible for verifying that the message contains the expected receiver
 /// </summary>
-public interface IRequestAggregatedMeasureDataReceiver
+public interface IReceiverValidator
 {
     /// <summary>
-    /// Responsible for receiving the incoming message.
+    /// Verify the receiver Id and role
     /// </summary>
-    Task ReceiveAsync(
-        RequestAggregatedMeasureDataDto requestAggregatedMeasureDataDto,
-        CancellationToken cancellationToken);
+    /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
+    Task<Result> VerifyAsync(string receiverNumber, string receiverRole);
 }

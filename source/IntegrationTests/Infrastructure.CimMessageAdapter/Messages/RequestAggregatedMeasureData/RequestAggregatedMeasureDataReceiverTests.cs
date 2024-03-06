@@ -25,9 +25,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
+using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
@@ -220,8 +218,8 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .WithReceiverId(knownReceiverId)
             .Message();
 
-        var messageParser = await ParseMessageAsync(message);
-        var resultFromFirstMessage = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser.IncomingMessage!, CancellationToken.None);
+        var messageParserResult = await ParseMessageAsync(message);
+        var resultFromFirstMessage = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParserResult.IncomingMessage!, CancellationToken.None);
 
         // Request from a second sender.
         await using var message02 = BusinessMessageBuilder
@@ -231,8 +229,8 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             .WithMessageId("123564789123564789123564789123564789")
             .Message();
 
-        var messageParser2 = await ParseMessageAsync(message02);
-        var resultFromSecondMessage = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser2.IncomingMessage!, CancellationToken.None);
+        var messageParserResult2 = await ParseMessageAsync(message02);
+        var resultFromSecondMessage = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParserResult2.IncomingMessage!, CancellationToken.None);
 
         Assert.DoesNotContain(resultFromFirstMessage.Errors, error => error is DuplicateTransactionIdDetected);
         Assert.DoesNotContain(resultFromSecondMessage.Errors, error => error is DuplicateTransactionIdDetected);
