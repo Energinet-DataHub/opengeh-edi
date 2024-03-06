@@ -72,11 +72,8 @@ public sealed class WholesaleServicesMessageFactory
     {
         ArgumentNullException.ThrowIfNull(message);
 
-        var chargeOwner = message.IsTax
-            ? await _masterDataClient
-                .GetGridOwnerForGridAreaCodeAsync(message.GridAreaCode, CancellationToken.None)
-                .ConfigureAwait(false)
-            : ActorNumber.Create(message.ChargeOwnerId);
+        var chargeOwner = await GetChargeOwnerAsync(message.GridAreaCode, message.ChargeOwnerId, message.IsTax)
+            .ConfigureAwait(false);
 
         var wholesaleCalculationSeries = new WholesaleServicesSeries(
             TransactionId: Guid.NewGuid(),
@@ -107,11 +104,8 @@ public sealed class WholesaleServicesMessageFactory
     {
         ArgumentNullException.ThrowIfNull(message);
 
-        var chargeOwner = message.IsTax
-            ? await _masterDataClient
-                  .GetGridOwnerForGridAreaCodeAsync(message.GridAreaCode, CancellationToken.None)
-                  .ConfigureAwait(false)
-            : ActorNumber.Create(message.ChargeOwnerId);
+        var chargeOwner = await GetChargeOwnerAsync(message.GridAreaCode, message.ChargeOwnerId, message.IsTax)
+            .ConfigureAwait(false);
 
         var wholesaleCalculationSeries = new WholesaleServicesSeries(
             TransactionId: Guid.NewGuid(),
@@ -133,5 +127,14 @@ public sealed class WholesaleServicesMessageFactory
             SettlementType: SettlementTypeMapper.Map(message.SettlementMethod));
 
         return wholesaleCalculationSeries;
+    }
+
+    private async Task<ActorNumber> GetChargeOwnerAsync(string gridAreaCode, string chargeOwnerId, bool isTax)
+    {
+        return isTax
+            ? await _masterDataClient
+                .GetGridOwnerForGridAreaCodeAsync(gridAreaCode, CancellationToken.None)
+                .ConfigureAwait(false)
+            : ActorNumber.Create(chargeOwnerId);
     }
 }

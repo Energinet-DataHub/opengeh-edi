@@ -104,48 +104,60 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
 
     [Fact]
     public async Task
-        AmountPerChargeResultProducedV1Processor_creates_outgoing_message_to_energy_supplier_and_grid_owner_if_tax_and_charge_owner_is_grid_owner()
+        AmountPerChargeResultProducedV1Processor_creates_outgoing_messages_to_energy_supplier_and_grid_owner_if_tax_and_charge_owner_is_grid_owner()
     {
-        await new GridAreaBuilder()
-            .WithGridAreaCode("805")
-            .WithActorNumber(ActorNumber.Create("8200000007740"))
-            .StoreAsync(GetService<IMasterDataClient>());
+        const string gridOperatorAndChargeOwner = "8200000007740";
 
         var amountPerChargeEvent = _amountPerChargeEventBuilder
             .WithIsTax(true)
-            .WithChargeOwner("8200000007740")
+            .WithChargeOwner(gridOperatorAndChargeOwner)
             .Build();
+
+        await new GridAreaBuilder()
+            .WithGridAreaCode(amountPerChargeEvent.GridAreaCode)
+            .WithActorNumber(ActorNumber.Create(gridOperatorAndChargeOwner))
+            .StoreAsync(GetService<IMasterDataClient>());
 
         await HandleIntegrationEventAsync(amountPerChargeEvent);
 
         var energySupplierMessage = await AssertOutgoingMessageAsync(ActorRole.EnergySupplier);
         var gridOperatorMessage = await AssertOutgoingMessageAsync(ActorRole.GridOperator);
+        var fetchSystemOperatorMessage = async () => await AssertOutgoingMessageAsync(ActorRole.SystemOperator);
 
-        energySupplierMessage.HasReceiverId("8200000007743");
-        gridOperatorMessage.HasReceiverId("8200000007740");
+        energySupplierMessage.HasReceiverId(amountPerChargeEvent.EnergySupplierId);
+        gridOperatorMessage.HasReceiverId(gridOperatorAndChargeOwner);
+        await fetchSystemOperatorMessage.Should()
+            .ThrowExactlyAsync<InvalidOperationException>()
+            .WithMessage("Sequence contains no elements");
     }
 
     [Fact]
     public async Task
-        AmountPerChargeResultProducedV1Processor_creates_outgoing_message_to_energy_supplier_and_grid_owner_if_tax_and_charge_owner_is_tso()
+        AmountPerChargeResultProducedV1Processor_creates_outgoing_messages_to_energy_supplier_and_grid_owner_if_tax_and_charge_owner_is_tso()
     {
-        await new GridAreaBuilder()
-            .WithGridAreaCode("805")
-            .WithActorNumber(ActorNumber.Create("8200000007740"))
-            .StoreAsync(GetService<IMasterDataClient>());
+        const string gridOperator = "8200000007740";
 
         var amountPerChargeEvent = _amountPerChargeEventBuilder
             .WithIsTax(true)
             .WithChargeOwner(DataHubDetails.DataHubActorNumber.Value)
             .Build();
 
+        await new GridAreaBuilder()
+            .WithGridAreaCode(amountPerChargeEvent.GridAreaCode)
+            .WithActorNumber(ActorNumber.Create(gridOperator))
+            .StoreAsync(GetService<IMasterDataClient>());
+
         await HandleIntegrationEventAsync(amountPerChargeEvent);
 
         var energySupplierMessage = await AssertOutgoingMessageAsync(ActorRole.EnergySupplier);
         var gridOperatorMessage = await AssertOutgoingMessageAsync(ActorRole.GridOperator);
+        var fetchSystemOperatorMessage = async () => await AssertOutgoingMessageAsync(ActorRole.SystemOperator);
 
-        energySupplierMessage.HasReceiverId("8200000007743");
-        gridOperatorMessage.HasReceiverId("8200000007740");
+        energySupplierMessage.HasReceiverId(amountPerChargeEvent.EnergySupplierId);
+        gridOperatorMessage.HasReceiverId(gridOperator);
+        await fetchSystemOperatorMessage.Should()
+            .ThrowExactlyAsync<InvalidOperationException>()
+            .WithMessage("Sequence contains no elements");
     }
 
     [Fact]
