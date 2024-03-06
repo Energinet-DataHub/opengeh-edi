@@ -17,7 +17,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.Core.Messaging.Communication;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
@@ -28,13 +27,16 @@ public class MonthlyAmountPerChargeResultProducedV1Processor : IIntegrationEvent
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly IFeatureFlagManager _featureManager;
+    private readonly WholesaleServicesMessageFactory _wholesaleServicesMessageFactory;
 
     public MonthlyAmountPerChargeResultProducedV1Processor(
         IOutgoingMessagesClient outgoingMessagesClient,
-        IFeatureFlagManager featureManager)
+        IFeatureFlagManager featureManager,
+        WholesaleServicesMessageFactory wholesaleServicesMessageFactory)
     {
         _outgoingMessagesClient = outgoingMessagesClient;
         _featureManager = featureManager;
+        _wholesaleServicesMessageFactory = wholesaleServicesMessageFactory;
     }
 
     public string EventTypeToHandle => MonthlyAmountPerChargeResultProducedV1.EventName;
@@ -49,7 +51,8 @@ public class MonthlyAmountPerChargeResultProducedV1Processor : IIntegrationEvent
         }
 
         var monthlyAmountPerChargeResultProducedV1 = (MonthlyAmountPerChargeResultProducedV1)integrationEvent.Message;
-        var message = WholesaleServicesMessageFactory.CreateMessage(monthlyAmountPerChargeResultProducedV1);
+        var message = await _wholesaleServicesMessageFactory.CreateMessageAsync(monthlyAmountPerChargeResultProducedV1)
+            .ConfigureAwait(false);
 
         await _outgoingMessagesClient.EnqueueAndCommitAsync(message, cancellationToken).ConfigureAwait(false);
     }

@@ -36,7 +36,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application;
 public class IncomingMessageClient : IIncomingMessageClient
 {
     private readonly MarketMessageParser _marketMessageParser;
-    private readonly RequestAggregatedMeasureDataMessageValidator _requestAggregatedMeasureDataMarketMessageValidator;
+    private readonly RequestAggregatedMeasureDataMessageValidator _requestAggregatedMeasureDataMessageValidator;
     private readonly ResponseFactory _responseFactory;
     private readonly IArchivedMessagesClient _archivedMessagesClient;
     private readonly ILogger<IncomingMessageClient> _logger;
@@ -45,7 +45,7 @@ public class IncomingMessageClient : IIncomingMessageClient
 
     public IncomingMessageClient(
         MarketMessageParser marketMessageParser,
-        RequestAggregatedMeasureDataMessageValidator requestAggregatedMeasureDataMarketMessageValidator,
+        RequestAggregatedMeasureDataMessageValidator requestAggregatedMeasureDataMessageValidator,
         ResponseFactory responseFactory,
         IArchivedMessagesClient archivedMessagesClient,
         ILogger<IncomingMessageClient> logger,
@@ -53,7 +53,7 @@ public class IncomingMessageClient : IIncomingMessageClient
         ISystemDateTimeProvider systemDateTimeProvider)
     {
         _marketMessageParser = marketMessageParser;
-        _requestAggregatedMeasureDataMarketMessageValidator = requestAggregatedMeasureDataMarketMessageValidator;
+        _requestAggregatedMeasureDataMessageValidator = requestAggregatedMeasureDataMessageValidator;
         _responseFactory = responseFactory;
         _archivedMessagesClient = archivedMessagesClient;
         _logger = logger;
@@ -77,7 +77,7 @@ public class IncomingMessageClient : IIncomingMessageClient
         if (incomingMarketMessageParserResult.Errors.Count != 0 || incomingMarketMessageParserResult.IncomingMessage == null)
         {
             var res = Result.Failure(incomingMarketMessageParserResult.Errors.ToArray());
-            _logger.LogInformation("Failed to parse incoming message. Errors: {Errors}", res.Errors);
+            _logger.LogInformation("Failed to parse incoming message {DocumentType}. Errors: {Errors}", documentType, res.Errors);
             return _responseFactory.From(res, responseFormat ?? documentFormat);
         }
 
@@ -87,7 +87,7 @@ public class IncomingMessageClient : IIncomingMessageClient
         var validationResult =
             documentType == IncomingDocumentType.RequestWholesaleSettlement
                 ? Result.Succeeded()
-                : await _requestAggregatedMeasureDataMarketMessageValidator
+                : await _requestAggregatedMeasureDataMessageValidator
             .ValidateAsync(incomingMarketMessageParserResult.IncomingMessage as RequestAggregatedMeasureDataMessage ?? throw new InvalidOperationException(), cancellationToken)
             .ConfigureAwait(false);
 

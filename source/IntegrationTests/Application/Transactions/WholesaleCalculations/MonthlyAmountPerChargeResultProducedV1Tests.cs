@@ -24,9 +24,11 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
+using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NodaTime;
@@ -188,6 +190,81 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
         var message = await AssertOutgoingMessageAsync(businessReason: BusinessReason.Correction);
         message
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.SettlementVersion, SettlementVersion.FirstCorrection);
+    }
+
+    [Fact]
+    public async Task
+        MonthlyAmountPerChargeResultProducedV1Processor_creates_outgoing_messages_to_energy_supplier_and_grid_owner_if_tax_and_charge_owner_is_grid_owner()
+    {
+        const string gridOperatorAndChargeOwner = "8200000007740";
+
+        var amountPerChargeEvent = _monthlyPerChargeEventBuilder
+            .WithIsTax(true)
+            .WithChargeOwner(gridOperatorAndChargeOwner)
+            .Build();
+
+        await new GridAreaBuilder()
+            .WithGridAreaCode(amountPerChargeEvent.GridAreaCode)
+            .WithActorNumber(ActorNumber.Create(gridOperatorAndChargeOwner))
+            .StoreAsync(GetService<IMasterDataClient>());
+
+        await HandleIntegrationEventAsync(amountPerChargeEvent);
+
+        var energySupplierMessage = await AssertOutgoingMessageAsync(ActorRole.EnergySupplier);
+        var gridOperatorMessage = await AssertOutgoingMessageAsync(ActorRole.GridOperator);
+        var fetchSystemOperatorMessage = async () => await AssertOutgoingMessageAsync(ActorRole.SystemOperator);
+
+        energySupplierMessage.HasReceiverId(amountPerChargeEvent.EnergySupplierId);
+        gridOperatorMessage.HasReceiverId(gridOperatorAndChargeOwner);
+        await fetchSystemOperatorMessage.Should()
+            .ThrowExactlyAsync<InvalidOperationException>()
+            .WithMessage("Sequence contains no elements");
+    }
+
+    [Fact]
+    public async Task
+        MonthlyAmountPerChargeResultProducedV1Processor_creates_outgoing_messages_to_energy_supplier_and_grid_owner_if_tax_and_charge_owner_is_tso()
+    {
+        const string gridOperator = "8200000007740";
+
+        var amountPerChargeEvent = _monthlyPerChargeEventBuilder
+            .WithIsTax(true)
+            .WithChargeOwner(DataHubDetails.DataHubActorNumber.Value)
+            .Build();
+
+        await new GridAreaBuilder()
+            .WithGridAreaCode(amountPerChargeEvent.GridAreaCode)
+            .WithActorNumber(ActorNumber.Create(gridOperator))
+            .StoreAsync(GetService<IMasterDataClient>());
+
+        await HandleIntegrationEventAsync(amountPerChargeEvent);
+
+        var energySupplierMessage = await AssertOutgoingMessageAsync(ActorRole.EnergySupplier);
+        var gridOperatorMessage = await AssertOutgoingMessageAsync(ActorRole.GridOperator);
+        var fetchSystemOperatorMessage = async () => await AssertOutgoingMessageAsync(ActorRole.SystemOperator);
+
+        energySupplierMessage.HasReceiverId(amountPerChargeEvent.EnergySupplierId);
+        gridOperatorMessage.HasReceiverId(gridOperator);
+        await fetchSystemOperatorMessage.Should()
+            .ThrowExactlyAsync<InvalidOperationException>()
+            .WithMessage("Sequence contains no elements");
+    }
+
+    [Fact]
+    public async Task
+        MonthlyAmountPerChargeResultProducedV1Processor_does_not_create_outgoing_messages_if_tax_and_grid_area_is_without_owner()
+    {
+        var amountPerChargeEvent = _monthlyPerChargeEventBuilder
+            .WithIsTax(true)
+            .WithChargeOwner(DataHubDetails.DataHubActorNumber.Value)
+            .Build();
+
+        // This shouldn't really happen, but now it is documented
+        var act = async () => await HandleIntegrationEventAsync(amountPerChargeEvent);
+
+        await act.Should()
+            .ThrowExactlyAsync<InvalidOperationException>()
+            .WithMessage("Sequence contains no elements.");
     }
 
     private async Task HandleIntegrationEventAsync(MonthlyAmountPerChargeResultProducedV1 @event)

@@ -89,7 +89,7 @@ public class IncomingMessageReceiver
             .RegisterAndSendAsync(
                 new IncomingMessageStream(request.Body),
                 documentFormat,
-                IncomingDocumentType.RequestAggregatedMeasureData,
+                incomingDocumentType,
                 cancellationToken)
             .ConfigureAwait(false);
 
