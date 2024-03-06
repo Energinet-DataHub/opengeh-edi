@@ -12,9 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
 
 public class MarketMessageParser
 {
@@ -25,8 +31,11 @@ public class MarketMessageParser
         _parsers = parsers;
     }
 
-    public Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(
-        IIncomingMessageStream message, DocumentFormat documentFormat, IncomingDocumentType documentType, CancellationToken cancellationToken)
+    public Task<IncomingMarketMessageParserResult> ParseAsync(
+        IIncomingMessageStream message,
+        DocumentFormat documentFormat,
+        IncomingDocumentType documentType,
+        CancellationToken cancellationToken)
     {
         var parser = _parsers.FirstOrDefault(parser =>
             parser.HandledFormat.Equals(documentFormat) && parser.DocumentType.Equals(documentType));

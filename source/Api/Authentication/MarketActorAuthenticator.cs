@@ -72,7 +72,7 @@ namespace Energinet.DataHub.EDI.Api.Authentication
                 _logger.LogError(
                     @"Could not authenticate market actor identity.
                     This is due to missing marketRole in the http request data claims for ActorNumber: {ActorNumber}.",
-                    actorNumber);
+                    actorNumber.Value);
                 return false;
             }
 

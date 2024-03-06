@@ -19,7 +19,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
 /// <summary>
 /// Responsible for verifying that the Receiver is a Calculation Responsible Receiver and Datahub
 /// </summary>
-public class CalculationResponsibleReceiverVerification : IReceiverValidator
+public class CalculationResponsibleReceiverValidator : IReceiverValidator
 {
     private const string CalculationResponsibleRole = "DGL";
     private const string GlnOfDataHub = "5790001330552";

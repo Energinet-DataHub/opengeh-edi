@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
 
 /// <summary>
 /// Parses CIM messages from a stream
@@ -35,6 +37,6 @@ public interface IMessageParser
     /// <summary>
     /// Parse from stream
     /// </summary>
-    Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(
+    Task<IncomingMarketMessageParserResult> ParseAsync(
         IIncomingMessageStream incomingMessageStream, CancellationToken cancellationToken);
 }

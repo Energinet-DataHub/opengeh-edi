@@ -12,22 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.ObjectModel;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Process.Interfaces;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
 
-public static class RequestAggregatedMeasureDataMarketMessageFactory
+public static class RequestAggregatedMeasureDataMessageFactory
 {
-    public static RequestAggregatedMeasureDataDto Create(
+    public static RequestAggregatedMeasureDataMessage Create(
         MessageHeader header,
         ReadOnlyCollection<Serie> series)
     {
         ArgumentNullException.ThrowIfNull(header);
         ArgumentNullException.ThrowIfNull(series);
 
-        return new RequestAggregatedMeasureDataDto(
+        return new RequestAggregatedMeasureDataMessage(
             header.SenderId,
             header.SenderRole,
             header.ReceiverId,

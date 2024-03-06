@@ -12,12 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
-using Energinet.DataHub.EDI.Process.Interfaces;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators
 {
-    public abstract class RequestAggregatedMeasureDataMarketMessageValidator
+    public class RequestAggregatedMeasureDataMessageValidator
     {
         private const int MessageIdLength = 36;
         private const int TransactionIdLength = 36;
@@ -30,7 +36,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.Request
         private readonly IReceiverValidator _receiverValidator;
         private readonly IBusinessTypeValidator _businessTypeValidator;
 
-        protected RequestAggregatedMeasureDataMarketMessageValidator(
+        public RequestAggregatedMeasureDataMessageValidator(
             IMessageIdRepository messageIdRepository,
             ITransactionIdRepository transactionIdRepository,
             ISenderAuthorizer senderAuthorizer,
@@ -49,7 +55,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.Request
         }
 
         public async Task<Result> ValidateAsync(
-            RequestAggregatedMeasureDataDto requestAggregatedMeasureDataDto,
+            RequestAggregatedMeasureDataMessage requestAggregatedMeasureDataDto,
             CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(requestAggregatedMeasureDataDto);
@@ -158,15 +164,15 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.Request
             _errors.AddRange(result.Errors);
         }
 
-        private async Task AuthorizeSenderAsync(RequestAggregatedMeasureDataDto dto)
+        private async Task AuthorizeSenderAsync(RequestAggregatedMeasureDataMessage message)
         {
-            var result = await _senderAuthorizer.AuthorizeAsync(dto.SenderNumber, dto.SenderRoleCode).ConfigureAwait(false);
+            var result = await _senderAuthorizer.AuthorizeAsync(message.SenderNumber, message.SenderRoleCode).ConfigureAwait(false);
             _errors.AddRange(result.Errors);
         }
 
-        private async Task VerifyReceiverAsync(RequestAggregatedMeasureDataDto dto)
+        private async Task VerifyReceiverAsync(RequestAggregatedMeasureDataMessage message)
         {
-            var receiverVerification = await _receiverValidator.VerifyAsync(dto.ReceiverNumber, dto.ReceiverRoleCode).ConfigureAwait(false);
+            var receiverVerification = await _receiverValidator.VerifyAsync(message.ReceiverNumber, message.ReceiverRoleCode).ConfigureAwait(false);
             _errors.AddRange(receiverVerification.Errors);
         }
 
