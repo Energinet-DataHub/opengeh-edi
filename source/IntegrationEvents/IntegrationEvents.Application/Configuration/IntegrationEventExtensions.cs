@@ -52,11 +52,15 @@ public static class IntegrationEventExtensions
             MonthlyAmountPerChargeResultProducedV1.Descriptor,
             AmountPerChargeResultProducedV1.Descriptor,
         };
+
         services.AddSubscriber<IntegrationEventHandler>(integrationEventDescriptors);
         services.AddTransient<IDataRetention, ReceivedIntegrationEventsRetention>()
             .AddTransient<IReceivedIntegrationEventRepository, ReceivedIntegrationEventRepository>()
             .AddTransient<EnergyResultMessageResultFactory>()
             .AddTransient<IIntegrationEventHandler, IntegrationEventHandler>();
+
+        services.AddTransient<WholesaleServicesMessageFactory>();
+
         return services;
     }
 }

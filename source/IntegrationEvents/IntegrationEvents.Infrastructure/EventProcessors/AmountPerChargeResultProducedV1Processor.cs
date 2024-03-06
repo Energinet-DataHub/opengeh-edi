@@ -27,13 +27,16 @@ public class AmountPerChargeResultProducedV1Processor : IIntegrationEventProcess
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly IFeatureFlagManager _featureManager;
+    private readonly WholesaleServicesMessageFactory _wholesaleServicesMessageFactory;
 
     public AmountPerChargeResultProducedV1Processor(
         IOutgoingMessagesClient outgoingMessagesClient,
-        IFeatureFlagManager featureManager)
+        IFeatureFlagManager featureManager,
+        WholesaleServicesMessageFactory wholesaleServicesMessageFactory)
     {
         _outgoingMessagesClient = outgoingMessagesClient;
         _featureManager = featureManager;
+        _wholesaleServicesMessageFactory = wholesaleServicesMessageFactory;
     }
 
     public string EventTypeToHandle => AmountPerChargeResultProducedV1.EventName;
@@ -48,7 +51,9 @@ public class AmountPerChargeResultProducedV1Processor : IIntegrationEventProcess
         }
 
         var amountPerChargeResultProducedV1 = (AmountPerChargeResultProducedV1)integrationEvent.Message;
-        var message = WholesaleServicesMessageFactory.CreateMessage(amountPerChargeResultProducedV1);
+        var message = await _wholesaleServicesMessageFactory
+            .CreateMessageAsync(amountPerChargeResultProducedV1)
+            .ConfigureAwait(false);
 
         await _outgoingMessagesClient.EnqueueAndCommitAsync(message, cancellationToken).ConfigureAwait(false);
     }
