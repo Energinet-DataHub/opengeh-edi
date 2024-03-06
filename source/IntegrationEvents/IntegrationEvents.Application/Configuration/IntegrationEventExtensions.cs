@@ -59,7 +59,7 @@ public static class IntegrationEventExtensions
             .AddTransient<EnergyResultMessageResultFactory>()
             .AddTransient<IIntegrationEventHandler, IntegrationEventHandler>();
 
-        services.AddScoped<WholesaleServicesMessageFactory>();
+        services.AddTransient<WholesaleServicesMessageFactory>();
 
         return services;
     }
