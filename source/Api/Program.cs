@@ -90,7 +90,8 @@ namespace Energinet.DataHub.EDI.Api
                 .ConfigureServices(
                     (context, services) =>
                     {
-                        services.AddApplicationInsights()
+                        services
+                            .AddApplicationInsights()
                             .ConfigureFunctionsApplicationInsights()
                             .AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>()
                             .AddDataRetention()
@@ -101,7 +102,6 @@ namespace Energinet.DataHub.EDI.Api
                                 runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!,
                                 runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!)
                             .AddSqlServerHealthCheck(context.Configuration)
-                            .AddSqlServerHealthCheck(configuration)
                             .AddB2BAuthentication(tokenValidationParameters)
                             .AddSystemClock()
                             .AddSerializer()
@@ -109,13 +109,14 @@ namespace Energinet.DataHub.EDI.Api
                         services.AddBlobStorageHealthCheck("edi-web-jobs-storage", runtime.AzureWebJobsStorage!);
                         services.AddBlobStorageHealthCheck("edi-documents-storage", runtime.AZURE_STORAGE_ACCOUNT_URL!);
 
-                        services.AddIntegrationEventModule()
-                        .AddArchivedMessagesModule(configuration)
-                        .AddIncomingMessagesModule(configuration)
-                        .AddOutgoingMessagesModule(configuration)
-                        .AddProcessModule(configuration)
-                        .AddMasterDataModule(configuration)
-                        .AddDataAccessUnitOfWorkModule(configuration);
+                        services
+                            .AddIntegrationEventModule()
+                            .AddArchivedMessagesModule(context.Configuration)
+                            .AddIncomingMessagesModule(context.Configuration)
+                            .AddOutgoingMessagesModule(context.Configuration)
+                            .AddProcessModule(context.Configuration)
+                            .AddMasterDataModule(context.Configuration)
+                            .AddDataAccessUnitOfWorkModule(context.Configuration);
                 })
                 .ConfigureLogging(logging =>
                 {

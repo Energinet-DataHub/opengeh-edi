@@ -56,25 +56,6 @@ public static class HealtCheckExtensions
         return services;
     }
 
-    // public static IServiceCollection AddExternalDomainServiceBusQueuesHealthCheck(this IServiceCollection services, IConfiguration configuration, string domainName)
-    // {
-    //
-    //     if (QueueHealthCheckIsAdded(services, name))
-    //     {
-    //         return services;
-    //     }
-    //
-    //     services.AddHealthChecks()
-    //         .AddAzureServiceBusQueue(
-    //             name: name + "Exists",
-    //             connectionString: serviceBusConnectionString,
-    //             queueName: name);
-    //     services.TryAddSingleton(new ServiceBusQueueHealthCheckIsAdded(name));
-    //
-    //
-    //     return services;
-    // }
-
     public static void AddBlobStorageHealthCheck(this IServiceCollection services, string name, string blobConnectionString)
     {
         services.AddHealthChecks().AddAzureBlobStorage(blobConnectionString, name: name);
