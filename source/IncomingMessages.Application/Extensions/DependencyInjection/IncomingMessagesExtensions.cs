@@ -45,7 +45,7 @@ public static class IncomingMessagesExtensions
         var serviceBusOptions = configuration.Get<ServiceBusClientOptions>()!;
         services
             .AddServiceBus(configuration)
-            .AddExternalDomainServiceBusQueuesHealthCheck(
+            .TryAddExternalDomainServiceBusQueuesHealthCheck(
                 serviceBusOptions.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
                 serviceBusOptions.INCOMING_MESSAGES_QUEUE_NAME!)
             .AddDapperConnectionToDatabase(configuration)

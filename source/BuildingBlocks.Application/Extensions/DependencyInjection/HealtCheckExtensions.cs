@@ -34,7 +34,7 @@ public static class HealtCheckExtensions
     /// <summary>
     /// Used for Service Bus queues where the app have peek (receiver) permissions
     /// </summary>
-    public static IServiceCollection AddExternalDomainServiceBusQueuesHealthCheck(this IServiceCollection services, string serviceBusConnectionString, params string[] queueNames)
+    public static IServiceCollection TryAddExternalDomainServiceBusQueuesHealthCheck(this IServiceCollection services, string serviceBusConnectionString, params string[] queueNames)
     {
         ArgumentNullException.ThrowIfNull(serviceBusConnectionString);
         ArgumentNullException.ThrowIfNull(queueNames);

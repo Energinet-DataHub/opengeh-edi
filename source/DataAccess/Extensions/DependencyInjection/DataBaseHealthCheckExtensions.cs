@@ -24,7 +24,7 @@ public static class DataBaseHealthCheckExtensions
 {
     private const string DatabaseName = "edi-sql-db";
 
-    public static IServiceCollection AddSqlServerHealthCheck(this IServiceCollection services,  IConfiguration configuration)
+    public static IServiceCollection TryAddSqlServerHealthCheck(this IServiceCollection services,  IConfiguration configuration)
     {
         if (SqlServerHealthCheckIsAdded(services))
         {

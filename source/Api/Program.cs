@@ -97,11 +97,11 @@ namespace Energinet.DataHub.EDI.Api
                             .AddDataRetention()
                             .AddCorrelation(context.Configuration)
                             .AddLiveHealthCheck()
-                            .AddExternalDomainServiceBusQueuesHealthCheck(
+                            .TryAddExternalDomainServiceBusQueuesHealthCheck(
                                 runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
                                 runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!,
                                 runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!)
-                            .AddSqlServerHealthCheck(context.Configuration)
+                            .TryAddSqlServerHealthCheck(context.Configuration)
                             .AddB2BAuthentication(tokenValidationParameters)
                             .AddSystemTimer()
                             .AddSerializer()

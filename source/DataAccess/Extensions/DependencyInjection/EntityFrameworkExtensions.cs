@@ -39,7 +39,7 @@ public static class EntityFrameworkExtensions
                 o.UseSqlServer(source.Connection, y => y.UseNodaTime().EnableRetryOnFailure());
             });
 
-        services.AddSqlServerHealthCheck(configuration);
+        services.TryAddSqlServerHealthCheck(configuration);
 
         return services;
     }
