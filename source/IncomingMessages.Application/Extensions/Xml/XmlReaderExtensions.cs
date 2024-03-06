@@ -12,38 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Threading.Tasks;
 using System.Xml;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.Xml;
 
 internal static class XmlReaderExtensions
 {
-    public static Task<bool> MoveToNextElementByNameAsync(
-        this XmlReader reader,
-        string elementName,
-        string namespaceUri)
-    {
-        bool Predicate(XmlReader internalReader)
-        {
-            return internalReader.LocalName == elementName
-                   && internalReader.NodeType == XmlNodeType.Element
-                   && internalReader.NamespaceURI == namespaceUri;
-        }
-
-        return reader.MoveToNextAsync(Predicate);
-    }
-
-    public static async Task<bool> MoveToNextAsync(this XmlReader reader, Func<XmlReader, bool> predicate)
-    {
-        while (await reader.ReadAsync().ConfigureAwait(false))
-        {
-            if (predicate(reader))
-                return true;
-        }
-
-        return false;
-    }
-
     public static bool Is(this XmlReader reader, string localName, string ns, XmlNodeType xmlNodeType = XmlNodeType.Element)
     {
         ArgumentNullException.ThrowIfNull(reader);

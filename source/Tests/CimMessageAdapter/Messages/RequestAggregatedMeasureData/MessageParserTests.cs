@@ -23,16 +23,17 @@ using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Common.Serialization;
+using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
+using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers;
+using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using FluentAssertions.Execution;
 using NodaTime;
 using Xunit;
+using Serie = Energinet.DataHub.EDI.Process.Interfaces.Serie;
 
 namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
@@ -96,7 +97,7 @@ public class MessageParserTests
         var result = await _marketMessageParser.ParseAsync(new IncomingMessageStream(message), format, IncomingDocumentType.RequestAggregatedMeasureData, CancellationToken.None);
         using var assertionScope = new AssertionScope();
         Assert.True(result.Success);
-        var marketMessage = result!.Dto!;
+        var marketMessage = (RequestAggregatedMeasureDataMessage)result!.IncomingMessage!;
         Assert.True(marketMessage != null);
         Assert.Equal("123564789123564789123564789123564789", marketMessage.MessageId);
         Assert.Equal("D05", marketMessage.BusinessReason);
@@ -107,7 +108,7 @@ public class MessageParserTests
         //Assert.Equal("2022-12-17T09:30:47Z", marketMessage.CreatedAt);
         Assert.Equal("23", marketMessage.BusinessType);
 
-        foreach (var serie in result!.Dto!.Series)
+        foreach (var serie in marketMessage.Series)
         {
             Assert.True(serie != null);
             Assert.Equal("123353185", serie.Id);
@@ -129,7 +130,7 @@ public class MessageParserTests
         var result = await _marketMessageParser.ParseAsync(new IncomingMessageStream(message), format, IncomingDocumentType.B2CRequestAggregatedMeasureData, CancellationToken.None);
         using var assertionScope = new AssertionScope();
         Assert.True(result.Success);
-        var marketMessage = result!.Dto!;
+        var marketMessage = (RequestAggregatedMeasureDataMessage)result!.IncomingMessage!;
         Assert.True(marketMessage != null);
         Assert.Equal("123564789123564789123564789123564789", marketMessage.MessageId);
         Assert.Equal("D05", marketMessage.BusinessReason);
@@ -140,7 +141,7 @@ public class MessageParserTests
         //Assert.Equal("2022-12-17T09:30:47Z", marketMessage.CreatedAt);
         Assert.Equal("23", marketMessage.BusinessType);
 
-        foreach (var serie in result!.Dto!.Series)
+        foreach (var serie in marketMessage.Series)
         {
             Assert.True(serie != null);
             Assert.Equal("123353185", serie.Id);
