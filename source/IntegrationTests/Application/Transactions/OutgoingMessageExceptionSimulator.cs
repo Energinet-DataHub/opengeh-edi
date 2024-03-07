@@ -31,13 +31,15 @@ internal sealed class OutgoingMessageExceptionSimulator : OutgoingMessagesClient
         MessageDequeuer messageDequeuer,
         MessageEnqueuer messageEnqueuer,
         ActorMessageQueueContext actorMessageQueueContext,
-        ISystemDateTimeProvider systemDateTimeProvider)
+        ISystemDateTimeProvider systemDateTimeProvider,
+        ISerializer serializer)
         : base(
             messagePeeker,
             messageDequeuer,
             messageEnqueuer,
             actorMessageQueueContext,
-            systemDateTimeProvider)
+            systemDateTimeProvider,
+            serializer)
     {
     }
 

@@ -36,6 +36,7 @@ public class OutgoingMessageTests
         // Act
         var outgoingMesssage = OutgoingMessage.CreateMessage(
             energyResultMessageDto,
+            serializer,
             SystemClock.Instance.GetCurrentInstant());
 
         // Assert
@@ -54,6 +55,7 @@ public class OutgoingMessageTests
         // Act
         var outgoingMesssage = OutgoingMessage.CreateMessage(
             acceptedEnergyResultMessageDto,
+            serializer,
             SystemClock.Instance.GetCurrentInstant());
 
         // Assert
@@ -72,6 +74,7 @@ public class OutgoingMessageTests
         // Act
         var outgoingMesssage = OutgoingMessage.CreateMessage(
             rejectedEnergyResultMessageDto,
+            serializer,
             SystemClock.Instance.GetCurrentInstant());
 
         // Assert
@@ -90,6 +93,7 @@ public class OutgoingMessageTests
         // Act
         var outgoingMesssages = OutgoingMessage.CreateMessages(
             wholesaleServicesMessageDto,
+            serializer,
             SystemClock.Instance.GetCurrentInstant());
 
         // Assert
@@ -109,11 +113,13 @@ public class OutgoingMessageTests
     public void Creates_two_outgoing_message_for_wholesale_services()
     {
         // Arrange
+        var serializer = new Serializer();
         var wholesaleServicesMessageDto = WholesaleServicesMessageDtoBuilder.Build();
 
         // Act
         var outgoingMesssages = OutgoingMessage.CreateMessages(
             wholesaleServicesMessageDto,
+            serializer,
             SystemClock.Instance.GetCurrentInstant());
 
         // Assert

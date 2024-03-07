@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using NodaTime;
 
@@ -113,13 +113,14 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
         /// <summary>
         /// This method create a single outgoing message, for the receiver, based on the accepted energyResultMessage.
         /// </summary>
-        /// <param name="acceptedEnergyResultMessage"></param>
-        /// <param name="timestamp"></param>
         public static OutgoingMessage CreateMessage(
             AcceptedEnergyResultMessageDto acceptedEnergyResultMessage,
+            ISerializer serializer,
             Instant timestamp)
         {
+            ArgumentNullException.ThrowIfNull(serializer);
             ArgumentNullException.ThrowIfNull(acceptedEnergyResultMessage);
+
             return new OutgoingMessage(
                 acceptedEnergyResultMessage.DocumentType,
                 acceptedEnergyResultMessage.ReceiverId,
@@ -128,7 +129,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                 acceptedEnergyResultMessage.ReceiverRole,
                 acceptedEnergyResultMessage.SenderId,
                 acceptedEnergyResultMessage.SenderRole,
-                new Serializer().Serialize(acceptedEnergyResultMessage.Series),
+                serializer.Serialize(acceptedEnergyResultMessage.Series),
                 timestamp,
                 acceptedEnergyResultMessage.RelatedToMessageId);
         }
@@ -136,13 +137,14 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
         /// <summary>
         /// This method create a single outgoing message, for the receiver, based on the rejected energyResultMessage.
         /// </summary>
-        /// <param name="rejectedEnergyResultMessage"></param>
-        /// <param name="timestamp"></param>
         public static OutgoingMessage CreateMessage(
             RejectedEnergyResultMessageDto rejectedEnergyResultMessage,
+            ISerializer serializer,
             Instant timestamp)
         {
+            ArgumentNullException.ThrowIfNull(serializer);
             ArgumentNullException.ThrowIfNull(rejectedEnergyResultMessage);
+
             return new OutgoingMessage(
                 rejectedEnergyResultMessage.DocumentType,
                 rejectedEnergyResultMessage.ReceiverId,
@@ -151,7 +153,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                 rejectedEnergyResultMessage.ReceiverRole,
                 rejectedEnergyResultMessage.SenderId,
                 rejectedEnergyResultMessage.SenderRole,
-                new Serializer().Serialize(rejectedEnergyResultMessage.Series),
+                serializer.Serialize(rejectedEnergyResultMessage.Series),
                 timestamp,
                 rejectedEnergyResultMessage.RelatedToMessageId);
         }
@@ -159,13 +161,14 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
         /// <summary>
         /// This method create a single outgoing message, for the receiver, based on the energyResultMessage.
         /// </summary>
-        /// <param name="energyResultMessage"></param>
-        /// <param name="timestamp"></param>
         public static OutgoingMessage CreateMessage(
             EnergyResultMessageDto energyResultMessage,
+            ISerializer serializer,
             Instant timestamp)
         {
+            ArgumentNullException.ThrowIfNull(serializer);
             ArgumentNullException.ThrowIfNull(energyResultMessage);
+
             return new OutgoingMessage(
                 energyResultMessage.DocumentType,
                 energyResultMessage.ReceiverId,
@@ -174,7 +177,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                 energyResultMessage.ReceiverRole,
                 energyResultMessage.SenderId,
                 energyResultMessage.SenderRole,
-                new Serializer().Serialize(energyResultMessage.Series),
+                serializer.Serialize(energyResultMessage.Series),
                 timestamp,
                 energyResultMessage.RelatedToMessageId);
         }
@@ -182,13 +185,14 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
         /// <summary>
         /// This method creates two outgoing messages, one for the receiver and one for the charge owner, based on the wholesaleResultMessage.
         /// </summary>
-        /// <param name="wholesaleServicesMessageDto"></param>
-        /// <param name="timestamp"></param>
         public static IReadOnlyCollection<OutgoingMessage> CreateMessages(
             WholesaleServicesMessageDto wholesaleServicesMessageDto,
+            ISerializer serializer,
             Instant timestamp)
         {
+            ArgumentNullException.ThrowIfNull(serializer);
             ArgumentNullException.ThrowIfNull(wholesaleServicesMessageDto);
+
             return new List<OutgoingMessage>()
             {
                 new(
@@ -199,7 +203,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                     wholesaleServicesMessageDto.ReceiverRole,
                     wholesaleServicesMessageDto.SenderId,
                     wholesaleServicesMessageDto.SenderRole,
-                    new Serializer().Serialize(wholesaleServicesMessageDto.Series),
+                    serializer.Serialize(wholesaleServicesMessageDto.Series),
                     timestamp,
                     wholesaleServicesMessageDto.RelatedToMessageId),
                 new(
@@ -210,7 +214,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                     GetChargeOwnerRole(wholesaleServicesMessageDto.ChargeOwnerId),
                     wholesaleServicesMessageDto.SenderId,
                     wholesaleServicesMessageDto.SenderRole,
-                    new Serializer().Serialize(wholesaleServicesMessageDto.Series),
+                    serializer.Serialize(wholesaleServicesMessageDto.Series),
                     timestamp,
                     wholesaleServicesMessageDto.RelatedToMessageId),
             };
