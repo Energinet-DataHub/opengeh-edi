@@ -28,6 +28,10 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using AggregatedMeasureDataB2CJsonMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers.B2CJsonMessageParser;
+using AggregatedMeasureDataJsonMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers.JsonMessageParser;
+using AggregatedMeasureDataXmlMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers.XmlMessageParser;
+using WholesaleSettlementJsonMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.WholesaleSettlementMessageParsers.JsonMessageParser;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 
@@ -55,9 +59,10 @@ public static class IncomingMessagesExtensions
             .AddScoped<IIncomingMessageClient, IncomingMessageClient>()
             .AddScoped<ITransactionIdRepository, TransactionIdRepository>()
             .AddScoped<IMessageIdRepository, MessageIdRepository>()
-            .AddScoped<IMessageParser, XmlMessageParser>()
-            .AddScoped<IMessageParser, JsonMessageParser>()
-            .AddScoped<IMessageParser, B2CJsonMessageParser>()
+            .AddScoped<IMessageParser, AggregatedMeasureDataXmlMessageParser>()
+            .AddScoped<IMessageParser, AggregatedMeasureDataJsonMessageParser>()
+            .AddScoped<IMessageParser, AggregatedMeasureDataB2CJsonMessageParser>()
+            .AddScoped<IMessageParser, WholesaleSettlementJsonMessageParser>()
             .AddScoped<MarketMessageParser>()
             .AddScoped<ISenderAuthorizer, SenderAuthorizer>()
             .AddScoped<IncomingRequestAggregatedMeasuredDataSender>()

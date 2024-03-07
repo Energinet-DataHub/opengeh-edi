@@ -24,7 +24,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application.Messages
             Errors = errors;
         }
 
-        public IncomingMarketMessageParserResult(IncomingMessage incomingMessage)
+        public IncomingMarketMessageParserResult(IIncomingMessage incomingMessage)
         {
             IncomingMessage = incomingMessage;
         }
@@ -33,6 +33,6 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application.Messages
 
         public bool Success => Errors.Count == 0;
 
-        public IncomingMessage? IncomingMessage { get; }
+        public IIncomingMessage? IncomingMessage { get; }
     }
 }

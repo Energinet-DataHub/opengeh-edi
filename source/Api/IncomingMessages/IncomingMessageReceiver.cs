@@ -76,7 +76,7 @@ public class IncomingMessageReceiver
             return await request.CreateInvalidContentTypeResponseAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        var incomingDocumentType = DocumentTypeParser.ParseFromName(incomingDocumentTypeName);
+        var incomingDocumentType = IncomingDocumentType.FromName(incomingDocumentTypeName);
         if (incomingDocumentType == null) return request.CreateResponse(HttpStatusCode.NotFound);
 
         if (incomingDocumentType == IncomingDocumentType.RequestWholesaleSettlement
