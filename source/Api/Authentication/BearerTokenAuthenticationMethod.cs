@@ -17,7 +17,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
-using Energinet.DataHub.EDI.Api.Configuration.Authentication;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 

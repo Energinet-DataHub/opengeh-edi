@@ -15,8 +15,6 @@
 using Azure.Identity;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -24,12 +22,11 @@ namespace BuildingBlocks.Application.Extensions.DependencyInjection;
 
 public static class HealtCheckExtensions
 {
-    private const string DatabaseName = "edi-sql-db";
-
     public static IServiceCollection AddLiveHealthCheck(this IServiceCollection services)
     {
-        services.AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>();
-        services.AddHealthChecks()
+        services
+            .AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>()
+            .AddHealthChecks()
             .AddLiveCheck();
 
         return services;
@@ -38,7 +35,7 @@ public static class HealtCheckExtensions
     /// <summary>
     /// Used for Service Bus queues where the app have peek (receiver) permissions
     /// </summary>
-    public static IServiceCollection AddExternalDomainServiceBusQueuesHealthCheck(this IServiceCollection services, string serviceBusConnectionString, params string[] queueNames)
+    public static IServiceCollection TryAddExternalDomainServiceBusQueuesHealthCheck(this IServiceCollection services, string serviceBusConnectionString, params string[] queueNames)
     {
         ArgumentNullException.ThrowIfNull(serviceBusConnectionString);
         ArgumentNullException.ThrowIfNull(queueNames);
@@ -60,30 +57,6 @@ public static class HealtCheckExtensions
         return services;
     }
 
-    public static IServiceCollection AddSqlServerHealthCheck(this IServiceCollection services,  IConfiguration configuration)
-    {
-        if (SqlServerHealthCheckIsAdded(services))
-        {
-            return services;
-        }
-
-        services
-            .AddOptions<SqlDatabaseConnectionOptions>()
-            .Bind(configuration)
-            .Validate(o => !string.IsNullOrEmpty(o.DB_CONNECTION_STRING), "DB_CONNECTION_STRING must be set");
-
-        var database = configuration.Get<SqlDatabaseConnectionOptions>()!;
-
-        services.AddHealthChecks()
-            .AddSqlServer(
-                name: DatabaseName,
-                connectionString: database.DB_CONNECTION_STRING);
-
-        services.TryAddSingleton<SqlHealthCheckIsAdded>();
-
-        return services;
-    }
-
     public static void AddBlobStorageHealthCheck(this IServiceCollection services, string name, string blobConnectionString)
     {
         services.AddHealthChecks().AddAzureBlobStorage(blobConnectionString, name: name);
@@ -96,11 +69,6 @@ public static class HealtCheckExtensions
         return services;
     }
 
-    private static bool SqlServerHealthCheckIsAdded(IServiceCollection services)
-    {
-        return services.Any(service => service.ServiceType == typeof(SqlHealthCheckIsAdded));
-    }
-
     private static bool QueueHealthCheckIsAdded(IServiceCollection services, string name)
     {
         return services.Any(
@@ -108,10 +76,6 @@ public static class HealtCheckExtensions
                 service.ServiceType == typeof(ServiceBusQueueHealthCheckIsAdded)
                 && service.ImplementationInstance is ServiceBusQueueHealthCheckIsAdded
                 && ((ServiceBusQueueHealthCheckIsAdded)service.ImplementationInstance).Name == name);
-    }
-
-    private sealed class SqlHealthCheckIsAdded
-    {
     }
 
     private sealed record ServiceBusQueueHealthCheckIsAdded(string Name);

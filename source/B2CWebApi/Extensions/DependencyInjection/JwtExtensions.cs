@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
-using Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
+using Energinet.DataHub.EDI.B2CWebApi.Extensions.Options;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;

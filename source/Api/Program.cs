@@ -12,41 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.using System;
 
-using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 using BuildingBlocks.Application.Configuration.Logging;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.Api.Authentication;
-using Energinet.DataHub.EDI.Api.Authentication.Certificate;
-using Energinet.DataHub.EDI.Api.Configuration.Authentication;
+using Energinet.DataHub.EDI.Api.Configuration;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
-using Energinet.DataHub.EDI.Api.DataRetention;
 using Energinet.DataHub.EDI.Api.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
-using Energinet.DataHub.EDI.Common.DateTime;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Configuration;
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
-using MediatR;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Protocols;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Energinet.DataHub.EDI.Api
@@ -56,7 +46,8 @@ namespace Energinet.DataHub.EDI.Api
         public static async Task Main()
         {
             var runtime = RuntimeEnvironment.Default;
-            var tokenValidationParameters = await GetTokenValidationParametersAsync(runtime).ConfigureAwait(false);
+            var tokenValidationParameters =
+                await TokenConfiguration.GetTokenValidationParametersAsync(runtime).ConfigureAwait(false);
             var config = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
                 .Build();
@@ -90,49 +81,42 @@ namespace Energinet.DataHub.EDI.Api
                 {
                     worker.UseMiddleware<UnHandledExceptionMiddleware>();
                     worker.UseMiddleware<CorrelationIdMiddleware>();
-                    ConfigureAuthenticationMiddleware(worker);
+                    worker.UseMiddleware<MarketActorAuthenticatorMiddleware>();
                 },
                     option =>
                 {
                     option.EnableUserCodeException = true;
                 })
-                .ConfigureServices(services =>
-                {
-                    services.AddApplicationInsights()
-                        .ConfigureFunctionsApplicationInsights()
-                        .AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>()
-                        .AddB2BAuthentication(tokenValidationParameters);
+                .ConfigureServices(
+                    (context, services) =>
+                    {
+                        services
+                            .AddApplicationInsights()
+                            .ConfigureFunctionsApplicationInsights()
+                            .AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>()
+                            .AddDataRetention()
+                            .AddCorrelation(context.Configuration)
+                            .AddLiveHealthCheck()
+                            .TryAddExternalDomainServiceBusQueuesHealthCheck(
+                                runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
+                                runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!,
+                                runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!)
+                            .TryAddSqlServerHealthCheck(context.Configuration)
+                            .AddB2BAuthentication(tokenValidationParameters)
+                            .AddSystemTimer()
+                            .AddSerializer()
+                            .AddLogging();
+                        services.AddBlobStorageHealthCheck("edi-web-jobs-storage", runtime.AzureWebJobsStorage!);
+                        services.AddBlobStorageHealthCheck("edi-documents-storage", runtime.AZURE_STORAGE_ACCOUNT_URL!);
 
-                    CompositionRoot.Initialize(services)
-                        .AddSystemClock(new SystemDateTimeProvider());
-
-                    services.AddScoped(_ => new JwtTokenParser(tokenValidationParameters));
-                    services.AddDataRetention();
-                    services.AddScoped<ICorrelationContext>(
-                        _ =>
-                        {
-                            var correlationContext = new CorrelationContext();
-                            if (!runtime.IsRunningLocally()) return correlationContext;
-                            correlationContext.SetId(Guid.NewGuid().ToString());
-
-                            return correlationContext;
-                        });
-                    services.AddLiveHealthCheck()
-                        .AddExternalDomainServiceBusQueuesHealthCheck(
-                            runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
-                            runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!,
-                            runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!)
-                        .AddSqlServerHealthCheck(configuration);
-                    services.AddBlobStorageHealthCheck("edi-web-jobs-storage", runtime.AzureWebJobsStorage!);
-                    services.AddBlobStorageHealthCheck("edi-documents-storage", runtime.AZURE_STORAGE_ACCOUNT_URL!);
-
-                    services.AddIntegrationEventModule()
-                        .AddArchivedMessagesModule(configuration)
-                        .AddIncomingMessagesModule(configuration)
-                        .AddOutgoingMessagesModule(configuration)
-                        .AddProcessModule(configuration)
-                        .AddMasterDataModule(configuration)
-                        .AddDataAccessModule(configuration);
+                        services
+                            .AddIntegrationEventModule()
+                            .AddArchivedMessagesModule(context.Configuration)
+                            .AddIncomingMessagesModule(context.Configuration)
+                            .AddOutgoingMessagesModule(context.Configuration)
+                            .AddProcessModule(context.Configuration)
+                            .AddMasterDataModule(context.Configuration)
+                            .AddDataAccessUnitOfWorkModule(context.Configuration);
                 })
                 .ConfigureLogging(logging =>
                 {
@@ -147,53 +131,6 @@ namespace Energinet.DataHub.EDI.Api
                     });
                 })
                 .Build();
-        }
-
-        public static IServiceCollection AddB2BAuthentication(this IServiceCollection services, TokenValidationParameters tokenValidationParameters)
-        {
-            services.AddScoped(sp => new JwtTokenParser(tokenValidationParameters))
-                .AddTransient<IClientCertificateRetriever, HeaderClientCertificateRetriever>()
-                .AddTransient<IAuthenticationMethod, BearerTokenAuthenticationMethod>()
-                .AddTransient<IAuthenticationMethod, CertificateAuthenticationMethod>();
-
-            services.AddScoped<IMarketActorAuthenticator>(sp =>
-                new MarketActorAuthenticator(
-                sp.GetRequiredService<IMasterDataClient>(),
-                sp.GetRequiredService<AuthenticatedActor>(),
-                sp.GetRequiredService<ILogger<MarketActorAuthenticator>>()));
-
-            return services;
-        }
-
-        private static void ConfigureAuthenticationMiddleware(IFunctionsWorkerApplicationBuilder worker)
-        {
-            worker.UseMiddleware<MarketActorAuthenticatorMiddleware>();
-        }
-
-        private static void AddDataRetention(this IServiceCollection services)
-        {
-            services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>();
-        }
-
-        private static async Task<TokenValidationParameters> GetTokenValidationParametersAsync(RuntimeEnvironment runtime)
-        {
-            var tenantId = Environment.GetEnvironmentVariable("B2C_TENANT_ID") ?? throw new InvalidOperationException("B2C tenant id not found.");
-            var audience = Environment.GetEnvironmentVariable("BACKEND_SERVICE_APP_ID") ?? throw new InvalidOperationException("Backend service app id not found.");
-            var metaDataAddress = $"https://login.microsoftonline.com/{tenantId}/v2.0/.well-known/openid-configuration";
-            var openIdConfigurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(metaDataAddress, new OpenIdConnectConfigurationRetriever());
-            var stsConfig = await openIdConfigurationManager.GetConfigurationAsync().ConfigureAwait(false);
-            return new TokenValidationParameters
-            {
-                ValidateAudience = true,
-                ValidateIssuer = true,
-                ValidateIssuerSigningKey = true,
-                ValidateLifetime = true,
-                RequireSignedTokens = true,
-                ClockSkew = TimeSpan.Zero,
-                ValidAudience = audience,
-                IssuerSigningKeys = stsConfig.SigningKeys,
-                ValidIssuer = stsConfig.Issuer,
-            };
         }
     }
 }
