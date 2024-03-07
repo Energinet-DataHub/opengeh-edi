@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories;

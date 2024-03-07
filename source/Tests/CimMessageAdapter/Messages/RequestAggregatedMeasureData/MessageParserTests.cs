@@ -22,7 +22,7 @@ using System.Xml.Linq;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;

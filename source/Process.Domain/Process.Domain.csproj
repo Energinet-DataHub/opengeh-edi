@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MediatR.Contracts" Version="2.0.1"/>
     <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.1.2" />
   </ItemGroup>
 

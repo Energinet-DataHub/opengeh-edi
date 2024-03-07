@@ -6,6 +6,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ArchivedMessages.Interfaces\ArchivedMessages.Interfaces.csproj" />
     <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\DataAccess\DataAccess.csproj"/>
     <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
     <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj" />
   </ItemGroup>

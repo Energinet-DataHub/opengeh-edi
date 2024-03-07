@@ -22,7 +22,6 @@ public static class BuildingBlockExtensions
     public static IServiceCollection AddBuildingBlocks(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddServiceBus(configuration)
-            .AddDatabase(configuration)
             .AddFileStorage(configuration)
             .AddFeatureFlags();
         return services;
