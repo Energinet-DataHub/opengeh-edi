@@ -524,6 +524,7 @@ resharper_csharp_wrap_arguments_style = chop_if_long
 resharper_csharp_wrap_parameters_style = chop_if_long
 resharper_trailing_comma_in_multiline_lists = true
 resharper_wrap_chained_method_calls = chop_if_long
+resharper_csharp_wrap_before_binary_opsign = true
 
 ##############################################################
 # C# Test Conventions                                        #
