@@ -163,7 +163,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
         public void All_dependencies_can_be_resolved_in_b2c_app()
         {
 #pragma warning disable CA2000
-            using var application = new WebApplicationFactory<global::Program>()
+            using var application = new WebApplicationFactory<global::Energinet.DataHub.EDI.B2CWebApi.Program>()
 #pragma warning restore CA2000
                 .WithWebHostBuilder(
                     webBuilder =>

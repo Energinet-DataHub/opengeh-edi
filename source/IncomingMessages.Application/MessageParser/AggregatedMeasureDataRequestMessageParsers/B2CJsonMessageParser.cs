@@ -16,7 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers;
@@ -42,7 +42,9 @@ public class B2CJsonMessageParser : IMessageParser
     {
         ArgumentNullException.ThrowIfNull(incomingMessageStream);
 
-        var requestAggregatedMeasureData = await _serializer.DeserializeAsync<RequestAggregatedMeasureDataMessage>(incomingMessageStream.Stream, cancellationToken).ConfigureAwait(false);
+        var requestAggregatedMeasureData = await _serializer
+            .DeserializeAsync<RequestAggregatedMeasureDataMessage>(incomingMessageStream.Stream, cancellationToken)
+            .ConfigureAwait(false);
         return new IncomingMarketMessageParserResult(requestAggregatedMeasureData);
     }
 }

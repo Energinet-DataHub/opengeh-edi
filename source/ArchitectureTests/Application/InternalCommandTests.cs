@@ -19,6 +19,7 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers;
+using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.ArchitectureTests.Application;
