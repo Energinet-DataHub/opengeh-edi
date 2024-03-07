@@ -14,7 +14,7 @@
 
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Microsoft.Extensions.Options;
 using ServiceBusClientOptions = Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options.ServiceBusClientOptions;

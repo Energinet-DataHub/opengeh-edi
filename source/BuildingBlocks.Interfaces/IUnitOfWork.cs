@@ -14,16 +14,15 @@
 
 using System.Threading.Tasks;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure
+namespace Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+
+/// <summary>
+/// Unit of work
+/// </summary>
+public interface IUnitOfWork
 {
     /// <summary>
-    /// Unit of work
+    /// Commits all changes made to the database in the current transaction asynchronously.
     /// </summary>
-    public interface IUnitOfWork
-    {
-        /// <summary>
-        /// Commits all changes made to the database in the current transaction asynchronously.
-        /// </summary>
-        Task CommitTransactionAsync();
-    }
+    Task CommitTransactionAsync();
 }

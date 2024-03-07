@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
+namespace Energinet.DataHub.EDI.B2CWebApi.Extensions.Options;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1707", Justification = "To match naming in other domains")]
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1056", Justification = "Nuget expects a string")]

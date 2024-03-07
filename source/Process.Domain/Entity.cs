@@ -13,9 +13,8 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using Energinet.DataHub.EDI.Process.Domain;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain
+namespace Energinet.DataHub.EDI.Process.Domain
 {
     public abstract class Entity
     {

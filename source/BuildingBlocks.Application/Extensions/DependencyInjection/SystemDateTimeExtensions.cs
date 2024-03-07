@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DateTime;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BuildingBlocks.Application.Extensions.DependencyInjection;

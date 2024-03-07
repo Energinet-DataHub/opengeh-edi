@@ -14,7 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DateTime;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -27,13 +27,13 @@ public class MessageEnqueuer
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-    private readonly ILogger<MessageDequeuer> _logger;
+    private readonly ILogger<MessageEnqueuer> _logger;
 
     public MessageEnqueuer(
         IActorMessageQueueRepository actorMessageQueueRepository,
         IOutgoingMessageRepository outgoingMessageRepository,
         ISystemDateTimeProvider systemDateTimeProvider,
-        ILogger<MessageDequeuer> logger)
+        ILogger<MessageEnqueuer> logger)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _outgoingMessageRepository = outgoingMessageRepository;

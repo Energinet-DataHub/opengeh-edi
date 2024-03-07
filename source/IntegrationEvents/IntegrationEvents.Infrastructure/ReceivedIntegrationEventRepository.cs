@@ -16,7 +16,7 @@ using System;
 using System.Data;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DateTime;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.Data.SqlClient;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure;

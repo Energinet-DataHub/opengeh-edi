@@ -89,6 +89,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\Da
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess.UnitOfWork", "DataAccess.UnitOfWork\DataAccess.UnitOfWork.csproj", "{E8758610-EA43-4B5C-B020-B073EAEE15C5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingBlocks.Interfaces", "BuildingBlocks.Interfaces\BuildingBlocks.Interfaces.csproj", "{70F9A75A-29B5-48CF-9B8C-90CDAD0BFC42}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -227,6 +229,10 @@ Global
 		{E8758610-EA43-4B5C-B020-B073EAEE15C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E8758610-EA43-4B5C-B020-B073EAEE15C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E8758610-EA43-4B5C-B020-B073EAEE15C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70F9A75A-29B5-48CF-9B8C-90CDAD0BFC42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70F9A75A-29B5-48CF-9B8C-90CDAD0BFC42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70F9A75A-29B5-48CF-9B8C-90CDAD0BFC42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70F9A75A-29B5-48CF-9B8C-90CDAD0BFC42}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -264,6 +270,7 @@ Global
 		{6C724147-25FB-40C6-9588-8D70BF743215} = {43960FA1-298B-474F-BA83-C317C4FD76E3}
 		{A24ADE32-4199-4F73-B793-780BC944E21A} = {1C6AE199-73AE-4355-B745-10EC6CE7BD85}
 		{E8758610-EA43-4B5C-B020-B073EAEE15C5} = {1C6AE199-73AE-4355-B745-10EC6CE7BD85}
+		{70F9A75A-29B5-48CF-9B8C-90CDAD0BFC42} = {F85C2695-FAD5-43E0-8518-087CCFD74836}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D7925810-FA85-4F9E-A124-72F36BAEB9F0}

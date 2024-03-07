@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using BuildingBlocks.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices;

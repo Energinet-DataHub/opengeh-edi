@@ -18,6 +18,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization.Converters;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using NodaTime.Serialization.SystemTextJson;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization

@@ -14,7 +14,7 @@
 
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DateTime
+namespace Energinet.DataHub.EDI.BuildingBlocks.Interfaces
 {
     /// <summary>
     /// System time provider

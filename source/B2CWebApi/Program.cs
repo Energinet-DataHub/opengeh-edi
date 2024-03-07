@@ -87,6 +87,9 @@ app.MapReadyHealthChecks();
 app.Run();
 
 // This is needed in order to test the dependency injection
-public partial class Program
+namespace Energinet.DataHub.EDI.B2CWebApi
 {
+    public partial class Program
+    {
+    }
 }

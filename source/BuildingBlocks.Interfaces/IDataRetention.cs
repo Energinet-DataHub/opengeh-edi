@@ -15,7 +15,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 
 /// <summary>
 /// Represent the contract for data retention for a single data source.
