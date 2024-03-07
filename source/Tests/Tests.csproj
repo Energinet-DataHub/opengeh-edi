@@ -99,6 +99,18 @@ limitations under the License.
       <None Remove="CimMessageAdapter\Messages\xml\RequestChangeAccountingPointCharacteristics.xml" />
       <None Remove="CimMessageAdapter\Messages\xml\RequestChangeCustomerCharacteristics.xml" />
       <None Remove="CimMessageAdapter\Messages\json\AggregatedMeasure\Request Aggregated Measure Data.json" />
+      <None Remove="CimMessageAdapter\Messages\json\WholesaleSettlement\RequestWholesaleSettlement.json" />
+      <EmbeddedResource Include="CimMessageAdapter\Messages\json\WholesaleSettlement\RequestWholesaleSettlement.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="CimMessageAdapter\Messages\json\WholesaleSettlement\InvalidRequestWholesaleSettlement.json" />
+      <EmbeddedResource Include="CimMessageAdapter\Messages\json\WholesaleSettlement\InvalidJsonRequestWholesaleSettlement.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="CimMessageAdapter\Messages\json\WholesaleSettlement\FailRequestWholesaleSettlement.json" />
+      <EmbeddedResource Include="CimMessageAdapter\Messages\json\WholesaleSettlement\FailSchemeValidationRequestWholesaleSettlement.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>
