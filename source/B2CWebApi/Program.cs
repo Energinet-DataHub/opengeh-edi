@@ -21,7 +21,6 @@ using Energinet.DataHub.Core.Logging.LoggingMiddleware;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Microsoft.ApplicationInsights.Extensibility;
 
@@ -40,11 +39,9 @@ builder.Services
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services
-    .AddHttpContextAccessor()
     .AddSystemTimer()
     .AddHttpLoggingScope(domainName)
     .AddSerializer()
-    .AddScoped<AuthenticatedActor>()
     .AddIncomingMessagesModule(builder.Configuration)
     .AddArchivedMessagesModule(builder.Configuration)
     .AddJwtTokenSecurity(builder.Configuration)
