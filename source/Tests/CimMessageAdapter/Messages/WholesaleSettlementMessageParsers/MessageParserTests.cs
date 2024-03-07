@@ -77,7 +77,7 @@ public class MessageParserTests
         using var assertionScope = new AssertionScope();
         Assert.True(result.Success);
         var marketMessage = (WholesaleSettlementMessage)result!.IncomingMessage!;
-        Assert.True(marketMessage != null);
+        Assert.NotNull(marketMessage);
         Assert.Equal("12345678", marketMessage.MessageId);
         Assert.Equal("D05", marketMessage.BusinessReason);
         Assert.Equal("5799999933318", marketMessage.SenderNumber);
@@ -113,7 +113,7 @@ public class MessageParserTests
     {
         var result = await _marketMessageParser.ParseAsync(new IncomingMessageStream(message), format, IncomingDocumentType.RequestWholesaleSettlement, CancellationToken.None);
 
-        Assert.True(result.Errors.Count > 0);
+        Assert.NotEmpty(result.Errors);
         Assert.True(result.Success == false);
         Assert.True(expectedError != null);
         Assert.Contains(result.Errors, error => error.GetType().Name == expectedError);
