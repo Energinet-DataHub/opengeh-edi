@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.Api.Extensions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.IncomingMessages;

@@ -12,16 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.BaseParsers;
+using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.BaseParsers;
+using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
-using Energinet.DataHub.EDI.Process.Interfaces;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers;
 
 public class JsonMessageParser : JsonParserBase, IMessageParser
 {
@@ -38,7 +41,7 @@ public class JsonMessageParser : JsonParserBase, IMessageParser
 
     public IncomingDocumentType DocumentType => IncomingDocumentType.RequestAggregatedMeasureData;
 
-    public async Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(
+    public async Task<IncomingMarketMessageParserResult> ParseAsync(
         IIncomingMessageStream incomingMessageStream,
         CancellationToken cancellationToken)
     {
@@ -47,7 +50,7 @@ public class JsonMessageParser : JsonParserBase, IMessageParser
         var schema = await GetSchemaAsync(DocumentName, cancellationToken).ConfigureAwait(false);
         if (schema is null)
         {
-            return new RequestAggregatedMeasureDataMarketMessageParserResult(
+            return new IncomingMarketMessageParserResult(
                 new InvalidBusinessReasonOrVersion(DocumentName, "0"));
         }
 
@@ -57,7 +60,7 @@ public class JsonMessageParser : JsonParserBase, IMessageParser
 
             if (errors.Count > 0)
             {
-                return new RequestAggregatedMeasureDataMarketMessageParserResult(errors.ToArray());
+                return new IncomingMarketMessageParserResult(errors.ToArray());
             }
 
             using var document = await JsonDocument.ParseAsync(incomingMessageStream.Stream, cancellationToken: cancellationToken)
@@ -101,7 +104,7 @@ public class JsonMessageParser : JsonParserBase, IMessageParser
         return element.TryGetProperty(propertyName, out var property) ? property.GetProperty("value").ToString() : null;
     }
 
-    private static RequestAggregatedMeasureDataMarketMessageParserResult ParseJsonData(
+    private static IncomingMarketMessageParserResult ParseJsonData(
         MessageHeader header,
         JsonElement seriesJson)
     {
@@ -112,7 +115,7 @@ public class JsonMessageParser : JsonParserBase, IMessageParser
             series.Add(SeriesFrom(jsonElement));
         }
 
-        return new RequestAggregatedMeasureDataMarketMessageParserResult(
-            RequestAggregatedMeasureDataMarketMessageFactory.Create(header, series.AsReadOnly()));
+        return new IncomingMarketMessageParserResult(
+            RequestAggregatedMeasureDataMessageFactory.Create(header, series.AsReadOnly()));
     }
 }

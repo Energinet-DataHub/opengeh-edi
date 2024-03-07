@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.Process.Interfaces;
+using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers;
 
 public class B2CJsonMessageParser : IMessageParser
 {
@@ -35,13 +36,13 @@ public class B2CJsonMessageParser : IMessageParser
 
     public IncomingDocumentType DocumentType => IncomingDocumentType.B2CRequestAggregatedMeasureData;
 
-    public async Task<RequestAggregatedMeasureDataMarketMessageParserResult> ParseAsync(
+    public async Task<IncomingMarketMessageParserResult> ParseAsync(
         IIncomingMessageStream incomingMessageStream,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(incomingMessageStream);
 
-        var requestAggregatedMeasureData = await _serializer.DeserializeAsync<RequestAggregatedMeasureDataDto>(incomingMessageStream.Stream, cancellationToken).ConfigureAwait(false);
-        return new RequestAggregatedMeasureDataMarketMessageParserResult(requestAggregatedMeasureData);
+        var requestAggregatedMeasureData = await _serializer.DeserializeAsync<RequestAggregatedMeasureDataMessage>(incomingMessageStream.Stream, cancellationToken).ConfigureAwait(false);
+        return new IncomingMarketMessageParserResult(requestAggregatedMeasureData);
     }
 }

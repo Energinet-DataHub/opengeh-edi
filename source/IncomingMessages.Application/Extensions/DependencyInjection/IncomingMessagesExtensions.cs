@@ -13,6 +13,9 @@
 // limitations under the License.
 
 using BuildingBlocks.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
+using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers;
+using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
@@ -21,7 +24,6 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -57,13 +59,13 @@ public static class IncomingMessagesExtensions
             .AddScoped<IMessageParser, JsonMessageParser>()
             .AddScoped<IMessageParser, B2CJsonMessageParser>()
             .AddScoped<MarketMessageParser>()
-            .AddTransient<SenderAuthorizer>()
-            .AddTransient<IncomingRequestAggregatedMeasuredDataSender>()
-            .AddTransient<RequestAggregatedMeasureDataValidator>()
-            .AddScoped<ProcessTypeValidator>()
-            .AddScoped<MessageTypeValidator>()
-            .AddScoped<BusinessTypeValidator>()
-            .AddScoped<CalculationResponsibleReceiverVerification>()
+            .AddScoped<ISenderAuthorizer, SenderAuthorizer>()
+            .AddScoped<IncomingRequestAggregatedMeasuredDataSender>()
+            .AddScoped<RequestAggregatedMeasureDataMessageValidator>()
+            .AddSingleton<IProcessTypeValidator, ProcessTypeValidator>()
+            .AddSingleton<IMessageTypeValidator, MessageTypeValidator>()
+            .AddSingleton<IBusinessTypeValidator, BusinessTypeValidator>()
+            .AddSingleton<IReceiverValidator, CalculationResponsibleReceiverValidator>()
             .AddScoped<IRequestAggregatedMeasureDataReceiver, RequestAggregatedMeasureDataReceiver>()
             .AddSingleton<IResponseFactory, JsonResponseFactory>()
             .AddSingleton<IResponseFactory, XmlResponseFactory>()
