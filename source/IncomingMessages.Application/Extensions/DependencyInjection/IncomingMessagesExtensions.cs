@@ -27,6 +27,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using WholesaleSettlementMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.WholesaleSettlementMessageParsers.JsonMessageParser;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 
@@ -57,6 +58,7 @@ public static class IncomingMessagesExtensions
             .AddScoped<IMessageParser, XmlMessageParser>()
             .AddScoped<IMessageParser, JsonMessageParser>()
             .AddScoped<IMessageParser, B2CJsonMessageParser>()
+            .AddScoped<IMessageParser, WholesaleSettlementMessageParser>()
             .AddScoped<MarketMessageParser>()
             .AddScoped<ISenderAuthorizer, SenderAuthorizer>()
             .AddScoped<IncomingRequestAggregatedMeasuredDataSender>()
