@@ -15,14 +15,15 @@
 using System;
 using System.Collections.ObjectModel;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.Factories;
 
 public static class RequestAggregatedMeasureDataMessageFactory
 {
     public static RequestAggregatedMeasureDataMessage Create(
         MessageHeader header,
-        ReadOnlyCollection<Serie> series)
+        ReadOnlyCollection<RequestAggregatedMeasureDataSerie> series)
     {
         ArgumentNullException.ThrowIfNull(header);
         ArgumentNullException.ThrowIfNull(series);

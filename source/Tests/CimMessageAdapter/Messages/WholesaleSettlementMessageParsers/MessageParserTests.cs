@@ -15,13 +15,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.WholesaleSettlementMessageParsers;
-using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
@@ -76,7 +77,7 @@ public class MessageParserTests
         var result = await _marketMessageParser.ParseAsync(new IncomingMessageStream(message), format, IncomingDocumentType.RequestWholesaleSettlement, CancellationToken.None);
         using var assertionScope = new AssertionScope();
         Assert.True(result.Success);
-        var marketMessage = (WholesaleSettlementMessage)result!.IncomingMessage!;
+        var marketMessage = (RequestWholesaleSettlementMessage)result!.IncomingMessage!;
         Assert.NotNull(marketMessage);
         Assert.Equal("12345678", marketMessage.MessageId);
         Assert.Equal("D05", marketMessage.BusinessReason);
@@ -87,10 +88,10 @@ public class MessageParserTests
         Assert.Equal("2022-12-17T09:30:47Z", marketMessage.CreatedAt);
         Assert.Equal("23", marketMessage.BusinessType);
 
-        foreach (var serie in marketMessage.Series)
+        foreach (var serie in marketMessage.Serie.Cast<RequestWholesaleSettlementSerie>())
         {
-            Assert.True(serie != null);
-            Assert.Equal("25836143", serie.Id);
+            Assert.NotNull(serie);
+            Assert.Equal("25836143", serie.TransactionId);
             Assert.Equal("PT1M", serie.Resolution);
             Assert.Equal("570001110111", serie.ChargeOwner);
             Assert.Equal("5799999933318", serie.EnergySupplierMarketParticipantId);

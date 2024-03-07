@@ -20,10 +20,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.BaseParsers;
-using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
-using ChargeType = Energinet.DataHub.EDI.IncomingMessages.Application.Messages.ChargeType;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.WholesaleSettlementMessageParsers;
 
@@ -86,14 +85,14 @@ public class JsonMessageParser : JsonParserBase, IMessageParser
         MessageHeader header,
         JsonElement seriesJson)
     {
-        var series = new List<WholesaleSettlementSerie>();
+        var series = new List<RequestWholesaleSettlementSerie>();
 
         foreach (var jsonElement in seriesJson.EnumerateArray())
         {
             series.Add(SeriesFrom(jsonElement));
         }
 
-        return new IncomingMarketMessageParserResult(new WholesaleSettlementMessage(
+        return new IncomingMarketMessageParserResult(new RequestWholesaleSettlementMessage(
             header.SenderId,
             header.SenderRole,
             header.ReceiverId,
@@ -106,9 +105,9 @@ public class JsonMessageParser : JsonParserBase, IMessageParser
             series.AsReadOnly()));
     }
 
-    private static WholesaleSettlementSerie SeriesFrom(JsonElement element)
+    private static RequestWholesaleSettlementSerie SeriesFrom(JsonElement element)
     {
-        var chargeTypes = new List<ChargeType>();
+        var chargeTypes = new List<RequestWholesaleSettlementChargeType>();
         JsonElement? chargeTypeElements = element.TryGetProperty("ChargeType", out var chargeTypesElement)
             ? chargeTypesElement
             : null;
@@ -116,13 +115,13 @@ public class JsonMessageParser : JsonParserBase, IMessageParser
         {
             foreach (var chargeTypeElement in chargeTypeElements.Value.EnumerateArray())
             {
-                chargeTypes.Add(new ChargeType(
+                chargeTypes.Add(new RequestWholesaleSettlementChargeType(
                     chargeTypeElement.TryGetProperty("mRID", out var id) ? id.ToString() : null,
                     GetPropertyWithValue(chargeTypeElement, "type")));
             }
         }
 
-        return new WholesaleSettlementSerie(
+        return new RequestWholesaleSettlementSerie(
             element.GetProperty("mRID").ToString(),
             element.GetProperty("start_DateAndOrTime.dateTime").ToString(),
             element.TryGetProperty("end_DateAndOrTime.dateTime", out var endDateProperty) ? endDateProperty.ToString() : null,

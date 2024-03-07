@@ -15,6 +15,8 @@
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Factories;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Microsoft.Extensions.Options;
 using ServiceBusClientOptions = Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options.ServiceBusClientOptions;
@@ -39,15 +41,46 @@ public class IncomingRequestAggregatedMeasuredDataSender
     }
 
     public async Task SendAsync(
-        RequestAggregatedMeasureDataDto request,
+        IIncomingMessage incomingMessage,
         CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(request, nameof(request));
+        ArgumentNullException.ThrowIfNull(incomingMessage, nameof(incomingMessage));
+        switch (incomingMessage)
+        {
+            case RequestAggregatedMeasureDataMessage requestAggregatedMeasureDataMessage:
+                await SendRequestAggregatedMeasureDateAsync(RequestAggregatedMeasureDataDtoFactory.Create(requestAggregatedMeasureDataMessage), cancellationToken).ConfigureAwait(false);
+                break;
+            case RequestWholesaleSettlementMessage wholesaleSettlementMessage:
+                await SendRequestAggregatedMeasureDateAsync(RequestWholesaleServicesDtoFactory.Create(wholesaleSettlementMessage), cancellationToken).ConfigureAwait(false);
+                break;
+            default:
+                throw new InvalidOperationException($"Unknown message type {incomingMessage.GetType().Name}");
+        }
+    }
+
+    private async Task SendRequestAggregatedMeasureDateAsync(RequestAggregatedMeasureDataDto requestAggregatedMeasureDataDto, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(requestAggregatedMeasureDataDto);
+
         var serviceBusMessage =
             new ServiceBusMessage(
-                _serializer.Serialize(request))
+                _serializer.Serialize(requestAggregatedMeasureDataDto))
             {
                 Subject = nameof(RequestAggregatedMeasureDataDto),
+            };
+
+        await _senderCreator.SendAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task SendRequestAggregatedMeasureDateAsync(InitializeWholesaleServicesProcessDto initializeWholesaleServicesProcessDto, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(initializeWholesaleServicesProcessDto);
+
+        var serviceBusMessage =
+            new ServiceBusMessage(
+                _serializer.Serialize(initializeWholesaleServicesProcessDto))
+            {
+                Subject = nameof(InitializeWholesaleServicesProcessDto),
             };
 
         await _senderCreator.SendAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);

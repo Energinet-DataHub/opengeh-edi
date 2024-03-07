@@ -12,24 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.ObjectModel;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
-using Energinet.DataHub.EDI.Process.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 
-public class RequestAggregatedMeasureDataReceiver : IRequestAggregatedMeasureDataReceiver
+public class IncomingMessageReceiver : IIncomingMessageReceiver
 {
     private readonly IncomingRequestAggregatedMeasuredDataSender _incomingRequestAggregatedMeasuredDataSender;
     private readonly IncomingMessagesContext _incomingMessagesContext;
     private readonly IMessageIdRepository _messageIdRepository;
     private readonly ITransactionIdRepository _transactionIdRepository;
 
-    public RequestAggregatedMeasureDataReceiver(
+    public IncomingMessageReceiver(
         IncomingRequestAggregatedMeasuredDataSender incomingRequestAggregatedMeasuredDataSender,
         IncomingMessagesContext incomingMessagesContext,
         IMessageIdRepository messageIdRepository,
@@ -41,13 +42,15 @@ public class RequestAggregatedMeasureDataReceiver : IRequestAggregatedMeasureDat
         _transactionIdRepository = transactionIdRepository;
     }
 
-    public async Task<Result> ReceiveAsync(
-        RequestAggregatedMeasureDataDto requestAggregatedMeasureDataDto,
-        CancellationToken cancellationToken)
+    public async Task<Result> ReceiveAsync(IIncomingMessage incomingMessage, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(requestAggregatedMeasureDataDto);
+        ArgumentNullException.ThrowIfNull(incomingMessage);
 
-        await AddMessageIdAndTransactionIdAsync(requestAggregatedMeasureDataDto, cancellationToken)
+        await AddMessageIdAndTransactionIdAsync(
+                incomingMessage.SenderNumber,
+                incomingMessage.MessageId,
+                incomingMessage.Serie.Select(x => x.TransactionId).ToList().AsReadOnly(),
+                cancellationToken)
             .ConfigureAwait(false);
 
         try
@@ -55,7 +58,7 @@ public class RequestAggregatedMeasureDataReceiver : IRequestAggregatedMeasureDat
             await ResilientTransaction.New(_incomingMessagesContext, async () =>
                 {
                     await _incomingRequestAggregatedMeasuredDataSender.SendAsync(
-                            requestAggregatedMeasureDataDto,
+                            incomingMessage,
                             cancellationToken)
                         .ConfigureAwait(false);
                 })
@@ -74,23 +77,25 @@ public class RequestAggregatedMeasureDataReceiver : IRequestAggregatedMeasureDat
                                                "Violation of PRIMARY KEY constraint 'PK_MessageRegistry_MessageIdAndSenderId'",
                                                StringComparison.OrdinalIgnoreCase))
         {
-            return Result.Failure(new DuplicateMessageIdDetected(requestAggregatedMeasureDataDto.MessageId));
+            return Result.Failure(new DuplicateMessageIdDetected(incomingMessage.MessageId));
         }
 
         return Result.Succeeded();
     }
 
     private async Task AddMessageIdAndTransactionIdAsync(
-        RequestAggregatedMeasureDataDto requestAggregatedMeasureDataDto,
+        string senderNumber,
+        string messageId,
+        ReadOnlyCollection<string> transactionIds,
         CancellationToken cancellationToken)
     {
         await _transactionIdRepository.AddAsync(
-            requestAggregatedMeasureDataDto.SenderNumber,
-            requestAggregatedMeasureDataDto.Series.Select(x => x.Id).ToList(),
+            senderNumber,
+            transactionIds,
             cancellationToken).ConfigureAwait(false);
         await _messageIdRepository.AddAsync(
-                requestAggregatedMeasureDataDto.SenderNumber,
-                requestAggregatedMeasureDataDto.MessageId,
+                senderNumber,
+                messageId,
                 cancellationToken)
             .ConfigureAwait(false);
     }

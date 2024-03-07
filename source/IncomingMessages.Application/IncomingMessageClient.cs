@@ -20,8 +20,8 @@ using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
-using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
@@ -39,7 +39,7 @@ public class IncomingMessageClient : IIncomingMessageClient
     private readonly ResponseFactory _responseFactory;
     private readonly IArchivedMessagesClient _archivedMessagesClient;
     private readonly ILogger<IncomingMessageClient> _logger;
-    private readonly IRequestAggregatedMeasureDataReceiver _requestAggregatedMeasureDataReceiver;
+    private readonly IIncomingMessageReceiver _incomingMessageReceiver;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
     public IncomingMessageClient(
@@ -48,7 +48,7 @@ public class IncomingMessageClient : IIncomingMessageClient
         ResponseFactory responseFactory,
         IArchivedMessagesClient archivedMessagesClient,
         ILogger<IncomingMessageClient> logger,
-        IRequestAggregatedMeasureDataReceiver requestAggregatedMeasureDataReceiver,
+        IIncomingMessageReceiver incomingMessageReceiver,
         ISystemDateTimeProvider systemDateTimeProvider)
     {
         _marketMessageParser = marketMessageParser;
@@ -56,7 +56,7 @@ public class IncomingMessageClient : IIncomingMessageClient
         _responseFactory = responseFactory;
         _archivedMessagesClient = archivedMessagesClient;
         _logger = logger;
-        _requestAggregatedMeasureDataReceiver = requestAggregatedMeasureDataReceiver;
+        _incomingMessageReceiver = incomingMessageReceiver;
         _systemDateTimeProvider = systemDateTimeProvider;
     }
 
@@ -109,12 +109,11 @@ public class IncomingMessageClient : IIncomingMessageClient
             return _responseFactory.From(validationResult, responseFormat ?? documentFormat);
         }
 
-        var result = documentType == IncomingDocumentType.RequestWholesaleSettlement
-            ? Result.Failure()
-            : await ReceiveRequestAggregatedMeasureDataMessageAsync(
-                    incomingMarketMessageParserResult,
+        var result = await _incomingMessageReceiver
+            .ReceiveAsync(
+                    incomingMarketMessageParserResult.IncomingMessage,
                     cancellationToken)
-                .ConfigureAwait(false);
+            .ConfigureAwait(false);
 
         if (result.Success)
         {
@@ -126,44 +125,6 @@ public class IncomingMessageClient : IIncomingMessageClient
             incomingMarketMessageParserResult.IncomingMessage!.MessageId,
             incomingMarketMessageParserResult.Errors);
         return _responseFactory.From(result, responseFormat ?? documentFormat);
-    }
-
-    private async Task<Result> ReceiveRequestAggregatedMeasureDataMessageAsync(
-        IncomingMarketMessageParserResult incomingMarketMessageParserResult,
-        CancellationToken cancellationToken)
-    {
-        var aggregatedMeasureDataRequestMessage =
-            incomingMarketMessageParserResult.IncomingMessage as RequestAggregatedMeasureDataMessage ??
-            throw new InvalidOperationException();
-        var series = aggregatedMeasureDataRequestMessage.Series
-            .Select(
-                serie => new Serie(
-                    serie.Id,
-                    serie.MarketEvaluationPointType,
-                    serie.MarketEvaluationSettlementMethod,
-                    serie.StartDateAndOrTimeDateTime,
-                    serie.EndDateAndOrTimeDateTime,
-                    serie.MeteringGridAreaDomainId,
-                    serie.EnergySupplierMarketParticipantId,
-                    serie.BalanceResponsiblePartyMarketParticipantId,
-                    serie.SettlementSeriesVersion))
-            .ToList()
-            .AsReadOnly();
-
-        return await _requestAggregatedMeasureDataReceiver.ReceiveAsync(
-                new RequestAggregatedMeasureDataDto(
-                    aggregatedMeasureDataRequestMessage.SenderNumber,
-                    aggregatedMeasureDataRequestMessage.SenderRoleCode,
-                    aggregatedMeasureDataRequestMessage.ReceiverNumber,
-                    aggregatedMeasureDataRequestMessage.ReceiverRoleCode,
-                    aggregatedMeasureDataRequestMessage.BusinessReason,
-                    aggregatedMeasureDataRequestMessage.MessageType,
-                    aggregatedMeasureDataRequestMessage.MessageId,
-                    aggregatedMeasureDataRequestMessage.CreatedAt,
-                    aggregatedMeasureDataRequestMessage.BusinessType,
-                    series),
-                cancellationToken)
-            .ConfigureAwait(false);
     }
 
     private async Task ArchiveIncomingMessageAsync(

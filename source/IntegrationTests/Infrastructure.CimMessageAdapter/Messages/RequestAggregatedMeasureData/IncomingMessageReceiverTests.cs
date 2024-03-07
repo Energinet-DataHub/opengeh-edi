@@ -23,8 +23,8 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
-using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
@@ -35,17 +35,18 @@ using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureDa
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Xunit;
+using RequestAggregatedMeasureDataDto = Energinet.DataHub.EDI.Process.Interfaces.RequestAggregatedMeasureDataDto;
 using Serie = Energinet.DataHub.EDI.Process.Interfaces.Serie;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
-public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetime
+public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
 {
     private readonly MarketMessageParser _marketMessageParser;
     private readonly ProcessContext _processContext;
     private readonly RequestAggregatedMeasureDataMessageValidator _requestAggregatedMeasureDataMessageValidator;
 
-    public RequestAggregatedMeasureDataReceiverTests(IntegrationTestFixture integrationTestFixture)
+    public IncomingMessageReceiverTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
     {
         _marketMessageParser = GetService<MarketMessageParser>();
@@ -513,10 +514,11 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var authenticatedActor = GetService<AuthenticatedActor>();
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create(knownSenderId), restriction: Restriction.None,  ActorRole.FromCode(knownSenderRole)));
 
-        var series = message.Series
+        var series = message.Serie
+            .Cast<RequestAggregatedMeasureDataSerie>()
             .Select(
                 serie => new Serie(
-                    serie.Id,
+                    serie.TransactionId,
                     serie.MarketEvaluationPointType,
                     serie.MarketEvaluationSettlementMethod,
                     serie.StartDateAndOrTimeDateTime,

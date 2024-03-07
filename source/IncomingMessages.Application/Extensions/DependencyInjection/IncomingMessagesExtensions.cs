@@ -71,7 +71,7 @@ public static class IncomingMessagesExtensions
             .AddSingleton<IMessageTypeValidator, MessageTypeValidator>()
             .AddSingleton<IBusinessTypeValidator, BusinessTypeValidator>()
             .AddSingleton<IReceiverValidator, CalculationResponsibleReceiverValidator>()
-            .AddScoped<IRequestAggregatedMeasureDataReceiver, RequestAggregatedMeasureDataReceiver>()
+            .AddScoped<IIncomingMessageReceiver, IncomingMessageReceiver>()
             .AddSingleton<IResponseFactory, JsonResponseFactory>()
             .AddSingleton<IResponseFactory, XmlResponseFactory>()
             .AddSingleton<ResponseFactory>();

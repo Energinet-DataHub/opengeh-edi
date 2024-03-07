@@ -12,30 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
-using System.Threading.Tasks;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 
 /// <summary>
-/// Parses CIM messages from a stream
+/// Responsible for receiving a incoming message.
 /// </summary>
-public interface IMessageParser
+public interface IIncomingMessageReceiver
 {
     /// <summary>
-    /// The CIM format handled
+    /// Responsible for receiving the incoming message.
     /// </summary>
-    DocumentFormat HandledFormat { get; }
-
-    /// <summary>
-    /// The CIM document type handled
-    /// </summary>
-    IncomingDocumentType DocumentType { get; }
-
-    /// <summary>
-    /// Parse from stream
-    /// </summary>
-    Task<IncomingMarketMessageParserResult> ParseAsync(
-        IIncomingMessageStream incomingMessageStream, CancellationToken cancellationToken);
+    Task<Result> ReceiveAsync(
+        IIncomingMessage incomingMessage,
+        CancellationToken cancellationToken);
 }

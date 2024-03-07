@@ -12,20 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
-using Energinet.DataHub.EDI.Process.Interfaces;
-
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
+namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 
 /// <summary>
-/// Responsible for receiving a incoming message.
+/// Represents a serie of an incoming message
 /// </summary>
-public interface IRequestAggregatedMeasureDataReceiver
+public interface IIncomingMessageSerie
 {
     /// <summary>
-    /// Responsible for receiving the incoming message.
+    /// Id of the incoming message serie
     /// </summary>
-    Task<Result> ReceiveAsync(
-        RequestAggregatedMeasureDataDto requestAggregatedMeasureDataDto,
-        CancellationToken cancellationToken);
+    public string TransactionId { get; }
+
+    /// <summary>
+    /// Start Date and Time of the incoming message serie
+    /// </summary>
+    public string StartDateAndOrTimeDateTime { get; }
+
+    /// <summary>
+    /// End Date and Time of the incoming message serie
+    /// </summary>
+    public string? EndDateAndOrTimeDateTime { get; }
 }

@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
-using Energinet.DataHub.EDI.Process.Interfaces;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Factories;

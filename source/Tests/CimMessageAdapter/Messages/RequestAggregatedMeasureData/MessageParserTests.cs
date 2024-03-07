@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,15 +26,15 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers;
-using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
-using Energinet.DataHub.EDI.Process.Interfaces;
 using FluentAssertions.Execution;
 using NodaTime;
 using Xunit;
-using Serie = Energinet.DataHub.EDI.Process.Interfaces.Serie;
+using RequestAggregatedMeasureDataDto = Energinet.DataHub.EDI.IncomingMessages.Interfaces.RequestAggregatedMeasureDataDto;
+using Serie = Energinet.DataHub.EDI.IncomingMessages.Interfaces.Serie;
 
 namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
@@ -108,10 +109,10 @@ public class MessageParserTests
         //Assert.Equal("2022-12-17T09:30:47Z", marketMessage.CreatedAt);
         Assert.Equal("23", marketMessage.BusinessType);
 
-        foreach (var serie in marketMessage.Series)
+        foreach (var serie in marketMessage.Serie.Cast<RequestAggregatedMeasureDataSerie>())
         {
             Assert.NotNull(serie);
-            Assert.Equal("123353185", serie.Id);
+            Assert.Equal("123353185", serie.TransactionId);
             Assert.Equal("5799999933318", serie.BalanceResponsiblePartyMarketParticipantId);
             Assert.Equal("5790001330552", serie.EnergySupplierMarketParticipantId);
             Assert.Equal("E17", serie.MarketEvaluationPointType);
@@ -141,10 +142,10 @@ public class MessageParserTests
         //Assert.Equal("2022-12-17T09:30:47Z", marketMessage.CreatedAt);
         Assert.Equal("23", marketMessage.BusinessType);
 
-        foreach (var serie in marketMessage.Series)
+        foreach (var serie in marketMessage.Serie.Cast<RequestAggregatedMeasureDataSerie>())
         {
             Assert.NotNull(serie);
-            Assert.Equal("123353185", serie.Id);
+            Assert.Equal("123353185", serie.TransactionId);
             Assert.Equal("5799999933318", serie.BalanceResponsiblePartyMarketParticipantId);
             Assert.Equal("5790001330552", serie.EnergySupplierMarketParticipantId);
             Assert.Equal("E17", serie.MarketEvaluationPointType);
