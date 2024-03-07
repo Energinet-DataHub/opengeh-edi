@@ -94,13 +94,13 @@ public class JsonMessageParser : JsonParserBase, IMessageParser
         }
 
         return new IncomingMarketMessageParserResult(new WholesaleSettlementMessage(
-            header.MessageId,
-            header.ReceiverId,
-            header.ReceiverRole,
             header.SenderId,
             header.SenderRole,
+            header.ReceiverId,
+            header.ReceiverRole,
             header.BusinessReason,
             header.MessageType,
+            header.MessageId,
             header.CreatedAt,
             header.BusinessType,
             series.AsReadOnly()));

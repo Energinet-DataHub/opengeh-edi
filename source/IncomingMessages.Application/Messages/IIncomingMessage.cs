@@ -14,45 +14,53 @@
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
 
-public abstract class IncomingMessage
+/// <summary>
+/// Represents an incoming message
+/// </summary>
+public interface IIncomingMessage
 {
-    protected IncomingMessage(
-        string messageId,
-        string receiverNumber,
-        string receiverRoleCode,
-        string senderNumber,
-        string senderRoleCode,
-        string businessReason,
-        string messageType,
-        string createdAt,
-        string? businessType)
-    {
-        MessageId = messageId;
-        ReceiverNumber = receiverNumber;
-        ReceiverRoleCode = receiverRoleCode;
-        SenderNumber = senderNumber;
-        SenderRoleCode = senderRoleCode;
-        BusinessReason = businessReason;
-        MessageType = messageType;
-        CreatedAt = createdAt;
-        BusinessType = businessType;
-    }
-
+    /// <summary>
+    /// Id of the incoming message
+    /// </summary>
     public string MessageId { get; }
 
+    /// <summary>
+    /// Receiver number of the incoming message
+    /// </summary>
     public string ReceiverNumber { get; }
 
+    /// <summary>
+    /// Receiver Role of the incoming message
+    /// </summary>
     public string ReceiverRoleCode { get; }
 
+    /// <summary>
+    /// Sender Number of the incoming message
+    /// </summary>
     public string SenderNumber { get; }
 
+    /// <summary>
+    /// Sender Role of the incoming message
+    /// </summary>
     public string SenderRoleCode { get; }
 
+    /// <summary>
+    /// Business Reason of the incoming message
+    /// </summary>
     public string BusinessReason { get; }
 
+    /// <summary>
+    /// Message Type of the incoming message
+    /// </summary>
     public string MessageType { get; }
 
+    /// <summary>
+    /// When the message was created
+    /// </summary>
     public string CreatedAt { get; }
 
+    /// <summary>
+    /// Business Type of the incoming message
+    /// </summary>
     public string? BusinessType { get; }
 }

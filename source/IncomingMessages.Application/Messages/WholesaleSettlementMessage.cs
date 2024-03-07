@@ -16,35 +16,17 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
 
-public class WholesaleSettlementMessage : IncomingMessage
-{
-    public WholesaleSettlementMessage(
-        string messageId,
-        string receiverNumber,
-        string receiverRoleCode,
-        string senderNumber,
-        string senderRoleCode,
-        string businessReason,
-        string messageType,
-        string createdAt,
-        string? businessType,
-        IReadOnlyCollection<WholesaleSettlementSerie> series)
-        : base(
-            messageId,
-            receiverNumber,
-            receiverRoleCode,
-            senderNumber,
-            senderRoleCode,
-            businessReason,
-            messageType,
-            createdAt,
-            businessType)
-    {
-        Series = series;
-    }
-
-    public IReadOnlyCollection<WholesaleSettlementSerie> Series { get; }
-}
+public record WholesaleSettlementMessage(
+    string SenderNumber,
+    string SenderRoleCode,
+    string ReceiverNumber,
+    string ReceiverRoleCode,
+    string BusinessReason,
+    string MessageType,
+    string MessageId,
+    string CreatedAt,
+    string? BusinessType,
+    IReadOnlyCollection<WholesaleSettlementSerie> Series) : IIncomingMessage;
 
 public record WholesaleSettlementSerie(
     string Id,
