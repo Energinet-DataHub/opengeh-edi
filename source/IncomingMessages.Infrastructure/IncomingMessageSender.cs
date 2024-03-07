@@ -23,12 +23,12 @@ using ServiceBusClientOptions = Energinet.DataHub.EDI.IncomingMessages.Infrastru
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 
-public class IncomingRequestAggregatedMeasuredDataSender
+public class IncomingMessageSender
 {
     private readonly ISerializer _serializer;
     private readonly IServiceBusSenderAdapter _senderCreator;
 
-    public IncomingRequestAggregatedMeasuredDataSender(
+    public IncomingMessageSender(
         IServiceBusSenderFactory serviceBusSenderFactory,
         IOptions<ServiceBusClientOptions> options,
         ISerializer serializer)

@@ -25,18 +25,18 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 
 public class IncomingMessageReceiver : IIncomingMessageReceiver
 {
-    private readonly IncomingRequestAggregatedMeasuredDataSender _incomingRequestAggregatedMeasuredDataSender;
+    private readonly IncomingMessageSender _incomingMessageSender;
     private readonly IncomingMessagesContext _incomingMessagesContext;
     private readonly IMessageIdRepository _messageIdRepository;
     private readonly ITransactionIdRepository _transactionIdRepository;
 
     public IncomingMessageReceiver(
-        IncomingRequestAggregatedMeasuredDataSender incomingRequestAggregatedMeasuredDataSender,
+        IncomingMessageSender incomingMessageSender,
         IncomingMessagesContext incomingMessagesContext,
         IMessageIdRepository messageIdRepository,
         ITransactionIdRepository transactionIdRepository)
     {
-        _incomingRequestAggregatedMeasuredDataSender = incomingRequestAggregatedMeasuredDataSender;
+        _incomingMessageSender = incomingMessageSender;
         _incomingMessagesContext = incomingMessagesContext;
         _messageIdRepository = messageIdRepository;
         _transactionIdRepository = transactionIdRepository;
@@ -57,7 +57,7 @@ public class IncomingMessageReceiver : IIncomingMessageReceiver
         {
             await ResilientTransaction.New(_incomingMessagesContext, async () =>
                 {
-                    await _incomingRequestAggregatedMeasuredDataSender.SendAsync(
+                    await _incomingMessageSender.SendAsync(
                             incomingMessage,
                             cancellationToken)
                         .ConfigureAwait(false);

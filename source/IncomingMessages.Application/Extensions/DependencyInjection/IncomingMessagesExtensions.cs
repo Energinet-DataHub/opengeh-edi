@@ -65,7 +65,7 @@ public static class IncomingMessagesExtensions
             .AddScoped<IMessageParser, WholesaleSettlementJsonMessageParser>()
             .AddScoped<MarketMessageParser>()
             .AddScoped<ISenderAuthorizer, SenderAuthorizer>()
-            .AddScoped<IncomingRequestAggregatedMeasuredDataSender>()
+            .AddScoped<IncomingMessageSender>()
             .AddScoped<RequestAggregatedMeasureDataMessageValidator>()
             .AddSingleton<IProcessTypeValidator, ProcessTypeValidator>()
             .AddSingleton<IMessageTypeValidator, MessageTypeValidator>()
