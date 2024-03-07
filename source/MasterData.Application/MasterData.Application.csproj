@@ -4,7 +4,6 @@
     <RootNamespace>Energinet.DataHub.EDI.MasterData.Application</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj"/>
     <ProjectReference Include="..\DataAccess\DataAccess.csproj"/>
     <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj"/>
     <ProjectReference Include="..\MasterData.Infrastructure\MasterData.Infrastructure.csproj" />
