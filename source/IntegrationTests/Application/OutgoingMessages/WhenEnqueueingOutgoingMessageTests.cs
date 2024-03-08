@@ -323,6 +323,12 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         Assert.Equal(existingBundleId, bundleIdForMessage2);
     }
 
+    /// <summary>
+    /// This test verifies the "hack" for a MDR/GridOperator actor which is the same Actor but with two distinct roles MDR and GridOperator
+    /// The actor uses the MDR (MeteredDataResponsible) role when making request (RequestAggregatedMeasureData)
+    /// but uses the DDM (GridOperator) role when peeking.
+    /// This means that a NotifyAggregatedMeasureData document with a MDR receiver should be added to the DDM ActorMessageQueue
+    /// </summary>
     [Fact]
     public async Task Given_EnqueuingNotifyAggregatedMeasureData_When_ReceiverActorRoleIsMDR_Then_MessageShouldBeEnqueuedAsDDM()
     {
@@ -357,7 +363,6 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
                     Id = createdId.Value.ToString(),
                 });
 
-        var t = result;
         return (QueueActorNumber: result.ActorNumber, QueueActorRole: result.ActorRole);
     }
 
