@@ -343,9 +343,9 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         // Assert
         var fromDb = await GetOutgoingMessageWithActorMessageQueueFromDatabase(createdId);
 
+        fromDb.ActorMessageQueueNumber.Should().Be(message.ReceiverId.Value);
+        fromDb.ActorMessageQueueRole.Should().Be(ActorRole.GridOperator.Code);
         fromDb.OutgoingMessageReceiverRole.Should().Be(ActorRole.MeteredDataResponsible.Code);
-        fromDb.QueueActorNumber.Should().Be(message.ReceiverId.Value);
-        fromDb.QueueActorRole.Should().Be(ActorRole.GridOperator.Code);
     }
 
     protected override void Dispose(bool disposing)
@@ -354,7 +354,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         base.Dispose(disposing);
     }
 
-    private async Task<(string QueueActorNumber, string QueueActorRole, string OutgoingMessageReceiverRole)> GetOutgoingMessageWithActorMessageQueueFromDatabase(OutgoingMessageId createdId)
+    private async Task<(string ActorMessageQueueNumber, string ActorMessageQueueRole, string OutgoingMessageReceiverRole)> GetOutgoingMessageWithActorMessageQueueFromDatabase(OutgoingMessageId createdId)
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
 
@@ -367,7 +367,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
                     Id = createdId.Value.ToString(),
                 });
 
-        return (QueueActorNumber: result.ActorNumber, QueueActorRole: result.ActorRole, OutgoingMessageReceiverRole: result.ReceiverRole);
+        return (ActorMessageQueueNumber: result.ActorNumber, ActorMessageQueueRole: result.ActorRole, OutgoingMessageReceiverRole: result.ReceiverRole);
     }
 
     private async Task<string> GetOutgoingMessageFileStorageReferenceFromDatabase(OutgoingMessageId id)
