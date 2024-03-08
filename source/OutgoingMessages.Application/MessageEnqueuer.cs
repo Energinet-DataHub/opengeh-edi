@@ -56,8 +56,7 @@ public class MessageEnqueuer
 
     private async Task AddToActorMessageQueueAsync(OutgoingMessage outgoingMessage)
     {
-        var outgoingMessageReceiver = Receiver.Create(outgoingMessage.ReceiverId, outgoingMessage.ReceiverRole);
-        var actorMessageQueue = await GetMessageQueueForReceiverAsync(outgoingMessageReceiver).ConfigureAwait(false);
+        var actorMessageQueue = await GetMessageQueueForReceiverAsync(outgoingMessage.GetActorMessageQueueMetadata()).ConfigureAwait(false);
         actorMessageQueue.Enqueue(outgoingMessage, _systemDateTimeProvider.Now());
     }
 

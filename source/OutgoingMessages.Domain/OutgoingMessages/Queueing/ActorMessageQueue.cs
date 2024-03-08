@@ -89,7 +89,7 @@ public class ActorMessageQueue
 
     private void EnsureApplicable(OutgoingMessage outgoingMessage)
     {
-        if (outgoingMessage.Receiver.Equals(Receiver) == false)
+        if (outgoingMessage.GetActorMessageQueueMetadata().Equals(Receiver) == false)
         {
             throw new ReceiverMismatchException();
         }

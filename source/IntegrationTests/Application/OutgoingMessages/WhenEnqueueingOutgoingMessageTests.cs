@@ -323,10 +323,51 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         Assert.Equal(existingBundleId, bundleIdForMessage2);
     }
 
+    /// <summary>
+    /// This test verifies the "hack" for a MDR/GridOperator actor which is the same Actor but with two distinct roles MDR and GridOperator
+    /// The actor uses the MDR (MeteredDataResponsible) role when making request (RequestAggregatedMeasureData)
+    /// but uses the DDM (GridOperator) role when peeking.
+    /// This means that a NotifyAggregatedMeasureData document with a MDR receiver should be added to the DDM ActorMessageQueue
+    /// </summary>
+    [Fact]
+    public async Task Given_EnqueuingNotifyAggregatedMeasureData_When_ReceiverActorRoleIsMDR_Then_MessageShouldBeEnqueuedAsDDM()
+    {
+        // Arrange
+        var message = _energyResultMessageDtoBuilder
+            .WithReceiverRole(ActorRole.MeteredDataResponsible)
+            .Build();
+
+        // Act
+        var createdId = await EnqueueAndCommitAsync(message);
+
+        // Assert
+        var fromDb = await GetOutgoingMessageWithActorMessageQueueFromDatabase(createdId);
+
+        fromDb.ActorMessageQueueNumber.Should().Be(message.ReceiverId.Value);
+        fromDb.ActorMessageQueueRole.Should().Be(ActorRole.GridOperator.Code);
+        fromDb.OutgoingMessageReceiverRole.Should().Be(ActorRole.MeteredDataResponsible.Code);
+    }
+
     protected override void Dispose(bool disposing)
     {
         _context.Dispose();
         base.Dispose(disposing);
+    }
+
+    private async Task<(string ActorMessageQueueNumber, string ActorMessageQueueRole, string OutgoingMessageReceiverRole)> GetOutgoingMessageWithActorMessageQueueFromDatabase(OutgoingMessageId createdId)
+    {
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+
+        var result = await connection.QuerySingleAsync(
+            @"SELECT tQueue.ActorNumber, tQueue.ActorRole, tOutgoing.ReceiverRole FROM [dbo].[OutgoingMessages] AS tOutgoing
+                    INNER JOIN [dbo].[Bundles] as tBundle ON tOutgoing.AssignedBundleId = tBundle.Id
+                    INNER JOIN [dbo].ActorMessageQueues as tQueue on tBundle.ActorMessageQueueId = tQueue.Id",
+            new
+                {
+                    Id = createdId.Value.ToString(),
+                });
+
+        return (ActorMessageQueueNumber: result.ActorNumber, ActorMessageQueueRole: result.ActorRole, OutgoingMessageReceiverRole: result.ReceiverRole);
     }
 
     private async Task<string> GetOutgoingMessageFileStorageReferenceFromDatabase(OutgoingMessageId id)

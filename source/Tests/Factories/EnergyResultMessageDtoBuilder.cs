@@ -21,12 +21,11 @@ using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.Tests.Factories;
 
-public static class EnergyResultMessageDtoBuilder
+public class EnergyResultMessageDtoBuilder
 {
     private const long CalculationResultVersion = 1;
     private const string GridAreaCode = "804";
     private static readonly ActorNumber _receiverNumber = ActorNumber.Create("1234567890123");
-    private static readonly ActorRole _receiverRole = ActorRole.MeteredDataResponsible;
     private static readonly Guid _processId = Guid.NewGuid();
     private static readonly string _meteringPointType = MeteringPointType.Consumption.Code;
     private static readonly string? _settlementType = SettlementType.Flex.Code;
@@ -51,7 +50,9 @@ public static class EnergyResultMessageDtoBuilder
     private static readonly string _businessReasonName = BusinessReason.BalanceFixing.Code;
     private static readonly string? _settlementVersion = SettlementVersion.FirstCorrection.Code;
 
-    public static EnergyResultMessageDto Build()
+    private ActorRole _receiverRole = ActorRole.MeteredDataResponsible;
+
+    public EnergyResultMessageDto Build()
     {
         return EnergyResultMessageDto.Create(
             _receiverNumber,
@@ -69,5 +70,11 @@ public static class EnergyResultMessageDtoBuilder
             _businessReasonName,
             CalculationResultVersion,
             _settlementVersion);
+    }
+
+    public EnergyResultMessageDtoBuilder WithReceiverRole(ActorRole receiverRole)
+    {
+        _receiverRole = receiverRole;
+        return this;
     }
 }
