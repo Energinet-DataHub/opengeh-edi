@@ -323,20 +323,42 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         Assert.Equal(existingBundleId, bundleIdForMessage2);
     }
 
-
     [Fact]
-    public void Given_ReceiverActorRoleIsMDR_When_EnqueingNotifyAggregatedMeasureData_Then_MessageShouldBeEnqueuedAsDDM()
+    public async Task Given_EnqueuingNotifyAggregatedMeasureData_When_ReceiverActorRoleIsMDR_Then_MessageShouldBeEnqueuedAsDDM()
     {
-        var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.MeteredDataResponsible);
+        var message = _energyResultMessageDtoBuilder
+            .WithReceiverRole(ActorRole.MeteredDataResponsible)
+            .Build();
 
+        var createdId = await EnqueueAndCommitAsync(message);
 
+        var actorMessageQueue = await GetOutgoingMessageActorMessageQueueFromDatabase(createdId);
 
+        actorMessageQueue.QueueActorNumber.Should().Be(message.ReceiverId.Value);
+        actorMessageQueue.QueueActorRole.Should().Be(ActorRole.GridOperator.Code);
     }
 
     protected override void Dispose(bool disposing)
     {
         _context.Dispose();
         base.Dispose(disposing);
+    }
+
+    private async Task<(string QueueActorNumber, string QueueActorRole)> GetOutgoingMessageActorMessageQueueFromDatabase(OutgoingMessageId createdId)
+    {
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+
+        var result = await connection.QuerySingleAsync(
+            @"SELECT tQueue.ActorNumber, tQueue.ActorRole FROM [dbo].[OutgoingMessages] AS tOutgoing
+                    INNER JOIN [dbo].[Bundles] as tBundle ON tOutgoing.AssignedBundleId = tBundle.Id
+                    INNER JOIN [dbo].ActorMessageQueues as tQueue on tBundle.ActorMessageQueueId = tQueue.Id",
+            new
+                {
+                    Id = createdId.Value.ToString(),
+                });
+
+        var t = result;
+        return (QueueActorNumber: result.ActorNumber, QueueActorRole: result.ActorRole);
     }
 
     private async Task<string> GetOutgoingMessageFileStorageReferenceFromDatabase(OutgoingMessageId id)

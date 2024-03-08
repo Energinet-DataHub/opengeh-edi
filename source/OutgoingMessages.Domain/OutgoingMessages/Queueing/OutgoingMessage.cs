@@ -239,6 +239,22 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             return _serializedContent;
         }
 
+        /// <summary>
+        /// The ActorMessageQueue metadata (which ActorMessageQueue the OutgoingMessage should be saved in).
+        /// This is implemented to support the "hack" where a NotifyAggregatedMeasureData document for a MeteredDataResponsible
+        /// should be added to the GridOperator queue
+        /// </summary>
+        public Receiver GetActorMessageQueueMetadata()
+        {
+            var actorMessageQueueReceiverRole = ReceiverRole;
+
+            // NotifyAggregatedMeasureData document to MDR should always be added to the GridOperator queue
+            if (DocumentType == DocumentType.NotifyAggregatedMeasureData && ReceiverRole == ActorRole.MeteredDataResponsible)
+                actorMessageQueueReceiverRole = ActorRole.GridOperator;
+
+            return Receiver.Create(ReceiverId, actorMessageQueueReceiverRole);
+        }
+
         private static FileStorageReference CreateFileStorageReference(ActorNumber receiverActorNumber, Instant timestamp, OutgoingMessageId outgoingMessageId)
         {
             return FileStorageReference.Create(FileStorageCategory, receiverActorNumber.Value, timestamp, outgoingMessageId.Value);
