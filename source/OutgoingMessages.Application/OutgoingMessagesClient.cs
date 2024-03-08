@@ -14,7 +14,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Common.DateTime;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -29,19 +29,22 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     private readonly MessageEnqueuer _messageEnqueuer;
     private readonly ActorMessageQueueContext _actorMessageQueueContext;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly ISerializer _serializer;
 
     public OutgoingMessagesClient(
         MessagePeeker messagePeeker,
         MessageDequeuer messageDequeuer,
         MessageEnqueuer messageEnqueuer,
         ActorMessageQueueContext actorMessageQueueContext,
-        ISystemDateTimeProvider systemDateTimeProvider)
+        ISystemDateTimeProvider systemDateTimeProvider,
+        ISerializer serializer)
     {
         _messagePeeker = messagePeeker;
         _messageDequeuer = messageDequeuer;
         _messageEnqueuer = messageEnqueuer;
         _actorMessageQueueContext = actorMessageQueueContext;
         _systemDateTimeProvider = systemDateTimeProvider;
+        _serializer = serializer;
     }
 
     public async Task<DequeueRequestResultDto> DequeueAndCommitAsync(DequeueRequestDto request, CancellationToken cancellationToken)
@@ -62,7 +65,10 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         AcceptedEnergyResultMessageDto acceptedEnergyResultMessage,
         CancellationToken cancellationToken)
     {
-        var message = OutgoingMessage.CreateMessage(acceptedEnergyResultMessage, _systemDateTimeProvider.Now());
+        var message = OutgoingMessage.CreateMessage(
+            acceptedEnergyResultMessage,
+            _serializer,
+            _systemDateTimeProvider.Now());
         var messageId = await _messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
         return messageId;
     }
@@ -71,7 +77,10 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         RejectedEnergyResultMessageDto rejectedEnergyResultMessage,
         CancellationToken cancellationToken)
     {
-        var message = OutgoingMessage.CreateMessage(rejectedEnergyResultMessage, _systemDateTimeProvider.Now());
+        var message = OutgoingMessage.CreateMessage(
+            rejectedEnergyResultMessage,
+            _serializer,
+            _systemDateTimeProvider.Now());
         var messageId = await _messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
         return messageId;
     }
@@ -80,7 +89,10 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         EnergyResultMessageDto energyResultMessage,
         CancellationToken cancellationToken)
     {
-        var message = OutgoingMessage.CreateMessage(energyResultMessage, _systemDateTimeProvider.Now());
+        var message = OutgoingMessage.CreateMessage(
+            energyResultMessage,
+            _serializer,
+            _systemDateTimeProvider.Now());
         var messageId = await _messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return messageId;
@@ -90,7 +102,10 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         WholesaleServicesMessageDto wholesaleServicesMessage,
         CancellationToken cancellationToken)
     {
-        var messages = OutgoingMessage.CreateMessages(wholesaleServicesMessage, _systemDateTimeProvider.Now());
+        var messages = OutgoingMessage.CreateMessages(
+            wholesaleServicesMessage,
+            _serializer,
+            _systemDateTimeProvider.Now());
         foreach (var message in messages)
         {
             await _messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);

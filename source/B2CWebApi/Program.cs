@@ -21,9 +21,6 @@ using Energinet.DataHub.Core.Logging.LoggingMiddleware;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
-using Energinet.DataHub.EDI.Common.DateTime;
-using Energinet.DataHub.EDI.Common.Serialization;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Microsoft.ApplicationInsights.Extensibility;
 
@@ -42,11 +39,9 @@ builder.Services
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services
-    .AddHttpContextAccessor()
-    .AddScoped<ISystemDateTimeProvider, SystemDateTimeProvider>()
+    .AddSystemTimer()
     .AddHttpLoggingScope(domainName)
-    .AddSingleton<ISerializer, Serializer>()
-    .AddScoped<AuthenticatedActor>()
+    .AddSerializer()
     .AddIncomingMessagesModule(builder.Configuration)
     .AddArchivedMessagesModule(builder.Configuration)
     .AddJwtTokenSecurity(builder.Configuration)
@@ -89,6 +84,9 @@ app.MapReadyHealthChecks();
 app.Run();
 
 // This is needed in order to test the dependency injection
-public partial class Program
+namespace Energinet.DataHub.EDI.B2CWebApi
 {
+    public partial class Program
+    {
+    }
 }

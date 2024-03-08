@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using BuildingBlocks.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands.Handlers;
@@ -43,10 +43,11 @@ public static class ProcessExtensions
                 o => !string.IsNullOrEmpty(o.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME),
                 "WHOLESALE_INBOX_MESSAGE_QUEUE_NAME must be set");
 
-        services.AddScopedSqlDbContext<ProcessContext>(configuration);
+        services
+            .AddScopedSqlDbContext<ProcessContext>(configuration)
+            .AddMediatR();
 
-        //EventsConfiguration
-        //TODO: can we move them out and delete ref to Infrastructure?
+        //InboxEventsConfiguration
         services.AddTransient<IInboxEventMapper, EnergyResultTimeSeriesRequestAcceptedEventMapper>()
             .AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestRejectedMapper>();
 

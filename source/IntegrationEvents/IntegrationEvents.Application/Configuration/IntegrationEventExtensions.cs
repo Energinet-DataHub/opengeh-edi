@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories;
@@ -52,11 +52,15 @@ public static class IntegrationEventExtensions
             MonthlyAmountPerChargeResultProducedV1.Descriptor,
             AmountPerChargeResultProducedV1.Descriptor,
         };
+
         services.AddSubscriber<IntegrationEventHandler>(integrationEventDescriptors);
         services.AddTransient<IDataRetention, ReceivedIntegrationEventsRetention>()
             .AddTransient<IReceivedIntegrationEventRepository, ReceivedIntegrationEventRepository>()
             .AddTransient<EnergyResultMessageResultFactory>()
             .AddTransient<IIntegrationEventHandler, IntegrationEventHandler>();
+
+        services.AddTransient<WholesaleServicesMessageFactory>();
+
         return services;
     }
 }

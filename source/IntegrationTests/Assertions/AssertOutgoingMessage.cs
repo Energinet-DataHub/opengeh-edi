@@ -21,7 +21,7 @@ using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
-using Energinet.DataHub.EDI.Common.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using Xunit;

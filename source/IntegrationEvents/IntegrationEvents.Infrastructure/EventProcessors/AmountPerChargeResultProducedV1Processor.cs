@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BuildingBlocks.Application.FeatureFlag;
@@ -20,6 +21,7 @@ using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
 
@@ -27,13 +29,19 @@ public class AmountPerChargeResultProducedV1Processor : IIntegrationEventProcess
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly IFeatureFlagManager _featureManager;
+    private readonly WholesaleServicesMessageFactory _wholesaleServicesMessageFactory;
+    private readonly ILogger<AmountPerChargeResultProducedV1Processor> _logger;
 
     public AmountPerChargeResultProducedV1Processor(
         IOutgoingMessagesClient outgoingMessagesClient,
-        IFeatureFlagManager featureManager)
+        IFeatureFlagManager featureManager,
+        WholesaleServicesMessageFactory wholesaleServicesMessageFactory,
+        ILogger<AmountPerChargeResultProducedV1Processor> logger)
     {
         _outgoingMessagesClient = outgoingMessagesClient;
         _featureManager = featureManager;
+        _wholesaleServicesMessageFactory = wholesaleServicesMessageFactory;
+        _logger = logger;
     }
 
     public string EventTypeToHandle => AmountPerChargeResultProducedV1.EventName;
@@ -48,7 +56,18 @@ public class AmountPerChargeResultProducedV1Processor : IIntegrationEventProcess
         }
 
         var amountPerChargeResultProducedV1 = (AmountPerChargeResultProducedV1)integrationEvent.Message;
-        var message = WholesaleServicesMessageFactory.CreateMessage(amountPerChargeResultProducedV1);
+
+        if (!AmountPerChargeResultProducedProcessorExtensions.SupportedMeteringPointTypes().Contains(amountPerChargeResultProducedV1.MeteringPointType))
+        {
+            _logger.LogInformation(
+                "MeteringPointType {MeteringPointType} is not supported",
+                amountPerChargeResultProducedV1.MeteringPointType);
+            return;
+        }
+
+        var message = await _wholesaleServicesMessageFactory
+            .CreateMessageAsync(amountPerChargeResultProducedV1)
+            .ConfigureAwait(false);
 
         await _outgoingMessagesClient.EnqueueAndCommitAsync(message, cancellationToken).ConfigureAwait(false);
     }
