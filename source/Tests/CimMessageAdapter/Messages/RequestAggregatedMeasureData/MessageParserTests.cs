@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,17 +23,18 @@ using System.Xml.Linq;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
+using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
+using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
-using Energinet.DataHub.EDI.Process.Interfaces;
 using FluentAssertions.Execution;
 using NodaTime;
 using Xunit;
+using RequestAggregatedMeasureDataDto = Energinet.DataHub.EDI.IncomingMessages.Interfaces.RequestAggregatedMeasureDataDto;
+using Serie = Energinet.DataHub.EDI.IncomingMessages.Interfaces.Serie;
 
 namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
@@ -96,8 +98,8 @@ public class MessageParserTests
         var result = await _marketMessageParser.ParseAsync(new IncomingMessageStream(message), format, IncomingDocumentType.RequestAggregatedMeasureData, CancellationToken.None);
         using var assertionScope = new AssertionScope();
         Assert.True(result.Success);
-        var marketMessage = result!.Dto!;
-        Assert.True(marketMessage != null);
+        var marketMessage = (RequestAggregatedMeasureDataMessage)result!.IncomingMessage!;
+        Assert.NotNull(marketMessage);
         Assert.Equal("123564789123564789123564789123564789", marketMessage.MessageId);
         Assert.Equal("D05", marketMessage.BusinessReason);
         Assert.Equal("5799999933318", marketMessage.SenderNumber);
@@ -107,17 +109,17 @@ public class MessageParserTests
         //Assert.Equal("2022-12-17T09:30:47Z", marketMessage.CreatedAt);
         Assert.Equal("23", marketMessage.BusinessType);
 
-        foreach (var serie in result!.Dto!.Series)
+        foreach (var serie in marketMessage.Serie.Cast<RequestAggregatedMeasureDataSerie>())
         {
-            Assert.True(serie != null);
-            Assert.Equal("123353185", serie.Id);
+            Assert.NotNull(serie);
+            Assert.Equal("123353185", serie.TransactionId);
             Assert.Equal("5799999933318", serie.BalanceResponsiblePartyMarketParticipantId);
             Assert.Equal("5790001330552", serie.EnergySupplierMarketParticipantId);
             Assert.Equal("E17", serie.MarketEvaluationPointType);
             Assert.Equal("244", serie.MeteringGridAreaDomainId);
             Assert.Equal("D01", serie.MarketEvaluationSettlementMethod);
-            Assert.Equal("2022-07-22T22:00:00Z", serie.EndDateAndOrTimeDateTime);
-            Assert.Equal("2022-06-17T22:00:00Z", serie.StartDateAndOrTimeDateTime);
+            Assert.Equal("2022-07-22T22:00:00Z", serie.EndDateTime);
+            Assert.Equal("2022-06-17T22:00:00Z", serie.StartDateTime);
             Assert.Equal("D01", serie.SettlementSeriesVersion);
         }
     }
@@ -129,8 +131,8 @@ public class MessageParserTests
         var result = await _marketMessageParser.ParseAsync(new IncomingMessageStream(message), format, IncomingDocumentType.B2CRequestAggregatedMeasureData, CancellationToken.None);
         using var assertionScope = new AssertionScope();
         Assert.True(result.Success);
-        var marketMessage = result!.Dto!;
-        Assert.True(marketMessage != null);
+        var marketMessage = (RequestAggregatedMeasureDataMessage)result!.IncomingMessage!;
+        Assert.NotNull(marketMessage);
         Assert.Equal("123564789123564789123564789123564789", marketMessage.MessageId);
         Assert.Equal("D05", marketMessage.BusinessReason);
         Assert.Equal("5799999933318", marketMessage.SenderNumber);
@@ -140,17 +142,17 @@ public class MessageParserTests
         //Assert.Equal("2022-12-17T09:30:47Z", marketMessage.CreatedAt);
         Assert.Equal("23", marketMessage.BusinessType);
 
-        foreach (var serie in result!.Dto!.Series)
+        foreach (var serie in marketMessage.Serie.Cast<RequestAggregatedMeasureDataSerie>())
         {
-            Assert.True(serie != null);
-            Assert.Equal("123353185", serie.Id);
+            Assert.NotNull(serie);
+            Assert.Equal("123353185", serie.TransactionId);
             Assert.Equal("5799999933318", serie.BalanceResponsiblePartyMarketParticipantId);
             Assert.Equal("5790001330552", serie.EnergySupplierMarketParticipantId);
             Assert.Equal("E17", serie.MarketEvaluationPointType);
             Assert.Equal("244", serie.MeteringGridAreaDomainId);
             Assert.Equal("D01", serie.MarketEvaluationSettlementMethod);
-            Assert.Equal("2022-07-22T22:00:00Z", serie.EndDateAndOrTimeDateTime);
-            Assert.Equal("2022-06-17T22:00:00Z", serie.StartDateAndOrTimeDateTime);
+            Assert.Equal("2022-07-22T22:00:00Z", serie.EndDateTime);
+            Assert.Equal("2022-06-17T22:00:00Z", serie.StartDateTime);
             Assert.Equal("D01", serie.SettlementSeriesVersion);
         }
     }
@@ -161,7 +163,7 @@ public class MessageParserTests
     {
         var result = await _marketMessageParser.ParseAsync(new IncomingMessageStream(message), format, IncomingDocumentType.RequestAggregatedMeasureData, CancellationToken.None);
 
-        Assert.True(result.Errors.Count > 0);
+        Assert.NotEmpty(result.Errors);
         Assert.True(result.Success == false);
         Assert.True(expectedError != null);
         Assert.Contains(result.Errors, error => error.GetType().Name == expectedError);

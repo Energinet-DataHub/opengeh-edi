@@ -18,7 +18,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Api.Configuration.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
@@ -72,7 +71,7 @@ namespace Energinet.DataHub.EDI.Api.Authentication
                 _logger.LogError(
                     @"Could not authenticate market actor identity.
                     This is due to missing marketRole in the http request data claims for ActorNumber: {ActorNumber}.",
-                    actorNumber);
+                    actorNumber.Value);
                 return false;
             }
 

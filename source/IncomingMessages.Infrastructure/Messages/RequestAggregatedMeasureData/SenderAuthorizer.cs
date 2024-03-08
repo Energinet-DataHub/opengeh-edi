@@ -16,53 +16,71 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
+
+public class SenderAuthorizer : ISenderAuthorizer
 {
-    public class SenderAuthorizer : ISenderAuthorizer
+    private readonly AuthenticatedActor _actorAuthenticator;
+    private readonly List<ValidationError> _validationErrors = new();
+
+    public SenderAuthorizer(AuthenticatedActor actorAuthenticator)
     {
-        private readonly AuthenticatedActor _actorAuthenticator;
-        private readonly List<ValidationError> _validationErrors = new();
+        _actorAuthenticator = actorAuthenticator;
+    }
 
-        public SenderAuthorizer(AuthenticatedActor actorAuthenticator)
+    public Task<Result> AuthorizeAsync(string senderNumber, string senderRoleCode)
+    {
+        ArgumentNullException.ThrowIfNull(senderNumber);
+        ArgumentNullException.ThrowIfNull(senderRoleCode);
+        EnsureSenderIdMatches(senderNumber);
+        EnsureSenderRoleCode(senderRoleCode);
+        EnsureCurrentUserHasRequiredRole(senderRoleCode);
+
+        return Task.FromResult(
+            _validationErrors.Count == 0 ? Result.Succeeded() : Result.Failure(_validationErrors.ToArray()));
+    }
+
+    private void EnsureCurrentUserHasRequiredRole(string senderRole)
+    {
+        if (HackThatAllowDdmToActAsMdr(senderRole)) return;
+
+        if (!_actorAuthenticator.CurrentActorIdentity.HasRole(ActorRole.FromCode(senderRole)))
         {
-            _actorAuthenticator = actorAuthenticator;
+            _validationErrors.Add(new AuthenticatedUserDoesNotHoldRequiredRoleType());
         }
+    }
 
-        public Task<Result> AuthorizeAsync(string senderNumber, string senderRoleCode)
+    private void EnsureSenderRoleCode(string senderRoleCode)
+    {
+        if (!senderRoleCode.Equals(ActorRole.EnergySupplier.Code, StringComparison.OrdinalIgnoreCase)
+            && !senderRoleCode.Equals(ActorRole.MeteredDataResponsible.Code, StringComparison.OrdinalIgnoreCase)
+            && !senderRoleCode.Equals(ActorRole.BalanceResponsibleParty.Code, StringComparison.OrdinalIgnoreCase)
+            && HackThatAllowDdmToDoRequestsAsMdr(senderRoleCode))
         {
-            ArgumentNullException.ThrowIfNull(senderNumber);
-            ArgumentNullException.ThrowIfNull(senderRoleCode);
-            EnsureSenderIdMatches(senderNumber);
-            EnsureSenderRoleCode(senderRoleCode);
-            EnsureCurrentUserHasRequiredRole(senderRoleCode);
-
-            return Task.FromResult(_validationErrors.Count == 0 ? Result.Succeeded() : Result.Failure(_validationErrors.ToArray()));
+            _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
         }
+    }
 
-        private void EnsureCurrentUserHasRequiredRole(string senderRole)
+    private void EnsureSenderIdMatches(string senderNumber)
+    {
+        if (_actorAuthenticator.CurrentActorIdentity.ActorNumber.Value.Equals(
+                senderNumber,
+                StringComparison.OrdinalIgnoreCase) == false)
         {
-            if (!_actorAuthenticator.CurrentActorIdentity.HasRole(ActorRole.FromCode(senderRole)))
-            {
-                _validationErrors.Add(new AuthenticatedUserDoesNotHoldRequiredRoleType());
-            }
+            _validationErrors.Add(new AuthenticatedUserDoesNotMatchSenderId());
         }
+    }
 
-        private void EnsureSenderRoleCode(string senderRoleCode)
-        {
-            if (!senderRoleCode.Equals(ActorRole.EnergySupplier.Code, StringComparison.OrdinalIgnoreCase)
-                && !senderRoleCode.Equals(ActorRole.MeteredDataResponsible.Code, StringComparison.OrdinalIgnoreCase)
-                && !senderRoleCode.Equals(ActorRole.BalanceResponsibleParty.Code, StringComparison.OrdinalIgnoreCase))
-            {
-                _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
-            }
-        }
+#pragma warning disable CA1822
+    private bool HackThatAllowDdmToDoRequestsAsMdr(string senderRoleCode)
+#pragma warning restore CA1822
+    {
+        return !senderRoleCode.Equals(ActorRole.GridOperator.Code, StringComparison.OrdinalIgnoreCase);
+    }
 
-        private void EnsureSenderIdMatches(string senderNumber)
-        {
-            if (_actorAuthenticator.CurrentActorIdentity.ActorNumber.Value.Equals(senderNumber, StringComparison.OrdinalIgnoreCase) == false)
-            {
-                _validationErrors.Add(new AuthenticatedUserDoesNotMatchSenderId());
-            }
-        }
+    private bool HackThatAllowDdmToActAsMdr(string senderRole)
+    {
+        return senderRole == ActorRole.MeteredDataResponsible.Code
+               && _actorAuthenticator.CurrentActorIdentity.HasRole(ActorRole.GridOperator);
     }
 }

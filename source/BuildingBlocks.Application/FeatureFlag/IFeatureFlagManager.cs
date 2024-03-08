@@ -34,4 +34,9 @@ public interface IFeatureFlagManager
     /// Whether to allow handling AmountPerChargeResultProduced events
     /// </summary>
     Task<bool> UseAmountPerChargeResultProduced { get; }
+
+    /// <summary>
+    /// Whether to allow handling WholesaleSettlement Request
+    /// </summary>
+    Task<bool> UseRequestWholesaleSettlementReceiver { get; }
 }

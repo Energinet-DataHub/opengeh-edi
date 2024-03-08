@@ -17,7 +17,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common.DateTime;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -31,13 +31,15 @@ internal sealed class OutgoingMessageExceptionSimulator : OutgoingMessagesClient
         MessageDequeuer messageDequeuer,
         MessageEnqueuer messageEnqueuer,
         ActorMessageQueueContext actorMessageQueueContext,
-        ISystemDateTimeProvider systemDateTimeProvider)
+        ISystemDateTimeProvider systemDateTimeProvider,
+        ISerializer serializer)
         : base(
             messagePeeker,
             messageDequeuer,
             messageEnqueuer,
             actorMessageQueueContext,
-            systemDateTimeProvider)
+            systemDateTimeProvider,
+            serializer)
     {
     }
 

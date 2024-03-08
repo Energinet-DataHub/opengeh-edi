@@ -16,12 +16,11 @@ using System;
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.RequestAggregatedMeasureDataParsers;
 using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using NodaTime;
+using Serie = Energinet.DataHub.EDI.Process.Interfaces.Serie;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 
@@ -102,14 +101,21 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
 
     internal RequestAggregatedMeasureDataDto Build()
     {
-        var messageParser = new RequestAggregatedMeasureDataMarketMessageParserResult(
-            RequestAggregatedMeasureDataMarketMessageFactory.Create(
-                CreateHeader(),
-                new List<Serie> { CreateSerieCreateRecord() }.AsReadOnly()));
-        return messageParser.Dto!;
+        var header = CreateHeader();
+        return new RequestAggregatedMeasureDataDto(
+            header.SenderId,
+            header.SenderRole,
+            header.ReceiverId,
+            header.ReceiverRole,
+            header.BusinessReason,
+            header.MessageType,
+            header.MessageId,
+            header.CreatedAt,
+            header.BusinessType,
+            new List<Serie> { CreateSerie() }.AsReadOnly());
     }
 
-    private Serie CreateSerieCreateRecord() =>
+    private Serie CreateSerie() =>
         new(
             _serieId,
             _marketEvaluationPointType,
