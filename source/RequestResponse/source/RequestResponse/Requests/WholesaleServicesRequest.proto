@@ -17,7 +17,7 @@ syntax = "proto3";
 
 option csharp_namespace = "Energinet.DataHub.Edi.Requests";
 
-message WholesaleSettlementRequest {
+message WholesaleServicesRequest {
   string requested_by_actor_id = 1; // GLN or EIC for the requesting party. This is the party that receives the settlement request.
   string requested_by_actor_role = 2; //The kind of market roles that can be played by parties for given domains within the electricity market. Eg. GridOperator, EnergySupplier etc.
   string business_reason = 3; // The requested business reason for the settlement request. eg. WholesaleFixing or Correction.
