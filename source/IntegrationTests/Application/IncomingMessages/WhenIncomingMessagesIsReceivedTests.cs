@@ -67,7 +67,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
 
       // Act
       await _incomingMessagesRequest.RegisterAndSendAsync(
-          ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
+          ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json"),
           DocumentFormat.Json,
           IncomingDocumentType.RequestAggregatedMeasureData,
           CancellationToken.None);
@@ -120,7 +120,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
 
         // Act & Assert
         await Assert.ThrowsAsync<ServiceBusException>(() => _incomingMessagesRequest.RegisterAndSendAsync(
-            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
+            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
             CancellationToken.None));
@@ -154,12 +154,12 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, restriction: Restriction.None, ActorRole.BalanceResponsibleParty));
 
         var task01 = _incomingMessagesRequest.RegisterAndSendAsync(
-            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
+            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
             CancellationToken.None);
         var task02 = secondParser.RegisterAndSendAsync(
-            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
+            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
             CancellationToken.None);
@@ -198,12 +198,12 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, restriction: Restriction.None, ActorRole.BalanceResponsibleParty));
 
         var task01 = _incomingMessagesRequest.RegisterAndSendAsync(
-            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
+            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
             CancellationToken.None);
         var task02 = secondParser.RegisterAndSendAsync(
-            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
+            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
             CancellationToken.None);
@@ -253,7 +253,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
-        var messageStream = ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json");
+        var messageStream = ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json");
         var messageIdFromFile = "123564789123564789123564789123564789";
         // Act
         await _incomingMessagesRequest.RegisterAndSendAsync(
@@ -281,7 +281,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
-        var messageStream = ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json");
+        var messageStream = ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json");
         var messageIdFromFile = "123564789123564789123564789123564789";
         // Act
         await _incomingMessagesRequest.RegisterAndSendAsync(
