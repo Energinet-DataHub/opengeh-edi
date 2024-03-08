@@ -31,6 +31,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit;
@@ -66,7 +67,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
 
       // Act
       await _incomingMessagesRequest.RegisterAndSendAsync(
-          ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
+          ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json"),
           DocumentFormat.Json,
           IncomingDocumentType.RequestAggregatedMeasureData,
           CancellationToken.None);
@@ -83,6 +84,32 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
     }
 
     [Fact]
+    public async Task Incoming_message_is_received_with_Ddm_Mdr_hack()
+    {
+        // Assert
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        var senderActorNumber = ActorNumber.Create("5799999933318");
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.GridOperator));
+
+        // Act
+        await _incomingMessagesRequest.RegisterAndSendAsync(
+            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsMdr.json"),
+            DocumentFormat.Json,
+            IncomingDocumentType.RequestAggregatedMeasureData,
+            CancellationToken.None);
+
+        // Assert
+        var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
+        var messageIds = await GetMessageIdsAsync(senderActorNumber);
+        var message = _senderSpy.Message;
+
+        using var assertionScope = new AssertionScope();
+        message.Should().NotBeNull();
+        transactionIds.Should().ContainSingle();
+        messageIds.Should().ContainSingle();
+    }
+
+    [Fact]
     public async Task Transaction_and_message_ids_are_not_saved_when_failing_to_send_to_ServiceBus()
     {
         // Assert
@@ -93,7 +120,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
 
         // Act & Assert
         await Assert.ThrowsAsync<ServiceBusException>(() => _incomingMessagesRequest.RegisterAndSendAsync(
-            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
+            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
             CancellationToken.None));
@@ -127,12 +154,12 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, restriction: Restriction.None, ActorRole.BalanceResponsibleParty));
 
         var task01 = _incomingMessagesRequest.RegisterAndSendAsync(
-            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
+            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
             CancellationToken.None);
         var task02 = secondParser.RegisterAndSendAsync(
-            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
+            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
             CancellationToken.None);
@@ -171,12 +198,12 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, restriction: Restriction.None, ActorRole.BalanceResponsibleParty));
 
         var task01 = _incomingMessagesRequest.RegisterAndSendAsync(
-            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
+            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
             CancellationToken.None);
         var task02 = secondParser.RegisterAndSendAsync(
-            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json"),
+            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
             CancellationToken.None);
@@ -226,7 +253,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
-        var messageStream = ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json");
+        var messageStream = ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json");
         var messageIdFromFile = "123564789123564789123564789123564789";
         // Act
         await _incomingMessagesRequest.RegisterAndSendAsync(
@@ -254,7 +281,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
-        var messageStream = ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureData.json");
+        var messageStream = ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json");
         var messageIdFromFile = "123564789123564789123564789123564789";
         // Act
         await _incomingMessagesRequest.RegisterAndSendAsync(
