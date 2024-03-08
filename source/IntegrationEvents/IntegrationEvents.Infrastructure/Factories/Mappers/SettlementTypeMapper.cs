@@ -28,12 +28,7 @@ public static class SettlementTypeMapper
             EnergyResultProducedV2.Types.TimeSeriesType.Production or
             EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerGa or
             EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerNeighboringGa or
-            EnergyResultProducedV2.Types.TimeSeriesType.GridLoss or
-            EnergyResultProducedV2.Types.TimeSeriesType.NegativeGridLoss or
-            EnergyResultProducedV2.Types.TimeSeriesType.PositiveGridLoss or
-            EnergyResultProducedV2.Types.TimeSeriesType.TotalConsumption or
-            EnergyResultProducedV2.Types.TimeSeriesType.TempFlexConsumption or
-            EnergyResultProducedV2.Types.TimeSeriesType.TempProduction => null,
+            EnergyResultProducedV2.Types.TimeSeriesType.TotalConsumption => null,
 
             EnergyResultProducedV2.Types.TimeSeriesType.FlexConsumption => SettlementType.Flex,
             EnergyResultProducedV2.Types.TimeSeriesType.NonProfiledConsumption => SettlementType.NonProfiled,
