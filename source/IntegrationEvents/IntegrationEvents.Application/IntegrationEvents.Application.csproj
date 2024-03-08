@@ -15,6 +15,7 @@
 
     <ItemGroup>
       <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="3.3.1" />
+      <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="9.0.0" />
       <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
     </ItemGroup>
 

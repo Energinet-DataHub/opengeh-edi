@@ -63,6 +63,7 @@ limitations under the License.
       <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
       <ProjectReference Include="..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
       <ProjectReference Include="..\ApplyDBMigrationsApp\ApplyDBMigrationsApp.csproj" />
+      <ProjectReference Include="..\DataAccess.UnitOfWork\DataAccess.UnitOfWork.csproj"/>
       <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
       <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj" />
       <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
@@ -92,7 +93,10 @@ limitations under the License.
       <EmbeddedResource Include="Application\IncomingMessages\FailSchemeValidationAggregatedMeasureData.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="Application\IncomingMessages\RequestAggregatedMeasureData.json">
+      <EmbeddedResource Include="Application\IncomingMessages\RequestAggregatedMeasureDataAsDdk.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Application\IncomingMessages\RequestAggregatedMeasureDataAsMdr.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <EmbeddedResource Include="Infrastructure.CimMessageAdapter\Messages\xml\BadRequestAggregatedMeasureData.xml">

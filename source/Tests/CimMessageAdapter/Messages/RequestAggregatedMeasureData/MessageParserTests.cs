@@ -22,7 +22,7 @@ using System.Xml.Linq;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Common.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
@@ -98,7 +98,7 @@ public class MessageParserTests
         using var assertionScope = new AssertionScope();
         Assert.True(result.Success);
         var marketMessage = (RequestAggregatedMeasureDataMessage)result!.IncomingMessage!;
-        Assert.True(marketMessage != null);
+        Assert.NotNull(marketMessage);
         Assert.Equal("123564789123564789123564789123564789", marketMessage.MessageId);
         Assert.Equal("D05", marketMessage.BusinessReason);
         Assert.Equal("5799999933318", marketMessage.SenderNumber);
@@ -110,7 +110,7 @@ public class MessageParserTests
 
         foreach (var serie in marketMessage.Series)
         {
-            Assert.True(serie != null);
+            Assert.NotNull(serie);
             Assert.Equal("123353185", serie.Id);
             Assert.Equal("5799999933318", serie.BalanceResponsiblePartyMarketParticipantId);
             Assert.Equal("5790001330552", serie.EnergySupplierMarketParticipantId);
@@ -131,7 +131,7 @@ public class MessageParserTests
         using var assertionScope = new AssertionScope();
         Assert.True(result.Success);
         var marketMessage = (RequestAggregatedMeasureDataMessage)result!.IncomingMessage!;
-        Assert.True(marketMessage != null);
+        Assert.NotNull(marketMessage);
         Assert.Equal("123564789123564789123564789123564789", marketMessage.MessageId);
         Assert.Equal("D05", marketMessage.BusinessReason);
         Assert.Equal("5799999933318", marketMessage.SenderNumber);
@@ -143,7 +143,7 @@ public class MessageParserTests
 
         foreach (var serie in marketMessage.Series)
         {
-            Assert.True(serie != null);
+            Assert.NotNull(serie);
             Assert.Equal("123353185", serie.Id);
             Assert.Equal("5799999933318", serie.BalanceResponsiblePartyMarketParticipantId);
             Assert.Equal("5790001330552", serie.EnergySupplierMarketParticipantId);
@@ -162,7 +162,7 @@ public class MessageParserTests
     {
         var result = await _marketMessageParser.ParseAsync(new IncomingMessageStream(message), format, IncomingDocumentType.RequestAggregatedMeasureData, CancellationToken.None);
 
-        Assert.True(result.Errors.Count > 0);
+        Assert.NotEmpty(result.Errors);
         Assert.True(result.Success == false);
         Assert.True(expectedError != null);
         Assert.Contains(result.Errors, error => error.GetType().Name == expectedError);

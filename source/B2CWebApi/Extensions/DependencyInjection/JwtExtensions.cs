@@ -14,8 +14,9 @@
 
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
-using Energinet.DataHub.EDI.B2CWebApi.Configuration.Options;
+using Energinet.DataHub.EDI.B2CWebApi.Extensions.Options;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
 
@@ -42,6 +43,9 @@ public static class JwtExtensions
         services.AddJwtBearerAuthentication(options.EXTERNAL_OPEN_ID_URL, options.INTERNAL_OPEN_ID_URL, options.BACKEND_BFF_APP_ID);
         services.AddUserAuthentication<FrontendUser, FrontendUserProvider>();
         services.AddPermissionAuthorization();
+        services
+            .AddScoped<AuthenticatedActor>()
+            .AddHttpContextAccessor();
 
         return services;
     }

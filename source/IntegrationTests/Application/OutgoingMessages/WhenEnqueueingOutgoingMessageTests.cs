@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
-using Energinet.DataHub.EDI.Common.DateTime;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
@@ -189,10 +190,14 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     public async Task Outgoing_message_record_is_added_to_file_storage_with_correct_content()
     {
         // Arrange
+        var serializer = new BuildingBlocks.Infrastructure.Serialization.Serializer();
         var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
             .Build();
-        var outgoingMessage = OutgoingMessage.CreateMessage(message, Instant.FromUtc(2024, 1, 1, 0, 0));
+        var outgoingMessage = OutgoingMessage.CreateMessage(
+            message,
+            serializer,
+            Instant.FromUtc(2024, 1, 1, 0, 0));
         // Act
         var createdId = await EnqueueAndCommitAsync(message);
 

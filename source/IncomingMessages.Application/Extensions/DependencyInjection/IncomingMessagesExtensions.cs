@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using BuildingBlocks.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators;
@@ -27,6 +28,10 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using AggregatedMeasureDataB2CJsonMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers.B2CJsonMessageParser;
+using AggregatedMeasureDataJsonMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers.JsonMessageParser;
+using AggregatedMeasureDataXmlMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers.XmlMessageParser;
+using WholesaleSettlementJsonMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.WholesaleSettlementMessageParsers.JsonMessageParser;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 
@@ -46,17 +51,18 @@ public static class IncomingMessagesExtensions
         var serviceBusOptions = configuration.Get<ServiceBusClientOptions>()!;
         services
             .AddServiceBus(configuration)
-            .AddExternalDomainServiceBusQueuesHealthCheck(
+            .TryAddExternalDomainServiceBusQueuesHealthCheck(
                 serviceBusOptions.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
                 serviceBusOptions.INCOMING_MESSAGES_QUEUE_NAME!)
-            .AddDatabase(configuration)
+            .AddDapperConnectionToDatabase(configuration)
             .AddScopedSqlDbContext<IncomingMessagesContext>(configuration)
             .AddScoped<IIncomingMessageClient, IncomingMessageClient>()
             .AddScoped<ITransactionIdRepository, TransactionIdRepository>()
             .AddScoped<IMessageIdRepository, MessageIdRepository>()
-            .AddScoped<IMessageParser, XmlMessageParser>()
-            .AddScoped<IMessageParser, JsonMessageParser>()
-            .AddScoped<IMessageParser, B2CJsonMessageParser>()
+            .AddScoped<IMessageParser, AggregatedMeasureDataXmlMessageParser>()
+            .AddScoped<IMessageParser, AggregatedMeasureDataJsonMessageParser>()
+            .AddScoped<IMessageParser, AggregatedMeasureDataB2CJsonMessageParser>()
+            .AddScoped<IMessageParser, WholesaleSettlementJsonMessageParser>()
             .AddScoped<MarketMessageParser>()
             .AddScoped<ISenderAuthorizer, SenderAuthorizer>()
             .AddScoped<IncomingRequestAggregatedMeasuredDataSender>()
