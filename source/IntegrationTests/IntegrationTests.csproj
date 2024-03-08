@@ -93,7 +93,10 @@ limitations under the License.
       <EmbeddedResource Include="Application\IncomingMessages\FailSchemeValidationAggregatedMeasureData.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="Application\IncomingMessages\RequestAggregatedMeasureData.json">
+      <EmbeddedResource Include="Application\IncomingMessages\RequestAggregatedMeasureDataAsDdk.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Application\IncomingMessages\RequestAggregatedMeasureDataAsMdr.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <EmbeddedResource Include="Infrastructure.CimMessageAdapter\Messages\xml\BadRequestAggregatedMeasureData.xml">

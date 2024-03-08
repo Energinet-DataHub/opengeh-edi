@@ -20,13 +20,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -34,6 +33,8 @@ using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Interfaces;
+using FluentAssertions;
+using FluentAssertions.Execution;
 using Xunit;
 using Serie = Energinet.DataHub.EDI.Process.Interfaces.Serie;
 
@@ -63,6 +64,7 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
             new object[] { ActorRole.EnergySupplier.Code },
             new object[] { ActorRole.MeteredDataResponsible.Code },
             new object[] { ActorRole.BalanceResponsibleParty.Code },
+            new object[] { ActorRole.GridOperator.Code },
         };
 
     public async Task InitializeAsync()
@@ -145,7 +147,11 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         Assert.False(messageParser.ParserResult.Success);
         Assert.Contains(messageParser.ParserResult.Errors, error => error is InvalidMessageStructure);
-        Assert.Contains(messageParser.ParserResult.Errors, error => error.Message.Contains(new InvalidReceiverRole().Target!, StringComparison.InvariantCultureIgnoreCase));
+        Assert.Contains(
+            messageParser.ParserResult.Errors,
+            error => error.Message.Contains(
+                new InvalidReceiverRole().Target!,
+                StringComparison.InvariantCultureIgnoreCase));
     }
 
     [Fact]
@@ -189,6 +195,38 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
         var result = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser.IncomingMessage!, CancellationToken.None);
 
         Assert.Contains(result.Errors, error => error is AuthenticatedUserDoesNotHoldRequiredRoleType);
+    }
+
+    [Fact]
+    public async Task
+        Authenticated_user_must_hold_the_role_type_as_specified_in_message_unless_Ddm_Mdr_hack_applicable()
+    {
+        // Arrange
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(ActorNumber.Create("0192837465019"), Restriction.None, ActorRole.GridOperator));
+
+        await using var message = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .WithReceiverId(DataHubDetails.DataHubActorNumber.Value)
+            .WithReceiverRole("DGL")
+            .WithSenderRole("MDR")
+            .WithSenderId("0192837465019")
+            .Message();
+
+        // Act
+        var messageParser = await ParseMessageAsync(message);
+        var result = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(
+            messageParser.IncomingMessage!,
+            CancellationToken.None);
+
+        // Assert
+        using var assertionScope = new AssertionScope();
+        result.Errors.Should().BeEmpty();
+
+        // RESET TEST CLASS!
+        authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(ActorNumber.Create("1234567890123"), Restriction.None, ActorRole.FromCode("DDQ")));
     }
 
     [Fact]
@@ -369,7 +407,11 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         Assert.False(messageParser.ParserResult.Success);
         Assert.Contains(messageParser.ParserResult.Errors, error => error is InvalidMessageStructure);
-        Assert.Contains(messageParser.ParserResult.Errors, error => error.Message.Contains(new NotSupportedProcessType(string.Empty).Target!, StringComparison.InvariantCultureIgnoreCase));
+        Assert.Contains(
+            messageParser.ParserResult.Errors,
+            error => error.Message.Contains(
+                new NotSupportedProcessType(string.Empty).Target!,
+                StringComparison.InvariantCultureIgnoreCase));
     }
 
     [Fact]
@@ -389,7 +431,11 @@ public class RequestAggregatedMeasureDataReceiverTests : TestBase, IAsyncLifetim
 
         Assert.False(messageParser.ParserResult.Success);
         Assert.Contains(messageParser.ParserResult.Errors, error => error is InvalidMessageStructure);
-        Assert.Contains(messageParser.ParserResult.Errors, error => error.Message.Contains(new NotSupportedMessageType(string.Empty).Target!, StringComparison.InvariantCultureIgnoreCase));
+        Assert.Contains(
+            messageParser.ParserResult.Errors,
+            error => error.Message.Contains(
+                new NotSupportedMessageType(string.Empty).Target!,
+                StringComparison.InvariantCultureIgnoreCase));
     }
 
     [Fact]
