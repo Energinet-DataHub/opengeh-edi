@@ -318,6 +318,16 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         Assert.Equal(existingBundleId, bundleIdForMessage2);
     }
 
+
+    [Fact]
+    public void Given_ReceiverActorRoleIsMDR_When_EnqueingNotifyAggregatedMeasureData_Then_MessageShouldBeEnqueuedAsDDM()
+    {
+        var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.MeteredDataResponsible);
+
+
+
+    }
+
     protected override void Dispose(bool disposing)
     {
         _context.Dispose();
