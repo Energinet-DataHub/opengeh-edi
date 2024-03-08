@@ -93,7 +93,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
 
         // Act
         await _incomingMessagesRequest.RegisterAndSendAsync(
-            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataWithDdmMdrHack.json"),
+            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsMdr.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
             CancellationToken.None);
