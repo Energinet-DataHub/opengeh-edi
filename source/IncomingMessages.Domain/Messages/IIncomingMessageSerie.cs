@@ -12,23 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 
-namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Exceptions;
-
-public class NotSupportedTimeSeriesTypeException : InvalidOperationException
+/// <summary>
+/// Represents a serie of an incoming message
+/// </summary>
+public interface IIncomingMessageSerie
 {
-    public NotSupportedTimeSeriesTypeException()
-    {
-    }
+    /// <summary>
+    /// Id of the incoming message serie
+    /// </summary>
+    public string TransactionId { get; }
 
-    public NotSupportedTimeSeriesTypeException(string message)
-        : base(message)
-    {
-    }
+    /// <summary>
+    /// Start Date and Time of the incoming message serie
+    /// </summary>
+    public string StartDateTime { get; }
 
-    public NotSupportedTimeSeriesTypeException(string message, Exception innerException)
-        : base(message, innerException)
-    {
-    }
+    /// <summary>
+    /// End Date and Time of the incoming message serie
+    /// </summary>
+    public string? EndDateTime { get; }
 }

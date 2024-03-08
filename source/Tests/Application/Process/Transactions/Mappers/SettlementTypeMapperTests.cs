@@ -25,12 +25,7 @@ public class SettlementTypeMapperTests : BaseEnumMapperTests
         EnergyResultProducedV2.Types.TimeSeriesType.Production,
         EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerGa,
         EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerNeighboringGa,
-        EnergyResultProducedV2.Types.TimeSeriesType.GridLoss,
-        EnergyResultProducedV2.Types.TimeSeriesType.NegativeGridLoss,
-        EnergyResultProducedV2.Types.TimeSeriesType.PositiveGridLoss,
         EnergyResultProducedV2.Types.TimeSeriesType.TotalConsumption,
-        EnergyResultProducedV2.Types.TimeSeriesType.TempFlexConsumption,
-        EnergyResultProducedV2.Types.TimeSeriesType.TempProduction,
     };
 
     [Theory]

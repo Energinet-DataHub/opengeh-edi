@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
-using Energinet.DataHub.EDI.Process.Interfaces;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 
 /// <summary>
 /// Responsible for receiving a incoming message.
 /// </summary>
-public interface IRequestAggregatedMeasureDataReceiver
+public interface IIncomingMessageReceiver
 {
     /// <summary>
     /// Responsible for receiving the incoming message.
     /// </summary>
     Task<Result> ReceiveAsync(
-        RequestAggregatedMeasureDataDto requestAggregatedMeasureDataDto,
+        IIncomingMessage incomingMessage,
         CancellationToken cancellationToken);
 }

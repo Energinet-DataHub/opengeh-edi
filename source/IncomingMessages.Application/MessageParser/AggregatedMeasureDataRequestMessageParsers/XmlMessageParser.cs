@@ -20,7 +20,8 @@ using System.Xml;
 using System.Xml.Schema;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.Xml;
-using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Application.Factories;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 
@@ -145,7 +146,7 @@ public class XmlMessageParser : IMessageParser
             .ExtractAsync(reader, root, HeaderElementName, SeriesRecordElementName)
             .ConfigureAwait(false);
 
-        var series = new List<Serie>();
+        var series = new List<RequestAggregatedMeasureDataSerie>();
         await foreach (var serie in ParseSerieAsync(reader, root))
         {
             series.Add(serie);
@@ -155,7 +156,7 @@ public class XmlMessageParser : IMessageParser
             RequestAggregatedMeasureDataMessageFactory.Create(messageHeader, series.AsReadOnly()));
     }
 
-    private static async IAsyncEnumerable<Serie> ParseSerieAsync(XmlReader reader, RootElement rootElement)
+    private static async IAsyncEnumerable<RequestAggregatedMeasureDataSerie> ParseSerieAsync(XmlReader reader, RootElement rootElement)
     {
         var id = string.Empty;
         var marketEvaluationPointType = string.Empty;
@@ -233,7 +234,7 @@ public class XmlMessageParser : IMessageParser
         }
     }
 
-    private static Serie CreateSerie(
+    private static RequestAggregatedMeasureDataSerie CreateSerie(
         ref string id,
         ref string? marketEvaluationPointType,
         ref string? marketEvaluationSettlementMethod,
@@ -244,7 +245,7 @@ public class XmlMessageParser : IMessageParser
         ref string? balanceResponsiblePartyMarketParticipantId,
         ref string? settlementSeriesVersion)
     {
-        var serie = new Serie(
+        var serie = new RequestAggregatedMeasureDataSerie(
             id,
             marketEvaluationPointType,
             marketEvaluationSettlementMethod,
