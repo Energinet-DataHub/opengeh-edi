@@ -19,16 +19,16 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.Tests.Factories;
 
-public static class WholesaleServicesMessageDtoBuilder
+public class WholesaleServicesMessageDtoBuilder
 {
     private static readonly ActorNumber _receiverNumber = ActorNumber.Create("1234567890123");
-    private static readonly ActorRole _receiverRole = ActorRole.MeteredDataResponsible;
     private static readonly ActorNumber _chargeOwner = DataHubDetails.DataHubActorNumber;
     private static readonly Guid _processId = Guid.NewGuid();
-
     private static readonly BusinessReason _businessReason = BusinessReason.BalanceFixing;
 
-    public static WholesaleServicesMessageDto Build()
+    private ActorRole _receiverRole = ActorRole.MeteredDataResponsible;
+
+    public WholesaleServicesMessageDto Build()
     {
         var series = new WholesaleServicesSeriesBuilder().BuildWholesaleCalculation();
 
@@ -39,5 +39,11 @@ public static class WholesaleServicesMessageDtoBuilder
             _processId,
             _businessReason,
             series);
+    }
+
+    public WholesaleServicesMessageDtoBuilder WithReceiverRole(ActorRole receiverRole)
+    {
+        _receiverRole = receiverRole;
+        return this;
     }
 }
