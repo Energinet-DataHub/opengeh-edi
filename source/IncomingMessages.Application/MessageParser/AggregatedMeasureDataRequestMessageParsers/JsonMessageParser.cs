@@ -19,8 +19,9 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IncomingMessages.Application.Factories;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.BaseParsers;
-using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 
@@ -85,9 +86,9 @@ public class JsonMessageParser : JsonParserBase, IMessageParser
         }
     }
 
-    private static Serie SeriesFrom(JsonElement element)
+    private static RequestAggregatedMeasureDataSerie SeriesFrom(JsonElement element)
     {
-        return new Serie(
+        return new RequestAggregatedMeasureDataSerie(
             element.GetProperty("mRID").ToString(),
             GetPropertyWithValue(element, "marketEvaluationPoint.type"),
             GetPropertyWithValue(element, "marketEvaluationPoint.settlementMethod"),
@@ -108,7 +109,7 @@ public class JsonMessageParser : JsonParserBase, IMessageParser
         MessageHeader header,
         JsonElement seriesJson)
     {
-        var series = new List<Serie>();
+        var series = new List<RequestAggregatedMeasureDataSerie>();
 
         foreach (var jsonElement in seriesJson.EnumerateArray())
         {

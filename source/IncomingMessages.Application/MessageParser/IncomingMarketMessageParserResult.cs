@@ -13,9 +13,10 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Application.Messages
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser
 {
     public class IncomingMarketMessageParserResult
     {

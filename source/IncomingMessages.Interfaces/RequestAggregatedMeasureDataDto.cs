@@ -14,9 +14,12 @@
 
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
+namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 
-public record WholesaleSettlementMessage(
+/// <summary>
+/// Responsible for carrying the market message data from the incoming message before any data validation.
+/// </summary>
+public record RequestAggregatedMeasureDataDto(
     string SenderNumber,
     string SenderRoleCode,
     string ReceiverNumber,
@@ -26,17 +29,15 @@ public record WholesaleSettlementMessage(
     string MessageId,
     string CreatedAt,
     string? BusinessType,
-    IReadOnlyCollection<WholesaleSettlementSerie> Series) : IIncomingMessage;
+    IReadOnlyCollection<Serie> Serie);
 
-public record WholesaleSettlementSerie(
+public record Serie(
     string Id,
+    string? MarketEvaluationPointType,
+    string? MarketEvaluationSettlementMethod,
     string StartDateAndOrTimeDateTime,
     string? EndDateAndOrTimeDateTime,
     string? MeteringGridAreaDomainId,
     string? EnergySupplierMarketParticipantId,
-    string? SettlementSeriesVersion,
-    string? Resolution,
-    string? ChargeOwner,
-    IReadOnlyCollection<ChargeType> ChargeTypes);
-
-public record ChargeType(string? Id, string? Type);
+    string? BalanceResponsiblePartyMarketParticipantId,
+    string? SettlementSeriesVersion);

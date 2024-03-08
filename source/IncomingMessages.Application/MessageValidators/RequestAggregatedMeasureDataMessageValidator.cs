@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
@@ -55,17 +55,17 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators
         }
 
         public async Task<Result> ValidateAsync(
-            RequestAggregatedMeasureDataMessage requestAggregatedMeasureDataDto,
+            RequestAggregatedMeasureDataMessage requestAggregatedMeasureDataMessage,
             CancellationToken cancellationToken)
         {
-            ArgumentNullException.ThrowIfNull(requestAggregatedMeasureDataDto);
+            ArgumentNullException.ThrowIfNull(requestAggregatedMeasureDataMessage);
 
-            var authorizeSenderTask = AuthorizeSenderAsync(requestAggregatedMeasureDataDto);
-            var verifyReceiverTask = VerifyReceiverAsync(requestAggregatedMeasureDataDto);
-            var checkMessageIdTask = CheckMessageIdAsync(requestAggregatedMeasureDataDto.SenderNumber, requestAggregatedMeasureDataDto.MessageId, cancellationToken);
-            var checkMessageTypeTask = CheckMessageTypeAsync(requestAggregatedMeasureDataDto.MessageType, cancellationToken);
-            var checkProcessTypeTask = CheckBusinessReasonAsync(requestAggregatedMeasureDataDto.BusinessReason, cancellationToken);
-            var checkBusinessTypeTask = CheckBusinessTypeAsync(requestAggregatedMeasureDataDto.BusinessType, cancellationToken);
+            var authorizeSenderTask = AuthorizeSenderAsync(requestAggregatedMeasureDataMessage);
+            var verifyReceiverTask = VerifyReceiverAsync(requestAggregatedMeasureDataMessage);
+            var checkMessageIdTask = CheckMessageIdAsync(requestAggregatedMeasureDataMessage.SenderNumber, requestAggregatedMeasureDataMessage.MessageId, cancellationToken);
+            var checkMessageTypeTask = CheckMessageTypeAsync(requestAggregatedMeasureDataMessage.MessageType, cancellationToken);
+            var checkProcessTypeTask = CheckBusinessReasonAsync(requestAggregatedMeasureDataMessage.BusinessReason, cancellationToken);
+            var checkBusinessTypeTask = CheckBusinessTypeAsync(requestAggregatedMeasureDataMessage.BusinessType, cancellationToken);
 
             await Task.WhenAll(
                 authorizeSenderTask,
@@ -76,13 +76,13 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators
                 checkBusinessTypeTask).ConfigureAwait(false);
 
             var transactionIdsToBeStored = new List<string>();
-            foreach (var serie in requestAggregatedMeasureDataDto.Series)
+            foreach (var serie in requestAggregatedMeasureDataMessage.Serie)
             {
-                var transactionId = serie.Id;
+                var transactionId = serie.TransactionId;
 
                 if (await CheckTransactionIdAsync(
                         transactionId,
-                        requestAggregatedMeasureDataDto.SenderNumber,
+                        requestAggregatedMeasureDataMessage.SenderNumber,
                         transactionIdsToBeStored,
                         cancellationToken).ConfigureAwait(false))
                 {
