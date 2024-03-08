@@ -85,14 +85,14 @@ public class JsonMessageParser : JsonParserBase, IMessageParser
         MessageHeader header,
         JsonElement seriesJson)
     {
-        var series = new List<RequestWholesaleSettlementSerie>();
+        var series = new List<RequestWholesaleServiceSerie>();
 
         foreach (var jsonElement in seriesJson.EnumerateArray())
         {
             series.Add(SeriesFrom(jsonElement));
         }
 
-        return new IncomingMarketMessageParserResult(new RequestWholesaleSettlementMessage(
+        return new IncomingMarketMessageParserResult(new RequestWholesaleServicesMessage(
             header.SenderId,
             header.SenderRole,
             header.ReceiverId,
@@ -105,9 +105,9 @@ public class JsonMessageParser : JsonParserBase, IMessageParser
             series.AsReadOnly()));
     }
 
-    private static RequestWholesaleSettlementSerie SeriesFrom(JsonElement element)
+    private static RequestWholesaleServiceSerie SeriesFrom(JsonElement element)
     {
-        var chargeTypes = new List<RequestWholesaleSettlementChargeType>();
+        var chargeTypes = new List<RequestWholesaleServiceChargeType>();
         JsonElement? chargeTypeElements = element.TryGetProperty("ChargeType", out var chargeTypesElement)
             ? chargeTypesElement
             : null;
@@ -115,13 +115,13 @@ public class JsonMessageParser : JsonParserBase, IMessageParser
         {
             foreach (var chargeTypeElement in chargeTypeElements.Value.EnumerateArray())
             {
-                chargeTypes.Add(new RequestWholesaleSettlementChargeType(
+                chargeTypes.Add(new RequestWholesaleServiceChargeType(
                     chargeTypeElement.TryGetProperty("mRID", out var id) ? id.ToString() : null,
                     GetPropertyWithValue(chargeTypeElement, "type")));
             }
         }
 
-        return new RequestWholesaleSettlementSerie(
+        return new RequestWholesaleServiceSerie(
             element.GetProperty("mRID").ToString(),
             element.GetProperty("start_DateAndOrTime.dateTime").ToString(),
             element.TryGetProperty("end_DateAndOrTime.dateTime", out var endDateProperty) ? endDateProperty.ToString() : null,

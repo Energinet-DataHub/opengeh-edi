@@ -77,7 +77,7 @@ public class MessageParserTests
         var result = await _marketMessageParser.ParseAsync(new IncomingMessageStream(message), format, IncomingDocumentType.RequestWholesaleSettlement, CancellationToken.None);
         using var assertionScope = new AssertionScope();
         Assert.True(result.Success);
-        var marketMessage = (RequestWholesaleSettlementMessage)result!.IncomingMessage!;
+        var marketMessage = (RequestWholesaleServicesMessage)result!.IncomingMessage!;
         Assert.NotNull(marketMessage);
         Assert.Equal("12345678", marketMessage.MessageId);
         Assert.Equal("D05", marketMessage.BusinessReason);
@@ -88,17 +88,17 @@ public class MessageParserTests
         Assert.Equal("2022-12-17T09:30:47Z", marketMessage.CreatedAt);
         Assert.Equal("23", marketMessage.BusinessType);
 
-        foreach (var serie in marketMessage.Serie.Cast<RequestWholesaleSettlementSerie>())
+        foreach (var serie in marketMessage.Serie.Cast<RequestWholesaleServiceSerie>())
         {
             Assert.NotNull(serie);
             Assert.Equal("25836143", serie.TransactionId);
             Assert.Equal("PT1M", serie.Resolution);
             Assert.Equal("570001110111", serie.ChargeOwner);
             Assert.Equal("5799999933318", serie.EnergySupplierMarketParticipantId);
-            Assert.Equal("2022-08-31T22:00:00Z", serie.EndDateAndOrTimeDateTime);
+            Assert.Equal("2022-08-31T22:00:00Z", serie.EndDateTime);
             Assert.Equal("244", serie.MeteringGridAreaDomainId);
             Assert.Equal("D01", serie.SettlementSeriesVersion);
-            Assert.Equal("2022-08-17T22:00:00Z", serie.StartDateAndOrTimeDateTime);
+            Assert.Equal("2022-08-17T22:00:00Z", serie.StartDateTime);
             foreach (var chargeType in serie.ChargeTypes)
             {
                 Assert.True(chargeType != null);

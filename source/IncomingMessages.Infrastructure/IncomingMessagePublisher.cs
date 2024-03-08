@@ -23,12 +23,12 @@ using ServiceBusClientOptions = Energinet.DataHub.EDI.IncomingMessages.Infrastru
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 
-public class IncomingMessageSender
+public class IncomingMessagePublisher
 {
     private readonly ISerializer _serializer;
     private readonly IServiceBusSenderAdapter _senderCreator;
 
-    public IncomingMessageSender(
+    public IncomingMessagePublisher(
         IServiceBusSenderFactory serviceBusSenderFactory,
         IOptions<ServiceBusClientOptions> options,
         ISerializer serializer)
@@ -40,7 +40,7 @@ public class IncomingMessageSender
         _senderCreator = serviceBusSenderFactory.GetSender(options.Value.INCOMING_MESSAGES_QUEUE_NAME);
     }
 
-    public async Task SendAsync(
+    public async Task PublishAsync(
         IIncomingMessage incomingMessage,
         CancellationToken cancellationToken)
     {
@@ -50,7 +50,7 @@ public class IncomingMessageSender
             case RequestAggregatedMeasureDataMessage requestAggregatedMeasureDataMessage:
                 await SendRequestAggregatedMeasureDateAsync(RequestAggregatedMeasureDataDtoFactory.Create(requestAggregatedMeasureDataMessage), cancellationToken).ConfigureAwait(false);
                 break;
-            case RequestWholesaleSettlementMessage wholesaleSettlementMessage:
+            case RequestWholesaleServicesMessage wholesaleSettlementMessage:
                 await SendRequestAggregatedMeasureDateAsync(RequestWholesaleServicesDtoFactory.Create(wholesaleSettlementMessage), cancellationToken).ConfigureAwait(false);
                 break;
             default:

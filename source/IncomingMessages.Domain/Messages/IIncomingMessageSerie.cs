@@ -27,10 +27,10 @@ public interface IIncomingMessageSerie
     /// <summary>
     /// Start Date and Time of the incoming message serie
     /// </summary>
-    public string StartDateAndOrTimeDateTime { get; }
+    public string StartDateTime { get; }
 
     /// <summary>
     /// End Date and Time of the incoming message serie
     /// </summary>
-    public string? EndDateAndOrTimeDateTime { get; }
+    public string? EndDateTime { get; }
 }

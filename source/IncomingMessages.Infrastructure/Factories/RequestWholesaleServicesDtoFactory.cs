@@ -19,17 +19,17 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Factories;
 
 public static class RequestWholesaleServicesDtoFactory
 {
-    public static InitializeWholesaleServicesProcessDto Create(RequestWholesaleSettlementMessage wholesaleSettlementMessage)
+    public static InitializeWholesaleServicesProcessDto Create(RequestWholesaleServicesMessage wholesaleServicesMessage)
     {
-        ArgumentNullException.ThrowIfNull(wholesaleSettlementMessage);
+        ArgumentNullException.ThrowIfNull(wholesaleServicesMessage);
 
-        var series = wholesaleSettlementMessage.Serie
-            .Cast<RequestWholesaleSettlementSerie>()
+        var series = wholesaleServicesMessage.Serie
+            .Cast<RequestWholesaleServiceSerie>()
             .Select(
                 serie => new RequestWholesaleServicesSerie(
                     serie.TransactionId,
-                    serie.StartDateAndOrTimeDateTime,
-                    serie.EndDateAndOrTimeDateTime,
+                    serie.StartDateTime,
+                    serie.EndDateTime,
                     serie.MeteringGridAreaDomainId,
                     serie.EnergySupplierMarketParticipantId,
                     serie.SettlementSeriesVersion,
@@ -42,15 +42,15 @@ public static class RequestWholesaleServicesDtoFactory
             .ToList().AsReadOnly();
 
         return new InitializeWholesaleServicesProcessDto(
-                wholesaleSettlementMessage.SenderNumber,
-                wholesaleSettlementMessage.SenderRoleCode,
-                wholesaleSettlementMessage.ReceiverNumber,
-                wholesaleSettlementMessage.ReceiverRoleCode,
-                wholesaleSettlementMessage.BusinessReason,
-                wholesaleSettlementMessage.MessageType,
-                wholesaleSettlementMessage.MessageId,
-                wholesaleSettlementMessage.CreatedAt,
-                wholesaleSettlementMessage.BusinessType,
+                wholesaleServicesMessage.SenderNumber,
+                wholesaleServicesMessage.SenderRoleCode,
+                wholesaleServicesMessage.ReceiverNumber,
+                wholesaleServicesMessage.ReceiverRoleCode,
+                wholesaleServicesMessage.BusinessReason,
+                wholesaleServicesMessage.MessageType,
+                wholesaleServicesMessage.MessageId,
+                wholesaleServicesMessage.CreatedAt,
+                wholesaleServicesMessage.BusinessType,
                 series);
     }
 }

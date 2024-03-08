@@ -14,7 +14,7 @@
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 
-public record RequestWholesaleSettlementMessage(
+public record RequestWholesaleServicesMessage(
     string SenderNumber,
     string SenderRoleCode,
     string ReceiverNumber,
@@ -26,15 +26,15 @@ public record RequestWholesaleSettlementMessage(
     string? BusinessType,
     IReadOnlyCollection<IIncomingMessageSerie> Serie) : IIncomingMessage;
 
-public record RequestWholesaleSettlementSerie(
+public record RequestWholesaleServiceSerie(
     string TransactionId,
-    string StartDateAndOrTimeDateTime,
-    string? EndDateAndOrTimeDateTime,
+    string StartDateTime,
+    string? EndDateTime,
     string? MeteringGridAreaDomainId,
     string? EnergySupplierMarketParticipantId,
     string? SettlementSeriesVersion,
     string? Resolution,
     string? ChargeOwner,
-    IReadOnlyCollection<RequestWholesaleSettlementChargeType> ChargeTypes) : IIncomingMessageSerie;
+    IReadOnlyCollection<RequestWholesaleServiceChargeType> ChargeTypes) : IIncomingMessageSerie;
 
-public record RequestWholesaleSettlementChargeType(string? Id, string? Type);
+public record RequestWholesaleServiceChargeType(string? Id, string? Type);
