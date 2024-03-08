@@ -31,6 +31,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit;
@@ -80,6 +81,32 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
           () => Assert.NotNull(message),
           () => Assert.Single(transactionIds),
           () => Assert.Single(messageIds));
+    }
+
+    [Fact]
+    public async Task Incoming_message_is_received_with_Ddm_Mdr_hack()
+    {
+        // Assert
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        var senderActorNumber = ActorNumber.Create("5799999933318");
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.GridOperator));
+
+        // Act
+        await _incomingMessagesRequest.RegisterAndSendAsync(
+            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataWithDdmMdrHack.json"),
+            DocumentFormat.Json,
+            IncomingDocumentType.RequestAggregatedMeasureData,
+            CancellationToken.None);
+
+        // Assert
+        var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
+        var messageIds = await GetMessageIdsAsync(senderActorNumber);
+        var message = _senderSpy.Message;
+
+        using var assertionScope = new AssertionScope();
+        message.Should().NotBeNull();
+        transactionIds.Should().ContainSingle();
+        messageIds.Should().ContainSingle();
     }
 
     [Fact]
