@@ -13,11 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.IncomingMessages.Application.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers;
 
@@ -42,9 +44,35 @@ public class B2CJsonMessageParser : IMessageParser
     {
         ArgumentNullException.ThrowIfNull(incomingMessageStream);
 
-        var requestAggregatedMeasureData = await _serializer
-            .DeserializeAsync<RequestAggregatedMeasureDataMessage>(incomingMessageStream.Stream, cancellationToken)
+        var requestAggregatedMeasureDataDto = await _serializer
+            .DeserializeAsync<RequestAggregatedMeasureDataDto>(incomingMessageStream.Stream, cancellationToken)
             .ConfigureAwait(false);
+
+        var series = requestAggregatedMeasureDataDto.Serie
+            .Select(
+                serie => new RequestAggregatedMeasureDataSerie(
+                    serie.Id,
+                    serie.MarketEvaluationPointType,
+                    serie.MarketEvaluationSettlementMethod,
+                    serie.StartDateAndOrTimeDateTime,
+                    serie.EndDateAndOrTimeDateTime,
+                    serie.MeteringGridAreaDomainId,
+                    serie.EnergySupplierMarketParticipantId,
+                    serie.BalanceResponsiblePartyMarketParticipantId,
+                    serie.SettlementSeriesVersion)).ToList().AsReadOnly();
+
+        var requestAggregatedMeasureData = new RequestAggregatedMeasureDataMessage(
+            requestAggregatedMeasureDataDto.SenderNumber,
+            requestAggregatedMeasureDataDto.SenderRoleCode,
+            requestAggregatedMeasureDataDto.ReceiverNumber,
+            requestAggregatedMeasureDataDto.ReceiverRoleCode,
+            requestAggregatedMeasureDataDto.BusinessReason,
+            requestAggregatedMeasureDataDto.MessageType,
+            requestAggregatedMeasureDataDto.MessageId,
+            requestAggregatedMeasureDataDto.CreatedAt,
+            requestAggregatedMeasureDataDto.BusinessType,
+            series);
+
         return new IncomingMarketMessageParserResult(requestAggregatedMeasureData);
     }
 }

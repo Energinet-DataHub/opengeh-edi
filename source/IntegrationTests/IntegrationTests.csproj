@@ -66,6 +66,7 @@ limitations under the License.
       <ProjectReference Include="..\DataAccess.UnitOfWork\DataAccess.UnitOfWork.csproj"/>
       <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
       <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj" />
+      <ProjectReference Include="..\IncomingMessages.Domain\IncomingMessages.Domain.csproj" />
       <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\IntegrationEvents\IntegrationEvents.Application\IntegrationEvents.Application.csproj" />
       <ProjectReference Include="..\IntegrationEvents\IntegrationEvents.Infrastructure\IntegrationEvents.Infrastructure.csproj" />
@@ -93,10 +94,16 @@ limitations under the License.
       <EmbeddedResource Include="Application\IncomingMessages\FailSchemeValidationAggregatedMeasureData.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+      <EmbeddedResource Include="Application\IncomingMessages\FailSchemeValidationRequestWholesaleSettlement.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
       <EmbeddedResource Include="Application\IncomingMessages\RequestAggregatedMeasureDataAsDdk.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <EmbeddedResource Include="Application\IncomingMessages\RequestAggregatedMeasureDataAsMdr.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Application\IncomingMessages\RequestWholesaleSettlement.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <EmbeddedResource Include="Infrastructure.CimMessageAdapter\Messages\xml\BadRequestAggregatedMeasureData.xml">

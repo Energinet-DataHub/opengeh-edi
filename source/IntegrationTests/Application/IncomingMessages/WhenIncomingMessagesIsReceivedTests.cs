@@ -57,8 +57,27 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         _dateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
     }
 
-    [Fact]
-    public async Task Incoming_message_is_received()
+    public static IEnumerable<object[]> ValidIncomingRequestMessages()
+    {
+        return new List<object[]>
+        {
+            new object[] { DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData, ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json") },
+            new object[] { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ReadJsonFile("Application\\IncomingMessages\\RequestWholesaleSettlement.json") },
+        };
+    }
+
+    public static IEnumerable<object[]> InvalidIncomingRequestMessages()
+    {
+        return new List<object[]>
+        {
+            new object[] { DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData, ReadJsonFile("Application\\IncomingMessages\\FailSchemeValidationAggregatedMeasureData.json") },
+            new object[] { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ReadJsonFile("Application\\IncomingMessages\\FailSchemeValidationRequestWholesaleSettlement.json") },
+        };
+    }
+
+    [Theory]
+    [MemberData(nameof(ValidIncomingRequestMessages))]
+    public async Task Incoming_message_is_received(DocumentFormat format, IncomingDocumentType incomingDocumentType, IncomingMessageStream incomingMessageStream)
     {
       // Assert
       var authenticatedActor = GetService<AuthenticatedActor>();
@@ -67,9 +86,9 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
 
       // Act
       await _incomingMessagesRequest.RegisterAndSendAsync(
-          ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json"),
-          DocumentFormat.Json,
-          IncomingDocumentType.RequestAggregatedMeasureData,
+          incomingMessageStream,
+          format,
+          incomingDocumentType,
           CancellationToken.None);
 
       // Assert
@@ -109,8 +128,9 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         messageIds.Should().ContainSingle();
     }
 
-    [Fact]
-    public async Task Transaction_and_message_ids_are_not_saved_when_failing_to_send_to_ServiceBus()
+    [Theory]
+    [MemberData(nameof(ValidIncomingRequestMessages))]
+    public async Task Transaction_and_message_ids_are_not_saved_when_failing_to_send_to_ServiceBus(DocumentFormat format, IncomingDocumentType incomingDocumentType, IncomingMessageStream incomingMessageStream)
     {
         // Assert
         var authenticatedActor = GetService<AuthenticatedActor>();
@@ -120,9 +140,9 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
 
         // Act & Assert
         await Assert.ThrowsAsync<ServiceBusException>(() => _incomingMessagesRequest.RegisterAndSendAsync(
-            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json"),
-            DocumentFormat.Json,
-            IncomingDocumentType.RequestAggregatedMeasureData,
+            incomingMessageStream,
+            format,
+            incomingDocumentType,
             CancellationToken.None));
 
         var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
@@ -137,8 +157,9 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         _senderSpy.ShouldFail = false;
     }
 
-    [Fact]
-    public async Task Only_one_request_pr_transactionId_and_messageId_is_accepted()
+    [Theory]
+    [MemberData(nameof(ValidIncomingRequestMessages))]
+    public async Task Only_one_request_pr_transactionId_and_messageId_is_accepted(DocumentFormat format, IncomingDocumentType incomingDocumentType, IncomingMessageStream incomingMessageStream)
     {
         // Arrange
         var authenticatedActor = GetService<AuthenticatedActor>();
@@ -154,14 +175,14 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, restriction: Restriction.None, ActorRole.BalanceResponsibleParty));
 
         var task01 = _incomingMessagesRequest.RegisterAndSendAsync(
-            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json"),
-            DocumentFormat.Json,
-            IncomingDocumentType.RequestAggregatedMeasureData,
+            incomingMessageStream,
+            format,
+            incomingDocumentType,
             CancellationToken.None);
         var task02 = secondParser.RegisterAndSendAsync(
-            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json"),
-            DocumentFormat.Json,
-            IncomingDocumentType.RequestAggregatedMeasureData,
+            incomingMessageStream,
+            format,
+            incomingDocumentType,
             CancellationToken.None);
 
         // Act
@@ -179,8 +200,9 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             () => Assert.Single(messageIds));
     }
 
-    [Fact]
-    public async Task Second_request_with_same_transactionId_and_messageId_is_rejected()
+    [Theory]
+    [MemberData(nameof(ValidIncomingRequestMessages))]
+    public async Task Second_request_with_same_transactionId_and_messageId_is_rejected(DocumentFormat format, IncomingDocumentType incomingDocumentType, IncomingMessageStream incomingMessageStream)
     {
         // Arrange
         var exceptedDuplicateTransactionIdDetectedErrorCode = "00110";
@@ -198,14 +220,14 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, restriction: Restriction.None, ActorRole.BalanceResponsibleParty));
 
         var task01 = _incomingMessagesRequest.RegisterAndSendAsync(
-            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json"),
-            DocumentFormat.Json,
-            IncomingDocumentType.RequestAggregatedMeasureData,
+            incomingMessageStream,
+            format,
+            incomingDocumentType,
             CancellationToken.None);
         var task02 = secondParser.RegisterAndSendAsync(
-            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json"),
-            DocumentFormat.Json,
-            IncomingDocumentType.RequestAggregatedMeasureData,
+            incomingMessageStream,
+            format,
+            incomingDocumentType,
             CancellationToken.None);
 
         // Act
@@ -220,8 +242,9 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
                 || result.MessageBody.Contains(exceptedDuplicateMessageIdDetectedErrorCode, StringComparison.OrdinalIgnoreCase))));
     }
 
-    [Fact]
-    public async Task Transaction_and_message_ids_are_not_saved_when_receiving_a_faulted_request()
+    [Theory]
+    [MemberData(nameof(InvalidIncomingRequestMessages))]
+    public async Task Transaction_and_message_ids_are_not_saved_when_receiving_a_faulted_request(DocumentFormat format, IncomingDocumentType incomingDocumentType, IncomingMessageStream incomingMessageStream)
     {
         // Assert
         var senderActorNumber = ActorNumber.Create("5799999933318");
@@ -230,9 +253,9 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
 
         // Act
         await _incomingMessagesRequest.RegisterAndSendAsync(
-            ReadJsonFile("Application\\IncomingMessages\\FailSchemeValidationAggregatedMeasureData.json"),
-            DocumentFormat.Json,
-            IncomingDocumentType.RequestAggregatedMeasureData,
+            incomingMessageStream,
+            format,
+            incomingDocumentType,
             CancellationToken.None);
 
         // Assert
