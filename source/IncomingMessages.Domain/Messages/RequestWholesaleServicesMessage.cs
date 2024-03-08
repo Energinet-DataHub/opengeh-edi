@@ -26,7 +26,7 @@ public record RequestWholesaleServicesMessage(
     string? BusinessType,
     IReadOnlyCollection<IIncomingMessageSerie> Serie) : IIncomingMessage;
 
-public record RequestWholesaleServiceSerie(
+public record RequestWholesaleServicesSerie(
     string TransactionId,
     string StartDateTime,
     string? EndDateTime,
@@ -35,6 +35,6 @@ public record RequestWholesaleServiceSerie(
     string? SettlementSeriesVersion,
     string? Resolution,
     string? ChargeOwner,
-    IReadOnlyCollection<RequestWholesaleServiceChargeType> ChargeTypes) : IIncomingMessageSerie;
+    IReadOnlyCollection<RequestWholesaleServicesChargeType> ChargeTypes) : IIncomingMessageSerie;
 
-public record RequestWholesaleServiceChargeType(string? Id, string? Type);
+public record RequestWholesaleServicesChargeType(string? Id, string? Type);

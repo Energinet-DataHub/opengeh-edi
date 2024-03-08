@@ -24,9 +24,9 @@ public static class RequestWholesaleServicesDtoFactory
         ArgumentNullException.ThrowIfNull(wholesaleServicesMessage);
 
         var series = wholesaleServicesMessage.Serie
-            .Cast<RequestWholesaleServiceSerie>()
+            .Cast<RequestWholesaleServicesSerie>()
             .Select(
-                serie => new RequestWholesaleServicesSerie(
+                serie => new InitializeWholesaleServicesSerie(
                     serie.TransactionId,
                     serie.StartDateTime,
                     serie.EndDateTime,
@@ -37,7 +37,7 @@ public static class RequestWholesaleServicesDtoFactory
                     serie.ChargeOwner,
                     serie.ChargeTypes
                         .Select(
-                            chargeType => new RequestWholesaleServicesChargeType(chargeType.Id, chargeType.Type))
+                            chargeType => new InitializeWholesaleServicesChargeType(chargeType.Id, chargeType.Type))
                         .ToList().AsReadOnly()))
             .ToList().AsReadOnly();
 

@@ -26,9 +26,9 @@ public record InitializeWholesaleServicesProcessDto(
     string MessageId,
     string CreatedAt,
     string? BusinessType,
-    IReadOnlyCollection<RequestWholesaleServicesSerie> Series);
+    IReadOnlyCollection<InitializeWholesaleServicesSerie> Serie);
 
-public record RequestWholesaleServicesSerie(
+public record InitializeWholesaleServicesSerie(
     string Id,
     string StartDateAndOrTimeDateTime,
     string? EndDateAndOrTimeDateTime,
@@ -37,6 +37,6 @@ public record RequestWholesaleServicesSerie(
     string? SettlementSeriesVersion,
     string? Resolution,
     string? ChargeOwner,
-    IReadOnlyCollection<RequestWholesaleServicesChargeType> ChargeTypes);
+    IReadOnlyCollection<InitializeWholesaleServicesChargeType> ChargeTypes);
 
-public record RequestWholesaleServicesChargeType(string? Id, string? Type);
+public record InitializeWholesaleServicesChargeType(string? Id, string? Type);
