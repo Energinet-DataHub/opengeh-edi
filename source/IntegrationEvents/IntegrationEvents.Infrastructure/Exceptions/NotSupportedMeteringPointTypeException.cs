@@ -16,18 +16,18 @@ using System;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Exceptions;
 
-public class NotSupportedTimeSeriesTypeException : InvalidOperationException
+public class NotSupportedMeteringPointTypeException : InvalidOperationException
 {
-    public NotSupportedTimeSeriesTypeException()
+    public NotSupportedMeteringPointTypeException()
     {
     }
 
-    public NotSupportedTimeSeriesTypeException(string message)
+    public NotSupportedMeteringPointTypeException(string message)
         : base(message)
     {
     }
 
-    public NotSupportedTimeSeriesTypeException(string message, Exception innerException)
+    public NotSupportedMeteringPointTypeException(string message, Exception innerException)
         : base(message, innerException)
     {
     }
