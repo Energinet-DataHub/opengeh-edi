@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 
@@ -40,9 +41,15 @@ public class SenderAuthorizer : ISenderAuthorizer
             _validationErrors.Count == 0 ? Result.Succeeded() : Result.Failure(_validationErrors.ToArray()));
     }
 
+    private static bool HackThatAllowDdmToDoRequestsAsMdr(string senderRoleCode)
+    {
+        return WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack &&
+            !senderRoleCode.Equals(ActorRole.GridOperator.Code, StringComparison.OrdinalIgnoreCase);
+    }
+
     private void EnsureCurrentUserHasRequiredRole(string senderRole)
     {
-        if (HackThatAllowDdmToActAsMdr(senderRole)) return;
+        if (WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack && HackThatAllowDdmToActAsMdr(senderRole)) return;
 
         if (!_actorAuthenticator.CurrentActorIdentity.HasRole(ActorRole.FromCode(senderRole)))
         {
@@ -71,16 +78,10 @@ public class SenderAuthorizer : ISenderAuthorizer
         }
     }
 
-#pragma warning disable CA1822
-    private bool HackThatAllowDdmToDoRequestsAsMdr(string senderRoleCode)
-#pragma warning restore CA1822
-    {
-        return !senderRoleCode.Equals(ActorRole.GridOperator.Code, StringComparison.OrdinalIgnoreCase);
-    }
-
     private bool HackThatAllowDdmToActAsMdr(string senderRole)
     {
-        return senderRole == ActorRole.MeteredDataResponsible.Code
+        return WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack
+               && senderRole == ActorRole.MeteredDataResponsible.Code
                && _actorAuthenticator.CurrentActorIdentity.HasRole(ActorRole.GridOperator);
     }
 }
