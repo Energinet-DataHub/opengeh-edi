@@ -178,12 +178,15 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
         }
 
         [Fact]
-        public void FunctionApp_Has_3_middlewares()
+        public void All_middlewares_in_functions_should_be_registered()
         {
             var allTypes = ReflectionHelper.FindAllTypes();
             var middlewareTypes = ReflectionHelper.FindAllTypesThatImplementType();
             var middlewares = middlewareTypes(typeof(IFunctionsWorkerMiddleware), allTypes(typeof(Program)));
-            middlewares.Should().HaveCount(3);
+            middlewares.Should()
+                .AllSatisfy(
+                    middleware =>
+                        _host.Services.GetService(middleware).Should().NotBeNull());
         }
 
         private static IEnumerable<object[]> ResolveTypes(Type targetType, Assembly[] assemblies)
