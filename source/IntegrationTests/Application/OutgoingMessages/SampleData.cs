@@ -39,4 +39,6 @@ internal static class SampleData
     internal static Guid GridOperatorId => Guid.Parse("AC509EEB-C67E-4E64-A94F-23C0C6BC4828");
 
     internal static string GridOperatorNumber => "5790000555551";
+
+    internal static string? ChargeOwner => "5799999933318";
 }

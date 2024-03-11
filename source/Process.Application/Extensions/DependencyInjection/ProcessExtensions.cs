@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureDa
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
@@ -27,6 +28,7 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Infrastructure.Processing;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Infrastructure.Wholesale;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using MediatR;
@@ -67,6 +69,7 @@ public static class ProcessExtensions
 
         // ProcessInitialization handlers Configuration
         services.AddTransient<IProcessInitializationHandler, InitializeAggregatedMeasureDataHandler>();
+        services.AddTransient<IProcessInitializationHandler, InitializeWholesaleServicesProcessHandler>();
 
         // ProcessInitializationClient Configuration
         services.AddTransient<IProcessInitializationClient, ProcessInitializationClient>();
@@ -81,6 +84,11 @@ public static class ProcessExtensions
             .AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasRejected>, WhenAnRejectedAggregatedTimeSeriesRequestIsAvailable>()
             .AddScoped<WholesaleInbox>()
             .AddScoped<IAggregatedMeasureDataProcessRepository, AggregatedMeasureDataProcessRepository>();
+
+        // RequestedAggregatedMeasureDataConfiguration
+        services
+            .AddTransient<IRequestHandler<InitializeWholesaleServicesProcessesCommand, Unit>, InitializeWholesaleServicesProcessesHandler>()
+            .AddScoped<IWholesaleServicesProcessRepository, WholesaleServicesProcessRepository>();
 
         return services;
     }

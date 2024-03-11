@@ -14,9 +14,11 @@
 
 using System;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.WholesaleServices;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess
@@ -39,6 +41,8 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess
 
         public DbSet<ReceivedInboxEvent> ReceivedInboxEvents { get; private set; }
 
+        public DbSet<WholesaleServicesProcess> WholesaleServicesProcesses { get; private set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             ArgumentNullException.ThrowIfNull(modelBuilder);
@@ -46,6 +50,7 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess
             modelBuilder.ApplyConfiguration(new AggregatedMeasureDataProcessEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QueuedInternalCommandEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ReceivedInboxEventEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new WholesaleServicesProcessEntityConfiguration());
         }
     }
 }
