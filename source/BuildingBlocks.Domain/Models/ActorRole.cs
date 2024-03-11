@@ -60,6 +60,7 @@ public class ActorRole : EnumerationType
     /// <summary>
     /// The ActorRole for a ActorMessageQueue. This is implemented to support the "hack" where
     ///     a MeteredDataResponsible uses the GridOperator queue
+    /// Is used when peeking, dequeuing and enqueuing
     /// </summary>
     public ActorRole ForActorMessageQueue()
     {
