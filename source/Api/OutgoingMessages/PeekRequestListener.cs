@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Common;
 using Energinet.DataHub.EDI.Api.Extensions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -79,11 +80,19 @@ public class PeekRequestListener
             ? EnumerationType.FromName<MessageCategory>(messageCategory)
             : MessageCategory.None;
 
+        var currentActorRole = _authenticatedActor.CurrentActorIdentity.MarketRole!;
+        if (WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack)
+        {
+            // MDR should peek the DDM queue while this workaround is active
+            if (currentActorRole == ActorRole.MeteredDataResponsible)
+                currentActorRole = ActorRole.GridOperator;
+        }
+
         var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(
                 new PeekRequestDto(
                     _authenticatedActor.CurrentActorIdentity.ActorNumber,
                     parsedMessageCategory,
-                    _authenticatedActor.CurrentActorIdentity.MarketRole!,
+                    currentActorRole,
                     desiredDocumentFormat),
                 cancellationToken)
             .ConfigureAwait(false);
