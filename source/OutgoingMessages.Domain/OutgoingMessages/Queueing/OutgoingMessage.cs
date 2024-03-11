@@ -248,11 +248,19 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
         {
             var actorMessageQueueReceiverRole = ReceiverRole;
 
-            // NotifyAggregatedMeasureData document to MDR should always be added to the GridOperator queue
-            if (DocumentType == DocumentType.NotifyAggregatedMeasureData && ReceiverRole == ActorRole.MeteredDataResponsible)
-                actorMessageQueueReceiverRole = ActorRole.GridOperator;
+            if (WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack)
+            {
+                // AggregatedMeasureData messages (notify & reject) to the MDR role should always be added to the GridOperator queue
+                if (DocumentIsAggregatedMeasureData(DocumentType))
+                    actorMessageQueueReceiverRole = actorMessageQueueReceiverRole.ForActorMessageQueue();
+            }
 
             return Receiver.Create(ReceiverId, actorMessageQueueReceiverRole);
+        }
+
+        private static bool DocumentIsAggregatedMeasureData(DocumentType documentType)
+        {
+            return documentType == DocumentType.NotifyAggregatedMeasureData || documentType == DocumentType.RejectRequestAggregatedMeasureData;
         }
 
         private static FileStorageReference CreateFileStorageReference(ActorNumber receiverActorNumber, Instant timestamp, OutgoingMessageId outgoingMessageId)

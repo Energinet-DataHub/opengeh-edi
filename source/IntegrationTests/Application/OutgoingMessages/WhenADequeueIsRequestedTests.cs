@@ -23,6 +23,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using FluentAssertions;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
@@ -84,6 +85,42 @@ public class WhenADequeueIsRequestedTests : TestBase
 
         Assert.True(dequeueResult.Success);
         Assert.True(found);
+    }
+
+    /// <summary>
+    /// This test verifies the "hack" for a MDR/GridOperator actor which is the same Actor but with two distinct roles MDR and GridOperator
+    /// The actor uses the MDR (MeteredDataResponsible) role when making request (RequestAggregatedMeasureData)
+    /// but uses the DDM (GridOperator) role when peeking.
+    /// This means that when dequeuing as a MDR we should dequeue the DDM queue
+    /// </summary>
+    [Fact]
+    public async Task When_DequeuingAsMeteredDataResponsible_Then_DequeuesGridOperatorMessages()
+    {
+        // Arrange
+        var actorNumber = ActorNumber.Create(SampleData.SenderId);
+        var message = _energyResultMessageDtoBuilder
+            .WithReceiverNumber(actorNumber.Value)
+            .WithReceiverRole(ActorRole.GridOperator)
+            .Build();
+        await EnqueueMessage(message);
+        var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(
+            new PeekRequestDto(
+                actorNumber,
+                MessageCategory.Aggregations,
+                ActorRole.MeteredDataResponsible,
+                DocumentFormat.Xml),
+            CancellationToken.None);
+
+        // Act
+        var dequeueResult = await _outgoingMessagesClient.DequeueAndCommitAsync(
+            new DequeueRequestDto(
+                peekResult.MessageId.GetValueOrDefault().ToString(),
+                ActorRole.MeteredDataResponsible,
+                actorNumber),
+            CancellationToken.None);
+
+        // Assert
+        dequeueResult.Success.Should().BeTrue();
     }
 
     private async Task EnqueueMessage(EnergyResultMessageDto message)
