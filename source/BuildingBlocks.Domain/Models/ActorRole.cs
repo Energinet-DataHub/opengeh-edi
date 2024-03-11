@@ -35,6 +35,7 @@ public class ActorRole : EnumerationType
     public static readonly ActorRole ImbalanceSettlementResponsible = new("ImbalanceSettlementResponsible", "DDX");
     public static readonly ActorRole SystemOperator = new("SystemOperator", "EZ");
     public static readonly ActorRole DanishEnergyAgency = new("DanishEnergyAgency", "STS");
+    public static readonly ActorRole Delegated = new("Delegated", "DEL");
 
     private ActorRole(string name, string code)
         : base(name)
