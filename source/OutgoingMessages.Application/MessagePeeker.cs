@@ -16,6 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
@@ -56,6 +57,12 @@ public class MessagePeeker
     public async Task<PeekResultDto> PeekAsync(PeekRequestDto request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
+
+        if (WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack)
+        {
+            request = request with { ActorRole = request.ActorRole.ForActorMessageQueue(), };
+        }
+
         await PeekAndCommitToEnsureBundleIsClosedAsync(request).ConfigureAwait(false);
 
         var actorMessageQueue = await
