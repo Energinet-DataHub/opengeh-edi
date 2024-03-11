@@ -179,6 +179,30 @@ public class WhenAPeekIsRequestedTests : TestBase
         marketDocumentFileStorageReference.Should().Be(archivedMessageFileStorageReference);
     }
 
+    /// <summary>
+    /// This test verifies the "hack" for a MDR/GridOperator actor which is the same Actor but with two distinct roles MDR and GridOperator
+    /// The actor uses the MDR (MeteredDataResponsible) role when making request (RequestAggregatedMeasureData)
+    /// but uses the DDM (GridOperator) role when peeking.
+    /// This means that when peeking as a MDR we should peek the DDM queue
+    /// </summary>
+    [Fact]
+    public async Task When_PeekingAsMeteredDataResponsible_Then_FindsGridOperatorMessages()
+    {
+        // Arrange
+        var actorNumberString = "1234567890123";
+        var message = _energyResultMessageDtoBuilder
+            .WithReceiverNumber(actorNumberString)
+            .WithReceiverRole(ActorRole.GridOperator)
+            .Build();
+        await EnqueueMessage(message);
+
+        // Act
+        var peekResult = await PeekMessage(MessageCategory.Aggregations, actorNumber: ActorNumber.Create(actorNumberString), actorRole: ActorRole.MeteredDataResponsible);
+
+        // Assert
+        peekResult.MessageId.Should().NotBeNull();
+    }
+
     private async Task<bool> BundleIsRegistered()
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
@@ -187,9 +211,9 @@ public class WhenAPeekIsRequestedTests : TestBase
         return numberOfBundles == 1;
     }
 
-    private Task<PeekResultDto> PeekMessage(MessageCategory category)
+    private Task<PeekResultDto> PeekMessage(MessageCategory category, ActorNumber? actorNumber = null, ActorRole? actorRole = null)
     {
-        return _outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, ActorRole.EnergySupplier, DocumentFormat.Xml), CancellationToken.None);
+        return _outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, actorRole ?? ActorRole.EnergySupplier, DocumentFormat.Xml), CancellationToken.None);
     }
 
     private async Task<bool> MarketDocumentExists(Guid marketDocumentBundleId)

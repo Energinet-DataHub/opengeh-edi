@@ -83,7 +83,7 @@ public class PeekRequestListener
                 new PeekRequestDto(
                     _authenticatedActor.CurrentActorIdentity.ActorNumber,
                     parsedMessageCategory,
-                    _authenticatedActor.CurrentActorIdentity.MarketRole!.ForActorMessageQueue(),
+                    _authenticatedActor.CurrentActorIdentity.MarketRole!,
                     desiredDocumentFormat),
                 cancellationToken)
             .ConfigureAwait(false);

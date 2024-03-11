@@ -15,6 +15,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Extensions.Logging;
@@ -37,6 +38,11 @@ public class MessageDequeuer
     public async Task<DequeueRequestResultDto> DequeueAsync(DequeueRequestDto request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
+
+        if (WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack)
+        {
+            request = request with { ActorRole = request.ActorRole.ForActorMessageQueue(), };
+        }
 
         if (Guid.TryParse(request.MessageId, out var messageId) == false)
         {
