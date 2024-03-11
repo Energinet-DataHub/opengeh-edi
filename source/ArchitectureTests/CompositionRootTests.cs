@@ -28,7 +28,6 @@ using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Azure.Functions.Worker.Middleware;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Xunit;
@@ -41,17 +40,14 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
 
         public CompositionRootTests()
         {
-            var testEnvironment = new TestEnvironment();
             Environment.SetEnvironmentVariable("SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND", TestEnvironment.CreateFakeServiceBusConnectionString());
             Environment.SetEnvironmentVariable("SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE", TestEnvironment.CreateFakeServiceBusConnectionString());
             Environment.SetEnvironmentVariable("WHOLESALE_INBOX_MESSAGE_QUEUE_NAME", "FakeQueueName");
-            Environment.SetEnvironmentVariable("INCOMING_MESSAGES_QUEUE_NAME", "FakeQueueName");
+            Environment.SetEnvironmentVariable("INCOMING_MESSAGES_QUEUE_NAME", "FakeQueueName1");
             Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", TestEnvironment.CreateConnectionString());
             Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", TestEnvironment.CreateDevelopmentStorageConnectionString());
-            var config = new ConfigurationBuilder()
-                .AddEnvironmentVariables()
-                .Build();
-            _host = Api.Program.ConfigureHost(Api.Program.DevelopmentTokenValidationParameters(), testEnvironment, config);
+
+            _host = HostFactory.CreateHost(RuntimeEnvironment.Default, Program.TokenValidationParameters);
         }
 
         #region Member data providers
@@ -93,7 +89,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
             var functionTypes = ReflectionHelper.FindAllFunctionTypes();
             var constructorDependencies = ReflectionHelper.FindAllConstructorDependenciesForType();
 
-            return functionTypes(allTypes(typeof(Api.Program)))
+            return functionTypes(allTypes(typeof(Program)))
                 .Select(f => new object[] { new Requirement(f.Name, constructorDependencies(f)) });
         }
 
@@ -104,7 +100,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
             var constructorDependencies = ReflectionHelper.FindAllConstructorDependenciesForType();
 
             return
-                middlewareTypes(typeof(IFunctionsWorkerMiddleware), allTypes(typeof(Api.Program)))
+                middlewareTypes(typeof(IFunctionsWorkerMiddleware), allTypes(typeof(Program)))
                     .Select(m => new object[] { new Requirement(m.Name, constructorDependencies(m)) });
         }
 
@@ -211,6 +207,8 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
                 CreateConnectionString();
 
             public override Uri? AZURE_STORAGE_ACCOUNT_URL => new Uri(CreateFakeStorageUrl());
+
+            public override string AZURE_FUNCTIONS_ENVIRONMENT => "Development";
 
             public static string CreateFakeServiceBusConnectionString()
             {
