@@ -14,10 +14,8 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.Process.Interfaces;
-using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -26,14 +24,14 @@ namespace Energinet.DataHub.EDI.Api.EventListeners;
 public class ProcessInitializationListener
 {
     private readonly ILogger<ProcessInitializationListener> _logger;
-    private readonly IMediator _mediator;
-    private readonly ISerializer _serializer;
+    private readonly IProcessInitializationClient _processInitializationClient;
 
-    public ProcessInitializationListener(ILogger<ProcessInitializationListener> logger, IMediator mediator, ISerializer serializer)
+    public ProcessInitializationListener(
+        ILogger<ProcessInitializationListener> logger,
+        IProcessInitializationClient processInitializationClient)
     {
         _logger = logger;
-        _mediator = mediator;
-        _serializer = serializer;
+        _processInitializationClient = processInitializationClient;
     }
 
     [Function(nameof(ProcessInitializationListener))]
@@ -41,15 +39,14 @@ public class ProcessInitializationListener
         [ServiceBusTrigger(
             "%INCOMING_MESSAGES_QUEUE_NAME%",
             Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER")]
-        byte[] eventData,
+        ServiceBusReceivedMessage message,
         FunctionContext context)
     {
+        ArgumentNullException.ThrowIfNull(message);
         ArgumentNullException.ThrowIfNull(context);
         var eventDetails = context.ExtractEventDetails();
         _logger.LogInformation("Integration event details: {EventDetails}", eventDetails);
-        //This is a temporary solution, an upcoming PR will pass the eventData to a generic handler.
-        //The generic handler will then deserialize the eventData and pass it to the correct handler.
-        var marketMessage = _serializer.Deserialize<RequestAggregatedMeasureDataDto>(System.Text.Encoding.UTF8.GetString(eventData));
-        await _mediator.Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
+
+        await _processInitializationClient.InitializeAsync(message.Subject, message.Body.ToArray()).ConfigureAwait(false);
     }
 }
