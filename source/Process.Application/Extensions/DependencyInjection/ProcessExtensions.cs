@@ -65,7 +65,7 @@ public static class ProcessExtensions
         services.AddTransient<INotificationHandler<EnqueueAcceptedEnergyResultMessageEvent>, EnqueueAcceptedEnergyResultMessageHandler>();
         services.AddTransient<INotificationHandler<EnqueueRejectedEnergyResultMessageEvent>, EnqueueRejectedEnergyResultMessageHandler>();
 
-        // ProcessInitialization Configuration
+        // ProcessInitialization handlers Configuration
         services.AddTransient<IProcessInitializationHandler, InitializeAggregatedMeasureDataHandler>();
 
         // ProcessInitializationClient Configuration
