@@ -270,7 +270,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 .AddScoped<ISystemDateTimeProvider>(_ => new SystemDateTimeProviderStub());
 
             _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>();
-            _services.AddScoped(_ => new JwtTokenParser(JwtTokenParserTests.DisableAllTokenValidations));
             _services.AddCorrelation(config)
             .AddIntegrationEventModule()
             .AddOutgoingMessagesModule(config)
