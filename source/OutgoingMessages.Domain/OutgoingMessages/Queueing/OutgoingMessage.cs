@@ -250,7 +250,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
             if (WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack)
             {
-                // NotifyAggregatedMeasureData document to MDR should always be added to the GridOperator queue
+                // AggregatedMeasureData messages (notify & reject) to the MDR role should always be added to the GridOperator queue
                 if (DocumentIsAggregatedMeasureData(DocumentType))
                     actorMessageQueueReceiverRole = actorMessageQueueReceiverRole.ForActorMessageQueue();
             }
