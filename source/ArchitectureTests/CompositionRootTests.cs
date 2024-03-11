@@ -48,7 +48,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
             Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", TestEnvironment.CreateDevelopmentStorageConnectionString());
             Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", TestEnvironment.CreateDevelopmentStorageConnectionString());
 
-            _host = ProgramHelper.CreateHost(RuntimeEnvironment.Default, Program.TokenValidationParameters);
+            _host = HostFactory.CreateHost(RuntimeEnvironment.Default, Program.TokenValidationParameters);
         }
 
         #region Member data providers

@@ -35,7 +35,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Energinet.DataHub.EDI.Api;
 
-public static class ProgramHelper
+public static class HostFactory
 {
     public static IHost CreateHost(RuntimeEnvironment runtime, TokenValidationParameters tokenValidationParameters)
     {
