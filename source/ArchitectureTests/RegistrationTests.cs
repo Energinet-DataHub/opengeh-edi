@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Xml;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
+using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -34,11 +35,11 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.ArchitectureTests
 {
-    public class CompositionRootTests
+    public class RegistrationTests
     {
         private readonly IHost _host;
 
-        public CompositionRootTests()
+        public RegistrationTests()
         {
             Environment.SetEnvironmentVariable("SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND", TestEnvironment.CreateFakeServiceBusConnectionString());
             Environment.SetEnvironmentVariable("SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE", TestEnvironment.CreateFakeServiceBusConnectionString());
@@ -174,6 +175,15 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
                             });
                     })
                 .CreateClient(); // This will resolve the dependency injections, hence the test
+        }
+
+        [Fact]
+        public void FunctionApp_Has_3_middlewares()
+        {
+            var allTypes = ReflectionHelper.FindAllTypes();
+            var middlewareTypes = ReflectionHelper.FindAllTypesThatImplementType();
+            var middlewares = middlewareTypes(typeof(IFunctionsWorkerMiddleware), allTypes(typeof(Program)));
+            middlewares.Should().HaveCount(3);
         }
 
         private static IEnumerable<object[]> ResolveTypes(Type targetType, Assembly[] assemblies)
