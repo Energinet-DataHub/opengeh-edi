@@ -17,6 +17,9 @@ using System.Linq;
 using BuildingBlocks.Application.Configuration.Logging;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.Api.Configuration.Middleware;
+using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication;
+using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.Api.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
@@ -43,7 +46,17 @@ public static class HostFactory
         ArgumentNullException.ThrowIfNull(tokenValidationParameters);
 
         return new HostBuilder()
-            .ConfigureFunctionsWorkerDefaults()
+            .ConfigureFunctionsWorkerDefaults(
+                worker =>
+                {
+                    worker.UseMiddleware<UnHandledExceptionMiddleware>();
+                    worker.UseMiddleware<CorrelationIdMiddleware>();
+                    worker.UseMiddleware<MarketActorAuthenticatorMiddleware>();
+                },
+                option =>
+                {
+                    option.EnableUserCodeException = true;
+                })
             .ConfigureServices(
                 (context, services) =>
                 {
