@@ -80,19 +80,11 @@ public class PeekRequestListener
             ? EnumerationType.FromName<MessageCategory>(messageCategory)
             : MessageCategory.None;
 
-        var currentActorRole = _authenticatedActor.CurrentActorIdentity.MarketRole!;
-        if (WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack)
-        {
-            // MDR should peek the DDM queue while this workaround is active
-            if (currentActorRole == ActorRole.MeteredDataResponsible)
-                currentActorRole = ActorRole.GridOperator;
-        }
-
         var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(
                 new PeekRequestDto(
                     _authenticatedActor.CurrentActorIdentity.ActorNumber,
                     parsedMessageCategory,
-                    currentActorRole,
+                    _authenticatedActor.CurrentActorIdentity.MarketRole!.ForActorMessageQueue(),
                     desiredDocumentFormat),
                 cancellationToken)
             .ConfigureAwait(false);

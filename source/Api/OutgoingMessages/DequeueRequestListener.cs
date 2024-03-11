@@ -47,7 +47,7 @@ public class DequeueRequestListener
         var result = await _outgoingMessagesClient.DequeueAndCommitAsync(
                 new DequeueRequestDto(
                     messageId,
-                    _authenticatedActor.CurrentActorIdentity.MarketRole!,
+                    _authenticatedActor.CurrentActorIdentity.MarketRole!.ForActorMessageQueue(),
                     _authenticatedActor.CurrentActorIdentity.ActorNumber),
                 cancellationToken)
             .ConfigureAwait(false);
