@@ -189,15 +189,15 @@ public class WhenAPeekIsRequestedTests : TestBase
     public async Task When_PeekingAsMeteredDataResponsible_Then_FindsGridOperatorMessages()
     {
         // Arrange
-        var actorNumberString = "1234567890123";
+        var actorNumber = ActorNumber.Create("1234567890123");
         var message = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(actorNumberString)
+            .WithReceiverNumber(actorNumber.Value)
             .WithReceiverRole(ActorRole.GridOperator)
             .Build();
         await EnqueueMessage(message);
 
         // Act
-        var peekResult = await PeekMessage(MessageCategory.Aggregations, actorNumber: ActorNumber.Create(actorNumberString), actorRole: ActorRole.MeteredDataResponsible);
+        var peekResult = await PeekMessage(MessageCategory.Aggregations, actorNumber: actorNumber, actorRole: ActorRole.MeteredDataResponsible);
 
         // Assert
         peekResult.MessageId.Should().NotBeNull();
