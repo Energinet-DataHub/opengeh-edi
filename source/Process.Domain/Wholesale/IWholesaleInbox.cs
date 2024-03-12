@@ -15,6 +15,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Wholesale;
 
@@ -26,7 +27,10 @@ public interface IWholesaleInbox
     /// <summary>
     /// Send <paramref name="aggregatedMeasureDataProcess"/> to wholesale
     /// </summary>
-    /// <param name="aggregatedMeasureDataProcess"></param>
-    /// <param name="cancellationToken"></param>
     Task SendProcessAsync(AggregatedMeasureDataProcess aggregatedMeasureDataProcess, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Send <paramref name="wholesaleServicesProcess"/> to wholesale
+    /// </summary>
+    Task SendProcessAsync(WholesaleServicesProcess wholesaleServicesProcess, CancellationToken cancellationToken);
 }

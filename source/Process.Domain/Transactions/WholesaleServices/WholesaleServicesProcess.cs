@@ -14,12 +14,13 @@
 
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ProcessEvents;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 
 public class WholesaleServicesProcess : Entity
 {
-    private readonly State _state = State.Initialized;
+    private State _state = State.Initialized;
 
     public WholesaleServicesProcess(
         ProcessId processId,
@@ -51,6 +52,7 @@ public class WholesaleServicesProcess : Entity
         Resolution = resolution;
         ChargeOwner = chargeOwner;
         ChargeTypes = chargeTypes;
+        AddDomainEvent(new WholesaleServicesProcessIsInitialized(processId));
     }
 
     /// <summary>
@@ -103,4 +105,13 @@ public class WholesaleServicesProcess : Entity
     public string? ChargeOwner { get; }
 
     public IReadOnlyCollection<ChargeType> ChargeTypes { get; }
+
+    public void SendToWholesale()
+    {
+        if (_state == State.Initialized)
+        {
+            AddDomainEvent(new NotifyWholesaleThatWholesaleServicesIsRequested(this));
+            _state = State.Sent;
+        }
+    }
 }
