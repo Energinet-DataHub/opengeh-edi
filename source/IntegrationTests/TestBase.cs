@@ -220,12 +220,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             await ProcessInternalCommandsAsync().ConfigureAwait(false);
         }
 
-        private Task ProcessReceivedInboxEventsAsync()
-        {
-            return ProcessBackgroundTasksAsync();
-        }
-
-        private async Task ProcessInternalCommandsAsync()
+        protected async Task ProcessInternalCommandsAsync()
         {
             await ProcessBackgroundTasksAsync();
 
@@ -233,6 +228,11 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             {
                 await ProcessInternalCommandsAsync();
             }
+        }
+
+        private Task ProcessReceivedInboxEventsAsync()
+        {
+            return ProcessBackgroundTasksAsync();
         }
 
         private Task ProcessBackgroundTasksAsync()

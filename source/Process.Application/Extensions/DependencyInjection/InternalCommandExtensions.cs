@@ -16,6 +16,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
+using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Commands;
 using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using MediatR;
@@ -46,6 +47,7 @@ internal static class InternalCommandExtensions
         mapper.Add("SendAggregatedMeasureRequestToWholesale", typeof(SendAggregatedMeasureRequestToWholesale));
         mapper.Add("AcceptedAggregatedTimeSerie", typeof(AcceptedEnergyResultTimeSerieCommand));
         mapper.Add("RejectedAggregatedTimeSeries", typeof(RejectedAggregatedTimeSeries));
+        mapper.Add("SendWholesaleServicesRequestToWholesale", typeof(SendWholesaleServicesRequestToWholesale));
 
         return mapper;
     }
