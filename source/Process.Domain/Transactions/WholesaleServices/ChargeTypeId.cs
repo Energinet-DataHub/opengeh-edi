@@ -12,18 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Process.Domain.Commands;
-using Energinet.DataHub.EDI.Process.Interfaces;
-using MediatR;
+using System;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 
-public class InitializeAggregatedMeasureDataProcessesCommand : ICommand<Unit>
+public record ChargeTypeId
 {
-    public InitializeAggregatedMeasureDataProcessesCommand(RequestAggregatedMeasureDataDto dto)
+    private ChargeTypeId(Guid id)
     {
-        Dto = dto;
+        Id = id;
     }
 
-    public RequestAggregatedMeasureDataDto Dto { get; }
+    public Guid Id { get; }
+
+    public static ChargeTypeId New()
+    {
+        return new ChargeTypeId(Guid.NewGuid());
+    }
+
+    public static ChargeTypeId Create(Guid id)
+    {
+        return new ChargeTypeId(id);
+    }
 }
