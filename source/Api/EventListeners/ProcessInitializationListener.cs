@@ -30,7 +30,6 @@ public class ProcessInitializationListener
         ILogger<ProcessInitializationListener> logger,
         IProcessClient processClient)
     {
-        _logger = logger;
         _processClient = processClient;
     }
 
@@ -39,13 +38,10 @@ public class ProcessInitializationListener
         [ServiceBusTrigger(
             "%INCOMING_MESSAGES_QUEUE_NAME%",
             Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER")]
-        ServiceBusReceivedMessage message,
-        FunctionContext context)
+        ServiceBusReceivedMessage message)
     {
         ArgumentNullException.ThrowIfNull(message);
-        ArgumentNullException.ThrowIfNull(context);
-        var eventDetails = context.ExtractEventDetails();
-        _logger.LogInformation("Integration event details: {EventDetails}", eventDetails);
+        _logger.LogInformation("Initialization Listener details: {Message}", message);
 
         await _processClient.InitializeAsync(message.Subject, message.Body.ToArray()).ConfigureAwait(false);
     }
