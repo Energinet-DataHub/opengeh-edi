@@ -14,24 +14,25 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 
 /// <summary>
 /// Storage for Process
 /// </summary>
-public interface IAggregatedMeasureDataProcessRepository
+public interface IWholesaleServicesProcessRepository
 {
     /// <summary>
     /// Adds a new process to database
     /// </summary>
     /// <param name="process"></param>
-    void Add(AggregatedMeasureDataProcess process);
+    void Add(WholesaleServicesProcess process);
 
     /// <summary>
     /// Gets the process with ID = <paramref name="processId"/>
     /// </summary>
     /// <param name="processId"></param>
     /// <param name="cancellationToken"></param>
-    Task<AggregatedMeasureDataProcess> GetAsync(ProcessId processId, CancellationToken cancellationToken);
+    Task<WholesaleServicesProcess> GetAsync(ProcessId processId, CancellationToken cancellationToken);
 }

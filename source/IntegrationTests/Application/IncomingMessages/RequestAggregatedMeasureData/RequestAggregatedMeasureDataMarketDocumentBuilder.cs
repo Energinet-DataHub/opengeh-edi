@@ -22,7 +22,7 @@ using Energinet.DataHub.EDI.Process.Interfaces;
 using NodaTime;
 using Serie = Energinet.DataHub.EDI.Process.Interfaces.Serie;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages.RequestAggregatedMeasureData;
 
 public class RequestAggregatedMeasureDataMarketDocumentBuilder
 {

@@ -93,13 +93,8 @@ public class IncomingMessageReceiver
                 cancellationToken)
             .ConfigureAwait(false);
 
-        if (responseMessage.IsErrorResponse)
-        {
-            var httpErrorStatusCode = HttpStatusCode.BadRequest;
-            return CreateResponse(request, httpErrorStatusCode, responseMessage);
-        }
+        var httpStatusCode = responseMessage.IsErrorResponse ? HttpStatusCode.BadRequest : HttpStatusCode.Accepted;
 
-        var httpStatusCode = !responseMessage.IsErrorResponse ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
         return CreateResponse(request, httpStatusCode, responseMessage);
     }
 

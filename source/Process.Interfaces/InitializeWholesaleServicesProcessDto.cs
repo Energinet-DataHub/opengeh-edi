@@ -30,10 +30,10 @@ public record InitializeWholesaleServicesProcessDto(
 
 public record InitializeWholesaleServicesSerie(
     string Id,
-    string StartDateAndOrTimeDateTime,
-    string? EndDateAndOrTimeDateTime,
-    string? MeteringGridAreaDomainId,
-    string? EnergySupplierMarketParticipantId,
+    string StartDateTime,
+    string? EndDateTime,
+    string? GridAreaCode,
+    string? EnergySupplierId,
     string? SettlementSeriesVersion,
     string? Resolution,
     string? ChargeOwner,
