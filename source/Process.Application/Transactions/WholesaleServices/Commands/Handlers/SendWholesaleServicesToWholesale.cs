@@ -25,14 +25,11 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServic
 public class SendWholesaleServicesRequestToWholesaleHandler : IRequestHandler<SendWholesaleServicesRequestToWholesale, Unit>
 {
     private readonly IWholesaleServicesProcessRepository _wholesaleServicesProcessRepository;
-    private readonly WholesaleInbox _wholesaleInbox;
 
     public SendWholesaleServicesRequestToWholesaleHandler(
-        IWholesaleServicesProcessRepository wholesaleServicesProcessRepository,
-        WholesaleInbox wholesaleInbox)
+        IWholesaleServicesProcessRepository wholesaleServicesProcessRepository)
     {
         _wholesaleServicesProcessRepository = wholesaleServicesProcessRepository;
-        _wholesaleInbox = wholesaleInbox;
     }
 
     public async Task<Unit> Handle(
@@ -43,9 +40,7 @@ public class SendWholesaleServicesRequestToWholesaleHandler : IRequestHandler<Se
 
         var process = await _wholesaleServicesProcessRepository
             .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
-        await _wholesaleInbox.SendProcessAsync(process, cancellationToken).ConfigureAwait(false);
-
-        process.WasSentToWholesale();
+        process.SentToWholesale();
 
         return Unit.Value;
     }

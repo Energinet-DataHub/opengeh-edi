@@ -106,10 +106,11 @@ public class WholesaleServicesProcess : Entity
 
     public IReadOnlyCollection<ChargeType> ChargeTypes { get; }
 
-    public void WasSentToWholesale()
+    public void SentToWholesale()
     {
         if (_state == State.Initialized)
         {
+            AddDomainEvent(new NotifyWholesaleThatWholesaleServicesIsRequested(this));
             _state = State.Sent;
         }
     }

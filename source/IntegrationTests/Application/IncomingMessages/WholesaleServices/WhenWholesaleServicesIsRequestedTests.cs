@@ -23,6 +23,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
+using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Commands;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Interfaces;
@@ -38,12 +39,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages.Wh
 [IntegrationTest]
 public class WhenWholesaleServicesIsRequestedTests : TestBase
 {
+    private readonly ProcessContext _processContext;
     private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
     private readonly ServiceBusSenderSpy _senderSpy;
 
     public WhenWholesaleServicesIsRequestedTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
     {
+        _processContext = GetService<ProcessContext>();
         _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IServiceBusSenderFactory>();
         _senderSpy = new ServiceBusSenderSpy("Fake");
         _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
@@ -81,15 +84,54 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         await ProcessInternalCommandsAsync();
 
         // Assert
+        var process = GetProcess(marketMessage.SenderNumber);
         var message = _senderSpy.Message;
-        Assert.NotNull(message);
-        Assert.Equal(exceptedServiceBusMessageSubject, message!.Subject);
+        message.Should().NotBeNull();
+        message!.Subject.Should().Be(exceptedServiceBusMessageSubject);
+        process.Should().BeEquivalentTo(marketMessage, opt => opt.Using(new ProcessAndRequestComparer()));
         await AssertProcessState(marketMessage!.MessageId, WholesaleServicesProcess.State.Sent);
+    }
+
+    [Fact]
+    public async Task When_WholesaleServicesProcess_is_sent_service_bus_message_is_not_resent_to_wholesale()
+    {
+        // Arrange
+        var marketMessage = InitializeProcessDtoBuilder()
+            .Build();
+        await InvokeCommandAsync(new InitializeWholesaleServicesProcessesCommand(marketMessage));
+        await ProcessInternalCommandsAsync();
+        _senderSpy.Message = null; // Reset the spy
+        var process = GetProcess(marketMessage.SenderNumber);
+
+        // Act
+        process!.SentToWholesale();
+
+        // Assert
+        _senderSpy.Message.Should().BeNull();
+        await AssertProcessState(marketMessage!.MessageId, WholesaleServicesProcess.State.Sent);
+    }
+
+    [Fact]
+    public async Task When_WholesaleServicesProcess_fails_to_sent_service_bus_message_to_wholesale_state_is_initialized()
+    {
+        // Arrange
+        var marketMessage = InitializeProcessDtoBuilder()
+            .Build();
+        _senderSpy.ShouldFail = true;
+
+        // Act
+        await InvokeCommandAsync(new InitializeWholesaleServicesProcessesCommand(marketMessage));
+        await ProcessInternalCommandsAsync();
+
+        // Assert
+        _senderSpy.Message.Should().BeNull();
+        await AssertProcessState(marketMessage!.MessageId, WholesaleServicesProcess.State.Initialized);
     }
 
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
+        _processContext.Dispose();
         _senderSpy.Dispose();
         _serviceBusClientSenderFactory.Dispose();
     }
@@ -112,8 +154,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
 
     private WholesaleServicesProcess? GetProcess(string senderNumber)
     {
-        var processContext = GetService<ProcessContext>();
-        return processContext.WholesaleServicesProcesses
+        return _processContext.WholesaleServicesProcesses
             .ToList()
             .FirstOrDefault(x => x.RequestedByActorId.Value == senderNumber);
     }

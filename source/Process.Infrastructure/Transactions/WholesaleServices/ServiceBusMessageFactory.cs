@@ -21,7 +21,7 @@ using ChargeType = Energinet.DataHub.Edi.Requests.ChargeType;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.WholesaleServices;
 
-public static class WholesaleServicesProcessFactory
+public static class ServiceBusMessageFactory
 {
     public static ServiceBusMessage CreateServiceBusMessage(WholesaleServicesProcess process)
     {
@@ -65,7 +65,7 @@ public static class WholesaleServicesProcessFactory
             request.GridAreaCode = process.GridAreaCode;
 
         if (process.SettlementVersion != null)
-            request.SettlementSeriesVersion = process.SettlementVersion.Code;
+            request.SettlementSeriesVersion = process.SettlementVersion.Name;
 
         foreach (var chargeType in process.ChargeTypes)
         {
