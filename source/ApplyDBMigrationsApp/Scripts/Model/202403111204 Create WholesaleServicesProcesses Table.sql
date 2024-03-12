@@ -3,7 +3,7 @@
     [RecordId]                           [int] IDENTITY(1,1)    NOT NULL,
     [ProcessId]                          [uniqueidentifier]     NOT NULL,
     [BusinessTransactionId]              [nvarchar](36)         NOT NULL,
-    [StartOfPeriod]                      [varchar](32)          NULL,
+    [StartOfPeriod]                      [varchar](32)          NOT NULL,
     [EndOfPeriod]                        [varchar](32)          NULL,
     [GridAreaCode]                       [nvarchar](16)         NULL,
     [ChargeOwner]                        [nvarchar](16)         NULL,
