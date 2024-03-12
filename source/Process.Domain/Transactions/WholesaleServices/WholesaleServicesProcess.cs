@@ -106,7 +106,7 @@ public class WholesaleServicesProcess : Entity
 
     public IReadOnlyCollection<ChargeType> ChargeTypes { get; }
 
-    public void SentToWholesale()
+    public void SendToWholesale()
     {
         if (_state == State.Initialized)
         {

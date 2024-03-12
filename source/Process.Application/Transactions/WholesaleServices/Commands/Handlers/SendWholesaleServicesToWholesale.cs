@@ -40,7 +40,7 @@ public class SendWholesaleServicesRequestToWholesaleHandler : IRequestHandler<Se
 
         var process = await _wholesaleServicesProcessRepository
             .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
-        process.SentToWholesale();
+        process.SendToWholesale();
 
         return Unit.Value;
     }

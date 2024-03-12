@@ -65,7 +65,6 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         // Assert
         var process = GetProcess(marketMessage.SenderNumber);
         process.Should().NotBeNull();
-        marketMessage.Serie.Should().NotBeEmpty();
         process!.BusinessTransactionId.Id.Should().Be(marketMessage.Serie.First().Id);
         process.Should().BeEquivalentTo(marketMessage, opt => opt.Using(new ProcessAndRequestComparer()));
         await AssertProcessState(marketMessage.MessageId, WholesaleServicesProcess.State.Initialized);
@@ -104,7 +103,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         var process = GetProcess(marketMessage.SenderNumber);
 
         // Act
-        process!.SentToWholesale();
+        process!.SendToWholesale();
 
         // Assert
         _senderSpy.Message.Should().BeNull();
