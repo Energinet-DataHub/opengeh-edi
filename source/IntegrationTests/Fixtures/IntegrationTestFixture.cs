@@ -77,7 +77,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
                 $"DELETE FROM [dbo].[TransactionRegistry]" +
                 $"DELETE FROM [dbo].[Actor]" +
                 $"DELETE FROM [dbo].[GridAreaOwner]" +
-                $"DELETE FROM [dbo].[ActorCertificate]";
+                $"DELETE FROM [dbo].[ActorCertificate]" +
+                $"DELETE FROM [dbo].[WholesaleServicesProcessChargeTypes]" +
+                $"DELETE FROM [dbo].[WholesaleServicesProcesses]";
 
             using var connection = new SqlConnection(DatabaseConnectionString);
             connection.Open();
