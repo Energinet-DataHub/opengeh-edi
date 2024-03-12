@@ -64,7 +64,7 @@ public class IncomingMessagePublisher
 
         var serviceBusMessage =
             new ServiceBusMessage(
-                _serializer.Serialize(requestAggregatedMeasureDataDto))
+                new BinaryData(_serializer.Serialize(requestAggregatedMeasureDataDto)))
             {
                 Subject = nameof(RequestAggregatedMeasureDataDto),
             };
