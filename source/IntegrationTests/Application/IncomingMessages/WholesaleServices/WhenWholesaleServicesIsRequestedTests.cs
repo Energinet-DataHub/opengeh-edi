@@ -112,7 +112,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
     }
 
     [Fact]
-    public async Task When_WholesaleServicesProcess_fails_to_sent_service_bus_message_to_wholesale_state_is_initialized()
+    public async Task When_WholesaleServicesProcess_fails_to_send_service_bus_message_to_wholesale_state_is_initialized()
     {
         // Arrange
         var marketMessage = InitializeProcessDtoBuilder()
