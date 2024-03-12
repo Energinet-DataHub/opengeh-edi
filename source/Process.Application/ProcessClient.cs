@@ -20,11 +20,11 @@ using Energinet.DataHub.EDI.Process.Interfaces;
 
 namespace Energinet.DataHub.EDI.Process.Application;
 
-public class ProcessInitializationClient : IProcessInitializationClient
+public class ProcessClient : IProcessClient
 {
     private readonly IEnumerable<IProcessInitializationHandler> _processInitializationHandlers;
 
-    public ProcessInitializationClient(IEnumerable<IProcessInitializationHandler> processInitializationHandlers)
+    public ProcessClient(IEnumerable<IProcessInitializationHandler> processInitializationHandlers)
     {
         _processInitializationHandlers = processInitializationHandlers;
     }

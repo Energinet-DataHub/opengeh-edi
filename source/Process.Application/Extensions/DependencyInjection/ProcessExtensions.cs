@@ -69,7 +69,7 @@ public static class ProcessExtensions
         services.AddTransient<IProcessInitializationHandler, InitializeAggregatedMeasureDataHandler>();
 
         // ProcessInitializationClient Configuration
-        services.AddTransient<IProcessInitializationClient, ProcessInitializationClient>();
+        services.AddTransient<IProcessClient, ProcessClient>();
 
         // RequestedAggregatedMeasureDataConfiguration
         services.AddTransient<IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>, SendAggregatedMeasuredDataToWholesale>()

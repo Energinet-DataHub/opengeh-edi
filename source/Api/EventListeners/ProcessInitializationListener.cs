@@ -24,14 +24,14 @@ namespace Energinet.DataHub.EDI.Api.EventListeners;
 public class ProcessInitializationListener
 {
     private readonly ILogger<ProcessInitializationListener> _logger;
-    private readonly IProcessInitializationClient _processInitializationClient;
+    private readonly IProcessClient _processClient;
 
     public ProcessInitializationListener(
         ILogger<ProcessInitializationListener> logger,
-        IProcessInitializationClient processInitializationClient)
+        IProcessClient processClient)
     {
         _logger = logger;
-        _processInitializationClient = processInitializationClient;
+        _processClient = processClient;
     }
 
     [Function(nameof(ProcessInitializationListener))]
@@ -47,6 +47,6 @@ public class ProcessInitializationListener
         var eventDetails = context.ExtractEventDetails();
         _logger.LogInformation("Integration event details: {EventDetails}", eventDetails);
 
-        await _processInitializationClient.InitializeAsync(message.Subject, message.Body.ToArray()).ConfigureAwait(false);
+        await _processClient.InitializeAsync(message.Subject, message.Body.ToArray()).ConfigureAwait(false);
     }
 }

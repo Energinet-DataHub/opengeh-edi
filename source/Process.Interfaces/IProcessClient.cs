@@ -19,7 +19,7 @@ namespace Energinet.DataHub.EDI.Process.Interfaces;
 /// <summary>
 /// Client for initializing processes.
 /// </summary>
-public interface IProcessInitializationClient
+public interface IProcessClient
 {
     /// <summary>
     /// Initialize a process based on type and process initialization data.
