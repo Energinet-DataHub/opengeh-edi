@@ -21,8 +21,12 @@ using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureDa
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
+using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Commands;
+using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Commands.Handlers;
+using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ProcessEvents;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
@@ -87,6 +91,8 @@ public static class ProcessExtensions
 
         // RequestedAggregatedMeasureDataConfiguration
         services
+            .AddTransient<IRequestHandler<SendWholesaleServicesRequestToWholesale, Unit>, SendWholesaleServicesRequestToWholesaleHandler>()
+            .AddTransient<INotificationHandler<WholesaleServicesProcessIsInitialized>, NotifyWholesaleWhenWholesaleServicesProcessIsInitialized>()
             .AddTransient<IRequestHandler<InitializeWholesaleServicesProcessesCommand, Unit>, InitializeWholesaleServicesProcessesHandler>()
             .AddScoped<IWholesaleServicesProcessRepository, WholesaleServicesProcessRepository>();
 

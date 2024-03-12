@@ -15,13 +15,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
+using Dapper;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Interfaces;
+using Energinet.DataHub.Edi.Requests;
 using FluentAssertions;
 using FluentAssertions.Equivalency;
 using FluentAssertions.Execution;
@@ -31,14 +36,17 @@ using Xunit.Categories;
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages.WholesaleServices;
 
 [IntegrationTest]
-public class InitializeWholesaleServicesProcessesCommandTests : TestBase
+public class WhenWholesaleServicesIsRequestedTests : TestBase
 {
-    private readonly ProcessContext _processContext;
+    private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
+    private readonly ServiceBusSenderSpy _senderSpy;
 
-    public InitializeWholesaleServicesProcessesCommandTests(IntegrationTestFixture integrationTestFixture)
+    public WhenWholesaleServicesIsRequestedTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
     {
-        _processContext = GetService<ProcessContext>();
+        _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IServiceBusSenderFactory>();
+        _senderSpy = new ServiceBusSenderSpy("Fake");
+        _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
     }
 
     [Fact]
@@ -56,14 +64,34 @@ public class InitializeWholesaleServicesProcessesCommandTests : TestBase
         process.Should().NotBeNull();
         marketMessage.Serie.Should().NotBeEmpty();
         process!.BusinessTransactionId.Id.Should().Be(marketMessage.Serie.First().Id);
-        AssertProcessState(process, WholesaleServicesProcess.State.Initialized);
         process.Should().BeEquivalentTo(marketMessage, opt => opt.Using(new ProcessAndRequestComparer()));
+        await AssertProcessState(marketMessage.MessageId, WholesaleServicesProcess.State.Initialized);
+    }
+
+    [Fact]
+    public async Task When_WholesaleServicesProcess_is_initialized_service_bus_message_is_sent_to_wholesale()
+    {
+        // Arrange
+        var exceptedServiceBusMessageSubject = nameof(WholesaleServicesRequest);
+        var marketMessage = InitializeProcessDtoBuilder()
+            .Build();
+
+        // Act
+        await InvokeCommandAsync(new InitializeWholesaleServicesProcessesCommand(marketMessage));
+        await ProcessInternalCommandsAsync();
+
+        // Assert
+        var message = _senderSpy.Message;
+        Assert.NotNull(message);
+        Assert.Equal(exceptedServiceBusMessageSubject, message!.Subject);
+        await AssertProcessState(marketMessage!.MessageId, WholesaleServicesProcess.State.Sent);
     }
 
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
-        _processContext.Dispose();
+        _senderSpy.Dispose();
+        _serviceBusClientSenderFactory.Dispose();
     }
 
     private static InitializeWholesaleServicesProcessDtoBuilder InitializeProcessDtoBuilder()
@@ -71,17 +99,21 @@ public class InitializeWholesaleServicesProcessesCommandTests : TestBase
         return new InitializeWholesaleServicesProcessDtoBuilder();
     }
 
-    private static void AssertProcessState(WholesaleServicesProcess process, WholesaleServicesProcess.State state)
+    private async Task AssertProcessState(string messageId, WholesaleServicesProcess.State state)
     {
-        var processState = typeof(WholesaleServicesProcess)
-            .GetField("_state", BindingFlags.NonPublic | BindingFlags.Instance)
-            ?.GetValue(process);
-        Assert.Equal(state, processState);
+        var databaseConnectionFactory = GetService<IDatabaseConnectionFactory>();
+        var sqlStatement =
+            $"SELECT [State] FROM [dbo].[WholesaleServicesProcesses] WHERE [InitiatedByMessageId] = '{messageId}'";
+
+        using var connection = await databaseConnectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
+        var actualState = await connection.ExecuteScalarAsync<string>(sqlStatement);
+        actualState.Should().Be(state.ToString());
     }
 
     private WholesaleServicesProcess? GetProcess(string senderNumber)
     {
-        return _processContext.WholesaleServicesProcesses
+        var processContext = GetService<ProcessContext>();
+        return processContext.WholesaleServicesProcesses
             .ToList()
             .FirstOrDefault(x => x.RequestedByActorId.Value == senderNumber);
     }
