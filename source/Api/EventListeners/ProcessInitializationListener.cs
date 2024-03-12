@@ -30,6 +30,7 @@ public class ProcessInitializationListener
         ILogger<ProcessInitializationListener> logger,
         IProcessClient processClient)
     {
+        _logger = logger;
         _processClient = processClient;
     }
 
