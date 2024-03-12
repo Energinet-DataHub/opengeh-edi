@@ -16,14 +16,14 @@ using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using MediatR;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
 
-public class InitializeAggregatedMeasureDataProcessesCommand : ICommand<Unit>
+public class InitializeWholesaleServicesProcessesCommand : ICommand<Unit>
 {
-    public InitializeAggregatedMeasureDataProcessesCommand(RequestAggregatedMeasureDataDto dto)
+    public InitializeWholesaleServicesProcessesCommand(InitializeWholesaleServicesProcessDto initializeWholesaleServicesProcessDto)
     {
-        Dto = dto;
+        InitializeWholesaleServicesProcessDto = initializeWholesaleServicesProcessDto;
     }
 
-    public RequestAggregatedMeasureDataDto Dto { get; }
+    public InitializeWholesaleServicesProcessDto InitializeWholesaleServicesProcessDto { get; }
 }
