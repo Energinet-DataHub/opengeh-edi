@@ -14,6 +14,7 @@
 
 using System;
 using System.Linq;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -35,6 +36,7 @@ public class ActorRole : EnumerationType
     public static readonly ActorRole ImbalanceSettlementResponsible = new("ImbalanceSettlementResponsible", "DDX");
     public static readonly ActorRole SystemOperator = new("SystemOperator", "EZ");
     public static readonly ActorRole DanishEnergyAgency = new("DanishEnergyAgency", "STS");
+    public static readonly ActorRole Delegated = new("Delegated", "DEL");
 
     private ActorRole(string name, string code)
         : base(name)
@@ -53,5 +55,18 @@ public class ActorRole : EnumerationType
     public override string ToString()
     {
         return Name;
+    }
+
+    /// <summary>
+    /// The ActorRole for a ActorMessageQueue. This is implemented to support the "hack" where
+    ///     a MeteredDataResponsible uses the GridOperator queue
+    /// Is used when peeking, dequeuing and enqueuing
+    /// </summary>
+    public ActorRole ForActorMessageQueue()
+    {
+        if (WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack && Equals(MeteredDataResponsible))
+            return GridOperator;
+
+        return this;
     }
 }
