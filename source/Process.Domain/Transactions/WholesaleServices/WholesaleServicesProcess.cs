@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ProcessEvents;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
@@ -113,5 +116,43 @@ public class WholesaleServicesProcess : Entity
             AddDomainEvent(new NotifyWholesaleThatWholesaleServicesIsRequested(this));
             _state = State.Sent;
         }
+    }
+
+    public void IsRejected(RejectedWholesaleServicesRequest rejectedWholesaleServicesRequest)
+    {
+        ArgumentNullException.ThrowIfNull(rejectedWholesaleServicesRequest);
+
+        if (_state != State.Sent)
+        {
+            return;
+        }
+
+        AddDomainEvent(
+            new EnqueueRejectedWholesaleServicesMessageEvent(
+                CreateRejectedWholesaleServicesResultMessage(rejectedWholesaleServicesRequest)));
+
+        _state = State.Rejected;
+    }
+
+    private RejectedWholesaleServicesMessageDto CreateRejectedWholesaleServicesResultMessage(
+        RejectedWholesaleServicesRequest rejectedWholesaleServicesRequest)
+    {
+        var rejectedWholesaleServices = new RejectedWholesaleServicesMessageSeries(
+            ProcessId.Id,
+            rejectedWholesaleServicesRequest.RejectReasons.Select(
+                    reason =>
+                        new RejectedWholesaleServicesMessageRejectReason(
+                            reason.ErrorCode,
+                            reason.ErrorMessage))
+                .ToList(),
+            BusinessTransactionId.Id);
+
+        return new RejectedWholesaleServicesMessageDto(
+            RequestedByActorId,
+            ProcessId.Id,
+            rejectedWholesaleServicesRequest.BusinessReason.Name,
+            ActorRole.FromCode(RequestedByActorRoleCode),
+            InitiatedByMessageId,
+            rejectedWholesaleServices);
     }
 }

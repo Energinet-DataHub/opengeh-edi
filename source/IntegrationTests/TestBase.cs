@@ -216,6 +216,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                     processId,
                     eventPayload.ToByteArray())
                 .ConfigureAwait(false);
+
             await ProcessReceivedInboxEventsAsync().ConfigureAwait(false);
             await ProcessInternalCommandsAsync().ConfigureAwait(false);
         }
