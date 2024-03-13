@@ -15,60 +15,51 @@
 
 syntax = "proto3";
 import "google/protobuf/timestamp.proto";
+import "Requests/Common/DecimalValue.proto";
+import "Requests/Common/Period.proto";
 
-option csharp_namespace = "Energinet.DataHub.Wholesale.Contracts.IntegrationEvents";
+option csharp_namespace = "Energinet.DataHub.Edi.Responses";
 
 message WholesaleServicesRequestAccepted {
-  repeated Series series = 1;
+  repeated WholesaleServicesRequestSeries series = 1;
 }
 
 /*
  * A calculation will result in one or more wholesale results. Each result is
  * published as an instance of this type.
  */
-message Series {
-  /*
-   * The beginning of the calculation period.
-   * The time is included in the period and is identical to the time of the first time series point
-   * in the process time series type results.
-   */
-  google.protobuf.Timestamp period_start_utc = 1;
+message WholesaleServicesRequestSeries {
+  Period period = 1;
 
-  /*
-   * The end of the calculation period.
-   * The time is excluded from the period.
-   */
-  google.protobuf.Timestamp period_end_utc = 2;
+  string grid_area = 2;
 
-  string grid_area_code = 3;
+  string energy_supplier_id = 3;
 
-  string energy_supplier_id = 4;
+  string charge_code = 4;
 
-  string charge_code = 5;
+  ChargeType charge_type = 5;
 
-  ChargeType charge_type = 6;
+  string charge_owner_id = 6;
 
-  string charge_owner_id = 7;
+  Resolution resolution = 7;
 
-  Resolution resolution = 8;
+  QuantityUnit quantity_unit = 8;
 
-  QuantityUnit quantity_unit = 9;
-
-  MeteringPointType metering_point_type = 10;
+  MeteringPointType metering_point_type = 9;
 
   /*
    * Settlement method is only set when metering point type is 'METERING_POINT_TYPE_CONSUMPTION'.
    */
-  optional SettlementMethod settlement_method = 11;
+  optional SettlementMethod settlement_method = 10;
 
-  Currency currency = 12;
+  Currency currency = 11;
 
-  repeated TimeSeriesPoint time_series_points = 13;
+  repeated TimeSeriesPoint time_series_points = 12;
 
   /*
    * The version of the calculation result. It is a positive integer (int64).
   */
-  int64 calculation_result_version = 14;
+  int64 calculation_result_version = 13;
 
    // ---------------------------- NESTED TYPES BELOW ----------------------------------------
 
@@ -131,8 +122,9 @@ message Series {
      * Read more at https://protobuf.dev/programming-guides/style/#enums.
      */
     RESOLUTION_UNSPECIFIED = 0;
-    RESOLUTION_DAY = 4;
-    RESOLUTION_HOUR = 6;
+    RESOLUTION_DAY = 1;
+    RESOLUTION_HOUR = 2;
+    RESOLUTION_MONTHLY = 3;
   }
 
   enum SettlementMethod {
@@ -173,19 +165,4 @@ message Series {
      */
     optional DecimalValue amount = 5;
   }
-}
-
-/*
- * Representation of a decimal value.
- * See more at https://learn.microsoft.com/en-us/dotnet/architecture/grpc-for-wcf-developers/protobuf-data-types#decimals.
- * Example: 12345.6789 -> { units = 12345, nanos = 678900000 }
- */
-message DecimalValue {
-
-  // Whole units part of the amount
-  int64 units = 1;
-
-  // Nano units of the amount (10^-9)
-  // Must be same sign as units
-  sfixed32 nanos = 2;
 }

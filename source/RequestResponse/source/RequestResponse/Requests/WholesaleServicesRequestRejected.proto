@@ -14,15 +14,10 @@
  */
 
 syntax = "proto3";
+import "Requests/Common/RejectedReason.proto";
 
 option csharp_namespace = "Energinet.DataHub.Edi.Responses";
 
 message WholesaleServicesRequestRejected {
   repeated RejectReason reject_reasons = 1;
-}
-
-// Contains all errors for the request
-message RejectReason {
-  string error_code = 1;
-  string error_message = 2;
 }

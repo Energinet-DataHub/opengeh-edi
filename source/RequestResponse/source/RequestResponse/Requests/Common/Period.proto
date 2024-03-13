@@ -14,10 +14,14 @@
  */
 
 syntax = "proto3";
-import "Requests/Common/RejectedReason.proto";
-
+import "google/protobuf/timestamp.proto";
+    
 option csharp_namespace = "Energinet.DataHub.Edi.Responses";
 
-message AggregatedTimeSeriesRequestRejected {
-  repeated RejectReason reject_reasons = 1;
+/*
+ * Representation of period for the time series.
+ */
+message Period {
+  google.protobuf.Timestamp start_of_period = 1;
+  google.protobuf.Timestamp end_of_period = 2;
 }
