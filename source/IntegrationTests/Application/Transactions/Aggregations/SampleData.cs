@@ -21,19 +21,17 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.Aggreg
 
 internal sealed class SampleData
 {
-    internal static string NameOfBalanceFixingCompletedIntegrationEvent => "BalanceFixingCompleted";
-
     internal static ActorNumber GridOperatorNumber => ActorNumber.Create("8200000007739");
 
     internal static string GridAreaCode => "805";
 
     internal static Guid ResultId => Guid.Parse("42AB7292-FE2E-4F33-B537-4A15FEDB9754");
 
-    internal static string MeteringPointType => "E18";
+    internal static MeteringPointType MeteringPointType => MeteringPointType.Production;
 
-    internal static string MeasureUnitType => "KWH";
+    internal static MeasurementUnit MeasureUnitType => MeasurementUnit.Kwh;
 
-    internal static string Resolution => "PT1H";
+    internal static Resolution Resolution => Resolution.Hourly;
 
     internal static Instant StartOfPeriod => EffectiveDateFactory.InstantAsOfToday();
 

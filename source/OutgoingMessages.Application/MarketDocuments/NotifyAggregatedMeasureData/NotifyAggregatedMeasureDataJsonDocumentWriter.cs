@@ -103,7 +103,7 @@ public class NotifyAggregatedMeasureDataJsonDocumentWriter : IDocumentWriter
             {
                 writer.WriteObject(
                     "marketEvaluationPoint.settlementMethod",
-                    new KeyValuePair<string, string>("value", CimCode.Of(SettlementType.From(series.SettlementType))));
+                    new KeyValuePair<string, string>("value", SettlementType.From(series.SettlementType).Code));
             }
 
             if (series.OriginalTransactionIdReference is not null)
@@ -111,24 +111,34 @@ public class NotifyAggregatedMeasureDataJsonDocumentWriter : IDocumentWriter
                 writer.WriteProperty("originalTransactionIDReference_Series.mRID", series.OriginalTransactionIdReference);
             }
 
-            writer.WriteObject("marketEvaluationPoint.type", new KeyValuePair<string, string>("value", CimCode.Of(MeteringPointType.From(series.MeteringPointType))));
+            writer.WriteObject(
+                "marketEvaluationPoint.type",
+                new KeyValuePair<string, string>("value", MeteringPointType.From(series.MeteringPointType).Code));
             writer.WriteProperty("product", ProductType.EnergyActive.Code);
-            writer.WriteObject("quantity_Measure_Unit.name", new KeyValuePair<string, string>("value", CimCode.Of(MeasurementUnit.From(series.MeasureUnitType))));
+            writer.WriteObject(
+                "quantity_Measure_Unit.name",
+                new KeyValuePair<string, string>("value", MeasurementUnit.From(series.MeasureUnitType).Code));
 
             if (series.SettlementVersion is not null)
             {
-                writer.WriteObject("settlement_Series.version", new KeyValuePair<string, string>("value", CimCode.Of(SettlementVersion.FromName(series.SettlementVersion))));
+                writer.WriteObject(
+                    "settlement_Series.version",
+                    new KeyValuePair<string, string>(
+                        "value",
+                        SettlementVersion.FromName(series.SettlementVersion).Code));
             }
 
             writer.WritePropertyName("Period");
             writer.WriteStartObject();
+            {
+                writer.WriteProperty("resolution", Resolution.From(series.Resolution).Code);
 
-            writer.WriteProperty("resolution", CimCode.Of(Resolution.From(series.Resolution)));
+                writer.WritePropertyName("timeInterval");
+                writer.WriteStartObject();
+                writer.WriteObject("start", new KeyValuePair<string, string>("value", series.Period.StartToString()));
+                writer.WriteObject("end", new KeyValuePair<string, string>("value", series.Period.EndToString()));
+            }
 
-            writer.WritePropertyName("timeInterval");
-            writer.WriteStartObject();
-            writer.WriteObject("start", new KeyValuePair<string, string>("value", series.Period.StartToString()));
-            writer.WriteObject("end", new KeyValuePair<string, string>("value", series.Period.EndToString()));
             writer.WriteEndObject();
 
             // Points

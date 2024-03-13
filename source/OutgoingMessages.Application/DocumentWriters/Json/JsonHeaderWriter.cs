@@ -36,7 +36,7 @@ internal static class JsonHeaderWriter
         writer.WriteProperty("mRID", messageHeader.MessageId);
         writer.WriteObject("businessSector.type", new KeyValuePair<string, string>("value", GeneralValues.SectorTypeCode));
         writer.WriteProperty("createdDateTime", messageHeader.TimeStamp.ToString());
-        writer.WriteObject("process.processType", new KeyValuePair<string, string>("value", CimCode.Of(BusinessReason.FromName(messageHeader.BusinessReason))));
+        writer.WriteObject("process.processType", new KeyValuePair<string, string>("value", BusinessReason.FromName(messageHeader.BusinessReason).Code));
 
         if (reasonCode is not null)
         {
@@ -50,7 +50,7 @@ internal static class JsonHeaderWriter
 
         writer.WriteObject(
             "receiver_MarketParticipant.marketRole.type",
-            new KeyValuePair<string, string>("value", CimCode.Of(ActorRole.FromCode(messageHeader.ReceiverRole))));
+            new KeyValuePair<string, string>("value", messageHeader.ReceiverRole));
 
         writer.WriteObject(
             "sender_MarketParticipant.mRID",
@@ -59,7 +59,7 @@ internal static class JsonHeaderWriter
 
         writer.WriteObject(
             "sender_MarketParticipant.marketRole.type",
-            new KeyValuePair<string, string>("value", CimCode.Of(ActorRole.FromCode(messageHeader.SenderRole))));
+            new KeyValuePair<string, string>("value", messageHeader.SenderRole));
 
         writer.WriteObject("type", new KeyValuePair<string, string>("value", typeCode));
     }
