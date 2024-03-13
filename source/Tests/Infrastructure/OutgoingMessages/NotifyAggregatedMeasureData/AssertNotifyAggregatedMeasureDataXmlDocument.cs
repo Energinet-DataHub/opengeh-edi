@@ -16,7 +16,6 @@ using System;
 using System.Globalization;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
@@ -152,13 +151,15 @@ public class AssertNotifyAggregatedMeasureDataXmlDocument : IAssertNotifyAggrega
 
     public IAssertNotifyAggregatedMeasureDataDocument HasBusinessReason(BusinessReason businessReason)
     {
-        _documentAsserter.HasValue("process.processType", CimCode.Of(businessReason));
+        ArgumentNullException.ThrowIfNull(businessReason);
+        _documentAsserter.HasValue("process.processType", businessReason.Code);
         return this;
     }
 
     public IAssertNotifyAggregatedMeasureDataDocument HasSettlementVersion(SettlementVersion settlementVersion)
     {
-        _documentAsserter.HasValue("Series[1]/settlement_Series.version", CimCode.Of(settlementVersion));
+        ArgumentNullException.ThrowIfNull(settlementVersion);
+        _documentAsserter.HasValue("Series[1]/settlement_Series.version", settlementVersion.Code);
         return this;
     }
 
@@ -176,7 +177,8 @@ public class AssertNotifyAggregatedMeasureDataXmlDocument : IAssertNotifyAggrega
 
     public IAssertNotifyAggregatedMeasureDataDocument HasSettlementMethod(SettlementType settlementMethod)
     {
-        _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.settlementMethod", CimCode.Of(settlementMethod));
+        ArgumentNullException.ThrowIfNull(settlementMethod);
+        _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.settlementMethod", settlementMethod.Code);
         return this;
     }
 }

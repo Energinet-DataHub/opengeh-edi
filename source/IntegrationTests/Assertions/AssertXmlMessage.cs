@@ -18,7 +18,6 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Assertions
@@ -106,7 +105,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Assertions
 
         internal AssertXmlMessage IsBusinessReason(BusinessReason businessReason)
         {
-            Assert.Equal(CimCode.Of(businessReason), GetMessageHeaderValue("process.processType"));
+            Assert.Equal(businessReason.Code, GetMessageHeaderValue("process.processType"));
             return this;
         }
 
