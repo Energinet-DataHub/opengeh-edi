@@ -76,6 +76,8 @@ limitations under the License.
         <ProtoCompile>True</ProtoCompile>
         <CompileOutputs>True</CompileOutputs>
         <Generator>MSBuild:Compile</Generator>
+      </Protobuf>
+      <Protobuf Update="IntegrationEvents\MarketPaticipant\EicFunction.proto">
         <OutputDir>obj\Debug\net8.0\</OutputDir>
       </Protobuf>
     </ItemGroup>
