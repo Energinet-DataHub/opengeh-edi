@@ -18,6 +18,6 @@ import "Requests/Common/RejectedReason.proto";
 
 option csharp_namespace = "Energinet.DataHub.Edi.Responses";
 
-message AggregatedTimeSeriesRequestRejected {
+message WholesaleServicesRequestRejected {
   repeated RejectReason reject_reasons = 1;
 }
