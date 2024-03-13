@@ -36,7 +36,7 @@ public class ChargeType : EnumerationType
         return GetAll<ChargeType>()
             .First(
                 chargeType =>
-            chargeType.Code.Equals(value, StringComparison.OrdinalIgnoreCase) ||
-            chargeType.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
+                    chargeType.Code.Equals(value, StringComparison.OrdinalIgnoreCase) ||
+                    chargeType.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
     }
 }
