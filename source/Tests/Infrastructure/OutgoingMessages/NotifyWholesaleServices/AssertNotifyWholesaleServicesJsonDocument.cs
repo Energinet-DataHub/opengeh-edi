@@ -22,7 +22,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using FluentAssertions;
 using Json.Schema;
 
@@ -73,11 +72,12 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
         BusinessReason expectedBusinessReason,
         CodeListType codeListType)
     {
+        ArgumentNullException.ThrowIfNull(expectedBusinessReason);
         _root.GetProperty("process.processType")
             .GetProperty("value")
             .GetString()
             .Should()
-            .Be(CimCode.Of(expectedBusinessReason));
+            .Be(expectedBusinessReason.Code);
 
         return this;
     }
@@ -165,12 +165,13 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
 
     public IAssertNotifyWholesaleServicesDocument HasSettlementVersion(SettlementVersion expectedSettlementVersion)
     {
+        ArgumentNullException.ThrowIfNull(expectedSettlementVersion);
         FirstWholesaleSeriesElement()
             .GetProperty("settlement_Series.version")
             .GetProperty("value")
             .GetString()
             .Should()
-            .Be(CimCode.Of(expectedSettlementVersion));
+            .Be(expectedSettlementVersion.Code);
 
         return this;
     }

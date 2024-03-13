@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -55,7 +54,7 @@ public class RejectRequestAggregatedMeasureDataJsonDocumentWriter : IDocumentWri
         var options = new JsonWriterOptions() { Indented = true };
         using var writer = new Utf8JsonWriter(stream, options);
 
-        JsonHeaderWriter.Write(header, DocumentTypeName, TypeCode, CimCode.Of(ReasonCode.FullyRejected), writer);
+        JsonHeaderWriter.Write(header, DocumentTypeName, TypeCode, ReasonCode.FullyRejected.Code, writer);
         WriteSeries(marketActivityRecords, writer);
         writer.WriteEndObject();
         await writer.FlushAsync().ConfigureAwait(false);

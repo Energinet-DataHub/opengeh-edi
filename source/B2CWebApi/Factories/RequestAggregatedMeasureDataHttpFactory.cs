@@ -21,6 +21,9 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Factories;
 
 public static class RequestAggregatedMeasureDataHttpFactory
 {
+    private const string AggregatedMeasureDataMessageType = "E74";
+    private const string Electricity = "23";
+
     public static RequestAggregatedMeasureDataDto Create(
         RequestAggregatedMeasureDataMarketRequest request,
         string senderNumber,
@@ -49,21 +52,15 @@ public static class RequestAggregatedMeasureDataHttpFactory
             DataHubDetails.DataHubActorNumber.Value,
             MarketRole.CalculationResponsibleRole.Code,
             MapToBusinessReasonCode(request.ProcessType),
-            "E74",
+            AggregatedMeasureDataMessageType,
             Guid.NewGuid().ToString(),
             now.ToString(),
-            BusinessType: "23",
+            Electricity,
             new[] { serie });
     }
 
     private static string? SetSettlementSeriesVersion(ProcessType processType)
     {
-        if (processType != ProcessType.FirstCorrection && processType != ProcessType.SecondCorrection &&
-            processType != ProcessType.ThirdCorrection)
-        {
-            return null;
-        }
-
         if (processType == ProcessType.FirstCorrection)
         {
             return "D01";
@@ -74,7 +71,12 @@ public static class RequestAggregatedMeasureDataHttpFactory
             return "D02";
         }
 
-        return "D03";
+        if (processType == ProcessType.ThirdCorrection)
+        {
+            return "D03";
+        }
+
+        return null;
     }
 
     private static string MapToBusinessReasonCode(ProcessType requestProcessType)
