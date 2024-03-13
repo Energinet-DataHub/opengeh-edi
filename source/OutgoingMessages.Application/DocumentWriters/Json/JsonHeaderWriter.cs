@@ -50,7 +50,7 @@ internal static class JsonHeaderWriter
 
         writer.WriteObject(
             "receiver_MarketParticipant.marketRole.type",
-            new KeyValuePair<string, string>("value", ActorRole.FromCode(messageHeader.ReceiverRole).Code));
+            new KeyValuePair<string, string>("value", messageHeader.ReceiverRole));
 
         writer.WriteObject(
             "sender_MarketParticipant.mRID",
@@ -59,7 +59,7 @@ internal static class JsonHeaderWriter
 
         writer.WriteObject(
             "sender_MarketParticipant.marketRole.type",
-            new KeyValuePair<string, string>("value", ActorRole.FromCode(messageHeader.SenderRole).Code));
+            new KeyValuePair<string, string>("value", messageHeader.SenderRole));
 
         writer.WriteObject("type", new KeyValuePair<string, string>("value", typeCode));
     }
