@@ -33,7 +33,7 @@ public class RejectRequestAggregatedMeasureDataXmlDocumentWriter : DocumentWrite
                 "cim",
                 "ERR"),
             parser,
-            CimCode.Of(ReasonCode.FullyRejected))
+            ReasonCode.FullyRejected.Code)
     {
     }
 
