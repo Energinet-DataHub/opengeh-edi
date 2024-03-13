@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Linq;
+
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public class ProductType : EnumerationType
@@ -26,6 +29,14 @@ public class ProductType : EnumerationType
     }
 
     public string Code { get; }
+
+    public static ProductType FromName(string value)
+    {
+        return GetAll<ProductType>()
+            .First(
+                chargeType =>
+                    chargeType.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
+    }
 
     public override string ToString()
     {

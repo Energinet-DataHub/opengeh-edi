@@ -23,6 +23,9 @@ public class CimCodeTests
     [Theory]
     [InlineData(nameof(BusinessReason.BalanceFixing), "D04")]
     [InlineData(nameof(BusinessReason.MoveIn), "E65")]
+    [InlineData(nameof(BusinessReason.PreliminaryAggregation), "D03")]
+    [InlineData(nameof(BusinessReason.WholesaleFixing), "D05")]
+    [InlineData(nameof(BusinessReason.Correction), "D32")]
     public void Translate_business_reason(string businessReason, string expectedCode)
     {
         Assert.Equal(expectedCode, BusinessReason.FromName(businessReason).Code);
@@ -44,6 +47,10 @@ public class CimCodeTests
     [InlineData(nameof(ActorRole.BalanceResponsibleParty), "DDK")]
     [InlineData(nameof(ActorRole.EnergySupplier), "DDQ")]
     [InlineData(nameof(ActorRole.MeteringPointAdministrator), "DDZ")]
+    [InlineData(nameof(ActorRole.ImbalanceSettlementResponsible), "DDX")]
+    [InlineData(nameof(ActorRole.SystemOperator), "EZ")]
+    [InlineData(nameof(ActorRole.DanishEnergyAgency), "STS")]
+    [InlineData(nameof(ActorRole.Delegated), "DEL")]
     public void Translate_market_role(string marketRole, string expectedCode)
     {
         Assert.Equal(expectedCode, EnumerationType.FromName<ActorRole>(marketRole).Code);
@@ -59,17 +66,68 @@ public class CimCodeTests
 
     [Theory]
     [InlineData(nameof(MeasurementUnit.Kwh), "KWH")]
+    [InlineData(nameof(MeasurementUnit.Pieces), "H87")]
     public void Translate_measurement_unit(string measurementUnit, string expectedCode)
     {
         Assert.Equal(expectedCode, MeasurementUnit.From(measurementUnit).Code);
     }
 
     [Theory]
-    [InlineData(nameof(Resolution.Hourly), "PT1H")]
     [InlineData(nameof(Resolution.QuarterHourly), "PT15M")]
+    [InlineData(nameof(Resolution.Daily), "P1D")]
+    [InlineData(nameof(Resolution.Hourly), "PT1H")]
+    [InlineData(nameof(Resolution.Monthly), "P1M")]
     public void Translate_resolution(string resolution, string expectedCode)
     {
         Assert.Equal(expectedCode, Resolution.From(resolution).Code);
+    }
+
+    [Theory]
+    [InlineData(nameof(SettlementVersion.FirstCorrection), "D01")]
+    [InlineData(nameof(SettlementVersion.SecondCorrection), "D02")]
+    [InlineData(nameof(SettlementVersion.ThirdCorrection), "D03")]
+    [InlineData(nameof(SettlementVersion.FourthCorrection), "D04")]
+    [InlineData(nameof(SettlementVersion.FifthCorrection), "D05")]
+    [InlineData(nameof(SettlementVersion.SixthCorrection), "D06")]
+    [InlineData(nameof(SettlementVersion.SeventhCorrection), "D07")]
+    [InlineData(nameof(SettlementVersion.EighthCorrection), "D08")]
+    [InlineData(nameof(SettlementVersion.NinthCorrection), "D09")]
+    [InlineData(nameof(SettlementVersion.TenthCorrection), "D10")]
+    public void Translate_settlement_version(string settlementVersion, string expectedCode)
+    {
+        Assert.Equal(expectedCode, SettlementVersion.FromName(settlementVersion).Code);
+    }
+
+    [Theory]
+    [InlineData(nameof(ChargeType.Subscription), "D01")]
+    [InlineData(nameof(ChargeType.Fee), "D02")]
+    [InlineData(nameof(ChargeType.Tariff), "D03")]
+    public void Translate_charge_type(string chargeType, string expectedCode)
+    {
+        Assert.Equal(expectedCode, ChargeType.From(chargeType).Code);
+    }
+
+    [Theory]
+    [InlineData(nameof(ProductType.EnergyActive), "8716867000030")]
+    [InlineData(nameof(ProductType.Tariff), "5790001330590")]
+    public void Translate_product_type(string productType, string expectedCode)
+    {
+        Assert.Equal(expectedCode, ProductType.FromName(productType).Code);
+    }
+
+    [Theory]
+    [InlineData(nameof(ReasonCode.FullyAccepted), "A01")]
+    [InlineData(nameof(ReasonCode.FullyRejected), "A02")]
+    public void Translate_reason_code(string reasonCode, string expectedCode)
+    {
+        Assert.Equal(expectedCode, ReasonCode.From(reasonCode).Code);
+    }
+
+    [Theory]
+    [InlineData(nameof(Currency.DanishCrowns), "DKK")]
+    public void Translate_currency(string currency, string expectedCode)
+    {
+        Assert.Equal(expectedCode, Currency.From(currency).Code);
     }
 
     [Theory]
