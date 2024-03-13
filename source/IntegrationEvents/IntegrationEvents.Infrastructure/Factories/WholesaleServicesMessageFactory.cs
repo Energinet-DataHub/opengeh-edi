@@ -47,7 +47,7 @@ public sealed class WholesaleServicesMessageFactory
             ActorRole.EnergySupplier,
             message.ChargeOwner,
             Guid.NewGuid(),
-            BusinessReasonMapper.Map(monthlyAmountPerChargeResultProducedV1.CalculationType),
+            BusinessReasonMapper.Map(monthlyAmountPerChargeResultProducedV1.CalculationType).Name,
             message);
     }
 
@@ -63,7 +63,7 @@ public sealed class WholesaleServicesMessageFactory
             receiverRole: ActorRole.EnergySupplier,
             chargeOwnerId: message.ChargeOwner,
             processId: Guid.NewGuid(),
-            businessReason: BusinessReasonMapper.Map(amountPerChargeResultProducedV1.CalculationType),
+            businessReason: BusinessReasonMapper.Map(amountPerChargeResultProducedV1.CalculationType).Name,
             wholesaleSeries: message);
     }
 

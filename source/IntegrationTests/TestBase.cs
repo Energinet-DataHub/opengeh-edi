@@ -51,6 +51,7 @@ using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureDa
 using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
+using Energinet.DataHub.EDI.Process.Interfaces;
 using Google.Protobuf;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -209,7 +210,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
         protected async Task HavingReceivedInboxEventAsync(string eventType, IMessage eventPayload, Guid processId)
         {
-            await GetService<InboxEventReceiver>().
+            await GetService<IInboxEventReceiver>().
                 ReceiveAsync(
                     Guid.NewGuid().ToString(),
                     eventType,

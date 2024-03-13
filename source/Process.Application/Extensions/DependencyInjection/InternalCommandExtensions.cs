@@ -48,6 +48,7 @@ internal static class InternalCommandExtensions
         mapper.Add("AcceptedAggregatedTimeSerie", typeof(AcceptedEnergyResultTimeSerieCommand));
         mapper.Add("RejectedAggregatedTimeSeries", typeof(RejectedAggregatedTimeSeries));
         mapper.Add("SendWholesaleServicesRequestToWholesale", typeof(SendWholesaleServicesRequestToWholesale));
+        mapper.Add("AcceptedWholesaleServicesSerieCommand", typeof(AcceptedWholesaleServicesSerieCommand));
 
         return mapper;
     }

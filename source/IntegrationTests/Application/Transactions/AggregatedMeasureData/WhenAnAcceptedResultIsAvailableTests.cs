@@ -28,7 +28,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
+using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf;
 using NodaTime.Serialization.Protobuf;
@@ -192,7 +192,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         AggregatedMeasureDataProcess process,
         AggregatedTimeSeriesRequestAccepted acceptedEvent)
     {
-        await GetService<InboxEventReceiver>()
+        await GetService<IInboxEventReceiver>()
             .ReceiveAsync(
                 Guid.NewGuid().ToString(),
                 nameof(AggregatedTimeSeriesRequestAccepted),

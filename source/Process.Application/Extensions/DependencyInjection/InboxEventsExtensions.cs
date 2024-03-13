@@ -14,7 +14,10 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
+using Energinet.DataHub.EDI.Process.Interfaces;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -26,8 +29,13 @@ public static class InboxEventsExtensions
     {
         services.AddTransient<INotificationHandler<TenSecondsHasHasPassed>, ProcessInboxEventsOnTenSecondsHasPassed>();
         services.AddTransient<IDataRetention, ReceivedInboxEventsRetention>();
-        services.AddTransient<InboxEventReceiver>();
+        services.AddTransient<IInboxEventReceiver, InboxEventReceiver>();
         services.AddTransient<InboxEventsProcessor>();
+
+        //InboxEventsConfiguration
+        services.AddTransient<IInboxEventMapper, WholesaleServicesRequestAcceptedMapper>()
+            .AddTransient<IInboxEventMapper, EnergyResultTimeSeriesRequestAcceptedEventMapper>()
+            .AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestRejectedMapper>();
 
         return services;
     }

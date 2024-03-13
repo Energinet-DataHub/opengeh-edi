@@ -14,61 +14,54 @@
 
 using System;
 using System.Collections.Generic;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-public class WholesaleServicesMessageDto : OutgoingMessageDto
+public class AcceptedWholesaleServicesMessageDto : WholesaleServicesMessageDto
 {
-    protected WholesaleServicesMessageDto(
+    protected AcceptedWholesaleServicesMessageDto(
         ActorNumber receiverId,
         Guid processId,
         string businessReason,
         ActorRole receiverRole,
         ActorNumber chargeOwnerId,
-        WholesaleServicesSeries series,
-        MessageId? relatedToMessageId = null)
+        AcceptedWholesaleServicesSeries series,
+        MessageId relatedToMessageId)
         : base(
-            DocumentType.NotifyWholesaleServices,
-            receiverId,
-            processId,
-            businessReason,
-            receiverRole,
-            DataHubDetails.DataHubActorNumber,
-            ActorRole.MeteredDataAdministrator,
-            relatedToMessageId)
+        receiverId,
+        processId,
+        businessReason,
+        receiverRole,
+        chargeOwnerId,
+        series)
     {
-        ChargeOwnerId = chargeOwnerId;
-        Series = series;
     }
 
-    public ActorNumber ChargeOwnerId { get; }
-
-    public WholesaleServicesSeries Series { get; }
-
-    public static WholesaleServicesMessageDto Create(
+    public static AcceptedWholesaleServicesMessageDto Create(
         ActorNumber receiverNumber,
         ActorRole receiverRole,
         ActorNumber chargeOwnerId,
         Guid processId,
         string businessReason,
-        WholesaleServicesSeries wholesaleSeries)
+        AcceptedWholesaleServicesSeries wholesaleSeries,
+        MessageId relatedToMessageId)
     {
         ArgumentNullException.ThrowIfNull(processId);
         ArgumentNullException.ThrowIfNull(businessReason);
 
-        return new WholesaleServicesMessageDto(
+        return new AcceptedWholesaleServicesMessageDto(
             receiverId: receiverNumber,
             receiverRole: receiverRole,
             processId: processId,
             businessReason: businessReason,
             series: wholesaleSeries,
-            chargeOwnerId: chargeOwnerId);
+            chargeOwnerId: chargeOwnerId,
+            relatedToMessageId: relatedToMessageId);
     }
 }
 
-public record WholesaleServicesSeries(
+public record AcceptedWholesaleServicesSeries(
     Guid TransactionId,
     long CalculationVersion,
     string GridAreaCode,
@@ -85,6 +78,22 @@ public record WholesaleServicesSeries(
     ChargeType ChargeType,
     Resolution Resolution,
     MeteringPointType? MeteringPointType,
-    SettlementType? SettlementType);
-
-public record WholesaleServicesPoint(int Position, decimal? Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality? QuantityQuality);
+    SettlementType? SettlementType,
+    string OriginalTransactionIdReference) : WholesaleServicesSeries(
+    TransactionId,
+    CalculationVersion,
+    GridAreaCode,
+    ChargeCode,
+    IsTax,
+    Points,
+    EnergySupplier,
+    ChargeOwner,
+    Period,
+    SettlementVersion,
+    QuantityUnit,
+    PriceMeasureUnit,
+    Currency,
+    ChargeType,
+    Resolution,
+    MeteringPointType,
+    SettlementType);

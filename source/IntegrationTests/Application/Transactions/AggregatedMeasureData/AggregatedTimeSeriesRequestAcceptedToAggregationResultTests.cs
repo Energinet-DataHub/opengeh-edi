@@ -27,7 +27,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
+using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using Google.Protobuf;
@@ -50,7 +50,7 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
 
     private readonly GridAreaBuilder _gridAreaBuilder = new();
     private readonly ProcessContext _processContext;
-    private readonly InboxEventReceiver _inboxEventReceiver;
+    private readonly IInboxEventReceiver _inboxEventReceiver;
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
     private readonly IMasterDataClient _masterDataClient;
     private readonly IFileStorageClient _fileStorageClient;
@@ -59,7 +59,7 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
         : base(integrationTestFixture)
     {
         _processContext = GetService<ProcessContext>();
-        _inboxEventReceiver = GetService<InboxEventReceiver>();
+        _inboxEventReceiver = GetService<IInboxEventReceiver>();
         _databaseConnectionFactory = GetService<IDatabaseConnectionFactory>();
         _masterDataClient = GetService<IMasterDataClient>();
         _fileStorageClient = GetService<IFileStorageClient>();

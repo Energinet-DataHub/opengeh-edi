@@ -220,6 +220,24 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             };
         }
 
+        public static OutgoingMessage CreateMessage(AcceptedWholesaleServicesMessageDto acceptedWholesaleServicesMessage, ISerializer serializer, Instant timestamp)
+        {
+            ArgumentNullException.ThrowIfNull(serializer);
+            ArgumentNullException.ThrowIfNull(acceptedWholesaleServicesMessage);
+
+            return new OutgoingMessage(
+                acceptedWholesaleServicesMessage.DocumentType,
+                acceptedWholesaleServicesMessage.ReceiverId,
+                acceptedWholesaleServicesMessage.ProcessId,
+                acceptedWholesaleServicesMessage.BusinessReason,
+                acceptedWholesaleServicesMessage.ReceiverRole,
+                acceptedWholesaleServicesMessage.SenderId,
+                acceptedWholesaleServicesMessage.SenderRole,
+                serializer.Serialize(acceptedWholesaleServicesMessage.Series),
+                timestamp,
+                acceptedWholesaleServicesMessage.RelatedToMessageId);
+        }
+
         public void AssignToBundle(BundleId bundleId)
         {
             AssignedBundleId = bundleId;

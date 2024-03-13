@@ -37,7 +37,7 @@ public class WholesaleServicesMessageDtoBuilder
             _receiverRole,
             _chargeOwner,
             _processId,
-            _businessReason,
+            _businessReason.Name,
             series);
     }
 

@@ -15,13 +15,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Commands;
-using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ProcessEvents;
 using Energinet.DataHub.EDI.Process.Infrastructure.Wholesale;
 using MediatR;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications.Handlers;
 
 public class NotifyWholesaleThatWholesaleServicesIsRequestedHandler : INotificationHandler<NotifyWholesaleThatWholesaleServicesIsRequested>
 {

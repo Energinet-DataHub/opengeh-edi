@@ -12,20 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ProcessEvents;
 
 /// <summary>
-/// Event to raise whe to enqueue accepted Energy Result response
-/// </summary>
-public class EnqueueAcceptedEnergyResultMessageEvent : DomainEvent
+/// Event to raise whe to enqueue accepted Wholesale Services response
+/// /// </summary>
+public class EnqueuedWholesaleServicesEvent : DomainEvent
 {
-    public EnqueueAcceptedEnergyResultMessageEvent(AcceptedEnergyResultMessageDto acceptedEnergyResultMessage)
+    public EnqueuedWholesaleServicesEvent(AcceptedWholesaleServicesMessageDto acceptedWholesaleServices)
     {
-        AcceptedEnergyResultMessage = acceptedEnergyResultMessage;
+        AcceptedWholesaleServices = acceptedWholesaleServices;
     }
 
-    public AcceptedEnergyResultMessageDto AcceptedEnergyResultMessage { get; }
+    public AcceptedWholesaleServicesMessageDto AcceptedWholesaleServices { get; }
 }

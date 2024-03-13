@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ProcessEvents;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
@@ -112,6 +114,21 @@ public class WholesaleServicesProcess : Entity
         {
             AddDomainEvent(new NotifyWholesaleThatWholesaleServicesIsRequested(this));
             _state = State.Sent;
+        }
+    }
+
+    public void IsAccepted(IReadOnlyCollection<AcceptedWholesaleServicesMessageDto> acceptedWholesaleServicesMessages)
+    {
+        ArgumentNullException.ThrowIfNull(acceptedWholesaleServicesMessages);
+
+        if (_state == State.Sent)
+        {
+            foreach (var acceptedWholesaleServicesMessage in acceptedWholesaleServicesMessages)
+            {
+                AddDomainEvent(new EnqueuedWholesaleServicesEvent(acceptedWholesaleServicesMessage));
+            }
+
+            _state = State.Accepted;
         }
     }
 }

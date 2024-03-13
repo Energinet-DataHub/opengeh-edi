@@ -8,6 +8,10 @@
   <ItemGroup>
     <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="9.1.0" />
+  </ItemGroup>
 
   <ItemDefinitionGroup>
     <ProjectReference>
