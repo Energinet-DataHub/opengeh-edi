@@ -15,7 +15,6 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using NodaTime;
 
@@ -39,7 +38,8 @@ public class AssertRejectRequestAggregatedMeasureDataXmlDocument : IAssertReject
 
     public IAssertRejectRequestAggregatedMeasureDataDocument HasBusinessReason(BusinessReason businessReason)
     {
-        _documentAsserter.HasValue("process.processType", CimCode.Of(businessReason));
+        ArgumentNullException.ThrowIfNull(businessReason);
+        _documentAsserter.HasValue("process.processType", businessReason.Code);
         return this;
     }
 

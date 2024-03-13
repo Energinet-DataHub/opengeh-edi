@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using NodaTime;
 using Serie = Energinet.DataHub.EDI.Process.Interfaces.Serie;
@@ -40,8 +39,8 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
     private string _messageId = Guid.NewGuid().ToString();
     private string _serieId = Guid.NewGuid().ToString();
     private string _senderRole = ActorRole.EnergySupplier.Code;
-    private string? _marketEvaluationPointType = "E17";
-    private string? _marketEvaluationSettlementMethod = "D01";
+    private string? _marketEvaluationPointType = MeteringPointType.Consumption.Code;
+    private string? _marketEvaluationSettlementMethod = SettlementType.Flex.Code;
     private string? _energySupplierMarketParticipantId = SampleData.NewEnergySupplierNumber;
     private string? _balanceResponsiblePartyMarketParticipantId = "5799999933318";
 
@@ -132,7 +131,7 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
         return new MessageHeader(
             _messageId,
             _messageType,
-            CimCode.Of(_businessReason),
+            _businessReason.Code,
             _senderId,
             _senderRole,
             _receiverId.Value,

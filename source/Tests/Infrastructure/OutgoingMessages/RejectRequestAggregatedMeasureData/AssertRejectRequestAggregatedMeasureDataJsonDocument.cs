@@ -20,7 +20,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Json.Schema;
 using NodaTime;
 using Xunit;
@@ -88,7 +87,7 @@ internal sealed class AssertRejectRequestAggregatedMeasureDataJsonDocument : IAs
 
     public IAssertRejectRequestAggregatedMeasureDataDocument HasBusinessReason(BusinessReason businessReason)
     {
-        Assert.Equal(CimCode.Of(businessReason), _root.GetProperty("process.processType").GetProperty("value").ToString());
+        Assert.Equal(businessReason.Code, _root.GetProperty("process.processType").GetProperty("value").ToString());
         return this;
     }
 

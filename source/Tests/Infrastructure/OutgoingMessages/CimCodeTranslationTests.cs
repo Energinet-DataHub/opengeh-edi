@@ -25,7 +25,7 @@ public class CimCodeTests
     [InlineData(nameof(BusinessReason.MoveIn), "E65")]
     public void Translate_business_reason(string businessReason, string expectedCode)
     {
-        Assert.Equal(expectedCode, CimCode.Of(BusinessReason.FromName(businessReason)));
+        Assert.Equal(expectedCode, BusinessReason.FromName(businessReason).Code);
     }
 
     [Theory]
@@ -34,7 +34,7 @@ public class CimCodeTests
     [InlineData(nameof(MeteringPointType.Exchange), "E20")]
     public void Translate_metering_point_type(string meteringPointType, string expectedCode)
     {
-        Assert.Equal(expectedCode, CimCode.Of(MeteringPointType.From(meteringPointType)));
+        Assert.Equal(expectedCode, MeteringPointType.From(meteringPointType).Code);
     }
 
     [Theory]
@@ -46,7 +46,7 @@ public class CimCodeTests
     [InlineData(nameof(ActorRole.MeteringPointAdministrator), "DDZ")]
     public void Translate_market_role(string marketRole, string expectedCode)
     {
-        Assert.Equal(expectedCode, CimCode.Of(EnumerationType.FromName<ActorRole>(marketRole)));
+        Assert.Equal(expectedCode, EnumerationType.FromName<ActorRole>(marketRole).Code);
     }
 
     [Theory]
@@ -54,14 +54,14 @@ public class CimCodeTests
     [InlineData(nameof(SettlementType.Flex), "D01")]
     public void Translate_settlement_type(string settlementType, string expectedCode)
     {
-        Assert.Equal(expectedCode, CimCode.Of(SettlementType.From(settlementType)));
+        Assert.Equal(expectedCode, SettlementType.From(settlementType).Code);
     }
 
     [Theory]
     [InlineData(nameof(MeasurementUnit.Kwh), "KWH")]
     public void Translate_measurement_unit(string measurementUnit, string expectedCode)
     {
-        Assert.Equal(expectedCode, CimCode.Of(MeasurementUnit.From(measurementUnit)));
+        Assert.Equal(expectedCode, MeasurementUnit.From(measurementUnit).Code);
     }
 
     [Theory]
@@ -69,7 +69,7 @@ public class CimCodeTests
     [InlineData(nameof(Resolution.QuarterHourly), "PT15M")]
     public void Translate_resolution(string resolution, string expectedCode)
     {
-        Assert.Equal(expectedCode, CimCode.Of(Resolution.From(resolution)));
+        Assert.Equal(expectedCode, Resolution.From(resolution).Code);
     }
 
     [Theory]

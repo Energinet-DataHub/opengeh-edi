@@ -25,123 +25,6 @@ public static class CimCode
     public const string QuantityQualityCodeCalculated = "A06";
     public const string QuantityQualityCodeNotAvailable = "A02";
 
-    public static string Of(BusinessReason businessReason)
-    {
-        ArgumentNullException.ThrowIfNull(businessReason);
-
-        if (businessReason == BusinessReason.BalanceFixing)
-            return "D04";
-
-        if (businessReason == BusinessReason.MoveIn)
-            return "E65";
-
-        if (businessReason == BusinessReason.PreliminaryAggregation)
-            return "D03";
-
-        if (businessReason == BusinessReason.WholesaleFixing)
-            return "D05";
-
-        if (businessReason == BusinessReason.Correction)
-            return "D32";
-
-        throw NoCodeFoundFor(businessReason.Name);
-    }
-
-    public static BusinessReason To(string businessReasonCode)
-    {
-        ArgumentNullException.ThrowIfNull(businessReasonCode);
-
-        if (businessReasonCode == "D04")
-            return BusinessReason.BalanceFixing;
-
-        if (businessReasonCode == "E65")
-            return BusinessReason.MoveIn;
-
-        if (businessReasonCode == "D03")
-            return BusinessReason.PreliminaryAggregation;
-
-        if (businessReasonCode == "D05")
-            return BusinessReason.WholesaleFixing;
-
-        if (businessReasonCode == "D32")
-            return BusinessReason.Correction;
-
-        throw NoBusinessReasonFoundFor(businessReasonCode);
-    }
-
-    public static string Of(SettlementVersion settlementVersion)
-    {
-        ArgumentNullException.ThrowIfNull(settlementVersion);
-
-        if (settlementVersion == SettlementVersion.FirstCorrection)
-            return "D01";
-
-        if (settlementVersion == SettlementVersion.SecondCorrection)
-            return "D02";
-
-        if (settlementVersion == SettlementVersion.ThirdCorrection)
-            return "D03";
-
-        throw NoCodeFoundFor(settlementVersion.Name);
-    }
-
-    public static string Of(MeteringPointType meteringPointType)
-    {
-        ArgumentNullException.ThrowIfNull(meteringPointType);
-
-        if (meteringPointType == MeteringPointType.Consumption)
-            return "E17";
-
-        if (meteringPointType == MeteringPointType.Production)
-            return "E18";
-
-        if (meteringPointType == MeteringPointType.Exchange)
-            return "E20";
-
-        throw NoCodeFoundFor(meteringPointType.Name);
-    }
-
-    public static string Of(ActorRole actorRole)
-    {
-        ArgumentNullException.ThrowIfNull(actorRole);
-
-        return actorRole.Code;
-    }
-
-    public static string Of(SettlementType settlementType)
-    {
-        ArgumentNullException.ThrowIfNull(settlementType);
-
-        if (settlementType == SettlementType.Flex)
-            return "D01";
-        if (settlementType == SettlementType.NonProfiled)
-            return "E02";
-
-        throw NoCodeFoundFor(settlementType.Name);
-    }
-
-    public static string Of(MeasurementUnit measurementUnit)
-    {
-        ArgumentNullException.ThrowIfNull(measurementUnit);
-
-        if (measurementUnit == MeasurementUnit.Kwh)
-            return "KWH";
-
-        throw NoCodeFoundFor(measurementUnit.Name);
-    }
-
-    public static string Of(Resolution resolution)
-    {
-        ArgumentNullException.ThrowIfNull(resolution);
-
-        if (resolution == Resolution.QuarterHourly)
-            return "PT15M";
-        if (resolution == Resolution.Hourly)
-            return "PT1H";
-
-        throw NoCodeFoundFor(resolution.Name);
-    }
-
     public static string Of(CalculatedQuantityQuality calculatedQuantityQuality)
     {
         return calculatedQuantityQuality switch
@@ -154,18 +37,6 @@ public static class CimCode
             CalculatedQuantityQuality.NotAvailable => QuantityQualityCodeNotAvailable,
             _ => throw NoCodeFoundFor(calculatedQuantityQuality.ToString()),
         };
-    }
-
-    public static string Of(ReasonCode reasonCode)
-    {
-        ArgumentNullException.ThrowIfNull(reasonCode);
-
-        if (reasonCode == ReasonCode.FullyAccepted)
-            return "A01";
-        if (reasonCode == ReasonCode.FullyRejected)
-            return "A02";
-
-        throw NoCodeFoundFor(reasonCode.Name);
     }
 
     public static string CodingSchemeOf(ActorNumber actorNumber)
@@ -182,10 +53,5 @@ public static class CimCode
     private static InvalidOperationException NoCodeFoundFor(string domainType)
     {
         return new InvalidOperationException($"No code has been defined for {domainType}");
-    }
-
-    private static InvalidOperationException NoBusinessReasonFoundFor(string businessReasonCode)
-    {
-        return new InvalidOperationException($"No business reason has been defined for {businessReasonCode}");
     }
 }

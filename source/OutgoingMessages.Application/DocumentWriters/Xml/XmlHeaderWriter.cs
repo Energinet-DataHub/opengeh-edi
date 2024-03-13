@@ -44,7 +44,7 @@ internal static class XmlHeaderWriter
             .ConfigureAwait(false);
         await writer.WriteElementStringAsync(documentDetails.Prefix, "mRID", null, messageHeader.MessageId).ConfigureAwait(false);
         await writer.WriteElementStringAsync(documentDetails.Prefix, "type", null, documentDetails.TypeCode).ConfigureAwait(false);
-        await writer.WriteElementStringAsync(documentDetails.Prefix, "process.processType", null, CimCode.Of(BusinessReason.FromName(messageHeader.BusinessReason)))
+        await writer.WriteElementStringAsync(documentDetails.Prefix, "process.processType", null, BusinessReason.FromName(messageHeader.BusinessReason).Code)
             .ConfigureAwait(false);
         await writer.WriteElementStringAsync(documentDetails.Prefix, "businessSector.type", null, GeneralValues.SectorTypeCode).ConfigureAwait(false);
 
@@ -57,7 +57,7 @@ internal static class XmlHeaderWriter
                 documentDetails.Prefix,
                 "sender_MarketParticipant.marketRole.type",
                 null,
-                CimCode.Of(ActorRole.FromCode(messageHeader.SenderRole)))
+                ActorRole.FromCode(messageHeader.SenderRole).Code)
             .ConfigureAwait(false);
 
         await writer.WriteStartElementAsync(documentDetails.Prefix, "receiver_MarketParticipant.mRID", null).ConfigureAwait(false);
@@ -66,7 +66,7 @@ internal static class XmlHeaderWriter
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 
         await writer
-            .WriteElementStringAsync(documentDetails.Prefix, "receiver_MarketParticipant.marketRole.type", null, CimCode.Of(ActorRole.FromCode(messageHeader.ReceiverRole)))
+            .WriteElementStringAsync(documentDetails.Prefix, "receiver_MarketParticipant.marketRole.type", null, ActorRole.FromCode(messageHeader.ReceiverRole).Code)
             .ConfigureAwait(false);
         await writer.WriteElementStringAsync(documentDetails.Prefix, "createdDateTime", null, messageHeader.TimeStamp.ToString()).ConfigureAwait(false);
         if (reasonCode is not null)

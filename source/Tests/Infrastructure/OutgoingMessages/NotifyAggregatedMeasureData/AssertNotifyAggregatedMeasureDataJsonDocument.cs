@@ -22,7 +22,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using FluentAssertions;
 using Json.Schema;
 using Xunit;
@@ -206,13 +205,13 @@ internal sealed class AssertNotifyAggregatedMeasureDataJsonDocument : IAssertNot
 
     public IAssertNotifyAggregatedMeasureDataDocument HasBusinessReason(BusinessReason businessReason)
     {
-        Assert.Equal(CimCode.Of(businessReason), _root.GetProperty("process.processType").GetProperty("value").ToString());
+        Assert.Equal(businessReason.Code, _root.GetProperty("process.processType").GetProperty("value").ToString());
         return this;
     }
 
     public IAssertNotifyAggregatedMeasureDataDocument HasSettlementVersion(SettlementVersion settlementVersion)
     {
-        Assert.Equal(CimCode.Of(settlementVersion), FirstTimeSeriesElement().GetProperty("settlement_Series.version").GetProperty("value").ToString());
+        Assert.Equal(settlementVersion.Code, FirstTimeSeriesElement().GetProperty("settlement_Series.version").GetProperty("value").ToString());
         return this;
     }
 
@@ -232,7 +231,7 @@ internal sealed class AssertNotifyAggregatedMeasureDataJsonDocument : IAssertNot
 
     public IAssertNotifyAggregatedMeasureDataDocument HasSettlementMethod(SettlementType settlementMethod)
     {
-        Assert.Equal(CimCode.Of(settlementMethod), FirstTimeSeriesElement()
+        Assert.Equal(settlementMethod.Code, FirstTimeSeriesElement()
             .GetProperty("marketEvaluationPoint.settlementMethod").GetProperty("value")
             .ToString());
         return this;
