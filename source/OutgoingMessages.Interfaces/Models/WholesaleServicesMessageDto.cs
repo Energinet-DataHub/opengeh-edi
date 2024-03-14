@@ -85,6 +85,7 @@ public record WholesaleServicesSeries(
     ChargeType ChargeType,
     Resolution Resolution,
     MeteringPointType? MeteringPointType,
-    SettlementType? SettlementType);
+    SettlementType? SettlementType,
+    string? OriginalTransactionIdReference = null);
 
 public record WholesaleServicesPoint(int Position, decimal? Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality? QuantityQuality);

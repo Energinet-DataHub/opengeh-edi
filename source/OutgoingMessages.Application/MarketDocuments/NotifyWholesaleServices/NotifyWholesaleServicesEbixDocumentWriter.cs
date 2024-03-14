@@ -223,6 +223,9 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
                 } // End </ChargeTypeOwnerEnergyParty>
 
+                // <OriginalBusinessDocument />
+                await WriteElementIfHasValueAsync("OriginalBusinessDocument", series.OriginalTransactionIdReference, writer).ConfigureAwait(false);
+
                 // <Version />
                 await WriteElementIfHasValueAsync("Version", series.CalculationVersion.ToString(NumberFormatInfo.InvariantInfo), writer).ConfigureAwait(false);
 

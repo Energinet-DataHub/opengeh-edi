@@ -97,4 +97,5 @@ public record AcceptedWholesaleServicesSeries(
     ChargeType,
     Resolution,
     MeteringPointType,
-    SettlementType);
+    SettlementType,
+    OriginalTransactionIdReference);

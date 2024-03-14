@@ -88,9 +88,11 @@ public sealed class NotifyWholesaleServicesJsonDocumentWriter : IDocumentWriter
                             KeyValuePair.Create("value", series.SettlementVersion.Code));
                     }
 
-                    // TODO (MWO): These lines have to be converted from xml to json when the time comes
-                    // TODO (MWO): These are there for later use, but are not used as of right now
-                    //await WriteElementIfHasValueAsync("originalTransactionIDReference_Series.mRID", wholesaleCalculationSeries.OriginalTransactionIdReference, writer).ConfigureAwait(false);
+                    if (series.OriginalTransactionIdReference is not null)
+                    {
+                        writer.WriteProperty("originalTransactionIDReference_Series.mRID", series.OriginalTransactionIdReference);
+                    }
+
                     if (series.MeteringPointType is not null)
                     {
                         writer.WriteObject(

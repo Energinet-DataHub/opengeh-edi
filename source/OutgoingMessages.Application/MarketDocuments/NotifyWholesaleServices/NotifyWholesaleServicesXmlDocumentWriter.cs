@@ -52,7 +52,7 @@ public class NotifyWholesaleServicesXmlDocumentWriter : DocumentWriter
             await WriteElementIfHasValueAsync("settlement_Series.version", wholesaleCalculationSeries.SettlementVersion?.Code, writer).ConfigureAwait(false);
 
             // These are there for later use, but are not used as of right now
-            // await WriteElementIfHasValueAsync("originalTransactionIDReference_Series.mRID", wholesaleCalculationSeries.OriginalTransactionIdReference, writer).ConfigureAwait(false);
+            await WriteElementIfHasValueAsync("originalTransactionIDReference_Series.mRID", wholesaleCalculationSeries.OriginalTransactionIdReference, writer).ConfigureAwait(false);
             await WriteElementIfHasValueAsync("marketEvaluationPoint.type", wholesaleCalculationSeries.MeteringPointType?.Code, writer).ConfigureAwait(false);
             await WriteElementIfHasValueAsync("marketEvaluationPoint.settlementMethod", wholesaleCalculationSeries.SettlementType?.Code, writer).ConfigureAwait(false);
 
