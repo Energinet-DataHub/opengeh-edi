@@ -85,6 +85,19 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         return messageId;
     }
 
+    public async Task<OutgoingMessageId> EnqueueAsync(
+        RejectedWholesaleServicesMessageDto rejectedWholesaleServicesMessage,
+        CancellationToken cancellationToken)
+    {
+        var message = OutgoingMessage.CreateMessage(
+            rejectedWholesaleServicesMessage,
+            _serializer,
+            _systemDateTimeProvider.Now());
+
+        var messageId = await _messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
+        return messageId;
+    }
+
     public async Task<OutgoingMessageId> EnqueueAndCommitAsync(
         EnergyResultMessageDto energyResultMessage,
         CancellationToken cancellationToken)

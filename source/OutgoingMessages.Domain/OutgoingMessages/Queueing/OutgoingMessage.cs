@@ -220,6 +220,33 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             };
         }
 
+        /// <summary>
+        ///     This method create a single outgoing message, for the receiver, based on the rejected WholesaleServicesMessage.
+        /// </summary>
+        public static OutgoingMessage CreateMessage(
+            RejectedWholesaleServicesMessageDto rejectedWholesaleServicesMessage,
+            ISerializer serializer,
+            Instant timestamp)
+        {
+            ArgumentNullException.ThrowIfNull(serializer);
+            ArgumentNullException.ThrowIfNull(rejectedWholesaleServicesMessage);
+
+            return new OutgoingMessage(
+                rejectedWholesaleServicesMessage.DocumentType,
+                rejectedWholesaleServicesMessage.ReceiverId,
+                rejectedWholesaleServicesMessage.ProcessId,
+                rejectedWholesaleServicesMessage.BusinessReason,
+                rejectedWholesaleServicesMessage.ReceiverRole,
+                rejectedWholesaleServicesMessage.SenderId,
+                rejectedWholesaleServicesMessage.SenderRole,
+                serializer.Serialize(rejectedWholesaleServicesMessage.Series),
+                timestamp,
+                rejectedWholesaleServicesMessage.RelatedToMessageId);
+        }
+
+        /// <summary>
+        ///     This method create a single outgoing message, for the receiver, based on the accepted WholesaleServicesMessage.
+        /// </summary>
         public static OutgoingMessage CreateMessage(AcceptedWholesaleServicesMessageDto acceptedWholesaleServicesMessage, ISerializer serializer, Instant timestamp)
         {
             ArgumentNullException.ThrowIfNull(serializer);

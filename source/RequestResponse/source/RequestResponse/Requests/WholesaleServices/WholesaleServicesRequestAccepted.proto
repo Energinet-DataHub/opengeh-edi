@@ -17,6 +17,7 @@ syntax = "proto3";
 import "google/protobuf/timestamp.proto";
 import "Requests/Common/DecimalValue.proto";
 import "Requests/Common/Period.proto";
+import "Requests/Common/QuantityQuality.proto";
 
 option csharp_namespace = "Energinet.DataHub.Edi.Responses";
 
@@ -110,21 +111,6 @@ message WholesaleServicesRequestSeries {
     // States that the energy quantity is measured in kWh (kilo Watt hours).
     QUANTITY_UNIT_KWH = 1;
     QUANTITY_UNIT_PIECES = 2;
-  }
-
-  /*
-   * The quality of the energy quantity.
-   */
-  enum QuantityQuality {
-    /*
-     * Unspecified is unused but according to best practice.
-     * Read more at https://protobuf.dev/programming-guides/style/#enums.
-     */
-    QUANTITY_QUALITY_UNSPECIFIED = 0;
-    QUANTITY_QUALITY_ESTIMATED = 1;
-    QUANTITY_QUALITY_MEASURED = 2;
-    QUANTITY_QUALITY_MISSING = 3;
-    QUANTITY_QUALITY_CALCULATED = 4;
   }
 
   /*

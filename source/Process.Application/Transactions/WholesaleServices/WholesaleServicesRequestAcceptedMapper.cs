@@ -24,7 +24,7 @@ using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.Collections;
 using MediatR;
 using NodaTime.Serialization.Protobuf;
-using QuantityQuality = Energinet.DataHub.Edi.Responses.WholesaleServicesRequestSeries.Types.QuantityQuality;
+using DecimalValue = Energinet.DataHub.Edi.Responses.DecimalValue;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
 
@@ -169,10 +169,9 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         return points.AsReadOnly();
     }
 
-    private static CalculatedQuantityQuality MapQuality(IReadOnlyCollection<QuantityQuality> quantityQualities)
+    private static CalculatedQuantityQuality MapQuality(ReadOnlyCollection<QuantityQuality> quantityQualities)
     {
         ArgumentNullException.ThrowIfNull(quantityQualities);
-
         return (missing: quantityQualities.Contains(QuantityQuality.Missing),
                 estimated: quantityQualities.Contains(QuantityQuality.Estimated),
                 measured: quantityQualities.Contains(QuantityQuality.Measured),

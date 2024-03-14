@@ -46,7 +46,7 @@ public class WholesaleServicesRequestAcceptedBuilder
                 Time = currentTime.ToTimestamp(),
                 Price = price,
                 Amount = amount,
-                QuantityQualities = { WholesaleServicesRequestSeries.Types.QuantityQuality.Calculated },
+                QuantityQualities = { QuantityQuality.Calculated },
             });
             currentTime = currentTime.Plus(NodaTime.Duration.FromMinutes(15));
         }

@@ -66,6 +66,8 @@ public static class ProcessExtensions
         services.AddTransient<INotificationHandler<EnqueuedWholesaleServicesEvent>, EnqueuedWholesaleServicesMessageHandler>();
         services.AddTransient<INotificationHandler<EnqueueAcceptedEnergyResultMessageEvent>, EnqueueAcceptedEnergyResultMessageHandler>();
         services.AddTransient<INotificationHandler<EnqueueRejectedEnergyResultMessageEvent>, EnqueueRejectedEnergyResultMessageHandler>();
+        services.AddTransient<INotificationHandler<EnqueueRejectedWholesaleServicesMessageEvent>,
+                EnqueueRejectedWholesaleServicesMessageHandler>();
 
         // ProcessInitialization handlers Configuration
         services.AddTransient<IProcessInitializationHandler, InitializeAggregatedMeasureDataHandler>();
@@ -93,7 +95,11 @@ public static class ProcessExtensions
             .AddTransient<INotificationHandler<WholesaleServicesProcessIsInitialized>, NotifyWholesaleWhenWholesaleServicesProcessIsInitialized>()
             .AddTransient<INotificationHandler<NotifyWholesaleThatWholesaleServicesIsRequested>, NotifyWholesaleThatWholesaleServicesIsRequestedHandler>()
             .AddTransient<IRequestHandler<InitializeWholesaleServicesProcessesCommand, Unit>, InitializeWholesaleServicesProcessesHandler>()
-            .AddScoped<IWholesaleServicesProcessRepository, WholesaleServicesProcessRepository>();
+            .AddScoped<IWholesaleServicesProcessRepository, WholesaleServicesProcessRepository>()
+            .AddTransient<IRequestHandler<RejectedWholesaleServices, Unit>,
+                RejectProcessWhenRejectedWholesaleServicesIsAvailable>()
+            .AddTransient<INotificationHandler<WholesaleServicesRequestWasRejected>,
+                WhenARejectedWholesaleServicesRequestIsAvailable>();
 
         return services;
     }
