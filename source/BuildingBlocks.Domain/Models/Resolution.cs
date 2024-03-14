@@ -34,10 +34,21 @@ public class Resolution : EnumerationType
 
     public string Code { get; }
 
-    public static Resolution From(string value)
+    public static Resolution FromName(string name)
     {
-        return GetAll<Resolution>().First(resolution =>
-            resolution.Code.Equals(value, StringComparison.OrdinalIgnoreCase) ||
-            resolution.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
+        return GetAll<Resolution>()
+                   .First(
+                       resolution =>
+                           resolution.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(Currency)} {nameof(name)}");
+    }
+
+    public static Resolution FromCode(string code)
+    {
+        return GetAll<Resolution>()
+                   .First(
+                       resolution =>
+                           resolution.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException($"{code} is not a valid {typeof(Currency)} {nameof(code)}");
     }
 }

@@ -131,7 +131,7 @@ public class NotifyAggregatedMeasureDataJsonDocumentWriter : IDocumentWriter
             writer.WritePropertyName("Period");
             writer.WriteStartObject();
             {
-                writer.WriteProperty("resolution", Resolution.From(series.Resolution).Code);
+                writer.WriteProperty("resolution", Resolution.FromName(series.Resolution).Code);
 
                 writer.WritePropertyName("timeInterval");
                 writer.WriteStartObject();

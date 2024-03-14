@@ -21,10 +21,9 @@ public class ResolutionTests
 {
     [Theory]
     [InlineData("pt1h")]
-    [InlineData("hourly")]
-    public void Can_parse_from_name_or_code(string valueToParseFrom)
+    public void Can_parse_from_code(string valueToParseFrom)
     {
-        var resolution = Resolution.From(valueToParseFrom);
+        var resolution = Resolution.FromCode(valueToParseFrom);
 
         Assert.Equal(Resolution.Hourly, resolution);
     }

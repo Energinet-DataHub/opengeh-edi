@@ -30,7 +30,7 @@ public class ReasonCode : EnumerationType
 
     public string Code { get; }
 
-    public static ReasonCode From(string code)
+    public static ReasonCode FromCode(string code)
     {
         return GetAll
                 <ReasonCode>()

@@ -93,7 +93,7 @@ public class NotifyAggregatedMeasureDataXmlDocumentWriter : DocumentWriter
                 .ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Period", null).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "resolution", null, Resolution.From(timeSeries.Resolution).Code).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "resolution", null, Resolution.FromName(timeSeries.Resolution).Code).ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "timeInterval", null).ConfigureAwait(false);
 

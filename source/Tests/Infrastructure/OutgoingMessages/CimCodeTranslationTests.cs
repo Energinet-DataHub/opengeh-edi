@@ -79,7 +79,7 @@ public class CimCodeTests
     [InlineData(nameof(Resolution.Monthly), "P1M")]
     public void Translate_resolution(string resolution, string expectedCode)
     {
-        Assert.Equal(expectedCode, Resolution.From(resolution).Code);
+        Assert.Equal(expectedCode, Resolution.FromName(resolution).Code);
     }
 
     [Theory]
@@ -120,7 +120,7 @@ public class CimCodeTests
     [InlineData(nameof(ReasonCode.FullyRejected), "A02")]
     public void Translate_reason_code(string reasonCode, string expectedCode)
     {
-        Assert.Equal(expectedCode, ReasonCode.From(reasonCode).Code);
+        Assert.Equal(expectedCode, ReasonCode.FromName(reasonCode).Code);
     }
 
     [Theory]
