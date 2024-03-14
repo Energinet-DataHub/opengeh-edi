@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Commands;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Commands.Handlers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications;
+using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications.Handlers;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ProcessEvents;
@@ -57,7 +58,8 @@ public static class ProcessExtensions
 
         //InboxEventsConfiguration
         services.AddTransient<IInboxEventMapper, EnergyResultTimeSeriesRequestAcceptedEventMapper>()
-            .AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestRejectedMapper>();
+            .AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestRejectedMapper>()
+            .AddTransient<IInboxEventMapper, WholesaleServicesRequestRejectedMapper>();
 
         //ProcessingConfiguration
         services.AddScoped<DomainEventsAccessor>()
@@ -70,6 +72,10 @@ public static class ProcessExtensions
         //EnqueueMessageConfiguration
         services.AddTransient<INotificationHandler<EnqueueAcceptedEnergyResultMessageEvent>, EnqueueAcceptedEnergyResultMessageHandler>();
         services.AddTransient<INotificationHandler<EnqueueRejectedEnergyResultMessageEvent>, EnqueueRejectedEnergyResultMessageHandler>();
+
+        services
+            .AddTransient<INotificationHandler<EnqueueRejectedWholesaleServicesMessageEvent>,
+                EnqueueRejectedWholesaleServicesMessageHandler>();
 
         // ProcessInitialization handlers Configuration
         services.AddTransient<IProcessInitializationHandler, InitializeAggregatedMeasureDataHandler>();
@@ -95,7 +101,11 @@ public static class ProcessExtensions
             .AddTransient<INotificationHandler<WholesaleServicesProcessIsInitialized>, NotifyWholesaleWhenWholesaleServicesProcessIsInitialized>()
             .AddTransient<INotificationHandler<NotifyWholesaleThatWholesaleServicesIsRequested>, NotifyWholesaleThatWholesaleServicesIsRequestedHandler>()
             .AddTransient<IRequestHandler<InitializeWholesaleServicesProcessesCommand, Unit>, InitializeWholesaleServicesProcessesHandler>()
-            .AddScoped<IWholesaleServicesProcessRepository, WholesaleServicesProcessRepository>();
+            .AddScoped<IWholesaleServicesProcessRepository, WholesaleServicesProcessRepository>()
+            .AddTransient<IRequestHandler<RejectedWholesaleServices, Unit>,
+                RejectProcessWhenRejectedWholesaleServicesIsAvailable>()
+            .AddTransient<INotificationHandler<WholesaleServicesRequestWasRejected>,
+                WhenARejectedWholesaleServicesRequestIsAvailable>();
 
         return services;
     }

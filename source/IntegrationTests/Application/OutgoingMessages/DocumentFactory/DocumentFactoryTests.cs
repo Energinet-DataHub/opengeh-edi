@@ -17,6 +17,7 @@ using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
+using FluentAssertions;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.DocumentFactory;
@@ -45,7 +46,13 @@ public class DocumentFactoryTests
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Xml));
 
-        Assert.NotNull(writer);
+        if (documentType == DocumentType.RejectRequestWholesaleSettlement)
+        {
+            writer.Should().BeNull("RejectRequestWholesaleServices does not have any document writers yet");
+            return;
+        }
+
+        writer.Should().NotBeNull();
     }
 
     [Theory]
@@ -55,7 +62,13 @@ public class DocumentFactoryTests
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Json));
 
-        Assert.NotNull(writer);
+        if (documentType == DocumentType.RejectRequestWholesaleSettlement)
+        {
+            writer.Should().BeNull("RejectRequestWholesaleServices does not have any document writers yet");
+            return;
+        }
+
+        writer.Should().NotBeNull();
     }
 
     [Theory]
@@ -65,6 +78,12 @@ public class DocumentFactoryTests
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Ebix));
 
-        Assert.NotNull(writer);
+        if (documentType == DocumentType.RejectRequestWholesaleSettlement)
+        {
+            writer.Should().BeNull("RejectRequestWholesaleServices does not have any document writers yet");
+            return;
+        }
+
+        writer.Should().NotBeNull();
     }
 }
