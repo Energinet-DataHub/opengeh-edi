@@ -48,6 +48,14 @@ public interface IOutgoingMessagesClient
     Task<OutgoingMessageId> EnqueueAsync(RejectedEnergyResultMessageDto rejectedEnergyResultMessage, CancellationToken cancellationToken);
 
     /// <summary>
+    ///     Enqueue a rejected wholesale service message, no commit. Currently ONLY used by the Process module which handles the
+    ///     commit itself.
+    /// </summary>
+    Task<OutgoingMessageId> EnqueueAsync(
+        RejectedWholesaleServicesMessageDto rejectedWholesaleServicesMessage,
+        CancellationToken cancellationToken);
+
+    /// <summary>
     ///  Enqueue a energy result message, WITH commit. Currently ONLY used by the integration event.
     /// </summary>
     Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultMessageDto energyResultMessage, CancellationToken cancellationToken);

@@ -15,11 +15,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers;
 using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
+using FluentAssertions;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
@@ -47,7 +47,9 @@ public class InternalCommandRegistrationTests : TestBase
     [MemberData(nameof(GetInternalCommands))]
     public void Internal_commands_are_registered(Type internalCommand)
     {
-        Assert.True(IsRegistered(internalCommand));
+        IsRegistered(internalCommand)
+            .Should()
+            .BeTrue($"internal command {internalCommand.Name} should have been registered");
     }
 
     private bool IsRegistered(Type commandType)
