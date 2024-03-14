@@ -19,7 +19,6 @@ import "Requests/Common/DecimalValue.proto";
 import "Requests/Common/Period.proto";
 import "Requests/Common/QuantityQuality.proto";
 
-
 option csharp_namespace = "Energinet.DataHub.Edi.Responses";
 
 message AggregatedTimeSeriesRequestAccepted {
