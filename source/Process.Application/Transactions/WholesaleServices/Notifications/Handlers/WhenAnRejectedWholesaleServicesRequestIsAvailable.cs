@@ -26,7 +26,7 @@ public sealed class
 {
     private readonly CommandSchedulerFacade _commandSchedulerFacade;
 
-    public WhenAnRejectedWholesaleServicesRequestIsAvailable(CommandSchedulerFacade commandSchedulerFacade)
+    public WhenARejectedWholesaleServicesRequestIsAvailable(CommandSchedulerFacade commandSchedulerFacade)
     {
         _commandSchedulerFacade = commandSchedulerFacade;
     }

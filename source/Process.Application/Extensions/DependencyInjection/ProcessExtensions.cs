@@ -105,7 +105,7 @@ public static class ProcessExtensions
             .AddTransient<IRequestHandler<RejectedWholesaleServices, Unit>,
                 RejectProcessWhenRejectedWholesaleServicesIsAvailable>()
             .AddTransient<INotificationHandler<WholesaleServicesRequestWasRejected>,
-                WhenAnRejectedWholesaleServicesRequestIsAvailable>();
+                WhenARejectedWholesaleServicesRequestIsAvailable>();
 
         return services;
     }
