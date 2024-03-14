@@ -130,7 +130,7 @@ public sealed class NotifyWholesaleServicesJsonDocumentWriter : IDocumentWriter
 
                     writer.WriteObject(
                         "quantity_Measure_Unit.name",
-                        KeyValuePair.Create("value", series.QuantityUnit.Code));
+                        KeyValuePair.Create("value", series.QuantityMeasureUnit.Code));
 
                     writer.WriteObject(
                         "price_Measure_Unit.name",

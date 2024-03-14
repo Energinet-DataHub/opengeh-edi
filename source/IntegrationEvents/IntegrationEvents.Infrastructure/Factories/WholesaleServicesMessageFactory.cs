@@ -47,7 +47,7 @@ public sealed class WholesaleServicesMessageFactory
             ActorRole.EnergySupplier,
             message.ChargeOwner,
             Guid.NewGuid(),
-            BusinessReasonMapper.Map(monthlyAmountPerChargeResultProducedV1.CalculationType),
+            BusinessReasonMapper.Map(monthlyAmountPerChargeResultProducedV1.CalculationType).Name,
             message);
     }
 
@@ -63,7 +63,7 @@ public sealed class WholesaleServicesMessageFactory
             receiverRole: ActorRole.EnergySupplier,
             chargeOwnerId: message.ChargeOwner,
             processId: Guid.NewGuid(),
-            businessReason: BusinessReasonMapper.Map(amountPerChargeResultProducedV1.CalculationType),
+            businessReason: BusinessReasonMapper.Map(amountPerChargeResultProducedV1.CalculationType).Name,
             wholesaleSeries: message);
     }
 
@@ -89,7 +89,7 @@ public sealed class WholesaleServicesMessageFactory
             chargeOwner,
             Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),
             SettlementVersion: SettlementVersionMapper.Map(message.CalculationType),
-            QuantityUnit: MeasurementUnitMapper.Map(message.QuantityUnit),
+            MeasurementUnitMapper.Map(message.QuantityUnit),
             PriceMeasureUnit: MeasurementUnit.Kwh,
             Currency: CurrencyMapper.Map(message.Currency),
             ChargeType: ChargeTypeMapper.Map(message.ChargeType),
@@ -118,7 +118,7 @@ public sealed class WholesaleServicesMessageFactory
             chargeOwner,
             Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),
             SettlementVersion: SettlementVersionMapper.Map(message.CalculationType),
-            QuantityUnit: MeasurementUnitMapper.Map(message.QuantityUnit),
+            MeasurementUnitMapper.Map(message.QuantityUnit),
             PriceMeasureUnit: MeasurementUnit.Kwh,
             Currency: CurrencyMapper.Map(message.Currency),
             ChargeType: ChargeTypeMapper.Map(message.ChargeType),

@@ -18,6 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
+using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using FluentAssertions;
@@ -348,7 +349,7 @@ public sealed class CalculatedQuantityQualityMapperTests
             ICollection<QuantityQuality>? quality = null;
 
             // Act & Assert
-            var act = () => CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(quality);
+            var act = () => CalculatedQuantityQualityMapper.Map(quality);
             act.Should().ThrowExactly<ArgumentNullException>();
         }
 
@@ -359,7 +360,7 @@ public sealed class CalculatedQuantityQualityMapperTests
             CalculatedQuantityQuality expectedCalculatedQuantityQuality)
         {
             // Act
-            var actual = CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(qualitySetFromWholesale);
+            var actual = CalculatedQuantityQualityMapper.Map(qualitySetFromWholesale);
 
             // Assert
             actual.Should().Be(expectedCalculatedQuantityQuality);
@@ -370,7 +371,7 @@ public sealed class CalculatedQuantityQualityMapperTests
         public void Can_handle_all_quantity_qualities(QuantityQuality quantityQuality)
         {
             // Act
-            CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(new[] { quantityQuality });
+            CalculatedQuantityQualityMapper.Map(new[] { quantityQuality });
         }
     }
 

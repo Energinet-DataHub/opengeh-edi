@@ -13,29 +13,22 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using Energinet.DataHub.EDI.Process.Domain.Commands;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Commands;
 
-[Serializable]
-public class Currency : EnumerationType
+public class AcceptedWholesaleServicesSerieCommand : InternalCommand
 {
-    public static readonly Currency DanishCrowns = new(nameof(DanishCrowns), "DKK");
-
     [JsonConstructor]
-    private Currency(string name, string code)
-        : base(name)
+    public AcceptedWholesaleServicesSerieCommand(Guid processId, IReadOnlyCollection<AcceptedWholesaleServicesSerieDto> acceptedWholesaleServicesSerie)
     {
-        Code = code;
+        ProcessId = processId;
+        AcceptedWholesaleServicesSerie = acceptedWholesaleServicesSerie;
     }
 
-    public string Code { get; }
+    public Guid ProcessId { get; }
 
-    public static Currency From(string value)
-    {
-        return GetAll<Currency>().First(currency =>
-            currency.Code.Equals(value, StringComparison.OrdinalIgnoreCase) ||
-            currency.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
-    }
+    public IReadOnlyCollection<AcceptedWholesaleServicesSerieDto> AcceptedWholesaleServicesSerie { get; }
 }

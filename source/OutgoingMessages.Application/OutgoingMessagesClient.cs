@@ -126,4 +126,16 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
 
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
+
+    public async Task<OutgoingMessageId> EnqueueAsync(
+        AcceptedWholesaleServicesMessageDto acceptedWholesaleServicesMessage,
+        CancellationToken cancellationToken)
+    {
+        var message = OutgoingMessage.CreateMessage(
+            acceptedWholesaleServicesMessage,
+            _serializer,
+            _systemDateTimeProvider.Now());
+        var messageId = await _messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
+        return messageId;
+    }
 }

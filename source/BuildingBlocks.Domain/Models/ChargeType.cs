@@ -17,6 +17,7 @@ using System.Linq;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
+[Serializable]
 public class ChargeType : EnumerationType
 {
     public static readonly ChargeType Subscription = new(nameof(Subscription), "D01");

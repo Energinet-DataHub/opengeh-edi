@@ -19,7 +19,6 @@ using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureDa
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands.Handlers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers;
-using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Commands;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Commands.Handlers;
@@ -30,7 +29,6 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.Pr
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ProcessEvents;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
-using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Infrastructure.Processing;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.WholesaleServices;
@@ -56,11 +54,6 @@ public static class ProcessExtensions
             .AddScopedSqlDbContext<ProcessContext>(configuration)
             .AddMediatR();
 
-        //InboxEventsConfiguration
-        services.AddTransient<IInboxEventMapper, EnergyResultTimeSeriesRequestAcceptedEventMapper>()
-            .AddTransient<IInboxEventMapper, AggregatedTimeSeriesRequestRejectedMapper>()
-            .AddTransient<IInboxEventMapper, WholesaleServicesRequestRejectedMapper>();
-
         //ProcessingConfiguration
         services.AddScoped<DomainEventsAccessor>()
             .AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>))
@@ -70,11 +63,10 @@ public static class ProcessExtensions
             .AddWholesaleInbox();
 
         //EnqueueMessageConfiguration
+        services.AddTransient<INotificationHandler<EnqueuedAcceptedWholesaleServicesEvent>, EnqueuedWholesaleServicesMessageHandler>();
         services.AddTransient<INotificationHandler<EnqueueAcceptedEnergyResultMessageEvent>, EnqueueAcceptedEnergyResultMessageHandler>();
         services.AddTransient<INotificationHandler<EnqueueRejectedEnergyResultMessageEvent>, EnqueueRejectedEnergyResultMessageHandler>();
-
-        services
-            .AddTransient<INotificationHandler<EnqueueRejectedWholesaleServicesMessageEvent>,
+        services.AddTransient<INotificationHandler<EnqueueRejectedWholesaleServicesMessageEvent>,
                 EnqueueRejectedWholesaleServicesMessageHandler>();
 
         // ProcessInitialization handlers Configuration
@@ -95,9 +87,11 @@ public static class ProcessExtensions
             .AddScoped<WholesaleInbox>()
             .AddScoped<IAggregatedMeasureDataProcessRepository, AggregatedMeasureDataProcessRepository>();
 
-        // RequestedAggregatedMeasureDataConfiguration
+        // RequestedWholesaleServicesConfiguration
         services
+            .AddTransient<IRequestHandler<AcceptedWholesaleServicesSerieCommand, Unit>, AcceptWholesaleServicesWhenAnAcceptedWholesaleServicesRequestIsAvailable>()
             .AddTransient<IRequestHandler<SendWholesaleServicesRequestToWholesale, Unit>, SendWholesaleServicesRequestToWholesaleHandler>()
+            .AddTransient<INotificationHandler<WholesaleServicesRequestWasAccepted>, WhenAnAcceptedWholesaleServicesRequestIsAvailable>()
             .AddTransient<INotificationHandler<WholesaleServicesProcessIsInitialized>, NotifyWholesaleWhenWholesaleServicesProcessIsInitialized>()
             .AddTransient<INotificationHandler<NotifyWholesaleThatWholesaleServicesIsRequested>, NotifyWholesaleThatWholesaleServicesIsRequestedHandler>()
             .AddTransient<IRequestHandler<InitializeWholesaleServicesProcessesCommand, Unit>, InitializeWholesaleServicesProcessesHandler>()
