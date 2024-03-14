@@ -29,7 +29,7 @@ public sealed class RejectedWholesaleServicesMessageDto : OutgoingMessageDto
         MessageId relatedToMessageId,
         RejectedWholesaleServicesMessageSeries series)
         : base(
-            DocumentType.RejectRequestWholesaleServices,
+            DocumentType.RejectRequestWholesaleSettlement,
             receiverId,
             processId,
             businessReason,

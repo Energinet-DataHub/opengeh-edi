@@ -93,7 +93,7 @@ public sealed class WhenARejectedWholesaleServicesIsAvailableTests : TestBase
         BusinessReason businessReason)
     {
         return await AssertOutgoingMessage.OutgoingMessageAsync(
-            DocumentType.RejectRequestWholesaleServices.Name,
+            DocumentType.RejectRequestWholesaleSettlement.Name,
             businessReason.Name,
             roleOfReceiver,
             GetService<IDatabaseConnectionFactory>(),
