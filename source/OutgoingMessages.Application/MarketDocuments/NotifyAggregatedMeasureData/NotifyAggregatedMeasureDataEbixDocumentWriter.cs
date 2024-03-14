@@ -122,15 +122,15 @@ public class NotifyAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
 
             // Begin DetailMeasurementMeteringPointCharacteristic
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "DetailMeasurementMeteringPointCharacteristic", null).ConfigureAwait(false);
-            await WriteCodeWithCodeListReferenceAttributesAsync(
-                    "TypeOfMeteringPoint",
-                    EbixCode.Of(MeteringPointType.FromName(timeSeries.MeteringPointType)),
-                    writer)
-                .ConfigureAwait(false);
+            await WriteCodeWithCodeListReferenceAttributesAsync("TypeOfMeteringPoint", EbixCode.Of(MeteringPointType.FromName(timeSeries.MeteringPointType)), writer).ConfigureAwait(false);
 
             if (timeSeries.SettlementType != null)
             {
-                await WriteCodeWithCodeListReferenceAttributesAsync("SettlementMethod", EbixCode.Of(SettlementType.From(timeSeries.SettlementType)), writer).ConfigureAwait(false);
+                await WriteCodeWithCodeListReferenceAttributesAsync(
+                        "SettlementMethod",
+                        EbixCode.Of(SettlementType.FromCode(timeSeries.SettlementType)),
+                        writer)
+                    .ConfigureAwait(false);
             }
 
             await writer.WriteEndElementAsync().ConfigureAwait(false);

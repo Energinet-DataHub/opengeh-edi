@@ -35,15 +35,17 @@ public class SettlementType : EnumerationType
 
     public string Code { get; }
 
-    public static SettlementType From(string valueToParse)
+    public static SettlementType FromName(string name)
     {
-        var settlementType = GetAll<SettlementType>()
-            .FirstOrDefault(type => type.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase) ||
-                                    type.Code.Equals(valueToParse, StringComparison.OrdinalIgnoreCase));
+        return GetAll<SettlementType>()
+                   .First(type => type.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(SettlementType)} {nameof(name)}");
+    }
 
-        if (settlementType is null)
-            throw new InvalidCastException($"Could not parse {valueToParse} to settlement type");
-
-        return settlementType;
+    public static SettlementType FromCode(string code)
+    {
+        return GetAll<SettlementType>()
+                   .First(type => type.Name.Equals(code, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException($"{code} is not a valid {typeof(SettlementType)} {nameof(code)}");
     }
 }

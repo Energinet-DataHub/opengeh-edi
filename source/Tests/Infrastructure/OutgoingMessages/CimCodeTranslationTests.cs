@@ -61,7 +61,7 @@ public class CimCodeTests
     [InlineData(nameof(SettlementType.Flex), "D01")]
     public void Translate_settlement_type(string settlementType, string expectedCode)
     {
-        Assert.Equal(expectedCode, SettlementType.From(settlementType).Code);
+        Assert.Equal(expectedCode, SettlementType.FromName(settlementType).Code);
     }
 
     [Theory]
