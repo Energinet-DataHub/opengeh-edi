@@ -28,9 +28,10 @@ public class DocumentFormat : EnumerationType
     {
     }
 
-    public static DocumentFormat From(string valueToParse)
+    public static DocumentFormat FromName(string name)
     {
         return GetAll<DocumentFormat>()
-            .First(format => format.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase));
+                   .First(format => format.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(DocumentFormat)} {nameof(name)}");
     }
 }
