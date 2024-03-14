@@ -31,12 +31,21 @@ public class ChargeType : EnumerationType
 
     public string Code { get; }
 
-    public static ChargeType From(string value)
+    public static ChargeType FromCode(string code)
     {
         return GetAll<ChargeType>()
-            .First(
-                chargeType =>
-                    chargeType.Code.Equals(value, StringComparison.OrdinalIgnoreCase) ||
-                    chargeType.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
+                   .First(
+                       chargeType =>
+                           chargeType.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException($"{code} is not a valid {typeof(ChargeType)} code");
+    }
+
+    public static ChargeType FromName(string name)
+    {
+        return GetAll<ChargeType>()
+                   .First(
+                       chargeType =>
+                           chargeType.Code.Equals(name, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(ChargeType)} {nameof(name)}");
     }
 }

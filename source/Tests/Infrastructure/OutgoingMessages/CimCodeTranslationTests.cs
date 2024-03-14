@@ -104,7 +104,7 @@ public class CimCodeTests
     [InlineData(nameof(ChargeType.Tariff), "D03")]
     public void Translate_charge_type(string chargeType, string expectedCode)
     {
-        Assert.Equal(expectedCode, ChargeType.From(chargeType).Code);
+        Assert.Equal(expectedCode, ChargeType.FromName(chargeType).Code);
     }
 
     [Theory]
