@@ -34,7 +34,8 @@ public class AcceptedWholesaleServicesMessageDto : WholesaleServicesMessageDto
         businessReason,
         receiverRole,
         chargeOwnerId,
-        series)
+        series,
+        relatedToMessageId)
     {
     }
 

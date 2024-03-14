@@ -12,12 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Dapper;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.Edi.Responses;
@@ -55,25 +62,84 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(ActorRole.EnergySupplier, BusinessReason.WholesaleFixing);
         outgoingMessage.Should().NotBeNull();
-        // TODO: Add assertions for the message content
+        outgoingMessage
+            .HasReceiverId(process.EnergySupplierId!)
+            .HasReceiverRole(ActorRole.EnergySupplier.Code)
+            .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
+            .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
+            .HasRelationTo(process.InitiatedByMessageId)
+            .HasBusinessReason(process.BusinessReason)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.Period.Start.ToString(), process.StartOfPeriod)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.Period.End.ToString(), process.EndOfPeriod)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.GridAreaCode, process.GridAreaCode)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.MeteringPointType, MeteringPointType.Production)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.ChargeOwner.Value, process.ChargeOwner)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.EnergySupplier.Value, process.EnergySupplierId);
     }
 
     [Fact]
-    public void Received_same_accepted_wholesale_services_event_twice_enqueues_1_message()
+    public async Task Received_same_accepted_wholesale_services_event_twice_enqueues_1_message()
     {
-        1.Should().Be(2);
+        // Arrange
+        var process = WholesaleServicesProcessBuilder()
+            .SetState(WholesaleServicesProcess.State.Sent)
+            .Build();
+        Store(process);
+        var acceptedEvent = WholesaleServicesRequestAcceptedBuilder(process)
+            .Build();
+
+        // Act
+        await HavingReceivedInboxEventAsync(nameof(WholesaleServicesRequestAccepted), acceptedEvent, process.ProcessId.Id);
+        await HavingReceivedInboxEventAsync(nameof(WholesaleServicesRequestAccepted), acceptedEvent, process.ProcessId.Id);
+
+        // Assert
+        var outgoingMessages = await OutgoingMessagesAsync(ActorRole.EnergySupplier, BusinessReason.WholesaleFixing);
+        outgoingMessages.Count.Should().Be(1);
     }
 
     [Fact]
-    public void Received_accepted_wholesale_services_event_when_process_is_rejected_enqueues_0_message()
+    public async Task Received_accepted_wholesale_services_event_when_process_is_rejected_enqueues_0_message()
     {
-        1.Should().Be(2);
+        // Arrange
+        var process = WholesaleServicesProcessBuilder()
+            .SetState(WholesaleServicesProcess.State.Rejected)
+            .Build();
+        Store(process);
+        var acceptedEvent = WholesaleServicesRequestAcceptedBuilder(process)
+            .Build();
+
+        // Act
+        await HavingReceivedInboxEventAsync(nameof(WholesaleServicesRequestAccepted), acceptedEvent, process.ProcessId.Id);
+
+        // Assert
+        var outgoingMessages = await OutgoingMessagesAsync(ActorRole.EnergySupplier, BusinessReason.WholesaleFixing);
+        outgoingMessages.Count.Should().Be(0);
     }
 
     [Fact]
-    public void Received_2_accepted_wholesale_services_events__enqueues_1_message()
+    public async Task Received_2_accepted_wholesale_services_events_enqueues_2_message()
     {
-        1.Should().Be(2);
+        // Arrange
+        var firstProcess = WholesaleServicesProcessBuilder()
+            .SetState(WholesaleServicesProcess.State.Sent)
+            .Build();
+        Store(firstProcess);
+        var firstAcceptedEvent = WholesaleServicesRequestAcceptedBuilder(firstProcess)
+            .Build();
+        var secondProcess = WholesaleServicesProcessBuilder()
+            .SetState(WholesaleServicesProcess.State.Sent)
+            .Build();
+        Store(secondProcess);
+        var secondAcceptedEvent = WholesaleServicesRequestAcceptedBuilder(firstProcess)
+            .Build();
+
+        // Act
+        await HavingReceivedInboxEventAsync(nameof(WholesaleServicesRequestAccepted), firstAcceptedEvent, firstProcess.ProcessId.Id);
+        await HavingReceivedInboxEventAsync(nameof(WholesaleServicesRequestAccepted), secondAcceptedEvent, secondProcess.ProcessId.Id);
+
+        // Assert
+        var outgoingMessages = await OutgoingMessagesAsync(ActorRole.EnergySupplier, BusinessReason.WholesaleFixing);
+        outgoingMessages.Count.Should().Be(2);
     }
 
     protected override void Dispose(bool disposing)
@@ -90,6 +156,25 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
     private static WholesaleServicesProcessBuilder WholesaleServicesProcessBuilder()
     {
         return new WholesaleServicesProcessBuilder();
+    }
+
+    private async Task<IReadOnlyCollection<dynamic>> OutgoingMessagesAsync(
+        ActorRole receiverRole,
+        BusinessReason businessReason)
+    {
+        ArgumentNullException.ThrowIfNull(businessReason);
+        ArgumentNullException.ThrowIfNull(receiverRole);
+
+        var connectionFactoryFactory = GetService<IDatabaseConnectionFactory>();
+        using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+
+        var messages = await connection.QueryAsync(
+            $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.ProcessId, m.BusinessReason," +
+            $"m.ReceiverRole, m.SenderId, m.SenderRole, m.FileStorageReference, m.RelatedToMessageId " +
+            $" FROM [dbo].[OutgoingMessages] m" +
+            $" WHERE m.DocumentType = '{DocumentType.NotifyWholesaleServices.Name}' AND m.BusinessReason = '{businessReason.Name}' AND m.ReceiverRole = '{receiverRole.Code}'");
+
+        return messages.ToList().AsReadOnly();
     }
 
     private async Task<AssertOutgoingMessage> OutgoingMessageAsync(

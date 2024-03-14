@@ -45,7 +45,7 @@ message WholesaleServicesRequestSeries {
 
   QuantityUnit quantity_unit = 8;
 
-  MeteringPointType metering_point_type = 9;
+  optional MeteringPointType metering_point_type = 9;
 
   /*
    * Settlement method is only set when metering point type is 'METERING_POINT_TYPE_CONSUMPTION'.
