@@ -41,7 +41,7 @@ public class Resolution : EnumerationType
                    .First(
                        resolution =>
                            resolution.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(Currency)} {nameof(name)}");
+               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(Resolution)} {nameof(name)}");
     }
 
     public static Resolution FromCode(string code)
