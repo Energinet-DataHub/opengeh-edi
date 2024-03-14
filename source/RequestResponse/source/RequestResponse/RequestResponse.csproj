@@ -77,27 +77,6 @@ limitations under the License.
         <CompileOutputs>True</CompileOutputs>
         <Generator>MSBuild:Compile</Generator>
       </Protobuf>
-      <Protobuf Update="Requests\AggregatedTimeSeries\AggregatedTimeSeriesRequest.proto">
-        <OutputDir>obj\Debug\net8.0\</OutputDir>
-      </Protobuf>
-      <Protobuf Update="Requests\AggregatedTimeSeries\AggregatedTimeSeriesRequestAccepted.proto">
-        <OutputDir>obj\Debug\net8.0\</OutputDir>
-      </Protobuf>
-      <Protobuf Update="Requests\AggregatedTimeSeries\AggregatedTimeSeriesRequestRejected.proto">
-        <OutputDir>obj\Debug\net8.0\</OutputDir>
-      </Protobuf>
-      <Protobuf Update="Requests\WholesaleServices\WholesaleServicesRequest.proto">
-        <OutputDir>obj\Debug\net8.0\</OutputDir>
-      </Protobuf>
-      <Protobuf Update="Requests\WholesaleServices\WholesaleServicesRequestAccepted.proto">
-        <OutputDir>obj\Debug\net8.0\</OutputDir>
-      </Protobuf>
-      <Protobuf Update="Requests\WholesaleServices\WholesaleServicesRequestRejected.proto">
-        <OutputDir>obj\Debug\net8.0\</OutputDir>
-      </Protobuf>
-      <Protobuf Update="Requests\Common\QuantityQuality.proto">
-        <OutputDir>obj\Debug\net8.0\</OutputDir>
-      </Protobuf>
     </ItemGroup>
 
 </Project>
