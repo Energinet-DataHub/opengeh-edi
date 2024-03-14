@@ -12,20 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using System;
+using System.Threading.Tasks;
 
-namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+namespace Energinet.DataHub.EDI.Process.Interfaces;
 
 /// <summary>
-/// Event to raise when to enqueue accepted Energy Result response
+/// Responsible for receiving all types inbox events
 /// </summary>
-public class EnqueueAcceptedEnergyResultMessageEvent : DomainEvent
+public interface IInboxEventReceiver
 {
-    public EnqueueAcceptedEnergyResultMessageEvent(AcceptedEnergyResultMessageDto acceptedEnergyResultMessage)
-    {
-        AcceptedEnergyResultMessage = acceptedEnergyResultMessage;
-    }
-
-    public AcceptedEnergyResultMessageDto AcceptedEnergyResultMessage { get; }
+    /// <summary>
+    /// Receives an inbox event
+    /// </summary>
+    Task ReceiveAsync(string eventId, string eventType, Guid referenceId, byte[] eventPayload);
 }

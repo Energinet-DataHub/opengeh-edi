@@ -118,6 +118,21 @@ public class WholesaleServicesProcess : Entity
         }
     }
 
+    public void IsAccepted(IReadOnlyCollection<AcceptedWholesaleServicesMessageDto> acceptedWholesaleServicesMessages)
+    {
+        ArgumentNullException.ThrowIfNull(acceptedWholesaleServicesMessages);
+
+        if (_state == State.Sent)
+        {
+            foreach (var acceptedWholesaleServicesMessage in acceptedWholesaleServicesMessages)
+            {
+                AddDomainEvent(new EnqueuedAcceptedWholesaleServicesEvent(acceptedWholesaleServicesMessage));
+            }
+
+            _state = State.Accepted;
+        }
+    }
+
     public void IsRejected(RejectedWholesaleServicesRequest rejectedWholesaleServicesRequest)
     {
         ArgumentNullException.ThrowIfNull(rejectedWholesaleServicesRequest);

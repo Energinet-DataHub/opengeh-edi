@@ -214,7 +214,7 @@ public class WholesaleServicesSeriesBuilder
             ChargeOwner: _chargeOwner,
             Period: _period,
             SettlementVersion: _settlementVersion,
-            QuantityUnit: _measurementUnit,
+            _measurementUnit,
             PriceMeasureUnit: _priceMeasureUnit,
             Currency: _currency,
             ChargeType: _chargeType,

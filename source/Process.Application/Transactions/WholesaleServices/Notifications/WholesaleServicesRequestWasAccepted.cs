@@ -14,22 +14,20 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
-using Energinet.DataHub.EDI.Process.Domain.Commands;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
+using MediatR;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications;
 
-public class AcceptedEnergyResultTimeSerieCommand : InternalCommand
+public class WholesaleServicesRequestWasAccepted : INotification
 {
-    [JsonConstructor]
-    public AcceptedEnergyResultTimeSerieCommand(Guid processId, IReadOnlyCollection<AcceptedEnergyResultTimeSerie> aggregatedTimeSeries)
+    public WholesaleServicesRequestWasAccepted(Guid processId, IReadOnlyCollection<AcceptedWholesaleServicesSerieDto> acceptedWholesaleServicesSerie)
     {
         ProcessId = processId;
-        AggregatedTimeSeries = aggregatedTimeSeries;
+        AcceptedWholesaleServicesSerie = acceptedWholesaleServicesSerie;
     }
 
     public Guid ProcessId { get; }
 
-    public IReadOnlyCollection<AcceptedEnergyResultTimeSerie> AggregatedTimeSeries { get; }
+    public IReadOnlyCollection<AcceptedWholesaleServicesSerieDto> AcceptedWholesaleServicesSerie { get; }
 }
