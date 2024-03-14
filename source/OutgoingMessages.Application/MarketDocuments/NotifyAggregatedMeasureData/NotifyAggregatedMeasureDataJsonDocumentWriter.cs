@@ -117,7 +117,7 @@ public class NotifyAggregatedMeasureDataJsonDocumentWriter : IDocumentWriter
             writer.WriteProperty("product", ProductType.EnergyActive.Code);
             writer.WriteObject(
                 "quantity_Measure_Unit.name",
-                new KeyValuePair<string, string>("value", MeasurementUnit.From(series.MeasureUnitType).Code));
+                new KeyValuePair<string, string>("value", MeasurementUnit.FromName(series.MeasureUnitType).Code));
 
             if (series.SettlementVersion is not null)
             {

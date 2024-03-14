@@ -22,9 +22,9 @@ public class MeasurementUnitTests
     [Theory]
     [InlineData("kwh")]
     [InlineData("KWH")]
-    public void Can_parse_from_name_or_code(string valueToParse)
+    public void Can_parse_from_code(string valueToParse)
     {
-        var measurementUnitType = MeasurementUnit.From(valueToParse);
+        var measurementUnitType = MeasurementUnit.FromCode(valueToParse);
 
         Assert.NotNull(measurementUnitType);
     }

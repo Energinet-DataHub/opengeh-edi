@@ -80,7 +80,12 @@ public class NotifyAggregatedMeasureDataXmlDocumentWriter : DocumentWriter
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, ProductType.EnergyActive.Code).ConfigureAwait(false);
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, MeasurementUnit.From(timeSeries.MeasureUnitType).Code).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(
+                    DocumentDetails.Prefix,
+                    "quantity_Measure_Unit.name",
+                    null,
+                    MeasurementUnit.FromName(timeSeries.MeasureUnitType).Code)
+                .ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Period", null).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "resolution", null, Resolution.From(timeSeries.Resolution).Code).ConfigureAwait(false);

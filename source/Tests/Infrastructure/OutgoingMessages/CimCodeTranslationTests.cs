@@ -69,7 +69,7 @@ public class CimCodeTests
     [InlineData(nameof(MeasurementUnit.Pieces), "H87")]
     public void Translate_measurement_unit(string measurementUnit, string expectedCode)
     {
-        Assert.Equal(expectedCode, MeasurementUnit.From(measurementUnit).Code);
+        Assert.Equal(expectedCode, MeasurementUnit.FromName(measurementUnit).Code);
     }
 
     [Theory]

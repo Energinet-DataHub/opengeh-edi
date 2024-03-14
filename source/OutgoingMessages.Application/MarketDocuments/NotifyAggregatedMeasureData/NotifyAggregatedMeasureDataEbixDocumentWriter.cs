@@ -112,7 +112,11 @@ public class NotifyAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
             await writer.WriteStringAsync(ProductType.EnergyActive.Code).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-            await WriteCodeWithCodeListReferenceAttributesAsync("UnitType", EbixCode.Of(MeasurementUnit.From(timeSeries.MeasureUnitType)), writer).ConfigureAwait(false);
+            await WriteCodeWithCodeListReferenceAttributesAsync(
+                    "UnitType",
+                    EbixCode.Of(MeasurementUnit.FromName(timeSeries.MeasureUnitType)),
+                    writer)
+                .ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             // End IncludedProductCharacteristic
 
