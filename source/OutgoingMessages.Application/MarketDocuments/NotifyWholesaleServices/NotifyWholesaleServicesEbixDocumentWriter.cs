@@ -118,7 +118,7 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
 
                     // <UnitType />
-                    await WriteCodeWithCodeListReferenceAttributesAsync("UnitType", EbixCode.Of(series.QuantityUnit), writer).ConfigureAwait(false);
+                    await WriteCodeWithCodeListReferenceAttributesAsync("UnitType", EbixCode.Of(series.QuantityMeasureUnit), writer).ConfigureAwait(false);
 
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
                 } // End </IncludedProductCharacteristic>

@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Api.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
+using Energinet.DataHub.EDI.Process.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.EDI.Api.EventListeners;
@@ -25,11 +25,11 @@ namespace Energinet.DataHub.EDI.Api.EventListeners;
 public class InboxEventListener
 {
     private readonly ISerializer _jsonSerializer;
-    private readonly InboxEventReceiver _inboxEventReceiver;
+    private readonly IInboxEventReceiver _inboxEventReceiver;
 
     public InboxEventListener(
         ISerializer jsonSerializer,
-        InboxEventReceiver inboxEventReceiver)
+        IInboxEventReceiver inboxEventReceiver)
     {
         _jsonSerializer = jsonSerializer;
         _inboxEventReceiver = inboxEventReceiver;

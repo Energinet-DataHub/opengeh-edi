@@ -12,12 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using MediatR;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications;
+namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ProcessEvents;
 
-public sealed record WholesaleServicesRequestWasRejected(
-    Guid ReferenceId,
-    IReadOnlyCollection<RejectReasonDto> RejectReasons) : INotification;
+/// <summary>
+/// Event to raise when to enqueue accepted Wholesale Services response
+/// /// </summary>
+public class EnqueuedAcceptedWholesaleServicesEvent : DomainEvent
+{
+    public EnqueuedAcceptedWholesaleServicesEvent(AcceptedWholesaleServicesMessageDto acceptedWholesaleServices)
+    {
+        AcceptedWholesaleServices = acceptedWholesaleServices;
+    }
+
+    public AcceptedWholesaleServicesMessageDto AcceptedWholesaleServices { get; }
+}

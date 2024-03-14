@@ -18,6 +18,7 @@ using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
+[Serializable]
 public class Resolution : EnumerationType
 {
     public static readonly Resolution QuarterHourly = new(nameof(QuarterHourly), "PT15M");

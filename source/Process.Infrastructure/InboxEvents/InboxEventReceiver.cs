@@ -18,10 +18,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Process.Interfaces;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 
-public class InboxEventReceiver
+public class InboxEventReceiver : IInboxEventReceiver
 {
     private readonly ProcessContext _context;
     private readonly ISystemDateTimeProvider _dateTimeProvider;

@@ -16,20 +16,19 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.Process.Domain.Commands;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Commands;
 
-public sealed class RejectedWholesaleServices : InternalCommand
+public class AcceptedWholesaleServicesSerieCommand : InternalCommand
 {
     [JsonConstructor]
-    public RejectedWholesaleServices(Guid processId, IReadOnlyCollection<RejectReasonDto> rejectReasons)
+    public AcceptedWholesaleServicesSerieCommand(Guid processId, IReadOnlyCollection<AcceptedWholesaleServicesSerieDto> acceptedWholesaleServicesSerie)
     {
         ProcessId = processId;
-        RejectReasons = rejectReasons;
+        AcceptedWholesaleServicesSerie = acceptedWholesaleServicesSerie;
     }
 
     public Guid ProcessId { get; }
 
-    public IReadOnlyCollection<RejectReasonDto> RejectReasons { get; }
+    public IReadOnlyCollection<AcceptedWholesaleServicesSerieDto> AcceptedWholesaleServicesSerie { get; }
 }

@@ -22,7 +22,6 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using MediatR;
-using ChargeType = Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ChargeType;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
 
@@ -54,11 +53,15 @@ public class InitializeWholesaleServicesProcessesHandler : IRequestHandler<Initi
         foreach (var serie in initializeWholesaleServicesProcessDto.Serie)
         {
             var settlementVersion = !string.IsNullOrWhiteSpace(serie.SettlementSeriesVersion)
-                ? SettlementVersion.FromCode(serie.SettlementSeriesVersion)
+                ? Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementVersion.FromCode(serie.SettlementSeriesVersion)
                 : null;
 
             var chargeTypes = serie.ChargeTypes
-                .Select(chargeType => new ChargeType(ChargeTypeId.New(), chargeType.Id, chargeType.Type))
+                .Select(
+                    chargeType => new Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ChargeType(
+                        ChargeTypeId.New(),
+                        chargeType.Id,
+                        chargeType.Type))
                 .ToList();
 
             _wholesaleServicesProcessRepository.Add(

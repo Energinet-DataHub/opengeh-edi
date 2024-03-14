@@ -13,11 +13,17 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using MediatR;
+using System.Threading.Tasks;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications;
+namespace Energinet.DataHub.EDI.Process.Interfaces;
 
-public sealed record WholesaleServicesRequestWasRejected(
-    Guid ReferenceId,
-    IReadOnlyCollection<RejectReasonDto> RejectReasons) : INotification;
+/// <summary>
+/// Responsible for receiving all types inbox events
+/// </summary>
+public interface IInboxEventReceiver
+{
+    /// <summary>
+    /// Receives an inbox event
+    /// </summary>
+    Task ReceiveAsync(string eventId, string eventType, Guid referenceId, byte[] eventPayload);
+}

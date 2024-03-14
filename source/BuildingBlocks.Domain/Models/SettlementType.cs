@@ -18,6 +18,7 @@ using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
+[Serializable]
 public class SettlementType : EnumerationType
 {
     // Customer with more than ~100.000 kwH per year

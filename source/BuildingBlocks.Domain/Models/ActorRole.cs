@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
+[Serializable]
 public class ActorRole : EnumerationType
 {
     public static readonly ActorRole MeteringPointAdministrator = new("MeteringPointAdministrator", "DDZ");

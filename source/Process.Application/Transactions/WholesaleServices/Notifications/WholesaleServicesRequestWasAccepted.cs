@@ -14,10 +14,20 @@
 
 using System;
 using System.Collections.Generic;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications;
 
-public sealed record WholesaleServicesRequestWasRejected(
-    Guid ReferenceId,
-    IReadOnlyCollection<RejectReasonDto> RejectReasons) : INotification;
+public class WholesaleServicesRequestWasAccepted : INotification
+{
+    public WholesaleServicesRequestWasAccepted(Guid processId, IReadOnlyCollection<AcceptedWholesaleServicesSerieDto> acceptedWholesaleServicesSerie)
+    {
+        ProcessId = processId;
+        AcceptedWholesaleServicesSerie = acceptedWholesaleServicesSerie;
+    }
+
+    public Guid ProcessId { get; }
+
+    public IReadOnlyCollection<AcceptedWholesaleServicesSerieDto> AcceptedWholesaleServicesSerie { get; }
+}

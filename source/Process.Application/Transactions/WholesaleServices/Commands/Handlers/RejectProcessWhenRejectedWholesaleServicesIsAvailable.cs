@@ -13,8 +13,12 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
@@ -41,8 +45,31 @@ public sealed class
             .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken)
             .ConfigureAwait(false);
 
-        process.IsRejected(new RejectedWholesaleServicesRequest(request.RejectReasons, process.BusinessReason));
+        process.IsRejected(CreateRejectedWholesaleServicesResultMessage(process, request.RejectReasons));
 
         return Unit.Value;
+    }
+
+    private static RejectedWholesaleServicesMessageDto CreateRejectedWholesaleServicesResultMessage(
+        WholesaleServicesProcess process,
+        IReadOnlyCollection<RejectReasonDto> rejectReasons)
+    {
+        var rejectedWholesaleServices = new RejectedWholesaleServicesMessageSeries(
+            process.ProcessId.Id,
+            rejectReasons.Select(
+                    reason =>
+                        new RejectedWholesaleServicesMessageRejectReason(
+                            reason.ErrorCode,
+                            reason.ErrorMessage))
+                .ToList(),
+            process.BusinessTransactionId.Id);
+
+        return new RejectedWholesaleServicesMessageDto(
+            process.RequestedByActorId,
+            process.ProcessId.Id,
+            process.BusinessReason.Name,
+            ActorRole.FromCode(process.RequestedByActorRoleCode),
+            process.InitiatedByMessageId,
+            rejectedWholesaleServices);
     }
 }
