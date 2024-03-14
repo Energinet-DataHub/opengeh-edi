@@ -55,6 +55,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(ActorRole.EnergySupplier, BusinessReason.WholesaleFixing);
         outgoingMessage.Should().NotBeNull();
+        // TODO: Add assertions for the message content
     }
 
     [Fact]
