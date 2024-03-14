@@ -21,7 +21,7 @@ using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications.Handlers;
 
-public class EnqueuedWholesaleServicesMessageHandler : INotificationHandler<EnqueuedWholesaleServicesEvent>
+public class EnqueuedWholesaleServicesMessageHandler : INotificationHandler<EnqueuedAcceptedWholesaleServicesEvent>
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
 
@@ -30,7 +30,7 @@ public class EnqueuedWholesaleServicesMessageHandler : INotificationHandler<Enqu
         _outgoingMessagesClient = outgoingMessagesClient;
     }
 
-    public async Task Handle(EnqueuedWholesaleServicesEvent notification, CancellationToken cancellationToken)
+    public async Task Handle(EnqueuedAcceptedWholesaleServicesEvent notification, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(notification);
         await _outgoingMessagesClient.EnqueueAsync(notification.AcceptedWholesaleServices, cancellationToken).ConfigureAwait(false);

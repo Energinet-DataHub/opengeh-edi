@@ -18,7 +18,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 
 /// <summary>
-/// Event to raise whe to enqueue accepted Energy Result response
+/// Event to raise when to enqueue accepted Energy Result response
 /// </summary>
 public class EnqueueAcceptedEnergyResultMessageEvent : DomainEvent
 {

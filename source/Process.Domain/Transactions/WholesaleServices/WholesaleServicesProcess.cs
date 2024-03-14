@@ -126,7 +126,7 @@ public class WholesaleServicesProcess : Entity
         {
             foreach (var acceptedWholesaleServicesMessage in acceptedWholesaleServicesMessages)
             {
-                AddDomainEvent(new EnqueuedWholesaleServicesEvent(acceptedWholesaleServicesMessage));
+                AddDomainEvent(new EnqueuedAcceptedWholesaleServicesEvent(acceptedWholesaleServicesMessage));
             }
 
             _state = State.Accepted;

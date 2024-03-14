@@ -17,11 +17,11 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ProcessEvents;
 
 /// <summary>
-/// Event to raise whe to enqueue accepted Wholesale Services response
+/// Event to raise when to enqueue accepted Wholesale Services response
 /// /// </summary>
-public class EnqueuedWholesaleServicesEvent : DomainEvent
+public class EnqueuedAcceptedWholesaleServicesEvent : DomainEvent
 {
-    public EnqueuedWholesaleServicesEvent(AcceptedWholesaleServicesMessageDto acceptedWholesaleServices)
+    public EnqueuedAcceptedWholesaleServicesEvent(AcceptedWholesaleServicesMessageDto acceptedWholesaleServices)
     {
         AcceptedWholesaleServices = acceptedWholesaleServices;
     }
