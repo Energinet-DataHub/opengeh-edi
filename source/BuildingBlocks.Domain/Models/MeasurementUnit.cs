@@ -18,6 +18,7 @@ using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
+[Serializable]
 public class MeasurementUnit : EnumerationType
 {
     // Tariffs are measured in Kwh

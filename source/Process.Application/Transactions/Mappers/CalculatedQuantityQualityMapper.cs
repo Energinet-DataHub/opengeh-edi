@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Edi.Responses;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 
 /// <summary>
 ///     Provides mapping functionality for converting a collection of quantity qualities to EDI quality.
@@ -68,7 +68,7 @@ public static class CalculatedQuantityQualityMapper
     /// </summary>
     /// <param name="quantityQualities">The collection of quantity qualities to convert.</param>
     /// <returns>The calculated quantity quality based on the input collection.</returns>
-    public static CalculatedQuantityQuality QuantityQualityCollectionToEdiQuality(
+    public static CalculatedQuantityQuality Map(
         ICollection<QuantityQuality> quantityQualities)
     {
         ArgumentNullException.ThrowIfNull(quantityQualities);

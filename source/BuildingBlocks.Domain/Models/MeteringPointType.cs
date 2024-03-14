@@ -18,6 +18,7 @@ using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
+[Serializable]
 public class MeteringPointType : EnumerationType
 {
     public static readonly MeteringPointType Consumption = new(nameof(Consumption), "E17");

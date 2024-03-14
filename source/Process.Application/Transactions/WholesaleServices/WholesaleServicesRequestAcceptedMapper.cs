@@ -18,6 +18,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.Edi.Responses;
@@ -25,6 +27,7 @@ using Google.Protobuf.Collections;
 using MediatR;
 using NodaTime.Serialization.Protobuf;
 using DecimalValue = Energinet.DataHub.Edi.Responses.DecimalValue;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
 
@@ -51,12 +54,12 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
                 MapMeteringPointType(aggregation.MeteringPointType),
                 MapResolution(aggregation.Resolution),
                 MapChargeType(aggregation.ChargeType),
-                MapQuantityUnit(aggregation.QuantityUnit),
+                MapMeasurementUnit(aggregation.QuantityUnit),
                 SettlementVersion: MapSettlementVersion(aggregation.CalculationType),
-                MapSettlementMethod(aggregation.SettlementMethod),
+                MapSettlementType(aggregation.SettlementMethod),
                 MapCurrency(aggregation.Currency),
-                aggregation.ChargeOwnerId,
-                aggregation.EnergySupplierId,
+                ActorNumber.Create(aggregation.ChargeOwnerId),
+                ActorNumber.Create(aggregation.EnergySupplierId),
                 aggregation.GridArea,
                 aggregation.ChargeCode,
                 aggregation.Period.StartOfPeriod.ToInstant(),
@@ -69,14 +72,18 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
             acceptedWholesaleServicesSeries));
     }
 
-    private static SettlementVersion MapSettlementVersion(WholesaleServicesRequestSeries.Types.CalculationType calculationType)
+    private static SettlementVersion? MapSettlementVersion(
+        WholesaleServicesRequestSeries.Types.CalculationType calculationType)
     {
         return calculationType switch
         {
-            WholesaleServicesRequestSeries.Types.CalculationType.WholesaleFixing => SettlementVersion.WholesaleFixing,
-            WholesaleServicesRequestSeries.Types.CalculationType.FirstCorrectionSettlement => SettlementVersion.FirstCorrectionSettlement,
-            WholesaleServicesRequestSeries.Types.CalculationType.SecondCorrectionSettlement => SettlementVersion.SecondCorrectionSettlement,
-            WholesaleServicesRequestSeries.Types.CalculationType.ThirdCorrectionSettlement => SettlementVersion.ThirdCorrectionSettlement,
+            WholesaleServicesRequestSeries.Types.CalculationType.WholesaleFixing => null,
+            WholesaleServicesRequestSeries.Types.CalculationType.FirstCorrectionSettlement => SettlementVersion
+                .FirstCorrection,
+            WholesaleServicesRequestSeries.Types.CalculationType.SecondCorrectionSettlement => SettlementVersion
+                .SecondCorrection,
+            WholesaleServicesRequestSeries.Types.CalculationType.ThirdCorrectionSettlement => SettlementVersion
+                .ThirdCorrection,
             WholesaleServicesRequestSeries.Types.CalculationType.Unspecified => throw new InvalidOperationException("Could not map settlement version"),
             _ => throw new InvalidOperationException("Unknown calculation type"),
         };
@@ -86,29 +93,30 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
     {
         return currency switch
         {
-            WholesaleServicesRequestSeries.Types.Currency.Dkk => Currency.Dkk,
+            WholesaleServicesRequestSeries.Types.Currency.Dkk => Currency.DanishCrowns,
             WholesaleServicesRequestSeries.Types.Currency.Unspecified => throw new InvalidOperationException("Could not map currency"),
             _ => throw new InvalidOperationException("Unknown currency type"),
         };
     }
 
-    private static SettlementMethod? MapSettlementMethod(WholesaleServicesRequestSeries.Types.SettlementMethod settlementMethod)
+    private static SettlementType? MapSettlementType(
+        WholesaleServicesRequestSeries.Types.SettlementMethod settlementMethod)
     {
         return settlementMethod switch
         {
-            WholesaleServicesRequestSeries.Types.SettlementMethod.Flex => SettlementMethod.Flex,
-            WholesaleServicesRequestSeries.Types.SettlementMethod.NonProfiled => SettlementMethod.NonProfiled,
+            WholesaleServicesRequestSeries.Types.SettlementMethod.Flex => SettlementType.Flex,
+            WholesaleServicesRequestSeries.Types.SettlementMethod.NonProfiled => SettlementType.NonProfiled,
             WholesaleServicesRequestSeries.Types.SettlementMethod.Unspecified => null,
             _ => throw new InvalidOperationException("Unknown settlement method"),
         };
     }
 
-    private static QuantityUnit MapQuantityUnit(WholesaleServicesRequestSeries.Types.QuantityUnit quantityUnit)
+    private static MeasurementUnit MapMeasurementUnit(WholesaleServicesRequestSeries.Types.QuantityUnit quantityUnit)
     {
         return quantityUnit switch
         {
-            WholesaleServicesRequestSeries.Types.QuantityUnit.Kwh => QuantityUnit.Kwh,
-            WholesaleServicesRequestSeries.Types.QuantityUnit.Pieces => QuantityUnit.Pieces,
+            WholesaleServicesRequestSeries.Types.QuantityUnit.Kwh => MeasurementUnit.Kwh,
+            WholesaleServicesRequestSeries.Types.QuantityUnit.Pieces => MeasurementUnit.Pieces,
             WholesaleServicesRequestSeries.Types.QuantityUnit.Unspecified => throw new InvalidOperationException("Could not map quantity unit"),
             _ => throw new InvalidOperationException("Unknown quantity unit"),
         };
@@ -130,8 +138,8 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
     {
         return resolution switch
         {
-            WholesaleServicesRequestSeries.Types.Resolution.Day => Resolution.Day,
-            WholesaleServicesRequestSeries.Types.Resolution.Hour => Resolution.Hour,
+            WholesaleServicesRequestSeries.Types.Resolution.Day => Resolution.Daily,
+            WholesaleServicesRequestSeries.Types.Resolution.Hour => Resolution.Hourly,
             WholesaleServicesRequestSeries.Types.Resolution.Monthly => Resolution.Monthly,
             WholesaleServicesRequestSeries.Types.Resolution.Unspecified => throw new InvalidOperationException("Could not map resolution"),
             _ => throw new InvalidOperationException("Unknown resolution"),
@@ -159,7 +167,7 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
             points.Add(new Point(
                 pointPosition,
                 Parse(point.Quantity) ?? throw new InvalidOperationException("Missing time serie point quantity"),
-                MapQuality(point.QuantityQualities.ToList().AsReadOnly()),
+                CalculatedQuantityQualityMapper.Map(point.QuantityQualities.ToList().AsReadOnly()),
                 Parse(point.Price),
                 Parse(point.Amount)));
 
@@ -167,22 +175,6 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         }
 
         return points.AsReadOnly();
-    }
-
-    private static CalculatedQuantityQuality MapQuality(ReadOnlyCollection<QuantityQuality> quantityQualities)
-    {
-        ArgumentNullException.ThrowIfNull(quantityQualities);
-        return (missing: quantityQualities.Contains(QuantityQuality.Missing),
-                estimated: quantityQualities.Contains(QuantityQuality.Estimated),
-                measured: quantityQualities.Contains(QuantityQuality.Measured),
-                calculated: quantityQualities.Contains(QuantityQuality.Calculated)) switch
-            {
-                (missing: true, _, _, _) => CalculatedQuantityQuality.Missing,
-                (_, estimated: true, _, _) => CalculatedQuantityQuality.Estimated,
-                (_, _, measured: true, _) => CalculatedQuantityQuality.Measured,
-                (_, _, _, calculated: true) => CalculatedQuantityQuality.Calculated,
-                _ => throw new InvalidOperationException("Unknown quantity quality type"),
-            };
     }
 
     private static decimal? Parse(DecimalValue? input)

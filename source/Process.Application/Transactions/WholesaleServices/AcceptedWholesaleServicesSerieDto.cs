@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
@@ -24,12 +25,12 @@ public record AcceptedWholesaleServicesSerieDto(
     MeteringPointType MeteringPointType,
     Resolution Resolution,
     ChargeType ChargeType,
-    QuantityUnit QuantityUnit,
+    MeasurementUnit MeasurementUnit,
     SettlementVersion? SettlementVersion,
-    SettlementMethod? SettlementMethod,
+    SettlementType? SettlementType,
     Currency Currency,
-    string ChargeOwnerId,
-    string EnergySupplierId,
+    ActorNumber ChargeOwnerId,
+    ActorNumber EnergySupplierId,
     string GridArea,
     string ChargeCode,
     Instant StartOfPeriod,
@@ -38,64 +39,3 @@ public record AcceptedWholesaleServicesSerieDto(
 
 [Serializable]
 public record Point(int Position, decimal Quantity, CalculatedQuantityQuality QuantityQuality, decimal? Price, decimal? Amount);
-
-[Serializable]
-public enum Currency
-{
-    Dkk,
-}
-
-[Serializable]
-public enum SettlementVersion
-{
-    WholesaleFixing,
-    FirstCorrectionSettlement,
-    SecondCorrectionSettlement,
-    ThirdCorrectionSettlement,
-}
-
-[Serializable]
-public enum SettlementMethod
-{
-    Flex,
-    NonProfiled,
-}
-
-[Serializable]
-public enum QuantityUnit
-{
-    Kwh,
-    Pieces,
-}
-
-[Serializable]
-public enum ChargeType
-{
-    Fee,
-    Tariff,
-    Subscription,
-}
-
-[Serializable]
-public enum Resolution
-{
-    Day,
-    Hour,
-    Monthly,
-}
-
-[Serializable]
-public enum MeteringPointType
-{
-    Production,
-    Consumption,
-}
-
-[Serializable]
-public enum CalculatedQuantityQuality
-{
-    Missing,
-    Estimated,
-    Measured,
-    Calculated,
-}

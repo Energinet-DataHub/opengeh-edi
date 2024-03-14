@@ -30,7 +30,7 @@ public record WholesaleCalculationMarketActivityRecord(
     ActorNumber ChargeOwner,
     Period Period,
     SettlementVersion? SettlementVersion,
-    MeasurementUnit QuantityUnit,
+    MeasurementUnit QuantityMeasureUnit,
     MeasurementUnit PriceMeasureUnit,
     Currency Currency,
     ChargeType ChargeType,
