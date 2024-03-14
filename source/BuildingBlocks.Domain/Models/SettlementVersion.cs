@@ -18,6 +18,7 @@ using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
+[Serializable]
 public class SettlementVersion : EnumerationType
 {
     public static readonly SettlementVersion FirstCorrection = new(nameof(FirstCorrection), "D01");

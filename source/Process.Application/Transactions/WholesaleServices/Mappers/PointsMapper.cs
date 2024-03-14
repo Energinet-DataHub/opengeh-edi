@@ -29,7 +29,7 @@ public static class PointsMapper
                     p.Quantity,
                     p.Price,
                     p.Amount,
-                    CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(p.QuantityQuality)))
+                    p.QuantityQuality))
             .ToList()
             .AsReadOnly();
 

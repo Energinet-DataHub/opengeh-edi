@@ -55,14 +55,14 @@ public static class AcceptedWholesaleServiceMessageDtoFactory
             EnergySupplier: ActorNumber.Create(acceptedWholesaleServices.EnergySupplierId),
             ChargeOwner: ActorNumber.Create(acceptedWholesaleServices.ChargeOwnerId),
             Period: new Period(acceptedWholesaleServices.StartOfPeriod, acceptedWholesaleServices.EndOfPeriod),
-            SettlementVersion: SettlementVersionMapper.Map(acceptedWholesaleServices.SettlementVersion),
-            QuantityUnit: MeasurementUnitMapper.Map(acceptedWholesaleServices.QuantityUnit),
+            acceptedWholesaleServices.SettlementVersion,
+            acceptedWholesaleServices.MeasurementUnit,
             PriceMeasureUnit: MeasurementUnit.Kwh,
-            Currency: CurrencyMapper.Map(acceptedWholesaleServices.Currency),
-            ChargeType: ChargeTypeMapper.Map(acceptedWholesaleServices.ChargeType),
-            Resolution: ResolutionMapper.Map(acceptedWholesaleServices.Resolution),
-            MeteringPointType: MeteringPointTypeMapper.Map(acceptedWholesaleServices.MeteringPointType),
-            SettlementType: SettlementTypeMapper.Map(acceptedWholesaleServices.SettlementMethod),
+            acceptedWholesaleServices.Currency,
+            acceptedWholesaleServices.ChargeType,
+            acceptedWholesaleServices.Resolution,
+            acceptedWholesaleServices.MeteringPointType,
+            acceptedWholesaleServices.SettlementType,
             OriginalTransactionIdReference: process.BusinessTransactionId.Id);
 
         return acceptedWholesaleCalculationSeries;

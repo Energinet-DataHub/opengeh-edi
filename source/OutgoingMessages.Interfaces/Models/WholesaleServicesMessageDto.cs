@@ -79,7 +79,7 @@ public record WholesaleServicesSeries(
     ActorNumber ChargeOwner,
     Period Period,
     SettlementVersion? SettlementVersion,
-    MeasurementUnit QuantityUnit,
+    MeasurementUnit MeasurementUnit,
     MeasurementUnit PriceMeasureUnit,
     Currency Currency,
     ChargeType ChargeType,
