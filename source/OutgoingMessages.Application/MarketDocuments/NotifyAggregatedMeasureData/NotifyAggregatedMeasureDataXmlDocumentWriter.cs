@@ -55,7 +55,12 @@ public class NotifyAggregatedMeasureDataXmlDocumentWriter : DocumentWriter
                     writer)
                 .ConfigureAwait(false);
             await WriteElementIfHasValueAsync("originalTransactionIDReference_Series.mRID", timeSeries.OriginalTransactionIdReference, writer).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "marketEvaluationPoint.type", null, MeteringPointType.From(timeSeries.MeteringPointType).Code).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(
+                    DocumentDetails.Prefix,
+                    "marketEvaluationPoint.type",
+                    null,
+                    MeteringPointType.FromName(timeSeries.MeteringPointType).Code)
+                .ConfigureAwait(false);
             await WriteElementIfHasValueAsync("marketEvaluationPoint.settlementMethod", timeSeries.SettlementType is null ? null : SettlementType.From(timeSeries.SettlementType).Code, writer).ConfigureAwait(false);
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "meteringGridArea_Domain.mRID", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "codingScheme", null, "NDK").ConfigureAwait(false);

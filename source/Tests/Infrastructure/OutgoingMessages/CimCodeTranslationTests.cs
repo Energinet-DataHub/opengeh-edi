@@ -37,7 +37,7 @@ public class CimCodeTests
     [InlineData(nameof(MeteringPointType.Exchange), "E20")]
     public void Translate_metering_point_type(string meteringPointType, string expectedCode)
     {
-        Assert.Equal(expectedCode, MeteringPointType.From(meteringPointType).Code);
+        Assert.Equal(expectedCode, MeteringPointType.FromName(meteringPointType).Code);
     }
 
     [Theory]
