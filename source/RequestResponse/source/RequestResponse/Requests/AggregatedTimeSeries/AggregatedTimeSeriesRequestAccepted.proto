@@ -17,6 +17,8 @@ syntax = "proto3";
 import "google/protobuf/timestamp.proto";
 import "Requests/Common/DecimalValue.proto";
 import "Requests/Common/Period.proto";
+import "Requests/Common/QuantityQuality.proto";
+
 
 option csharp_namespace = "Energinet.DataHub.Edi.Responses";
 
@@ -54,22 +56,6 @@ message TimeSeriesPoint {
 
   // The quantity quality set representing a value suitable for creation of RSM-014 CIM XML messages.
   repeated QuantityQuality quantity_qualities = 4;
-}
-
-/*
- * Unspecified is unused but according to best practice.
- * Read more at https://protobuf.dev/programming-guides/style/#enums.
- */
-enum QuantityQuality{
-  // Reserves the old, now unused, QuantityQuality enum value "Incomplete".
-  reserved 4;
-  reserved "QUANTITY_QUALITY_INCOMPLETE";
-
-  QUANTITY_QUALITY_UNSPECIFIED = 0;
-  QUANTITY_QUALITY_MISSING = 1;
-  QUANTITY_QUALITY_ESTIMATED = 2;
-  QUANTITY_QUALITY_MEASURED = 3;
-  QUANTITY_QUALITY_CALCULATED = 5;
 }
 
 /*
