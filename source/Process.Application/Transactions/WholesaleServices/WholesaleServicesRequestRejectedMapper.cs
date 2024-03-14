@@ -17,13 +17,13 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.Collections;
 using MediatR;
-using RejectReason = Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.RejectReason;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
 
 public sealed class WholesaleServicesRequestRejectedMapper : IInboxEventMapper
 {
@@ -46,12 +46,12 @@ public sealed class WholesaleServicesRequestRejectedMapper : IInboxEventMapper
         return eventType.Equals(nameof(WholesaleServicesRequestRejected), StringComparison.OrdinalIgnoreCase);
     }
 
-    private static ReadOnlyCollection<RejectReason> MapRejectReasons(
+    private static ReadOnlyCollection<RejectReasonDto> MapRejectReasons(
         RepeatedField<Edi.Responses.RejectReason> rejectReasons)
     {
         return rejectReasons
             .Select(
-                reason => new RejectReason(
+                reason => new RejectReasonDto(
                     reason.ErrorCode,
                     reason.ErrorMessage))
             .ToList()

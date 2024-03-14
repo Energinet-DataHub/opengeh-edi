@@ -32,7 +32,7 @@ using Xunit.Categories;
 using ChargeType = Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ChargeType;
 using RejectReason = Energinet.DataHub.Edi.Responses.RejectReason;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.WholesaleCalculations;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.WholesaleServices;
 
 [IntegrationTest]
 public sealed class WhenARejectedWholesaleServicesIsAvailableTests : TestBase
