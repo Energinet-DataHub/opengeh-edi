@@ -19,6 +19,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.Edi.Responses;
@@ -166,7 +167,7 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
             points.Add(new Point(
                 pointPosition,
                 Parse(point.Quantity) ?? throw new InvalidOperationException("Missing time serie point quantity"),
-                MapQuality(point.QuantityQualities.ToList().AsReadOnly()),
+                CalculatedQuantityQualityMapper.Map(point.QuantityQualities.ToList().AsReadOnly()),
                 Parse(point.Price),
                 Parse(point.Amount)));
 
@@ -174,22 +175,6 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         }
 
         return points.AsReadOnly();
-    }
-
-    private static CalculatedQuantityQuality MapQuality(ReadOnlyCollection<QuantityQuality> quantityQualities)
-    {
-        ArgumentNullException.ThrowIfNull(quantityQualities);
-        return (missing: quantityQualities.Contains(QuantityQuality.Missing),
-                estimated: quantityQualities.Contains(QuantityQuality.Estimated),
-                measured: quantityQualities.Contains(QuantityQuality.Measured),
-                calculated: quantityQualities.Contains(QuantityQuality.Calculated)) switch
-            {
-                (missing: true, _, _, _) => CalculatedQuantityQuality.Missing,
-                (_, estimated: true, _, _) => CalculatedQuantityQuality.Estimated,
-                (_, _, measured: true, _) => CalculatedQuantityQuality.Measured,
-                (_, _, _, calculated: true) => CalculatedQuantityQuality.Calculated,
-                _ => throw new InvalidOperationException("Unknown quantity quality type"),
-            };
     }
 
     private static decimal? Parse(DecimalValue? input)
