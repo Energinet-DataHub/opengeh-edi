@@ -168,7 +168,7 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.Period.End, endOfPeriod)
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.SettlementVersion, null)
             .HasMessageRecordValue<WholesaleServicesSeries>(
-                wholesaleCalculation => wholesaleCalculation.MeasurementUnit,
+                wholesaleCalculation => wholesaleCalculation.QuantityMeasureUnit,
                 MeasurementUnit.Kwh)
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.PriceMeasureUnit, MeasurementUnit.Kwh)
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.Currency, Currency.DanishCrowns)
