@@ -30,11 +30,17 @@ public class ReasonCode : EnumerationType
 
     public string Code { get; }
 
-    public static ReasonCode From(string valueToParseFrom)
+    public static ReasonCode From(string code)
     {
         return GetAll
                 <ReasonCode>()
-            .First(reasonCode => reasonCode.Name.Equals(valueToParseFrom, StringComparison.OrdinalIgnoreCase) ||
-                                 reasonCode.Code.Equals(valueToParseFrom, StringComparison.OrdinalIgnoreCase));
+            .First(reasonCode => reasonCode.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
+    }
+
+    public static ReasonCode FromName(string name)
+    {
+        return GetAll<ReasonCode>()
+            .First(reasonCode => reasonCode.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(ReasonCode)} {nameof(name)}");
     }
 }
