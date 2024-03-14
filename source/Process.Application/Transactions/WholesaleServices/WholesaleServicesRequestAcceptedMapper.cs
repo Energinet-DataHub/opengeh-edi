@@ -149,7 +149,7 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         };
     }
 
-    private static ReadOnlyCollection<Point> MapPoints(RepeatedField<WholesaleServicesRequestSeries.Types.TimeSeriesPoint> timeSeriesPoints)
+    private static ReadOnlyCollection<Point> MapPoints(RepeatedField<WholesaleServicesRequestSeries.Types.Point> timeSeriesPoints)
     {
         var points = new List<Point>();
 

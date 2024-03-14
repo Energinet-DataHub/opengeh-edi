@@ -33,14 +33,14 @@ public class WholesaleServicesRequestAcceptedBuilder
 
     public WholesaleServicesRequestAccepted Build()
     {
-        List<WholesaleServicesRequestSeries.Types.TimeSeriesPoint> timeSeriesPoints = new();
+        List<WholesaleServicesRequestSeries.Types.Point> timeSeriesPoints = new();
         var currentTime = InstantPattern.General.Parse(_process.StartOfPeriod).Value;
         while (currentTime < InstantPattern.General.Parse(_process.EndOfPeriod!).Value)
         {
             var quantity = new DecimalValue() { Units = currentTime.ToUnixTimeSeconds(), Nanos = 123450000, };
             var price = new DecimalValue() { Units = currentTime.ToUnixTimeSeconds(), Nanos = 123450000, };
             var amount = new DecimalValue() { Units = currentTime.ToUnixTimeSeconds(), Nanos = 123450000, };
-            timeSeriesPoints.Add(new WholesaleServicesRequestSeries.Types.TimeSeriesPoint()
+            timeSeriesPoints.Add(new WholesaleServicesRequestSeries.Types.Point()
             {
                 Quantity = quantity,
                 Time = currentTime.ToTimestamp(),

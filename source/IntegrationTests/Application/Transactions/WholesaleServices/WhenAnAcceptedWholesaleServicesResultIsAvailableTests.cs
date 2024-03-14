@@ -58,13 +58,19 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
     }
 
     [Fact]
-    public void Received_2_accepted_wholesale_services_event_enqueues_1_message()
+    public void Received_same_accepted_wholesale_services_event_twice_enqueues_1_message()
     {
         1.Should().Be(2);
     }
 
     [Fact]
     public void Received_accepted_wholesale_services_event_when_process_is_rejected_enqueues_0_message()
+    {
+        1.Should().Be(2);
+    }
+
+    [Fact]
+    public void Received_2_accepted_wholesale_services_events__enqueues_1_message()
     {
         1.Should().Be(2);
     }
