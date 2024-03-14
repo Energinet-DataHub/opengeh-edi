@@ -50,6 +50,6 @@ public class Resolution : EnumerationType
                    .First(
                        resolution =>
                            resolution.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{code} is not a valid {typeof(Currency)} {nameof(code)}");
+               ?? throw new InvalidOperationException($"{code} is not a valid {typeof(Resolution)} {nameof(code)}");
     }
 }
