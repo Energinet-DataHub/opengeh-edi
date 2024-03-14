@@ -22,7 +22,7 @@ using MediatR;
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications.Handlers;
 
 public sealed class
-    WhenAnRejectedWholesaleServicesRequestIsAvailable : INotificationHandler<WholesaleServicesRequestWasRejected>
+    WhenARejectedWholesaleServicesRequestIsAvailable : INotificationHandler<WholesaleServicesRequestWasRejected>
 {
     private readonly CommandSchedulerFacade _commandSchedulerFacade;
 
