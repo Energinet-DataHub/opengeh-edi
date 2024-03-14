@@ -133,7 +133,7 @@ public class WholesaleServicesProcess : Entity
         }
     }
 
-    public void IsRejected(RejectedWholesaleServicesRequest rejectedWholesaleServicesRequest)
+    public void IsRejected(RejectedWholesaleServicesMessageDto rejectedWholesaleServicesRequest)
     {
         ArgumentNullException.ThrowIfNull(rejectedWholesaleServicesRequest);
 
@@ -142,32 +142,8 @@ public class WholesaleServicesProcess : Entity
             return;
         }
 
-        AddDomainEvent(
-            new EnqueueRejectedWholesaleServicesMessageEvent(
-                CreateRejectedWholesaleServicesResultMessage(rejectedWholesaleServicesRequest)));
+        AddDomainEvent(new EnqueueRejectedWholesaleServicesMessageEvent(rejectedWholesaleServicesRequest));
 
         _state = State.Rejected;
-    }
-
-    private RejectedWholesaleServicesMessageDto CreateRejectedWholesaleServicesResultMessage(
-        RejectedWholesaleServicesRequest rejectedWholesaleServicesRequest)
-    {
-        var rejectedWholesaleServices = new RejectedWholesaleServicesMessageSeries(
-            ProcessId.Id,
-            rejectedWholesaleServicesRequest.RejectReasons.Select(
-                    reason =>
-                        new RejectedWholesaleServicesMessageRejectReason(
-                            reason.ErrorCode,
-                            reason.ErrorMessage))
-                .ToList(),
-            BusinessTransactionId.Id);
-
-        return new RejectedWholesaleServicesMessageDto(
-            RequestedByActorId,
-            ProcessId.Id,
-            rejectedWholesaleServicesRequest.BusinessReason.Name,
-            ActorRole.FromCode(RequestedByActorRoleCode),
-            InitiatedByMessageId,
-            rejectedWholesaleServices);
     }
 }
