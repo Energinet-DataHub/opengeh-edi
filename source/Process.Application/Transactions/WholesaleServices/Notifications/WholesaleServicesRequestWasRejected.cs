@@ -14,11 +14,10 @@
 
 using System;
 using System.Collections.Generic;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications;
 
 public sealed record WholesaleServicesRequestWasRejected(
     Guid ReferenceId,
-    IReadOnlyCollection<RejectReason> RejectReasons) : INotification;
+    IReadOnlyCollection<RejectReasonDto> RejectReasons) : INotification;

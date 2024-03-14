@@ -12,13 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using System;
 
-namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
 
-public sealed record RejectedWholesaleServicesRequest(
-    IReadOnlyCollection<RejectReason> RejectReasons,
-    BusinessReason BusinessReason);
-
-public sealed record RejectReason(string ErrorCode, string ErrorMessage);
+[Serializable]
+public record RejectReasonDto(string ErrorCode, string ErrorMessage);
