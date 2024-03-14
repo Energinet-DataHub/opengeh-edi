@@ -127,7 +127,7 @@ public class CimCodeTests
     [InlineData(nameof(Currency.DanishCrowns), "DKK")]
     public void Translate_currency(string currency, string expectedCode)
     {
-        Assert.Equal(expectedCode, Currency.From(currency).Code);
+        Assert.Equal(expectedCode, Currency.FromName(currency).Code);
     }
 
     [Theory]

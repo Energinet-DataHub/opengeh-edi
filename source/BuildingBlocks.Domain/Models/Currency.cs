@@ -31,10 +31,21 @@ public class Currency : EnumerationType
 
     public string Code { get; }
 
-    public static Currency From(string value)
+    public static Currency FromName(string name)
     {
-        return GetAll<Currency>().First(currency =>
-            currency.Code.Equals(value, StringComparison.OrdinalIgnoreCase) ||
-            currency.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
+        return GetAll<Currency>()
+                   .First(
+                       currency =>
+                           currency.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(Currency)} {nameof(name)}");
+    }
+
+    public static Currency FromCode(string code)
+    {
+        return GetAll<Currency>()
+                   .First(
+                       currency =>
+                           currency.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException($"{code} is not a valid {typeof(Currency)} {nameof(code)}");
     }
 }
