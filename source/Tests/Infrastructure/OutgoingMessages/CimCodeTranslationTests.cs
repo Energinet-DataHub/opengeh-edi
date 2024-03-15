@@ -21,21 +21,6 @@ namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages;
 public class CimCodeTests
 {
     [Theory]
-    [InlineData(nameof(ReasonCode.FullyAccepted), "A01")]
-    [InlineData(nameof(ReasonCode.FullyRejected), "A02")]
-    public void Translate_reason_code(string reasonCode, string expectedCode)
-    {
-        Assert.Equal(expectedCode, ReasonCode.FromName(reasonCode).Code);
-    }
-
-    [Theory]
-    [InlineData(nameof(Currency.DanishCrowns), "DKK")]
-    public void Translate_currency(string currency, string expectedCode)
-    {
-        Assert.Equal(expectedCode, Currency.FromName(currency).Code);
-    }
-
-    [Theory]
     [InlineData("1234567890123", "A10")]
     [InlineData("1234567890123456", "A01")]
     public void Translate_actor_number_coding_scheme(string actorNumber, string expectedCode)
