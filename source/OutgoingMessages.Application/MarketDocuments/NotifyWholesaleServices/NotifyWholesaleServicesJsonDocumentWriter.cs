@@ -128,9 +128,20 @@ public sealed class NotifyWholesaleServicesJsonDocumentWriter : IDocumentWriter
 
                     writer.WriteProperty("product", ProductType.Tariff.Code);
 
-                    writer.WriteObject(
-                        "quantity_Measure_Unit.name",
-                        KeyValuePair.Create("value", series.QuantityMeasureUnit.Code));
+                    if (series.QuantityUnit != null)
+                    {
+                        // This is a bit of a hack, but it is the only way empty queues with old name
+                        writer.WriteObject(
+                            "quantity_Measure_Unit.name",
+                            KeyValuePair.Create("value", series.QuantityUnit.Code));
+                    }
+                    else
+                    {
+                        // this is the correct way to do it
+                        writer.WriteObject(
+                            "quantity_Measure_Unit.name",
+                            KeyValuePair.Create("value", series.QuantityMeasureUnit.Code));
+                    }
 
                     writer.WriteObject(
                         "price_Measure_Unit.name",

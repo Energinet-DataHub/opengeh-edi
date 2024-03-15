@@ -51,8 +51,7 @@ public class ActorMessageQueue
         EnsureApplicable(outgoingMessage);
 
         var currentBundle = CurrentBundleOf(BusinessReason.FromName(outgoingMessage.BusinessReason), outgoingMessage.DocumentType, outgoingMessage.RelatedToMessageId) ??
-                            CreateBundleOf(BusinessReason.FromName(outgoingMessage.BusinessReason), outgoingMessage.DocumentType,
-                                GetMaxNumberOfMessagesInABundle(maxNumberOfMessagesInABundle, outgoingMessage.DocumentType), timeStamp, outgoingMessage.RelatedToMessageId);
+                            CreateBundleOf(BusinessReason.FromName(outgoingMessage.BusinessReason), outgoingMessage.DocumentType, GetMaxNumberOfMessagesInABundle(maxNumberOfMessagesInABundle, outgoingMessage.DocumentType), timeStamp, outgoingMessage.RelatedToMessageId);
 
         currentBundle.Add(outgoingMessage);
     }

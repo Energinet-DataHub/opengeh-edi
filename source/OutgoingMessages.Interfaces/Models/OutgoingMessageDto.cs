@@ -42,7 +42,7 @@ public abstract class OutgoingMessageDto
         RelatedToMessageId = relatedToMessageId;
     }
 
-    public DocumentType DocumentType { get; set; }
+    public DocumentType DocumentType { get; }
 
     public ActorNumber ReceiverId { get; }
 
