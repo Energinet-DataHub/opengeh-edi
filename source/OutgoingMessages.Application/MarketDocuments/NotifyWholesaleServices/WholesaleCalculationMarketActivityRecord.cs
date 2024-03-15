@@ -31,11 +31,13 @@ public record WholesaleCalculationMarketActivityRecord(
     Period Period,
     SettlementVersion? SettlementVersion,
     MeasurementUnit QuantityMeasureUnit,
+    MeasurementUnit? QuantityUnit,
     MeasurementUnit PriceMeasureUnit,
     Currency Currency,
     ChargeType ChargeType,
     Resolution Resolution,
     MeteringPointType? MeteringPointType,
-    SettlementType? SettlementType);
+    SettlementType? SettlementType,
+    string? OriginalTransactionIdReference);
 
 public record Point(int Position, decimal? Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality? QuantityQuality);

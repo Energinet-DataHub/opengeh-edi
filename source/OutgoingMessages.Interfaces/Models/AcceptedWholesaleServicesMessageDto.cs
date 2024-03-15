@@ -92,9 +92,11 @@ public record AcceptedWholesaleServicesSeries(
     Period,
     SettlementVersion,
     QuantityMeasureUnit,
+    null,
     PriceMeasureUnit,
     Currency,
     ChargeType,
     Resolution,
     MeteringPointType,
-    SettlementType);
+    SettlementType,
+    OriginalTransactionIdReference);

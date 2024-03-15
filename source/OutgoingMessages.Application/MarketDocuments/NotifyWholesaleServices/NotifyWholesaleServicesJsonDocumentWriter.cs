@@ -88,9 +88,11 @@ public sealed class NotifyWholesaleServicesJsonDocumentWriter : IDocumentWriter
                             KeyValuePair.Create("value", series.SettlementVersion.Code));
                     }
 
-                    // TODO (MWO): These lines have to be converted from xml to json when the time comes
-                    // TODO (MWO): These are there for later use, but are not used as of right now
-                    //await WriteElementIfHasValueAsync("originalTransactionIDReference_Series.mRID", wholesaleCalculationSeries.OriginalTransactionIdReference, writer).ConfigureAwait(false);
+                    if (series.OriginalTransactionIdReference is not null)
+                    {
+                        writer.WriteProperty("originalTransactionIDReference_Series.mRID", series.OriginalTransactionIdReference);
+                    }
+
                     if (series.MeteringPointType is not null)
                     {
                         writer.WriteObject(
@@ -128,9 +130,20 @@ public sealed class NotifyWholesaleServicesJsonDocumentWriter : IDocumentWriter
 
                     writer.WriteProperty("product", ProductType.Tariff.Code);
 
-                    writer.WriteObject(
-                        "quantity_Measure_Unit.name",
-                        KeyValuePair.Create("value", series.QuantityMeasureUnit.Code));
+                    if (series.QuantityUnit != null)
+                    {
+                        // This is a bit of a hack, but it is the only way empty queues with old name
+                        writer.WriteObject(
+                            "quantity_Measure_Unit.name",
+                            KeyValuePair.Create("value", series.QuantityUnit.Code));
+                    }
+                    else
+                    {
+                        // this is the correct way to do it
+                        writer.WriteObject(
+                            "quantity_Measure_Unit.name",
+                            KeyValuePair.Create("value", series.QuantityMeasureUnit.Code));
+                    }
 
                     writer.WriteObject(
                         "price_Measure_Unit.name",

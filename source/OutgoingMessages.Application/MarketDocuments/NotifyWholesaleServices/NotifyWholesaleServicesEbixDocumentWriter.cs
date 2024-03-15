@@ -117,8 +117,20 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
                     await writer.WriteStringAsync(ProductType.Tariff.Code).ConfigureAwait(false);
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-                    // <UnitType />
-                    await WriteCodeWithCodeListReferenceAttributesAsync("UnitType", EbixCode.Of(series.QuantityMeasureUnit), writer).ConfigureAwait(false);
+                    if (series.QuantityUnit != null)
+                    {
+                        // This is a bit of a hack, but it is the only way empty queues with old name
+
+                        // <UnitType />
+                        await WriteCodeWithCodeListReferenceAttributesAsync("UnitType", EbixCode.Of(series.QuantityUnit), writer).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        // this is the correct way to do it
+
+                        // <UnitType />
+                        await WriteCodeWithCodeListReferenceAttributesAsync("UnitType", EbixCode.Of(series.QuantityMeasureUnit), writer).ConfigureAwait(false);
+                    }
 
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
                 } // End </IncludedProductCharacteristic>
@@ -213,6 +225,13 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
 
                 // <PartyChargeTypeID />
                 await writer.WriteElementStringAsync(DocumentDetails.Prefix, "PartyChargeTypeID", null, series.ChargeCode).ConfigureAwait(false);
+
+                // <OriginalBusinessDocument />
+                await WriteElementIfHasValueAsync(
+                        "OriginalBusinessDocument",
+                        series.OriginalTransactionIdReference,
+                        writer)
+                    .ConfigureAwait(false);
 
                 // Begin <ChargeTypeOwnerEnergyParty>
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "ChargeTypeOwnerEnergyParty", null).ConfigureAwait(false);

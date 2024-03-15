@@ -80,11 +80,13 @@ public record WholesaleServicesSeries(
     Period Period,
     SettlementVersion? SettlementVersion,
     MeasurementUnit QuantityMeasureUnit,
+    MeasurementUnit? QuantityUnit, // To ensure backwards compatibility, will be remove in another PR.
     MeasurementUnit PriceMeasureUnit,
     Currency Currency,
     ChargeType ChargeType,
     Resolution Resolution,
     MeteringPointType? MeteringPointType,
-    SettlementType? SettlementType);
+    SettlementType? SettlementType,
+    string? OriginalTransactionIdReference = null);
 
 public record WholesaleServicesPoint(int Position, decimal? Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality? QuantityQuality);
