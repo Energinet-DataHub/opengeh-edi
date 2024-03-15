@@ -76,7 +76,17 @@ public class NotifyWholesaleServicesXmlDocumentWriter : DocumentWriter
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, ProductType.Tariff.Code).ConfigureAwait(false);
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, wholesaleCalculationSeries.QuantityMeasureUnit.Code).ConfigureAwait(false);
+            if (wholesaleCalculationSeries.QuantityUnit != null)
+            {
+                // This is a bit of a hack, but it is the only way empty queues with old name
+                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, wholesaleCalculationSeries.QuantityUnit.Code).ConfigureAwait(false);
+            }
+            else
+            {
+                // this is the correct way to do it
+                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, wholesaleCalculationSeries.QuantityMeasureUnit.Code).ConfigureAwait(false);
+            }
+
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "price_Measure_Unit.name", null, wholesaleCalculationSeries.PriceMeasureUnit.Code).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "currency_Unit.name", null, wholesaleCalculationSeries.Currency.Code).ConfigureAwait(false);
 
