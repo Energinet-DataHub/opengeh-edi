@@ -14,7 +14,7 @@
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ProcessEvents;
 
-public class NotifyWholesaleThatWholesaleServicesIsRequested : DomainEvent
+public sealed class NotifyWholesaleThatWholesaleServicesIsRequested : DomainEvent
 {
     public NotifyWholesaleThatWholesaleServicesIsRequested(WholesaleServicesProcess process)
     {
