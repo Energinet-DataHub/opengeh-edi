@@ -264,9 +264,11 @@ internal sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyW
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasOriginalTransactionIdReference(string originalTransactionIdReference)
+    public IAssertNotifyWholesaleServicesDocument HasOriginalTransactionIdReference(Guid originalTransactionIdReference)
     {
-        // Not supported in ebIX, since ebIX has no requests (anmodning)
+        _documentAsserter.HasValue(
+            $"{PayloadEnergyTimeSeries}[1]/OriginalBusinessDocument",
+            originalTransactionIdReference.ToString());
         return this;
     }
 

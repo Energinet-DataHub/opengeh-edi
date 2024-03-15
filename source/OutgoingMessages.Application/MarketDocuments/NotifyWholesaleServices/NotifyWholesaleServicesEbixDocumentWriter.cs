@@ -226,6 +226,13 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
                 // <PartyChargeTypeID />
                 await writer.WriteElementStringAsync(DocumentDetails.Prefix, "PartyChargeTypeID", null, series.ChargeCode).ConfigureAwait(false);
 
+                // <OriginalBusinessDocument />
+                await WriteElementIfHasValueAsync(
+                        "OriginalBusinessDocument",
+                        series.OriginalTransactionIdReference,
+                        writer)
+                    .ConfigureAwait(false);
+
                 // Begin <ChargeTypeOwnerEnergyParty>
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "ChargeTypeOwnerEnergyParty", null).ConfigureAwait(false);
                 {

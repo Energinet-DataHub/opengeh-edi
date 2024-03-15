@@ -70,6 +70,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             .WithMeasurementUnit(SampleData.MeasurementUnit)
             .WithPriceMeasurementUnit(SampleData.PriceMeasureUnit)
             .WithResolution(SampleData.Resolution)
+            // .WithOriginalTransactionIdReference(SampleData.TransactionId)
             .WithPoints(new Collection<WholesaleServicesPoint>() { new(1, 1, 1, SampleData.Quantity, null) });
 
         // Act
@@ -99,6 +100,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             .HasResolution(SampleData.Resolution)
             .HasPositionAndQuantity(1, SampleData.Quantity)
             .HasProductCode(ProductType.Tariff.Code)
+            // .HasOriginalTransactionIdReference(SampleData.TransactionId)
             .SettlementVersionIsNotPresent()
             .DocumentIsValidAsync();
     }

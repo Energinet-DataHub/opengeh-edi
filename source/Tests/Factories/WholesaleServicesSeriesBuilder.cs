@@ -147,9 +147,9 @@ public class WholesaleServicesSeriesBuilder
         return this;
     }
 
-    public WholesaleServicesSeriesBuilder WithOriginalTransactionIdReference(string originalTransactionIdReference)
+    public WholesaleServicesSeriesBuilder WithOriginalTransactionIdReference(Guid originalTransactionIdReference)
     {
-        _originalTransactionIdReference = originalTransactionIdReference;
+        _originalTransactionIdReference = originalTransactionIdReference.ToString();
         return this;
     }
 
@@ -221,7 +221,8 @@ public class WholesaleServicesSeriesBuilder
             ChargeType: _chargeType,
             Resolution: _resolution,
             MeteringPointType: _meteringPointType,
-            SettlementType: _settlementMethod);
+            _settlementMethod,
+            _originalTransactionIdReference);
     }
 
     private static Instant ParseTimeStamp(string timestamp)
