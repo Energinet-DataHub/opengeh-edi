@@ -79,7 +79,7 @@ public class NotifyWholesaleServicesXmlDocumentWriter : DocumentWriter
             if (wholesaleCalculationSeries.QuantityUnit != null)
             {
                 // This is a bit of a hack, but it is the only way empty queues with old name
-                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "qquantity_Measure_Unit.name", null, wholesaleCalculationSeries.QuantityUnit.Code).ConfigureAwait(false);
+                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, wholesaleCalculationSeries.QuantityUnit.Code).ConfigureAwait(false);
             }
             else
             {
