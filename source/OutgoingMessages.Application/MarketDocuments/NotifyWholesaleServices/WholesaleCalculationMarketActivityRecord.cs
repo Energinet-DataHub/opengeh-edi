@@ -31,6 +31,7 @@ public record WholesaleCalculationMarketActivityRecord(
     Period Period,
     SettlementVersion? SettlementVersion,
     MeasurementUnit QuantityMeasureUnit,
+    MeasurementUnit? QuantityUnit,
     MeasurementUnit PriceMeasureUnit,
     Currency Currency,
     ChargeType ChargeType,
