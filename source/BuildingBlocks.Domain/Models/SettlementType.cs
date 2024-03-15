@@ -44,7 +44,7 @@ public class SettlementType : EnumerationType
 
     public static SettlementType FromCode(string code)
     {
-        return GetAll<SettlementType>().FirstOrDefault(t => t.Name.Equals(code, StringComparison.OrdinalIgnoreCase))
+        return GetAll<SettlementType>().FirstOrDefault(t => t.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
                ?? throw new InvalidOperationException($"{code} is not a valid {typeof(SettlementType)} {nameof(code)}");
     }
 }
