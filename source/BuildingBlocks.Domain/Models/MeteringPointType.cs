@@ -36,16 +36,14 @@ public class MeteringPointType : EnumerationType
 
     public static MeteringPointType FromName(string name)
     {
-        return GetAll<MeteringPointType>()
-                   .First(type => type.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+        return GetAll<MeteringPointType>().FirstOrDefault(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                ?? throw new InvalidOperationException(
                    $"{name} is not a valid {typeof(MeteringPointType)} {nameof(name)}");
     }
 
     public static MeteringPointType FromCode(string code)
     {
-        return GetAll<MeteringPointType>()
-                   .First(type => type.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
+        return GetAll<MeteringPointType>().FirstOrDefault(t => t.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
                ?? throw new InvalidOperationException(
                    $"{code} is not a valid {typeof(MeteringPointType)} {nameof(code)}");
     }

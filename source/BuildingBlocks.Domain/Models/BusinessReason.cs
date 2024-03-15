@@ -429,21 +429,13 @@ public sealed class BusinessReason : EnumerationType
 
     public static BusinessReason FromName(string name)
     {
-        return GetAll<BusinessReason>()
-                   .First(
-                       br =>
-                           br.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException(
-                   $"{name} is not a valid {typeof(BusinessReason)} {nameof(name)}");
+        return GetAll<BusinessReason>().FirstOrDefault(br => br.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(BusinessReason)} {nameof(name)}");
     }
 
     public static BusinessReason FromCode(string code)
     {
-        return GetAll<BusinessReason>()
-                   .First(
-                       br =>
-                           br.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException(
-                   $"{code} is not a valid {typeof(BusinessReason)} {nameof(code)}");
+        return GetAll<BusinessReason>().FirstOrDefault(br => br.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException($"{code} is not a valid {typeof(BusinessReason)} {nameof(code)}");
     }
 }

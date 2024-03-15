@@ -38,15 +38,13 @@ public class SettlementType : EnumerationType
 
     public static SettlementType FromName(string name)
     {
-        return GetAll<SettlementType>()
-                   .First(type => type.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+        return GetAll<SettlementType>().FirstOrDefault(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                ?? throw new InvalidOperationException($"{name} is not a valid {typeof(SettlementType)} {nameof(name)}");
     }
 
     public static SettlementType FromCode(string code)
     {
-        return GetAll<SettlementType>()
-                   .First(type => type.Name.Equals(code, StringComparison.OrdinalIgnoreCase))
+        return GetAll<SettlementType>().FirstOrDefault(t => t.Name.Equals(code, StringComparison.OrdinalIgnoreCase))
                ?? throw new InvalidOperationException($"{code} is not a valid {typeof(SettlementType)} {nameof(code)}");
     }
 }

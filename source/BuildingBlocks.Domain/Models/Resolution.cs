@@ -37,19 +37,13 @@ public class Resolution : EnumerationType
 
     public static Resolution FromName(string name)
     {
-        return GetAll<Resolution>()
-                   .First(
-                       resolution =>
-                           resolution.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+        return GetAll<Resolution>().FirstOrDefault(r => r.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                ?? throw new InvalidOperationException($"{name} is not a valid {typeof(Resolution)} {nameof(name)}");
     }
 
     public static Resolution FromCode(string code)
     {
-        return GetAll<Resolution>()
-                   .First(
-                       resolution =>
-                           resolution.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
+        return GetAll<Resolution>().FirstOrDefault(r => r.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
                ?? throw new InvalidOperationException($"{code} is not a valid {typeof(Resolution)} {nameof(code)}");
     }
 }

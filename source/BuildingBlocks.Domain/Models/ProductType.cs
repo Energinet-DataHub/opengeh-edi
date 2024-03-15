@@ -30,12 +30,11 @@ public class ProductType : EnumerationType
 
     public string Code { get; }
 
-    public static ProductType FromName(string value)
+    public static ProductType FromName(string name)
     {
         return GetAll<ProductType>()
-            .First(
-                chargeType =>
-                    chargeType.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
+                   .FirstOrDefault(productType => productType.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(ProductType)} {nameof(name)}");
     }
 
     public override string ToString()

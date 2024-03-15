@@ -30,8 +30,7 @@ public class DocumentFormat : EnumerationType
 
     public static DocumentFormat FromName(string name)
     {
-        return GetAll<DocumentFormat>()
-                   .First(format => format.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+        return GetAll<DocumentFormat>().FirstOrDefault(f => f.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                ?? throw new InvalidOperationException($"{name} is not a valid {typeof(DocumentFormat)} {nameof(name)}");
     }
 }
