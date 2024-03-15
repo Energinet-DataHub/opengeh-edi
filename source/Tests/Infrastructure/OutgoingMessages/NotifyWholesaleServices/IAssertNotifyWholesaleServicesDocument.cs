@@ -100,7 +100,7 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// </summary>
     /// <param name="expectedOriginalTransactionIdReference"></param>
     IAssertNotifyWholesaleServicesDocument HasOriginalTransactionIdReference(
-        string expectedOriginalTransactionIdReference);
+        Guid expectedOriginalTransactionIdReference);
 
     /// <summary>
     /// Asserts the settlement method of the first series element
