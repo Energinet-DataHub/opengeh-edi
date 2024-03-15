@@ -22,7 +22,7 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.BuildingBlocks.Models;
 
-public class MeasureUnitTests
+public class MeasurementUnitTests
 {
     public static IEnumerable<MeasurementUnit> GetAllMeasurementUnit()
     {

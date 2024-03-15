@@ -101,7 +101,7 @@ public class NotifyAggregatedMeasureDataJsonDocumentWriter : IDocumentWriter
 
             if (series.SettlementType is not null)
             {
-                writer.WriteObject("marketEvaluationPoint.settlementMethod", new KeyValuePair<string, string>("value", SettlementType.FromCode(series.SettlementType).Code));
+                writer.WriteObject("marketEvaluationPoint.settlementMethod", new KeyValuePair<string, string>("value", SettlementType.FromName(series.SettlementType).Code));
             }
 
             if (series.OriginalTransactionIdReference is not null)

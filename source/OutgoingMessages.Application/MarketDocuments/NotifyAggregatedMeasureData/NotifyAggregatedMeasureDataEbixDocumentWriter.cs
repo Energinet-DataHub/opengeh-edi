@@ -128,7 +128,7 @@ public class NotifyAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
             {
                 await WriteCodeWithCodeListReferenceAttributesAsync(
                         "SettlementMethod",
-                        EbixCode.Of(SettlementType.FromCode(timeSeries.SettlementType)),
+                        EbixCode.Of(SettlementType.FromName(timeSeries.SettlementType)),
                         writer)
                     .ConfigureAwait(false);
             }

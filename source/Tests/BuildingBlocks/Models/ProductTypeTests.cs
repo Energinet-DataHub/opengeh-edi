@@ -33,7 +33,7 @@ public class ProductTypeTests
     }
 
     [Fact]
-    public void Ensure_all_ProductType()
+    public void Ensure_all_ProductTypes()
     {
         var productTypes = new List<(ProductType ExpectedValue, string Name, string Code)>()
         {

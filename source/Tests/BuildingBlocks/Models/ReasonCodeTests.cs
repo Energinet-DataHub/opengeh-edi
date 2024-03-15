@@ -33,7 +33,7 @@ public class ReasonCodeTests
     }
 
     [Fact]
-    public void Ensure_all_MeteringPointType()
+    public void Ensure_all_ReasonCodes()
     {
         var reasonCode = new List<(ReasonCode ExpectedValue, string Name, string Code)>()
         {

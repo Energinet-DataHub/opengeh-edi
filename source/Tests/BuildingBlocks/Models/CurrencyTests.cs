@@ -33,7 +33,7 @@ public class CurrencyTests
     }
 
     [Fact]
-    public void Ensure_all_MeteringPointType()
+    public void Ensure_all_currencies()
     {
         var currencies = new List<(Currency ExpectedValue, string Name, string Code)>()
         {
