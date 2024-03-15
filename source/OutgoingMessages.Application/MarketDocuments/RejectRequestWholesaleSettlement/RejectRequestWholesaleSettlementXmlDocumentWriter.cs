@@ -27,9 +27,9 @@ public class RejectRequestWholesaleSettlementXmlDocumentWriter : DocumentWriter
     public RejectRequestWholesaleSettlementXmlDocumentWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
-                "RejectRequestAggregatedMeasureData_MarketDocument",
-                "urn:ediel.org:measure:rejectrequestaggregatedmeasuredata:0:1 urn-ediel-org-measure-rejectrequestaggregatedmeasuredata-0-1.xsd",
-                "urn:ediel.org:measure:rejectrequestaggregatedmeasuredata:0:1",
+                "RejectRequestWholesaleSettlement_MarketDocument",
+                "urn:ediel.org:measure:rejectrequestwholesalesettlement:0:1 urn-ediel-org-measure-rejectrequestwholesalesettlement-0-1.xsd",
+                "urn:ediel.org:measure:rejectrequestwholesalesettlement:0:1",
                 "cim",
                 "ERR"),
             parser,
