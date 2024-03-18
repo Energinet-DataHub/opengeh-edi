@@ -24,11 +24,15 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
+using NodaTime;
 using Xunit;
 using Xunit.Categories;
 
@@ -141,6 +145,44 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         // Assert
         var outgoingMessages = await OutgoingMessagesAsync(ActorRole.EnergySupplier, BusinessReason.WholesaleFixing);
         outgoingMessages.Count.Should().Be(2);
+    }
+
+    [Fact]
+    public async Task Received_same_accepted_wholesale_services_event_can_write_document_in_json()
+    {
+        // Arrange
+        var messageParser = GetService<IMessageRecordParser>();
+        var jsonParser = new NotifyWholesaleServicesJsonDocumentWriter(messageParser);
+
+        var process = WholesaleServicesProcessBuilder()
+            .SetState(WholesaleServicesProcess.State.Sent)
+            .Build();
+        Store(process);
+        var acceptedEvent = WholesaleServicesRequestAcceptedBuilder(process)
+            .Build();
+
+        // Act
+        await HavingReceivedInboxEventAsync(
+            nameof(WholesaleServicesRequestAccepted),
+            acceptedEvent,
+            process.ProcessId.Id);
+
+        // Assert
+        var outgoingMessages = await OutgoingMessageAsync(ActorRole.EnergySupplier, BusinessReason.WholesaleFixing);
+        var messageRecord = outgoingMessages.GetMessageRecord();
+        var header = new OutgoingMessageHeader(
+            BusinessReason.WholesaleFixing.Name,
+            "1234567812345",
+            ActorRole.MeteredDataAdministrator.Code,
+            "1234567812345",
+            ActorRole.DanishEnergyAgency.Code,
+            MessageId.New().ToString()!,
+            Instant.FromUtc(2022, 1, 1, 0, 0));
+
+        // Assert
+        // Asserting one document type is enough, since the document writer as compared in another test
+        var act = () => jsonParser.WriteAsync(header, new List<string> { messageRecord });
+        await act.Should().NotThrowAsync();
     }
 
     protected override void Dispose(bool disposing)
