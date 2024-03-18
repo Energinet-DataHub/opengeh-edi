@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,6 +22,7 @@ using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -32,6 +32,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAc
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using NodaTime;
 using Xunit;
@@ -85,26 +86,26 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
 
         var propertyAssertions = new Action[]
         {
-            () => Assert.Equal(createdOutgoingMessageId.Value, result.Id),
-            () => Assert.NotNull(result.RecordId),
-            () => Assert.Equal(message.ProcessId, result.ProcessId),
-            () => Assert.Equal(DocumentType.NotifyAggregatedMeasureData.Name, result.DocumentType),
-            () => Assert.Equal(message.ReceiverId.Value, result.ReceiverId),
-            () => Assert.Equal(message.ReceiverRole.Code, result.ReceiverRole),
-            () => Assert.Equal(message.SenderId.Value, result.SenderId),
-            () => Assert.Equal(message.SenderRole.Code, result.SenderRole),
-            () => Assert.Equal(message.BusinessReason, result.BusinessReason),
-            () => Assert.Equal(expectedFileStorageReference, result.FileStorageReference),
-            () => Assert.Equal("OutgoingMessage", result.Discriminator),
-            () => Assert.Equal(message.RelatedToMessageId?.Value, result.RelatedToMessageId),
-            () => Assert.False(result.IsPublished),
-            () => Assert.NotNull(result.AssignedBundleId),
+            () => Assert.Equal(createdOutgoingMessageId.Value, result!.Id),
+            () => Assert.NotNull(result!.RecordId),
+            () => Assert.Equal(message.ProcessId, result!.ProcessId),
+            () => Assert.Equal(DocumentType.NotifyAggregatedMeasureData.Name, result!.DocumentType),
+            () => Assert.Equal(message.ReceiverId.Value, result!.ReceiverId),
+            () => Assert.Equal(message.ReceiverRole.Code, result!.ReceiverRole),
+            () => Assert.Equal(message.SenderId.Value, result!.SenderId),
+            () => Assert.Equal(message.SenderRole.Code, result!.SenderRole),
+            () => Assert.Equal(message.BusinessReason, result!.BusinessReason),
+            () => Assert.Equal(expectedFileStorageReference, result!.FileStorageReference),
+            () => Assert.Equal("OutgoingMessage", result!.Discriminator),
+            () => Assert.Equal(message.RelatedToMessageId?.Value, result!.RelatedToMessageId),
+            () => Assert.False(result!.IsPublished),
+            () => Assert.NotNull(result!.AssignedBundleId),
         };
 
         Assert.Multiple(propertyAssertions);
 
         // Confirm that all database columns are asserted
-        var databaseColumnsCount = ((IDictionary<string, object>)result).Count;
+        var databaseColumnsCount = ((IDictionary<string, object>)result!).Count;
         var propertiesAssertedCount = propertyAssertions.Length;
         propertiesAssertedCount.Should().Be(databaseColumnsCount, "asserted properties count should be equal to OutgoingMessage database columns count");
     }
@@ -190,7 +191,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     public async Task Outgoing_message_record_is_added_to_file_storage_with_correct_content()
     {
         // Arrange
-        var serializer = new BuildingBlocks.Infrastructure.Serialization.Serializer();
+        var serializer = new Serializer();
         var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
             .Build();
@@ -202,9 +203,11 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var createdId = await EnqueueAndCommitAsync(message);
 
         // Assert
+        using var assertionScope = new AssertionScope();
         var fileStorageReference = await GetOutgoingMessageFileStorageReferenceFromDatabase(createdId);
+        fileStorageReference.Should().NotBeNull();
 
-        var fileContent = await GetFileContentFromFileStorageAsync("outgoing", fileStorageReference);
+        var fileContent = await GetFileContentFromFileStorageAsync("outgoing", fileStorageReference!);
         fileContent.Should().Be(outgoingMessage.GetSerializedContent());
     }
 
@@ -219,7 +222,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         // Act
         var createdId = await EnqueueAndCommitAsync(message);
         var fileStorageReference = await GetOutgoingMessageFileStorageReferenceFromDatabase(createdId);
-        var uploadDuplicateFile = async () => await _fileStorageClient.UploadAsync(new FileStorageReference(OutgoingMessage.FileStorageCategory, fileStorageReference), new MemoryStream(new byte[] { 0x20 }));
+        var uploadDuplicateFile = async () => await _fileStorageClient.UploadAsync(new FileStorageReference(OutgoingMessage.FileStorageCategory, fileStorageReference!), new MemoryStream(new byte[] { 0x20 }));
 
         // Assert
         (await uploadDuplicateFile.Should().ThrowAsync<RequestFailedException>())
@@ -370,7 +373,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         return (ActorMessageQueueNumber: result.ActorNumber, ActorMessageQueueRole: result.ActorRole, OutgoingMessageReceiverRole: result.ReceiverRole);
     }
 
-    private async Task<string> GetOutgoingMessageFileStorageReferenceFromDatabase(OutgoingMessageId id)
+    private async Task<string?> GetOutgoingMessageFileStorageReferenceFromDatabase(OutgoingMessageId id)
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
 
