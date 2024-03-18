@@ -85,26 +85,26 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
 
         var propertyAssertions = new Action[]
         {
-            () => Assert.Equal(createdOutgoingMessageId.Value, result.Id),
-            () => Assert.NotNull(result.RecordId),
-            () => Assert.Equal(message.ProcessId, result.ProcessId),
-            () => Assert.Equal(DocumentType.NotifyAggregatedMeasureData.Name, result.DocumentType),
-            () => Assert.Equal(message.ReceiverId.Value, result.ReceiverId),
-            () => Assert.Equal(message.ReceiverRole.Code, result.ReceiverRole),
-            () => Assert.Equal(message.SenderId.Value, result.SenderId),
-            () => Assert.Equal(message.SenderRole.Code, result.SenderRole),
-            () => Assert.Equal(message.BusinessReason, result.BusinessReason),
-            () => Assert.Equal(expectedFileStorageReference, result.FileStorageReference),
-            () => Assert.Equal("OutgoingMessage", result.Discriminator),
-            () => Assert.Equal(message.RelatedToMessageId?.Value, result.RelatedToMessageId),
-            () => Assert.False(result.IsPublished),
-            () => Assert.NotNull(result.AssignedBundleId),
+            () => Assert.Equal(createdOutgoingMessageId.Value, result!.Id),
+            () => Assert.NotNull(result!.RecordId),
+            () => Assert.Equal(message.ProcessId, result!.ProcessId),
+            () => Assert.Equal(DocumentType.NotifyAggregatedMeasureData.Name, result!.DocumentType),
+            () => Assert.Equal(message.ReceiverId.Value, result!.ReceiverId),
+            () => Assert.Equal(message.ReceiverRole.Code, result!.ReceiverRole),
+            () => Assert.Equal(message.SenderId.Value, result!.SenderId),
+            () => Assert.Equal(message.SenderRole.Code, result!.SenderRole),
+            () => Assert.Equal(message.BusinessReason, result!.BusinessReason),
+            () => Assert.Equal(expectedFileStorageReference, result!.FileStorageReference),
+            () => Assert.Equal("OutgoingMessage", result!.Discriminator),
+            () => Assert.Equal(message.RelatedToMessageId?.Value, result!.RelatedToMessageId),
+            () => Assert.False(result!.IsPublished),
+            () => Assert.NotNull(result!.AssignedBundleId),
         };
 
         Assert.Multiple(propertyAssertions);
 
         // Confirm that all database columns are asserted
-        var databaseColumnsCount = ((IDictionary<string, object>)result).Count;
+        var databaseColumnsCount = ((IDictionary<string, object>)result!).Count;
         var propertiesAssertedCount = propertyAssertions.Length;
         propertiesAssertedCount.Should().Be(databaseColumnsCount, "asserted properties count should be equal to OutgoingMessage database columns count");
     }
@@ -219,7 +219,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         // Act
         var createdId = await EnqueueAndCommitAsync(message);
         var fileStorageReference = await GetOutgoingMessageFileStorageReferenceFromDatabase(createdId);
-        var uploadDuplicateFile = async () => await _fileStorageClient.UploadAsync(new FileStorageReference(OutgoingMessage.FileStorageCategory, fileStorageReference), new MemoryStream(new byte[] { 0x20 }));
+        var uploadDuplicateFile = async () => await _fileStorageClient.UploadAsync(new FileStorageReference(OutgoingMessage.FileStorageCategory, fileStorageReference!), new MemoryStream(new byte[] { 0x20 }));
 
         // Assert
         (await uploadDuplicateFile.Should().ThrowAsync<RequestFailedException>())
@@ -370,7 +370,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         return (ActorMessageQueueNumber: result.ActorNumber, ActorMessageQueueRole: result.ActorRole, OutgoingMessageReceiverRole: result.ReceiverRole);
     }
 
-    private async Task<string> GetOutgoingMessageFileStorageReferenceFromDatabase(OutgoingMessageId id)
+    private async Task<string?> GetOutgoingMessageFileStorageReferenceFromDatabase(OutgoingMessageId id)
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
 
