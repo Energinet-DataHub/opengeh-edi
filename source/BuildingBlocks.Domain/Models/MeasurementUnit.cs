@@ -36,10 +36,17 @@ public class MeasurementUnit : EnumerationType
 
     public string Code { get; }
 
-    public static MeasurementUnit From(string value)
+    public static MeasurementUnit FromName(string name)
     {
-        return GetAll<MeasurementUnit>().First(type =>
-            type.Code.Equals(value, StringComparison.OrdinalIgnoreCase) ||
-            type.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
+        return GetAll<MeasurementUnit>().FirstOrDefault(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException(
+                   $"{name} is not a valid {typeof(MeasurementUnit)} {nameof(name)}");
+    }
+
+    public static MeasurementUnit FromCode(string code)
+    {
+        return GetAll<MeasurementUnit>().FirstOrDefault(t => t.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException(
+                   $"{code} is not a valid {typeof(MeasurementUnit)} {nameof(code)}");
     }
 }

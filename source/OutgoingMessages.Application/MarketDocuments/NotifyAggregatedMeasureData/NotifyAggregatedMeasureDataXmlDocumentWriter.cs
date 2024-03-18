@@ -55,8 +55,13 @@ public class NotifyAggregatedMeasureDataXmlDocumentWriter : DocumentWriter
                     writer)
                 .ConfigureAwait(false);
             await WriteElementIfHasValueAsync("originalTransactionIDReference_Series.mRID", timeSeries.OriginalTransactionIdReference, writer).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "marketEvaluationPoint.type", null, MeteringPointType.From(timeSeries.MeteringPointType).Code).ConfigureAwait(false);
-            await WriteElementIfHasValueAsync("marketEvaluationPoint.settlementMethod", timeSeries.SettlementType is null ? null : SettlementType.From(timeSeries.SettlementType).Code, writer).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(
+                    DocumentDetails.Prefix,
+                    "marketEvaluationPoint.type",
+                    null,
+                    MeteringPointType.FromName(timeSeries.MeteringPointType).Code)
+                .ConfigureAwait(false);
+            await WriteElementIfHasValueAsync("marketEvaluationPoint.settlementMethod", timeSeries.SettlementType is null ? null : SettlementType.FromName(timeSeries.SettlementType).Code, writer).ConfigureAwait(false);
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "meteringGridArea_Domain.mRID", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "codingScheme", null, "NDK").ConfigureAwait(false);
             await writer.WriteStringAsync(timeSeries.GridAreaCode).ConfigureAwait(false);
@@ -80,10 +85,15 @@ public class NotifyAggregatedMeasureDataXmlDocumentWriter : DocumentWriter
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, ProductType.EnergyActive.Code).ConfigureAwait(false);
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, MeasurementUnit.From(timeSeries.MeasureUnitType).Code).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(
+                    DocumentDetails.Prefix,
+                    "quantity_Measure_Unit.name",
+                    null,
+                    MeasurementUnit.FromName(timeSeries.MeasureUnitType).Code)
+                .ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Period", null).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "resolution", null, Resolution.From(timeSeries.Resolution).Code).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "resolution", null, Resolution.FromName(timeSeries.Resolution).Code).ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "timeInterval", null).ConfigureAwait(false);
 

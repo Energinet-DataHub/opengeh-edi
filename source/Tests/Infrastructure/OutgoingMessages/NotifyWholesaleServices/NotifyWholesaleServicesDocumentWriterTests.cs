@@ -74,11 +74,14 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             .WithPoints(new Collection<WholesaleServicesPoint>() { new(1, 1, 1, SampleData.Quantity, null) });
 
         // Act
-        var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
+        var document = await WriteDocument(
+            messageBuilder.BuildHeader(),
+            messageBuilder.BuildWholesaleCalculation(),
+            DocumentFormat.FromName(documentFormat));
 
         // Assert
         using var assertionScope = new AssertionScope();
-        await AssertDocument(document, DocumentFormat.From(documentFormat))
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .HasMessageId(SampleData.MessageId)
             .HasBusinessReason(SampleData.BusinessReason, CodeListType.EbixDenmark) // "D05" (WholesaleFixing) is from CodeListType.EbixDenmark
             .HasSenderId(SampleData.SenderId, "A10")
@@ -116,11 +119,14 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             .WithPoints(new Collection<WholesaleServicesPoint>() { new(1, 1, 1, null, null) });
 
         // Act
-        var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
+        var document = await WriteDocument(
+            messageBuilder.BuildHeader(),
+            messageBuilder.BuildWholesaleCalculation(),
+            DocumentFormat.FromName(documentFormat));
 
         // Assert
         using var assertionScope = new AssertionScope();
-        AssertDocument(document, DocumentFormat.From(documentFormat))
+        AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .HasPositionAndQuantity(1, 0);
     }
 
@@ -135,11 +141,14 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             .WithSettlementVersion(SettlementVersion.FirstCorrection);
 
         // Act
-        var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
+        var document = await WriteDocument(
+            messageBuilder.BuildHeader(),
+            messageBuilder.BuildWholesaleCalculation(),
+            DocumentFormat.FromName(documentFormat));
 
         // Assert
         using var assertionScope = new AssertionScope();
-        AssertDocument(document, DocumentFormat.From(documentFormat))
+        AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .HasSettlementVersion(SettlementVersion.FirstCorrection);
     }
 
@@ -154,10 +163,13 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             .WithMeasurementUnit(MeasurementUnit.Pieces);
 
         // Act
-        var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
+        var document = await WriteDocument(
+            messageBuilder.BuildHeader(),
+            messageBuilder.BuildWholesaleCalculation(),
+            DocumentFormat.FromName(documentFormat));
 
         // Assert
-        AssertDocument(document, DocumentFormat.From(documentFormat))
+        AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .HasMeasurementUnit(MeasurementUnit.Pieces);
     }
 
@@ -182,10 +194,13 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             });
 
         // Act
-        var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
+        var document = await WriteDocument(
+            messageBuilder.BuildHeader(),
+            messageBuilder.BuildWholesaleCalculation(),
+            DocumentFormat.FromName(documentFormat));
 
         // Assert
-        AssertDocument(document, DocumentFormat.From(documentFormat))
+        AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .HasSettlementMethod(SettlementType.Flex)
             .HasMeteringPointType(MeteringPointType.Consumption)
             .HasResolution(Resolution.Hourly)
@@ -214,10 +229,13 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
                 });
 
         // Act
-        var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
+        var document = await WriteDocument(
+            messageBuilder.BuildHeader(),
+            messageBuilder.BuildWholesaleCalculation(),
+            DocumentFormat.FromName(documentFormat));
 
         // Assert
-        AssertDocument(document, DocumentFormat.From(documentFormat))
+        AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .SettlementMethodIsNotPresent()
             .HasMeteringPointType(MeteringPointType.Production)
             .HasResolution(Resolution.Hourly)
@@ -246,10 +264,13 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             });
 
         // Act
-        var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
+        var document = await WriteDocument(
+            messageBuilder.BuildHeader(),
+            messageBuilder.BuildWholesaleCalculation(),
+            DocumentFormat.FromName(documentFormat));
 
         // Assert
-        AssertDocument(document, DocumentFormat.From(documentFormat))
+        AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .HasSettlementMethod(SettlementType.NonProfiled)
             .HasMeteringPointType(MeteringPointType.Consumption)
             .HasResolution(Resolution.Hourly)
@@ -268,10 +289,13 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             .WithResolution(Resolution.Hourly);
 
         // Act
-        var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
+        var document = await WriteDocument(
+            messageBuilder.BuildHeader(),
+            messageBuilder.BuildWholesaleCalculation(),
+            DocumentFormat.FromName(documentFormat));
 
         // Assert
-        AssertDocument(document, DocumentFormat.From(documentFormat))
+        AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .HasResolution(Resolution.Hourly);
     }
 
@@ -286,10 +310,13 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             .WithResolution(Resolution.Daily);
 
         // Act
-        var document = await WriteDocument(messageBuilder.BuildHeader(), messageBuilder.BuildWholesaleCalculation(), DocumentFormat.From(documentFormat));
+        var document = await WriteDocument(
+            messageBuilder.BuildHeader(),
+            messageBuilder.BuildWholesaleCalculation(),
+            DocumentFormat.FromName(documentFormat));
 
         // Assert
-        AssertDocument(document, DocumentFormat.From(documentFormat))
+        AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .HasResolution(Resolution.Daily);
     }
 

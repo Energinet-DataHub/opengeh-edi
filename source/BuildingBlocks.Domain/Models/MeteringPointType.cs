@@ -34,17 +34,17 @@ public class MeteringPointType : EnumerationType
 
     public string Code { get; }
 
-    public static MeteringPointType From(string name)
+    public static MeteringPointType FromName(string name)
     {
-        var meteringPointType = GetAll<MeteringPointType>().FirstOrDefault(type => type.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{name} is not a valid metering point type name");
-
-        return meteringPointType;
+        return GetAll<MeteringPointType>().FirstOrDefault(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException(
+                   $"{name} is not a valid {typeof(MeteringPointType)} {nameof(name)}");
     }
 
     public static MeteringPointType FromCode(string code)
     {
-        var meteringPointType = GetAll<MeteringPointType>().FirstOrDefault(type => type.Code.Equals(code, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{code} is not a valid metering point type code");
-
-        return meteringPointType;
+        return GetAll<MeteringPointType>().FirstOrDefault(t => t.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException(
+                   $"{code} is not a valid {typeof(MeteringPointType)} {nameof(code)}");
     }
 }

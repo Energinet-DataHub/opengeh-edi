@@ -49,8 +49,14 @@ public class ActorRole : EnumerationType
 
     public static ActorRole FromCode(string code)
     {
-        var matchingItem = GetAll<ActorRole>().FirstOrDefault(item => item.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
-        return matchingItem ?? throw new InvalidOperationException($"'{code}' is not a valid code in {typeof(ActorRole)}");
+        return GetAll<ActorRole>().FirstOrDefault(item => item.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException($"{code} is not a valid {typeof(ActorRole)} {nameof(code)}");
+    }
+
+    public static ActorRole FromName(string name)
+    {
+        return GetAll<ActorRole>().FirstOrDefault(item => item.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(ActorRole)} {nameof(name)}");
     }
 
     public override string ToString()

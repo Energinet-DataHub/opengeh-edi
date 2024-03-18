@@ -32,8 +32,8 @@ public class IncomingDocumentType : EnumerationType
     {
         if (name == null) return null;
         return GetAll<IncomingDocumentType>()
-            .FirstOrDefault(
-                br =>
-                    br.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+                   .FirstOrDefault(document => document.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException(
+                   $"{name} is not a valid {typeof(IncomingDocumentType)} {nameof(name)}");
     }
 }
