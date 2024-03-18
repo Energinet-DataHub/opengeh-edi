@@ -49,7 +49,7 @@ internal static class InternalCommandExtensions
         mapper.Add("RejectedAggregatedTimeSeries", typeof(RejectedAggregatedTimeSeries));
         mapper.Add("SendWholesaleServicesRequestToWholesale", typeof(SendWholesaleServicesRequestToWholesale));
         mapper.Add("RejectedWholesaleServices", typeof(RejectedWholesaleServices));
-        mapper.Add("AcceptedWholesaleServicesSerieCommand", typeof(AcceptedWholesaleServicesSerieCommand));
+        mapper.Add("AcceptedWholesaleServicesSerieCommand", typeof(AcceptedWholesaleServices));
 
         return mapper;
     }

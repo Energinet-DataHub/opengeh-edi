@@ -89,7 +89,7 @@ public static class ProcessExtensions
 
         // RequestedWholesaleServicesConfiguration
         services
-            .AddTransient<IRequestHandler<AcceptedWholesaleServicesSerieCommand, Unit>, AcceptWholesaleServicesWhenAnAcceptedWholesaleServicesRequestIsAvailable>()
+            .AddTransient<IRequestHandler<AcceptedWholesaleServices, Unit>, AcceptWholesaleServicesWhenAnAcceptedWholesaleServicesRequestIsAvailable>()
             .AddTransient<IRequestHandler<SendWholesaleServicesRequestToWholesale, Unit>, SendWholesaleServicesRequestToWholesaleHandler>()
             .AddTransient<INotificationHandler<WholesaleServicesRequestWasAccepted>, WhenAnAcceptedWholesaleServicesRequestIsAvailable>()
             .AddTransient<INotificationHandler<WholesaleServicesProcessIsInitialized>, NotifyWholesaleWhenWholesaleServicesProcessIsInitialized>()
