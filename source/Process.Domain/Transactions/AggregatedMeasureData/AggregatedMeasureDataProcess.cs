@@ -118,12 +118,14 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
 
         public string RequestedByActorRoleCode { get; }
 
-        public void WasSentToWholesale()
+        public void SendToWholesale()
         {
-            if (_state == State.Initialized)
-            {
-                _state = State.Sent;
-            }
+            if (_state != State.Initialized)
+                return;
+
+            AddDomainEvent(new NotifyWholesaleThatAggregatedMeasureDataIsRequested(this));
+
+            _state = State.Sent;
         }
 
         public void IsAccepted(IReadOnlyCollection<AcceptedEnergyResultMessageDto> acceptedEnergyResultMessages)

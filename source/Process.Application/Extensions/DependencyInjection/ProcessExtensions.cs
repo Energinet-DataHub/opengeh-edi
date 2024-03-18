@@ -77,7 +77,9 @@ public static class ProcessExtensions
         services.AddTransient<IProcessClient, ProcessClient>();
 
         // RequestedAggregatedMeasureDataConfiguration
-        services.AddTransient<IRequestHandler<SendAggregatedMeasureRequestToWholesale, Unit>, SendAggregatedMeasuredDataToWholesale>()
+        services
+            .AddTransient<IRequestHandler<SendAggregatedMeasureDataRequestToWholesale, Unit>,
+                SendAggregatedMeasureDataRequestToWholesaleHandler>()
             .AddTransient<IRequestHandler<AcceptedEnergyResultTimeSerieCommand, Unit>, AcceptProcessWhenAcceptedEnergyResultTimeSeriesIsAvailable>()
             .AddTransient<IRequestHandler<RejectedAggregatedTimeSeries, Unit>, RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable>()
             .AddTransient<INotificationHandler<AggregatedMeasureProcessIsInitialized>, NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized>()

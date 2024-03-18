@@ -14,15 +14,14 @@
 
 using System;
 using System.Text.Json.Serialization;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Domain.Commands;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
 
-public class SendAggregatedMeasureRequestToWholesale : InternalCommand
+public class SendAggregatedMeasureDataRequestToWholesale : InternalCommand
 {
     [JsonConstructor]
-    public SendAggregatedMeasureRequestToWholesale(Guid processId)
+    public SendAggregatedMeasureDataRequestToWholesale(Guid processId)
     {
         ProcessId = processId;
     }

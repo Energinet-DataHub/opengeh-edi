@@ -44,10 +44,10 @@ internal static class InternalCommandExtensions
     {
         var mapper = new InternalCommandMapper();
         mapper.Add("GridAreaOwnershipAssigned", typeof(GridAreaOwnershipAssignedDto));
-        mapper.Add("SendAggregatedMeasureRequestToWholesale", typeof(SendAggregatedMeasureRequestToWholesale));
         mapper.Add("AcceptedAggregatedTimeSerie", typeof(AcceptedEnergyResultTimeSerieCommand));
         mapper.Add("RejectedAggregatedTimeSeries", typeof(RejectedAggregatedTimeSeries));
         mapper.Add("SendWholesaleServicesRequestToWholesale", typeof(SendWholesaleServicesRequestToWholesale));
+        mapper.Add("SendAggregatedMeasureDataRequestToWholesale", typeof(SendAggregatedMeasureDataRequestToWholesale));
         mapper.Add("RejectedWholesaleServices", typeof(RejectedWholesaleServices));
         mapper.Add("AcceptedWholesaleServicesSerieCommand", typeof(AcceptedWholesaleServicesSerieCommand));
 

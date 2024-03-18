@@ -17,7 +17,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 using Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages.RequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -25,6 +24,7 @@ using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureDa
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using FluentAssertions;
 using NodaTime.Text;
 using Xunit;
 using Xunit.Categories;
@@ -50,7 +50,7 @@ public class EnergyResultResponseFromWholesaleTests : TestBase
         var marketMessage = MessageBuilder().Build();
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
-        process!.WasSentToWholesale();
+        process!.SendToWholesale();
         var aggregationResultMessage = CreateAcceptedEnergyResultMessageDtoMessage(process);
 
         // Act
@@ -67,7 +67,7 @@ public class EnergyResultResponseFromWholesaleTests : TestBase
         var marketMessage = MessageBuilder().Build();
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
-        process!.WasSentToWholesale();
+        process!.SendToWholesale();
         var firstAggregationResultMessage = CreateAcceptedEnergyResultMessageDtoMessage(process);
         var secondAggregationResultMessage = CreateAcceptedEnergyResultMessageDtoMessage(process, gridarea: "808");
 
@@ -76,10 +76,19 @@ public class EnergyResultResponseFromWholesaleTests : TestBase
 
         // Assert
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Accepted);
-        Assert.Contains(process.DomainEvents, x => x is EnqueueAcceptedEnergyResultMessageEvent);
-        Assert.All(process.DomainEvents, x
-            => Assert.Equal(typeof(EnqueueAcceptedEnergyResultMessageEvent), x.GetType()));
-        Assert.Equal(2, process.DomainEvents.Count);
+
+        process.DomainEvents.Should().HaveCount(3);
+        process.DomainEvents.Select(de => de.GetType())
+            .Distinct()
+            .Should()
+            .BeEquivalentTo(
+                new[]
+                {
+                    typeof(EnqueueAcceptedEnergyResultMessageEvent),
+                    typeof(NotifyWholesaleThatAggregatedMeasureDataIsRequested),
+                });
+
+        process.DomainEvents.Where(de => de is EnqueueAcceptedEnergyResultMessageEvent).Should().HaveCount(2);
     }
 
     [Fact]
@@ -89,7 +98,7 @@ public class EnergyResultResponseFromWholesaleTests : TestBase
         var marketMessage = MessageBuilder().Build();
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
-        process!.WasSentToWholesale();
+        process!.SendToWholesale();
         var aggregationResultMessage = CreateAcceptedEnergyResultMessageDtoMessage(process);
 
         // Act
@@ -108,7 +117,7 @@ public class EnergyResultResponseFromWholesaleTests : TestBase
         var marketMessage = MessageBuilder().Build();
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
-        process!.WasSentToWholesale();
+        process!.SendToWholesale();
         var rejectedRequest = CreateRejectRequest();
 
         // Act
@@ -126,7 +135,7 @@ public class EnergyResultResponseFromWholesaleTests : TestBase
         var marketMessage = MessageBuilder().Build();
         await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
         var process = GetProcess(marketMessage.SenderNumber);
-        process!.WasSentToWholesale();
+        process!.SendToWholesale();
         var rejectedRequest = CreateRejectRequest();
 
         // Act
