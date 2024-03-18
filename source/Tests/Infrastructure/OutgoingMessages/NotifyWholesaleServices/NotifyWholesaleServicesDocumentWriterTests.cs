@@ -51,6 +51,9 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
     [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Can_create_notifyWholesaleServices_document(string documentFormat)
     {
+        var transactionId = documentFormat == nameof(DocumentFormat.Ebix)
+            ? SampleData.TransactionId.ToString().Substring(0, 35)
+            : SampleData.TransactionId.ToString();
         // Arrange
         var messageBuilder = _wholesaleServicesSeriesBuilder
             .WithMessageId(SampleData.MessageId)
@@ -70,7 +73,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             .WithMeasurementUnit(SampleData.MeasurementUnit)
             .WithPriceMeasurementUnit(SampleData.PriceMeasureUnit)
             .WithResolution(SampleData.Resolution)
-            // .WithOriginalTransactionIdReference(SampleData.TransactionId)
+            .WithOriginalTransactionIdReference(transactionId)
             .WithPoints(new Collection<WholesaleServicesPoint>() { new(1, 1, 1, SampleData.Quantity, null) });
 
         // Act
@@ -103,7 +106,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             .HasResolution(SampleData.Resolution)
             .HasPositionAndQuantity(1, SampleData.Quantity)
             .HasProductCode(ProductType.Tariff.Code)
-            // .HasOriginalTransactionIdReference(SampleData.TransactionId)
+            .HasOriginalTransactionIdReference(transactionId)
             .SettlementVersionIsNotPresent()
             .DocumentIsValidAsync();
     }

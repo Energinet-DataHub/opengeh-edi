@@ -264,11 +264,11 @@ internal sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyW
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasOriginalTransactionIdReference(Guid originalTransactionIdReference)
+    public IAssertNotifyWholesaleServicesDocument HasOriginalTransactionIdReference(string originalTransactionIdReference)
     {
         _documentAsserter.HasValue(
             $"{PayloadEnergyTimeSeries}[1]/OriginalBusinessDocument",
-            originalTransactionIdReference.ToString());
+            originalTransactionIdReference);
         return this;
     }
 

@@ -147,9 +147,9 @@ public class WholesaleServicesSeriesBuilder
         return this;
     }
 
-    public WholesaleServicesSeriesBuilder WithOriginalTransactionIdReference(Guid originalTransactionIdReference)
+    public WholesaleServicesSeriesBuilder WithOriginalTransactionIdReference(string originalTransactionIdReference)
     {
-        _originalTransactionIdReference = originalTransactionIdReference.ToString();
+        _originalTransactionIdReference = originalTransactionIdReference;
         return this;
     }
 
