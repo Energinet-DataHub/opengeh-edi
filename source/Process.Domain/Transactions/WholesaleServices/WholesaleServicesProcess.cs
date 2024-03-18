@@ -21,7 +21,7 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.Proces
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 
-public class WholesaleServicesProcess : Entity
+public sealed class WholesaleServicesProcess : Entity
 {
     private State _state = State.Initialized;
 
@@ -111,26 +111,27 @@ public class WholesaleServicesProcess : Entity
 
     public void SendToWholesale()
     {
-        if (_state == State.Initialized)
-        {
-            AddDomainEvent(new NotifyWholesaleThatWholesaleServicesIsRequested(this));
-            _state = State.Sent;
-        }
+        if (_state != State.Initialized)
+            return;
+
+        AddDomainEvent(new NotifyWholesaleThatWholesaleServicesIsRequested(this));
+
+        _state = State.Sent;
     }
 
     public void IsAccepted(IReadOnlyCollection<AcceptedWholesaleServicesMessageDto> acceptedWholesaleServicesMessages)
     {
         ArgumentNullException.ThrowIfNull(acceptedWholesaleServicesMessages);
 
-        if (_state == State.Sent)
-        {
-            foreach (var acceptedWholesaleServicesMessage in acceptedWholesaleServicesMessages)
-            {
-                AddDomainEvent(new EnqueuedAcceptedWholesaleServicesEvent(acceptedWholesaleServicesMessage));
-            }
+        if (_state != State.Sent)
+            return;
 
-            _state = State.Accepted;
+        foreach (var acceptedWholesaleServicesMessage in acceptedWholesaleServicesMessages)
+        {
+            AddDomainEvent(new EnqueuedAcceptedWholesaleServicesEvent(acceptedWholesaleServicesMessage));
         }
+
+        _state = State.Accepted;
     }
 
     public void IsRejected(RejectedWholesaleServicesMessageDto rejectedWholesaleServicesRequest)

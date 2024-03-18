@@ -12,14 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ProcessEvents;
+using System;
+using System.Text.Json.Serialization;
+using Energinet.DataHub.EDI.Process.Domain.Commands;
 
-public sealed class NotifyWholesaleThatWholesaleServicesIsRequested : DomainEvent
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
+
+public class SendAggregatedMeasureDataRequestToWholesale : InternalCommand
 {
-    public NotifyWholesaleThatWholesaleServicesIsRequested(WholesaleServicesProcess process)
+    [JsonConstructor]
+    public SendAggregatedMeasureDataRequestToWholesale(Guid processId)
     {
-        Process = process;
+        ProcessId = processId;
     }
 
-    public WholesaleServicesProcess Process { get; }
+    public Guid ProcessId { get; }
 }

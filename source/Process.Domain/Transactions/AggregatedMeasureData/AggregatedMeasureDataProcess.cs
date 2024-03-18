@@ -21,7 +21,7 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.Pr
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData
 {
-    public class AggregatedMeasureDataProcess : Entity
+    public sealed class AggregatedMeasureDataProcess : Entity
     {
         private State _state = State.Initialized;
 
@@ -118,38 +118,41 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
 
         public string RequestedByActorRoleCode { get; }
 
-        public void WasSentToWholesale()
+        public void SendToWholesale()
         {
-            if (_state == State.Initialized)
-            {
-                _state = State.Sent;
-            }
+            if (_state != State.Initialized)
+                return;
+
+            AddDomainEvent(new NotifyWholesaleThatAggregatedMeasureDataIsRequested(this));
+
+            _state = State.Sent;
         }
 
         public void IsAccepted(IReadOnlyCollection<AcceptedEnergyResultMessageDto> acceptedEnergyResultMessages)
         {
             ArgumentNullException.ThrowIfNull(acceptedEnergyResultMessages);
 
-            if (_state == State.Sent)
-            {
-                foreach (var acceptedEnergyResultMessage in acceptedEnergyResultMessages)
-                {
-                    AddDomainEvent(new EnqueueAcceptedEnergyResultMessageEvent(acceptedEnergyResultMessage));
-                }
+            if (_state != State.Sent)
+                return;
 
-                _state = State.Accepted;
+            foreach (var acceptedEnergyResultMessage in acceptedEnergyResultMessages)
+            {
+                AddDomainEvent(new EnqueueAcceptedEnergyResultMessageEvent(acceptedEnergyResultMessage));
             }
+
+            _state = State.Accepted;
         }
 
         public void IsRejected(RejectedAggregatedMeasureDataRequest rejectAggregatedMeasureDataRequest)
         {
             ArgumentNullException.ThrowIfNull(rejectAggregatedMeasureDataRequest);
 
-            if (_state == State.Sent)
-            {
-                AddDomainEvent(new EnqueueRejectedEnergyResultMessageEvent(CreateRejectedAggregationResultMessage(rejectAggregatedMeasureDataRequest)));
-                _state = State.Rejected;
-            }
+            if (_state != State.Sent)
+                return;
+
+            AddDomainEvent(new EnqueueRejectedEnergyResultMessageEvent(CreateRejectedAggregationResultMessage(rejectAggregatedMeasureDataRequest)));
+
+            _state = State.Rejected;
         }
 
         private RejectedEnergyResultMessageDto CreateRejectedAggregationResultMessage(
@@ -158,7 +161,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             var rejectedTimeSerie = new RejectedEnergyResultMessageSerie(
                 ProcessId.Id,
                 rejectedAggregatedMeasureDataRequest.RejectReasons.Select(reason =>
-                        new Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.RejectedEnergyResultMessageRejectReason(
+                        new RejectedEnergyResultMessageRejectReason(
                             reason.ErrorCode,
                             reason.ErrorMessage))
                     .ToList(),

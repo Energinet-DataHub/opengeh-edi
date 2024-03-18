@@ -12,20 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text.Json.Serialization;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Process.Domain.Commands;
+namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
-
-public class SendAggregatedMeasureRequestToWholesale : InternalCommand
+public sealed class NotifyWholesaleThatAggregatedMeasureDataIsRequested : DomainEvent
 {
-    [JsonConstructor]
-    public SendAggregatedMeasureRequestToWholesale(Guid processId)
+    public NotifyWholesaleThatAggregatedMeasureDataIsRequested(AggregatedMeasureDataProcess process)
     {
-        ProcessId = processId;
+        Process = process;
     }
 
-    public Guid ProcessId { get; }
+    public AggregatedMeasureDataProcess Process { get; }
 }
