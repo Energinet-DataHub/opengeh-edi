@@ -12,20 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Xunit;
+using System;
+using System.Text.Json.Serialization;
+using Energinet.DataHub.EDI.Process.Domain.Commands;
 
-namespace Energinet.DataHub.EDI.Tests.Domain.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
 
-public class ResolutionTests
+public class SendAggregatedMeasureDataRequestToWholesale : InternalCommand
 {
-    [Theory]
-    [InlineData("pt1h")]
-    [InlineData("hourly")]
-    public void Can_parse_from_name_or_code(string valueToParseFrom)
+    [JsonConstructor]
+    public SendAggregatedMeasureDataRequestToWholesale(Guid processId)
     {
-        var resolution = Resolution.From(valueToParseFrom);
-
-        Assert.Equal(Resolution.Hourly, resolution);
+        ProcessId = processId;
     }
+
+    public Guid ProcessId { get; }
 }

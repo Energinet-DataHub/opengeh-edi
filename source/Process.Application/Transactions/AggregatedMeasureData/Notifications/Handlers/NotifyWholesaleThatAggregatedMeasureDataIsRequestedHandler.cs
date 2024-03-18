@@ -15,25 +15,29 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
-using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+using Energinet.DataHub.EDI.Process.Infrastructure.Wholesale;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers;
 
-public class NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized : INotificationHandler<AggregatedMeasureProcessIsInitialized>
+public sealed class
+    NotifyWholesaleThatAggregatedMeasureDataIsRequestedHandler : INotificationHandler<
+    NotifyWholesaleThatAggregatedMeasureDataIsRequested>
 {
-    private readonly ICommandScheduler _commandScheduler;
+    private readonly WholesaleInbox _wholesaleInbox;
 
-    public NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized(ICommandScheduler commandScheduler)
+    public NotifyWholesaleThatAggregatedMeasureDataIsRequestedHandler(
+        WholesaleInbox wholesaleInbox)
     {
-        _commandScheduler = commandScheduler;
+        _wholesaleInbox = wholesaleInbox;
     }
 
-    public async Task Handle(AggregatedMeasureProcessIsInitialized notification, CancellationToken cancellationToken)
+    public async Task Handle(
+        NotifyWholesaleThatAggregatedMeasureDataIsRequested notification,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(notification);
-        await _commandScheduler.EnqueueAsync(new SendAggregatedMeasureDataRequestToWholesale(notification.ProcessId.Id)).ConfigureAwait(false);
+        await _wholesaleInbox.SendProcessAsync(notification.Process, cancellationToken).ConfigureAwait(false);
     }
 }

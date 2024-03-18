@@ -27,6 +27,7 @@ using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using NodaTime;
 using Xunit;
 
@@ -111,11 +112,17 @@ public class WhenAPeekIsRequestedTests : TestBase
         var peekResult = await PeekMessage(MessageCategory.Aggregations);
 
         // Assert
+        using var assertScope = new AssertionScope();
         peekResult.Bundle.Should().NotBeNull();
 
         var peekResultFileContent = await GetStreamContentAsStringAsync(peekResult.Bundle!);
         var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value);
-        var archivedMessageFileContent = await GetFileContentFromFileStorageAsync("archived", archivedMessageFileStorageReference);
+        archivedMessageFileStorageReference.Should().NotBeNull();
+
+        var archivedMessageFileContent = await GetFileContentFromFileStorageAsync(
+            "archived",
+            archivedMessageFileStorageReference!);
+
         archivedMessageFileContent.Should().Be(peekResultFileContent);
     }
 

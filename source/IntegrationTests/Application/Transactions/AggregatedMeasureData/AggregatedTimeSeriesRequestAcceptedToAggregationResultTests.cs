@@ -424,7 +424,7 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
             SampleData.ReceiverNumber.Value,
             null);
 
-        process.WasSentToWholesale();
+        process.SendToWholesale();
         _processContext.AggregatedMeasureDataProcesses.Add(process);
         _processContext.SaveChanges();
         return process;

@@ -12,20 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Xunit;
+namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 
-namespace Energinet.DataHub.EDI.Tests.Domain.Transactions.Aggregations;
-
-public class MeasurementUnitTests
+public sealed class NotifyWholesaleThatAggregatedMeasureDataIsRequested : DomainEvent
 {
-    [Theory]
-    [InlineData("kwh")]
-    [InlineData("KWH")]
-    public void Can_parse_from_name_or_code(string valueToParse)
+    public NotifyWholesaleThatAggregatedMeasureDataIsRequested(AggregatedMeasureDataProcess process)
     {
-        var measurementUnitType = MeasurementUnit.From(valueToParse);
-
-        Assert.NotNull(measurementUnitType);
+        Process = process;
     }
+
+    public AggregatedMeasureDataProcess Process { get; }
 }

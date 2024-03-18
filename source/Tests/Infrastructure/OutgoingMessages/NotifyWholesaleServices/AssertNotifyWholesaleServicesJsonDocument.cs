@@ -177,13 +177,13 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
     }
 
     public IAssertNotifyWholesaleServicesDocument HasOriginalTransactionIdReference(
-        Guid expectedOriginalTransactionIdReference)
+        string expectedOriginalTransactionIdReference)
     {
         FirstWholesaleSeriesElement()
             .GetProperty("originalTransactionIDReference_Series.mRID")
             .GetString()
             .Should()
-            .Be(expectedOriginalTransactionIdReference.ToString());
+            .Be(expectedOriginalTransactionIdReference);
         return this;
     }
 

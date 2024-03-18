@@ -112,11 +112,11 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
     }
 
     public IAssertNotifyWholesaleServicesDocument HasOriginalTransactionIdReference(
-        Guid expectedOriginalTransactionIdReference)
+        string expectedOriginalTransactionIdReference)
     {
         _documentAsserter.HasValue(
             "Series[1]/originalTransactionIDReference_Series.mRID",
-            expectedOriginalTransactionIdReference.ToString());
+            expectedOriginalTransactionIdReference);
         return this;
     }
 

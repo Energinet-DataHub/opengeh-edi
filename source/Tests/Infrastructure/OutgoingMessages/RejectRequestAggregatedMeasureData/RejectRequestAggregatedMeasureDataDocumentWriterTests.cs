@@ -48,9 +48,9 @@ public class RejectRequestAggregatedMeasureDataDocumentWriterTests : IClassFixtu
     {
         var marketDocumentStream = await CreateDocument(
                 _rejectedEnergyResultMessageSerie,
-                DocumentFormat.From(documentFormat));
+                DocumentFormat.FromName(documentFormat));
 
-        await AssertDocument(marketDocumentStream.Stream, DocumentFormat.From(documentFormat))
+        await AssertDocument(marketDocumentStream.Stream, DocumentFormat.FromName(documentFormat))
             .HasMessageId(SampleData.MessageId)
             .HasSenderId(SampleData.SenderId)
             .HasReceiverId(SampleData.ReceiverId)
