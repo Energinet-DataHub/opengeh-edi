@@ -65,9 +65,9 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
                     .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
                     .WithPoint(new EnergyResultMessagePoint(1, 1m, CalculatedQuantityQuality.Calculated, "2022-12-12T23:00:00Z"))
                     .WithSettlementMethod(SettlementType.NonProfiled),
-                DocumentFormat.From(documentFormat));
+                DocumentFormat.FromName(documentFormat));
 
-        await AssertDocument(document, DocumentFormat.From(documentFormat))
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .HasMessageId(SampleData.MessageId)
             .HasSenderId(SampleData.SenderId)
             .HasReceiverId(SampleData.ReceiverId)
@@ -94,9 +94,9 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
         _energyResultMessageTimeSeries
             .WithPoint(new EnergyResultMessagePoint(1, null, CalculatedQuantityQuality.Missing, "2022-12-12T23:00:00Z"));
 
-        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.From(documentFormat));
+        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.FromName(documentFormat));
 
-        AssertDocument(document, DocumentFormat.From(documentFormat))
+        AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .QuantityIsNotPresentForPosition(1);
     }
 
@@ -109,9 +109,9 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
         _energyResultMessageTimeSeries
             .WithPoint(new EnergyResultMessagePoint(1, 1, CalculatedQuantityQuality.Measured, "2022-12-12T23:00:00Z"));
 
-        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.From(documentFormat));
+        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.FromName(documentFormat));
 
-        AssertDocument(document, DocumentFormat.From(documentFormat))
+        AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .QualityIsNotPresentForPosition(1);
     }
 
@@ -129,11 +129,11 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
 
         points.ForEach(point => _energyResultMessageTimeSeries.WithPoint(point));
 
-        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.From(documentFormat));
+        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.FromName(documentFormat));
 
         // Assert
         points.Should().HaveCount(5);
-        AssertDocument(document, DocumentFormat.From(documentFormat))
+        AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .QualityIsPresentForPosition(1, CimCode.QuantityQualityCodeIncomplete)
             .QualityIsPresentForPosition(2, CimCode.QuantityQualityCodeIncomplete)
             .QualityIsPresentForPosition(3, CimCode.QuantityQualityCodeEstimated)
@@ -152,10 +152,10 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
         _energyResultMessageTimeSeries
             .WithPoint(new EnergyResultMessagePoint(2, 1, CalculatedQuantityQuality.NotAvailable, "2022-12-12T23:01:00Z"));
 
-        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.From(documentFormat));
+        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.FromName(documentFormat));
 
         // Assert
-        AssertDocument(document, DocumentFormat.From(documentFormat))
+        AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .QualityIsNotPresentForPosition(1)
             .QualityIsNotPresentForPosition(2);
     }
@@ -174,11 +174,11 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
 
         points.ForEach(point => _energyResultMessageTimeSeries.WithPoint(point));
 
-        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.From(documentFormat));
+        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.FromName(documentFormat));
 
         // Assert
         points.Should().HaveCount(4);
-        AssertDocument(document, DocumentFormat.From(documentFormat))
+        AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .QualityIsPresentForPosition(1, EbixCode.QuantityQualityCodeEstimated)
             .QualityIsPresentForPosition(2, EbixCode.QuantityQualityCodeEstimated)
             .QualityIsPresentForPosition(3, EbixCode.QuantityQualityCodeMeasured)
@@ -195,9 +195,9 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
             .WithMeteringPointType(MeteringPointType.Production)
             .WithSettlementMethod(null);
 
-        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.From(documentFormat));
+        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.FromName(documentFormat));
 
-        AssertDocument(document, DocumentFormat.From(documentFormat))
+        AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .SettlementMethodIsNotPresent();
     }
 
@@ -210,9 +210,9 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
         _energyResultMessageTimeSeries
             .WithEnergySupplierNumber(null);
 
-        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.From(documentFormat));
+        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.FromName(documentFormat));
 
-        AssertDocument(document, DocumentFormat.From(documentFormat))
+        AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .EnergySupplierNumberIsNotPresent();
     }
 
@@ -225,9 +225,9 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
         _energyResultMessageTimeSeries
             .WithBalanceResponsibleNumber(null);
 
-        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.From(documentFormat));
+        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.FromName(documentFormat));
 
-        AssertDocument(document, DocumentFormat.From(documentFormat))
+        AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .BalanceResponsibleNumberIsNotPresent();
     }
 
@@ -242,9 +242,9 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     {
         _energyResultMessageTimeSeries.WithBusinessReason(BusinessReason.FromName(processType));
 
-        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.From(documentFormat));
+        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.FromName(documentFormat));
 
-        AssertDocument(document, DocumentFormat.From(documentFormat))
+        AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .HasBusinessReason(BusinessReason.FromName(processType))
             .SettlementVersionIsNotPresent();
     }
@@ -263,9 +263,9 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
             .WithPoint(new EnergyResultMessagePoint(1, 1m, CalculatedQuantityQuality.Calculated, "2022-12-12T23:00:00Z"));
 
-        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.From(documentFormat));
+        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.FromName(documentFormat));
 
-        await AssertDocument(document, DocumentFormat.From(documentFormat))
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .HasBusinessReason(BusinessReason.FromName(processType))
             .HasSettlementVersion(SettlementVersion.FromName(settlementVersion))
             .DocumentIsValidAsync();
