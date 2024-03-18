@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,6 +22,7 @@ using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -32,6 +32,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAc
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using NodaTime;
 using Xunit;
@@ -190,7 +191,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     public async Task Outgoing_message_record_is_added_to_file_storage_with_correct_content()
     {
         // Arrange
-        var serializer = new BuildingBlocks.Infrastructure.Serialization.Serializer();
+        var serializer = new Serializer();
         var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
             .Build();
@@ -202,9 +203,11 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var createdId = await EnqueueAndCommitAsync(message);
 
         // Assert
+        using var assertionScope = new AssertionScope();
         var fileStorageReference = await GetOutgoingMessageFileStorageReferenceFromDatabase(createdId);
+        fileStorageReference.Should().NotBeNull();
 
-        var fileContent = await GetFileContentFromFileStorageAsync("outgoing", fileStorageReference);
+        var fileContent = await GetFileContentFromFileStorageAsync("outgoing", fileStorageReference!);
         fileContent.Should().Be(outgoingMessage.GetSerializedContent());
     }
 

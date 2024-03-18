@@ -22,7 +22,6 @@ using Azure.Storage.Blobs;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.FeatureFlag;
 using Dapper;
-using Energinet.DataHub.EDI.Api.Authentication;
 using Energinet.DataHub.EDI.Api.DataRetention;
 using Energinet.DataHub.EDI.Api.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
@@ -102,7 +101,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             GC.SuppressFinalize(this);
         }
 
-        protected static async Task<string> GetFileContentFromFileStorageAsync(string container, string? fileStorageReference)
+        protected static async Task<string> GetFileContentFromFileStorageAsync(
+            string container,
+            string fileStorageReference)
         {
             var azuriteBlobConnectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING");
             var blobServiceClient = new BlobServiceClient(azuriteBlobConnectionString); // Uses new client to avoid some form of caching or similar
