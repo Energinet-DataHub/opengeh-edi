@@ -114,7 +114,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
           null,
           null);
 
-        process.WasSentToWholesale();
+        process.SendToWholesale();
         _processContext.AggregatedMeasureDataProcesses.Add(process);
         _processContext.SaveChanges();
         return process;

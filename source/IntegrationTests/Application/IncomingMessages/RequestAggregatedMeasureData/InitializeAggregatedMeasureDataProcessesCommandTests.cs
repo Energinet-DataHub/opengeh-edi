@@ -16,8 +16,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
+using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -44,15 +47,11 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
     private readonly ProcessContext _processContext;
     private readonly ServiceBusSenderSpy _senderSpy;
     private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
-    private readonly InternalCommandMapper _mapper;
-    private readonly ISerializer _serializer;
 
     public InitializeAggregatedMeasureDataProcessesCommandTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
     {
         _processContext = GetService<ProcessContext>();
-        _mapper = GetService<InternalCommandMapper>();
-        _serializer = GetService<ISerializer>();
         _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IServiceBusSenderFactory>();
         _senderSpy = new ServiceBusSenderSpy("Fake");
         _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
@@ -90,14 +89,13 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                 SetEnergySupplierId(null).
                 SetBalanceResponsibleId(null).
                 Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
-        var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
-        var exceptedServiceBusMessageSubject = nameof(AggregatedTimeSeriesRequest);
 
         // Act
-        await InvokeCommandAsync(command);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
+        await ProcessInternalCommandsAsync();
 
         // Assert
+        var exceptedServiceBusMessageSubject = nameof(AggregatedTimeSeriesRequest);
         var message = _senderSpy.Message;
         var process = GetProcess(marketMessage.SenderNumber);
         Assert.NotNull(message);
@@ -116,11 +114,10 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
             MessageBuilder().
                 SetMarketEvaluationSettlementMethod(null).
                 Build();
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
-        var command = LoadCommand(nameof(SendAggregatedMeasureRequestToWholesale));
 
         // Act
-        await InvokeCommandAsync(command);
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
+        await ProcessInternalCommandsAsync();
 
         // Assert
         var message = _senderSpy.Message;
@@ -146,18 +143,10 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         Assert.Equal(state, processState);
     }
 
-    private InternalCommand LoadCommand(string internalCommandType)
-    {
-        var queuedInternalCommand = _processContext.QueuedInternalCommands
-            .ToList()
-            .First(x => x.Type == internalCommandType);
-
-        var commandMetaData = _mapper.GetByName(queuedInternalCommand.Type);
-        return (InternalCommand)_serializer.Deserialize(queuedInternalCommand.Data, commandMetaData.CommandType);
-    }
-
     private AggregatedMeasureDataProcess? GetProcess(string senderNumber)
     {
+        ClearDbContextCaches();
+
         return _processContext.AggregatedMeasureDataProcesses
             .ToList()
             .FirstOrDefault(x => x.RequestedByActorId.Value == senderNumber);
