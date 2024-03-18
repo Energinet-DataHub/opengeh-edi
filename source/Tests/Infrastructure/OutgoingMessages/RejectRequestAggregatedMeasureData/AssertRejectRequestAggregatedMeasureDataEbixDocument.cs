@@ -45,7 +45,7 @@ public class AssertRejectRequestAggregatedMeasureDataEbixDocument : IAssertRejec
 
     public IAssertRejectRequestAggregatedMeasureDataDocument HasReasonCode(string reasonCode)
     {
-        _documentAsserter.HasValue("PayloadResponseEvent[1]/StatusType", EbixCode.Of(ReasonCode.From(reasonCode)));
+        _documentAsserter.HasValue("PayloadResponseEvent[1]/StatusType", EbixCode.Of(ReasonCode.FromCode(reasonCode)));
         return this;
     }
 

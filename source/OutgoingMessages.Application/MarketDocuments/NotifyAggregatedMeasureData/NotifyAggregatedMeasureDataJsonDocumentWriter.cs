@@ -101,9 +101,7 @@ public class NotifyAggregatedMeasureDataJsonDocumentWriter : IDocumentWriter
 
             if (series.SettlementType is not null)
             {
-                writer.WriteObject(
-                    "marketEvaluationPoint.settlementMethod",
-                    new KeyValuePair<string, string>("value", SettlementType.From(series.SettlementType).Code));
+                writer.WriteObject("marketEvaluationPoint.settlementMethod", new KeyValuePair<string, string>("value", SettlementType.FromName(series.SettlementType).Code));
             }
 
             if (series.OriginalTransactionIdReference is not null)
@@ -113,11 +111,11 @@ public class NotifyAggregatedMeasureDataJsonDocumentWriter : IDocumentWriter
 
             writer.WriteObject(
                 "marketEvaluationPoint.type",
-                new KeyValuePair<string, string>("value", MeteringPointType.From(series.MeteringPointType).Code));
+                new KeyValuePair<string, string>("value", MeteringPointType.FromName(series.MeteringPointType).Code));
             writer.WriteProperty("product", ProductType.EnergyActive.Code);
             writer.WriteObject(
                 "quantity_Measure_Unit.name",
-                new KeyValuePair<string, string>("value", MeasurementUnit.From(series.MeasureUnitType).Code));
+                new KeyValuePair<string, string>("value", MeasurementUnit.FromName(series.MeasureUnitType).Code));
 
             if (series.SettlementVersion is not null)
             {
@@ -131,7 +129,7 @@ public class NotifyAggregatedMeasureDataJsonDocumentWriter : IDocumentWriter
             writer.WritePropertyName("Period");
             writer.WriteStartObject();
             {
-                writer.WriteProperty("resolution", Resolution.From(series.Resolution).Code);
+                writer.WriteProperty("resolution", Resolution.FromName(series.Resolution).Code);
 
                 writer.WritePropertyName("timeInterval");
                 writer.WriteStartObject();

@@ -45,19 +45,15 @@ public class SettlementVersion : EnumerationType
 
     public static SettlementVersion FromName(string name)
     {
-        var settlementVersion = GetAll<SettlementVersion>()
-            .FirstOrDefault(type => type.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-            ?? throw new InvalidCastException($"Could not parse name {name} to settlement version");
-
-        return settlementVersion;
+        return GetAll<SettlementVersion>().FirstOrDefault(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException(
+                   $"{name} is not a valid {typeof(SettlementVersion)} {nameof(name)}");
     }
 
     public static SettlementVersion FromCode(string code)
     {
-        var settlementVersion = GetAll<SettlementVersion>()
-            .FirstOrDefault(type => type.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
-            ?? throw new InvalidCastException($"Could not parse code {code} to settlement version");
-
-        return settlementVersion;
+        return GetAll<SettlementVersion>().FirstOrDefault(t => t.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException(
+                   $"{code} is not a valid {typeof(SettlementVersion)} {nameof(code)}");
     }
 }
