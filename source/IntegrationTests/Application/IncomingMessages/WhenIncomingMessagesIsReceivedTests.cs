@@ -286,9 +286,15 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             CancellationToken.None);
 
         // Assert
+        using var assertionScope = new AssertionScope();
         var incomingMessageContent = await GetStreamContentAsStringAsync(messageStream.Stream);
         var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageIdFromFile);
-        var archivedMessageFileContent = await GetFileContentFromFileStorageAsync("archived", archivedMessageFileStorageReference);
+        archivedMessageFileStorageReference.Should().NotBeNull();
+
+        var archivedMessageFileContent = await GetFileContentFromFileStorageAsync(
+            "archived",
+            archivedMessageFileStorageReference!);
+
         archivedMessageFileContent.Should().Be(incomingMessageContent);
     }
 
