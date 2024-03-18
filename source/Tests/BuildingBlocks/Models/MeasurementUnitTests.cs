@@ -47,6 +47,6 @@ public class MeasurementUnitTests
             MeasurementUnit.FromCode(test.Code).Should().Be(test.ExpectedValue);
         }
 
-        measurementUnits.Should().HaveCount(GetAllMeasurementUnit().Count());
+        measurementUnits.Select(c => c.ExpectedValue).Should().BeEquivalentTo(GetAllMeasurementUnit());
     }
 }

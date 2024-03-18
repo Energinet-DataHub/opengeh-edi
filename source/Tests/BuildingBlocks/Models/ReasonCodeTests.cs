@@ -48,6 +48,6 @@ public class ReasonCodeTests
             ReasonCode.FromCode(test.Code).Should().Be(test.ExpectedValue);
         }
 
-        reasonCode.Should().HaveCount(GetAllReasonCodes().Count());
+        reasonCode.Select(c => c.ExpectedValue).Should().BeEquivalentTo(GetAllReasonCodes());
     }
 }

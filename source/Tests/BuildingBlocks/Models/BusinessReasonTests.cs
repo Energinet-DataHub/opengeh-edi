@@ -58,6 +58,6 @@ public class BusinessReasonTests
             BusinessReason.FromCode(test.Code).Should().Be(test.ExpectedValue);
         }
 
-        businessReasons.Should().HaveCount(GetAllBusinessReasons().Count());
+        businessReasons.Select(c => c.ExpectedValue).Should().BeEquivalentTo(GetAllBusinessReasons());
     }
 }

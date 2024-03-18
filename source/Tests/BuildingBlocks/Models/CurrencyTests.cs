@@ -47,6 +47,6 @@ public class CurrencyTests
             Currency.FromCode(test.Code).Should().Be(test.ExpectedValue);
         }
 
-        currencies.Should().HaveCount(GetAllCurrencies().Count());
+        currencies.Select(c => c.ExpectedValue).Should().BeEquivalentTo(GetAllCurrencies());
     }
 }

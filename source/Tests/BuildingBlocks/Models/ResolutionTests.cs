@@ -50,6 +50,6 @@ public class ResolutionTests
             Resolution.FromCode(test.Code).Should().Be(test.ExpectedValue);
         }
 
-        resolutions.Should().HaveCount(GetAllResolutions().Count());
+        resolutions.Select(c => c.ExpectedValue).Should().BeEquivalentTo(GetAllResolutions());
     }
 }

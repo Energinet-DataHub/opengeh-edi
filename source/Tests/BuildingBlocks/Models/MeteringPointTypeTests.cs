@@ -49,6 +49,6 @@ public class MeteringPointTypeTests
             MeteringPointType.FromCode(test.Code).Should().Be(test.ExpectedValue);
         }
 
-        meteringPointTypes.Should().HaveCount(GetAllMeteringPointTypes().Count());
+        meteringPointTypes.Select(c => c.ExpectedValue).Should().BeEquivalentTo(GetAllMeteringPointTypes());
     }
 }

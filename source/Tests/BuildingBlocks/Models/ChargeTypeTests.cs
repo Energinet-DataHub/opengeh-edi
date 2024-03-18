@@ -49,6 +49,6 @@ public class ChargeTypeTests
             ChargeType.FromCode(test.Code).Should().Be(test.ExpectedValue);
         }
 
-        chargeTypes.Should().HaveCount(GetAllChargeTypes().Count());
+        chargeTypes.Select(c => c.ExpectedValue).Should().BeEquivalentTo(GetAllChargeTypes());
     }
 }

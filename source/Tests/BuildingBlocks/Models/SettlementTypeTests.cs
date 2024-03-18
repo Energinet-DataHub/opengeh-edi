@@ -47,6 +47,6 @@ public class SettlementTypeTests
             SettlementType.FromCode(test.Code).Should().Be(test.ExpectedValue);
         }
 
-        settlementTypes.Should().HaveCount(GetAllSettlementTypes().Count());
+        settlementTypes.Select(c => c.ExpectedValue).Should().BeEquivalentTo(GetAllSettlementTypes());
     }
 }

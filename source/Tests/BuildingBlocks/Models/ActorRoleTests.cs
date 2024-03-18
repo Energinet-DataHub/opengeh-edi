@@ -56,6 +56,6 @@ public class ActorRoleTests
             ActorRole.FromCode(test.Code).Should().Be(test.ExpectedValue);
         }
 
-        actorRole.Should().HaveCount(GetAllActorRoles().Count());
+        actorRole.Select(c => c.ExpectedValue).Should().BeEquivalentTo(GetAllActorRoles());
     }
 }

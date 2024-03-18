@@ -47,6 +47,6 @@ public class ProductTypeTests
             ProductType.FromName(test.Name).Should().Be(test.ExpectedValue);
         }
 
-        productTypes.Should().HaveCount(GetAllProductType().Count());
+        productTypes.Select(c => c.ExpectedValue).Should().BeEquivalentTo(GetAllProductType());
     }
 }

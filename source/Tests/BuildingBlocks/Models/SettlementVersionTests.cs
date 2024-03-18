@@ -56,6 +56,6 @@ public class SettlementVersionTests
             SettlementVersion.FromCode(test.Code).Should().Be(test.ExpectedValue);
         }
 
-        settlementVersions.Should().HaveCount(GetAllSettlementVersions().Count());
+        settlementVersions.Select(c => c.ExpectedValue).Should().BeEquivalentTo(GetAllSettlementVersions());
     }
 }
