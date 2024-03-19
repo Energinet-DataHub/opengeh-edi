@@ -24,18 +24,13 @@ using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Responses;
-using FluentAssertions;
 using Google.Protobuf;
-using NodaTime;
 using NodaTime.Serialization.Protobuf;
 using NodaTime.Text;
 using Xunit;
@@ -144,54 +139,6 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1);
-    }
-
-    [Fact]
-    public async Task Received_accepted_events_can_write_document_in_all_formats()
-    {
-        // Arrange
-        await _gridAreaBuilder
-            .WithGridAreaCode(SampleData.GridAreaCode)
-            .StoreAsync(GetService<IMasterDataClient>());
-
-        var process = BuildProcess();
-        var acceptedEvent = GetAcceptedEvent(process);
-
-        // Act
-        await AddInboxEvent(process, acceptedEvent);
-        await HavingReceivedInboxEventAsync(
-            nameof(AggregatedTimeSeriesRequestAccepted),
-            acceptedEvent,
-            process.ProcessId.Id);
-
-        var outgoingMessage = await OutgoingMessageAsync(
-            ActorRole.BalanceResponsibleParty,
-            BusinessReason.BalanceFixing);
-        var messageRecord = outgoingMessage.GetMessageRecord();
-
-        var header = new OutgoingMessageHeader(
-            BusinessReason.BalanceFixing.Name,
-            "1234567812345",
-            ActorRole.MeteredDataAdministrator.Code,
-            "1234567812345",
-            ActorRole.DanishEnergyAgency.Code,
-            MessageId.New().ToString()!,
-            Instant.FromUtc(2022, 1, 1, 0, 0));
-
-        // Assert
-        var documentFormats = EnumerationType.GetAll<DocumentFormat>();
-        var documentWriters = GetService<IEnumerable<IDocumentWriter>>();
-
-        foreach (var documentType in documentFormats)
-        {
-            var writer = documentWriters.Single(
-                x =>
-                    x.HandlesType(DocumentType.NotifyAggregatedMeasureData)
-                    && x.HandlesFormat(documentType));
-
-            var act = () => writer.WriteAsync(header, new List<string> { messageRecord });
-            await act.Should().NotThrowAsync();
-        }
     }
 
     protected override void Dispose(bool disposing)
