@@ -148,12 +148,9 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
     }
 
     [Fact]
-    public async Task Received_accepted_wholesale_services_event_can_write_document_in_json()
+    public async Task Received_accepted_wholesale_services_event_can_write_document_in_all_formats()
     {
         // Arrange
-        var messageParser = GetService<IMessageRecordParser>();
-        var jsonParser = new NotifyWholesaleServicesJsonDocumentWriter(messageParser);
-
         var process = WholesaleServicesProcessBuilder()
             .SetState(WholesaleServicesProcess.State.Sent)
             .Build();
@@ -180,9 +177,19 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             Instant.FromUtc(2022, 1, 1, 0, 0));
 
         // Assert
-        // Asserting one document type is enough, since the document writers as compared in another test
-        var act = () => jsonParser.WriteAsync(header, new List<string> { messageRecord });
-        await act.Should().NotThrowAsync();
+        var documentFormats = EnumerationType.GetAll<DocumentFormat>();
+        var documentWriters = GetService<IEnumerable<IDocumentWriter>>();
+
+        foreach (var documentType in documentFormats)
+        {
+            var writer = documentWriters.Single(
+                x =>
+                    x.HandlesType(DocumentType.NotifyWholesaleServices)
+                    && x.HandlesFormat(documentType));
+
+            var act = () => writer.WriteAsync(header, new List<string> { messageRecord });
+            await act.Should().NotThrowAsync();
+        }
     }
 
     protected override void Dispose(bool disposing)

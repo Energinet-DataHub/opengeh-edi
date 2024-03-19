@@ -147,7 +147,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     }
 
     [Fact]
-    public async Task Received_accepted_events_can_write_document_in_json()
+    public async Task Received_accepted_events_can_write_document_in_all_formats()
     {
         // Arrange
         await _gridAreaBuilder
@@ -156,9 +156,6 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
         var process = BuildProcess();
         var acceptedEvent = GetAcceptedEvent(process);
-
-        var messageParser = GetService<IMessageRecordParser>();
-        var jsonParser = new NotifyAggregatedMeasureDataJsonDocumentWriter(messageParser);
 
         // Act
         await AddInboxEvent(process, acceptedEvent);
@@ -182,9 +179,19 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             Instant.FromUtc(2022, 1, 1, 0, 0));
 
         // Assert
-        // Asserting one document type is enough, since the document writers as compared in another test
-        var act = () => jsonParser.WriteAsync(header, new List<string> { messageRecord });
-        await act.Should().NotThrowAsync();
+        var documentFormats = EnumerationType.GetAll<DocumentFormat>();
+        var documentWriters = GetService<IEnumerable<IDocumentWriter>>();
+
+        foreach (var documentType in documentFormats)
+        {
+            var writer = documentWriters.Single(
+                x =>
+                    x.HandlesType(DocumentType.NotifyAggregatedMeasureData)
+                    && x.HandlesFormat(documentType));
+
+            var act = () => writer.WriteAsync(header, new List<string> { messageRecord });
+            await act.Should().NotThrowAsync();
+        }
     }
 
     protected override void Dispose(bool disposing)
