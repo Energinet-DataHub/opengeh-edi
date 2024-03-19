@@ -271,7 +271,7 @@ internal sealed class EdiDriver : IDisposable
             return jsonContent;
         }
 
-        var xmlContent = File.ReadAllText("Messages/xml/RequestWholesaleSettlement.xml");
+        var xmlContent = File.ReadAllText("Messages/xml/RequestWholesaleSettlementWithBadPeriod.xml");
 
         xmlContent = xmlContent.Replace("{MessageId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
         xmlContent = xmlContent.Replace("{TransactionId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
