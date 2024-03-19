@@ -85,8 +85,10 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
             TimeSeriesType.NetExchangePerGa => MeteringPointType.Exchange,
             TimeSeriesType.NetExchangePerNeighboringGa => MeteringPointType.Exchange,
             TimeSeriesType.TotalConsumption => MeteringPointType.Consumption,
-            TimeSeriesType.Unspecified => throw new InvalidOperationException("Unknown metering point type"),
-            _ => throw new InvalidOperationException("Could not determine metering point type"),
+            TimeSeriesType.Unspecified => throw new InvalidOperationException(
+                $"Unknown {typeof(TimeSeriesType)}. Value: {timeSeriesType}'"),
+            _ => throw new InvalidOperationException(
+                $"Could not determine {typeof(MeteringPointType)} from 'timeSeriesType: {timeSeriesType}' of type: {typeof(TimeSeriesType)}"),
         };
     }
 
@@ -100,8 +102,10 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
             TimeSeriesType.NetExchangePerGa => null,
             TimeSeriesType.NetExchangePerNeighboringGa => null,
             TimeSeriesType.TotalConsumption => null,
-            TimeSeriesType.Unspecified => throw new InvalidOperationException("Unknown metering point type"),
-            _ => throw new InvalidOperationException("Could not determine metering point type"),
+            TimeSeriesType.Unspecified => throw new InvalidOperationException(
+                $"Unknown {typeof(TimeSeriesType)}. Value: {timeSeriesType}'"),
+            _ => throw new InvalidOperationException(
+                $"Could not determine {typeof(SettlementType)} from 'timeSeriesType: {timeSeriesType}' of type: {typeof(TimeSeriesType)}"),
         };
     }
 
