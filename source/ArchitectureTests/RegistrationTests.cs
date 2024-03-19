@@ -57,7 +57,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
         {
             var constructorDependencies = ReflectionHelper.FindAllConstructorDependenciesForType();
             return typeof(NotifyAggregatedMeasureDataXmlDocumentWriter).Assembly.GetTypes()
-                .Where(t => t.IsSubclassOf(typeof(IDocumentWriter)))
+                .Where(t => t.GetInterfaces().Contains(typeof(IDocumentWriter)) && !t.IsAbstract)
                 .Select(t => new object[] { new Requirement(t.Name, constructorDependencies(t), t) });
         }
 
