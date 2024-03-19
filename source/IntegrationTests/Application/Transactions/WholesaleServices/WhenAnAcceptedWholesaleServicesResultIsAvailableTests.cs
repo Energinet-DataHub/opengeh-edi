@@ -148,7 +148,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
     }
 
     [Fact]
-    public async Task Received_same_accepted_wholesale_services_event_can_write_document_in_json()
+    public async Task Received_accepted_wholesale_services_event_can_write_document_in_json()
     {
         // Arrange
         var messageParser = GetService<IMessageRecordParser>();
