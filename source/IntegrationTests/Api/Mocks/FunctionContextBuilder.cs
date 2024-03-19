@@ -30,6 +30,7 @@ internal sealed class FunctionContextBuilder
     private string? _bearerToken;
     private X509Certificate2? _certificate;
     private string? _functionName;
+    private string? _bodyHack;
 
     public FunctionContextBuilder(IServiceProvider serviceProvider)
     {
@@ -72,6 +73,13 @@ internal sealed class FunctionContextBuilder
         return this;
     }
 
+    public FunctionContextBuilder WithBodyHack(string body)
+    {
+        _bodyHack = body;
+
+        return this;
+    }
+
     internal FunctionContextMock Build()
     {
         return new FunctionContextMock(
@@ -80,6 +88,7 @@ internal sealed class FunctionContextBuilder
             _functionName,
             _contentType,
             _bearerToken,
-            _certificate?.GetRawCertDataString());
+            _certificate?.GetRawCertDataString(),
+            _bodyHack);
     }
 }
