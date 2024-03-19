@@ -66,7 +66,65 @@ public sealed class MwoScienceTests : TestBase
 
         var functionContext = new FunctionContextBuilder(ServiceProvider)
             .WithBodyHack(
-                "{\n\t\"RequestAggregatedMeasureData_MarketDocument\": {\n\t\t\"mRID\": \"123564789123564789123564789123564789\",\n\t\t\"businessSector.type\": {\n\t\t\t\"value\": \"23\"\n\t\t},\n\t\t\"createdDateTime\": \"2022-12-17T09:30:47Z\",\n\t\t\"process.processType\": {\n\t\t\t\"value\": \"D05\"\n\t\t},\n\t\t\"receiver_MarketParticipant.mRID\": {\n\t\t\t\"codingScheme\": \"A10\",\n\t\t\t\"value\": \"5790001330552\"\n\t\t},\n\t\t\"receiver_MarketParticipant.marketRole.type\": {\n\t\t\t\"value\": \"DGL\"\n\t\t},\n\t\t\"sender_MarketParticipant.mRID\": {\n\t\t\t\"codingScheme\": \"A10\",\n\t\t\t\"value\": \"5799999933318\"\n\t\t},\n\t\t\"sender_MarketParticipant.marketRole.type\": {\n\t\t\t\"value\": \"DDK\"\n\t\t},\n\t\t\"type\": {\n\t\t\t\"value\": \"E74\"\n\t\t},\n\t\t\"Series\": [\n\t\t\t{\n\t\t\t\t\"mRID\": \"123564789123564789123564789123564787\",\n\t\t\t\t\"balanceResponsibleParty_MarketParticipant.mRID\": {\n\t\t\t\t\t\"codingScheme\": \"A10\",\n\t\t\t\t\t\"value\": \"5799999933318\"\n\t\t\t\t},\n\t\t\t\t\"end_DateAndOrTime.dateTime\": \"2022-07-22T22:00:00Z\",\n\t\t\t\t\"energySupplier_MarketParticipant.mRID\": {\n\t\t\t\t\t\"codingScheme\": \"A10\",\n\t\t\t\t\t\"value\": \"5799999933318\"\n\t\t\t\t},\n\t\t\t\t\"marketEvaluationPoint.settlementMethod\": {\n\t\t\t\t\t\"value\": \"D01\"\n\t\t\t\t},\n\t\t\t\t\"marketEvaluationPoint.type\": {\n\t\t\t\t\t\"value\": \"E17\"\n\t\t\t\t},\n\t\t\t\t\"meteringGridArea_Domain.mRID\": {\n\t\t\t\t\t\"codingScheme\": \"NDK\",\n\t\t\t\t\t\"value\": \"244\"\n\t\t\t\t},\n\t\t\t\t\"start_DateAndOrTime.dateTime\": \"2022-06-17T22:00:00Z\",\n        \"settlement_Series.version\": {\n          \"value\": \"D01\"\n        }\n      }\n\t\t]\n\t}\n}")
+                """
+                {
+                    "RequestAggregatedMeasureData_MarketDocument": {
+                        "mRID": "123564789123564789123564789123564789",
+                        "businessSector.type": {
+                            "value": "23"
+                        },
+                        "createdDateTime": "2022-12-17T09:30:47Z",
+                        "process.processType": {
+                            "value": "D05"
+                        },
+                        "receiver_MarketParticipant.mRID": {
+                            "codingScheme": "A10",
+                            "value": "5790001330552"
+                        },
+                        "receiver_MarketParticipant.marketRole.type": {
+                            "value": "DGL"
+                        },
+                        "sender_MarketParticipant.mRID": {
+                            "codingScheme": "A10",
+                            "value": "5799999933318"
+                        },
+                        "sender_MarketParticipant.marketRole.type": {
+                            "value": "DDK"
+                        },
+                        "type": {
+                            "value": "E74"
+                        },
+                        "Series": [
+                            {
+                                "mRID": "123564789123564789123564789123564787",
+                                "balanceResponsibleParty_MarketParticipant.mRID": {
+                                    "codingScheme": "A10",
+                                    "value": "5799999933318"
+                                },
+                                "end_DateAndOrTime.dateTime": "2022-07-22T22:00:00Z",
+                                "energySupplier_MarketParticipant.mRID": {
+                                    "codingScheme": "A10",
+                                    "value": "5799999933318"
+                                },
+                                "marketEvaluationPoint.settlementMethod": {
+                                    "value": "D01"
+                                },
+                                "marketEvaluationPoint.type": {
+                                    "value": "E17"
+                                },
+                                "meteringGridArea_Domain.mRID": {
+                                    "codingScheme": "NDK",
+                                    "value": "244"
+                                },
+                                "start_DateAndOrTime.dateTime": "2022-06-17T22:00:00Z",
+                                "settlement_Series.version": {
+                                    "value": "D01"
+                                }
+                            }
+                        ]
+                    }
+                }
+                """)
             .Build();
 
         var httpRequestData =
