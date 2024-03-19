@@ -27,10 +27,10 @@ public class EnergyResultMessageDtoBuilder
     private const string GridAreaCode = "804";
     private static readonly ActorNumber _receiverNumber = ActorNumber.Create("1234567890123");
     private static readonly Guid _processId = Guid.NewGuid();
-    private static readonly string _meteringPointType = MeteringPointType.Consumption.Code;
-    private static readonly string? _settlementType = SettlementType.Flex.Code;
+    private static readonly string _meteringPointType = MeteringPointType.Consumption.Name;
+    private static readonly string? _settlementType = SettlementType.Flex.Name;
     private static readonly string _measureUnitType = MeasurementUnit.Kwh.Code;
-    private static readonly string _resolution = Resolution.QuarterHourly.Code;
+    private static readonly string _resolution = Resolution.QuarterHourly.Name;
     private static readonly ActorNumber? _energySupplierNumber = ActorNumber.Create("1234567890123");
     private static readonly ActorNumber? _balanceResponsibleNumber = ActorNumber.Create("1234567890124");
     private static readonly Period _period = new(
@@ -48,7 +48,7 @@ public class EnergyResultMessageDtoBuilder
         };
 
     private static readonly string _businessReasonName = BusinessReason.BalanceFixing.Code;
-    private static readonly string? _settlementVersion = SettlementVersion.FirstCorrection.Code;
+    private static readonly string? _settlementVersion = SettlementVersion.FirstCorrection.Name;
 
     private ActorRole _receiverRole = ActorRole.MeteredDataResponsible;
 
