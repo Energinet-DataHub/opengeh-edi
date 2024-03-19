@@ -19,10 +19,10 @@ using Energinet.DataHub.EDI.Process.Domain.Commands;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Commands;
 
-public class AcceptedWholesaleServicesSerieCommand : InternalCommand
+public class AcceptedWholesaleServices : InternalCommand
 {
     [JsonConstructor]
-    public AcceptedWholesaleServicesSerieCommand(Guid processId, IReadOnlyCollection<AcceptedWholesaleServicesSerieDto> acceptedWholesaleServicesSerie)
+    public AcceptedWholesaleServices(Guid processId, IReadOnlyCollection<AcceptedWholesaleServicesSerieDto> acceptedWholesaleServicesSerie)
     {
         ProcessId = processId;
         AcceptedWholesaleServicesSerie = acceptedWholesaleServicesSerie;

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
@@ -28,6 +30,37 @@ namespace Energinet.DataHub.EDI.Tests.Domain.OutgoingMessages.Queueing;
 
 public class OutgoingMessageTests
 {
+    /// <summary>
+    /// This contains the serialized content for the different messages that we should be able to deserialize in order to write message from actor queues
+    /// </summary>
+    /// <remarks>NEVER REMOVE FROM THE LIST ONLY EXTEND IT, to ensure backwards compatibility</remarks>
+    public static IEnumerable<object?[]> EnqueuedQueuedSerializedContents()
+    {
+        return new[]
+        {
+            new object?[] { typeof(RejectedTimeSerieMarketActivityRecord), "{\"TransactionId\":\"4e85a732-85fd-4d92-8ff3-72c052802716\",\"RejectReasons\":[{\"ErrorCode\":\"E18\",\"ErrorMessage\":\"Det virker ikke!\"}],\"OriginalTransactionIdReference\":\"4E85A73285FD4D928FF372C052802717\"}" },
+            new object?[] { typeof(TimeSeriesMarketActivityRecord), "{\"TransactionId\":\"b114111b-ee09-4a0a-8399-ddca6a7edeca\",\"GridAreaCode\":\"804\",\"MeteringPointType\":\"E17\",\"SettlementType\":\"D01\",\"MeasureUnitType\":\"KWH\",\"Resolution\":\"PT15M\",\"EnergySupplierNumber\":\"1234567890123\",\"BalanceResponsibleNumber\":\"1234567890124\",\"Period\":{\"Start\":\"2024-02-02T02:02:02Z\",\"End\":\"2024-02-02T02:02:02Z\"},\"Point\":[{\"Position\":1,\"Quantity\":2,\"QuantityQuality\":4,\"SampleTime\":\"2024-02-02T02:02:02Z\"}],\"CalculationResultVersion\":1,\"OriginalTransactionIdReference\":null,\"SettlementVersion\":\"D01\"}" },
+            new object?[] { typeof(WholesaleCalculationMarketActivityRecord), "{\"TransactionId\":\"39843d03-d5e3-4695-b3a4-2d05a93373dc\",\"CalculationVersion\":1,\"GridAreaCode\":\"870\",\"ChargeCode\":\"123\",\"IsTax\":false,\"Points\":[{\"Position\":1,\"Quantity\":100,\"Price\":100,\"Amount\":100,\"QuantityQuality\":null}],\"EnergySupplier\":{\"Value\":\"1234567894444\"},\"ChargeOwner\":{\"Value\":\"1234567897777\"},\"Period\":{\"Start\":\"2023-11-01T00:00:00Z\",\"End\":\"2023-12-01T00:00:00Z\"},\"SettlementVersion\":null,\"QuantityMeasureUnit\":{\"Code\":\"KWH\",\"Name\":\"Kwh\"},\"QuantityUnit\":null,\"PriceMeasureUnit\":{\"Code\":\"KWH\",\"Name\":\"Kwh\"},\"Currency\":{\"Code\":\"DKK\",\"Name\":\"DanishCrowns\"},\"ChargeType\":{\"Code\":\"D02\",\"Name\":\"Fee\"},\"Resolution\":{\"Code\":\"P1M\",\"Name\":\"Monthly\"},\"MeteringPointType\":{\"Code\":\"E17\",\"Name\":\"Consumption\"},\"SettlementType\":{\"Code\":\"E02\",\"Name\":\"NonProfiled\"}}" },
+            // Request Accepted
+            new object?[] { typeof(TimeSeriesMarketActivityRecord), "{\"TransactionId\":\"2c928b8b-b596-43da-9dcb-e8a36748f415\",\"GridAreaCode\":\"804\",\"MeteringPointType\":\"E17\",\"SettlementType\":\"D01\",\"MeasureUnitType\":\"KWH\",\"Resolution\":\"PT15M\",\"EnergySupplierNumber\":\"1234567890123\",\"BalanceResponsibleNumber\":\"1234567890124\",\"Period\":{\"Start\":\"2024-02-02T02:02:02Z\",\"End\":\"2024-02-02T02:02:02Z\"},\"Point\":[{\"Position\":1,\"Quantity\":2,\"QuantityQuality\":4,\"SampleTime\":\"2024-02-02T02:02:02Z\"}],\"CalculationResultVersion\":1,\"OriginalTransactionIdReference\":\"643e50ea-8811-4ee2-81a7-5dac21731f22\",\"SettlementVersion\":\"D01\"}" },
+            new object?[] { typeof(WholesaleCalculationMarketActivityRecord), "{\"OriginalTransactionIdReference\":\"941c025a-3c98-48e5-985d-d0c843c4dc49\",\"TransactionId\":\"050e2270-3702-4885-b021-15d22d3c0977\",\"CalculationVersion\":1,\"GridAreaCode\":\"870\",\"ChargeCode\":\"123\",\"IsTax\":false,\"Points\":[{\"Position\":1,\"Quantity\":100,\"Price\":100,\"Amount\":100,\"QuantityQuality\":null}],\"EnergySupplier\":{\"Value\":\"1234567894444\"},\"ChargeOwner\":{\"Value\":\"1234567897777\"},\"Period\":{\"Start\":\"2023-11-01T00:00:00Z\",\"End\":\"2023-12-01T00:00:00Z\"},\"SettlementVersion\":null,\"QuantityMeasureUnit\":{\"Code\":\"KWH\",\"Name\":\"Kwh\"},\"QuantityUnit\":null,\"PriceMeasureUnit\":{\"Code\":\"KWH\",\"Name\":\"Kwh\"},\"Currency\":{\"Code\":\"DKK\",\"Name\":\"DanishCrowns\"},\"ChargeType\":{\"Code\":\"D02\",\"Name\":\"Fee\"},\"Resolution\":{\"Code\":\"P1M\",\"Name\":\"Monthly\"},\"MeteringPointType\":{\"Code\":\"E17\",\"Name\":\"Consumption\"},\"SettlementType\":{\"Code\":\"E02\",\"Name\":\"NonProfiled\"}}" },
+        };
+    }
+
+    [Theory]
+    [MemberData(nameof(EnqueuedQueuedSerializedContents))]
+    public void Ensure_we_can_deserialize_all_enqueued_messages(Type typeToDeserializeTo, string serializedContent)
+    {
+        // Arrange
+        var serializer = new Serializer();
+
+        // Act
+        var deserializedContent = serializer.Deserialize(serializedContent, typeToDeserializeTo);
+
+        // Assert
+        deserializedContent.Should().NotBeNull();
+    }
+
     [Fact]
     public void Ensure_energy_result_can_be_deserialized_to_market_activity_record()
     {
@@ -44,8 +77,12 @@ public class OutgoingMessageTests
 
         // Assert
         var deserializedContent = serializer.Deserialize<TimeSeriesMarketActivityRecord>(outgoingMessage.GetSerializedContent());
-        energyResultMessageDto.Series.Should().BeEquivalentTo(deserializedContent);
-        energyResultMessageDto.Series.Point.Should().BeEquivalentTo(deserializedContent.Point);
+        energyResultMessageDto.Series.Should().BeEquivalentTo(
+            deserializedContent,
+            "because the point should be the same. If one is changed, the other should be changed as well. Remember to add the enqueuedQueuedSerializedContents with the new serialized content");
+        energyResultMessageDto.Series.Point.Should().BeEquivalentTo(
+            deserializedContent.Point,
+            "because the series point should be the same. If one is changed, the other should be changed as well. Remember to add the enqueuedQueuedSerializedContents with the new serialized content");
     }
 
     [Fact]
@@ -63,8 +100,12 @@ public class OutgoingMessageTests
 
         // Assert
         var deserializedContent = serializer.Deserialize<TimeSeriesMarketActivityRecord>(outgoingMessage.GetSerializedContent());
-        acceptedEnergyResultMessageDto.Series.Should().BeEquivalentTo(deserializedContent);
-        acceptedEnergyResultMessageDto.Series.Point.Should().BeEquivalentTo(deserializedContent.Point);
+        acceptedEnergyResultMessageDto.Series.Should().BeEquivalentTo(
+            deserializedContent,
+            "because the series should be the same. If one is changed, the other should be changed as well. Remember to add the enqueuedQueuedSerializedContents with the new serialized content");
+        acceptedEnergyResultMessageDto.Series.Point.Should().BeEquivalentTo(
+            deserializedContent.Point,
+            "because the series point should be the same. If one is changed, the other should be changed as well. Remember to add the enqueuedQueuedSerializedContents with the new serialized content");
     }
 
     [Fact]
@@ -82,8 +123,12 @@ public class OutgoingMessageTests
 
         // Assert
         var deserializedContent = serializer.Deserialize<RejectedTimeSerieMarketActivityRecord>(outgoingMessage.GetSerializedContent());
-        rejectedEnergyResultMessageDto.Series.Should().BeEquivalentTo(deserializedContent);
-        rejectedEnergyResultMessageDto.Series.RejectReasons.Should().BeEquivalentTo(deserializedContent.RejectReasons);
+        rejectedEnergyResultMessageDto.Series.Should().BeEquivalentTo(
+            deserializedContent,
+            "because the series should be the same. If one is changed, the other should be changed as well. Remember to add the enqueuedQueuedSerializedContents with the new serialized content");
+        rejectedEnergyResultMessageDto.Series.RejectReasons.Should().BeEquivalentTo(
+            deserializedContent.RejectReasons,
+            "because the reject reasons should be the same. If one is changed, the other should be changed as well. Remember to add the enqueuedQueuedSerializedContents with the new serialized content");
     }
 
     [Fact]
@@ -108,9 +153,36 @@ public class OutgoingMessageTests
                     var deserializedContent =
                         serializer.Deserialize<WholesaleCalculationMarketActivityRecord>(
                             outgoingMesssage.GetSerializedContent());
-                    wholesaleServicesMessageDto.Series.Should().BeEquivalentTo(deserializedContent);
-                    wholesaleServicesMessageDto.Series.Points.Should().BeEquivalentTo(deserializedContent.Points);
+                    wholesaleServicesMessageDto.Series.Should().BeEquivalentTo(
+                        deserializedContent,
+                        "because the series should be the same. If one is changed, the other should be changed as well. Remember to add the enqueuedQueuedSerializedContents with the new serialized content");
+                    wholesaleServicesMessageDto.Series.Points.Should().BeEquivalentTo(
+                        deserializedContent.Points,
+                        "because the series points should be the same. If one is changed, the other should be changed as well. Remember to add the enqueuedQueuedSerializedContents with the new serialized content");
                 });
+    }
+
+    [Fact]
+    public void Ensure_accepted_wholesale_services_result_can_be_deserialized_to_market_activity_record()
+    {
+        // Arrange
+        var serializer = new Serializer();
+        var acceptedWholesaleServicesMessageDto = AcceptedWholesaleServicesMessageDtoBuilder.Build();
+
+        // Act
+        var outgoingMessage = OutgoingMessage.CreateMessage(
+            acceptedWholesaleServicesMessageDto,
+            serializer,
+            SystemClock.Instance.GetCurrentInstant());
+
+        // Assert
+        var deserializedContent = serializer.Deserialize<WholesaleCalculationMarketActivityRecord>(outgoingMessage.GetSerializedContent());
+        acceptedWholesaleServicesMessageDto.Series.Should().BeEquivalentTo(
+            deserializedContent,
+            "because the series should be the same. If one is changed, the other should be changed as well. Remember to add the enqueuedQueuedSerializedContents with the new serialized content");
+        acceptedWholesaleServicesMessageDto.Series.Points.Should().BeEquivalentTo(
+            deserializedContent.Points,
+            "because the series points should be the same. If one is changed, the other should be changed as well. Remember to add the enqueuedQueuedSerializedContents with the new serialized content");
     }
 
     [Fact]

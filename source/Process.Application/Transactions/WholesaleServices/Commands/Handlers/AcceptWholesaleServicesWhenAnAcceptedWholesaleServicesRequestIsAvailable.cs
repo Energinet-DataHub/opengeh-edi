@@ -23,7 +23,7 @@ using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Commands.Handlers;
 
-public class AcceptWholesaleServicesWhenAnAcceptedWholesaleServicesRequestIsAvailable : IRequestHandler<AcceptedWholesaleServicesSerieCommand, Unit>
+public class AcceptWholesaleServicesWhenAnAcceptedWholesaleServicesRequestIsAvailable : IRequestHandler<AcceptedWholesaleServices, Unit>
 {
     private readonly IWholesaleServicesProcessRepository _wholesaleServicesProcessRepository;
 
@@ -32,7 +32,7 @@ public class AcceptWholesaleServicesWhenAnAcceptedWholesaleServicesRequestIsAvai
         _wholesaleServicesProcessRepository = wholesaleServicesProcessRepository;
     }
 
-    public async Task<Unit> Handle(AcceptedWholesaleServicesSerieCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(AcceptedWholesaleServices request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
