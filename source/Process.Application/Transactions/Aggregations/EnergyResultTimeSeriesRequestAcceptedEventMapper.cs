@@ -55,6 +55,7 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
             acceptedEnergyResultTimeSeries.Add(new AcceptedEnergyResultTimeSerie(
                 MapPoints(aggregation.TimeSeriesPoints),
                 MapMeteringPointType(aggregation.TimeSeriesType),
+                MapSettlementType(aggregation.TimeSeriesType),
                 MapUnitType(aggregation.QuantityUnit),
                 MapResolution(aggregation.Resolution),
                 await MapGridAreaDetailsAsync(aggregation.GridArea, cancellationToken).ConfigureAwait(false),
@@ -74,16 +75,31 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
         return eventType.Equals(nameof(AggregatedTimeSeriesRequestAccepted), StringComparison.OrdinalIgnoreCase);
     }
 
-    private static string MapMeteringPointType(TimeSeriesType timeSeriesType)
+    private static MeteringPointType MapMeteringPointType(TimeSeriesType timeSeriesType)
     {
         return timeSeriesType switch
         {
-            TimeSeriesType.Production => MeteringPointType.Production.Name,
-            TimeSeriesType.FlexConsumption => MeteringPointType.Consumption.Name,
-            TimeSeriesType.NonProfiledConsumption => MeteringPointType.Consumption.Name,
-            TimeSeriesType.NetExchangePerGa => MeteringPointType.Exchange.Name,
-            TimeSeriesType.NetExchangePerNeighboringGa => MeteringPointType.Exchange.Name,
-            TimeSeriesType.TotalConsumption => MeteringPointType.Consumption.Name,
+            TimeSeriesType.Production => MeteringPointType.Production,
+            TimeSeriesType.FlexConsumption => MeteringPointType.Consumption,
+            TimeSeriesType.NonProfiledConsumption => MeteringPointType.Consumption,
+            TimeSeriesType.NetExchangePerGa => MeteringPointType.Exchange,
+            TimeSeriesType.NetExchangePerNeighboringGa => MeteringPointType.Exchange,
+            TimeSeriesType.TotalConsumption => MeteringPointType.Consumption,
+            TimeSeriesType.Unspecified => throw new InvalidOperationException("Unknown metering point type"),
+            _ => throw new InvalidOperationException("Could not determine metering point type"),
+        };
+    }
+
+    private static SettlementType? MapSettlementType(TimeSeriesType timeSeriesType)
+    {
+        return timeSeriesType switch
+        {
+            TimeSeriesType.Production => null,
+            TimeSeriesType.FlexConsumption => SettlementType.Flex,
+            TimeSeriesType.NonProfiledConsumption => SettlementType.NonProfiled,
+            TimeSeriesType.NetExchangePerGa => null,
+            TimeSeriesType.NetExchangePerNeighboringGa => null,
+            TimeSeriesType.TotalConsumption => null,
             TimeSeriesType.Unspecified => throw new InvalidOperationException("Unknown metering point type"),
             _ => throw new InvalidOperationException("Could not determine metering point type"),
         };
@@ -108,22 +124,22 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
         return points.AsReadOnly();
     }
 
-    private static string MapResolution(Resolution resolution)
+    private static BuildingBlocks.Domain.Models.Resolution MapResolution(Resolution resolution)
     {
         return resolution switch
         {
-            Resolution.Pt15M => BuildingBlocks.Domain.Models.Resolution.QuarterHourly.Name,
-            Resolution.Pt1H => BuildingBlocks.Domain.Models.Resolution.Hourly.Name,
+            Resolution.Pt15M => BuildingBlocks.Domain.Models.Resolution.QuarterHourly,
+            Resolution.Pt1H => BuildingBlocks.Domain.Models.Resolution.Hourly,
             Resolution.Unspecified => throw new InvalidOperationException("Could not map resolution type"),
             _ => throw new InvalidOperationException("Unknown resolution type"),
         };
     }
 
-    private static string MapUnitType(QuantityUnit quantityUnit)
+    private static MeasurementUnit MapUnitType(QuantityUnit quantityUnit)
     {
         return quantityUnit switch
         {
-            QuantityUnit.Kwh => MeasurementUnit.Kwh.Name,
+            QuantityUnit.Kwh => MeasurementUnit.Kwh,
             QuantityUnit.Unspecified => throw new InvalidOperationException("Could not map unit type"),
             _ => throw new InvalidOperationException("Unknown unit type"),
         };

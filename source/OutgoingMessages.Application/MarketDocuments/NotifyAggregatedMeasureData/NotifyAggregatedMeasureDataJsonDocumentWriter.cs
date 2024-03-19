@@ -101,20 +101,9 @@ public class NotifyAggregatedMeasureDataJsonDocumentWriter : IDocumentWriter
 
             if (series.SettlementType is not null)
             {
-                //TODO: REMOVE THIS
-                // This is here since AggregatedMeasureDataProcess saves codes and not names
-                if (series.SettlementType.Length == 3)
-                {
-                    writer.WriteObject(
-                        "marketEvaluationPoint.settlementMethod",
-                        new KeyValuePair<string, string>("value", SettlementType.FromCode(series.SettlementType).Code));
-                }
-                else
-                {
-                    writer.WriteObject(
-                        "marketEvaluationPoint.settlementMethod",
-                        new KeyValuePair<string, string>("value", SettlementType.FromName(series.SettlementType).Code));
-                }
+                writer.WriteObject(
+                    "marketEvaluationPoint.settlementMethod",
+                    new KeyValuePair<string, string>("value", SettlementType.FromName(series.SettlementType).Code));
             }
 
             if (series.OriginalTransactionIdReference is not null)

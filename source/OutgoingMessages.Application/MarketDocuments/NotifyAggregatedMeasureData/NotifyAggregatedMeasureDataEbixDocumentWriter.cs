@@ -126,24 +126,11 @@ public class NotifyAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
 
             if (timeSeries.SettlementType != null)
             {
-                //TODO: REMOVE THIS
-                // This is here since AggregatedMeasureDataProcess saves codes and not names
-                if (timeSeries.SettlementType.Length == 3)
-                {
-                    await WriteCodeWithCodeListReferenceAttributesAsync(
-                            "SettlementMethod",
-                            EbixCode.Of(SettlementType.FromCode(timeSeries.SettlementType)),
-                            writer)
-                        .ConfigureAwait(false);
-                }
-                else
-                {
-                    await WriteCodeWithCodeListReferenceAttributesAsync(
-                            "SettlementMethod",
-                            EbixCode.Of(SettlementType.FromName(timeSeries.SettlementType)),
-                            writer)
-                        .ConfigureAwait(false);
-                }
+                await WriteCodeWithCodeListReferenceAttributesAsync(
+                        "SettlementMethod",
+                        EbixCode.Of(SettlementType.FromName(timeSeries.SettlementType)),
+                        writer)
+                    .ConfigureAwait(false);
             }
 
             await writer.WriteEndElementAsync().ConfigureAwait(false);
