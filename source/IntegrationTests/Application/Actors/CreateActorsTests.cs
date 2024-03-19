@@ -78,7 +78,7 @@ public class CreateActorsTests : TestBase
         return new CreateActorDto(SampleData.ExternalId, ActorNumber.Create(SampleData.ActorNumber));
     }
 
-    private async Task<Actor> GetActor()
+    private async Task<Actor?> GetActor()
     {
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = $"SELECT Id, ActorNumber, ExternalId FROM [dbo].[Actor] WHERE ExternalId = '{SampleData.ExternalId}' AND ActorNumber = '{SampleData.ActorNumber}'";
