@@ -132,24 +132,25 @@ internal sealed class EdiDriver : IDisposable
             .GetString());
     }
 
-    public async Task PeekAcceptedWholesaleSettlementAsync()
+    public async Task PeekWholesaleSettlementResponseAsync(DocumentFormat documentFormat, string expectedDocumentType)
     {
         var documentStream = await PeekMessageAsync().ConfigureAwait(false);
-        var jsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(documentStream).ConfigureAwait(false);
 
-        var documentIsOfExpectedType = jsonElement.TryGetProperty(
-            "NotifyWholesaleServices_MarketDocument",
-            out var marketDocument);
+        if (documentFormat == DocumentFormat.Json)
+        {
+            var jsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(documentStream).ConfigureAwait(false);
 
-        Assert.True(documentIsOfExpectedType, "\nAccepted message failed with wrong message type\n Document: " + jsonElement.ToString() + "\n");
-    }
+            var documentIsOfExpectedType = jsonElement.TryGetProperty(
+                expectedDocumentType,
+                out var marketDocument);
 
-    public async Task PeekRejectedWholesaleSettlementInXmlAsync()
-    {
-        var documentStream = await PeekMessageAsync(DocumentFormat.Xml).ConfigureAwait(false);
+            Assert.True(documentIsOfExpectedType, "\nAccepted message failed with wrong message type\n Document: " + jsonElement.ToString() + "\n");
+            return;
+        }
+
         using var reader = new StreamReader(documentStream);
         string text = await reader.ReadToEndAsync().ConfigureAwait(false);
-        text.Should().Contain("RejectRequestWholesaleSettlement_MarketDocument");
+        text.Should().Contain(expectedDocumentType, "\nAccepted message failed with wrong message type\n Document: " + text + "\n");
     }
 
     public async Task PeekRejectedMessageAsync()

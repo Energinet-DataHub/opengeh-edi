@@ -40,12 +40,12 @@ public sealed class WholesaleServicesRequestDsl
 
     internal Task ConfirmAcceptedResultIsAvailableInJson()
     {
-        return _edi.PeekAcceptedWholesaleSettlementAsync();
+        return _edi.PeekWholesaleSettlementResponseAsync(DocumentFormat.Json, "NotifyWholesaleServices_MarketDocument");
     }
 
     internal Task ConfirmRejectedResultIsAvailableInXml()
     {
-        return _edi.PeekRejectedWholesaleSettlementInXmlAsync();
+        return _edi.PeekWholesaleSettlementResponseAsync(DocumentFormat.Xml, "RejectRequestWholesaleSettlement_MarketDocument");
     }
 
     internal Task EmptyQueueForActor()
