@@ -36,5 +36,7 @@ public class MicrosoftFeatureFlagManager : IFeatureFlagManager
 
     public Task<bool> UseRequestWholesaleSettlementReceiver => IsEnabledAsync(FeatureFlagName.UseRequestWholesaleSettlementReceiver);
 
+    public Task<bool> UseMessageDelegation => IsEnabledAsync(FeatureFlagName.UseMessageDelegation);
+
     private Task<bool> IsEnabledAsync(FeatureFlagName featureFlagName) => _featureManager.IsEnabledAsync(featureFlagName.ToString());
 }
