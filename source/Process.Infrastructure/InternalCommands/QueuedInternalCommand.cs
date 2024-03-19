@@ -21,12 +21,13 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
 {
     public class QueuedInternalCommand
     {
-        public QueuedInternalCommand(Guid id, string type, string data, Instant creationDate)
+        public QueuedInternalCommand(Guid id, string type, string data, Instant creationDate, int commandVersion = 0)
         {
             Id = id;
             Type = type;
             Data = data;
             CreationDate = creationDate;
+            CommandVersion = commandVersion;
         }
 
         public Guid Id { get; }
@@ -40,6 +41,8 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
         public Instant? ProcessedDate { get; set; }
 
         public string? ErrorMessage { get; private set; }
+
+        public int CommandVersion { get; private set; }
 
         public void SetProcessed(Instant now)
         {
