@@ -134,7 +134,7 @@ internal sealed class EdiDriver : IDisposable
 
     public async Task PeekWholesaleSettlementResponseAsync(DocumentFormat documentFormat, string expectedDocumentType)
     {
-        var documentStream = await PeekMessageAsync().ConfigureAwait(false);
+        var documentStream = await PeekMessageAsync(documentFormat).ConfigureAwait(false);
 
         if (documentFormat == DocumentFormat.Json)
         {
