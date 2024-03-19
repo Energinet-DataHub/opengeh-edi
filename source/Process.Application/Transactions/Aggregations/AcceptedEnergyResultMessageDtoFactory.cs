@@ -49,4 +49,31 @@ public static class AcceptedEnergyResultMessageDtoFactory
             relatedToMessageId: aggregatedMeasureDataProcess.InitiatedByMessageId,
             originalTransactionIdReference: aggregatedMeasureDataProcess.BusinessTransactionId.Id);
     }
+
+    public static AcceptedEnergyResultMessageDto Create(
+        AggregatedMeasureDataProcess aggregatedMeasureDataProcess,
+        AcceptedEnergyResultTimeSeries acceptedEnergyResultTimeSerie)
+    {
+        ArgumentNullException.ThrowIfNull(aggregatedMeasureDataProcess);
+        ArgumentNullException.ThrowIfNull(acceptedEnergyResultTimeSerie);
+
+        return AcceptedEnergyResultMessageDto.Create(
+            aggregatedMeasureDataProcess.RequestedByActorId,
+            ActorRole.FromCode(aggregatedMeasureDataProcess.RequestedByActorRoleCode),
+            aggregatedMeasureDataProcess.ProcessId.Id,
+            acceptedEnergyResultTimeSerie.GridAreaDetails.GridAreaCode,
+            acceptedEnergyResultTimeSerie.MeteringPointType.Name,
+            acceptedEnergyResultTimeSerie.SettlementType?.Name,
+            acceptedEnergyResultTimeSerie.UnitType.Name,
+            acceptedEnergyResultTimeSerie.Resolution.Name,
+            aggregatedMeasureDataProcess.EnergySupplierId,
+            aggregatedMeasureDataProcess.BalanceResponsibleId,
+            new Period(acceptedEnergyResultTimeSerie.StartOfPeriod, acceptedEnergyResultTimeSerie.EndOfPeriod),
+            AcceptedEnergyResultMessageMapper.MapPoints(acceptedEnergyResultTimeSerie.Points),
+            aggregatedMeasureDataProcess.BusinessReason.Name,
+            acceptedEnergyResultTimeSerie.CalculationResultVersion,
+            settlementVersion: aggregatedMeasureDataProcess.SettlementVersion?.Name,
+            relatedToMessageId: aggregatedMeasureDataProcess.InitiatedByMessageId,
+            originalTransactionIdReference: aggregatedMeasureDataProcess.BusinessTransactionId.Id);
+    }
 }

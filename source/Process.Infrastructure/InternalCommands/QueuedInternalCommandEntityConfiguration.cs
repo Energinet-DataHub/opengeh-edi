@@ -30,6 +30,8 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
                 .HasColumnName("Data");
             builder.Property(x => x.Type)
                 .HasColumnName("Type");
+            builder.Property(x => x.CommandVersion)
+                .HasColumnName("CommandVersion");
             builder.Property(x => x.CreationDate)
                 .HasColumnName("CreationDate");
             builder.Property(x => x.ProcessedDate)

@@ -13,24 +13,22 @@
 // limitations under the License.
 
 using System;
-using System.Text.Json.Serialization;
-using Energinet.DataHub.EDI.Process.Domain.Commands;
+using System.Threading;
+using System.Threading.Tasks;
+using MediatR;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 
-public class TestCreateOutgoingMessageCommand : InternalCommand
+public class TestCommandForVersionHandler : IRequestHandler<TestCommandForVersion, Unit>
 {
-    [JsonConstructor]
-    public TestCreateOutgoingMessageCommand(Guid id, int numberOfOutgoingMessages)
-        : base(id)
+    public Task<Unit> Handle(TestCommandForVersion request, CancellationToken cancellationToken)
     {
-        NumberOfOutgoingMessages = numberOfOutgoingMessages;
-    }
+        ArgumentNullException.ThrowIfNull(request);
+        if (request.ShouldNotThrowException == false)
+        {
+            throw new InvalidOperationException("This is a test exception");
+        }
 
-    public TestCreateOutgoingMessageCommand(int numberOfOutgoingMessages)
-    {
-        NumberOfOutgoingMessages = numberOfOutgoingMessages;
+        return Unit.Task;
     }
-
-    public int NumberOfOutgoingMessages { get; }
 }
