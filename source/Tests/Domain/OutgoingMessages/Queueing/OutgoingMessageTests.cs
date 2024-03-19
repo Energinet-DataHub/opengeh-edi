@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
@@ -80,6 +82,16 @@ public class OutgoingMessageTests
                 await act.Should().NotThrowAsync();
             }
         }
+    }
+
+    [Fact]
+    public void Ensure_all_document_writer_is_represented()
+    {
+        // Arrange
+        var documentWriters = GetAllDocumentWriters();
+
+        // Act & Assert
+        documentWriters.Should().AllSatisfy(x => _documentWriters.Any(d => d.GetType() == x).Should().BeTrue());
     }
 
     [Fact]
@@ -284,5 +296,11 @@ public class OutgoingMessageTests
             ActorRole.DanishEnergyAgency.Code,
             MessageId.New().ToString()!,
             Instant.FromUtc(2022, 1, 1, 0, 0));
+    }
+
+    private static IEnumerable<Type> GetAllDocumentWriters()
+    {
+        return typeof(NotifyWholesaleServicesJsonDocumentWriter).Assembly.GetTypes()
+            .Where(t => t.GetInterfaces().Contains(typeof(IDocumentWriter)) && !t.IsAbstract);
     }
 }
