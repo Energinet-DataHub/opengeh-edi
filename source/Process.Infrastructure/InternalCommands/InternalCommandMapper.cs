@@ -33,8 +33,7 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
             var metadata = _values.Values.FirstOrDefault(
                 c =>
                     c.CommandName == commandName
-                    && c.CommandVersion
-                    == commandVersion);
+                    && c.CommandVersion == commandVersion);
             if (metadata is null)
             {
                 throw new InvalidOperationException(
