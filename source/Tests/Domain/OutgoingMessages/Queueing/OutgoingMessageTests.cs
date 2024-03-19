@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
+using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Tests.Factories;
 using FluentAssertions;
@@ -30,6 +33,21 @@ namespace Energinet.DataHub.EDI.Tests.Domain.OutgoingMessages.Queueing;
 
 public class OutgoingMessageTests
 {
+    private readonly IList<IDocumentWriter> _documentWriters = new List<IDocumentWriter>()
+    {
+        new NotifyWholesaleServicesJsonDocumentWriter(new MessageRecordParser(new Serializer())),
+        new NotifyWholesaleServicesEbixDocumentWriter(new MessageRecordParser(new Serializer())),
+        new NotifyWholesaleServicesXmlDocumentWriter(new MessageRecordParser(new Serializer())),
+
+        new NotifyAggregatedMeasureDataEbixDocumentWriter(new MessageRecordParser(new Serializer())),
+        new NotifyAggregatedMeasureDataXmlDocumentWriter(new MessageRecordParser(new Serializer())),
+        new NotifyAggregatedMeasureDataJsonDocumentWriter(new MessageRecordParser(new Serializer())),
+
+        new RejectRequestAggregatedMeasureDataJsonDocumentWriter(new MessageRecordParser(new Serializer())),
+        new RejectRequestAggregatedMeasureDataEbixDocumentWriter(new MessageRecordParser(new Serializer())),
+        new RejectRequestAggregatedMeasureDataXmlDocumentWriter(new MessageRecordParser(new Serializer())),
+    };
+
     /// <summary>
     /// This contains the serialized content for the different messages that we should be able to deserialize in order to write message from actor queues
     /// </summary>
@@ -38,27 +56,30 @@ public class OutgoingMessageTests
     {
         return new[]
         {
-            new object?[] { typeof(RejectedTimeSerieMarketActivityRecord), "{\"TransactionId\":\"4e85a732-85fd-4d92-8ff3-72c052802716\",\"RejectReasons\":[{\"ErrorCode\":\"E18\",\"ErrorMessage\":\"Det virker ikke!\"}],\"OriginalTransactionIdReference\":\"4E85A73285FD4D928FF372C052802717\"}" },
-            new object?[] { typeof(TimeSeriesMarketActivityRecord), "{\"TransactionId\":\"b114111b-ee09-4a0a-8399-ddca6a7edeca\",\"GridAreaCode\":\"804\",\"MeteringPointType\":\"E17\",\"SettlementType\":\"D01\",\"MeasureUnitType\":\"KWH\",\"Resolution\":\"PT15M\",\"EnergySupplierNumber\":\"1234567890123\",\"BalanceResponsibleNumber\":\"1234567890124\",\"Period\":{\"Start\":\"2024-02-02T02:02:02Z\",\"End\":\"2024-02-02T02:02:02Z\"},\"Point\":[{\"Position\":1,\"Quantity\":2,\"QuantityQuality\":4,\"SampleTime\":\"2024-02-02T02:02:02Z\"}],\"CalculationResultVersion\":1,\"OriginalTransactionIdReference\":null,\"SettlementVersion\":\"D01\"}" },
-            new object?[] { typeof(WholesaleCalculationMarketActivityRecord), "{\"TransactionId\":\"39843d03-d5e3-4695-b3a4-2d05a93373dc\",\"CalculationVersion\":1,\"GridAreaCode\":\"870\",\"ChargeCode\":\"123\",\"IsTax\":false,\"Points\":[{\"Position\":1,\"Quantity\":100,\"Price\":100,\"Amount\":100,\"QuantityQuality\":null}],\"EnergySupplier\":{\"Value\":\"1234567894444\"},\"ChargeOwner\":{\"Value\":\"1234567897777\"},\"Period\":{\"Start\":\"2023-11-01T00:00:00Z\",\"End\":\"2023-12-01T00:00:00Z\"},\"SettlementVersion\":null,\"QuantityMeasureUnit\":{\"Code\":\"KWH\",\"Name\":\"Kwh\"},\"QuantityUnit\":null,\"PriceMeasureUnit\":{\"Code\":\"KWH\",\"Name\":\"Kwh\"},\"Currency\":{\"Code\":\"DKK\",\"Name\":\"DanishCrowns\"},\"ChargeType\":{\"Code\":\"D02\",\"Name\":\"Fee\"},\"Resolution\":{\"Code\":\"P1M\",\"Name\":\"Monthly\"},\"MeteringPointType\":{\"Code\":\"E17\",\"Name\":\"Consumption\"},\"SettlementType\":{\"Code\":\"E02\",\"Name\":\"NonProfiled\"}}" },
+            new object?[] { DocumentType.RejectRequestAggregatedMeasureData, "{\"TransactionId\":\"4e85a732-85fd-4d92-8ff3-72c052802716\",\"RejectReasons\":[{\"ErrorCode\":\"E18\",\"ErrorMessage\":\"Det virker ikke!\"}],\"OriginalTransactionIdReference\":\"4E85A73285FD4D928FF372C052802717\"}" },
+            new object?[] { DocumentType.NotifyAggregatedMeasureData, "{\"TransactionId\":\"b114111b-ee09-4a0a-8399-ddca6a7edeca\",\"GridAreaCode\":\"804\",\"MeteringPointType\":\"Consumption\",\"SettlementType\":\"Flex\",\"MeasureUnitType\":\"KWH\",\"Resolution\":\"QuarterHourly\",\"EnergySupplierNumber\":\"1234567890123\",\"BalanceResponsibleNumber\":\"1234567890124\",\"Period\":{\"Start\":\"2024-02-02T02:02:02Z\",\"End\":\"2024-02-02T02:02:02Z\"},\"Point\":[{\"Position\":1,\"Quantity\":2,\"QuantityQuality\":4,\"SampleTime\":\"2024-02-02T02:02:02Z\"}],\"CalculationResultVersion\":1,\"OriginalTransactionIdReference\":null,\"SettlementVersion\":\"FirstCorrection\"}" },
+            new object?[] { DocumentType.NotifyWholesaleServices, "{\"TransactionId\":\"39843d03-d5e3-4695-b3a4-2d05a93373dc\",\"CalculationVersion\":1,\"GridAreaCode\":\"870\",\"ChargeCode\":\"123\",\"IsTax\":false,\"Points\":[{\"Position\":1,\"Quantity\":100,\"Price\":100,\"Amount\":100,\"QuantityQuality\":null}],\"EnergySupplier\":{\"Value\":\"1234567894444\"},\"ChargeOwner\":{\"Value\":\"1234567897777\"},\"Period\":{\"Start\":\"2023-11-01T00:00:00Z\",\"End\":\"2023-12-01T00:00:00Z\"},\"SettlementVersion\":null,\"QuantityMeasureUnit\":{\"Code\":\"KWH\",\"Name\":\"Kwh\"},\"QuantityUnit\":null,\"PriceMeasureUnit\":{\"Code\":\"KWH\",\"Name\":\"Kwh\"},\"Currency\":{\"Code\":\"DKK\",\"Name\":\"DanishCrowns\"},\"ChargeType\":{\"Code\":\"D02\",\"Name\":\"Fee\"},\"Resolution\":{\"Code\":\"P1M\",\"Name\":\"Monthly\"},\"MeteringPointType\":{\"Code\":\"E17\",\"Name\":\"Consumption\"},\"SettlementType\":{\"Code\":\"E02\",\"Name\":\"NonProfiled\"}}" },
             // Request Accepted
-            new object?[] { typeof(TimeSeriesMarketActivityRecord), "{\"TransactionId\":\"2c928b8b-b596-43da-9dcb-e8a36748f415\",\"GridAreaCode\":\"804\",\"MeteringPointType\":\"E17\",\"SettlementType\":\"D01\",\"MeasureUnitType\":\"KWH\",\"Resolution\":\"PT15M\",\"EnergySupplierNumber\":\"1234567890123\",\"BalanceResponsibleNumber\":\"1234567890124\",\"Period\":{\"Start\":\"2024-02-02T02:02:02Z\",\"End\":\"2024-02-02T02:02:02Z\"},\"Point\":[{\"Position\":1,\"Quantity\":2,\"QuantityQuality\":4,\"SampleTime\":\"2024-02-02T02:02:02Z\"}],\"CalculationResultVersion\":1,\"OriginalTransactionIdReference\":\"643e50ea-8811-4ee2-81a7-5dac21731f22\",\"SettlementVersion\":\"D01\"}" },
-            new object?[] { typeof(WholesaleCalculationMarketActivityRecord), "{\"OriginalTransactionIdReference\":\"941c025a-3c98-48e5-985d-d0c843c4dc49\",\"TransactionId\":\"050e2270-3702-4885-b021-15d22d3c0977\",\"CalculationVersion\":1,\"GridAreaCode\":\"870\",\"ChargeCode\":\"123\",\"IsTax\":false,\"Points\":[{\"Position\":1,\"Quantity\":100,\"Price\":100,\"Amount\":100,\"QuantityQuality\":null}],\"EnergySupplier\":{\"Value\":\"1234567894444\"},\"ChargeOwner\":{\"Value\":\"1234567897777\"},\"Period\":{\"Start\":\"2023-11-01T00:00:00Z\",\"End\":\"2023-12-01T00:00:00Z\"},\"SettlementVersion\":null,\"QuantityMeasureUnit\":{\"Code\":\"KWH\",\"Name\":\"Kwh\"},\"QuantityUnit\":null,\"PriceMeasureUnit\":{\"Code\":\"KWH\",\"Name\":\"Kwh\"},\"Currency\":{\"Code\":\"DKK\",\"Name\":\"DanishCrowns\"},\"ChargeType\":{\"Code\":\"D02\",\"Name\":\"Fee\"},\"Resolution\":{\"Code\":\"P1M\",\"Name\":\"Monthly\"},\"MeteringPointType\":{\"Code\":\"E17\",\"Name\":\"Consumption\"},\"SettlementType\":{\"Code\":\"E02\",\"Name\":\"NonProfiled\"}}" },
+            new object?[] { DocumentType.NotifyAggregatedMeasureData, "{\"TransactionId\":\"2c928b8b-b596-43da-9dcb-e8a36748f415\",\"GridAreaCode\":\"804\",\"MeteringPointType\":\"Consumption\",\"SettlementType\":\"Flex\",\"MeasureUnitType\":\"KWH\",\"Resolution\":\"QuarterHourly\",\"EnergySupplierNumber\":\"1234567890123\",\"BalanceResponsibleNumber\":\"1234567890124\",\"Period\":{\"Start\":\"2024-02-02T02:02:02Z\",\"End\":\"2024-02-02T02:02:02Z\"},\"Point\":[{\"Position\":1,\"Quantity\":2,\"QuantityQuality\":4,\"SampleTime\":\"2024-02-02T02:02:02Z\"}],\"CalculationResultVersion\":1,\"OriginalTransactionIdReference\":\"643e50ea-8811-4ee2-81a7-5dac21731f22\",\"SettlementVersion\":\"FirstCorrection\"}" },
+            new object?[] { DocumentType.NotifyWholesaleServices, "{\"OriginalTransactionIdReference\":\"941c025a-3c98-48e5-985d-d0c843c4dc49\",\"TransactionId\":\"050e2270-3702-4885-b021-15d22d3c0977\",\"CalculationVersion\":1,\"GridAreaCode\":\"870\",\"ChargeCode\":\"123\",\"IsTax\":false,\"Points\":[{\"Position\":1,\"Quantity\":100,\"Price\":100,\"Amount\":100,\"QuantityQuality\":null}],\"EnergySupplier\":{\"Value\":\"1234567894444\"},\"ChargeOwner\":{\"Value\":\"1234567897777\"},\"Period\":{\"Start\":\"2023-11-01T00:00:00Z\",\"End\":\"2023-12-01T00:00:00Z\"},\"SettlementVersion\":null,\"QuantityMeasureUnit\":{\"Code\":\"KWH\",\"Name\":\"Kwh\"},\"QuantityUnit\":null,\"PriceMeasureUnit\":{\"Code\":\"KWH\",\"Name\":\"Kwh\"},\"Currency\":{\"Code\":\"DKK\",\"Name\":\"DanishCrowns\"},\"ChargeType\":{\"Code\":\"D02\",\"Name\":\"Fee\"},\"Resolution\":{\"Code\":\"P1M\",\"Name\":\"Monthly\"},\"MeteringPointType\":{\"Code\":\"E17\",\"Name\":\"Consumption\"},\"SettlementType\":{\"Code\":\"E02\",\"Name\":\"NonProfiled\"}}" },
         };
     }
 
     [Theory]
     [MemberData(nameof(EnqueuedQueuedSerializedContents))]
-    public void Ensure_we_can_deserialize_all_enqueued_messages(Type typeToDeserializeTo, string serializedContent)
+    public async Task Ensure_we_can_write_all_enqueued_messages(DocumentType documentType, string serializedContent)
     {
         // Arrange
-        var serializer = new Serializer();
-
-        // Act
-        var deserializedContent = serializer.Deserialize(serializedContent, typeToDeserializeTo);
-
-        // Assert
-        deserializedContent.Should().NotBeNull();
+        foreach (var documentWriter in _documentWriters)
+        {
+            if (documentWriter.HandlesType(documentType))
+            {
+                // Act
+                var act = () => documentWriter.WriteAsync(GetHeader(), new List<string> { serializedContent });
+                // Assert
+                await act.Should().NotThrowAsync();
+            }
+        }
     }
 
     [Fact]
@@ -251,5 +272,17 @@ public class OutgoingMessageTests
         using var scope = new AssertionScope();
         outgoingMessages.Should().ContainSingle(m => m.Receiver.ActorRole == ActorRole.MeteredDataResponsible);
         outgoingMessages.Should().ContainSingle(m => m.GetActorMessageQueueMetadata().ActorRole == ActorRole.MeteredDataResponsible);
+    }
+
+    private static OutgoingMessageHeader GetHeader()
+    {
+        return new OutgoingMessageHeader(
+            BusinessReason.BalanceFixing.Name,
+            "1234567812345",
+            ActorRole.MeteredDataAdministrator.Code,
+            "1234567812345",
+            ActorRole.DanishEnergyAgency.Code,
+            MessageId.New().ToString()!,
+            Instant.FromUtc(2022, 1, 1, 0, 0));
     }
 }

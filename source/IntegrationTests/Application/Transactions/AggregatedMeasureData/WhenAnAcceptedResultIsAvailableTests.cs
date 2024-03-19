@@ -98,9 +98,9 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
         var process = BuildProcess();
         var acceptedEvent = GetAcceptedEvent(process);
+        await AddInboxEvent(process, acceptedEvent);
 
         // Act
-        await AddInboxEvent(process, acceptedEvent);
         await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id);
 
         // Assert
@@ -139,7 +139,9 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasReceiverRole(process.RequestedByActorRoleCode)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
-            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1);
+            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(
+                timeSerie => timeSerie.CalculationResultVersion,
+                1);
     }
 
     protected override void Dispose(bool disposing)
