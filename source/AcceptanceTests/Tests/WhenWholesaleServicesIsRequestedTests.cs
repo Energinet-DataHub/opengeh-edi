@@ -49,7 +49,7 @@ public sealed class WhenWholesaleServicesIsRequestedTests
     {
         await _wholesaleServicesRequest.EmptyQueueForActor();
 
-        await _wholesaleServicesRequest.RequestWholesaleSettlementInXml();
+        await _wholesaleServicesRequest.RequestWholesaleSettlementInJson();
 
         await _wholesaleServicesRequest.ConfirmRejectedResultIsAvailableInXml();
     }
