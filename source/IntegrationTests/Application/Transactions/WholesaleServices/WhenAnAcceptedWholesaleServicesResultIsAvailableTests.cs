@@ -180,7 +180,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             Instant.FromUtc(2022, 1, 1, 0, 0));
 
         // Assert
-        // Asserting one document type is enough, since the document writer as compared in another test
+        // Asserting one document type is enough, since the document writers as compared in another test
         var act = () => jsonParser.WriteAsync(header, new List<string> { messageRecord });
         await act.Should().NotThrowAsync();
     }
