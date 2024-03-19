@@ -14,17 +14,16 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
-using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using MediatR;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
+namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
 
-//TODO: remove this, it's for backwards compatibility
-public class AcceptedEnergyResultTimeSerieCommand : InternalCommand
+public class AggregatedTimeSeriesRequestWasAccepted : INotification
 {
-    [JsonConstructor]
-    public AcceptedEnergyResultTimeSerieCommand(Guid processId, IReadOnlyCollection<AcceptedEnergyResultTimeSerie> aggregatedTimeSeries)
+    public AggregatedTimeSeriesRequestWasAccepted(
+        Guid processId,
+        IReadOnlyCollection<AcceptedEnergyResultTimeSeries> aggregatedTimeSeries)
     {
         ProcessId = processId;
         AggregatedTimeSeries = aggregatedTimeSeries;
@@ -32,5 +31,5 @@ public class AcceptedEnergyResultTimeSerieCommand : InternalCommand
 
     public Guid ProcessId { get; }
 
-    public IReadOnlyCollection<AcceptedEnergyResultTimeSerie> AggregatedTimeSeries { get; }
+    public IReadOnlyCollection<AcceptedEnergyResultTimeSeries> AggregatedTimeSeries { get; }
 }

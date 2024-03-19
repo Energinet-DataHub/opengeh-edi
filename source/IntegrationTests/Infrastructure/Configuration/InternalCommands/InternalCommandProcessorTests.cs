@@ -16,7 +16,6 @@ using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.Process.Domain.Commands;
@@ -43,6 +42,9 @@ public class InternalCommandProcessorTests : TestBase
         _connectionFactory = GetService<IDatabaseConnectionFactory>();
         var mapper = GetService<InternalCommandMapper>();
         mapper.Add(nameof(TestCommand), typeof(TestCommand));
+
+        // Do not change "nameof(TestCommand)" in the registration below. It is used to test the versioning of the command.
+        mapper.Add(nameof(TestCommand), typeof(TestCommandForVersion), 1);
         mapper.Add(nameof(TestCreateOutgoingMessageCommand), typeof(TestCreateOutgoingMessageCommand));
     }
 
@@ -105,6 +107,26 @@ public class InternalCommandProcessorTests : TestBase
         AssertSingleActorMessageQueue();
         AssertOutgoingMessage(2);
         AssertIsProcessedSuccessful(command);
+    }
+
+    [Fact]
+    public async Task Can_get_correct_internal_command_based_on_enqueued_command()
+    {
+        // Arrange
+        var command1 = new TestCommand(false);
+
+        // The boolean has be turned around. To ensure different behaviour of the two handlers, for the same value
+        var command2 = new TestCommandForVersion(false);
+
+        await Schedule(command1);
+        await Schedule(command2);
+
+        // Act
+        await ProcessPendingCommands();
+
+        // Assert
+        AssertIsProcessedSuccessful(command1);
+        AssertHasErrorMessage(command2);
     }
 
     protected override void Dispose(bool disposing)

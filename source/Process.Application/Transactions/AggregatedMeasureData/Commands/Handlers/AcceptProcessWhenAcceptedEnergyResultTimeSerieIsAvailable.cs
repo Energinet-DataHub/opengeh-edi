@@ -25,18 +25,18 @@ using MediatR;
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands.Handlers;
 
 public class
-    AcceptProcessWhenAcceptedEnergyResultTimeSeriesIsAvailable : IRequestHandler<AcceptedEnergyResultTimeSeriesCommand,
+    AcceptProcessWhenAcceptedEnergyResultTimeSerieIsAvailable : IRequestHandler<AcceptedEnergyResultTimeSerieCommand,
     Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
 
-    public AcceptProcessWhenAcceptedEnergyResultTimeSeriesIsAvailable(
+    public AcceptProcessWhenAcceptedEnergyResultTimeSerieIsAvailable(
         IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
     }
 
-    public async Task<Unit> Handle(AcceptedEnergyResultTimeSeriesCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(AcceptedEnergyResultTimeSerieCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 

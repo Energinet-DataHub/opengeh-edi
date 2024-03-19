@@ -18,19 +18,19 @@ using Energinet.DataHub.EDI.Process.Domain.Commands;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 
-public class TestCreateOutgoingMessageCommand : InternalCommand
+public class TestCommandForVersion : InternalCommand
 {
     [JsonConstructor]
-    public TestCreateOutgoingMessageCommand(Guid id, int numberOfOutgoingMessages)
+    public TestCommandForVersion(Guid id, bool shouldNotThrowException = false)
         : base(id)
     {
-        NumberOfOutgoingMessages = numberOfOutgoingMessages;
+        ShouldNotThrowException = shouldNotThrowException;
     }
 
-    public TestCreateOutgoingMessageCommand(int numberOfOutgoingMessages)
+    public TestCommandForVersion(bool shouldNotThrowException = true)
     {
-        NumberOfOutgoingMessages = numberOfOutgoingMessages;
+        ShouldNotThrowException = shouldNotThrowException;
     }
 
-    public int NumberOfOutgoingMessages { get; }
+    public bool ShouldNotThrowException { get; }
 }

@@ -28,7 +28,7 @@ using MediatR;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 
-public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHandler<AggregatedTimeSerieRequestWasAccepted>
+public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>
 {
     private static readonly List<INotification> _actualNotifications = new();
 
@@ -44,9 +44,9 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
         using var assertionScope = new AssertionScope();
 
         _actualNotifications.Should().ContainSingle();
-        _actualNotifications.Should().ContainItemsAssignableTo<AggregatedTimeSerieRequestWasAccepted>();
+        _actualNotifications.Should().ContainItemsAssignableTo<AggregatedTimeSeriesRequestWasAccepted>();
 
-        var actualNotification = _actualNotifications.Single() as AggregatedTimeSerieRequestWasAccepted;
+        var actualNotification = _actualNotifications.Single() as AggregatedTimeSeriesRequestWasAccepted;
         actualNotification.Should().NotBeNull();
         actualNotification!.AggregatedTimeSeries.Should().ContainSingle();
 
@@ -63,7 +63,7 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
         actualTimeSeries.CalculationResultVersion.Should().Be(firstSeries.CalculationResultVersion);
     }
 
-    public Task Handle(AggregatedTimeSerieRequestWasAccepted notification, CancellationToken cancellationToken)
+    public Task Handle(AggregatedTimeSeriesRequestWasAccepted notification, CancellationToken cancellationToken)
     {
         _actualNotifications.Add(notification);
         return Task.CompletedTask;

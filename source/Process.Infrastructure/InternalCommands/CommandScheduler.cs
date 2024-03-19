@@ -47,7 +47,12 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
 
             var data = _serializer.Serialize(command);
             var commandMetadata = _internalCommandMapper.GetByType(command.GetType());
-            var queuedCommand = new QueuedInternalCommand(command.Id, commandMetadata.CommandName, data, _systemDateTimeProvider.Now());
+            var queuedCommand = new QueuedInternalCommand(
+                command.Id,
+                commandMetadata.CommandName,
+                data,
+                _systemDateTimeProvider.Now(),
+                commandMetadata.CommandVersion);
             await _context.QueuedInternalCommands.AddAsync(queuedCommand).ConfigureAwait(false);
         }
     }

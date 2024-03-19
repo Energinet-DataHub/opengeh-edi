@@ -21,19 +21,26 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
     public class InternalCommandMapper
     {
         private readonly Dictionary<string, CommandMetadata> _values = new();
+        //private readonly List<CommandMetadata> _commandMetaData = new();
 
-        public void Add(string eventName, Type eventType)
+        public void Add(string eventName, Type eventType, int commandVersion = 0)
         {
-            var metadata = new CommandMetadata(eventName, eventType);
-            _values.Add(metadata.CommandName, metadata);
+            var metadata = new CommandMetadata(eventName, eventType, commandVersion);
+            //_commandMetaData.Add(metadata);
+            _values.Add(metadata.CommandType.ToString(), metadata);
         }
 
-        public CommandMetadata GetByName(string commandName)
+        public CommandMetadata GetByNameAndVersion(string commandName, int commandVersion)
         {
-            if (_values.TryGetValue(commandName, out var metadata) == false)
+            var metadata = _values.Values.FirstOrDefault(
+                c =>
+                    c.CommandName == commandName
+                    && c.CommandVersion
+                    == commandVersion); //_commandMetaData.FirstOrDefault(c => c.CommandName == commandName && c.CommandVersion == commandVersion);
+            if (metadata is null)
             {
                 throw new InvalidOperationException(
-                    $"No event metadata is registered for event {commandName}");
+                    $"No event metadata is registered for event {commandName} with version {commandVersion}");
             }
 
             return metadata;
@@ -42,6 +49,7 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
         public CommandMetadata GetByType(Type commandType)
         {
             ArgumentNullException.ThrowIfNull(commandType);
+            //return _commandMetaData.FirstOrDefault(metadata => metadata.CommandType == commandType) ??
             return _values.Values
                        .FirstOrDefault(metadata => metadata.CommandType == commandType) ??
                    throw new InvalidOperationException(
@@ -49,5 +57,5 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
         }
     }
 
-    public record CommandMetadata(string CommandName, Type CommandType);
+    public record CommandMetadata(string CommandName, Type CommandType, int CommandVersion = 0);
 }

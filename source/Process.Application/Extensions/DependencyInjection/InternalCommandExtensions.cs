@@ -43,13 +43,14 @@ internal static class InternalCommandExtensions
     private static InternalCommandMapper CreateInternalCommandMap()
     {
         var mapper = new InternalCommandMapper();
-        mapper.Add("GridAreaOwnershipAssigned", typeof(GridAreaOwnershipAssignedDto));
-        mapper.Add("SendAggregatedMeasureDataRequestToWholesale", typeof(SendAggregatedMeasureDataRequestToWholesale));
-        mapper.Add("AcceptedAggregatedTimeSerie", typeof(AcceptedEnergyResultTimeSerieCommand));
-        mapper.Add("RejectedAggregatedTimeSeries", typeof(RejectedAggregatedTimeSeries));
-        mapper.Add("SendWholesaleServicesRequestToWholesale", typeof(SendWholesaleServicesRequestToWholesale));
-        mapper.Add("RejectedWholesaleServices", typeof(RejectedWholesaleServices));
-        mapper.Add("AcceptedWholesaleServicesSerieCommand", typeof(AcceptedWholesaleServices));
+        mapper.Add("GridAreaOwnershipAssigned", typeof(GridAreaOwnershipAssignedDto), 0);
+        mapper.Add("SendAggregatedMeasureDataRequestToWholesale", typeof(SendAggregatedMeasureDataRequestToWholesale), 0);
+        mapper.Add("AcceptedAggregatedTimeSerie", typeof(AcceptedEnergyResultTimeSerieCommand), 0);
+        mapper.Add("AcceptedAggregatedTimeSerie", typeof(AcceptedEnergyResultTimeSeriesCommand), 1);
+        mapper.Add("RejectedAggregatedTimeSeries", typeof(RejectedAggregatedTimeSeries), 0);
+        mapper.Add("SendWholesaleServicesRequestToWholesale", typeof(SendWholesaleServicesRequestToWholesale), 0);
+        mapper.Add("RejectedWholesaleServices", typeof(RejectedWholesaleServices), 0);
+        mapper.Add("AcceptedWholesaleServicesSerieCommand", typeof(AcceptedWholesaleServices), 0);
 
         return mapper;
     }

@@ -103,7 +103,9 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
 
         private Task ExecuteCommandAsync(QueuedInternalCommand queuedInternalCommand)
         {
-            var commandMetaData = _mapper.GetByName(queuedInternalCommand.Type);
+            var commandMetaData = _mapper.GetByNameAndVersion(
+                queuedInternalCommand.Type,
+                queuedInternalCommand.CommandVersion);
             var command = (InternalCommand)_serializer.Deserialize(queuedInternalCommand.Data, commandMetaData.CommandType);
             return _commandExecutor.ExecuteAsync(command, CancellationToken.None);
         }
