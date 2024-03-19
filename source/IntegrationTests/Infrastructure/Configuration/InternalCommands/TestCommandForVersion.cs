@@ -21,7 +21,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.In
 public class TestCommandForVersion : InternalCommand
 {
     [JsonConstructor]
-    public TestCommandForVersion(Guid id, bool shouldNotThrowException = false)
+    public TestCommandForVersion(Guid id, bool shouldNotThrowException = true)
         : base(id)
     {
         ShouldNotThrowException = shouldNotThrowException;

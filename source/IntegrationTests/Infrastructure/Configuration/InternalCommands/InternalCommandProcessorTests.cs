@@ -43,7 +43,7 @@ public class InternalCommandProcessorTests : TestBase
         var mapper = GetService<InternalCommandMapper>();
         mapper.Add(nameof(TestCommand), typeof(TestCommand));
 
-        // Do not change "nameof(TestCommand)" in the registration below. It is used to test the versioning of the command.
+        // Do not change "nameof(TestCommand)" in the registration below. It is used to test the versioning of internal commands.
         mapper.Add(nameof(TestCommand), typeof(TestCommandForVersion), 1);
         mapper.Add(nameof(TestCreateOutgoingMessageCommand), typeof(TestCreateOutgoingMessageCommand));
     }

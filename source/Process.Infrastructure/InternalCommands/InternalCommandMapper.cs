@@ -21,12 +21,10 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
     public class InternalCommandMapper
     {
         private readonly Dictionary<string, CommandMetadata> _values = new();
-        //private readonly List<CommandMetadata> _commandMetaData = new();
 
         public void Add(string eventName, Type eventType, int commandVersion = 0)
         {
             var metadata = new CommandMetadata(eventName, eventType, commandVersion);
-            //_commandMetaData.Add(metadata);
             _values.Add(metadata.CommandType.ToString(), metadata);
         }
 
@@ -36,7 +34,7 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
                 c =>
                     c.CommandName == commandName
                     && c.CommandVersion
-                    == commandVersion); //_commandMetaData.FirstOrDefault(c => c.CommandName == commandName && c.CommandVersion == commandVersion);
+                    == commandVersion);
             if (metadata is null)
             {
                 throw new InvalidOperationException(
@@ -49,7 +47,6 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
         public CommandMetadata GetByType(Type commandType)
         {
             ArgumentNullException.ThrowIfNull(commandType);
-            //return _commandMetaData.FirstOrDefault(metadata => metadata.CommandType == commandType) ??
             return _values.Values
                        .FirstOrDefault(metadata => metadata.CommandType == commandType) ??
                    throw new InvalidOperationException(
