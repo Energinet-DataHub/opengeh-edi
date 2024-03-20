@@ -12,11 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Reflection;
 using System.Text.Json.Serialization;
+using Asp.Versioning;
 using BuildingBlocks.Application.Configuration.Logging;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
+using Energinet.DataHub.Core.App.WebApp.Extensions.Builder;
+using Energinet.DataHub.Core.App.WebApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Logging.LoggingMiddleware;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
@@ -33,7 +37,8 @@ builder.Logging
     .AddApplicationInsights();
 
 builder.Services
-    .AddSwaggerForApplication()
+    .AddSwaggerForWebApp(Assembly.GetExecutingAssembly())
+    .AddApiVersioningForWebApp(new ApiVersion(1, 0))
     .AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>()
     .AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
@@ -68,7 +73,7 @@ if (isDevelopment)
     app.UseDeveloperExceptionPage();
 
 app
-    .UseSwaggerUiForDevEnvironment()
+    .UseSwaggerForWebApp()
     .UseLoggingScope()
     .UseHttpsRedirection()
     .UseAuthentication()
