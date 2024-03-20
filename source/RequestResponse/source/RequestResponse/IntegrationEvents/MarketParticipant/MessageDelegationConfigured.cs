@@ -12,19 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using NodaTime;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 
-namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
-
-[Serializable]
-public record AcceptedEnergyResultTimeSerie(
-    IReadOnlyCollection<Point> Points,
-    string MeteringPointType,
-    string UnitType,
-    string Resolution,
-    GridAreaDetails GridAreaDetails,
-    long CalculationResultVersion,
-    Instant StartOfPeriod,
-    Instant EndOfPeriod);
+public partial class MessageDelegationConfigured
+{
+    public const string EventName = "MessageDelegationConfigured";
+    public const int CurrentMinorVersion = 1;
+}
