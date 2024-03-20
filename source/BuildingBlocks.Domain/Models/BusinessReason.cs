@@ -21,11 +21,12 @@ public sealed class BusinessReason : EnumerationType
 {
     // ReSharper disable InconsistentNaming
     #pragma warning disable IDE1006
+    // Must match the BusinessReason names in Energinet.DataHub.Wholesale.Edi.Models.BusinessReason
     public static readonly BusinessReason MoveIn = new(nameof(MoveIn), "E65");
-    public static readonly BusinessReason BalanceFixing = new(nameof(BalanceFixing), "D04");
-    public static readonly BusinessReason PreliminaryAggregation = new(nameof(PreliminaryAggregation), "D03");
-    public static readonly BusinessReason WholesaleFixing = new(nameof(WholesaleFixing), "D05");    //Engrosafiksering
-    public static readonly BusinessReason Correction = new(nameof(Correction), "D32");
+    public static readonly BusinessReason BalanceFixing = new("BalanceFixing", "D04");
+    public static readonly BusinessReason PreliminaryAggregation = new("PreliminaryAggregation", "D03");
+    public static readonly BusinessReason WholesaleFixing = new("WholesaleFixing", "D05");    //Engrosafiksering
+    public static readonly BusinessReason Correction = new("Correction", "D32");
 
     #region Unused business reasons
     [Obsolete("Unused, but required for schema compliance")]

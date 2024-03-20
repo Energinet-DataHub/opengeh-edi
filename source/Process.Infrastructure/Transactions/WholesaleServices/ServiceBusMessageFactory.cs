@@ -53,7 +53,7 @@ public static class ServiceBusMessageFactory
             request.PeriodEnd = process.EndOfPeriod;
 
         if (process.Resolution != null)
-            request.Resolution = process.Resolution;
+            request.Resolution = process.Resolution; // TODO: Introduce value type (?) and use .Name
 
         if (process.EnergySupplierId != null)
             request.EnergySupplierId = process.EnergySupplierId;

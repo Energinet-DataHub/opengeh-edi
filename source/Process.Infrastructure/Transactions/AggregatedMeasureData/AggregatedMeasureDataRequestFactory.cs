@@ -59,16 +59,16 @@ public static class AggregatedMeasureDataRequestFactory
             Period = MapPeriod(process),
             RequestedByActorId = process.RequestedByActorId.Value,
             RequestedByActorRole = process.RequestedByActorRoleCode,
-            BusinessReason = process.BusinessReason.Code,
+            BusinessReason = process.BusinessReason.Name,
         };
 
         if (process.MeteringPointType != null)
         {
-            request.MeteringPointType = process.MeteringPointType;
+            request.MeteringPointType = process.MeteringPointType; // TODO: Introduce value type and use .Name
         }
 
         if (process.SettlementMethod != null)
-            request.SettlementMethod = process.SettlementMethod;
+            request.SettlementMethod = process.SettlementMethod; // TODO: Introduce value type and use .Name
 
         if (process.EnergySupplierId != null)
             request.EnergySupplierId = process.EnergySupplierId;
@@ -80,7 +80,7 @@ public static class AggregatedMeasureDataRequestFactory
             request.BalanceResponsibleId = process.BalanceResponsibleId;
 
         if (process.SettlementVersion != null)
-            request.SettlementSeriesVersion = process.SettlementVersion.Code;
+            request.SettlementSeriesVersion = process.SettlementVersion.Name;
 
         if (process.MeteringGridAreaDomainId != null)
             request.GridAreaCode = process.MeteringGridAreaDomainId;
