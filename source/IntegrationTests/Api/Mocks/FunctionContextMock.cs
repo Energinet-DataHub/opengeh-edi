@@ -20,6 +20,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.FunctionApp;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions;
@@ -37,11 +38,29 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Api.Mocks;
 [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:Elements should be documented", Justification = "Test class")]
 internal sealed class FunctionContextMock : FunctionContext
 {
-    public FunctionContextMock(IServiceProvider serviceProvider, TriggerType triggerType, string? functionName, string? contentType, string? bearerToken, string? certificateHexString)
+    public FunctionContextMock(
+        IServiceProvider serviceProvider,
+        TriggerType triggerType,
+        string? functionName,
+        string? contentType,
+        string? bearerToken,
+        string? certificateHexString)
+        : this(serviceProvider, triggerType, functionName, contentType, bearerToken, certificateHexString, null)
+    {
+    }
+
+    public FunctionContextMock(
+        IServiceProvider serviceProvider,
+        TriggerType triggerType,
+        string? functionName,
+        string? contentType,
+        string? bearerToken,
+        string? certificateHexString,
+        string? bodyHack)
     {
         InstanceServices = serviceProvider;
 
-        var mockHttpRequestData = new MockHttpRequestData(this);
+        var mockHttpRequestData = new MockHttpRequestData(this, bodyHack);
 
         if (!string.IsNullOrWhiteSpace(contentType))
             mockHttpRequestData.Headers.Add("Content-Type", contentType);
@@ -130,12 +149,13 @@ internal sealed class FunctionContextMock : FunctionContext
 
     private sealed class MockHttpRequestData : HttpRequestData
     {
-        public MockHttpRequestData(FunctionContext functionContext)
+        public MockHttpRequestData(FunctionContext functionContext, string? bodyHack = null)
             : base(functionContext)
         {
+            Body = new MemoryStream(Encoding.UTF8.GetBytes(bodyHack ?? string.Empty));
         }
 
-        public override Stream Body { get; } = null!;
+        public override Stream Body { get; }
 
         public override HttpHeadersCollection Headers { get; } = new();
 
@@ -164,7 +184,7 @@ internal sealed class FunctionContextMock : FunctionContext
 
         public override HttpHeadersCollection Headers { get; set; } = new();
 
-        public override Stream Body { get; set; } = null!;
+        public override Stream Body { get; set; } = new MemoryStream();
 
         public override HttpCookies Cookies { get; } = null!;
     }
