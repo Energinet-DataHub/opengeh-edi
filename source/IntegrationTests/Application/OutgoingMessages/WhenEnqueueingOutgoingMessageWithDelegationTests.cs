@@ -44,6 +44,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : WhenEnqueueingOu
     private readonly EnergyResultMessageDtoBuilder _energyResultMessageDtoBuilder;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ActorMessageQueueContext _context;
+    private readonly SystemDateTimeProviderStub _dateTimeProvider;
 
     public WhenEnqueueingOutgoingMessageWithDelegationTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
@@ -51,6 +52,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : WhenEnqueueingOu
         _energyResultMessageDtoBuilder = new EnergyResultMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
         _context = GetService<ActorMessageQueueContext>();
+        _dateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
     }
 
     [Fact]
@@ -259,6 +261,76 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : WhenEnqueueingOu
 
         enqueuedOutgoingMessage.ActorMessageQueueNumber.Should().Be(delegatedBy.ActorNumber.Value);
         enqueuedOutgoingMessage.ActorMessageQueueRole.Should().Be(delegatedBy.ActorRole.Code);
+        enqueuedOutgoingMessage.OutgoingMessageReceiverNumber.Should().Be(delegatedBy.ActorNumber.Value);
+        enqueuedOutgoingMessage.OutgoingMessageReceiverRole.Should().Be(delegatedBy.ActorRole.Code);
+    }
+
+    [Fact]
+    public async Task Can_peek_message_as_delegated_including_starts_at()
+    {
+        // Arrange
+        var delegatedBy = new { ActorNumber = ActorNumber.Create("123"), ActorRole = ActorRole.BalanceResponsibleParty };
+        var delegatedTo = new { ActorNumber = ActorNumber.Create("456"), ActorRole = ActorRole.Delegated };
+        var message = _energyResultMessageDtoBuilder
+            .WithReceiverNumber(delegatedBy.ActorNumber.Value)
+            .WithReceiverRole(delegatedTo.ActorRole)
+            .Build();
+
+        var startsAt = Instant.FromUtc(2024, 10, 1, 0, 0);
+        _dateTimeProvider.SetNow(startsAt);
+        AddDelegation(
+            delegatedBy.ActorNumber,
+            delegatedBy.ActorRole,
+            delegatedTo.ActorNumber,
+            delegatedTo.ActorRole,
+            message.Series.GridAreaCode,
+            DocumentType.NotifyAggregatedMeasureData,
+            startsAt,
+            startsAt.Plus(Duration.FromDays(5)));
+
+        // Act
+        var createdId = await EnqueueAndCommitAsync(message);
+
+        // Assert
+        var enqueuedOutgoingMessage = await GetEnqueuedOutgoingMessageFromDatabase(createdId);
+
+        enqueuedOutgoingMessage.ActorMessageQueueNumber.Should().Be(delegatedTo.ActorNumber.Value);
+        enqueuedOutgoingMessage.ActorMessageQueueRole.Should().Be(delegatedTo.ActorRole.Code);
+        enqueuedOutgoingMessage.OutgoingMessageReceiverNumber.Should().Be(delegatedBy.ActorNumber.Value);
+        enqueuedOutgoingMessage.OutgoingMessageReceiverRole.Should().Be(delegatedBy.ActorRole.Code);
+    }
+
+    [Fact]
+    public async Task Can_not_peek_message_as_delegated_excluding_stops_at()
+    {
+        // Arrange
+        var delegatedBy = new { ActorNumber = ActorNumber.Create("123"), ActorRole = ActorRole.BalanceResponsibleParty };
+        var delegatedTo = new { ActorNumber = ActorNumber.Create("456"), ActorRole = ActorRole.Delegated };
+        var message = _energyResultMessageDtoBuilder
+            .WithReceiverNumber(delegatedBy.ActorNumber.Value)
+            .WithReceiverRole(delegatedTo.ActorRole)
+            .Build();
+
+        var stopsAt = Instant.FromUtc(2024, 10, 1, 0, 0);
+        _dateTimeProvider.SetNow(stopsAt);
+        AddDelegation(
+            delegatedBy.ActorNumber,
+            delegatedBy.ActorRole,
+            delegatedTo.ActorNumber,
+            delegatedTo.ActorRole,
+            message.Series.GridAreaCode,
+            DocumentType.NotifyAggregatedMeasureData,
+            stopsAt.Minus(Duration.FromDays(5)),
+            stopsAt);
+
+        // Act
+        var createdId = await EnqueueAndCommitAsync(message);
+
+        // Assert
+        var enqueuedOutgoingMessage = await GetEnqueuedOutgoingMessageFromDatabase(createdId);
+
+        enqueuedOutgoingMessage.ActorMessageQueueNumber.Should().Be(delegatedTo.ActorNumber.Value);
+        enqueuedOutgoingMessage.ActorMessageQueueRole.Should().Be(delegatedTo.ActorRole.Code);
         enqueuedOutgoingMessage.OutgoingMessageReceiverNumber.Should().Be(delegatedBy.ActorNumber.Value);
         enqueuedOutgoingMessage.OutgoingMessageReceiverRole.Should().Be(delegatedBy.ActorRole.Code);
     }
