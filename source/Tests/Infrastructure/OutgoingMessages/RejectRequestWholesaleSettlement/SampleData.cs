@@ -43,5 +43,5 @@ internal static class SampleData
 
     public static string SerieReasonMessage => "Det virker ikke!";
 
-    public static string OriginalTransactionId => "4E85A73285FD4D928FF372C052802717";
+    public static string OriginalTransactionId => "lZ3sWkZS9AFlQpMxQvKT2qZg0w91cB2DS2AO";
 }

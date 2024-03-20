@@ -23,6 +23,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -31,14 +32,12 @@ namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequ
 public sealed class RejectRequestWholesaleSettlementDocumentWriterTests : IClassFixture<DocumentValidationFixture>
 {
     private readonly DocumentValidationFixture _documentValidation;
-    private readonly ITestOutputHelper _testOutputHelper;
     private readonly MessageRecordParser _parser;
     private readonly RejectedWholesaleServicesMessageBuilder _rejectedEnergyResultMessageBuilder;
 
-    public RejectRequestWholesaleSettlementDocumentWriterTests(DocumentValidationFixture documentValidation, ITestOutputHelper testOutputHelper)
+    public RejectRequestWholesaleSettlementDocumentWriterTests(DocumentValidationFixture documentValidation)
     {
         _documentValidation = documentValidation;
-        _testOutputHelper = testOutputHelper;
         _parser = new MessageRecordParser(new Serializer());
         _rejectedEnergyResultMessageBuilder = RejectedWholesaleServicesMessageBuilder.RejectWholesaleService();
     }
@@ -53,10 +52,7 @@ public sealed class RejectRequestWholesaleSettlementDocumentWriterTests : IClass
             _rejectedEnergyResultMessageBuilder,
             DocumentFormat.FromName(documentFormat));
 
-        using var streamReader = new StreamReader(marketDocumentStream.Stream);
-        _testOutputHelper.WriteLine(await streamReader.ReadToEndAsync());
-
-        await AssertDocument(marketDocumentStream.Stream, DocumentFormat.FromName(documentFormat))
+        AssertDocument(marketDocumentStream.Stream, DocumentFormat.FromName(documentFormat))
             .HasMessageId(SampleData.MessageId)
             .HasSenderId(SampleData.SenderId)
             .HasReceiverId(SampleData.ReceiverId)
@@ -66,8 +62,29 @@ public sealed class RejectRequestWholesaleSettlementDocumentWriterTests : IClass
             .HasTransactionId(SampleData.TransactionId)
             .HasSerieReasonCode(SampleData.SerieReasonCode)
             .HasSerieReasonMessage(SampleData.SerieReasonMessage)
-            .HasOriginalTransactionId(SampleData.OriginalTransactionId)
-            .DocumentIsValidAsync();
+            .HasOriginalTransactionId(SampleData.OriginalTransactionId);
+
+        marketDocumentStream.Stream.Position = 0;
+        var validateDocument = () =>
+            AssertDocument(marketDocumentStream.Stream, DocumentFormat.FromName(documentFormat)).DocumentIsValidAsync();
+
+        if (documentFormat == nameof(DocumentFormat.Ebix))
+        {
+            (await validateDocument.Should()
+                .ThrowAsync<Exception>())
+                .Which
+                .Message
+                .Should()
+                .Contain("OriginalBusinessDocument")
+                .And
+                .Contain(SampleData.OriginalTransactionId)
+                .And
+                .Contain("The actual length is greater than the MaxLength value");
+        }
+        else
+        {
+            await validateDocument.Should().NotThrowAsync();
+        }
     }
 
     private Task<MarketDocumentStream> CreateDocument(
