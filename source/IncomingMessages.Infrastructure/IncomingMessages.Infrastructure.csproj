@@ -920,16 +920,16 @@
     <EmbeddedResource Include="DocumentValidation\CimXml\Schemas\urn-ediel-org-measure-rejectrequestwholesalesettlement-0-1.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_AggregatedBusinessInformationEntities_0p1pA.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_AggregatedBusinessInformationEntities_0p1pA.xsd">
+    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_AggregatedBusinessInformationEntities-2.xsd" />
+    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_AggregatedBusinessInformationEntities-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_DK_RejectAggregatedBillingInformation_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_DK_RejectAggregatedBillingInformation_0p9pC.xsd">
+    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_BusinessDataType-2.xsd" />
+    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_BusinessDataType-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_BusinessDataType_0p1pA.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_BusinessDataType_0p1pA.xsd">
+    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_DK_RejectAggregatedBillingInformation-2.xsd" />
+    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_DK_RejectAggregatedBillingInformation-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
