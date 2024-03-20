@@ -28,6 +28,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
         public static readonly FileStorageCategory FileStorageCategory = FileStorageCategory.OutgoingMessage();
 
         private string? _serializedContent;
+        private Receiver? _receiver;
 
         public OutgoingMessage(
             DocumentType documentType,
@@ -98,7 +99,14 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
         public ActorRole SenderRole { get; }
 
-        public Receiver Receiver => Receiver.Create(ReceiverId, ReceiverRole);
+        /// <summary>
+        /// Receiver reference the actor queue that should receive the message.
+        /// </summary>
+        public Receiver Receiver
+        {
+            get => _receiver ?? Receiver.Create(ReceiverId, ReceiverRole);
+            set => _receiver = value;
+        }
 
         public BundleId? AssignedBundleId { get; private set; }
 
@@ -291,7 +299,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
         /// </summary>
         public Receiver GetActorMessageQueueMetadata()
         {
-            var actorMessageQueueReceiverRole = ReceiverRole;
+            var actorMessageQueueReceiverRole = Receiver.ActorRole;
 
             if (WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack)
             {
@@ -300,7 +308,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                     actorMessageQueueReceiverRole = actorMessageQueueReceiverRole.ForActorMessageQueue();
             }
 
-            return Receiver.Create(ReceiverId, actorMessageQueueReceiverRole);
+            return Receiver.Create(Receiver.Number, actorMessageQueueReceiverRole);
         }
 
         private static bool DocumentIsAggregatedMeasureData(DocumentType documentType)
