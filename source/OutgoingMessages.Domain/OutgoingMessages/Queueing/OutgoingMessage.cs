@@ -52,6 +52,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             _serializedContent = serializedContent;
             FileStorageReference = CreateFileStorageReference(ReceiverId, timestamp, Id);
             RelatedToMessageId = relatedToMessageId;
+            Receiver = Receiver.Create(ReceiverId, ReceiverRole);
         }
 
         /// <summary>
@@ -77,6 +78,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             SenderId = senderId;
             SenderRole = senderRole;
             FileStorageReference = fileStorageReference;
+            Receiver = Receiver.Create(ReceiverId, ReceiverRole);
             // _serializedContent is set later in OutgoingMessageRepository, by getting the message from File Storage
         }
 
@@ -98,7 +100,10 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
         public ActorRole SenderRole { get; }
 
-        public Receiver Receiver => Receiver.Create(ReceiverId, ReceiverRole);
+        /// <summary>
+        /// Reference the actor queue that should receive the message.
+        /// </summary>
+        public Receiver Receiver { get; }
 
         public BundleId? AssignedBundleId { get; private set; }
 
@@ -291,7 +296,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
         /// </summary>
         public Receiver GetActorMessageQueueMetadata()
         {
-            var actorMessageQueueReceiverRole = ReceiverRole;
+            var actorMessageQueueReceiverRole = Receiver.ActorRole;
 
             if (WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack)
             {
@@ -300,7 +305,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                     actorMessageQueueReceiverRole = actorMessageQueueReceiverRole.ForActorMessageQueue();
             }
 
-            return Receiver.Create(ReceiverId, actorMessageQueueReceiverRole);
+            return Receiver.Create(Receiver.Number, actorMessageQueueReceiverRole);
         }
 
         private static bool DocumentIsAggregatedMeasureData(DocumentType documentType)
