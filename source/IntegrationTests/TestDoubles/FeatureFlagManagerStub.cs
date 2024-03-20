@@ -29,4 +29,6 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
     public Task<bool> UseAmountPerChargeResultProduced { get; set; } = Task.FromResult(true);
 
     public Task<bool> UseRequestWholesaleSettlementReceiver { get; } = Task.FromResult(true);
+
+    public Task<bool> UseMessageDelegation { get; } = Task.FromResult(true);
 }
