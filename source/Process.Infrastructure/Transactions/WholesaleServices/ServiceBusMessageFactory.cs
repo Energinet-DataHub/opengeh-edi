@@ -69,8 +69,8 @@ public static class ServiceBusMessageFactory
 
         foreach (var chargeType in process.ChargeTypes)
         {
-            request.ChargeType.Add(
-                new ChargeType() { ChargeId = chargeType.Id, ChargeType_ = chargeType.Type, });
+            request.ChargeTypes.Add(
+                new ChargeType() { ChargeCode = chargeType.Id, ChargeType_ = chargeType.Type, });
         }
 
         return request;
