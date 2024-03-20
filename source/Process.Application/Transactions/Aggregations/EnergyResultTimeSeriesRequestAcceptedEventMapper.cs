@@ -49,10 +49,10 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
 
         ArgumentNullException.ThrowIfNull(aggregations);
 
-        var acceptedEnergyResultTimeSeries = new List<AcceptedEnergyResultTimeSerie>();
+        var acceptedEnergyResultTimeSeries = new List<AcceptedEnergyResultTimeSeries>();
         foreach (var aggregation in aggregations.Series)
         {
-            acceptedEnergyResultTimeSeries.Add(new AcceptedEnergyResultTimeSerie(
+            acceptedEnergyResultTimeSeries.Add(new AcceptedEnergyResultTimeSeries(
                 MapPoints(aggregation.TimeSeriesPoints),
                 MapMeteringPointType(aggregation.TimeSeriesType),
                 MapSettlementType(aggregation.TimeSeriesType),
@@ -64,7 +64,7 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
                 aggregation.Period.EndOfPeriod.ToInstant()));
         }
 
-        return new AggregatedTimeSerieRequestWasAccepted(
+        return new AggregatedTimeSeriesRequestWasAccepted(
             referenceId,
             acceptedEnergyResultTimeSeries);
     }
