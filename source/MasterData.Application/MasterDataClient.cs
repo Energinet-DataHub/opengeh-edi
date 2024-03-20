@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Domain.ActorCertificates;
 using Energinet.DataHub.EDI.MasterData.Domain.Actors;
 using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
+using Energinet.DataHub.EDI.MasterData.Domain.MessageDelegations;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
@@ -33,19 +34,22 @@ internal sealed class MasterDataClient : IMasterDataClient
     private readonly IActorCertificateRepository _actorCertificateRepository;
     private readonly MasterDataContext _masterDataContext;
     private readonly ILogger<IMasterDataClient> _logger;
+    private readonly IMessageDelegationRepository _messageDelegationRepository;
 
     public MasterDataClient(
         IActorRepository actorRepository,
         IGridAreaRepository gridAreaRepository,
         IActorCertificateRepository actorCertificateRepository,
         MasterDataContext masterDataContext,
-        ILogger<IMasterDataClient> logger)
+        ILogger<IMasterDataClient> logger,
+        IMessageDelegationRepository messageDelegationRepository)
     {
         _actorRepository = actorRepository;
         _gridAreaRepository = gridAreaRepository;
         _actorCertificateRepository = actorCertificateRepository;
         _masterDataContext = masterDataContext;
         _logger = logger;
+        _messageDelegationRepository = messageDelegationRepository;
     }
 
     public async Task CreateActorIfNotExistAsync(CreateActorDto createActorDto, CancellationToken cancellationToken)
@@ -140,6 +144,16 @@ internal sealed class MasterDataClient : IMasterDataClient
             .ConfigureAwait(false);
 
         await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task CreateMessageDelegationConfiguredAsync(
+        MessageDelegationDto messageDelegationDto,
+        CancellationToken cancellationToken)
+    {
+        await _messageDelegationRepository.CreateAsync(
+            new MessageDelegation(),
+            cancellationToken)
+            .ConfigureAwait(false);
     }
 
     private void CreateNewActorCertificate(ActorCertificateCredentialsAssignedDto request)

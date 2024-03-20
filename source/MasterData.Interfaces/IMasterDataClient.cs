@@ -64,4 +64,9 @@ public interface IMasterDataClient
     Task DeleteActorCertificateAsync(
         ActorCertificateCredentialsRemovedDto actorCertificateCredentialsRemovedDto,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    ///    Create a new message delegation configuration.
+    /// </summary>
+    Task CreateMessageDelegationConfiguredAsync(MessageDelegationDto messageDelegationDto, CancellationToken cancellationToken);
 }
