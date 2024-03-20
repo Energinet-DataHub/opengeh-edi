@@ -29,7 +29,6 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
-using NodaTime;
 using Xunit;
 using Xunit.Categories;
 

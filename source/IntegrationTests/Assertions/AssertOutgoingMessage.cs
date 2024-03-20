@@ -79,13 +79,6 @@ public class AssertOutgoingMessage
         Assert.Null(message);
     }
 
-#pragma warning disable CA1024
-    public string GetMessageRecord()
-#pragma warning restore CA1024
-    {
-        return _messageRecord;
-    }
-
     public AssertOutgoingMessage HasReceiverId(string receiverId)
     {
         Assert.Equal(receiverId, _message.ReceiverId);

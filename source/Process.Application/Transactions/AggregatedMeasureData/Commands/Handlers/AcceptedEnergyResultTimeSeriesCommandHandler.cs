@@ -24,11 +24,11 @@ using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands.Handlers;
 
-public class AcceptProcessWhenAcceptedEnergyResultTimeSeriesIsAvailable : IRequestHandler<AcceptedEnergyResultTimeSeriesCommand, Unit>
+public class AcceptedEnergyResultTimeSeriesCommandHandler : IRequestHandler<AcceptedEnergyResultTimeSeriesCommand, Unit>
 {
     private readonly IAggregatedMeasureDataProcessRepository _aggregatedMeasureDataProcessRepository;
 
-    public AcceptProcessWhenAcceptedEnergyResultTimeSeriesIsAvailable(
+    public AcceptedEnergyResultTimeSeriesCommandHandler(
         IAggregatedMeasureDataProcessRepository aggregatedMeasureDataProcessRepository)
     {
         _aggregatedMeasureDataProcessRepository = aggregatedMeasureDataProcessRepository;
@@ -42,10 +42,10 @@ public class AcceptProcessWhenAcceptedEnergyResultTimeSeriesIsAvailable : IReque
             .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
         var energyResultMessageDtos = new List<AcceptedEnergyResultMessageDto>();
-        foreach (var aggregatedTimeSerie in request.AggregatedTimeSeries)
+        foreach (var aggregatedTimeSeries in request.AggregatedTimeSeries)
         {
             var message = AcceptedEnergyResultMessageDtoFactory
-                .Create(process, aggregatedTimeSerie);
+                .Create(process, aggregatedTimeSeries);
             energyResultMessageDtos.Add(message);
         }
 

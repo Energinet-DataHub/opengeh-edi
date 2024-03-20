@@ -128,7 +128,7 @@ public class NotifyAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
             {
                 if (timeSeries.SettlementType.Length == 3)
                 {
-                    // TODO: This is keep for backward compatibility. Remove this
+                    // TODO: This is keep for backward compatibility. Remove this in next pull request
                     // only codes has length 3
                     await WriteCodeWithCodeListReferenceAttributesAsync(
                             "SettlementMethod",

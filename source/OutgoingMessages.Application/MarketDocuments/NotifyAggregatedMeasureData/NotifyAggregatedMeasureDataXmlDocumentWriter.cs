@@ -62,7 +62,7 @@ public class NotifyAggregatedMeasureDataXmlDocumentWriter : DocumentWriter
                     MeteringPointType.FromName(timeSeries.MeteringPointType).Code)
                 .ConfigureAwait(false);
 
-            // TODO: This is keep for backward compatibility. Remove this
+            // TODO: This is keep for backward compatibility. Remove this in next pull request
             // only codes has length 3
             if (timeSeries.SettlementType is not null && timeSeries.SettlementType.Length == 3)
             {
