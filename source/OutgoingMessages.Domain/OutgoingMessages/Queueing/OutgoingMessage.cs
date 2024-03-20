@@ -69,7 +69,6 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             ActorRole receiverRole,
             ActorNumber senderId,
             ActorRole senderRole,
-            string gridAreaCode,
             FileStorageReference fileStorageReference)
         {
             Id = OutgoingMessageId.New();
@@ -80,9 +79,10 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             ReceiverRole = receiverRole;
             SenderId = senderId;
             SenderRole = senderRole;
-            GridAreaCode = gridAreaCode;
             FileStorageReference = fileStorageReference;
+            //TODO: this is not correct as the receiver could have been changed.
             Receiver = Receiver.Create(ReceiverId, ReceiverRole);
+            //TODO: gridAreaCode is not set here
             // _serializedContent is set later in OutgoingMessageRepository, by getting the message from File Storage
         }
 

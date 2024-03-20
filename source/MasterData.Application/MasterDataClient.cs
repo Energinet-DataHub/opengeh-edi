@@ -157,22 +157,22 @@ internal sealed class MasterDataClient : IMasterDataClient
             .ConfigureAwait(false);
     }
 
-    public async Task<MessageDelegationDto?> GetMessageDelegationAsync(
+    public Task<MessageDelegationDto?> GetMessageDelegationAsync(
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
         string gridAreaCode,
         DocumentType documentType,
         Instant now)
     {
-        var messageDelegation = await _messageDelegationRepository.GetAsync(
-            delegatedByActorNumber,
-            delegatedByActorRole,
-            gridAreaCode,
-            documentType,
-            now).ConfigureAwait(false);
+        return Task.FromResult<MessageDelegationDto?>(null);
+        // var messageDelegation = await _messageDelegationRepository.GetAsync(
+        //     delegatedByActorNumber,
+        //     delegatedByActorRole,
+        //     gridAreaCode,
+        //     documentType,
+        //     now).ConfigureAwait(false);
 
         // return messageDelegation is not null ? new MessageDelegationDto(messageDelegation) : null;
-        return null;
     }
 
     private void CreateNewActorCertificate(ActorCertificateCredentialsAssignedDto request)
