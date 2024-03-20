@@ -117,8 +117,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : WhenEnqueueingOu
 
         enqueuedOutgoingMessage.ActorMessageQueueNumber.Should().Be(delegatedTo.ActorNumber.Value);
         enqueuedOutgoingMessage.ActorMessageQueueRole.Should().Be(delegatedTo.ActorRole.Code);
-        enqueuedOutgoingMessage.OutgoingMessageReceiverNumber.Should().Be(delegatedBy.ActorNumber.Value);
-        enqueuedOutgoingMessage.OutgoingMessageReceiverRole.Should().Be(delegatedBy.ActorRole.Code);
+        enqueuedOutgoingMessage.OutgoingMessageReceiverNumber.Should().Be(delegatedTo.ActorNumber.Value);
+        enqueuedOutgoingMessage.OutgoingMessageReceiverRole.Should().Be(delegatedTo.ActorRole.Code);
     }
 
     [Fact]
@@ -150,8 +150,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : WhenEnqueueingOu
 
         enqueuedOutgoingMessage.ActorMessageQueueNumber.Should().NotBe(delegatedBy.ActorNumber.Value);
         enqueuedOutgoingMessage.ActorMessageQueueRole.Should().NotBe(delegatedBy.ActorRole.Code);
-        enqueuedOutgoingMessage.OutgoingMessageReceiverNumber.Should().Be(delegatedBy.ActorNumber.Value);
-        enqueuedOutgoingMessage.OutgoingMessageReceiverRole.Should().Be(delegatedBy.ActorRole.Code);
+        enqueuedOutgoingMessage.OutgoingMessageReceiverNumber.Should().NotBe(delegatedBy.ActorNumber.Value);
+        enqueuedOutgoingMessage.OutgoingMessageReceiverRole.Should().NotBe(delegatedBy.ActorRole.Code);
     }
 
     [Fact]
@@ -296,8 +296,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : WhenEnqueueingOu
 
         enqueuedOutgoingMessage.ActorMessageQueueNumber.Should().Be(delegatedTo.ActorNumber.Value);
         enqueuedOutgoingMessage.ActorMessageQueueRole.Should().Be(delegatedTo.ActorRole.Code);
-        enqueuedOutgoingMessage.OutgoingMessageReceiverNumber.Should().Be(delegatedBy.ActorNumber.Value);
-        enqueuedOutgoingMessage.OutgoingMessageReceiverRole.Should().Be(delegatedBy.ActorRole.Code);
+        enqueuedOutgoingMessage.OutgoingMessageReceiverNumber.Should().Be(delegatedTo.ActorNumber.Value);
+        enqueuedOutgoingMessage.OutgoingMessageReceiverRole.Should().Be(delegatedTo.ActorRole.Code);
     }
 
     [Fact]
@@ -329,10 +329,10 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : WhenEnqueueingOu
         // Assert
         var enqueuedOutgoingMessage = await GetEnqueuedOutgoingMessageFromDatabase(createdId);
 
-        enqueuedOutgoingMessage.ActorMessageQueueNumber.Should().Be(delegatedTo.ActorNumber.Value);
-        enqueuedOutgoingMessage.ActorMessageQueueRole.Should().Be(delegatedTo.ActorRole.Code);
-        enqueuedOutgoingMessage.OutgoingMessageReceiverNumber.Should().Be(delegatedBy.ActorNumber.Value);
-        enqueuedOutgoingMessage.OutgoingMessageReceiverRole.Should().Be(delegatedBy.ActorRole.Code);
+        enqueuedOutgoingMessage.ActorMessageQueueNumber.Should().NotBe(delegatedTo.ActorNumber.Value);
+        enqueuedOutgoingMessage.ActorMessageQueueRole.Should().NotBe(delegatedTo.ActorRole.Code);
+        enqueuedOutgoingMessage.OutgoingMessageReceiverNumber.Should().NotBe(delegatedTo.ActorNumber.Value);
+        enqueuedOutgoingMessage.OutgoingMessageReceiverRole.Should().NotBe(delegatedTo.ActorRole.Code);
     }
 
     protected override void Dispose(bool disposing)

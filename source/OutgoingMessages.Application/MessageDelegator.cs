@@ -35,7 +35,8 @@ public class MessageDelegator
 
         if (delegatedTo is not null)
         {
-            messageToEnqueue.Receiver = delegatedTo;
+            messageToEnqueue.ReceiverId = delegatedTo.Number;
+            messageToEnqueue.ReceiverRole = delegatedTo.ActorRole;
         }
 
         return messageToEnqueue;
