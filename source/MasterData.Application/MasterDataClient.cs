@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.MasterData.Application;
 
@@ -154,6 +155,24 @@ internal sealed class MasterDataClient : IMasterDataClient
             new MessageDelegation(),
             cancellationToken)
             .ConfigureAwait(false);
+    }
+
+    public async Task<MessageDelegationDto?> GetMessageDelegationAsync(
+        ActorNumber delegatedByActorNumber,
+        ActorRole delegatedByActorRole,
+        string gridAreaCode,
+        DocumentType documentType,
+        Instant now)
+    {
+        var messageDelegation = await _messageDelegationRepository.GetAsync(
+            delegatedByActorNumber,
+            delegatedByActorRole,
+            gridAreaCode,
+            documentType,
+            now).ConfigureAwait(false);
+
+        // return messageDelegation is not null ? new MessageDelegationDto(messageDelegation) : null;
+        return null;
     }
 
     private void CreateNewActorCertificate(ActorCertificateCredentialsAssignedDto request)

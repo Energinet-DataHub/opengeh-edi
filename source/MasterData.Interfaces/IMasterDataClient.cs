@@ -16,6 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.MasterData.Interfaces;
 
@@ -69,4 +70,9 @@ public interface IMasterDataClient
     ///    Create a new message delegation configuration.
     /// </summary>
     Task CreateMessageDelegationConfiguredAsync(MessageDelegationDto messageDelegationDto, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///    Get message delegation.
+    /// </summary>
+    Task<MessageDelegationDto?> GetMessageDelegationAsync(ActorNumber delegatedByActorNumber, ActorRole delegatedByActorRole, string gridAreaCode, DocumentType documentType, Instant now);
 }

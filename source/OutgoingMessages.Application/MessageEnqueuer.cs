@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
@@ -29,26 +30,32 @@ public class MessageEnqueuer
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly ILogger<MessageEnqueuer> _logger;
     private readonly MessageDelegator _messageDelegator;
+    private readonly IFeatureFlagManager _featureFlagManager;
 
     public MessageEnqueuer(
         IActorMessageQueueRepository actorMessageQueueRepository,
         IOutgoingMessageRepository outgoingMessageRepository,
         ISystemDateTimeProvider systemDateTimeProvider,
         ILogger<MessageEnqueuer> logger,
-        MessageDelegator messageDelegator)
+        MessageDelegator messageDelegator,
+        IFeatureFlagManager featureFlagManager)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _outgoingMessageRepository = outgoingMessageRepository;
         _systemDateTimeProvider = systemDateTimeProvider;
         _logger = logger;
         _messageDelegator = messageDelegator;
+        _featureFlagManager = featureFlagManager;
     }
 
     public async Task<OutgoingMessageId> EnqueueAsync(OutgoingMessage messageToEnqueue)
     {
         ArgumentNullException.ThrowIfNull(messageToEnqueue);
 
-        messageToEnqueue = _messageDelegator.Delegate(messageToEnqueue);
+        if (await _featureFlagManager.UseMessageDelegation.ConfigureAwait(false))
+        {
+            messageToEnqueue = await _messageDelegator.DelegateAsync(messageToEnqueue).ConfigureAwait(false);
+        }
 
         var addToRepositoryTask = _outgoingMessageRepository.AddAsync(messageToEnqueue);
         var addToActorMessageQueueTask = AddToActorMessageQueueAsync(messageToEnqueue);

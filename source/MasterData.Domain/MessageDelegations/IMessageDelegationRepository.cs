@@ -14,6 +14,8 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.MasterData.Domain.MessageDelegations;
 
@@ -26,4 +28,9 @@ public interface IMessageDelegationRepository
     ///     Create a message delegation
     /// </summary>
     Task CreateAsync(MessageDelegation messageDelegation, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Get a message delegation
+    /// </summary>
+    Task<MessageDelegation?> GetAsync(ActorNumber delegatedByActorNumber, ActorRole delegatedByActorRole, string gridAreaCode, DocumentType documentType, Instant now);
 }

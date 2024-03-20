@@ -28,7 +28,6 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
         public static readonly FileStorageCategory FileStorageCategory = FileStorageCategory.OutgoingMessage();
 
         private string? _serializedContent;
-        private Receiver? _receiver;
 
         public OutgoingMessage(
             DocumentType documentType,
@@ -40,7 +39,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             ActorRole senderRole,
             string serializedContent,
             Instant timestamp,
-            MessageId? relatedToMessageId = null)
+            MessageId? relatedToMessageId = null,
+            string? gridAreaCode = null)
         {
             Id = OutgoingMessageId.New();
             DocumentType = documentType;
@@ -50,9 +50,11 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             ReceiverRole = receiverRole;
             SenderId = senderId;
             SenderRole = senderRole;
+            GridAreaCode = gridAreaCode;
             _serializedContent = serializedContent;
             FileStorageReference = CreateFileStorageReference(ReceiverId, timestamp, Id);
             RelatedToMessageId = relatedToMessageId;
+            Receiver = Receiver.Create(ReceiverId, ReceiverRole);
         }
 
         /// <summary>
@@ -67,6 +69,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             ActorRole receiverRole,
             ActorNumber senderId,
             ActorRole senderRole,
+            string gridAreaCode,
             FileStorageReference fileStorageReference)
         {
             Id = OutgoingMessageId.New();
@@ -77,7 +80,9 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             ReceiverRole = receiverRole;
             SenderId = senderId;
             SenderRole = senderRole;
+            GridAreaCode = gridAreaCode;
             FileStorageReference = fileStorageReference;
+            Receiver = Receiver.Create(ReceiverId, ReceiverRole);
             // _serializedContent is set later in OutgoingMessageRepository, by getting the message from File Storage
         }
 
@@ -99,11 +104,12 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
         public ActorRole SenderRole { get; }
 
-        public Receiver Receiver
-        {
-            get => _receiver ?? Receiver.Create(ReceiverId, ReceiverRole);
-            set => _receiver = value;
-        }
+        public string? GridAreaCode { get; }
+
+        /// <summary>
+        /// Reference the actor queue that should receive the message.
+        /// </summary>
+        public Receiver Receiver { get; private set; }
 
         public BundleId? AssignedBundleId { get; private set; }
 
@@ -160,7 +166,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                 rejectedEnergyResultMessage.SenderRole,
                 serializer.Serialize(rejectedEnergyResultMessage.Series),
                 timestamp,
-                rejectedEnergyResultMessage.RelatedToMessageId);
+                relatedToMessageId: rejectedEnergyResultMessage.RelatedToMessageId);
         }
 
         /// <summary>
@@ -184,7 +190,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                 energyResultMessage.SenderRole,
                 serializer.Serialize(energyResultMessage.Series),
                 timestamp,
-                energyResultMessage.RelatedToMessageId);
+                energyResultMessage.RelatedToMessageId,
+                energyResultMessage.Series.GridAreaCode);
         }
 
         /// <summary>
@@ -210,7 +217,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                     wholesaleServicesMessageDto.SenderRole,
                     serializer.Serialize(wholesaleServicesMessageDto.Series),
                     timestamp,
-                    wholesaleServicesMessageDto.RelatedToMessageId),
+                    wholesaleServicesMessageDto.RelatedToMessageId,
+                    wholesaleServicesMessageDto.Series.GridAreaCode),
                 new(
                     wholesaleServicesMessageDto.DocumentType,
                     wholesaleServicesMessageDto.ChargeOwnerId,
@@ -221,7 +229,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                     wholesaleServicesMessageDto.SenderRole,
                     serializer.Serialize(wholesaleServicesMessageDto.Series),
                     timestamp,
-                    wholesaleServicesMessageDto.RelatedToMessageId),
+                    wholesaleServicesMessageDto.RelatedToMessageId,
+                    wholesaleServicesMessageDto.Series.GridAreaCode),
             };
         }
 
@@ -306,6 +315,11 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             }
 
             return Receiver.Create(Receiver.Number, actorMessageQueueReceiverRole);
+        }
+
+        public void DelegateTo(Receiver delegatedToReceiver)
+        {
+            Receiver = delegatedToReceiver;
         }
 
         private static bool DocumentIsAggregatedMeasureData(DocumentType documentType)

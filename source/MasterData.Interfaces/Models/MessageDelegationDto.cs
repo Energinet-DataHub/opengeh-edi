@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 
 /// <summary>
-///
+///    Data transfer object for message delegation
 /// </summary>
 public record MessageDelegationDto(
     int SequenceNumber,
-    string DocumentType,
+    DocumentType DocumentType,
     string GridAreaCode,
     Instant StartsAt,
     Instant StopsAt,

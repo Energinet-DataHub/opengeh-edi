@@ -12,47 +12,66 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DateTime;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
 
 public class MessageDelegator
 {
-    private readonly MessageDelegationRepository _messageDelegationRepository;
-    private readonly SystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IMasterDataClient _masterDataClient;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-    public MessageDelegator(MessageDelegationRepository messageDelegationRepository, SystemDateTimeProvider systemDateTimeProvider)
+    public MessageDelegator(IMasterDataClient masterDataClient, ISystemDateTimeProvider systemDateTimeProvider)
     {
-        _messageDelegationRepository = messageDelegationRepository;
+        _masterDataClient = masterDataClient;
         _systemDateTimeProvider = systemDateTimeProvider;
     }
 
-    public OutgoingMessage Delegate(OutgoingMessage messageToEnqueue)
+    public async Task<OutgoingMessage> DelegateAsync(OutgoingMessage messageToEnqueue)
     {
-        var delegatedTo = GetDelegation(messageToEnqueue);
+        ArgumentNullException.ThrowIfNull(messageToEnqueue);
+
+        // Delegation is only relevant for messages with a grid area code. E.g. not reject messages.
+        if (messageToEnqueue.GridAreaCode is null)
+        {
+            return messageToEnqueue;
+        }
+
+        var delegatedTo = await GetDelegationReceiverAsync(
+            messageToEnqueue.ReceiverId,
+            messageToEnqueue.ReceiverRole,
+            messageToEnqueue.GridAreaCode,
+            messageToEnqueue.DocumentType).ConfigureAwait(false);
 
         if (delegatedTo is not null)
         {
-            messageToEnqueue.ReceiverId = delegatedTo.Number;
-            messageToEnqueue.ReceiverRole = delegatedTo.ActorRole;
+            messageToEnqueue.DelegateTo(delegatedTo);
         }
 
         return messageToEnqueue;
     }
 
-    private Receiver? GetDelegation(
+    private async Task<Receiver?> GetDelegationReceiverAsync(
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
         string gridAreaCode,
         DocumentType documentType)
     {
-        return _messageDelegationRepository.GetDelegation(
+        var messageDelegation = await _masterDataClient.GetMessageDelegationAsync(
             delegatedByActorNumber,
             delegatedByActorRole,
             gridAreaCode,
             documentType,
-            _systemDateTimeProvider.Now());
+            _systemDateTimeProvider.Now())
+            .ConfigureAwait(false);
+
+        return messageDelegation is not null
+            ? Receiver.Create(messageDelegation.DelegatedTo.ActorNumber, messageDelegation.DelegatedTo.ActorRole)
+            : null;
     }
 }

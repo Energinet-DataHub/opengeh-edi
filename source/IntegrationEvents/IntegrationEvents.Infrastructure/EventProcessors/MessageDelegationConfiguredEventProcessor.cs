@@ -33,14 +33,14 @@ public class MessageDelegationConfiguredEventProcessor : IIntegrationEventProces
 
     public string EventTypeToHandle => MessageDelegationConfigured.EventName;
 
-    public async Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    public Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
         var message = (MessageDelegationConfigured)integrationEvent.Message;
-        await _masterDataClient.CreateMessageDelegationConfiguredAsync(
-            new MessageDelegationDto(),
-            cancellationToken).ConfigureAwait(false);
         throw new System.NotImplementedException();
+        // await _masterDataClient.CreateMessageDelegationConfiguredAsync(
+        //     new MessageDelegationDto(),
+        //     cancellationToken).ConfigureAwait(false);
     }
 }
