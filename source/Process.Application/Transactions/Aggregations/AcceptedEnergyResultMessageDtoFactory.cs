@@ -36,7 +36,7 @@ public static class AcceptedEnergyResultMessageDtoFactory
             processId: aggregatedMeasureDataProcess.ProcessId.Id,
             gridAreaCode: acceptedEnergyResultTimeSerie.GridAreaDetails.GridAreaCode,
             meteringPointType: acceptedEnergyResultTimeSerie.MeteringPointType,
-            settlementType: acceptedEnergyResultTimeSerie.SettlementType,
+            settlementType: aggregatedMeasureDataProcess.SettlementMethod,
             measureUnitType: acceptedEnergyResultTimeSerie.UnitType,
             resolution: acceptedEnergyResultTimeSerie.Resolution,
             energySupplierNumber: aggregatedMeasureDataProcess.EnergySupplierId,
