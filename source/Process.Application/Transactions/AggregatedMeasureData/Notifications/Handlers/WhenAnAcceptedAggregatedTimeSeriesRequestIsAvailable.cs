@@ -21,11 +21,11 @@ using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers;
 
-public class AggregatedTimeSeriesRequestWasAcceptedHandler : INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>
+public class WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable : INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>
 {
     private readonly CommandSchedulerFacade _commandSchedulerFacade;
 
-    public AggregatedTimeSeriesRequestWasAcceptedHandler(CommandSchedulerFacade commandSchedulerFacade)
+    public WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable(CommandSchedulerFacade commandSchedulerFacade)
     {
         _commandSchedulerFacade = commandSchedulerFacade;
     }
