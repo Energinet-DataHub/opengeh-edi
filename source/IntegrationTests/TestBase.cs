@@ -260,7 +260,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             _services = new ServiceCollection();
 
             _services.AddTransient<InboxEventsProcessor>()
-                .AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>>(
+                .AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>>(
                     _ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy)
                 .AddTransient<INotificationHandler<TestNotification>>(_ => InboxEventNotificationHandler)
                 .AddTransient<IRequestHandler<TestCommand, Unit>, TestCommandHandler>()
