@@ -46,7 +46,7 @@ public class AssertRejectRequestWholesaleSettlementEbixDocument : IAssertRejectR
 
     public IAssertRejectRequestWholesaleSettlementDocument HasReasonCode(string reasonCode)
     {
-        _documentAsserter.HasValue("PayloadChargeEvent[1]/StatusType", EbixCode.Of(ReasonCode.From(reasonCode)));
+        _documentAsserter.HasValue("PayloadChargeEvent[1]/StatusType", EbixCode.Of(ReasonCode.FromCode(reasonCode)));
         return this;
     }
 

@@ -51,12 +51,12 @@ public sealed class RejectRequestWholesaleSettlementDocumentWriterTests : IClass
     {
         var marketDocumentStream = await CreateDocument(
             _rejectedEnergyResultMessageBuilder,
-            DocumentFormat.From(documentFormat));
+            DocumentFormat.FromName(documentFormat));
 
         using var streamReader = new StreamReader(marketDocumentStream.Stream);
         _testOutputHelper.WriteLine(await streamReader.ReadToEndAsync());
 
-        await AssertDocument(marketDocumentStream.Stream, DocumentFormat.From(documentFormat))
+        await AssertDocument(marketDocumentStream.Stream, DocumentFormat.FromName(documentFormat))
             .HasMessageId(SampleData.MessageId)
             .HasSenderId(SampleData.SenderId)
             .HasReceiverId(SampleData.ReceiverId)
