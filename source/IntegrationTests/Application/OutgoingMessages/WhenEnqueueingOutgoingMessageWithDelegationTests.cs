@@ -71,7 +71,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : WhenEnqueueingOu
             delegatedTo.ActorRole,
             message.Series.GridAreaCode,
             DocumentType.NotifyAggregatedMeasureData,
-            SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)),
+            SystemClock.Instance.GetCurrentInstant(),
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)));
 
         // Act
@@ -171,7 +171,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : WhenEnqueueingOu
             message.Series.GridAreaCode,
             DocumentType.NotifyAggregatedMeasureData,
             SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(10)),
-            SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)));
+            SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(1)));
 
         // Act
         var createdId = await EnqueueAndCommitAsync(message);
@@ -203,8 +203,53 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : WhenEnqueueingOu
             delegatedTo.ActorRole,
             message.Series.GridAreaCode,
             DocumentType.NotifyAggregatedMeasureData,
+            SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(1)),
+            SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(10)));
+
+        // Act
+        var createdId = await EnqueueAndCommitAsync(message);
+
+        // Assert
+        var enqueuedOutgoingMessage = await GetEnqueuedOutgoingMessageFromDatabase(createdId);
+
+        enqueuedOutgoingMessage.ActorMessageQueueNumber.Should().Be(delegatedBy.ActorNumber.Value);
+        enqueuedOutgoingMessage.ActorMessageQueueRole.Should().Be(delegatedBy.ActorRole.Code);
+        enqueuedOutgoingMessage.OutgoingMessageReceiverNumber.Should().Be(delegatedBy.ActorNumber.Value);
+        enqueuedOutgoingMessage.OutgoingMessageReceiverRole.Should().Be(delegatedBy.ActorRole.Code);
+    }
+
+    [Fact]
+    public async Task Can_peek_message_as_delegated_by_when_delegation_has_stopped()
+    {
+        // Arrange
+        var delegatedBy = new { ActorNumber = ActorNumber.Create("123"), ActorRole = ActorRole.BalanceResponsibleParty };
+        var delegatedTo = new { ActorNumber = ActorNumber.Create("456"), ActorRole = ActorRole.Delegated };
+        var message = _energyResultMessageDtoBuilder
+            .WithReceiverNumber(delegatedBy.ActorNumber.Value)
+            .WithReceiverRole(delegatedTo.ActorRole)
+            .Build();
+
+        AddDelegation(
+            delegatedBy.ActorNumber,
+            delegatedBy.ActorRole,
+            delegatedTo.ActorNumber,
+            delegatedTo.ActorRole,
+            message.Series.GridAreaCode,
+            DocumentType.NotifyAggregatedMeasureData,
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)),
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(10)));
+
+        // Newer delegation to original receiver, which stops previous delegation
+        AddDelegation(
+            delegatedBy.ActorNumber,
+            delegatedBy.ActorRole,
+            delegatedBy.ActorNumber,
+            delegatedBy.ActorRole,
+            message.Series.GridAreaCode,
+            DocumentType.NotifyAggregatedMeasureData,
+            SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)),
+            SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(10)),
+            1);
 
         // Act
         var createdId = await EnqueueAndCommitAsync(message);
@@ -222,6 +267,20 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : WhenEnqueueingOu
     {
         _context.Dispose();
         base.Dispose(disposing);
+    }
+
+    private void AddDelegation(
+        ActorNumber delegatedByActorNumber,
+        ActorRole delegatedByActorRole,
+        ActorNumber delegatedToActorNumber,
+        ActorRole delegatedToActorRole,
+        string gridAreaCode,
+        DocumentType documentType,
+        Instant startsAt,
+        Instant stopsAt,
+        int sequenceNumber = 0)
+    {
+        throw new NotImplementedException();
     }
 
     private async Task<(string ActorMessageQueueNumber, string ActorMessageQueueRole, string OutgoingMessageReceiverNumber, string OutgoingMessageReceiverRole)> GetEnqueuedOutgoingMessageFromDatabase(OutgoingMessageId createdId)
