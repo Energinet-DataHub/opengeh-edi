@@ -80,13 +80,14 @@ public static class ProcessExtensions
         services
             .AddTransient<IRequestHandler<SendAggregatedMeasureDataRequestToWholesale, Unit>,
                 SendAggregatedMeasureDataRequestToWholesaleHandler>()
-            .AddTransient<IRequestHandler<AcceptedEnergyResultTimeSerieCommand, Unit>, AcceptProcessWhenAcceptedEnergyResultTimeSeriesIsAvailable>()
+            .AddTransient<IRequestHandler<AcceptedEnergyResultTimeSerieCommand, Unit>, AcceptProcessWhenAcceptedEnergyResultTimeSerieIsAvailable>()
+            .AddTransient<IRequestHandler<AcceptedEnergyResultTimeSeriesCommand, Unit>, AcceptProcessWhenAcceptedEnergyResultTimeSeriesIsAvailable>()
             .AddTransient<IRequestHandler<RejectedAggregatedTimeSeries, Unit>, RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable>()
             .AddTransient<INotificationHandler<AggregatedMeasureProcessIsInitialized>, NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized>()
             .AddTransient<INotificationHandler<NotifyWholesaleThatAggregatedMeasureDataIsRequested>,
                 NotifyWholesaleThatAggregatedMeasureDataIsRequestedHandler>()
             .AddTransient<IRequestHandler<InitializeAggregatedMeasureDataProcessesCommand, Unit>, InitializeAggregatedMeasureDataProcessesHandler>()
-            .AddTransient<INotificationHandler<AggregatedTimeSerieRequestWasAccepted>, WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable>()
+            .AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>, WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable>()
             .AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasRejected>, WhenAnRejectedAggregatedTimeSeriesRequestIsAvailable>()
             .AddScoped<WholesaleInbox>()
             .AddScoped<IAggregatedMeasureDataProcessRepository, AggregatedMeasureDataProcessRepository>();
