@@ -21,7 +21,7 @@ using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers;
 
-public class WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable : INotificationHandler<AggregatedTimeSerieRequestWasAccepted>
+public class WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable : INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>
 {
     private readonly CommandSchedulerFacade _commandSchedulerFacade;
 
@@ -30,9 +30,10 @@ public class WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable : INotificatio
         _commandSchedulerFacade = commandSchedulerFacade;
     }
 
-    public Task Handle(AggregatedTimeSerieRequestWasAccepted notification, CancellationToken cancellationToken)
+    public Task Handle(AggregatedTimeSeriesRequestWasAccepted notification, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(notification);
-        return _commandSchedulerFacade.EnqueueAsync(new AcceptedEnergyResultTimeSerieCommand(notification.ProcessId, notification.AggregatedTimeSeries));
+        return _commandSchedulerFacade.EnqueueAsync(
+            new AcceptedEnergyResultTimeSeriesCommand(notification.ProcessId, notification.AggregatedTimeSeries));
     }
 }
