@@ -46,6 +46,7 @@ internal static class InternalCommandExtensions
         mapper.Add("GridAreaOwnershipAssigned", typeof(GridAreaOwnershipAssignedDto));
         mapper.Add("SendAggregatedMeasureDataRequestToWholesale", typeof(SendAggregatedMeasureDataRequestToWholesale));
         mapper.Add("AcceptedAggregatedTimeSerie", typeof(AcceptedEnergyResultTimeSerieCommand));
+        mapper.Add("AcceptedAggregatedTimeSeries", typeof(AcceptedEnergyResultTimeSeriesCommand));
         mapper.Add("RejectedAggregatedTimeSeries", typeof(RejectedAggregatedTimeSeries));
         mapper.Add("SendWholesaleServicesRequestToWholesale", typeof(SendWholesaleServicesRequestToWholesale));
         mapper.Add("RejectedWholesaleServices", typeof(RejectedWholesaleServices));

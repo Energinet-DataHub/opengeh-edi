@@ -30,7 +30,6 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Responses;
-using FluentAssertions;
 using Google.Protobuf;
 using NodaTime.Serialization.Protobuf;
 using NodaTime.Text;
@@ -224,8 +223,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
           receiverRole.Code,
           BusinessReason.BalanceFixing,
           MessageId.New(),
-          MeteringPointType.Production.Code,
-          null,
+          MeteringPointType.Consumption.Code,
+          SettlementType.Flex.Code,
           SampleData.StartOfPeriod,
           SampleData.EndOfPeriod,
           SampleData.GridAreaCode,

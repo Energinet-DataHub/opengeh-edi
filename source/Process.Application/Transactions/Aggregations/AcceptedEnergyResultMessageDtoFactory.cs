@@ -49,4 +49,31 @@ public static class AcceptedEnergyResultMessageDtoFactory
             relatedToMessageId: aggregatedMeasureDataProcess.InitiatedByMessageId,
             originalTransactionIdReference: aggregatedMeasureDataProcess.BusinessTransactionId.Id);
     }
+
+    public static AcceptedEnergyResultMessageDto Create(
+        AggregatedMeasureDataProcess aggregatedMeasureDataProcess,
+        AcceptedEnergyResultTimeSeries acceptedEnergyResultTimeSerie)
+    {
+        ArgumentNullException.ThrowIfNull(aggregatedMeasureDataProcess);
+        ArgumentNullException.ThrowIfNull(acceptedEnergyResultTimeSerie);
+
+        return AcceptedEnergyResultMessageDto.Create(
+            receiverNumber: aggregatedMeasureDataProcess.RequestedByActorId,
+            receiverRole: ActorRole.FromCode(aggregatedMeasureDataProcess.RequestedByActorRoleCode),
+            processId: aggregatedMeasureDataProcess.ProcessId.Id,
+            gridAreaCode: acceptedEnergyResultTimeSerie.GridAreaDetails.GridAreaCode,
+            meteringPointType: acceptedEnergyResultTimeSerie.MeteringPointType.Name,
+            settlementType: acceptedEnergyResultTimeSerie.SettlementType?.Name,
+            measureUnitType: acceptedEnergyResultTimeSerie.UnitType.Name,
+            resolution: acceptedEnergyResultTimeSerie.Resolution.Name,
+            energySupplierNumber: aggregatedMeasureDataProcess.EnergySupplierId,
+            balanceResponsibleNumber: aggregatedMeasureDataProcess.BalanceResponsibleId,
+            period: new Period(acceptedEnergyResultTimeSerie.StartOfPeriod, acceptedEnergyResultTimeSerie.EndOfPeriod),
+            points: AcceptedEnergyResultMessageMapper.MapPoints(acceptedEnergyResultTimeSerie.Points),
+            businessReasonName: aggregatedMeasureDataProcess.BusinessReason.Name,
+            calculationResultVersion: acceptedEnergyResultTimeSerie.CalculationResultVersion,
+            settlementVersion: aggregatedMeasureDataProcess.SettlementVersion?.Name,
+            relatedToMessageId: aggregatedMeasureDataProcess.InitiatedByMessageId,
+            originalTransactionIdReference: aggregatedMeasureDataProcess.BusinessTransactionId.Id);
+    }
 }

@@ -14,17 +14,25 @@
 
 using System;
 using System.Collections.Generic;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 
 [Serializable]
-public record AcceptedEnergyResultTimeSerie(
+public record AcceptedEnergyResultTimeSeries(
     IReadOnlyCollection<Point> Points,
-    string MeteringPointType,
-    string UnitType,
-    string Resolution,
+    MeteringPointType MeteringPointType,
+    SettlementType? SettlementType,
+    MeasurementUnit UnitType,
+    Resolution Resolution,
     GridAreaDetails GridAreaDetails,
     long CalculationResultVersion,
     Instant StartOfPeriod,
     Instant EndOfPeriod);
+
+[Serializable]
+public record Point(int Position, decimal? Quantity, CalculatedQuantityQuality QuantityQuality, string SampleTime);
+
+[Serializable]
+public record GridAreaDetails(string GridAreaCode, string OperatorNumber);

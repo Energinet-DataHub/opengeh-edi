@@ -49,12 +49,13 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
 
         ArgumentNullException.ThrowIfNull(aggregations);
 
-        var acceptedEnergyResultTimeSeries = new List<AcceptedEnergyResultTimeSerie>();
+        var acceptedEnergyResultTimeSeries = new List<AcceptedEnergyResultTimeSeries>();
         foreach (var aggregation in aggregations.Series)
         {
-            acceptedEnergyResultTimeSeries.Add(new AcceptedEnergyResultTimeSerie(
+            acceptedEnergyResultTimeSeries.Add(new AcceptedEnergyResultTimeSeries(
                 MapPoints(aggregation.TimeSeriesPoints),
                 MapMeteringPointType(aggregation.TimeSeriesType),
+                MapSettlementType(aggregation.TimeSeriesType),
                 MapUnitType(aggregation.QuantityUnit),
                 MapResolution(aggregation.Resolution),
                 await MapGridAreaDetailsAsync(aggregation.GridArea, cancellationToken).ConfigureAwait(false),
@@ -63,7 +64,7 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
                 aggregation.Period.EndOfPeriod.ToInstant()));
         }
 
-        return new AggregatedTimeSerieRequestWasAccepted(
+        return new AggregatedTimeSeriesRequestWasAccepted(
             referenceId,
             acceptedEnergyResultTimeSeries);
     }
@@ -74,18 +75,37 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
         return eventType.Equals(nameof(AggregatedTimeSeriesRequestAccepted), StringComparison.OrdinalIgnoreCase);
     }
 
-    private static string MapMeteringPointType(TimeSeriesType timeSeriesType)
+    private static MeteringPointType MapMeteringPointType(TimeSeriesType timeSeriesType)
     {
         return timeSeriesType switch
         {
-            TimeSeriesType.Production => MeteringPointType.Production.Name,
-            TimeSeriesType.FlexConsumption => MeteringPointType.Consumption.Name,
-            TimeSeriesType.NonProfiledConsumption => MeteringPointType.Consumption.Name,
-            TimeSeriesType.NetExchangePerGa => MeteringPointType.Exchange.Name,
-            TimeSeriesType.NetExchangePerNeighboringGa => MeteringPointType.Exchange.Name,
-            TimeSeriesType.TotalConsumption => MeteringPointType.Consumption.Name,
-            TimeSeriesType.Unspecified => throw new InvalidOperationException("Unknown metering point type"),
-            _ => throw new InvalidOperationException("Could not determine metering point type"),
+            TimeSeriesType.Production => MeteringPointType.Production,
+            TimeSeriesType.FlexConsumption => MeteringPointType.Consumption,
+            TimeSeriesType.NonProfiledConsumption => MeteringPointType.Consumption,
+            TimeSeriesType.NetExchangePerGa => MeteringPointType.Exchange,
+            TimeSeriesType.NetExchangePerNeighboringGa => MeteringPointType.Exchange,
+            TimeSeriesType.TotalConsumption => MeteringPointType.Consumption,
+            TimeSeriesType.Unspecified => throw new InvalidOperationException(
+                $"Unknown {typeof(TimeSeriesType)}. Value: {timeSeriesType}'"),
+            _ => throw new InvalidOperationException(
+                $"Could not determine {typeof(MeteringPointType)} from 'timeSeriesType: {timeSeriesType}' of type: {typeof(TimeSeriesType)}"),
+        };
+    }
+
+    private static SettlementType? MapSettlementType(TimeSeriesType timeSeriesType)
+    {
+        return timeSeriesType switch
+        {
+            TimeSeriesType.Production => null,
+            TimeSeriesType.FlexConsumption => SettlementType.Flex,
+            TimeSeriesType.NonProfiledConsumption => SettlementType.NonProfiled,
+            TimeSeriesType.NetExchangePerGa => null,
+            TimeSeriesType.NetExchangePerNeighboringGa => null,
+            TimeSeriesType.TotalConsumption => null,
+            TimeSeriesType.Unspecified => throw new InvalidOperationException(
+                $"Unknown {typeof(TimeSeriesType)}. Value: {timeSeriesType}'"),
+            _ => throw new InvalidOperationException(
+                $"Could not determine {typeof(SettlementType)} from 'timeSeriesType: {timeSeriesType}' of type: {typeof(TimeSeriesType)}"),
         };
     }
 
@@ -108,22 +128,22 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
         return points.AsReadOnly();
     }
 
-    private static string MapResolution(Resolution resolution)
+    private static BuildingBlocks.Domain.Models.Resolution MapResolution(Resolution resolution)
     {
         return resolution switch
         {
-            Resolution.Pt15M => BuildingBlocks.Domain.Models.Resolution.QuarterHourly.Name,
-            Resolution.Pt1H => BuildingBlocks.Domain.Models.Resolution.Hourly.Name,
+            Resolution.Pt15M => BuildingBlocks.Domain.Models.Resolution.QuarterHourly,
+            Resolution.Pt1H => BuildingBlocks.Domain.Models.Resolution.Hourly,
             Resolution.Unspecified => throw new InvalidOperationException("Could not map resolution type"),
             _ => throw new InvalidOperationException("Unknown resolution type"),
         };
     }
 
-    private static string MapUnitType(QuantityUnit quantityUnit)
+    private static MeasurementUnit MapUnitType(QuantityUnit quantityUnit)
     {
         return quantityUnit switch
         {
-            QuantityUnit.Kwh => MeasurementUnit.Kwh.Name,
+            QuantityUnit.Kwh => MeasurementUnit.Kwh,
             QuantityUnit.Unspecified => throw new InvalidOperationException("Could not map unit type"),
             _ => throw new InvalidOperationException("Unknown unit type"),
         };

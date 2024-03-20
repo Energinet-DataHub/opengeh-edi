@@ -126,11 +126,24 @@ public class NotifyAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
 
             if (timeSeries.SettlementType != null)
             {
-                await WriteCodeWithCodeListReferenceAttributesAsync(
-                        "SettlementMethod",
-                        EbixCode.Of(SettlementType.FromName(timeSeries.SettlementType)),
-                        writer)
-                    .ConfigureAwait(false);
+                if (timeSeries.SettlementType.Length == 3)
+                {
+                    // TODO: This is keep for backward compatibility. Remove this in next pull request
+                    // only codes has length 3
+                    await WriteCodeWithCodeListReferenceAttributesAsync(
+                            "SettlementMethod",
+                            EbixCode.Of(SettlementType.FromCode(timeSeries.SettlementType)),
+                            writer)
+                        .ConfigureAwait(false);
+                }
+                else
+                {
+                    await WriteCodeWithCodeListReferenceAttributesAsync(
+                            "SettlementMethod",
+                            EbixCode.Of(SettlementType.FromName(timeSeries.SettlementType)),
+                            writer)
+                        .ConfigureAwait(false);
+                }
             }
 
             await writer.WriteEndElementAsync().ConfigureAwait(false);
