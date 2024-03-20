@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -23,18 +24,21 @@ using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestWholesaleSettlement;
 
 public sealed class RejectRequestWholesaleSettlementDocumentWriterTests : IClassFixture<DocumentValidationFixture>
 {
     private readonly DocumentValidationFixture _documentValidation;
+    private readonly ITestOutputHelper _testOutputHelper;
     private readonly MessageRecordParser _parser;
     private readonly RejectedWholesaleServicesMessageBuilder _rejectedEnergyResultMessageBuilder;
 
-    public RejectRequestWholesaleSettlementDocumentWriterTests(DocumentValidationFixture documentValidation)
+    public RejectRequestWholesaleSettlementDocumentWriterTests(DocumentValidationFixture documentValidation, ITestOutputHelper testOutputHelper)
     {
         _documentValidation = documentValidation;
+        _testOutputHelper = testOutputHelper;
         _parser = new MessageRecordParser(new Serializer());
         _rejectedEnergyResultMessageBuilder = RejectedWholesaleServicesMessageBuilder.RejectWholesaleService();
     }
@@ -48,6 +52,9 @@ public sealed class RejectRequestWholesaleSettlementDocumentWriterTests : IClass
         var marketDocumentStream = await CreateDocument(
             _rejectedEnergyResultMessageBuilder,
             DocumentFormat.From(documentFormat));
+
+        using var streamReader = new StreamReader(marketDocumentStream.Stream);
+        _testOutputHelper.WriteLine(await streamReader.ReadToEndAsync());
 
         await AssertDocument(marketDocumentStream.Stream, DocumentFormat.From(documentFormat))
             .HasMessageId(SampleData.MessageId)

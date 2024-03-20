@@ -46,7 +46,7 @@ public class AssertRejectRequestWholesaleSettlementEbixDocument : IAssertRejectR
 
     public IAssertRejectRequestWholesaleSettlementDocument HasReasonCode(string reasonCode)
     {
-        _documentAsserter.HasValue("PayloadResponseEvent[1]/StatusType", EbixCode.Of(ReasonCode.From(reasonCode)));
+        _documentAsserter.HasValue("PayloadChargeEvent[1]/StatusType", EbixCode.Of(ReasonCode.From(reasonCode)));
         return this;
     }
 
@@ -76,20 +76,20 @@ public class AssertRejectRequestWholesaleSettlementEbixDocument : IAssertRejectR
 
     public IAssertRejectRequestWholesaleSettlementDocument HasTransactionId(Guid expectedTransactionId)
     {
-        _documentAsserter.HasValue("PayloadResponseEvent[1]/Identification", expectedTransactionId.ToString("N"));
+        _documentAsserter.HasValue("PayloadChargeEvent[1]/Identification", expectedTransactionId.ToString("N"));
         return this;
     }
 
     public IAssertRejectRequestWholesaleSettlementDocument HasOriginalTransactionId(
         string expectedOriginalTransactionId)
     {
-        _documentAsserter.HasValue("PayloadResponseEvent[1]/OriginalBusinessDocument", expectedOriginalTransactionId);
+        _documentAsserter.HasValue("PayloadChargeEvent[1]/OriginalBusinessDocument", expectedOriginalTransactionId);
         return this;
     }
 
     public IAssertRejectRequestWholesaleSettlementDocument HasSerieReasonCode(string expectedSerieReasonCode)
     {
-        _documentAsserter.HasValue("PayloadResponseEvent[1]/ResponseReasonType", expectedSerieReasonCode);
+        _documentAsserter.HasValue("PayloadChargeEvent[1]/ResponseReasonType", expectedSerieReasonCode);
         return this;
     }
 

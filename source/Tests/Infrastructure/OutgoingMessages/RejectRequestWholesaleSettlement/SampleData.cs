@@ -29,7 +29,7 @@ internal static class SampleData
 
     public static string ReceiverId => "1234567890987";
 
-    public static ActorRole ReceiverRole => ActorRole.BalanceResponsibleParty;
+    public static ActorRole ReceiverRole => ActorRole.GridOperator;
 
     public static Instant CreationDate => InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value;
 
