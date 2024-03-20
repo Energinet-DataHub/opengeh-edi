@@ -31,7 +31,7 @@ public sealed class WhenWholesaleServicesIsRequestedTests
         ArgumentNullException.ThrowIfNull(fixture);
         _wholesaleServicesRequest = new WholesaleServicesRequestDsl(
             new EdiDriver(
-                fixture.B2BMeteredDataResponsibleAuthorizedHttpClient));
+                fixture.B2BEnergySupplierAuthorizedHttpClient));
     }
 
     [Fact]
