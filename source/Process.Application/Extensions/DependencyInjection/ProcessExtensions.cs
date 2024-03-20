@@ -80,7 +80,7 @@ public static class ProcessExtensions
         services
             .AddTransient<IRequestHandler<SendAggregatedMeasureDataRequestToWholesale, Unit>,
                 SendAggregatedMeasureDataRequestToWholesaleHandler>()
-            .AddTransient<IRequestHandler<AcceptedEnergyResultTimeSerieCommand, Unit>, AcceptProcessWhenAcceptedEnergyResultTimeSerieIsAvailable>()
+            .AddTransient<IRequestHandler<AcceptedEnergyResultTimeSerieCommand, Unit>, AcceptProcessWhenAcceptedEnergyResultTimeSeriesIsAvailable>()
             .AddTransient<IRequestHandler<AcceptedEnergyResultTimeSeriesCommand, Unit>, AcceptedEnergyResultTimeSeriesCommandHandler>()
             .AddTransient<IRequestHandler<RejectedAggregatedTimeSeries, Unit>, RejectProcessWhenRejectedAggregatedTimeSeriesIsAvailable>()
             .AddTransient<INotificationHandler<AggregatedMeasureProcessIsInitialized>, NotifyWholesaleWhenAggregatedMeasureProcessIsInitialized>()
