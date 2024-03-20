@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestWholesaleSettlement;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
@@ -48,6 +49,10 @@ public class OutgoingMessageTests
         new RejectRequestAggregatedMeasureDataJsonDocumentWriter(new MessageRecordParser(new Serializer())),
         new RejectRequestAggregatedMeasureDataEbixDocumentWriter(new MessageRecordParser(new Serializer())),
         new RejectRequestAggregatedMeasureDataXmlDocumentWriter(new MessageRecordParser(new Serializer())),
+
+        new RejectRequestWholesaleSettlementJsonDocumentWriter(new MessageRecordParser(new Serializer())),
+        new RejectRequestWholesaleSettlementEbixDocumentWriter(new MessageRecordParser(new Serializer())),
+        new RejectRequestWholesaleSettlementXmlDocumentWriter(new MessageRecordParser(new Serializer())),
     };
 
     /// <summary>
@@ -91,7 +96,7 @@ public class OutgoingMessageTests
         var documentWriters = GetAllDocumentWriters();
 
         // Act & Assert
-        documentWriters.Should().AllSatisfy(x => _documentWriters.Any(d => d.GetType() == x).Should().BeTrue());
+        documentWriters.Should().AllSatisfy(x => _documentWriters.Should().Contain(d => d.GetType() == x));
     }
 
     [Fact]
