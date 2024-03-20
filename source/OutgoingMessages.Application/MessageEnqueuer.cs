@@ -28,22 +28,27 @@ public class MessageEnqueuer
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly ILogger<MessageEnqueuer> _logger;
+    private readonly MessageDelegator _messageDelegator;
 
     public MessageEnqueuer(
         IActorMessageQueueRepository actorMessageQueueRepository,
         IOutgoingMessageRepository outgoingMessageRepository,
         ISystemDateTimeProvider systemDateTimeProvider,
-        ILogger<MessageEnqueuer> logger)
+        ILogger<MessageEnqueuer> logger,
+        MessageDelegator messageDelegator)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _outgoingMessageRepository = outgoingMessageRepository;
         _systemDateTimeProvider = systemDateTimeProvider;
         _logger = logger;
+        _messageDelegator = messageDelegator;
     }
 
     public async Task<OutgoingMessageId> EnqueueAsync(OutgoingMessage messageToEnqueue)
     {
         ArgumentNullException.ThrowIfNull(messageToEnqueue);
+
+        messageToEnqueue = _messageDelegator.Delegate(messageToEnqueue);
 
         var addToRepositoryTask = _outgoingMessageRepository.AddAsync(messageToEnqueue);
         var addToActorMessageQueueTask = AddToActorMessageQueueAsync(messageToEnqueue);
