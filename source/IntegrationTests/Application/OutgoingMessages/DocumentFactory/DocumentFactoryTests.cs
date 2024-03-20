@@ -46,12 +46,6 @@ public class DocumentFactoryTests
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Xml));
 
-        if (documentType == DocumentType.RejectRequestWholesaleSettlement)
-        {
-            writer.Should().BeNull("RejectRequestWholesaleServices does not have any document writers yet");
-            return;
-        }
-
         writer.Should().NotBeNull();
     }
 
@@ -62,12 +56,6 @@ public class DocumentFactoryTests
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Json));
 
-        if (documentType == DocumentType.RejectRequestWholesaleSettlement)
-        {
-            writer.Should().BeNull("RejectRequestWholesaleServices does not have any document writers yet");
-            return;
-        }
-
         writer.Should().NotBeNull();
     }
 
@@ -77,12 +65,6 @@ public class DocumentFactoryTests
     {
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Ebix));
-
-        if (documentType == DocumentType.RejectRequestWholesaleSettlement)
-        {
-            writer.Should().BeNull("RejectRequestWholesaleServices does not have any document writers yet");
-            return;
-        }
 
         writer.Should().NotBeNull();
     }

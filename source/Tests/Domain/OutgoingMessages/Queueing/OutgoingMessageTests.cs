@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestWholesaleSettlement;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
@@ -48,6 +49,10 @@ public class OutgoingMessageTests
         new RejectRequestAggregatedMeasureDataJsonDocumentWriter(new MessageRecordParser(new Serializer())),
         new RejectRequestAggregatedMeasureDataEbixDocumentWriter(new MessageRecordParser(new Serializer())),
         new RejectRequestAggregatedMeasureDataXmlDocumentWriter(new MessageRecordParser(new Serializer())),
+
+        new RejectRequestWholesaleSettlementJsonDocumentWriter(new MessageRecordParser(new Serializer())),
+        new RejectRequestWholesaleSettlementEbixDocumentWriter(new MessageRecordParser(new Serializer())),
+        new RejectRequestWholesaleSettlementXmlDocumentWriter(new MessageRecordParser(new Serializer())),
     };
 
     /// <summary>
@@ -64,6 +69,7 @@ public class OutgoingMessageTests
             // Request Accepted
             new object?[] { DocumentType.NotifyAggregatedMeasureData, "{\"TransactionId\":\"2c928b8b-b596-43da-9dcb-e8a36748f415\",\"GridAreaCode\":\"804\",\"MeteringPointType\":\"Consumption\",\"SettlementType\":\"Flex\",\"MeasureUnitType\":\"KWH\",\"Resolution\":\"QuarterHourly\",\"EnergySupplierNumber\":\"1234567890123\",\"BalanceResponsibleNumber\":\"1234567890124\",\"Period\":{\"Start\":\"2024-02-02T02:02:02Z\",\"End\":\"2024-02-02T02:02:02Z\"},\"Point\":[{\"Position\":1,\"Quantity\":2,\"QuantityQuality\":4,\"SampleTime\":\"2024-02-02T02:02:02Z\"}],\"CalculationResultVersion\":1,\"OriginalTransactionIdReference\":\"643e50ea-8811-4ee2-81a7-5dac21731f22\",\"SettlementVersion\":\"FirstCorrection\"}" },
             new object?[] { DocumentType.NotifyWholesaleServices, "{\"OriginalTransactionIdReference\":\"941c025a-3c98-48e5-985d-d0c843c4dc49\",\"TransactionId\":\"050e2270-3702-4885-b021-15d22d3c0977\",\"CalculationVersion\":1,\"GridAreaCode\":\"870\",\"ChargeCode\":\"123\",\"IsTax\":false,\"Points\":[{\"Position\":1,\"Quantity\":100,\"Price\":100,\"Amount\":100,\"QuantityQuality\":null}],\"EnergySupplier\":{\"Value\":\"1234567894444\"},\"ChargeOwner\":{\"Value\":\"1234567897777\"},\"Period\":{\"Start\":\"2023-11-01T00:00:00Z\",\"End\":\"2023-12-01T00:00:00Z\"},\"SettlementVersion\":null,\"QuantityMeasureUnit\":{\"Code\":\"KWH\",\"Name\":\"Kwh\"},\"QuantityUnit\":null,\"PriceMeasureUnit\":{\"Code\":\"KWH\",\"Name\":\"Kwh\"},\"Currency\":{\"Code\":\"DKK\",\"Name\":\"DanishCrowns\"},\"ChargeType\":{\"Code\":\"D02\",\"Name\":\"Fee\"},\"Resolution\":{\"Code\":\"P1M\",\"Name\":\"Monthly\"},\"MeteringPointType\":{\"Code\":\"E17\",\"Name\":\"Consumption\"},\"SettlementType\":{\"Code\":\"E02\",\"Name\":\"NonProfiled\"}}" },
+            new object?[] { DocumentType.RejectRequestWholesaleSettlement, "{\n  \"TransactionId\": \"4e85a732-85fd-4d92-8ff3-72c052802716\",\n  \"RejectReasons\": [\n    {\n      \"ErrorCode\": \"E18\",\n      \"ErrorMessage\": \"Det virker ikke!\"\n    }\n  ],\n  \"OriginalTransactionIdReference\": \"4E85A73285FD4D928FF372C052802717\"\n}" },
 
             // Delete this in the next PR
             new object?[] { DocumentType.NotifyAggregatedMeasureData, "{\"TransactionId\":\"2c928b8b-b596-43da-9dcb-e8a36748f415\",\"GridAreaCode\":\"804\",\"MeteringPointType\":\"Consumption\",\"SettlementType\":\"D01\",\"MeasureUnitType\":\"KWH\",\"Resolution\":\"QuarterHourly\",\"EnergySupplierNumber\":\"1234567890123\",\"BalanceResponsibleNumber\":\"1234567890124\",\"Period\":{\"Start\":\"2024-02-02T02:02:02Z\",\"End\":\"2024-02-02T02:02:02Z\"},\"Point\":[{\"Position\":1,\"Quantity\":2,\"QuantityQuality\":4,\"SampleTime\":\"2024-02-02T02:02:02Z\"}],\"CalculationResultVersion\":1,\"OriginalTransactionIdReference\":\"643e50ea-8811-4ee2-81a7-5dac21731f22\",\"SettlementVersion\":\"FirstCorrection\"}" },
@@ -94,7 +100,7 @@ public class OutgoingMessageTests
         var documentWriters = GetAllDocumentWriters();
 
         // Act & Assert
-        documentWriters.Should().AllSatisfy(x => _documentWriters.Any(d => d.GetType() == x).Should().BeTrue());
+        documentWriters.Should().AllSatisfy(x => _documentWriters.Should().Contain(d => d.GetType() == x));
     }
 
     [Fact]
@@ -219,6 +225,29 @@ public class OutgoingMessageTests
         acceptedWholesaleServicesMessageDto.Series.Points.Should().BeEquivalentTo(
             deserializedContent.Points,
             "because the series points should be the same. If one is changed, the other should be changed as well. Remember to add the enqueuedQueuedSerializedContents with the new serialized content");
+    }
+
+    [Fact]
+    public void Ensure_rejected_wholesale_services_can_be_deserialized_to_market_activity_record()
+    {
+        // Arrange
+        var serializer = new Serializer();
+        var rejectedWholesaleServicesMessageDto = RejectedWholesaleServicesMessageDtoBuilder.Build();
+
+        // Act
+        var outgoingMessage = OutgoingMessage.CreateMessage(
+            rejectedWholesaleServicesMessageDto,
+            serializer,
+            SystemClock.Instance.GetCurrentInstant());
+
+        // Assert
+        var deserializedContent = serializer.Deserialize<RejectedWholesaleServicesRecord>(outgoingMessage.GetSerializedContent());
+        rejectedWholesaleServicesMessageDto.Series.Should().BeEquivalentTo(
+            deserializedContent,
+            "the series should be the same. If one is changed, the other should be changed as well. Remember to add the enqueuedQueuedSerializedContents with the new serialized content");
+        rejectedWholesaleServicesMessageDto.Series.RejectReasons.Should().BeEquivalentTo(
+            deserializedContent.RejectReasons,
+            "the reject reasons should be the same. If one is changed, the other should be changed as well. Remember to add the enqueuedQueuedSerializedContents with the new serialized content");
     }
 
     [Fact]

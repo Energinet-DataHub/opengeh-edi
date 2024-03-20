@@ -912,6 +912,26 @@
     <EmbeddedResource Include="DocumentValidation\Schemas\Json\Request-wholesale-settlement-assembly-model.schema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <None Remove="DocumentValidation\Schemas\Json\Reject-request-wholesale-settlement-assembly-model.schema.json" />
+    <EmbeddedResource Include="DocumentValidation\Schemas\Json\Reject-request-wholesale-settlement-assembly-model.schema.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="DocumentValidation\CimXml\Schemas\urn-ediel-org-measure-rejectrequestwholesalesettlement-0-1.xsd" />
+    <EmbeddedResource Include="DocumentValidation\CimXml\Schemas\urn-ediel-org-measure-rejectrequestwholesalesettlement-0-1.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_AggregatedBusinessInformationEntities-2.xsd" />
+    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_AggregatedBusinessInformationEntities-2.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_BusinessDataType-2.xsd" />
+    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_BusinessDataType-2.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_DK_RejectAggregatedBillingInformation-2.xsd" />
+    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_DK_RejectAggregatedBillingInformation-2.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>
