@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories.Mappers;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
@@ -46,54 +47,10 @@ public sealed class ActorCertificateCredentialsAssignedEventProcessor : IIntegra
         await _masterDataClient.CreateOrUpdateActorCertificateAsync(
             new ActorCertificateCredentialsAssignedDto(
                 ActorNumber.Create(message.ActorNumber),
-                GetMarketRole(message.ActorRole),
+                EicFunctionMapper.GetMarketRole(message.ActorRole),
                 new CertificateThumbprintDto(message.CertificateThumbprint),
                 message.ValidFrom.ToInstant(),
                 message.SequenceNumber),
             cancellationToken).ConfigureAwait(false);
-    }
-
-    private static ActorRole GetMarketRole(EicFunction actorRole)
-    {
-        return actorRole switch
-        {
-            EicFunction.MeteringPointAdministrator => ActorRole.MeteringPointAdministrator,
-            EicFunction.EnergySupplier => ActorRole.EnergySupplier,
-            EicFunction.GridAccessProvider => ActorRole.GridOperator,
-            EicFunction.MeteredDataAdministrator => ActorRole.MeteredDataAdministrator,
-            EicFunction.MeteredDataResponsible => ActorRole.MeteredDataResponsible,
-            EicFunction.BalanceResponsibleParty => ActorRole.BalanceResponsibleParty,
-            EicFunction.ImbalanceSettlementResponsible => ActorRole.ImbalanceSettlementResponsible,
-            EicFunction.SystemOperator => ActorRole.SystemOperator,
-            EicFunction.DanishEnergyAgency => ActorRole.DanishEnergyAgency,
-            EicFunction.Unspecified => throw new ArgumentOutOfRangeException(
-                nameof(actorRole),
-                actorRole,
-                "Unsupported EicFunction actor role"),
-            EicFunction.BillingAgent => throw new ArgumentOutOfRangeException(
-                nameof(actorRole),
-                actorRole,
-                "Unsupported EicFunction actor role"),
-            EicFunction.DatahubAdministrator => throw new ArgumentOutOfRangeException(
-                nameof(actorRole),
-                actorRole,
-                "Unsupported EicFunction actor role"),
-            EicFunction.IndependentAggregator => throw new ArgumentOutOfRangeException(
-                nameof(actorRole),
-                actorRole,
-                "Unsupported EicFunction actor role"),
-            EicFunction.SerialEnergyTrader => throw new ArgumentOutOfRangeException(
-                nameof(actorRole),
-                actorRole,
-                "Unsupported EicFunction actor role"),
-            EicFunction.MeterOperator => throw new ArgumentOutOfRangeException(
-                nameof(actorRole),
-                actorRole,
-                "Unsupported EicFunction actor role"),
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(actorRole),
-                actorRole,
-                "Unknown EicFunction actor role value"),
-        };
     }
 }

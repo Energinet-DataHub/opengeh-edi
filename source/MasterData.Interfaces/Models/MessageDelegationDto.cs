@@ -17,7 +17,7 @@ using NodaTime;
 namespace Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 
 /// <summary>
-///
+///    Data transfer object for message delegation
 /// </summary>
 public record MessageDelegationDto(
     int SequenceNumber,

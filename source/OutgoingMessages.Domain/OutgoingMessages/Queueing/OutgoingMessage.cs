@@ -66,6 +66,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             ActorRole receiverRole,
             ActorNumber senderId,
             ActorRole senderRole,
+            Receiver receiver,
             FileStorageReference fileStorageReference)
         {
             Id = OutgoingMessageId.New();

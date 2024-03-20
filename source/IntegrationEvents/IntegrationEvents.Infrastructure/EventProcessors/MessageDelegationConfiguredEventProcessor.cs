@@ -16,9 +16,12 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories.Mappers;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
+using NodaTime.Serialization.Protobuf;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
 
@@ -39,8 +42,14 @@ public class MessageDelegationConfiguredEventProcessor : IIntegrationEventProces
 
         var message = (MessageDelegationConfigured)integrationEvent.Message;
         await _masterDataClient.CreateMessageDelegationConfiguredAsync(
-            new MessageDelegationDto(),
+            new MessageDelegationDto(
+                message.SequenceNumber,
+                message.MessageType.ToString(),
+                message.GridAreaCode,
+                message.StartsAt.ToInstant(),
+                message.StopsAt.ToInstant(),
+                new ActorNumberAndRoleDto(ActorNumber.Create(message.DelegatedByActorNumber), EicFunctionMapper.GetMarketRole(message.DelegatedByActorRole)),
+                new ActorNumberAndRoleDto(ActorNumber.Create(message.DelegatedToActorNumber), EicFunctionMapper.GetMarketRole(message.DelegatedToActorRole))),
             cancellationToken).ConfigureAwait(false);
-        throw new System.NotImplementedException();
     }
 }

@@ -12,8 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using NodaTime;
+
 namespace Energinet.DataHub.EDI.MasterData.Domain.MessageDelegations;
 
 public class MessageDelegation
 {
+    public int SequenceNumber { get; set; }
+
+    public string DocumentType { get; set; }
+
+    public string GridAreaCode { get; set; }
+
+    public Instant StartsAt { get; set; }
+
+    public Instant StopsAt { get; set; }
+
+    public ActorNumber DelegatedBy { get; set; }
+
+    public ActorRole DelegatedByRole { get; set; }
+
+    public ActorNumber DelegatedTo { get; set; }
+
+    public ActorRole DelegatedToRole { get; set; }
+
+    private MessageDelegation()
+    {
+    }
+    public
 }
