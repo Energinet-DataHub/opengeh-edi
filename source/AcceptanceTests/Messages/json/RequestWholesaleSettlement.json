@@ -28,7 +28,7 @@
     "Series": [
       {
         "mRID": "{TransactionId}",
-        "aggregationSeries_Period.resolution": "PT1M",
+        "aggregationSeries_Period.resolution": "P1M",
         "chargeTypeOwner_MarketParticipant.mRID": {
           "codingScheme": "A10",
           "value": "570001110111"
