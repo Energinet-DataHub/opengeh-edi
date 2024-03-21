@@ -17,6 +17,9 @@ using System.Linq;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
+/// <summary>
+/// Base class for enumeration types with a code (typically used for our domain object with CIM codes)
+/// </summary>
 public abstract class EnumerationTypeWithCode<T> : EnumerationType
     where T : EnumerationTypeWithCode<T>
 {
