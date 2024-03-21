@@ -46,7 +46,7 @@ public static class WholesaleServicesRequestFactory
         {
             RequestedByActorId = process.RequestedByActorId.Value,
             RequestedByActorRole = process.RequestedByActorRoleCode,
-            BusinessReason = process.BusinessReason.Code,
+            BusinessReason = process.BusinessReason.Name,
             PeriodStart = process.StartOfPeriod,
         };
 
@@ -54,7 +54,7 @@ public static class WholesaleServicesRequestFactory
             request.PeriodEnd = process.EndOfPeriod;
 
         if (process.Resolution != null)
-            request.Resolution = MapResolution(process.Resolution); // TODO: Introduce value type (?) and use .Name
+            request.Resolution = MapResolution(process.Resolution);
 
         if (process.EnergySupplierId != null)
             request.EnergySupplierId = process.EnergySupplierId;

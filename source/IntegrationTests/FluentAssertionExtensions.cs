@@ -22,10 +22,10 @@ namespace Energinet.DataHub.EDI.IntegrationTests;
 public static class FluentAssertionExtensions
 {
     /*
-     * This RegEx is a little naive, but it works for our current CIM codes
+     * This RegEx test if a string looks like a CIM code
      * Here is an example: https://regex101.com/r/HhGUH4/1
-     * The regex tests that:
-     * 1. The string MUST starts with A, D, E, P, K, or H
+     * The regex thinks the string is a CIM code if:
+     * 1. The string MUST start with A, D, E, P, K, or H
      * 2. The string MUST be followed by 2 characters
      * 3. The string can be followed by 0 to 2 characters
      * So in total: The string start with A, D, E, P, K, or H has a total length of 3 to 5 characters
