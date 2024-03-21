@@ -71,10 +71,16 @@ public static class ServiceBusMessageFactory
         foreach (var chargeType in process.ChargeTypes)
         {
             request.ChargeTypes.Add(
-                new ChargeType() { ChargeCode = chargeType.Id, ChargeType_ = chargeType.Type, });
+                new ChargeType() { ChargeCode = chargeType.Id, ChargeType_ = MapChargeType(chargeType.Type), });
         }
 
         return request;
+    }
+
+    private static string? MapChargeType(string? chargeType)
+    {
+        if (chargeType == null) return null;
+        return Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType.TryFromCode(chargeType)?.Name ?? chargeType;
     }
 
     private static string MapResolution(string resolution)
