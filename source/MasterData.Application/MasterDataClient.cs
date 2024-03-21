@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Domain.ActorCertificates;
 using Energinet.DataHub.EDI.MasterData.Domain.Actors;
 using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
-using Energinet.DataHub.EDI.MasterData.Domain.MessageDelegations;
+using Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
@@ -34,7 +34,7 @@ internal sealed class MasterDataClient : IMasterDataClient
     private readonly IActorCertificateRepository _actorCertificateRepository;
     private readonly MasterDataContext _masterDataContext;
     private readonly ILogger<IMasterDataClient> _logger;
-    private readonly IMessageDelegationRepository _messageDelegationRepository;
+    private readonly IProcessDelegationRepository _processDelegationRepository;
 
     public MasterDataClient(
         IActorRepository actorRepository,
@@ -42,14 +42,14 @@ internal sealed class MasterDataClient : IMasterDataClient
         IActorCertificateRepository actorCertificateRepository,
         MasterDataContext masterDataContext,
         ILogger<IMasterDataClient> logger,
-        IMessageDelegationRepository messageDelegationRepository)
+        IProcessDelegationRepository processDelegationRepository)
     {
         _actorRepository = actorRepository;
         _gridAreaRepository = gridAreaRepository;
         _actorCertificateRepository = actorCertificateRepository;
         _masterDataContext = masterDataContext;
         _logger = logger;
-        _messageDelegationRepository = messageDelegationRepository;
+        _processDelegationRepository = processDelegationRepository;
     }
 
     public async Task CreateActorIfNotExistAsync(CreateActorDto createActorDto, CancellationToken cancellationToken)
@@ -146,19 +146,21 @@ internal sealed class MasterDataClient : IMasterDataClient
         await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task CreateMessageDelegationAsync(
-        MessageDelegationDto messageDelegationDto,
+    public async Task CreateProcessDelegationAsync(
+        ProcessDelegationDto processDelegationDto,
         CancellationToken cancellationToken)
     {
-        await _messageDelegationRepository.CreateAsync(
-            new MessageDelegation(
-                messageDelegationDto.SequenceNumber,
-                messageDelegationDto.MessageType, // Find a way to map this to DocumentType
-                messageDelegationDto.GridAreaCode,
-                messageDelegationDto.StartsAt,
-                messageDelegationDto.StopsAt,
-                messageDelegationDto.DelegatedBy,
-                messageDelegationDto.DelegatedTo),
+        await _processDelegationRepository.CreateAsync(
+            new ProcessDelegation(
+                processDelegationDto.SequenceNumber,
+                processDelegationDto.ProcessDelegationType,
+                processDelegationDto.GridAreaCode,
+                processDelegationDto.StartsAt,
+                processDelegationDto.StopsAt,
+                processDelegationDto.DelegatedBy.ActorNumber,
+                processDelegationDto.DelegatedBy.ActorRole,
+                processDelegationDto.DelegatedTo.ActorNumber,
+                processDelegationDto.DelegatedTo.ActorRole),
             cancellationToken)
             .ConfigureAwait(false);
     }

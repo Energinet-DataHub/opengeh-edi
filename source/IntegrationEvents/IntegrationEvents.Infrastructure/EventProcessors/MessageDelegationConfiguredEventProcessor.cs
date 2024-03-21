@@ -41,8 +41,8 @@ public class MessageDelegationConfiguredEventProcessor : IIntegrationEventProces
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
         var message = (MessageDelegationConfigured)integrationEvent.Message;
-        await _masterDataClient.CreateMessageDelegationAsync(
-            new MessageDelegationDto(
+        await _masterDataClient.CreateProcessDelegationAsync(
+            new ProcessDelegationDto(
                 message.SequenceNumber,
                 message.MessageType.ToString(),
                 message.GridAreaCode,

@@ -15,13 +15,17 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.MasterData.Domain.MessageDelegations;
+namespace Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
 
-public class MessageDelegation
+/// <summary>
+/// A process delegation is used when one actor wishes to delegated a process to another actor.
+/// An example: Actor A wants Actor B to receive all their energy results.
+/// </summary>
+public class ProcessDelegation
 {
-    public MessageDelegation(
+    public ProcessDelegation(
         int sequenceNumber,
-        DocumentType documentType,
+        string processDelegationType,
         string gridAreaCode,
         Instant startsAt,
         Instant stopsAt,
@@ -31,7 +35,7 @@ public class MessageDelegation
         ActorRole delegatedToRole)
     {
         SequenceNumber = sequenceNumber;
-        DocumentType = documentType;
+        ProcessDelegationType = processDelegationType;
         GridAreaCode = gridAreaCode;
         StartsAt = startsAt;
         StopsAt = stopsAt;
@@ -42,21 +46,41 @@ public class MessageDelegation
     }
 
 #pragma warning disable CS8618 // Needed by Entity Framework
-    private MessageDelegation()
+    private ProcessDelegation()
     {
     }
 #pragma warning restore CS8618 // Needed by Entity Framework
 
+    /// <summary>
+    /// Used to determine the latest delegation configuration.
+    /// </summary>
     public int SequenceNumber { get; set; }
 
-    public DocumentType DocumentType { get; set; }
+    /// <summary>
+    /// The type of process that is delegated ex: PROCESS_REQUEST_ENERGY_RESULTS
+    /// </summary>
+    public string ProcessDelegationType { get; }
 
+    /// <summary>
+    /// The code of the grid area for which the process is delegated.
+    /// </summary>
     public string GridAreaCode { get; set; }
 
+    /// <summary>
+    /// The start timestamp of the configured delegation (inclusive).
+    /// </summary>
     public Instant StartsAt { get; set; }
 
+    /// <summary>
+    /// The end timestamp of the configured delegation (inclusive).
+    /// If the delegation does not stop, stops_at is set to December 31, 9999.
+    /// If stops_at occurs before starts_at, then the delegation is cancelled.
+    /// </summary>
     public Instant StopsAt { get; set; }
 
+    /// <summary>
+    /// The EIC or GLN identifier of the actor that delegated its process to another actor.
+    /// </summary>
     public ActorNumber DelegatedBy { get; set; }
 
     public ActorRole DelegatedByRole { get; set; }

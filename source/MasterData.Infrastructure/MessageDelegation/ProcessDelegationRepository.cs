@@ -14,16 +14,14 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
 
-namespace Energinet.DataHub.EDI.MasterData.Domain.MessageDelegations;
+namespace Energinet.DataHub.EDI.MasterData.Infrastructure.MessageDelegation;
 
-/// <summary>
-///     Message delegation repository
-/// </summary>
-public interface IMessageDelegationRepository
+public class ProcessDelegationRepository : IProcessDelegationRepository
 {
-    /// <summary>
-    ///     Create a message delegation
-    /// </summary>
-    Task CreateAsync(MessageDelegation messageDelegation, CancellationToken cancellationToken);
+    public Task CreateAsync(ProcessDelegation processDelegation, CancellationToken cancellationToken)
+    {
+        throw new System.NotImplementedException();
+    }
 }

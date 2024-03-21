@@ -19,9 +19,9 @@ namespace Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 /// <summary>
 ///    Data transfer object for message delegation
 /// </summary>
-public record MessageDelegationDto(
+public record ProcessDelegationDto(
     int SequenceNumber,
-    string DocumentType,
+    string ProcessDelegationType,
     string GridAreaCode,
     Instant StartsAt,
     Instant StopsAt,
