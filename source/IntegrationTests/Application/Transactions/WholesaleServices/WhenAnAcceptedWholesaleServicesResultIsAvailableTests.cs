@@ -64,7 +64,9 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         outgoingMessage.Should().NotBeNull();
         outgoingMessage
             .HasReceiverId(process.EnergySupplierId!)
+            .HasDocumentReceiverId(process.EnergySupplierId!)
             .HasReceiverRole(ActorRole.EnergySupplier.Code)
+            .HasDocumentReceiverRole(ActorRole.EnergySupplier.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasRelationTo(process.InitiatedByMessageId)
@@ -170,7 +172,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
 
         var messages = await connection.QueryAsync(
-            $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.ProcessId, m.BusinessReason," +
+            $"SELECT m.Id, m.RecordId, m.DocumentType, m.DocumentReceiverNumber, m.DocumentReceiverRole, m.ReceiverNumber, m.ProcessId, m.BusinessReason," +
             $"m.ReceiverRole, m.SenderId, m.SenderRole, m.FileStorageReference, m.RelatedToMessageId " +
             $" FROM [dbo].[OutgoingMessages] m" +
             $" WHERE m.DocumentType = '{DocumentType.NotifyWholesaleServices.Name}' AND m.BusinessReason = '{businessReason.Name}' AND m.ReceiverRole = '{receiverRole.Code}'");

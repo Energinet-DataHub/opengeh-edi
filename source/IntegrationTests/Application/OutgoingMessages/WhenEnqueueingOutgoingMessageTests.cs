@@ -90,15 +90,16 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             () => Assert.NotNull(result!.RecordId),
             () => Assert.Equal(message.ProcessId, result!.ProcessId),
             () => Assert.Equal(DocumentType.NotifyAggregatedMeasureData.Name, result!.DocumentType),
-            () => Assert.Equal(message.ReceiverId.Value, result!.ReceiverId),
+            () => Assert.Equal(message.ReceiverId.Value, result!.ReceiverNumber),
             () => Assert.Equal(message.ReceiverRole.Code, result!.ReceiverRole),
+            () => Assert.Equal(message.ReceiverId.Value, result!.DocumentReceiverNumber),
+            () => Assert.Equal(message.ReceiverRole.Code, result!.DocumentReceiverRole),
             () => Assert.Equal(message.SenderId.Value, result!.SenderId),
             () => Assert.Equal(message.SenderRole.Code, result!.SenderRole),
             () => Assert.Equal(message.BusinessReason, result!.BusinessReason),
             () => Assert.Equal(expectedFileStorageReference, result!.FileStorageReference),
             () => Assert.Equal("OutgoingMessage", result!.Discriminator),
             () => Assert.Equal(message.RelatedToMessageId?.Value, result!.RelatedToMessageId),
-            () => Assert.False(result!.IsPublished),
             () => Assert.NotNull(result!.AssignedBundleId),
         };
 

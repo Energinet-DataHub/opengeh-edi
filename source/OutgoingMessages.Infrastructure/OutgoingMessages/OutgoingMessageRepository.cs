@@ -62,13 +62,11 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
 
         return new OutgoingMessageBundle(
             firstMessage.DocumentType,
-            firstMessage.ReceiverId,
+            firstMessage.Receiver,
             firstMessage.ProcessId,
             firstMessage.BusinessReason,
-            firstMessage.ReceiverRole,
             firstMessage.SenderId,
             firstMessage.SenderRole,
-            firstMessage.IsPublished,
             bundleId,
             outgoingMessages,
             firstMessage.RelatedToMessageId);
