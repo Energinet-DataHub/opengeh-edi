@@ -33,9 +33,9 @@ public sealed class WholesaleServicesRequestDsl
         return _edi.RequestWholesaleSettlementAsync(DocumentFormat.Json);
     }
 
-    internal Task RequestWholesaleSettlementInXml()
+    internal Task RequestInvalidWholesaleSettlementInJson()
     {
-        return _edi.RequestWholesaleSettlementAsync(DocumentFormat.Xml);
+        return _edi.RequestWholesaleSettlementAsync(DocumentFormat.Json, validMessage: false);
     }
 
     internal Task ConfirmAcceptedResultIsAvailableInJson()

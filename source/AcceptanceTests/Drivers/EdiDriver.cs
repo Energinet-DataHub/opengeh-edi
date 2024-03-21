@@ -59,12 +59,12 @@ internal sealed class EdiDriver : IDisposable
         return document;
     }
 
-    public async Task<Stream> RequestWholesaleSettlementAsync(DocumentFormat documentFormat)
+    public async Task<Stream> RequestWholesaleSettlementAsync(DocumentFormat documentFormat, bool validMessage = true)
     {
         var b2bClient = await _httpClient;
         using var request = new HttpRequestMessage(HttpMethod.Post, "v1.0/cim/requestwholesalesettlement");
         var contentType = DocumentFormat.Json == documentFormat ? "application/json" : "application/xml";
-        request.Content = new StringContent(GetRequestWholesaleSettlementContent(documentFormat), Encoding.UTF8, contentType);
+        request.Content = new StringContent(GetRequestWholesaleSettlementContent(documentFormat, validMessage), Encoding.UTF8, contentType);
         request.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
 
         var wholesaleSettlementResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
@@ -260,11 +260,13 @@ internal sealed class EdiDriver : IDisposable
         return jsonContent;
     }
 
-    private static string GetRequestWholesaleSettlementContent(DocumentFormat documentFormat)
+    private static string GetRequestWholesaleSettlementContent(DocumentFormat documentFormat, bool validMessage)
     {
         if (DocumentFormat.Json == documentFormat)
         {
-            var jsonContent = File.ReadAllText("Messages/json/RequestWholesaleSettlement.json");
+            var jsonContent = validMessage
+                ? File.ReadAllText("Messages/json/RequestWholesaleSettlement.json")
+                : File.ReadAllText("Messages/json/RequestWholesaleSettlementWithWrongDateFormat.json");
 
             jsonContent = jsonContent.Replace("{MessageId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
             jsonContent = jsonContent.Replace("{TransactionId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
