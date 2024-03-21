@@ -30,21 +30,29 @@ public abstract class EnumerationTypeWithCode<T> : EnumerationType
 
 #pragma warning disable CA1000
     public static T FromName(string name)
-#pragma warning restore CA1000
     {
         return GetAll<T>().FirstOrDefault(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                ?? throw new InvalidOperationException(
                    $"{name} is not a valid {typeof(T).Name} {nameof(name)}");
     }
 
-#pragma warning disable CA1000
     public static T FromCode(string code)
-#pragma warning restore CA1000
     {
-        return GetAll<T>().FirstOrDefault(t => t.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
+        return TryFromCode(code)
                ?? throw new InvalidOperationException(
                    $"{code} is not a valid {typeof(T).Name} {nameof(code)}");
     }
+
+    public static T? TryFromCode(string code)
+    {
+        return GetAll<T>().FirstOrDefault(r => r.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
+    }
+
+    public static string? GetNameFromCode(string code)
+    {
+        return TryFromCode(code)?.Name ?? null;
+    }
+#pragma warning restore CA1000
 
     protected override bool ValueMatches(EnumerationType otherEnumerationType)
     {

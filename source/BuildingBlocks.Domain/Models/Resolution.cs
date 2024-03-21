@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
@@ -31,11 +30,6 @@ public class Resolution : EnumerationTypeWithCode<Resolution>
     private Resolution(string name, string code)
         : base(name, code)
     {
-    }
-
-    public static Resolution? TryFromCode(string code)
-    {
-        return GetAll<Resolution>().FirstOrDefault(r => r.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
     }
 
     private static Resolution CreateUnknown(string? name, string? code)

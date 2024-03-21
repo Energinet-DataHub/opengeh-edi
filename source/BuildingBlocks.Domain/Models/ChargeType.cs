@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -28,10 +27,5 @@ public class ChargeType : EnumerationTypeWithCode<ChargeType>
     public ChargeType(string name, string code)
         : base(name, code)
     {
-    }
-
-    public static ChargeType? TryFromCode(string code)
-    {
-        return GetAll<ChargeType>().FirstOrDefault(r => r.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
     }
 }
