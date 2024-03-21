@@ -22,25 +22,25 @@ using ChargeType = Energinet.DataHub.Edi.Requests.ChargeType;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.WholesaleServices;
 
-public static class ServiceBusMessageFactory
+public static class WholesaleServicesRequestFactory
 {
     public static ServiceBusMessage CreateServiceBusMessage(WholesaleServicesProcess process)
     {
         ArgumentNullException.ThrowIfNull(process);
 
-        var body = CreateWholesaleServicesProcessRequest(process);
+        var request = CreateWholesaleServicesRequest(process);
 
         var message = new ServiceBusMessage()
         {
-            Body = new BinaryData(body.ToByteArray()),
-            Subject = body.GetType().Name,
+            Body = new BinaryData(request.ToByteArray()),
+            Subject = request.GetType().Name,
             MessageId = process.ProcessId.Id.ToString(),
         };
         message.ApplicationProperties.Add("ReferenceId", process.ProcessId.Id.ToString());
         return message;
     }
 
-    private static WholesaleServicesRequest CreateWholesaleServicesProcessRequest(WholesaleServicesProcess process)
+    private static WholesaleServicesRequest CreateWholesaleServicesRequest(WholesaleServicesProcess process)
     {
         var request = new WholesaleServicesRequest()
         {
