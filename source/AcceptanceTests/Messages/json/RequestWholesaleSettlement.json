@@ -1,31 +1,31 @@
 {
-	"RequestWholesaleSettlement_MarketDocument": {
-		"mRID": "{MessageId}",
-		"businessSector.type": {
-			"value": "23"
-		},
-		"createdDateTime": "2022-12-17T09:30:47Z",
-		"process.processType": {
-			"value": "D05"
-		},
-		"receiver_MarketParticipant.mRID": {
-			"codingScheme": "A10",
-			"value": "5790001330552"
-		},
-		"receiver_MarketParticipant.marketRole.type": {
-			"value": "DDZ"
-		},
-		"sender_MarketParticipant.mRID": {
-			"codingScheme": "A10",
-			"value": "5790000392551"
-		},
-		"sender_MarketParticipant.marketRole.type": {
-			"value": "DDQ"
-		},
-		"type": {
-			"value": "D21"
-		},
-		"Series": [
+  "RequestWholesaleSettlement_MarketDocument": {
+    "mRID": "{MessageId}",
+    "businessSector.type": {
+      "value": "23"
+    },
+    "createdDateTime": "2022-12-17T09:30:47Z",
+    "process.processType": {
+      "value": "D05"
+    },
+    "receiver_MarketParticipant.mRID": {
+      "codingScheme": "A10",
+      "value": "5790001330552"
+    },
+    "receiver_MarketParticipant.marketRole.type": {
+      "value": "DDZ"
+    },
+    "sender_MarketParticipant.mRID": {
+      "codingScheme": "A10",
+      "value": "5790000392551"
+    },
+    "sender_MarketParticipant.marketRole.type": {
+      "value": "DDQ"
+    },
+    "type": {
+      "value": "D21"
+    },
+    "Series": [
       {
         "mRID": "{TransactionId}",
         "aggregationSeries_Period.resolution": "PT1M",
@@ -40,10 +40,7 @@
         },
         "meteringGridArea_Domain.mRID": {
           "codingScheme": "NDK",
-          "value": "244"
-        },
-        "settlement_Series.version": {
-          "value": "D01"
+          "value": "804"
         },
         "start_DateAndOrTime.dateTime": "2023-01-31T23:00:00Z",
         "ChargeType": [
@@ -55,6 +52,6 @@
           }
         ]
       }
-		]
-	}
+    ]
+  }
 }
