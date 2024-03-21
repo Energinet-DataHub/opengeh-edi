@@ -19,7 +19,6 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public sealed class BusinessReason : EnumerationTypeWithCode<BusinessReason>
 {
-    // Must match the BusinessReason names in Energinet.DataHub.Wholesale.Edi.Models.BusinessReason in the Wholesale subsystem
     public static readonly BusinessReason MoveIn = new(DomainNames.BusinessReason.MoveIn, "E65");
     public static readonly BusinessReason BalanceFixing = new(DomainNames.BusinessReason.BalanceFixing, "D04");
     public static readonly BusinessReason PreliminaryAggregation = new(DomainNames.BusinessReason.PreliminaryAggregation, "D03");

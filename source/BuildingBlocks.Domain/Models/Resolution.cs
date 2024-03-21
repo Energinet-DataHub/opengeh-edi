@@ -22,7 +22,6 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 [Serializable]
 public class Resolution : EnumerationTypeWithCode<Resolution>
 {
-    // Must match the Resolution names in Energinet.DataHub.Wholesale.Edi.Models.Resolution in the Wholesale subsystem
     public static readonly Resolution QuarterHourly = new(DomainNames.Resolution.QuarterHourly, "PT15M");
     public static readonly Resolution Hourly = new(DomainNames.Resolution.Hourly, "PT1H");
     public static readonly Resolution Daily = new(DomainNames.Resolution.Daily, "P1D");

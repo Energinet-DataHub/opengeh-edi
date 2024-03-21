@@ -21,8 +21,6 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 [Serializable]
 public class SettlementType : EnumerationTypeWithCode<SettlementType>
 {
-    // Must match the SettlementMethod names in Energinet.DataHub.Wholesale.Edi.Models.SettlementMethod
-
     // Customer with more than ~100.000 kwH per year
     public static readonly SettlementType NonProfiled = new(DomainNames.SettlementType.NonProfiled, "E02");
 
