@@ -20,7 +20,7 @@ import "IntegrationEvents/MarketParticipant/EicFunction.proto";
 option csharp_namespace = "Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts";
 
 /*
-* MessageDelegationConfigured Integration Event.
+* ProcessDelegationConfigured Integration Event.
 *
 * Occurs when an actor (delegated_by) configures delegation of certain processes to another actor (delegated_to).
 * Delegations cannot be deleted, but their validity period (stops_at) can be either shortened or extended.
