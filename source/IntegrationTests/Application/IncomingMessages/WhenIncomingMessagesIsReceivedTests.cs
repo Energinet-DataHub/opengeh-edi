@@ -298,10 +298,13 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         archivedMessageFileContent.Should().Be(incomingMessageContent);
     }
 
-    [Fact]
-    public async Task Incoming_message_is_archived_with_correct_file_storage_reference()
+    [Theory]
+    [InlineData("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json", "RequestAggregatedMeasureData")]
+    [InlineData("Application\\IncomingMessages\\RequestWholesaleSettlement.json", "RequestWholesaleSettlement")]
+    public async Task Incoming_message_is_archived_with_correct_data(string path, string incomingDocumentTypeName)
     {
         // Assert
+        var incomingDocumentType = IncomingDocumentType.FromName(incomingDocumentTypeName)!;
         int year = 2024,
             month = 01,
             date = 05;
@@ -310,19 +313,20 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
-        var messageStream = ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json");
+        var messageStream = ReadJsonFile(path);
         var messageIdFromFile = "123564789123564789123564789123564789";
         // Act
         await _incomingMessagesRequest.RegisterAndSendAsync(
             messageStream,
             DocumentFormat.Json,
-            IncomingDocumentType.RequestAggregatedMeasureData,
+            incomingDocumentType,
             CancellationToken.None);
 
         // Assert
         var archivedMessageId = await GetArchivedMessageIdFromDatabaseAsync(messageIdFromFile);
         var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageIdFromFile);
         archivedMessageFileStorageReference.Should().Be($"{senderActorNumber.Value}/{year:0000}/{month:00}/{date:00}/{archivedMessageId:N}");
+        await AssertArchivedMessageDocumentType(messageIdFromFile, incomingDocumentType);
     }
 
     protected override void Dispose(bool disposing)
@@ -344,6 +348,14 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         stream.Position = 0;
 
         return new IncomingMessageStream(stream);
+    }
+
+    private async Task AssertArchivedMessageDocumentType(string messageId, IncomingDocumentType incomingDocumentType)
+    {
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+        var documentType = await connection.ExecuteScalarAsync<string>($"SELECT DocumentType FROM [dbo].[ArchivedMessages] WHERE MessageId = '{messageId}'");
+
+        incomingDocumentType.Name.Should().Be(documentType);
     }
 
     private async Task<List<dynamic>> GetTransactionIdsAsync(ActorNumber senderNumber)
