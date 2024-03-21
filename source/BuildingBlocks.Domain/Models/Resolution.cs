@@ -15,6 +15,7 @@
 using System;
 using System.Linq;
 using System.Text.Json.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -22,10 +23,10 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 public class Resolution : EnumerationTypeWithCode<Resolution>
 {
     // Must match the Resolution names in Energinet.DataHub.Wholesale.Edi.Models.Resolution in the Wholesale subsystem
-    public static readonly Resolution QuarterHourly = new(nameof(QuarterHourly), "PT15M");
-    public static readonly Resolution Hourly = new(nameof(Hourly), "PT1H");
-    public static readonly Resolution Daily = new(nameof(Daily), "P1D");
-    public static readonly Resolution Monthly = new(nameof(Monthly), "P1M");
+    public static readonly Resolution QuarterHourly = new(DomainNames.Resolution.QuarterHourly, "PT15M");
+    public static readonly Resolution Hourly = new(DomainNames.Resolution.Hourly, "PT1H");
+    public static readonly Resolution Daily = new(DomainNames.Resolution.Daily, "P1D");
+    public static readonly Resolution Monthly = new(DomainNames.Resolution.Monthly, "P1M");
 
     [JsonConstructor]
     private Resolution(string name, string code)

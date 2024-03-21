@@ -14,6 +14,7 @@
 
 using System;
 using System.Linq;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -21,9 +22,9 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 public class ChargeType : EnumerationTypeWithCode<ChargeType>
 {
     // Must match the ChargeType names in Energinet.DataHub.Wholesale.Edi.Models.ChargeType in the Wholesale subsystem
-    public static readonly ChargeType Subscription = new(nameof(Subscription), "D01");
-    public static readonly ChargeType Fee = new(nameof(Fee), "D02");
-    public static readonly ChargeType Tariff = new(nameof(Tariff), "D03");
+    public static readonly ChargeType Subscription = new(DomainNames.ChargeType.Subscription, "D01");
+    public static readonly ChargeType Fee = new(DomainNames.ChargeType.Fee, "D02");
+    public static readonly ChargeType Tariff = new(DomainNames.ChargeType.Tariff, "D03");
 
     public ChargeType(string name, string code)
         : base(name, code)

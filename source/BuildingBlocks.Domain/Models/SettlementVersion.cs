@@ -14,6 +14,7 @@
 
 using System;
 using System.Text.Json.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -21,9 +22,9 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 public class SettlementVersion : EnumerationTypeWithCode<SettlementVersion>
 {
     // Must match the SettlementSeriesVersion names in Energinet.DataHub.Wholesale.Edi.Models.SettlementSeriesVersion
-    public static readonly SettlementVersion FirstCorrection = new("FirstCorrection", "D01");
-    public static readonly SettlementVersion SecondCorrection = new("SecondCorrection", "D02");
-    public static readonly SettlementVersion ThirdCorrection = new("ThirdCorrection", "D03");
+    public static readonly SettlementVersion FirstCorrection = new(DomainNames.SettlementVersion.FirstCorrection, "D01");
+    public static readonly SettlementVersion SecondCorrection = new(DomainNames.SettlementVersion.SecondCorrection, "D02");
+    public static readonly SettlementVersion ThirdCorrection = new(DomainNames.SettlementVersion.ThirdCorrection, "D03");
 
     // Below SettlementVersions are not used directly, but must be here for possible mapping
     public static readonly SettlementVersion FourthCorrection = new(nameof(FourthCorrection), "D04");

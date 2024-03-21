@@ -14,6 +14,7 @@
 
 using System;
 using System.Text.Json.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -21,9 +22,9 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 public class MeteringPointType : EnumerationTypeWithCode<MeteringPointType>
 {
     // Must match the MeteringPointType names in Energinet.DataHub.Wholesale.Edi.Models.MeteringPointType in the Wholesale subsystem
-    public static readonly MeteringPointType Consumption = new(nameof(Consumption), "E17");
-    public static readonly MeteringPointType Production = new(nameof(Production), "E18");
-    public static readonly MeteringPointType Exchange = new(nameof(Exchange), "E20");
+    public static readonly MeteringPointType Consumption = new(DomainNames.MeteringPointType.Consumption, "E17");
+    public static readonly MeteringPointType Production = new(DomainNames.MeteringPointType.Production, "E18");
+    public static readonly MeteringPointType Exchange = new(DomainNames.MeteringPointType.Exchange, "E20");
 
     [JsonConstructor]
     private MeteringPointType(string name, string code)

@@ -14,6 +14,7 @@
 
 using System;
 using System.Text.Json.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -23,10 +24,10 @@ public class SettlementType : EnumerationTypeWithCode<SettlementType>
     // Must match the SettlementMethod names in Energinet.DataHub.Wholesale.Edi.Models.SettlementMethod
 
     // Customer with more than ~100.000 kwH per year
-    public static readonly SettlementType NonProfiled = new(nameof(NonProfiled), "E02");
+    public static readonly SettlementType NonProfiled = new(DomainNames.SettlementType.NonProfiled, "E02");
 
     // Customer with less than ~100.000 kwH per year
-    public static readonly SettlementType Flex = new(nameof(Flex), "D01");
+    public static readonly SettlementType Flex = new(DomainNames.SettlementType.Flex, "D01");
 
     [JsonConstructor]
     private SettlementType(string name, string code)
