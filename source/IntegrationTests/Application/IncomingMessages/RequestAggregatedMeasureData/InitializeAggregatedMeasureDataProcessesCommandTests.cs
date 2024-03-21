@@ -16,21 +16,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
-using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Commands;
-using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Requests;
 using FluentAssertions;
@@ -122,6 +115,30 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         // Assert
         var message = _senderSpy.Message;
         Assert.NotNull(message);
+    }
+
+    [Fact]
+    public async Task When_AggregatedTimeSeriesRequest_is_sent_to_wholesale_it_contains_no_CIM_codes()
+    {
+        // Arrange
+        var marketMessage = MessageBuilder()
+            .Build();
+
+        // Act
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
+        await ProcessInternalCommandsAsync();
+
+        // Assert
+        var message = _senderSpy.Message;
+
+        using var scope = new AssertionScope();
+        message.Should().NotBeNull();
+        var aggregatedTimeSeriesRequest = AggregatedTimeSeriesRequest.Parser.ParseFrom(message!.Body);
+
+        aggregatedTimeSeriesRequest.BusinessReason.Should().NotBeCimCode();
+        aggregatedTimeSeriesRequest.SettlementSeriesVersion.Should().NotBeCimCode();
+        aggregatedTimeSeriesRequest.SettlementMethod.Should().NotBeCimCode();
+        aggregatedTimeSeriesRequest.MeteringPointType.Should().NotBeCimCode();
     }
 
     protected override void Dispose(bool disposing)

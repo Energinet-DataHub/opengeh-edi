@@ -23,7 +23,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
-using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Commands;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Interfaces;
@@ -89,6 +88,33 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         message!.Subject.Should().Be(exceptedServiceBusMessageSubject);
         process.Should().BeEquivalentTo(marketMessage, opt => opt.Using(new ProcessAndRequestComparer()));
         await AssertProcessState(marketMessage!.MessageId, WholesaleServicesProcess.State.Sent);
+    }
+
+    [Fact]
+    public async Task When_WholesaleServicesRequest_is_sent_to_wholesale_it_contains_no_CIM_codes()
+    {
+        // Arrange
+        var marketMessage = InitializeProcessDtoBuilder()
+            .Build();
+
+        // Act
+        await InvokeCommandAsync(new InitializeWholesaleServicesProcessesCommand(marketMessage));
+        await ProcessInternalCommandsAsync();
+
+        // Assert
+        var message = _senderSpy.Message;
+
+        using var scope = new AssertionScope();
+        message.Should().NotBeNull();
+        var wholesaleServicesRequest = WholesaleServicesRequest.Parser.ParseFrom(message!.Body);
+
+        wholesaleServicesRequest.BusinessReason.Should().NotBeCimCode();
+        wholesaleServicesRequest.Resolution.Should().NotBeCimCode();
+        wholesaleServicesRequest.SettlementSeriesVersion.Should().NotBeCimCode();
+        foreach (var chargeType in wholesaleServicesRequest.ChargeTypes)
+        {
+            chargeType.ChargeType_.Should().NotBeCimCode();
+        }
     }
 
     [Fact]
