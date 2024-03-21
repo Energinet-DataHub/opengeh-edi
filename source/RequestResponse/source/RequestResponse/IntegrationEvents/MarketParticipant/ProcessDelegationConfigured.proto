@@ -20,42 +20,42 @@ import "IntegrationEvents/MarketParticipant/EicFunction.proto";
 option csharp_namespace = "Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts";
 
 /*
- * MessageDelegationConfigured Integration Event.
- *
- * Occurs when an actor (delegated_by) configures delegation of certain messages to another actor (delegated_to).
- * Delegations cannot be deleted, but their validity period (stops_at) can be either shortened or extended.
- * Delegations cannot overlap, *EXCEPT* if a delegation ends before it begins.
- */
-message MessageDelegationConfigured {
+* ProcessDelegationConfigured Integration Event.
+*
+* Occurs when an actor (delegated_by) configures delegation a certain process to another actor (delegated_to).
+* Delegations cannot be deleted, but their validity period (stops_at) can be either shortened or extended.
+* Delegations cannot overlap, *EXCEPT* if a delegation ends before it begins.
+*/
+message ProcessDelegationConfigured {
 
   /*
-   * The EIC or GLN identifier of the actor that delegated its messages to another actor.
+   * The EIC or GLN identifier of the actor that delegated its process to another actor.
    */
   string delegated_by_actor_number = 1;
 
   /*
-   * The market role of the actor that delegated its messages to another actor.
+   * The market role of the actor that delegated its process to another actor.
    */
   EicFunction delegated_by_actor_role = 2;
 
   /*
-   * The EIC or GLN identifier of the actor that receives the delegated messages.
+   * The EIC or GLN identifier of the actor that handles the delegated process.
    */
   string delegated_to_actor_number = 3;
 
   /*
-   * The market role of the actor that receives the delegated messages.
+   * The market role of the actor that handles the delegated process.
    * This is currently always EIC_FUNCTION_DELEGATED.
    */
   EicFunction delegated_to_actor_role = 4;
 
   /*
-   * The type of the delegated messages.
+   * The process to delegate messages for.
    */
-  DelegatedMessageType message_type = 5;
+  DelegatedProcess process = 5;
 
   /*
-   * The code of the grid area for which messages are delegated.
+   * The code of the grid area for which the process is delegated.
    */
   string grid_area_code = 6;
 
@@ -78,19 +78,14 @@ message MessageDelegationConfigured {
   int32 sequence_number = 9;
 }
 
-enum DelegatedMessageType {
+enum DelegatedProcess {
   /*
    * Unspecified is unused but according to best practice.
    * Read more at https://protobuf.dev/programming-guides/style/#enums.
    */
-  MESSAGE_TYPE_UNSPECIFIED = 0;
-  MESSAGE_TYPE_RSM012_INBOUND = 1;
-  MESSAGE_TYPE_RSM014_INBOUND = 2;
-  MESSAGE_TYPE_RSM016_INBOUND = 3;
-  MESSAGE_TYPE_RSM017_INBOUND = 4;
-  MESSAGE_TYPE_RSM018_INBOUND = 5;
-  MESSAGE_TYPE_RSM019_INBOUND = 6;
-  MESSAGE_TYPE_RSM012_OUTBOUND = 7;
-  MESSAGE_TYPE_RSM016_OUTBOUND = 8;
-  MESSAGE_TYPE_RSM017_OUTBOUND = 9;
+  PROCESS_UNSPECIFIED = 0;
+  PROCESS_REQUEST_ENERGY_RESULTS = 1;
+  PROCESS_RECEIVE_ENERGY_RESULTS = 2;
+  PROCESS_REQUEST_WHOLESALE_RESULTS = 3;
+  PROCESS_RECEIVE_WHOLESALE_RESULTS = 4;
 }
