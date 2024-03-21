@@ -14,6 +14,7 @@
 
 using System;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Energinet.DataHub.Edi.Requests;
 using Google.Protobuf;
@@ -53,7 +54,7 @@ public static class ServiceBusMessageFactory
             request.PeriodEnd = process.EndOfPeriod;
 
         if (process.Resolution != null)
-            request.Resolution = process.Resolution;
+            request.Resolution = MapResolution(process.Resolution);
 
         if (process.EnergySupplierId != null)
             request.EnergySupplierId = process.EnergySupplierId;
@@ -74,5 +75,10 @@ public static class ServiceBusMessageFactory
         }
 
         return request;
+    }
+
+    private static string MapResolution(string resolution)
+    {
+        return Resolution.TryFromCode(resolution)?.Name ?? resolution;
     }
 }
