@@ -22,7 +22,6 @@ using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Xunit;
 
