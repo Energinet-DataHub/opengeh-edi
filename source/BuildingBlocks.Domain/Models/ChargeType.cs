@@ -43,4 +43,9 @@ public class ChargeType : EnumerationType
         return GetAll<ChargeType>().FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                ?? throw new InvalidOperationException($"{name} is not a valid {typeof(ChargeType)} {nameof(name)}");
     }
+
+    public static ChargeType? TryFromCode(string code)
+    {
+        return GetAll<ChargeType>().FirstOrDefault(r => r.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
+    }
 }
