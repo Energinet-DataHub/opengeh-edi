@@ -14,6 +14,7 @@
 
 using System;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.Edi.Requests;
 using Google.Protobuf;
@@ -63,12 +64,10 @@ public static class AggregatedMeasureDataRequestFactory
         };
 
         if (process.MeteringPointType != null)
-        {
-            request.MeteringPointType = process.MeteringPointType; // TODO: Introduce value type and use .Name
-        }
+            request.MeteringPointType = MapMeteringPointType(process.MeteringPointType);
 
         if (process.SettlementMethod != null)
-            request.SettlementMethod = process.SettlementMethod; // TODO: Introduce value type and use .Name
+            request.SettlementMethod = MapSettlementType(process.SettlementMethod);
 
         if (process.EnergySupplierId != null)
             request.EnergySupplierId = process.EnergySupplierId;
@@ -86,5 +85,15 @@ public static class AggregatedMeasureDataRequestFactory
             request.GridAreaCode = process.MeteringGridAreaDomainId;
 
         return request;
+    }
+
+    private static string MapMeteringPointType(string meteringPointType)
+    {
+        return MeteringPointType.GetNameFromCode(meteringPointType) ?? meteringPointType;
+    }
+
+    private static string MapSettlementType(string settlementType)
+    {
+        return SettlementType.GetNameFromCode(settlementType) ?? settlementType;
     }
 }
