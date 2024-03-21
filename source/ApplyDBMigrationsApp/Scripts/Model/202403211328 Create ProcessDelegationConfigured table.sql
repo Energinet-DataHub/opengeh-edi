@@ -14,6 +14,6 @@
     [Start]                         DATETIMEOFFSET NOT NULL,
     [End]                           DATETIMEOFFSET NOT NULL,
 
-    CONSTRAINT [PK_MessageDelegation]           PRIMARY KEY NONCLUSTERED ([Id]),
-    CONSTRAINT [UX_MessageDelegation_RecordId]  UNIQUE CLUSTERED ([RecordId] ASC),
+    CONSTRAINT [PK_ProcessDelegation]           PRIMARY KEY NONCLUSTERED ([Id]),
+    CONSTRAINT [UX_ProcessDelegation_RecordId]  UNIQUE CLUSTERED ([RecordId] ASC),
 )
