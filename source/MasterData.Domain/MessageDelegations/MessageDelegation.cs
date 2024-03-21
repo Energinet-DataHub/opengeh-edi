@@ -19,9 +19,37 @@ namespace Energinet.DataHub.EDI.MasterData.Domain.MessageDelegations;
 
 public class MessageDelegation
 {
+    public MessageDelegation(
+        int sequenceNumber,
+        DocumentType documentType,
+        string gridAreaCode,
+        Instant startsAt,
+        Instant stopsAt,
+        ActorNumber delegatedBy,
+        ActorRole delegatedByRole,
+        ActorNumber delegatedTo,
+        ActorRole delegatedToRole)
+    {
+        SequenceNumber = sequenceNumber;
+        DocumentType = documentType;
+        GridAreaCode = gridAreaCode;
+        StartsAt = startsAt;
+        StopsAt = stopsAt;
+        DelegatedBy = delegatedBy;
+        DelegatedByRole = delegatedByRole;
+        DelegatedTo = delegatedTo;
+        DelegatedToRole = delegatedToRole;
+    }
+
+#pragma warning disable CS8618 // Needed by Entity Framework
+    private MessageDelegation()
+    {
+    }
+#pragma warning restore CS8618 // Needed by Entity Framework
+
     public int SequenceNumber { get; set; }
 
-    public string DocumentType { get; set; }
+    public DocumentType DocumentType { get; set; }
 
     public string GridAreaCode { get; set; }
 
@@ -36,9 +64,4 @@ public class MessageDelegation
     public ActorNumber DelegatedTo { get; set; }
 
     public ActorRole DelegatedToRole { get; set; }
-
-    private MessageDelegation()
-    {
-    }
-    public
 }

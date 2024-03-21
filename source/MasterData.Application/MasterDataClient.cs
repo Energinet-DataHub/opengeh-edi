@@ -146,12 +146,19 @@ internal sealed class MasterDataClient : IMasterDataClient
         await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task CreateMessageDelegationConfiguredAsync(
+    public async Task CreateMessageDelegationAsync(
         MessageDelegationDto messageDelegationDto,
         CancellationToken cancellationToken)
     {
         await _messageDelegationRepository.CreateAsync(
-            new MessageDelegation(),
+            new MessageDelegation(
+                messageDelegationDto.SequenceNumber,
+                messageDelegationDto.MessageType, // Find a way to map this to DocumentType
+                messageDelegationDto.GridAreaCode,
+                messageDelegationDto.StartsAt,
+                messageDelegationDto.StopsAt,
+                messageDelegationDto.DelegatedBy,
+                messageDelegationDto.DelegatedTo),
             cancellationToken)
             .ConfigureAwait(false);
     }

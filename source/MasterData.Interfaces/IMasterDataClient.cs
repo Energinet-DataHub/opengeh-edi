@@ -68,5 +68,5 @@ public interface IMasterDataClient
     /// <summary>
     ///    Create a new message delegation configuration.
     /// </summary>
-    Task CreateMessageDelegationConfiguredAsync(MessageDelegationDto messageDelegationDto, CancellationToken cancellationToken);
+    Task CreateMessageDelegationAsync(MessageDelegationDto messageDelegationDto, CancellationToken cancellationToken);
 }
