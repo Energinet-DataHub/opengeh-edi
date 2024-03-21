@@ -18,13 +18,11 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public sealed class BusinessReason : EnumerationTypeWithCode<BusinessReason>
 {
-    // ReSharper disable InconsistentNaming
-    #pragma warning disable IDE1006
-    // Must match the BusinessReason names in Energinet.DataHub.Wholesale.Edi.Models.BusinessReason
+    // Must match the BusinessReason names in Energinet.DataHub.Wholesale.Edi.Models.BusinessReason in the Wholesale subsystem
     public static readonly BusinessReason MoveIn = new(nameof(MoveIn), "E65");
     public static readonly BusinessReason BalanceFixing = new("BalanceFixing", "D04");
     public static readonly BusinessReason PreliminaryAggregation = new("PreliminaryAggregation", "D03");
-    public static readonly BusinessReason WholesaleFixing = new("WholesaleFixing", "D05");    //Engrosafiksering
+    public static readonly BusinessReason WholesaleFixing = new("WholesaleFixing", "D05"); // Engrosfiksering
     public static readonly BusinessReason Correction = new("Correction", "D32");
 
     #region Unused business reasons
@@ -416,8 +414,6 @@ public sealed class BusinessReason : EnumerationTypeWithCode<BusinessReason>
                 "E84"
      */
     #endregion
-    // ReSharper restore InconsistentNaming
-    #pragma warning restore IDE1006
 
     private BusinessReason(string name, string code)
      : base(name, code)

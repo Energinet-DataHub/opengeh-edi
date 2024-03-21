@@ -13,13 +13,13 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
 public class ChargeType : EnumerationTypeWithCode<ChargeType>
 {
+    // Must match the ChargeType names in Energinet.DataHub.Wholesale.Edi.Models.ChargeType in the Wholesale subsystem
     public static readonly ChargeType Subscription = new(nameof(Subscription), "D01");
     public static readonly ChargeType Fee = new(nameof(Fee), "D02");
     public static readonly ChargeType Tariff = new(nameof(Tariff), "D03");

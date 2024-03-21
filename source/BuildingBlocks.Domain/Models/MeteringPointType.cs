@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -21,6 +20,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 [Serializable]
 public class MeteringPointType : EnumerationTypeWithCode<MeteringPointType>
 {
+    // Must match the MeteringPointType names in Energinet.DataHub.Wholesale.Edi.Models.MeteringPointType in the Wholesale subsystem
     public static readonly MeteringPointType Consumption = new(nameof(Consumption), "E17");
     public static readonly MeteringPointType Production = new(nameof(Production), "E18");
     public static readonly MeteringPointType Exchange = new(nameof(Exchange), "E20");

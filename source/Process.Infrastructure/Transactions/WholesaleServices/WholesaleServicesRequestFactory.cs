@@ -45,7 +45,7 @@ public static class WholesaleServicesRequestFactory
         {
             RequestedByActorId = process.RequestedByActorId.Value,
             RequestedByActorRole = process.RequestedByActorRoleCode,
-            BusinessReason = process.BusinessReason.Code,
+            BusinessReason = process.BusinessReason.Name,
             PeriodStart = process.StartOfPeriod,
         };
 

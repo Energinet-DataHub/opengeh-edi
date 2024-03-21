@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -21,6 +20,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 [Serializable]
 public class Resolution : EnumerationTypeWithCode<Resolution>
 {
+    // Must match the Resolution names in Energinet.DataHub.Wholesale.Edi.Models.Resolution in the Wholesale subsystem
     public static readonly Resolution QuarterHourly = new(nameof(QuarterHourly), "PT15M");
     public static readonly Resolution Hourly = new(nameof(Hourly), "PT1H");
     public static readonly Resolution Daily = new(nameof(Daily), "P1D");
