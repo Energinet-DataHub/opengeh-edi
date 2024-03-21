@@ -12,10 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
+using System;
+using System.Collections.Generic;
 
-public partial class MessageDelegationConfigured
-{
-    public const string EventName = "MessageDelegationConfigured";
-    public const int CurrentMinorVersion = 1;
-}
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestWholesaleSettlement;
+
+// This is a copy of RejectedWholesaleServicesMessageSeries defined in the process module
+public record RejectedWholesaleServicesRecord(
+    Guid TransactionId,
+    IReadOnlyCollection<RejectReason> RejectReasons,
+    string OriginalTransactionIdReference);
+
+public record RejectReason(string ErrorCode, string ErrorMessage);
