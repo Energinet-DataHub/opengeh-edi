@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
