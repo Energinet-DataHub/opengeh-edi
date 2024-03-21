@@ -30,7 +30,7 @@ using Microsoft.ApplicationInsights.Extensibility;
 
 var builder = WebApplication.CreateBuilder(args);
 
-const string domainName = "EDI.B2CWebApi";
+const string domainName = "EDI";
 
 builder.Logging
     .ClearProviders()
@@ -39,6 +39,7 @@ builder.Logging
 builder.Services
     .AddSwaggerForWebApp(Assembly.GetExecutingAssembly())
     .AddApiVersioningForWebApp(new ApiVersion(1, 0))
+    .AddApplicationInsightsForWebApp(domainName)
     .AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>()
     .AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));

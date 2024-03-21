@@ -40,6 +40,8 @@ namespace Energinet.DataHub.EDI.Api;
 
 public static class HostFactory
 {
+    private const string DomainName = "EDI";
+
     public static IHost CreateHost(RuntimeEnvironment runtime, TokenValidationParameters tokenValidationParameters)
     {
         ArgumentNullException.ThrowIfNull(runtime);
@@ -61,7 +63,7 @@ public static class HostFactory
                 (context, services) =>
                 {
                     services
-                        .AddApplicationInsights()
+                        .AddApplicationInsightsForIsolatedWorker(DomainName)
                         .ConfigureFunctionsApplicationInsights()
                         .AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>()
                         .AddDataRetention()
