@@ -160,6 +160,8 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202402181300 Add RelatedToMessageId column to ArchivedMessages.sql" />
     <EmbeddedResource Include="Scripts\Model\202403111204 Create WholesaleServicesProcesses Table.sql" />
     <EmbeddedResource Include="Scripts\Model\202403191331 Create MessageDelegation table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202403211328 Create ProcessDelegationConfigured table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202403211329 Drop MessageDelegationConfigured table.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
     <None Remove="Scripts\Model\202310231329 Alter Bundles1.sql" />
