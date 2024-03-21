@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 
@@ -23,26 +24,29 @@ namespace Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
 /// </summary>
 public class ProcessDelegation
 {
+    private readonly Guid _id;
+
     public ProcessDelegation(
         int sequenceNumber,
-        string processDelegationType,
+        string delegatedProcess,
         string gridAreaCode,
         Instant startsAt,
         Instant stopsAt,
-        ActorNumber delegatedBy,
-        ActorRole delegatedByRole,
-        ActorNumber delegatedTo,
-        ActorRole delegatedToRole)
+        ActorNumber delegatedByActorNumber,
+        ActorRole delegatedByActorRole,
+        ActorNumber delegatedToActorNumber,
+        ActorRole delegatedToActorRole)
     {
+        _id = Guid.NewGuid();
         SequenceNumber = sequenceNumber;
-        ProcessDelegationType = processDelegationType;
+        DelegatedProcess = delegatedProcess;
         GridAreaCode = gridAreaCode;
         StartsAt = startsAt;
         StopsAt = stopsAt;
-        DelegatedBy = delegatedBy;
-        DelegatedByRole = delegatedByRole;
-        DelegatedTo = delegatedTo;
-        DelegatedToRole = delegatedToRole;
+        DelegatedByActorNumber = delegatedByActorNumber;
+        DelegatedByActorRole = delegatedByActorRole;
+        DelegatedToActorNumber = delegatedToActorNumber;
+        DelegatedToActorRole = delegatedToActorRole;
     }
 
 #pragma warning disable CS8618 // Needed by Entity Framework
@@ -59,7 +63,7 @@ public class ProcessDelegation
     /// <summary>
     /// The type of process that is delegated ex: PROCESS_REQUEST_ENERGY_RESULTS
     /// </summary>
-    public string ProcessDelegationType { get; }
+    public string DelegatedProcess { get; }
 
     /// <summary>
     /// The code of the grid area for which the process is delegated.
@@ -81,11 +85,11 @@ public class ProcessDelegation
     /// <summary>
     /// The EIC or GLN identifier of the actor that delegated its process to another actor.
     /// </summary>
-    public ActorNumber DelegatedBy { get; set; }
+    public ActorNumber DelegatedByActorNumber { get; set; }
 
-    public ActorRole DelegatedByRole { get; set; }
+    public ActorRole DelegatedByActorRole { get; set; }
 
-    public ActorNumber DelegatedTo { get; set; }
+    public ActorNumber DelegatedToActorNumber { get; set; }
 
-    public ActorRole DelegatedToRole { get; set; }
+    public ActorRole DelegatedToActorRole { get; set; }
 }

@@ -15,13 +15,21 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
+using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 
 namespace Energinet.DataHub.EDI.MasterData.Infrastructure.MessageDelegation;
 
 public class ProcessDelegationRepository : IProcessDelegationRepository
 {
-    public Task CreateAsync(ProcessDelegation processDelegation, CancellationToken cancellationToken)
+    private readonly MasterDataContext _masterDataContext;
+
+    public ProcessDelegationRepository(MasterDataContext masterDataContext)
     {
-        throw new System.NotImplementedException();
+        _masterDataContext = masterDataContext;
+    }
+
+    public void Create(ProcessDelegation processDelegation, CancellationToken cancellationToken)
+    {
+        _masterDataContext.ProcessDelegations.Add(processDelegation);
     }
 }

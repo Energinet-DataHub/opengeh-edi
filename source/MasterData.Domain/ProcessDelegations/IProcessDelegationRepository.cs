@@ -25,5 +25,5 @@ public interface IProcessDelegationRepository
     /// <summary>
     ///     Create a process delegation
     /// </summary>
-    Task CreateAsync(ProcessDelegation processDelegation, CancellationToken cancellationToken);
+    void Create(ProcessDelegation processDelegation, CancellationToken cancellationToken);
 }

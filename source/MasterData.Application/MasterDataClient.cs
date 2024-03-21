@@ -150,7 +150,7 @@ internal sealed class MasterDataClient : IMasterDataClient
         ProcessDelegationDto processDelegationDto,
         CancellationToken cancellationToken)
     {
-        await _processDelegationRepository.CreateAsync(
+        _processDelegationRepository.Create(
             new ProcessDelegation(
                 processDelegationDto.SequenceNumber,
                 processDelegationDto.ProcessDelegationType,
@@ -161,8 +161,9 @@ internal sealed class MasterDataClient : IMasterDataClient
                 processDelegationDto.DelegatedBy.ActorRole,
                 processDelegationDto.DelegatedTo.ActorNumber,
                 processDelegationDto.DelegatedTo.ActorRole),
-            cancellationToken)
-            .ConfigureAwait(false);
+            cancellationToken);
+
+        await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private void CreateNewActorCertificate(ActorCertificateCredentialsAssignedDto request)

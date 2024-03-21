@@ -34,17 +34,17 @@ public class MessageDelegationConfiguredEventProcessor : IIntegrationEventProces
         _masterDataClient = masterDataClient;
     }
 
-    public string EventTypeToHandle => MessageDelegationConfigured.EventName;
+    public string EventTypeToHandle => ProcessDelegationConfigured.EventName;
 
     public async Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        var message = (MessageDelegationConfigured)integrationEvent.Message;
+        var message = (ProcessDelegationConfigured)integrationEvent.Message;
         await _masterDataClient.CreateProcessDelegationAsync(
             new ProcessDelegationDto(
                 message.SequenceNumber,
-                message.MessageType.ToString(),
+                message.Process.ToString(),
                 message.GridAreaCode,
                 message.StartsAt.ToInstant(),
                 message.StopsAt.ToInstant(),
