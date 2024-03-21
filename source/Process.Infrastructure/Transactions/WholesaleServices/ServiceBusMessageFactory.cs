@@ -21,7 +21,7 @@ using ChargeType = Energinet.DataHub.Edi.Requests.ChargeType;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.WholesaleServices;
 
-public static class WholesaleServicesRequestFactory
+public static class ServiceBusMessageFactory
 {
     public static ServiceBusMessage CreateServiceBusMessage(WholesaleServicesProcess process)
     {
