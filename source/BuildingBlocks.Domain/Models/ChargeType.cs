@@ -28,4 +28,9 @@ public class ChargeType : EnumerationTypeWithCode<ChargeType>
         : base(name, code)
     {
     }
+
+    public static ChargeType? TryFromCode(string code)
+    {
+        return GetAll<ChargeType>().FirstOrDefault(r => r.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
+    }
 }

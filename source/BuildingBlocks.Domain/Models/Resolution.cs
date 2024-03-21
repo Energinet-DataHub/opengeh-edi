@@ -36,4 +36,9 @@ public class Resolution : EnumerationTypeWithCode<Resolution>
     {
         return new Resolution(name ?? "UNKNOWN", code ?? "???");
     }
+
+    public static Resolution? TryFromCode(string code)
+    {
+        return GetAll<Resolution>().FirstOrDefault(r => r.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
+    }
 }
