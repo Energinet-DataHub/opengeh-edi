@@ -17,28 +17,13 @@ using System.Linq;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public class ReasonCode : EnumerationType
+public class ReasonCode : EnumerationTypeWithCode<ReasonCode>
 {
     public static readonly ReasonCode FullyAccepted = new(nameof(FullyAccepted), "A01");
     public static readonly ReasonCode FullyRejected = new(nameof(FullyRejected), "A02");
 
-    public ReasonCode(string name, string code)
-        : base(name)
+    private ReasonCode(string name, string code)
+        : base(name, code)
     {
-        Code = code;
-    }
-
-    public string Code { get; }
-
-    public static ReasonCode FromCode(string code)
-    {
-        return GetAll<ReasonCode>().FirstOrDefault(r => r.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{code} is not a valid {typeof(ReasonCode)} {nameof(code)}");
-    }
-
-    public static ReasonCode FromName(string name)
-    {
-        return GetAll<ReasonCode>().FirstOrDefault(r => r.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(ReasonCode)} {nameof(name)}");
     }
 }

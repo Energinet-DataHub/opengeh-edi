@@ -19,7 +19,7 @@ using System.Text.Json.Serialization;
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
-public class MeasurementUnit : EnumerationType
+public class MeasurementUnit : EnumerationTypeWithCode<MeasurementUnit>
 {
     // Tariffs are measured in Kwh
     public static readonly MeasurementUnit Kwh = new(nameof(Kwh), "KWH");
@@ -29,24 +29,7 @@ public class MeasurementUnit : EnumerationType
 
     [JsonConstructor]
     private MeasurementUnit(string name, string code)
-        : base(name)
+        : base(name, code)
     {
-        Code = code;
-    }
-
-    public string Code { get; }
-
-    public static MeasurementUnit FromName(string name)
-    {
-        return GetAll<MeasurementUnit>().FirstOrDefault(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException(
-                   $"{name} is not a valid {typeof(MeasurementUnit)} {nameof(name)}");
-    }
-
-    public static MeasurementUnit FromCode(string code)
-    {
-        return GetAll<MeasurementUnit>().FirstOrDefault(t => t.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException(
-                   $"{code} is not a valid {typeof(MeasurementUnit)} {nameof(code)}");
     }
 }

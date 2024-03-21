@@ -17,28 +17,13 @@ using System.Linq;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public class ProductType : EnumerationType
+public class ProductType : EnumerationTypeWithCode<ProductType>
 {
     public static readonly ProductType EnergyActive = new(nameof(EnergyActive), "8716867000030");
     public static readonly ProductType Tariff = new(nameof(Tariff), "5790001330590");
 
-    protected ProductType(string name, string code)
-        : base(name)
+    private ProductType(string name, string code)
+        : base(name, code)
     {
-        Code = code;
-    }
-
-    public string Code { get; }
-
-    public static ProductType FromName(string name)
-    {
-        return GetAll<ProductType>()
-                   .FirstOrDefault(productType => productType.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(ProductType)} {nameof(name)}");
-    }
-
-    public override string ToString()
-    {
-        return Name;
     }
 }

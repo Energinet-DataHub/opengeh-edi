@@ -19,7 +19,7 @@ using System.Text.Json.Serialization;
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
-public class Resolution : EnumerationType
+public class Resolution : EnumerationTypeWithCode<Resolution>
 {
     public static readonly Resolution QuarterHourly = new(nameof(QuarterHourly), "PT15M");
     public static readonly Resolution Hourly = new(nameof(Hourly), "PT1H");
@@ -28,22 +28,12 @@ public class Resolution : EnumerationType
 
     [JsonConstructor]
     private Resolution(string name, string code)
-        : base(name)
+        : base(name, code)
     {
-        Code = code;
     }
 
-    public string Code { get; }
-
-    public static Resolution FromName(string name)
+    private static Resolution CreateUnknown(string? name, string? code)
     {
-        return GetAll<Resolution>().FirstOrDefault(r => r.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(Resolution)} {nameof(name)}");
-    }
-
-    public static Resolution FromCode(string code)
-    {
-        return GetAll<Resolution>().FirstOrDefault(r => r.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{code} is not a valid {typeof(Resolution)} {nameof(code)}");
+        return new Resolution(name ?? "UNKNOWN", code ?? "???");
     }
 }

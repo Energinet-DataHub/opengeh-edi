@@ -19,7 +19,7 @@ using System.Text.Json.Serialization;
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
-public class SettlementType : EnumerationType
+public class SettlementType : EnumerationTypeWithCode<SettlementType>
 {
     // Customer with more than ~100.000 kwH per year
     public static readonly SettlementType NonProfiled = new(nameof(NonProfiled), "E02");
@@ -29,22 +29,7 @@ public class SettlementType : EnumerationType
 
     [JsonConstructor]
     private SettlementType(string name, string code)
-        : base(name)
+        : base(name, code)
     {
-        Code = code;
-    }
-
-    public string Code { get; }
-
-    public static SettlementType FromName(string name)
-    {
-        return GetAll<SettlementType>().FirstOrDefault(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(SettlementType)} {nameof(name)}");
-    }
-
-    public static SettlementType FromCode(string code)
-    {
-        return GetAll<SettlementType>().FirstOrDefault(t => t.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{code} is not a valid {typeof(SettlementType)} {nameof(code)}");
     }
 }

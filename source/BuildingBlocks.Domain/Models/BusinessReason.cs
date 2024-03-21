@@ -13,11 +13,10 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public sealed class BusinessReason : EnumerationType
+public sealed class BusinessReason : EnumerationTypeWithCode<BusinessReason>
 {
     // ReSharper disable InconsistentNaming
     #pragma warning disable IDE1006
@@ -421,22 +420,7 @@ public sealed class BusinessReason : EnumerationType
     #pragma warning restore IDE1006
 
     private BusinessReason(string name, string code)
-     : base(name)
+     : base(name, code)
     {
-        Code = code;
-    }
-
-    public string Code { get; }
-
-    public static BusinessReason FromName(string name)
-    {
-        return GetAll<BusinessReason>().FirstOrDefault(br => br.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(BusinessReason)} {nameof(name)}");
-    }
-
-    public static BusinessReason FromCode(string code)
-    {
-        return GetAll<BusinessReason>().FirstOrDefault(br => br.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{code} is not a valid {typeof(BusinessReason)} {nameof(code)}");
     }
 }

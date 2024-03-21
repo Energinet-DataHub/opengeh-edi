@@ -19,28 +19,13 @@ using System.Text.Json.Serialization;
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
-public class Currency : EnumerationType
+public class Currency : EnumerationTypeWithCode<Currency>
 {
     public static readonly Currency DanishCrowns = new(nameof(DanishCrowns), "DKK");
 
     [JsonConstructor]
     private Currency(string name, string code)
-        : base(name)
+        : base(name, code)
     {
-        Code = code;
-    }
-
-    public string Code { get; }
-
-    public static Currency FromName(string name)
-    {
-        return GetAll<Currency>().FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(Currency)} {nameof(name)}");
-    }
-
-    public static Currency FromCode(string code)
-    {
-        return GetAll<Currency>().FirstOrDefault(c => c.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{code} is not a valid {typeof(Currency)} {nameof(code)}");
     }
 }

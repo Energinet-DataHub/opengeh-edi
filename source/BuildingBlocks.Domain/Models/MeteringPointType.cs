@@ -19,7 +19,7 @@ using System.Text.Json.Serialization;
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
-public class MeteringPointType : EnumerationType
+public class MeteringPointType : EnumerationTypeWithCode<MeteringPointType>
 {
     public static readonly MeteringPointType Consumption = new(nameof(Consumption), "E17");
     public static readonly MeteringPointType Production = new(nameof(Production), "E18");
@@ -27,24 +27,7 @@ public class MeteringPointType : EnumerationType
 
     [JsonConstructor]
     private MeteringPointType(string name, string code)
-        : base(name)
+        : base(name, code)
     {
-        Code = code;
-    }
-
-    public string Code { get; }
-
-    public static MeteringPointType FromName(string name)
-    {
-        return GetAll<MeteringPointType>().FirstOrDefault(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException(
-                   $"{name} is not a valid {typeof(MeteringPointType)} {nameof(name)}");
-    }
-
-    public static MeteringPointType FromCode(string code)
-    {
-        return GetAll<MeteringPointType>().FirstOrDefault(t => t.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException(
-                   $"{code} is not a valid {typeof(MeteringPointType)} {nameof(code)}");
     }
 }

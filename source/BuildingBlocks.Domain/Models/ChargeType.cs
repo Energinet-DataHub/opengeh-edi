@@ -18,29 +18,14 @@ using System.Linq;
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
-public class ChargeType : EnumerationType
+public class ChargeType : EnumerationTypeWithCode<ChargeType>
 {
     public static readonly ChargeType Subscription = new(nameof(Subscription), "D01");
     public static readonly ChargeType Fee = new(nameof(Fee), "D02");
     public static readonly ChargeType Tariff = new(nameof(Tariff), "D03");
 
     public ChargeType(string name, string code)
-        : base(name)
+        : base(name, code)
     {
-        Code = code;
-    }
-
-    public string Code { get; }
-
-    public static ChargeType FromCode(string code)
-    {
-        return GetAll<ChargeType>().FirstOrDefault(c => c.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{code} is not a valid {typeof(ChargeType)} code");
-    }
-
-    public static ChargeType FromName(string name)
-    {
-        return GetAll<ChargeType>().FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(ChargeType)} {nameof(name)}");
     }
 }

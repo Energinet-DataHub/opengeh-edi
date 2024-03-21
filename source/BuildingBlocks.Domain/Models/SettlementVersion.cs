@@ -19,7 +19,7 @@ using System.Text.Json.Serialization;
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
-public class SettlementVersion : EnumerationType
+public class SettlementVersion : EnumerationTypeWithCode<SettlementVersion>
 {
     // Must match the SettlementSeriesVersion names in Energinet.DataHub.Wholesale.Edi.Models.SettlementSeriesVersion
     public static readonly SettlementVersion FirstCorrection = new("FirstCorrection", "D01");
@@ -37,24 +37,7 @@ public class SettlementVersion : EnumerationType
 
     [JsonConstructor]
     private SettlementVersion(string name, string code)
-        : base(name)
+        : base(name, code)
     {
-        Code = code;
-    }
-
-    public string Code { get; }
-
-    public static SettlementVersion FromName(string name)
-    {
-        return GetAll<SettlementVersion>().FirstOrDefault(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException(
-                   $"{name} is not a valid {typeof(SettlementVersion)} {nameof(name)}");
-    }
-
-    public static SettlementVersion FromCode(string code)
-    {
-        return GetAll<SettlementVersion>().FirstOrDefault(t => t.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException(
-                   $"{code} is not a valid {typeof(SettlementVersion)} {nameof(code)}");
     }
 }
