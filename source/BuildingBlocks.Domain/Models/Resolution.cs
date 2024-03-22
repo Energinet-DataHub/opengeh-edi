@@ -46,4 +46,9 @@ public class Resolution : EnumerationType
         return GetAll<Resolution>().FirstOrDefault(r => r.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
                ?? throw new InvalidOperationException($"{code} is not a valid {typeof(Resolution)} {nameof(code)}");
     }
+
+    public static Resolution? TryFromCode(string code)
+    {
+        return GetAll<Resolution>().FirstOrDefault(r => r.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
+    }
 }
