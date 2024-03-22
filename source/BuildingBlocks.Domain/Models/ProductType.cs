@@ -14,7 +14,7 @@
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public class ProductType : EnumerationTypeWithCode<ProductType>
+public class ProductType : DataHubType<ProductType>
 {
     public static readonly ProductType EnergyActive = new(nameof(EnergyActive), "8716867000030");
     public static readonly ProductType Tariff = new(nameof(Tariff), "5790001330590");

@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
-public class MeteringPointType : EnumerationTypeWithCode<MeteringPointType>
+public class MeteringPointType : DataHubType<MeteringPointType>
 {
     public static readonly MeteringPointType Consumption = new(DataHubNames.MeteringPointType.Consumption, "E17");
     public static readonly MeteringPointType Production = new(DataHubNames.MeteringPointType.Production, "E18");

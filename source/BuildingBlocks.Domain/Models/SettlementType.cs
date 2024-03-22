@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
-public class SettlementType : EnumerationTypeWithCode<SettlementType>
+public class SettlementType : DataHubType<SettlementType>
 {
     // Customer with more than ~100.000 kwH per year
     public static readonly SettlementType NonProfiled = new(DataHubNames.SettlementMethod.NonProfiled, "E02");

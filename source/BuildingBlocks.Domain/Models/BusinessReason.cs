@@ -17,7 +17,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public sealed class BusinessReason : EnumerationTypeWithCode<BusinessReason>
+public sealed class BusinessReason : DataHubType<BusinessReason>
 {
     public static readonly BusinessReason MoveIn = new(DataHubNames.BusinessReason.MoveIn, "E65");
     public static readonly BusinessReason BalanceFixing = new(DataHubNames.BusinessReason.BalanceFixing, "D04");

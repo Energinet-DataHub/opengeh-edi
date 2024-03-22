@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
-public class Resolution : EnumerationTypeWithCode<Resolution>
+public class Resolution : DataHubType<Resolution>
 {
     public static readonly Resolution QuarterHourly = new(DataHubNames.Resolution.QuarterHourly, "PT15M");
     public static readonly Resolution Hourly = new(DataHubNames.Resolution.Hourly, "PT1H");

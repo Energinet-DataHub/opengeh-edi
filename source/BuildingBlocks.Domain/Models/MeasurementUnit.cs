@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
-public class MeasurementUnit : EnumerationTypeWithCode<MeasurementUnit>
+public class MeasurementUnit : DataHubType<MeasurementUnit>
 {
     // Tariffs are measured in Kwh
     public static readonly MeasurementUnit Kwh = new(DataHubNames.MeasurementUnit.Kwh, "KWH");

@@ -14,7 +14,7 @@
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public class ReasonCode : EnumerationTypeWithCode<ReasonCode>
+public class ReasonCode : DataHubType<ReasonCode>
 {
     public static readonly ReasonCode FullyAccepted = new(nameof(FullyAccepted), "A01");
     public static readonly ReasonCode FullyRejected = new(nameof(FullyRejected), "A02");

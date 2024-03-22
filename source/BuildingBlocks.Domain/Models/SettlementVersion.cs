@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
-public class SettlementVersion : EnumerationTypeWithCode<SettlementVersion>
+public class SettlementVersion : DataHubType<SettlementVersion>
 {
     public static readonly SettlementVersion FirstCorrection = new(DataHubNames.SettlementVersion.FirstCorrection, "D01");
     public static readonly SettlementVersion SecondCorrection = new(DataHubNames.SettlementVersion.SecondCorrection, "D02");

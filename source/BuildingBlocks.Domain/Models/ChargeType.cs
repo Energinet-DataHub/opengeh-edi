@@ -18,7 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
-public class ChargeType : EnumerationTypeWithCode<ChargeType>
+public class ChargeType : DataHubType<ChargeType>
 {
     public static readonly ChargeType Subscription = new(DataHubNames.ChargeType.Subscription, "D01");
     public static readonly ChargeType Fee = new(DataHubNames.ChargeType.Fee, "D02");

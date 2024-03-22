@@ -20,10 +20,10 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 /// <summary>
 /// Base class for enumeration types with a code (typically used for our domain object with CIM codes)
 /// </summary>
-public abstract class EnumerationTypeWithCode<T> : EnumerationType
-    where T : EnumerationTypeWithCode<T>
+public abstract class DataHubType<T> : EnumerationType
+    where T : DataHubType<T>
 {
-    protected EnumerationTypeWithCode(string name, string code)
+    protected DataHubType(string name, string code)
         : base(name)
     {
         Code = code;
@@ -59,7 +59,7 @@ public abstract class EnumerationTypeWithCode<T> : EnumerationType
 
     protected override bool ValueMatches(EnumerationType otherEnumerationType)
     {
-        if (otherEnumerationType is not EnumerationTypeWithCode<T> otherEnumerationTypeWithCode)
+        if (otherEnumerationType is not DataHubType<T> otherEnumerationTypeWithCode)
             return false;
 
         return base.ValueMatches(otherEnumerationTypeWithCode) && Code.Equals(otherEnumerationTypeWithCode.Code, StringComparison.Ordinal);
