@@ -108,6 +108,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         message.Should().NotBeNull();
         var wholesaleServicesRequest = WholesaleServicesRequest.Parser.ParseFrom(message!.Body);
 
+        wholesaleServicesRequest.RequestedByActorRole.Should().NotBeCimCode();
         wholesaleServicesRequest.BusinessReason.Should().NotBeCimCode();
         wholesaleServicesRequest.Resolution.Should().NotBeCimCode();
         wholesaleServicesRequest.SettlementSeriesVersion.Should().NotBeCimCode();

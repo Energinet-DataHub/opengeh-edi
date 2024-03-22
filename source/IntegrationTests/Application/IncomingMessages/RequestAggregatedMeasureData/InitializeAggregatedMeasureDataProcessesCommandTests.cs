@@ -135,6 +135,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         message.Should().NotBeNull();
         var aggregatedTimeSeriesRequest = AggregatedTimeSeriesRequest.Parser.ParseFrom(message!.Body);
 
+        aggregatedTimeSeriesRequest.RequestedByActorRole.Should().NotBeCimCode();
         aggregatedTimeSeriesRequest.BusinessReason.Should().NotBeCimCode();
         aggregatedTimeSeriesRequest.SettlementSeriesVersion.Should().NotBeCimCode();
         aggregatedTimeSeriesRequest.SettlementMethod.Should().NotBeCimCode();

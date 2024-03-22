@@ -59,15 +59,15 @@ public static class AggregatedMeasureDataRequestFactory
         {
             Period = MapPeriod(process),
             RequestedByActorId = process.RequestedByActorId.Value,
-            RequestedByActorRole = process.RequestedByActorRoleCode,
+            RequestedByActorRole = WholesaleRequestNameConverter.ActorRoleCodeToName(process.RequestedByActorRoleCode),
             BusinessReason = process.BusinessReason.Name,
         };
 
         if (process.MeteringPointType != null)
-            request.MeteringPointType = MapMeteringPointType(process.MeteringPointType);
+            request.MeteringPointType = WholesaleRequestNameConverter.MeteringPointTypeCodeToName(process.MeteringPointType);
 
         if (process.SettlementMethod != null)
-            request.SettlementMethod = MapSettlementType(process.SettlementMethod);
+            request.SettlementMethod = WholesaleRequestNameConverter.SettlementTypeCodeToName(process.SettlementMethod);
 
         if (process.EnergySupplierId != null)
             request.EnergySupplierId = process.EnergySupplierId;
@@ -85,15 +85,5 @@ public static class AggregatedMeasureDataRequestFactory
             request.GridAreaCode = process.MeteringGridAreaDomainId;
 
         return request;
-    }
-
-    private static string MapMeteringPointType(string meteringPointType)
-    {
-        return MeteringPointType.TryGetNameFromCode(meteringPointType) ?? meteringPointType;
-    }
-
-    private static string MapSettlementType(string settlementType)
-    {
-        return SettlementType.TryGetNameFromCode(settlementType) ?? settlementType;
     }
 }
