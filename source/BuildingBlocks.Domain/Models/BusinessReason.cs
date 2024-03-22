@@ -19,11 +19,11 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public sealed class BusinessReason : EnumerationTypeWithCode<BusinessReason>
 {
-    public static readonly BusinessReason MoveIn = new(DomainNames.BusinessReason.MoveIn, "E65");
-    public static readonly BusinessReason BalanceFixing = new(DomainNames.BusinessReason.BalanceFixing, "D04");
-    public static readonly BusinessReason PreliminaryAggregation = new(DomainNames.BusinessReason.PreliminaryAggregation, "D03");
-    public static readonly BusinessReason WholesaleFixing = new(DomainNames.BusinessReason.WholesaleFixing, "D05"); // Engrosfiksering
-    public static readonly BusinessReason Correction = new(DomainNames.BusinessReason.Correction, "D32");
+    public static readonly BusinessReason MoveIn = new(DataHubNames.BusinessReason.MoveIn, "E65");
+    public static readonly BusinessReason BalanceFixing = new(DataHubNames.BusinessReason.BalanceFixing, "D04");
+    public static readonly BusinessReason PreliminaryAggregation = new(DataHubNames.BusinessReason.PreliminaryAggregation, "D03");
+    public static readonly BusinessReason WholesaleFixing = new(DataHubNames.BusinessReason.WholesaleFixing, "D05"); // Engrosfiksering
+    public static readonly BusinessReason Correction = new(DataHubNames.BusinessReason.Correction, "D32");
 
     #region Unused business reasons
     [Obsolete("Unused, but required for schema compliance")]

@@ -21,9 +21,9 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 [Serializable]
 public class MeteringPointType : EnumerationTypeWithCode<MeteringPointType>
 {
-    public static readonly MeteringPointType Consumption = new(DomainNames.MeteringPointType.Consumption, "E17");
-    public static readonly MeteringPointType Production = new(DomainNames.MeteringPointType.Production, "E18");
-    public static readonly MeteringPointType Exchange = new(DomainNames.MeteringPointType.Exchange, "E20");
+    public static readonly MeteringPointType Consumption = new(DataHubNames.MeteringPointType.Consumption, "E17");
+    public static readonly MeteringPointType Production = new(DataHubNames.MeteringPointType.Production, "E18");
+    public static readonly MeteringPointType Exchange = new(DataHubNames.MeteringPointType.Exchange, "E20");
 
     [JsonConstructor]
     private MeteringPointType(string name, string code)

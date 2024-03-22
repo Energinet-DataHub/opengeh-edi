@@ -21,10 +21,10 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 [Serializable]
 public class Resolution : EnumerationTypeWithCode<Resolution>
 {
-    public static readonly Resolution QuarterHourly = new(DomainNames.Resolution.QuarterHourly, "PT15M");
-    public static readonly Resolution Hourly = new(DomainNames.Resolution.Hourly, "PT1H");
-    public static readonly Resolution Daily = new(DomainNames.Resolution.Daily, "P1D");
-    public static readonly Resolution Monthly = new(DomainNames.Resolution.Monthly, "P1M");
+    public static readonly Resolution QuarterHourly = new(DataHubNames.Resolution.QuarterHourly, "PT15M");
+    public static readonly Resolution Hourly = new(DataHubNames.Resolution.Hourly, "PT1H");
+    public static readonly Resolution Daily = new(DataHubNames.Resolution.Daily, "P1D");
+    public static readonly Resolution Monthly = new(DataHubNames.Resolution.Monthly, "P1M");
 
     [JsonConstructor]
     private Resolution(string name, string code)

@@ -22,10 +22,10 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 public class SettlementType : EnumerationTypeWithCode<SettlementType>
 {
     // Customer with more than ~100.000 kwH per year
-    public static readonly SettlementType NonProfiled = new(DomainNames.SettlementMethod.NonProfiled, "E02");
+    public static readonly SettlementType NonProfiled = new(DataHubNames.SettlementMethod.NonProfiled, "E02");
 
     // Customer with less than ~100.000 kwH per year
-    public static readonly SettlementType Flex = new(DomainNames.SettlementMethod.Flex, "D01");
+    public static readonly SettlementType Flex = new(DataHubNames.SettlementMethod.Flex, "D01");
 
     [JsonConstructor]
     private SettlementType(string name, string code)

@@ -21,9 +21,9 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 [Serializable]
 public class SettlementVersion : EnumerationTypeWithCode<SettlementVersion>
 {
-    public static readonly SettlementVersion FirstCorrection = new(DomainNames.SettlementVersion.FirstCorrection, "D01");
-    public static readonly SettlementVersion SecondCorrection = new(DomainNames.SettlementVersion.SecondCorrection, "D02");
-    public static readonly SettlementVersion ThirdCorrection = new(DomainNames.SettlementVersion.ThirdCorrection, "D03");
+    public static readonly SettlementVersion FirstCorrection = new(DataHubNames.SettlementVersion.FirstCorrection, "D01");
+    public static readonly SettlementVersion SecondCorrection = new(DataHubNames.SettlementVersion.SecondCorrection, "D02");
+    public static readonly SettlementVersion ThirdCorrection = new(DataHubNames.SettlementVersion.ThirdCorrection, "D03");
 
     // Below SettlementVersions are not used directly, but must be here for possible mapping
     public static readonly SettlementVersion FourthCorrection = new(nameof(FourthCorrection), "D04");
