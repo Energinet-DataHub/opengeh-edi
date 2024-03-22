@@ -12,11 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// ReSharper disable once CheckNamespace -- Protobuf is in with another namespace
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
+using System.Threading;
+using System.Threading.Tasks;
 
-public partial class ProcessDelegationConfigured
+namespace Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
+
+/// <summary>
+///     Process delegation repository
+/// </summary>
+public interface IProcessDelegationRepository
 {
-    public const string EventName = "ProcessDelegationConfigured";
-    public const int CurrentMinorVersion = 1;
+    /// <summary>
+    ///     Create a process delegation
+    /// </summary>
+    void Create(ProcessDelegation processDelegation, CancellationToken cancellationToken);
 }
