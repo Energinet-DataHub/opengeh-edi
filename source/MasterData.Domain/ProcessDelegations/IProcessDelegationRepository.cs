@@ -12,19 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.MasterData.Interfaces.Models;
+namespace Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
 
 /// <summary>
-///    Data transfer object for message delegation
+///     Process delegation repository
 /// </summary>
-public record MessageDelegationDto(
-    int SequenceNumber,
-    DocumentType DocumentType,
-    string GridAreaCode,
-    Instant StartsAt,
-    Instant StopsAt,
-    ActorNumberAndRoleDto DelegatedBy,
-    ActorNumberAndRoleDto DelegatedTo);
+public interface IProcessDelegationRepository
+{
+    /// <summary>
+    ///     Create a process delegation
+    /// </summary>
+    void Create(ProcessDelegation processDelegation, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Get a process delegation
+    /// </summary>
+    Task<ProcessDelegation?> GetAsync(ActorNumber delegatedByActorNumber, ActorRole delegatedByActorRole, string gridAreaCode, DocumentType documentType, Instant now);
+}

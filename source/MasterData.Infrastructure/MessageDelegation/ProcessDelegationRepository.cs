@@ -15,19 +15,27 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.MasterData.Domain.MessageDelegations;
+using Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
+using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.MasterData.Infrastructure.MessageDelegation;
 
-public class MessageDelegationRepository : IMessageDelegationRepository
+public class ProcessDelegationRepository : IProcessDelegationRepository
 {
-    public Task CreateAsync(Domain.MessageDelegations.MessageDelegation messageDelegation, CancellationToken cancellationToken)
+    private readonly MasterDataContext _masterDataContext;
+
+    public ProcessDelegationRepository(MasterDataContext masterDataContext)
     {
-        throw new System.NotImplementedException();
+        _masterDataContext = masterDataContext;
     }
 
-    public Task<Domain.MessageDelegations.MessageDelegation?> GetAsync(
+    public void Create(ProcessDelegation processDelegation, CancellationToken cancellationToken)
+    {
+        _masterDataContext.ProcessDelegations.Add(processDelegation);
+    }
+
+    public Task<ProcessDelegation?> GetAsync(
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
         string gridAreaCode,

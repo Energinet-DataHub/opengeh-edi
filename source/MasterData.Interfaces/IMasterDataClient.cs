@@ -67,12 +67,12 @@ public interface IMasterDataClient
         CancellationToken cancellationToken);
 
     /// <summary>
-    ///    Create a new message delegation configuration.
+    ///    Create a new process delegation configuration.
     /// </summary>
-    Task CreateMessageDelegationConfiguredAsync(MessageDelegationDto messageDelegationDto, CancellationToken cancellationToken);
+    Task CreateProcessDelegationAsync(ProcessDelegationDto processDelegationDto, CancellationToken cancellationToken);
 
     /// <summary>
-    ///    Get message delegation.
+    ///    Get process delegation.
     /// </summary>
-    Task<MessageDelegationDto?> GetMessageDelegationAsync(ActorNumber delegatedByActorNumber, ActorRole delegatedByActorRole, string gridAreaCode, DocumentType documentType, Instant now);
+    Task<ProcessDelegationDto?> GetProcessDelegationAsync(ActorNumber delegatedByActorNumber, ActorRole delegatedByActorRole, string gridAreaCode, DocumentType documentType, Instant now);
 }

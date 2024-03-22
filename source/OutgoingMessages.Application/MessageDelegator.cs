@@ -62,7 +62,7 @@ public class MessageDelegator
         string gridAreaCode,
         DocumentType documentType)
     {
-        var messageDelegation = await _masterDataClient.GetMessageDelegationAsync(
+        var messageDelegation = await _masterDataClient.GetProcessDelegationAsync(
             delegatedByActorNumber,
             delegatedByActorRole,
             gridAreaCode,

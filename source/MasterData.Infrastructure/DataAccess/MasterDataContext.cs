@@ -15,9 +15,11 @@
 using System;
 using Energinet.DataHub.EDI.MasterData.Domain.Actors;
 using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
+using Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.ActorCertificate;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Actors;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.GridAreas;
+using Energinet.DataHub.EDI.MasterData.Infrastructure.MessageDelegation;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
@@ -44,6 +46,10 @@ public class MasterDataContext : DbContext
 
     // ReSharper disable once UnusedAutoPropertyAccessor.Local
     // It is used by EF.
+    public DbSet<ProcessDelegation> ProcessDelegations { get; private set; }
+
+    // ReSharper disable once UnusedAutoPropertyAccessor.Local
+    // It is used by EF.
     public DbSet<Domain.ActorCertificates.ActorCertificate> ActorCertificates { get; private set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -53,5 +59,6 @@ public class MasterDataContext : DbContext
         modelBuilder.ApplyConfiguration(new ActorEntityConfiguration());
         modelBuilder.ApplyConfiguration(new GridAreaOwnerEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ActorCertificateEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new ProcessDelegationEntityConfiguration());
     }
 }

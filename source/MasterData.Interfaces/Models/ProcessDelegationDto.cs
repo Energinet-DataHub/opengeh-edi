@@ -12,8 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.MasterData.Domain.MessageDelegations;
+using NodaTime;
 
-public class MessageDelegation
-{
-}
+namespace Energinet.DataHub.EDI.MasterData.Interfaces.Models;
+
+/// <summary>
+///    Data transfer object for message delegation
+/// </summary>
+public record ProcessDelegationDto(
+    int SequenceNumber,
+    string ProcessDelegationType,
+    string GridAreaCode,
+    Instant StartsAt,
+    Instant StopsAt,
+    ActorNumberAndRoleDto DelegatedBy,
+    ActorNumberAndRoleDto DelegatedTo);

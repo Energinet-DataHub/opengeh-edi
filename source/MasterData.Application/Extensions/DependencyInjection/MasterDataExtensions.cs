@@ -17,7 +17,7 @@ using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Domain.ActorCertificates;
 using Energinet.DataHub.EDI.MasterData.Domain.Actors;
 using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
-using Energinet.DataHub.EDI.MasterData.Domain.MessageDelegations;
+using Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.ActorCertificate;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Actors;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
@@ -40,17 +40,16 @@ public static class MasterDataExtensions
             .AddTransient<IGridAreaRepository, GridAreaRepository>()
             .AddTransient<IDataRetention, GridAreaOwnerRetention>();
 
-        // Delegation
-        services.AddTransient<IMessageDelegationRepository, MessageDelegationRepository>();
-
         // Actors
         services
             .AddTransient<IActorRepository, ActorRepository>()
             .AddTransient<IActorCertificateRepository, ActorCertificateRepository>();
 
-        // Master data client
-        services.AddTransient<IMasterDataClient, MasterDataClient>();
+        //Delegations
+        services
+            .AddTransient<IProcessDelegationRepository, ProcessDelegationRepository>();
 
+        services.AddTransient<IMasterDataClient, MasterDataClient>();
         return services;
     }
 }
