@@ -22,31 +22,31 @@ using ChargeType = Energinet.DataHub.Edi.Requests.ChargeType;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.WholesaleServices;
 
-public static class ServiceBusMessageFactory
+public static class WholesaleServicesRequestFactory
 {
     public static ServiceBusMessage CreateServiceBusMessage(WholesaleServicesProcess process)
     {
         ArgumentNullException.ThrowIfNull(process);
 
-        var body = CreateWholesaleServicesProcessRequest(process);
+        var request = CreateWholesaleServicesRequest(process);
 
         var message = new ServiceBusMessage()
         {
-            Body = new BinaryData(body.ToByteArray()),
-            Subject = body.GetType().Name,
+            Body = new BinaryData(request.ToByteArray()),
+            Subject = request.GetType().Name,
             MessageId = process.ProcessId.Id.ToString(),
         };
         message.ApplicationProperties.Add("ReferenceId", process.ProcessId.Id.ToString());
         return message;
     }
 
-    private static WholesaleServicesRequest CreateWholesaleServicesProcessRequest(WholesaleServicesProcess process)
+    private static WholesaleServicesRequest CreateWholesaleServicesRequest(WholesaleServicesProcess process)
     {
         var request = new WholesaleServicesRequest()
         {
             RequestedByActorId = process.RequestedByActorId.Value,
-            RequestedByActorRole = process.RequestedByActorRoleCode,
-            BusinessReason = process.BusinessReason.Code,
+            RequestedByActorRole = ActorRole.TryGetNameFromCode(process.RequestedByActorRoleCode, fallbackValue: process.RequestedByActorRoleCode),
+            BusinessReason = process.BusinessReason.Name,
             PeriodStart = process.StartOfPeriod,
         };
 
@@ -54,7 +54,7 @@ public static class ServiceBusMessageFactory
             request.PeriodEnd = process.EndOfPeriod;
 
         if (process.Resolution != null)
-            request.Resolution = MapResolution(process.Resolution);
+            request.Resolution = Resolution.TryGetNameFromCode(process.Resolution, fallbackValue: process.Resolution);
 
         if (process.EnergySupplierId != null)
             request.EnergySupplierId = process.EnergySupplierId;
@@ -71,7 +71,7 @@ public static class ServiceBusMessageFactory
         foreach (var chargeType in process.ChargeTypes)
         {
             request.ChargeTypes.Add(
-                new ChargeType() { ChargeCode = chargeType.Id, ChargeType_ = MapChargeType(chargeType.Type), });
+                new ChargeType() { ChargeCode = chargeType.Id, ChargeType_ = MapChargeType(chargeType.Type) });
         }
 
         return request;
@@ -80,11 +80,7 @@ public static class ServiceBusMessageFactory
     private static string? MapChargeType(string? chargeType)
     {
         if (chargeType == null) return null;
-        return Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType.TryFromCode(chargeType)?.Name ?? chargeType;
-    }
 
-    private static string MapResolution(string resolution)
-    {
-        return Resolution.TryFromCode(resolution)?.Name ?? resolution;
+        return BuildingBlocks.Domain.Models.ChargeType.TryGetNameFromCode(chargeType, fallbackValue: chargeType);
     }
 }
