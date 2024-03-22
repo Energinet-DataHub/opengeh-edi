@@ -93,7 +93,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models
             }
 
             var typeMatches = GetType() == obj.GetType();
-            var valueMatches = ValueMatches(otherValue); // Name.Equals(otherValue.Name, StringComparison.OrdinalIgnoreCase);
+            var valueMatches = ValueMatches(otherValue);
 
             return typeMatches && valueMatches;
         }
