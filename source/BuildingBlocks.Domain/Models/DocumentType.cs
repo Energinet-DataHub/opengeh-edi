@@ -21,7 +21,7 @@ public class DocumentType : EnumerationType
     public static readonly DocumentType NotifyWholesaleServices = new(nameof(NotifyWholesaleServices), MessageCategory.Aggregations);
     public static readonly DocumentType RejectRequestWholesaleSettlement = new(nameof(RejectRequestWholesaleSettlement), MessageCategory.Aggregations);
 
-    protected DocumentType(string name, MessageCategory category)
+    private DocumentType(string name, MessageCategory category)
         : base(name)
     {
         Category = category;
