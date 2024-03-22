@@ -31,9 +31,4 @@ public class Resolution : DataHubType<Resolution>
         : base(name, code)
     {
     }
-
-    private static Resolution CreateUnknown(string? name, string? code)
-    {
-        return new Resolution(name ?? "UNKNOWN", code ?? "???");
-    }
 }
