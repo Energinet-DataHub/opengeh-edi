@@ -89,11 +89,11 @@ public static class AggregatedMeasureDataRequestFactory
 
     private static string MapMeteringPointType(string meteringPointType)
     {
-        return MeteringPointType.GetNameFromCode(meteringPointType) ?? meteringPointType;
+        return MeteringPointType.TryGetNameFromCode(meteringPointType) ?? meteringPointType;
     }
 
     private static string MapSettlementType(string settlementType)
     {
-        return SettlementType.GetNameFromCode(settlementType) ?? settlementType;
+        return SettlementType.TryGetNameFromCode(settlementType) ?? settlementType;
     }
 }

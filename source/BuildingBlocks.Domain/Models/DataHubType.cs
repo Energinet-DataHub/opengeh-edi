@@ -51,7 +51,7 @@ public abstract class DataHubType<T> : EnumerationType
         return GetAll<T>().FirstOrDefault(r => r.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
     }
 
-    public static string? GetNameFromCode(string code)
+    public static string? TryGetNameFromCode(string code)
     {
         return TryFromCode(code)?.Name ?? null;
     }

@@ -80,11 +80,11 @@ public static class WholesaleServicesRequestFactory
     private static string? MapChargeType(string? chargeType)
     {
         if (chargeType == null) return null;
-        return Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType.GetNameFromCode(chargeType) ?? chargeType;
+        return Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType.TryGetNameFromCode(chargeType) ?? chargeType;
     }
 
     private static string MapResolution(string resolution)
     {
-        return Resolution.GetNameFromCode(resolution) ?? resolution;
+        return Resolution.TryGetNameFromCode(resolution) ?? resolution;
     }
 }
