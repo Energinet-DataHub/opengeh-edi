@@ -59,15 +59,15 @@ public static class AggregatedMeasureDataRequestFactory
         {
             Period = MapPeriod(process),
             RequestedByActorId = process.RequestedByActorId.Value,
-            RequestedByActorRole = WholesaleRequestNameConverter.ActorRoleCodeToName(process.RequestedByActorRoleCode),
+            RequestedByActorRole = ActorRole.TryGetNameFromCode(process.RequestedByActorRoleCode, fallbackValue: process.RequestedByActorRoleCode),
             BusinessReason = process.BusinessReason.Name,
         };
 
         if (process.MeteringPointType != null)
-            request.MeteringPointType = WholesaleRequestNameConverter.MeteringPointTypeCodeToName(process.MeteringPointType);
+            request.MeteringPointType = MeteringPointType.TryGetNameFromCode(process.MeteringPointType, fallbackValue: process.MeteringPointType);
 
         if (process.SettlementMethod != null)
-            request.SettlementMethod = WholesaleRequestNameConverter.SettlementTypeCodeToName(process.SettlementMethod);
+            request.SettlementMethod = SettlementType.TryGetNameFromCode(process.SettlementMethod, fallbackValue: process.SettlementMethod);
 
         if (process.EnergySupplierId != null)
             request.EnergySupplierId = process.EnergySupplierId;

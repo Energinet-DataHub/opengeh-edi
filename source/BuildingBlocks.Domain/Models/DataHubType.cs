@@ -55,6 +55,11 @@ public abstract class DataHubType<T> : EnumerationType
     {
         return TryFromCode(code)?.Name ?? null;
     }
+
+    public static string TryGetNameFromCode(string code, string fallbackValue)
+    {
+        return TryGetNameFromCode(code) ?? fallbackValue;
+    }
 #pragma warning restore CA1000
 
     protected override bool ValueMatches(EnumerationType otherEnumerationType)

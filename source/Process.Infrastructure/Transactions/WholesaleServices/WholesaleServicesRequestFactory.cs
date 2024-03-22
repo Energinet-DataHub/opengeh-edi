@@ -45,7 +45,7 @@ public static class WholesaleServicesRequestFactory
         var request = new WholesaleServicesRequest()
         {
             RequestedByActorId = process.RequestedByActorId.Value,
-            RequestedByActorRole = WholesaleRequestNameConverter.ActorRoleCodeToName(process.RequestedByActorRoleCode),
+            RequestedByActorRole = ActorRole.TryGetNameFromCode(process.RequestedByActorRoleCode, fallbackValue: process.RequestedByActorRoleCode),
             BusinessReason = process.BusinessReason.Name,
             PeriodStart = process.StartOfPeriod,
         };
@@ -54,7 +54,7 @@ public static class WholesaleServicesRequestFactory
             request.PeriodEnd = process.EndOfPeriod;
 
         if (process.Resolution != null)
-            request.Resolution = WholesaleRequestNameConverter.ResolutionCodeToName(process.Resolution);
+            request.Resolution = Resolution.TryGetNameFromCode(process.Resolution, fallbackValue: process.Resolution);
 
         if (process.EnergySupplierId != null)
             request.EnergySupplierId = process.EnergySupplierId;
@@ -71,9 +71,16 @@ public static class WholesaleServicesRequestFactory
         foreach (var chargeType in process.ChargeTypes)
         {
             request.ChargeTypes.Add(
-                new ChargeType() { ChargeCode = chargeType.Id, ChargeType_ = WholesaleRequestNameConverter.ChargeTypeCodeToName(chargeType.Type), });
+                new ChargeType() { ChargeCode = chargeType.Id, ChargeType_ = MapChargeType(chargeType.Type) });
         }
 
         return request;
+    }
+
+    private static string? MapChargeType(string? chargeType)
+    {
+        if (chargeType == null) return null;
+
+        return BuildingBlocks.Domain.Models.ChargeType.TryGetNameFromCode(chargeType, fallbackValue: chargeType);
     }
 }
