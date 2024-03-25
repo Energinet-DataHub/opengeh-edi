@@ -22,7 +22,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 public class RejectedEnergyResultMessageDto : OutgoingMessageDto
 {
     public RejectedEnergyResultMessageDto(
-        ActorNumber receiverId,
+        ActorNumber receiverNumber,
         Guid processId,
         string businessReason,
         ActorRole receiverRole,
@@ -30,7 +30,7 @@ public class RejectedEnergyResultMessageDto : OutgoingMessageDto
         RejectedEnergyResultMessageSerie series)
         : base(
             DocumentType.RejectRequestAggregatedMeasureData,
-            receiverId,
+            receiverNumber,
             processId,
             businessReason,
             receiverRole,

@@ -123,7 +123,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
             return new OutgoingMessage(
                 acceptedEnergyResultMessage.DocumentType,
-                acceptedEnergyResultMessage.ReceiverId,
+                acceptedEnergyResultMessage.ReceiverNumber,
                 acceptedEnergyResultMessage.ProcessId,
                 acceptedEnergyResultMessage.BusinessReason,
                 acceptedEnergyResultMessage.ReceiverRole,
@@ -147,7 +147,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
             return new OutgoingMessage(
                 rejectedEnergyResultMessage.DocumentType,
-                rejectedEnergyResultMessage.ReceiverId,
+                rejectedEnergyResultMessage.ReceiverNumber,
                 rejectedEnergyResultMessage.ProcessId,
                 rejectedEnergyResultMessage.BusinessReason,
                 rejectedEnergyResultMessage.ReceiverRole,
@@ -171,7 +171,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
             return new OutgoingMessage(
                 energyResultMessage.DocumentType,
-                energyResultMessage.ReceiverId,
+                energyResultMessage.ReceiverNumber,
                 energyResultMessage.ProcessId,
                 energyResultMessage.BusinessReason,
                 energyResultMessage.ReceiverRole,
@@ -197,7 +197,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             {
                 new(
                     wholesaleServicesMessageDto.DocumentType,
-                    wholesaleServicesMessageDto.ReceiverId,
+                    wholesaleServicesMessageDto.ReceiverNumber,
                     wholesaleServicesMessageDto.ProcessId,
                     wholesaleServicesMessageDto.BusinessReason,
                     wholesaleServicesMessageDto.ReceiverRole,
@@ -233,7 +233,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
             return new OutgoingMessage(
                 rejectedWholesaleServicesMessage.DocumentType,
-                rejectedWholesaleServicesMessage.ReceiverId,
+                rejectedWholesaleServicesMessage.ReceiverNumber,
                 rejectedWholesaleServicesMessage.ProcessId,
                 rejectedWholesaleServicesMessage.BusinessReason,
                 rejectedWholesaleServicesMessage.ReceiverRole,
@@ -254,7 +254,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
             return new OutgoingMessage(
                 acceptedWholesaleServicesMessage.DocumentType,
-                acceptedWholesaleServicesMessage.ReceiverId,
+                acceptedWholesaleServicesMessage.ReceiverNumber,
                 acceptedWholesaleServicesMessage.ProcessId,
                 acceptedWholesaleServicesMessage.BusinessReason,
                 acceptedWholesaleServicesMessage.ReceiverRole,
