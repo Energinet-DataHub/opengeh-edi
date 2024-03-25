@@ -69,7 +69,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     }
 
     [Fact]
-    public async Task Enqueue_message_to_delegated_with_many_delegation()
+    public async Task Enqueue_message_to_delegated_with_multiple_delegations()
     {
         // Arrange
         var delegatedBy = CreateActorNumberAndRole();
@@ -269,7 +269,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             .WithReceiverRole(delegatedBy.ActorRole)
             .Build();
 
-        await AddDelegation(delegatedBy, delegatedTo, message.Series.GridAreaCode, processType: ProcessType.ReceiveWholesaleResults);
+        await AddDelegation(delegatedBy, delegatedTo, message.Series.GridAreaCode, processType: ProcessType.CalculatedWholesaleResults);
 
         // Act
         var createdId = await EnqueueAndCommitAsync(message);
@@ -306,7 +306,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             ActorNumber.Create("8884567892341"),
             ActorRole.Delegated,
             "500",
-            ProcessType.ReceiveWholesaleResults,
+            ProcessType.CalculatedWholesaleResults,
             SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)),
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)));
         await AddDelegation(
@@ -315,7 +315,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             ActorNumber.Create("8884567892342"),
             ActorRole.Delegated,
             "600",
-            ProcessType.ReceiveWholesaleResults,
+            ProcessType.CalculatedWholesaleResults,
             SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(4)),
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(14)));
         await AddDelegation(
@@ -324,7 +324,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             ActorNumber.Create("8884567892343"),
             ActorRole.Delegated,
             "700",
-            ProcessType.ReceiveWholesaleResults,
+            ProcessType.CalculatedWholesaleResults,
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)),
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(7)));
     }
@@ -342,7 +342,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         await masterDataClient.CreateProcessDelegationAsync(
             new ProcessDelegationDto(
                 sequenceNumber,
-                processType ?? ProcessType.ReceiveEnergyResults,
+                processType ?? ProcessType.CalculatedEnergyResults,
                 gridAreaCode,
                 startsAt ?? SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)),
                 stopsAt ?? SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)),

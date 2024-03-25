@@ -39,6 +39,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             ActorRole senderRole,
             string serializedContent,
             Instant timestamp,
+            ProcessType messageCreatedFromProcess,
             MessageId? relatedToMessageId = null,
             string? gridAreaCode = null)
         {
@@ -49,6 +50,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             BusinessReason = businessReason;
             SenderId = senderId;
             SenderRole = senderRole;
+            MessageCreatedFromProcess = messageCreatedFromProcess;
             GridAreaCode = gridAreaCode;
             _serializedContent = serializedContent;
             RelatedToMessageId = relatedToMessageId;
@@ -69,6 +71,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             ActorNumber senderId,
             ActorRole senderRole,
             FileStorageReference fileStorageReference,
+            ProcessType messageCreatedFromProcess,
             string? gridAreaCode)
         {
             Id = OutgoingMessageId.New();
@@ -78,6 +81,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             SenderId = senderId;
             SenderRole = senderRole;
             FileStorageReference = fileStorageReference;
+            MessageCreatedFromProcess = messageCreatedFromProcess;
             GridAreaCode = gridAreaCode;
             // DocumentReceiver, EF will set this after the constructor
             // Receiver, EF will set this after the constructor
@@ -111,6 +115,11 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
         public FileStorageReference FileStorageReference { get; private set; }
 
         /// <summary>
+        /// Describes the process type that the message was created from.
+        /// </summary>
+        public ProcessType MessageCreatedFromProcess { get; }
+
+        /// <summary>
         /// If this attribute has a value, then it is used to store the message id of a request from an actor.
         /// Giving us the possibility to track the request and the response.
         /// </summary>
@@ -137,6 +146,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                 acceptedEnergyResultMessage.SenderRole,
                 serializer.Serialize(acceptedEnergyResultMessage.Series),
                 timestamp,
+                ProcessType.RequestedEnergyResults,
                 acceptedEnergyResultMessage.RelatedToMessageId);
         }
 
@@ -161,6 +171,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                 rejectedEnergyResultMessage.SenderRole,
                 serializer.Serialize(rejectedEnergyResultMessage.Series),
                 timestamp,
+                ProcessType.RequestedEnergyResults,
                 relatedToMessageId: rejectedEnergyResultMessage.RelatedToMessageId);
         }
 
@@ -185,6 +196,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                 energyResultMessage.SenderRole,
                 serializer.Serialize(energyResultMessage.Series),
                 timestamp,
+                ProcessType.CalculatedEnergyResults,
                 energyResultMessage.RelatedToMessageId,
                 energyResultMessage.Series.GridAreaCode);
         }
@@ -212,6 +224,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                     wholesaleServicesMessageDto.SenderRole,
                     serializer.Serialize(wholesaleServicesMessageDto.Series),
                     timestamp,
+                    ProcessType.RequestedWholesaleResults,
                     wholesaleServicesMessageDto.RelatedToMessageId,
                     wholesaleServicesMessageDto.Series.GridAreaCode),
                 new(
@@ -224,6 +237,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                     wholesaleServicesMessageDto.SenderRole,
                     serializer.Serialize(wholesaleServicesMessageDto.Series),
                     timestamp,
+                    ProcessType.RequestedWholesaleResults,
                     wholesaleServicesMessageDto.RelatedToMessageId,
                     wholesaleServicesMessageDto.Series.GridAreaCode),
             };
@@ -250,6 +264,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                 rejectedWholesaleServicesMessage.SenderRole,
                 serializer.Serialize(rejectedWholesaleServicesMessage.Series),
                 timestamp,
+                ProcessType.RequestedWholesaleResults,
                 rejectedWholesaleServicesMessage.RelatedToMessageId);
         }
 
@@ -271,6 +286,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                 acceptedWholesaleServicesMessage.SenderRole,
                 serializer.Serialize(acceptedWholesaleServicesMessage.Series),
                 timestamp,
+                ProcessType.CalculatedWholesaleResults,
                 acceptedWholesaleServicesMessage.RelatedToMessageId);
         }
 

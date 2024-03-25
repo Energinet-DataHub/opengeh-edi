@@ -46,8 +46,7 @@ public class MessageDelegator
             messageToEnqueue.DocumentReceiver.Number,
             messageToEnqueue.DocumentReceiver.ActorRole,
             messageToEnqueue.GridAreaCode,
-            messageToEnqueue.DocumentType,
-            messageToEnqueue.RelatedToMessageId != null,
+            messageToEnqueue.MessageCreatedFromProcess,
             cancellationToken).ConfigureAwait(false);
 
         if (delegatedTo is not null)
@@ -58,35 +57,18 @@ public class MessageDelegator
         return messageToEnqueue;
     }
 
-    private static ProcessType MapDocumentTypeToProcessType(DocumentType documentType, bool isAResponseToARequest)
-    {
-        return documentType.Name switch
-        {
-            nameof(DocumentType.NotifyAggregatedMeasureData) => isAResponseToARequest
-                ? ProcessType.RequestEnergyResults
-                : ProcessType.ReceiveEnergyResults,
-            nameof(DocumentType.NotifyWholesaleServices) => isAResponseToARequest
-                ? ProcessType.RequestWholesaleResults
-                : ProcessType.ReceiveWholesaleResults,
-            nameof(DocumentType.RejectRequestAggregatedMeasureData) => ProcessType.RequestEnergyResults,
-            nameof(DocumentType.RejectRequestWholesaleSettlement) => ProcessType.RequestWholesaleResults,
-            _ => throw new InvalidOperationException("Document type is not supported for delegation"),
-        };
-    }
-
     private async Task<Receiver?> GetDelegatedReceiverAsync(
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
         string? gridAreaCode,
-        DocumentType documentType,
-        bool isAResponseToARequest,
+        ProcessType messageCreatedFromProcess,
         CancellationToken cancellationToken)
     {
         var messageDelegation = await _masterDataClient.GetProcessDelegationAsync(
             delegatedByActorNumber,
             delegatedByActorRole,
             gridAreaCode,
-            MapDocumentTypeToProcessType(documentType, isAResponseToARequest),
+            messageCreatedFromProcess,
             cancellationToken)
             .ConfigureAwait(false);
 

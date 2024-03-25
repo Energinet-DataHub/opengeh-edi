@@ -57,10 +57,10 @@ public class ProcessDelegationConfiguredEventProcessor : IIntegrationEventProces
     {
         return delegatedProcess switch
         {
-            "ProcessRequestEnergyResults" => ProcessType.RequestEnergyResults,
-            "ProcessReceiveEnergyResults" => ProcessType.RequestEnergyResults,
-            "ProcessRequestWholesaleResults" => ProcessType.RequestWholesaleResults,
-            "ProcessReceiveWholesaleResults" => ProcessType.ReceiveWholesaleResults,
+            "ProcessRequestEnergyResults" => ProcessType.RequestedEnergyResults,
+            "ProcessReceiveEnergyResults" => ProcessType.RequestedEnergyResults,
+            "ProcessRequestWholesaleResults" => ProcessType.RequestedWholesaleResults,
+            "ProcessReceiveWholesaleResults" => ProcessType.CalculatedWholesaleResults,
             _ => throw new ArgumentOutOfRangeException(nameof(delegatedProcess), delegatedProcess, null),
         };
     }

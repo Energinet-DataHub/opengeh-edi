@@ -163,8 +163,9 @@ public class ActorMessageQueueTests
 
     private static OutgoingMessage CreateOutgoingMessage(
         Receiver? receiver = null,
-        BusinessReason? processType = null,
-        DocumentType? messageType = null)
+        BusinessReason? businessReason = null,
+        DocumentType? messageType = null,
+        ProcessType? processType = null)
     {
         receiver ??= Receiver.Create(
             ActorNumber.Create("1234567890124"),
@@ -174,11 +175,12 @@ public class ActorMessageQueueTests
             messageType ?? DocumentType.NotifyAggregatedMeasureData,
             receiver.Number,
             ProcessId.New().Id,
-            processType?.Name ?? BusinessReason.BalanceFixing.Name,
+            businessReason?.Name ?? BusinessReason.BalanceFixing.Name,
             receiver.ActorRole,
             ActorNumber.Create("1234567890987"),
             ActorRole.MeteringPointAdministrator,
             string.Empty,
-            Instant.FromUtc(2024, 1, 1, 0, 0));
+            Instant.FromUtc(2024, 1, 1, 0, 0),
+            processType ?? ProcessType.CalculatedEnergyResults);
     }
 }
