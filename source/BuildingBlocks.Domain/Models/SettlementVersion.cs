@@ -13,17 +13,17 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Text.Json.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
-public class SettlementVersion : EnumerationType
+public class SettlementVersion : DataHubType<SettlementVersion>
 {
-    public static readonly SettlementVersion FirstCorrection = new(nameof(FirstCorrection), "D01");
-    public static readonly SettlementVersion SecondCorrection = new(nameof(SecondCorrection), "D02");
-    public static readonly SettlementVersion ThirdCorrection = new(nameof(ThirdCorrection), "D03");
+    public static readonly SettlementVersion FirstCorrection = new(DataHubNames.SettlementVersion.FirstCorrection, "D01");
+    public static readonly SettlementVersion SecondCorrection = new(DataHubNames.SettlementVersion.SecondCorrection, "D02");
+    public static readonly SettlementVersion ThirdCorrection = new(DataHubNames.SettlementVersion.ThirdCorrection, "D03");
 
     // Below SettlementVersions are not used directly, but must be here for possible mapping
     public static readonly SettlementVersion FourthCorrection = new(nameof(FourthCorrection), "D04");
@@ -36,24 +36,7 @@ public class SettlementVersion : EnumerationType
 
     [JsonConstructor]
     private SettlementVersion(string name, string code)
-        : base(name)
+        : base(name, code)
     {
-        Code = code;
-    }
-
-    public string Code { get; }
-
-    public static SettlementVersion FromName(string name)
-    {
-        return GetAll<SettlementVersion>().FirstOrDefault(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException(
-                   $"{name} is not a valid {typeof(SettlementVersion)} {nameof(name)}");
-    }
-
-    public static SettlementVersion FromCode(string code)
-    {
-        return GetAll<SettlementVersion>().FirstOrDefault(t => t.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException(
-                   $"{code} is not a valid {typeof(SettlementVersion)} {nameof(code)}");
     }
 }

@@ -12,20 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using NodaTime;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+namespace Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 
-[Serializable]
-public class ChargeType : DataHubType<ChargeType>
-{
-    public static readonly ChargeType Subscription = new(DataHubNames.ChargeType.Subscription, "D01");
-    public static readonly ChargeType Fee = new(DataHubNames.ChargeType.Fee, "D02");
-    public static readonly ChargeType Tariff = new(DataHubNames.ChargeType.Tariff, "D03");
-
-    public ChargeType(string name, string code)
-        : base(name, code)
-    {
-    }
-}
+/// <summary>
+///    Data transfer object for message delegation
+/// </summary>
+public record ProcessDelegationDto(
+    int SequenceNumber,
+    string ProcessDelegationType,
+    string GridAreaCode,
+    Instant StartsAt,
+    Instant StopsAt,
+    ActorNumberAndRoleDto DelegatedBy,
+    ActorNumberAndRoleDto DelegatedTo);

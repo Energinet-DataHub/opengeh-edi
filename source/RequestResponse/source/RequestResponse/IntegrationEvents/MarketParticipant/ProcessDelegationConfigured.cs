@@ -12,20 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+// ReSharper disable once CheckNamespace -- Protobuf is in with another namespace
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-
-[Serializable]
-public class ChargeType : DataHubType<ChargeType>
+public partial class ProcessDelegationConfigured
 {
-    public static readonly ChargeType Subscription = new(DataHubNames.ChargeType.Subscription, "D01");
-    public static readonly ChargeType Fee = new(DataHubNames.ChargeType.Fee, "D02");
-    public static readonly ChargeType Tariff = new(DataHubNames.ChargeType.Tariff, "D03");
-
-    public ChargeType(string name, string code)
-        : base(name, code)
-    {
-    }
+    public const string EventName = "ProcessDelegationConfigured";
+    public const int CurrentMinorVersion = 1;
 }

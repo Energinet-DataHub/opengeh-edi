@@ -19,44 +19,29 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
-public class ActorRole : EnumerationType
+public class ActorRole : DataHubType<ActorRole>
 {
-    public static readonly ActorRole MeteringPointAdministrator = new("MeteringPointAdministrator", "DDZ");
-    public static readonly ActorRole EnergySupplier = new("EnergySupplier", "DDQ");
+    public static readonly ActorRole MeteringPointAdministrator = new(DataHubNames.ActorRole.MeteringPointAdministrator, "DDZ");
+    public static readonly ActorRole EnergySupplier = new(DataHubNames.ActorRole.EnergySupplier, "DDQ");
 
     // A grid operator has two roles.
     // GridOperator (DDM) when creating a new metering point
-    public static readonly ActorRole GridOperator = new("GridOperator", "DDM");
-    public static readonly ActorRole MeteredDataAdministrator = new("MeteredDataAdministrator", "DGL");
+    public static readonly ActorRole GridOperator = new(DataHubNames.ActorRole.GridOperator, "DDM");
+    public static readonly ActorRole MeteredDataAdministrator = new(DataHubNames.ActorRole.MeteredDataAdministrator, "DGL");
 
     // A grid operator has two roles.
     // MeteredDataResponsible (MDR) when requesting data from DataHub
-    public static readonly ActorRole MeteredDataResponsible = new("MeteredDataResponsible", "MDR");
-    public static readonly ActorRole BalanceResponsibleParty = new("BalanceResponsibleParty", "DDK");
+    public static readonly ActorRole MeteredDataResponsible = new(DataHubNames.ActorRole.MeteredDataResponsible, "MDR");
+    public static readonly ActorRole BalanceResponsibleParty = new(DataHubNames.ActorRole.BalanceResponsibleParty, "DDK");
 
-    public static readonly ActorRole ImbalanceSettlementResponsible = new("ImbalanceSettlementResponsible", "DDX");
-    public static readonly ActorRole SystemOperator = new("SystemOperator", "EZ");
-    public static readonly ActorRole DanishEnergyAgency = new("DanishEnergyAgency", "STS");
-    public static readonly ActorRole Delegated = new("Delegated", "DEL");
+    public static readonly ActorRole ImbalanceSettlementResponsible = new(DataHubNames.ActorRole.ImbalanceSettlementResponsible, "DDX");
+    public static readonly ActorRole SystemOperator = new(DataHubNames.ActorRole.SystemOperator, "EZ");
+    public static readonly ActorRole DanishEnergyAgency = new(DataHubNames.ActorRole.DanishEnergyAgency, "STS");
+    public static readonly ActorRole Delegated = new(DataHubNames.ActorRole.Delegated, "DEL");
 
     private ActorRole(string name, string code)
-        : base(name)
+        : base(name, code)
     {
-        Code = code;
-    }
-
-    public string Code { get; }
-
-    public static ActorRole FromCode(string code)
-    {
-        return GetAll<ActorRole>().FirstOrDefault(item => item.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{code} is not a valid {typeof(ActorRole)} {nameof(code)}");
-    }
-
-    public static ActorRole FromName(string name)
-    {
-        return GetAll<ActorRole>().FirstOrDefault(item => item.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(ActorRole)} {nameof(name)}");
     }
 
     public override string ToString()

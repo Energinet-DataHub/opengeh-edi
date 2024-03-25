@@ -12,10 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
+using System.Threading;
+using System.Threading.Tasks;
 
-public partial class MessageDelegationConfigured
+namespace Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
+
+/// <summary>
+///     Process delegation repository
+/// </summary>
+public interface IProcessDelegationRepository
 {
-    public const string EventName = "MessageDelegationConfigured";
-    public const int CurrentMinorVersion = 1;
+    /// <summary>
+    ///     Create a process delegation
+    /// </summary>
+    void Create(ProcessDelegation processDelegation, CancellationToken cancellationToken);
 }
