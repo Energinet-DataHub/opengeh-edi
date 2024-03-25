@@ -42,31 +42,30 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             MessageId? relatedToMessageId = null,
             string? gridAreaCode = null)
         {
+            ArgumentNullException.ThrowIfNull(receiverId);
             Id = OutgoingMessageId.New();
             DocumentType = documentType;
-            ReceiverId = receiverId;
             ProcessId = processId;
             BusinessReason = businessReason;
-            ReceiverRole = receiverRole;
             SenderId = senderId;
             SenderRole = senderRole;
             GridAreaCode = gridAreaCode;
             _serializedContent = serializedContent;
-            FileStorageReference = CreateFileStorageReference(ReceiverId, timestamp, Id);
             RelatedToMessageId = relatedToMessageId;
-            Receiver = Receiver.Create(ReceiverId, ReceiverRole);
+            DocumentReceiver = Receiver.Create(receiverId, receiverRole);
+            Receiver = Receiver.Create(receiverId, receiverRole);
+            FileStorageReference = CreateFileStorageReference(Receiver.Number, timestamp, Id);
         }
 
         /// <summary>
         /// Should only be used by Entity Framework
         /// </summary>
         // ReSharper disable once UnusedMember.Local -- Used by Entity Framework
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private OutgoingMessage(
             DocumentType documentType,
-            ActorNumber receiverId,
             Guid processId,
             string businessReason,
-            ActorRole receiverRole,
             ActorNumber senderId,
             ActorRole senderRole,
             FileStorageReference fileStorageReference,
@@ -74,32 +73,25 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
         {
             Id = OutgoingMessageId.New();
             DocumentType = documentType;
-            ReceiverId = receiverId;
             ProcessId = processId;
             BusinessReason = businessReason;
-            ReceiverRole = receiverRole;
             SenderId = senderId;
             SenderRole = senderRole;
             FileStorageReference = fileStorageReference;
-            //TODO: this is not correct as the receiver could have been changed.
-            Receiver = Receiver.Create(ReceiverId, ReceiverRole);
             GridAreaCode = gridAreaCode;
+            // DocumentReceiver, EF will set this after the constructor
+            // Receiver, EF will set this after the constructor
             // _serializedContent is set later in OutgoingMessageRepository, by getting the message from File Storage
         }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public OutgoingMessageId Id { get; }
-
-        public bool IsPublished { get; private set; }
-
-        public ActorNumber ReceiverId { get; }
 
         public DocumentType DocumentType { get; }
 
         public Guid ProcessId { get; }
 
         public string BusinessReason { get; }
-
-        public ActorRole ReceiverRole { get; }
 
         public ActorNumber SenderId { get; }
 
@@ -111,6 +103,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
         /// Reference the actor queue that should receive the message.
         /// </summary>
         public Receiver Receiver { get; private set; }
+
+        public Receiver DocumentReceiver { get; }
 
         public BundleId? AssignedBundleId { get; private set; }
 

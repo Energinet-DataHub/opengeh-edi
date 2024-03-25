@@ -43,8 +43,8 @@ public class MessageDelegator
         }
 
         var delegatedTo = await GetDelegationReceiverAsync(
-            messageToEnqueue.ReceiverId,
-            messageToEnqueue.ReceiverRole,
+            messageToEnqueue.DocumentReceiver.Number,
+            messageToEnqueue.DocumentReceiver.ActorRole,
             messageToEnqueue.GridAreaCode,
             messageToEnqueue.DocumentType,
             cancellationToken).ConfigureAwait(false);

@@ -520,10 +520,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
 
         var result = await connection.QuerySingleAsync(
-            @"SELECT tQueue.ActorNumber, tQueue.ActorRole, tOutgoing.ReceiverId, tOutgoing.ReceiverRole
+            @"SELECT tOutgoing.ReceiverNumber, tOutgoing.ReceiverRole, tOutgoing.DocumentReceiverNumber, tOutgoing.DocumentReceiverRole
                     FROM [dbo].[OutgoingMessages] AS tOutgoing
-                        INNER JOIN [dbo].[Bundles] as tBundle ON tOutgoing.AssignedBundleId = tBundle.Id
-                        INNER JOIN [dbo].ActorMessageQueues as tQueue on tBundle.ActorMessageQueueId = tQueue.Id
                     WHERE tOutgoing.Id = @Id",
             new
                 {
@@ -531,10 +529,10 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
                 });
 
         return (
-            ActorMessageQueueNumber: result.ActorNumber,
-            ActorMessageQueueRole: result.ActorRole,
-            OutgoingMessageReceiverNumber: result.ReceiverId,
-            OutgoingMessageReceiverRole: result.ReceiverRole);
+            ActorMessageQueueNumber: result.ReceiverNumber,
+            ActorMessageQueueRole: result.ReceiverRole,
+            OutgoingMessageReceiverNumber: result.DocumentReceiverNumber,
+            OutgoingMessageReceiverRole: result.DocumentReceiverRole);
     }
 
     private async Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultMessageDto message)

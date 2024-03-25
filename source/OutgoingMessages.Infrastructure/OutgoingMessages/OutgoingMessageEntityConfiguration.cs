@@ -41,18 +41,6 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages
                     toDbValue => toDbValue.Name,
                     fromDbValue => EnumerationType.FromName<DocumentType>(fromDbValue));
 
-            builder.Property(x => x.IsPublished);
-
-            builder.Property(x => x.ReceiverId)
-                .HasConversion(
-                    toDbValue => toDbValue.Value,
-                    fromDbValue => ActorNumber.Create(fromDbValue));
-
-            builder.Property(x => x.ReceiverRole)
-                .HasConversion(
-                    toDbValue => toDbValue.Code,
-                    fromDbValue => ActorRole.FromCode(fromDbValue));
-
             builder.Property(x => x.ProcessId);
 
             builder.Property(x => x.BusinessReason);
@@ -83,6 +71,38 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages
                 .HasConversion(
                     toDbValue => toDbValue != null ? toDbValue.Value : null,
                     fromDbValue => fromDbValue != null ? MessageId.Create(fromDbValue) : null);
+
+            builder.OwnsOne(
+                o => o.DocumentReceiver,
+                r =>
+                {
+                    r.Property(x => x.Number)
+                        .HasConversion(
+                            toDbValue => toDbValue.Value,
+                            fromDbValue => ActorNumber.Create(fromDbValue))
+                        .HasColumnName("DocumentReceiverNumber");
+                    r.Property(x => x.ActorRole)
+                        .HasConversion(
+                            toDbValue => toDbValue.Code,
+                            fromDbValue => ActorRole.FromCode(fromDbValue))
+                        .HasColumnName("DocumentReceiverRole");
+                });
+
+            builder.OwnsOne(
+                o => o.Receiver,
+                r =>
+                {
+                    r.Property(x => x.Number)
+                        .HasConversion(
+                            toDbValue => toDbValue.Value,
+                            fromDbValue => ActorNumber.Create(fromDbValue))
+                        .HasColumnName("ReceiverNumber");
+                    r.Property(x => x.ActorRole)
+                        .HasConversion(
+                            toDbValue => toDbValue.Code,
+                            fromDbValue => ActorRole.FromCode(fromDbValue))
+                        .HasColumnName("ReceiverRole");
+                });
         }
     }
 }
