@@ -28,7 +28,7 @@ public class ProcessDelegation
 
     public ProcessDelegation(
         int sequenceNumber,
-        string delegatedProcess,
+        DelegatedProcess delegatedProcess,
         string gridAreaCode,
         Instant startsAt,
         Instant stopsAt,
@@ -63,7 +63,7 @@ public class ProcessDelegation
     /// <summary>
     /// The type of process that is delegated ex: PROCESS_REQUEST_ENERGY_RESULTS
     /// </summary>
-    public string DelegatedProcess { get; }
+    public DelegatedProcess DelegatedProcess { get; }
 
     /// <summary>
     /// The code of the grid area for which the process is delegated.

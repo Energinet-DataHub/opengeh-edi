@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 
@@ -24,15 +24,15 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
 public class MessageDelegator
 {
     private readonly IMasterDataClient _masterDataClient;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-    public MessageDelegator(IMasterDataClient masterDataClient, ISystemDateTimeProvider systemDateTimeProvider)
+    public MessageDelegator(IMasterDataClient masterDataClient)
     {
         _masterDataClient = masterDataClient;
-        _systemDateTimeProvider = systemDateTimeProvider;
     }
 
-    public async Task<OutgoingMessage> DelegateAsync(OutgoingMessage messageToEnqueue)
+    public async Task<OutgoingMessage> DelegateAsync(
+        OutgoingMessage messageToEnqueue,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(messageToEnqueue);
 
@@ -46,7 +46,8 @@ public class MessageDelegator
             messageToEnqueue.ReceiverId,
             messageToEnqueue.ReceiverRole,
             messageToEnqueue.GridAreaCode,
-            messageToEnqueue.DocumentType).ConfigureAwait(false);
+            messageToEnqueue.DocumentType,
+            cancellationToken).ConfigureAwait(false);
 
         if (delegatedTo is not null)
         {
@@ -56,18 +57,29 @@ public class MessageDelegator
         return messageToEnqueue;
     }
 
+    private static DelegatedProcess MapToDelegated(DocumentType documentType)
+    {
+        return documentType.Name switch
+        {
+            nameof(DocumentType.NotifyAggregatedMeasureData) => DelegatedProcess.ProcessReceiveEnergyResults,
+            nameof(DocumentType.NotifyWholesaleServices) => DelegatedProcess.ProcessReceiveEnergyResults,
+            _ => throw new InvalidOperationException("Document type is not supported for delegation"),
+        };
+    }
+
     private async Task<Receiver?> GetDelegationReceiverAsync(
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
         string gridAreaCode,
-        DocumentType documentType)
+        DocumentType documentType,
+        CancellationToken cancellationToken)
     {
         var messageDelegation = await _masterDataClient.GetProcessDelegationAsync(
             delegatedByActorNumber,
             delegatedByActorRole,
             gridAreaCode,
-            documentType,
-            _systemDateTimeProvider.Now())
+            MapToDelegated(documentType),
+            cancellationToken)
             .ConfigureAwait(false);
 
         return messageDelegation is not null

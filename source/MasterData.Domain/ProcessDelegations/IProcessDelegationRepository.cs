@@ -32,5 +32,10 @@ public interface IProcessDelegationRepository
     /// <summary>
     ///     Get a process delegation
     /// </summary>
-    Task<ProcessDelegation?> GetAsync(ActorNumber delegatedByActorNumber, ActorRole delegatedByActorRole, string gridAreaCode, DocumentType documentType, Instant now);
+    Task<ProcessDelegation?> GetAsync(
+        ActorNumber delegatedByActorNumber,
+        ActorRole delegatedByActorRole,
+        string gridAreaCode,
+        DelegatedProcess delegatedProcess,
+        CancellationToken cancellationToken);
 }

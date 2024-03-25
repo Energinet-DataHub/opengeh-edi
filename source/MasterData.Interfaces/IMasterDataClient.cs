@@ -74,5 +74,10 @@ public interface IMasterDataClient
     /// <summary>
     ///    Get process delegation.
     /// </summary>
-    Task<ProcessDelegationDto?> GetProcessDelegationAsync(ActorNumber delegatedByActorNumber, ActorRole delegatedByActorRole, string gridAreaCode, DocumentType documentType, Instant now);
+    Task<ProcessDelegationDto?> GetProcessDelegationAsync(
+        ActorNumber delegatedByActorNumber,
+        ActorRole delegatedByActorRole,
+        string gridAreaCode,
+        DelegatedProcess delegatedProcess,
+        CancellationToken cancellationToken);
 }

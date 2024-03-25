@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
@@ -48,13 +49,16 @@ public class MessageEnqueuer
         _featureFlagManager = featureFlagManager;
     }
 
-    public async Task<OutgoingMessageId> EnqueueAsync(OutgoingMessage messageToEnqueue)
+    public async Task<OutgoingMessageId> EnqueueAsync(
+        OutgoingMessage messageToEnqueue,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(messageToEnqueue);
 
         if (await _featureFlagManager.UseMessageDelegation.ConfigureAwait(false))
         {
-            messageToEnqueue = await _messageDelegator.DelegateAsync(messageToEnqueue).ConfigureAwait(false);
+            messageToEnqueue = await _messageDelegator.DelegateAsync(messageToEnqueue, cancellationToken)
+                .ConfigureAwait(false);
         }
 
         var addToRepositoryTask = _outgoingMessageRepository.AddAsync(messageToEnqueue);

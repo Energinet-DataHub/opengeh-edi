@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
+using Microsoft.EntityFrameworkCore;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.MasterData.Infrastructure.MessageDelegation;
@@ -24,10 +27,12 @@ namespace Energinet.DataHub.EDI.MasterData.Infrastructure.MessageDelegation;
 public class ProcessDelegationRepository : IProcessDelegationRepository
 {
     private readonly MasterDataContext _masterDataContext;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-    public ProcessDelegationRepository(MasterDataContext masterDataContext)
+    public ProcessDelegationRepository(MasterDataContext masterDataContext, ISystemDateTimeProvider systemDateTimeProvider)
     {
         _masterDataContext = masterDataContext;
+        _systemDateTimeProvider = systemDateTimeProvider;
     }
 
     public void Create(ProcessDelegation processDelegation, CancellationToken cancellationToken)
@@ -35,13 +40,25 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         _masterDataContext.ProcessDelegations.Add(processDelegation);
     }
 
-    public Task<ProcessDelegation?> GetAsync(
+    public async Task<ProcessDelegation?> GetAsync(
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
         string gridAreaCode,
-        DocumentType documentType,
-        Instant now)
+        DelegatedProcess delegatedProcess,
+        CancellationToken cancellationToken)
     {
-        throw new System.NotImplementedException();
+        var now = _systemDateTimeProvider.Now();
+        var delegation = await _masterDataContext.ProcessDelegations
+            .Where(
+                processDelegation => processDelegation.GridAreaCode == gridAreaCode
+                                     && processDelegation.DelegatedByActorNumber == delegatedByActorNumber
+                                     && processDelegation.DelegatedByActorRole == delegatedByActorRole
+                                     && processDelegation.DelegatedProcess == delegatedProcess
+                                     && processDelegation.StartsAt <= now)
+            .OrderByDescending(y => y.SequenceNumber)
+            .ThenByDescending(y => y.StartsAt)
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+
+        return delegation?.StopsAt > now ? delegation : null;
     }
 }

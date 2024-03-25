@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.MasterData.Infrastructure.MessageDelegation;
 
@@ -39,9 +40,14 @@ public class ProcessDelegationEntityConfiguration : IEntityTypeConfiguration<Pro
         builder.Property(entity => entity.DelegatedToActorRole)
             .HasConversion(actorRole => actorRole.Code, dbValue => ActorRole.FromCode(dbValue));
         builder.Property(entity => entity.GridAreaCode);
-        builder.Property(entity => entity.DelegatedProcess);
+        builder.Property(entity => entity.DelegatedProcess)
+            .HasConversion(delegatedProcess => delegatedProcess.Name, dbValue => DelegatedProcess.FromName(dbValue));
         builder.Property(entity => entity.SequenceNumber);
-        builder.Property(entity => entity.StartsAt).HasColumnName("Start");
-        builder.Property(entity => entity.StopsAt).HasColumnName("End");
+        builder.Property(entity => entity.StartsAt)
+            .HasConversion(startsAt => startsAt.ToDateTimeOffset(), dbValue => Instant.FromDateTimeOffset(dbValue))
+            .HasColumnName("Start");
+        builder.Property(entity => entity.StopsAt)
+            .HasConversion(stopsAt => stopsAt.ToDateTimeOffset(), dbValue => Instant.FromDateTimeOffset(dbValue))
+            .HasColumnName("End");
     }
 }

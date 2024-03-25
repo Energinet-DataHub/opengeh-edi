@@ -154,7 +154,7 @@ internal sealed class MasterDataClient : IMasterDataClient
         _processDelegationRepository.Create(
             new ProcessDelegation(
                 processDelegationDto.SequenceNumber,
-                processDelegationDto.ProcessDelegationType,
+                processDelegationDto.ProcessDelegation,
                 processDelegationDto.GridAreaCode,
                 processDelegationDto.StartsAt,
                 processDelegationDto.StopsAt,
@@ -167,22 +167,27 @@ internal sealed class MasterDataClient : IMasterDataClient
         await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public Task<ProcessDelegationDto?> GetProcessDelegationAsync(
+    public async Task<ProcessDelegationDto?> GetProcessDelegationAsync(
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
         string gridAreaCode,
-        DocumentType documentType,
-        Instant now)
+        DelegatedProcess delegatedProcess,
+        CancellationToken cancellationToken)
     {
-        return Task.FromResult<ProcessDelegationDto?>(null);
-        // var messageDelegation = await _messageDelegationRepository.GetAsync(
-        //     delegatedByActorNumber,
-        //     delegatedByActorRole,
-        //     gridAreaCode,
-        //     documentType,
-        //     now).ConfigureAwait(false);
-
-        // return messageDelegation is not null ? new MessageDelegationDto(messageDelegation) : null;
+        var processDelegation = await _processDelegationRepository.GetAsync(
+            delegatedByActorNumber,
+            delegatedByActorRole,
+            gridAreaCode,
+            delegatedProcess,
+            cancellationToken).ConfigureAwait(false);
+        return processDelegation is not null ? new ProcessDelegationDto(
+            processDelegation.SequenceNumber,
+            processDelegation.DelegatedProcess,
+            processDelegation.GridAreaCode,
+            processDelegation.StartsAt,
+            processDelegation.StopsAt,
+            new ActorNumberAndRoleDto(processDelegation.DelegatedByActorNumber, processDelegation.DelegatedByActorRole),
+            new ActorNumberAndRoleDto(processDelegation.DelegatedToActorNumber, processDelegation.DelegatedToActorRole)) : null;
     }
 
     private void CreateNewActorCertificate(ActorCertificateCredentialsAssignedDto request)
