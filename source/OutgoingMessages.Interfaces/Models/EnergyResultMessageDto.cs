@@ -23,7 +23,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 public class EnergyResultMessageDto : OutgoingMessageDto
 {
     private EnergyResultMessageDto(
-        ActorNumber receiverId,
+        ActorNumber receiverNumber,
         Guid processId,
         string businessReason,
         ActorRole receiverRole,
@@ -31,7 +31,7 @@ public class EnergyResultMessageDto : OutgoingMessageDto
         MessageId? relatedToMessageId = null)
         : base(
             DocumentType.NotifyAggregatedMeasureData,
-            receiverId,
+            receiverNumber,
             processId,
             businessReason,
             receiverRole,
