@@ -39,6 +39,9 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         _masterDataContext.ProcessDelegations.Add(processDelegation);
     }
 
+    /// <summary>
+    /// Get the latest delegation configuration for the given parameters.
+    /// </summary>
     public async Task<ProcessDelegation?> GetAsync(
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
@@ -58,6 +61,8 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
             .ThenByDescending(y => y.StartsAt)
             .FirstOrDefaultAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
 
+        // To ensure that the delegation is not in the past and if the delegation has been cancelled the StopsAt
+        // will be set to same time as StartsAt
         return delegation?.StopsAt > now ? delegation : null;
     }
 }

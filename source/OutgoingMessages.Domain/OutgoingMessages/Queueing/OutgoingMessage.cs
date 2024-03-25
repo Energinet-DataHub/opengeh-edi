@@ -312,6 +312,9 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             return Receiver.Create(Receiver.Number, actorMessageQueueReceiverRole);
         }
 
+        /// <summary>
+        /// Override the current receiver of the message when the message is delegated to another actor.
+        /// </summary>
         public void DelegateTo(Receiver delegatedToReceiver)
         {
             Receiver = delegatedToReceiver;

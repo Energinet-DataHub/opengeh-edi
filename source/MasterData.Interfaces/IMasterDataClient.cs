@@ -67,7 +67,7 @@ public interface IMasterDataClient
         CancellationToken cancellationToken);
 
     /// <summary>
-    ///    Create a new process delegation configuration.
+    ///    Create a new process delegation.
     /// </summary>
     Task CreateProcessDelegationAsync(ProcessDelegationDto processDelegationDto, CancellationToken cancellationToken);
 

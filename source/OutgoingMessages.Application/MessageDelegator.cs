@@ -42,7 +42,7 @@ public class MessageDelegator
             return messageToEnqueue;
         }
 
-        var delegatedTo = await GetDelegationReceiverAsync(
+        var delegatedTo = await GetDelegatedReceiverAsync(
             messageToEnqueue.DocumentReceiver.Number,
             messageToEnqueue.DocumentReceiver.ActorRole,
             messageToEnqueue.GridAreaCode,
@@ -67,7 +67,7 @@ public class MessageDelegator
         };
     }
 
-    private async Task<Receiver?> GetDelegationReceiverAsync(
+    private async Task<Receiver?> GetDelegatedReceiverAsync(
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
         string gridAreaCode,

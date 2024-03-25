@@ -179,14 +179,18 @@ internal sealed class MasterDataClient : IMasterDataClient
             gridAreaCode,
             processType,
             cancellationToken).ConfigureAwait(false);
-        return processDelegation is not null ? new ProcessDelegationDto(
+
+        if (processDelegation is null)
+            return null;
+
+        return new ProcessDelegationDto(
             processDelegation.SequenceNumber,
             processDelegation.ProcessType,
             processDelegation.GridAreaCode,
             processDelegation.StartsAt,
             processDelegation.StopsAt,
             new ActorNumberAndRoleDto(processDelegation.DelegatedByActorNumber, processDelegation.DelegatedByActorRole),
-            new ActorNumberAndRoleDto(processDelegation.DelegatedToActorNumber, processDelegation.DelegatedToActorRole)) : null;
+            new ActorNumberAndRoleDto(processDelegation.DelegatedToActorNumber, processDelegation.DelegatedToActorRole));
     }
 
     private void CreateNewActorCertificate(ActorCertificateCredentialsAssignedDto request)

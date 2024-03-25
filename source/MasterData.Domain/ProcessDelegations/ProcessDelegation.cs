@@ -18,10 +18,6 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
 
-/// <summary>
-/// A process delegation is used when one actor wishes to delegated a process to another actor.
-/// An example: Actor A wants Actor B to receive all their energy results.
-/// </summary>
 public class ProcessDelegation
 {
     private readonly Guid _id;
