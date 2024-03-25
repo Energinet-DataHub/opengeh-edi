@@ -13,19 +13,17 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public sealed class BusinessReason : EnumerationType
+public sealed class BusinessReason : DataHubType<BusinessReason>
 {
-    // ReSharper disable InconsistentNaming
-    #pragma warning disable IDE1006
-    public static readonly BusinessReason MoveIn = new(nameof(MoveIn), "E65");
-    public static readonly BusinessReason BalanceFixing = new(nameof(BalanceFixing), "D04");
-    public static readonly BusinessReason PreliminaryAggregation = new(nameof(PreliminaryAggregation), "D03");
-    public static readonly BusinessReason WholesaleFixing = new(nameof(WholesaleFixing), "D05");    //Engrosafiksering
-    public static readonly BusinessReason Correction = new(nameof(Correction), "D32");
+    public static readonly BusinessReason MoveIn = new(DataHubNames.BusinessReason.MoveIn, "E65");
+    public static readonly BusinessReason BalanceFixing = new(DataHubNames.BusinessReason.BalanceFixing, "D04");
+    public static readonly BusinessReason PreliminaryAggregation = new(DataHubNames.BusinessReason.PreliminaryAggregation, "D03");
+    public static readonly BusinessReason WholesaleFixing = new(DataHubNames.BusinessReason.WholesaleFixing, "D05"); // Engrosfiksering
+    public static readonly BusinessReason Correction = new(DataHubNames.BusinessReason.Correction, "D32");
 
     #region Unused business reasons
     [Obsolete("Unused, but required for schema compliance")]
@@ -416,26 +414,9 @@ public sealed class BusinessReason : EnumerationType
                 "E84"
      */
     #endregion
-    // ReSharper restore InconsistentNaming
-    #pragma warning restore IDE1006
 
     private BusinessReason(string name, string code)
-     : base(name)
+     : base(name, code)
     {
-        Code = code;
-    }
-
-    public string Code { get; }
-
-    public static BusinessReason FromName(string name)
-    {
-        return GetAll<BusinessReason>().FirstOrDefault(br => br.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(BusinessReason)} {nameof(name)}");
-    }
-
-    public static BusinessReason FromCode(string code)
-    {
-        return GetAll<BusinessReason>().FirstOrDefault(br => br.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{code} is not a valid {typeof(BusinessReason)} {nameof(code)}");
     }
 }

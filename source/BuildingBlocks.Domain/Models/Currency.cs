@@ -13,34 +13,19 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Text.Json.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
-public class Currency : EnumerationType
+public class Currency : DataHubType<Currency>
 {
-    public static readonly Currency DanishCrowns = new(nameof(DanishCrowns), "DKK");
+    public static readonly Currency DanishCrowns = new(DataHubNames.Currency.DanishCrowns, "DKK");
 
     [JsonConstructor]
     private Currency(string name, string code)
-        : base(name)
+        : base(name, code)
     {
-        Code = code;
-    }
-
-    public string Code { get; }
-
-    public static Currency FromName(string name)
-    {
-        return GetAll<Currency>().FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(Currency)} {nameof(name)}");
-    }
-
-    public static Currency FromCode(string code)
-    {
-        return GetAll<Currency>().FirstOrDefault(c => c.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{code} is not a valid {typeof(Currency)} {nameof(code)}");
     }
 }

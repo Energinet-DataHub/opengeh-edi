@@ -13,40 +13,23 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Text.Json.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
-public class MeasurementUnit : EnumerationType
+public class MeasurementUnit : DataHubType<MeasurementUnit>
 {
     // Tariffs are measured in Kwh
-    public static readonly MeasurementUnit Kwh = new(nameof(Kwh), "KWH");
+    public static readonly MeasurementUnit Kwh = new(DataHubNames.MeasurementUnit.Kwh, "KWH");
 
     // Subscription and Fees are measured in pieces
-    public static readonly MeasurementUnit Pieces = new(nameof(Pieces), "H87");
+    public static readonly MeasurementUnit Pieces = new(DataHubNames.MeasurementUnit.Pieces, "H87");
 
     [JsonConstructor]
     private MeasurementUnit(string name, string code)
-        : base(name)
+        : base(name, code)
     {
-        Code = code;
-    }
-
-    public string Code { get; }
-
-    public static MeasurementUnit FromName(string name)
-    {
-        return GetAll<MeasurementUnit>().FirstOrDefault(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException(
-                   $"{name} is not a valid {typeof(MeasurementUnit)} {nameof(name)}");
-    }
-
-    public static MeasurementUnit FromCode(string code)
-    {
-        return GetAll<MeasurementUnit>().FirstOrDefault(t => t.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException(
-                   $"{code} is not a valid {typeof(MeasurementUnit)} {nameof(code)}");
     }
 }

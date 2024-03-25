@@ -54,7 +54,7 @@ public class WholesaleInbox : IWholesaleInbox
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(wholesaleServicesProcess);
-        var serviceBusMessage = ServiceBusMessageFactory.CreateServiceBusMessage(wholesaleServicesProcess);
+        var serviceBusMessage = WholesaleServicesRequestFactory.CreateServiceBusMessage(wholesaleServicesProcess);
         await _senderCreator.SendAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
     }
 }

@@ -25,32 +25,31 @@ using NodaTime.Serialization.Protobuf;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
 
-#pragma warning disable CA1711
-public sealed class ActorCertificateCredentialsAssignedEventProcessor : IIntegrationEventProcessor
-#pragma warning restore CA1711
+public class MessageDelegationConfiguredEventProcessor : IIntegrationEventProcessor
 {
     private readonly IMasterDataClient _masterDataClient;
 
-    public ActorCertificateCredentialsAssignedEventProcessor(IMasterDataClient masterDataClient)
+    public MessageDelegationConfiguredEventProcessor(IMasterDataClient masterDataClient)
     {
         _masterDataClient = masterDataClient;
     }
 
-    public string EventTypeToHandle => ActorCertificateCredentialsAssigned.EventName;
+    public string EventTypeToHandle => ProcessDelegationConfigured.EventName;
 
     public async Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        var message = (ActorCertificateCredentialsAssigned)integrationEvent.Message;
-
-        await _masterDataClient.CreateOrUpdateActorCertificateAsync(
-            new ActorCertificateCredentialsAssignedDto(
-                ActorNumber.Create(message.ActorNumber),
-                EicFunctionMapper.GetMarketRole(message.ActorRole),
-                new CertificateThumbprintDto(message.CertificateThumbprint),
-                message.ValidFrom.ToInstant(),
-                message.SequenceNumber),
+        var message = (ProcessDelegationConfigured)integrationEvent.Message;
+        await _masterDataClient.CreateProcessDelegationAsync(
+            new ProcessDelegationDto(
+                message.SequenceNumber,
+                message.Process.ToString(),
+                message.GridAreaCode,
+                message.StartsAt.ToInstant(),
+                message.StopsAt.ToInstant(),
+                new ActorNumberAndRoleDto(ActorNumber.Create(message.DelegatedByActorNumber), EicFunctionMapper.GetMarketRole(message.DelegatedByActorRole)),
+                new ActorNumberAndRoleDto(ActorNumber.Create(message.DelegatedToActorNumber), EicFunctionMapper.GetMarketRole(message.DelegatedToActorRole))),
             cancellationToken).ConfigureAwait(false);
     }
 }

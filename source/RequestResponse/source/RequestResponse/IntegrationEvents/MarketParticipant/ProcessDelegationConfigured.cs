@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// ReSharper disable once CheckNamespace -- Protobuf is in with another namespace
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 
 public partial class ProcessDelegationConfigured

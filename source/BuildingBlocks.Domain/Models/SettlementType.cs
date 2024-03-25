@@ -13,38 +13,23 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Text.Json.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
-public class SettlementType : EnumerationType
+public class SettlementType : DataHubType<SettlementType>
 {
     // Customer with more than ~100.000 kwH per year
-    public static readonly SettlementType NonProfiled = new(nameof(NonProfiled), "E02");
+    public static readonly SettlementType NonProfiled = new(DataHubNames.SettlementMethod.NonProfiled, "E02");
 
     // Customer with less than ~100.000 kwH per year
-    public static readonly SettlementType Flex = new(nameof(Flex), "D01");
+    public static readonly SettlementType Flex = new(DataHubNames.SettlementMethod.Flex, "D01");
 
     [JsonConstructor]
     private SettlementType(string name, string code)
-        : base(name)
+        : base(name, code)
     {
-        Code = code;
-    }
-
-    public string Code { get; }
-
-    public static SettlementType FromName(string name)
-    {
-        return GetAll<SettlementType>().FirstOrDefault(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(SettlementType)} {nameof(name)}");
-    }
-
-    public static SettlementType FromCode(string code)
-    {
-        return GetAll<SettlementType>().FirstOrDefault(t => t.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{code} is not a valid {typeof(SettlementType)} {nameof(code)}");
     }
 }

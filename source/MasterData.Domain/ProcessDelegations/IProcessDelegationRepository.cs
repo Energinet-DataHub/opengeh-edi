@@ -12,20 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+namespace Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
 
-[Serializable]
-public class ChargeType : DataHubType<ChargeType>
+/// <summary>
+///     Process delegation repository
+/// </summary>
+public interface IProcessDelegationRepository
 {
-    public static readonly ChargeType Subscription = new(DataHubNames.ChargeType.Subscription, "D01");
-    public static readonly ChargeType Fee = new(DataHubNames.ChargeType.Fee, "D02");
-    public static readonly ChargeType Tariff = new(DataHubNames.ChargeType.Tariff, "D03");
-
-    public ChargeType(string name, string code)
-        : base(name, code)
-    {
-    }
+    /// <summary>
+    ///     Create a process delegation
+    /// </summary>
+    void Create(ProcessDelegation processDelegation, CancellationToken cancellationToken);
 }
