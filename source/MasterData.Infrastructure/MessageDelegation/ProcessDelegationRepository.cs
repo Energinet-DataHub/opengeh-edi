@@ -20,7 +20,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.MasterData.Infrastructure.MessageDelegation;
 

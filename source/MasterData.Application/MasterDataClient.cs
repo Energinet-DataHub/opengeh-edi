@@ -24,7 +24,6 @@ using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Microsoft.Extensions.Logging;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.MasterData.Application;
 

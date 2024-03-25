@@ -15,7 +15,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
 

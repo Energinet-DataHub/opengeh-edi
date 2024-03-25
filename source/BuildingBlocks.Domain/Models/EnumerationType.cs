@@ -93,7 +93,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models
             }
 
             var typeMatches = GetType() == obj.GetType();
-            var valueMatches = Name.Equals(otherValue.Name, StringComparison.OrdinalIgnoreCase);
+            var valueMatches = ValueMatches(otherValue);
 
             return typeMatches && valueMatches;
         }
@@ -108,6 +108,13 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models
             ArgumentNullException.ThrowIfNull(obj);
 
             return string.Compare(Name, ((EnumerationType)obj).Name, StringComparison.OrdinalIgnoreCase);
+        }
+
+        protected virtual bool ValueMatches(EnumerationType otherEnumerationType)
+        {
+            ArgumentNullException.ThrowIfNull(otherEnumerationType);
+
+            return Name.Equals(otherEnumerationType.Name, StringComparison.OrdinalIgnoreCase);
         }
 
         private static T Parse<T, TValue>(TValue value, string description, Func<T, bool> predicate)
