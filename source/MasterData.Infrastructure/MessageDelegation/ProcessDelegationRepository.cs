@@ -40,25 +40,31 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
     }
 
     /// <summary>
-    /// Get the latest delegation configuration for the given parameters.
+    /// Get the latest delegation for the given actor number, actor role, grid area code and process type.
     /// </summary>
     public async Task<ProcessDelegation?> GetAsync(
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
-        string gridAreaCode,
+        string? gridAreaCode,
         ProcessType processType,
         CancellationToken cancellationToken)
     {
         var now = _systemDateTimeProvider.Now();
-        var delegation = await _masterDataContext.ProcessDelegations
+        var delegationQuery = _masterDataContext.ProcessDelegations
             .Where(
-                processDelegation => processDelegation.GridAreaCode == gridAreaCode
-                                     && processDelegation.DelegatedByActorNumber == delegatedByActorNumber
+                processDelegation => processDelegation.DelegatedByActorNumber == delegatedByActorNumber
                                      && processDelegation.DelegatedByActorRole == delegatedByActorRole
                                      && processDelegation.ProcessType == processType
-                                     && processDelegation.StartsAt <= now)
-            .OrderByDescending(y => y.SequenceNumber)
-            .ThenByDescending(y => y.StartsAt)
+                                     && processDelegation.StartsAt <= now);
+
+        if (gridAreaCode != null)
+        {
+            delegationQuery = delegationQuery.Where(processDelegation => processDelegation.GridAreaCode == gridAreaCode);
+        }
+
+        var delegation = await delegationQuery
+            .OrderByDescending(processDelegation => processDelegation.SequenceNumber)
+            .ThenByDescending(processDelegation => processDelegation.StartsAt)
             .FirstOrDefaultAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
 
         // To ensure that the delegation is not in the past and if the delegation has been cancelled the StopsAt

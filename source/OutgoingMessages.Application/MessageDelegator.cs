@@ -36,17 +36,12 @@ public class MessageDelegator
     {
         ArgumentNullException.ThrowIfNull(messageToEnqueue);
 
-        // Delegation is currently relevant for messages with a grid area code (integration events). E.g. not request responses messages.
-        if (messageToEnqueue.GridAreaCode is null)
-        {
-            return messageToEnqueue;
-        }
-
         var delegatedTo = await GetDelegatedReceiverAsync(
             messageToEnqueue.DocumentReceiver.Number,
             messageToEnqueue.DocumentReceiver.ActorRole,
             messageToEnqueue.GridAreaCode,
             messageToEnqueue.DocumentType,
+            messageToEnqueue.RelatedToMessageId != null,
             cancellationToken).ConfigureAwait(false);
 
         if (delegatedTo is not null)
@@ -57,12 +52,18 @@ public class MessageDelegator
         return messageToEnqueue;
     }
 
-    private static ProcessType MapToDelegated(DocumentType documentType)
+    private static ProcessType MapDocumentTypeToProcessType(DocumentType documentType, bool isAResponseToARequest)
     {
         return documentType.Name switch
         {
-            nameof(DocumentType.NotifyAggregatedMeasureData) => ProcessType.ReceiveEnergyResults,
-            nameof(DocumentType.NotifyWholesaleServices) => ProcessType.ReceiveEnergyResults,
+            nameof(DocumentType.NotifyAggregatedMeasureData) => isAResponseToARequest
+                ? ProcessType.RequestEnergyResults
+                : ProcessType.ReceiveEnergyResults,
+            nameof(DocumentType.NotifyWholesaleServices) => isAResponseToARequest
+                ? ProcessType.RequestWholesaleResults
+                : ProcessType.ReceiveWholesaleResults,
+            nameof(DocumentType.RejectRequestAggregatedMeasureData) => ProcessType.RequestEnergyResults,
+            nameof(DocumentType.RejectRequestWholesaleSettlement) => ProcessType.RequestWholesaleResults,
             _ => throw new InvalidOperationException("Document type is not supported for delegation"),
         };
     }
@@ -70,15 +71,16 @@ public class MessageDelegator
     private async Task<Receiver?> GetDelegatedReceiverAsync(
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
-        string gridAreaCode,
+        string? gridAreaCode,
         DocumentType documentType,
+        bool isAResponseToARequest,
         CancellationToken cancellationToken)
     {
         var messageDelegation = await _masterDataClient.GetProcessDelegationAsync(
             delegatedByActorNumber,
             delegatedByActorRole,
             gridAreaCode,
-            MapToDelegated(documentType),
+            MapDocumentTypeToProcessType(documentType, isAResponseToARequest),
             cancellationToken)
             .ConfigureAwait(false);
 

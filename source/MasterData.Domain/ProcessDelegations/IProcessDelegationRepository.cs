@@ -29,12 +29,12 @@ public interface IProcessDelegationRepository
     void Create(ProcessDelegation processDelegation, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Get a process delegation
+    ///     Get the latest process delegation
     /// </summary>
     Task<ProcessDelegation?> GetAsync(
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
-        string gridAreaCode,
+        string? gridAreaCode,
         ProcessType processType,
         CancellationToken cancellationToken);
 }
