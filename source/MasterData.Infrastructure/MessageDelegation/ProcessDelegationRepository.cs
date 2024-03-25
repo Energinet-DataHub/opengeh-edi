@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -50,6 +51,10 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         CancellationToken cancellationToken)
     {
         var now = _systemDateTimeProvider.Now();
+
+        // The latest delegation can cover the period from the start date to the end date.
+        // If a delegation relation ship has been cancelled the EndsAt is set to StartsAt, the delegation has stopped.
+        // Therefore, we can not use the EndsAt to determine if the delegation is active in the query.
         var delegationQuery = _masterDataContext.ProcessDelegations
             .Where(
                 processDelegation => processDelegation.DelegatedByActorNumber == delegatedByActorNumber
@@ -62,13 +67,18 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
             delegationQuery = delegationQuery.Where(processDelegation => processDelegation.GridAreaCode == gridAreaCode);
         }
 
-        var delegation = await delegationQuery
+        var latestDelegationForTheNewestStartDate = await delegationQuery
             .OrderByDescending(processDelegation => processDelegation.SequenceNumber)
             .ThenByDescending(processDelegation => processDelegation.StartsAt)
             .FirstOrDefaultAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        // To ensure that the delegation is not in the past and if the delegation has been cancelled the StopsAt
-        // will be set to same time as StartsAt
-        return delegation?.StopsAt > now ? delegation : null;
+        if (latestDelegationForTheNewestStartDate == null)
+            return null;
+
+        // If StopsAt is less than or equal to the current time, the delegation has ended.
+        if (latestDelegationForTheNewestStartDate.StopsAt <= now)
+            return null;
+
+        return latestDelegationForTheNewestStartDate;
     }
 }

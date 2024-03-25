@@ -21,6 +21,9 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
 
+/// <summary>
+/// Responsible for delegating messages to the correct receiver if a delegation relationship exists.
+/// </summary>
 public class MessageDelegator
 {
     private readonly IMasterDataClient _masterDataClient;
