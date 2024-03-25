@@ -13,7 +13,7 @@
       "value": "5790001330552"
     },
     "receiver_MarketParticipant.marketRole.type": {
-      "value": "DDZ"
+      "value": "DGL"
     },
     "sender_MarketParticipant.mRID": {
       "codingScheme": "A10",
@@ -44,7 +44,7 @@
         "start_DateAndOrTime.dateTime": "2023-01-31T23:00:00Z",
         "ChargeType": [
           {
-            "mRID": "EA-001",
+            "mRID": "40000",
             "type": {
               "value": "D03"
             }
