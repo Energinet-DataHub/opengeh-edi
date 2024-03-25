@@ -153,7 +153,7 @@ internal sealed class MasterDataClient : IMasterDataClient
         _processDelegationRepository.Create(
             new ProcessDelegation(
                 processDelegationDto.SequenceNumber,
-                processDelegationDto.ProcessType,
+                processDelegationDto.DelegatedProcess,
                 processDelegationDto.GridAreaCode,
                 processDelegationDto.StartsAt,
                 processDelegationDto.StopsAt,
@@ -185,7 +185,7 @@ internal sealed class MasterDataClient : IMasterDataClient
 
         return new ProcessDelegationDto(
             processDelegation.SequenceNumber,
-            processDelegation.ProcessType,
+            processDelegation.DelegatedProcess,
             processDelegation.GridAreaCode,
             processDelegation.StartsAt,
             processDelegation.StopsAt,

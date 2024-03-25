@@ -40,9 +40,8 @@ public class ProcessDelegationEntityConfiguration : IEntityTypeConfiguration<Pro
         builder.Property(entity => entity.DelegatedToActorRole)
             .HasConversion(actorRole => actorRole.Code, dbValue => ActorRole.FromCode(dbValue));
         builder.Property(entity => entity.GridAreaCode);
-        builder.Property(entity => entity.ProcessType)
-            .HasConversion(delegatedProcess => delegatedProcess.Name, dbValue => ProcessType.FromName(dbValue))
-            .HasColumnName("DelegatedProcess");
+        builder.Property(entity => entity.DelegatedProcess)
+            .HasConversion(delegatedProcess => delegatedProcess.Name, dbValue => ProcessType.FromName(dbValue));
         builder.Property(entity => entity.SequenceNumber);
         builder.Property(entity => entity.StartsAt)
             .HasConversion(startsAt => startsAt.ToDateTimeOffset(), dbValue => Instant.FromDateTimeOffset(dbValue))

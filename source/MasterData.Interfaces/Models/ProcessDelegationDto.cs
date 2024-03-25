@@ -22,7 +22,7 @@ namespace Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 /// </summary>
 public record ProcessDelegationDto(
     int SequenceNumber,
-    ProcessType ProcessType,
+    ProcessType DelegatedProcess,
     string GridAreaCode,
     Instant StartsAt,
     Instant StopsAt,

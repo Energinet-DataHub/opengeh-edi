@@ -54,7 +54,7 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
             .Where(
                 processDelegation => processDelegation.DelegatedByActorNumber == delegatedByActorNumber
                                      && processDelegation.DelegatedByActorRole == delegatedByActorRole
-                                     && processDelegation.ProcessType == processType
+                                     && processDelegation.DelegatedProcess == processType
                                      && processDelegation.StartsAt <= now);
 
         if (gridAreaCode != null)
