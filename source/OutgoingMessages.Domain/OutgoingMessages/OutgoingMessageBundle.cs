@@ -23,25 +23,21 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages
     {
         public OutgoingMessageBundle(
             DocumentType documentType,
-            ActorNumber receiverId,
+            Receiver receiver,
             Guid processId,
             string businessReason,
-            ActorRole receiverRole,
             ActorNumber senderId,
             ActorRole senderRole,
-            bool isPublished,
             BundleId assignedBundleId,
             IReadOnlyCollection<OutgoingMessage> outgoingMessages,
             MessageId? relatedToMessageId = null)
         {
             DocumentType = documentType;
-            ReceiverId = receiverId;
+            Receiver = receiver;
             ProcessId = processId;
             BusinessReason = businessReason;
-            ReceiverRole = receiverRole;
             SenderId = senderId;
             SenderRole = senderRole;
-            IsPublished = isPublished;
             AssignedBundleId = assignedBundleId;
             OutgoingMessages = outgoingMessages;
             Id = Guid.NewGuid();
@@ -50,23 +46,17 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages
 
         public Guid Id { get; }
 
-        public bool IsPublished { get; private set; }
-
-        public ActorNumber ReceiverId { get; }
-
         public DocumentType DocumentType { get; }
 
         public Guid ProcessId { get; }
 
         public string BusinessReason { get; }
 
-        public ActorRole ReceiverRole { get; }
-
         public ActorNumber SenderId { get; }
 
         public ActorRole SenderRole { get; }
 
-        public Receiver Receiver => Receiver.Create(ReceiverId, ReceiverRole);
+        public Receiver Receiver { get; }
 
         public BundleId AssignedBundleId { get; private set; }
 
