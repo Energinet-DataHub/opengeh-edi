@@ -22,7 +22,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 public class WholesaleServicesMessageDto : OutgoingMessageDto
 {
     protected WholesaleServicesMessageDto(
-        ActorNumber receiverId,
+        ActorNumber receiverNumber,
         Guid processId,
         string businessReason,
         ActorRole receiverRole,
@@ -31,7 +31,7 @@ public class WholesaleServicesMessageDto : OutgoingMessageDto
         MessageId? relatedToMessageId = null)
         : base(
             DocumentType.NotifyWholesaleServices,
-            receiverId,
+            receiverNumber,
             processId,
             businessReason,
             receiverRole,
@@ -59,7 +59,7 @@ public class WholesaleServicesMessageDto : OutgoingMessageDto
         ArgumentNullException.ThrowIfNull(businessReason);
 
         return new WholesaleServicesMessageDto(
-            receiverId: receiverNumber,
+            receiverNumber: receiverNumber,
             receiverRole: receiverRole,
             processId: processId,
             businessReason: businessReason,

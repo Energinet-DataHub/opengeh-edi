@@ -24,7 +24,7 @@ public abstract class OutgoingMessageDto
 {
     protected OutgoingMessageDto(
         DocumentType documentType,
-        ActorNumber receiverId,
+        ActorNumber receiverNumber,
         Guid processId,
         string businessReason,
         ActorRole receiverRole,
@@ -33,7 +33,7 @@ public abstract class OutgoingMessageDto
         MessageId? relatedToMessageId = null)
     {
         DocumentType = documentType;
-        ReceiverId = receiverId;
+        ReceiverNumber = receiverNumber;
         ProcessId = processId;
         BusinessReason = businessReason;
         ReceiverRole = receiverRole;
@@ -44,7 +44,7 @@ public abstract class OutgoingMessageDto
 
     public DocumentType DocumentType { get; }
 
-    public ActorNumber ReceiverId { get; }
+    public ActorNumber ReceiverNumber { get; }
 
     public Guid ProcessId { get; }
 
