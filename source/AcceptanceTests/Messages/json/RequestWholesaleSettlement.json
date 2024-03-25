@@ -17,10 +17,10 @@
     },
     "sender_MarketParticipant.mRID": {
       "codingScheme": "A10",
-      "value": "5790000392551"
+      "value": "5790001330552"
     },
     "sender_MarketParticipant.marketRole.type": {
-      "value": "DDQ"
+      "value": "EZ"
     },
     "type": {
       "value": "D21"
@@ -28,15 +28,14 @@
     "Series": [
       {
         "mRID": "{TransactionId}",
-        "aggregationSeries_Period.resolution": "P1M",
         "chargeTypeOwner_MarketParticipant.mRID": {
           "codingScheme": "A10",
-          "value": "570001110111"
+          "value": "5790001330552"
         },
         "end_DateAndOrTime.dateTime": "2023-02-28T23:00:00Z",
         "energySupplier_MarketParticipant.mRID": {
           "codingScheme": "A10",
-          "value": "5799999933318"
+          "value": "5790001687137"
         },
         "meteringGridArea_Domain.mRID": {
           "codingScheme": "NDK",
