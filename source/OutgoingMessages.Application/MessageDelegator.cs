@@ -33,6 +33,9 @@ public class MessageDelegator
         _masterDataClient = masterDataClient;
     }
 
+    /// <summary>
+    /// If a delegation relationship exists, the message is delegated to the correct receiver.
+    /// </summary>
     public async Task<OutgoingMessage> DelegateAsync(
         OutgoingMessage messageToEnqueue,
         CancellationToken cancellationToken)
