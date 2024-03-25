@@ -29,7 +29,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
 using NodaTime;
 using Xunit;
-using DelegatedProcess = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.DelegatedProcess;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
@@ -66,7 +65,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             delegatedTo.ActorNumber,
             delegatedTo.ActorRole,
             message.Series.GridAreaCode,
-            DelegatedProcess.ProcessReceiveEnergyResults,
+            ProcessType.ReceiveEnergyResults,
             SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)),
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)));
 
@@ -99,7 +98,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             delegatedTo.ActorNumber,
             delegatedTo.ActorRole,
             message.Series.GridAreaCode,
-            DelegatedProcess.ProcessReceiveEnergyResults,
+            ProcessType.ReceiveEnergyResults,
             SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)),
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)));
 
@@ -132,7 +131,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             delegatedTo.ActorNumber,
             delegatedTo.ActorRole,
             message.Series.GridAreaCode,
-            DelegatedProcess.ProcessReceiveEnergyResults,
+            ProcessType.ReceiveEnergyResults,
             SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)),
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)));
 
@@ -165,7 +164,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             delegatedTo.ActorNumber,
             delegatedTo.ActorRole,
             message.Series.GridAreaCode,
-            DelegatedProcess.ProcessReceiveEnergyResults,
+            ProcessType.ReceiveEnergyResults,
             SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)),
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)));
 
@@ -198,7 +197,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             delegatedTo.ActorNumber,
             delegatedTo.ActorRole,
             message.Series.GridAreaCode,
-            DelegatedProcess.ProcessReceiveEnergyResults,
+            ProcessType.ReceiveEnergyResults,
             SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(10)),
             SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(1)));
 
@@ -231,7 +230,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             delegatedTo.ActorNumber,
             delegatedTo.ActorRole,
             message.Series.GridAreaCode,
-            DelegatedProcess.ProcessReceiveEnergyResults,
+            ProcessType.ReceiveEnergyResults,
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(1)),
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(10)));
 
@@ -266,7 +265,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             delegatedTo.ActorNumber,
             delegatedTo.ActorRole,
             message.Series.GridAreaCode,
-            DelegatedProcess.ProcessReceiveEnergyResults,
+            ProcessType.ReceiveEnergyResults,
             firstDelegationStartsAt,
             firstDelegationStopsAt);
 
@@ -277,7 +276,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             delegatedTo.ActorNumber,
             delegatedTo.ActorRole,
             message.Series.GridAreaCode,
-            DelegatedProcess.ProcessReceiveEnergyResults,
+            ProcessType.ReceiveEnergyResults,
             firstDelegationStartsAt,
             firstDelegationStartsAt,
             1);
@@ -311,7 +310,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             delegatedTo.ActorNumber,
             delegatedTo.ActorRole,
             message.Series.GridAreaCode,
-            DelegatedProcess.ProcessReceiveEnergyResults,
+            ProcessType.ReceiveEnergyResults,
             SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(10)),
             SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)));
 
@@ -322,7 +321,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             delegatedTo.ActorNumber,
             delegatedTo.ActorRole,
             message.Series.GridAreaCode,
-            DelegatedProcess.ProcessReceiveEnergyResults,
+            ProcessType.ReceiveEnergyResults,
             SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(10)),
             SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(10)),
             1);
@@ -334,7 +333,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             delegatedTo.ActorNumber,
             delegatedTo.ActorRole,
             message.Series.GridAreaCode,
-            DelegatedProcess.ProcessReceiveEnergyResults,
+            ProcessType.ReceiveEnergyResults,
             SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)),
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)),
             1);
@@ -370,7 +369,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             delegatedTo.ActorNumber,
             delegatedTo.ActorRole,
             message.Series.GridAreaCode,
-            DelegatedProcess.ProcessReceiveEnergyResults,
+            ProcessType.ReceiveEnergyResults,
             startsAt,
             startsAt.Plus(Duration.FromDays(5)));
 
@@ -405,7 +404,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             delegatedTo.ActorNumber,
             delegatedTo.ActorRole,
             message.Series.GridAreaCode,
-            DelegatedProcess.ProcessReceiveEnergyResults,
+            ProcessType.ReceiveEnergyResults,
             stopsAt.Minus(Duration.FromDays(5)),
             stopsAt);
 
@@ -440,7 +439,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             delegatedTo.ActorNumber,
             delegatedTo.ActorRole,
             message.Series.GridAreaCode,
-            DelegatedProcess.ProcessReceiveWholesaleResults,
+            ProcessType.ReceiveWholesaleResults,
             stopsAt.Minus(Duration.FromDays(5)),
             stopsAt);
 
@@ -468,7 +467,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             ActorNumber.Create("8884567892341"),
             ActorRole.Delegated,
             "500",
-            DelegatedProcess.ProcessReceiveWholesaleResults,
+            ProcessType.ReceiveWholesaleResults,
             SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)),
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)));
         await AddDelegation(
@@ -477,7 +476,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             ActorNumber.Create("8884567892342"),
             ActorRole.Delegated,
             "600",
-            DelegatedProcess.ProcessReceiveWholesaleResults,
+            ProcessType.ReceiveWholesaleResults,
             SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(4)),
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(14)));
         await AddDelegation(
@@ -486,7 +485,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             ActorNumber.Create("8884567892343"),
             ActorRole.Delegated,
             "700",
-            DelegatedProcess.ProcessReceiveWholesaleResults,
+            ProcessType.ReceiveWholesaleResults,
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)),
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(7)));
     }
@@ -497,7 +496,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         ActorNumber delegatedToActorNumber,
         ActorRole delegatedToActorRole,
         string gridAreaCode,
-        DelegatedProcess delegatedProcess,
+        ProcessType processType,
         Instant startsAt,
         Instant stopsAt,
         int sequenceNumber = 0)
@@ -506,7 +505,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         await masterDataClient.CreateProcessDelegationAsync(
             new ProcessDelegationDto(
                 sequenceNumber,
-                delegatedProcess,
+                processType,
                 gridAreaCode,
                 startsAt,
                 stopsAt,

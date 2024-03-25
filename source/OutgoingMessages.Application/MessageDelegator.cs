@@ -57,12 +57,12 @@ public class MessageDelegator
         return messageToEnqueue;
     }
 
-    private static DelegatedProcess MapToDelegated(DocumentType documentType)
+    private static ProcessType MapToDelegated(DocumentType documentType)
     {
         return documentType.Name switch
         {
-            nameof(DocumentType.NotifyAggregatedMeasureData) => DelegatedProcess.ProcessReceiveEnergyResults,
-            nameof(DocumentType.NotifyWholesaleServices) => DelegatedProcess.ProcessReceiveEnergyResults,
+            nameof(DocumentType.NotifyAggregatedMeasureData) => ProcessType.ReceiveEnergyResults,
+            nameof(DocumentType.NotifyWholesaleServices) => ProcessType.ReceiveEnergyResults,
             _ => throw new InvalidOperationException("Document type is not supported for delegation"),
         };
     }

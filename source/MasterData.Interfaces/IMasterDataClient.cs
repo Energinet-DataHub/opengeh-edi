@@ -78,6 +78,6 @@ public interface IMasterDataClient
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
         string gridAreaCode,
-        DelegatedProcess delegatedProcess,
+        ProcessType processType,
         CancellationToken cancellationToken);
 }

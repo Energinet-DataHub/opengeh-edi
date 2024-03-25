@@ -22,7 +22,6 @@ using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using NodaTime.Serialization.Protobuf;
-using DelegatedProcess = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.DelegatedProcess;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
 
@@ -45,7 +44,7 @@ public class ProcessDelegationConfiguredEventProcessor : IIntegrationEventProces
         await _masterDataClient.CreateProcessDelegationAsync(
             new ProcessDelegationDto(
                 message.SequenceNumber,
-                DelegatedProcess.FromName(message.Process.ToString()),
+                ProcessType.FromName(message.Process.ToString()),
                 message.GridAreaCode,
                 message.StartsAt.ToInstant(),
                 message.StopsAt.ToInstant(),

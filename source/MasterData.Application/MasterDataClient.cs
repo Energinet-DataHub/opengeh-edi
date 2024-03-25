@@ -153,7 +153,7 @@ internal sealed class MasterDataClient : IMasterDataClient
         _processDelegationRepository.Create(
             new ProcessDelegation(
                 processDelegationDto.SequenceNumber,
-                processDelegationDto.ProcessDelegation,
+                processDelegationDto.ProcessTypeDelegation,
                 processDelegationDto.GridAreaCode,
                 processDelegationDto.StartsAt,
                 processDelegationDto.StopsAt,
@@ -170,18 +170,18 @@ internal sealed class MasterDataClient : IMasterDataClient
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
         string gridAreaCode,
-        DelegatedProcess delegatedProcess,
+        ProcessType processType,
         CancellationToken cancellationToken)
     {
         var processDelegation = await _processDelegationRepository.GetAsync(
             delegatedByActorNumber,
             delegatedByActorRole,
             gridAreaCode,
-            delegatedProcess,
+            processType,
             cancellationToken).ConfigureAwait(false);
         return processDelegation is not null ? new ProcessDelegationDto(
             processDelegation.SequenceNumber,
-            processDelegation.DelegatedProcess,
+            processDelegation.ProcessType,
             processDelegation.GridAreaCode,
             processDelegation.StartsAt,
             processDelegation.StopsAt,

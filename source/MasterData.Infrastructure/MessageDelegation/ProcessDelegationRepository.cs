@@ -43,7 +43,7 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
         string gridAreaCode,
-        DelegatedProcess delegatedProcess,
+        ProcessType processType,
         CancellationToken cancellationToken)
     {
         var now = _systemDateTimeProvider.Now();
@@ -52,7 +52,7 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
                 processDelegation => processDelegation.GridAreaCode == gridAreaCode
                                      && processDelegation.DelegatedByActorNumber == delegatedByActorNumber
                                      && processDelegation.DelegatedByActorRole == delegatedByActorRole
-                                     && processDelegation.DelegatedProcess == delegatedProcess
+                                     && processDelegation.ProcessType == processType
                                      && processDelegation.StartsAt <= now)
             .OrderByDescending(y => y.SequenceNumber)
             .ThenByDescending(y => y.StartsAt)

@@ -35,6 +35,6 @@ public interface IProcessDelegationRepository
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
         string gridAreaCode,
-        DelegatedProcess delegatedProcess,
+        ProcessType processType,
         CancellationToken cancellationToken);
 }
