@@ -36,7 +36,7 @@ public class MessageDelegator
     {
         ArgumentNullException.ThrowIfNull(messageToEnqueue);
 
-        // Delegation is only relevant for messages with a grid area code. E.g. not reject messages.
+        // Delegation is currently relevant for messages with a grid area code (integration events). E.g. not request responses messages.
         if (messageToEnqueue.GridAreaCode is null)
         {
             return messageToEnqueue;

@@ -100,6 +100,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202306271334 Create AggregatedMeasureDataProcesses Table.sql" />
     <EmbeddedResource Include="Scripts\Model\202307061430 Create ActorMessageQueue Table.sql" />
     <EmbeddedResource Include="Scripts\Model\202307061435 Create Bundle Table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202403250652 Add gridarea column to Outgoing Messages.sql" />
     <EmbeddedResource Include="Scripts\Model\202403111207 Create ChargeTypes Table.sql" />
     <EmbeddedResource Include="Scripts\Model\202307061440 Create MarketDocument Table.sql" />
     <EmbeddedResource Include="Scripts\Model\202307061450 ReCreate MarketDocument Table.sql" />
