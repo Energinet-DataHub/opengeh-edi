@@ -40,9 +40,6 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         _masterDataContext.ProcessDelegations.Add(processDelegation);
     }
 
-    /// <summary>
-    /// Get the latest delegation for the given actor number, actor role, grid area code and process type.
-    /// </summary>
     public async Task<ProcessDelegation?> GetAsync(
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
@@ -53,7 +50,7 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         var now = _systemDateTimeProvider.Now();
 
         // The latest delegation can cover the period from the start date to the end date.
-        // If a delegation relation ship has been cancelled the EndsAt is set to StartsAt, the delegation has stopped.
+        // If a delegation relationship has been cancelled the EndsAt is set to StartsAt.
         // Therefore, we can not use the EndsAt to determine if the delegation is active in the query.
         var delegationQuery = _masterDataContext.ProcessDelegations
             .Where(
@@ -67,18 +64,18 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
             delegationQuery = delegationQuery.Where(processDelegation => processDelegation.GridAreaCode == gridAreaCode);
         }
 
-        var latestDelegationForTheNewestStartDate = await delegationQuery
+        var delegation = await delegationQuery
             .OrderByDescending(processDelegation => processDelegation.SequenceNumber)
             .ThenByDescending(processDelegation => processDelegation.StartsAt)
             .FirstOrDefaultAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        if (latestDelegationForTheNewestStartDate == null)
+        if (delegation == null)
             return null;
 
         // If StopsAt is less than or equal to the current time, the delegation has ended.
-        if (latestDelegationForTheNewestStartDate.StopsAt <= now)
+        if (delegation.StopsAt <= now)
             return null;
 
-        return latestDelegationForTheNewestStartDate;
+        return delegation;
     }
 }

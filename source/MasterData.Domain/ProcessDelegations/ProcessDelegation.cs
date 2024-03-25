@@ -57,7 +57,7 @@ public class ProcessDelegation
     public int SequenceNumber { get; set; }
 
     /// <summary>
-    /// The type of process that is delegated ex: PROCESS_REQUEST_ENERGY_RESULTS
+    /// The type of process that is delegated.
     /// </summary>
     public ProcessType DelegatedProcess { get; }
 
