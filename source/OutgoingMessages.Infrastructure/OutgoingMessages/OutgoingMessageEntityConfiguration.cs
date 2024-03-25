@@ -56,6 +56,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages
             builder.Property(x => x.ProcessId);
 
             builder.Property(x => x.BusinessReason);
+
             builder.Property(x => x.GridAreaCode);
 
             builder.Property(x => x.SenderId)
