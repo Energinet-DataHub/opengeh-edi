@@ -33,6 +33,7 @@ public static class EicFunctionMapper
             EicFunction.ImbalanceSettlementResponsible => ActorRole.ImbalanceSettlementResponsible,
             EicFunction.SystemOperator => ActorRole.SystemOperator,
             EicFunction.DanishEnergyAgency => ActorRole.DanishEnergyAgency,
+            EicFunction.Delegated => ActorRole.Delegated,
             EicFunction.Unspecified => throw new ArgumentOutOfRangeException(
                 nameof(actorRole),
                 actorRole,
