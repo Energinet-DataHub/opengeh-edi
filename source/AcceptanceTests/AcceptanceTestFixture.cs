@@ -172,6 +172,8 @@ public class AcceptanceTestFixture : IAsyncLifetime
     {
         var httpTokenClient = new HttpClient();
 
+        Console.WriteLine($"clientId: {clientId.Substring(0, 5)}");
+        Console.WriteLine($"clientSe: {clientSecret.Substring(0, 5)}");
         var tokenRetriever = new B2BTokenReceiver(httpTokenClient, azureB2CTenantId, azureEntraBackendAppId);
         var token = await tokenRetriever
             .GetB2BTokenAsync(clientId, clientSecret)
