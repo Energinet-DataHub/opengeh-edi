@@ -16,6 +16,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using NodaTime;
 using NodaTime.Serialization.Protobuf;
+using DelegatedProcess = Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts.DelegatedProcess;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 

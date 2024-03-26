@@ -25,11 +25,11 @@ using NodaTime.Serialization.Protobuf;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
 
-public class MessageDelegationConfiguredEventProcessor : IIntegrationEventProcessor
+public class ProcessDelegationConfiguredEventProcessor : IIntegrationEventProcessor
 {
     private readonly IMasterDataClient _masterDataClient;
 
-    public MessageDelegationConfiguredEventProcessor(IMasterDataClient masterDataClient)
+    public ProcessDelegationConfiguredEventProcessor(IMasterDataClient masterDataClient)
     {
         _masterDataClient = masterDataClient;
     }
@@ -44,12 +44,24 @@ public class MessageDelegationConfiguredEventProcessor : IIntegrationEventProces
         await _masterDataClient.CreateProcessDelegationAsync(
             new ProcessDelegationDto(
                 message.SequenceNumber,
-                message.Process.ToString(),
+                MapToProcessType(message.Process),
                 message.GridAreaCode,
                 message.StartsAt.ToInstant(),
                 message.StopsAt.ToInstant(),
                 new ActorNumberAndRoleDto(ActorNumber.Create(message.DelegatedByActorNumber), EicFunctionMapper.GetMarketRole(message.DelegatedByActorRole)),
                 new ActorNumberAndRoleDto(ActorNumber.Create(message.DelegatedToActorNumber), EicFunctionMapper.GetMarketRole(message.DelegatedToActorRole))),
             cancellationToken).ConfigureAwait(false);
+    }
+
+    private static ProcessType MapToProcessType(DelegatedProcess delegatedProcess)
+    {
+        return delegatedProcess switch
+        {
+            DelegatedProcess.ProcessReceiveEnergyResults => ProcessType.ReceiveEnergyResults,
+            DelegatedProcess.ProcessRequestEnergyResults => ProcessType.RequestEnergyResults,
+            DelegatedProcess.ProcessRequestWholesaleResults => ProcessType.RequestWholesaleResults,
+            DelegatedProcess.ProcessReceiveWholesaleResults => ProcessType.ReceiveWholesaleResults,
+            _ => throw new ArgumentOutOfRangeException(nameof(delegatedProcess), delegatedProcess, null),
+        };
     }
 }

@@ -31,7 +31,7 @@ public static class IntegrationEventExtensions
 {
     public static IServiceCollection AddIntegrationEventModule(this IServiceCollection services)
     {
-        services.AddTransient<IIntegrationEventProcessor, MessageDelegationConfiguredEventProcessor>()
+        services.AddTransient<IIntegrationEventProcessor, ProcessDelegationConfiguredEventProcessor>()
             .AddTransient<IIntegrationEventProcessor, EnergyResultProducedV2Processor>()
             .AddTransient<IIntegrationEventProcessor, MonthlyAmountPerChargeResultProducedV1Processor>()
             .AddTransient<IIntegrationEventProcessor, AmountPerChargeResultProducedV1Processor>()
