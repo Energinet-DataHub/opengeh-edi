@@ -58,7 +58,6 @@ public class WholesaleServicesMessageDto : OutgoingMessageDto
         ArgumentNullException.ThrowIfNull(processId);
         ArgumentNullException.ThrowIfNull(businessReason);
 
-        // TODO retrigger pipeline
         return new WholesaleServicesMessageDto(
             receiverNumber: receiverNumber,
             receiverRole: receiverRole,
