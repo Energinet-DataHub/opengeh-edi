@@ -52,6 +52,7 @@ public static class IntegrationEventExtensions
             ActorCertificateCredentialsAssigned.Descriptor,
             MonthlyAmountPerChargeResultProducedV1.Descriptor,
             AmountPerChargeResultProducedV1.Descriptor,
+            ProcessDelegationConfigured.Descriptor,
         };
 
         services.AddSubscriber<IntegrationEventHandler>(integrationEventDescriptors);
