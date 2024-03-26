@@ -73,7 +73,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
         var systemOperatorId = root.GetValue<string>("SYSTEM_OPERATOR_CLIENT_ID") ?? throw new InvalidOperationException("SYSTEM_OPERATOR_CLIENT_ID is not set in configuration");
         var systemOperatorSecret = root.GetValue<string>("SYSTEM_OPERATOR_CLIENT_SECRET") ?? throw new InvalidOperationException("SYSTEM_OPERATOR_CLIENT_SECRET is not set in configuration");
-        B2BSystemOperatorAuthorizedHttpClient = new AsyncLazy<HttpClient>(() => CreateB2BEnergySupplierAuthorizedHttpClientAsync(azureB2CTenantId, azureEntraBackendAppId, systemOperatorId, systemOperatorSecret, ApiManagementUri));
+        B2BSystemOperatorAuthorizedHttpClient = new AsyncLazy<HttpClient>(() => CreateB2BSystemOperatorAuthorizedHttpClientAsync(azureB2CTenantId, azureEntraBackendAppId, systemOperatorId, systemOperatorSecret, ApiManagementUri));
 
         EbixCertificateThumbprint = root.GetValue<string>("EBIX_CERTIFICATE_THUMBPRINT") ?? "39D64F012A19C6F6FDFB0EA91D417873599D3325";
         EbixCertificatePasswordForMeterDataResponsible = root.GetValue<string>("EBIX_CERTIFICATE_PASSWORD_MDR") ?? throw new InvalidOperationException("EBIX_CERTIFICATE_PASSWORD_MDR is not set in configuration");
@@ -144,6 +144,26 @@ public class AcceptanceTestFixture : IAsyncLifetime
     }
 
     private static async Task<HttpClient> CreateB2BEnergySupplierAuthorizedHttpClientAsync(
+        string azureB2CTenantId,
+        string azureEntraBackendAppId,
+        string clientId,
+        string clientSecret,
+        Uri baseAddress)
+    {
+        var httpTokenClient = new HttpClient();
+
+        var tokenRetriever = new B2BTokenReceiver(httpTokenClient, azureB2CTenantId, azureEntraBackendAppId);
+        var token = await tokenRetriever
+            .GetB2BTokenAsync(clientId, clientSecret)
+            .ConfigureAwait(false);
+
+        var httpClient = new HttpClient();
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+        httpClient.BaseAddress = baseAddress;
+        return httpClient;
+    }
+
+    private static async Task<HttpClient> CreateB2BSystemOperatorAuthorizedHttpClientAsync(
         string azureB2CTenantId,
         string azureEntraBackendAppId,
         string clientId,
