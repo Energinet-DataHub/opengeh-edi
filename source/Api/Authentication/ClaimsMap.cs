@@ -29,6 +29,7 @@ public static class ClaimsMap
         { "balanceresponsibleparty", ActorRole.BalanceResponsibleParty },
         { "systemoperator", ActorRole.SystemOperator },
         { "gridoperator", ActorRole.GridOperator },
+        { "delegated", ActorRole.Delegated },
     };
 
     public static string UserId => "azp";
