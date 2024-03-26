@@ -14,6 +14,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
 
@@ -26,4 +27,14 @@ public interface IProcessDelegationRepository
     ///     Create a process delegation
     /// </summary>
     void Create(ProcessDelegation processDelegation, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Get the latest delegation from today for the given actor number, actor role, grid area code and process type.
+    /// </summary>
+    Task<ProcessDelegation?> GetAsync(
+        ActorNumber delegatedByActorNumber,
+        ActorRole delegatedByActorRole,
+        string? gridAreaCode,
+        ProcessType processType,
+        CancellationToken cancellationToken);
 }
