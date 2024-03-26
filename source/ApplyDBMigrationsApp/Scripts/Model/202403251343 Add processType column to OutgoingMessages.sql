@@ -4,11 +4,11 @@ ALTER TABLE [dbo].[OutgoingMessages]
 go
 
 UPDATE [dbo].[OutgoingMessages]
-SET [MessageCreatedFromProcess] = 'CalculatedEnergyResults'
+SET [MessageCreatedFromProcess] = 'ReceiveEnergyResults'
 WHERE [DocumentType] = 'NotifyAggregatedMeasureData' OR [DocumentType] = 'RejectRequestAggregatedMeasureData';
 
 UPDATE [dbo].[OutgoingMessages]
-SET [MessageCreatedFromProcess] = 'CalculatedWholesaleResults'
+SET [MessageCreatedFromProcess] = 'ReceiveWholesaleResults'
 WHERE [DocumentType] = 'NotifyWholesaleServices' OR [DocumentType] = 'RejectRequestWholesaleSettlement';
 
 go
