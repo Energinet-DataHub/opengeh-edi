@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.MasterData.Interfaces.Models;
@@ -21,7 +22,7 @@ namespace Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 /// </summary>
 public record ProcessDelegationDto(
     int SequenceNumber,
-    string ProcessDelegationType,
+    ProcessType DelegatedProcess,
     string GridAreaCode,
     Instant StartsAt,
     Instant StopsAt,
