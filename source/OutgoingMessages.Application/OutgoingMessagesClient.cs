@@ -69,7 +69,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             acceptedEnergyResultMessage,
             _serializer,
             _systemDateTimeProvider.Now());
-        var messageId = await _messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
+        var messageId = await _messageEnqueuer.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
         return messageId;
     }
 
@@ -81,7 +81,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             rejectedEnergyResultMessage,
             _serializer,
             _systemDateTimeProvider.Now());
-        var messageId = await _messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
+        var messageId = await _messageEnqueuer.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
         return messageId;
     }
 
@@ -94,7 +94,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             _serializer,
             _systemDateTimeProvider.Now());
 
-        var messageId = await _messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
+        var messageId = await _messageEnqueuer.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
         return messageId;
     }
 
@@ -106,7 +106,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             energyResultMessage,
             _serializer,
             _systemDateTimeProvider.Now());
-        var messageId = await _messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
+        var messageId = await _messageEnqueuer.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return messageId;
     }
@@ -121,7 +121,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             _systemDateTimeProvider.Now());
         foreach (var message in messages)
         {
-            await _messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
+            await _messageEnqueuer.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
         }
 
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -135,7 +135,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             acceptedWholesaleServicesMessage,
             _serializer,
             _systemDateTimeProvider.Now());
-        var messageId = await _messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
+        var messageId = await _messageEnqueuer.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
         return messageId;
     }
 }

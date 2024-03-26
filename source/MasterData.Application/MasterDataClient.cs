@@ -153,7 +153,7 @@ internal sealed class MasterDataClient : IMasterDataClient
         _processDelegationRepository.Create(
             new ProcessDelegation(
                 processDelegationDto.SequenceNumber,
-                processDelegationDto.ProcessDelegationType,
+                processDelegationDto.DelegatedProcess,
                 processDelegationDto.GridAreaCode,
                 processDelegationDto.StartsAt,
                 processDelegationDto.StopsAt,
@@ -164,6 +164,33 @@ internal sealed class MasterDataClient : IMasterDataClient
             cancellationToken);
 
         await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task<ProcessDelegationDto?> GetProcessDelegationAsync(
+        ActorNumber delegatedByActorNumber,
+        ActorRole delegatedByActorRole,
+        string? gridAreaCode,
+        ProcessType processType,
+        CancellationToken cancellationToken)
+    {
+        var processDelegation = await _processDelegationRepository.GetAsync(
+            delegatedByActorNumber,
+            delegatedByActorRole,
+            gridAreaCode,
+            processType,
+            cancellationToken).ConfigureAwait(false);
+
+        if (processDelegation is null)
+            return null;
+
+        return new ProcessDelegationDto(
+            processDelegation.SequenceNumber,
+            processDelegation.DelegatedProcess,
+            processDelegation.GridAreaCode,
+            processDelegation.StartsAt,
+            processDelegation.StopsAt,
+            new ActorNumberAndRoleDto(processDelegation.DelegatedByActorNumber, processDelegation.DelegatedByActorRole),
+            new ActorNumberAndRoleDto(processDelegation.DelegatedToActorNumber, processDelegation.DelegatedToActorRole));
     }
 
     private void CreateNewActorCertificate(ActorCertificateCredentialsAssignedDto request)

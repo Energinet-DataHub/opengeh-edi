@@ -45,6 +45,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages
 
             builder.Property(x => x.BusinessReason);
 
+            builder.Property(x => x.GridAreaCode);
+
             builder.Property(x => x.SenderId)
                 .HasConversion(
                     toDbValue => toDbValue.Value,
@@ -69,6 +71,10 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages
                 .HasConversion(
                     toDbValue => toDbValue != null ? toDbValue.Value : null,
                     fromDbValue => fromDbValue != null ? MessageId.Create(fromDbValue) : null);
+            builder.Property(x => x.MessageCreatedFromProcess)
+                .HasConversion(
+                    toDbValue => toDbValue.Name,
+                    fromDbValue => ProcessType.FromName(fromDbValue));
 
             builder.OwnsOne(
                 o => o.DocumentReceiver,
